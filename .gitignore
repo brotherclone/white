@@ -1,0 +1,11 @@
+.venv
+.idea
+# Ignore staged raw materials directory
+/staged_raw_materials/
+
+# Ignore common media file types
+*.wav
+*.mp3
+*.mp4
+*.flac
+*.midi
