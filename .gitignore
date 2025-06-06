@@ -9,3 +9,6 @@
 *.mp4
 *.flac
 *.midi
+*.mid
+.DS_Store
+*.pyc
