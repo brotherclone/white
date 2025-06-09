@@ -1,10 +1,10 @@
 import datetime
 import yaml
 import os
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from app.objects.rainbow_color import RainbowColor
 
-the_artist = "The Earthly Frames"
+THE_ARTIST = "The Earthly Frames"
 
 rainbow_table_title_dict ={
     RainbowColor.Z: "The Conjurer's Thread",
@@ -18,40 +18,64 @@ rainbow_table_title_dict ={
     RainbowColor.A: "TBD"
 }
 
-class MetaDataModel(BaseModel):
+class RainbowSongTrackModel(BaseModel):
+    id: int
+    description: str
+    audio_file: str | None = None
+    audio_file_path: str | None = None
+    group: bool | str = False
+    midi_file: str | None = None
+    midi_group_file: str | None = None
+
+class RainbowSongStructureModel(BaseModel):
+    section_name: str
+    start_time: str | datetime.timedelta
+    end_time: str | datetime.timedelta
+    duration: datetime.timedelta | None = None
+    sequence: None | int = None
+
+class RainbowMetaDataModel(BaseModel):
     bpm: int
-    tempo: str # ToDo: Model better if useful
-    key: str # ToDo: Model better if useful
-    rainbow_color: RainbowColor
-    artist: str
-    album_title: str
-    song_title: str
-    release_date: str
+    tempo: str
+    key: str
+    rainbow_color: str | RainbowColor | None = None
+    artist: str | None = None
+    album_title: str | None = None
+    title: str
+    release_date: str | datetime.date
     album_sequence: int
-    main_audio_file: str
-    TRT: str  # Total Running Time
+    main_audio_file: str | None = None
+    TRT: str | datetime.timedelta
     vocals: bool
     lyrics: bool
+    structure: list[RainbowSongStructureModel]
+    mood: list[str]
+    sounds_like: list[str]
+    genres: list[str]
+    lrc_file: bool | str = False
+    audio_tracks: list[RainbowSongTrackModel] | None =None
 
 class RainbowSongMeta(BaseModel):
     yaml_file_name: str
     base_path: str
     track_materials_path: str
-    data: MetaDataModel | None = None
+    data: RainbowMetaDataModel | None = None
 
     def __init__(self, /, **data):
+        global yaml_path
         super().__init__(**data)
-        with(open(os.path.join(self.base_path,self.track_materials_path,self.yaml_file_name), 'r')) as f:
-            self.data = yaml.safe_load(f)
-        self.data['artist'] = the_artist
-        album = RainbowColor.get_key_by_value(self.data['rainbow_color'])
-        k: RainbowColor = RainbowColor[album] # type: ignore
-        self.data['album_title'] = rainbow_table_title_dict[k]
+        try:
+            yaml_path = os.path.join(self.base_path, self.track_materials_path, self.yaml_file_name)
+            with open(yaml_path, 'r') as f:
+                raw_data = yaml.safe_load(f)
+            self.data = RainbowMetaDataModel(**raw_data)
+            self.data.artist = THE_ARTIST
+            album = RainbowColor.get_key_by_value(self.data.rainbow_color)  # type: ignore
+            k: RainbowColor = RainbowColor[album]  # type: ignore
+            self.data.album_title = rainbow_table_title_dict[k]
+        except FileNotFoundError:
+            raise FileNotFoundError(f"YAML file not found: {yaml_path}")
+        except ValidationError as e:
+            raise ValueError(f"Invalid YAML structure: {e}")
 
-    def get_release_date(self):
-        return datetime.datetime.strptime(self.data['release_date'], "%Y-%m-%d").date() if self.data else None
 
-    def get_duration(self) -> datetime.timedelta:
-        if self.data and self.data['TRT']:
-            return datetime.timedelta(seconds=self.data['TRT'])
-        return datetime.timedelta(0)
