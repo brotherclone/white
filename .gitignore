@@ -2,7 +2,7 @@
 .idea
 # Ignore staged raw materials directory
 /staged_raw_materials/
-
+/working/
 # Ignore common media file types
 *.wav
 *.mp3

@@ -94,6 +94,7 @@ class RainbowSong(BaseModel):
                                 f"Extracted audio segment from '{audio_track.description}' for song '{self.meta_data.data.title}'")
                             file_name = f"{safe_filename(self.meta_data.data.title)}_{safe_filename(an_extract.extract_data.section_name)}_{audio_track.id}.wav"
                             segment.export(os.path.join(AUDIO_WORKING_DIR, file_name), format="wav")
+
                             #ToDO: add to extract data
 
 
