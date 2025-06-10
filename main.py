@@ -365,10 +365,8 @@
 
 import os
 import app.objects.rainbow_song_meta
-
+import app.objects.rainbow_song
 
 if __name__ == "__main__":
-    test = app.objects.rainbow_song_meta.RainbowSongMeta(yaml_file_name="01_01.yml", base_path=os.path.join(os.path.dirname(__file__), "staged_raw_material"), track_materials_path="01_01")
-    print(test)
-    print(test.get_release_date())
-    print(test.get_duration())
+    meta = app.objects.rainbow_song_meta.RainbowSongMeta(yaml_file_name="01_01.yml", base_path=os.path.join(os.path.dirname(__file__), "staged_raw_material"), track_materials_path="01_01")
+    songs = app.objects.rainbow_song.RainbowSong(meta_data=meta, extracts=None)
