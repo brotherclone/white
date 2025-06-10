@@ -69,6 +69,9 @@ class RainbowSong(BaseModel):
                                 lyrics_in_section[add_to_next_segment_index]['content'] = line
                             else:
                                 lyrics_in_section.append({'time': lyric_time_stamp, 'content': line})
+
+            # ToDo: Add to extract data
+
         except Exception as e:
             print(f"✗ Failed to extract lyrics: {e}")
 
@@ -95,7 +98,7 @@ class RainbowSong(BaseModel):
                             file_name = f"{safe_filename(self.meta_data.data.title)}_{safe_filename(an_extract.extract_data.section_name)}_{audio_track.id}.wav"
                             segment.export(os.path.join(AUDIO_WORKING_DIR, file_name), format="wav")
 
-                            #ToDO: add to extract data
+                            #ToDo: add to extract data
 
 
                     except Exception as e:
@@ -117,21 +120,6 @@ class RainbowSong(BaseModel):
                 # print(f"Extracting MIDI from track '{audio_track.description}' {midi_file_path} for song '{self.meta_data.data.title}'")
             # ToDo: Handle grouped MIDI files if necessary
 
-    def create_audio_chunk(self):
-        """
-        Create audio chunks from the song.
-        This is a placeholder for actual audio chunk creation logic.
-        """
-        # Placeholder for audio chunk creation logic
-        print(f"Created audio chunks for song '{self.meta_data.data.title}'")
-
-    def create_midi_chunk(self):
-        """
-        Create MIDI chunks from the song.
-        This is a placeholder for actual MIDI chunk creation logic.
-        """
-        # Placeholder for MIDI chunk creation logic
-        print(f"Created MIDI chunks for song '{self.meta_data.data.title}'")
 
     def create_temporal_data_frame(self):
         """
