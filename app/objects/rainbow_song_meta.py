@@ -23,7 +23,6 @@ class RainbowSongTrackModel(BaseModel):
     description: str
     audio_file: str | None = None
     audio_file_path: str | None = None
-    group: bool | str = False # ToDo: remove this
     midi_file: str | None = None
     midi_group_file: str | None = None
 
@@ -59,7 +58,7 @@ class RainbowSongMeta(BaseModel):
     yaml_file_name: str
     base_path: str
     track_materials_path: str
-    data: RainbowMetaDataModel | None = None # Why not just put the model here?
+    data: RainbowMetaDataModel | None = None
 
     def __init__(self, /, **data):
         yaml_path: str

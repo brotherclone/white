@@ -21,3 +21,8 @@ def compute_rms(samples):
         print("Warning: mean_square is not positive or is NaN after filtering.")
         return 0.0
     return np.sqrt(mean_square)
+
+def get_microseconds_per_beat(bpm):
+    if bpm <= 0:
+        raise ValueError("BPM must be a positive number.")
+    return 60000000 / bpm  # Convert BPM to microseconds per beat

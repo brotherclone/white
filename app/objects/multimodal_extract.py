@@ -1,12 +1,18 @@
 import datetime
 from typing import List, Any
-
+from enum import Enum
 from pydantic import BaseModel
 
+class ExtractionContentType(Enum):
+    AUDIO = "audio"
+    MIDI = "midi"
+    SHARED_MIDI = "shared_midi"
+    LYRICS = "lyrics"
 
 class MultimodalExtractEventModel(BaseModel):
-    time: str
-    type: str
+    start_time: datetime.timedelta | float | None = None
+    end_time: datetime.timedelta | float | None = None
+    type: ExtractionContentType | str | None = None
     content: Any
 
 class MultimodalExtractModel(BaseModel):
@@ -16,9 +22,6 @@ class MultimodalExtractModel(BaseModel):
     duration: datetime.timedelta | None = None
     sequence: int | None = None
     section_name: str | None = None
-    audio_segments: List[str] | None = None # Todo: Fix type
-    midi_segments: List[str] | None = None   # Todo: Fix type
-    lyric_segment: list[dict[str, datetime.timedelta | str | Any]] | None = None
 
 class MultimodalExtract(BaseModel):
     extract_data: MultimodalExtractModel # Why not just put the model here?

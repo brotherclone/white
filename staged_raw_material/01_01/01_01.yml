@@ -113,7 +113,7 @@ audio_tracks:
   - id: 7
     description: "Wurlitzer style home organ"
     audio_file: "01_01_09.wav"
-    midi_file: "01_01_organ.mid"
+    midi_file: "test-organ.mid"
   - id: 8
     description: "Physical modeled synth sound. Note this sound may contribute to the unexplained ghost overtone"
     audio_file: "01_01_10.wav"
@@ -129,7 +129,7 @@ audio_tracks:
   - id: 11
     description: "Pitched and sampled guitar sound"
     audio_file: "01_01_12.wav"
-    midi_file: "01_01_guitar_sampled.mid"
+    midi_file: "01_01_guitar_sample.mid"
   - id: 12
     description: "heavily spring-reverb electric guitar"
     audio_file: "01_01_15.wav"
@@ -147,35 +147,28 @@ audio_tracks:
   - id: 16
     description: "sizzling ride and crash cymbals"
     audio_file: "01_01_20.wav"
-    group: "drums"
     midi_group_file: "01_01_drums.mid"
   - id: 17
     description: "leaky noise gate may get other drum sounds"
     audio_file: "01_01_21.wav"
-    group: "drums"
     midi_group_file: "01_01_drums.mid"
   - id: 18
     description: "not a great mic placement but adds character to kick"
     audio_file: "01_01_22.wav"
-    group: "drums"
     midi_group_file: "01_01_drums.mid"
   - id: 19
     description: "ungated mic over hi-hat"
     audio_file: "01_01_23.wav"
-    group: "drums"
     midi_group_file: "01_01_drums.mid"
   - id: 20
     description: "gated with loose snare"
     audio_file: "01_01_24.wav"
-    group: "drums"
     midi_group_file: "01_01_drums.mid"
   - id: 21
     description: "gated, but roomy mic picking up multiple hits"
     audio_file: "01_01_25.wav"
-    group: "drums"
     midi_group_file: "01_01_drums.mid"
   - id: 20
     description: "big, over-modulated floor tom"
     audio_file: "01_01_26.wav"
-    group: "drums"
     midi_group_file: "01_01_drums.mid"
