@@ -129,7 +129,6 @@ audio_tracks:
   - id: 11
     description: "Pitched and sampled guitar sound"
     audio_file: "01_01_12.wav"
-    group: false
     midi_file: "01_01_guitar_sampled.mid"
   - id: 12
     description: "heavily spring-reverb electric guitar"

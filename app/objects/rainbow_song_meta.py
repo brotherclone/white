@@ -23,7 +23,7 @@ class RainbowSongTrackModel(BaseModel):
     description: str
     audio_file: str | None = None
     audio_file_path: str | None = None
-    group: bool | str = False
+    group: bool | str = False # ToDo: remove this
     midi_file: str | None = None
     midi_group_file: str | None = None
 
@@ -59,10 +59,10 @@ class RainbowSongMeta(BaseModel):
     yaml_file_name: str
     base_path: str
     track_materials_path: str
-    data: RainbowMetaDataModel | None = None
+    data: RainbowMetaDataModel | None = None # Why not just put the model here?
 
     def __init__(self, /, **data):
-        global yaml_path
+        yaml_path: str
         super().__init__(**data)
         try:
             yaml_path = os.path.join(self.base_path, self.track_materials_path, self.yaml_file_name)
@@ -74,7 +74,7 @@ class RainbowSongMeta(BaseModel):
             k: RainbowColor = RainbowColor[album]  # type: ignore
             self.data.album_title = rainbow_table_title_dict[k]
         except FileNotFoundError:
-            raise FileNotFoundError(f"YAML file not found: {yaml_path}")
+            raise FileNotFoundError(f"YAML file not found")
         except ValidationError as e:
             raise ValueError(f"Invalid YAML structure: {e}")
 

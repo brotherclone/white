@@ -1,8 +1,7 @@
-from typing import List
+import datetime
+from typing import List, Any
 
 from pydantic import BaseModel
-
-from app.objects.rainbow_song_meta import RainbowSongMeta
 
 
 class MultimodalExtractEventModel(BaseModel):
@@ -10,17 +9,19 @@ class MultimodalExtractEventModel(BaseModel):
     type: str
     content: str
 
-
 class MultimodalExtractModel(BaseModel):
-    events: List[MultimodalExtractEventModel]
-
+    events: List[MultimodalExtractEventModel] | None = None
+    start_time:  datetime.timedelta | None = None
+    end_time:  datetime.timedelta | None = None
+    duration: datetime.timedelta | None = None
+    sequence: int | None = None
+    section_name: str | None = None
+    audio_segments: List[str] | None = None
+    midi_segments: List[str] | None = None   # Todo: Fix type
+    lyric_segment: list[dict[str, datetime.timedelta | str | Any]] | None = None
 
 class MultimodalExtract(BaseModel):
+    extract_data: MultimodalExtractModel # Why not just put the model here?
     def __init__(self, /, **data):
         super().__init__(**data)
 
-    def extract(self) -> MultimodalExtractModel:
-        """
-        Extracts the multimodal data and returns a structured model.
-        """
-        return MultimodalExtractModel(events=self.events)
