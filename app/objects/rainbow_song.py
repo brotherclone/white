@@ -39,8 +39,8 @@ class RainbowSong(BaseModel):
             extract = MultimodalExtract(extract_data=ext)
             self.extracts.append(extract)
         for extract in self.extracts:
-            # self.extract_lyrics(extract)
-            # self.extract_audio(extract)
+            self.extract_lyrics(extract)
+            self.extract_audio(extract)
             self.extract_midi(extract)
 
     def extract_lyrics(self, an_extract: MultimodalExtract) -> None:
@@ -52,7 +52,8 @@ class RainbowSong(BaseModel):
             with open(lrc, 'r', encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
-                    if line.startswith('[') and ']' in line:
+                    match = re.match(r'^\[(\d+:\d+(?:\.\d+)?|\d+(?:\.\d+)?)\](.*)', line)
+                    if match:
                         if re.match(JUST_NUMBERS_PATTERN, line[1]):
                             lyric_time_stamp = lrc_to_seconds(line)
                             if an_extract.extract_data.end_time >= lyric_time_stamp >= an_extract.extract_data.start_time:
@@ -64,40 +65,67 @@ class RainbowSong(BaseModel):
                                 lyrics_in_section[add_to_next_segment_index]['content'] = line
                             else:
                                 lyrics_in_section.append({'time': lyric_time_stamp, 'content': line})
-            lyric_extract_event = MultimodalExtractEventModel(start_time=an_extract.extract_data.start_time, end_time=an_extract.extract_data.end_time, type=ExtractionContentType.LYRICS, content=lyrics_in_section)
-            an_extract.extract_data.events.append(lyric_extract_event)
 
+            if len(lyrics_in_section) > 0:
+                lyric_extract_event = MultimodalExtractEventModel(start_time=an_extract.extract_data.start_time, end_time=an_extract.extract_data.end_time, type=ExtractionContentType.LYRICS, content=lyrics_in_section)
+                an_extract.extract_data.events.append(lyric_extract_event)
+                lyrics_in_section.sort(key=lambda x: x['time'])
         except Exception as e:
             print(f"✗ Failed to extract lyrics: {e}")
 
+
     def extract_audio(self, an_extract: MultimodalExtract) -> None:
+        tracks = []
+        if self.meta_data.data.main_audio_file:
+            tracks.append({
+                'audio_file': self.meta_data.data.main_audio_file,
+                'id': 'mix',
+                'description': 'Stereo Mix',
+                'event_type': ExtractionContentType.MIX_AUDIO,
+                'file_suffix': ''
+            })
         for audio_track in self.meta_data.data.audio_tracks or []:
             if audio_track.audio_file:
-                audio_file_path = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path,
-                                               audio_track.audio_file)
+                tracks.append({
+                    'audio_file': audio_track.audio_file,
+                    'id': audio_track.id,
+                    'description': audio_track.description,
+                    'event_type': ExtractionContentType.TRACK_AUDIO,
+                    'file_suffix': f"_{audio_track.id}"
+                })
+
+        for track in tracks:
+            audio_file_path = os.path.join(
+                self.meta_data.base_path,
+                self.meta_data.track_materials_path,
+                track['audio_file']
+            )
+            try:
+                audio_segment = AudioSegment.from_file(audio_file_path)
+                start_ms = an_extract.extract_data.start_time.total_seconds() * 1000
+                end_ms = an_extract.extract_data.end_time.total_seconds() * 1000
+                segment = audio_segment[start_ms:end_ms]
                 try:
-                    audio_segment = AudioSegment.from_file(audio_file_path)
-                    start_time = an_extract.extract_data.start_time
-                    end_time = an_extract.extract_data.end_time
-                    segment = audio_segment[
-                              start_time.total_seconds() * 1000:end_time.total_seconds() * 1000]  # Convert to milliseconds
-                    try:
-                        segment = segment.set_frame_rate(44100)  # Ensure the audio segment is at 44100 Hz
-                        if has_significant_audio(segment):
-                            file_name = f"{safe_filename(self.meta_data.data.title)}_{safe_filename(an_extract.extract_data.section_name)}_{audio_track.id}.wav"
-                            segment.export(os.path.join(AUDIO_WORKING_DIR, file_name), format="wav")
-                            audio_extract_event = MultimodalExtractEventModel(
-                                start_time=an_extract.extract_data.start_time,
-                                end_time=an_extract.extract_data.end_time,
-                                type=ExtractionContentType.AUDIO,
-                                content=file_name
-                            )
-                            an_extract.extract_data.events.append(audio_extract_event)
-                    except Exception as e:
-                        print(f"✗ Failed to set frame rate for track '{audio_track.description}': {e}")
-                        continue
+                    segment = segment.set_frame_rate(44100)
+                    if has_significant_audio(segment):
+                        file_name = f"{safe_filename(self.meta_data.data.title)}_{safe_filename(an_extract.extract_data.section_name)}{track['file_suffix']}.wav"
+                        segment.export(os.path.join(AUDIO_WORKING_DIR, file_name), format="wav")
+                        audio_event = MultimodalExtractEventModel(
+                            start_time=an_extract.extract_data.start_time,
+                            end_time=an_extract.extract_data.end_time,
+                            type=track['event_type'],
+                            content={
+                                'file_name':file_name,
+                                'description': track['description'],
+                                'id': track['id'],
+                                'source_audio_file': track['audio_file'],
+                            }
+                        )
+                        an_extract.extract_data.events.append(audio_event)
                 except Exception as e:
-                    print(f"✗ Failed to extract audio from track '{audio_track.description}': {e}")
+                    print(f"✗ Failed to set frame rate for track '{track['description']}': {e}")
+            except Exception as e:
+                print(f"✗ Failed to extract audio from track '{track['description']}': {e}")
 
     def extract_midi(self, an_extract: MultimodalExtract) -> None:
         """
@@ -108,6 +136,7 @@ class RainbowSong(BaseModel):
             if audio_track.midi_file and audio_track.midi_group_file is None:
                 midi_file_path = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path,
                                               audio_track.midi_file)
+                print(f"Extracting MIDI from: {midi_file_path}")
                 try:
                     midi = mido.MidiFile(midi_file_path)
                     ticks_per_beat = midi.ticks_per_beat
@@ -126,6 +155,7 @@ class RainbowSong(BaseModel):
                                 end_sec = an_extract.extract_data.end_time.total_seconds()
                                 if start_sec <= midi_note_start_time <= end_sec:
                                     midi_note = {
+                                        'track': t.name,
                                         'note': msg.note,
                                         'velocity': msg.velocity,
                                         'start_time': midi_note_start_time,
@@ -144,19 +174,12 @@ class RainbowSong(BaseModel):
                    print(f"✗ Failed to load MIDI file '{audio_track.midi_file}': {e}")
             # ToDo: Handle grouped MIDI files if necessary
 
-
-    def create_temporal_data_frame(self):
-        """
-        Create a temporal data frame from the song.
-        This is a placeholder for actual temporal data frame creation logic.
-        """
-        # Placeholder for temporal data frame creation logic
-        print(f"Created temporal data frame for song '{self.meta_data.data.title}'")
-
-    def create_training_data(self):
-        """
-        Create training data from the song.
-        This is a placeholder for actual training data creation logic.
-        """
-        # Placeholder for training data creation logic
-        print(f"Created training data for song '{self.meta_data.data.title}'")
+    def create_training_data(self) -> None:
+        for extract in self.extracts:
+            for event in extract.extract_data.events:
+                if event.type == ExtractionContentType.LYRICS:
+                    print(f"Lyric Events '{extract.extract_data.section_name}': {event.content}")
+                elif event.type == ExtractionContentType.TRACK_AUDIO or event.type == ExtractionContentType.MIX_AUDIO:
+                    print(f"Audio Events '{extract.extract_data.section_name}': {event.content}")
+                elif event.type == ExtractionContentType.MIDI:
+                    print(f"MIDI events '{extract.extract_data.section_name}': {event.content}")

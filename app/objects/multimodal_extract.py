@@ -4,7 +4,8 @@ from enum import Enum
 from pydantic import BaseModel
 
 class ExtractionContentType(Enum):
-    AUDIO = "audio"
+    TRACK_AUDIO = "track_audio"
+    MIX_AUDIO = "mix_audio"
     MIDI = "midi"
     SHARED_MIDI = "shared_midi"
     LYRICS = "lyrics"
@@ -24,7 +25,7 @@ class MultimodalExtractModel(BaseModel):
     section_name: str | None = None
 
 class MultimodalExtract(BaseModel):
-    extract_data: MultimodalExtractModel # Why not just put the model here?
+    extract_data: MultimodalExtractModel
     def __init__(self, /, **data):
         super().__init__(**data)
 

@@ -113,7 +113,7 @@ audio_tracks:
   - id: 7
     description: "Wurlitzer style home organ"
     audio_file: "01_01_09.wav"
-    midi_file: "test-organ.mid"
+    midi_file: "01_01_organ.mid"
   - id: 8
     description: "Physical modeled synth sound. Note this sound may contribute to the unexplained ghost overtone"
     audio_file: "01_01_10.wav"
