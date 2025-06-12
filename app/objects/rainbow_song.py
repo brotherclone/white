@@ -1,6 +1,9 @@
 import os
 import re
 import mido
+import pandas as pd
+import json
+
 from typing import Any
 from pydantic import BaseModel
 from pydub import AudioSegment
@@ -9,22 +12,23 @@ from app.objects.multimodal_extract import MultimodalExtract, MultimodalExtractM
     ExtractionContentType
 from app.objects.rainbow_song_meta import RainbowSongMeta
 from app.utils.audio_util import has_significant_audio, get_microseconds_per_beat
-from app.utils.time_util import lrc_to_seconds, get_duration
+from app.utils.time_util import lrc_to_seconds, get_duration, convert_timedelta
 from app.utils.string_util import safe_filename
 
 JUST_NUMBERS_PATTERN = r'^\d+$'
 AUDIO_WORKING_DIR = "/Volumes/LucidNonsense/White/working"
-
+TRAINING_DIR = "/Volumes/LucidNonsense/White/training"
 
 class RainbowSong(BaseModel):
     meta_data: RainbowSongMeta
     extracts: list[MultimodalExtract] | None = None
-
+    event_data_frame: Any | None = None
     def __init__(self, /, **data: Any):
         super().__init__(**data)
-
+        # ToDo: Split longer sections into smaller extracts if needed
         if self.extracts is None:
             self.extracts = []
+        section_sequence = 0
         for song_section in self.meta_data.data.structure:
             s = lrc_to_seconds(song_section.start_time)
             e = lrc_to_seconds(song_section.end_time)
@@ -33,9 +37,11 @@ class RainbowSong(BaseModel):
                 end_time=e,
                 duration=get_duration(s, e),
                 section_name=song_section.section_name,
-                sequence=song_section.sequence,
+                sequence=section_sequence,
                 events=[]
             )
+            section_sequence+= 1
+            # ToDo: Add more metadata to the extract
             extract = MultimodalExtract(extract_data=ext)
             self.extracts.append(extract)
         for extract in self.extracts:
@@ -174,12 +180,28 @@ class RainbowSong(BaseModel):
                    print(f"✗ Failed to load MIDI file '{audio_track.midi_file}': {e}")
             # ToDo: Handle grouped MIDI files if necessary
 
-    def create_training_data(self) -> None:
+    def create_dataframe(self) -> None:
+        event_holder = []
         for extract in self.extracts:
             for event in extract.extract_data.events:
-                if event.type == ExtractionContentType.LYRICS:
-                    print(f"Lyric Events '{extract.extract_data.section_name}': {event.content}")
-                elif event.type == ExtractionContentType.TRACK_AUDIO or event.type == ExtractionContentType.MIX_AUDIO:
-                    print(f"Audio Events '{extract.extract_data.section_name}': {event.content}")
-                elif event.type == ExtractionContentType.MIDI:
-                    print(f"MIDI events '{extract.extract_data.section_name}': {event.content}")
+                event_dict = event.dict() if hasattr(event, "dict") else event.__dict__
+                for key in ["start_time", "end_time"]:
+                    if isinstance(event_dict.get(key), pd.Timedelta) or hasattr(event_dict.get(key), "total_seconds"):
+                        event_dict[key] = event_dict[key].total_seconds()
+                if "type" in event_dict and hasattr(event_dict["type"], "value"):
+                    event_dict["type"] = event_dict["type"].value
+                if "content" in event_dict:
+                    content = convert_timedelta(event_dict["content"])
+                    if event_dict["type"] in ["track_audio", "mix_audio"]:
+                        file_name = content.get("file_name")
+                        audio_path = os.path.join(AUDIO_WORKING_DIR, file_name)
+                        try:
+                            with open(audio_path, "rb") as f:
+                                event_dict["audio_bytes"] = f.read()
+                        except Exception as e:
+                            event_dict["audio_bytes"] = None
+                            print (f"✗ Failed to read audio file '{audio_path}': {e}")
+                    event_dict["content"] = json.dumps(content)
+                event_holder.append(event_dict)
+        self.event_data_frame = pd.DataFrame(sorted(event_holder, key=lambda x: x["start_time"]))
+        self.event_data_frame.to_parquet(os.path.join(TRAINING_DIR, f"{safe_filename(self.meta_data.data.title)}.parquet"))

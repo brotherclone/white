@@ -3,6 +3,7 @@
 # Ignore staged raw materials directory
 /staged_raw_materials/
 /working/
+/training/
 # Ignore common media file types
 *.wav
 *.mp3

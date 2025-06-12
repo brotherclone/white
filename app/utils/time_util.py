@@ -86,3 +86,13 @@ def get_duration(start_time:float | datetime.timedelta | str, end_time:float | d
         end_seconds = end_time
 
     return seconds_to_timedelta(end_seconds - start_seconds)
+
+def convert_timedelta(obj):
+    if isinstance(obj, datetime.timedelta):
+        return obj.total_seconds()
+    elif isinstance(obj, dict):
+        return {k: convert_timedelta(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_timedelta(i) for i in obj]
+    else:
+        return obj
