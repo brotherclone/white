@@ -18,6 +18,12 @@ rainbow_table_title_dict ={
     RainbowColor.A: "TBD"
 }
 
+class RainbowSongLyricModel(BaseModel):
+    time_stamp: str | datetime.timedelta | None = None
+    lrc: str | datetime.timedelta | None = None
+    lyrics: str | None = None
+    is_in_range: bool = False
+
 class RainbowSongTrackModel(BaseModel):
     id: int
     description: str

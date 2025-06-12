@@ -11,7 +11,7 @@ from pydub import AudioSegment
 
 from app.objects.multimodal_extract import MultimodalExtract, MultimodalExtractModel, MultimodalExtractEventModel, \
     ExtractionContentType
-from app.objects.rainbow_song_meta import RainbowSongMeta
+from app.objects.rainbow_song_meta import RainbowSongMeta, RainbowSongLyricModel
 from app.objects.training_sample import TrainingSample
 from app.utils.audio_util import has_significant_audio, get_microseconds_per_beat, audio_to_byes, \
     split_midi_file_by_segment, midi_to_bytes
@@ -19,6 +19,8 @@ from app.utils.time_util import lrc_to_seconds, get_duration
 from app.utils.string_util import safe_filename, just_lyrics, make_lrc_fragment, to_str_dict, bytes_to_base64_str
 
 JUST_NUMBERS_PATTERN = r'^\d+$'
+LRC_TIME_STAMP_PATTERN = r'^\[(\d+:\d+(?:\.\d+)?|\d+(?:\.\d+)?)\](.*)'
+LRC_META_PATTERN = r'^\[(ti|ar|al):\s*(.*?)\]$'
 AUDIO_WORKING_DIR = "/Volumes/LucidNonsense/White/working"
 TRAINING_DIR = "/Volumes/LucidNonsense/White/training"
 
@@ -54,39 +56,51 @@ class RainbowSong(BaseModel):
             self.extracts.append(extract)
         for extract in self.extracts:
             self.extract_lyrics(extract)
-            self.extract_audio(extract)
-            self.extract_midi(extract)
+            # self.extract_audio(extract)
+            # self.extract_midi(extract)
 
     def extract_lyrics(self, an_extract: MultimodalExtract) -> None:
         lrc = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
         try:
-            lyrics_in_section = []
-            add_to_next_segment_index = 0
-            add_to_next_segment = False
+            lyric_contents: list[RainbowSongLyricModel] = []
             with open(lrc, 'r', encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
-                    match = re.match(r'^\[(\d+:\d+(?:\.\d+)?|\d+(?:\.\d+)?)\](.*)', line)
-                    if match:
-                        if re.match(JUST_NUMBERS_PATTERN, line[1]):
-                            lyric_time_stamp = lrc_to_seconds(line)
-                            if an_extract.extract_data.end_time >= lyric_time_stamp >= an_extract.extract_data.start_time:
-                                add_to_next_segment = True
-                                add_to_next_segment_index = len(lyrics_in_section)
+                    meta_match = re.match(LRC_META_PATTERN, line)
+                    if meta_match is None:
+                        time_stamp_match = re.match(LRC_TIME_STAMP_PATTERN, line)
+                        if time_stamp_match:
+                            next_line = next(f, None)
+                            date_time_lyric_time_stamp = lrc_to_seconds(line)
+                            lyric_content: RainbowSongLyricModel = RainbowSongLyricModel(
+                                time_stamp= lrc_to_seconds(line),
+                                lrc=None,
+                                lyrics=None,
+                                is_in_range= (an_extract.extract_data.start_time <= date_time_lyric_time_stamp < an_extract.extract_data.end_time)
+                            )
+                            if next_line is not None:
+                                next_line = next_line.strip()
+                                lyric_content.lrc = f"\n{line}\n{next_line}"
+                                lyric_content.lyrics = f"{next_line}\n"
+                            lyric_contents.append(lyric_content)
                     else:
-                        if add_to_next_segment:
-                            if add_to_next_segment_index < len(lyrics_in_section):
-                                lyrics_in_section[add_to_next_segment_index]['content'] = line
-                            else:
-                                lyrics_in_section.append({'time_stamp': lyric_time_stamp, 'content': line})
-
-            if len(lyrics_in_section) > 0:
-                lyric_extract_event = MultimodalExtractEventModel(start_time=an_extract.extract_data.start_time,
-                                                                  end_time=an_extract.extract_data.end_time,
-                                                                  type=ExtractionContentType.LYRICS,
-                                                                  content=lyrics_in_section)
-                an_extract.extract_data.events.append(lyric_extract_event)
-                lyrics_in_section.sort(key=lambda x: x['time'])
+                        print("Ignoring meta line in lrc:", line)
+            segment_lrc_collector = []
+            segment_lyric_collector = []
+            for lc in lyric_contents:
+                if lc.is_in_range:
+                    segment_lrc_collector.append(lc.lrc)
+                    segment_lyric_collector.append(lc.lyrics)
+            lyric_extract_event = MultimodalExtractEventModel(start_time=an_extract.extract_data.start_time,
+                                                              end_time=an_extract.extract_data.end_time,
+                                                              type=ExtractionContentType.LYRICS,
+                                                              content={
+                                                                    'lrc': ''.join(segment_lrc_collector),
+                                                                    'lyrics': ''.join(segment_lyric_collector),
+                                                                    'time_stamp': an_extract.extract_data.start_time.total_seconds()
+                                                              })
+            an_extract.extract_data.events.append(lyric_extract_event)
+            an_extract.extract_data.events.sort(key=lambda x: getattr(x.content, 'time_stamp', None))
         except Exception as e:
             print(f"✗ Failed to extract lyrics: {e}")
 
@@ -235,11 +249,8 @@ class RainbowSong(BaseModel):
                     song_segment_track_midi_is_group=False,
                 )
                 if event.type == ExtractionContentType.LYRICS:
-                    ts.song_segment_lyrics_lrc = make_lrc_fragment(album=self.meta_data.data.album_title,
-                                                                   song=self.meta_data.data.title,
-                                                                   artist=self.meta_data.data.artist,
-                                                                   lyric_content=event.content)
-                    ts.song_segment_lyrics_text = just_lyrics(event.content)
+                    ts.song_segment_lyrics_lrc =  event.content.get('lrc')
+                    ts.song_segment_lyrics_text =  event.content.get('lyrics')
                 elif event.type == ExtractionContentType.MIX_AUDIO:
                     ts.song_segment_main_audio_file_name = event.content.get('file_name')
                     ts.song_segment_main_audio_binary_data = audio_to_byes(event.content.get('file_name'),
@@ -256,7 +267,8 @@ class RainbowSong(BaseModel):
                     ts.song_segment_track_midi_data = json.dumps(event.content['notes'])
                     ts.song_segment_track_midi_file_name = event.content.get('file_name')
                     ts.song_segment_track_midi_binary_data = event.content.get('bytes')
-            self.training_samples.append(ts)
+                self.training_samples.append(ts)
+
         self.training_sample_data_frame = pd.DataFrame([
             to_str_dict(ts.model_dump()) for ts in self.training_samples
         ])

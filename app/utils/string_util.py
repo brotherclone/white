@@ -4,17 +4,12 @@ import base64
 def safe_filename(title: str) -> str:
     return re.sub(r'[\\/*?:"<>|\' ]+', '_', title).strip('_')
 
-def just_lyrics(lyric_content: dict) -> str:
-    return ''.join([line['content'] for line in lyric_content])
+def just_lyrics(lyric_events_in_range) -> str:
+    pass
 
-def make_lrc_fragment(album:str, song:str, artist: str, lyric_content: dict) -> str:
-    lrc = f"[ti: {song}]\n"
-    lrc += f"[ar: {artist}]\n"
-    lrc += f"[al: {album}]\n"
-    for lyric_content in lyric_content:
-        lrc += f"{lyric_content['time_stamp']}\n"
-        lrc += f"{lyric_content['content']}\n"
-    return lrc
+def make_lrc_fragment(album, song, artist, lyric_events_in_range) -> str:
+    lrc = f"[al:{album}]\n[ti:{song}]\n[ar:{artist}]\n"
+    pass
 
 def to_str_dict(d: dict) -> dict:
     return {
