@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 import mido
@@ -11,23 +12,30 @@ from pydub import AudioSegment
 from app.objects.multimodal_extract import MultimodalExtract, MultimodalExtractModel, MultimodalExtractEventModel, \
     ExtractionContentType
 from app.objects.rainbow_song_meta import RainbowSongMeta
-from app.utils.audio_util import has_significant_audio, get_microseconds_per_beat
-from app.utils.time_util import lrc_to_seconds, get_duration, convert_timedelta
-from app.utils.string_util import safe_filename
+from app.objects.training_sample import TrainingSample
+from app.utils.audio_util import has_significant_audio, get_microseconds_per_beat, audio_to_byes, \
+    split_midi_file_by_segment, midi_to_bytes
+from app.utils.time_util import lrc_to_seconds, get_duration
+from app.utils.string_util import safe_filename, just_lyrics, make_lrc_fragment, to_str_dict, bytes_to_base64_str
 
 JUST_NUMBERS_PATTERN = r'^\d+$'
 AUDIO_WORKING_DIR = "/Volumes/LucidNonsense/White/working"
 TRAINING_DIR = "/Volumes/LucidNonsense/White/training"
 
+
 class RainbowSong(BaseModel):
     meta_data: RainbowSongMeta
     extracts: list[MultimodalExtract] | None = None
-    event_data_frame: Any | None = None
+    training_samples: list[TrainingSample] | None = None
+    training_sample_data_frame: Any | None = None
+
     def __init__(self, /, **data: Any):
         super().__init__(**data)
         # ToDo: Split longer sections into smaller extracts if needed
         if self.extracts is None:
             self.extracts = []
+        if self.training_samples is None:
+            self.training_samples = []
         section_sequence = 0
         for song_section in self.meta_data.data.structure:
             s = lrc_to_seconds(song_section.start_time)
@@ -40,7 +48,7 @@ class RainbowSong(BaseModel):
                 sequence=section_sequence,
                 events=[]
             )
-            section_sequence+= 1
+            section_sequence += 1
             # ToDo: Add more metadata to the extract
             extract = MultimodalExtract(extract_data=ext)
             self.extracts.append(extract)
@@ -70,15 +78,17 @@ class RainbowSong(BaseModel):
                             if add_to_next_segment_index < len(lyrics_in_section):
                                 lyrics_in_section[add_to_next_segment_index]['content'] = line
                             else:
-                                lyrics_in_section.append({'time': lyric_time_stamp, 'content': line})
+                                lyrics_in_section.append({'time_stamp': lyric_time_stamp, 'content': line})
 
             if len(lyrics_in_section) > 0:
-                lyric_extract_event = MultimodalExtractEventModel(start_time=an_extract.extract_data.start_time, end_time=an_extract.extract_data.end_time, type=ExtractionContentType.LYRICS, content=lyrics_in_section)
+                lyric_extract_event = MultimodalExtractEventModel(start_time=an_extract.extract_data.start_time,
+                                                                  end_time=an_extract.extract_data.end_time,
+                                                                  type=ExtractionContentType.LYRICS,
+                                                                  content=lyrics_in_section)
                 an_extract.extract_data.events.append(lyric_extract_event)
                 lyrics_in_section.sort(key=lambda x: x['time'])
         except Exception as e:
             print(f"✗ Failed to extract lyrics: {e}")
-
 
     def extract_audio(self, an_extract: MultimodalExtract) -> None:
         tracks = []
@@ -99,7 +109,6 @@ class RainbowSong(BaseModel):
                     'event_type': ExtractionContentType.TRACK_AUDIO,
                     'file_suffix': f"_{audio_track.id}"
                 })
-
         for track in tracks:
             audio_file_path = os.path.join(
                 self.meta_data.base_path,
@@ -121,7 +130,7 @@ class RainbowSong(BaseModel):
                             end_time=an_extract.extract_data.end_time,
                             type=track['event_type'],
                             content={
-                                'file_name':file_name,
+                                'file_name': file_name,
                                 'description': track['description'],
                                 'id': track['id'],
                                 'source_audio_file': track['audio_file'],
@@ -147,11 +156,12 @@ class RainbowSong(BaseModel):
                     midi = mido.MidiFile(midi_file_path)
                     ticks_per_beat = midi.ticks_per_beat
                     tempo = midi.tempo if hasattr(midi, 'tempo') else get_microseconds_per_beat(self.meta_data.data.bpm)
+                    segment_path = split_midi_file_by_segment(tempo,  midi_file_path, an_extract.extract_data.duration.total_seconds())
                     note_collector = []
                     for t in midi.tracks:
                         mt = 0
                         for msg in t:
-                            mt+=  msg.time
+                            mt += msg.time
                             if msg.type == 'set_tempo':
                                 tempo = msg.tempo
                             if msg.type == 'note_on' and msg.velocity > 0:
@@ -170,38 +180,87 @@ class RainbowSong(BaseModel):
                                     note_collector.append(midi_note)
                     if len(note_collector) > 0:
                         midi_extract_event = MultimodalExtractEventModel(
-                        start_time=an_extract.extract_data.start_time,
-                        end_time=an_extract.extract_data.end_time,
-                        type=ExtractionContentType.MIDI,
-                        content=note_collector)
+                            start_time=an_extract.extract_data.start_time,
+                            end_time=an_extract.extract_data.end_time,
+                            type=ExtractionContentType.MIDI,
+                            content={
+                                'notes': note_collector,
+                                'file_name': segment_path,
+                                'bytes': midi_to_bytes(segment_path)
+                            })
                         an_extract.extract_data.events.append(midi_extract_event)
-
                 except Exception as e:
-                   print(f"✗ Failed to load MIDI file '{audio_track.midi_file}': {e}")
+                    print(f"✗ Failed to load MIDI file '{audio_track.midi_file}': {e}")
             # ToDo: Handle grouped MIDI files if necessary
 
-    def create_dataframe(self) -> None:
-        event_holder = []
+    def create_training_samples(self):
+        ts = None
         for extract in self.extracts:
             for event in extract.extract_data.events:
-                event_dict = event.dict() if hasattr(event, "dict") else event.__dict__
-                for key in ["start_time", "end_time"]:
-                    if isinstance(event_dict.get(key), pd.Timedelta) or hasattr(event_dict.get(key), "total_seconds"):
-                        event_dict[key] = event_dict[key].total_seconds()
-                if "type" in event_dict and hasattr(event_dict["type"], "value"):
-                    event_dict["type"] = event_dict["type"].value
-                if "content" in event_dict:
-                    content = convert_timedelta(event_dict["content"])
-                    if event_dict["type"] in ["track_audio", "mix_audio"]:
-                        file_name = content.get("file_name")
-                        audio_path = os.path.join(AUDIO_WORKING_DIR, file_name)
-                        try:
-                            with open(audio_path, "rb") as f:
-                                event_dict["audio_bytes"] = f.read()
-                        except Exception as e:
-                            event_dict["audio_bytes"] = None
-                            print (f"✗ Failed to read audio file '{audio_path}': {e}")
-                    event_dict["content"] = json.dumps(content)
-                event_holder.append(event_dict)
-        self.event_data_frame = pd.DataFrame(sorted(event_holder, key=lambda x: x["start_time"]))
-        self.event_data_frame.to_parquet(os.path.join(TRAINING_DIR, f"{safe_filename(self.meta_data.data.title)}.parquet"))
+                ts = TrainingSample(
+                    song_bpm=str(self.meta_data.data.bpm) if isinstance(self.meta_data.data.bpm, int) else self.meta_data.data.bpm,
+                    song_key=self.meta_data.data.key,
+                    album_rainbow_color=str(
+                        self.meta_data.data.rainbow_color) if self.meta_data.data.rainbow_color else None,
+                    artist=self.meta_data.data.artist,
+                    album_title=self.meta_data.data.album_title,
+                    song_title=self.meta_data.data.title,
+                    album_realise_date=self.meta_data.data.release_date,
+                    song_on_album_sequence=str(self.meta_data.data.album_sequence) if isinstance(self.meta_data.data.album_sequence, int) else self.meta_data.data.album_sequence,
+                    song_trt=str(self.meta_data.data.TRT) if isinstance(self.meta_data.data.TRT, datetime.timedelta) else self.meta_data.data.TRT,
+                    song_has_vocals=self.meta_data.data.vocals,
+                    song_has_lyrics=self.meta_data.data.lyrics,
+                    song_structure=json.dumps([s.model_dump() for s in self.meta_data.data.structure]),
+                    song_moods=", ".join([str(m) for m in self.meta_data.data.mood]),
+                    song_sounds_like=", ".join([str(l) for l in self.meta_data.data.sounds_like]),
+                    song_genres=", ".join([str(g) for g in self.meta_data.data.genres]),
+                    song_segment_name=extract.extract_data.section_name,
+                    song_segment_start_time=str(extract.extract_data.start_time.total_seconds()),
+                    song_segment_end_time=str(extract.extract_data.end_time.total_seconds()),
+                    song_segment_duration=str(extract.extract_data.duration.total_seconds()),
+                    song_segment_sequence=extract.extract_data.sequence,
+                    song_segment_description=None,  # ToDo: forgot to pull this through
+                    song_segment_track_id=None,
+                    song_segment_track_name=None,
+                    song_segment_track_description=None,
+                    song_segment_main_audio_file_name=None,
+                    song_segment_track_audio_file_name=None,
+                    song_segment_main_audio_binary_data=None,
+                    song_segment_track_audio_binary_data=None,
+                    song_segment_lyrics_text=None,
+                    song_segment_lyrics_lrc=None,
+                    song_segment_track_midi_data=None,
+                    song_segment_track_midi_file_name=None,
+                    song_segment_track_midi_binary_data=None,
+                    song_segment_track_midi_is_group=False,
+                )
+                if event.type == ExtractionContentType.LYRICS:
+                    ts.song_segment_lyrics_lrc = make_lrc_fragment(album=self.meta_data.data.album_title,
+                                                                   song=self.meta_data.data.title,
+                                                                   artist=self.meta_data.data.artist,
+                                                                   lyric_content=event.content)
+                    ts.song_segment_lyrics_text = just_lyrics(event.content)
+                elif event.type == ExtractionContentType.MIX_AUDIO:
+                    ts.song_segment_main_audio_file_name = event.content.get('file_name')
+                    ts.song_segment_main_audio_binary_data = audio_to_byes(event.content.get('file_name'),
+                                                                           AUDIO_WORKING_DIR)
+                    ts.song_segment_track_description = event.content.get('description')
+                    ts.song_segment_track_id = event.content.get('id')
+                elif event.type == ExtractionContentType.TRACK_AUDIO:
+                    ts.song_segment_track_audio_file_name = event.content.get('file_name')
+                    ts.song_segment_track_audio_binary_data = audio_to_byes(event.content.get('file_name'),
+                                                                            AUDIO_WORKING_DIR)
+                    ts.song_segment_track_description = event.content.get('description')
+                    ts.song_segment_track_id = event.content.get('id')
+                elif event.type == ExtractionContentType.MIDI:
+                    ts.song_segment_track_midi_data = json.dumps(event.content['notes'])
+                    ts.song_segment_track_midi_file_name = event.content.get('file_name')
+                    ts.song_segment_track_midi_binary_data = event.content.get('bytes')
+            self.training_samples.append(ts)
+        self.training_sample_data_frame = pd.DataFrame([
+            to_str_dict(ts.model_dump()) for ts in self.training_samples
+        ])
+        self.training_sample_data_frame.to_parquet(
+            os.path.join(TRAINING_DIR, f"{safe_filename(self.meta_data.data.title)}_training_samples.parquet")
+        )
+
