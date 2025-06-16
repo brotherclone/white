@@ -47,11 +47,13 @@ class RainbowSong(BaseModel):
                 end_time=e,
                 duration=get_duration(s, e),
                 section_name=song_section.section_name,
+                section_description=song_section.section_description,
                 sequence=section_sequence,
-                events=[]
+                events=[],
+                extract_lrc=None,
+                extract_lyrics=None,
             )
             section_sequence += 1
-            # ToDo: Add more metadata to the extract
             extract = MultimodalExtract(extract_data=ext)
             self.extracts.append(extract)
         for extract in self.extracts:
@@ -91,16 +93,8 @@ class RainbowSong(BaseModel):
                 if lc.is_in_range:
                     segment_lrc_collector.append(lc.lrc)
                     segment_lyric_collector.append(lc.lyrics)
-            lyric_extract_event = MultimodalExtractEventModel(start_time=an_extract.extract_data.start_time,
-                                                              end_time=an_extract.extract_data.end_time,
-                                                              type=ExtractionContentType.LYRICS,
-                                                              content={
-                                                                    'lrc': ''.join(segment_lrc_collector),
-                                                                    'lyrics': ''.join(segment_lyric_collector),
-                                                                    'time_stamp': an_extract.extract_data.start_time.total_seconds()
-                                                              })
-            an_extract.extract_data.events.append(lyric_extract_event)
-            an_extract.extract_data.events.sort(key=lambda x: getattr(x.content, 'time_stamp', None))
+            an_extract.extract_data.extract_lrc = ''.join(segment_lrc_collector)
+            an_extract.extract_data.extract_lyrics = ''.join(segment_lyric_collector)
         except Exception as e:
             print(f"✗ Failed to extract lyrics: {e}")
 
@@ -233,7 +227,7 @@ class RainbowSong(BaseModel):
                     song_segment_end_time=str(extract.extract_data.end_time.total_seconds()),
                     song_segment_duration=str(extract.extract_data.duration.total_seconds()),
                     song_segment_sequence=extract.extract_data.sequence,
-                    song_segment_description=None,  # ToDo: forgot to pull this through
+                    song_segment_description= extract.extract_data.section_description,
                     song_segment_track_id=None,
                     song_segment_track_name=None,
                     song_segment_track_description=None,
@@ -241,17 +235,14 @@ class RainbowSong(BaseModel):
                     song_segment_track_audio_file_name=None,
                     song_segment_main_audio_binary_data=None,
                     song_segment_track_audio_binary_data=None,
-                    song_segment_lyrics_text=None,
-                    song_segment_lyrics_lrc=None,
+                    song_segment_lyrics_text=extract.extract_data.lyrics,
+                    song_segment_lyrics_lrc=extract.extract_data.extract_lrc,
                     song_segment_track_midi_data=None,
                     song_segment_track_midi_file_name=None,
                     song_segment_track_midi_binary_data=None,
                     song_segment_track_midi_is_group=False,
                 )
-                if event.type == ExtractionContentType.LYRICS:
-                    ts.song_segment_lyrics_lrc =  event.content.get('lrc')
-                    ts.song_segment_lyrics_text =  event.content.get('lyrics')
-                elif event.type == ExtractionContentType.MIX_AUDIO:
+                if event.type == ExtractionContentType.MIX_AUDIO:
                     ts.song_segment_main_audio_file_name = event.content.get('file_name')
                     ts.song_segment_main_audio_binary_data = audio_to_byes(event.content.get('file_name'),
                                                                            AUDIO_WORKING_DIR)

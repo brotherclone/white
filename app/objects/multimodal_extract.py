@@ -8,7 +8,6 @@ class ExtractionContentType(Enum):
     MIX_AUDIO = "mix_audio"
     MIDI = "midi"
     SHARED_MIDI = "shared_midi"
-    LYRICS = "lyrics"
 
 class MultimodalExtractEventModel(BaseModel):
     start_time: datetime.timedelta | float | None = None
@@ -23,6 +22,9 @@ class MultimodalExtractModel(BaseModel):
     duration: datetime.timedelta | None = None
     sequence: int | None = None
     section_name: str | None = None
+    extract_lyrics: str | None = None
+    extract_lrc: str | None = None
+    section_description: str | None = None
 
 class MultimodalExtract(BaseModel):
     extract_data: MultimodalExtractModel

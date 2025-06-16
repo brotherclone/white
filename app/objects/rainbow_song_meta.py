@@ -34,6 +34,7 @@ class RainbowSongTrackModel(BaseModel):
 
 class RainbowSongStructureModel(BaseModel):
     section_name: str
+    section_description: str | None = None
     start_time: str | datetime.timedelta
     end_time: str | datetime.timedelta
     duration: datetime.timedelta | None = None
