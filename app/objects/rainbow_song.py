@@ -210,7 +210,7 @@ class RainbowSong(BaseModel):
         This is a placeholder for actual MIDI extraction logic.
         """
         for audio_track in self.meta_data.data.audio_tracks or []:
-            if audio_track.midi_file and audio_track.midi_group_file is None:
+            if audio_track.midi_file and audio_track.midi_group is None:
                 midi_file_path = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path,
                                               audio_track.midi_file)
                 print(f"Extracting MIDI from: {midi_file_path}")

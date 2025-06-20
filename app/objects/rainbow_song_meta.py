@@ -30,7 +30,7 @@ class RainbowSongTrackModel(BaseModel):
     audio_file: str | None = None
     audio_file_path: str | None = None
     midi_file: str | None = None
-    midi_group_file: str | None = None
+    midi_group: str | None = None
 
 class RainbowSongStructureModel(BaseModel):
     section_name: str
@@ -39,6 +39,7 @@ class RainbowSongStructureModel(BaseModel):
     end_time: str | datetime.timedelta
     duration: datetime.timedelta | None = None
     sequence: None | int = None
+    midi_group: str | None = None
 
 class RainbowMetaDataModel(BaseModel):
     bpm: int
