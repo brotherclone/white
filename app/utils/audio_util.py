@@ -1,9 +1,5 @@
 import os
-import mido
 import numpy as np
-
-from app.utils.string_util import bytes_to_base64_str
-
 
 def has_significant_audio(audio_chunk, threshold_db=-40):
     if len(audio_chunk) == 0:

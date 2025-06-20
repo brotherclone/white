@@ -16,16 +16,30 @@ from app.objects.training_sample import TrainingSample
 from app.utils.audio_util import has_significant_audio, get_microseconds_per_beat, audio_to_byes, \
     split_midi_file_by_segment, midi_to_bytes
 from app.utils.time_util import lrc_to_seconds, get_duration
-from app.utils.string_util import safe_filename, just_lyrics, make_lrc_fragment, to_str_dict, bytes_to_base64_str
+from app.utils.string_util import safe_filename,to_str_dict
 
 JUST_NUMBERS_PATTERN = r'^\d+$'
 LRC_TIME_STAMP_PATTERN = r'^\[(\d+:\d+(?:\.\d+)?|\d+(?:\.\d+)?)\](.*)'
 LRC_META_PATTERN = r'^\[(ti|ar|al):\s*(.*?)\]$'
 AUDIO_WORKING_DIR = "/Volumes/LucidNonsense/White/working"
 TRAINING_DIR = "/Volumes/LucidNonsense/White/training"
+MAXIMUM_EXTRACT_DURATION = datetime.timedelta(seconds=29)
 
 
 class RainbowSong(BaseModel):
+    """
+    Represents a song with associated metadata, extracts, and training samples.
+
+    This class handles the segmentation of a song into extracts based on its structure,
+    and provides methods to extract lyrics, audio, and MIDI data for each segment.
+    It also supports the creation of training samples for machine learning tasks.
+
+    Attributes:
+        meta_data (RainbowSongMeta): Metadata for the song.
+        extracts (list[MultimodalExtract] | None): List of extracted song segments.
+        training_samples (list[TrainingSample] | None): List of generated training samples.
+        training_sample_data_frame (Any | None): DataFrame containing training sample data.
+    """
     meta_data: RainbowSongMeta
     extracts: list[MultimodalExtract] | None = None
     training_samples: list[TrainingSample] | None = None
@@ -33,35 +47,70 @@ class RainbowSong(BaseModel):
 
     def __init__(self, /, **data: Any):
         super().__init__(**data)
-        # ToDo: Split longer sections into smaller extracts if needed
         if self.extracts is None:
             self.extracts = []
         if self.training_samples is None:
             self.training_samples = []
         section_sequence = 0
         for song_section in self.meta_data.data.structure:
-            s = lrc_to_seconds(song_section.start_time)
-            e = lrc_to_seconds(song_section.end_time)
-            ext = MultimodalExtractModel(
-                start_time=s,
-                end_time=e,
-                duration=get_duration(s, e),
-                section_name=song_section.section_name,
-                section_description=song_section.section_description,
-                sequence=section_sequence,
-                events=[],
-                extract_lrc=None,
-                extract_lyrics=None,
-            )
-            section_sequence += 1
-            extract = MultimodalExtract(extract_data=ext)
-            self.extracts.append(extract)
+            if song_section.duration is not None and song_section.duration > datetime.timedelta(MAXIMUM_EXTRACT_DURATION.total_seconds()):
+                section_start_time = lrc_to_seconds(song_section.start_time)
+                section_end_time = lrc_to_seconds(song_section.end_time)
+                total_seconds = (section_end_time - section_start_time).total_seconds()
+                max_seconds = MAXIMUM_EXTRACT_DURATION.total_seconds()
+                num_segments = int(total_seconds / max_seconds) + (1 if total_seconds % max_seconds > 0 else 0)
+                print(f"Splitting section '{song_section.section_name}' into {num_segments} parts")
+                for i in range(num_segments):
+                    segment_start_offset = i * max_seconds
+                    segment_end_offset = min((i + 1) * max_seconds, total_seconds)
+                    segment_start = section_start_time + datetime.timedelta(seconds=segment_start_offset)
+                    segment_end = section_start_time + datetime.timedelta(seconds=segment_end_offset)
+                    segment_name = f"{song_section.section_name} (part {i + 1}/{num_segments})"
+                    segment_description = f"{song_section.section_description} [Part {i + 1}/{num_segments}]"
+                    ext = MultimodalExtractModel(
+                        start_time=segment_start,
+                        end_time=segment_end,
+                        duration=get_duration(segment_start, segment_end),
+                        section_name=segment_name,
+                        section_description=segment_description,
+                        sequence=section_sequence,
+                        events=[],
+                        extract_lrc=None,
+                        extract_lyrics=None,
+                        midi_group=song_section.midi_group if song_section.midi_group else None
+                    )
+                    section_sequence += 1
+                    extract = MultimodalExtract(extract_data=ext)
+                    self.extracts.append(extract)
+            else:
+                s = lrc_to_seconds(song_section.start_time)
+                e = lrc_to_seconds(song_section.end_time)
+                ext = MultimodalExtractModel(
+                    start_time=s,
+                    end_time=e,
+                    duration=get_duration(s, e),
+                    section_name=song_section.section_name,
+                    section_description=song_section.section_description,
+                    sequence=section_sequence,
+                    events=[],
+                    extract_lrc=None,
+                    extract_lyrics=None,
+                    midi_group=song_section.midi_group if song_section.midi_group else None
+                )
+                section_sequence += 1
+                extract = MultimodalExtract(extract_data=ext)
+                self.extracts.append(extract)
         for extract in self.extracts:
             self.extract_lyrics(extract)
-            # self.extract_audio(extract)
-            # self.extract_midi(extract)
+            self.extract_audio(extract)
+            self.extract_midi(extract)
 
     def extract_lyrics(self, an_extract: MultimodalExtract) -> None:
+        """
+        Extract lyrics from the LRC file.
+        :param an_extract:
+        :return:
+        """
         lrc = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
         try:
             lyric_contents: list[RainbowSongLyricModel] = []
@@ -99,6 +148,11 @@ class RainbowSong(BaseModel):
             print(f"✗ Failed to extract lyrics: {e}")
 
     def extract_audio(self, an_extract: MultimodalExtract) -> None:
+        """
+        Extract audio segments from the song.
+        :param an_extract:
+        :return:
+        """
         tracks = []
         if self.meta_data.data.main_audio_file:
             tracks.append({
@@ -190,7 +244,7 @@ class RainbowSong(BaseModel):
                         midi_extract_event = MultimodalExtractEventModel(
                             start_time=an_extract.extract_data.start_time,
                             end_time=an_extract.extract_data.end_time,
-                            type=ExtractionContentType.MIDI,
+                            type=ExtractionContentType.MIDI if audio_track.midi_group_file is None else ExtractionContentType.SHARED_MIDI,
                             content={
                                 'notes': note_collector,
                                 'file_name': segment_path,
@@ -199,10 +253,12 @@ class RainbowSong(BaseModel):
                         an_extract.extract_data.events.append(midi_extract_event)
                 except Exception as e:
                     print(f"✗ Failed to load MIDI file '{audio_track.midi_file}': {e}")
-            # ToDo: Handle grouped MIDI files if necessary
 
     def create_training_samples(self):
-        ts = None
+        """
+        Create training samples from the extracts.
+        :return:
+        """
         for extract in self.extracts:
             for event in extract.extract_data.events:
                 ts = TrainingSample(
@@ -235,12 +291,12 @@ class RainbowSong(BaseModel):
                     song_segment_track_audio_file_name=None,
                     song_segment_main_audio_binary_data=None,
                     song_segment_track_audio_binary_data=None,
-                    song_segment_lyrics_text=extract.extract_data.lyrics,
+                    song_segment_lyrics_text=extract.extract_data.extract_lyrics,
                     song_segment_lyrics_lrc=extract.extract_data.extract_lrc,
                     song_segment_track_midi_data=None,
                     song_segment_track_midi_file_name=None,
                     song_segment_track_midi_binary_data=None,
-                    song_segment_track_midi_is_group=False,
+                    song_segment_track_midi_is_group=extract.extract_data.midi_group,
                 )
                 if event.type == ExtractionContentType.MIX_AUDIO:
                     ts.song_segment_main_audio_file_name = event.content.get('file_name')
@@ -254,7 +310,7 @@ class RainbowSong(BaseModel):
                                                                             AUDIO_WORKING_DIR)
                     ts.song_segment_track_description = event.content.get('description')
                     ts.song_segment_track_id = event.content.get('id')
-                elif event.type == ExtractionContentType.MIDI:
+                elif event.type == ExtractionContentType.MIDI or event.type == ExtractionContentType.SHARED_MIDI:
                     ts.song_segment_track_midi_data = json.dumps(event.content['notes'])
                     ts.song_segment_track_midi_file_name = event.content.get('file_name')
                     ts.song_segment_track_midi_binary_data = event.content.get('bytes')
@@ -266,4 +322,3 @@ class RainbowSong(BaseModel):
         self.training_sample_data_frame.to_parquet(
             os.path.join(TRAINING_DIR, f"{safe_filename(self.meta_data.data.title)}_training_samples.parquet")
         )
-

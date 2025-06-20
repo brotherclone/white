@@ -83,5 +83,3 @@ class RainbowSongMeta(BaseModel):
             raise FileNotFoundError(f"YAML file not found")
         except ValidationError as e:
             raise ValueError(f"Invalid YAML structure: {e}")
-
-
