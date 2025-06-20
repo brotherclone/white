@@ -25,9 +25,9 @@ class MultimodalExtractModel(BaseModel):
     extract_lyrics: str | None = None
     extract_lrc: str | None = None
     section_description: str | None = None
+    midi_group: str | None = None
 
 class MultimodalExtract(BaseModel):
     extract_data: MultimodalExtractModel
     def __init__(self, /, **data):
         super().__init__(**data)
-
