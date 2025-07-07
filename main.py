@@ -7,11 +7,8 @@ import app.objects.rainbow_song
 def clear_working_directory():
     working_dir = os.path.join(os.path.dirname(__file__), "working")
     if os.path.exists(working_dir):
-        # Remove the directory and all its contents
         shutil.rmtree(working_dir)
         print(f"Removed contents of {working_dir}")
-
-    # Create fresh empty directory
     os.makedirs(working_dir, exist_ok=True)
     print(f"Created fresh working directory at {working_dir}")
 

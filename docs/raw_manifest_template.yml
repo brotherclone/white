@@ -27,3 +27,8 @@ audio_tracks:
     audio_file: # String, e.g. "01_01_main.wav"
     midi_file: # String, e.g. "01_01_main.mid"
     midi_group_file: # String, e.g. "01_01_main_group.mid"
+plans:
+  positive:
+    - 'plan_file_name' # String, e.g. "1_close.yml"
+  negative:
+    - 'plan_file_name' # String, e.g. "1_far.yml"
