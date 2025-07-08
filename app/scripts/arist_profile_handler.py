@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from app.models.models import Artist  # Assuming your models are defined in models.py
+from app.objects.db_models.artist import Artist
 
 def check_arist_profile_exists(db: Session, artist_name=None, discogs_id=None):
     """Check if artist profile exists by name or discogs_id"""

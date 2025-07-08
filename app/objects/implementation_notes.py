@@ -7,13 +7,13 @@ from app.objects.plan_feedback import RainbowPlanFeedback
 
 class RainbowImplementationNotes(BaseModel):
 
-    plain_id: uuid.UUID | None = None
-    notes: RainbowPlanFeedback | None = None
+    notes: str | None = None
+    feedback: RainbowPlanFeedback | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.notes = RainbowPlanFeedback(
-            plan_id=self.plain_id,
+        self.feedback = RainbowPlanFeedback(
+            plan_id=None,
             field_name="implementation_notes",
             rating=None,
             comment=None,

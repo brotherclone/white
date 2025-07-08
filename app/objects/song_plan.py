@@ -10,11 +10,13 @@ from app.objects.sounds_like import RainbowSoundsLike
 
 
 class RainbowSongPlan(BaseModel):
-    batch_id: uuid.UUID
+    batch_id: uuid.UUID | None = None
     plan_id: uuid.UUID
     plan_state: PlanState = PlanState.incomplete
+    associated_resource: str | None = None
     key: str | None = None
     bpm: int | None = None
+    tempo: str | None = None
     moods: list[str] | None = None
     moods_feedback: RainbowPlanFeedback | None = None
     sounds_like: RainbowSoundsLike | None = None

@@ -1,4 +1,5 @@
 bpm: # Int
+reference_id: # String, e.g. "01_01"
 tempo: # String, e.g. "4/4"
 key: # String, e.g. "C major"
 rainbow_color: # String, e.g. "Black"

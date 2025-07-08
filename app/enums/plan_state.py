@@ -6,3 +6,4 @@ class PlanState(Enum):
     ready_to_review = "ready_to_review"
     accepted = "accepted"
     rejected = "rejected"
+    reference = "reference"
