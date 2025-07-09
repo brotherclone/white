@@ -4,14 +4,13 @@ from pydantic import BaseModel
 
 from app.enums.plan_state import PlanState
 from app.enums.rainbow_color import RainbowColor
-from app.objects.implementation_notes import RainbowImplementationNotes
 from app.objects.plan_feedback import RainbowPlanFeedback
 from app.objects.sounds_like import RainbowSoundsLike
 
 
 class RainbowSongPlan(BaseModel):
     batch_id: uuid.UUID | None = None
-    plan_id: uuid.UUID
+    plan_id: uuid.UUID | None = None
     plan_state: PlanState = PlanState.incomplete
     associated_resource: str | None = None
     key: str | None = None
@@ -21,13 +20,13 @@ class RainbowSongPlan(BaseModel):
     moods_feedback: RainbowPlanFeedback | None = None
     sounds_like: RainbowSoundsLike | None = None
     sounds_like_feedback: RainbowPlanFeedback | None = None
-    rainbow_color: RainbowColor
+    rainbow_color: RainbowColor | None = None
     rainbow_color_feedback: RainbowPlanFeedback | None = None
-    plan: str | None
+    plan: str | None = None
     plan_feedback: RainbowPlanFeedback | None = None
     genres: list[str] | None = None
     genres_feedback: RainbowPlanFeedback | None = None
-    implementation_notes: RainbowImplementationNotes | None = None
+    implementation_notes:  RainbowPlanFeedback | None = None
 
 
     def __init__(self):
@@ -69,18 +68,13 @@ class RainbowSongPlan(BaseModel):
                 comment=None,
                 suggested_replacement_value=None
             )
-        self.implementation_notes = RainbowImplementationNotes(
-            plain_id=self.plan_id,
-            notes=RainbowPlanFeedback(
+        self.implementation_notes  = RainbowPlanFeedback(
                 plan_id=self.plan_id,
                 field_name="implementation_notes",
                 rating=None,
                 comment=None,
                 suggested_replacement_value=None
             )
-        )
-
-
 
 
     def save_file(self):

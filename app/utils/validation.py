@@ -179,3 +179,5 @@ class TrainingSampleValidator:
             print("\nWarning types:")
             for warning_type, count in sorted(self.summary.warning_counts.items(), key=lambda x: x[1], reverse=True):
                 print(f"  - {warning_type}: {count}")
+
+# ToDo: Validate reference_id matches the directory
