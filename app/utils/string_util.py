@@ -1,10 +1,8 @@
 import random
 import re
-import os
 import base64
-import string
 
-from networkx.algorithms.bipartite.cluster import modes
+from app.objects.rainbow_color import RainbowColor
 
 
 def safe_filename(title: str) -> str:
@@ -39,3 +37,17 @@ def get_random_musical_key() -> str:
         mode = random.choice(modes)
     return f"{note} {mode}"
 
+def uuid_representer(dumper, data):
+    return dumper.represent_scalar('tag:yaml.org,2002:str', str(data))
+
+def enum_representer(dumper, data):
+    return dumper.represent_scalar('tag:yaml.org,2002:str', str(data.name))
+
+def convert_to_rainbow_color(color_value):
+    """Convert a string value to RainbowColor enum"""
+    if isinstance(color_value, str):
+        try:
+            return getattr(RainbowColor, color_value)
+        except (AttributeError, KeyError):
+            return RainbowColor.Z
+    return color_value

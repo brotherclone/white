@@ -1,16 +1,19 @@
 import uuid
+import yaml
 
+from enum import Enum
 from pydantic import BaseModel
 
 from app.enums.plan_state import PlanState
-from app.enums.rainbow_color import RainbowColor
+from app.objects.rainbow_color import RainbowColor
 from app.objects.plan_feedback import RainbowPlanFeedback
 from app.objects.sounds_like import RainbowSoundsLike
+from app.utils.string_util import uuid_representer, enum_representer
 
 
 class RainbowSongPlan(BaseModel):
-    batch_id: uuid.UUID | None = None
-    plan_id: uuid.UUID | None = None
+    batch_id: uuid.UUID | str | None = None
+    plan_id: uuid.UUID | str | None = None
     plan_state: PlanState = PlanState.incomplete
     associated_resource: str | None = None
     key: str | None = None
@@ -76,7 +79,8 @@ class RainbowSongPlan(BaseModel):
                 suggested_replacement_value=None
             )
 
-
-    def save_file(self):
-        pass
-
+    def to_yaml(self):
+        yaml_dumper = yaml.SafeDumper
+        yaml_dumper.add_representer(uuid.UUID, uuid_representer)
+        yaml_dumper.add_multi_representer(Enum, enum_representer)
+        return yaml.dump(self.dict(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)

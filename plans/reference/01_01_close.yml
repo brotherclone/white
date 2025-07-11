@@ -1,0 +1,88 @@
+associated_resource: '01_01'
+batch_id: c305dff9-a586-4eec-abd3-0d74981896aa
+bpm: 134
+genres:
+- Experimental
+- Psychedelic
+- Post-Punk
+- Art Rock
+- Avant-Garde
+- Electronic
+- Indie Rock
+- Dark Wave
+- Gothic Rock
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: b0675a4e-8eae-478c-9237-e4d34a8c8597
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: b0675a4e-8eae-478c-9237-e4d34a8c8597
+  rating: null
+  suggested_replacement_value: null
+key: C phrygian
+moods:
+- dark
+- mysterious
+- haunting
+- ethereal
+- ghostly
+- ominous
+- spooky
+- eerie
+- otherworldly
+- unsettling
+- creepy
+- chilling
+- foreboding
+- sinister
+- supernatural
+- phantasmal
+- spectral
+- haunted
+- occult
+- arcane
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: b0675a4e-8eae-478c-9237-e4d34a8c8597
+  rating: null
+  suggested_replacement_value: null
+plan: Make it magic!
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: b0675a4e-8eae-478c-9237-e4d34a8c8597
+  rating: null
+  suggested_replacement_value: null
+plan_id: b0675a4e-8eae-478c-9237-e4d34a8c8597
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: b0675a4e-8eae-478c-9237-e4d34a8c8597
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+  artist_a_discogs_id: b5f8d72d-cc84-4752-a949-738105edc0df
+  artist_a_local_id: 4df4d3ff-659a-4352-a786-0e111dfaa1dc
+  artist_a_musicbrainz_id: 5a2aa7c7-c94c-496c-a129-745874969270
+  artist_b_discogs_id: 004714d0-7c71-45de-9005-88b5e603f7dc
+  artist_b_local_id: f0f4272f-e6af-46b1-b9dd-d3da7e150cd2
+  artist_b_musicbrainz_id: 8ec66936-1c00-4ca3-9b84-cadf56d06a93
+  artist_name_a: Artist A
+  artist_name_b: Artist B
+  descriptor_a: Descriptor A
+  descriptor_b: Descriptor B
+  location: Unknown Location
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: b0675a4e-8eae-478c-9237-e4d34a8c8597
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4

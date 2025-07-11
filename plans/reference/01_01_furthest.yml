@@ -1,0 +1,88 @@
+associated_resource: '01_01'
+batch_id: 06d66eab-6756-495a-a4ec-27c935fc0ca7
+bpm: 135
+genres:
+- Art Rock
+- Avant-Garde
+- Dark Wave
+- Electronic
+- Experimental
+- Indie Rock
+- Marching Band
+- Post-Punk
+- Psychedelic
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  rating: null
+  suggested_replacement_value: null
+key: C major
+moods:
+- arcane
+- chilling
+- creepy
+- dark
+- eerie
+- foreboding
+- ghostly
+- haunted
+- haunting
+- jingoistic
+- mysterious
+- occult
+- ominous
+- otherworldly
+- phantasmal
+- sinister
+- spectral
+- spooky
+- supernatural
+- unsettling
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  rating: null
+  suggested_replacement_value: null
+plan: Make it magic!
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  rating: null
+  suggested_replacement_value: null
+plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+  artist_a_discogs_id: e381ee8e-c250-45ec-858b-8957ca55f42e
+  artist_a_local_id: ae772879-94b8-4d5b-be4b-7ed22d4563a2
+  artist_a_musicbrainz_id: 849157f8-11c2-4662-8521-7454d34dc377
+  artist_b_discogs_id: 07ab8415-dfee-48bb-abb4-a48882e720c3
+  artist_b_local_id: d2db23bc-8bca-472b-9ace-2750a9ec09c3
+  artist_b_musicbrainz_id: 9656e80a-bb5a-4e9a-aa47-ab3233316841
+  artist_name_a: Artist A
+  artist_name_b: Artist B
+  descriptor_a: Descriptor A
+  descriptor_b: Descriptor B
+  location: Unknown Location
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4

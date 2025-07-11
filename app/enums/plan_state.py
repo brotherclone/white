@@ -7,3 +7,4 @@ class PlanState(Enum):
     accepted = "accepted"
     rejected = "rejected"
     reference = "reference"
+    generated = "generated"
