@@ -77,9 +77,18 @@ mood:
   - "occult"
   - "arcane"
 sounds_like:
-  - "David Bowie"
-  - "Broadcast"
-  - "Nick Cave and the Bad Seeds"
+    - name: "David Bowie"
+      local_id: "",
+      discogs_id: "10263"
+      musicbrainz_id: "116c9875-5dcc-4461-b6b2-1860c1b8cc97"
+    - name: "Broadcast"
+      local_id: "",
+      discogs_id: "1e47505a-fd2e-4222-893b-8510c37cd0de"
+      musicbrainz_id: "ba687149-60ef-4faa-84ff-c4b4a738df6c"
+    - name: "Nick Cave and the Bad Seeds"
+      local_id: "",
+      discogs_id: "1ecdd5a4-d697-44ca-9c43-69c7710d921d"
+      musicbrainz_id: "2a13b995-abbf-4a0f-8348-037c297d1314"
 genres:
   - "Experimental"
   - "Psychedelic"

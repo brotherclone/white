@@ -19,36 +19,145 @@ NEGATIVE_REFERENCE_PLAN_NAMES = ["far", "further", "furthest"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PATH_TO_STAGED_RAW_MATERIALS = os.path.abspath(os.path.join(SCRIPT_DIR, "../..", "staged_raw_material"))
 PATH_TO_REFERENCE_PLANS = os.path.join(SCRIPT_DIR,"../..", "plans/reference")
+
 POSITIVE_PLAN_PARTS: List[RainbowSongStructureModel] = [
-    # "Intro",
-    # "Verse",
-    # "Chorus",
-    # "Bridge",
-    # "Outro",
-    # "Pre-Chorus",
-    # "Excursion",
-    # "Interlude",
-    # "Coda",
-    # "Found Sound",
-    # "Melodic Guitar Lead"
-    # "Protracted silence with room tone",
-    # "Art for art's sake",
-    # "Repeative, hypnotic groove",
+    RainbowSongStructureModel(
+        section_name="Intro",
+        section_description="Provides an overview of the song",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Verse",
+        section_description="The storytelling part of the song",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Chorus",
+        section_description="The repeated, catchy part of the song",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Bridge",
+        section_description="Unites the song's themes",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Outro",
+        section_description="Jams out the song",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Pre-Chorus",
+        section_description="Builds up to the chorus",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Excursion",
+        section_description="An extended instrumental section",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Interlude",
+        section_description="A short new sonic landscape visited momentarily",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Coda",
+        section_description="A concluding section that wraps up the song",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Found Sound",
+        section_description="A section that incorporates found sounds or field recordings",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Melodic Guitar Lead",
+        section_description="A section featuring a melodic guitar lead, without showy solos",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Protracted silence with room tone",
+        section_description="Protracted silence with room tone. 3:33",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Art for art's sake",
+        section_description="Expresss yourself or die",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Repetitive, hypnotic groove",
+        section_description="Repetitive, hypnotic groove",
+        sequence=0
+    ),
 ]
 NEGATIVE_PLAN_PARTS: List[RainbowSongStructureModel] = [
-    # "Drum Solo",
-    # "Breakdown with Spoken Word",
-    # "Skit",
-    # "Tempo Changes",
-    # "Key Changes",
-    # "Gratuitous Guitar Solo",
-    # "A direct plea to the listener to stand up and dance",
-    # "The whole song again in another language",
-    # "A long, drawn-out fade-out",
-    # "Protracted silence without room tone",
-    # "A hype man section",
-    # "Sex sounds",
-    # "Vocal solo with lots of trills and runs",
+    RainbowSongStructureModel(
+        section_name="Drum Solo",
+        section_description="Really boring for audience",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Breakdown with Spoken Word",
+        section_description="Why?",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Skit",
+        section_description="A skit that interrupts the flow of the song",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Tempo Changes",
+        section_description="As if the song wasn't already hard to follow",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Key Changes",
+        section_description="Almost always unnecessary",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Gratuitous Guitar Solo",
+        section_description="I'm sure it's fun for the guitarist, but it doesn't add anything to the song",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="A direct plea to the listener to stand up and dance",
+        section_description="Wedding stuff",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="The whole song again in another language",
+        section_description="And now I'll show off my mediocre language skills",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="A long, drawn-out fade-out",
+        section_description="A long, drawn-out fade-out",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Protracted silence without room tone",
+        section_description="So edgy",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="A hype man section",
+        section_description="Insert hype",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Sex sounds",
+        section_description="Ohhh girl",
+        sequence=0
+    ),
+    RainbowSongStructureModel(
+        section_name="Vocal solo with lots of trills and runs",
+        section_description="Whitney Houston would be proud",
+        sequence=0
+    ),
 ]
 POSITIVE_ARTISTS = [
     "Stereolab",
@@ -605,22 +714,30 @@ def stub_out_reference_plans(current_manifest_id: str,
 
 
 def stub_sounds_like(manifest_sounds_like: List[str]) -> RainbowSoundsLike:
-    # for ref in manifest_sounds_like:
-    #     print(ref)
-    plan_sounds_like = RainbowSoundsLike(
-        artist_name_a="Artist A",
-        artist_a_local_id=str(uuid.uuid4()),
-        artist_a_discogs_id=str(uuid.uuid4()),
-        artist_a_musicbrainz_id=str(uuid.uuid4()),
-        artist_name_b="Artist B",
-        artist_b_local_id=str(uuid.uuid4()),
-        artist_b_discogs_id=str(uuid.uuid4()),
-        artist_b_musicbrainz_id=str(uuid.uuid4()),
-        descriptor_a="Descriptor A",
-        descriptor_b="Descriptor B",
-        location="Unknown Location"
-    )
-    return plan_sounds_like
+        if len(manifest_sounds_like) >= 2:
+            selected_artists = random.sample(manifest_sounds_like, 2)
+            artist_a, artist_b = selected_artists
+        elif len(manifest_sounds_like) == 1:
+            artist_a = manifest_sounds_like[0]
+            artist_b = "Unknown Artist"
+        else:
+            artist_a = "Unknown Artist"
+            artist_b = "Unknown Artist"
+
+        plan_sounds_like = RainbowSoundsLike(
+            artist_name_a=artist_a,
+            artist_a_local_id=str(uuid.uuid4()),
+            artist_a_discogs_id=str(uuid.uuid4()),
+            artist_a_musicbrainz_id=str(uuid.uuid4()),
+            artist_name_b=artist_b,
+            artist_b_local_id=str(uuid.uuid4()),
+            artist_b_discogs_id=str(uuid.uuid4()),
+            artist_b_musicbrainz_id=str(uuid.uuid4()),
+            descriptor_a="Descriptor A",
+            descriptor_b="Descriptor B",
+            location="Unknown Location"
+        )
+        return plan_sounds_like
 
 def stub_plan_from_song_structure(song_structure: List[RainbowSongStructureModel]) -> str:
     # for sec in song_structure:

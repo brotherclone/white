@@ -1,40 +1,40 @@
 associated_resource: '01_01'
-batch_id: 78e9626d-69df-4ae9-998d-c846de98140e
-bpm: 139
+batch_id: 31326365-fac4-4d04-95cc-ffeb45cc7a1c
+bpm: 141
 genres:
 - Art Rock
 - Avant-Garde
-- Baroque Pop
 - Dark Wave
-- Electronic
 - Experimental
+- Experimental Blues
 - Gothic Rock
+- Indie Rock
 - Post-Punk
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 35981068-4f72-4e83-b020-898dd3e01c52
+  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 35981068-4f72-4e83-b020-898dd3e01c52
+  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
   rating: null
   suggested_replacement_value: null
-key: G# major
+key: C major
 moods:
 - arcane
 - chilling
 - creepy
-- eerie
+- dark
 - ethereal
-- experimental
 - foreboding
 - ghostly
 - haunted
 - haunting
+- melancholic
 - mysterious
 - occult
 - ominous
@@ -48,41 +48,41 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 35981068-4f72-4e83-b020-898dd3e01c52
+  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
   rating: null
   suggested_replacement_value: null
 plan: Make it magic!
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 35981068-4f72-4e83-b020-898dd3e01c52
+  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
   rating: null
   suggested_replacement_value: null
-plan_id: 35981068-4f72-4e83-b020-898dd3e01c52
+plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 35981068-4f72-4e83-b020-898dd3e01c52
+  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
   rating: null
   suggested_replacement_value: null
 sounds_like:
-  artist_a_discogs_id: e1daee03-396a-4b25-a8ec-1868853160c8
-  artist_a_local_id: 3905dc8f-20d4-49a8-ab5c-d0be401926cf
-  artist_a_musicbrainz_id: 5976bc1d-94fb-4141-af0a-d696bc16ed19
-  artist_b_discogs_id: 1cc0fb85-031a-4835-acd5-0208f2aa28cc
-  artist_b_local_id: bf4cc4b2-6382-493c-867d-b74139fdd44b
-  artist_b_musicbrainz_id: 300fdd63-93f3-4dcd-a149-faa528370212
-  artist_name_a: Artist A
-  artist_name_b: Artist B
+  artist_a_discogs_id: 93e36ef5-740b-433b-aa33-226f65da513d
+  artist_a_local_id: 4ee78f88-720f-4a86-98ba-d7bc6db772e3
+  artist_a_musicbrainz_id: 73a63841-b40c-420e-9a09-69ebab2a1c52
+  artist_b_discogs_id: 83f3f27b-7d48-409e-9d9b-ca57d531e285
+  artist_b_local_id: 8af7cd63-a663-4f08-9b69-6282edaf361c
+  artist_b_musicbrainz_id: db185204-1fa3-4265-ac30-d03798b0a8ec
+  artist_name_a: Nick Cave and the Bad Seeds
+  artist_name_b: Broadcast
   descriptor_a: Descriptor A
   descriptor_b: Descriptor B
   location: Unknown Location
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 35981068-4f72-4e83-b020-898dd3e01c52
+  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

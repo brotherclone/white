@@ -1,45 +1,45 @@
 associated_resource: '01_01'
-batch_id: 84e49519-e0e1-4e9d-b231-a5d2bc209e4e
-bpm: 136
+batch_id: bab4e78f-9dab-4da1-be4f-088aad824675
+bpm: 132
 genres:
+- Art Rock
 - Avant-Garde
 - Dark Wave
 - Electronic
 - Experimental
 - Gothic Rock
-- Indie Rock
-- Lounge
 - Post-Punk
 - Psychedelic
+- Reactionary Bluegrass
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 16c76421-d9e9-4b0c-909a-ae948c65f930
+  plan_id: eb36c1d7-e60a-444c-a954-a032589d2f8b
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 16c76421-d9e9-4b0c-909a-ae948c65f930
+  plan_id: eb36c1d7-e60a-444c-a954-a032589d2f8b
   rating: null
   suggested_replacement_value: null
-key: G major
+key: C# dorian
 moods:
 - arcane
 - chilling
 - creepy
+- dark
 - eerie
 - ethereal
 - foreboding
 - ghostly
-- haunted
 - haunting
+- kitschy
 - mysterious
 - occult
 - ominous
 - otherworldly
 - phantasmal
-- saccharine
 - sinister
 - spectral
 - spooky
@@ -48,41 +48,41 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 16c76421-d9e9-4b0c-909a-ae948c65f930
+  plan_id: eb36c1d7-e60a-444c-a954-a032589d2f8b
   rating: null
   suggested_replacement_value: null
 plan: Make it magic!
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 16c76421-d9e9-4b0c-909a-ae948c65f930
+  plan_id: eb36c1d7-e60a-444c-a954-a032589d2f8b
   rating: null
   suggested_replacement_value: null
-plan_id: 16c76421-d9e9-4b0c-909a-ae948c65f930
+plan_id: eb36c1d7-e60a-444c-a954-a032589d2f8b
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 16c76421-d9e9-4b0c-909a-ae948c65f930
+  plan_id: eb36c1d7-e60a-444c-a954-a032589d2f8b
   rating: null
   suggested_replacement_value: null
 sounds_like:
-  artist_a_discogs_id: 33f4a487-f67a-42c5-b75c-023f7be3f32d
-  artist_a_local_id: 983f13bc-c602-4782-a9e1-38db1da1cd40
-  artist_a_musicbrainz_id: dd04948c-5a48-41ff-add3-7386d6c7c060
-  artist_b_discogs_id: 11f36ddd-d0de-4ad2-9ca8-8b156e06e700
-  artist_b_local_id: c6a323e4-25e4-4d33-8beb-0153e3e01997
-  artist_b_musicbrainz_id: 01434a5d-a671-42c6-9f7f-41106345175f
-  artist_name_a: Artist A
-  artist_name_b: Artist B
+  artist_a_discogs_id: fe1e8494-7049-4873-aca2-b0334b373220
+  artist_a_local_id: 0ef3e951-202e-4583-836e-e4e6ea02f4f8
+  artist_a_musicbrainz_id: b04c5bfc-75da-4411-88e0-1af846be2fc2
+  artist_b_discogs_id: 37b1ec57-e7f1-4530-a40d-a8af4f0fdcd6
+  artist_b_local_id: 9f3c5951-6797-461b-b4a8-3e84cf304c48
+  artist_b_musicbrainz_id: 434b4b8e-685d-46b9-87bc-731ac1ea688b
+  artist_name_a: David Bowie
+  artist_name_b: Broadcast
   descriptor_a: Descriptor A
   descriptor_b: Descriptor B
   location: Unknown Location
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 16c76421-d9e9-4b0c-909a-ae948c65f930
+  plan_id: eb36c1d7-e60a-444c-a954-a032589d2f8b
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

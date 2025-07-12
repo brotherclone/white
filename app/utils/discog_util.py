@@ -5,9 +5,23 @@ from dotenv import load_dotenv
 def get_artist(artist_id):
     try:
         artist = discogs.artist(artist_id)
-        return artist.groups
+        return artist
     except Exception as e:
         print(f"Error fetching artist with ID {artist_id}: {e}")
+        return None
+
+def search_artist(artist_name):
+    """
+    Search for an artist by name
+    """
+    try:
+        results = discogs.search(artist_name, type='artist')
+        if not results:
+            print(f"No results found for {artist_name}")
+            return None
+        return results[0]
+    except Exception as e:
+        print(f"Error searching for artist {artist_name}: {e}")
         return None
 
 def get_group_members(group_name):
@@ -64,6 +78,7 @@ if __name__ == "__main__":
         'RainbowProfiler/1.0',
         user_token=os.environ['USER_ACCESS_TOKEN'],
     )
-    beatles_members = get_group_members("The Beatles")
-    releases = get_release_list(82730, per_page=25, main_release=True, debug=True)
-
+    a = search_artist("David Bowie")
+    print(a.id)
+    b = get_artist(a.id)
+    print(b.profile)

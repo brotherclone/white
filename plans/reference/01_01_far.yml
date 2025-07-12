@@ -1,6 +1,6 @@
 associated_resource: '01_01'
-batch_id: b18f2e37-72d6-413b-ab1a-6f0b5419f983
-bpm: 138
+batch_id: 4d4ab060-3c09-482a-a221-82ec273fb0c9
+bpm: 134
 genres:
 - Experimental
 - Psychedelic
@@ -14,13 +14,13 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 36f5c854-5619-4218-a745-74f6b22fc39c
+  plan_id: 0f4cee9c-ef27-4065-afbf-7ff1b7122e6f
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 36f5c854-5619-4218-a745-74f6b22fc39c
+  plan_id: 0f4cee9c-ef27-4065-afbf-7ff1b7122e6f
   rating: null
   suggested_replacement_value: null
 key: C major
@@ -48,41 +48,41 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 36f5c854-5619-4218-a745-74f6b22fc39c
+  plan_id: 0f4cee9c-ef27-4065-afbf-7ff1b7122e6f
   rating: null
   suggested_replacement_value: null
 plan: Make it magic!
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 36f5c854-5619-4218-a745-74f6b22fc39c
+  plan_id: 0f4cee9c-ef27-4065-afbf-7ff1b7122e6f
   rating: null
   suggested_replacement_value: null
-plan_id: 36f5c854-5619-4218-a745-74f6b22fc39c
+plan_id: 0f4cee9c-ef27-4065-afbf-7ff1b7122e6f
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 36f5c854-5619-4218-a745-74f6b22fc39c
+  plan_id: 0f4cee9c-ef27-4065-afbf-7ff1b7122e6f
   rating: null
   suggested_replacement_value: null
 sounds_like:
-  artist_a_discogs_id: d9988b13-bae8-4bb6-884c-81282c8658f2
-  artist_a_local_id: ba655607-a41f-47bb-b872-9723cff7f397
-  artist_a_musicbrainz_id: 714417d0-0c64-4ec4-9b0f-5d36a6c85144
-  artist_b_discogs_id: d9f4bbac-791b-4eac-b2ea-4903a772c0a4
-  artist_b_local_id: 1acaa8e9-f648-473e-bc05-2db5b5265121
-  artist_b_musicbrainz_id: d9e9f764-d66e-4f81-92f4-f83362cd3f8c
-  artist_name_a: Artist A
-  artist_name_b: Artist B
+  artist_a_discogs_id: aafb2f4c-d972-4f36-b3a4-9d2b9ef536f0
+  artist_a_local_id: 33bcf8ae-26b2-4866-87d4-757f8ac19cbd
+  artist_a_musicbrainz_id: 7ee6ae88-d071-4995-8aa2-a324a593fd13
+  artist_b_discogs_id: a005c147-1c0e-4d38-9ebe-2f90c030175b
+  artist_b_local_id: 3c55145e-955d-4f27-86a4-b006ed284542
+  artist_b_musicbrainz_id: 9f19c1f8-8757-4447-96c6-deb92ed1c68f
+  artist_name_a: Nick Cave and the Bad Seeds
+  artist_name_b: Broadcast
   descriptor_a: Descriptor A
   descriptor_b: Descriptor B
   location: Unknown Location
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 36f5c854-5619-4218-a745-74f6b22fc39c
+  plan_id: 0f4cee9c-ef27-4065-afbf-7ff1b7122e6f
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base,sessionmaker
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"  # Replace with your DB connection string
 
@@ -15,3 +14,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+if __name__ == '__main__':
+    # Example usage
+    db = next(get_db())
+    print("Database session created successfully.")
+    db.close()
+    print("Database session closed.")

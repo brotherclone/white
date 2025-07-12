@@ -1,26 +1,26 @@
 associated_resource: '01_01'
-batch_id: 06d66eab-6756-495a-a4ec-27c935fc0ca7
-bpm: 135
+batch_id: 43bac57f-9bc6-4c59-9240-3cff922c8916
+bpm: 131
 genres:
 - Art Rock
 - Avant-Garde
 - Dark Wave
 - Electronic
 - Experimental
+- Gospel Blues
 - Indie Rock
-- Marching Band
 - Post-Punk
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
   rating: null
   suggested_replacement_value: null
 key: C major
@@ -30,16 +30,16 @@ moods:
 - creepy
 - dark
 - eerie
+- ethereal
 - foreboding
 - ghostly
 - haunted
 - haunting
-- jingoistic
 - mysterious
 - occult
 - ominous
-- otherworldly
 - phantasmal
+- predictable
 - sinister
 - spectral
 - spooky
@@ -48,41 +48,41 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
   rating: null
   suggested_replacement_value: null
 plan: Make it magic!
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
   rating: null
   suggested_replacement_value: null
-plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
   rating: null
   suggested_replacement_value: null
 sounds_like:
-  artist_a_discogs_id: e381ee8e-c250-45ec-858b-8957ca55f42e
-  artist_a_local_id: ae772879-94b8-4d5b-be4b-7ed22d4563a2
-  artist_a_musicbrainz_id: 849157f8-11c2-4662-8521-7454d34dc377
-  artist_b_discogs_id: 07ab8415-dfee-48bb-abb4-a48882e720c3
-  artist_b_local_id: d2db23bc-8bca-472b-9ace-2750a9ec09c3
-  artist_b_musicbrainz_id: 9656e80a-bb5a-4e9a-aa47-ab3233316841
-  artist_name_a: Artist A
-  artist_name_b: Artist B
+  artist_a_discogs_id: d5c2ddb3-9622-49fd-9d1c-59b61afc291b
+  artist_a_local_id: 318443a8-21ff-4a71-8c4e-95538adc851a
+  artist_a_musicbrainz_id: 0e451493-caac-4d20-9428-e31d0cb57041
+  artist_b_discogs_id: ecb11351-449f-4983-9041-3ab933187b08
+  artist_b_local_id: f7af3130-f4f7-40ab-aac6-cef1d0528b1e
+  artist_b_musicbrainz_id: 4bb2b902-8380-4fa0-87b8-ab6bfb6567ea
+  artist_name_a: David Bowie
+  artist_name_b: Nick Cave and the Bad Seeds
   descriptor_a: Descriptor A
   descriptor_b: Descriptor B
   location: Unknown Location
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 358b4bd1-4759-4cfb-bf90-4ac7bcd9891f
+  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
