@@ -57,11 +57,13 @@ class RainbowMetaDataModel(BaseModel):
     lyrics: bool
     structure: list[RainbowSongStructureModel]
     mood: list[str]
+    # ToDo: Change to SoundslikeModel
     sounds_like: list[str]
+
     genres: list[str]
     lrc_file: bool | str = False
     audio_tracks: list[RainbowSongTrackModel] | None =None
-
+# ToDo: Add reference plans
 class RainbowSongMeta(BaseModel):
     yaml_file_name: str
     base_path: str

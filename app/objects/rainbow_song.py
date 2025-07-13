@@ -277,8 +277,11 @@ class RainbowSong(BaseModel):
                     song_has_lyrics=self.meta_data.data.lyrics,
                     song_structure=json.dumps([s.model_dump() for s in self.meta_data.data.structure]),
                     song_moods=", ".join([str(m) for m in self.meta_data.data.mood]),
+
                     # This needs updating to use the correct data structure
                     song_sounds_like=", ".join([str(l) for l in self.meta_data.data.sounds_like]),
+
+
                     song_genres=", ".join([str(g) for g in self.meta_data.data.genres]),
                     song_segment_name=extract.extract_data.section_name,
                     song_segment_start_time=str(extract.extract_data.start_time.total_seconds()),

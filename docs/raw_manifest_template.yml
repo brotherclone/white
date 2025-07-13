@@ -18,7 +18,10 @@ structure:
 mood:
   - "string"
 sounds_like:
-  - "string"
+    - name: "string" # e.g. "ABBA"
+      local_id: "string" # e.g. "1234",
+      discogs_id: "string" # e.g. "12345678"
+      musicbrainz_id: "string" # e.g. "12345678-1234-1234-1234-123456789012"
 genres:
   - "string"
 lrc_file: # String, e.g. "01_01.lrc"
@@ -28,7 +31,7 @@ audio_tracks:
     audio_file: # String, e.g. "01_01_main.wav"
     midi_file: # String, e.g. "01_01_main.mid"
     midi_group_file: # String, e.g. "01_01_main_group.mid"
-plans:
+reference_plans:
   positive:
     - 'plan_file_name' # String, e.g. "1_close.yml"
   negative:

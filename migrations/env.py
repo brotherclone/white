@@ -1,26 +1,20 @@
-from alembic import context
-from sqlalchemy import engine_from_config, pool
-from logging.config import fileConfig
 import os
 import sys
 
-# Add project root to Python path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Import your SQLAlchemy models - adjust import path as needed
+from dotenv import load_dotenv
+from alembic import context
+from sqlalchemy import engine_from_config, pool
+from logging.config import fileConfig
 from app.utils.db_util import Base
 
-# Alembic Config object
+load_dotenv()
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 config = context.config
+config.set_main_option("sqlalchemy.url", os.getenv('LOCAL_DB_PATH'))
 
-database_url = "sqlite:////Volumes/LucidNonsense/White/db/white.sqlite"
-config.set_main_option("sqlalchemy.url", database_url)
-
-# Interpret the config file for Python logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Set SQLAlchemy metadata target for migrations
 target_metadata = Base.metadata
 
 def run_migrations_offline():

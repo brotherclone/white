@@ -1,15 +1,19 @@
-import importlib
 import os
-from datetime import datetime
-from typing import List, Optional
-
 import alembic.config
+from dotenv import load_dotenv
+from datetime import datetime
+
 from alembic import command
-from alembic.script import ScriptDirectory
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MIGRATIONS_DIR = os.path.join(BASE_DIR, "migrations")
 
+
+def initialize_env():
+    load_dotenv()
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable is not set")
 
 def init_migrations():
     """Initialize the migration environment if it doesn't exist"""
