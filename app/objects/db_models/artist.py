@@ -8,7 +8,6 @@ class Artist(Base):
 
     id = Column(Integer, primary_key=True)
     discogs_id = Column(Integer, unique=True)
-    musicbrainz_id = Column(String(255), unique=True)
     name = Column(String(255), nullable=False)
     real_name = Column(String(255))
     profile = Column(Text)

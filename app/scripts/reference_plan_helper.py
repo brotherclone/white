@@ -728,11 +728,9 @@ def stub_sounds_like(manifest_sounds_like: List[str]) -> RainbowSoundsLike:
             artist_name_a=artist_a,
             artist_a_local_id=str(uuid.uuid4()),
             artist_a_discogs_id=str(uuid.uuid4()),
-            artist_a_musicbrainz_id=str(uuid.uuid4()),
             artist_name_b=artist_b,
             artist_b_local_id=str(uuid.uuid4()),
             artist_b_discogs_id=str(uuid.uuid4()),
-            artist_b_musicbrainz_id=str(uuid.uuid4()),
             descriptor_a="Descriptor A",
             descriptor_b="Descriptor B",
             location="Unknown Location"

@@ -49,22 +49,6 @@ def get_artist_by_discogs_id(discogs_id):
     finally:
         next(db_generator, None)
 
-def get_artist_by_music_brainz_id(musicbrainz_id):
-    db_generator = get_db()
-    db = next(db_generator)
-    try:
-        q = db.query(Artist).filter(Artist.musicbrainz_id == musicbrainz_id).first()
-        if q:
-            return q
-        else:
-            print(f"No artist found with MusicBrainz ID {musicbrainz_id}")
-            return None
-    except Exception as e:
-        print(f"Error fetching artist by MusicBrainz ID {musicbrainz_id}: {e}")
-        return None
-    finally:
-        next(db_generator, None)
-
 def update_artist(artist):
     db_generator = get_db()
     db = next(db_generator)
@@ -89,13 +73,9 @@ def create_artist(artist):
     db_generator = get_db()
     db = next(db_generator)
     try:
-        # Check if artist with same discogs_id or musicbrainz_id already exists
+        # Check if artist with same discogs_id exists
         if artist.discogs_id and get_artist_by_discogs_id(artist.discogs_id):
             print(f"Artist with discogs ID {artist.discogs_id} already exists")
-            return False
-
-        if artist.musicbrainz_id and get_artist_by_music_brainz_id(artist.musicbrainz_id):
-            print(f"Artist with musicbrainz ID {artist.musicbrainz_id} already exists")
             return False
 
         # Add the new artist to the database

@@ -25,8 +25,8 @@ def up():
         'artists',
         sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('discogs_id', sa.Integer, unique=True, nullable=False),
-        sa.Column('musicbrainz_id', sa.Integer, unique=True, nullable=False),
         sa.Column('name', sa.String(255), nullable=False),
+        sa.Column('profile', sa.Text, nullable=True),
         sa.Column('created_at', sa.DateTime, server_default=sa.func.now(), nullable=False),
         sa.Column('updated_at', sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False)
     )

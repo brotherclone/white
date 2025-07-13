@@ -70,10 +70,8 @@ rainbow_color_feedback:
 sounds_like:
   artist_a_discogs_id: 93e36ef5-740b-433b-aa33-226f65da513d
   artist_a_local_id: 4ee78f88-720f-4a86-98ba-d7bc6db772e3
-  artist_a_musicbrainz_id: 73a63841-b40c-420e-9a09-69ebab2a1c52
   artist_b_discogs_id: 83f3f27b-7d48-409e-9d9b-ca57d531e285
   artist_b_local_id: 8af7cd63-a663-4f08-9b69-6282edaf361c
-  artist_b_musicbrainz_id: db185204-1fa3-4265-ac30-d03798b0a8ec
   artist_name_a: Nick Cave and the Bad Seeds
   artist_name_b: Broadcast
   descriptor_a: Descriptor A
