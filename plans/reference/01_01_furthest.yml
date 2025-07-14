@@ -1,29 +1,29 @@
 associated_resource: '01_01'
-batch_id: 43bac57f-9bc6-4c59-9240-3cff922c8916
-bpm: 131
+batch_id: 82d5cdb5-39b5-4a24-834a-d5b1b476dcfa
+bpm: 144
 genres:
 - Art Rock
 - Avant-Garde
 - Dark Wave
 - Electronic
-- Experimental
-- Gospel Blues
+- Gothic Rock
 - Indie Rock
+- Jazz Rap
 - Post-Punk
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
+  plan_id: 6c3169ac-c31e-4597-9322-8deb7e7164cd
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
+  plan_id: 6c3169ac-c31e-4597-9322-8deb7e7164cd
   rating: null
   suggested_replacement_value: null
-key: C major
+key: B major
 moods:
 - arcane
 - chilling
@@ -37,7 +37,7 @@ moods:
 - haunting
 - mysterious
 - occult
-- ominous
+- otherworldly
 - phantasmal
 - predictable
 - sinister
@@ -48,41 +48,35 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
+  plan_id: 6c3169ac-c31e-4597-9322-8deb7e7164cd
   rating: null
   suggested_replacement_value: null
 plan: Make it magic!
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
+  plan_id: 6c3169ac-c31e-4597-9322-8deb7e7164cd
   rating: null
   suggested_replacement_value: null
-plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
+plan_id: 6c3169ac-c31e-4597-9322-8deb7e7164cd
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
+  plan_id: 6c3169ac-c31e-4597-9322-8deb7e7164cd
   rating: null
   suggested_replacement_value: null
 sounds_like:
-  artist_a_discogs_id: d5c2ddb3-9622-49fd-9d1c-59b61afc291b
-  artist_a_local_id: 318443a8-21ff-4a71-8c4e-95538adc851a
-  artist_a_musicbrainz_id: 0e451493-caac-4d20-9428-e31d0cb57041
-  artist_b_discogs_id: ecb11351-449f-4983-9041-3ab933187b08
-  artist_b_local_id: f7af3130-f4f7-40ab-aac6-cef1d0528b1e
-  artist_b_musicbrainz_id: 4bb2b902-8380-4fa0-87b8-ab6bfb6567ea
-  artist_name_a: David Bowie
-  artist_name_b: Nick Cave and the Bad Seeds
-  descriptor_a: Descriptor A
-  descriptor_b: Descriptor B
-  location: Unknown Location
+  artist_a: null
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 310050a9-24ff-4f85-b83a-d52ad68b72d9
+  plan_id: 6c3169ac-c31e-4597-9322-8deb7e7164cd
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

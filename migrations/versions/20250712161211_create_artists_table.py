@@ -1,5 +1,5 @@
 """
-Migration: create_users_table
+Migration: create_artists_table
 Created: 2025-07-12T16:12:11.123939
 """
 from alembic import op

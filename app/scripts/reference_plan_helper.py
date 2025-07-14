@@ -1,18 +1,20 @@
 import os
 import random
 import uuid
-from random import uniform
-from typing import List
-
 import yaml
 
+from random import uniform
+from typing import List
 from app.enums.plan_state import PlanState
 from app.objects.plan_feedback import RainbowPlanFeedback
 from app.objects.rainbow_color import RainbowColor
 from app.objects.rainbow_song_meta import RainbowSongStructureModel
 from app.objects.song_plan import RainbowSongPlan
-from app.objects.sounds_like import RainbowSoundsLike
+from app.objects.sounds_like import RainbowSoundsLike, RainbowSoundsLikeArtist
+from app.utils.db_util import create_artist, get_artist_by_discogs_id, update_artist, get_artist_by_local_id
+from app.utils.discog_util import search_discogs_artist
 from app.utils.string_util import get_random_musical_key, convert_to_rainbow_color
+from app.objects.db_models.artist import Artist
 
 POSITIVE_REFERENCE_PLAN_NAMES = ["close", "closer", "closest"]
 NEGATIVE_REFERENCE_PLAN_NAMES = ["far", "further", "furthest"]
@@ -590,7 +592,7 @@ def stub_out_reference_plans(current_manifest_id: str,
                              manifest_tempo: str,
                              manifest_key: str,
                              manifest_structure: List[RainbowSongStructureModel],
-                             manifest_sounds_like: List[str],
+                             manifest_sounds_like: List[RainbowSoundsLikeArtist],
                              manifest_genres: List[str],
                              manifest_mood: List[str],
                              manifest_color: RainbowColor):
@@ -613,7 +615,7 @@ def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        positive_plan.sounds_like = stub_sounds_like(manifest_sounds_like)  # fixme
+        positive_plan.sounds_like = stub_sounds_like(manifest_sounds_like)
         positive_plan.sounds_like_feedback = RainbowPlanFeedback(
             plan_id=positive_plan_id,
             field_name="sounds_like",
@@ -712,28 +714,10 @@ def stub_out_reference_plans(current_manifest_id: str,
             fy.write(plan_yaml)
         print(f"Created negative reference plan: {negative_plan_file_name}")
 
-
-def stub_sounds_like(manifest_sounds_like: List[str]) -> RainbowSoundsLike:
-        if len(manifest_sounds_like) >= 2:
-            selected_artists = random.sample(manifest_sounds_like, 2)
-            artist_a, artist_b = selected_artists
-        elif len(manifest_sounds_like) == 1:
-            artist_a = manifest_sounds_like[0]
-            artist_b = "Unknown Artist"
-        else:
-            artist_a = "Unknown Artist"
-            artist_b = "Unknown Artist"
+def stub_sounds_like(manifest_sounds_like: List[RainbowSoundsLikeArtist]) -> RainbowSoundsLike:
 
         plan_sounds_like = RainbowSoundsLike(
-            artist_name_a=artist_a,
-            artist_a_local_id=str(uuid.uuid4()),
-            artist_a_discogs_id=str(uuid.uuid4()),
-            artist_name_b=artist_b,
-            artist_b_local_id=str(uuid.uuid4()),
-            artist_b_discogs_id=str(uuid.uuid4()),
-            descriptor_a="Descriptor A",
-            descriptor_b="Descriptor B",
-            location="Unknown Location"
+
         )
         return plan_sounds_like
 
@@ -805,9 +789,76 @@ def randomly_modify_mood(current_moods: List[str], degradation: float, positive:
 def update_reference_manifest_with_plans():
     pass
 
-# get arist ids from names in sounds like
-def enrich_sounds_like():
-    pass
+def enrich_sounds_like(sounds_like_artist: RainbowSoundsLikeArtist) -> Artist | None:
+        working_artist = Artist(name=sounds_like_artist.name)
+
+        # Case 1: No discogs_id and no local_id - search and create new artist
+        if sounds_like_artist.discogs_id is None and sounds_like_artist.local_id is None:
+            search_result = search_discogs_artist(sounds_like_artist.name)
+            if search_result is not None:
+                # Store discogs_id as a string consistently
+                discogs_id = str(search_result.id)
+                working_artist.discogs_id = discogs_id
+
+                # Check if artist already exists with this discogs_id
+                existing = get_artist_by_discogs_id(discogs_id)
+                if existing:
+                    print(f"Artist already exists with discogs ID {discogs_id}")
+                    return existing
+
+                # Create new artist
+                try:
+                    result = create_artist(working_artist)
+                    if result and not isinstance(result, bool):
+                        working_artist = result  # Use the returned artist with DB-generated ID
+                        return working_artist
+                    else:
+                        print(f"Failed to create artist {sounds_like_artist.name}")
+                        return None
+                except Exception as err:
+                    print(f"Error creating artist {sounds_like_artist.name}: {err}")
+                    return None
+
+        # Case 2: Has local_id but no discogs_id
+        elif sounds_like_artist.discogs_id is None and sounds_like_artist.local_id is not None:
+            try:
+                # Get artist from local DB first
+                local_artist = get_artist_by_local_id(sounds_like_artist.local_id)
+                if not local_artist:
+                    print(f"No artist found with local ID {sounds_like_artist.local_id}")
+                    return None
+
+                # Enrich with discogs data if needed
+                search_result = search_discogs_artist(sounds_like_artist.name)
+                if search_result:
+                    local_artist.discogs_id = str(search_result.id)
+                    update_artist(local_artist)
+                return local_artist
+            except Exception as err:
+                print(f"Error processing artist with local ID {sounds_like_artist.local_id}: {err}")
+                return None
+
+        # Case 3: Has discogs_id but no local_id
+        elif sounds_like_artist.discogs_id is not None:
+            try:
+                # Convert to string to ensure consistency
+                discogs_id = str(sounds_like_artist.discogs_id)
+                local_artist = get_artist_by_discogs_id(discogs_id)
+                if local_artist:
+                    return local_artist
+
+                # If not found, create a new artist with this discogs_id
+                working_artist.discogs_id = discogs_id
+                result = create_artist(working_artist)
+                if result and not isinstance(result, bool):
+                    return result
+                return None
+            except Exception as err:
+                print(f"Error searching for artist with discogs ID {sounds_like_artist.discogs_id}: {err}")
+                return None
+
+        return None
+
 
 def split_song_structure():
     pass
@@ -887,3 +938,12 @@ if __name__ == "__main__":
                             continue
             else:
                 print(f"Skipping non-directory item: {subdir_path}")
+
+
+if __name__ == "__main__":
+    sl = RainbowSoundsLikeArtist(
+        name="The Rolling Stones",
+        local_id=None,
+        discogs_id=None
+    )
+    enriched_artist = enrich_sounds_like(sl)

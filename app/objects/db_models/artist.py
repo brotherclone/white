@@ -9,6 +9,7 @@ class Artist(Base):
     id = Column(Integer, primary_key=True)
     discogs_id = Column(Integer, unique=True)
     name = Column(String(255), nullable=False)
-    real_name = Column(String(255))
     profile = Column(Text)
-    url = Column(String(255))
+
+    def __repr__(self):
+        return f"<Artist(id={self.id}, name='{self.name}', discogs_id='{self.discogs_id}')>"

@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base,sessionmaker
 from app.objects.db_models.artist import Artist
+from app.utils.discog_util import search_discogs_artist
 
 load_dotenv()
 engine = create_engine(os.environ['LOCAL_DB_PATH'])
@@ -49,50 +50,42 @@ def get_artist_by_discogs_id(discogs_id):
     finally:
         next(db_generator, None)
 
-def update_artist(artist):
+def update_artist(artist)-> Artist | None:
     db_generator = get_db()
     db = next(db_generator)
     try:
         existing_artist = db.query(Artist).filter(Artist.id == artist.id).first()
         if not existing_artist:
             print(f"No artist found with ID {artist.id}")
-            return False
+            return None
         # Merge the updated artist object and commit
         db.merge(artist)
         db.commit()
-        return True
+        return artist
     except Exception as e:
         # Rollback in case of error
         db.rollback()
         print(f"Error updating artist: {e}")
-        return False
+        return None
     finally:
         next(db_generator, None)
 
-def create_artist(artist):
+def create_artist(artist) -> Artist | None:
     db_generator = get_db()
     db = next(db_generator)
     try:
-        # Check if artist with same discogs_id exists
-        if artist.discogs_id and get_artist_by_discogs_id(artist.discogs_id):
-            print(f"Artist with discogs ID {artist.discogs_id} already exists")
-            return False
-
-        # Add the new artist to the database
         db.add(artist)
         db.commit()
-
-        # Refresh to get the auto-generated ID and any other default values
         db.refresh(artist)
         return artist
     except Exception as e:
         db.rollback()
         print(f"Error creating artist: {e}")
-        return False
+        return None
     finally:
         next(db_generator, None)
 
-def delete_artist(artist_id):
+def delete_artist(artist_id) -> bool:
     db_generator = get_db()
     db = next(db_generator)
     try:
@@ -115,4 +108,23 @@ def delete_artist(artist_id):
         next(db_generator, None)
 
 if __name__ == '__main__':
-    pass
+    test_artist = Artist(name="The Kinks", discogs_id=0)
+    look_up_artist = search_discogs_artist(test_artist.name)
+    if look_up_artist:
+        test_artist.discogs_id = look_up_artist.id
+        test_artist.profile = look_up_artist.profile
+        test_artist.name = look_up_artist.name
+    created_artist = create_artist(test_artist)
+    if created_artist:
+        print(f"Created artist: {created_artist.name} with ID {created_artist.id}")
+    else:
+        print("Failed to create artist")
+    patched_artist = created_artist
+    patched_artist.profile = "Testing profile update"
+    updated_artist = update_artist(patched_artist)
+    if updated_artist:
+        print(f"Updated artist: {updated_artist.name} with ID {updated_artist.id}")
+    else:
+        print("Failed to update artist")
+    if delete_artist(updated_artist.id):
+        print(f"Deleted artist with ID {updated_artist.id}")

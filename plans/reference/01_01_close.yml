@@ -1,6 +1,6 @@
 associated_resource: '01_01'
-batch_id: fcd018c7-b781-4998-a6f1-12356c9da7bd
-bpm: 137
+batch_id: 6705ae10-c7b6-4df2-8e49-f00e7fd3de10
+bpm: 133
 genres:
 - Experimental
 - Psychedelic
@@ -14,13 +14,13 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: ba687149-60ef-4faa-84ff-c4b4a738df6c
+  plan_id: 6accc5e3-8ddc-4d9c-b305-baaa5cd73b06
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: ba687149-60ef-4faa-84ff-c4b4a738df6c
+  plan_id: 6accc5e3-8ddc-4d9c-b305-baaa5cd73b06
   rating: null
   suggested_replacement_value: null
 key: C major
@@ -48,41 +48,35 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: ba687149-60ef-4faa-84ff-c4b4a738df6c
+  plan_id: 6accc5e3-8ddc-4d9c-b305-baaa5cd73b06
   rating: null
   suggested_replacement_value: null
 plan: Make it magic!
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: ba687149-60ef-4faa-84ff-c4b4a738df6c
+  plan_id: 6accc5e3-8ddc-4d9c-b305-baaa5cd73b06
   rating: null
   suggested_replacement_value: null
-plan_id: ba687149-60ef-4faa-84ff-c4b4a738df6c
+plan_id: 6accc5e3-8ddc-4d9c-b305-baaa5cd73b06
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: ba687149-60ef-4faa-84ff-c4b4a738df6c
+  plan_id: 6accc5e3-8ddc-4d9c-b305-baaa5cd73b06
   rating: null
   suggested_replacement_value: null
 sounds_like:
-  artist_a_discogs_id: eafe49d7-dbac-4b8f-8657-58d68a4a9b10
-  artist_a_local_id: 116c9875-5dcc-4461-b6b2-1860c1b8cc97
-  artist_a_musicbrainz_id: 1e47505a-fd2e-4222-893b-8510c37cd0de
-  artist_b_discogs_id: 1ecdd5a4-d697-44ca-9c43-69c7710d921d
-  artist_b_local_id: 2a13b995-abbf-4a0f-8348-037c297d1314
-  artist_b_musicbrainz_id: 81f14e70-14cf-4293-8de5-38d3666858af
-  artist_name_a: Broadcast
-  artist_name_b: Nick Cave and the Bad Seeds
-  descriptor_a: Descriptor A
-  descriptor_b: Descriptor B
-  location: Unknown Location
+  artist_a: null
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: ba687149-60ef-4faa-84ff-c4b4a738df6c
+  plan_id: 6accc5e3-8ddc-4d9c-b305-baaa5cd73b06
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

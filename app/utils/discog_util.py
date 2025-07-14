@@ -2,7 +2,13 @@ import os
 import discogs_client
 from dotenv import load_dotenv
 
-def get_artist(artist_id):
+load_dotenv()
+discogs = discogs_client.Client(
+    'RainbowProfiler/1.0',
+    user_token=os.environ['USER_ACCESS_TOKEN'],
+)
+
+def get_discogs_artist(artist_id):
     try:
         artist = discogs.artist(artist_id)
         return artist
@@ -10,10 +16,11 @@ def get_artist(artist_id):
         print(f"Error fetching artist with ID {artist_id}: {e}")
         return None
 
-def search_artist(artist_name):
+def search_discogs_artist(artist_name):
     """
     Search for an artist by name
     """
+    print(f"Searching for artist: {artist_name}")
     try:
         results = discogs.search(artist_name, type='artist')
         if not results:
@@ -24,7 +31,7 @@ def search_artist(artist_name):
         print(f"Error searching for artist {artist_name}: {e}")
         return None
 
-def get_group_members(group_name):
+def get_discogs_group_members(group_name):
     results = discogs.search(group_name, type='artist')
     if not results:
         print(f"No results found for {group_name}")
@@ -41,8 +48,8 @@ def get_group_members(group_name):
     return members
 
 
-def get_release_list(artist_id, per_page=50, page=1, sort='year', sort_order='asc',
-                     release_type=None, main_release=True, debug=False):
+def get_discogs_release_list(artist_id, per_page=50, page=1, sort='year', sort_order='asc',
+                             release_type=None, main_release=True, debug=False):
     """
     Get releases for an artist with filtering options
     """
@@ -73,12 +80,8 @@ def get_release_list(artist_id, per_page=50, page=1, sort='year', sort_order='as
 
 
 if __name__ == "__main__":
-    load_dotenv()
-    discogs = discogs_client.Client(
-        'RainbowProfiler/1.0',
-        user_token=os.environ['USER_ACCESS_TOKEN'],
-    )
-    a = search_artist("David Bowie")
+
+    a = search_discogs_artist("David Bowie")
     print(a.id)
-    b = get_artist(a.id)
+    b = get_discogs_artist(a.id)
     print(b.profile)

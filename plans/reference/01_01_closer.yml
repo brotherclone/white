@@ -1,26 +1,26 @@
 associated_resource: '01_01'
-batch_id: 31326365-fac4-4d04-95cc-ffeb45cc7a1c
-bpm: 141
+batch_id: 4a464a40-9f38-4b69-b1c9-c01867491a06
+bpm: 131
 genres:
 - Art Rock
 - Avant-Garde
 - Dark Wave
+- Electronic
 - Experimental
-- Experimental Blues
+- Experimental Pop
 - Gothic Rock
 - Indie Rock
-- Post-Punk
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
+  plan_id: 1b2d5259-b8ef-47dd-bc58-31483d4070e9
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
+  plan_id: 1b2d5259-b8ef-47dd-bc58-31483d4070e9
   rating: null
   suggested_replacement_value: null
 key: C major
@@ -29,58 +29,54 @@ moods:
 - chilling
 - creepy
 - dark
+- eerie
 - ethereal
 - foreboding
 - ghostly
 - haunted
 - haunting
-- melancholic
 - mysterious
 - occult
 - ominous
 - otherworldly
-- phantasmal
 - sinister
 - spectral
 - spooky
 - supernatural
+- transcendent
 - unsettling
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
+  plan_id: 1b2d5259-b8ef-47dd-bc58-31483d4070e9
   rating: null
   suggested_replacement_value: null
 plan: Make it magic!
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
+  plan_id: 1b2d5259-b8ef-47dd-bc58-31483d4070e9
   rating: null
   suggested_replacement_value: null
-plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
+plan_id: 1b2d5259-b8ef-47dd-bc58-31483d4070e9
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
+  plan_id: 1b2d5259-b8ef-47dd-bc58-31483d4070e9
   rating: null
   suggested_replacement_value: null
 sounds_like:
-  artist_a_discogs_id: 93e36ef5-740b-433b-aa33-226f65da513d
-  artist_a_local_id: 4ee78f88-720f-4a86-98ba-d7bc6db772e3
-  artist_b_discogs_id: 83f3f27b-7d48-409e-9d9b-ca57d531e285
-  artist_b_local_id: 8af7cd63-a663-4f08-9b69-6282edaf361c
-  artist_name_a: Nick Cave and the Bad Seeds
-  artist_name_b: Broadcast
-  descriptor_a: Descriptor A
-  descriptor_b: Descriptor B
-  location: Unknown Location
+  artist_a: null
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 0232885f-43cb-4fcb-a52e-ee44d9c665aa
+  plan_id: 1b2d5259-b8ef-47dd-bc58-31483d4070e9
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
