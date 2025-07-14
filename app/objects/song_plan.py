@@ -21,7 +21,7 @@ class RainbowSongPlan(BaseModel):
     tempo: str | None = None
     moods: list[str] | None = None
     moods_feedback: RainbowPlanFeedback | None = None
-    sounds_like: RainbowSoundsLike | None = None
+    sounds_like: list[RainbowSoundsLike] | None = None
     sounds_like_feedback: RainbowPlanFeedback | None = None
     rainbow_color: RainbowColor | None = None
     rainbow_color_feedback: RainbowPlanFeedback | None = None

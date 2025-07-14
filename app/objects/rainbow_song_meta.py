@@ -2,7 +2,9 @@ import datetime
 import yaml
 import os
 from pydantic import BaseModel, ValidationError
+
 from app.objects.rainbow_color import RainbowColor
+from app.objects.sounds_like import RainbowSoundsLike
 
 THE_ARTIST = "The Earthly Frames"
 
@@ -57,13 +59,12 @@ class RainbowMetaDataModel(BaseModel):
     lyrics: bool
     structure: list[RainbowSongStructureModel]
     mood: list[str]
-    # ToDo: Change to SoundslikeModel
-    sounds_like: list[str]
-
+    sounds_like: list[RainbowSoundsLike]
     genres: list[str]
     lrc_file: bool | str = False
     audio_tracks: list[RainbowSongTrackModel] | None =None
-# ToDo: Add reference plans
+    # ToDo: Add reference plans
+
 class RainbowSongMeta(BaseModel):
     yaml_file_name: str
     base_path: str

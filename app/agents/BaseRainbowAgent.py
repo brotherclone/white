@@ -5,7 +5,7 @@ import os
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from pydantic import BaseModel, ConfigDict
-from typing import List, Any, Optional
+from typing import list, Any, Optional
 from app.enums.agent_state import AgentState
 
 class BaseRainbowAgent(BaseModel):
@@ -63,7 +63,7 @@ class BaseRainbowAgent(BaseModel):
         else:
             print("No data frames to process.")
 
-    def create_vector_store(self, text_field:str, metadata_fields: List[str]) -> None:
+    def create_vector_store(self, text_field:str, metadata_fields: list[str]) -> None:
         if self.training_data is None:
             print("No training data available to create vector store.")
             return

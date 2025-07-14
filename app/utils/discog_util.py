@@ -1,4 +1,5 @@
 import os
+import asyncio
 import discogs_client
 from dotenv import load_dotenv
 
@@ -8,7 +9,8 @@ discogs = discogs_client.Client(
     user_token=os.environ['USER_ACCESS_TOKEN'],
 )
 
-def get_discogs_artist(artist_id):
+
+async def get_discogs_artist(artist_id):
     try:
         artist = discogs.artist(artist_id)
         return artist
@@ -16,7 +18,8 @@ def get_discogs_artist(artist_id):
         print(f"Error fetching artist with ID {artist_id}: {e}")
         return None
 
-def search_discogs_artist(artist_name):
+
+async def search_discogs_artist(artist_name):
     """
     Search for an artist by name
     """
@@ -31,7 +34,8 @@ def search_discogs_artist(artist_name):
         print(f"Error searching for artist {artist_name}: {e}")
         return None
 
-def get_discogs_group_members(group_name):
+
+async def get_discogs_group_members(group_name):
     results = discogs.search(group_name, type='artist')
     if not results:
         print(f"No results found for {group_name}")
@@ -48,7 +52,7 @@ def get_discogs_group_members(group_name):
     return members
 
 
-def get_discogs_release_list(artist_id, per_page=50, page=1, sort='year', sort_order='asc',
+async def get_discogs_release_list(artist_id, per_page=50, page=1, sort='year', sort_order='asc',
                              release_type=None, main_release=True, debug=False):
     """
     Get releases for an artist with filtering options
@@ -80,8 +84,10 @@ def get_discogs_release_list(artist_id, per_page=50, page=1, sort='year', sort_o
 
 
 if __name__ == "__main__":
+    async def main():
+        a = await search_discogs_artist("David Bowie")
+        print(a.id)
+        b = await get_discogs_artist(a.id)
+        print(b.profile)
 
-    a = search_discogs_artist("David Bowie")
-    print(a.id)
-    b = get_discogs_artist(a.id)
-    print(b.profile)
+    asyncio.run(main())

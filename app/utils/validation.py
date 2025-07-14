@@ -1,14 +1,13 @@
-import os
 import json
 import pandas as pd
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, Optional, Any, Union
 from pydantic import BaseModel
 
 class ValidationResult(BaseModel):
     """Results of validating a training sample"""
     is_valid: bool = True
-    errors: List[str] = []
-    warnings: List[str] = []
+    errors: list[str] = []
+    warnings: list[str] = []
     sample_id: Optional[str] = None
 
 class ValidationSummary(BaseModel):
@@ -19,7 +18,7 @@ class ValidationSummary(BaseModel):
     samples_with_warnings: int = 0
     error_counts: Dict[str, int] = {}
     warning_counts: Dict[str, int] = {}
-    results: List[ValidationResult] = []
+    results: list[ValidationResult] = []
 
 class TrainingSampleValidator:
     """Validates training samples for completeness and consistency"""

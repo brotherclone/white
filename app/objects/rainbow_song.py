@@ -37,8 +37,8 @@ class RainbowSong(BaseModel):
 
     Attributes:
         meta_data (RainbowSongMeta): Metadata for the song.
-        extracts (list[MultimodalExtract] | None): List of extracted song segments.
-        training_samples (list[TrainingSample] | None): List of generated training samples.
+        extracts (list[MultimodalExtract] | None): list of extracted song segments.
+        training_samples (list[TrainingSample] | None): list of generated training samples.
         training_sample_data_frame (Any | None): DataFrame containing training sample data.
     """
     meta_data: RainbowSongMeta

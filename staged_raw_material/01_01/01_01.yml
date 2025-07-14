@@ -78,14 +78,14 @@ mood:
   - "arcane"
 sounds_like:
     - name: "David Bowie"
-      local_id: ""
-      discogs_id: "10263"
+      id: ~
+      discogs_id: 10263
     - name: "Broadcast"
-      local_id: ""
-      discogs_id: ""
+      id: ~
+      discogs_id: ~
     - name: "Nick Cave and the Bad Seeds"
-      local_id: ""
-      discogs_id: ""
+      id: ~
+      discogs_id: ~
 genres:
   - "Experimental"
   - "Psychedelic"
