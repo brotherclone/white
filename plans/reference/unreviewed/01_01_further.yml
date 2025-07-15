@@ -1,0 +1,122 @@
+associated_resource: '01_01'
+batch_id: 86800794-49a3-4dec-8292-b672026c8b59
+bpm: 133
+genres:
+- Art Rock
+- Christian Worship
+- Dark Wave
+- Electronic
+- Experimental
+- Gothic Rock
+- Indie Rock
+- Post-Punk
+- Psychedelic
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  rating: null
+  suggested_replacement_value: null
+key: A mixolydian
+moods:
+- arcane
+- blunt
+- chilling
+- creepy
+- dark
+- eerie
+- ethereal
+- foreboding
+- ghostly
+- haunted
+- haunting
+- mysterious
+- ominous
+- otherworldly
+- phantasmal
+- sinister
+- spectral
+- spooky
+- supernatural
+- unsettling
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  rating: null
+  suggested_replacement_value: null
+plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a:
+    discogs_id: 10263
+    id: 104
+    name: David Bowie
+    profile: "British pop/rock singer, musician, songwriter, and actor.\r\n\r\nBorn:\
+      \ 8 January 1947 in Brixton, London, England, UK.\r\nDied: 10 January 2016 in\
+      \ Manhattan, New York City, USA (aged 69).\r\n\r\nBowie is recognized as one\
+      \ of the most respected contemporary musicians of his period. He was a leading\
+      \ figure in the music industry and is considered one of the most influential\
+      \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
+      \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 955
+    id: 202
+    name: Broadcast
+    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
+      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
+      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
+      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
+      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
+      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
+      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
+      \ \r\n"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 36665
+    id: 203
+    name: Nick Cave and the Bad Seeds
+    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
+      \ The group has had an international line-up throughout their career.\r\n\r\n\
+      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
+      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
+      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
+      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: bleak
+  location: at Glastonbury
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4

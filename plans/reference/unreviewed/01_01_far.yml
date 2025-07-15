@@ -1,0 +1,106 @@
+associated_resource: '01_01'
+batch_id: 115ef8c3-982a-48c4-a2b7-070da5127373
+bpm: 136
+genres:
+- Experimental
+- Psychedelic
+- Post-Punk
+- Art Rock
+- Avant-Garde
+- Electronic
+- Indie Rock
+- Dark Wave
+- Gothic Rock
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: b788fe40-bc27-4b4a-9cdc-95e119361fbd
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: b788fe40-bc27-4b4a-9cdc-95e119361fbd
+  rating: null
+  suggested_replacement_value: null
+key: C major
+moods:
+- dark
+- mysterious
+- haunting
+- ethereal
+- ghostly
+- ominous
+- spooky
+- eerie
+- otherworldly
+- unsettling
+- creepy
+- chilling
+- foreboding
+- sinister
+- supernatural
+- phantasmal
+- spectral
+- haunted
+- occult
+- arcane
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: b788fe40-bc27-4b4a-9cdc-95e119361fbd
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: b788fe40-bc27-4b4a-9cdc-95e119361fbd
+  rating: null
+  suggested_replacement_value: null
+plan_id: b788fe40-bc27-4b4a-9cdc-95e119361fbd
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: b788fe40-bc27-4b4a-9cdc-95e119361fbd
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a:
+    discogs_id: 10263
+    id: 104
+    name: David Bowie
+    profile: "British pop/rock singer, musician, songwriter, and actor.\r\n\r\nBorn:\
+      \ 8 January 1947 in Brixton, London, England, UK.\r\nDied: 10 January 2016 in\
+      \ Manhattan, New York City, USA (aged 69).\r\n\r\nBowie is recognized as one\
+      \ of the most respected contemporary musicians of his period. He was a leading\
+      \ figure in the music industry and is considered one of the most influential\
+      \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
+      \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
+  artist_b: null
+  descriptor_a: oppressive
+  descriptor_b: disturbing
+  location: in a hospital waiting room
+- artist_a:
+    discogs_id: 36665
+    id: 203
+    name: Nick Cave and the Bad Seeds
+    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
+      \ The group has had an international line-up throughout their career.\r\n\r\n\
+      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
+      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
+      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
+      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: b788fe40-bc27-4b4a-9cdc-95e119361fbd
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4

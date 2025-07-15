@@ -17,6 +17,7 @@ from app.utils.audio_util import has_significant_audio, get_microseconds_per_bea
     split_midi_file_by_segment, midi_to_bytes
 from app.utils.time_util import lrc_to_seconds, get_duration
 from app.utils.string_util import safe_filename,to_str_dict
+from app.utils.validation import TrainingSampleValidator
 
 JUST_NUMBERS_PATTERN = r'^\d+$'
 LRC_TIME_STAMP_PATTERN = r'^\[(\d+:\d+(?:\.\d+)?|\d+(?:\.\d+)?)\](.*)'
@@ -36,8 +37,8 @@ class RainbowSong(BaseModel):
 
     Attributes:
         meta_data (RainbowSongMeta): Metadata for the song.
-        extracts (list[MultimodalExtract] | None): List of extracted song segments.
-        training_samples (list[TrainingSample] | None): List of generated training samples.
+        extracts (list[MultimodalExtract] | None): list of extracted song segments.
+        training_samples (list[TrainingSample] | None): list of generated training samples.
         training_sample_data_frame (Any | None): DataFrame containing training sample data.
     """
     meta_data: RainbowSongMeta
@@ -276,7 +277,11 @@ class RainbowSong(BaseModel):
                     song_has_lyrics=self.meta_data.data.lyrics,
                     song_structure=json.dumps([s.model_dump() for s in self.meta_data.data.structure]),
                     song_moods=", ".join([str(m) for m in self.meta_data.data.mood]),
+
+                    # This needs updating to use the correct data structure
                     song_sounds_like=", ".join([str(l) for l in self.meta_data.data.sounds_like]),
+
+
                     song_genres=", ".join([str(g) for g in self.meta_data.data.genres]),
                     song_segment_name=extract.extract_data.section_name,
                     song_segment_start_time=str(extract.extract_data.start_time.total_seconds()),
@@ -319,6 +324,18 @@ class RainbowSong(BaseModel):
         self.training_sample_data_frame = pd.DataFrame([
             to_str_dict(ts.model_dump()) for ts in self.training_samples
         ])
+
+        validator = TrainingSampleValidator()
+        validation_summary = validator.validate_dataframe(self.training_sample_data_frame)
+        validator.print_summary()
+
+        if validation_summary.samples_with_errors == 0:
+            self.training_sample_data_frame.to_parquet(
+                os.path.join(TRAINING_DIR, f"{safe_filename(self.meta_data.data.title)}_training_samples.parquet")
+            )
+        else:
+            print("WARNING: Training samples have validation errors. Data not saved.")
+
         self.training_sample_data_frame.to_parquet(
             os.path.join(TRAINING_DIR, f"{safe_filename(self.meta_data.data.title)}_training_samples.parquet")
         )

@@ -1,4 +1,5 @@
 bpm: 136
+manifest_id: "01_01"
 tempo: "4/4"
 key: "C major"
 rainbow_color: "Black"
@@ -76,9 +77,15 @@ mood:
   - "occult"
   - "arcane"
 sounds_like:
-  - "David Bowie"
-  - "Broadcast"
-  - "Nick Cave and the Bad Seeds"
+    - name: "David Bowie"
+      id: ~
+      discogs_id: 10263
+    - name: "Broadcast"
+      id: ~
+      discogs_id: ~
+    - name: "Nick Cave and the Bad Seeds"
+      id: ~
+      discogs_id: ~
 genres:
   - "Experimental"
   - "Psychedelic"
@@ -172,3 +179,12 @@ audio_tracks:
     description: "big, over-modulated floor tom"
     audio_file: "01_01_26.wav"
     midi_group_file: "01_01_drums.mid"
+reference_plans:
+    positive:
+        - "01_01_close.yml"
+        - "01_01_closer.yml"
+        - "01_01_closest.yml"
+    negative:
+        - "01_01_far.yml"
+        - "01_01_further.yml"
+        - "01_01_furthest.yml"

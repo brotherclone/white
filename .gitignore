@@ -13,3 +13,7 @@
 *.mid
 .DS_Store
 *.pyc
+.env
+
+!**/*.lrc
+!**/*.yml

@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Any
+from typing import Any
 from enum import Enum
 from pydantic import BaseModel
 
@@ -16,7 +16,7 @@ class MultimodalExtractEventModel(BaseModel):
     content: Any
 
 class MultimodalExtractModel(BaseModel):
-    events: List[MultimodalExtractEventModel] | None = None
+    events: list[MultimodalExtractEventModel] | None = None
     start_time:  datetime.timedelta | None = None
     end_time:  datetime.timedelta | None = None
     duration: datetime.timedelta | None = None

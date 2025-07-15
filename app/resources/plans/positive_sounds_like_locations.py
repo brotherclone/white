@@ -1,0 +1,15 @@
+POSITIVE_SOUNDS_LIKE_LOCATIONS: list[str] = [
+    "in an abandoned vaudeville theatre",
+    "in a bomb shelter",
+    "in a cave",
+    "in a church",
+    "in a deserted warehouse",
+    "in a forest",
+    "in a haunted house",
+    "in a hidden speakeasy",
+    "in a library",
+    "in a mystical garden",
+    "in a mountain cabin",
+    "in a mystical forest",
+    "in a remote cabin",
+]
