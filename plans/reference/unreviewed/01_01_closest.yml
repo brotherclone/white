@@ -1,0 +1,112 @@
+associated_resource: '01_01'
+batch_id: 3affc777-e9fa-4031-857f-7faeac27d019
+bpm: 143
+genres:
+- Avant-Garde
+- Dark Wave
+- Electronic
+- Experimental
+- Gothic Rock
+- Indie Rock
+- Post-Punk
+- Post-Rock
+- Psychedelic
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  rating: null
+  suggested_replacement_value: null
+key: C major
+moods:
+- arcane
+- chilling
+- creepy
+- dark
+- eerie
+- ethereal
+- existential
+- foreboding
+- ghostly
+- haunted
+- haunting
+- mysterious
+- occult
+- ominous
+- otherworldly
+- sinister
+- spectral
+- spooky
+- supernatural
+- unsettling
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  rating: null
+  suggested_replacement_value: null
+plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a:
+    discogs_id: 10263
+    id: 104
+    name: David Bowie
+    profile: "British pop/rock singer, musician, songwriter, and actor.\r\n\r\nBorn:\
+      \ 8 January 1947 in Brixton, London, England, UK.\r\nDied: 10 January 2016 in\
+      \ Manhattan, New York City, USA (aged 69).\r\n\r\nBowie is recognized as one\
+      \ of the most respected contemporary musicians of his period. He was a leading\
+      \ figure in the music industry and is considered one of the most influential\
+      \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
+      \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 20991
+    id: 153
+    name: The Rolling Stones
+    profile: "English rock band formed in London in May 1962. They are one of the\
+      \ longest-lived and most commercially successful groups in rock history. Inducted\
+      \ into the Rock And Roll Hall of Fame in 1989 (Performer).\r\n\r\n[i]Band members[/i]\r\
+      \n\r\n[u]05/1962 - 05/1963[/u]\r\n[a255182] (Keyboards, piano)\r\n\r\n[u]05/1962\
+      \ - 06/1969[/u]\r\n[a409290] (Lead and rhythm guitars)\r\n\r\n[u]06/1962 - 10/1962[/u]\r\
+      \n[a414255] (Bass)\r\n\r\n[u]06/1962 - 12/1962[/u]\r\n[a677434] (Drums)\r\n\r\
+      \n[u]06/1962 - present[/u]\r\n[a90541] (Lead vocals, harmonica, percussion)\r\
+      \n[a166570] (Lead and rhythm guitars, acoustic guitar, backing vocals)\r\n\r\
+      \n[u]12/1962 - 01/1993[/u]\r\n[a272814] (Bass)\r\n\r\n[u]01/1963 - 08/2021[/u]\r\
+      \n[a299325] (Drums and percussion)\r\n\r\n[u]07/1969 - 12/1974[/u]\r\n[a300117]\
+      \ (Lead and slide guitars)\r\n\r\n[u]03/1975 - present[/u]\r\n[a271311] (Guitars,\
+      \ backing vocals)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4

@@ -1,0 +1,110 @@
+associated_resource: '01_01'
+batch_id: b5929a96-828c-42ad-b9e7-63e469788896
+bpm: 134
+genres:
+- Experimental
+- Psychedelic
+- Post-Punk
+- Art Rock
+- Avant-Garde
+- Electronic
+- Indie Rock
+- Dark Wave
+- Gothic Rock
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  rating: null
+  suggested_replacement_value: null
+key: C major
+moods:
+- dark
+- mysterious
+- haunting
+- ethereal
+- ghostly
+- ominous
+- spooky
+- eerie
+- otherworldly
+- unsettling
+- creepy
+- chilling
+- foreboding
+- sinister
+- supernatural
+- phantasmal
+- spectral
+- haunted
+- occult
+- arcane
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  rating: null
+  suggested_replacement_value: null
+plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a:
+    discogs_id: 280442
+    id: 114
+    name: Godspeed You! Black Emperor
+    profile: "Canadian post-rock band. Formed in 1994 in Montreal, Quebec, Canada.\
+      \ Hiatus between 2004-2009. Originally called Godspeed You Black Emperor!, before\
+      \ later using Godspeed You! Black Emperor. \r\n\r\nAs an experimental nine-piece\
+      \ from Montreal, they specialize in instrumental music. Members consist of [a=Mike\
+      \ Moya] (guitar),  [a=Efrim Menuck] (guitar), [a=David Bryant] (guitar), [a=Mauro\
+      \ Pezzente] (bass), [a=Thierry Amar] (bass), [a=Sophie Trudeau] (violin), [a=Aidan\
+      \ Girt] (percussion), [a=Tim Herzog] (percussion), [a=Karl Lemieux] (16mm film\
+      \ projections), and [a=Philippe Léonard] (16mm film projections). \r\n\r\nPlease\
+      \ use artist page [a=God Speed You Black Emperor!] for anything relating to\
+      \ the [m=2509531] cassette release from 1994 as this is now definitively a solo\
+      \ [a=Efrim Menuck] project.\r\n"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 36665
+    id: 203
+    name: Nick Cave and the Bad Seeds
+    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
+      \ The group has had an international line-up throughout their career.\r\n\r\n\
+      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
+      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
+      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
+      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4

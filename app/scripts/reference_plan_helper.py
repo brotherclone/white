@@ -6,17 +6,24 @@ import asyncio
 
 from random import uniform
 from app.enums.plan_state import PlanState
+from app.enums.sounds_like_treatment import PLAN_CHANGE_TABLE, SoundsLikeTreatment
 from app.objects.plan_feedback import RainbowPlanFeedback
 from app.objects.rainbow_color import RainbowColor
 from app.objects.rainbow_song_meta import RainbowSongStructureModel
 from app.objects.song_plan import RainbowSongPlan
 from app.objects.sounds_like import RainbowSoundsLike
+from app.resources.plans.negative_artist_reference import NEGATIVE_ARTISTS
 from app.resources.plans.negative_genre_reference import NEGATIVE_GENRES
 from app.resources.plans.negative_mood_reference import NEGATIVE_MOODS
+from app.resources.plans.negative_sounds_like_descriptor_reference import NEGATIVE_DESCRIPTORS
+from app.resources.plans.negative_sounds_like_locations import NEGATIVE_SOUNDS_LIKE_LOCATIONS
+from app.resources.plans.positive_artist_reference import POSITIVE_ARTISTS
 from app.resources.plans.positive_genre_reference import POSITIVE_GENRES
 from app.resources.plans.positive_mood_reference import POSITIVE_MOODS
+from app.resources.plans.positive_sounds_like_descriptor_reference import POSITIVE_DESCRIPTORS
+from app.resources.plans.positive_sounds_like_locations import POSITIVE_SOUNDS_LIKE_LOCATIONS
 from app.resources.plans.tempo_reference import MINIMUM_BPM, MAXIMUM_BPM, TEMPO_CHANGE_TABLE
-from app.utils.db_util import create_artist, update_artist, db_arist_to_rainbow_artist
+from app.utils.db_util import update_artist, db_arist_to_rainbow_artist, get_or_create_artist
 from app.utils.discog_util import search_discogs_artist, get_discogs_artist
 from app.utils.string_util import get_random_musical_key, convert_to_rainbow_color
 from app.objects.db_models.artist_schema import ArtistSchema, RainbowArtist
@@ -76,7 +83,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
                              manifest_bpm: int,
                              manifest_tempo: str,
                              manifest_key: str,
-                             manifest_structure: list[RainbowSongStructureModel],
+                             # manifest_structure: list[RainbowSongStructureModel],
                              manifest_sounds_like: list[RainbowArtist],
                              manifest_genres: list[str],
                              manifest_mood: list[str],
@@ -112,7 +119,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        positive_plan.sounds_like = await manifest_artist_to_soundslike(manifest_sounds_like)
+        positive_plan.sounds_like = await manifest_artists_to_soundslike(manifest_sounds_like)
         positive_plan.sounds_like_feedback = RainbowPlanFeedback(
             plan_id=positive_plan_id,
             field_name="sounds_like",
@@ -146,7 +153,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        positive_plan = degrade_reference_plans(positive_plan, index + 1, positive=True)
+        positive_plan = await degrade_reference_plans(positive_plan, index + 1, positive=True)
         plan_yaml = positive_plan.to_yaml()
         plan_file_path = os.path.join(PATH_TO_REFERENCE_PLANS, positive_plan_file_name)
         with open(plan_file_path, 'w') as fy:
@@ -170,7 +177,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        negative_plan.sounds_like = await manifest_artist_to_soundslike(manifest_sounds_like)
+        negative_plan.sounds_like = await manifest_artists_to_soundslike(manifest_sounds_like)
         negative_plan.sounds_like_feedback = RainbowPlanFeedback(
             plan_id=negative_plan_id,
             field_name="sounds_like",
@@ -204,7 +211,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        negative_plan = degrade_reference_plans(negative_plan, index + 1, positive=False)
+        negative_plan = await degrade_reference_plans(negative_plan, index + 1, positive=False)
         plan_yaml = negative_plan.to_yaml()
         plan_file_path = os.path.join(PATH_TO_REFERENCE_PLANS, negative_plan_file_name)
         with open(plan_file_path, 'w') as fy:
@@ -212,13 +219,17 @@ async def stub_out_reference_plans(current_manifest_id: str,
         print(f"Created negative reference plan: {negative_plan_file_name}")
 
 
-async def manifest_artist_to_soundslike(manifest_sounds_like: list[RainbowArtist]) -> list[RainbowSoundsLike]:
+
+async def manifest_artists_to_soundslike(manifest_sounds_like: list[RainbowArtist]) -> list[RainbowSoundsLike]:
     """
     Converts a list of RainbowArtist objects from a manifest into a list of RainbowSoundsLike objects.
     :param manifest_sounds_like:
     :return:
     """
     sounds_likes = []
+    if not manifest_sounds_like or not isinstance(manifest_sounds_like, list):
+        print("No sounds like artists found in manifest or invalid format")
+        return sounds_likes
     for manifest_artist in manifest_sounds_like:
         if manifest_artist.name:
             sounds_like_artist = RainbowArtist(
@@ -226,6 +237,7 @@ async def manifest_artist_to_soundslike(manifest_sounds_like: list[RainbowArtist
                 id=manifest_artist.id,
                 discogs_id=manifest_artist.discogs_id
             )
+
             current_enriched_artist = await enrich_sounds_like(sounds_like_artist)
             if current_enriched_artist:
                 current_sounds_like = RainbowSoundsLike(
@@ -238,7 +250,7 @@ async def manifest_artist_to_soundslike(manifest_sounds_like: list[RainbowArtist
                 sounds_likes.append(current_sounds_like)
     return sounds_likes
 
-def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positive: bool) -> RainbowSongPlan:
+async def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positive: bool) -> RainbowSongPlan:
     """
     Degrades a RainbowSongPlan based on the degradation factor.
     :param plan:
@@ -252,8 +264,8 @@ def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positive: boo
     new_plan.tempo = randomly_modify_tempo(degrade, plan.tempo)
     new_plan.moods = randomly_modify_mood(plan.moods, degrade, positive)
     new_plan.genres = randomly_modify_genres(plan.genres, degrade, positive)
-    new_plan.sounds_like = randomly_modify_sounds_like(plan.sounds_like, degrade, positive)
-    new_plan.structure = randomly_modify_structure(plan.structure, degrade, positive)
+    new_plan.sounds_like = await randomly_modify_sounds_like(plan.sounds_like, degrade, positive)
+    # new_plan.structure = randomly_modify_structure(plan.structure, degrade, positive)
     return new_plan
 
 def randomly_modify_key(degradation: float, current_key: str) -> str:
@@ -288,8 +300,231 @@ def randomly_modify_tempo(degradation: float, current_tempo: str) -> str:
 def randomly_modify_structure(current_structure: list[RainbowSongStructureModel], degradation: float, positive: bool)-> list[RainbowSongStructureModel]:
     return current_structure
 
-def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float, positive: bool) -> list[RainbowSoundsLike]:
-    return current_sounds_like
+async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float, positive: bool) -> list[RainbowSoundsLike]:
+    new_rainbow_sounds_like: list[RainbowSoundsLike] = []
+    for sl in current_sounds_like:
+        roll = uniform(0.0, 100.0)
+        treatment = lookup_result_from_roll(roll, PLAN_CHANGE_TABLE)
+        if treatment == SoundsLikeTreatment.remove_b:
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=None,
+                descriptor_a=sl.descriptor_a,
+                descriptor_b=sl.descriptor_b,
+                location=sl.location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.b_to_a_remove_b:
+            if sl.artist_b is not None:
+                new_sl = RainbowSoundsLike(
+                    artist_a=sl.artist_b,
+                    artist_b=None,
+                    descriptor_a=sl.descriptor_a,
+                    descriptor_b=sl.descriptor_b,
+                    location=sl.location
+                )
+                new_rainbow_sounds_like.append(new_sl)
+            else:
+                new_rainbow_sounds_like.append(sl)
+            break
+        elif treatment == SoundsLikeTreatment.swap_a:
+            artist_list = POSITIVE_ARTISTS if positive else NEGATIVE_ARTISTS
+            new_artist_name = RainbowArtist(name=random.choice(artist_list))
+            enriched_new_artist = await enrich_sounds_like(new_artist_name)
+            if enriched_new_artist:
+                new_sl = RainbowSoundsLike(
+                    artist_a=enriched_new_artist,
+                    artist_b=sl.artist_b,
+                    descriptor_a=sl.descriptor_a,
+                    descriptor_b=sl.descriptor_b,
+                    location=sl.location
+                )
+                new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.swap_b:
+            if sl.artist_b is not None:
+                artist_list = POSITIVE_ARTISTS if positive else NEGATIVE_ARTISTS
+                new_artist_name = RainbowArtist(name=random.choice(artist_list))
+                enriched_new_artist = await enrich_sounds_like(new_artist_name)
+                if enriched_new_artist:
+                    new_sl = RainbowSoundsLike(
+                        artist_a=sl.artist_a,
+                        artist_b=enriched_new_artist,
+                        descriptor_a=sl.descriptor_a,
+                        descriptor_b=sl.descriptor_b,
+                        location=sl.location
+                    )
+                    new_rainbow_sounds_like.append(new_sl)
+            else:
+                new_rainbow_sounds_like.append(sl)
+            break
+        elif treatment == SoundsLikeTreatment.swap_both_a_and_b:
+            if sl.artist_b is not None:
+                artist_list = POSITIVE_ARTISTS if positive else NEGATIVE_ARTISTS
+                new_artist_a_name = RainbowArtist(name=random.choice(artist_list))
+                enriched_new_artist_a = await enrich_sounds_like(new_artist_a_name)
+                if enriched_new_artist_a:
+                    new_artist_b_name = RainbowArtist(name=random.choice(artist_list))
+                    enriched_new_artist_b = await enrich_sounds_like(new_artist_b_name)
+                    if enriched_new_artist_b:
+                        new_sl = RainbowSoundsLike(
+                            artist_a=enriched_new_artist_a,
+                            artist_b=enriched_new_artist_b,
+                            descriptor_a=sl.descriptor_a,
+                            descriptor_b=sl.descriptor_b,
+                            location=sl.location
+                        )
+                        new_rainbow_sounds_like.append(new_sl)
+            else:
+                artist_list = POSITIVE_ARTISTS if positive else NEGATIVE_ARTISTS
+                new_artist_a_name = RainbowArtist(name=random.choice(artist_list))
+                enriched_new_artist_a = await enrich_sounds_like(new_artist_a_name)
+                if enriched_new_artist_a:
+                    new_sl = RainbowSoundsLike(
+                        artist_a=enriched_new_artist_a,
+                        artist_b=None,
+                        descriptor_a=sl.descriptor_a,
+                        descriptor_b=sl.descriptor_b,
+                        location=sl.location
+                    )
+                    new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.change_location:
+            if sl.location is not None:
+                location_list = POSITIVE_SOUNDS_LIKE_LOCATIONS if positive else NEGATIVE_SOUNDS_LIKE_LOCATIONS
+                new_location = random.choice(location_list)
+                new_sl = RainbowSoundsLike(
+                    artist_a=sl.artist_a,
+                    artist_b=sl.artist_b,
+                    descriptor_a=sl.descriptor_a,
+                    descriptor_b=sl.descriptor_b,
+                    location= new_location)
+                new_rainbow_sounds_like.append(new_sl)
+            else:
+                new_rainbow_sounds_like.append(sl)
+            break
+        elif treatment == SoundsLikeTreatment.remove_location:
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=sl.descriptor_a,
+                descriptor_b=sl.descriptor_b,
+                location=None
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.change_descriptor_a:
+            descriptor_list = POSITIVE_DESCRIPTORS if positive else NEGATIVE_DESCRIPTORS
+            new_descriptor = random.choice(descriptor_list)
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=new_descriptor,
+                descriptor_b=sl.descriptor_b,
+                location=sl.location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.change_descriptor_b:
+            descriptor_list = POSITIVE_DESCRIPTORS if positive else NEGATIVE_DESCRIPTORS
+            new_descriptor = random.choice(descriptor_list)
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=sl.descriptor_a,
+                descriptor_b=new_descriptor,
+                location=sl.location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.change_descriptor_a_and_b:
+            descriptor_list = POSITIVE_DESCRIPTORS if positive else NEGATIVE_DESCRIPTORS
+            new_descriptor_a, new_descriptor_b = random.sample(descriptor_list, 2)
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=new_descriptor_a,
+                descriptor_b=new_descriptor_b,
+                location=sl.location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.change_descriptor_a_and_location:
+            descriptor_list = POSITIVE_DESCRIPTORS if positive else NEGATIVE_DESCRIPTORS
+            location_list = POSITIVE_SOUNDS_LIKE_LOCATIONS if positive else NEGATIVE_SOUNDS_LIKE_LOCATIONS
+            new_location = random.choice(location_list)
+            new_descriptor = random.choice(descriptor_list)
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=new_descriptor,
+                descriptor_b=sl.descriptor_b,
+                location=new_location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.change_descriptor_b_and_location:
+            descriptor_list = POSITIVE_DESCRIPTORS if positive else NEGATIVE_DESCRIPTORS
+            location_list = POSITIVE_SOUNDS_LIKE_LOCATIONS if positive else NEGATIVE_SOUNDS_LIKE_LOCATIONS
+            new_location = random.choice(location_list)
+            new_descriptor = random.choice(descriptor_list)
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=sl.descriptor_a,
+                descriptor_b=new_descriptor,
+                location=new_location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.change_descriptor_a_b_and_location:
+            descriptor_list = POSITIVE_DESCRIPTORS if positive else NEGATIVE_DESCRIPTORS
+            location_list = POSITIVE_SOUNDS_LIKE_LOCATIONS if positive else NEGATIVE_SOUNDS_LIKE_LOCATIONS
+            new_location = random.choice(location_list)
+            new_descriptor_a, new_descriptor_b = random.sample(descriptor_list, 2)
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=new_descriptor_a,
+                descriptor_b=new_descriptor_b,
+                location=new_location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.remove_descriptor_a:
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=None,
+                descriptor_b=sl.descriptor_b,
+                location=sl.location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.remove_descriptor_b:
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=sl.descriptor_a,
+                descriptor_b=None,
+                location=sl.location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        elif treatment == SoundsLikeTreatment.remove_descriptor_a_and_b:
+            new_sl = RainbowSoundsLike(
+                artist_a=sl.artist_a,
+                artist_b=sl.artist_b,
+                descriptor_a=None,
+                descriptor_b=None,
+                location=sl.location
+            )
+            new_rainbow_sounds_like.append(new_sl)
+            break
+        else:
+            new_rainbow_sounds_like.append(sl)
+    return new_rainbow_sounds_like
 
 def randomly_modify_genres(current_genres: list[str], degradation: float, positive: bool) -> list[str]:
     i = int(degradation * 0.5)
@@ -371,7 +606,7 @@ async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist
                         discogs_id=discogs_artist_id,
                         profile=discogs_artist.profile if discogs_artist.profile else ''
                     )
-                    created_artist = await create_artist(new_artist)
+                    created_artist = await get_or_create_artist(new_artist)
                     if created_artist:
                         return db_arist_to_rainbow_artist(created_artist)
                     else:
@@ -414,7 +649,7 @@ async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist
                     discogs_id=discogs_record.id,
                     profile= discogs_record.profile if discogs_record.profile else ''
                 )
-                created_artist = await create_artist(new_artist)
+                created_artist = await get_or_create_artist(new_artist)
                 if created_artist:
                     return db_arist_to_rainbow_artist(created_artist)
                 else:
@@ -505,19 +740,13 @@ if __name__ == "__main__":
                                 raw_sounds_like = manifest_data.get('sounds_like', [])
                                 if raw_sounds_like:
                                     for sound_like in raw_sounds_like:
-                                        if isinstance(sound_like, dict):
-                                            artist = RainbowArtist(
-                                                name=sound_like.get('name', ''),
-                                                id=sound_like.get('id', 0),
-                                                discogs_id=sound_like.get('discogs_id', 0)
-                                            )
-                                            enriched_artist = await enrich_sounds_like(artist)
-                                            if enriched_artist:
-                                                sounds_like.append(enriched_artist)
-                                        elif isinstance(sound_like, RainbowArtist):
-                                            enriched_artist = await enrich_sounds_like(sound_like)
-                                            if enriched_artist:
-                                                sounds_like.append(enriched_artist)
+                                        artist = RainbowArtist(
+                                            name=sound_like.get('name', ''),
+                                            id=sound_like.get('id', 0),
+                                            discogs_id=sound_like.get('discogs_id', 0)
+                                        )
+                                        if artist.name:
+                                            sounds_like.append(artist)
                                 genres = manifest_data.get('genres', [
                                     'Pop', 'Rock', 'Electronic'
                                 ])
@@ -532,7 +761,7 @@ if __name__ == "__main__":
                                     manifest_bpm=bpm,
                                     manifest_tempo=tempo,
                                     manifest_key=key,
-                                    manifest_structure=structure,
+                                    #manifest_structure=structure,
                                     manifest_sounds_like=sounds_like,
                                     manifest_genres=genres,
                                     manifest_mood=mood,

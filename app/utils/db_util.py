@@ -115,6 +115,28 @@ async def create_artist(artist) -> ArtistSchema | None:
     finally:
         next(db_generator, None)
 
+async def get_or_create_artist(artist_schema):
+    db_generator = get_db()
+    db = next(db_generator)
+    try:
+        # First check if artist exists
+        existing_artist = db.query(ArtistSchema).filter(ArtistSchema.name == artist_schema.name).first()
+        if existing_artist:
+            return existing_artist
+
+        # If not exists, create new
+        db.add(artist_schema)
+        db.commit()
+        db.refresh(artist_schema)
+        return artist_schema
+    except Exception as e:
+        db.rollback()
+        print(f"Error in get_or_create_artist: {e}")
+        return None
+    finally:
+        next(db_generator, None)  # Properly close the session
+
+
 async def delete_artist(artist_id) -> bool:
     db_generator = get_db()
     db = next(db_generator)

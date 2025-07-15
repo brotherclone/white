@@ -1,0 +1,22 @@
+POSITIVE_DESCRIPTORS: list[str] = [
+    "uplifting",
+    "joyful",
+    "soothing",
+    "melodic",
+    "harmonious",
+    "inspiring",
+    "dreamy",
+    "ethereal",
+    "nostalgic",
+    "energetic",
+    "catchy",
+    "rhythmic",
+    "groovy",
+    "danceable",
+    "heartwarming",
+    "peaceful",
+    "reflective",
+    "optimistic",
+    "whimsical",
+    "playful"
+]

@@ -1,0 +1,135 @@
+associated_resource: '01_01'
+batch_id: d5fa44bc-50ea-4df1-86f1-263c0082f849
+bpm: 131
+genres:
+- Art Rock
+- Celtic Folk
+- Dark Wave
+- Electronic
+- Experimental
+- Gothic Rock
+- Indie Rock
+- Post-Punk
+- Psychedelic
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: 0e149c81-adf4-4702-992a-8d340b29b54e
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: 0e149c81-adf4-4702-992a-8d340b29b54e
+  rating: null
+  suggested_replacement_value: null
+key: C major
+moods:
+- arcane
+- chilling
+- creepy
+- eerie
+- enigmatic
+- ethereal
+- foreboding
+- ghostly
+- haunted
+- haunting
+- mysterious
+- occult
+- ominous
+- otherworldly
+- phantasmal
+- sinister
+- spectral
+- spooky
+- supernatural
+- unsettling
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: 0e149c81-adf4-4702-992a-8d340b29b54e
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: 0e149c81-adf4-4702-992a-8d340b29b54e
+  rating: null
+  suggested_replacement_value: null
+plan_id: 0e149c81-adf4-4702-992a-8d340b29b54e
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: 0e149c81-adf4-4702-992a-8d340b29b54e
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a:
+    discogs_id: 47333
+    id: 142
+    name: Fleetwood Mac
+    profile: "Founded in London in July 1967 (by ex-[url=http://www.discogs.com/artist/John+Mayall+%26+The+Bluesbreakers]Bluesbreakers[/url]\
+      \ members, Peter Green and Mick Fleetwood), \"Peter Green's Fleetwood Mac\"\
+      \ instantly became a major force in the UK blues scene, along with their eponymous\
+      \ first album. Following \"Mr. Wonderful\" & \"Then Play On\" the driving force\
+      \ of Peter Green had deteriorated as he lapsed into a personal crisis by 1970.\
+      \ The group reorganized, under the leadership of Fleetwood, and slowly took\
+      \ on a new direction - away from the blues and into the mainstream of international\
+      \ popularity, known simply as [b]Fleetwood Mac[/b].\r\n\r\nMember/Dates:\r\n\
+      Peter Green (guitar, vocals, 1967-70)\r\nMick Fleetwood (drums, 1967-1995, 1997-present)\r\
+      \nJohn McVie (bass, 1967-1995, 1997-present)\r\nJeremy Spencer (guitar, vocals,\
+      \ 1967-71)\r\nBob Brunning (bass, 1967)\r\nDanny Kirwan (guitar, 1968-72)\r\n\
+      Christine McVie (vocals, piano, accordion, 1970-1995, 1997-1998, 2014-2022)\r\
+      \nBob Welch (guitar, vocals, 1971-74)\r\nBob Weston (guitar, 1973-74)\r\nDave\
+      \ Walker (guitar, vocals, 1973)\r\nDoug Graves (keyboards, 1974)\r\nLindsey\
+      \ Buckingham (guitar, vocals, piano, 1975-87, 1993, 1997-2018)\r\nStevie Nicks\
+      \ (vocals, 1974–1991, 1993, 1997-present)\r\nBilly Burnette (guitar, vocals,\
+      \ 1990-94)\r\nRick Vito (guitar, 1990-91)\r\nDave Mason, (guitar, vocals, 1993-94)\r\
+      \nBekka Bramlett (vocals, 1993-94)\r\nMike Campbell (lead guitar, vocals, 2018–present)\r\
+      \nNeil Finn, (vocals, rhythm guitar, 2018–present)\r\n\r\nInducted into Rock\
+      \ And Roll Hall of Fame in 1998 (Performer)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 955
+    id: 202
+    name: Broadcast
+    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
+      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
+      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
+      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
+      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
+      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
+      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
+      \ \r\n"
+  artist_b: null
+  descriptor_a: melodic
+  descriptor_b: null
+  location: in a hidden speakeasy
+- artist_a:
+    discogs_id: 36665
+    id: 203
+    name: Nick Cave and the Bad Seeds
+    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
+      \ The group has had an international line-up throughout their career.\r\n\r\n\
+      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
+      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
+      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
+      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: 0e149c81-adf4-4702-992a-8d340b29b54e
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4

@@ -62,7 +62,8 @@ class TrainingSampleValidator:
         except (ValueError, TypeError):
             result.errors.append("Invalid segment timing values")
 
-    def _validate_audio(self, sample: Any, result: ValidationResult) -> None:
+    @staticmethod
+    def _validate_audio(sample: Any, result: ValidationResult) -> None:
         """Validate audio data consistency"""
         # Check if audio filenames match binary data presence
         if sample.song_segment_main_audio_file_name and not sample.song_segment_main_audio_binary_data:
@@ -77,8 +78,8 @@ class TrainingSampleValidator:
 
         if not has_audio_file and not has_audio_data:
             result.warnings.append("Sample contains no audio data")
-
-    def _validate_midi(self, sample: Any, result: ValidationResult) -> None:
+    @staticmethod
+    def _validate_midi(sample: Any, result: ValidationResult) -> None:
         """Validate MIDI data consistency"""
         has_midi_file = bool(sample.song_segment_track_midi_file_name)
         has_midi_data = bool(sample.song_segment_track_midi_binary_data)

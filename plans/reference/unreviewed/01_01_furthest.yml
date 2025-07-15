@@ -1,0 +1,82 @@
+associated_resource: '01_01'
+batch_id: 8da25552-8178-4fde-9e10-56ea106ba4ab
+bpm: 129
+genres:
+- Art Rock
+- Avant-Garde
+- Crunk
+- Dark Wave
+- Electronic
+- Gothic Rock
+- Indie Rock
+- Post-Punk
+- Psychedelic
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: 4da6dc7e-8045-42b4-815c-d15d9ca7bc59
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: 4da6dc7e-8045-42b4-815c-d15d9ca7bc59
+  rating: null
+  suggested_replacement_value: null
+key: C major
+moods:
+- arcane
+- chilling
+- conventional
+- creepy
+- dark
+- eerie
+- ethereal
+- foreboding
+- ghostly
+- haunted
+- haunting
+- mysterious
+- occult
+- ominous
+- otherworldly
+- phantasmal
+- sinister
+- spectral
+- supernatural
+- unsettling
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: 4da6dc7e-8045-42b4-815c-d15d9ca7bc59
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: 4da6dc7e-8045-42b4-815c-d15d9ca7bc59
+  rating: null
+  suggested_replacement_value: null
+plan_id: 4da6dc7e-8045-42b4-815c-d15d9ca7bc59
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: 4da6dc7e-8045-42b4-815c-d15d9ca7bc59
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a: null
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: 4da6dc7e-8045-42b4-815c-d15d9ca7bc59
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4
