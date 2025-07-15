@@ -16,8 +16,8 @@ from app.resources.plans.negative_mood_reference import NEGATIVE_MOODS
 from app.resources.plans.positive_genre_reference import POSITIVE_GENRES
 from app.resources.plans.positive_mood_reference import POSITIVE_MOODS
 from app.resources.plans.tempo_reference import MINIMUM_BPM, MAXIMUM_BPM, TEMPO_CHANGE_TABLE
-from app.utils.db_util import create_artist, get_artist_by_discogs_id, update_artist, get_artist_by_local_id
-from app.utils.discog_util import search_discogs_artist
+from app.utils.db_util import create_artist, update_artist, db_arist_to_rainbow_artist
+from app.utils.discog_util import search_discogs_artist, get_discogs_artist
 from app.utils.string_util import get_random_musical_key, convert_to_rainbow_color
 from app.objects.db_models.artist_schema import ArtistSchema, RainbowArtist
 
@@ -231,9 +231,9 @@ async def manifest_artist_to_soundslike(manifest_sounds_like: list[RainbowArtist
                 current_sounds_like = RainbowSoundsLike(
                     artist_a=current_enriched_artist,
                     artist_b=None,
-                    descriptor_a="similar to",
+                    descriptor_a=None,
                     descriptor_b=None,
-                    location="unknown"
+                    location=None
                 )
                 sounds_likes.append(current_sounds_like)
     return sounds_likes
@@ -286,14 +286,10 @@ def randomly_modify_tempo(degradation: float, current_tempo: str) -> str:
 
 
 def randomly_modify_structure(current_structure: list[RainbowSongStructureModel], degradation: float, positive: bool)-> list[RainbowSongStructureModel]:
-    # ToDo: Slice and dice the song structure based on degradation, using combine and split functions
-    pass
+    return current_structure
 
-
-def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float, positive: bool)-> list[RainbowSoundsLike]:
-    # ToDo: Randomly modify the sounds like artists based on degradation.
-    pass
-
+def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float, positive: bool) -> list[RainbowSoundsLike]:
+    return current_sounds_like
 
 def randomly_modify_genres(current_genres: list[str], degradation: float, positive: bool) -> list[str]:
     i = int(degradation * 0.5)
@@ -356,78 +352,97 @@ def update_reference_manifest_with_plans():
 
 
 async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist | None:
-        """
-        Enriches a RainbowArtist object by searching for it in Discogs.
-        :param sounds_like_artist:
-        :return:
-        """
-        working_artist = ArtistSchema(name=sounds_like_artist.name)
-
-        # Check for None or 0 (placeholder) values
+    if not sounds_like_artist or not sounds_like_artist.name:
+        print(f"Missing artist name or object for sounds like enrichment")
+    else:
         has_no_discogs_id = sounds_like_artist.discogs_id is None or sounds_like_artist.discogs_id == 0
         has_no_local_id = sounds_like_artist.id is None or sounds_like_artist.id <= 0
-
         if has_no_discogs_id and has_no_local_id:
-            # Case 1: No IDs at all, search by name
-            search_result = await search_discogs_artist(sounds_like_artist.name)
-            if search_result is not None:
-                discogs_id = str(search_result.id)
-                working_artist.discogs_id = discogs_id
-                full_artist_data = await get_artist_by_discogs_id(discogs_id)
-                if full_artist_data:
-                    working_artist.profile = full_artist_data.profile
-                existing = await get_artist_by_discogs_id(discogs_id)
-                if existing:
-                    print(f"Artist already exists with discogs ID {discogs_id}")
-                    return db_arist_to_rainbow_artist(existing)
-                try:
-                    result = await create_artist(working_artist)
-                    if result and not isinstance(result, bool):
-                        return db_arist_to_rainbow_artist(result)
+            discogs_artist = await search_discogs_artist(sounds_like_artist.name)
+            if discogs_artist:
+                discogs_artist_id = discogs_artist.id
+                if not discogs_artist_id:
+                    print(f"Discogs artist ID not found for {sounds_like_artist.name}")
+                    return None
+                discogs_record = await get_discogs_artist(discogs_artist_id)
+                if discogs_record:
+                    new_artist = ArtistSchema(
+                        name=sounds_like_artist.name,
+                        discogs_id=discogs_artist_id,
+                        profile=discogs_artist.profile if discogs_artist.profile else ''
+                    )
+                    created_artist = await create_artist(new_artist)
+                    if created_artist:
+                        return db_arist_to_rainbow_artist(created_artist)
                     else:
-                        print(f"Failed to create artist {sounds_like_artist.name}")
+                        print(f"Failed to create artist in local database for {sounds_like_artist.name}")
                         return None
-                except Exception as err:
-                    print(f"Error creating artist {sounds_like_artist.name}: {err}")
-                    return None
-        elif has_no_discogs_id and not has_no_local_id:
-            # Case 2: Has local ID but no discogs ID
-            try:
-                local_artist = await get_artist_by_local_id(sounds_like_artist.id)
-                if not local_artist:
-                    print(f"No artist found with local ID {sounds_like_artist.id}")
-                    return None
-                search_result = await search_discogs_artist(sounds_like_artist.name)
-                if search_result:
-                    local_artist.discogs_id = str(search_result.id)
-                    updated_artist = await update_artist(local_artist)
-                    if updated_artist:
-                        print(f"Updated artist {sounds_like_artist.name} with discogs ID {local_artist.discogs_id}")
-                        return db_arist_to_rainbow_artist(updated_artist)
-                    return db_arist_to_rainbow_artist(local_artist)
                 else:
-                    print(f"No Discogs artist found for {sounds_like_artist.name}")
-                    return db_arist_to_rainbow_artist(local_artist)
-            except Exception as err:
-                print(f"Error processing artist with local ID {sounds_like_artist.id}: {err}")
+                    print(f"Artist not found in local database for Discogs ID {discogs_artist_id}")
+                    return None
+            else:
+                print(f"Artist {sounds_like_artist.name} not found in Discogs")
                 return None
-        elif not has_no_discogs_id:
-            # Case 3: Has a valid discogs ID
-            try:
-                discogs_id = str(sounds_like_artist.discogs_id)
-                local_artist = await get_artist_by_discogs_id(discogs_id)
-                if local_artist:
-                    return db_arist_to_rainbow_artist(local_artist)
-                working_artist.discogs_id = discogs_id
-                working_artist.profile = full_artist_data.profile
-                result = await create_artist(working_artist)
-                if result and not isinstance(result, bool):
-                   return db_arist_to_rainbow_artist(result)
+        elif has_no_discogs_id and not has_no_local_id:
+            discogs_artist = await search_discogs_artist(sounds_like_artist.name)
+            if discogs_artist:
+                discogs_record = await get_discogs_artist(discogs_artist.id)
+                if discogs_record:
+                    updated_artist = ArtistSchema(
+                        id=sounds_like_artist.id,
+                        discogs_id=discogs_artist.id,
+                        name=sounds_like_artist.name,
+                        profile=discogs_artist.profile if discogs_artist.profile else ''
+                    )
+                    updated_record = await update_artist(updated_artist)
+                    if updated_record:
+                        return db_arist_to_rainbow_artist(updated_record)
+                    else:
+                        print(f"Failed to update artist {sounds_like_artist.name} in local database")
+                        return None
+                else:
+                    print(f"Artist {sounds_like_artist.name} not found in local database for Discogs ID {discogs_artist.get('id')}")
+                    return None
+            else:
+                print(f"Artist {sounds_like_artist.name} not found in Discogs")
                 return None
-            except Exception as err:
-                print(f"Error searching for artist with discogs ID {sounds_like_artist.discogs_id}: {err}")
+        elif not has_no_discogs_id and has_no_local_id:
+            discogs_record = await get_discogs_artist(sounds_like_artist.discogs_id)
+            if discogs_record:
+                new_artist = ArtistSchema(
+                    name=sounds_like_artist.name,
+                    discogs_id=discogs_record.id,
+                    profile= discogs_record.profile if discogs_record.profile else ''
+                )
+                created_artist = await create_artist(new_artist)
+                if created_artist:
+                    return db_arist_to_rainbow_artist(created_artist)
+                else:
+                    print(f"Failed to create artist in local database for {sounds_like_artist.name}")
+                    return None
+            else:
+                print(f"Artist with Discogs ID {sounds_like_artist.discogs_id} not found in local database")
                 return None
-        return None
+        elif not sounds_like_artist.profile:
+            discogs_record = await get_discogs_artist(sounds_like_artist.discogs_id)
+            if discogs_record:
+                updated_artist = ArtistSchema(
+                    id=sounds_like_artist.id,
+                    discogs_id=discogs_record.id,
+                    name=sounds_like_artist.name,
+                    profile=discogs_record.profile if discogs_record.profile else ''
+                )
+                updated_record = await update_artist(updated_artist)
+                if updated_record:
+                    return db_arist_to_rainbow_artist(updated_record)
+                else:
+                    print(f"Failed to update artist {sounds_like_artist.name} in local database")
+                    return None
+            else:
+                print(f"Artist with Discogs ID {sounds_like_artist.discogs_id} not found")
+                return None
+    return None
+
 
 
 def split_song_structure(current_structure_node: RainbowSongStructureModel)-> list[RainbowSongStructureModel]:
@@ -437,18 +452,6 @@ def split_song_structure(current_structure_node: RainbowSongStructureModel)-> li
 def combine_song_structure(current_structure_nodes: list[RainbowSongStructureModel]) -> RainbowSongStructureModel:
     pass
 
-def db_arist_to_rainbow_artist(db_artist: ArtistSchema) -> RainbowArtist:
-    """
-    Converts a database artist schema to a RainbowArtist object.
-    :param db_artist: ArtistSchema object from the database
-    :return: RainbowArtist object
-    """
-    return RainbowArtist(
-        name=db_artist.name,
-        id=db_artist.id,
-        discogs_id=db_artist.discogs_id,
-        profile=db_artist.profile,
-    )
 
 if __name__ == "__main__":
     async def main():

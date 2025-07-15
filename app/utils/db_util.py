@@ -4,7 +4,7 @@ import asyncio
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base,sessionmaker
-from app.objects.db_models.artist_schema import ArtistSchema
+from app.objects.db_models.artist_schema import ArtistSchema, RainbowArtist
 from app.utils.discog_util import search_discogs_artist
 
 # ToDo: Break out to separate files per model
@@ -21,7 +21,36 @@ def get_db():
     finally:
         db.close()
 
-async def get_artist_by_local_id(local_id):
+def db_arist_to_rainbow_artist(db_artist: ArtistSchema) -> RainbowArtist:
+    """
+    Converts a database artist schema to a RainbowArtist object.
+    :param db_artist: ArtistSchema object from the database
+    :return: RainbowArtist object
+    """
+    return RainbowArtist(
+        name=db_artist.name,
+        id=db_artist.id,
+        discogs_id=db_artist.discogs_id,
+        profile=db_artist.profile,
+    )
+
+async def get_artist_by_name(name):
+    db_generator = get_db()
+    db = next(db_generator)
+    try:
+        q = db.query(ArtistSchema).filter(ArtistSchema.name == name).first()
+        if q:
+            return q
+        else:
+            print(f"No artist found with name {name}")
+            return None
+    except Exception as e:
+        print(f"Error fetching artist by name {name}: {e}")
+        return None
+    finally:
+        next(db_generator, None)
+
+async def get_local_artist_by_local_id(local_id):
     db_generator = get_db()
     db = next(db_generator)
     try:
@@ -37,7 +66,7 @@ async def get_artist_by_local_id(local_id):
     finally:
         next(db_generator, None)
 
-async def get_artist_by_discogs_id(discogs_id):
+async def get_local_artist_by_discogs_id(discogs_id):
     db_generator = get_db()
     db = next(db_generator)
     try:
@@ -61,12 +90,10 @@ async def update_artist(artist)-> ArtistSchema | None:
         if not existing_artist:
             print(f"No artist found with ID {artist.id}")
             return None
-        # Merge the updated artist object and commit
-        db.merge(artist)
+        await db.merge(artist)
         db.commit()
         return artist
     except Exception as e:
-        # Rollback in case of error
         db.rollback()
         print(f"Error updating artist: {e}")
         return None
@@ -92,12 +119,10 @@ async def delete_artist(artist_id) -> bool:
     db_generator = get_db()
     db = next(db_generator)
     try:
-        # Find the artist by ID
         artist = db.query(ArtistSchema).filter(ArtistSchema.id == artist_id).first()
         if not artist:
             print(f"No artist found with ID {artist_id}")
             return False
-        # Delete the artist
         db.delete(artist)
         db.commit()
         return True
