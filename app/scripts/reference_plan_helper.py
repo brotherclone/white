@@ -85,6 +85,7 @@ def lookup_result_from_roll(roll: float, table: list) -> any:
 
 
 async def stub_out_reference_plans(current_manifest_id: str,
+                             manifest_track_title: str,
                              manifest_bpm: int,
                              manifest_tempo: str,
                              manifest_key: str,
@@ -115,8 +116,26 @@ async def stub_out_reference_plans(current_manifest_id: str,
         positive_plan.plan_state = PlanState.generated
         positive_plan.associated_resource = current_manifest_id
         positive_plan.bpm = manifest_bpm
+        positive_plan.bpm_feedback = RainbowPlanFeedback(
+            plan_id=positive_plan_id,
+            field_name="bpm",
+            rating=None,
+            comment=None,
+        )
         positive_plan.tempo = manifest_tempo
+        positive_plan.tempo_feedback = RainbowPlanFeedback(
+            plan_id=positive_plan_id,
+            field_name="tempo",
+            rating=None,
+            comment=None,
+        )
         positive_plan.key = manifest_key
+        positive_plan.key_feedback = RainbowPlanFeedback(
+            plan_id=positive_plan_id,
+            field_name="key",
+            rating=None,
+            comment=None,
+        )
         positive_plan.moods = manifest_mood
         positive_plan.moods_feedback = RainbowPlanFeedback(
             plan_id=positive_plan_id,
@@ -138,7 +157,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        positive_plan.plan = None
+        positive_plan.plan = "Make a song like " + manifest_track_title
         positive_plan.plan_feedback = RainbowPlanFeedback(
             plan_id=positive_plan_id,
             field_name="plan",
@@ -203,7 +222,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        negative_plan.plan = None
+        negative_plan.plan = "Make a song like " + manifest_track_title
         negative_plan.plan_feedback = RainbowPlanFeedback(
             plan_id=negative_plan_id,
             field_name="plan",
@@ -867,8 +886,10 @@ async def process_single_manifest(manifest_file_path: str):
         manifest_id = manifest_data.get('manifest_id', 'default_manifest')
         color_value = manifest_data.get('rainbow_color', 'Z')
         color = convert_to_rainbow_color(color_value)
+        title = manifest_data.get('title', 'Default Title')
         await stub_out_reference_plans(
             current_manifest_id=manifest_id,
+            manifest_track_title=title,
             manifest_bpm=bpm,
             manifest_tempo=tempo,
             manifest_key=key,

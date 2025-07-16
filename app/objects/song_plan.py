@@ -18,8 +18,11 @@ class RainbowSongPlan(BaseModel):
     plan_state: PlanState = PlanState.incomplete
     associated_resource: str | None = None
     key: str | None = None
+    key_feedback: RainbowPlanFeedback | None = None
     bpm: int | None = None
+    bpm_feedback: RainbowPlanFeedback | None = None
     tempo: str | None = None
+    tempo_feedback: RainbowPlanFeedback | None = None
     moods: list[str] | None = None
     moods_feedback: RainbowPlanFeedback | None = None
     sounds_like: list[RainbowSoundsLike] | None = None
@@ -39,6 +42,27 @@ class RainbowSongPlan(BaseModel):
         super().__init__()
         self.batch_id = uuid.uuid4()
         self.plan_id = uuid.uuid4()
+        self.bpm_feedback = RainbowPlanFeedback(
+            plan_id=self.plan_id,
+            field_name="bpm",
+            rating=None,
+            comment=None,
+            suggested_replacement_value=None
+        )
+        self.key_feedback = RainbowPlanFeedback(
+            plan_id=self.plan_id,
+            field_name="key",
+            rating=None,
+            comment=None,
+            suggested_replacement_value=None
+        )
+        self.tempo_feedback = RainbowPlanFeedback(
+            plan_id=self.plan_id,
+            field_name="tempo",
+            rating=None,
+            comment=None,
+            suggested_replacement_value=None
+        )
         self.moods_feedback = RainbowPlanFeedback(
             plan_id=self.plan_id,
             field_name="moods",
@@ -90,7 +114,9 @@ class RainbowSongPlan(BaseModel):
             )
 
     def to_yaml(self):
-        yaml_dumper = yaml.SafeDumper
-        yaml_dumper.add_representer(uuid.UUID, uuid_representer)
-        yaml_dumper.add_multi_representer(Enum, enum_representer)
-        return yaml.dump(self.dict(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)
+    yaml_dumper = yaml.SafeDumper
+    yaml_dumper.add_representer(uuid.UUID, uuid_representer)
+    yaml_dumper.add_multi_representer(Enum, enum_representer)
+    # Disable anchor/alias creation in YAML output # Claude Sonnet 3.7 is a genuis!!!
+    yaml_dumper.ignore_aliases = lambda self, data: True
+    return yaml.dump(self.dict(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)

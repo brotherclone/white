@@ -1,29 +1,41 @@
 associated_resource: '01_01'
-batch_id: 1a0ad665-46e6-4c7f-9947-07e67c131d6a
-bpm: 138
+batch_id: aba90afd-9813-47b9-b136-77d349c4168a
+bpm: 131
+bpm_feedback:
+  comment: null
+  field_name: bpm
+  plan_id: &id001 ce03c755-bbd6-4f53-88d7-ca7a7b12bc20
+  rating: null
+  suggested_replacement_value: null
 genres:
 - Art Rock
 - Avant-Garde
 - Dark Wave
 - Electronic
-- Experimental
+- Exercise
 - Gothic Rock
 - Indie Rock
-- K-Pop
+- Post-Punk
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
   rating: null
   suggested_replacement_value: null
 key: C major
+key_feedback:
+  comment: null
+  field_name: key
+  plan_id: *id001
+  rating: null
+  suggested_replacement_value: null
 moods:
 - arcane
 - chilling
@@ -32,39 +44,39 @@ moods:
 - eerie
 - ethereal
 - foreboding
+- formulaic
 - ghostly
 - haunted
 - haunting
 - mysterious
 - occult
 - ominous
-- pedestrian
+- otherworldly
 - phantasmal
 - sinister
 - spectral
 - spooky
 - supernatural
-- unsettling
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
   rating: null
   suggested_replacement_value: null
-plan: null
+plan: Make a song like The Conjurer's Thread
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
   rating: null
   suggested_replacement_value: null
-plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -96,97 +108,103 @@ sounds_like:
       \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
       \ \r\n"
   artist_b: null
-  descriptor_a: null
+  descriptor_a: bleak
   descriptor_b: null
-  location: null
+  location: in a children's cancer ward
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: As if the song wasn't already hard to follow
-  section_name: Tempo Changes
+  section_description: And now I'll show off my mediocre language skills
+  section_name: The whole song again in another language
   sequence: 1
   start_time: null
 - duration: null
-  end_time: null
+  end_time: '[00:14.027]'
   midi_group: null
   section_description: Description for Verse Intro
   section_name: Verse Intro
   sequence: 1
-  start_time: null
+  start_time: '[00:00.000]'
 - duration: null
-  end_time: null
+  end_time: '[00:38.000]'
   midi_group: null
   section_description: Description for Verse 1
   section_name: Verse 1
   sequence: 2
-  start_time: null
+  start_time: '[00:14.027]'
 - duration: null
-  end_time: null
+  end_time: '[00:42.086]'
   midi_group: null
   section_description: Description for Verse 2
   section_name: Verse 2
   sequence: 3
-  start_time: null
+  start_time: '[00:28.057]'
 - duration: null
-  end_time: null
+  end_time: '[00:55.145]'
   midi_group: null
   section_description: Description for Verse 3
   section_name: Verse 3
   sequence: 4
-  start_time: null
+  start_time: '[00:42.086]'
 - duration: null
-  end_time: null
+  end_time: '[01:24.175]'
   midi_group: null
   section_description: Description for Interlude 1
   section_name: Interlude 1
   sequence: 5
-  start_time: null
+  start_time: '[00:55.145]'
 - duration: null
-  end_time: null
+  end_time: '[01:52.234]'
   midi_group: null
   section_description: Description for Chorus 1
   section_name: Chorus 1
   sequence: 6
-  start_time: null
+  start_time: '[01:24.175]'
 - duration: null
-  end_time: null
+  end_time: '[02:07.013]'
+  midi_group: null
+  section_description: Description for Verse 4
+  section_name: Verse 4
+  sequence: 7
+  start_time: '[01:52.234]'
+- duration: null
+  end_time: '[02:21.043]'
   midi_group: null
   section_description: Description for Verse 5
   section_name: Verse 5
   sequence: 8
-  start_time: null
+  start_time: '[02:07.013]'
 - duration: null
-  end_time: null
-  midi_group: null
-  section_description: Description for Chorus 2
-  section_name: Chorus 2
-  sequence: 9
-  start_time: null
-- duration: null
-  end_time: null
+  end_time: '[03:17.161]'
   midi_group: null
   section_description: Description for Interlude 2
   section_name: Interlude 2
   sequence: 10
-  start_time: null
+  start_time: '[02:49.102]'
 - duration: null
-  end_time: null
+  end_time: '[04:25.999]'
   midi_group: null
   section_description: Description for Outro
   section_name: Outro
   sequence: 11
-  start_time: null
+  start_time: '[03:17.161]'
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 829521a2-ae54-49fd-b59f-ecbe97eda1db
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
+tempo_feedback:
+  comment: null
+  field_name: tempo
+  plan_id: *id001
+  rating: null
+  suggested_replacement_value: null

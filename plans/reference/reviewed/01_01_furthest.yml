@@ -1,32 +1,32 @@
 associated_resource: '01_01'
-batch_id: a2157400-de1f-4989-9d10-1f49b7052a78
-bpm: 136
+batch_id: dedc7cb0-3bb1-4e7a-af4a-7a7f7327d4c3
+bpm: 142
 bpm_feedback:
   comment: null
   field_name: bpm
-  plan_id: &id001 8d822d95-10cd-466c-8df8-8152275c3009
+  plan_id: &id001 f93e1152-8b81-40fd-a01e-3e9c4c0aa17e
   rating: null
   suggested_replacement_value: null
 genres:
-- Experimental
-- Psychedelic
-- Post-Punk
-- Art Rock
 - Avant-Garde
-- Electronic
-- Indie Rock
+- Christian Hip Hop
 - Dark Wave
+- Electronic
+- Experimental
 - Gothic Rock
+- Indie Rock
+- Post-Punk
+- Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
   rating: null
   suggested_replacement_value: null
 key: C major
@@ -37,46 +37,46 @@ key_feedback:
   rating: null
   suggested_replacement_value: null
 moods:
-- dark
-- mysterious
-- haunting
-- ethereal
-- ghostly
-- ominous
-- spooky
-- eerie
-- otherworldly
-- unsettling
-- creepy
-- chilling
-- foreboding
-- sinister
-- supernatural
-- phantasmal
-- spectral
-- haunted
-- occult
 - arcane
+- chilling
+- dark
+- eerie
+- ethereal
+- foreboding
+- ghostly
+- haunted
+- haunting
+- mysterious
+- occult
+- ominous
+- otherworldly
+- phantasmal
+- saccharine
+- sinister
+- spectral
+- spooky
+- supernatural
+- unsettling
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
   rating: null
   suggested_replacement_value: null
 plan: Make a song like The Conjurer's Thread
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
   rating: null
   suggested_replacement_value: null
-plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -95,26 +95,10 @@ sounds_like:
   descriptor_a: null
   descriptor_b: null
   location: null
-- artist_a:
-    discogs_id: 955
-    id: 202
-    name: Broadcast
-    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
-      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
-      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
-      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
-      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
-      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
-      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
-      \ \r\n"
-  artist_b: null
-  descriptor_a: null
-  descriptor_b: abrasive
-  location: at a wedding
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
   rating: null
   suggested_replacement_value: null
 structure:
@@ -125,6 +109,13 @@ structure:
   section_name: Verse Intro
   sequence: 1
   start_time: '[00:00.000]'
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: And now I'll show off my mediocre language skills
+  section_name: The whole song again in another language
+  sequence: 1
+  start_time: null
 - duration: null
   end_time: '[00:38.000]'
   midi_group: null
@@ -161,13 +152,6 @@ structure:
   sequence: 6
   start_time: '[01:24.175]'
 - duration: null
-  end_time: '[02:07.013]'
-  midi_group: null
-  section_description: Description for Verse 4
-  section_name: Verse 4
-  sequence: 7
-  start_time: '[01:52.234]'
-- duration: null
   end_time: '[02:21.043]'
   midi_group: null
   section_description: Description for Verse 5
@@ -198,7 +182,7 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: c9f891ca-cf8d-43a9-9b08-09fb69b941c0
+  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

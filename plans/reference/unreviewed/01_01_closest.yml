@@ -1,40 +1,53 @@
 associated_resource: '01_01'
-batch_id: 4fd121c7-8a97-4830-8a05-38b9ca85a277
-bpm: 143
+batch_id: 5e9b8380-8d15-4976-9fae-5c676b173f17
+bpm: 144
+bpm_feedback:
+  comment: null
+  field_name: bpm
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
+  rating: null
+  suggested_replacement_value: null
 genres:
 - Art Rock
 - Avant-Garde
 - Dark Wave
+- Electronic
 - Experimental
 - Gothic Rock
-- Indie Rock
-- Lo-Fi
 - Post-Punk
 - Psychedelic
+- Psychedelic Electronic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
   rating: null
   suggested_replacement_value: null
-key: C# minor
+key: C major
+key_feedback:
+  comment: null
+  field_name: key
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
+  rating: null
+  suggested_replacement_value: null
 moods:
 - arcane
 - chilling
 - creepy
-- dark
 - eerie
 - ethereal
 - foreboding
 - ghostly
 - haunted
 - haunting
+- melancholic
+- mysterious
 - occult
 - ominous
 - otherworldly
@@ -44,27 +57,26 @@ moods:
 - spooky
 - supernatural
 - unsettling
-- wistful
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
   rating: null
   suggested_replacement_value: null
-plan: null
+plan: Make a song like The Conjurer's Thread
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
   rating: null
   suggested_replacement_value: null
-plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -80,98 +92,133 @@ sounds_like:
       \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
       \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
   artist_b: null
-  descriptor_a: rhythmic
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 955
+    id: 202
+    name: Broadcast
+    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
+      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
+      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
+      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
+      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
+      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
+      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
+      \ \r\n"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 36665
+    id: 203
+    name: Nick Cave and the Bad Seeds
+    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
+      \ The group has had an international line-up throughout their career.\r\n\r\n\
+      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
+      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
+      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
+      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+  artist_b: null
+  descriptor_a: null
   descriptor_b: null
   location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: Description for Chorus 1 and Protracted silence with room tone.
-    3:33
-  section_name: Chorus 1 & Protracted silence with room tone
+  section_description: The repeated, catchy part of the song
+  section_name: Chorus
   sequence: 1
   start_time: null
 - duration: null
-  end_time: null
+  end_time: '[00:14.027]'
+  midi_group: null
+  section_description: Description for Verse Intro
+  section_name: Verse Intro
+  sequence: 1
+  start_time: '[00:00.000]'
+- duration: null
+  end_time: '[00:38.000]'
   midi_group: null
   section_description: Description for Verse 1
   section_name: Verse 1
   sequence: 2
-  start_time: null
+  start_time: '[00:14.027]'
 - duration: null
-  end_time: null
+  end_time: '[00:42.086]'
   midi_group: null
   section_description: Description for Verse 2
   section_name: Verse 2
   sequence: 3
-  start_time: null
+  start_time: '[00:28.057]'
 - duration: null
-  end_time: null
-  midi_group: null
-  section_description: Description for Verse 2
-  section_name: ' SplitVerse 2'
-  sequence: 3
-  start_time: null
-- duration: null
-  end_time: null
+  end_time: '[00:55.145]'
   midi_group: null
   section_description: Description for Verse 3
   section_name: Verse 3
   sequence: 4
-  start_time: null
+  start_time: '[00:42.086]'
 - duration: null
-  end_time: null
+  end_time: '[01:24.175]'
   midi_group: null
   section_description: Description for Interlude 1
   section_name: Interlude 1
   sequence: 5
-  start_time: null
+  start_time: '[00:55.145]'
 - duration: null
-  end_time: null
+  end_time: '[01:52.234]'
+  midi_group: null
+  section_description: Description for Chorus 1
+  section_name: Chorus 1
+  sequence: 6
+  start_time: '[01:24.175]'
+- duration: null
+  end_time: '[02:07.013]'
   midi_group: null
   section_description: Description for Verse 4
   section_name: Verse 4
   sequence: 7
-  start_time: null
+  start_time: '[01:52.234]'
 - duration: null
-  end_time: null
+  end_time: '[02:21.043]'
   midi_group: null
   section_description: Description for Verse 5
   section_name: Verse 5
   sequence: 8
-  start_time: null
+  start_time: '[02:07.013]'
 - duration: null
-  end_time: null
+  end_time: '[02:49.102]'
   midi_group: null
   section_description: Description for Chorus 2
   section_name: Chorus 2
   sequence: 9
-  start_time: null
+  start_time: '[02:21.043]'
 - duration: null
-  end_time: null
-  midi_group: null
-  section_description: Description for Interlude 2
-  section_name: Interlude 2
-  sequence: 10
-  start_time: null
-- duration: null
-  end_time: null
+  end_time: '[04:25.999]'
   midi_group: null
   section_description: Description for Outro
   section_name: Outro
   sequence: 11
-  start_time: null
+  start_time: '[03:17.161]'
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
+tempo_feedback:
+  comment: null
+  field_name: tempo
+  plan_id: c6936563-b0da-4eed-b765-bb2e29ceb0e4
+  rating: null
+  suggested_replacement_value: null
