@@ -271,7 +271,7 @@ async def manifest_artists_to_soundslike(manifest_sounds_like: list[RainbowArtis
 
 async def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positive: bool) -> RainbowSongPlan:
     """
-    Degrades a RainbowSongPlan based on the degradation factor.
+    Degrades a given RainbowSongPlan by randomly modifying its attributes based on the degradation factor.
     :param plan:
     :param degrade:
     :param positive:
@@ -288,6 +288,12 @@ async def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positiv
     return new_plan
 
 def randomly_modify_key(degradation: float, current_key: str) -> str:
+    """
+    Randomly modifies the musical key based on a degradation factor.
+    :param degradation:
+    :param current_key:
+    :return:
+    """
     key_roll = uniform(0.0, 100.0)
     if key_roll < degradation * 10.0:
        return get_random_musical_key()
@@ -295,6 +301,12 @@ def randomly_modify_key(degradation: float, current_key: str) -> str:
 
 
 def randomly_modify_bpm(current_bpm: int, degradation: float) -> int:
+    """
+    Randomly modifies the BPM based on a degradation factor.
+    :param current_bpm:
+    :param degradation:
+    :return:
+    """
     r = degradation * 3.33
     ri = int(r)
     modifier = uniform(ri, ri * -1)
@@ -307,6 +319,12 @@ def randomly_modify_bpm(current_bpm: int, degradation: float) -> int:
 
 
 def randomly_modify_tempo(degradation: float, current_tempo: str) -> str:
+    """
+    Randomly modifies the tempo of a song based on a degradation factor.
+    :param degradation:
+    :param current_tempo:
+    :return:
+    """
     enact_roll = uniform(0.0, 100.0)
     if enact_roll <= degradation:
         tempo_roll = uniform(0.0, 100.0)
@@ -317,6 +335,13 @@ def randomly_modify_tempo(degradation: float, current_tempo: str) -> str:
 
 
 def randomly_modify_structure(current_structure: list[RainbowSongStructureModel], degradation: float, positive: bool)-> list[RainbowSongStructureModel]:
+    """
+    Randomly modifies the song structure based on a degradation factor.
+    :param current_structure:
+    :param degradation:
+    :param positive:
+    :return:
+    """
     i = int(degradation * 0.5)
     return_structure: list[RainbowSongStructureModel] = current_structure
     if i > 0:
@@ -339,6 +364,13 @@ def randomly_modify_structure(current_structure: list[RainbowSongStructureModel]
     return return_structure
 
 async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float, positive: bool) -> list[RainbowSoundsLike]:
+    """
+    Randomly modifies the sounds like attributes of a song based on a degradation factor.
+    :param current_sounds_like:
+    :param degradation:
+    :param positive:
+    :return:
+    """
     new_rainbow_sounds_like: list[RainbowSoundsLike] = []
     for sl in current_sounds_like:
         roll = uniform(0.0, 100.0)
@@ -565,6 +597,13 @@ async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLik
     return new_rainbow_sounds_like
 
 def randomly_modify_genres(current_genres: list[str], degradation: float, positive: bool) -> list[str]:
+    """
+    Randomly modifies the genres of a song based on a degradation factor.
+    :param current_genres:
+    :param degradation:
+    :param positive:
+    :return:
+    """
     i = int(degradation * 0.5)
     if i > 0:
         if positive:
@@ -577,6 +616,13 @@ def randomly_modify_genres(current_genres: list[str], degradation: float, positi
 
 
 def randomly_modify_mood(current_moods: list[str], degradation: float, positive: bool) -> list[str]:
+    """
+    Randomly modifies the moods of a song based on a degradation factor.
+    :param current_moods:
+    :param degradation:
+    :param positive:
+    :return:
+    """
     i = int(degradation * 0.5)
     if i > 0:
         if positive:
@@ -853,5 +899,5 @@ if __name__ == "__main__":
                         if file.endswith(".yml"):
                             yaml_file_path = os.path.join(subdir_path, file)
                             await process_single_manifest(yaml_file_path)
-
+        update_reference_manifest_with_plans()
     asyncio.run(main())
