@@ -15,11 +15,13 @@ from app.objects.sounds_like import RainbowSoundsLike
 from app.resources.plans.negative_artist_reference import NEGATIVE_ARTISTS
 from app.resources.plans.negative_genre_reference import NEGATIVE_GENRES
 from app.resources.plans.negative_mood_reference import NEGATIVE_MOODS
+from app.resources.plans.negative_plan_structure_reference import NEGATIVE_PLAN_PARTS
 from app.resources.plans.negative_sounds_like_descriptor_reference import NEGATIVE_DESCRIPTORS
 from app.resources.plans.negative_sounds_like_locations import NEGATIVE_SOUNDS_LIKE_LOCATIONS
 from app.resources.plans.positive_artist_reference import POSITIVE_ARTISTS
 from app.resources.plans.positive_genre_reference import POSITIVE_GENRES
 from app.resources.plans.positive_mood_reference import POSITIVE_MOODS
+from app.resources.plans.positive_plan_structure_reference import POSITIVE_PLAN_PARTS
 from app.resources.plans.positive_sounds_like_descriptor_reference import POSITIVE_DESCRIPTORS
 from app.resources.plans.positive_sounds_like_locations import POSITIVE_SOUNDS_LIKE_LOCATIONS
 from app.resources.plans.tempo_reference import MINIMUM_BPM, MAXIMUM_BPM, TEMPO_CHANGE_TABLE
@@ -59,7 +61,10 @@ def swap_random_items(count: int, source_list: list, new_items_list: list) -> li
     items_to_keep = random.sample(source_list, len(source_list) - count)
     items_to_add = random.sample(new_items_list, count)
     result = items_to_keep + items_to_add
-    return sorted(result)
+    if result and hasattr(result[0], 'sequence'):
+        return sorted(result, key=lambda x: x.sequence)
+    else:
+        return sorted(result)
 
 
 def lookup_result_from_roll(roll: float, table: list) -> any:
@@ -83,7 +88,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
                              manifest_bpm: int,
                              manifest_tempo: str,
                              manifest_key: str,
-                             # manifest_structure: list[RainbowSongStructureModel],
+                             manifest_structure: list[RainbowSongStructureModel],
                              manifest_sounds_like: list[RainbowArtist],
                              manifest_genres: list[str],
                              manifest_mood: list[str],
@@ -153,6 +158,13 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
+        positive_plan.structure = manifest_structure
+        positive_plan.structure_feedback = RainbowPlanFeedback(
+            plan_id=positive_plan_id,
+            field_name="structure",
+            rating=None,
+            comment=None,
+        )
         positive_plan = await degrade_reference_plans(positive_plan, index + 1, positive=True)
         plan_yaml = positive_plan.to_yaml()
         plan_file_path = os.path.join(PATH_TO_REFERENCE_PLANS, positive_plan_file_name)
@@ -211,6 +223,13 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
+        negative_plan.structure = manifest_structure
+        negative_plan.structure_feedback = RainbowPlanFeedback(
+            plan_id=negative_plan_id,
+            field_name="structure",
+            rating=None,
+            comment=None,
+        )
         negative_plan = await degrade_reference_plans(negative_plan, index + 1, positive=False)
         plan_yaml = negative_plan.to_yaml()
         plan_file_path = os.path.join(PATH_TO_REFERENCE_PLANS, negative_plan_file_name)
@@ -265,7 +284,7 @@ async def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positiv
     new_plan.moods = randomly_modify_mood(plan.moods, degrade, positive)
     new_plan.genres = randomly_modify_genres(plan.genres, degrade, positive)
     new_plan.sounds_like = await randomly_modify_sounds_like(plan.sounds_like, degrade, positive)
-    # new_plan.structure = randomly_modify_structure(plan.structure, degrade, positive)
+    new_plan.structure = randomly_modify_structure(plan.structure, degrade, positive)
     return new_plan
 
 def randomly_modify_key(degradation: float, current_key: str) -> str:
@@ -298,7 +317,26 @@ def randomly_modify_tempo(degradation: float, current_tempo: str) -> str:
 
 
 def randomly_modify_structure(current_structure: list[RainbowSongStructureModel], degradation: float, positive: bool)-> list[RainbowSongStructureModel]:
-    return current_structure
+    i = int(degradation * 0.5)
+    return_structure: list[RainbowSongStructureModel] = current_structure
+    if i > 0:
+        plan_parts = POSITIVE_PLAN_PARTS if positive else NEGATIVE_PLAN_PARTS
+        new_structure = swap_random_items(i, current_structure, plan_parts)
+        split_roll = uniform(0.0, 100.0)
+        if split_roll <= degradation * 10.0:
+            new_structure = split_song_structure(new_structure)
+        combined_roll = uniform(0.0, 100.0)
+        if combined_roll <= degradation * 10.0:
+            new_structure = combine_song_structure(new_structure)
+        return_structure = new_structure
+    for index, section in enumerate(return_structure):
+        if not section.section_name:
+            section.section_name = f"Section {index + 1}"
+        if not section.section_description:
+            section.section_description = f"Description for {section.section_name}"
+        if section.sequence is None or section.sequence <= 0:
+            section.sequence = index + 1
+    return return_structure
 
 async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float, positive: bool) -> list[RainbowSoundsLike]:
     new_rainbow_sounds_like: list[RainbowSoundsLike] = []
@@ -680,13 +718,39 @@ async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist
 
 
 
-def split_song_structure(current_structure_node: RainbowSongStructureModel)-> list[RainbowSongStructureModel]:
-    return []
+def split_song_structure(current_structure: list[RainbowSongStructureModel])-> list[RainbowSongStructureModel]:
+    to_split = random.choice(current_structure)
+    if to_split:
+        split_index = random.randint(0, len(to_split.section_name) - 1)
+        new_section_name = to_split.section_name[:split_index] + " Split" + to_split.section_name[split_index:]
+        new_section = RainbowSongStructureModel(
+            section_name=new_section_name,
+            section_description=to_split.section_description,
+            sequence=to_split.sequence
+        )
+        current_structure.append(new_section)
+        return sorted(current_structure, key=lambda x: x.sequence)
+    return current_structure
 
 
-def combine_song_structure(current_structure_nodes: list[RainbowSongStructureModel]) -> RainbowSongStructureModel:
-    pass
-
+def combine_song_structure(current_structure: list[RainbowSongStructureModel]) -> list[RainbowSongStructureModel]:
+    if len(current_structure) == 1:
+        print("Cannot combine structure with only one section")
+        return current_structure
+    to_combine = random.sample(current_structure, 2)
+    if to_combine:
+        combined_section_name = f"{to_combine[0].section_name} & {to_combine[1].section_name}"
+        combined_section_description = f"{to_combine[0].section_description} and {to_combine[1].section_description}"
+        combined_section = RainbowSongStructureModel(
+            section_name=combined_section_name,
+            section_description=combined_section_description,
+            sequence=min(to_combine[0].sequence, to_combine[1].sequence)
+        )
+        current_structure.remove(to_combine[0])
+        current_structure.remove(to_combine[1])
+        current_structure.append(combined_section)
+        return sorted(current_structure, key=lambda x: x.sequence)
+    return current_structure
 
 if __name__ == "__main__":
     async def main():
@@ -761,7 +825,7 @@ if __name__ == "__main__":
                                     manifest_bpm=bpm,
                                     manifest_tempo=tempo,
                                     manifest_key=key,
-                                    #manifest_structure=structure,
+                                    manifest_structure=structure,
                                     manifest_sounds_like=sounds_like,
                                     manifest_genres=genres,
                                     manifest_mood=mood,

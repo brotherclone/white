@@ -1,8 +1,7 @@
 import random
 
 from app.agents.BaseRainbowAgent import BaseRainbowAgent
-from app.enums.rainbow_color import RainbowColor
-
+from app.objects.rainbow_color import RainbowColor
 
 class Subutai(BaseRainbowAgent):
 

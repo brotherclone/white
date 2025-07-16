@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from app.enums.plan_state import PlanState
 from app.objects.rainbow_color import RainbowColor
 from app.objects.plan_feedback import RainbowPlanFeedback
+from app.objects.rainbow_song_meta import RainbowSongStructureModel
 from app.objects.sounds_like import RainbowSoundsLike
 from app.utils.string_util import uuid_representer, enum_representer
 
@@ -29,6 +30,8 @@ class RainbowSongPlan(BaseModel):
     plan_feedback: RainbowPlanFeedback | None = None
     genres: list[str] | None = None
     genres_feedback: RainbowPlanFeedback | None = None
+    structure: list[RainbowSongStructureModel] | None = None
+    structure_feedback: RainbowPlanFeedback | None = None
     implementation_notes:  RainbowPlanFeedback | None = None
 
 
@@ -71,7 +74,14 @@ class RainbowSongPlan(BaseModel):
                 comment=None,
                 suggested_replacement_value=None
             )
-        self.implementation_notes  = RainbowPlanFeedback(
+        self.structure_feedback = RainbowPlanFeedback(
+                plan_id=self.plan_id,
+                field_name="structure",
+                rating=None,
+                comment=None,
+                suggested_replacement_value=None
+        )
+        self.implementation_notes = RainbowPlanFeedback(
                 plan_id=self.plan_id,
                 field_name="implementation_notes",
                 rating=None,

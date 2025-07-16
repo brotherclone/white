@@ -1,6 +1,6 @@
 associated_resource: '01_01'
-batch_id: b5929a96-828c-42ad-b9e7-63e469788896
-bpm: 134
+batch_id: e258e082-1317-4a7b-9e6a-b8480928d969
+bpm: 135
 genres:
 - Experimental
 - Psychedelic
@@ -14,13 +14,13 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
   rating: null
   suggested_replacement_value: null
 key: C major
@@ -48,63 +48,129 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
   rating: null
   suggested_replacement_value: null
-plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
   rating: null
   suggested_replacement_value: null
 sounds_like:
 - artist_a:
-    discogs_id: 280442
-    id: 114
-    name: Godspeed You! Black Emperor
-    profile: "Canadian post-rock band. Formed in 1994 in Montreal, Quebec, Canada.\
-      \ Hiatus between 2004-2009. Originally called Godspeed You Black Emperor!, before\
-      \ later using Godspeed You! Black Emperor. \r\n\r\nAs an experimental nine-piece\
-      \ from Montreal, they specialize in instrumental music. Members consist of [a=Mike\
-      \ Moya] (guitar),  [a=Efrim Menuck] (guitar), [a=David Bryant] (guitar), [a=Mauro\
-      \ Pezzente] (bass), [a=Thierry Amar] (bass), [a=Sophie Trudeau] (violin), [a=Aidan\
-      \ Girt] (percussion), [a=Tim Herzog] (percussion), [a=Karl Lemieux] (16mm film\
-      \ projections), and [a=Philippe Léonard] (16mm film projections). \r\n\r\nPlease\
-      \ use artist page [a=God Speed You Black Emperor!] for anything relating to\
-      \ the [m=2509531] cassette release from 1994 as this is now definitively a solo\
-      \ [a=Efrim Menuck] project.\r\n"
+    discogs_id: 10263
+    id: 104
+    name: David Bowie
+    profile: "British pop/rock singer, musician, songwriter, and actor.\r\n\r\nBorn:\
+      \ 8 January 1947 in Brixton, London, England, UK.\r\nDied: 10 January 2016 in\
+      \ Manhattan, New York City, USA (aged 69).\r\n\r\nBowie is recognized as one\
+      \ of the most respected contemporary musicians of his period. He was a leading\
+      \ figure in the music industry and is considered one of the most influential\
+      \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
+      \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
   artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
-- artist_a:
-    discogs_id: 36665
-    id: 203
-    name: Nick Cave and the Bad Seeds
-    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
-      \ The group has had an international line-up throughout their career.\r\n\r\n\
-      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
-      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
-      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
-      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
-  artist_b: null
-  descriptor_a: null
+  descriptor_a: rhythmic
   descriptor_b: null
   location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: f5d60b71-518f-43be-be30-c1b736f786df
+  plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
+  rating: null
+  suggested_replacement_value: null
+structure:
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse Intro
+  section_name: Verse Intro
+  sequence: 1
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 1
+  section_name: Verse 1
+  sequence: 2
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 2
+  section_name: Verse 2
+  sequence: 3
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 3
+  section_name: Verse 3
+  sequence: 4
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Interlude 1
+  section_name: Interlude 1
+  sequence: 5
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Chorus 1
+  section_name: Chorus 1
+  sequence: 6
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 4
+  section_name: Verse 4
+  sequence: 7
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 5
+  section_name: Verse 5
+  sequence: 8
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Chorus 2
+  section_name: Chorus 2
+  sequence: 9
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Interlude 2
+  section_name: Interlude 2
+  sequence: 10
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: null
+structure_feedback:
+  comment: null
+  field_name: structure
+  plan_id: b1579a93-2f38-4169-9b5d-db79bbdbc83d
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

@@ -1,29 +1,29 @@
 associated_resource: '01_01'
-batch_id: 3affc777-e9fa-4031-857f-7faeac27d019
+batch_id: 4fd121c7-8a97-4830-8a05-38b9ca85a277
 bpm: 143
 genres:
+- Art Rock
 - Avant-Garde
 - Dark Wave
-- Electronic
 - Experimental
 - Gothic Rock
 - Indie Rock
+- Lo-Fi
 - Post-Punk
-- Post-Rock
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
   rating: null
   suggested_replacement_value: null
-key: C major
+key: C# minor
 moods:
 - arcane
 - chilling
@@ -31,40 +31,40 @@ moods:
 - dark
 - eerie
 - ethereal
-- existential
 - foreboding
 - ghostly
 - haunted
 - haunting
-- mysterious
 - occult
 - ominous
 - otherworldly
+- phantasmal
 - sinister
 - spectral
 - spooky
 - supernatural
 - unsettling
+- wistful
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
   rating: null
   suggested_replacement_value: null
-plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -80,33 +80,98 @@ sounds_like:
       \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
       \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
   artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
-- artist_a:
-    discogs_id: 20991
-    id: 153
-    name: The Rolling Stones
-    profile: "English rock band formed in London in May 1962. They are one of the\
-      \ longest-lived and most commercially successful groups in rock history. Inducted\
-      \ into the Rock And Roll Hall of Fame in 1989 (Performer).\r\n\r\n[i]Band members[/i]\r\
-      \n\r\n[u]05/1962 - 05/1963[/u]\r\n[a255182] (Keyboards, piano)\r\n\r\n[u]05/1962\
-      \ - 06/1969[/u]\r\n[a409290] (Lead and rhythm guitars)\r\n\r\n[u]06/1962 - 10/1962[/u]\r\
-      \n[a414255] (Bass)\r\n\r\n[u]06/1962 - 12/1962[/u]\r\n[a677434] (Drums)\r\n\r\
-      \n[u]06/1962 - present[/u]\r\n[a90541] (Lead vocals, harmonica, percussion)\r\
-      \n[a166570] (Lead and rhythm guitars, acoustic guitar, backing vocals)\r\n\r\
-      \n[u]12/1962 - 01/1993[/u]\r\n[a272814] (Bass)\r\n\r\n[u]01/1963 - 08/2021[/u]\r\
-      \n[a299325] (Drums and percussion)\r\n\r\n[u]07/1969 - 12/1974[/u]\r\n[a300117]\
-      \ (Lead and slide guitars)\r\n\r\n[u]03/1975 - present[/u]\r\n[a271311] (Guitars,\
-      \ backing vocals)"
-  artist_b: null
-  descriptor_a: null
+  descriptor_a: rhythmic
   descriptor_b: null
   location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 53cbe5c5-fe81-4ce0-8346-0dd0f6c77900
+  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
+  rating: null
+  suggested_replacement_value: null
+structure:
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Chorus 1 and Protracted silence with room tone.
+    3:33
+  section_name: Chorus 1 & Protracted silence with room tone
+  sequence: 1
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 1
+  section_name: Verse 1
+  sequence: 2
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 2
+  section_name: Verse 2
+  sequence: 3
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 2
+  section_name: ' SplitVerse 2'
+  sequence: 3
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 3
+  section_name: Verse 3
+  sequence: 4
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Interlude 1
+  section_name: Interlude 1
+  sequence: 5
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 4
+  section_name: Verse 4
+  sequence: 7
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 5
+  section_name: Verse 5
+  sequence: 8
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Chorus 2
+  section_name: Chorus 2
+  sequence: 9
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Interlude 2
+  section_name: Interlude 2
+  sequence: 10
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: null
+structure_feedback:
+  comment: null
+  field_name: structure
+  plan_id: b30fce9e-8748-4089-8a0b-f628266beb2e
   rating: null
   suggested_replacement_value: null
 tempo: 4/4

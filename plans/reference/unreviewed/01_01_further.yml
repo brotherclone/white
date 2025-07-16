@@ -1,32 +1,31 @@
 associated_resource: '01_01'
-batch_id: 86800794-49a3-4dec-8292-b672026c8b59
-bpm: 133
+batch_id: 1a0ad665-46e6-4c7f-9947-07e67c131d6a
+bpm: 138
 genres:
 - Art Rock
-- Christian Worship
+- Avant-Garde
 - Dark Wave
 - Electronic
 - Experimental
 - Gothic Rock
 - Indie Rock
-- Post-Punk
+- K-Pop
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
   rating: null
   suggested_replacement_value: null
-key: A mixolydian
+key: C major
 moods:
 - arcane
-- blunt
 - chilling
 - creepy
 - dark
@@ -37,8 +36,9 @@ moods:
 - haunted
 - haunting
 - mysterious
+- occult
 - ominous
-- otherworldly
+- pedestrian
 - phantasmal
 - sinister
 - spectral
@@ -48,23 +48,23 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
   rating: null
   suggested_replacement_value: null
-plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -99,24 +99,94 @@ sounds_like:
   descriptor_a: null
   descriptor_b: null
   location: null
-- artist_a:
-    discogs_id: 36665
-    id: 203
-    name: Nick Cave and the Bad Seeds
-    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
-      \ The group has had an international line-up throughout their career.\r\n\r\n\
-      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
-      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
-      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
-      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
-  artist_b: null
-  descriptor_a: null
-  descriptor_b: bleak
-  location: at Glastonbury
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: bb209e93-0079-4016-b994-b79b37e0201a
+  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  rating: null
+  suggested_replacement_value: null
+structure:
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: As if the song wasn't already hard to follow
+  section_name: Tempo Changes
+  sequence: 1
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse Intro
+  section_name: Verse Intro
+  sequence: 1
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 1
+  section_name: Verse 1
+  sequence: 2
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 2
+  section_name: Verse 2
+  sequence: 3
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 3
+  section_name: Verse 3
+  sequence: 4
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Interlude 1
+  section_name: Interlude 1
+  sequence: 5
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Chorus 1
+  section_name: Chorus 1
+  sequence: 6
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Verse 5
+  section_name: Verse 5
+  sequence: 8
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Chorus 2
+  section_name: Chorus 2
+  sequence: 9
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Interlude 2
+  section_name: Interlude 2
+  sequence: 10
+  start_time: null
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: null
+structure_feedback:
+  comment: null
+  field_name: structure
+  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
