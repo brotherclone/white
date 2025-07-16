@@ -752,6 +752,94 @@ def combine_song_structure(current_structure: list[RainbowSongStructureModel]) -
         return sorted(current_structure, key=lambda x: x.sequence)
     return current_structure
 
+async def process_single_manifest(manifest_file_path: str):
+    """
+    Process a single manifest file to create reference plans.
+
+    Args:
+        manifest_file_path: Path to the manifest YAML file
+
+    Returns:
+        bool: True if processing was successful, False otherwise
+    """
+    if not os.path.isfile(manifest_file_path):
+        raise FileNotFoundError(f"The file {manifest_file_path} does not exist.")
+
+    try:
+        with open(manifest_file_path, 'r') as f:
+            manifest_data = yaml.safe_load(f)
+        bpm = manifest_data.get('bpm', 120)
+        tempo = manifest_data.get('tempo', '4/4')
+        key = manifest_data.get('key', 'C major')
+        raw_structure = manifest_data.get('structure', [])
+        structure = []
+        if raw_structure:
+            for section in raw_structure:
+                if isinstance(section, dict):
+                    structure.append(RainbowSongStructureModel(
+                        section_name=section.get('section_name', 'Unknown'),
+                        section_description=section.get('section_description', ''),
+                        sequence=section.get('sequence', 0),
+                        start_time= section.get('start_time', None),
+                        end_time= section.get('end_time', None),
+                        duration=section.get('duration', None),
+                        midi_group=section.get('midi_group', None),
+                    ))
+                else:
+                    structure.append(section)
+        else:
+            structure = [
+                RainbowSongStructureModel(
+                    section_name='Intro',
+                    section_description='Introduction section',
+                    sequence=1
+                ),
+                RainbowSongStructureModel(
+                    section_name='Verse',
+                    section_description='Verse',
+                    sequence=2
+                ),
+                RainbowSongStructureModel(
+                    section_name='Chorus',
+                    section_description='Chorus',
+                    sequence=3
+                )
+            ]
+        sounds_like = []
+        raw_sounds_like = manifest_data.get('sounds_like', [])
+        if raw_sounds_like:
+            for sound_like in raw_sounds_like:
+                artist = RainbowArtist(
+                    name=sound_like.get('name', ''),
+                    id=sound_like.get('id', 0),
+                    discogs_id=sound_like.get('discogs_id', 0)
+                )
+                if artist.name:
+                    sounds_like.append(artist)
+        genres = manifest_data.get('genres', ['Pop', 'Rock', 'Electronic'])
+        mood = manifest_data.get('mood', ['Happy', 'Energetic', 'Uplifting'])
+        manifest_id = manifest_data.get('manifest_id', 'default_manifest')
+        color_value = manifest_data.get('rainbow_color', 'Z')
+        color = convert_to_rainbow_color(color_value)
+        await stub_out_reference_plans(
+            current_manifest_id=manifest_id,
+            manifest_bpm=bpm,
+            manifest_tempo=tempo,
+            manifest_key=key,
+            manifest_structure=structure,
+            manifest_sounds_like=sounds_like,
+            manifest_genres=genres,
+            manifest_mood=mood,
+            manifest_color=color
+        )
+
+        print(f"Successfully processed manifest: {manifest_file_path}")
+        return True
+    except Exception as e:
+        print(f"Error processing manifest {manifest_file_path}: {e}")
+        return False
+
+
 if __name__ == "__main__":
     async def main():
         if not os.path.isdir(PATH_TO_STAGED_RAW_MATERIALS):
@@ -764,77 +852,6 @@ if __name__ == "__main__":
                     for file in os.listdir(subdir_path):
                         if file.endswith(".yml"):
                             yaml_file_path = os.path.join(subdir_path, file)
-                            try:
-                                with open(yaml_file_path, 'r') as f:
-                                    manifest_data = yaml.safe_load(f)
-                                bpm = manifest_data.get('bpm', 120)
-                                tempo = manifest_data.get('tempo', '4/4')
-                                key = manifest_data.get('key', 'C major')
-                                raw_structure = manifest_data.get('structure', [])
-                                structure = []
-                                if raw_structure:
-                                    for section in raw_structure:
-                                        if isinstance(section, dict):
-                                            structure.append(RainbowSongStructureModel(
-                                                section_name=section.get('section_name', 'Unknown'),
-                                                section_description=section.get('section_description', ''),
-                                                sequence=section.get('sequence', 0)
-                                            ))
-                                        else:
-                                            structure.append(section)
-                                else:
-                                    structure = [
-                                        RainbowSongStructureModel(
-                                            section_name='Intro',
-                                            section_description='Introduction section',
-                                            sequence=1
-                                        ),
-                                        RainbowSongStructureModel(
-                                            section_name='Verse',
-                                            section_description='Verse',
-                                            sequence=2
-                                        ),
-                                        RainbowSongStructureModel(
-                                            section_name='Chorus',
-                                            section_description='Chorus',
-                                            sequence=3
-                                        )
-                                    ]
-                                sounds_like = []
-                                raw_sounds_like = manifest_data.get('sounds_like', [])
-                                if raw_sounds_like:
-                                    for sound_like in raw_sounds_like:
-                                        artist = RainbowArtist(
-                                            name=sound_like.get('name', ''),
-                                            id=sound_like.get('id', 0),
-                                            discogs_id=sound_like.get('discogs_id', 0)
-                                        )
-                                        if artist.name:
-                                            sounds_like.append(artist)
-                                genres = manifest_data.get('genres', [
-                                    'Pop', 'Rock', 'Electronic'
-                                ])
-                                mood = manifest_data.get('mood', [
-                                    'Happy', 'Energetic', 'Uplifting'
-                                ])
-                                manifest_id = manifest_data.get('manifest_id', 'default_manifest')
-                                color_value = manifest_data.get('rainbow_color', 'Z')
-                                color = convert_to_rainbow_color(color_value)
-                                await stub_out_reference_plans(
-                                    current_manifest_id=manifest_id,
-                                    manifest_bpm=bpm,
-                                    manifest_tempo=tempo,
-                                    manifest_key=key,
-                                    manifest_structure=structure,
-                                    manifest_sounds_like=sounds_like,
-                                    manifest_genres=genres,
-                                    manifest_mood=mood,
-                                    manifest_color=color
-                                )
-                            except Exception as e:
-                                print(f"Error loading YAML file {yaml_file_path}: {e}")
-                                continue
-                else:
-                    print(f"Skipping non-directory item: {subdir_path}")
+                            await process_single_manifest(yaml_file_path)
 
     asyncio.run(main())
