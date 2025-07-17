@@ -43,6 +43,10 @@ class RainbowSongStructureModel(BaseModel):
     sequence: None | int = None
     midi_group: str | None = None
 
+class RainbowSongPlanListModel(BaseModel):
+    positive: list[str] = []
+    negative: list[str] = []
+
 class RainbowMetaDataModel(BaseModel):
     bpm: int
     tempo: str
@@ -63,7 +67,7 @@ class RainbowMetaDataModel(BaseModel):
     genres: list[str]
     lrc_file: bool | str = False
     audio_tracks: list[RainbowSongTrackModel] | None =None
-    # ToDo: Add reference plans
+    reference_plans: RainbowSongPlanListModel | None = None
 
 class RainbowSongMeta(BaseModel):
     yaml_file_name: str

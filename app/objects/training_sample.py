@@ -38,3 +38,5 @@ class TrainingSample(BaseModel):
 
     def __init__(self, /, **data):
         super().__init__(**data)
+
+# ToDo: Add reference plan file lists

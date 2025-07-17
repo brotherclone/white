@@ -30,7 +30,7 @@ from app.utils.discog_util import search_discogs_artist, get_discogs_artist
 from app.utils.string_util import get_random_musical_key, convert_to_rainbow_color
 from app.objects.db_models.artist_schema import ArtistSchema, RainbowArtist
 
-POSITIVE_REFERENCE_PLAN_NAMES = ["close", "closer", "closest"]
+POSITIVE_REFERENCE_PLAN_NAMES = ["closest", "closer", "close"]
 NEGATIVE_REFERENCE_PLAN_NAMES = ["far", "further", "furthest"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PATH_TO_STAGED_RAW_MATERIALS = os.path.abspath(os.path.join(SCRIPT_DIR, "../..", "staged_raw_material"))

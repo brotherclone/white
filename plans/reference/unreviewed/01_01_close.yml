@@ -1,10 +1,10 @@
 associated_resource: '01_01'
-batch_id: 06acabf8-b26a-4848-9681-bbb7ad288ce8
-bpm: 135
+batch_id: c6731171-95bb-48b1-9a60-10bd7562b8ed
+bpm: 134
 bpm_feedback:
   comment: null
   field_name: bpm
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 genres:
@@ -20,20 +20,20 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 key: C major
 key_feedback:
   comment: null
   field_name: key
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 moods:
@@ -60,23 +60,23 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 plan: Make a song like The Conjurer's Thread
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
-plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -96,31 +96,21 @@ sounds_like:
   descriptor_b: null
   location: null
 - artist_a:
-    discogs_id: 955
-    id: 202
-    name: Broadcast
-    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
-      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
-      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
-      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
-      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
-      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
-      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
-      \ \r\n"
-  artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
-- artist_a:
-    discogs_id: 215471
-    id: 150
-    name: The Byrds
-    profile: 'Influential American folk, psychedelic, and country rock band founded
-      in Los Angeles in 1964. They recorded 12 studio albums before disbanding in
-      1973. During this period the band underwent several line-up changes with frontman
-      and guitarist [a=Roger McGuinn] remaining the only constant member. In 1991
-      The Byrds were inducted into the Rock and Roll Hall of Fame with the original
-      five members performing together for the last time after their induction. '
+    discogs_id: 253234
+    id: 179
+    name: The Pogues
+    profile: "The Pogues are an Irish-British Celtic punk / folk band founded as [a=Pogue\
+      \ Mahone] (\"kiss my arse\" in Gaelic) in London in the early 1980s.\r\n\r\n\
+      Founder & front man [a=Shane MacGowan] was fired in 1991, going on to form [a=Shane\
+      \ MacGowan And The Popes]. The band continued, with some lineup changes (including\
+      \ the temporary addition of [a=Joe Strummer]), until 1996. The group reformed\
+      \ in 2001, and played their final show in August 2014, shortly after the death\
+      \ by cancer of [a=Philip Chevron] on 8 October 2013. [a=Darryl Hunt] died on\
+      \ 8 August 2022, and MacGowan passed away on 30 November 2023.\r\n\r\n[a=Spider\
+      \ Stacy], [a=James Fearnley], and [a=Jem Finer] reconvened under The Pogues'\
+      \ name, with a long list of special guests, for a series of shows in 2024 &\
+      \ 2025 curated by Stacy to celebrate the 40th anniversaries of [m=43754] and\
+      \ [m=43758]."
   artist_b: null
   descriptor_a: null
   descriptor_b: null
@@ -128,7 +118,7 @@ sounds_like:
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 structure:
@@ -212,13 +202,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
+  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
   rating: null
   suggested_replacement_value: null

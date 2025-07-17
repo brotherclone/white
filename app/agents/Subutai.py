@@ -1,4 +1,8 @@
 import random
+import numpy as np
+import os
+
+from stable_baselines3 import PPO
 
 from app.agents.BaseRainbowAgent import BaseRainbowAgent
 from app.objects.rainbow_color import RainbowColor
@@ -25,14 +29,7 @@ class Subutai(BaseRainbowAgent):
             col = kwargs.rainbow_color
         pass
 
-    def train_on_plans(self, **kwargs):
+    def _generate_random_plan(self):
         pass
 
-    def train_on_experience(self, **kwargs):
-        pass
 
-    def get_random_best_plan(self):
-        pass
-
-    def append_implemented_plan(self, plan):
-        pass

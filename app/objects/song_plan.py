@@ -114,9 +114,9 @@ class RainbowSongPlan(BaseModel):
             )
 
     def to_yaml(self):
-    yaml_dumper = yaml.SafeDumper
-    yaml_dumper.add_representer(uuid.UUID, uuid_representer)
-    yaml_dumper.add_multi_representer(Enum, enum_representer)
-    # Disable anchor/alias creation in YAML output # Claude Sonnet 3.7 is a genuis!!!
-    yaml_dumper.ignore_aliases = lambda self, data: True
-    return yaml.dump(self.dict(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)
+        yaml_dumper = yaml.SafeDumper
+        yaml_dumper.add_representer(uuid.UUID, uuid_representer)
+        yaml_dumper.add_multi_representer(Enum, enum_representer)
+        # Disable anchor/alias creation in YAML output # Claude Sonnet 3.7 is a genius!!!
+        yaml_dumper.ignore_aliases = lambda dumper, data: True
+        return yaml.dump(self.model_dump(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)

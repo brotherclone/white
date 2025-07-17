@@ -1,57 +1,57 @@
 associated_resource: '01_01'
-batch_id: dedc7cb0-3bb1-4e7a-af4a-7a7f7327d4c3
-bpm: 142
+batch_id: c85bf486-ce21-4fa3-8729-fc8c7ffd3835
+bpm: 140
 bpm_feedback:
   comment: null
   field_name: bpm
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 93646146-13ab-47a3-8830-bd0f045eb604
   rating: null
   suggested_replacement_value: null
 genres:
+- Art Rock
 - Avant-Garde
-- Christian Hip Hop
+- Christian Indie
 - Dark Wave
 - Electronic
 - Experimental
-- Gothic Rock
 - Indie Rock
 - Post-Punk
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
   rating: null
   suggested_replacement_value: null
-key: C major
+key: A# minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 93646146-13ab-47a3-8830-bd0f045eb604
   rating: null
   suggested_replacement_value: null
 moods:
 - arcane
 - chilling
+- creepy
 - dark
 - eerie
 - ethereal
 - foreboding
 - ghostly
-- haunted
 - haunting
 - mysterious
 - occult
 - ominous
 - otherworldly
 - phantasmal
-- saccharine
+- sanctimonious
 - sinister
 - spectral
 - spooky
@@ -60,23 +60,23 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
   rating: null
   suggested_replacement_value: null
 plan: Make a song like The Conjurer's Thread
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
   rating: null
   suggested_replacement_value: null
-plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -98,10 +98,17 @@ sounds_like:
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
   rating: null
   suggested_replacement_value: null
 structure:
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: Ohhh girl
+  section_name: Sex sounds
+  sequence: 1
+  start_time: null
 - duration: null
   end_time: '[00:14.027]'
   midi_group: null
@@ -109,13 +116,6 @@ structure:
   section_name: Verse Intro
   sequence: 1
   start_time: '[00:00.000]'
-- duration: null
-  end_time: null
-  midi_group: null
-  section_description: And now I'll show off my mediocre language skills
-  section_name: The whole song again in another language
-  sequence: 1
-  start_time: null
 - duration: null
   end_time: '[00:38.000]'
   midi_group: null
@@ -152,12 +152,12 @@ structure:
   sequence: 6
   start_time: '[01:24.175]'
 - duration: null
-  end_time: '[02:21.043]'
+  end_time: '[02:07.013]'
   midi_group: null
-  section_description: Description for Verse 5
-  section_name: Verse 5
-  sequence: 8
-  start_time: '[02:07.013]'
+  section_description: Description for Verse 4
+  section_name: Verse 4
+  sequence: 7
+  start_time: '[01:52.234]'
 - duration: null
   end_time: '[02:49.102]'
   midi_group: null
@@ -182,13 +182,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 9728f285-1745-43ef-9be8-420d4beb5d3b
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: fedf27ff-7a51-472c-9db2-72930c76f0ee
+  plan_id: 93646146-13ab-47a3-8830-bd0f045eb604
   rating: null
   suggested_replacement_value: null

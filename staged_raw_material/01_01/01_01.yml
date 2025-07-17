@@ -185,7 +185,7 @@ audio_tracks:
   midi_group_file: 01_01_drums.mid
 reference_plans:
   positive:
-  - 01_01_close.yml
+  - 01_01_closest.yml
   - 01_01_closer.yml
   - 01_01_closest.yml
   negative:
