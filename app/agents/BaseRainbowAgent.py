@@ -5,7 +5,7 @@ import os
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from pydantic import BaseModel, ConfigDict
-from typing import list, Any, Optional
+from typing import Any, Optional
 from app.enums.agent_state import AgentState
 
 class BaseRainbowAgent(BaseModel):
@@ -58,10 +58,11 @@ class BaseRainbowAgent(BaseModel):
             print("No valid data frames found in the provided training data.")
 
     def _process_agent_specific_data(self)-> None :
-        if self.data_frames is not None and not self.data_frames.empty:
-            pass
-        else:
-            print("No data frames to process.")
+        if self.data_frames is not None and len(self.data_frames) > 0:
+            if isinstance(self.data_frames, list):
+                # If it's a list of DataFrames, concatenate them
+                if all(isinstance(df, pd.DataFrame) for df in self.data_frames):
+                    self.data_frames = pd.concat(self.data_frames)
 
     def create_vector_store(self, text_field:str, metadata_fields: list[str]) -> None:
         if self.training_data is None:

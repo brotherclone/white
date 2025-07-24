@@ -2,7 +2,7 @@ associated_resource: '01_01'
 batch_id: 06acabf8-b26a-4848-9681-bbb7ad288ce8
 bpm: 135
 bpm_feedback:
-  comment: That's a good choice to slow down just a touch.
+  comment: "That's a good choice to slow down just a touch."
   field_name: bpm
   plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
   rating: 9.0
@@ -18,7 +18,7 @@ genres:
 - Dark Wave
 - Gothic Rock
 genres_feedback:
-  comment: These genres are generally good for all Black rainbow color plans. However, Dark Wave doesn't fit this particular plan as well as the others.
+  comment: "These genres are generally good for all Black rainbow color plans. However, Dark Wave doesn't fit this particular plan as well as the others."
   field_name: genres
   plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
   rating: 8.5
@@ -91,7 +91,7 @@ moods_feedback:
     - occult
     - arcane
     - vaudevillian
-plan: Make a song like The Conjurer's Thread
+plan: "Make a song like The Conjurer's Thread"
 plan_feedback:
   comment: Making a song like the original is what reference plans are for, so this is a good plan.
   field_name: plan
@@ -102,7 +102,7 @@ plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
-  comment: The Conjurer's Thread is a very 'black' type of song
+  comment: "The Conjurer's Thread is a very 'black' type of song"
   field_name: rainbow_color
   plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
   rating: 9.9
@@ -154,7 +154,7 @@ sounds_like:
   descriptor_b: null
   location: null
 sounds_like_feedback:
-  comment: I wonder if Nick Cave just comes in because of the word 'mercy' as in The Mercy Seat? Also - there's no 'b' artists, and it doesn't sound like The Byrds at all if the goal was to make a song like The Conjurer's Thread.
+  comment: "I wonder if Nick Cave just comes in because of the word 'mercy' as in The Mercy Seat? Also - there's no 'b' artists, and it doesn't sound like The Byrds at all if the goal was to make a song like The Conjurer's Thread."
   field_name: sounds_like
   plan_id: 08979dbe-0975-4639-aad4-e6694f09e4d5
   rating: 5.5
@@ -188,9 +188,7 @@ sounds_like_feedback:
         discogs_id: 85897
         id: null
         name: Bauhaus
-        profile: "Prototypical Goth rock band formed in Northampton, England in 1978.\
-          \ They were originally known as 'Bauhaus 1919' and later shortened to just 'Bauhaus'.\
-          \ The band is best known for their 1982 single 'Bela Lugosi\'s Dead'\n".
+        profile: "Prototypical Goth rock band formed in Northampton, England in 1978.They were originally known as 'Bauhaus 1919' and later shortened to just 'Bauhaus'.The band is best known for their 1982 single Bela Lugosi's Dead"
       descriptor_a: secretly
       descriptor_b: null
       location: A missile silo
