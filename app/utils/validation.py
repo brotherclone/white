@@ -72,7 +72,7 @@ class TrainingSampleValidator:
         if sample.song_segment_track_audio_file_name and not sample.song_segment_track_audio_binary_data:
             result.errors.append("Track audio filename exists but binary data is missing")
 
-        # If segment should have audio, check that it does
+        # If a segment should have audio, check that it does
         has_audio_file = bool(sample.song_segment_main_audio_file_name or sample.song_segment_track_audio_file_name)
         has_audio_data = bool(sample.song_segment_main_audio_binary_data or sample.song_segment_track_audio_binary_data)
 
@@ -181,3 +181,4 @@ class TrainingSampleValidator:
                 print(f"  - {warning_type}: {count}")
 
 # ToDo: Validate reference_id matches the directory
+# ToDo: Validate plans

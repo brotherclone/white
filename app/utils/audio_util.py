@@ -1,14 +1,21 @@
 import os
 import numpy as np
 
-def has_significant_audio(audio_chunk, threshold_db=-40):
+def has_significant_audio(audio_chunk, threshold_db=-20):
     if len(audio_chunk) == 0:
         return False
-    samples = np.array(audio_chunk.get_array_of_samples())
+
+    samples = audio_chunk.get_array_of_samples()
     if len(samples) == 0:
         return False
+
     rms = compute_rms(samples)
-    db_level = 20 * np.log10(rms + 1e-10)  # Avoid log(0)
+
+    # Convert RMS to decibels (with reference to maximum possible amplitude)
+    max_possible_amplitude = 32767  # For 16-bit audio
+    db_level = 20 * np.log10(rms / max_possible_amplitude) if rms > 0 else -float('inf')
+
+    # Check if the dB level exceeds the threshold
     return db_level > threshold_db
 
 def compute_rms(samples):
