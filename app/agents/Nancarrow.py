@@ -6,7 +6,7 @@ from app.agents.BaseRainbowAgent import BaseRainbowAgent
 class Nancarrow(BaseRainbowAgent):
 
     def __init__(self, **data):
-        super().__init__(data)
+        super().__init__(**data)
         self.model = None
 
     def initialize(self):

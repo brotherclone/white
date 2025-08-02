@@ -3,8 +3,6 @@ import torch
 
 TRAINING_PATH = "/Volumes/LucidNonsense/White/training"
 
-
-
 def try_agents():
     print("Initializing Dorthy agent...")
     dorthy = Dorthy(

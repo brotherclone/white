@@ -6,7 +6,7 @@ from app.agents.BaseRainbowAgent import BaseRainbowAgent
 class Martin(BaseRainbowAgent):
 
     def __init__(self, **data):
-        super().__init__(data)
+        super().__init__(**data)
         self.processor = None
         self.generator = None
         self.analyzer = None

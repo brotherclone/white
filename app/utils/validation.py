@@ -42,7 +42,8 @@ class TrainingSampleValidator:
         """Validate metadata fields"""
         required_fields = [
             "song_title", "song_bpm", "song_key",
-            "song_segment_name", "song_segment_duration"
+            "song_segment_name", "song_segment_duration",
+            "song_segment_reference_plan_paths"
         ]
 
         for field in required_fields:
@@ -179,6 +180,3 @@ class TrainingSampleValidator:
             print("\nWarning types:")
             for warning_type, count in sorted(self.summary.warning_counts.items(), key=lambda x: x[1], reverse=True):
                 print(f"  - {warning_type}: {count}")
-
-# ToDo: Validate reference_id matches the directory
-# ToDo: Validate plans

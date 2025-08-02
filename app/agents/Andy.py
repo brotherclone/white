@@ -14,12 +14,12 @@ class Andy(BaseRainbowAgent):
 
     def initialize(self):
         training_path = "/Volumes/LucidNonsense/White/training"
-        # self.lyrics_agent.load_training(training_path)
-        # self.lyrics_agent.initialize()
-        # self.audio_agent.load_training(training_path)
-        # self.audio_agent.initialize()
-        # self.midi_agent.load_training(training_path)
-        # self.midi_agent.initialize()
+        self.lyrics_agent.load_training(training_path)
+        self.lyrics_agent.initialize()
+        self.audio_agent.load_training(training_path)
+        self.audio_agent.initialize()
+        self.midi_agent.load_training(training_path)
+        self.midi_agent.initialize()
         self.agent_state = None
 
 

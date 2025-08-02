@@ -5,7 +5,7 @@ import os
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from pydantic import BaseModel, ConfigDict
-from typing import list, Any, Optional
+from typing import Any, Optional
 from app.enums.agent_state import AgentState
 
 class BaseRainbowAgent(BaseModel):

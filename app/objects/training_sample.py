@@ -35,6 +35,7 @@ class TrainingSample(BaseModel):
     song_segment_track_midi_file_name: str | None = None
     song_segment_track_midi_binary_data: bytes | None = None
     song_segment_track_midi_is_group: str | None = None
+    song_segment_reference_plan_paths: list[str] | None = None
 
     def __init__(self, /, **data):
         super().__init__(**data)

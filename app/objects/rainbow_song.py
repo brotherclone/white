@@ -277,11 +277,7 @@ class RainbowSong(BaseModel):
                     song_has_lyrics=self.meta_data.data.lyrics,
                     song_structure=json.dumps([s.model_dump() for s in self.meta_data.data.structure]),
                     song_moods=", ".join([str(m) for m in self.meta_data.data.mood]),
-
-                    # ToDo: This needs updating to use the correct data structure
-                    song_sounds_like=", ".join([str(l) for l in self.meta_data.data.sounds_like]),
-
-
+                    song_sounds_like= json.dumps([s.model_dump() for s in self.meta_data.data.sounds_like]),
                     song_genres=", ".join([str(g) for g in self.meta_data.data.genres]),
                     song_segment_name=extract.extract_data.section_name,
                     song_segment_start_time=str(extract.extract_data.start_time.total_seconds()),
@@ -302,6 +298,7 @@ class RainbowSong(BaseModel):
                     song_segment_track_midi_file_name=None,
                     song_segment_track_midi_binary_data=None,
                     song_segment_track_midi_is_group=extract.extract_data.midi_group,
+                    song_segment_reference_plan_paths=", ".join([str(rp) for rp in self.meta_data.data.reference_plans_paths]),
                 )
                 if event.type == ExtractionContentType.MIX_AUDIO:
                     ts.song_segment_main_audio_file_name = event.content.get('file_name')
