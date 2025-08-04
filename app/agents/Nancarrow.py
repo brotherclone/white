@@ -1,9 +1,11 @@
 from transformers import AutoModel
-
+from typing import Any
 from app.agents.BaseRainbowAgent import BaseRainbowAgent
 
 
 class Nancarrow(BaseRainbowAgent):
+
+    model: Any = None
 
     def __init__(self, **data):
         super().__init__(**data)

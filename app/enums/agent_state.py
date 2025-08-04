@@ -9,6 +9,7 @@ class AgentState(Enum):
     RUNNING = "running"
     PAUSED = "paused"
     COMPLETED = "completed"
+    TRAINED = "trained"
     FAILED = "failed"
 
     def __str__(self):

@@ -167,7 +167,11 @@ class TrainingSampleValidator:
         """Print a human-readable summary of validation results"""
         print(f"\n=== Validation Summary ===")
         print(f"Total samples: {self.summary.total_samples}")
-        print(f"Valid samples: {self.summary.valid_samples} ({self.summary.valid_samples/self.summary.total_samples*100:.1f}%)")
+        if self.summary.total_samples > 0:
+            percent = self.summary.valid_samples / self.summary.total_samples * 100
+        else:
+            percent = 0
+        print(f"Valid samples: {self.summary.valid_samples} ({percent:.1f}%)")
         print(f"Samples with errors: {self.summary.samples_with_errors}")
         print(f"Samples with warnings: {self.summary.samples_with_warnings}")
 

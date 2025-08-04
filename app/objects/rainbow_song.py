@@ -113,6 +113,7 @@ class RainbowSong(BaseModel):
         :return:
         """
         lrc = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
+        print(f"Extracting lyrics from: {lrc}", self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
         try:
             lyric_contents: list[RainbowSongLyricModel] = []
             with open(lrc, 'r', encoding='utf-8') as f:

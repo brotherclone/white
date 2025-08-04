@@ -2,7 +2,7 @@ from app.agents.BaseRainbowAgent import BaseRainbowAgent
 from app.agents.Dorthy import Dorthy
 from app.agents.Martin import Martin
 from app.agents.Nancarrow import Nancarrow
-
+from app.agents.Subutai import Subutai
 
 class Andy(BaseRainbowAgent):
 
@@ -11,6 +11,7 @@ class Andy(BaseRainbowAgent):
         self.lyrics_agent = Dorthy()
         self.audio_agent = Martin()
         self.midi_agent = Nancarrow()
+        self.plan_agent = Subutai()
 
     def initialize(self):
         training_path = "/Volumes/LucidNonsense/White/training"
@@ -20,6 +21,8 @@ class Andy(BaseRainbowAgent):
         self.audio_agent.initialize()
         self.midi_agent.load_training(training_path)
         self.midi_agent.initialize()
+        self.plan_agent.load_training(training_path)
+        self.plan_agent.initialize()
         self.agent_state = None
 
 

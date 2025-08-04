@@ -58,7 +58,7 @@ class BaseRainbowAgent(BaseModel):
             print("No valid data frames found in the provided training data.")
 
     def _process_agent_specific_data(self)-> None :
-        if self.data_frames is not None and not self.data_frames.empty:
+        if self.data_frames and all(df.empty for df in self.data_frames):
             pass
         else:
             print("No data frames to process.")
