@@ -1,10 +1,10 @@
 associated_resource: '01_01'
-batch_id: fbcaa744-99f6-4395-a920-8fee77f528d6
-bpm: 133
+batch_id: 3a2870f8-d6e5-4d4e-9055-613300999ef8
+bpm: 137
 bpm_feedback:
   comment: null
   field_name: bpm
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 concept: The song takes place in a vaudeville theater where a spiritualist has tried
@@ -16,7 +16,7 @@ concept: The song takes place in a vaudeville theater where a spiritualist has t
 concept_feedback:
   comment: null
   field_name: concept
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 genres:
@@ -32,20 +32,20 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
-key: A minor
+key: C# minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 moods:
@@ -72,23 +72,23 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
-plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -108,17 +108,22 @@ sounds_like:
   descriptor_b: null
   location: null
 - artist_a:
-    discogs_id: 955
-    id: 202
-    name: Broadcast
-    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
-      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
-      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
-      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
-      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
-      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
-      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
-      \ \r\n"
+    discogs_id: 94068
+    id: 69
+    name: Motley Crue
+    profile: "Hair / Glam Metal (Heavy Metal) band from Los Angeles, California.\r\
+      \n\r\nMötley Crüe was founded by Nikki Sixx (bass), Tommy Lee (drums), Mick\
+      \ Mars (guitar) and Vince Neil (vocals). The classic Crüe line-up broke up in\
+      \ 1992 when vocalist Vince Neil left the group and was replaced by John Corabi.\
+      \ In 1997, the band reunited with Vince Neil. In 1999, Tommy Lee departed to\
+      \ pursue his solo career and was replaced by Randy Castillo. In 2004, the original\
+      \ line-up announced their comeback.\r\n\r\nIn 2014, the band announced their\
+      \ retirement, and their final show took place on New Year's Eve, December 31st,\
+      \ 2015, at the Staples Center in Los Angeles.\r\n\r\nIn September 2018, news\
+      \ broke that the Crüe were back together and recording new songs to be used\
+      \ for the film adaptation of the band's biography, The Dirt. The band had also\
+      \ signed a contract to no longer tour, but they still plan to continue putting\
+      \ out new music."
   artist_b: null
   descriptor_a: null
   descriptor_b: null
@@ -126,7 +131,7 @@ sounds_like:
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 structure:
@@ -210,13 +215,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: f9f3e927-4f3d-4ac2-ab4e-94dbfd771310
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null

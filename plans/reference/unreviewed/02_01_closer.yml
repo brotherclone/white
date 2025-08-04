@@ -1,6 +1,6 @@
 associated_resource: '02_01'
-batch_id: 8130479f-cf48-4fb0-8006-f82e9c61182b
-bpm: 128
+batch_id: a18f2cd1-dd05-4185-92d8-47df9fad0ee3
+bpm: 132
 bpm_feedback: null
 concept: The first song on Light Reading which is an imaginary reading list comes
   from a book on entropy. In the song maxwell's demon and a doorman at a couple's
@@ -12,64 +12,64 @@ concept: The first song on Light Reading which is an imaginary reading list come
 concept_feedback:
   comment: null
   field_name: concept
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 genres:
 - Analog Synth
-- Art Pop
 - Electronic
 - Experimental
 - Krautrock
+- Modern Composition
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 key: C minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 moods:
+- ethereal
 - hypnotic
+- introspective
 - mad scientist
 - mysterious
 - otherworldly
-- otherworldly
 - raygun sci-fi
-- space age
 - unsettling
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
-plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
 plan_state: generated
-rainbow_color: Z
+rainbow_color: R
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -104,41 +104,23 @@ sounds_like:
       \ that had been left behind in the studio, still programmed to a sound that\
       \ caught his attention."
   artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
-- artist_a:
-    discogs_id: 160906
-    id: 205
-    name: Steely Dan
-    profile: US rock band (with fusion jazz influences) from New York, formed in 1972
-      by Walter Becker and Donald Fagen. Inducted into Rock And Roll Hall of Fame
-      in 2001 (Performer).
-  artist_b: null
-  descriptor_a: null
+  descriptor_a: playful
   descriptor_b: null
   location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: The storytelling part of the song
-  section_name: Verse
+  section_description: Protracted silence with room tone. 3:33
+  section_name: Protracted silence with room tone
   sequence: 1
   start_time: null
-- duration: null
-  end_time: '[00:22.142]'
-  midi_group: null
-  section_description: Description for Opening
-  section_name: Opening
-  sequence: 1
-  start_time: '[00:00.000]'
 - duration: null
   end_time: '[00:37.137]'
   midi_group: null
@@ -189,6 +171,13 @@ structure:
   sequence: 8
   start_time: '[02:22.106]'
 - duration: null
+  end_time: '[03:07.093]'
+  midi_group: null
+  section_description: Description for Jams 1
+  section_name: Jams 1
+  sequence: 9
+  start_time: '[02:44.251]'
+- duration: null
   end_time: '[03:22.087]'
   midi_group: null
   section_description: Description for Jams 2
@@ -205,13 +194,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  plan_id: ed9e1d64-5bc1-400c-8f4c-c7e3f1a7f00a
   rating: null
   suggested_replacement_value: null

@@ -1,6 +1,6 @@
 associated_resource: '01_01'
-batch_id: eaff4655-e4b4-47e3-a4e3-729b3c75050c
-bpm: 142
+batch_id: 9d77a052-ce60-4c41-bac8-f44096b74396
+bpm: 135
 bpm_feedback: null
 concept: The song takes place in a vaudeville theater where a spiritualist has tried
   to levitate but the trick has gone wrong. He now hangs high in the air and his thin
@@ -11,36 +11,36 @@ concept: The song takes place in a vaudeville theater where a spiritualist has t
 concept_feedback:
   comment: null
   field_name: concept
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 genres:
 - Art Rock
-- Avant-Garde
+- Baroque Pop
 - Dark Wave
 - Electronic
 - Experimental
-- Experimental Country
 - Gothic Rock
 - Indie Rock
 - Post-Punk
+- Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 key: A minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 moods:
@@ -54,7 +54,6 @@ moods:
 - foreboding
 - ghostly
 - haunted
-- haunting
 - mysterious
 - occult
 - ominous
@@ -64,26 +63,27 @@ moods:
 - spectral
 - spooky
 - supernatural
+- unsettling
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
-plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -102,34 +102,57 @@ sounds_like:
   descriptor_a: null
   descriptor_b: null
   location: null
+- artist_a:
+    discogs_id: 955
+    id: 202
+    name: Broadcast
+    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
+      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
+      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
+      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
+      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
+      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
+      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
+      \ \r\n"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 36665
+    id: 203
+    name: Nick Cave and the Bad Seeds
+    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
+      \ The group has had an international line-up throughout their career.\r\n\r\n\
+      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
+      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
+      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
+      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: The repeated, catchy part of the song and Description for Outro
-  section_name: Chorus & Outro
+  section_description: The storytelling part of the song
+  section_name: Verse
   sequence: 1
   start_time: null
 - duration: null
-  end_time: '[00:14.027]'
+  end_time: null
   midi_group: null
-  section_description: Description for Verse Intro
-  section_name: Verse Intro
-  sequence: 1
-  start_time: '[00:00.000]'
-- duration: null
-  end_time: '[00:38.000]'
-  midi_group: null
-  section_description: Description for Verse 1
-  section_name: Verse 1
+  section_description: Description for Interlude 1 and Description for Verse 1
+  section_name: Interlude 1 & Verse 1
   sequence: 2
-  start_time: '[00:14.027]'
+  start_time: null
 - duration: null
   end_time: '[00:42.086]'
   midi_group: null
@@ -144,13 +167,6 @@ structure:
   section_name: Verse 3
   sequence: 4
   start_time: '[00:42.086]'
-- duration: null
-  end_time: '[01:24.175]'
-  midi_group: null
-  section_description: Description for Interlude 1
-  section_name: Interlude 1
-  sequence: 5
-  start_time: '[00:55.145]'
 - duration: null
   end_time: '[01:52.234]'
   midi_group: null
@@ -179,16 +195,30 @@ structure:
   section_name: Chorus 2
   sequence: 9
   start_time: '[02:21.043]'
+- duration: null
+  end_time: '[03:17.161]'
+  midi_group: null
+  section_description: Description for Interlude 2
+  section_name: Interlude 2
+  sequence: 10
+  start_time: '[02:49.102]'
+- duration: null
+  end_time: '[04:25.999]'
+  midi_group: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: '[03:17.161]'
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: cfe3ca0d-9e2d-46fd-bd5d-86446ff2cffb
+  plan_id: 49f8818c-1a01-4dcb-8086-5925d891bff7
   rating: null
   suggested_replacement_value: null

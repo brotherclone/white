@@ -1,10 +1,10 @@
 associated_resource: '02_01'
-batch_id: 77852470-d1f4-4283-9d9f-a987a4ad0ccc
-bpm: 124
+batch_id: 46c9893c-b430-49f6-b001-3c5ad1920b22
+bpm: 123
 bpm_feedback:
   comment: null
   field_name: bpm
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 concept: The first song on Light Reading which is an imaginary reading list comes
@@ -17,64 +17,64 @@ concept: The first song on Light Reading which is an imaginary reading list come
 concept_feedback:
   comment: null
   field_name: concept
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 genres:
+- Acid House
 - Analog Synth
-- Art Rock
 - Electronic
 - Experimental
-- Hi-NRG
+- Krautrock
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 key: C minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 moods:
 - ethereal
-- hypnotic
 - mad scientist
 - mysterious
-- nostalgic
+- otherworldly
 - raygun sci-fi
+- sentimental
 - space age
 - unsettling
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
-plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
 plan_state: generated
-rainbow_color: Z
+rainbow_color: R
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -93,37 +93,19 @@ sounds_like:
   descriptor_a: null
   descriptor_b: null
   location: null
-- artist_a:
-    discogs_id: 12588
-    id: 204
-    name: Gary Numan
-    profile: "Born 8th of March 1958 in Hammersmith, London, England.\r\n\r\nStarted\
-      \ his musical career in 1977 as a punk rocker in the band [a=Mean Street], before\
-      \ being sacked in May 1977. He responded to an advert in Melody Maker to join\
-      \ the band The Lasers, alongside [a=Paul Gardiner]. Both soon left to form their\
-      \ own punk band, [a=Tubeway Army], with his uncle [a=Jess Lidyard] filling in\
-      \ on drums. \r\n\r\nIn 1978 [a=Tubeway Army] was signed to [l=Beggars Banquet]\
-      \ and released a couple of punk singles. By then he was using the name Numan\
-      \ and the band was performing live in pubs and clubs around London, supporting\
-      \ [a263209]. Whilst recording demos for Beggars, Gary stumbled upon a \"Minimoog,\"\
-      \ that had been left behind in the studio, still programmed to a sound that\
-      \ caught his attention."
-  artist_b: null
-  descriptor_a: gloomy
-  descriptor_b: null
-  location: at an amusement park
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: A skit that interrupts the flow of the song
-  section_name: Skit
+  section_description: I'm sure it's fun for the guitarist, but it doesn't add anything
+    to the song
+  section_name: Gratuitous Guitar Solo
   sequence: 1
   start_time: null
 - duration: null
@@ -199,13 +181,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: f50b9980-2deb-4895-be5f-42c34d418cd7
+  plan_id: 8fd23e73-3e7b-423d-b962-95c453980659
   rating: null
   suggested_replacement_value: null

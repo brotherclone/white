@@ -1,6 +1,6 @@
 associated_resource: '01_01'
-batch_id: 9e800ab3-f35b-4a39-83bf-25376a037c64
-bpm: 134
+batch_id: e7b7f0fa-c4be-444c-85c6-376303bf0df8
+bpm: 136
 bpm_feedback: null
 concept: The song takes place in a vaudeville theater where a spiritualist has tried
   to levitate but the trick has gone wrong. He now hangs high in the air and his thin
@@ -11,7 +11,7 @@ concept: The song takes place in a vaudeville theater where a spiritualist has t
 concept_feedback:
   comment: null
   field_name: concept
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 genres:
@@ -27,20 +27,20 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 key: A minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 moods:
@@ -67,37 +67,39 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
-plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 sounds_like:
 - artist_a:
-    discogs_id: 10263
-    id: 104
-    name: David Bowie
-    profile: "British pop/rock singer, musician, songwriter, and actor.\r\n\r\nBorn:\
-      \ 8 January 1947 in Brixton, London, England, UK.\r\nDied: 10 January 2016 in\
-      \ Manhattan, New York City, USA (aged 69).\r\n\r\nBowie is recognized as one\
-      \ of the most respected contemporary musicians of his period. He was a leading\
-      \ figure in the music industry and is considered one of the most influential\
-      \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
-      \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
+    discogs_id: 189718
+    id: 107
+    name: Brian Wilson
+    profile: American songwriter, producer, arranger and musician, co-founder and
+      leader of [a=The Beach Boys]. Born 20 June 1942 in Inglewood, California, USA,
+      died 11 June 2025 in Beverly Hills, California, U.S. From late 1964 to 1979
+      he was married to [url=https://www.discogs.com/artist/1009337-Marilyn-Rovell-Wilson]Marilyn
+      Rovell[/url] (divorced) with whom he had daughters [url=https://www.discogs.com/artist/434651-Carnie-Wilson]Carnie[/url]
+      and [url=https://www.discogs.com/artist/413862-Wendy-Wilson]Wendy[/url] who
+      became members of both [a=The Wilsons] and [a=Wilson Phillips]. He later was
+      married to [a=Melinda Wilson] until her death in 2024. Son of [a363017] and
+      [a3239364]. Brother of [a391245] and [a260571] and cousin of [a372789].
   artist_b: null
   descriptor_a: null
   descriptor_b: null
@@ -105,7 +107,7 @@ sounds_like:
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 structure:
@@ -189,13 +191,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: 27382398-7ae0-4373-9fc1-c6fc0d8f5c15
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
