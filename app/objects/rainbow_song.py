@@ -300,6 +300,7 @@ class RainbowSong(BaseModel):
                     song_segment_track_midi_binary_data=None,
                     song_segment_track_midi_is_group=extract.extract_data.midi_group,
                     song_segment_reference_plan_paths=", ".join([str(rp) for rp in self.meta_data.data.reference_plans_paths]),
+                    song_segment_concept= self.meta_data.data.concept if self.meta_data.data.concept else None
                 )
                 if event.type == ExtractionContentType.MIX_AUDIO:
                     ts.song_segment_main_audio_file_name = event.content.get('file_name')

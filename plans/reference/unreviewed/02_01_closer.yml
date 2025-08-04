@@ -1,0 +1,217 @@
+associated_resource: '02_01'
+batch_id: 8130479f-cf48-4fb0-8006-f82e9c61182b
+bpm: 128
+bpm_feedback: null
+concept: The first song on Light Reading which is an imaginary reading list comes
+  from a book on entropy. In the song maxwell's demon and a doorman at a couple's
+  apartment overlap in their duties. The boyfriend is trying to separate this belongings
+  and feelings from his girlfriend. Like heat and cold in the Maxwell's demon thought
+  experiment - but like the demon and his doorbell - there's just no way to separate
+  them. The song is a metaphor for the futility of trying to control memories and
+  feelings, and the inevitability of entropy in relationships.
+concept_feedback:
+  comment: null
+  field_name: concept
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+genres:
+- Analog Synth
+- Art Pop
+- Electronic
+- Experimental
+- Krautrock
+- Psychedelic
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+key: C minor
+key_feedback:
+  comment: null
+  field_name: key
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+moods:
+- hypnotic
+- mad scientist
+- mysterious
+- otherworldly
+- otherworldly
+- raygun sci-fi
+- space age
+- unsettling
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+plan_state: generated
+rainbow_color: Z
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a:
+    discogs_id: 12636
+    id: 166
+    name: Neu!
+    profile: German krautrock band formed in Düsseldorf in 1971 by [a=Klaus Dinger]
+      and [a=Michael Rother], after their split from [a=Kraftwerk]. The group's albums
+      were produced by [a=Conny Plank], who has been regarded as the group's "hidden
+      member". Though [a=Neu!] had minimal commercial success during its existence,
+      the band is retrospectively considered one of the founders of krautrock and
+      a significant influence on a variety of subsequent rock, post-punk, and electronic
+      music artists.
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 12588
+    id: 204
+    name: Gary Numan
+    profile: "Born 8th of March 1958 in Hammersmith, London, England.\r\n\r\nStarted\
+      \ his musical career in 1977 as a punk rocker in the band [a=Mean Street], before\
+      \ being sacked in May 1977. He responded to an advert in Melody Maker to join\
+      \ the band The Lasers, alongside [a=Paul Gardiner]. Both soon left to form their\
+      \ own punk band, [a=Tubeway Army], with his uncle [a=Jess Lidyard] filling in\
+      \ on drums. \r\n\r\nIn 1978 [a=Tubeway Army] was signed to [l=Beggars Banquet]\
+      \ and released a couple of punk singles. By then he was using the name Numan\
+      \ and the band was performing live in pubs and clubs around London, supporting\
+      \ [a263209]. Whilst recording demos for Beggars, Gary stumbled upon a \"Minimoog,\"\
+      \ that had been left behind in the studio, still programmed to a sound that\
+      \ caught his attention."
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 160906
+    id: 205
+    name: Steely Dan
+    profile: US rock band (with fusion jazz influences) from New York, formed in 1972
+      by Walter Becker and Donald Fagen. Inducted into Rock And Roll Hall of Fame
+      in 2001 (Performer).
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+structure:
+- duration: null
+  end_time: null
+  midi_group: null
+  section_description: The storytelling part of the song
+  section_name: Verse
+  sequence: 1
+  start_time: null
+- duration: null
+  end_time: '[00:22.142]'
+  midi_group: null
+  section_description: Description for Opening
+  section_name: Opening
+  sequence: 1
+  start_time: '[00:00.000]'
+- duration: null
+  end_time: '[00:37.137]'
+  midi_group: null
+  section_description: Description for Opening Build
+  section_name: Opening Build
+  sequence: 2
+  start_time: '[00:22.143]'
+- duration: null
+  end_time: '[00:44.285]'
+  midi_group: null
+  section_description: Description for Chorus 1 Intro
+  section_name: Chorus 1 Intro
+  sequence: 3
+  start_time: '[00:37.138]'
+- duration: null
+  end_time: '[00:59.281]'
+  midi_group: null
+  section_description: Description for Chorus 1
+  section_name: Chorus 1
+  sequence: 4
+  start_time: '[00:44.286]'
+- duration: null
+  end_time: '[01:29.272]'
+  midi_group: null
+  section_description: Description for Verse 1
+  section_name: Verse 1
+  sequence: 5
+  start_time: '[00:59.282]'
+- duration: null
+  end_time: '[01:44.266]'
+  midi_group: null
+  section_description: Description for Chorus 2
+  section_name: Chorus 2
+  sequence: 6
+  start_time: '[01:29.273]'
+- duration: null
+  end_time: '[02:22.105]'
+  midi_group: null
+  section_description: Description for Interlude 1
+  section_name: Interlude 1
+  sequence: 7
+  start_time: '[01:44.267]'
+- duration: null
+  end_time: '[02:44.250]'
+  midi_group: null
+  section_description: Description for Verse 2 - Bridging
+  section_name: Verse 2 - Bridging
+  sequence: 8
+  start_time: '[02:22.106]'
+- duration: null
+  end_time: '[03:22.087]'
+  midi_group: null
+  section_description: Description for Jams 2
+  section_name: Jams 2
+  sequence: 10
+  start_time: '[03:07.094]'
+- duration: null
+  end_time: '[03:46.193]'
+  midi_group: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: '[03:22.088]'
+structure_feedback:
+  comment: null
+  field_name: structure
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4
+tempo_feedback:
+  comment: null
+  field_name: tempo
+  plan_id: c0a12e5c-3072-48a2-8b89-bd55c89dac59
+  rating: null
+  suggested_replacement_value: null

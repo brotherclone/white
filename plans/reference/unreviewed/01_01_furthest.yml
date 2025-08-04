@@ -1,37 +1,60 @@
 associated_resource: '01_01'
-batch_id: 09b73674-71b4-48dc-b212-29152d4530e7
-bpm: 137
+batch_id: a3d9fcf9-8aec-4c1f-bc7b-0eea8df04653
+bpm: 127
+bpm_feedback:
+  comment: null
+  field_name: bpm
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
+  rating: null
+  suggested_replacement_value: null
+concept: The song takes place in a vaudeville theater where a spiritualist has tried
+  to levitate but the trick has gone wrong. He now hangs high in the air and his thin
+  thread is fraying. He watches as the audience revolts when the illusion is shattered.
+  This is the first song on the 'black' album which our protagonist are struggling
+  to find a way to survive in world where the magic has suddenly shut off. They yearns
+  for their connection to a higher plane and purpose.
+concept_feedback:
+  comment: null
+  field_name: concept
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
+  rating: null
+  suggested_replacement_value: null
 genres:
 - Art Rock
 - Avant-Garde
-- Christian Electronic
 - Dark Wave
 - Electronic
-- Experimental
 - Gothic Rock
 - Indie Rock
+- Post-Punk
 - Psychedelic
+- Vandeville
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
   rating: null
   suggested_replacement_value: null
-key: C major
+key: A minor
+key_feedback:
+  comment: null
+  field_name: key
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
+  rating: null
+  suggested_replacement_value: null
 moods:
 - arcane
 - chilling
-- clichéd
 - creepy
-- dark
 - eerie
 - ethereal
+- foreboding
 - ghostly
 - haunted
 - haunting
@@ -40,6 +63,7 @@ moods:
 - ominous
 - otherworldly
 - phantasmal
+- sappy
 - sinister
 - spectral
 - spooky
@@ -48,23 +72,23 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
   rating: null
   suggested_replacement_value: null
-plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -97,96 +121,109 @@ sounds_like:
       \ \r\n"
   artist_b: null
   descriptor_a: null
-  descriptor_b: confusing
-  location: in a Starbucks
+  descriptor_b: null
+  location: null
+- artist_a:
+    discogs_id: 36665
+    id: 203
+    name: Nick Cave and the Bad Seeds
+    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
+      \ The group has had an international line-up throughout their career.\r\n\r\n\
+      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
+      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
+      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
+      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: A skit that interrupts the flow of the song
-  section_name: Skit
+  section_description: So edgy and Description for Verse 3
+  section_name: Protracted silence without room tone & Verse 3
   sequence: 1
   start_time: null
 - duration: null
-  end_time: null
+  end_time: '[00:14.027]'
   midi_group: null
-  section_description: Description for Verse 3 and Description for Verse Intro
-  section_name: Verse 3 & Verse Intro
+  section_description: Description for Verse Intro
+  section_name: Verse Intro
   sequence: 1
-  start_time: null
+  start_time: '[00:00.000]'
 - duration: null
-  end_time: null
+  end_time: '[00:38.000]'
   midi_group: null
   section_description: Description for Verse 1
   section_name: Verse 1
   sequence: 2
-  start_time: null
+  start_time: '[00:14.027]'
 - duration: null
-  end_time: null
+  end_time: '[00:42.086]'
   midi_group: null
   section_description: Description for Verse 2
   section_name: Verse 2
   sequence: 3
-  start_time: null
+  start_time: '[00:28.057]'
 - duration: null
-  end_time: null
-  midi_group: null
-  section_description: Description for Verse 2
-  section_name: Verse Split 2
-  sequence: 3
-  start_time: null
-- duration: null
-  end_time: null
+  end_time: '[01:24.175]'
   midi_group: null
   section_description: Description for Interlude 1
   section_name: Interlude 1
   sequence: 5
-  start_time: null
+  start_time: '[00:55.145]'
 - duration: null
-  end_time: null
+  end_time: '[01:52.234]'
   midi_group: null
   section_description: Description for Chorus 1
   section_name: Chorus 1
   sequence: 6
-  start_time: null
+  start_time: '[01:24.175]'
 - duration: null
-  end_time: null
+  end_time: '[02:07.013]'
   midi_group: null
   section_description: Description for Verse 4
   section_name: Verse 4
   sequence: 7
-  start_time: null
+  start_time: '[01:52.234]'
 - duration: null
-  end_time: null
+  end_time: '[02:21.043]'
   midi_group: null
   section_description: Description for Verse 5
   section_name: Verse 5
   sequence: 8
-  start_time: null
+  start_time: '[02:07.013]'
 - duration: null
-  end_time: null
+  end_time: '[02:49.102]'
   midi_group: null
   section_description: Description for Chorus 2
   section_name: Chorus 2
   sequence: 9
-  start_time: null
+  start_time: '[02:21.043]'
 - duration: null
-  end_time: null
+  end_time: '[04:25.999]'
   midi_group: null
-  section_description: Description for Interlude 2
-  section_name: Interlude 2
-  sequence: 10
-  start_time: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: '[03:17.161]'
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: a6be8711-4f57-45eb-b188-60fcdb7e5cad
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
+tempo_feedback:
+  comment: null
+  field_name: tempo
+  plan_id: ae8a9751-6768-4769-8bb1-0c2350dbad68
+  rating: null
+  suggested_replacement_value: null

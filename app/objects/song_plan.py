@@ -18,8 +18,11 @@ class RainbowSongPlan(BaseModel):
     plan_state: PlanState = PlanState.incomplete
     associated_resource: str | None = None
     key: str | None = None
+    key_feedback: RainbowPlanFeedback | None = None
     bpm: int | None = None
+    bpm_feedback: RainbowPlanFeedback | None = None
     tempo: str | None = None
+    tempo_feedback: RainbowPlanFeedback | None = None
     moods: list[str] | None = None
     moods_feedback: RainbowPlanFeedback | None = None
     sounds_like: list[RainbowSoundsLike] | None = None
@@ -32,6 +35,8 @@ class RainbowSongPlan(BaseModel):
     genres_feedback: RainbowPlanFeedback | None = None
     structure: list[RainbowSongStructureModel] | None = None
     structure_feedback: RainbowPlanFeedback | None = None
+    concept: str | None = None
+    concept_feedback: RainbowPlanFeedback | None = None
     implementation_notes:  RainbowPlanFeedback | None = None
 
 

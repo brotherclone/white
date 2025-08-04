@@ -64,6 +64,7 @@ class RainbowMetaDataModel(BaseModel):
     lrc_file: bool | str = False
     audio_tracks: list[RainbowSongTrackModel] | None =None
     reference_plans_paths: list[str] | None = None
+    concept: str | None = None
 
 class RainbowSongMeta(BaseModel):
     yaml_file_name: str

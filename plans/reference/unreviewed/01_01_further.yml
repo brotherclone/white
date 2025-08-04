@@ -1,29 +1,53 @@
 associated_resource: '01_01'
-batch_id: 1a0ad665-46e6-4c7f-9947-07e67c131d6a
-bpm: 138
+batch_id: 138898b9-375f-4a1f-9f06-437de08a7b3b
+bpm: 131
+bpm_feedback:
+  comment: null
+  field_name: bpm
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
+  rating: null
+  suggested_replacement_value: null
+concept: The song takes place in a vaudeville theater where a spiritualist has tried
+  to levitate but the trick has gone wrong. He now hangs high in the air and his thin
+  thread is fraying. He watches as the audience revolts when the illusion is shattered.
+  This is the first song on the 'black' album which our protagonist are struggling
+  to find a way to survive in world where the magic has suddenly shut off. They yearns
+  for their connection to a higher plane and purpose.
+concept_feedback:
+  comment: null
+  field_name: concept
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
+  rating: null
+  suggested_replacement_value: null
 genres:
 - Art Rock
 - Avant-Garde
 - Dark Wave
-- Electronic
+- Exercise
 - Experimental
 - Gothic Rock
 - Indie Rock
-- K-Pop
+- Post-Punk
 - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
   rating: null
   suggested_replacement_value: null
-key: C major
+key: B major
+key_feedback:
+  comment: null
+  field_name: key
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
+  rating: null
+  suggested_replacement_value: null
 moods:
 - arcane
 - chilling
@@ -38,63 +62,56 @@ moods:
 - mysterious
 - occult
 - ominous
+- otherworldly
 - pedestrian
 - phantasmal
 - sinister
-- spectral
 - spooky
 - supernatural
 - unsettling
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
   rating: null
   suggested_replacement_value: null
 plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
   rating: null
   suggested_replacement_value: null
-plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
   rating: null
   suggested_replacement_value: null
 sounds_like:
 - artist_a:
-    discogs_id: 10263
-    id: 104
-    name: David Bowie
-    profile: "British pop/rock singer, musician, songwriter, and actor.\r\n\r\nBorn:\
-      \ 8 January 1947 in Brixton, London, England, UK.\r\nDied: 10 January 2016 in\
-      \ Manhattan, New York City, USA (aged 69).\r\n\r\nBowie is recognized as one\
-      \ of the most respected contemporary musicians of his period. He was a leading\
-      \ figure in the music industry and is considered one of the most influential\
-      \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
-      \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
-  artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
-- artist_a:
-    discogs_id: 955
-    id: 202
-    name: Broadcast
-    profile: "Formed in Birmingham in 1995.  \r\n\r\nOriginal members:\r\n[a=Trish\
-      \ Keenan] - vocals\r\n[a=Roj Stevens] - keyboards\r\n[a=James Cargill] - bass\r\
-      \n[a=Tim Felton] - guitar\r\n[a=Steve Perkins (2)] - drums\r\n\r\nThey first\
-      \ appeared on [l=Wurlitzer Jukebox] in 1996. Their experimental pop music references\
-      \ the work of [a=BBC Radiophonic Workshop], [a=Ennio Morricone] or [a=John Barry].\
-      \ At the time they were frequently associated with [a=Stereolab].\r\n\r\nLead\
-      \ singer Trish Keenan died of pneumonia on 14 January 2011 at the age of 42.\
-      \ \r\n"
+    discogs_id: 293115
+    id: 88
+    name: Great White
+    profile: "Hair / Glam Metal (Heavy Metal) & Hard Rock band from Los Angeles, California\
+      \ (USA). \r\n\r\nGreat White formed in 1977. The band gained popularity during\
+      \ the 1980's and early 1990's. In 2003, the band made headlines when The Station\
+      \ nightclub fire led to the deaths of 100 people in West Warwick, Rhode Island,\
+      \ including Ty Longley, who had been a member of lead singer [a255625]'s solo\
+      \ band. In 2011 the band split, with Jack Russell forming \"Jack Russell's Great\
+      \ White\" and lead singer [a2590929] (of [a408910]) fronting Great White.\r\n\
+      [b]\r\n[u]Current Line-Up[/u]\r\nBrett Carlisle: Vocals\r\nMark Kendall: Guitar\r\
+      \nMichael Lardie: Keyboards, Guitar \r\nScott Snyder: Bass \r\nAudie Desbrow:\
+      \ Drums\r\n[/b]\r\n\r\n[u]Former Line-Up[/u]\r\nKrys Baratto: Bass\r\nLorne\
+      \ Black: Bass\r\nTeddy Cook: Bass\r\nDave Filice: Bass\r\nGary Holland: Drums\r\
+      \nMatthew Johnson: Guitar\r\nTy Longley: Guitar\r\nJordan Martin: Guitar \r\n\
+      Tony Montana: Bass\r\nTyler Nelson: Guitar \r\nDerrick Pontier: Drums \r\nScott\
+      \ Pounds: Bass\r\nEric Powers: Drums\r\nFrancis Ruiz: Drums\r\nSean McNabb:\
+      \ Bass\r\nJack Russell: Vocals\r\nTerry Ilous: Vocals\r\nMitch Malloy: Vocals\r\
+      \nAndrew Freeman: Vocals\r\n"
   artist_b: null
   descriptor_a: null
   descriptor_b: null
@@ -102,91 +119,97 @@ sounds_like:
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: As if the song wasn't already hard to follow
-  section_name: Tempo Changes
+  section_description: Almost always unnecessary
+  section_name: Key Changes
   sequence: 1
   start_time: null
 - duration: null
-  end_time: null
+  end_time: '[00:14.027]'
   midi_group: null
   section_description: Description for Verse Intro
   section_name: Verse Intro
   sequence: 1
-  start_time: null
+  start_time: '[00:00.000]'
 - duration: null
-  end_time: null
+  end_time: '[00:38.000]'
   midi_group: null
   section_description: Description for Verse 1
   section_name: Verse 1
   sequence: 2
-  start_time: null
+  start_time: '[00:14.027]'
 - duration: null
-  end_time: null
+  end_time: '[00:42.086]'
   midi_group: null
   section_description: Description for Verse 2
   section_name: Verse 2
   sequence: 3
-  start_time: null
+  start_time: '[00:28.057]'
 - duration: null
-  end_time: null
+  end_time: '[00:55.145]'
   midi_group: null
   section_description: Description for Verse 3
   section_name: Verse 3
   sequence: 4
-  start_time: null
+  start_time: '[00:42.086]'
 - duration: null
-  end_time: null
+  end_time: '[01:24.175]'
   midi_group: null
   section_description: Description for Interlude 1
   section_name: Interlude 1
   sequence: 5
-  start_time: null
+  start_time: '[00:55.145]'
 - duration: null
-  end_time: null
+  end_time: '[01:52.234]'
   midi_group: null
   section_description: Description for Chorus 1
   section_name: Chorus 1
   sequence: 6
-  start_time: null
+  start_time: '[01:24.175]'
 - duration: null
-  end_time: null
+  end_time: '[02:07.013]'
+  midi_group: null
+  section_description: Description for Verse 4
+  section_name: Verse 4
+  sequence: 7
+  start_time: '[01:52.234]'
+- duration: null
+  end_time: '[02:21.043]'
   midi_group: null
   section_description: Description for Verse 5
   section_name: Verse 5
   sequence: 8
-  start_time: null
+  start_time: '[02:07.013]'
 - duration: null
-  end_time: null
+  end_time: '[02:49.102]'
   midi_group: null
   section_description: Description for Chorus 2
   section_name: Chorus 2
   sequence: 9
-  start_time: null
+  start_time: '[02:21.043]'
 - duration: null
-  end_time: null
+  end_time: '[03:17.161]'
   midi_group: null
   section_description: Description for Interlude 2
   section_name: Interlude 2
   sequence: 10
-  start_time: null
-- duration: null
-  end_time: null
-  midi_group: null
-  section_description: Description for Outro
-  section_name: Outro
-  sequence: 11
-  start_time: null
+  start_time: '[02:49.102]'
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: 6b5a9452-0c46-4e34-b2c9-7309298f9323
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
+tempo_feedback:
+  comment: null
+  field_name: tempo
+  plan_id: 5a4e6cae-b351-4a62-a7ba-36d8d0e37a13
+  rating: null
+  suggested_replacement_value: null
