@@ -1,10 +1,17 @@
 associated_resource: '01_01'
-batch_id: c6731171-95bb-48b1-9a60-10bd7562b8ed
-bpm: 134
-bpm_feedback:
+batch_id: e7b7f0fa-c4be-444c-85c6-376303bf0df8
+bpm: 136
+bpm_feedback: null
+concept: The song takes place in a vaudeville theater where a spiritualist has tried
+  to levitate but the trick has gone wrong. He now hangs high in the air and his thin
+  thread is fraying. He watches as the audience revolts when the illusion is shattered.
+  This is the first song on the 'black' album which our protagonist are struggling
+  to find a way to survive in world where the magic has suddenly shut off. They yearns
+  for their connection to a higher plane and purpose.
+concept_feedback:
   comment: null
-  field_name: bpm
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  field_name: concept
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 genres:
@@ -20,20 +27,20 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
-key: C major
+key: A minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 moods:
@@ -60,57 +67,39 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
-plan: Make a song like The Conjurer's Thread
+plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
-plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 sounds_like:
 - artist_a:
-    discogs_id: 10263
-    id: 104
-    name: David Bowie
-    profile: "British pop/rock singer, musician, songwriter, and actor.\r\n\r\nBorn:\
-      \ 8 January 1947 in Brixton, London, England, UK.\r\nDied: 10 January 2016 in\
-      \ Manhattan, New York City, USA (aged 69).\r\n\r\nBowie is recognized as one\
-      \ of the most respected contemporary musicians of his period. He was a leading\
-      \ figure in the music industry and is considered one of the most influential\
-      \ musicians of the 20th century.\r\nInducted into Rock And Roll Hall of Fame\
-      \ in 1996.\r\n\r\nFor a list of all band and group involvement, please see [b][a1240431][/b]."
-  artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
-- artist_a:
-    discogs_id: 253234
-    id: 179
-    name: The Pogues
-    profile: "The Pogues are an Irish-British Celtic punk / folk band founded as [a=Pogue\
-      \ Mahone] (\"kiss my arse\" in Gaelic) in London in the early 1980s.\r\n\r\n\
-      Founder & front man [a=Shane MacGowan] was fired in 1991, going on to form [a=Shane\
-      \ MacGowan And The Popes]. The band continued, with some lineup changes (including\
-      \ the temporary addition of [a=Joe Strummer]), until 1996. The group reformed\
-      \ in 2001, and played their final show in August 2014, shortly after the death\
-      \ by cancer of [a=Philip Chevron] on 8 October 2013. [a=Darryl Hunt] died on\
-      \ 8 August 2022, and MacGowan passed away on 30 November 2023.\r\n\r\n[a=Spider\
-      \ Stacy], [a=James Fearnley], and [a=Jem Finer] reconvened under The Pogues'\
-      \ name, with a long list of special guests, for a series of shows in 2024 &\
-      \ 2025 curated by Stacy to celebrate the 40th anniversaries of [m=43754] and\
-      \ [m=43758]."
+    discogs_id: 189718
+    id: 107
+    name: Brian Wilson
+    profile: American songwriter, producer, arranger and musician, co-founder and
+      leader of [a=The Beach Boys]. Born 20 June 1942 in Inglewood, California, USA,
+      died 11 June 2025 in Beverly Hills, California, U.S. From late 1964 to 1979
+      he was married to [url=https://www.discogs.com/artist/1009337-Marilyn-Rovell-Wilson]Marilyn
+      Rovell[/url] (divorced) with whom he had daughters [url=https://www.discogs.com/artist/434651-Carnie-Wilson]Carnie[/url]
+      and [url=https://www.discogs.com/artist/413862-Wendy-Wilson]Wendy[/url] who
+      became members of both [a=The Wilsons] and [a=Wilson Phillips]. He later was
+      married to [a=Melinda Wilson] until her death in 2024. Son of [a363017] and
+      [a3239364]. Brother of [a391245] and [a260571] and cousin of [a372789].
   artist_b: null
   descriptor_a: null
   descriptor_b: null
@@ -118,7 +107,7 @@ sounds_like:
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 structure:
@@ -202,13 +191,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: 3df8d942-40a6-44cf-a13b-3b8d837b818c
+  plan_id: 6145d905-ff0c-4c0e-8131-54a92833d842
   rating: null
   suggested_replacement_value: null

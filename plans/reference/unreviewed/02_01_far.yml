@@ -1,0 +1,192 @@
+associated_resource: '02_01'
+batch_id: 5f3274cb-d7e7-47c2-88e0-d6e13ee6f9c9
+bpm: 125
+bpm_feedback:
+  comment: null
+  field_name: bpm
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+concept: The first song on Light Reading which is an imaginary reading list comes
+  from a book on entropy. In the song maxwell's demon and a doorman at a couple's
+  apartment overlap in their duties. The boyfriend is trying to separate this belongings
+  and feelings from his girlfriend. Like heat and cold in the Maxwell's demon thought
+  experiment - but like the demon and his doorbell - there's just no way to separate
+  them. The song is a metaphor for the futility of trying to control memories and
+  feelings, and the inevitability of entropy in relationships.
+concept_feedback:
+  comment: null
+  field_name: concept
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+genres:
+- Experimental
+- Psychedelic
+- Art Rock
+- Electronic
+- Analog Synth
+- Krautrock
+genres_feedback:
+  comment: null
+  field_name: genres
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+implementation_notes:
+  comment: null
+  field_name: implementation_notes
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+key: C minor
+key_feedback:
+  comment: null
+  field_name: key
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+moods:
+- mysterious
+- raygun sci-fi
+- ethereal
+- space age
+- otherworldly
+- unsettling
+- mad scientist
+- hypnotic
+moods_feedback:
+  comment: null
+  field_name: moods
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+plan: null
+plan_feedback:
+  comment: null
+  field_name: plan
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+plan_state: generated
+rainbow_color: R
+rainbow_color_feedback:
+  comment: null
+  field_name: rainbow_color
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+sounds_like:
+- artist_a:
+    discogs_id: 12636
+    id: 166
+    name: Neu!
+    profile: German krautrock band formed in Düsseldorf in 1971 by [a=Klaus Dinger]
+      and [a=Michael Rother], after their split from [a=Kraftwerk]. The group's albums
+      were produced by [a=Conny Plank], who has been regarded as the group's "hidden
+      member". Though [a=Neu!] had minimal commercial success during its existence,
+      the band is retrospectively considered one of the founders of krautrock and
+      a significant influence on a variety of subsequent rock, post-punk, and electronic
+      music artists.
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
+sounds_like_feedback:
+  comment: null
+  field_name: sounds_like
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+structure:
+- duration: null
+  end_time: '[00:22.142]'
+  midi_group: null
+  section_description: Description for Opening
+  section_name: Opening
+  sequence: 1
+  start_time: '[00:00.000]'
+- duration: null
+  end_time: '[00:37.137]'
+  midi_group: null
+  section_description: Description for Opening Build
+  section_name: Opening Build
+  sequence: 2
+  start_time: '[00:22.143]'
+- duration: null
+  end_time: '[00:44.285]'
+  midi_group: null
+  section_description: Description for Chorus 1 Intro
+  section_name: Chorus 1 Intro
+  sequence: 3
+  start_time: '[00:37.138]'
+- duration: null
+  end_time: '[00:59.281]'
+  midi_group: null
+  section_description: Description for Chorus 1
+  section_name: Chorus 1
+  sequence: 4
+  start_time: '[00:44.286]'
+- duration: null
+  end_time: '[01:29.272]'
+  midi_group: null
+  section_description: Description for Verse 1
+  section_name: Verse 1
+  sequence: 5
+  start_time: '[00:59.282]'
+- duration: null
+  end_time: '[01:44.266]'
+  midi_group: null
+  section_description: Description for Chorus 2
+  section_name: Chorus 2
+  sequence: 6
+  start_time: '[01:29.273]'
+- duration: null
+  end_time: '[02:22.105]'
+  midi_group: null
+  section_description: Description for Interlude 1
+  section_name: Interlude 1
+  sequence: 7
+  start_time: '[01:44.267]'
+- duration: null
+  end_time: '[02:44.250]'
+  midi_group: null
+  section_description: Description for Verse 2 - Bridging
+  section_name: Verse 2 - Bridging
+  sequence: 8
+  start_time: '[02:22.106]'
+- duration: null
+  end_time: '[03:07.093]'
+  midi_group: null
+  section_description: Description for Jams 1
+  section_name: Jams 1
+  sequence: 9
+  start_time: '[02:44.251]'
+- duration: null
+  end_time: '[03:22.087]'
+  midi_group: null
+  section_description: Description for Jams 2
+  section_name: Jams 2
+  sequence: 10
+  start_time: '[03:07.094]'
+- duration: null
+  end_time: '[03:46.193]'
+  midi_group: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: '[03:22.088]'
+structure_feedback:
+  comment: null
+  field_name: structure
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null
+tempo: 4/4
+tempo_feedback:
+  comment: null
+  field_name: tempo
+  plan_id: 3ee684ad-ea64-4659-b644-ce8a06487754
+  rating: null
+  suggested_replacement_value: null

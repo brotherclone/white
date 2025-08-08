@@ -1,10 +1,17 @@
 associated_resource: '01_01'
-batch_id: d6aa7af8-5c55-4bd8-9b50-b771f72b5680
-bpm: 133
-bpm_feedback:
+batch_id: fbf3213e-2083-4b66-b563-5502c767f87e
+bpm: 132
+bpm_feedback: null
+concept: The song takes place in a vaudeville theater where a spiritualist has tried
+  to levitate but the trick has gone wrong. He now hangs high in the air and his thin
+  thread is fraying. He watches as the audience revolts when the illusion is shattered.
+  This is the first song on the 'black' album which our protagonist are struggling
+  to find a way to survive in world where the magic has suddenly shut off. They yearns
+  for their connection to a higher plane and purpose.
+concept_feedback:
   comment: null
-  field_name: bpm
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  field_name: concept
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
 genres:
@@ -13,32 +20,33 @@ genres:
 - Dark Wave
 - Electronic
 - Experimental
+- Experimental Rock
 - Indie Rock
 - Post-Punk
 - Psychedelic
-- Psychedelic Rock
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
-key: F# major
+key: A minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
 moods:
+- abstract
 - arcane
-- chilling
+- creepy
 - dark
 - eerie
 - ethereal
@@ -50,7 +58,6 @@ moods:
 - occult
 - ominous
 - otherworldly
-- pensive
 - phantasmal
 - sinister
 - spectral
@@ -60,23 +67,23 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
-plan: Make a song like The Conjurer's Thread
+plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
-plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -112,15 +119,20 @@ sounds_like:
   descriptor_b: null
   location: null
 - artist_a:
-    discogs_id: 36665
-    id: 203
-    name: Nick Cave and the Bad Seeds
-    profile: "An alternative/art rock band formed in 1983 in Melbourne, Australia.\
-      \ The group has had an international line-up throughout their career.\r\n\r\n\
-      Current line-up:\r\nNick Cave: vocals, piano, organ (1983–present)\r\nThomas\
-      \ Wydler: drums, percussion (1985–present)\r\nMartyn P. Casey: bass (1990–present)\r\
-      \nJim Sclavunos: percussion, drums (1994–present)\r\nWarren Ellis: violin, accordion,\
-      \ mandolin (1997–present)\r\nGeorge Vjestica: guitar (2013–present)"
+    discogs_id: 280442
+    id: 114
+    name: Godspeed You! Black Emperor
+    profile: "Canadian post-rock band. Formed in 1994 in Montreal, Quebec, Canada.\
+      \ Hiatus between 2004-2009. Originally called Godspeed You Black Emperor!, before\
+      \ later using Godspeed You! Black Emperor. \r\n\r\nAs an experimental nine-piece\
+      \ from Montreal, they specialize in instrumental music. Members consist of [a=Mike\
+      \ Moya] (guitar),  [a=Efrim Menuck] (guitar), [a=David Bryant] (guitar), [a=Mauro\
+      \ Pezzente] (bass), [a=Thierry Amar] (bass), [a=Sophie Trudeau] (violin), [a=Aidan\
+      \ Girt] (percussion), [a=Tim Herzog] (percussion), [a=Karl Lemieux] (16mm film\
+      \ projections), and [a=Philippe Léonard] (16mm film projections). \r\n\r\nPlease\
+      \ use artist page [a=God Speed You Black Emperor!] for anything relating to\
+      \ the [m=2509531] cassette release from 1994 as this is now definitively a solo\
+      \ [a=Efrim Menuck] project.\r\n"
   artist_b: null
   descriptor_a: null
   descriptor_b: null
@@ -128,15 +140,15 @@ sounds_like:
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
 structure:
 - duration: null
   end_time: null
   midi_group: null
-  section_description: Provides an overview of the song
-  section_name: Intro
+  section_description: The storytelling part of the song
+  section_name: Verse
   sequence: 1
   start_time: null
 - duration: null
@@ -153,13 +165,6 @@ structure:
   section_name: Verse 1
   sequence: 2
   start_time: '[00:14.027]'
-- duration: null
-  end_time: '[00:42.086]'
-  midi_group: null
-  section_description: Description for Verse 2
-  section_name: Verse 2
-  sequence: 3
-  start_time: '[00:28.057]'
 - duration: null
   end_time: '[00:55.145]'
   midi_group: null
@@ -209,16 +214,23 @@ structure:
   section_name: Interlude 2
   sequence: 10
   start_time: '[02:49.102]'
+- duration: null
+  end_time: '[04:25.999]'
+  midi_group: null
+  section_description: Description for Outro
+  section_name: Outro
+  sequence: 11
+  start_time: '[03:17.161]'
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: a95b9e81-c754-4a7c-ae84-6abb12ff08a4
+  plan_id: d03e15a2-992f-4db1-9ffb-4599284a88e3
   rating: null
   suggested_replacement_value: null

@@ -35,6 +35,8 @@ class RainbowSongPlan(BaseModel):
     genres_feedback: RainbowPlanFeedback | None = None
     structure: list[RainbowSongStructureModel] | None = None
     structure_feedback: RainbowPlanFeedback | None = None
+    concept: str | None = None
+    concept_feedback: RainbowPlanFeedback | None = None
     implementation_notes:  RainbowPlanFeedback | None = None
 
 
@@ -42,27 +44,6 @@ class RainbowSongPlan(BaseModel):
         super().__init__()
         self.batch_id = uuid.uuid4()
         self.plan_id = uuid.uuid4()
-        self.bpm_feedback = RainbowPlanFeedback(
-            plan_id=self.plan_id,
-            field_name="bpm",
-            rating=None,
-            comment=None,
-            suggested_replacement_value=None
-        )
-        self.key_feedback = RainbowPlanFeedback(
-            plan_id=self.plan_id,
-            field_name="key",
-            rating=None,
-            comment=None,
-            suggested_replacement_value=None
-        )
-        self.tempo_feedback = RainbowPlanFeedback(
-            plan_id=self.plan_id,
-            field_name="tempo",
-            rating=None,
-            comment=None,
-            suggested_replacement_value=None
-        )
         self.moods_feedback = RainbowPlanFeedback(
             plan_id=self.plan_id,
             field_name="moods",
@@ -117,6 +98,14 @@ class RainbowSongPlan(BaseModel):
         yaml_dumper = yaml.SafeDumper
         yaml_dumper.add_representer(uuid.UUID, uuid_representer)
         yaml_dumper.add_multi_representer(Enum, enum_representer)
-        # Disable anchor/alias creation in YAML output # Claude Sonnet 3.7 is a genius!!!
-        yaml_dumper.ignore_aliases = lambda dumper, data: True
-        return yaml.dump(self.model_dump(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)
+        return yaml.dump(self.dict(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)
+
+class RainbowSongPlanStarter(BaseModel):
+    plan_id: uuid.UUID | str | None = None
+    key: str | None = None
+    bpm: int | str | None = None
+    tempo: str | None = None
+    moods: list[str] | None = None
+    sounds_like: list[str] | None = None
+    concept: str | None = None
+    raw_response: str | None = None

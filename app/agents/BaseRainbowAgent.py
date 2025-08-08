@@ -58,11 +58,10 @@ class BaseRainbowAgent(BaseModel):
             print("No valid data frames found in the provided training data.")
 
     def _process_agent_specific_data(self)-> None :
-        if self.data_frames is not None and len(self.data_frames) > 0:
-            if isinstance(self.data_frames, list):
-                # If it's a list of DataFrames, concatenate them
-                if all(isinstance(df, pd.DataFrame) for df in self.data_frames):
-                    self.data_frames = pd.concat(self.data_frames)
+        if self.data_frames and all(df.empty for df in self.data_frames):
+            pass
+        else:
+            print("No data frames to process.")
 
     def create_vector_store(self, text_field:str, metadata_fields: list[str]) -> None:
         if self.training_data is None:

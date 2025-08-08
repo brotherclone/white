@@ -42,7 +42,8 @@ class TrainingSampleValidator:
         """Validate metadata fields"""
         required_fields = [
             "song_title", "song_bpm", "song_key",
-            "song_segment_name", "song_segment_duration"
+            "song_segment_name", "song_segment_duration",
+            "song_segment_reference_plan_paths"
         ]
 
         for field in required_fields:
@@ -129,8 +130,6 @@ class TrainingSampleValidator:
                 return False
         return False
 
-    # ToDo: Validate reference_id matches the directory
-
     def validate_dataframe(self, df: pd.DataFrame) -> ValidationSummary:
         """Validate all samples in a dataframe"""
         self.summary = ValidationSummary()
@@ -168,7 +167,11 @@ class TrainingSampleValidator:
         """Print a human-readable summary of validation results"""
         print(f"\n=== Validation Summary ===")
         print(f"Total samples: {self.summary.total_samples}")
-        print(f"Valid samples: {self.summary.valid_samples} ({self.summary.valid_samples/self.summary.total_samples*100:.1f}%)")
+        if self.summary.total_samples > 0:
+            percent = self.summary.valid_samples / self.summary.total_samples * 100
+        else:
+            percent = 0
+        print(f"Valid samples: {self.summary.valid_samples} ({percent:.1f}%)")
         print(f"Samples with errors: {self.summary.samples_with_errors}")
         print(f"Samples with warnings: {self.summary.samples_with_warnings}")
 
@@ -181,4 +184,3 @@ class TrainingSampleValidator:
             print("\nWarning types:")
             for warning_type, count in sorted(self.summary.warning_counts.items(), key=lambda x: x[1], reverse=True):
                 print(f"  - {warning_type}: {count}")
-
