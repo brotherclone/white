@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base,sessionmaker
 from app.objects.db_models.artist_schema import ArtistSchema, RainbowArtist
+from app.objects.db_models.concept_schema import ConceptSchema
 from app.utils.discog_util import search_discogs_artist
 
 # ToDo: Break out to separate files per model
@@ -119,12 +120,9 @@ async def get_or_create_artist(artist_schema):
     db_generator = get_db()
     db = next(db_generator)
     try:
-        # First check if artist exists
         existing_artist = db.query(ArtistSchema).filter(ArtistSchema.name == artist_schema.name).first()
         if existing_artist:
             return existing_artist
-
-        # If not exists, create new
         db.add(artist_schema)
         db.commit()
         db.refresh(artist_schema)
@@ -135,7 +133,6 @@ async def get_or_create_artist(artist_schema):
         return None
     finally:
         next(db_generator, None)  # Properly close the session
-
 
 async def delete_artist(artist_id) -> bool:
     db_generator = get_db()
@@ -155,28 +152,34 @@ async def delete_artist(artist_id) -> bool:
     finally:
         next(db_generator, None)
 
-if __name__ == '__main__':
-    async def main():
-        test_artist = ArtistSchema(name="The Kinks", discogs_id=0)
-        look_up_artist = await search_discogs_artist(test_artist.name)
-        if look_up_artist:
-            test_artist.discogs_id = look_up_artist.id
-            test_artist.profile = look_up_artist.profile
-            test_artist.name = look_up_artist.name
-        created_artist = await create_artist(test_artist)
-        if created_artist:
-            print(f"Created artist: {created_artist.name} with ID {created_artist.id}")
+async def create_concept(concept)-> ConceptSchema | None:
+    db_generator = get_db()
+    db = next(db_generator)
+    try:
+        db.add(concept)
+        db.commit()
+        db.refresh(concept)
+        return concept
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating concept: {e}")
+        return None
+    finally:
+        next(db_generator, None)
+
+
+async def get_random_concept()-> ConceptSchema | None:
+    db_generator = get_db()
+    db = next(db_generator)
+    try:
+        concept = db.query(ConceptSchema).order_by(func.random()).first()
+        if concept:
+            return concept
         else:
-            print("Failed to create artist")
-        patched_artist = created_artist
-        patched_artist.profile = "Testing profile update"
-        updated_artist = await update_artist(patched_artist)
-        if updated_artist:
-            print(f"Updated artist: {updated_artist.name} with ID {updated_artist.id}")
-        else:
-            print("Failed to update artist")
-        try:
-            d = await delete_artist(updated_artist.id)
-        except Exception as e:
-            print(f"Error deleting artist: {e}")
-    asyncio.run(main())
+            print("No concepts found in the database.")
+            return None
+    except Exception as e:
+        print(f"Error fetching random concept: {e}")
+        return None
+    finally:
+        next(db_generator, None)

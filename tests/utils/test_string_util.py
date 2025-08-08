@@ -42,3 +42,21 @@ class TestStringUtil(unittest.TestCase):
 
     def test_enum_representer(self):
         from yaml import Dumper
+
+    def test_quote_yaml_values(self):
+        from app.utils.string_util import quote_yaml_values
+
+        yaml_in = (
+            "concept: A song about hope: rising sun\n"
+            "moods: happy, bright\n"
+            "description: \"Already quoted: value with : inside\"\n"
+            "notes: This is fine\n"
+        )
+        expected = (
+            "concept: \"A song about hope: rising sun\"\n"
+            "moods: happy, bright\n"
+            "description: \"Already quoted: value with : inside\"\n"
+            "notes: This is fine\n"
+        )
+        result = quote_yaml_values(yaml_in)
+        self.assertEqual(result, expected)

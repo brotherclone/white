@@ -51,3 +51,11 @@ def convert_to_rainbow_color(color_value):
         except (AttributeError, KeyError):
             return RainbowColor.Z
     return color_value
+
+def quote_yaml_values(yaml_str):
+    def replacer(match):
+        key, value = match.group(1), match.group(2)
+        if ':' in value and not (value.startswith('"') or value.startswith("'")):
+            value = f'"{value.strip()}"'
+        return f"{key}: {value}"
+    return re.sub(r'^(\s*\w+):\s*(.+)$', replacer, yaml_str, flags=re.MULTILINE)

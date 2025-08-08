@@ -1,5 +1,8 @@
-from app.agents.Dorthy import Dorthy
 import torch
+import asyncio
+
+from app.agents.Dorthy import Dorthy
+from app.agents.Subutai import Subutai
 
 TRAINING_PATH = "/Volumes/LucidNonsense/White/training"
 
@@ -45,4 +48,9 @@ if __name__ == '__main__':
     device = torch.device("mps" if torch.backends.mps.is_available() else
                           "cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device set to: {device}")
-    try_agents()
+    s= Subutai(
+        llm_model_name="claude-3-5-sonnet-latest",
+    )
+    s.initialize()
+    con = asyncio.run(s.generate_concept())
+

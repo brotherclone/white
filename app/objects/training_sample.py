@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class TrainingSample(BaseModel):
     song_bpm: str | int
     song_key: str

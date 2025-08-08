@@ -4,7 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-
 class RainbowArtist(BaseModel):
     id: int | None = None
     discogs_id: int | None = None

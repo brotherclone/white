@@ -99,3 +99,13 @@ class RainbowSongPlan(BaseModel):
         yaml_dumper.add_representer(uuid.UUID, uuid_representer)
         yaml_dumper.add_multi_representer(Enum, enum_representer)
         return yaml.dump(self.dict(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)
+
+class RainbowSongPlanStarter(BaseModel):
+    plan_id: uuid.UUID | str | None = None
+    key: str | None = None
+    bpm: int | str | None = None
+    tempo: str | None = None
+    moods: list[str] | None = None
+    sounds_like: list[str] | None = None
+    concept: str | None = None
+    raw_response: str | None = None
