@@ -1,6 +1,8 @@
 import unittest
 
-from app.utils.discog_util import get_discogs_artist, search_discogs_artist, get_discogs_group_members, get_discogs_release_list
+from app.utils.discog_util import get_discogs_artist, search_discogs_artist, get_discogs_group_members, \
+    get_discogs_release_list
+
 
 class TestDiscogUtil(unittest.IsolatedAsyncioTestCase):
     async def test_get_discogs_artist(self):
