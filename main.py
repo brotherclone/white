@@ -16,7 +16,8 @@ def clear_working_directory():
 if __name__ == "__main__":
     raw_materials_path = os.path.join(os.path.dirname(__file__), "staged_raw_material")
     if not os.path.isdir(raw_materials_path):
-        raise FileNotFoundError(f"The directory {raw_materials_path} does not exist. Please ensure the raw materials are staged correctly.")
+        raise FileNotFoundError(
+            f"The directory {raw_materials_path} does not exist. Please ensure the raw materials are staged correctly.")
     else:
         for subdir in os.listdir(raw_materials_path):
             subdir_path = os.path.join(raw_materials_path, subdir)

@@ -15,6 +15,7 @@ def initialize_env():
     if not database_url:
         raise ValueError("DATABASE_URL environment variable is not set")
 
+
 def init_migrations():
     """Initialize the migration environment if it doesn't exist"""
     if not os.path.exists(MIGRATIONS_DIR):

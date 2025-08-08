@@ -102,7 +102,7 @@ class MusicPlanEnvironment(gym.Env):
         return self.current_state, reward, terminated, truncated, info
 
     @staticmethod
-    def _action_to_plan (action: np.ndarray) -> dict:
+    def _action_to_plan(action: np.ndarray) -> dict:
         """Convert action vector to a music plan"""
         # Get note (first 12 possibilities)
         note_index = int(action[1] * 12)
@@ -211,8 +211,9 @@ class MusicPlanEnvironment(gym.Env):
 
                 # Create section
                 section = RainbowSongStructureModel(
-                    section_name=f"{section_type} {i//3 + 1}" if section_type in ["Verse", "Chorus"] else section_type,
-                    sequence=i+1,
+                    section_name=f"{section_type} {i // 3 + 1}" if section_type in ["Verse",
+                                                                                    "Chorus"] else section_type,
+                    sequence=i + 1,
                     section_description=f"Generated with complexity={complexity:.2f}, variation={variation:.2f}"
                 )
                 plan.structure.append(section)

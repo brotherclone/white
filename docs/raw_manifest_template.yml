@@ -18,9 +18,9 @@ structure:
 mood:
   - "string"
 sounds_like:
-    - name: "string" # e.g. "ABBA"
-      local_id: "string" # e.g. "1234",
-      discogs_id: "string" # e.g. "12345678"
+  - name: "string" # e.g. "ABBA"
+    local_id: "string" # e.g. "1234",
+    discogs_id: "string" # e.g. "12345678"
 genres:
   - "string"
 lrc_file: # String, e.g. "02_01.lrc"

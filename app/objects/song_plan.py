@@ -37,8 +37,7 @@ class RainbowSongPlan(BaseModel):
     structure_feedback: RainbowPlanFeedback | None = None
     concept: str | None = None
     concept_feedback: RainbowPlanFeedback | None = None
-    implementation_notes:  RainbowPlanFeedback | None = None
-
+    implementation_notes: RainbowPlanFeedback | None = None
 
     def __init__(self):
         super().__init__()
@@ -66,39 +65,40 @@ class RainbowSongPlan(BaseModel):
             suggested_replacement_value=None
         )
         self.plan_feedback = RainbowPlanFeedback(
-                plan_id=self.plan_id,
-                field_name="plan",
-                rating=None,
-                comment=None,
-                suggested_replacement_value=None
-            )
+            plan_id=self.plan_id,
+            field_name="plan",
+            rating=None,
+            comment=None,
+            suggested_replacement_value=None
+        )
         self.genres_feedback = RainbowPlanFeedback(
-                plan_id=self.plan_id,
-                field_name="genres",
-                rating=None,
-                comment=None,
-                suggested_replacement_value=None
-            )
+            plan_id=self.plan_id,
+            field_name="genres",
+            rating=None,
+            comment=None,
+            suggested_replacement_value=None
+        )
         self.structure_feedback = RainbowPlanFeedback(
-                plan_id=self.plan_id,
-                field_name="structure",
-                rating=None,
-                comment=None,
-                suggested_replacement_value=None
+            plan_id=self.plan_id,
+            field_name="structure",
+            rating=None,
+            comment=None,
+            suggested_replacement_value=None
         )
         self.implementation_notes = RainbowPlanFeedback(
-                plan_id=self.plan_id,
-                field_name="implementation_notes",
-                rating=None,
-                comment=None,
-                suggested_replacement_value=None
-            )
+            plan_id=self.plan_id,
+            field_name="implementation_notes",
+            rating=None,
+            comment=None,
+            suggested_replacement_value=None
+        )
 
     def to_yaml(self):
         yaml_dumper = yaml.SafeDumper
         yaml_dumper.add_representer(uuid.UUID, uuid_representer)
         yaml_dumper.add_multi_representer(Enum, enum_representer)
         return yaml.dump(self.dict(), default_flow_style=False, allow_unicode=True, Dumper=yaml_dumper)
+
 
 class RainbowSongPlanStarter(BaseModel):
     plan_id: uuid.UUID | str | None = None

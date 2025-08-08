@@ -4,7 +4,6 @@ import uuid
 import yaml
 import asyncio
 
-
 from random import uniform
 from app.enums.plan_state import PlanState
 from app.enums.sounds_like_treatment import PLAN_CHANGE_TABLE, SoundsLikeTreatment
@@ -86,15 +85,15 @@ def lookup_result_from_roll(roll: float, table: list) -> any:
 
 
 async def stub_out_reference_plans(current_manifest_id: str,
-                             manifest_bpm: int,
-                             manifest_tempo: str,
-                             manifest_key: str,
-                             manifest_structure: list[RainbowSongStructureModel],
-                             manifest_sounds_like: list[RainbowArtist],
-                             manifest_genres: list[str],
-                             manifest_mood: list[str],
-                                manifest_concept: str,
-                             manifest_color: RainbowColor):
+                                   manifest_bpm: int,
+                                   manifest_tempo: str,
+                                   manifest_key: str,
+                                   manifest_structure: list[RainbowSongStructureModel],
+                                   manifest_sounds_like: list[RainbowArtist],
+                                   manifest_genres: list[str],
+                                   manifest_mood: list[str],
+                                   manifest_concept: str,
+                                   manifest_color: RainbowColor):
     """
     Stubs out reference plans for a given manifest ID with positive and negative examples.
     :param current_manifest_id:
@@ -291,7 +290,6 @@ async def stub_out_reference_plans(current_manifest_id: str,
         print(f"Created negative reference plan: {negative_plan_file_name}")
 
 
-
 async def manifest_artists_to_soundslike(manifest_sounds_like: list[RainbowArtist]) -> list[RainbowSoundsLike]:
     """
     Converts a list of RainbowArtist objects from a manifest into a list of RainbowSoundsLike objects.
@@ -322,6 +320,7 @@ async def manifest_artists_to_soundslike(manifest_sounds_like: list[RainbowArtis
                 sounds_likes.append(current_sounds_like)
     return sounds_likes
 
+
 async def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positive: bool) -> RainbowSongPlan:
     """
     Degrades a given RainbowSongPlan by randomly modifying its attributes based on the degradation factor.
@@ -341,6 +340,7 @@ async def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positiv
     new_plan.concept = plan.concept if plan.concept else "No concept provided"
     return new_plan
 
+
 def randomly_modify_key(degradation: float, current_key: str) -> str:
     """
     Randomly modifies the musical key based on a degradation factor.
@@ -350,7 +350,7 @@ def randomly_modify_key(degradation: float, current_key: str) -> str:
     """
     key_roll = uniform(0.0, 100.0)
     if key_roll < degradation * 10.0:
-       return get_random_musical_key()
+        return get_random_musical_key()
     return current_key
 
 
@@ -388,7 +388,8 @@ def randomly_modify_tempo(degradation: float, current_tempo: str) -> str:
     return current_tempo
 
 
-def randomly_modify_structure(current_structure: list[RainbowSongStructureModel], degradation: float, positive: bool)-> list[RainbowSongStructureModel]:
+def randomly_modify_structure(current_structure: list[RainbowSongStructureModel], degradation: float, positive: bool) -> \
+list[RainbowSongStructureModel]:
     """
     Randomly modifies the song structure based on a degradation factor.
     :param current_structure:
@@ -417,7 +418,9 @@ def randomly_modify_structure(current_structure: list[RainbowSongStructureModel]
             section.sequence = index + 1
     return return_structure
 
-async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float, positive: bool) -> list[RainbowSoundsLike]:
+
+async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLike], degradation: float,
+                                      positive: bool) -> list[RainbowSoundsLike]:
     """
     Randomly modifies the sounds like attributes of a song based on a degradation factor.
     :param current_sounds_like:
@@ -523,7 +526,7 @@ async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLik
                     artist_b=sl.artist_b,
                     descriptor_a=sl.descriptor_a,
                     descriptor_b=sl.descriptor_b,
-                    location= new_location)
+                    location=new_location)
                 new_rainbow_sounds_like.append(new_sl)
             else:
                 new_rainbow_sounds_like.append(sl)
@@ -650,6 +653,7 @@ async def randomly_modify_sounds_like(current_sounds_like: list[RainbowSoundsLik
             new_rainbow_sounds_like.append(sl)
     return new_rainbow_sounds_like
 
+
 def randomly_modify_genres(current_genres: list[str], degradation: float, positive: bool) -> list[str]:
     """
     Randomly modifies the genres of a song based on a degradation factor.
@@ -723,7 +727,6 @@ def update_reference_manifest_with_plans():
                 print(f"Error updating manifest {current_file}: {e}")
 
 
-
 async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist | None:
     if not sounds_like_artist or not sounds_like_artist.name:
         print(f"Missing artist name or object for sounds like enrichment")
@@ -774,7 +777,8 @@ async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist
                         print(f"Failed to update artist {sounds_like_artist.name} in local database")
                         return None
                 else:
-                    print(f"Artist {sounds_like_artist.name} not found in local database for Discogs ID {discogs_artist.get('id')}")
+                    print(
+                        f"Artist {sounds_like_artist.name} not found in local database for Discogs ID {discogs_artist.get('id')}")
                     return None
             else:
                 print(f"Artist {sounds_like_artist.name} not found in Discogs")
@@ -785,7 +789,7 @@ async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist
                 new_artist = ArtistSchema(
                     name=sounds_like_artist.name,
                     discogs_id=discogs_record.id,
-                    profile= discogs_record.profile if discogs_record.profile else ''
+                    profile=discogs_record.profile if discogs_record.profile else ''
                 )
                 created_artist = await get_or_create_artist(new_artist)
                 if created_artist:
@@ -817,8 +821,7 @@ async def enrich_sounds_like(sounds_like_artist: RainbowArtist) -> RainbowArtist
     return None
 
 
-
-def split_song_structure(current_structure: list[RainbowSongStructureModel])-> list[RainbowSongStructureModel]:
+def split_song_structure(current_structure: list[RainbowSongStructureModel]) -> list[RainbowSongStructureModel]:
     to_split = random.choice(current_structure)
     if to_split:
         split_index = random.randint(0, len(to_split.section_name) - 1)
@@ -852,6 +855,7 @@ def combine_song_structure(current_structure: list[RainbowSongStructureModel]) -
         return sorted(current_structure, key=lambda x: x.sequence)
     return current_structure
 
+
 async def process_single_manifest(manifest_file_path: str):
     """
     Process a single manifest file to create reference plans.
@@ -880,8 +884,8 @@ async def process_single_manifest(manifest_file_path: str):
                         section_name=section.get('section_name', 'Unknown'),
                         section_description=section.get('section_description', ''),
                         sequence=section.get('sequence', 0),
-                        start_time= section.get('start_time', None),
-                        end_time= section.get('end_time', None),
+                        start_time=section.get('start_time', None),
+                        end_time=section.get('end_time', None),
                         duration=section.get('duration', None),
                         midi_group=section.get('midi_group', None),
                     ))
@@ -920,7 +924,8 @@ async def process_single_manifest(manifest_file_path: str):
         mood = manifest_data.get('mood', ['Happy', 'Energetic', 'Uplifting'])
         manifest_id = manifest_data.get('manifest_id', 'default_manifest')
         color_value = manifest_data.get('rainbow_color', 'Z')
-        concept_value = manifest_data.get('concept', 'Make a song that feels like a haunted house without the monsters.')
+        concept_value = manifest_data.get('concept',
+                                          'Make a song that feels like a haunted house without the monsters.')
         color = convert_to_rainbow_color(color_value)
         await stub_out_reference_plans(
             current_manifest_id=manifest_id,
@@ -955,4 +960,6 @@ if __name__ == "__main__":
                             yaml_file_path = os.path.join(subdir_path, file)
                             await process_single_manifest(yaml_file_path)
         update_reference_manifest_with_plans()
+
+
     asyncio.run(main())

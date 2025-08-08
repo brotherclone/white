@@ -1,10 +1,13 @@
 import torch
 import asyncio
 
+from app.agents.Andy import Andy
 from app.agents.Dorthy import Dorthy
 from app.agents.Subutai import Subutai
+from app.objects.rainbow_color import RainbowColor
 
 TRAINING_PATH = "/Volumes/LucidNonsense/White/training"
+
 
 def try_agents():
     print("Initializing Dorthy agent...")
@@ -44,13 +47,19 @@ def try_agents():
     else:
         print("No training data available for Dorthy agent.")
 
+
 if __name__ == '__main__':
     device = torch.device("mps" if torch.backends.mps.is_available() else
                           "cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device set to: {device}")
-    s= Subutai(
-        llm_model_name="claude-3-5-sonnet-latest",
-    )
-    s.initialize()
-    con = asyncio.run(s.generate_concept())
+    andy = Andy()
+    andy.initialize()
+    result = andy.generate_song_with_chords(RainbowColor.Z)
+    print("=== Generated Song Plan ===")
+    print(f"Key: {result['song_plan'].key}")
+    print(f"BPM: {result['song_plan'].bpm}")
 
+    print("\n=== Chord Progressions ===")
+    for chart in result['chord_charts']:
+        print(chart)
+        print()

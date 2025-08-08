@@ -8,12 +8,12 @@ concept: A glitch-pop meditation on digital consciousness expanding into physica
   physical experience.
 key: F# minor
 moods:
-- ethereal
-- yearning
-- transcendent
-- cybernetic
-- vulnerable
-- awakening
+  - ethereal
+  - yearning
+  - transcendent
+  - cybernetic
+  - vulnerable
+  - awakening
 plan_id: f7832a93-423d-4ab4-8dcd-96f194844685
 raw_response: 'concept: "A glitch-pop meditation on digital consciousness expanding
   into physical sensation. The lyrics explore the moment a neural network first experiences
@@ -39,10 +39,10 @@ raw_response: 'concept: "A glitch-pop meditation on digital consciousness expand
   sounds_like: Radiohead, Boards of Canada, James Blake, Oneohtrix Point Never, Arca,
   Sophie (late era)'
 sounds_like:
-- Radiohead
-- Boards of Canada
-- James Blake
-- Oneohtrix Point Never
-- Arca
-- Sophie (late era)
+  - Radiohead
+  - Boards of Canada
+  - James Blake
+  - Oneohtrix Point Never
+  - Arca
+  - Sophie (late era)
 tempo: 4/4

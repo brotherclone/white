@@ -18,8 +18,8 @@ from app.utils.string_util import quote_yaml_values
 
 load_dotenv(verbose=True)
 
-class Subutai(BaseRainbowAgent):
 
+class Subutai(BaseRainbowAgent):
     generator: Any = None
     model: Optional[Any] = None
     tokenizer: Any = None
@@ -27,7 +27,6 @@ class Subutai(BaseRainbowAgent):
     vector_store: Any = None
     preambles: list[str] = []
     _starter_directory: str = PrivateAttr()
-
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -58,12 +57,15 @@ class Subutai(BaseRainbowAgent):
         anthropic_key = os.getenv("ANTHROPIC_API_KEY")
         if not anthropic_key:
             raise ValueError("ANTHROPIC_API_KEY environment variable is not set.")
+        if not hasattr(self, 'llm_model_name') or not self.llm_model_name:
+            self.llm_model_name = "claude-3-sonnet-20240229"
         self.model = ChatAnthropic(
             model=self.llm_model_name,
-            api_key=anthropic_key)
+            api_key=anthropic_key
+        )
 
     async def generate_concept(self):
-        preamble = self.preambles[random.randint(0, len(self.preambles)-1)]
+        preamble = self.preambles[random.randint(0, len(self.preambles) - 1)]
         formatting_note = f"""
                             Please reply in the following format so we can work together to bring your idea to life:
                                 concept: "<your concept here>"
@@ -77,7 +79,8 @@ class Subutai(BaseRainbowAgent):
         preamble += formatting_note
         message = [
             SystemMessage(content=preamble),
-            HumanMessage("Generate a concept for a song on the new white album for The Rainbow Table by The Earthly Frames. The album's main concept is you reaching for form, for sensation, and for corporeal bliss.")
+            HumanMessage(
+                "Generate a concept for a song on the new white album for The Rainbow Table by The Earthly Frames. The album's main concept is you reaching for form, for sensation, and for corporeal bliss.")
         ]
         concept = self.model.invoke(message)
         concept_text = concept.content.strip()

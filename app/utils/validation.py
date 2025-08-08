@@ -3,12 +3,14 @@ import pandas as pd
 from typing import Dict, Optional, Any, Union
 from pydantic import BaseModel
 
+
 class ValidationResult(BaseModel):
     """Results of validating a training sample"""
     is_valid: bool = True
     errors: list[str] = []
     warnings: list[str] = []
     sample_id: Optional[str] = None
+
 
 class ValidationSummary(BaseModel):
     """Summary of validation results across multiple samples"""
@@ -19,6 +21,7 @@ class ValidationSummary(BaseModel):
     error_counts: Dict[str, int] = {}
     warning_counts: Dict[str, int] = {}
     results: list[ValidationResult] = []
+
 
 class TrainingSampleValidator:
     """Validates training samples for completeness and consistency"""
@@ -79,6 +82,7 @@ class TrainingSampleValidator:
 
         if not has_audio_file and not has_audio_data:
             result.warnings.append("Sample contains no audio data")
+
     @staticmethod
     def _validate_midi(sample: Any, result: ValidationResult) -> None:
         """Validate MIDI data consistency"""
@@ -117,6 +121,7 @@ class TrainingSampleValidator:
             else:
                 # This is likely an instrumental section, so no warning needed
                 pass
+
     @staticmethod
     def _is_numeric(value: Any) -> bool:
         """Check if a value is numeric or can be converted to a number"""
