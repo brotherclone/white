@@ -4,6 +4,7 @@ import uuid
 import yaml
 import asyncio
 
+
 from random import uniform
 from app.enums.plan_state import PlanState
 from app.enums.sounds_like_treatment import PLAN_CHANGE_TABLE, SoundsLikeTreatment
@@ -30,7 +31,7 @@ from app.utils.discog_util import search_discogs_artist, get_discogs_artist
 from app.utils.string_util import get_random_musical_key, convert_to_rainbow_color
 from app.objects.db_models.artist_schema import ArtistSchema, RainbowArtist
 
-POSITIVE_REFERENCE_PLAN_NAMES = ["closest", "closer", "close"]
+POSITIVE_REFERENCE_PLAN_NAMES = ["close", "closer", "closest"]
 NEGATIVE_REFERENCE_PLAN_NAMES = ["far", "further", "furthest"]
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PATH_TO_STAGED_RAW_MATERIALS = os.path.abspath(os.path.join(SCRIPT_DIR, "../..", "staged_raw_material"))
@@ -85,7 +86,6 @@ def lookup_result_from_roll(roll: float, table: list) -> any:
 
 
 async def stub_out_reference_plans(current_manifest_id: str,
-                             manifest_track_title: str,
                              manifest_bpm: int,
                              manifest_tempo: str,
                              manifest_key: str,
@@ -93,6 +93,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
                              manifest_sounds_like: list[RainbowArtist],
                              manifest_genres: list[str],
                              manifest_mood: list[str],
+                                manifest_concept: str,
                              manifest_color: RainbowColor):
     """
     Stubs out reference plans for a given manifest ID with positive and negative examples.
@@ -104,6 +105,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
     :param manifest_sounds_like:
     :param manifest_genres:
     :param manifest_mood:
+     :param manifest_concept:
     :param manifest_color:
     :return:
     """
@@ -116,7 +118,7 @@ async def stub_out_reference_plans(current_manifest_id: str,
         positive_plan.plan_state = PlanState.generated
         positive_plan.associated_resource = current_manifest_id
         positive_plan.bpm = manifest_bpm
-        positive_plan.bpm_feedback = RainbowPlanFeedback(
+        positive_plan_bpm_feedback = RainbowPlanFeedback(
             plan_id=positive_plan_id,
             field_name="bpm",
             rating=None,
@@ -157,10 +159,17 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        positive_plan.plan = "Make a song like " + manifest_track_title
+        positive_plan.plan = None
         positive_plan.plan_feedback = RainbowPlanFeedback(
             plan_id=positive_plan_id,
             field_name="plan",
+            rating=None,
+            comment=None,
+        )
+        positive_plan.concept = manifest_concept
+        positive_plan.concept_feedback = RainbowPlanFeedback(
+            plan_id=positive_plan_id,
+            field_name="concept",
             rating=None,
             comment=None,
         )
@@ -199,8 +208,26 @@ async def stub_out_reference_plans(current_manifest_id: str,
         negative_plan.plan_state = PlanState.generated
         negative_plan.associated_resource = current_manifest_id
         negative_plan.bpm = manifest_bpm
+        negative_plan.bpm_feedback = RainbowPlanFeedback(
+            plan_id=negative_plan_id,
+            field_name="bpm",
+            rating=None,
+            comment=None,
+        )
         negative_plan.tempo = manifest_tempo
+        negative_plan.tempo_feedback = RainbowPlanFeedback(
+            plan_id=negative_plan_id,
+            field_name="tempo",
+            rating=None,
+            comment=None,
+        )
         negative_plan.key = manifest_key
+        negative_plan.key_feedback = RainbowPlanFeedback(
+            plan_id=negative_plan_id,
+            field_name="key",
+            rating=None,
+            comment=None,
+        )
         negative_plan.moods = manifest_mood
         negative_plan.moods_feedback = RainbowPlanFeedback(
             plan_id=negative_plan_id,
@@ -222,7 +249,14 @@ async def stub_out_reference_plans(current_manifest_id: str,
             rating=None,
             comment=None,
         )
-        negative_plan.plan = "Make a song like " + manifest_track_title
+        negative_plan.concept = manifest_concept
+        negative_plan.concept_feedback = RainbowPlanFeedback(
+            plan_id=negative_plan_id,
+            field_name="concept",
+            rating=None,
+            comment=None,
+        )
+        negative_plan.plan = None
         negative_plan.plan_feedback = RainbowPlanFeedback(
             plan_id=negative_plan_id,
             field_name="plan",
@@ -304,6 +338,7 @@ async def degrade_reference_plans(plan: RainbowSongPlan, degrade: float, positiv
     new_plan.genres = randomly_modify_genres(plan.genres, degrade, positive)
     new_plan.sounds_like = await randomly_modify_sounds_like(plan.sounds_like, degrade, positive)
     new_plan.structure = randomly_modify_structure(plan.structure, degrade, positive)
+    new_plan.concept = plan.concept if plan.concept else "No concept provided"
     return new_plan
 
 def randomly_modify_key(degradation: float, current_key: str) -> str:
@@ -885,11 +920,10 @@ async def process_single_manifest(manifest_file_path: str):
         mood = manifest_data.get('mood', ['Happy', 'Energetic', 'Uplifting'])
         manifest_id = manifest_data.get('manifest_id', 'default_manifest')
         color_value = manifest_data.get('rainbow_color', 'Z')
+        concept_value = manifest_data.get('concept', 'Make a song that feels like a haunted house without the monsters.')
         color = convert_to_rainbow_color(color_value)
-        title = manifest_data.get('title', 'Default Title')
         await stub_out_reference_plans(
             current_manifest_id=manifest_id,
-            manifest_track_title=title,
             manifest_bpm=bpm,
             manifest_tempo=tempo,
             manifest_key=key,
@@ -897,9 +931,9 @@ async def process_single_manifest(manifest_file_path: str):
             manifest_sounds_like=sounds_like,
             manifest_genres=genres,
             manifest_mood=mood,
+            manifest_concept=concept_value,
             manifest_color=color
         )
-
         print(f"Successfully processed manifest: {manifest_file_path}")
         return True
     except Exception as e:

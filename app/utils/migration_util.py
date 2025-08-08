@@ -6,7 +6,7 @@ from datetime import datetime
 from alembic import command
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-MIGRATIONS_DIR = os.path.join(BASE_DIR, "migrations")
+MIGRATIONS_DIR = os.path.join(BASE_DIR, "_m_bk")
 
 
 def initialize_env():
@@ -71,7 +71,7 @@ def down():
 
 
 def run_migrations(direction: str = "up"):
-    """Run all pending migrations up or down"""
+    """Run all pending _m_bk up or down"""
     alembic_cfg = alembic.config.Config()
     alembic_cfg.set_main_option("script_location", MIGRATIONS_DIR)
 

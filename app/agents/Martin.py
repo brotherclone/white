@@ -1,38 +1,23 @@
-from transformers import (
-    AutoModel,
-    AutoFeatureExtractor,
-    AutoModelForAudioClassification,
-    pipeline
-)
-from typing import Optional, Any
-
+from transformers import AutoModel, pipeline
+from typing import Any
 from app.agents.BaseRainbowAgent import BaseRainbowAgent
 
 
 class Martin(BaseRainbowAgent):
-    processor: Optional[Any] = None
-    generator: Optional[Any] = None
-    analyzer: Optional[Any] = None
+
+    processor: Any = None
+    generator: Any = None
+    analyzer: Any = None
 
     def __init__(self, **data):
         super().__init__(**data)
-        if not self.analyzer_name:
-            self.analyzer_name = "facebook/wav2vec2-base-960h"
-        if not self.processor_name:
-            self.processor_name = "facebook/wav2vec2-base-960h"
-
         self.processor = None
         self.generator = None
         self.analyzer = None
 
     def initialize(self):
-        try:
-            # Use more specific loading methods for audio models
-            self.processor = AutoFeatureExtractor.from_pretrained(self.processor_name)
-            self.analyzer = AutoModelForAudioClassification.from_pretrained(
-                self.analyzer_name,
-                num_labels=10  # Adjust based on your classification needs
-            ).to(self.device)
-            print("Audio models loaded successfully")
-        except Exception as e:
-            print(f"Error loading audio models: {e}")
+        self.analyzer = pipeline("audio-classification", model=self.analyzer_name)
+        if not self.generator_name:
+            self.generator_name = "bert-base-uncased"  # or your desired model
+        self.generator = AutoModel.from_pretrained(self.generator_name).to(self.device)
+        self.processor = AutoModel.from_pretrained(self.processor_name)

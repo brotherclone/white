@@ -113,6 +113,7 @@ class RainbowSong(BaseModel):
         :return:
         """
         lrc = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
+        print(f"Extracting lyrics from: {lrc}", self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
         try:
             lyric_contents: list[RainbowSongLyricModel] = []
             with open(lrc, 'r', encoding='utf-8') as f:
@@ -277,11 +278,7 @@ class RainbowSong(BaseModel):
                     song_has_lyrics=self.meta_data.data.lyrics,
                     song_structure=json.dumps([s.model_dump() for s in self.meta_data.data.structure]),
                     song_moods=", ".join([str(m) for m in self.meta_data.data.mood]),
-
-                    # ToDo: This needs updating to use the correct data structure
-                    song_sounds_like=", ".join([str(l) for l in self.meta_data.data.sounds_like]),
-
-
+                    song_sounds_like= json.dumps([s.model_dump() for s in self.meta_data.data.sounds_like]),
                     song_genres=", ".join([str(g) for g in self.meta_data.data.genres]),
                     song_segment_name=extract.extract_data.section_name,
                     song_segment_start_time=str(extract.extract_data.start_time.total_seconds()),
@@ -302,6 +299,8 @@ class RainbowSong(BaseModel):
                     song_segment_track_midi_file_name=None,
                     song_segment_track_midi_binary_data=None,
                     song_segment_track_midi_is_group=extract.extract_data.midi_group,
+                    song_segment_reference_plan_paths=", ".join([str(rp) for rp in self.meta_data.data.reference_plans_paths]),
+                    song_segment_concept= self.meta_data.data.concept if self.meta_data.data.concept else None
                 )
                 if event.type == ExtractionContentType.MIX_AUDIO:
                     ts.song_segment_main_audio_file_name = event.content.get('file_name')

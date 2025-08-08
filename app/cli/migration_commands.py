@@ -17,8 +17,8 @@ def main():
     create_parser = subparsers.add_parser("create", help="Create a new migration")
     create_parser.add_argument("name", help="Name of the migration (e.g., create_users_table)")
 
-    # Run migrations command
-    migrate_parser = subparsers.add_parser("migrate", help="Run migrations")
+    # Run _m_bk command
+    migrate_parser = subparsers.add_parser("migrate", help="Run _m_bk")
     migrate_parser.add_argument("direction", choices=["up", "down"],
                                 help="'up' to apply migration, 'down' to rollback")
 

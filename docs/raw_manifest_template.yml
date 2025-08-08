@@ -23,7 +23,7 @@ sounds_like:
       discogs_id: "string" # e.g. "12345678"
 genres:
   - "string"
-lrc_file: # String, e.g. "01_01.lrc"
+lrc_file: # String, e.g. "02_01.lrc"
 audio_tracks:
   - id: # String, e.g. "01_01_main"
     description: # String, e.g. "Main audio track with lead vocals"

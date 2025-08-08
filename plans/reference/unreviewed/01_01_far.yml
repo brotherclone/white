@@ -1,10 +1,22 @@
 associated_resource: '01_01'
-batch_id: 2aaa4433-38f1-4cc8-938a-19a312ff00b4
+batch_id: 3a2870f8-d6e5-4d4e-9055-613300999ef8
 bpm: 137
 bpm_feedback:
   comment: null
   field_name: bpm
-  plan_id: 6f38eaab-92bb-4443-8d4a-84e38cf396ca
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
+  rating: null
+  suggested_replacement_value: null
+concept: The song takes place in a vaudeville theater where a spiritualist has tried
+  to levitate but the trick has gone wrong. He now hangs high in the air and his thin
+  thread is fraying. He watches as the audience revolts when the illusion is shattered.
+  This is the first song on the 'black' album which our protagonist are struggling
+  to find a way to survive in world where the magic has suddenly shut off. They yearns
+  for their connection to a higher plane and purpose.
+concept_feedback:
+  comment: null
+  field_name: concept
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 genres:
@@ -20,20 +32,20 @@ genres:
 genres_feedback:
   comment: null
   field_name: genres
-  plan_id: 1997db21-384d-4944-998a-f20c36251002
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 implementation_notes:
   comment: null
   field_name: implementation_notes
-  plan_id: 1997db21-384d-4944-998a-f20c36251002
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
-key: C major
+key: C# minor
 key_feedback:
   comment: null
   field_name: key
-  plan_id: 6f38eaab-92bb-4443-8d4a-84e38cf396ca
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 moods:
@@ -60,23 +72,23 @@ moods:
 moods_feedback:
   comment: null
   field_name: moods
-  plan_id: 1997db21-384d-4944-998a-f20c36251002
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
-plan: Make a song like The Conjurer's Thread
+plan: null
 plan_feedback:
   comment: null
   field_name: plan
-  plan_id: 1997db21-384d-4944-998a-f20c36251002
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
-plan_id: 1997db21-384d-4944-998a-f20c36251002
+plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
 plan_state: generated
 rainbow_color: Z
 rainbow_color_feedback:
   comment: null
   field_name: rainbow_color
-  plan_id: 1997db21-384d-4944-998a-f20c36251002
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 sounds_like:
@@ -95,10 +107,31 @@ sounds_like:
   descriptor_a: null
   descriptor_b: null
   location: null
+- artist_a:
+    discogs_id: 94068
+    id: 69
+    name: Motley Crue
+    profile: "Hair / Glam Metal (Heavy Metal) band from Los Angeles, California.\r\
+      \n\r\nMötley Crüe was founded by Nikki Sixx (bass), Tommy Lee (drums), Mick\
+      \ Mars (guitar) and Vince Neil (vocals). The classic Crüe line-up broke up in\
+      \ 1992 when vocalist Vince Neil left the group and was replaced by John Corabi.\
+      \ In 1997, the band reunited with Vince Neil. In 1999, Tommy Lee departed to\
+      \ pursue his solo career and was replaced by Randy Castillo. In 2004, the original\
+      \ line-up announced their comeback.\r\n\r\nIn 2014, the band announced their\
+      \ retirement, and their final show took place on New Year's Eve, December 31st,\
+      \ 2015, at the Staples Center in Los Angeles.\r\n\r\nIn September 2018, news\
+      \ broke that the Crüe were back together and recording new songs to be used\
+      \ for the film adaptation of the band's biography, The Dirt. The band had also\
+      \ signed a contract to no longer tour, but they still plan to continue putting\
+      \ out new music."
+  artist_b: null
+  descriptor_a: null
+  descriptor_b: null
+  location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
-  plan_id: 1997db21-384d-4944-998a-f20c36251002
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 structure:
@@ -182,13 +215,13 @@ structure:
 structure_feedback:
   comment: null
   field_name: structure
-  plan_id: 1997db21-384d-4944-998a-f20c36251002
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
 tempo: 4/4
 tempo_feedback:
   comment: null
   field_name: tempo
-  plan_id: 6f38eaab-92bb-4443-8d4a-84e38cf396ca
+  plan_id: c693e314-7ad8-4c19-a778-47adab8322cc
   rating: null
   suggested_replacement_value: null
