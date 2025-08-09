@@ -53,7 +53,7 @@ async def get_discogs_group_members(group_name):
 
 
 async def get_discogs_release_list(artist_id, per_page=50, page=1, sort='year', sort_order='asc',
-                             release_type=None, main_release=True, debug=False):
+                                   release_type=None, main_release=True, debug=False):
     """
     Get releases for an artist with filtering options
     """
@@ -89,5 +89,6 @@ if __name__ == "__main__":
         print(a.id)
         b = await get_discogs_artist(a.id)
         print(b.profile)
+
 
     asyncio.run(main())

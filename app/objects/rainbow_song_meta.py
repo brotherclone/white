@@ -8,7 +8,7 @@ from app.objects.sounds_like import RainbowSoundsLike
 
 THE_ARTIST = "The Earthly Frames"
 
-rainbow_table_title_dict ={
+rainbow_table_title_dict = {
     RainbowColor.Z: "The Conjurer's Thread",
     RainbowColor.R: "Light Reading",
     RainbowColor.O: "Ruine",
@@ -20,11 +20,13 @@ rainbow_table_title_dict ={
     RainbowColor.A: "TBD"
 }
 
+
 class RainbowSongLyricModel(BaseModel):
     time_stamp: str | datetime.timedelta | None = None
     lrc: str | datetime.timedelta | None = None
     lyrics: str | None = None
     is_in_range: bool = False
+
 
 class RainbowSongTrackModel(BaseModel):
     id: int
@@ -34,6 +36,7 @@ class RainbowSongTrackModel(BaseModel):
     midi_file: str | None = None
     midi_group: str | None = None
 
+
 class RainbowSongStructureModel(BaseModel):
     section_name: str
     section_description: str | None = None
@@ -42,6 +45,7 @@ class RainbowSongStructureModel(BaseModel):
     duration: datetime.timedelta | None = None
     sequence: None | int = None
     midi_group: str | None = None
+
 
 class RainbowMetaDataModel(BaseModel):
     bpm: int
@@ -62,9 +66,10 @@ class RainbowMetaDataModel(BaseModel):
     sounds_like: list[RainbowSoundsLike]
     genres: list[str]
     lrc_file: bool | str = False
-    audio_tracks: list[RainbowSongTrackModel] | None =None
+    audio_tracks: list[RainbowSongTrackModel] | None = None
     reference_plans_paths: list[str] | None = None
     concept: str | None = None
+
 
 class RainbowSongMeta(BaseModel):
     yaml_file_name: str

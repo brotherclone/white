@@ -21,12 +21,12 @@ concept_feedback:
   rating: null
   suggested_replacement_value: null
 genres:
-- Acid House
-- Analog Synth
-- Electronic
-- Experimental
-- Krautrock
-- Psychedelic
+  - Acid House
+  - Analog Synth
+  - Electronic
+  - Experimental
+  - Krautrock
+  - Psychedelic
 genres_feedback:
   comment: null
   field_name: genres
@@ -47,14 +47,14 @@ key_feedback:
   rating: null
   suggested_replacement_value: null
 moods:
-- ethereal
-- mad scientist
-- mysterious
-- otherworldly
-- raygun sci-fi
-- sentimental
-- space age
-- unsettling
+  - ethereal
+  - mad scientist
+  - mysterious
+  - otherworldly
+  - raygun sci-fi
+  - sentimental
+  - space age
+  - unsettling
 moods_feedback:
   comment: null
   field_name: moods
@@ -78,21 +78,21 @@ rainbow_color_feedback:
   rating: null
   suggested_replacement_value: null
 sounds_like:
-- artist_a:
-    discogs_id: 12636
-    id: 166
-    name: Neu!
-    profile: German krautrock band formed in Düsseldorf in 1971 by [a=Klaus Dinger]
-      and [a=Michael Rother], after their split from [a=Kraftwerk]. The group's albums
-      were produced by [a=Conny Plank], who has been regarded as the group's "hidden
-      member". Though [a=Neu!] had minimal commercial success during its existence,
-      the band is retrospectively considered one of the founders of krautrock and
-      a significant influence on a variety of subsequent rock, post-punk, and electronic
-      music artists.
-  artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
+  - artist_a:
+      discogs_id: 12636
+      id: 166
+      name: Neu!
+      profile: German krautrock band formed in Düsseldorf in 1971 by [a=Klaus Dinger]
+        and [a=Michael Rother], after their split from [a=Kraftwerk]. The group's albums
+        were produced by [a=Conny Plank], who has been regarded as the group's "hidden
+        member". Though [a=Neu!] had minimal commercial success during its existence,
+        the band is retrospectively considered one of the founders of krautrock and
+        a significant influence on a variety of subsequent rock, post-punk, and electronic
+        music artists.
+    artist_b: null
+    descriptor_a: null
+    descriptor_b: null
+    location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
@@ -100,84 +100,84 @@ sounds_like_feedback:
   rating: null
   suggested_replacement_value: null
 structure:
-- duration: null
-  end_time: null
-  midi_group: null
-  section_description: I'm sure it's fun for the guitarist, but it doesn't add anything
-    to the song
-  section_name: Gratuitous Guitar Solo
-  sequence: 1
-  start_time: null
-- duration: null
-  end_time: '[00:22.142]'
-  midi_group: null
-  section_description: Description for Opening
-  section_name: Opening
-  sequence: 1
-  start_time: '[00:00.000]'
-- duration: null
-  end_time: '[00:37.137]'
-  midi_group: null
-  section_description: Description for Opening Build
-  section_name: Opening Build
-  sequence: 2
-  start_time: '[00:22.143]'
-- duration: null
-  end_time: '[00:44.285]'
-  midi_group: null
-  section_description: Description for Chorus 1 Intro
-  section_name: Chorus 1 Intro
-  sequence: 3
-  start_time: '[00:37.138]'
-- duration: null
-  end_time: '[00:59.281]'
-  midi_group: null
-  section_description: Description for Chorus 1
-  section_name: Chorus 1
-  sequence: 4
-  start_time: '[00:44.286]'
-- duration: null
-  end_time: '[01:29.272]'
-  midi_group: null
-  section_description: Description for Verse 1
-  section_name: Verse 1
-  sequence: 5
-  start_time: '[00:59.282]'
-- duration: null
-  end_time: '[01:44.266]'
-  midi_group: null
-  section_description: Description for Chorus 2
-  section_name: Chorus 2
-  sequence: 6
-  start_time: '[01:29.273]'
-- duration: null
-  end_time: '[02:22.105]'
-  midi_group: null
-  section_description: Description for Interlude 1
-  section_name: Interlude 1
-  sequence: 7
-  start_time: '[01:44.267]'
-- duration: null
-  end_time: '[02:44.250]'
-  midi_group: null
-  section_description: Description for Verse 2 - Bridging
-  section_name: Verse 2 - Bridging
-  sequence: 8
-  start_time: '[02:22.106]'
-- duration: null
-  end_time: '[03:22.087]'
-  midi_group: null
-  section_description: Description for Jams 2
-  section_name: Jams 2
-  sequence: 10
-  start_time: '[03:07.094]'
-- duration: null
-  end_time: '[03:46.193]'
-  midi_group: null
-  section_description: Description for Outro
-  section_name: Outro
-  sequence: 11
-  start_time: '[03:22.088]'
+  - duration: null
+    end_time: null
+    midi_group: null
+    section_description: I'm sure it's fun for the guitarist, but it doesn't add anything
+      to the song
+    section_name: Gratuitous Guitar Solo
+    sequence: 1
+    start_time: null
+  - duration: null
+    end_time: '[00:22.142]'
+    midi_group: null
+    section_description: Description for Opening
+    section_name: Opening
+    sequence: 1
+    start_time: '[00:00.000]'
+  - duration: null
+    end_time: '[00:37.137]'
+    midi_group: null
+    section_description: Description for Opening Build
+    section_name: Opening Build
+    sequence: 2
+    start_time: '[00:22.143]'
+  - duration: null
+    end_time: '[00:44.285]'
+    midi_group: null
+    section_description: Description for Chorus 1 Intro
+    section_name: Chorus 1 Intro
+    sequence: 3
+    start_time: '[00:37.138]'
+  - duration: null
+    end_time: '[00:59.281]'
+    midi_group: null
+    section_description: Description for Chorus 1
+    section_name: Chorus 1
+    sequence: 4
+    start_time: '[00:44.286]'
+  - duration: null
+    end_time: '[01:29.272]'
+    midi_group: null
+    section_description: Description for Verse 1
+    section_name: Verse 1
+    sequence: 5
+    start_time: '[00:59.282]'
+  - duration: null
+    end_time: '[01:44.266]'
+    midi_group: null
+    section_description: Description for Chorus 2
+    section_name: Chorus 2
+    sequence: 6
+    start_time: '[01:29.273]'
+  - duration: null
+    end_time: '[02:22.105]'
+    midi_group: null
+    section_description: Description for Interlude 1
+    section_name: Interlude 1
+    sequence: 7
+    start_time: '[01:44.267]'
+  - duration: null
+    end_time: '[02:44.250]'
+    midi_group: null
+    section_description: Description for Verse 2 - Bridging
+    section_name: Verse 2 - Bridging
+    sequence: 8
+    start_time: '[02:22.106]'
+  - duration: null
+    end_time: '[03:22.087]'
+    midi_group: null
+    section_description: Description for Jams 2
+    section_name: Jams 2
+    sequence: 10
+    start_time: '[03:07.094]'
+  - duration: null
+    end_time: '[03:46.193]'
+    midi_group: null
+    section_description: Description for Outro
+    section_name: Outro
+    sequence: 11
+    start_time: '[03:22.088]'
 structure_feedback:
   comment: null
   field_name: structure

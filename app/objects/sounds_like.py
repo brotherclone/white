@@ -1,12 +1,10 @@
 from app.objects.db_models.artist_schema import RainbowArtist
 from pydantic import BaseModel
 
-
 from app.utils.db_util import get_artist_by_name, db_arist_to_rainbow_artist
 
 
 class RainbowSoundsLike(BaseModel):
-
     artist_a: RainbowArtist | None = None
     artist_b: RainbowArtist | None = None
     descriptor_a: str | None = None
@@ -27,5 +25,5 @@ class RainbowSoundsLike(BaseModel):
                     statement = f"{statement} and {self.descriptor_b}"
                 if self.location:
                     statement = f"{statement} in {self.location}"
-            return  f"{statement}."
+            return f"{statement}."
         return None

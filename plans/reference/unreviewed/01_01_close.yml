@@ -15,15 +15,15 @@ concept_feedback:
   rating: null
   suggested_replacement_value: null
 genres:
-- Experimental
-- Psychedelic
-- Post-Punk
-- Art Rock
-- Avant-Garde
-- Electronic
-- Indie Rock
-- Dark Wave
-- Gothic Rock
+  - Experimental
+  - Psychedelic
+  - Post-Punk
+  - Art Rock
+  - Avant-Garde
+  - Electronic
+  - Indie Rock
+  - Dark Wave
+  - Gothic Rock
 genres_feedback:
   comment: null
   field_name: genres
@@ -44,26 +44,26 @@ key_feedback:
   rating: null
   suggested_replacement_value: null
 moods:
-- dark
-- mysterious
-- haunting
-- ethereal
-- ghostly
-- ominous
-- spooky
-- eerie
-- otherworldly
-- unsettling
-- creepy
-- chilling
-- foreboding
-- sinister
-- supernatural
-- phantasmal
-- spectral
-- haunted
-- occult
-- arcane
+  - dark
+  - mysterious
+  - haunting
+  - ethereal
+  - ghostly
+  - ominous
+  - spooky
+  - eerie
+  - otherworldly
+  - unsettling
+  - creepy
+  - chilling
+  - foreboding
+  - sinister
+  - supernatural
+  - phantasmal
+  - spectral
+  - haunted
+  - occult
+  - arcane
 moods_feedback:
   comment: null
   field_name: moods
@@ -87,23 +87,23 @@ rainbow_color_feedback:
   rating: null
   suggested_replacement_value: null
 sounds_like:
-- artist_a:
-    discogs_id: 189718
-    id: 107
-    name: Brian Wilson
-    profile: American songwriter, producer, arranger and musician, co-founder and
-      leader of [a=The Beach Boys]. Born 20 June 1942 in Inglewood, California, USA,
-      died 11 June 2025 in Beverly Hills, California, U.S. From late 1964 to 1979
-      he was married to [url=https://www.discogs.com/artist/1009337-Marilyn-Rovell-Wilson]Marilyn
-      Rovell[/url] (divorced) with whom he had daughters [url=https://www.discogs.com/artist/434651-Carnie-Wilson]Carnie[/url]
-      and [url=https://www.discogs.com/artist/413862-Wendy-Wilson]Wendy[/url] who
-      became members of both [a=The Wilsons] and [a=Wilson Phillips]. He later was
-      married to [a=Melinda Wilson] until her death in 2024. Son of [a363017] and
-      [a3239364]. Brother of [a391245] and [a260571] and cousin of [a372789].
-  artist_b: null
-  descriptor_a: null
-  descriptor_b: null
-  location: null
+  - artist_a:
+      discogs_id: 189718
+      id: 107
+      name: Brian Wilson
+      profile: American songwriter, producer, arranger and musician, co-founder and
+        leader of [a=The Beach Boys]. Born 20 June 1942 in Inglewood, California, USA,
+        died 11 June 2025 in Beverly Hills, California, U.S. From late 1964 to 1979
+        he was married to [url=https://www.discogs.com/artist/1009337-Marilyn-Rovell-Wilson]Marilyn
+        Rovell[/url] (divorced) with whom he had daughters [url=https://www.discogs.com/artist/434651-Carnie-Wilson]Carnie[/url]
+        and [url=https://www.discogs.com/artist/413862-Wendy-Wilson]Wendy[/url] who
+        became members of both [a=The Wilsons] and [a=Wilson Phillips]. He later was
+        married to [a=Melinda Wilson] until her death in 2024. Son of [a363017] and
+        [a3239364]. Brother of [a391245] and [a260571] and cousin of [a372789].
+    artist_b: null
+    descriptor_a: null
+    descriptor_b: null
+    location: null
 sounds_like_feedback:
   comment: null
   field_name: sounds_like
@@ -111,83 +111,83 @@ sounds_like_feedback:
   rating: null
   suggested_replacement_value: null
 structure:
-- duration: null
-  end_time: '[00:14.027]'
-  midi_group: null
-  section_description: Description for Verse Intro
-  section_name: Verse Intro
-  sequence: 1
-  start_time: '[00:00.000]'
-- duration: null
-  end_time: '[00:38.000]'
-  midi_group: null
-  section_description: Description for Verse 1
-  section_name: Verse 1
-  sequence: 2
-  start_time: '[00:14.027]'
-- duration: null
-  end_time: '[00:42.086]'
-  midi_group: null
-  section_description: Description for Verse 2
-  section_name: Verse 2
-  sequence: 3
-  start_time: '[00:28.057]'
-- duration: null
-  end_time: '[00:55.145]'
-  midi_group: null
-  section_description: Description for Verse 3
-  section_name: Verse 3
-  sequence: 4
-  start_time: '[00:42.086]'
-- duration: null
-  end_time: '[01:24.175]'
-  midi_group: null
-  section_description: Description for Interlude 1
-  section_name: Interlude 1
-  sequence: 5
-  start_time: '[00:55.145]'
-- duration: null
-  end_time: '[01:52.234]'
-  midi_group: null
-  section_description: Description for Chorus 1
-  section_name: Chorus 1
-  sequence: 6
-  start_time: '[01:24.175]'
-- duration: null
-  end_time: '[02:07.013]'
-  midi_group: null
-  section_description: Description for Verse 4
-  section_name: Verse 4
-  sequence: 7
-  start_time: '[01:52.234]'
-- duration: null
-  end_time: '[02:21.043]'
-  midi_group: null
-  section_description: Description for Verse 5
-  section_name: Verse 5
-  sequence: 8
-  start_time: '[02:07.013]'
-- duration: null
-  end_time: '[02:49.102]'
-  midi_group: null
-  section_description: Description for Chorus 2
-  section_name: Chorus 2
-  sequence: 9
-  start_time: '[02:21.043]'
-- duration: null
-  end_time: '[03:17.161]'
-  midi_group: null
-  section_description: Description for Interlude 2
-  section_name: Interlude 2
-  sequence: 10
-  start_time: '[02:49.102]'
-- duration: null
-  end_time: '[04:25.999]'
-  midi_group: null
-  section_description: Description for Outro
-  section_name: Outro
-  sequence: 11
-  start_time: '[03:17.161]'
+  - duration: null
+    end_time: '[00:14.027]'
+    midi_group: null
+    section_description: Description for Verse Intro
+    section_name: Verse Intro
+    sequence: 1
+    start_time: '[00:00.000]'
+  - duration: null
+    end_time: '[00:38.000]'
+    midi_group: null
+    section_description: Description for Verse 1
+    section_name: Verse 1
+    sequence: 2
+    start_time: '[00:14.027]'
+  - duration: null
+    end_time: '[00:42.086]'
+    midi_group: null
+    section_description: Description for Verse 2
+    section_name: Verse 2
+    sequence: 3
+    start_time: '[00:28.057]'
+  - duration: null
+    end_time: '[00:55.145]'
+    midi_group: null
+    section_description: Description for Verse 3
+    section_name: Verse 3
+    sequence: 4
+    start_time: '[00:42.086]'
+  - duration: null
+    end_time: '[01:24.175]'
+    midi_group: null
+    section_description: Description for Interlude 1
+    section_name: Interlude 1
+    sequence: 5
+    start_time: '[00:55.145]'
+  - duration: null
+    end_time: '[01:52.234]'
+    midi_group: null
+    section_description: Description for Chorus 1
+    section_name: Chorus 1
+    sequence: 6
+    start_time: '[01:24.175]'
+  - duration: null
+    end_time: '[02:07.013]'
+    midi_group: null
+    section_description: Description for Verse 4
+    section_name: Verse 4
+    sequence: 7
+    start_time: '[01:52.234]'
+  - duration: null
+    end_time: '[02:21.043]'
+    midi_group: null
+    section_description: Description for Verse 5
+    section_name: Verse 5
+    sequence: 8
+    start_time: '[02:07.013]'
+  - duration: null
+    end_time: '[02:49.102]'
+    midi_group: null
+    section_description: Description for Chorus 2
+    section_name: Chorus 2
+    sequence: 9
+    start_time: '[02:21.043]'
+  - duration: null
+    end_time: '[03:17.161]'
+    midi_group: null
+    section_description: Description for Interlude 2
+    section_name: Interlude 2
+    sequence: 10
+    start_time: '[02:49.102]'
+  - duration: null
+    end_time: '[04:25.999]'
+    midi_group: null
+    section_description: Description for Outro
+    section_name: Outro
+    sequence: 11
+    start_time: '[03:17.161]'
 structure_feedback:
   comment: null
   field_name: structure

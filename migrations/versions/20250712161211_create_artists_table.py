@@ -11,13 +11,16 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
+
 def upgrade():
     # Implement up() logic
     up()
 
+
 def downgrade():
     # Implement down() logic
     down()
+
 
 def up():
     """Create Artists table"""

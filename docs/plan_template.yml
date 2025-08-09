@@ -62,15 +62,15 @@ genres:
   - "Hip-Hop"
   - "Jazz"
 genres_feedback:
-    plan_id: "UUID"
-    field_name: "genres"
-    rating: 10.0
-    comment: "This is a comment"
-    suggested_replacement_value:
-        - "Electronic"
-        - "Indie"
-        - "Classical"
-        - "Folk"
+  plan_id: "UUID"
+  field_name: "genres"
+  rating: 10.0
+  comment: "This is a comment"
+  suggested_replacement_value:
+    - "Electronic"
+    - "Indie"
+    - "Classical"
+    - "Folk"
 implementation_notes:
   notes: "In early morning light, the melody should evoke a sense of nostalgia, while the bassline should be punchy and energetic."
   feedback:

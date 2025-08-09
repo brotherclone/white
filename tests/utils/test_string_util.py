@@ -1,6 +1,8 @@
 import unittest
 
-from app.utils.string_util import safe_filename, just_lyrics, make_lrc_fragment, to_str_dict, bytes_to_base64_str, get_random_musical_key, uuid_representer, enum_representer, convert_to_rainbow_color
+from app.utils.string_util import safe_filename, just_lyrics, make_lrc_fragment, to_str_dict, bytes_to_base64_str, \
+    get_random_musical_key, uuid_representer, enum_representer, convert_to_rainbow_color
+
 
 class TestStringUtil(unittest.TestCase):
     def test_safe_filename(self):

@@ -17,6 +17,7 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
+
 def run_migrations_offline():
     """Run _m_bk in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
@@ -29,6 +30,7 @@ def run_migrations_offline():
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 def run_migrations_online():
     """Run _m_bk in 'online' mode."""
@@ -46,6 +48,7 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

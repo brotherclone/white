@@ -3,7 +3,7 @@ import asyncio
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base,sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from app.objects.db_models.artist_schema import ArtistSchema, RainbowArtist
 from app.objects.db_models.concept_schema import ConceptSchema
 from app.utils.discog_util import search_discogs_artist
@@ -15,12 +15,14 @@ engine = create_engine(os.environ['LOCAL_DB_PATH'])
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 def db_arist_to_rainbow_artist(db_artist: ArtistSchema) -> RainbowArtist:
     """
@@ -34,6 +36,7 @@ def db_arist_to_rainbow_artist(db_artist: ArtistSchema) -> RainbowArtist:
         discogs_id=db_artist.discogs_id,
         profile=db_artist.profile,
     )
+
 
 async def get_artist_by_name(name):
     db_generator = get_db()
@@ -51,6 +54,7 @@ async def get_artist_by_name(name):
     finally:
         next(db_generator, None)
 
+
 async def get_local_artist_by_local_id(local_id):
     db_generator = get_db()
     db = next(db_generator)
@@ -66,6 +70,7 @@ async def get_local_artist_by_local_id(local_id):
         return None
     finally:
         next(db_generator, None)
+
 
 async def get_local_artist_by_discogs_id(discogs_id):
     db_generator = get_db()
@@ -83,7 +88,8 @@ async def get_local_artist_by_discogs_id(discogs_id):
     finally:
         next(db_generator, None)
 
-async def update_artist(artist)-> ArtistSchema | None:
+
+async def update_artist(artist) -> ArtistSchema | None:
     db_generator = get_db()
     db = next(db_generator)
     try:
@@ -101,6 +107,7 @@ async def update_artist(artist)-> ArtistSchema | None:
     finally:
         next(db_generator, None)
 
+
 async def create_artist(artist) -> ArtistSchema | None:
     db_generator = get_db()
     db = next(db_generator)
@@ -115,6 +122,7 @@ async def create_artist(artist) -> ArtistSchema | None:
         return None
     finally:
         next(db_generator, None)
+
 
 async def get_or_create_artist(artist_schema):
     db_generator = get_db()
@@ -134,6 +142,7 @@ async def get_or_create_artist(artist_schema):
     finally:
         next(db_generator, None)  # Properly close the session
 
+
 async def delete_artist(artist_id) -> bool:
     db_generator = get_db()
     db = next(db_generator)
@@ -152,7 +161,8 @@ async def delete_artist(artist_id) -> bool:
     finally:
         next(db_generator, None)
 
-async def create_concept(concept)-> ConceptSchema | None:
+
+async def create_concept(concept) -> ConceptSchema | None:
     db_generator = get_db()
     db = next(db_generator)
     try:
@@ -168,7 +178,7 @@ async def create_concept(concept)-> ConceptSchema | None:
         next(db_generator, None)
 
 
-async def get_random_concept()-> ConceptSchema | None:
+async def get_random_concept() -> ConceptSchema | None:
     db_generator = get_db()
     db = next(db_generator)
     try:
