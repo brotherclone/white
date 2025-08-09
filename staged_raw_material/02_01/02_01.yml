@@ -123,12 +123,3 @@ audio_tracks:
     description: Vocoder vocals
     audio_file: 02_01_10.wav
     midi_file: 02_01_10.mid
-reference_plans:
-  positive:
-    - 02_01_close.yml
-    - 02_01_closer.yml
-    - 02_01_closest.yml
-  negative:
-    - 02_01_far.yml
-    - 02_01_further.yml
-    - 02_01_furthest.yml
