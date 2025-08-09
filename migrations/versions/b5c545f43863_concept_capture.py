@@ -10,7 +10,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision: str = 'b5c545f43863'
 down_revision: Union[str, Sequence[str], None] = '20250712161211'
@@ -27,6 +26,7 @@ def downgrade() -> None:
     """Downgrade schema."""
     down()
 
+
 def up() -> None:
     """Create ConceptCapture table."""
     op.create_table(
@@ -37,6 +37,7 @@ def up() -> None:
         sa.Column('updated_at', sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False)
     )
     print("Created 'concept_capture' table successfully.")
+
 
 def down() -> None:
     """Revert migration changes."""

@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict
 from typing import Any, Optional
 from app.enums.agent_state import AgentState
 
+
 class BaseRainbowAgent(BaseModel):
     analyzer_name: Optional[str] = None
     processor_name: Optional[str] = None
@@ -18,7 +19,7 @@ class BaseRainbowAgent(BaseModel):
     data_frames: Any = None
     embeddings: Any = None
     vector_store: Any = None
-    device: str =None
+    device: str = None
     agent_state: Optional[AgentState] = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -57,13 +58,13 @@ class BaseRainbowAgent(BaseModel):
         else:
             print("No valid data frames found in the provided training data.")
 
-    def _process_agent_specific_data(self)-> None :
+    def _process_agent_specific_data(self) -> None:
         if self.data_frames and all(df.empty for df in self.data_frames):
             pass
         else:
             print("No data frames to process.")
 
-    def create_vector_store(self, text_field:str, metadata_fields: list[str]) -> None:
+    def create_vector_store(self, text_field: str, metadata_fields: list[str]) -> None:
         if self.training_data is None:
             print("No training data available to create vector store.")
             return

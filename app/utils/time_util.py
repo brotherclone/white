@@ -1,5 +1,6 @@
 import datetime
 
+
 def seconds_to_timedelta(seconds: float) -> datetime.timedelta:
     """
     Convert seconds to a timedelta object.
@@ -11,6 +12,7 @@ def seconds_to_timedelta(seconds: float) -> datetime.timedelta:
         datetime.timedelta: The timedelta object representing the time.
     """
     return datetime.timedelta(seconds=seconds)
+
 
 def timedelta_to_seconds(td: datetime.timedelta) -> float:
     """
@@ -59,7 +61,9 @@ def seconds_to_lrc(seconds: float) -> str:
     secs = seconds % 60
     return f"[{minutes:02}:{secs:06.3f}]"
 
-def get_duration(start_time:float | datetime.timedelta | str, end_time:float | datetime.timedelta | str) -> datetime.timedelta:
+
+def get_duration(start_time: float | datetime.timedelta | str,
+                 end_time: float | datetime.timedelta | str) -> datetime.timedelta:
     """
     Calculate the duration between start and end times.
 
@@ -86,6 +90,7 @@ def get_duration(start_time:float | datetime.timedelta | str, end_time:float | d
         end_seconds = end_time
 
     return seconds_to_timedelta(end_seconds - start_seconds)
+
 
 def convert_timedelta(obj):
     if isinstance(obj, datetime.timedelta):

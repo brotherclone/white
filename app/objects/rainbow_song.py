@@ -16,7 +16,7 @@ from app.objects.training_sample import TrainingSample
 from app.utils.audio_util import has_significant_audio, get_microseconds_per_beat, audio_to_byes, \
     split_midi_file_by_segment, midi_to_bytes
 from app.utils.time_util import lrc_to_seconds, get_duration
-from app.utils.string_util import safe_filename,to_str_dict
+from app.utils.string_util import safe_filename, to_str_dict
 from app.utils.validation import TrainingSampleValidator
 
 JUST_NUMBERS_PATTERN = r'^\d+$'
@@ -54,7 +54,8 @@ class RainbowSong(BaseModel):
             self.training_samples = []
         section_sequence = 0
         for song_section in self.meta_data.data.structure:
-            if song_section.duration is not None and song_section.duration > datetime.timedelta(MAXIMUM_EXTRACT_DURATION.total_seconds()):
+            if song_section.duration is not None and song_section.duration > datetime.timedelta(
+                    MAXIMUM_EXTRACT_DURATION.total_seconds()):
                 section_start_time = lrc_to_seconds(song_section.start_time)
                 section_end_time = lrc_to_seconds(song_section.end_time)
                 total_seconds = (section_end_time - section_start_time).total_seconds()
@@ -113,7 +114,8 @@ class RainbowSong(BaseModel):
         :return:
         """
         lrc = os.path.join(self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
-        print(f"Extracting lyrics from: {lrc}", self.meta_data.base_path, self.meta_data.track_materials_path, self.meta_data.data.lrc_file)
+        print(f"Extracting lyrics from: {lrc}", self.meta_data.base_path, self.meta_data.track_materials_path,
+              self.meta_data.data.lrc_file)
         try:
             lyric_contents: list[RainbowSongLyricModel] = []
             with open(lrc, 'r', encoding='utf-8') as f:
@@ -126,10 +128,11 @@ class RainbowSong(BaseModel):
                             next_line = next(f, None)
                             date_time_lyric_time_stamp = lrc_to_seconds(line)
                             lyric_content: RainbowSongLyricModel = RainbowSongLyricModel(
-                                time_stamp= lrc_to_seconds(line),
+                                time_stamp=lrc_to_seconds(line),
                                 lrc=None,
                                 lyrics=None,
-                                is_in_range= (an_extract.extract_data.start_time <= date_time_lyric_time_stamp < an_extract.extract_data.end_time)
+                                is_in_range=(
+                                            an_extract.extract_data.start_time <= date_time_lyric_time_stamp < an_extract.extract_data.end_time)
                             )
                             if next_line is not None:
                                 next_line = next_line.strip()
@@ -220,7 +223,8 @@ class RainbowSong(BaseModel):
                     midi = mido.MidiFile(midi_file_path)
                     ticks_per_beat = midi.ticks_per_beat
                     tempo = midi.tempo if hasattr(midi, 'tempo') else get_microseconds_per_beat(self.meta_data.data.bpm)
-                    segment_path = split_midi_file_by_segment(tempo,  midi_file_path, an_extract.extract_data.duration.total_seconds())
+                    segment_path = split_midi_file_by_segment(tempo, midi_file_path,
+                                                              an_extract.extract_data.duration.total_seconds())
                     note_collector = []
                     for t in midi.tracks:
                         mt = 0
@@ -264,7 +268,8 @@ class RainbowSong(BaseModel):
         for extract in self.extracts:
             for event in extract.extract_data.events:
                 ts = TrainingSample(
-                    song_bpm=str(self.meta_data.data.bpm) if isinstance(self.meta_data.data.bpm, int) else self.meta_data.data.bpm,
+                    song_bpm=str(self.meta_data.data.bpm) if isinstance(self.meta_data.data.bpm,
+                                                                        int) else self.meta_data.data.bpm,
                     song_key=self.meta_data.data.key,
                     album_rainbow_color=str(
                         self.meta_data.data.rainbow_color) if self.meta_data.data.rainbow_color else None,
@@ -272,20 +277,22 @@ class RainbowSong(BaseModel):
                     album_title=self.meta_data.data.album_title,
                     song_title=self.meta_data.data.title,
                     album_realise_date=self.meta_data.data.release_date,
-                    song_on_album_sequence=str(self.meta_data.data.album_sequence) if isinstance(self.meta_data.data.album_sequence, int) else self.meta_data.data.album_sequence,
-                    song_trt=str(self.meta_data.data.TRT) if isinstance(self.meta_data.data.TRT, datetime.timedelta) else self.meta_data.data.TRT,
+                    song_on_album_sequence=str(self.meta_data.data.album_sequence) if isinstance(
+                        self.meta_data.data.album_sequence, int) else self.meta_data.data.album_sequence,
+                    song_trt=str(self.meta_data.data.TRT) if isinstance(self.meta_data.data.TRT,
+                                                                        datetime.timedelta) else self.meta_data.data.TRT,
                     song_has_vocals=self.meta_data.data.vocals,
                     song_has_lyrics=self.meta_data.data.lyrics,
                     song_structure=json.dumps([s.model_dump() for s in self.meta_data.data.structure]),
                     song_moods=", ".join([str(m) for m in self.meta_data.data.mood]),
-                    song_sounds_like= json.dumps([s.model_dump() for s in self.meta_data.data.sounds_like]),
+                    song_sounds_like=json.dumps([s.model_dump() for s in self.meta_data.data.sounds_like]),
                     song_genres=", ".join([str(g) for g in self.meta_data.data.genres]),
                     song_segment_name=extract.extract_data.section_name,
                     song_segment_start_time=str(extract.extract_data.start_time.total_seconds()),
                     song_segment_end_time=str(extract.extract_data.end_time.total_seconds()),
                     song_segment_duration=str(extract.extract_data.duration.total_seconds()),
                     song_segment_sequence=extract.extract_data.sequence,
-                    song_segment_description= extract.extract_data.section_description,
+                    song_segment_description=extract.extract_data.section_description,
                     song_segment_track_id=None,
                     song_segment_track_name=None,
                     song_segment_track_description=None,
@@ -299,8 +306,9 @@ class RainbowSong(BaseModel):
                     song_segment_track_midi_file_name=None,
                     song_segment_track_midi_binary_data=None,
                     song_segment_track_midi_is_group=extract.extract_data.midi_group,
-                    song_segment_reference_plan_paths=", ".join([str(rp) for rp in self.meta_data.data.reference_plans_paths]),
-                    song_segment_concept= self.meta_data.data.concept if self.meta_data.data.concept else None
+                    song_segment_reference_plan_paths=", ".join(
+                        [str(rp) for rp in self.meta_data.data.reference_plans_paths]),
+                    song_segment_concept=self.meta_data.data.concept if self.meta_data.data.concept else None
                 )
                 if event.type == ExtractionContentType.MIX_AUDIO:
                     ts.song_segment_main_audio_file_name = event.content.get('file_name')

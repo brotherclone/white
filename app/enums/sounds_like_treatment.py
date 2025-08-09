@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SoundsLikeTreatment(Enum):
     nothing = "do nothing"
     remove_b = "remove b"
@@ -18,6 +19,7 @@ class SoundsLikeTreatment(Enum):
     remove_descriptor_a = "remove descriptor a"
     remove_descriptor_b = "remove descriptor b"
     remove_descriptor_a_and_b = "remove descriptor a and b"
+
 
 PLAN_CHANGE_TABLE = [
     (44.0, SoundsLikeTreatment.nothing),
