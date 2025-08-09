@@ -1,4 +1,5 @@
 import random
+import json
 
 from typing import Any, Dict, Optional
 from transformers import AutoModel
@@ -244,3 +245,90 @@ class Nancarrow(BaseRainbowAgent):
                 bars_per_chord[i] = 2
 
         return bars_per_chord
+
+
+    def generate_midi_from_training_data(self,
+                                         target_mood: list[str],
+                                         rainbow_color: str,
+                                         section_name: str,
+                                         key: str,
+                                         bpm: int) -> Dict[str, Any]:
+        """Generate MIDI based on your actual training data"""
+
+        print(f"🎹 Generating MIDI for {section_name}")
+
+        # Find segments with MIDI data
+        similar_segments = self.find_similar_segments(
+            target_mood=target_mood,
+            rainbow_color=rainbow_color,
+            section_type=section_name,
+            target_key=key,
+            target_bpm=bpm,
+            limit=15
+        )
+
+        # Filter for segments that have MIDI data
+        midi_segments = similar_segments[
+            similar_segments['song_segment_track_midi_data'].notna() &
+            (similar_segments['song_segment_track_midi_data'] != '')
+            ]
+
+        if midi_segments.empty:
+            print("⚠️ No MIDI data found in similar segments")
+            return self._generate_fallback_midi(section_name, key, bpm)
+
+        print(f"🎼 Found {len(midi_segments)} segments with MIDI data")
+
+        # Extract MIDI patterns from your training data
+        midi_patterns = []
+        for _, segment in midi_segments.iterrows():
+            try:
+                midi_data = json.loads(segment['song_segment_track_midi_data'])
+                if midi_data:
+                    midi_patterns.append({
+                        'notes': midi_data,
+                        'song_title': segment.get('song_title', 'Unknown'),
+                        'mood_score': segment.get('mood_score', 0),
+                        'section_name': segment.get('song_segment_name', 'Unknown')
+                    })
+            except json.JSONDecodeError as e:
+                print(f"⚠️ Error decoding MIDI data for segment {segment['song_segment_name']}: {e}")
+                continue
+
+        if not midi_patterns:
+            return self._generate_fallback_midi(section_name, key, bpm)
+
+        # Use the best matching MIDI pattern as a basis
+        best_pattern = max(midi_patterns, key=lambda x: x['mood_score'])
+
+        return {
+            'midi_notes': best_pattern['notes'],
+            'inspiration_source': best_pattern['song_title'],
+            'original_section': best_pattern['section_name'],
+            'confidence': best_pattern['mood_score'],
+            'method': 'training_data_based',
+            'key': key,
+            'bpm': bpm,
+            'training_examples_used': len(midi_patterns)
+        }
+
+    @staticmethod
+    def _generate_fallback_midi(section_name: str, key: str, bpm: int) -> Dict[str, Any]:
+        """Fallback MIDI generation"""
+        # Simple fallback MIDI pattern
+        fallback_notes = [
+            {'note': 60, 'velocity': 80, 'start_time': 0.0, 'end_time': 0.5},  # C
+            {'note': 64, 'velocity': 80, 'start_time': 0.5, 'end_time': 1.0},  # E
+            {'note': 67, 'velocity': 80, 'start_time': 1.0, 'end_time': 1.5},  # G
+            {'note': 72, 'velocity': 80, 'start_time': 1.5, 'end_time': 2.0},  # C
+        ]
+
+        return {
+            'midi_notes': fallback_notes,
+            'inspiration_source': 'fallback',
+            'confidence': 0.1,
+            'method': 'fallback',
+            'key': key,
+            'bpm': bpm,
+            'training_examples_used': 0
+        }

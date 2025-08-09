@@ -52,14 +52,35 @@ if __name__ == '__main__':
     device = torch.device("mps" if torch.backends.mps.is_available() else
                           "cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device set to: {device}")
+    print("🎵 Testing Training Data-Driven Generation")
+    print("=" * 60)
+
     andy = Andy()
     andy.initialize()
-    result = andy.generate_song_with_chords(RainbowColor.Z)
-    print("=== Generated Song Plan ===")
-    print(f"Key: {result['song_plan'].key}")
-    print(f"BPM: {result['song_plan'].bpm}")
 
-    print("\n=== Chord Progressions ===")
-    for chart in result['chord_charts']:
-        print(chart)
-        print()
+    print(f"📊 Training data loaded:")
+    print(
+        f"  Dorthy: {len(andy.lyrics_agent.training_data) if andy.lyrics_agent.training_data is not None else 0} samples")
+    print(
+        f"  Nancarrow: {len(andy.midi_agent.training_data) if andy.midi_agent.training_data is not None else 0} samples")
+
+    if andy.lyrics_agent.training_data is not None and len(andy.lyrics_agent.training_data) > 0:
+        print("\n✅ Training data found - generating from your catalog...")
+
+        # Generate using your actual musical catalog
+        result = andy.generate_from_your_catalog(
+            rainbow_color=RainbowColor.Z,
+            target_moods=['dark', 'mysterious', 'haunting']
+        )
+
+        print(f"\n🎯 Generated {len(result['sections'])} sections")
+        for section in result['sections']:
+            print(f"  📝 {section['section_name']}")
+            if 'lyrics' in section:
+                print(f"    🎤 Lyrics confidence: {section['lyrics']['confidence']:.2f}")
+            print(f"    🎹 MIDI confidence: {section['midi']['confidence']:.2f}")
+
+    else:
+        print("\n⚠️ No training data found")
+        print("💡 Run main.py first to generate training samples from your staged materials")
+
