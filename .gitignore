@@ -1,10 +1,8 @@
 .venv
 .idea
-# Ignore staged raw materials directory
 /staged_raw_materials/
 /working/
 /training/
-# Ignore common media file types
 *.wav
 *.mp3
 *.mp4
@@ -14,8 +12,6 @@
 .DS_Store
 *.pyc
 .env
-
 !**/*.lrc
 !**/*.yml
 /__pycache__/
-.DS_Store
