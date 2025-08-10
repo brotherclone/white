@@ -189,12 +189,3 @@ audio_tracks:
     description: big, over-modulated floor tom
     audio_file: 01_01_26.wav
     midi_group_file: 01_01_drums.mid
-reference_plans:
-  positive:
-    - 01_01_closest.yml
-    - 01_01_closer.yml
-    - 01_01_closest.yml
-  negative:
-    - 01_01_far.yml
-    - 01_01_further.yml
-    - 01_01_furthest.yml
