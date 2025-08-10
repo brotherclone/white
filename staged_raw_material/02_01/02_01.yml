@@ -11,79 +11,79 @@ TRT: '[03:46.193]'
 vocals: true
 lyrics: true
 structure:
-- section_name: Opening
-  start_time: '[00:00.000]'
-  end_time: '[00:22.142]'
-  description: Arpeggiated synths and strange effects, no drums or vocals
-- section_name: Opening Build
-  start_time: '[00:22.143]'
-  end_time: '[00:37.137]'
-  description: A bass is added, the mood becomes more ominous
-- section_name: Chorus 1 Intro
-  start_time: '[00:37.138]'
-  end_time: '[00:44.285]'
-  description: Drums are added to the driving bass it's dizzying and unsettling.
-- section_name: Chorus 1
-  start_time: '[00:44.286]'
-  end_time: '[00:59.281]'
-  description: The vocals begin, they are hushed, strained and doubled by a vocoder.
-- section_name: Verse 1
-  start_time: '[00:59.282]'
-  end_time: '[01:29.272]'
-  description: The vocals are no more projected and the track is grooving along.
-- section_name: Chorus 2
-  start_time: '[01:29.273]'
-  end_time: '[01:44.266]'
-  description: Back to the chorus in full swing.
-- section_name: Interlude 1
-  start_time: '[01:44.267]'
-  end_time: '[02:22.105]'
-  description: The synths are cranked up and sound like they are ripping the speakers
-    up.
-- section_name: Verse 2 - Bridging
-  start_time: '[02:22.106]'
-  end_time: '[02:44.250]'
-  description: The vocals continue and peak with energy before going into heavy vocoder.
-- section_name: Jams 1
-  start_time: '[02:44.251]'
-  end_time: '[03:07.093]'
-  description: Some motorik type jamming with the arpeggiated synths and a galloping
-    bass.
-- section_name: Jams 2
-  start_time: '[03:07.094]'
-  end_time: '[03:22.087]'
-  description: A cruising speed has been reached and music becomes more hypnotic.
-- section_name: Outro
-  start_time: '[03:22.088]'
-  end_time: '[03:46.193]'
-  description: The jam becomes more minor and the drums drop out leaving an arpeggiated
-    synth trailing off.
+  - section_name: Opening
+    start_time: '[00:00.000]'
+    end_time: '[00:22.142]'
+    description: Arpeggiated synths and strange effects, no drums or vocals
+  - section_name: Opening Build
+    start_time: '[00:22.143]'
+    end_time: '[00:37.137]'
+    description: A bass is added, the mood becomes more ominous
+  - section_name: Chorus 1 Intro
+    start_time: '[00:37.138]'
+    end_time: '[00:44.285]'
+    description: Drums are added to the driving bass it's dizzying and unsettling.
+  - section_name: Chorus 1
+    start_time: '[00:44.286]'
+    end_time: '[00:59.281]'
+    description: The vocals begin, they are hushed, strained and doubled by a vocoder.
+  - section_name: Verse 1
+    start_time: '[00:59.282]'
+    end_time: '[01:29.272]'
+    description: The vocals are no more projected and the track is grooving along.
+  - section_name: Chorus 2
+    start_time: '[01:29.273]'
+    end_time: '[01:44.266]'
+    description: Back to the chorus in full swing.
+  - section_name: Interlude 1
+    start_time: '[01:44.267]'
+    end_time: '[02:22.105]'
+    description: The synths are cranked up and sound like they are ripping the speakers
+      up.
+  - section_name: Verse 2 - Bridging
+    start_time: '[02:22.106]'
+    end_time: '[02:44.250]'
+    description: The vocals continue and peak with energy before going into heavy vocoder.
+  - section_name: Jams 1
+    start_time: '[02:44.251]'
+    end_time: '[03:07.093]'
+    description: Some motorik type jamming with the arpeggiated synths and a galloping
+      bass.
+  - section_name: Jams 2
+    start_time: '[03:07.094]'
+    end_time: '[03:22.087]'
+    description: A cruising speed has been reached and music becomes more hypnotic.
+  - section_name: Outro
+    start_time: '[03:22.088]'
+    end_time: '[03:46.193]'
+    description: The jam becomes more minor and the drums drop out leaving an arpeggiated
+      synth trailing off.
 mood:
-- mysterious
-- raygun sci-fi
-- ethereal
-- space age
-- otherworldly
-- unsettling
-- mad scientist
-- hypnotic
+  - mysterious
+  - raygun sci-fi
+  - ethereal
+  - space age
+  - otherworldly
+  - unsettling
+  - mad scientist
+  - hypnotic
 sounds_like:
-- name: Neu!
-  id: null
-  discogs_id: null
-- name: Gary Numan
-  id: null
-  discogs_id: null
-- name: Steely Dan
-  id: null
-  discogs_id: null
+  - name: Neu!
+    id: null
+    discogs_id: null
+  - name: Gary Numan
+    id: null
+    discogs_id: null
+  - name: Steely Dan
+    id: null
+    discogs_id: null
 genres:
-- Experimental
-- Psychedelic
-- Art Rock
-- Electronic
-- Analog Synth
-- Krautrock
+  - Experimental
+  - Psychedelic
+  - Art Rock
+  - Electronic
+  - Analog Synth
+  - Krautrock
 lrc_file: 02_01.lrc
 concept: The first song on Light Reading which is an imaginary reading list comes
   from a book on entropy. In the song maxwell's demon and a doorman at a couple's
@@ -93,42 +93,33 @@ concept: The first song on Light Reading which is an imaginary reading list come
   them. The song is a metaphor for the futility of trying to control memories and
   feelings, and the inevitability of entropy in relationships.
 audio_tracks:
-- id: 1
-  description: Bass guitar
-  audio_file: 02_01_02.wav
-- id: 2
-  description: Bass synth
-  audio_file: 02_01_03.wav
-- id: 3
-  description: Drums
-  audio_file: 02_01_04.wav
-  midi_group_file: 02_01_04.mid
-  group: drums
-- id: 4
-  description: Electric guitar
-  audio_file: 02_01_05.wav
-- id: 5
-  description: Intro synth
-  audio_file: 02_01_06.wav
-- id: 6
-  description: Arpeggiated synth
-  audio_file: 02_01_07.wav
-- id: 7
-  description: Main vocals
-  audio_file: 02_01_08.wav
-- id: 8
-  description: Doubled vocals
-  audio_file: 02_01_09.wav
-- id: 9
-  description: Vocoder vocals
-  audio_file: 02_01_10.wav
-  midi_file: 02_01_10.mid
-reference_plans:
-  positive:
-  - 02_01_close.yml
-  - 02_01_closer.yml
-  - 02_01_closest.yml
-  negative:
-  - 02_01_far.yml
-  - 02_01_further.yml
-  - 02_01_furthest.yml
+  - id: 1
+    description: Bass guitar
+    audio_file: 02_01_02.wav
+  - id: 2
+    description: Bass synth
+    audio_file: 02_01_03.wav
+  - id: 3
+    description: Drums
+    audio_file: 02_01_04.wav
+    midi_group_file: 02_01_04.mid
+    group: drums
+  - id: 4
+    description: Electric guitar
+    audio_file: 02_01_05.wav
+  - id: 5
+    description: Intro synth
+    audio_file: 02_01_06.wav
+  - id: 6
+    description: Arpeggiated synth
+    audio_file: 02_01_07.wav
+  - id: 7
+    description: Main vocals
+    audio_file: 02_01_08.wav
+  - id: 8
+    description: Doubled vocals
+    audio_file: 02_01_09.wav
+  - id: 9
+    description: Vocoder vocals
+    audio_file: 02_01_10.wav
+    midi_file: 02_01_10.mid
