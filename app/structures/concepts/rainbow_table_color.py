@@ -87,7 +87,7 @@ class RainbowColorOntologicalMode(Enum):
 
 
 
-class RainbowTableColors(BaseModel):
+class RainbowTableColor(BaseModel):
 
     color_name: str
     hex_value: int
