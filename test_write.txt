@@ -1,3 +1,0 @@
-Hello from Claude! This is a test of the write functionality.
-
-Testing multiple lines and some content to verify the write operation works properly.
