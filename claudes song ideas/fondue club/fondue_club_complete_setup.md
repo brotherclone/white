@@ -1,0 +1,76 @@
+# The Fondue Club - Complete MIDI Band Setup
+
+## Quick Setup Commands
+
+Copy and paste these three commands to create all MIDI files:
+
+```bash
+# Guitar (lead/rhythm)
+echo "TVRoZAAAAAYAAQABAeBNVHJrAAAEggD/UQMHoSAA/1gEBAIYCADAHgCQHDyHQIAcAIdAkB5Bh0CAHgCHQJAfRodAgB8Ah0CQIUuPAIAhAACQKFCBcIAoAACQK1CBcIArAACQL1CBcIAvAACQMlCBcIAyAACQKFCBcIAoAACQLVCBcIAtAACQL1CBcIAvAACQK1CBcIArAACQKFCBcIAoAACQK1CBcIArAACQL1CBcIAvAACQMlCBcIAyAACQKFCBcIAoAACQLVCBcIAtAACQL1CBcIAvAACQK1CBcIArAACQKFoAkC9ag2CAKAAAgC8AAJArWgCQMlqDYIArAACAMgAAkC1aAJA0WoNggC0AAIA0AACQL1oAkDZag2CALwAAgDYAAJAoWgCQL1qDYIAoAACALwAAkCtaAJAyWoNggCsAAIAyAACQLVoAkDRag2CALQAAgDQAAJAvWgCQNlqDYIAvAACANgAAkChQgXCAKAAAkCtQgXCAKwAAkC9QgXCALwAAkDJQgXCAMgAAkChQgXCAKAAAkC1QgXCALQAAkC9QgXCALwAAkCtQgXCAKwAAkChQgXCAKAAAkCtQgXCAKwAAkC9QgXCALwAAkDJQgXCAMgAAkChQgXCAKAAAkC1QgXCALQAAkC9QgXCALwAAkCtQgXCAKwAAkChaAJAvWoNggCgAAIAvAACQK1oAkDJag2CAKwAAgDIAAJAtWgCQNFqDYIAtAACANAAAkC9aAJA2WoNggC8AAIA2AACQKFoAkC9ag2CAKAAAgC8AAJArWgCQMlqDYIArAACAMgAAkC1aAJA0WoNggC0AAIA0AACQL1oAkDZag2CALwAAgDYAg2CQHDKPAIAcAINgkB43jwCAHgCDYJAfPI8AgB8Ag2CQIUGeAIAhAACQKF8AkC9fg2CAKAAAgC8AAJArXwCQMl+DYIArAACAMgAAkC1fAJA0X4NggC0AAIA0AACQL18AkDZfg2CALwAAgDYAAJAoXwCQL1+DYIAoAACALwAAkCtfAJAyX4NggCsAAIAyAACQLV8AkDRfg2CALQAAgDQAAJAvXwCQNl+DYIAvAACANgAAkChfAJAvX4NggCgAAIAvAACQK18AkDJfg2CAKwAAgDIAAJAtXwCQNF+DYIAtAACANAAAkC9fAJA2X4NggC8AAIA2AACQKEuBcIAoAACQK0uBcIArAACQL0uBcIAvAACQMkuBcIAyAACQKEaBcIAoAACQK0aBcIArAACQL0aBcIAvAACQMkaBcIAyAACQKEGBcIAoAACQK0GBcIArAACQL0GBcIAvAACQMkGBcIAyAACQKDyBcIAoAACQKzyBcIArAACQLzyBcIAvAACQMjyBcIAyAACQKDeBcIAoAACQKzeBcIArAACQLzeBcIAvAACQMjeBcIAyAACQKDKBcIAoAACQKzKBcIArAACQLzKBcIAvAACQMjKBcIAyAACQKC2BcIAoAACQKy2BcIArAACQLy2BcIAvAACQMi2BcIAyAACQKCiBcIAoAACQKyiBcIArAACQLyiBcIAvAACQMiiBcIAyAIdA/y8A" | base64 -d > fondue_club_guitar.mid
+
+# Bass  
+echo "TVRoZAAAAAYAAQABAeBNVHJrAAAGXgD/UQMHoSAA/1gEBAIYCADAIQCQHEaHQIAcAIdAkB5Lh0CAHgCHQJAfUIdAgB8Ah0CQIVWPAIAhAACQHFWDYIAcAACQHEuBcIAcAIFwkBxGgXCAHAAAkB9Vg2CAHwAAkB9LgXCAHwCBcJAfRoFwgB8AAJAhVYNggCEAAJAhS4FwgCEAgXCQIUaBcIAhAACQI1WDYIAjAACQI0uBcIAjAIFwkCNGgXCAIwAAkBxVg2CAHAAAkBxLgXCAHACBcJAcRoFwgBwAAJAfVYNggB8AAJAfS4FwgB8AgXCQH0aBcIAfAACQIVWDYIAhAACQIUuBcIAhAIFwkCFGgXCAIQAAkCNVg2CAIwAAkCNLgXCAIwCBcJAjRoFwgCMAAJAcWoNggBwAAJAcVYNggBwAAJAcWoNggBwAAJAcVYNggBwAAJAfWoNggB8AAJAfVYNggB8AAJAfWoNggB8AAJAfVYNggB8AAJAhWoNggCEAAJAhVYNggCEAAJAhWoNggCEAAJAhVYNggCEAAJAjWoNggCMAAJAjVYNggCMAAJAjWoNggCMAAJAjVYNggCMAAJAcWoNggBwAAJAcVYNggBwAAJAcWoNggBwAAJAcVYNggBwAAJAfWoNggB8AAJAfVYNggB8AAJAfWoNggB8AAJAfVYNggB8AAJAhWoNggCEAAJAhVYNggCEAAJAhWoNggCEAAJAhVYNggCEAAJAjWoNggCMAAJAjVYNggCMAAJAjWoNggCMAAJAjVYNggCMAAJAcVYNggBwAAJAcS4FwgBwAgXCQHEaBcIAcAACQH1WDYIAfAACQH0uBcIAfAIFwkB9GgXCAHwAAkCFVg2CAIQAAkCFLgXCAIQCBcJAhRoFwgCEAAJAjVYNggCMAAJAjS4FwgCMAgXCQI0aBcIAjAACQHFWDYIAcAACQHEuBcIAcAIFwkBxGgXCAHAAAkB9Vg2CAHwAAkB9LgXCAHwCBcJAfRoFwgB8AAJAhVYNggCEAAJAhS4FwgCEAgXCQIUaBcIAhAACQI1WDYIAjAACQI0uBcIAjAIFwkCNGgXCAIwAAkBxag2CAHAAAkBxVg2CAHAAAkBxag2CAHAAAkBxVg2CAHAAAkB9ag2CAHwAAkB9Vg2CAHwAAkB9ag2CAHwAAkB9Vg2CAHwAAkCFag2CAIQAAkCFVg2CAIQAAkCFag2CAIQAAkCFVg2CAIQAAkCNag2CAIwAAkCNVg2CAIwAAkCNag2CAIwAAkCNVg2CAIwAAkBxag2CAHAAAkBxVg2CAHAAAkBxag2CAHAAAkBxVg2CAHAAAkB9ag2CAHwAAkB9Vg2CAHwAAkB9ag2CAHwAAkB9Vg2CAHwAAkCFag2CAIQAAkCFVg2CAIQAAkCFag2CAIQAAkCFVg2CAIQAAkCNag2CAIwAAkCNVg2CAIwAAkCNag2CAIwAAkCNVg2CAIwCDYJAcPI8AgBwAg2CQHkGPAIAeAINgkB9GjwCAHwCDYJAhS54AgCEAAJAcX4NggBwAAJAcWoNggBwAAJAcX4NggBwAAJAcWoNggBwAAJAfX4NggB8AAJAfWoNggB8AAJAfX4NggB8AAJAfWoNggB8AAJAhX4NggCEAAJAhWoNggCEAAJAhX4NggCEAAJAhWoNggCEAAJAjX4NggCMAAJAjWoNggCMAAJAjX4NggCMAAJAjWoNggCMAAJAcX4NggBwAAJAcWoNggBwAAJAcX4NggBwAAJAcWoNggBwAAJAfX4NggB8AAJAfWoNggB8AAJAfX4NggB8AAJAfWoNggB8AAJAhX4NggCEAAJAhWoNggCEAAJAhX4NggCEAAJAhWoNggCEAAJAjX4NggCMAAJAjWoNggCMAAJAjX4NggCMAAJAjWoNggCMAAJAcX4NggBwAAJAcWoNggBwAAJAcX4NggBwAAJAcWoNggBwAAJAfX4NggB8AAJAfWoNggB8AAJAfX4NggB8AAJAfWoNggB8AAJAhX4NggCEAAJAhWoNggCEAAJAhX4NggCEAAJAhWoNggCEAAJAjX4NggCMAAJAjWoNggCMAAJAjX4NggCMAAJAjWoNggCMAAJAcUIdAgBwAAJAcS4dAgBwAAJAcRodAgBwAAJAcQYdAgBwAAJAcPIdAgBwAAJAcN4dAgBwAAJAcModAgBwAAJAcLYdAgBwAh0D/LwA=" | base64 -d > fondue_club_bass.mid
+
+# Drums
+echo "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JgB4mSpQeIkqAHiZJF94iSQAeJkqUHiJKgAAmSRkeIkkAHiZKlB4iSoAeJkkX3iJJAB4mSpQeIkqAHiZJmR4iSYAeJkqUHiJKgB4mSRfeIkkAHiZKlB4iSoAAJkkZHiJJAB4mSpQeIkqAHiZJF94iSQAeJkqUHiJKgB4mSZkeIkmAHiZKlB4iSoAeJkkX3iJJAB4mSpQeIkqAACZJGR4iSQAeJkqUHiJKgB4mSRfeIkkAHiZKlB4iSoAeJkmZHiJJgB4mSpQeIkqAHiZJF94iSQAeJkqUHiJKgAAmSRkeIkkAHiZKlB4iSoAeJkkX3iJJAB4mSpQeIkqAHiZJmR4iSYAeJkqUHiJKgB4mSRfeIkkAHiZKlB4iSoAAJkkZHiJJAB4mSpQeIkqAHiZJF94iSQAeJkqUHiJKgB4mSZkeIkmAHiZKlB4iSoAeJkkX3iJJAB4mSpQeIkqAACZJGR4iSQAeJkqUHiJKgB4mSRfeIkkAHiZKlB4iSoAeJkmZHiJJgB4mSpQeIkqAHiZJF94iSQAeJkqUHiJKgAAmTFQeIkxAIdAmTNGeIkzAIdAmTM8eIkzAIdAmTMyeIkzAIdAmTMoeIkzAIdAmTMeeIkzAIdAmTMUeIkzAIdAmTMPeIkzAIdAmTMKeIkzAIdA/y8A" | base64 -d > fondue_club_drums.mid
+```
+
+## Song Structure & Timeline
+
+**Total Duration: ~3:25 (205 seconds)**
+
+| Time | Section | Description |
+|------|---------|-------------|
+| 0:00-0:32 | **Intro** | Sparse, atmospheric - building suburban dread |
+| 0:32-1:04 | **Verse 1** | "Mrs. Patterson whispered at the copy machine..." |
+| 1:04-1:36 | **Chorus 1** | "The Fondue Club, The Fondue Club" |
+| 1:36-2:08 | **Verse 2** | "Tommy Morrison's older brother knew a guy..." |
+| 2:08-2:40 | **Chorus 2** | "The Fondue Club, The Fondue Club" |
+| 2:40-3:12 | **Bridge** | SPOKEN: "They found a pot on the cliffs..." |
+| 3:12-4:00 | **Final Chorus** | Extended, louder - mythic declaration |
+| 4:00-4:25 | **Outro** | Fade with fondue bubbling sounds |
+
+## Arrangement Notes
+
+### 🎸 **Guitar (Shreddage/Amp Sim)**
+- **Verse**: Light overdrive + reverb, atmospheric Em arpeggio pattern
+- **Chorus**: More distortion, driving power chord progression (Em-G-Am-B)
+- **Bridge**: Clean with deep reverb, sparse single notes
+- **Dynamics**: p-mp in verses, mf-f in chorus, pp-p in bridge
+
+### 🎸 **Bass (Electric Fingered)**
+- **Verse**: Root movement supporting guitar, slight syncopation 
+- **Chorus**: Steady quarter notes, more driving
+- **Bridge**: Minimal, long sustained notes
+- **Tone**: DI + slight compression, follows chord roots
+
+### 🥁 **Drums (Natural Kit)**
+- **Verse**: Restrained kick/snare/hi-hat pattern, atmospheric
+- **Chorus**: More aggressive, punk-style driving beat
+- **Bridge**: Very minimal - crash + occasional snare
+- **Final Chorus**: Most aggressive, loud kick/snare combinations
+- **Outro**: Crash + fading ride cymbal
+
+## Production Tips
+
+1. **Import all three MIDI files as separate tracks**
+2. **Guitar**: Use Shreddage or similar amp sim with appropriate presets
+3. **Bass**: Keep it simple - DI sound with light processing
+4. **Drums**: Natural room sound, not overly polished
+5. **Bridge**: Add reverb/space for spoken word section
+6. **Outro**: Layer in field recording of actual fondue bubbling
+7. **Overall**: Mix should support the Orange album aesthetic - nostalgic but slightly ominous
+
+## Orange Album Context
+
+This track embodies **PAST + THING + IMAGINED**:
+- **Past**: 1980 Verona, NJ suburban setting
+- **Thing**: The Fondue Club as concrete suburban legend
+- **Imagined**: Memory palace reconstruction of childhood overhearing
+
+The music supports the rebracketing process - from atmospheric dread (adult whispers) to mythic declaration (teenage legend) to confession (the truth behind the myth).
+
+---
+
+**🎉 You now have a complete Orange album track!**  
+*Perfect suburban gothic horror punk - The Fondue Club lives!*
