@@ -1,6 +1,7 @@
 import sys
 import logging
 import base64
+import os
 
 from mido import MidiFile
 
@@ -15,22 +16,34 @@ mcp = FastMCP("midi_mate")
 
 
 @mcp.tool()
-def save_midi_from_base64(base64_data: str, file_name: str) -> str:
+def save_midi_from_base64(base64_data: str, file_name: str, output_dir: str) -> str:
     """Save base64-encoded MIDI data to a file"""
     try:
+
+        # Decode base64 to bytes
         midi_bytes = base64.b64decode(base64_data)
-        with open(file_name, 'wb') as f:
+        print(f"Decoded {len(midi_bytes)} bytes")
+
+        # Write to file
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        full_path = os.path.join(output_dir, file_name)
+        print(f"Saving MIDI to {full_path}")
+
+        if not full_path.endswith('.mid'):
+            full_path += '.mid'  # Ensure the file has a .mid-extension
+
+        with open(full_path, 'wb') as f:
             f.write(midi_bytes)
 
-        midi_file = MidiFile(file_name)
+        # Validate with mido
+        midi_file = MidiFile(full_path)
         track_count = len(midi_file.tracks)
-        if track_count == 0:
-            return f"No tracks found in MIDI file: {file_name}"
-        else:
-            return f"MIDI file saved successfully: {file_name} ({track_count} tracks)"
 
-    except Exception as e:
-        return f"Error saving MIDI file: {str(e)}"
+        return f"MIDI saved: {full_path} ({track_count} tracks, {len(midi_bytes)} bytes)"
+
+    except Exception as err:
+        return f"Error: {type(err).__name__}: {str(err)}"
 
 mcp.tools = [save_midi_from_base64]
 
