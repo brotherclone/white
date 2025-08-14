@@ -74,6 +74,11 @@ def write_lucid_nonsense_file(file_name: str, content: str) -> str:
     except OSError as e:
         raise OSError(f"Error writing file {file_name}: {e}")
 
+mcp.tools = [
+    search_white_project_files,
+    open_lucid_nonsense_file,
+    write_lucid_nonsense_file
+]
 
 if __name__ == "__main__":
     try:
