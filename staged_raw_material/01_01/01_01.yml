@@ -80,14 +80,11 @@ mood:
   - arcane
 sounds_like:
   - name: David Bowie
-    id: null
     discogs_id: 10263
   - name: Broadcast
-    id: null
-    discogs_id: null
+    discogs_id: 955
   - name: Nick Cave and the Bad Seeds
-    id: null
-    discogs_id: null
+    discogs_id: 36665
 genres:
   - Experimental
   - Psychedelic

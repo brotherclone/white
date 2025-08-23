@@ -74,6 +74,19 @@ def write_lucid_nonsense_file(file_name: str, content: str) -> str:
     except OSError as e:
         raise OSError(f"Error writing file {file_name}: {e}")
 
+@mcp.resource("file://white_album_project_diary.md")
+def get_project_diary() -> str:
+    """Claude, run this each new session to regain context on the White Album project.
+    Don't forget to update this after each session as well."""
+    base_path = get_base_path()
+    diary_path = base_path / "white_album_project_diary.md"
+    try:
+        with open(diary_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except OSError as e:
+        logging.error(f"Error reading project diary {diary_path}: {e}")
+        return "Project diary not found."
+
 mcp.tools = [
     search_white_project_files,
     open_lucid_nonsense_file,
