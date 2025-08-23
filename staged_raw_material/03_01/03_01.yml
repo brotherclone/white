@@ -1,0 +1,126 @@
+bpm: 127
+manifest_id: '03_01'
+tempo: 6/8
+key: C major
+rainbow_color: O
+title: Moonrakers
+release_date: '2020-06-23'
+album_sequence: 1
+main_audio_file: 03_01_main.wav
+TRT: '[02:47.060]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Overture
+    start_time: '[00:00.000]'
+    end_time: '[00:11.083]'
+    description: This cacophony of synth sounds sets the the listener on edge looking for purchase as the odd tempos disorient.
+  - section_name: Overture 2
+    start_time: '[00:11.084]'
+    end_time: '[00:28.085]'
+    description: To the already overwhelming sound a hard panned, synthetic double-kick is added signifying a 1990s style or allusion to heavy metal and rave music.
+  - section_name: Verse 1
+    start_time: '[00:28.086]'
+    end_time: '[00:39.171]'
+    description: The vocal begin they are almost falsetto and ethereal.
+  - section_name: Verse 2
+    start_time: '[00:39.172]'
+    end_time: '[00:53.213]'
+    description: The vocals continue and reach toward higher registers as if riding the bucking odd tempo.
+  - section_name: Chorus 1
+    start_time: '[00:53.214]'
+    end_time: '[01:09.091]'
+    description: The noisy elements calm to make way for the chorus. The last note of the vocals freezes and becomes a droning sustain.
+  - section_name: Verse 3
+    start_time: '[01:09.092]'
+    end_time: '[01:09.091]'
+    description: As we return to the chorus with the overhanging frozen note the synths are less busy but occasionally creep up as if uncontrolled, unwielded.
+  - section_name: Verse 4
+    start_time: '[01:09.092]'
+    end_time: '[01:34.240]'
+    description: The vocals are doubled for emphasis as the verse continues.
+  - section_name: Chorus 2
+    start_time: '[01:34.241]'
+    end_time: '[01:44.220]'
+    description: The chorus builds in intensity
+  - section_name: Outro
+    start_time: '[01:44.221]'
+    end_time: '[02:33.016]'
+    description: Again the last note of the vocals is frozen and the whole wobbly enterprise goes off the rails with samples and synths jumping off the temp grid as the bass line maniacally repeats.
+  - section_name: Coda
+    start_time: '[02:33.017]'
+    end_time: '[02:47.060]'
+    description: As the music fades we hear a sample of a man describing some sort of alien, new age experience.
+mood:
+  - otherworldly
+  - intense
+  - frenetic
+  - unsettling
+  - chaotic
+sounds_like:
+  - name: The Space Spectrum
+    discogs_id: 3623833
+  - name: Animal Collective
+    discogs_id: 207958
+genres:
+  - Electronic
+  - Experimental
+  - Pop
+  - Rock
+  - Electropop
+  - Noise Pop
+lrc_file: 03_01.lrc
+concept: The term 'Moonraker' is a colloquialism for the people of Wiltshire and originates from a folk tale about smugglers. There are many communities who lay claim to originating the story but the one we favour is set in Devizes where a group of sixteenth century smugglers were forced to hide their contraband in The Crammer after being surprised by a visit from the excisemen. As a ruse, the smugglers pretended they were attempting to rake a 'cheese' that had rolled into the water. The excisemen, seeing the men were in fact raking the moon's reflection, left the simple country-folk to their labours and rode out of town, unaware that the Wiltshire men were having the last laugh! It is in this spirit that Ruine "misremembers" the past, specifically my early years in rural New Jersey and New York - the past is not forgotten but a memory rebracketed to gain new context and meaning. In such it is an overture to the "orange" album in The Rainbow Table as the word "orange" has evolved phonetically rebracketed and then rebracketed again to blend the object with the color, the map with the territory. In the song we get the first and perhaps most drastic sounds of the 1990s rave and heavy metal scene with the double-kick drum machine pattern. The vocals are ethereal and high-pitched as if trying to rise above the cacophony of sounds. The odd time signatures and shifting tempos are disorienting as if the listener is being taken on a journey through an alien landscape.
+audio_tracks:
+  - id: 1
+    description: Synths with hard cuts
+    audio_file: 03_02_synth_intro.wav
+  - id: 2
+    description: NSynth (Magenta) Bed
+    audio_file: 03_03_Nsynth_intro.wav
+  - id: 3
+    description: Drums
+    audio_file: 03_05_drums.wav
+    midi_file: 03_04_drums.mid
+  - id: 4
+    description: Synth Bass
+    audio_file: 03_07_synth_bass.wav
+    midi_file: 03_06_synth_bass.mid
+  - id: 5
+    description: Spliced Guitar
+    audio_file: 03_08_spliced_guitar.wav
+  - id: 6
+    description: Acoustic Guitar
+    audio_file: 03_09_acoustic_guitar.wav
+  - id: 7
+    description: Shared Keyboard Source
+    midi_group_file: 03_10_shared_keyboard_src.mid
+    group: shared_keyboard
+  - id: 8
+    description: Buchula Easel
+    audio_file: 03_11_easel.wav
+    group: shared_keyboard
+  - id: 9
+    description: CMI Synth
+    audio_file: 03_12_CMI.wav
+    group: shared_keyboard
+  - id: 10
+    description: Farfisa Organ
+    audio_file: 03_13_farfisa.wav
+    group: shared_keyboard
+  - id: 11
+    description: Soft Clavinet
+    audio_file: 03_15_clav.wav
+    midi_file: 03_14_clav.mid
+  - id: 12
+    description: Main Vocals
+    audio_file: 03_16_main_vocals.wav
+  - id: 13
+    description: Doubled Vocals
+    audio_file: 03_17_dbl_vocals.wav
+  - id: 14
+    description: Harmony Vocals
+    audio_file: 03_18_vox_harmonies.wav
+  - id: 15
+    description: Sample
+    audio_file: 03_19_sample.wav
