@@ -74,53 +74,53 @@ concept: The term 'Moonraker' is a colloquialism for the people of Wiltshire and
 audio_tracks:
   - id: 1
     description: Synths with hard cuts
-    audio_file: 03_02_synth_intro.wav
+    audio_file: 03_01_02_synth_intro.wav
   - id: 2
     description: NSynth (Magenta) Bed
-    audio_file: 03_03_Nsynth_intro.wav
+    audio_file: 03_01_03_nsynth_intro.wav
   - id: 3
     description: Drums
     audio_file: 03_05_drums.wav
-    midi_file: 03_04_drums.mid
+    midi_file: 03_01_04_drums.mid
   - id: 4
     description: Synth Bass
-    audio_file: 03_07_synth_bass.wav
-    midi_file: 03_06_synth_bass.mid
+    audio_file: 03_01_07_synth_bass.wav
+    midi_file: 03_01_06_synth_bass.mid
   - id: 5
     description: Spliced Guitar
-    audio_file: 03_08_spliced_guitar.wav
+    audio_file: 03_01_08_spliced_guitar.wav
   - id: 6
     description: Acoustic Guitar
-    audio_file: 03_09_acoustic_guitar.wav
+    audio_file: 03_01_09_acoustic_guitar.wav
   - id: 7
     description: Shared Keyboard Source
-    midi_group_file: 03_10_shared_keyboard_src.mid
+    midi_group_file: 03_01_10_shared_keyboard_src.mid
     group: shared_keyboard
   - id: 8
     description: Buchula Easel
-    audio_file: 03_11_easel.wav
+    audio_file: 03_01_11_easel.wav
     group: shared_keyboard
   - id: 9
     description: CMI Synth
-    audio_file: 03_12_CMI.wav
+    audio_file: 03_01_12_CMI.wav
     group: shared_keyboard
   - id: 10
     description: Farfisa Organ
-    audio_file: 03_13_farfisa.wav
+    audio_file: 03_01_13_farfisa.wav
     group: shared_keyboard
   - id: 11
     description: Soft Clavinet
-    audio_file: 03_15_clav.wav
-    midi_file: 03_14_clav.mid
+    audio_file: 03_01_15_clav.wav
+    midi_file: 03_01_14_clav.mid
   - id: 12
     description: Main Vocals
-    audio_file: 03_16_main_vocals.wav
+    audio_file: 03_01_16_main_vocals.wav
   - id: 13
     description: Doubled Vocals
-    audio_file: 03_17_dbl_vocals.wav
+    audio_file: 03_01_17_dbl_vocals.wav
   - id: 14
     description: Harmony Vocals
-    audio_file: 03_18_vox_harmonies.wav
+    audio_file: 03_01_18_vox_harmonies.wav
   - id: 15
     description: Sample
-    audio_file: 03_19_sample.wav
+    audio_file: 03_01_19_sample.wav
