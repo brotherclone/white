@@ -6,7 +6,7 @@ rainbow_color: O
 title: Moonrakers
 release_date: '2020-06-23'
 album_sequence: 1
-main_audio_file: 03_01_main.wav
+main_audio_file: 03_01_01_main.wav
 TRT: '[02:47.060]'
 vocals: true
 lyrics: true
@@ -80,7 +80,7 @@ audio_tracks:
     audio_file: 03_01_03_nsynth_intro.wav
   - id: 3
     description: Drums
-    audio_file: 03_05_drums.wav
+    audio_file: 03_01_05_drums.wav
     midi_file: 03_01_04_drums.mid
   - id: 4
     description: Synth Bass

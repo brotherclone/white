@@ -20,7 +20,7 @@ structure:
     end_time: '[00:38.000]'
     description: First verse with lead vocals
   - section_name: Verse 2
-    start_time: '[00:28.057]'
+    start_time: '[00:38.001]'
     end_time: '[00:42.086]'
     description: Second verse, more background synths introduced
   - section_name: Verse 3
@@ -83,7 +83,7 @@ sounds_like:
     discogs_id: 10263
   - name: Broadcast
     discogs_id: 955
-  - name: Nick Cave and the Bad Seeds
+  - name: Nick Cave & The Bad Seeds
     discogs_id: 36665
 genres:
   - Experimental
