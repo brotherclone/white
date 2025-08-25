@@ -1,10 +1,72 @@
+from xml.sax.handler import property_encoding
+
 import yaml
 import re
 import sys
 import os
 import glob
+import discogs_client
+from dotenv import load_dotenv
 from typing import Dict, List, Tuple, Any
 
+
+def validate_discogs_ids(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """
+    Validates that the Discogs IDs match the artist names in the sounds_like section
+    using the existing discogs_client.
+
+    Args:
+        yaml_data: Parsed YAML content
+
+    Returns:
+        Tuple of (is_valid, list_of_error_messages)
+    """
+    errors = []
+
+    if not isinstance(yaml_data, dict) or "sounds_like" not in yaml_data:
+        return True, errors
+
+    if not isinstance(yaml_data["sounds_like"], list):
+        errors.append("sounds_like section is not a list")
+        return False, errors
+
+    try:
+        # Initialize Discogs client
+        load_dotenv()
+        user_agent = "earthly_frames_discogs/1.0"
+        discogs = discogs_client.Client(
+            user_agent,
+            user_token=os.environ.get('USER_ACCESS_TOKEN')
+        )
+
+        for i, artist in enumerate(yaml_data["sounds_like"]):
+            if not isinstance(artist, dict):
+                errors.append(f"Artist entry {i + 1} is not a dictionary")
+                continue
+
+            if "name" not in artist or "discogs_id" not in artist:
+                errors.append(f"Artist entry {i + 1} missing required 'name' or 'discogs_id' property")
+                continue
+
+            artist_name = artist["name"]
+            discogs_id = artist["discogs_id"]
+
+            try:
+                # Fetch artist information from Discogs
+                discogs_artist = discogs.artist(discogs_id)
+                api_artist_name = discogs_artist.name
+
+                # Compare names (case-insensitive)
+                if api_artist_name.lower() != artist_name.lower():
+                    errors.append(f"Discogs ID {discogs_id} corresponds to '{api_artist_name}', not '{artist_name}'")
+
+            except Exception as e:
+                errors.append(f"Error checking Discogs ID {discogs_id}: {str(e)}")
+
+    except Exception as e:
+        errors.append(f"Error initializing Discogs client: {str(e)}")
+
+    return len(errors) == 0, errors
 
 def validate_timestamp_format(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     """
@@ -192,7 +254,7 @@ def validate_required_properties(yaml_data: Dict[str, Any]) -> Tuple[bool, List[
     Returns:
         Tuple of (is_valid, list_of_error_messages)
     """
-    errors = []
+    property_errors = []
 
     # Define required top-level properties
     required_properties = [
@@ -205,37 +267,41 @@ def validate_required_properties(yaml_data: Dict[str, Any]) -> Tuple[bool, List[
     # Check for required properties
     for prop in required_properties:
         if prop not in yaml_data:
-            errors.append(f"Missing required property: {prop}")
+            property_errors.append(f"Missing required property: {prop}")
 
     # Validate structure if present
     if "structure" in yaml_data and isinstance(yaml_data["structure"], list):
         for i, section in enumerate(yaml_data["structure"]):
             if not isinstance(section, dict):
-                errors.append(f"Structure section {i + 1} is not a dictionary")
+                property_errors.append(f"Structure section {i + 1} is not a dictionary")
                 continue
 
             # Check required section properties
             section_props = ["section_name", "start_time", "end_time", "description"]
             for prop in section_props:
                 if prop not in section:
-                    errors.append(f"Structure section {i + 1} missing required property: {prop}")
+                    property_errors.append(f"Structure section {i + 1} missing required property: {prop}")
 
     # Validate audio_tracks if present
     if "audio_tracks" in yaml_data and isinstance(yaml_data["audio_tracks"], list):
         for i, track in enumerate(yaml_data["audio_tracks"]):
             if not isinstance(track, dict):
-                errors.append(f"Audio track {i + 1} is not a dictionary")
+                property_errors.append(f"Audio track {i + 1} is not a dictionary")
                 continue
 
             # Check required track properties
             if "id" not in track:
-                errors.append(f"Audio track {i + 1} missing required property: id")
+                property_errors.append(f"Audio track {i + 1} missing required property: id")
             if "description" not in track:
-                errors.append(f"Audio track {i + 1} missing required property: description")
-            if "audio_file" not in track:
-                errors.append(f"Audio track {i + 1} missing required property: audio_file")
+                property_errors.append(f"Audio track {i + 1} missing required property: description")
 
-    return len(errors) == 0, errors
+            # Check that at least one file type is present
+            file_types = ["audio_file", "midi_file", "midi_group_file"]
+            if not any(file_type in track for file_type in file_types):
+                property_errors.append(
+                    f"Audio track {i + 1} missing at least one file type (audio_file, midi_file, or midi_group_file)")
+
+    return len(property_errors) == 0, property_errors
 
 
 def validate_structure_timestamps(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
@@ -289,7 +355,7 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
     Returns:
         Tuple of (is_valid, list_of_error_messages)
     """
-    yaml_errors = []
+    errors = []
 
     try:
         with open(file_path, 'r') as file:
@@ -299,36 +365,42 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
         is_valid, req_errors = validate_required_properties(yaml_data)
         if not is_valid:
             for err in req_errors:
-                yaml_errors.append(f"{os.path.basename(file_path)}: {err}")
+                errors.append(f"{os.path.basename(file_path)}: {err}")
 
         # Run validation: lyrics has lrc
         is_valid, error = validate_lyrics_has_lrc(yaml_data)
         if not is_valid:
-            yaml_errors.append(f"{os.path.basename(file_path)}: {error}")
+            errors.append(f"{os.path.basename(file_path)}: {error}")
 
         # Run validation: file existence
         yaml_dir = os.path.dirname(file_path)
         is_valid, file_errors = validate_file_existence(yaml_data, yaml_dir)
         if not is_valid:
             for err in file_errors:
-                yaml_errors.append(f"{os.path.basename(file_path)}: {err}")
+                errors.append(f"{os.path.basename(file_path)}: {err}")
 
         # Run validation: structure timestamps
         is_valid, structure_errors = validate_structure_timestamps(yaml_data)
         if not is_valid:
             for err in structure_errors:
-                yaml_errors.append(f"{os.path.basename(file_path)}: {err}")
+                errors.append(f"{os.path.basename(file_path)}: {err}")
 
+        # Run validation: timestamp format
         is_valid, timestamp_errors = validate_timestamp_format(yaml_data)
         if not is_valid:
             for err in timestamp_errors:
-                yaml_errors.append(f"{os.path.basename(file_path)}: {err}")
+                errors.append(f"{os.path.basename(file_path)}: {err}")
 
-        return len(yaml_errors) == 0, yaml_errors
+        # Run validation: Discogs IDs
+        is_valid, discogs_errors = validate_discogs_ids(yaml_data)
+        if not is_valid:
+            for err in discogs_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        return len(errors) == 0, errors
 
     except Exception as e:
         return False, [f"{os.path.basename(file_path)}: Error parsing YAML: {str(e)}"]
-
 
 if __name__ == "__main__":
 
