@@ -1,0 +1,12 @@
+bpm: 147
+manifest_id: '03_03'
+tempo: 4/4
+key: C major
+rainbow_color: O
+title: Tangier
+release_date: '2020-06-23'
+album_sequence: 3
+main_audio_file: 03_03_01_main.wav
+TRT: '[]'
+vocals: true
+lyrics: true
