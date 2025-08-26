@@ -41,3 +41,9 @@ tempered_notes = {
     'B': Note(pitch_name='B', pitch_alias=[], accidental=None,
               frequency=493, octave=4)
     }
+
+def get_note(note_str: str) -> Note:
+    if note_str in tempered_notes:
+        return tempered_notes[note_str]
+    else:
+        raise ValueError(f"Note {note_str} is not a valid tempered note.")
