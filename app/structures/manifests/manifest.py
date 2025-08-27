@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from pydantic import BaseModel
 
 from app.structures.concepts.rainbow_table_color import RainbowTableColor, get_rainbow_table_color
