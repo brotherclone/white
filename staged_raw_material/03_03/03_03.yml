@@ -7,6 +7,123 @@ title: Tangier
 release_date: '2020-06-23'
 album_sequence: 3
 main_audio_file: 03_03_01_main.wav
-TRT: '[]'
+TRT: '[04:23.096]'
 vocals: true
 lyrics: true
+structure:
+  - section_name: Opening
+    start_time: '[00:00.000]'
+    end_time: '[00:04.027]'
+    description: We hear only the gentle tide of the ocean and an erie synth lead.
+  - section_name: Intro
+    start_time: '[00:04.028]'
+    end_time: '[00:50.193]'
+    description: The synth lead continues and a strange, primitive drum machine begins
+  - section_name: Verse 1
+    start_time: '[00:50.194]'
+    end_time: '[01:29.277]'
+    description: The first verse begins with sullen vocals and a steady beat.
+  - section_name: Chorus 1
+    start_time: '[01:29.278]'
+    end_time: '[01:57.212]'
+    description: The chorus kicks in with more energy and a driving bass line.
+  - section_name: Bridging Chorus
+    start_time: '[01:57.213]'
+    end_time: '[02:17.113]'
+    description: The mood becomes warbly and the vocals more prophetic-sounding.
+  - section_name: Chorus 2
+    start_time: '[02:17.114]'
+    end_time: '[02:43.155]'
+    description: The chorus returns with a bit more intensity.
+  - section_name: Verse 2
+    start_time: '[02:43.156]'
+    end_time: '[03:22.241]'
+    description: Back to the verse to expand the story.
+  - section_name: Breaking Down
+    start_time: '[03:22.242]'
+    end_time: '[03:24.095]'
+    description: The song swings toward a dub-like feel as the some instruments drop out.
+  - section_name: Bridging Verse
+    start_time: '[03:24.096]'
+    end_time: '[04:16.235]'
+    description: The mood returns to a dazed testimonial and then, in a sick humorous gesture, we hear the sound of a steel drum playing ala "Under the Sea" from The Little Mermaid.
+  - section_name: The Tangier Dialect
+    start_time: '[04:16.236]'
+    end_time: '[04:23.096]'
+    description: The song ends with Tangier Island residents speaking in their unique dialect.
+mood:
+  - contemplative
+  - dreamy
+  - eerie
+  - hypnotic
+  - introspective
+  - melancholic
+  - mysterious
+  - surreal
+  - tranquil
+  - humorous
+sounds_like:
+  - name: Boards of Canada
+    discogs_id: 307
+  - name: Joy Division
+    discogs_id: 3898
+  - name: Mad Professor
+    discogs_id: 7870
+genres:
+  - Ambient
+  - Electronic
+  - Indie Rock
+  - Post-Punk
+  - Dub
+lrc_file: 03_03.lrc
+concept: Off the coast of Virginia lies Tangier Island, a small landmass in the Chesapeake Bay. The island is known for its unique dialect, which has been preserved over centuries due to the island's isolation. This community has also been significantly impacted by climate change, with rising sea levels threatening its very existence. Yet, due to their Christain ideology, many residents deny the reality of climate change and perhaps even nihilistically welcome it as a Noah-like flood that will cleanse the world. Their dialect, insular culture and denial of the rising waters plays upon the re-breacketing of the world in a post-climate change era.
+audio_tracks:
+  - id: 1
+    description: Ocean Sound Effect
+    audio_file: 03_03_02_ocean.wav
+  - id: 2
+    description: DFAM (Moog drummer from another mother) and other Drum Machines
+    audio_file: 03_03_04_drums.wav
+    midi_file: 03_03_03_drums.mid
+  - id: 3
+    description: Bass guitar
+    audio_file: 03_03_05_bass.wav
+  - id: 4
+    description: Moog Grandmother synth
+    audio_file: 03_03_06_gm.wav
+  - id: 5
+    description: Farfisa organ
+    audio_file: 03_03_08_farfisa.wav
+    midi_file: 03_03_07_farfisa.mid
+  - id: 6
+    description: Disney Steel Drum
+    audio_file: 03_03_10_steel_drum.wav
+    midi_file: 03_03_09_steel_drum.mid
+  - id: 7
+    description: Corrupted Guitar
+    audio_file: 03_03_11_corrupted_guitar.wav
+  - id: 8
+    description: Granular Grazed Guitar
+    audio_file: 03_03_12_grazed_guitar.wav
+  - id: 9
+    description: Main vocals
+    audio_file: 03_03_13_main_vocals.wav
+  - id: 10
+    description: Dbl vocals
+    audio_file: 03_03_14_dbl_vocals.wav
+  - id: 11
+    description: Backing vocals
+    audio_file: 03_03_15_bg_vocals.wav
+  - id: 12
+    description: Woozy CS-80 synth lead
+    audio_file: 03_03_19_woozy_synth.wav
+    midi_file: 03_03_16_woozy_synth.mid
+  - id: 12
+    description: Vocoder vocals
+    audio_file: 03_03_21_vocoder.wav
+    midi_file: 03_03_20_vocoder.mid
+  - id: 13
+    description: Tangier Island Residents Speaking in their unique dialect
+    audio_file: 03_03_22_tangier.wav
+
+
