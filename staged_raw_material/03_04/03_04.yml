@@ -78,9 +78,9 @@ mood:
   - layered
 sounds_like:
   - name: Hood
-    discogs_id: 20499
+    discogs_id: 5047
   - name: Brian Eno
-    discogs_id: 384
+    discogs_id: 634
 genres:
   - electronic
   - experimental
@@ -143,22 +143,22 @@ audio_tracks:
     midi_file: 03_04_22_matrix.mid
   - id: 14
     description: Corrupted Guitar
-    audio_file: 03_04_24_corrupted_guitar.wav
+    audio_file: 03_04_24_corrupter_guitar.wav
   - id: 15
     description: Google Magenta NSynth
     audio_file: 03_04_25_nsynth.wav
   - id: 16
     description: MC Cut up
-    audio_file: 03_04_26_mc_cutup.wav
+    audio_file: 03_04_26_mc_cut.wav
   - id: 17
     description: Baritone Guitar
     audio_file: 03_04_27_trem_guitar.wav
   - id: 18
     description: Main Vocals
-    audio_file: 03_04_28_main_vocals.wav
+    audio_file: 03_04_28_main_vocal.wav
   - id: 19
     description: Double Vocals
-    audio_file: 03_04_29_dbl_vocals.wav
+    audio_file: 03_04_29_dbl_vocal.wav
   - id: 20
     description: Vocoders
     audio_file: 03_04_30_vocoders.wav
@@ -166,8 +166,8 @@ audio_tracks:
     group: vocoders
   - id: 21
     description: Vocoder Two
-    midi_file: 03_04_33_vocoder_two.mid
+    midi_file: 03_04_32_vocoder_two.mid
     group: vocoders
   - id: 22
     description: Incident in Chelsea
-    audio_file: 03_04_34_incident.wav
+    audio_file: 03_04_33_incident_in_chelsea.wav
