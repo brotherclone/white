@@ -19,7 +19,7 @@ class MultimodalRebracketerTrainingDataGenerator:
         self.segment_types = ['section', 'bar', 'phrase', 'sliding_window']
         self.sample_rate = sample_rate
 
-    def parse_lrc_time(self, time_str: str) -> float:
+    def parse_lrc_time(self, time_str: str) -> float | None:
         """Parse LRC timestamp like [00:28.085] to seconds"""
         try:
             match = re.match(r'\[(\d{2}):(\d{2})\.(\d{3})\]', time_str)
@@ -37,7 +37,8 @@ class MultimodalRebracketerTrainingDataGenerator:
         """Parse YAML timestamp like '[00:28.086]' to seconds"""
         return self.parse_lrc_time(time_str)
 
-    def load_manifest(self, yaml_path: str) -> Dict[str, Any]:
+    @staticmethod
+    def load_manifest(yaml_path: str) -> Dict[str, Any]:
         """Load the YAML manifest file"""
         with open(yaml_path, 'r') as f:
             return yaml.safe_load(f)
@@ -75,7 +76,8 @@ class MultimodalRebracketerTrainingDataGenerator:
             print(f"Error loading audio segment {start_time:.3f}s-{end_time:.3f}s: {e}")
             return self._empty_audio_features()
 
-    def _analyze_silence(self, segment: np.ndarray, sr: int, threshold_db: float) -> Dict[str, Any]:
+    @staticmethod
+    def _analyze_silence(segment: np.ndarray, sr: int, threshold_db: float) -> Dict[str, Any]:
         """Analyze silence patterns in an audio segment"""
         if len(segment) == 0:
             return {
@@ -139,7 +141,8 @@ class MultimodalRebracketerTrainingDataGenerator:
             'rms_energy': float(np.sqrt(np.mean(segment ** 2)))
         }
 
-    def _create_silence_features(self, audio_path: str, start_time: float, end_time: float,
+    @staticmethod
+    def _create_silence_features(audio_path: str, start_time: float, end_time: float,
                                  segment: np.ndarray, silence_analysis: Dict) -> Dict[str, Any]:
         """Create features for a mostly-silent segment"""
         return {
