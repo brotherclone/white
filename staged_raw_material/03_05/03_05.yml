@@ -1,0 +1,38 @@
+bpm: 100
+manifest_id: '03_05'
+tempo: 4/4
+key: C major
+rainbow_color: O
+title: Newton
+release_date: '2020-06-23'
+album_sequence: 5
+main_audio_file: 03_05_01_main.wav
+TRT: '[04:48.000]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time:
+    description: TK
+mood:
+  - contemplative
+  - nostalgic
+sounds_like:
+  - name: Pale Saints
+    discogs_id: 0
+  - name: Ruhr
+    discogs_id: 0
+  - name: Ride
+    discogs_id: 0
+  - name: The Lewers
+    discogs_id: 0
+  - name: The Jesus and Mary Chain
+    discogs_id: 0
+lrc_file: 03_05.lrc
+concept: TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK
