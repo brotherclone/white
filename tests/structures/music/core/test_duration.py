@@ -1,5 +1,6 @@
 import pytest
 from app.structures.music.core.duration import Duration
+from app.structures.music.core.notes import Note, get_note
 
 def test_duration_str():
     d = Duration(minutes=3, seconds=30.123)
@@ -11,8 +12,7 @@ def test_duration_from_str():
     d = Duration(minutes=2, seconds=15.5)
     assert d.minutes == 2
     assert d.seconds == 15.5
-import pytest
-from app.structures.music.core.notes import Note, get_note
+
 
 def test_note_valid():
     n = Note(pitch_name='C')
