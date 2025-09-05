@@ -1,4 +1,3 @@
-# moved from /test/util/
 import pytest
 from app.util.lrc_validator import LRCValidator
 

@@ -1,6 +1,5 @@
-import pytest
 from app.structures.manifests.manifest_track import ManifestTrack
-from pydantic import ValidationError
+
 
 def test_manifest_track_required_fields():
     t = ManifestTrack(id=1, description='Guitar track')
