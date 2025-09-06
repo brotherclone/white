@@ -30,3 +30,8 @@ Workflow:
 8. **Audio Generation**: Create loops and one-shots that can be used with MIDI files to generate audio.
 9. **DAW Integration**: Integrate the MIDI files and audio loops into a DAW additional recording such as guitar, vocals and other 'real' instruments.
 10. **Final Review**: Review the final audio with LLMs and provide feedback.
+
+
+## Testing
+
+Run `PYTHONPATH=. pytest tests/ --maxfail=5 --disable-warnings -v`

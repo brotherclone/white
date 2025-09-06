@@ -211,5 +211,40 @@ class BaseManifestExtractor(BaseModel):
         return df
 
 if __name__ == "__main__":
-    extractor = BaseManifestExtractor(manifest_id="01_01")
-    print(extractor.manifest)
+    import os
+    import pandas as pd
+    print("=== BaseManifestExtractor Example Usage ===")
+    # Set up environment for manifest loading
+    os.environ['MANIFEST_PATH'] = 'staged_raw_material'
+    manifest_id = "01_01"
+    yaml_path = f"staged_raw_material/{manifest_id}/{manifest_id}.yml"
+    lrc_path = f"staged_raw_material/{manifest_id}/{manifest_id}.lrc"
+    audio_path = f"staged_raw_material/{manifest_id}/01_01_02.wav"
+    midi_path = f"staged_raw_material/{manifest_id}/01_01_biotron.mid"
+
+    # Initialize extractor
+    extractor = BaseManifestExtractor(manifest_id=manifest_id)
+    print("Loaded manifest:", extractor.manifest)
+
+    # Example: parse_yaml_time
+    example_time = '[00:28.086]'
+    try:
+        seconds = extractor.parse_yaml_time(example_time)
+        print(f"Parsed YAML time {example_time} -> {seconds} seconds")
+    except Exception as e:
+        print(f"parse_yaml_time error: {e}")
+
+    # Example: determine_temporal_relationship
+    rel = extractor.determine_temporal_relationship(0, 10, 2, 8)
+    print(f"Temporal relationship (0,10,2,8): {rel}")
+
+    # Example: generate_multimodal_segments (if files exist)
+    if os.path.exists(yaml_path):
+        try:
+            df = extractor.generate_multimodal_segments(yaml_path, lrc_path, audio_path, midi_path)
+            print("\nGenerated multimodal segments DataFrame:")
+            print(df.head())
+        except Exception as e:
+            print(f"generate_multimodal_segments error: {e}")
+    else:
+        print(f"Manifest YAML not found: {yaml_path}")
