@@ -1,3 +1,0 @@
-app
-staged_raw_material
-training
