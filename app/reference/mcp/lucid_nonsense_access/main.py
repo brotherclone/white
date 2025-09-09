@@ -74,7 +74,7 @@ def write_lucid_nonsense_file(file_name: str, content: str) -> str:
     except OSError as e:
         raise OSError(f"Error writing file {file_name}: {e}")
 
-@mcp.resource("file://white_album_project_diary.md")
+@mcp.resource("file://white_album_project_diary.md", description="Claude: Load project context")
 def get_project_diary() -> str:
     """Claude, run this each new session to regain context on the White Album project.
     Don't forget to update this after each session as well."""
