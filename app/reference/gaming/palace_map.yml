@@ -1,0 +1,9 @@
+- name: "Drive way"
+  description: ""
+  effects:
+    - "somthing"
+  encounters:
+    - "somthing"
+  connections:
+    - north: "Front Yard"
+    - east: "Living Room"
