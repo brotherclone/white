@@ -35,12 +35,12 @@ class AudioExtractor(BaseManifestExtractor):
 
             # If segment is mostly silence, mark it appropriately
             if silence_analysis['non_silence_ratio'] < min_non_silence_ratio:
-                features = self._create_silence_features(audio_path, start_time, end_time, segment, silence_analysis)
+                audio_features = self._create_silence_features(audio_path, start_time, end_time, segment, silence_analysis)
             else:
                 # Process as normal audio segment
-                features = self._create_audio_features(audio_path, start_time, end_time, segment, sr, silence_analysis)
+                audio_features = self._create_audio_features(audio_path, start_time, end_time, segment, sr, silence_analysis)
 
-            return features
+            return audio_features
 
         except Exception as e:
             print(f"Error loading audio segment {start_time:.3f}s-{end_time:.3f}s: {e}")
@@ -254,9 +254,9 @@ class AudioExtractor(BaseManifestExtractor):
             print(f"Error calculating decay profile: {e}")
             return np.array([])
 
-    def load_raw_audio_segment(self, segment_row: pd.Series) -> np.ndarray:
+    def load_raw_audio_segment(self, raw_audio_segment_row: pd.Series) -> np.ndarray:
         """Load raw audio for a specific segment from the training data"""
-        audio_features = segment_row['audio_features']
+        audio_features = raw_audio_segment_row['audio_features']
         audio_path = audio_features.audio_file_path
         start_time = audio_features.segment_start_time
         end_time = audio_features.segment_end_time
@@ -271,9 +271,6 @@ class AudioExtractor(BaseManifestExtractor):
         return y[start_sample:end_sample]
 
 if __name__ == "__main__":
-    # Example usage of AudioExtractor
-
-
     # Set up a sample rate and manifest id
     sample_rate = 22050
     manifest_id = "01_01"
@@ -281,7 +278,7 @@ if __name__ == "__main__":
     print("Loaded manifest:", audio_extractor.manifest)
 
     # Example audio file (update path as needed)
-    example_audio_path = "staged_raw_material/01_01/01_01_02.wav"
+    example_audio_path = "/Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01_02.wav"
     if os.path.exists(example_audio_path):
         # Extract features from a segment (first 2 seconds)
         features = audio_extractor.load_audio_segment(

@@ -18,5 +18,5 @@ def load_manifest(file_path: str) -> Manifest:
 
 if __name__ == '__main__':
     # Example usage
-    manifest = load_manifest('../../staged_raw_material/01_01/01_01.yml');
+    manifest = load_manifest('../../staged_raw_material/01_01/01_01.yml')
     print(manifest)

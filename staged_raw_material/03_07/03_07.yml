@@ -1,1 +1,36 @@
-Tell
+bpm: 154
+manifest_id: '03_07'
+tempo: 4/4
+key: A minor
+rainbow_color: O
+title: Tell
+release_date: '2020-06-23'
+album_sequence: 7
+main_audio_file: 03_07_01_main.wav
+TRT: '[03:10.041]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: TK
+    description: TK
+
+mood:
+  - TK
+sounds_like:
+  - name: TK
+    discogs_id: TK
+
+genres:
+  - TK
+
+lrc_file: 03_07.lrc
+concept: TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK
+    midi_group: TK
+    group: TK
