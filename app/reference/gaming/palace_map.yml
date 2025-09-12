@@ -1,9 +1,108 @@
 - name: "Drive way"
-  description: ""
+  description: "TK"
   effects:
-    - "somthing"
+    - "TK"
   encounters:
-    - "somthing"
+    - "TK"
   connections:
     - north: "Front Yard"
-    - east: "Living Room"
+- name: "Front Yard"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Drive way"
+    - north: "Entrance"
+- name: "Entrance"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Front Yard"
+    - north: "Vestibule"
+- name: "Vestibule"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Entrance"
+    - east: "Drawing Room"
+    - west: "Foyer"
+- name: "Foyer"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - west: "Entrance"
+    - north: "Grand Staircase"
+- name: "Drawing Room"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Grand Staircase"
+    - east: "Hallway"
+- name: "Guest Quarters"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - west: "Hallway"
+- name: "Great Chamber"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Drive way"
+    - north: "Entrance"
+- name: "Study"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Drive way"
+    - north: "Entrance"
+- name: "Nursery"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Drive way"
+    - north: "Entrance"
+- name: "Cloak Room"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Drive way"
+    - north: "Entrance"
+- name: "Back Gardens"
+  description: "TK"
+  effects:
+    - "TK"
+  encounters:
+    - "TK"
+  connections:
+    - south: "Drive way"
+    - north: "Entrance"
+

@@ -344,6 +344,17 @@ def validate_structure_timestamps(yaml_data: Dict[str, Any]) -> Tuple[bool, List
 
     return len(timestamp_structure_errors) == 0, timestamp_structure_errors
 
+def check_no_tk_fields(data, path=""):
+    errors = []
+    if isinstance(data, dict):
+        for k, v in data.items():
+            errors.extend(check_no_tk_fields(v, f"{path}.{k}" if path else k))
+    elif isinstance(data, list):
+        for idx, item in enumerate(data):
+            errors.extend(check_no_tk_fields(item, f"{path}[{idx}]"))
+    elif data == "TK":
+        errors.append(f"Manifest field at '{path}' is set to 'TK' (to come)")
+    return errors
 
 def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
     """
@@ -395,6 +406,11 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
         is_valid, discogs_errors = validate_discogs_ids(yaml_data)
         if not is_valid:
             for err in discogs_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        tk_errors = check_no_tk_fields(yaml_data)
+        if tk_errors:
+            for err in tk_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
         return len(errors) == 0, errors
