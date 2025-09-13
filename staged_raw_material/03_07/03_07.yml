@@ -6,31 +6,164 @@ rainbow_color: O
 title: Tell
 release_date: '2020-06-23'
 album_sequence: 7
-main_audio_file: 03_07_01_main.wav
+main_audio_file: 03_07_01.wav
 TRT: '[03:10.041]'
 vocals: true
 lyrics: true
 structure:
-  - section_name: TK
+  - section_name: Entering the pub
     start_time: '[00:00.000]'
-    end_time: TK
-    description: TK
-
+    end_time: '[00:04.200]'
+    description: We hear the sound of a Welsh pub, with people chatting and glasses clinking.
+  - section_name: Verse 1 intro
+    start_time: '[00:04.201]'
+    end_time: '[00:17.271]'
+    description: Some airy synth pop and cheesy MOR drum machines start the song
+  - section_name: Verse 1
+    start_time: '[00:17.272]'
+    end_time: '[00:42.010]'
+    description: New wave-inspired verse with a light bassline and airy synths.
+  - section_name: Interlude
+    start_time: '[00:42.011]'
+    end_time: '[00:48.077]'
+    description: The maudlin narrative of a post-breakup conversation oddly transitions to coms chatter about a dig site.
+  - section_name: Bridge 1
+    start_time: '[00:48.078]'
+    end_time: '[00:59.046]'
+    description: The vocals return unclear if they are describing a breakup or a dig site. The synths build in intensity and a piano line builds.
+  - section_name: Chorus
+    start_time: '[00:59.047]'
+    end_time: '[01:17.272]'
+    description: The chorus burst out in a big wave of LFO-destroyed guitars and a 70s-style punk vocal.
+  - section_name: Bridge 2
+    start_time: '[01:17.273]'
+    end_time: '[01:30.107]'
+    description: The energy dies down and we return to the synths and drum machines
+  - section_name: Verse 2
+    start_time: '[01:30.108]'
+    end_time: '[01:55.082]'
+    description: The second verse is similar to the first but with some vocal variations.
+  - section_name: Interlude 2
+    start_time: '[01:55.083]'
+    end_time: '[02:07.237]'
+    description: This interlude extends to here multiple "characters" discussing the dig site.
+  - section_name: Chorus 2
+    start_time: '[02:07.238]'
+    end_time: '[02:45.047]'
+    description: The chorus repeats with more intensity descending into non-verbal vocals.
+  - section_name: Outro
+    start_time: '[02:45.048]'
+    end_time: '[03:10.041]'
+    description: The outro is a long instrumental section with the synths and drum machines fading out
 mood:
-  - TK
+  - melancholic
+  - relaxed
+  - mercurial
+  - nerdy
+  - aggressive
+  - dreamy
+  - energetic
+  - introspective
 sounds_like:
-  - name: TK
-    discogs_id: TK
-
+  - name: Public Image Limited
+    discogs_id: 66302
+  - name: Tears for Fears
+    discogs_id: 19814
+  - name: Phil Collins
+    discogs_id: 101028
+  - name: Peter Gabriel
+    discogs_id: 11136
 genres:
-  - TK
-
+  - New Wave
+  - Synthpop
+  - Punk
+  - Post-Punk
+  - Art Rock
+  - Alternative Rock
 lrc_file: 03_07.lrc
-concept: TK
+concept: A guys is meeting his ex at pub and they are rehashing their breakup. Although he's invited her here, he gets bored and begins thinking of some childish adventure out of a comic book or saturday morning cartoon about digging up a mystical artifact. The lyrics blur the lines between the two scenarios. The thing forgotten was her tell - not a look but a habit of 'digging' through her food when she's annoyed.
 audio_tracks:
   - id: 2
-    description: TK
-    audio_file: TK
-    midi_file: TK
-    midi_group: TK
-    group: TK
+    description: Synth Bass
+    midi_file: 03_07_02_bass.mid
+    audio_file: 03_07_03_bass.wav
+  - id: 3
+    description: DX7 Synth
+    midi_file: 03_07_04_dx7.mid
+    audio_file: 03_07_05_dx7.wav
+  - id: 4
+    description: Modular Synth
+    midi_file: 03_07_06_modular.mid
+    audio_file: 03_07_07_modular.wav
+  - id: 5
+    description: Farfisa Organ
+    midi_file: 03_07_08_farfisa.mid
+    audio_file: 03_07_09_farfisa.wav
+  - id: 6
+    description: Steel Piano
+    midi_file: 03_07_10_steel_piano.mid
+    audio_file: 03_07_11_steel_piano.wav
+  - id: 7
+    description: 808 Drum Machine
+    midi_file: 03_07_12_808.mid
+    audio_file: 03_07_13_808.mid.wav
+  - id: 8
+    description: Drum Kit
+    midi_file: 03_07_14_kit.mid
+    audio_file: 03_07_15_kit.mid.wav
+  - id: 9
+    description: Kick Drum
+    midi_file: 03_07_16_kick.mid
+    audio_file: 03_07_17_kick.mid.wav
+  - id: 10
+    description: Snare Drum
+    midi_file: 03_07_18_snare.mid
+    audio_file: 03_07_19_snare.mid.wav
+  - id: 11
+    description: Hi-Hat
+    midi_file: 03_07_20_hihat.mid
+    audio_file: 03_07_21_hihat.mid.wav
+  - id: 12
+    description: Cymbals
+    midi_file: 03_07_22_cymbals.mid
+    audio_file: 03_07_23_cymbals.mid.wav
+  - id: 13
+    description: Rack Toms
+    midi_file: 03_07_24_rack_toms.mid
+    audio_file: 03_07_26_rack_toms.mid.wav
+  - id: 14
+    description: Floor Tom
+    midi_file: 03_07_25_floor_tom.mid
+    audio_file: 03_07_27_floor_tom.mid.wav
+  - id: 15
+    description: Toms (alt)
+    midi_file: 03_07_24_toms.mid
+  - id: 16
+    description: Tambourine
+    midi_file: 03_07_29_tambourine.mid
+    audio_file: 03_07_28_tambourine.wav
+  - id: 17
+    description: Shaker
+    midi_file: 03_07_30_shaker.mid
+    audio_file: 03_07_31_shaker.mid.wav
+  - id: 18
+    description: Fuzz Guitar
+    audio_file: 03_07_32_fuzz_guitar.mid.wav
+  - id: 19
+    description: Corrupter Guitar
+    audio_file: 03_07_34_corrupter_guitar.wav
+  - id: 20
+    description: Main Vocal
+    audio_file: 03_07_35_main_vocal.wav
+  - id: 21
+    description: Second Vocal
+    audio_file: 03_07_36_second_vocal.wav
+  - id: 22
+    description: Pub Ambience
+    audio_file: 03_07_37_pub.wav
+  - id: 23
+    description: Coms Chatter
+    audio_file: 03_07_38_coms.wav
+  - id: 24
+    description: Glitch FX
+    audio_file: 03_07_39_glitch.wav
