@@ -107,63 +107,75 @@ audio_tracks:
     description: 808 Drum Machine
     midi_file: 03_07_12_808.mid
     audio_file: 03_07_13_808.mid.wav
+    group: Drums
   - id: 8
     description: Drum Kit
     midi_file: 03_07_14_kit.mid
     audio_file: 03_07_15_kit.mid.wav
+    midi_group: Drums
+    group: Drums
   - id: 9
     description: Kick Drum
     midi_file: 03_07_16_kick.mid
     audio_file: 03_07_17_kick.mid.wav
+    midi_group: Drums
+    group: Drums
   - id: 10
     description: Snare Drum
     midi_file: 03_07_18_snare.mid
     audio_file: 03_07_19_snare.mid.wav
+    midi_group: Drums
+    group: Drums
   - id: 11
     description: Hi-Hat
     midi_file: 03_07_20_hihat.mid
     audio_file: 03_07_21_hihat.mid.wav
+    midi_group: Drums
+    group: Drums
   - id: 12
     description: Cymbals
     midi_file: 03_07_22_cymbals.mid
     audio_file: 03_07_23_cymbals.mid.wav
+    midi_group: Drums
+    group: Drums
   - id: 13
     description: Rack Toms
     midi_file: 03_07_24_rack_toms.mid
     audio_file: 03_07_26_rack_toms.mid.wav
+    midi_group: Drums
+    group: Drums
   - id: 14
     description: Floor Tom
     midi_file: 03_07_25_floor_tom.mid
     audio_file: 03_07_27_floor_tom.mid.wav
-  - id: 15
-    description: Toms (alt)
-    midi_file: 03_07_24_toms.mid
-  - id: 16
+    midi_group: Drums
+    group: Drums
+  - id: 17
     description: Tambourine
     midi_file: 03_07_29_tambourine.mid
     audio_file: 03_07_28_tambourine.wav
-  - id: 17
+  - id: 18
     description: Shaker
     midi_file: 03_07_30_shaker.mid
     audio_file: 03_07_31_shaker.mid.wav
-  - id: 18
+  - id: 19
     description: Fuzz Guitar
     audio_file: 03_07_32_fuzz_guitar.mid.wav
-  - id: 19
+  - id: 20
     description: Corrupter Guitar
     audio_file: 03_07_34_corrupter_guitar.wav
-  - id: 20
+  - id: 21
     description: Main Vocal
     audio_file: 03_07_35_main_vocal.wav
-  - id: 21
+  - id: 22
     description: Second Vocal
     audio_file: 03_07_36_second_vocal.wav
-  - id: 22
+  - id: 23
     description: Pub Ambience
     audio_file: 03_07_37_pub.wav
-  - id: 23
+  - id: 24
     description: Coms Chatter
     audio_file: 03_07_38_coms.wav
-  - id: 24
+  - id: 25
     description: Glitch FX
     audio_file: 03_07_39_glitch.wav

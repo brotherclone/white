@@ -16,3 +16,12 @@ def rename_mid_audio_extensions(root_dir):
                 new_filename = filename.replace('.mid.aif', '.aif')
                 new_path = os.path.join(dirpath, new_filename)
                 os.rename(old_path, new_path)
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Recursively rename .mid.wav/.mid.aif files to .wav/.aif in a directory.")
+    parser.add_argument("directory", type=str, help="Root directory to process.")
+    args = parser.parse_args()
+    print(f"Processing directory: {args.directory}")
+    rename_mid_audio_extensions(args.directory)
+    print("Renaming complete.")

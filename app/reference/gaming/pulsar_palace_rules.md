@@ -7,7 +7,7 @@ Pulsar Palace is a single-module, purpose-built role-playing game to accompany t
 Get your party through the Pulsar Palace, a surreal and dangerous environment, to reach the core and unlock its secrets. Along the way, you will encounter bizarre creatures, solve puzzles, and navigate through shifting landscapes.
 
 ## Character Creation
-Roll 1D10 for a time and place of origin:
+Roll 1D10 for a background: a time and place of origin:
 | Time | Place         | Image |
 |1 |2121 | New York City |  ![NYC](img/character__0014_setting-nyc.png) |
 |2 |1953 | Hollywood | ![Hollywood](img/character__0015_setting-hollywood.png) |
@@ -44,7 +44,7 @@ Roll 1D10 for a profession:
 | 9 | Tax Collector | ![Tax Collector](img/character__0028_role---tax-collector.png) |
 | 10 | Partisan | ![Partisan](img/character__0029_role---partisan.png) |
 
-(Note you can layer these transparent PNGs to make your character image Setting + Profession + Disposition)
+(Note you can layer these transparent PNGs to make your character image Background + Profession + Disposition)
 
 Roll 2D10 for your starting On and Off stats, you can reroll once if you want. If your on/off stats are equal, add 1D10 to one of them.
 
@@ -65,3 +65,19 @@ Roll 2D10 for your starting On and Off stats, you can reroll once if you want. I
 
 ## Winning the Game
 The game ends when the players reach the Great Chamber and then escape through the back garden gate. If all players are in stasis, the game ends and they have lost.
+
+## Design
+
+1. Initialize the game environment. The map has two rooms where the create room tool can be used, along with encounter, items and NPC
+2. Create the party. If instructed the LLM can create a player, but not a player character.
+3. Any created item needs to be written as yaml files for consideration and reference.
+4. Begin with the Drive Way in order to reduce calls the round is structured like so:
+    Description per room
+    Initiative per room
+    Character Declarations
+
+    Assessment of actions - they can be small, medium, or large, and On or Off
+    Rolls (non -LLM)
+    Apply effects
+    Check for knockouts, reactivation
+    Describe the results per room
