@@ -1,1 +1,174 @@
-Here comes the Mechanical Bride
+bpm: 133
+manifest_id: '03_08'
+tempo: 4/4
+key: C minor
+rainbow_color: O
+title: Here Comes the Mechanical Bride
+release_date: '2020-06-23'
+album_sequence: 8
+main_audio_file: 03_08_main.wav
+TRT: [04:36.022]
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: [00:00.000]
+    end_time: [00:21.162]
+    description: The song kicks right in with drums, bass, and synths. A melody stretches across the repeating chord progression.
+  - section_name: Verse Type A 1
+    start_time: [00:21.163]
+    end_time: [00:43.075]
+    description: The vocals begin here repeating the previous chords.
+  - section_name: Verse Type B 1
+    start_time: [00:43.076]
+    end_time: [00:57.184]
+    description: As this section begins, we get more of a sense of a celebratory, bridal march.
+  - section_name: Bridge 1
+    start_time: [00:57.185]
+    end_time: [01:09.933]
+    description: The music gets more sparse and delicate with keyboard melodies playing off the sappy bridal theme.
+  - section_name: Chorus 1
+    start_time: [01:09.934]
+    end_time: [01:30.055]
+    description: The chorus continues with the bridal march, the last vocal is held and overlaps into the next section.
+  - section_name: Verse Type A 2
+    start_time: [01:30.056]
+    end_time: [01:59.023]
+    description: The vocals return with variation of the vocal melody and some underscored overdubs to differentiate it from the first verse.
+  - section_name: Verse Type B 2
+    start_time: [01:59.024]
+    end_time: [02:13.132]
+    description: The bridal march returns with more energy and a fuller arrangement.
+  - section_name: Bridge 2
+    start_time: [02:13.133]
+    end_time: [02:22.137]
+    description: A reprise of the earlier bridge section.
+  - section_name: Chorus 2
+    start_time: [02:22.138]
+    end_time: [02:44.052]
+    description: The chorus returns with more energy and a fuller arrangement. The last vocal is held and overlaps into the next section.
+  - section_name: Verse Type A as transition to Jams
+    start_time: [02:44.053]
+    end_time: [02:58.161]
+    description: The verse part is stepped up and builds into the jams section.
+  - section_name: Verse A as Jams
+    start_time: [02:58.162]
+    end_time: [04:03.151]
+    description: Layers upon layers of vocals and guitars build up to a climax.
+  - section_name: Outro
+    start_time: [04:03.152]
+    end_time: [04:36.022]
+    description: The song ends with a monstrous barrage of 1970s television ads chopped and filtered into a cacophony of sound.
+mood:
+  - joyous
+  - precious
+  - celebratory
+  - sick
+  - intense
+  - frightening
+  - chaotic
+  - depraved
+  - surreal
+  - nightmarish
+sounds_like:
+  - name: The Carpenters
+    discogs_id: 13899
+  - name: The Pale Saints
+    discogs_id: 13699
+  - name: My Bloody Valentine
+    discogs_id: 13685
+  - name: Cocteau Twins
+    discogs_id: 13697
+genres:
+  - Wedding March
+  - Shoegaze
+  - Dream Pop
+  - Noise Pop
+  - Experimental
+  - Art Rock
+  - Commercial Jingle
+  - Sound Collage
+lrc_file: 03_08.lrc
+concept: Hazy memories of 1970s television ads always gave me the creeps. This play on both Mendelssohn's Wedding March and the saccharine pop of The Carpenters is meant to evoke that same feeling of unease and dread. The commercial jingles are reordered to tell the story of child sacrifice and cannibalism. The "mechanical bride" is from Marshal McLuhan's idea of the "mechanical bride" - the way media and technology shape our perceptions and experiences. The thing misremembered was a strange board game add where a disc was overturned and a cookie, like a girl scout thin mint, was revealed. I misremembered it being a Eucharistic wafer.
+audio_tracks:
+  - id: 2
+    description: Synth Bass
+    audio_file: 03_08_02_gm_bass.wav
+  - id: 3
+    description: Drum Machine
+    audio_file: 03_08_04_dm.wav
+    midi_file: 03_08_03_dm.mid
+    group: Drums
+    midi_group: Drums
+  - id: 4
+    description: Modular Drums
+    audio_file: 03_08_05_modular_drums.wav
+    group: Drums
+  - id: 5
+    description: Drum Kit
+    audio_file: 03_08_07_drum_kit.mid.wav
+    midi_file: 03_08_06_drum_kit.mid
+    group: Drums
+    midi_group: Drums
+  - id: 6
+    description: Wavering Pad
+    audio_file: 03_08_09_wavering_pad.mid.wav
+    midi_file: 03_08_08_wavering_pad.mid
+  - id: 7
+    description: Ambient Light
+    audio_file: 03_08_11_ambient_light.mid.wav
+    midi_file: 03_08_10_ambient_light.mid
+  - id: 8
+    description: Melody Synth
+    audio_file: 03_08_13_melody.mid.wav
+    midi_file: 03_08_12_melody.mid
+  - id: 9
+    description: Sweet Bell
+    audio_file: 03_08_15_sweet_bell.mid.wav
+    midi_file: 03_08_14_sweet_bell.mid
+  - id: 10
+    description: Chords Synth
+    audio_file: 03_08_17_chords.mid.wav
+    midi_file: 03_08_16_chords.mid
+  - id: 11
+    description: Heart Broken Guitar
+    audio_file: 03_08_18_heart_broken_guitar.mid.wav
+  - id: 12
+    description: Tweed Guitar
+    audio_file: 03_08_18_tweed_guitar.wav
+  - id: 13
+    description: Corrupter Guitar
+    audio_file: 03_08_19_corrupter_guitar.wav
+  - id: 14
+    description: Tiny Monster Guitar
+    audio_file: 03_08_19_tiny_monster_guitar.wav
+  - id: 15
+    description: Grazer Guitar
+    audio_file: 03_08_21_grazer_guitar.wav
+  - id: 16
+    description: Clean Guitar
+    audio_file: 03_08_22_clean_guitar.wav
+  - id: 17
+    description: Amazing Guitar
+    audio_file: 03_08_23_amazing_guitar.wav
+  - id: 18
+    description: Steel Wool Guitar
+    audio_file: 03_08_24_steel_wool_guitar.wav
+  - id: 19
+    description: Vocal 1
+    audio_file: 03_08_25_vocal_1.wav
+  - id: 20
+    description: Vocal 2
+    audio_file: 03_08_26_vocal_2.wav
+  - id: 21
+    description: Vocal 3
+    audio_file: 03_08_26_vocal_3.wav
+  - id: 22
+    description: Vocal 4
+    audio_file: 03_08_28_vocal_4.wav
+  - id: 23
+    description: Vocal 5
+    audio_file: 03_08_29_vocal_5.wav
+  - id: 24
+    description: TV Collage
+    audio_file: 03_08_30_tv.wav
