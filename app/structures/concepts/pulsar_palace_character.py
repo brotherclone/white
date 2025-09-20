@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from app.white_album_agent.gaming_tools import roll_dice, no_repeat_roll_dice
+from app.agents.tools.gaming_tools import roll_dice, no_repeat_roll_dice
 
 PULSAR_PALACE_IMAGE_BASE_PATH = "/Volumes/LucidNonsense/White/app/reference/gaming/img"
 
