@@ -1,5 +1,4 @@
-import pytest
-from app.white_album_agent.gaming_tools import roll_dice
+from app.agents.tools.gaming_tools import roll_dice
 
 def test_rolls_single_die_correctly():
     total, details = roll_dice([(1, 6)])

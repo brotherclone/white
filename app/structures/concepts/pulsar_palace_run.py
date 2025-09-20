@@ -2,7 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter, PulsarPalacePlayer
-from app.white_album_agent.gaming_tools import roll_dice
+from app.agents.tools.gaming_tools import roll_dice
 
 class PulsarPalaceRun(BaseModel):
 
