@@ -106,48 +106,48 @@ audio_tracks:
   - id: 7
     description: 808 Drum Machine
     midi_file: 03_07_12_808.mid
-    audio_file: 03_07_13_808.mid.wav
+    audio_file: 03_07_13_808.wav
     group: Drums
   - id: 8
     description: Drum Kit
     midi_file: 03_07_14_kit.mid
-    audio_file: 03_07_15_kit.mid.wav
+    audio_file: 03_07_15_kit.wav
     midi_group: Drums
     group: Drums
   - id: 9
     description: Kick Drum
     midi_file: 03_07_16_kick.mid
-    audio_file: 03_07_17_kick.mid.wav
+    audio_file: 03_07_17_kick.wav
     midi_group: Drums
     group: Drums
   - id: 10
     description: Snare Drum
     midi_file: 03_07_18_snare.mid
-    audio_file: 03_07_19_snare.mid.wav
+    audio_file: 03_07_19_snare.wav
     midi_group: Drums
     group: Drums
   - id: 11
     description: Hi-Hat
     midi_file: 03_07_20_hihat.mid
-    audio_file: 03_07_21_hihat.mid.wav
+    audio_file: 03_07_21_hihat.wav
     midi_group: Drums
     group: Drums
   - id: 12
     description: Cymbals
     midi_file: 03_07_22_cymbals.mid
-    audio_file: 03_07_23_cymbals.mid.wav
+    audio_file: 03_07_23_cymbals.wav
     midi_group: Drums
     group: Drums
   - id: 13
     description: Rack Toms
     midi_file: 03_07_24_rack_toms.mid
-    audio_file: 03_07_26_rack_toms.mid.wav
+    audio_file: 03_07_26_rack_toms.wav
     midi_group: Drums
     group: Drums
   - id: 14
     description: Floor Tom
     midi_file: 03_07_25_floor_tom.mid
-    audio_file: 03_07_27_floor_tom.mid.wav
+    audio_file: 03_07_27_floor_tom.wav
     midi_group: Drums
     group: Drums
   - id: 17
@@ -157,10 +157,10 @@ audio_tracks:
   - id: 18
     description: Shaker
     midi_file: 03_07_30_shaker.mid
-    audio_file: 03_07_31_shaker.mid.wav
+    audio_file: 03_07_31_shaker.wav
   - id: 19
     description: Fuzz Guitar
-    audio_file: 03_07_32_fuzz_guitar.mid.wav
+    audio_file: 03_07_32_fuzz_guitar.wav
   - id: 20
     description: Corrupter Guitar
     audio_file: 03_07_34_corrupter_guitar.wav

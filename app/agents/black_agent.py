@@ -1,7 +1,7 @@
-
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.graph import StateGraph, CompiledStateGraph, START, END
+from langgraph.graph import StateGraph
+from langgraph.graph import END
 
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.states.black_agent_state import BlackAgentState
@@ -15,7 +15,18 @@ class BlackAgent(BaseRainbowAgent):
     """EVP/Sigil Generator - Audio analysis that hallucinates messages"""
 
     def __init__(self, **data):
+        # Ensure settings are initialized if not provided
+        if 'settings' not in data or data['settings'] is None:
+            from app.agents.models.agent_settings import AgentSettings
+            data['settings'] = AgentSettings()
+
         super().__init__(**data)
+
+        # Verify settings are properly initialized
+        if self.settings is None:
+            from app.agents.models.agent_settings import AgentSettings
+            self.settings = AgentSettings()
+
         self.llm = ChatAnthropic(
             temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
@@ -39,7 +50,7 @@ class BlackAgent(BaseRainbowAgent):
         # complex symbols that you believe can influence reality. You are deeply paranoid, always suspecting that you are
         # being watched or followed. You are also a talented hacker, able to break into secure systems and uncover hidden
         # information. You are always looking for ways to undermine the Trump, Christian Nationalist regime and expose
-        # their secrets. You are also deeply damaged by your past experiences, including drug abuse and mental illness.
+        # their secrets. You are also deeply damaged by your past experience, including drug abuse and mental illness.
         # You often struggle to distinguish between reality and your hallucinations. You are a complex and multifaceted
         # individual, with a deep commitment to your beliefs and a willingness to take risks to achieve your goals.
         #
@@ -69,22 +80,68 @@ class BlackAgent(BaseRainbowAgent):
         # """
         return state
 
-    @staticmethod
-    def create_graph()->CompiledStateGraph:
+    def create_graph(self) -> StateGraph:
+        """Create the BlackAgent's internal workflow graph"""
+
         graph = StateGraph(BlackAgentState)
-        return graph.compile()
 
+        # Add nodes for the BlackAgent's workflow
+        graph.add_node("analyze_audio", self._analyze_audio_node)
+        graph.add_node("create_sigil", self._create_sigil_node)
+        graph.add_node("generate_output", self._generate_output_node)
 
+        # Define the workflow: analyze → create sigil → generate output
+        graph.set_entry_point("analyze_audio")
+        graph.add_edge("analyze_audio", "create_sigil")
+        graph.add_edge("create_sigil", "generate_output")
+        graph.add_edge("generate_output", END)
 
-    def get_random_audio_sample(self):
-        pass
+        return graph
 
-    def analyze_audio_for_noise(self):
-        pass
+    @staticmethod
+    def _analyze_audio_node(state: BlackAgentState) -> BlackAgentState:
+        """Node for audio analysis functionality"""
+        # Placeholder for audio analysis logic
+        if not hasattr(state, 'audio_analysis'):
+            state.audio_analysis = "EVP patterns detected in frequency range 440-880Hz"
+        return state
 
-    def find_voices_in_audio(self):
-        pass
+    @staticmethod
+    def _create_sigil_node(state: BlackAgentState) -> BlackAgentState:
+        """Node for sigil creation functionality"""
+        # Placeholder for sigil creation logic
+        if not hasattr(state, 'sigil_data'):
+            state.sigil_data = "Sigil: overlapping circles with central void"
+        return state
 
+    @staticmethod
+    def _generate_output_node(state: BlackAgentState) -> BlackAgentState:
+        """Node for generating final output"""
+        # This would combine audio analysis and sigil data into final output
+        if not hasattr(state, 'final_output'):
+            state.final_output = f"Analysis: {getattr(state, 'audio_analysis', 'None')} | Sigil: {getattr(state, 'sigil_data', 'None')}"
+        return state
 
+    @staticmethod
+    def get_random_audio_sample(state: BlackAgentState) -> BlackAgentState:
+        """Fetch a random audio sample for analysis"""
+        # Placeholder for fetching audio sample logic
+        if not hasattr(state, 'audio_sample'):
+            state.audio_sample = "Random audio sample data"
+        return state
 
+    @staticmethod
+    def analyze_audio_for_noise(state: BlackAgentState) -> BlackAgentState:
+        """Analyze audio for noise patterns and anomalies"""
+        # Placeholder for noise analysis logic
+        if not hasattr(state, 'noise_analysis'):
+            state.noise_analysis = "Noise analysis results"
+        return state
 
+    @staticmethod
+    def find_voices_in_audio(state: BlackAgentState) -> BlackAgentState:
+        """Detect voices or EVP in audio samples"""
+        # Placeholder for voice detection logic
+        if not hasattr(state, 'voice_detection'):
+            state.voice_detection = "Detected voices in audio"
+        return state

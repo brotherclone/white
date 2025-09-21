@@ -1,1 +1,168 @@
-Sleeve
+bpm: 78
+manifest_id: '03_10'
+tempo: 4/4
+key: E minor
+rainbow_color: O
+title: Sleeve
+release_date: '2020-06-23'
+album_sequence: 10
+main_audio_file: 03_10_main.wav
+TRT: '[05:19.153]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Carol's headphones
+    start_time: '[00:00.000]'
+    end_time: '[00:18.110]'
+    description: An audio clip from some type of In Search of... show about psychic energy places with strange other quotes and binaurl panning.
+  - section_name: Intro
+    start_time: '[00:18.111]'
+    end_time: '[00:30.183]'
+    description: A slow groove is played with a 1970s post-punk vibe.
+  - section_name: Verse 1
+    start_time: '[00:30.184]'
+    end_time: '[01:07.125]'
+    description: The verse kicks in with a steady beat, bass, and guitar. The vocals are laid-back and somewhat detached.
+  - section_name: Chorus 1
+    start_time: '[01:07.126]'
+    end_time: '[01:31.274]'
+    description: The song takes a left turn and suddenly sounds like 1980s new wave radio rock with a catchy chorus and melodic vocals.
+  - section_name: Bridge
+    start_time: '[01:31.275]'
+    end_time: '[01:44.047]'
+    description: And now what? Heavy metal guitar chugs?
+  - section_name: Chorus 2
+    start_time: '[01:44.048]'
+    end_time: '[02:08.215]'
+    description: Back to the catchy new wave chorus.
+  - section_name: Interlude
+    start_time: '[02:08.216]'
+    end_time: '[02:33.064]'
+    description: The song propels forward with punk-tinged vocals and both the electric piano and heavy guitars
+  - section_name: Verse 2
+    start_time: '[02:33.065]'
+    end_time: '[02:57.212]'
+    description: The verse returns with more intensity and layers of sounds.
+  - section_name: Chorus 3
+    start_time: '[02:57.213]'
+    end_time: '[03:22.081]'
+    description: Return to the catchy new wave chorus with some hangover notes
+  - section_name: Bridge 2
+    start_time: '[03:22.082]'
+    end_time: '[03:46.227]'
+    description: A reprise of the heavy metal guitar with string scraps and some eerie synths.
+  - section_name: Outro
+    start_time: '[03:46.228]'
+    end_time: '[05:19.153]'
+    description: The song adds guitar after to guitar to build into an epic crescendo.
+mood:
+    - eclectic
+    - quirky
+    - upbeat
+    - catchy
+    - energetic
+    - nostalgic
+    - playful
+    - trancendent
+    - dreamy
+    - eerie
+    - atmospheric
+    - experimental
+    - dynamic
+sounds_like:
+  - name: David Bowie
+    discogs_id: 10263
+  - name: Tear For Fears
+    discogs_id: 19814
+  - name: Godspeed You Black Emperor!
+    discogs_id: 280442
+genres:
+  - Rock
+  - Alternative Rock
+  - New Wave
+  - Post-Punk
+  - Experimental
+  - Indie Rock
+  - Art Rock
+  - Progressive Rock
+lrc_file: 03_10.lrc
+concept: While doing meditations I got into the habit of imagining meeting my seventeen year old self across a stream in the woods I would pass my consciousness to him (the sleeve) and try to find a hidden cave entrance that was different every time. Once in the cave I would carve a sigil into the wall and burn it into the rock by tracing the pattern with my eyes. There were three bells that would let me know how much time had passed in the meditation. The thing that was misremember was the long sleeve tshirt I was wearing as the teen. It was blue, not purple as in the meditation. The song is about that experience and the feeling of being out of time and place.
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 03_10_02_drums.wav
+    group: Drums
+  - id: 3
+    description: Shredder Guitar Synth 1
+    audio_file: 03_10_04_shredder_1.wav
+    midi_file: 03_10_03_shredder_1.mid
+    group: Guitars
+    midi_group: Guitars
+  - id: 5
+    description: Shredder Guitar Synth 2
+    audio_file: 03_10_06_shredder_2.wav
+    midi_file: 03_10_05_shredder_2.mid
+    group: Guitars
+    midi_group: Guitars
+  - id: 11
+    description: Bass
+    audio_file: 03_10_11_bass.wav
+    group: Bass
+  - id: 12
+    description: GM Bass
+    audio_file: 03_10_12_gm_bass.wav
+    group: Bass
+  - id: 13
+    description: Chords
+    audio_file: 03_10_14_chords.wav
+    midi_file: 03_10_13_chords.mid
+    group: Synths
+    midi_group: Synths
+  - id: 15
+    description: Melody
+    audio_file: 03_10_16_melody.wav
+    midi_file: 03_10_15_melody.mid
+    group: Synths
+    midi_group: Synths
+  - id: 17
+    description: Flange Goth
+    audio_file: 03_10_17_flange_goth.wav
+    group: FX
+  - id: 18
+    description: Glam
+    audio_file: 03_10_18_glam.wav
+    group: Guitars
+  - id: 19
+    description: GM
+    audio_file: 03_10_19_gm.wav
+    group: Synths
+  - id: 20
+    description: Vocal 1
+    audio_file: 03_10_20_vocal1.wav
+    group: Vocals
+  - id: 21
+    description: Paddy Synth
+    audio_file: 03_10_22_paddy_synth.wav
+    midi_file: 03_10_21_paddy_synth.mid
+    group: Synths
+    midi_group: Synths
+  - id: 23
+    description: 88Oh
+    audio_file: 03_10_24_88Oh.wav
+    midi_file: 03_10_23_88Oh.mid
+    group: Synths
+    midi_group: Synths
+  - id: 25
+    description: Cheesy Arp
+    audio_file: 03_10_26_cheesy_arp.wav
+    midi_file: 03_10_25_cheesy_arp.mid
+    group: Synths
+    midi_group: Synths
+  - id: 27
+    description: Vocal 2
+    audio_file: 03_10_27_vocal2.wav
+    group: Vocals
+  - id: 28
+    description: Carol's Headphone Collage
+    audio_file: 03_10_28_carols_headphone_collage.wav
+    group: FX
