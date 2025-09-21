@@ -1,0 +1,173 @@
+bpm: 85
+manifest_id: '03_04'
+tempo: 4/4
+key: C# major
+rainbow_color: O
+title: It Used To Be Space, Now it's Here
+release_date: '2020-06-23'
+album_sequence: 4
+main_audio_file: 03_04_01_main.wav
+TRT: '[03:38.027]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Opening
+    start_time: '[00:00.000]'
+    end_time: '[00:03.043]'
+    description: We hear the sounds of a Manhattan street, with cars and people.
+  - section_name: Intro
+    start_time: '[00:03.044]'
+    end_time: '[00:10.145]'
+    description: Dreary optigan and mellotron vibes play and odd-tempo riff with light percussion drum machines.
+  - section_name: Chopped MC
+    start_time: '[00:10.146]'
+    end_time: '[00:27.131]'
+    description: A radio DJ hyping a ticker give away has been chopped up into micro-samples and reassembled rhythmically to sound like a deconstructed rap. This technique would later be expanded by mapping to pitch-based extraction and used on Pulsar Palace.
+  - section_name: Verse 1
+    start_time: '[00:27.132]'
+    end_time: '[00:44.116]'
+    description: The drum machines and noises make just enough space for a weary vocal to come through.
+  - section_name: Chorus 1
+    start_time: '[00:44.117]'
+    end_time: '[01:09.220]'
+    description: The chorus kicks in but then the tail end of each chorus dips out to a strange sing-songy round.
+  - section_name: Verse 2
+    start_time: '[01:09.221]'
+    end_time: '[01:26.205]'
+    description: The verse returns.
+  - section_name: Interlude
+    start_time: '[01:26.206]'
+    end_time: '[01:43.190]'
+    description: The interlude is a dirge-like instrumental break with a sitar-sounding baritone guitar.
+  - section_name: Interlude Frenzy
+    start_time: '[01:43.191]'
+    end_time: '[02:00.175]'
+    description: The interlude continues but the drum machines go into a frenzy.
+  - section_name: Breakdown
+    start_time: '[02:00.176]'
+    end_time: '[02:26.027]'
+    description: All but a deep synthetic bass drop drops out. It wobbles sounding like a Tabla drum.
+  - section_name: Chorus 2
+    start_time: '[02:26.028]'
+    end_time: '[02:45.043]'
+    description: Repeat of the chorus but with the energy winding down.
+  - section_name: Interlude 2
+    start_time: '[02:45.044]'
+    end_time: '[03:00.000]'
+    description: A reprise of the interlude, the baritone is now on equal footing with the optigan and mellotron.
+  - section_name: Outro
+    start_time: '[03:00.001]'
+    end_time: '[03:38.027]'
+    description: The looping outro features a repeated vocal phrase "Not there no more"
+  - section_name: An Incident in Chelsea
+    start_time: '[03:38.028]'
+    end_time: '[03:38.027]'
+    description: The sounds of an argument on the street in Manhattan.
+mood:
+  - contemplative
+  - dreamy
+  - hypnotic
+  - introspective
+  - melancholic
+  - urban
+  - somber
+  - nostalgic
+  - experimental
+  - textured
+  - rhythmic
+  - layered
+sounds_like:
+  - name: Hood
+    discogs_id: 5047
+  - name: Brian Eno
+    discogs_id: 634
+genres:
+  - electronic
+  - experimental
+  - downtempo
+  - trip hop
+  - indie electronic
+  - lo-fi
+  - chillout
+  - art pop
+  - post-rock
+  - IDM
+lrc_file: 03_04.lrc
+concept: I lived in NYC area for college and for about five years after. For work I made the mistake of moving to the UK for a year. Unbeknownst to me, there's a tax treaty set up specifically between New York and London that made moving back a financial impossibility. When I finally made it back to New York everything had changed. A theater space I used as a landmark had changed it's name from "Here" to "Space" and I wound up texting a friend "It used to be Space, now it's Here." I was lost in my former home and downtown didn't know North from South without the World Trade Center to orient me. The song is about that dislocation and the feeling of being an outsider in a place that used to be home. Although not a favorite song of mine it has one of the best lines I've ever written "Was it across from the (Central) Park, where  John( Lennon) met his Mark( Chapman)? Or off Dekalb Ave (in Williamsburg Brooklyn) where Nicky the Knife (local mobster) got stabbed?" The past thing misremembered was the "Ear" sign/bar being above Canal.
+audio_tracks:
+  - id: 2
+    description: Sample Cut Up Drums
+    audio_file: 03_04_02_cutup_drums.wav
+    midi_file: 03_04_03_cutup_drums.mid
+  - id: 3
+    description: Fake motown drums
+    audio_file: 03_04_05_fake_kit.wav
+    midi_file: 03_04_04_fake_kit.mid
+  - id: 4
+    description: Filtered Drum Machine
+    audio_file: 03_04_06_filtered_dm.wav
+  - id: 5
+    description: Weird kick (tabla sounding)
+    audio_file: 03_04_07_weird_dm.wav
+  - id: 6
+    description: Synth Bass
+    audio_file: 03_04_10_synth_bass.wav
+    midi_file: 03_04_08_synth_bass.mid
+  - id: 7
+    description: Synth Bass Square Wave
+    audio_file: 03_04_11_synth_bass_square.wav
+    midi_file: 03_04_09_synth_bass_square.mid
+  - id: 8
+    description: Mellotron Vibes
+    audio_file: 03_04_13_mellotron_vibes.wav
+    midi_file: 03_04_12_mellotron_vibes.mid
+  - id: 9
+    description: Organ
+    audio_file: 03_04_15_organ.wav
+    midi_file: 03_04_14_organ.mid
+  - id: 10
+    description: Wurlitzer
+    audio_file: 03_04_17_wurlitzer.wav
+    midi_file: 03_04_16_wurlitzer.mid
+  - id: 11
+    description: Granular Synth Interference
+    audio_file: 03_04_19_interference.wav
+    midi_file: 03_04_18_interference.mid
+  - id: 12
+    description: Optigan (On Mellotron plugin)
+    audio_file: 03_04_21_mellotron.wav
+    midi_file: 03_04_20_mellotron.mid
+  - id: 13
+    description: Matrix Synth
+    audio_file: 03_04_23_matrix.wav
+    midi_file: 03_04_22_matrix.mid
+  - id: 14
+    description: Corrupted Guitar
+    audio_file: 03_04_24_corrupter_guitar.wav
+  - id: 15
+    description: Google Magenta NSynth
+    audio_file: 03_04_25_nsynth.wav
+  - id: 16
+    description: MC Cut up
+    audio_file: 03_04_26_mc_cut.wav
+  - id: 17
+    description: Baritone Guitar
+    audio_file: 03_04_27_trem_guitar.wav
+  - id: 18
+    description: Main Vocals
+    audio_file: 03_04_28_main_vocal.wav
+  - id: 19
+    description: Double Vocals
+    audio_file: 03_04_29_dbl_vocal.wav
+  - id: 20
+    description: Vocoders
+    audio_file: 03_04_30_vocoders.wav
+    midi_file: 03_04_31_vocoder_one.mid
+    group: vocoders
+  - id: 21
+    description: Vocoder Two
+    midi_file: 03_04_32_vocoder_two.mid
+    group: vocoders
+  - id: 22
+    description: Incident in Chelsea
+    audio_file: 03_04_33_incident_in_chelsea.wav

@@ -1,3 +1,4 @@
+
 from enum import Enum
 from pydantic import BaseModel
 
@@ -20,7 +21,7 @@ class RainbowColorModes(Enum):
     def __repr__(self):
         return f"RainbowColorModes.{self.name}"
 
-class RainbowTableTransmigrationalMode(Enum):
+class RainbowTableTransmigrationalMode(BaseModel):
 
     """ The Earthly to Frame and Frame to Earthly transmigrational modes of rainbow colors. Well, how 'bout that?"""
 
@@ -29,9 +30,8 @@ class RainbowTableTransmigrationalMode(Enum):
     transcendental_mode: RainbowColorModes
 
     def __init__(self, current_mode: RainbowColorModes, transitory_mode: RainbowColorModes, transcendental_mode: RainbowColorModes):
-        self.current_mode = current_mode
-        self.transitory_mode = transitory_mode
-        self.transcendental_mode = transcendental_mode
+        super().__init__(current_mode=current_mode, transitory_mode=transitory_mode,
+                         transcendental_mode=transcendental_mode)
 
     def __str__(self):
         return f"{self.current_mode} -> {self.transitory_mode} -> {self.transcendental_mode}"
@@ -104,7 +104,7 @@ class RainbowTableColor(BaseModel):
         return f"{self.color_name} ({self.hex_value:#06x})"
 
     def __repr__(self):
-        return f"RainbowTableColors(color_name={self.color_name}, hex_value={self.hex_value:#06x}, mnemonic_letter_value={self.mnemonic_character_value})"
+        return f"RainbowTableColor(color_name={self.color_name}, hex_value={self.hex_value:#06x}, mnemonic_character_value={self.mnemonic_character_value}, transmigrational_mode={self.transmigrational_mode})"
 
     def to_dict(self):
         return {
@@ -118,3 +118,87 @@ class RainbowTableColor(BaseModel):
         g = (self.hex_value >> 8) & 0xFF
         b = self.hex_value & 0xFF
         return r, g, b, 255
+
+
+the_rainbow_table_colors = {
+    "Z": RainbowTableColor(
+        color_name="Black",
+        hex_value=0x231f20,
+        mnemonic_character_value="0",
+        transmigrational_mode=RainbowTableTransmigrationalMode(
+            current_mode=RainbowColorModes.SPACE,
+            transitory_mode=RainbowColorModes.TIME,
+            transcendental_mode=RainbowColorModes.INFORMATION
+        )
+    ),
+    "R": RainbowTableColor(
+        color_name="Red",
+        hex_value=0xAE1E36,
+        mnemonic_character_value="R",
+        temporal_mode=RainbowColorTemporalMode.PAST,
+        objectional_mode=RainbowColorObjectionalMode.THING,
+        ontological_mode=[RainbowColorOntologicalMode.KNOWN]
+    ),
+    "O": RainbowTableColor(
+        color_name="Orange",
+        hex_value=0xEF7143,
+        mnemonic_character_value="O",
+        temporal_mode=RainbowColorTemporalMode.PAST,
+        objectional_mode=RainbowColorObjectionalMode.THING,
+        ontological_mode=[RainbowColorOntologicalMode.IMAGINED]
+    ),
+    "Y": RainbowTableColor(
+        color_name="Yellow",
+        hex_value=0xFFFF00,
+        mnemonic_character_value="Y",
+        temporal_mode=RainbowColorTemporalMode.FUTURE,
+        objectional_mode=RainbowColorObjectionalMode.PLACE,
+        ontological_mode=[RainbowColorOntologicalMode.IMAGINED]
+    ),
+    "G": RainbowTableColor(
+        color_name="Green",
+        hex_value=0xABD96D,
+        mnemonic_character_value="G",
+        temporal_mode=RainbowColorTemporalMode.FUTURE,
+        objectional_mode=RainbowColorObjectionalMode.PLACE,
+        ontological_mode=[RainbowColorOntologicalMode.FORGOTTEN]
+    ),
+    "B": RainbowTableColor(
+        color_name="Blue",
+        hex_value=0x042A7B,
+        mnemonic_character_value="B",
+        temporal_mode=RainbowColorTemporalMode.PRESENT,
+        objectional_mode=RainbowColorObjectionalMode.PERSON,
+        ontological_mode=[RainbowColorOntologicalMode.FORGOTTEN]
+    ),
+    "I": RainbowTableColor(
+        color_name="Indigo",
+        hex_value=0x26294A,
+        mnemonic_character_value="I",
+        ontological_mode=[RainbowColorOntologicalMode.KNOWN,RainbowColorOntologicalMode.FORGOTTEN]
+    ),
+    "V": RainbowTableColor(
+        color_name="Violet",
+        hex_value=0xAD85D6,
+        mnemonic_character_value="V",
+        temporal_mode=RainbowColorTemporalMode.PRESENT,
+        objectional_mode=RainbowColorObjectionalMode.PERSON,
+        ontological_mode=[RainbowColorOntologicalMode.KNOWN]
+    ),
+    "A": RainbowTableColor(
+        color_name="White",
+        hex_value=0xF6F6F6,
+        mnemonic_character_value="1",
+        transmigrational_mode=RainbowTableTransmigrationalMode(
+            current_mode=RainbowColorModes.INFORMATION,
+            transitory_mode=RainbowColorModes.TIME,
+            transcendental_mode=RainbowColorModes.SPACE
+        )
+    )
+}
+
+def get_rainbow_table_color(color_str: str) -> RainbowTableColor:
+    if color_str in the_rainbow_table_colors:
+        return the_rainbow_table_colors[color_str]
+    else:
+        raise ValueError(f"Color {color_str} is not a valid rainbow table color.")
