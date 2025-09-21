@@ -1,0 +1,159 @@
+bpm: 100
+manifest_id: '03_05'
+tempo: 4/4
+key: C major
+rainbow_color: O
+title: Newton
+release_date: '2020-06-23'
+album_sequence: 5
+main_audio_file: 03_05_01_main.wav
+TRT: '[04:48.000]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: A WSUS alert intro
+    start_time: '[00:00.000]'
+    end_time: '[00:14.100]'
+    description: The 1980s Sussex County, NJ weather alert jingle along with a buried announcer's voice.
+  - section_name: Opening verse
+    start_time: '[00:14.101]'
+    end_time: '[00:33.150]'
+    description: The music kicks in full throttle with gigantic 1990s style guitars
+  - section_name: Settling Pre-verse
+    start_time: '[00:33.151]'
+    end_time: '[00:43.050]'
+    description: The music drops down to a more contemplative level
+  - section_name: Verse 1
+    start_time: '[00:43.051]'
+    end_time: '[01:12.000]'
+    description: The first verse, with a more traditional indie rock arrangement
+  - section_name: Chorus 1
+    start_time: '[01:12.001]'
+    end_time: '[01:26.100]'
+    description: The chorus takes a major weird turn with trippy vocal effects and pulsating synths and background vocals.
+  - section_name: Bridge 1
+    start_time: '[01:26.101]'
+    end_time: '[01:31.050]'
+    description: A guitar line, based on the WSUS jingle, guides us back to the verse
+  - section_name: Verse 2
+    start_time: '[01:31.051]'
+    end_time: '[02:00.000]'
+    description: The second verse, there's variations on the vocal melody to suite the lyrics
+  - section_name: Bridge 2
+    start_time: '[02:00.001]'
+    end_time: '[02:24.000]'
+    description: The bridge idea is developed and extended to bring back to the next verse, the stuttered vocals from the chorus now underpin the whole section
+  - section_name: Verse 3
+    start_time: '[02:24.001]'
+    end_time: '[02:43.050]'
+    description: The third verse concludes the lyrical story
+  - section_name: Chorus 2
+    start_time: '[02:43.051]'
+    end_time: '[03:12.000]'
+    description: The chorus is brought in now more lamenting and wistful
+  - section_name: Bridge 3
+    start_time: '[03:12.001]'
+    end_time: '[03:21.000]'
+    description: The bridge is repeated again, now with more organ and synths
+  - section_name: Jams
+    start_time: '[03:21.001]'
+    end_time: '[04:33.150]'
+    description: The elements introduced, the WSUS jingle, 90s guitars, organs and stuttered vocals are all jammed out in a long outro section
+  - section_name: Outro
+    start_time: '[04:33.151]'
+    end_time: '[04:48.000]'
+    description: The drums drop out and the song ends with the guitars and synths playing off the jingle melody
+mood:
+  - contemplative
+  - nostalgic
+sounds_like:
+  - name: Pale Saints
+    discogs_id: 88711
+  - name: Ruhr
+    discogs_id: 93854
+  - name: Ride
+    discogs_id: 10138
+  - name: The Lewers
+    discogs_id: 13801555
+  - name: The Jesus and Mary Chain
+    discogs_id: 243280
+genres:
+  - indie rock
+  - shoegaze
+  - dream pop
+  - alternative rock
+  - psychedelic rock
+  - art rock
+lrc_file: 03_05.lrc
+concept: One of the most directly autobiographical songs, Newton (named for the town in Sussex County, NJ where I grew up - and obviously Rainbow-related) is about the "magical bored" moments of youth. The girl in the song is a composite of friends I spent a lot of time with back then - a couple of which had some mental health issues. Their unknowable inner worlds were something that I both related to and could never get close to. There's touches of drug-use and the casual racism of that area and time. Musically, the song is an extrapolation of the WSUS weather alert jingle - which had a cheesy synth melody that I always found haunting. The past thing remembered incorrectly was the jingle's melody.
+audio_tracks:
+  - id: 2
+    description: Synth bass 1
+    audio_file: 03_05_03_synth_bass_1.wav
+    midi_file: 03_05_02_synth_bass_1.mid
+  - id: 3
+    description: Synth bass 2
+    audio_file: 03_05_05_synth_bass_2.wav
+    midi_file: 03_05_04_synth_bass_2.mid
+  - id: 4
+    description: Electric Bass
+    audio_file: 03_05_06_electric_bass.wav
+  - id: 5
+    description: Hybrid Kick
+    audio_file: 03_05_07_hybrid_kick.wav
+    midi_file: 03_05_08_hybrid_kick.mid
+    midi_group: Drums
+    group: Drums
+  - id: 6
+    description: Snare
+    audio_file: 03_05_10_snare.wav
+    midi_file: 03_05_09_snare.mid
+    midi_group: Drums
+    group: Drums
+  - id: 7
+    description: Hi-Hat
+    audio_file: 03_05_12_hihat.wav
+    midi_file: 03_05_11_hihat.mid
+    midi_group: Drums
+    group: Drums
+  - id: 8
+    description: Toms
+    audio_file: 03_05_14_toms.wav
+    midi_file: 03_05_13_toms.mid
+    midi_group: Drums
+    group: Drums
+  - id: 9
+    description: Cymbals
+    audio_file: 03_05_16_cymbals.wav
+    midi_file: 03_05_15_cymbals.mid
+    midi_group: Drums
+    group: Drums
+  - id: 10
+    description: Farfisa Organ
+    audio_file: 03_05_18_farfisa.wav
+    midi_file: 03_05_17_farfisa.mid
+  - id: 11
+    description: Moog Grandmother Synth
+    audio_file: 03_05_19_grandmother.wav
+  - id: 12
+    description: Shredder Faux Metal Guitar
+    audio_file: 03_05_21_shredder.wav
+    midi_file: 03_05_20_shredder.mid
+  - id: 13
+    description: Rhythm Guitar with re-mic
+    audio_file: 03_05_22_rhythm_guitar.wav
+  - id: 14
+    description: Lead Guitar with re-mic
+    audio_file: 03_05_23_lead_guitar.wav
+  - id: 15
+    description: Vocal One Verse and Chorus
+    audio_file: 03_05_24_vocal_1.wav
+  - id: 16
+    description: Vocal Two Verse and Chorus
+    audio_file: 03_05_25_vocal_2.wav
+  - id: 17
+    description: Vocal Three Chorus and Background Vocals
+    audio_file: 03_05_26_vocal_3.wav
+  - id: 18
+    description: WSUS Jingle
+    audio_file: 03_05_27_radio.wav

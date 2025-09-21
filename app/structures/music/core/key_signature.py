@@ -34,3 +34,20 @@ class KeySignature(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
+
+tempered_modes = {
+    #ToDo: Check these - they are slopped in
+    'major': Mode(name=ModeName.MAJOR, intervals=[2, 2, 1, 2, 2, 2, 1]),
+    'minor': Mode(name=ModeName.MINOR, intervals=[2, 1, 2, 2, 1, 2, 2]),
+    'dorian': Mode(name=ModeName.DORIAN, intervals=[2, 1, 2, 2, 2, 1, 2]),
+    'phrygian': Mode(name=ModeName.PHRYGIAN, intervals=[1, 2, 2, 2, 1, 2, 2]),
+    'lydian': Mode(name=ModeName.LYDIAN, intervals=[2, 2, 2, 1, 2, 2, 1]),
+    'mixolydian': Mode(name=ModeName.MIXOLYDIAN, intervals=[2, 2, 1, 2, 2, 1, 2]),
+    'aeolian': Mode(name=ModeName.AEOLIAN, intervals=[2, 1, 2, 2, 1, 2, 2]),
+}
+
+def get_mode(mode_str: str) -> Mode:
+    if mode_str in tempered_modes:
+        return tempered_modes[mode_str]
+    else:
+        raise ValueError(f"Mode {mode_str} is not a valid tempered mode.")

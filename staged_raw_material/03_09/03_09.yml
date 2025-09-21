@@ -1,0 +1,175 @@
+bpm: 113
+manifest_id: '03_09'
+tempo: 4/4
+key: E minor
+rainbow_color: O
+title: Search Flares
+release_date: '2020-06-23'
+album_sequence: 9
+main_audio_file: 03_09_main.wav
+TRT: '[04:36.022]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[01:03.181]'
+    description: Throbbing noise and alarm sounds create an unwelcoming atmosphere.
+  - section_name: Verse 1
+    start_time: '[01:03.182]'
+    end_time: '[02:09.166]'
+    description: An industrial/metal beat kicks in with obliterated guitar sounds and panicked vocals.
+  - section_name: Chorus 1
+    start_time: '[02:09.167]'
+    end_time: '[02:26.160]'
+    description: The chorus becomes slightly more melodic and straightforward, but still chaotic.
+  - section_name: Verse as Jams
+    start_time: '[02:26.161]'
+    end_time: '[02:43.152]'
+    description: The verse returns with more intensity and layers of sounds. A ratchet-like synth line is introduced.
+  - section_name: Verse 2
+    start_time: '[02:43.153]'
+    end_time: '[03:00.164]'
+    description: The verse continues with more aggression and complexity culminating in a faux double-kick drum pattern.
+  - section_name: Chorus 2
+    start_time: '[03:00.165]'
+    end_time: '[03:17.171]'
+    description: The chorus returns with less chaos and more melody, but still retains the industrial/metal vibe.
+  - section_name: Lost in the woods
+    start_time: '[03:17.172]'
+    end_time: '[03:34.160]'
+    description: Air raid sirens and alarm sounds can be heard way off in the distance.
+mood:
+  - dark
+  - desperate
+  - chaotic
+  - intense
+  - aggressive
+  - unsettling
+  - eerie
+  - haunting
+  - frantic
+  - brooding
+  - ominous
+sounds_like:
+  - name: Killing Joke
+    discogs_id: 13408
+  - name: Nine Inch Nails
+    discogs_id: 3857
+  - name: Christian Death
+    discogs_id: 94647
+genres:
+  - Industrial
+  - Alternative Rock
+  - Metal
+  - Experimental
+  - Post-Punk
+  - Noise
+  - Gothic Rock
+lrc_file: 03_09.lrc
+concept: While trying to make a documentary about a concentration camp survivor, we got locked in the inner fortress of Theresienstadt in the Czech Republic. We had to scale the walls to escape through a former minefield. We were lost and trying to our way back to town and felt very alone and disoriented by horror of the place. This song captures that feeling of being lost in a dark and frightening place, with the industrial/metal sound reflecting the harshness of the environment and the panic of being lost. The item lost and misremembered was not a stone taken from the surrealist Robert Desnos memorial but a vile of dirt I gave to Jayson Merritt upon returning.
+audio_tracks:
+  - id: 2
+    description: Raspy Vocals
+    audio_file: 03_09_02_rasp_vox.wav
+    group: Vocals
+  - id: 3
+    description: Main Vocals
+    audio_file: 03_09_03_main_vox.wav
+    group: Vocals
+  - id: 4
+    description: Whiny Vocals
+    audio_file: 03_09_04_whiny_vox.wav
+    group: Vocals
+  - id: 5
+    description: Ambient
+    audio_file: 03_09_05_ambient.wav
+    group: Synths
+  - id: 6
+    description: Turbo
+    audio_file: 03_09_06_turbo.wav
+    midi_file: 03_09_07_turbo.mid
+    group: Synths
+    midi_group: Synths
+  - id: 8
+    description: Ebow Guitar
+    audio_file: 03_09_08_ebow_07_as_midi.wav
+    group: Guitars
+  - id: 9
+    description: Kick Drum
+    audio_file: 03_09_10_kick.wav
+    midi_file: 03_09_09_kick.mid
+    group: Drums
+    midi_group: Drums
+  - id: 11
+    description: Kick Drum 2
+    audio_file: 03_09_12_kick2.wav
+    midi_file: 03_09_11_kick2.mid
+    group: Drums
+    midi_group: Drums
+  - id: 13
+    description: Snare Drum
+    audio_file: 03_09_14_snare.wav
+    midi_file: 03_09_13_snare.mid
+    group: Drums
+    midi_group: Drums
+  - id: 15
+    description: Hi-Hat
+    audio_file: 03_09_16_hithat.wav
+    midi_file: 03_09_15_hithat.mid
+    group: Drums
+    midi_group: Drums
+  - id: 17
+    description: Ride Cymbal
+    audio_file: 03_09_18_ride.wav
+    midi_file: 03_09_17_ride.mid
+    group: Drums
+    midi_group: Drums
+  - id: 19
+    description: Crash Cymbal
+    audio_file: 03_09_20crash.wav
+    midi_file: 03_09_19_crash.mid
+    group: Drums
+    midi_group: Drums
+  - id: 21
+    description: Toms
+    audio_file: 03_09_22_toms.wav
+    midi_file: 03_09_21_toms.mid
+    group: Drums
+    midi_group: Drums
+  - id: 23
+    description: GM Bass
+    audio_file: 03_09_23_gm_bass.wav
+    group: Bass
+  - id: 24
+    description: Guitar 1
+    audio_file: 03_09_24_guitar_1.wav
+    group: Guitars
+  - id: 25
+    description: Guitar 2
+    audio_file: 03_09_25_guitar_2.wav
+    group: Guitars
+  - id: 26
+    description: Motor
+    audio_file: 03_09_26_motor.wav
+    group: FX
+  - id: 27
+    description: SEM Synth
+    audio_file: 03_09_27_SEM.wav
+    group: Synths
+  - id: 28
+    description: Split VCA
+    audio_file: 03_09_28_split_vca.wav
+    group: Synths
+  - id: 29
+    description: Easel Synth
+    audio_file: 03_09_29_easel.wav
+    group: Synths
+  - id: 30
+    description: Mantis Synth
+    audio_file: 03_09_30_mantis.wav
+    group: Synths
+  - id: 31
+    description: 259e Synth
+    audio_file: 03_09_31_259e.wav
+    group: Synths
