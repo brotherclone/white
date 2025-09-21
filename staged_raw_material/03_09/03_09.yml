@@ -93,47 +93,47 @@ audio_tracks:
     midi_group: Synths
   - id: 8
     description: Ebow Guitar
-    audio_file: 03_09_08_ebow_07_as_midi.mid.wav
+    audio_file: 03_09_08_ebow_07_as_midi.wav
     group: Guitars
   - id: 9
     description: Kick Drum
-    audio_file: 03_09_10_kick.mid.wav
+    audio_file: 03_09_10_kick.wav
     midi_file: 03_09_09_kick.mid
     group: Drums
     midi_group: Drums
   - id: 11
     description: Kick Drum 2
-    audio_file: 03_09_12_kick2.mid.wav
+    audio_file: 03_09_12_kick2.wav
     midi_file: 03_09_11_kick2.mid
     group: Drums
     midi_group: Drums
   - id: 13
     description: Snare Drum
-    audio_file: 03_09_14_snare.mid.wav
+    audio_file: 03_09_14_snare.wav
     midi_file: 03_09_13_snare.mid
     group: Drums
     midi_group: Drums
   - id: 15
     description: Hi-Hat
-    audio_file: 03_09_16_hithat.mid.wav
+    audio_file: 03_09_16_hithat.wav
     midi_file: 03_09_15_hithat.mid
     group: Drums
     midi_group: Drums
   - id: 17
     description: Ride Cymbal
-    audio_file: 03_09_18_ride.mid.wav
+    audio_file: 03_09_18_ride.wav
     midi_file: 03_09_17_ride.mid
     group: Drums
     midi_group: Drums
   - id: 19
     description: Crash Cymbal
-    audio_file: 03_09_20crash.mid.wav
+    audio_file: 03_09_20crash.wav
     midi_file: 03_09_19_crash.mid
     group: Drums
     midi_group: Drums
   - id: 21
     description: Toms
-    audio_file: 03_09_22_toms.mid.wav
+    audio_file: 03_09_22_toms.wav
     midi_file: 03_09_21_toms.mid
     group: Drums
     midi_group: Drums
