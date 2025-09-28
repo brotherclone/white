@@ -1,6 +1,6 @@
+from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.constants import END
 from langgraph.graph.state import StateGraph
 
 from app.agents.base_rainbow_agent import BaseRainbowAgent
@@ -10,7 +10,7 @@ from app.agents.states.yellow_agent_state import YellowAgentState
 
 load_dotenv()
 
-class YellowAgent(BaseRainbowAgent):
+class YellowAgent(BaseRainbowAgent, ABC):
 
     """Pulsar Palace RPG Runner - Automated RPG sessions"""
 
@@ -41,47 +41,12 @@ class YellowAgent(BaseRainbowAgent):
 
     def create_graph(self) -> StateGraph:
         graph = StateGraph(VioletAgentState)
-        graph.add_node("run_rpg_session", self._run_rpg_session)
-        graph.add_node("create_room", self._create_room)
-        graph.add_node("create_encounter", self._create_encounter)
-        graph.add_edge("run_rpg_session", "create_room")
-        graph.add_edge("create_room", "create_encounter")
-        graph.add_edge("create_encounter", END)
         return graph
+    def generate_document(self):
+        raise NotImplementedError("Subclasses must implement generate_document method")
 
-    @staticmethod
-    def _run_rpg_session(state: YellowAgentState)-> YellowAgentState:
-        """Node for RPG run"""
-        # Placeholder RPG run logic
-        if not hasattr(state, 'rpg_session'):
-            state.rpg_session = {
-                'players': [],
-                'current_room': None,
-                'encounters': []
-            }
-        return state
+    def generate_alternate_song_spec(self):
+        raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
 
-    @staticmethod
-    def _create_room(state: YellowAgentState)-> YellowAgentState:
-        """Node for creating a new room in the RPG session"""
-        # Placeholder room creation logic
-        if not hasattr(state, 'room'):
-            state.room = {
-                'description': 'A dark, eerie chamber filled with ancient artifacts.',
-                'monsters': [],
-                'treasures': []
-            }
-        return state
-
-    @staticmethod
-    def _create_encounter(state: YellowAgentState)-> YellowAgentState:
-        """Node for creating an encounter in the RPG session"""
-        # Placeholder encounter creation logic
-        if not hasattr(state, 'encounter'):
-            state.encounter = {
-                'type': 'combat',
-                'monsters': ['Goblin', 'Orc'],
-                'treasures': ['Gold Coin', 'Magic Sword']
-            }
-        return state
-
+    def contribute(self):
+        raise NotImplementedError("Subclasses must implement contribute method")

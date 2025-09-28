@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from unittest.mock import patch, mock_open
-from app.structures.extractors.base_manifest_extractor import BaseManifestExtractor
+from app.structures.extractors.main_manifest_extractor import BaseManifestExtractor
 from pathlib import Path
 
 # --- Fixture to set MANIFEST_PATH for all tests ---
