@@ -1,15 +1,49 @@
-
 import mido
 import numpy as np
-
+import os
+from dotenv import load_dotenv
 from typing import List, Dict, Any
-from app.structures.extractors.base_manifest_extractor import BaseManifestExtractor
+
+from app.util.manifest_loader import load_manifest
 
 
-class MidiExtractor(BaseManifestExtractor):
+class MidiExtractor:
+    """Standalone MIDI feature extractor"""
 
-    def __init__(self, **data):
-        super().__init__(**data)
+    def __init__(self, manifest_id: str):
+        load_dotenv()
+        self.manifest_id = manifest_id
+        self.manifest_path = os.path.join(
+            os.environ['MANIFEST_PATH'],
+            manifest_id,
+            f"{manifest_id}.yml"
+        )
+
+        if os.path.exists(self.manifest_path):
+            self.manifest = load_manifest(self.manifest_path)
+        else:
+            self.manifest = None
+
+    def extract_segment_features(self, midi_path: str, start_time: float, end_time: float) -> Dict[str, Any]:
+        """Extract MIDI features for a specific time segment - this is the method ManifestExtractor expects"""
+        try:
+            midi_features = self.load_midi_segment(midi_path, start_time, end_time)
+            if midi_features is None:
+                return {
+                    'note_density': 0.0,
+                    'pitch_variety': 0.0,
+                    'rhythmic_regularity': 1.0,
+                    'avg_polyphony': 0.0
+                }
+            return midi_features
+        except Exception as e:
+            print(f"Error in extract_segment_features: {e}")
+            return {
+                'note_density': 0.0,
+                'pitch_variety': 0.0,
+                'rhythmic_regularity': 1.0,
+                'avg_polyphony': 0.0
+            }
 
     def load_midi_segment(self, midi_path: str, start_time: float, end_time: float) -> Dict[str, Any] | None:
         """Extract MIDI events and features for a temporal segment"""
@@ -169,5 +203,5 @@ class MidiExtractor(BaseManifestExtractor):
     #     return midi_data.get('raw_events', [])
 
 if __name__ == "__main__":
-    midi_extractor = MidiExtractor(manifest_path="/Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01.yml")
+    midi_extractor = MidiExtractor(manifest_id="01_01")
     print(midi_extractor.manifest)

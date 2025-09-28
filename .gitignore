@@ -2,7 +2,6 @@
 .idea
 /staged_raw_materials/
 /working/
-/training/
 *.wav
 *.mp3
 *.mp4
