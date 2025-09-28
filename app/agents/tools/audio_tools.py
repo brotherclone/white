@@ -5,6 +5,9 @@ import warnings
 import logging
 import assemblyai as aai
 import os
+import random
+import soundfile as sf
+
 
 from dotenv import load_dotenv
 from scipy import signal
@@ -353,23 +356,133 @@ def try_speech_like_generation(duration: int = 5) -> str:
 
     return f"Generated and played {duration}s of speech-like noise. Saved to /tmp/speech_like_test.wav"
 
+def find_wav_files(root_dir):
+    wav_files = []
+    for dirpath, _, filenames in os.walk(root_dir):
+        for file_name in filenames:
+            if file_name.lower().endswith('.wav'):
+                wav_files.append(os.path.join(dirpath, file_name))
+    return wav_files
 
-def main():
-    """Main test function - no async needed!"""
-    logging.info("Starting Black Agent EVP test with enhanced speech-like generation...")
+def extract_non_silent_segments(audio, sr, min_duration, top_db=30):
+    intervals = librosa.effects.split(audio, top_db=top_db)
+    segments = []
+    min_samples = int(min_duration * sr)
+    for start, end in intervals:
+        if end - start >= min_samples:
+            segments.append(audio[start:end])
+    return segments
 
-    # Test 1: Generate and listen to speech-like noise
-    test_result = try_speech_like_generation(3)
-    logging.info(test_result)
+def select_random_segment_audio(root_dir, min_duration, num_segments, output_dir):
+    wav_files = find_wav_files(root_dir)
+    random.shuffle(wav_files)
+    os.makedirs(output_dir, exist_ok=True)
+    found = 0
 
-    # Test 2: Full EVP pipeline
-    evp_text = conjurers_evp(8, "/tmp", "black_agent_evp.wav")
+    for wav_path in wav_files:
+        if found >= num_segments:
+            break
+        audio, sr = librosa.load(wav_path, sr=None)
+        segments = extract_non_silent_segments(audio, sr, min_duration)
+        for seg in segments:
+            if found >= num_segments:
+                break
+            out_path = os.path.join(output_dir, f"segment_{found+1}.wav")
+            sf.write(out_path, seg, sr)
+            found += 1
+
+    print(f"Extracted {found} segments to {output_dir}.")
+
+def create_random_audio_mosaic(root_dir, slice_duration_ms, target_length_sec, output_path):
+    wav_files = []
+    for dirpath, _, filenames in os.walk(root_dir):
+        for fname in filenames:
+            if fname.lower().endswith('.wav'):
+                wav_files.append(os.path.join(dirpath, fname))
+    random.shuffle(wav_files)
+
+    segments = []
+    total_samples = 0
+    sample_rate = None
+    slice_samples = None
+
+    while total_samples < int(target_length_sec * 44100):
+        if not wav_files:
+            break
+        wav_path = random.choice(wav_files)
+        audio, sr = librosa.load(wav_path, sr=None)
+        if sample_rate is None:
+            sample_rate = sr
+            slice_samples = int(slice_duration_ms / 1000 * sample_rate)
+        if len(audio) < slice_samples:
+            continue
+        start = random.randint(0, len(audio) - slice_samples)
+        segment = audio[start:start + slice_samples]
+        segments.append(segment)
+        total_samples += slice_samples
+
+    if segments:
+        mosaic = np.concatenate(segments)[:int(target_length_sec * sample_rate)]
+        sf.write(output_path, mosaic, sample_rate)
+        print(f"Saved mosaic audio to {output_path}")
+    else:
+        print("No suitable segments found.")
+
+def blend_speech_like_noise(input_path: str, blend: float, output_dir: str) -> str:
+    """
+    Load an audio file, generate speech-like noise of the same length,
+    blend with the original using the blend factor, and save to output_dir.
+    """
+    audio, sr = librosa.load(input_path, sr=None)
+    duration_seconds = len(audio) / sr
+    noise = np.frombuffer(generate_speech_like_noise(duration_seconds, sr), dtype=np.int16).astype(np.float32) / 32767.0
+
+    # Match noise length to audio
+    if len(noise) > len(audio):
+        noise = noise[:len(audio)]
+    elif len(noise) < len(audio):
+        noise = np.pad(noise, (0, len(audio) - len(noise)), mode='constant')
+
+    # Blend
+    blended = (1 - blend) * audio + blend * noise
+    blended = np.clip(blended, -1.0, 1.0)
+
+    # Prepare output path
+    os.makedirs(output_dir, exist_ok=True)
+    out_path = os.path.join(output_dir, os.path.basename(input_path).replace('.wav', '_blended.wav'))
+    sf.write(out_path, blended, sr)
+    return out_path
+
+if __name__ == "__main__":
+    # logging.info("Starting Black Agent EVP test with enhanced speech-like generation...")
+    # test_result = try_speech_like_generation(3)
+    # logging.info(test_result)
+    # evp_text = conjurers_evp(8, "/tmp", "black_agent_evp.wav")
+    # if evp_text:
+    #     logging.info(f"SUCCESS! Generated EVP Text: '{evp_text}'")
+    #     logging.info(f"Text length: {len(evp_text)} characters")
+    # else:
+    #     logging.warning("Still no text generated - need to make audio even more speech-like!")
+    select_random_segment_audio(
+        root_dir="/Volumes/LucidNonsense/White/staged_raw_material",
+        min_duration=1.0,
+        num_segments=5,
+        output_dir="/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments"
+    )
+    create_random_audio_mosaic(
+        root_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments',
+        slice_duration_ms=50,
+        target_length_sec=10,
+        output_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav'
+    )
+    blended_path = blend_speech_like_noise(
+        input_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav',
+        blend=0.3,
+        output_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios'
+    )
+    evp_text = conjurers_evp(8, "/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/", "evp_test.wav")
     if evp_text:
         logging.info(f"SUCCESS! Generated EVP Text: '{evp_text}'")
         logging.info(f"Text length: {len(evp_text)} characters")
     else:
         logging.warning("Still no text generated - need to make audio even more speech-like!")
-
-
-if __name__ == "__main__":
-    main()
