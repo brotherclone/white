@@ -10,6 +10,7 @@ class MainAgentState(BaseRainbowAgentState):
 
     thread_id: str = "main_thread"
     song_proposal: SongProposal | None = None
+    artifacts: List[Any] = []
     black_content: Dict[str, Any] = Field(default_factory=dict)
     black_proposal: SongProposal | None = None
     red_content: Dict[str, Any] = Field(default_factory=dict)

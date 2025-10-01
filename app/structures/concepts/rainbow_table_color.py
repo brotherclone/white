@@ -124,7 +124,7 @@ the_rainbow_table_colors = {
     "Z": RainbowTableColor(
         color_name="Black",
         hex_value=0x231f20,
-        mnemonic_character_value="0",
+        mnemonic_character_value="Z",
         transmigrational_mode=RainbowTableTransmigrationalMode(
             current_mode=RainbowColorModes.SPACE,
             transitory_mode=RainbowColorModes.TIME,
@@ -188,7 +188,7 @@ the_rainbow_table_colors = {
     "A": RainbowTableColor(
         color_name="White",
         hex_value=0xF6F6F6,
-        mnemonic_character_value="1",
+        mnemonic_character_value="A",
         transmigrational_mode=RainbowTableTransmigrationalMode(
             current_mode=RainbowColorModes.INFORMATION,
             transitory_mode=RainbowColorModes.TIME,

@@ -1,20 +1,17 @@
 import numpy as np
-import sounddevice as sd
 import librosa
 import warnings
 import logging
-import assemblyai as aai
 import os
 import random
 import soundfile as sf
 
-
+from typing import List
 from dotenv import load_dotenv
 from scipy import signal
 from scipy.io import wavfile
 from scipy.fft import fft, ifft, fftfreq
 from app.agents.enums.noise_type import NoiseType
-
 
 
 load_dotenv()
@@ -24,21 +21,21 @@ logging.basicConfig(level=logging.INFO)
 
 def generate_speech_like_noise(duration_seconds: float, sample_rate: int = 44100) -> bytes:
     """
-    Generate more speech-like noise that AssemblyAI will be forced to transcribe.
-    Creates formant-like patterns that sound vaguely speech-ish.
+    Generate noise that mimics the spectral and temporal characteristics of human speech.
+    This includes formant structures, pauses, and a speech-like envelope.
+    1. Formants: Simulate resonant frequencies typical in human speech.
+    2. Envelope: Apply an amplitude envelope that mimics the rise and fall of speech.
+    3. Pauses: Introduce random pauses to simulate natural speech patterns.
+    :param duration_seconds:
+    :param sample_rate:
+    :return:
     """
     samples = int(duration_seconds * sample_rate)
     t = np.linspace(0, duration_seconds, samples)
-
-    # Create speech-like formant structure
-    fundamental = 120 + np.random.uniform(-20, 20)  # Vary fundamental frequency
-
-    # Multiple formants at typical speech frequencies
+    fundamental = 120 + np.random.uniform(-20, 20)
     formant1 = 700 + np.random.uniform(-100, 100)  # First formant (vowels)
     formant2 = 1200 + np.random.uniform(-200, 200)  # Second formant (vowels)
     formant3 = 2400 + np.random.uniform(-300, 300)  # Third formant (consonants)
-
-    # Generate speech-like signal with formants
     speech_like = (
             0.3 * np.sin(2 * np.pi * fundamental * t) +  # Fundamental
             0.25 * np.sin(2 * np.pi * fundamental * 2 * t) +  # First harmonic
@@ -47,33 +44,33 @@ def generate_speech_like_noise(duration_seconds: float, sample_rate: int = 44100
             0.1 * np.sin(2 * np.pi * formant3 * t) +  # Third formant
             0.05 * np.random.randn(samples)  # Noise component
     )
-
-    # Add speech-like envelope (pauses and emphasis)
     envelope_freq = 0.5 + np.random.uniform(-0.2, 0.3)  # Speech cadence
     envelope = 0.5 + 0.5 * np.abs(np.sin(2 * np.pi * envelope_freq * t)) ** 0.7
-
-    # Add random pauses like speech
     for i in range(int(duration_seconds * 2)):  # ~2 pauses per second
         pause_start = np.random.randint(0, samples - int(0.1 * sample_rate))
         pause_length = int(np.random.uniform(0.05, 0.15) * sample_rate)
         envelope[pause_start:pause_start + pause_length] *= 0.1
-
     speech_like *= envelope
-
-    # Normalize and convert to int16
     speech_like = speech_like / np.max(np.abs(speech_like))
     speech_like = np.clip(speech_like, -1.0, 1.0)
-
     return (speech_like * 32767).astype(np.int16).tobytes()
 
 
-def generate_speech_range_noise(duration_seconds: float, noise_type: NoiseType,
-                                mix_level: float = 0.25, sample_rate: int = 44100,
-                                freq_low: int = 300, freq_high: int = 3400) -> bytes:
-    """Generate noise specifically targeting speech frequency ranges."""
+def generate_noise(duration_seconds: float, noise_type: NoiseType,
+                   mix_level: float = 0.25, sample_rate: int = 44100,
+                   freq_low: int = 300, freq_high: int = 3400) -> bytes:
+    """
+    Generate different types of noise (white, pink, brown) filtered to speech frequencies.
+    :param duration_seconds:
+    :param noise_type:
+    :param mix_level:
+    :param sample_rate:
+    :param freq_low:
+    :param freq_high:
+    :return:
+    """
     samples = int(duration_seconds * sample_rate)
-
-    # Generate base noise
+    working_noise = np.zeros(samples)
     if noise_type == NoiseType.WHITE:
         working_noise = np.random.normal(0, 1, samples)
     elif noise_type == NoiseType.BROWN:
@@ -81,282 +78,189 @@ def generate_speech_range_noise(duration_seconds: float, noise_type: NoiseType,
         working_noise = np.cumsum(white_noise)
         working_noise = working_noise - np.mean(working_noise)
     elif noise_type == NoiseType.PINK:
-        # Improved pink noise generation
         working_noise = np.random.randn(samples)
-        # Apply 1/f filtering in frequency domain
         frequencies = fftfreq(samples, 1 / sample_rate)
         fft_noise = fft(working_noise)
-        # Pink noise has 1/f power spectrum
         pink_filter = 1 / np.sqrt(np.abs(frequencies) + 1e-10)
-        pink_filter[0] = 1  # DC component
+        pink_filter[0] = 1
         fft_noise *= pink_filter
         working_noise = np.real(ifft(fft_noise))
-
-    # Apply bandpass filter to target speech frequencies
     nyquist = sample_rate / 2
     low = freq_low / nyquist
     high = freq_high / nyquist
-
-    # Design Butterworth bandpass filter
     b, a = signal.butter(4, [low, high], btype='band')
     filtered_noise = signal.filtfilt(b, a, working_noise)
-
-    # Normalize and apply mix level
     filtered_noise = filtered_noise / np.max(np.abs(filtered_noise))
     filtered_noise *= mix_level
-
     audio_data = (filtered_noise * 32767).astype(np.int16)
     return audio_data.tobytes()
 
 
-def pitch_shift_audio(input_audio: bytes, cents: float = 50, sample_rate: int = 44100) -> bytes:
-    """Apply pitch shifting to audio data."""
-    # Convert bytes to float array
+def pitch_shift_audio_bytes(input_audio: bytes, cents: float = 50, sample_rate: int = 44100) -> bytes:
+    """
+    Apply micro pitch shifting to audio bytes.
+    1. Convert bytes to numpy array.
+    2. Use librosa to apply pitch shift.
+    3. Convert back to bytes.
+    4. Ensure no clipping occurs.
+    5. Return processed audio bytes.
+    :param input_audio:
+    :param cents:
+    :param sample_rate:
+    :return:
+    """
     audio_array = np.frombuffer(input_audio, dtype=np.int16).astype(np.float32) / 32767.0
-
-    # Use librosa for high-quality pitch shifting
     shifted_audio = librosa.effects.pitch_shift(audio_array, sr=sample_rate, n_steps=cents / 100.0)
-
-    # Convert back to int16
     shifted_audio = np.clip(shifted_audio, -1.0, 1.0)
     shifted_audio = (shifted_audio * 32767).astype(np.int16)
-
     return shifted_audio.tobytes()
 
 
-def micro_stutter_audio(input_audio: bytes, stutter_probability: float = 0.1,
-                        stutter_length_ms: int = 50, sample_rate: int = 44100) -> bytes:
-    """Apply random micro-stutters to create phonetic ambiguity."""
+def micro_stutter_audio_bytes(input_audio: bytes, stutter_probability: float = 0.1,
+                              stutter_length_ms: int = 50, sample_rate: int = 44100) -> bytes:
+    """
+    Introduce micro-stutters by repeating small segments of audio.
+    :param input_audio:
+    :param stutter_probability:
+    :param stutter_length_ms:
+    :param sample_rate:
+    :return:
+    """
     audio_array = np.frombuffer(input_audio, dtype=np.int16)
     output_audio = []
-
-    # Process in 100ms windows
     window_samples = int(0.1 * sample_rate)
     stutter_samples = int(stutter_length_ms / 1000.0 * sample_rate)
-
     for i in range(0, len(audio_array), window_samples):
         window = audio_array[i:i + window_samples]
         output_audio.extend(window)
-
-        # Random stutter
         if np.random.random() < stutter_probability and len(window) >= stutter_samples:
-            # Repeat a small segment from the window
             start_idx = np.random.randint(0, len(window) - stutter_samples)
             stutter_segment = window[start_idx:start_idx + stutter_samples]
             output_audio.extend(stutter_segment)
-
     return np.array(output_audio, dtype=np.int16).tobytes()
 
 
-def gate_audio(input_audio: bytes, gate_probability: float = 0.05,
-               gate_length_ms: int = 20, sample_rate: int = 44100) -> bytes:
-    """Apply random audio gates that cut off consonants/vowels unpredictably."""
-    audio_array = np.frombuffer(input_audio, dtype=np.int16).copy()  # Make writable
-
-    # Process in 50ms windows
+def gate_audio_bytes(input_audio: bytes, gate_probability: float = 0.05,
+                     gate_length_ms: int = 20, sample_rate: int = 44100) -> bytes:
+    """
+    Apply random gates (brief silences) to the audio.
+    :param input_audio:
+    :param gate_probability:
+    :param gate_length_ms:
+    :param sample_rate:
+    :return:
+    """
+    audio_array = np.frombuffer(input_audio, dtype=np.int16).copy()
     window_samples = int(0.05 * sample_rate)
     gate_samples = int(gate_length_ms / 1000.0 * sample_rate)
-
     for i in range(0, len(audio_array) - gate_samples, window_samples):
         if np.random.random() < gate_probability:
             audio_array[i:i + gate_samples] = 0
-
     return audio_array.tobytes()
 
 
-def crush_audio(input_audio: bytes, intensity: float = 0.5) -> bytes:
-    """Apply bit crushing with enhanced control for phonetic artifact creation."""
+def bit_crush_audio_bytes(input_audio: bytes, intensity: float = 0.5) -> bytes:
+    """
+    Reduce the bit depth of the audio to create a bit-crushed effect.
+    :param input_audio:
+    :param intensity:
+    :return:
+    """
     original_bits = 16
     min_bits = 1
     target_bits = int(original_bits - intensity * (original_bits - min_bits))
     if target_bits < 1:
         target_bits = 1
-
     audio_array = np.frombuffer(input_audio, dtype=np.int16)
     max_val = 2 ** (target_bits - 1) - 1
     min_val = -2 ** (target_bits - 1)
-
     audio_crushed = np.round(audio_array / 32767 * max_val)
     audio_crushed = np.clip(audio_crushed, min_val, max_val)
     audio_crushed = (audio_crushed / max_val * 32767).astype(np.int16)
-
     return audio_crushed.tobytes()
 
 
 def apply_speech_hallucination_processing(input_audio: bytes,
                                           hallucination_intensity: float = 0.5,
                                           sample_rate: int = 44100) -> bytes:
-    """Apply a complete speech-to-text hallucination processing chain."""
-    audio = input_audio
+    """
+    Apply a series of audio effects to simulate "hallucination" in speech-like audio.
+    1. Add speech-range noise.
+    2. Apply micro pitch shifting.
+    3. Add micro-stutters.
+    4. Apply random gates.
+    5. Apply bit crushing.
+    6. Return processed audio bytes.
+    :param input_audio:
+    :param hallucination_intensity:
+    :param sample_rate:
+    :return:
+    """
 
+    audio = input_audio
     # 1. Add speech-range noise
-    noise = generate_speech_range_noise(
+    noise = generate_noise(
         duration_seconds=len(audio) / (2 * sample_rate),  # 16-bit = 2 bytes per sample
         noise_type=NoiseType.PINK,
         mix_level=0.15 * hallucination_intensity
     )
-
     # Mix noise with original audio
     audio_array = np.frombuffer(audio, dtype=np.int16).astype(np.float32)
     noise_array = np.frombuffer(noise, dtype=np.int16).astype(np.float32)
-
     # Ensure same length
     min_len = min(len(audio_array), len(noise_array))
     mixed_audio = audio_array[:min_len] + noise_array[:min_len]
     mixed_audio = np.clip(mixed_audio, -32767, 32767).astype(np.int16)
     audio = mixed_audio.tobytes()
-
     # 2. Apply micro pitch shifting
     if hallucination_intensity > 0.3:
         cents = np.random.uniform(-100, 100) * hallucination_intensity
-        audio = pitch_shift_audio(audio, cents, sample_rate)
-
+        audio = pitch_shift_audio_bytes(audio, cents, sample_rate)
     # 3. Add micro-stutters
     if hallucination_intensity > 0.4:
-        audio = micro_stutter_audio(
+        audio = micro_stutter_audio_bytes(
             audio,
             stutter_probability=0.05 * hallucination_intensity,
             sample_rate=sample_rate
         )
-
     # 4. Apply random gates
     if hallucination_intensity > 0.2:
-        audio = gate_audio(
+        audio = gate_audio_bytes(
             audio,
             gate_probability=0.03 * hallucination_intensity,
             sample_rate=sample_rate
         )
-
     # 5. Apply bit crushing
     if hallucination_intensity > 0.1:
         crush_intensity = 0.3 * hallucination_intensity
-        audio = crush_audio(audio, crush_intensity)
-
+        audio = bit_crush_audio_bytes(audio, crush_intensity)
     return audio
 
-
-def save_wav(filename: str, audio_bytes: bytes, sample_rate: int = 44100):
-    """Save audio bytes as a WAV file."""
+def save_wav_from_bytes(filename: str, audio_bytes: bytes, sample_rate: int = 44100):
+    """
+    Save audio bytes as a WAV file.
+    1. Convert bytes to numpy array.
+    2. Use scipy.io.wavfile to write the WAV file.
+    3. Ensure correct sample rate and format.
+    4. Save to specified filename.
+    :param filename:
+    :param audio_bytes:
+    :param sample_rate:
+    :return:
+    """
     audio_array = np.frombuffer(audio_bytes, dtype=np.int16)
     wavfile.write(filename, sample_rate, audio_array)
 
-
-def conjurers_evp(evp_duration: int, working_path: str, file_name: str) -> str | None:
+def find_wav_files(root_dir: str)-> List[str]:
     """
-    Generate Electronic Voice Phenomena (EVP) using systematic audio hallucination
-    and force AssemblyAI to transcribe it with aggressive settings.
+    Recursively find all .wav files in the given directory.
+    1. Walk through the directory tree.
+    2. Check file extensions.
+    3. Collect and return full paths.
+    4. Return list of .wav file paths.
+    :param root_dir:
+    :return:
     """
-    # Check for API key
-    api_key = os.getenv("ASSEMBLYAI_API_KEY")
-    if not api_key:
-        logging.error("ASSEMBLYAI_API_KEY not found in environment variables!")
-        return None
-
-    aai.settings.api_key = api_key
-
-    # Generate more speech-like base audio that AssemblyAI will want to transcribe
-    logging.info(f"Generating {evp_duration}s of speech-like noise for EVP...")
-    base_evp_noise = generate_speech_like_noise(evp_duration)
-
-    # Apply hallucination processing
-    logging.info("Applying systematic hallucination processing...")
-    hallucinated_evp = apply_speech_hallucination_processing(
-        base_evp_noise,
-        hallucination_intensity=0.6  # Reduced intensity so it's still "speech-like"
-    )
-
-    # Save the audio file
-    full_path = f"{working_path}/{file_name}"
-    save_wav(full_path, hallucinated_evp)
-    logging.info(f"Saved hallucinated EVP audio to {full_path}")
-
-    # Configure AssemblyAI for maximum hallucination
-    aai_config = aai.TranscriptionConfig(
-        # Basic model settings
-        speech_model=aai.SpeechModel.universal,  # Most general model
-
-        # Disable smart features that might filter out our chaos
-        filter_profanity=False,
-        format_text=False,  # Don't clean up the output
-        punctuate=False,  # Don't add smart punctuation
-
-        # Language detection - let it guess wrong
-        language_code=None,  # Let it auto-detect (might get it wrong)
-        language_detection=True,
-
-        # Advanced settings for more chaos
-        disfluencies=True,  # Include "uh", "um", etc.
-
-        speaker_labels=False,
-        speakers_expected=None,  # Let it guess
-        sentiment_analysis=False,  # Might hallucinate emotions
-        entity_detection=True,  # Might hallucinate entities
-
-    )
-
-    logging.info("Starting aggressive AssemblyAI transcription...")
-    transcriber = aai.Transcriber(config=aai_config)
-    evp_transcription = transcriber.transcribe(full_path)
-
-    if evp_transcription.status == 'error':
-        logging.error(f"Transcription failed: {evp_transcription.error}")
-        raise RuntimeError(f"Transcription failed: {evp_transcription.error}")
-
-    if evp_transcription.status == 'completed':
-        # Log detailed results
-        logging.info(f"Transcription completed!")
-        logging.info(f"Text: {evp_transcription.text}")
-        logging.info(f"Confidence: {evp_transcription.confidence}")
-
-        # Check for additional hallucinated content
-        if hasattr(evp_transcription, 'sentiment_analysis_results') and evp_transcription.sentiment_analysis_results:
-            logging.info(f"Sentiment: {evp_transcription.sentiment_analysis_results}")
-
-        if hasattr(evp_transcription, 'entities') and evp_transcription.entities:
-            logging.info(f"Detected entities: {[e.text for e in evp_transcription.entities]}")
-
-        if hasattr(evp_transcription, 'summary') and evp_transcription.summary:
-            logging.info(f"Summary: {evp_transcription.summary}")
-
-        if hasattr(evp_transcription, 'utterances') and evp_transcription.utterances:
-            logging.info(f"Utterances: {len(evp_transcription.utterances)} detected")
-            for utterance in evp_transcription.utterances[:3]:  # First 3
-                logging.info(f"  Utterance: '{utterance.text}' (confidence: {utterance.confidence})")
-
-        # Return the main text, or fallback to utterances if main text is empty
-        if evp_transcription.text and evp_transcription.text.strip():
-            return evp_transcription.text
-        elif hasattr(evp_transcription, 'utterances') and evp_transcription.utterances:
-            # Combine utterances if main text is empty
-            utterance_texts = [u.text for u in evp_transcription.utterances if u.text.strip()]
-            if utterance_texts:
-                combined_text = " ".join(utterance_texts)
-                logging.info(f"Using combined utterances: {combined_text}")
-                return combined_text
-
-    logging.warning("No transcription text generated - AssemblyAI too conservative!")
-    return None
-
-
-def try_speech_like_generation(duration: int = 5) -> str:
-    """Test the speech-like noise generation and play it back."""
-    logging.info(f"Generating {duration}s of speech-like test audio...")
-
-    # Generate speech-like noise
-    speech_like = generate_speech_like_noise(duration)
-
-    # Save for inspection
-    save_wav("/tmp/speech_like_test.wav", speech_like)
-
-    # Play it back
-    audio_array = np.frombuffer(speech_like, dtype=np.int16)
-    logging.info("Playing speech-like test audio...")
-    sd.play(audio_array, samplerate=44100)
-    sd.wait()
-
-    return f"Generated and played {duration}s of speech-like noise. Saved to /tmp/speech_like_test.wav"
-
-def find_wav_files(root_dir):
     wav_files = []
     for dirpath, _, filenames in os.walk(root_dir):
         for file_name in filenames:
@@ -364,7 +268,18 @@ def find_wav_files(root_dir):
                 wav_files.append(os.path.join(dirpath, file_name))
     return wav_files
 
-def extract_non_silent_segments(audio, sr, min_duration, top_db=30):
+def extract_non_silent_segments(audio:np.ndarray, sr:int, min_duration:float, top_db:int=30)->List[np.ndarray] :
+    """
+    Extract non-silent segments from audio using librosa.
+    1. Use librosa.effects.split to find non-silent intervals.
+    2. Filter segments by minimum duration.
+    3. Return list of audio segments.
+    :param audio:
+    :param sr:
+    :param min_duration:
+    :param top_db:
+    :return:
+    """
     intervals = librosa.effects.split(audio, top_db=top_db)
     segments = []
     min_samples = int(min_duration * sr)
@@ -373,12 +288,25 @@ def extract_non_silent_segments(audio, sr, min_duration, top_db=30):
             segments.append(audio[start:end])
     return segments
 
-def select_random_segment_audio(root_dir, min_duration, num_segments, output_dir):
+def select_random_segment_audio(root_dir:str, min_duration:float, num_segments:int, output_dir:str) -> None:
+    """
+    Select random non-silent segments from .wav files in root_dir and save to output_dir.
+    1. Find all .wav files.
+    2. Shuffle the list for randomness.
+    3. For each file, extract non-silent segments.
+    4. Save segments until num_segments is reached.
+    5. Ensure output directory exists.
+    6. Return when done.
+    :param root_dir:
+    :param min_duration:
+    :param num_segments:
+    :param output_dir:
+    :return:
+    """
     wav_files = find_wav_files(root_dir)
     random.shuffle(wav_files)
     os.makedirs(output_dir, exist_ok=True)
     found = 0
-
     for wav_path in wav_files:
         if found >= num_segments:
             break
@@ -390,22 +318,34 @@ def select_random_segment_audio(root_dir, min_duration, num_segments, output_dir
             out_path = os.path.join(output_dir, f"segment_{found+1}.wav")
             sf.write(out_path, seg, sr)
             found += 1
-
     print(f"Extracted {found} segments to {output_dir}.")
 
-def create_random_audio_mosaic(root_dir, slice_duration_ms, target_length_sec, output_path):
+def create_random_audio_mosaic(root_dir:str, slice_duration_ms:int, target_length_sec:int|float, output_path:str) -> None:
+    """
+    Create an audio mosaic by randomly slicing segments from .wav files in root_dir.
+    1. Find all .wav files.
+    2. Shuffle the list for randomness.
+    3. Randomly select segments of slice_duration_ms.
+    4. Concatenate segments until target_length_sec is reached.
+    5. Save the mosaic to output_path.
+    6. Ensure no clipping occurs.
+    7. Return when done.
+    :param root_dir:
+    :param slice_duration_ms:
+    :param target_length_sec:
+    :param output_path:
+    :return:
+    """
     wav_files = []
     for dirpath, _, filenames in os.walk(root_dir):
-        for fname in filenames:
-            if fname.lower().endswith('.wav'):
-                wav_files.append(os.path.join(dirpath, fname))
+        for file_name in filenames:
+            if file_name.lower().endswith('.wav'):
+                wav_files.append(os.path.join(dirpath, file_name))
     random.shuffle(wav_files)
-
     segments = []
     total_samples = 0
     sample_rate = None
     slice_samples = None
-
     while total_samples < int(target_length_sec * 44100):
         if not wav_files:
             break
@@ -420,7 +360,6 @@ def create_random_audio_mosaic(root_dir, slice_duration_ms, target_length_sec, o
         segment = audio[start:start + slice_samples]
         segments.append(segment)
         total_samples += slice_samples
-
     if segments:
         mosaic = np.concatenate(segments)[:int(target_length_sec * sample_rate)]
         sf.write(output_path, mosaic, sample_rate)
@@ -428,41 +367,36 @@ def create_random_audio_mosaic(root_dir, slice_duration_ms, target_length_sec, o
     else:
         print("No suitable segments found.")
 
-def blend_speech_like_noise(input_path: str, blend: float, output_dir: str) -> str:
+def blend_with_noise(input_path: str, blend: float, output_dir: str) -> str:
     """
-    Load an audio file, generate speech-like noise of the same length,
-    blend with the original using the blend factor, and save to output_dir.
+    Blend the input audio with generated speech-like noise.
+    1. Load the input audio file.
+    2. Generate speech-like noise of the same duration.
+    3. Blend the two audios based on the blend factor.
+    4. Save the blended audio to output_dir.
+    5. Ensure no clipping occurs.
+    6. Return the path to the blended audio file.
+    :param input_path:
+    :param blend:
+    :param output_dir:
+    :return:
     """
     audio, sr = librosa.load(input_path, sr=None)
     duration_seconds = len(audio) / sr
     noise = np.frombuffer(generate_speech_like_noise(duration_seconds, sr), dtype=np.int16).astype(np.float32) / 32767.0
-
-    # Match noise length to audio
     if len(noise) > len(audio):
         noise = noise[:len(audio)]
     elif len(noise) < len(audio):
         noise = np.pad(noise, (0, len(audio) - len(noise)), mode='constant')
-
-    # Blend
     blended = (1 - blend) * audio + blend * noise
     blended = np.clip(blended, -1.0, 1.0)
-
-    # Prepare output path
     os.makedirs(output_dir, exist_ok=True)
     out_path = os.path.join(output_dir, os.path.basename(input_path).replace('.wav', '_blended.wav'))
     sf.write(out_path, blended, sr)
     return out_path
 
+# Example usage
 if __name__ == "__main__":
-    # logging.info("Starting Black Agent EVP test with enhanced speech-like generation...")
-    # test_result = try_speech_like_generation(3)
-    # logging.info(test_result)
-    # evp_text = conjurers_evp(8, "/tmp", "black_agent_evp.wav")
-    # if evp_text:
-    #     logging.info(f"SUCCESS! Generated EVP Text: '{evp_text}'")
-    #     logging.info(f"Text length: {len(evp_text)} characters")
-    # else:
-    #     logging.warning("Still no text generated - need to make audio even more speech-like!")
     select_random_segment_audio(
         root_dir="/Volumes/LucidNonsense/White/staged_raw_material",
         min_duration=1.0,
@@ -475,14 +409,8 @@ if __name__ == "__main__":
         target_length_sec=10,
         output_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav'
     )
-    blended_path = blend_speech_like_noise(
+    blended_path = blend_with_noise(
         input_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav',
         blend=0.3,
         output_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios'
     )
-    evp_text = conjurers_evp(8, "/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/", "evp_test.wav")
-    if evp_text:
-        logging.info(f"SUCCESS! Generated EVP Text: '{evp_text}'")
-        logging.info(f"Text length: {len(evp_text)} characters")
-    else:
-        logging.warning("Still no text generated - need to make audio even more speech-like!")
