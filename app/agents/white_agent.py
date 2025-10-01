@@ -12,6 +12,7 @@ from app.agents.black_agent import BlackAgent
 from app.agents.models.agent_settings import AgentSettings
 from app.agents.red_agent import RedAgent
 from app.agents.orange_agent import OrangeAgent
+from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.yellow_agent import YellowAgent
 from app.agents.green_agent import GreenAgent
 from app.agents.blue_agent import BlueAgent
@@ -61,8 +62,10 @@ class WhiteAgent(BaseModel):
         check_points = InMemorySaver()
         workflow = StateGraph(MainAgentState)
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
+        workflow.add_node("invoke_black_agent", self.invoke_black_agent)
         workflow.add_node("end", self.end)
         workflow.add_edge(START, "initiate_song_proposal")
+        workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
         workflow.add_edge("end", END)
         return workflow.compile(checkpointer=check_points)
 
@@ -79,6 +82,22 @@ class WhiteAgent(BaseModel):
             stop=self.settings.stop
         )
 
+    def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
+        black_agent = self.agents.get("black")
+        if black_agent is None:
+            raise ValueError("Black agent not found in WhiteAgent's agents dictionary.")
+        if  state.song_proposal is None or not  state.song_proposal.iterations:
+            raise ValueError("No song proposal found in the current state to pass to Black Agent.")
+        current_proposal = state.song_proposal
+        black_agent_state = BlackAgentState(
+            thread_id=state.thread_id,
+            song_proposal=current_proposal,
+        )
+        black_workflow = black_agent.create_graph().compile()
+        result = black_workflow.invoke(black_agent_state)
+        state.song_proposal.append(result)
+        state.artifacts.extend(result.artifacts)
+        return state
 
     def initiate_song_proposal(self, state_input) -> SongProposal:
         prompt = f"""
@@ -104,8 +123,6 @@ class WhiteAgent(BaseModel):
         claude = self._get_claude()
         proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            # Attempt to call the Anthropic model. This can fail if the API key is
-            # missing or the model name is invalid; fall back to a local stub.
             initial_proposal = proposer.invoke(prompt)
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
         except Exception as e:
