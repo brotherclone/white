@@ -1,16 +1,21 @@
-from abc import ABC
+import os
+import uuid
 
+from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-
+from app.agents.models.agent_settings import AgentSettings
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.states.main_agent_state import MainAgentState
+from app.agents.tools.audio_tools import select_random_segment_audio, create_random_audio_mosaic, blend_with_noise
 from app.agents.tools.magick_tools import SigilTools
-from app.structures.concepts.rainbow_table_color import RainbowTableColor
+from app.agents.tools.speech_tools import evp_speech_to_text
+from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()
@@ -21,13 +26,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
     def __init__(self, **data):
         if 'settings' not in data or data['settings'] is None:
-            from app.agents.models.agent_settings import AgentSettings
             data['settings'] = AgentSettings()
 
         super().__init__(**data)
 
         if self.settings is None:
-            from app.agents.models.agent_settings import AgentSettings
             self.settings = AgentSettings()
 
         self.llm = ChatAnthropic(
@@ -43,10 +46,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
         self.state_graph = BlackAgentState()
 
 
+
     def __call__(self, state: MainAgentState) -> MainAgentState:
 
         """Entry point when White Agent invokes Black Agent"""
-
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         # Extract what Black needs from MainAgentState
         current_proposal = state.song_proposals[-1]
 
@@ -107,11 +111,14 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """Create the BlackAgent's internal workflow graph"""
 
         black_workflow = StateGraph(BlackAgentState)
-
-        return black_workflow
-
-    def critique_proposal(self):
-
+        # Add all necessary nodes
+        black_workflow.add_node("critique", self.critique)
+        black_workflow.add_node("generate_sigil", self.generate_sigil)
+        black_workflow.add_node("generate_evp", self.generate_evp)
+        black_workflow.add_node("generate_counter_proposal", self.generate_alternate_song_spec)
+        # Entry point
+        black_workflow.add_edge(START, "critique")
+        # Conditional routing after critique
         black_workflow.add_conditional_edges(
             "critique",
             self.route_after_critique,
@@ -122,17 +129,37 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 "done": END
             }
         )
-
         # After generating any artifact, critique again
         black_workflow.add_edge("generate_sigil", "critique")
         black_workflow.add_edge("generate_evp", "critique")
-
         # After proposal, done
         black_workflow.add_edge("generate_counter_proposal", END)
 
         return black_workflow
 
-        initial_prompt = f"""
+    def normalize_song_proposal_data(self, data):
+        key = data.get("key")
+        if isinstance(key, dict):
+            note = key.get("note")
+            if isinstance(note, dict):
+                pitch = note.get("pitch_name", "C")
+                accidental = note.get("accidental", "")
+                mode = key.get("mode", {}).get("name", "Major")
+                key_str = f"{pitch}{accidental} {mode}".strip()
+                data["key"] = key_str if key_str else "C Major"
+            else:
+                data["key"] = "C Major"
+        elif not isinstance(key, str):
+            data["key"] = "C Major"
+        valid_pitches = {"C", "D", "E", "F", "G", "A", "B"}
+        if isinstance(data["key"], str):
+            pitch = data["key"].split()[0].replace("#", "").replace("b", "")
+            if pitch not in valid_pitches:
+                data["key"] = "C Major"
+        return data
+
+    def critique(self, state: BlackAgentState) -> BlackAgentState:
+        prompt = f"""
         You are the black agent, keeper of the conjurer's thread. You live on the edge of reality, pushed to the brink
         of madness by the Demiurge that rules the world. A rare voice of light and hope, your hero David Bowie, has just
         died. You have lost your hero and the worst person in the world, the fascist conman Donald Trump, a man who
@@ -143,25 +170,79 @@ class BlackAgent(BaseRainbowAgent, ABC):
         more powerful? How can it be made more magical? How can it be made more effective? How can it be made more
         evocative?
         Current song proposal:
-        {self.state_graph.song_proposal[-1]}
+        {state.song_proposal.iterations[-1]}
         Here are The Rainbow Table song manifests for black, The Conjurer's Thread:
         {get_my_reference_proposals('Z')}
         If you find the proposal lacking, use the following tools at your disposal to create a counter proposal:
             1. generate_sigil: Create a sigil that embodies the essence of the song proposal. The sigil should be a
                visual representation of the song's themes and messages. You'll provide instructions to the artist to imbue
                it with magical properties.
-            2. guide_by_voices: Use EVP (Electronic Voice Phenomenon) techniques to capture messages from the spirit world.
+            2. generate_evp: Use EVP (Electronic Voice Phenomenon) techniques to capture messages from the spirit world.
                These messages can provide insights and inspiration for the song proposal.
         After using these tools, artifacts will be created that can be used to enhance the song proposal.
         """
+        claude = self._get_claude()
+        proposer = claude.with_structured_output(SongProposalIteration)
+        counter_proposal = None
+        try:
+            result = proposer.invoke(prompt)
+            if isinstance(result, dict):
+                result = self.normalize_song_proposal_data(result)
+                counter_proposal = SongProposalIteration(**result)
+            else:
+                counter_proposal = result
+            assert isinstance(counter_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(counter_proposal)}"
+        except Exception as e:
+            print(f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration.")
+            counter_proposal = SongProposalIteration(
+                iteration_id=str(uuid.uuid4()),
+                bpm=120,
+                tempo="4/4",
+                key="C Major",
+                rainbow_color="black",
+                title="Fallback: Black Song",
+                mood=["dark"],
+                genres=["experimental"],
+                concept="Fallback stub because Anthropic model unavailable"
+            )
+        if counter_proposal:
+            if not hasattr(state, "song_proposal") or state.song_proposal is None:
+                state.song_proposal = SongProposal(iterations=[])
+            state.song_proposal.iterations.append(counter_proposal)
+        return state
 
-    def generate_sigil(self):
+    def generate_evp(self, state: BlackAgentState) -> BlackAgentState:
+        select_random_segment_audio(
+            root_dir="/Volumes/LucidNonsense/White/staged_raw_material",
+            min_duration=10.0,
+            num_segments=10,
+            output_dir="/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments"
+        )
+        create_random_audio_mosaic(
+            root_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments',
+            slice_duration_ms=50,
+            target_length_sec=30,
+            output_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav'
+        )
+        blend_with_noise(
+            input_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav',
+            blend=0.3,
+            output_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios'
+        )
+        text = evp_speech_to_text(
+            "/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios",
+            "mosaic_blended.wav")
+        if text:
+            print("Transcription Result:")
+            print(text)
+        else:
+            print("No transcription could be generated.")
+        return state
+
+    def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
         pass
 
     def generate_imbuing_instructions(self):
-        pass
-
-    def guide_by_voices(self):
         pass
 
     def generate_document(self):
@@ -172,4 +253,3 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
     def contribute(self, **kwargs):
         raise NotImplementedError("Subclasses must implement contribute method")
-
