@@ -1,0 +1,12 @@
+{
+  "iteration_id": "mock-iteration-1",
+  "bpm": 120,
+  "tempo": "4/4",
+  "key": "C Major",
+  "rainbow_color": "white",
+  "title": "Mock White Song",
+  "mood": ["reflective"],
+  "genres": ["art-pop"],
+  "concept": "This is a mock concept for development."
+}
+

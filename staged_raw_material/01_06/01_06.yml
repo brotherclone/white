@@ -1,0 +1,12 @@
+bpm:
+manifest_id: '01_06'
+tempo:
+key:
+rainbow_color: Z
+title: Star Filter
+release_date: '2017-07-18'
+album_sequence: 6
+main_audio_file: 01_06_main.wav
+TRT: ''
+vocals: true
+lyrics: true

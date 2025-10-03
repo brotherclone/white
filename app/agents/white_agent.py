@@ -1,3 +1,6 @@
+import json
+import os
+
 from typing import Dict, Any, cast
 from langgraph.constants import START
 from langgraph.graph import StateGraph, END
@@ -7,7 +10,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import ensure_config, RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 from IPython.display import Image
-
+from uuid import uuid4
 from app.agents.black_agent import BlackAgent
 from app.agents.models.agent_settings import AgentSettings
 from app.agents.red_agent import RedAgent
@@ -29,10 +32,10 @@ class WhiteAgent(BaseModel):
     agents: Dict[str, Any] = {}
     processors: Dict[str, Any] = {}
     settings: AgentSettings = AgentSettings()
+    song_proposal: SongProposal = SongProposal(iterations=[])
 
     def __init__(self, **data):
         if 'settings' not in data or data['settings'] is None:
-            from app.agents.models.agent_settings import AgentSettings
             data['settings'] = AgentSettings()
         if 'agents' not in data:
             data['agents'] = {}
@@ -40,7 +43,6 @@ class WhiteAgent(BaseModel):
             data['processors'] = {}
         super().__init__(**data)
         if self.settings is None:
-            from app.agents.models.agent_settings import AgentSettings
             self.settings = AgentSettings()
         self.agents = {
             "black": BlackAgent(),
@@ -70,9 +72,10 @@ class WhiteAgent(BaseModel):
         return workflow.compile(checkpointer=check_points)
 
     def end(self):
+        print("White Agent workflow completed.")
         pass
 
-    def _get_claude(self)-> ChatAnthropic:
+    def _get_claude_supervisor(self)-> ChatAnthropic:
         return ChatAnthropic(
             model_name=self.settings.anthropic_model_name,
             api_key=self.settings.anthropic_api_key,
@@ -99,7 +102,8 @@ class WhiteAgent(BaseModel):
         state.artifacts.extend(result.artifacts)
         return state
 
-    def initiate_song_proposal(self, state_input) -> SongProposal:
+    def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         prompt = f"""
         You, an instance of Anthropics's Claude model are creating the last avant-rock/art-pop album in The Rainbow Table
         series by The Earthly Frames. There have been albums for Black, Red, Orange, Yellow, Green, Blue, Indigo, and 
@@ -120,15 +124,15 @@ class WhiteAgent(BaseModel):
         proposal with a concept captures a longing for sensation and corporeality. Fill in the other musical aspects
         to compliment this concept.
         """
-        claude = self._get_claude()
+        claude = self._get_claude_supervisor()
         proposer = claude.with_structured_output(SongProposalIteration)
         try:
             initial_proposal = proposer.invoke(prompt)
+            if isinstance(initial_proposal, dict):
+                initial_proposal = SongProposalIteration(**self.normalize_song_proposal_data(initial_proposal))
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
         except Exception as e:
-            # Graceful fallback for local development / CI where Anthropic is not available
             print(f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration.")
-            from uuid import uuid4
             initial_proposal = SongProposalIteration(
                 iteration_id=str(uuid4()),
                 bpm=120,
@@ -140,14 +144,18 @@ class WhiteAgent(BaseModel):
                 genres=["art-pop"],
                 concept="Fallback stub because Anthropic model unavailable"
             )
-        song_proposal = SongProposal(iterations=[initial_proposal])
-        return song_proposal
+        if not hasattr(state, "song_proposal") or state.song_proposal is None:
+            state.song_proposal = SongProposal(iterations=[])
+        state.song_proposal.iterations.append(initial_proposal)
+        return state
 
 
 if __name__ == "__main__":
-    white_agent = WhiteAgent()
-    main_workflow = white_agent.build_workflow()
-    initial_state = MainAgentState(thread_id="main_thread")
-    runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
-    main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
-    display = Image(main_workflow.get_graph().draw_mermaid())
+    print(os.getenv("MOCK_MODE"))
+
+    # white_agent = WhiteAgent(settings=AgentSettings())
+    # main_workflow = white_agent.build_workflow()
+    # initial_state = MainAgentState(thread_id="main_thread")
+    # runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
+    # main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
+    # display = Image(main_workflow.get_graph().draw_mermaid())
