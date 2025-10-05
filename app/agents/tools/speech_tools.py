@@ -68,13 +68,3 @@ def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
                 return combined_text
     logging.warning("No transcription text generated - AssemblyAI too conservative!")
     return None
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    # Example usage
-    text = evp_speech_to_text("/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios", "mosaic_blended.wav")
-    if text:
-        print("Transcription Result:")
-        print(text)
-    else:
-        print("No transcription could be generated.")

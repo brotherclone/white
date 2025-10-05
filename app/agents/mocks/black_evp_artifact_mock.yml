@@ -1,0 +1,69 @@
+audio_segments:
+  - sample_rate: 1
+    duration: 1.0
+    channels: 1
+    chain_artifact_file_type: 'WAV'
+    rainbowColor:
+      color_name:
+      hex_value: '#FFFFFF'
+      basePath: "/mock/path"
+      mnemonic_character_value: 'A'
+      transmigrational_mode:
+        current_mode: 'None'
+        transitory_mode: 'None'
+        transcendental_mode: 'None'
+    base_path: "/mock/path"
+    artifact_path: "/mock/path/artifact.wav"
+    file_name: "artifact.wav"
+  - sample_rate: 1
+    duration: 1.0
+    channels: 1
+    chain_artifact_file_type: 'WAV'
+    rainbowColor:
+      color_name:
+      hex_value: '#FFFFFF'
+      basePath: "/mock/path"
+      mnemonic_character_value: 'A'
+      transmigrational_mode:
+        current_mode: 'None'
+        transitory_mode: 'None'
+        transcendental_mode: 'None'
+    base_path: "/mock/path"
+    artifact_path: "/mock/path/artifact.wav"
+    file_name: "artifact.wav"
+transcript: "Hello, this is a mock transcript."
+audio_mosiac:
+  sample_rate: 1
+  duration: 1.0
+  channels: 1
+  chain_artifact_file_type: 'WAV'
+  rainbowColor:
+    color_name:
+    hex_value: '#FFFFFF'
+    basePath: "/mock/path"
+    mnemonic_character_value: 'A'
+    transmigrational_mode:
+      current_mode: 'None'
+      transitory_mode: 'None'
+      transcendental_mode: 'None'
+    base_path: "/mock/path"
+    artifact_path: "/mock/path/artifact.wav"
+    file_name: "artifact.wav"
+noise_blended_audio:
+  sample_rate: 1
+  duration: 1.0
+  channels: 1
+  chain_artifact_file_type: 'WAV'
+  rainbowColor:
+    color_name:
+    hex_value: '#FFFFFF'
+    basePath: "/mock/path"
+    mnemonic_character_value: 'A'
+    transmigrational_mode:
+      current_mode: 'None'
+      transitory_mode: 'None'
+      transcendental_mode: 'None'
+    base_path: "/mock/path"
+    artifact_path: "/mock/path/artifact.wav"
+    file_name: "artifact.wav"
+thread_id: 'MOCK-THREAD-ID-12345'

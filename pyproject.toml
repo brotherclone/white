@@ -28,4 +28,5 @@ dependencies = [
     "scipy-stubs==1.16.2.0",
     "scipy>=1.16.1",
     "assemblyai>=0.44.3",
+    "todoist-api-python>=3.1.0",
 ]

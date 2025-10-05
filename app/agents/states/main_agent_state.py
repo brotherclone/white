@@ -10,28 +10,6 @@ class MainAgentState(BaseRainbowAgentState):
 
     thread_id: str = "main_thread"
     song_proposal: SongProposal | None = None
-    artifacts: List[Any] = []
-    black_content: Dict[str, Any] = Field(default_factory=dict)
-    black_proposal: SongProposal | None = None
-    red_content: Dict[str, Any] = Field(default_factory=dict)
-    red_proposal: SongProposal | None = None
-    orange_content: Dict[str, Any] = Field(default_factory=dict)
-    orange_proposal: SongProposal | None = None
-    yellow_content: Dict[str, Any] = Field(default_factory=dict)
-    yellow_proposal: SongProposal | None = None
-    green_content: Dict[str, Any] = Field(default_factory=dict)
-    green_proposal: SongProposal | None = None
-    blue_content: Dict[str, Any] = Field(default_factory=dict)
-    blue_proposal: SongProposal | None = None
-    indigo_content: Dict[str, Any] = Field(default_factory=dict)
-    indigo_proposal: SongProposal | None = None
-    violet_content: Dict[str, Any] = Field(default_factory=dict)
-    violet_proposal: SongProposal | None = None
-
-    cut_up_fragments: List[str] = Field(default_factory=list)
-    midi_data: Optional[Dict] = None
-
-    # Workflow control
     active_agents: List[str] = Field(default_factory=list)
 
     def __init__(self, **data):

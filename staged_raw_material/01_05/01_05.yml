@@ -1,12 +1,176 @@
-bpm:
+bpm: 135
 manifest_id: '01_05'
-tempo:
-key:
+tempo: 4/4
+key: A minor
 rainbow_color: Z
 title: Strings of Bad Luck
 release_date: '2017-07-18'
 album_sequence: 5
 main_audio_file: 01_05_main.wav
-TRT: ''
+TRT: '[04:51.082]'
 vocals: true
 lyrics: true
+structure:
+  - section_name: Intro verse
+    start_time: '[00:00.000]'
+    end_time: '[00:42.653]'
+    description: A slinky, ominous baritone + bell sound plays on a combo mellotron. In the background various glitching and buzzing of electronics can be heard.
+  - section_name: Intro Chorus
+    start_time: '[00:42.654]'
+    end_time: '[00:56.817]'
+    description: For a brief interlude the chords of the verse are played, still without vocals
+  - section_name: Verse 1
+    start_time: '[00:56.818]'
+    end_time: '[01:10.652]'
+    description: The vocals enter, with a deep reverb and echo effect. The mellotron baritone and bells continue.
+  - section_name: Verse 2
+    start_time: '[01:10.653]'
+    end_time: '[01:25.825]'
+    description: The next phrase continues posing darker questions.
+  - section_name: Chorus 1
+    start_time: '[01:25.826]'
+    end_time: '[01:53.934]'
+    description: The chorus comes in with a fuller sound, including drums, bass, and guitars. Before the part can gain momentum we're left with just the vocals hanging and echoing out.
+  - section_name: Verse 3
+    start_time: '[01:53.935]'
+    end_time: '[02:06.543]'
+    description: The vocals return to the verse, with the mellotron baritone and bells
+  - section_name: Verse 4
+    start_time: '[02:06.544]'
+    end_time: '[02:22.543]'
+    description: The fourth verse changes to address the listener directly, recalling us hiding our documents during fascist regimes.
+  - section_name: Chorus 2
+    start_time: '[02:22.544]'
+    end_time: '[02:50.652]'
+    description: The chorus returns with the fuller sound, including drums, bass, and guitars
+  - section_name: Chorus 3 with break down
+    start_time: '[02:50.653]'
+    end_time: '[04:51.082]'
+    description: The ending goes a bit 'Hey Jude' with claps, guitars and a triumphant feel.
+mood:
+  - eerie
+  - resilient
+  - triumphant
+  - defiant
+  - bleak
+sounds_like:
+  - name: Dirty Beaches
+    discogs_id: 1352332
+  - name: Dungen
+    discogs_id: 352175
+genres:
+  - Indie Rock
+  - Psychedelic Rock
+  - Lo-Fi
+  - Alternative Rock
+  - Experimental Rock
+  - Garage Rock
+  - Art Rock
+  - Noise Pop
+  - Indie Pop
+  - Post-Rock
+lrc_file: 01_05.lrc
+concept: 2016 was a beat down of a year. The election of the fucking orange menace, the continued rise of fascism worldwide, the ongoing refugee crisis, and the general sense that things were getting worse, not better. This song is about resilience in the face of all that. It's about continuing to create, to love, to live, even when the world seems bleak. The lyrics touch on themes of hiding from oppressive regimes, but also of finding strength in community and in art.
+audio_tracks:
+  - id: 1
+    description: Bass
+    audio_file: 01_05_02_bass.wav
+  - id: 2
+    description: Analog Synth Bass
+    audio_file: 01_05_04_analog_synth_bass.wav
+    midi_file: 01_05_03_analog_synth_bass.mid
+  - id: 3
+    description: Hi-Hat
+    audio_file: 01_05_07_hihat.wav
+    group: drums
+  - id: 4
+    description: Overhead Mic
+    audio_file: 01_05_09_overhead.wav
+    group: drums
+  - id: 5
+    description: Tambourine
+    audio_file: 01_05_10_tambourine.wav
+    group: drums
+  - id: 6
+    description: Kick
+    audio_file: 01_05_12_kick.wav
+    midi_file: 01_05_11_kick.mid
+    group: drums
+  - id: 7
+    description: Snare
+    audio_file: 01_05_14_snare.wav
+    midi_file: 01_05_13_snare.mid
+    group: drums
+  - id: 8
+    description: Floor Tom
+    audio_file: 01_05_16_floor_tom.wav
+    midi_file: 01_05_15_floor_tom.mid
+    group: drums
+  - id: 9
+    description: Click Track
+    audio_file: 01_05_18_click.wav
+    midi_file: 01_05_17_click.mid
+    group: drums
+  - id: 10
+    description: Ride Cymbal
+    audio_file: 01_05_20_ride.wav
+    midi_file: 01_05_19_ride.mid
+    group: drums
+  - id: 11
+    description: Crash Cymbal
+    midi_file: 01_05_20_crash.mid
+    group: drums
+  - id: 12
+    description: Hi-Hat (alt)
+    audio_file: 01_05_22_hihat.wav
+    midi_file: 01_05_21_hihat.mid
+    group: drums
+  - id: 13
+    description: Bellitar
+    audio_file: 01_05_24_bellitar.wav
+    midi_file: 01_05_23_bellitar.mid
+  - id: 14
+    description: Piano
+    audio_file: 01_05_26_piano.wav
+    midi_file: 01_05_25_piano.mid
+  - id: 15
+    description: Microgranular FX
+    audio_file: 01_05_28_microgran.wav
+  - id: 16
+    description: Stylus Groove
+    audio_file: 01_05_27_stylus.wav
+  - id: 17
+    description: Crunchy Guitar
+    audio_file: 01_05_29_crunchy_guitar.wav
+  - id: 18
+    description: Acoustic Guitar
+    audio_file: 01_05_30_acoustic_guitar.wav
+  - id: 19
+    description: Main Vocal
+    audio_file: 01_05_32_main_vocal.wav
+  - id: 20
+    description: Vocal 2
+    audio_file: 01_05_33_vocal_2.wav
+  - id: 21
+    description: Vocal 3
+    audio_file: 01_05_34_vocal_3.wav
+  - id: 22
+    description: Vocal 4
+    audio_file: 01_05_35_vocal_4.wav
+  - id: 23
+    description: Claps
+    audio_file: 01_05_36_claps.wav
+  - id: 24
+    description: Harmonium
+    audio_file: 01_05_37_harmonium.wav
+  - id: 25
+    description: Room Mic
+    audio_file: 01_05_08_room.wav
+    group: drums
+  - id: 26
+    description: Twang Guitar
+    audio_file: 01_05_31_twang.wav
+  - id: 27
+    description: Synth Bass
+    audio_file: 01_05_06_synth_bass.wav
+    midi_file: 01_05_05_synth_bass.mid
