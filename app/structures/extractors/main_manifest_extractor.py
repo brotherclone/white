@@ -13,13 +13,13 @@ from app.util.lrc_utils import load_lrc
 class ManifestExtractor:
     """Main orchestrator class for extracting data from manifests using specialized extractors"""
 
-    def __init__(self, manifest_id: str):
+    def __init__(self, mani_id: str):
         load_dotenv()
-        self.manifest_id = manifest_id
+        self.manifest_id = mani_id
         self.manifest_path = os.path.join(
             os.environ['MANIFEST_PATH'],
-            manifest_id,
-            f"{manifest_id}.yml"
+            mani_id,
+            f"{mani_id}.yml"
         )
 
         if not os.path.exists(self.manifest_path):
@@ -229,7 +229,7 @@ class ManifestExtractor:
             segment = {
                 'manifest_id': manifest.manifest_id,
                 'segment_type': 'section',
-                'segment_id': f"{manifest.manifest_id}_{section.section_name.lower().replace(' ', '_')}",
+                'segment_id': f"{manifest['manifest_id']}_{section['section_name'].lower().replace(' ', '_')}",
                 'canonical_start': section_start,
                 'canonical_end': section_end,
                 'duration': section_end - section_start,
@@ -399,6 +399,7 @@ class ManifestExtractor:
                 'boundary_crossing_indicators': self._identify_boundary_crossing_indicators(
                     section, intersecting_lyrics
                 )
+
             }
 
             # Add audio features with rebracketing analysis
@@ -922,7 +923,7 @@ if __name__ == "__main__":
     midi_path = f"{os.getenv('MANIFEST_PATH')}/{manifest_id}/01_01_biotron.mid"
 
     # Initialize extractor
-    extractor = ManifestExtractor(manifest_id=manifest_id)
+    extractor = ManifestExtractor(mani_id=manifest_id)
     print("Loaded manifest:", extractor.manifest.title if extractor.manifest else "None")
 
     # Example: generate_multimodal_segments (if files exist)

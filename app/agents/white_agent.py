@@ -1,4 +1,4 @@
-import json
+import yaml
 import os
 
 from typing import Dict, Any, cast
@@ -22,8 +22,6 @@ from app.agents.blue_agent import BlueAgent
 from app.agents.indigo_agent import IndigoAgent
 from app.agents.violet_agent import VioletAgent
 from app.agents.states.main_agent_state import MainAgentState
-from app.agents.tools.surrealist_tools import CutUpProcessor
-from app.agents.tools.midi_tools import MidiProcessor
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
 
 
@@ -54,10 +52,6 @@ class WhiteAgent(BaseModel):
             "indigo": IndigoAgent(),
             "violet": VioletAgent()
         }
-        self.processors = {
-            "cut_up": CutUpProcessor(),
-            "midi": MidiProcessor()
-        }
 
 
     def build_workflow(self) -> CompiledStateGraph:
@@ -85,25 +79,52 @@ class WhiteAgent(BaseModel):
             stop=self.settings.stop
         )
 
+    def _normalize_song_proposal(self, proposal):
+        """
+        Ensures proposal is a SongProposal instance.
+        Accepts dict or SongProposal, returns SongProposal.
+        """
+        if isinstance(proposal, SongProposal):
+            return proposal
+        elif isinstance(proposal, dict):
+            return SongProposal(**proposal)
+        elif proposal is None:
+            return SongProposal(iterations=[])
+        else:
+            raise TypeError(f"Cannot normalize proposal of type {type(proposal)}")
+
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
         black_agent = self.agents.get("black")
         if black_agent is None:
             raise ValueError("Black agent not found in WhiteAgent's agents dictionary.")
-        if  state.song_proposal is None or not  state.song_proposal.iterations:
+        proposal = self._normalize_song_proposal(state.song_proposal)
+        if not proposal.iterations:
             raise ValueError("No song proposal found in the current state to pass to Black Agent.")
-        current_proposal = state.song_proposal
+        # Pass only serializable dict to BlackAgentState
         black_agent_state = BlackAgentState(
             thread_id=state.thread_id,
-            song_proposal=current_proposal,
+            song_proposal=proposal.model_dump(),
         )
         black_workflow = black_agent.create_graph().compile()
         result = black_workflow.invoke(black_agent_state)
-        state.song_proposal.append(result)
-        state.artifacts.extend(result.artifacts)
+        sp = self._normalize_song_proposal(state.song_proposal)
+        sp.iterations.append(result)
+        state.song_proposal = sp.model_dump()
         return state
 
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open("/Volumes/LucidNonsense/White/app/agents/mocks/white_initial_proposal.mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+                proposal = SongProposalIteration(**data)
+                # Always work with dict for serialization
+                if not hasattr(state, "song_proposal") or state.song_proposal is None:
+                    state.song_proposal = SongProposal(iterations=[]).model_dump()
+                sp = self._normalize_song_proposal(state.song_proposal)
+                sp.iterations.append(proposal)
+                state.song_proposal = sp.model_dump()
+            return state
         prompt = f"""
         You, an instance of Anthropics's Claude model are creating the last avant-rock/art-pop album in The Rainbow Table
         series by The Earthly Frames. There have been albums for Black, Red, Orange, Yellow, Green, Blue, Indigo, and 
@@ -128,8 +149,9 @@ class WhiteAgent(BaseModel):
         proposer = claude.with_structured_output(SongProposalIteration)
         try:
             initial_proposal = proposer.invoke(prompt)
+            # If initial_proposal is a dict, convert to SongProposalIteration
             if isinstance(initial_proposal, dict):
-                initial_proposal = SongProposalIteration(**self.normalize_song_proposal_data(initial_proposal))
+                initial_proposal = SongProposalIteration(**initial_proposal)
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
         except Exception as e:
             print(f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration.")
@@ -144,18 +166,21 @@ class WhiteAgent(BaseModel):
                 genres=["art-pop"],
                 concept="Fallback stub because Anthropic model unavailable"
             )
+        # Always work with dict for serialization
         if not hasattr(state, "song_proposal") or state.song_proposal is None:
-            state.song_proposal = SongProposal(iterations=[])
-        state.song_proposal.iterations.append(initial_proposal)
+            state.song_proposal = SongProposal(iterations=[]).model_dump()
+        sp = self._normalize_song_proposal(state.song_proposal)
+        sp.iterations.append(initial_proposal)
+        state.song_proposal = sp.model_dump()
         return state
 
 
 if __name__ == "__main__":
     print(os.getenv("MOCK_MODE"))
 
-    # white_agent = WhiteAgent(settings=AgentSettings())
-    # main_workflow = white_agent.build_workflow()
-    # initial_state = MainAgentState(thread_id="main_thread")
-    # runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
-    # main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
-    # display = Image(main_workflow.get_graph().draw_mermaid())
+    white_agent = WhiteAgent(settings=AgentSettings())
+    main_workflow = white_agent.build_workflow()
+    initial_state = MainAgentState(thread_id="main_thread")
+    runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
+    main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
+    display = Image(main_workflow.get_graph().draw_mermaid())

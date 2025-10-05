@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Any
 
 from app.agents.enums.gnosis_method import GnosisMethod
 from app.agents.enums.sigil_type import SigilType
-from app.agents.models.sigil_record import SigilRecord
+from app.agents.models.sigil_artifact import SigilRecord
 
 
 class SigilTools:

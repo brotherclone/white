@@ -9,6 +9,7 @@ from app.structures.concepts.rainbow_table_color import RainbowTableColor
 
 load_dotenv()
 
+
 def load_manifest(file_path: str) -> Manifest:
     """
     Load a YAML manifest file and convert it to a Manifest object.

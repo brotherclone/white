@@ -11,8 +11,11 @@ from dotenv import load_dotenv
 from scipy import signal
 from scipy.io import wavfile
 from scipy.fft import fft, ifft, fftfreq
-from app.agents.enums.noise_type import NoiseType
 
+from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.agents.enums.noise_type import NoiseType
+from app.agents.models.audio_chain_artifact_file import AudioChainArtifactFile
+from app.structures.concepts.rainbow_table_color import RainbowTableColor, the_rainbow_table_colors
 
 load_dotenv()
 warnings.filterwarnings('ignore')
@@ -251,20 +254,21 @@ def save_wav_from_bytes(filename: str, audio_bytes: bytes, sample_rate: int = 44
     audio_array = np.frombuffer(audio_bytes, dtype=np.int16)
     wavfile.write(filename, sample_rate, audio_array)
 
-def find_wav_files(root_dir: str)-> List[str]:
+def find_wav_files(root_dir: str, prefix: str | None)-> List[str]:
     """
     Recursively find all .wav files in the given directory.
     1. Walk through the directory tree.
     2. Check file extensions.
     3. Collect and return full paths.
     4. Return list of .wav file paths.
+    :param prefix:
     :param root_dir:
     :return:
     """
-    wav_files = []
+    wav_files: List[str] = []
     for dirpath, _, filenames in os.walk(root_dir):
         for file_name in filenames:
-            if file_name.lower().endswith('.wav'):
+            if file_name.lower().endswith('.wav') and (prefix is None or file_name.startswith(prefix)):
                 wav_files.append(os.path.join(dirpath, file_name))
     return wav_files
 
@@ -303,22 +307,101 @@ def select_random_segment_audio(root_dir:str, min_duration:float, num_segments:i
     :param output_dir:
     :return:
     """
-    wav_files = find_wav_files(root_dir)
+    wav_files = find_wav_files(root_dir, None)
     random.shuffle(wav_files)
-    os.makedirs(output_dir, exist_ok=True)
-    found = 0
+    per_file_segments: dict[str, list[tuple[np.ndarray, int]]] = {}
     for wav_path in wav_files:
-        if found >= num_segments:
-            break
+        try:
+            audio, sr = librosa.load(wav_path, sr=None)
+        except Exception as e:
+            logging.error(f"Failed to load `{wav_path}`: {e}")
+            continue
+        segments = extract_non_silent_segments(audio, sr, min_duration)
+        if not segments:
+            continue
+        random.shuffle(segments)
+        per_file_segments[wav_path] = [(seg, sr) for seg in segments]
+    if not per_file_segments:
+        logging.info("No non-silent segments found in any file.")
+        return
+    os.makedirs(output_dir, exist_ok=True)
+    written = 0
+    file_list = list(per_file_segments.keys())
+    while written < num_segments and any(per_file_segments.values()):
+        for wav_path in file_list:
+            if written >= num_segments:
+                break
+            seg_list = per_file_segments.get(wav_path)
+            if not seg_list:
+                continue
+            seg, sr = seg_list.pop()
+            seg_arr = np.asarray(seg, dtype=np.float32)
+            max_abs = np.max(np.abs(seg_arr)) if seg_arr.size else 0.0
+            if max_abs > 1.0:
+                seg_arr = seg_arr / max_abs
+            base = os.path.splitext(os.path.basename(wav_path))[0]
+            out_path = os.path.join(output_dir, f"segment_{written + 1}_{base}.wav")
+            try:
+                sf.write(out_path, seg_arr, sr, subtype='PCM_16')
+                logging.info(f"Wrote `{out_path}` (sr={sr}, samples={len(seg_arr)}) from `{wav_path}`")
+                written += 1
+            except Exception as e:
+                logging.error(f"Failed to write `{out_path}`: {e}")
+                continue
+    logging.info(f"Extracted {written} segments to `{output_dir}`.")
+
+def get_audio_segments_as_chain_artifacts(min_duration: float,
+                                          num_segments: int,
+                                          rainbow_color: RainbowTableColor,
+                                          thread_id: str = "t") -> list:
+    wav_files = find_wav_files(os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix)
+    random.shuffle(wav_files)
+    all_segments: list[tuple[np.ndarray, int, str]] = []
+    for wav_path in wav_files:
         audio, sr = librosa.load(wav_path, sr=None)
         segments = extract_non_silent_segments(audio, sr, min_duration)
+        if not segments:
+            continue
+        random.shuffle(segments)
         for seg in segments:
-            if found >= num_segments:
-                break
-            out_path = os.path.join(output_dir, f"segment_{found+1}.wav")
-            sf.write(out_path, seg, sr)
-            found += 1
-    print(f"Extracted {found} segments to {output_dir}.")
+            all_segments.append((seg, sr, wav_path))
+        if len(all_segments) >= max(num_segments * 5, num_segments + 10):
+            break
+
+    if not all_segments:
+        return []
+
+    random.shuffle(all_segments)
+    selected = all_segments[:num_segments]
+
+    artifacts: list[AudioChainArtifactFile] = []
+    for idx, (seg, sr, wav_path) in enumerate(selected, start=1):
+        file_name = f"{thread_id}_segment_{idx}.wav"
+        artifact = AudioChainArtifactFile(
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            rainbow_color=rainbow_color,
+            chain_artifact_file_type=ChainArtifactFileType.AUDIO,
+            file_name=file_name,
+            artifact_path=wav_path,
+            duration=len(seg) / sr,
+            sample_rate=sr,
+            channels=1,
+            bit_depth=16
+        )
+        dest_path = artifact.get_artifact_path()
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+        logging.info(f"Writing audio segment to ` {dest_path} ` (sr={sr}, samples={len(seg)})")
+        seg_arr = np.asarray(seg, dtype=np.float32)
+        max_abs = np.max(np.abs(seg_arr)) if seg_arr.size else 0.0
+        if max_abs > 1.0:
+            seg_arr = seg_arr / max_abs
+        sf.write(dest_path, seg_arr, sr, subtype='PCM_16')
+        artifacts.append(artifact)
+
+    return artifacts
+
+
+
 
 def create_random_audio_mosaic(root_dir:str, slice_duration_ms:int, target_length_sec:int|float, output_path:str) -> None:
     """
@@ -367,6 +450,9 @@ def create_random_audio_mosaic(root_dir:str, slice_duration_ms:int, target_lengt
     else:
         print("No suitable segments found.")
 
+def create_audio_mosaic_chain_artifact():
+    pass
+
 def blend_with_noise(input_path: str, blend: float, output_dir: str) -> str:
     """
     Blend the input audio with generated speech-like noise.
@@ -395,22 +481,26 @@ def blend_with_noise(input_path: str, blend: float, output_dir: str) -> str:
     sf.write(out_path, blended, sr)
     return out_path
 
-# Example usage
+def create_blended_audio_chain_artifact():
+    pass
+
 if __name__ == "__main__":
-    select_random_segment_audio(
-        root_dir="/Volumes/LucidNonsense/White/staged_raw_material",
-        min_duration=1.0,
-        num_segments=5,
-        output_dir="/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments"
-    )
-    create_random_audio_mosaic(
-        root_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments',
-        slice_duration_ms=50,
-        target_length_sec=10,
-        output_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav'
-    )
-    blended_path = blend_with_noise(
-        input_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav',
-        blend=0.3,
-        output_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios'
-    )
+    # select_random_segment_audio(
+    #     root_dir="/Volumes/LucidNonsense/White/staged_raw_material",
+    #     min_duration=1.0,
+    #     num_segments=5,
+    #     output_dir="/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments"
+    # )
+    # create_random_audio_mosaic(
+    #     root_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments',
+    #     slice_duration_ms=50,
+    #     target_length_sec=10,
+    #     output_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav'
+    # )
+    # blended_path = blend_with_noise(
+    #     input_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav',
+    #     blend=0.3,
+    #     output_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios'
+    # )
+    a = get_audio_segments_as_chain_artifacts(4.0, 3,the_rainbow_table_colors['Z'], '123443')
+    print(a)

@@ -1,12 +1,13 @@
 from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import Optional, List
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 
 from app.agents.models.agent_settings import AgentSettings
-
+from app.agents.models.base_chain_artifact import ChainArtifact
+from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
 
 load_dotenv()
 
@@ -18,27 +19,26 @@ class BaseRainbowAgent(BaseModel, ABC):
 
     settings: AgentSettings | None = None
     graph: Optional[StateGraph] = None
+    chain_artifacts: List[ChainArtifact] = []
 
     def __init__(self, **data):
         super().__init__(**data)
-        # Initialize the graph after Pydantic initialization
         self.graph = self.create_graph()
 
     @abstractmethod
     def create_graph(self) -> StateGraph:
-        """Override this method in subclasses to define the agent's workflow"""
         raise NotImplementedError("Subclasses must implement create_graph method")
 
     @abstractmethod
-    def generate_document(self):
+    def generate_document(self, agent_state: BaseRainbowAgentState)-> StateGraph:
         raise NotImplementedError("Subclasses must implement generate_document method")
 
     @abstractmethod
-    def generate_alternate_song_spec(self):
+    def generate_alternate_song_spec(self, agent_state: BaseRainbowAgentState) -> StateGraph:
         raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
 
     @abstractmethod
-    def contribute(self):
+    def contribute(self,agent_state: BaseRainbowAgentState) -> StateGraph:
         raise NotImplementedError("Subclasses must implement contribute method")
 
     def _get_claude(self) -> ChatAnthropic:
