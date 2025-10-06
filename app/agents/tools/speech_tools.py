@@ -3,7 +3,12 @@ import os
 import assemblyai as aai
 from dotenv import load_dotenv
 
+from app.agents.models.audio_chain_artifact_file import AudioChainArtifactFile
+from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
+
 load_dotenv()
+
+
 def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
     """
     Use AssemblyAI to transcribe audio with aggressive settings.
@@ -68,3 +73,23 @@ def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
                 return combined_text
     logging.warning("No transcription text generated - AssemblyAI too conservative!")
     return None
+
+
+def chain_artifact_file_from_speech_to_text(audio: AudioChainArtifactFile,
+                                            thread_id: str = 't') -> TextChainArtifactFile | None:
+    transcript_artifact = TextChainArtifactFile(
+        rainbow_color=audio.rainbow_color,
+        base_path=audio.base_path,
+        chain_artifact_file_type='md',
+        file_name=f"{thread_id}_evp_transcript.md"
+    )
+    transcript_text = evp_speech_to_text(audio.get_artifact_path(with_file_name=False), audio.file_name)
+    if transcript_text:
+        transcript_artifact.artifact_path = transcript_artifact.get_artifact_path()
+        with open(transcript_artifact.artifact_path, 'w') as f:
+            f.write(transcript_text)
+        transcript_artifact.text_content = transcript_text
+        return transcript_artifact
+    else:
+        logging.warning("No transcript generated from audio.")
+        return None
