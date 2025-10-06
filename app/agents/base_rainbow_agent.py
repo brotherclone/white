@@ -30,16 +30,8 @@ class BaseRainbowAgent(BaseModel, ABC):
         raise NotImplementedError("Subclasses must implement create_graph method")
 
     @abstractmethod
-    def generate_document(self, agent_state: BaseRainbowAgentState)-> StateGraph:
-        raise NotImplementedError("Subclasses must implement generate_document method")
-
-    @abstractmethod
     def generate_alternate_song_spec(self, agent_state: BaseRainbowAgentState) -> StateGraph:
         raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
-
-    @abstractmethod
-    def contribute(self,agent_state: BaseRainbowAgentState) -> StateGraph:
-        raise NotImplementedError("Subclasses must implement contribute method")
 
     def _get_claude(self) -> ChatAnthropic:
         return ChatAnthropic(

@@ -15,3 +15,7 @@ class EVPArtifact(ChainArtifact):
 
     def __init__(self, **data):
         super().__init__(**data)
+
+    #ToDo implement to clean up segments and blended - keep mosaic and transcript
+    def clean_temp_files(self):
+        pass

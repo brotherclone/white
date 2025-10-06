@@ -9,14 +9,20 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
+from app.agents.enums.sigil_state import SigilState
+from app.agents.enums.sigil_type import SigilType
 from app.agents.models.agent_settings import AgentSettings
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.models.evp_artifact import EVPArtifact
-from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
+from app.agents.models.sigil_artifact import SigilArtifact
+from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
 from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.states.main_agent_state import MainAgentState
-from app.agents.tools.audio_tools import select_random_segment_audio
-from app.agents.tools.speech_tools import evp_speech_to_text
+from app.agents.tools.audio_tools import get_audio_segments_as_chain_artifacts, \
+    create_audio_mosaic_chain_artifact, create_blended_audio_chain_artifact
+from app.agents.tools.magick_tools import SigilTools
+from app.agents.tools.speech_tools import chain_artifact_file_from_speech_to_text
+from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
 from app.util.manifest_loader import get_my_reference_proposals
 
@@ -104,22 +110,21 @@ class BlackAgent(BaseRainbowAgent, ABC):
         black_workflow.add_node("generate_evp", self.generate_evp)
         black_workflow.add_node("route_after_spec", self.route_after_spec)
         black_workflow.add_edge(START, "generate_alternate_song_spec")
+        black_workflow.add_edge("generate_alternate_song_spec", "route_after_spec")
         black_workflow.add_conditional_edges(
             "route_after_spec",
             self.route_after_spec,
             {
                 "need_sigil": "generate_sigil",
                 "need_evp": "generate_evp",
-                "ready_for_proposal": "generate_alternate_song_spec",
+                "ready_for_proposal": "generate_alternate_song_spec",  # Loop back
                 "done": END
             }
         )
-        black_workflow.add_edge("generate_sigil", "generate_alternate_song_spec")
-        black_workflow.add_edge("generate_evp", "generate_alternate_song_spec")
-        black_workflow.add_edge("generate_alternate_song_spec", END)
+        black_workflow.add_edge("generate_sigil", "route_after_spec")
+        black_workflow.add_edge("generate_evp", "route_after_spec")
 
         return black_workflow
-
 
     def generate_alternate_song_spec(self, state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -188,12 +193,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.song_proposal.iterations.append(counter_proposal)
         return state
 
-    def contribute(self,agent_state: BaseRainbowAgentState) -> StateGraph:
-        pass
-
-    def generate_document(self, agent_state: BaseRainbowAgentState) -> StateGraph:
-        pass
-
     @staticmethod
     def generate_evp(state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -202,32 +201,60 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 data = yaml.safe_load(f)
             state.evp_artifact = EVPArtifact(**data)
             return state
-        select_random_segment_audio(
-            root_dir="/Volumes/LucidNonsense/White/staged_raw_material",
-            min_duration=10.0,
-            num_segments=10,
-            output_dir="/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments"
+        segments = get_audio_segments_as_chain_artifacts(2.0, 9, the_rainbow_table_colors['Z'], state.thread_id)
+        mosiac = create_audio_mosaic_chain_artifact(segments, 50,  state.song_proposal.target_length, state.thread_id)
+        blended = create_blended_audio_chain_artifact(mosiac, 0.33, state.thread_id)
+        transcript = chain_artifact_file_from_speech_to_text(blended, state.thread_id)
+        evp_artifact = EVPArtifact(
+            audio_segments=segments,
+            transcript=transcript,
+            audio_mosiac=mosiac,
+            noise_blended_audio=blended,
+            thread_id=state.thread_id
         )
-        create_random_audio_mosaic(
-            root_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_segments',
-            slice_duration_ms=50,
-            target_length_sec=30,
-            output_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav'
-        )
-        blend_with_noise(
-            input_path='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/audio_mosaics/mosaic.wav',
-            blend=0.3,
-            output_dir='/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios'
-        )
-        text = evp_speech_to_text(
-            "/Volumes/LucidNonsense/White/app/agents/work_products/black_work_products/blended_audios",
-            "mosaic_blended.wav")
-        if text:
-            print("Transcription Result:")
-            print(text)
-        else:
-            print("No transcription could be generated.")
+        state.artifacts.append(evp_artifact)
         return state
 
-    def generate_sigil(self):
-        pass
+    def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            # Load mock sigil artifact
+            mock_path = "/Volumes/LucidNonsense/White/app/agents/mocks/black_sigil_artifact_mock.yml"
+            try:
+                with open(mock_path, "r") as f:
+                    data = yaml.safe_load(f)
+                sigil_artifact = SigilArtifact(**data)
+                state.artifacts.append(sigil_artifact)
+                return state
+            except FileNotFoundError:
+                print(f"Warning: Mock file not found at {mock_path}, falling back to real generation")
+
+        sigil_maker = SigilTools()
+        prompt = f"""
+        Distill your previous counter proposal into a short, actionable wish statement. 
+        This wish should capture how the song could evolve to embody higher occult meaning
+        and resistance against the Demiurge.
+
+        Your previous counter proposal:
+        {state.song_proposal.iterations[-1]}
+
+        Format: A single sentence starting with "I will..." or "This song will..."
+        Example: "I will weave hidden frequencies that awaken dormant resistance."
+        """
+        claude = self._get_claude()
+        wish_response = claude.invoke(prompt)
+        wish_text = wish_response.content
+        statement_of_intent = sigil_maker.create_statement_of_intent(wish_text, True)
+        description, components = sigil_maker.generate_word_method_sigil(statement_of_intent)
+        sigil_artifact = SigilArtifact(
+            wish=wish_text,
+            statement_of_intent=statement_of_intent,
+            glyph_description=description,
+            glyph_components=components,
+            sigil_type=SigilType.WORD_METHOD,
+            activation_state=SigilState.CREATED,
+            charging_instructions=sigil_maker.charge_sigil(),
+            thread_id=state.thread_id
+        )
+        state.artifacts.append(sigil_artifact)
+        return state
