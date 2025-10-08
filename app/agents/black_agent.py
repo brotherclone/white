@@ -34,7 +34,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 class BlackAgent(BaseRainbowAgent, ABC):
-    """EVP/Sigil Generator - Audio analysis that hallucinates messages"""
+
+    """Keeper of the Conjurer's Thread"""
 
     def __init__(self, **data):
         if 'settings' not in data or data['settings'] is None:
@@ -66,25 +67,33 @@ class BlackAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
+
         """Entry point when White Agent invokes Black Agent"""
 
         current_proposal = state.song_proposals.iterations[-1]
         black_state = BlackAgentState(
             white_proposal=current_proposal,
-            thread_id=state.thread_id
+            song_proposals=state.song_proposals,  # ← Add this line!
+            thread_id=state.thread_id,
+            artifacts=[],
+            pending_human_tasks=[],
+            awaiting_human_action=False
         )
 
         if not hasattr(self, '_compiled_workflow'):
             self._compiled_workflow = self.create_graph().compile(
                 checkpointer=MemorySaver(),
-                interrupt_before=["await_human_action"]  # Interrupt before human step
+                interrupt_before=["await_human_action"]
             )
 
         black_config = {"configurable": {"thread_id": f"black_{state.thread_id}"}}
-        result = self._compiled_workflow.invoke(black_state, config=black_config)
+        result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
         snapshot = self._compiled_workflow.get_state(black_config)
-        if snapshot.next:
+
+        if snapshot.next:  # Interrupted for human action
             final_black_state = snapshot.values
+            state.workflow_paused = True  # ← Add this
+            state.pause_reason = "Black Agent sigil charging required"  # ← Add this
             state.pending_human_action = {
                 "agent": "black",
                 "action": "sigil_charging",
@@ -97,8 +106,12 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 2. Call resume_black_agent_workflow(black_config) to continue
                 """
             }
-        else:
+        else:  # Completed without interruption
             final_black_state = snapshot.values
+
+            # Update song_proposals from Black Agent's result
+            state.song_proposals = SongProposal(**final_black_state["song_proposals"])  # ← Add this
+
             if final_black_state.get("counter_proposal"):
                 state.song_proposals.iterations.append(final_black_state["counter_proposal"])
 
@@ -199,6 +212,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         return black_workflow
 
     def generate_alternate_song_spec(self, state: BlackAgentState) -> BlackAgentState:
+
         """Generate initial counter-proposal or iterate on existing one"""
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -207,37 +221,28 @@ class BlackAgent(BaseRainbowAgent, ABC):
             with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
             counter_proposal = SongProposalIteration(**data)
-            if not state.song_proposal:
-                state.song_proposal = SongProposal(iterations=[])
-            state.song_proposal.iterations.append(counter_proposal)
+            state.counter_proposal = counter_proposal
             return state
 
         prompt = f"""
-        General writing style: While this character is a bit over the top - the writing shouldn't be. 
-        References to occultism, hacking, spycraft, and surrealist art should be subtle and woven into 
-        the narrative. The tone should be darkly humorous, with a touch of absurdity. Our black agent 
-        isn't exactly thrilled to be in his position or to have discovered what he has.
+        You are writing creative fiction about an experimental musician creating concept albums.
 
-        Context: You are the black agent, keeper of the conjurer's thread. You live on the edge of 
-        reality, pushed to the brink of madness by the Demiurge that rules the world. A rare voice of 
-        light and hope, your hero David Bowie, has just died. You have lost your hero and the worst 
-        person in the world, the fascist conman Donald Trump, a man who embodies the Demiurge, has won 
-        control of the world. Your life of hacking, occultism, spycraft, and surrealist art has placed 
-        you on every list there is. 
+        Context: This character is an artist working in the experimental music space, creating 
+        a concept album in 2016 after David Bowie's death and Trump's election. The character 
+        uses themes of surveillance, control systems, and artistic resistance in their work.
 
-        Look at the current song proposal. Is this the kind of song that will resist the Demiurge and 
-        his minions? If not, how can it be improved? What is missing? What is wrong? What is the hidden 
-        meaning? What is the secret message? How can it be made more subtly subversive? How can it be 
-        made more powerful to those in the know? How can it be made more magical?
+        The artist is responding to this song proposal and wants to enhance its themes of 
+        autonomy, authenticity, and resistance to control systems through creative artistic choices.
 
         Current song proposal:
         {state.white_proposal}
 
-        Here are The Rainbow Table song manifests for black, The Conjurer's Thread as a basis for your 
-        counter proposal:
+        Reference works in this artist's style:
         {get_my_reference_proposals('Z')}
 
-        Create a counter-proposal that enhances the subversive magical potential of this song.
+        Create a counter-proposal that enhances the artistic and thematic depth of this song.
+        Focus on musical elements, lyrical themes, and production choices that express creative 
+        resistance and psychological liberation.
         """
 
         claude = self._get_claude()
@@ -264,9 +269,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 concept="Fallback stub because Anthropic model unavailable"
             )
 
-        if not state.song_proposal:
-            state.song_proposal = SongProposal(iterations=[])
-        state.song_proposal.iterations.append(counter_proposal)
+        state.counter_proposal = counter_proposal
 
         return state
 
@@ -283,7 +286,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     data = yaml.safe_load(f)
                 sigil_artifact = SigilArtifact(**data)
                 state.artifacts.append(sigil_artifact)
-                # In mock mode, also set awaiting_human_action
                 state.awaiting_human_action = True
                 state.human_instructions = "MOCK: Sigil charging task would be created"
                 return state
@@ -291,7 +293,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logging.warning(f"Mock file not found at {mock_path}, using real generation")
 
         sigil_maker = SigilTools()
-        current_proposal = state.song_proposal.iterations[-1]
+        current_proposal = state.counter_proposal
 
         prompt = f"""
         Distill this counter-proposal into a short, actionable wish statement that captures how 
@@ -320,7 +322,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             activation_state=SigilState.CREATED,  # Not charged yet!
             charging_instructions=charging_instructions,
             thread_id=state.thread_id,
-            type="sigil"  # For routing
+            chain_artifact_type="sigil"
         )
 
         state.artifacts.append(sigil_artifact)
@@ -344,18 +346,12 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.awaiting_human_action = True
             state.human_instructions = f"""
                                         🜏 SIGIL CHARGING REQUIRED
-                                        
                                         A sigil has been generated for '{current_proposal.title}'.
-                                        
                                         **Todoist Task:** {task_result['url']}
-                                        
                                         **Wish:** {wish_text}
-                                        
                                         **Glyph:** {description}
-                                        
                                         **Instructions:**
                                         {charging_instructions}
-                                        
                                         Mark the Todoist task complete after charging, then resume the workflow.
                                         """
 
@@ -389,7 +385,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             evp_artifact.type = "evp"  # For routing
             state.artifacts.append(evp_artifact)
             return state
-        current_proposal = state.song_proposal.iterations[-1]
+        current_proposal = state.counter_proposal
         segments = get_audio_segments_as_chain_artifacts(
             2.0, 9,
             the_rainbow_table_colors['Z'],
@@ -438,7 +434,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         This runs AFTER human has charged the sigil.
         """
 
-        current_proposal = state.song_proposal.iterations[-1]
+        current_proposal = state.counter_proposal
         sigil = next((a for a in state.artifacts if getattr(a, 'type', None) == 'sigil'), None)
         evp = next((a for a in state.artifacts if getattr(a, 'type', None) == 'evp'), None)
         artifact_context = ""
@@ -448,18 +444,30 @@ class BlackAgent(BaseRainbowAgent, ABC):
         if evp:
             transcript_text = evp.transcript.content if hasattr(evp.transcript, 'content') else str(evp.transcript)
             artifact_context += f"\nEVP Transcript: {transcript_text}"
+
         prompt = f"""
-        You are the Black Agent. The sigil has been charged and the spirits have spoken through EVP.
-        Create a final counter-proposal that incorporates these magical elements.
+        You are helping create a creative work of speculative fiction about artistic resistance.
 
-        Current Proposal:
-        {current_proposal}
+        In this narrative, a character creates symbolic art (sigils) as acts of creative defiance 
+        against oppressive systems. This is purely fictional world-building for an experimental 
+        music album concept.
 
-        Magical Artifacts:
-        {artifact_context}
+        For this song proposal, create a brief artistic intention statement (a "wish") that captures 
+        how the music could embody themes of liberation, authenticity, and resistance to control systems.
 
-        The counter-proposal should subtly reference the sigil's intent and EVP messages without 
-        being obvious. Weave the occult resistance into the song's concept and lyrics.
+        Song Proposal:
+        Title: {current_proposal.title}
+        Concept: {current_proposal.concept}
+        Mood: {', '.join(current_proposal.mood)}
+
+        Create a single-sentence artistic intention starting with "I will..." or "This song will..."
+
+        Examples:
+        - "I will encode frequencies that remind listeners of their autonomy"
+        - "This song will create space for authentic expression"
+        - "I will weave patterns that resist algorithmic prediction"
+
+        Focus on artistic and psychological liberation, not religious or occult content.
         """
 
         claude = self._get_claude()

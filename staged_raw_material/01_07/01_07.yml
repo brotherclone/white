@@ -1,12 +1,104 @@
-bpm:
+bpm: 196
 manifest_id: '01_07'
-tempo:
-key:
+tempo: 4/4
+key: F minor
 rainbow_color: Z
 title: RSI Labeling Act
 release_date: '2017-07-18'
 album_sequence: 7
 main_audio_file: 01_07_main.wav
-TRT: ''
+TRT: '[00:03.086]'
 vocals: true
 lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:25.243]'
+    description: A bizarre country vocal loop with many effects starts the song and then manchester-ish drums and heavy shoegaze guitars come in, with a dreamy, hypnotic quality.
+  - section_name: Verse 1
+    start_time: '[00:25.244]'
+    end_time: '[00:35.217]'
+    description: Vocals are added, with a big reverb and echo effect. The guitars continue.
+  - section_name: Chorus 1
+    start_time: '[00:35.218]'
+    end_time: '[01:00.153]'
+    description: During the chorus the vocal refrain and lyrics overlap, creating a dreamy, hypnotic texture.
+  - section_name: Verse 2
+    start_time: '[01:00.154]'
+    end_time: '[01:25.243]'
+    description: The vocals return to the verse, with the guitars.
+  - section_name: Bridge
+    start_time: '[01:25.244]'
+    end_time: '[01:40.051]'
+    description: A dreamy monotonous guitar note rings out, with a hypnotic quality.
+  - section_name: Chorus 2
+    start_time: '[01:40.052]'
+    end_time: '[02:00.000]'
+    description: The chorus returns with the overlapping vocal refrain and lyrics, creating a dreamy, hypnotic texture.
+  - section_name: Hypnotic repeating outro
+    start_time: '[02:00.001]'
+    end_time: '[00:03.086]'
+    description: The track continues with a repeative hypnotic texture, fading out to the end.
+mood:
+  - nerdy
+  - playful
+  - exhaustive
+  - coy
+  - bitter
+sounds_like:
+  - name: Momus
+    discogs_id: 17592
+  - name: The Charlatans
+    discogs_id: 49023
+  - name: My Bloody Valentine
+    discogs_id: 6516
+  - name: The Jesus and Mary Chain
+    discogs_id: 243280
+genres:
+  - Shoegaze
+  - Experimental
+  - Indie Rock
+  - Noise Pop
+lrc_file: 01_07.lrc
+concept: The Real, The Symbolic, and The Imaginary - I had a really dorky dream that there was an ordinance past in congress to label all objects with a nutrition label style tag that explained the object's symbolic meaning and its relationship to the real and imaginary. The song plays on the dazed and confused state of meta-thought.
+audio_tracks:
+  - id: 1
+    description: Mellotron
+    audio_file: 01_07_03_mellotron.wav
+    midi_file: 01_07_02_mellotron.mid
+  - id: 2
+    description: Main Vocal
+    audio_file: 01_07_04_main_vocals.wav
+  - id: 3
+    description: Double-tracked Vocal
+    audio_file: 01_07_05_dbl_vocals.wav
+  - id: 4
+    description: Backing Vocal
+    audio_file: 01_07_06_bg_vocals.wav
+  - id: 5
+    description: Electric Piano
+    audio_file: 01_07_08_electric_piano.wav
+    midi_file: 01_07_07_electric_piano.mid
+  - id: 6
+    description: Counter synth
+    audio_file: 01_07_10_counter_synth.wav
+    midi_file: 01_07_09_counter_synth.mid
+  - id: 7
+    description: Drum machine
+    audio_file: 01_07_12_drum_machine.wav
+    midi_file: 01_07_11_drum_machine.mid
+    group: drums
+  - id: 8
+    description: Kick thud
+    audio_file: 01_07_13_thud.mid
+    midi_file: 01_07_14_thud.wav
+    group: drums
+  - id: 9
+    description: Bass
+    audio_file: 01_07_15_bass.wav
+  - id: 10
+    description: Modular Synth
+    audio_file: 01_07_17_modular.wav
+    midi_file: 01_07_16_modular.mid
+
+

@@ -115,7 +115,7 @@ def resume_black_agent_workflow(
         BlackAgentState(**current_state)
     )
 
-    logging.info("🔄 Resuming Black Agent workflow after human action...")
+    logging.info("Resuming Black Agent workflow after human action...")
 
     # Resume workflow - it will continue from 'await_human_action' node
     # Pass None as input since we're resuming from checkpoint
@@ -169,7 +169,7 @@ def manual_resume_from_cli(thread_id: str):
     try:
         final_state = resume_black_agent_workflow(black_config, verify_tasks=False)
         print(f"\n✅ Workflow completed successfully!")
-        print(f"📝 Final counter-proposal: {final_state.get('counter_proposal', {}).get('title')}")
+        print(f"Final counter-proposal: {final_state.get('counter_proposal', {}).get('title')}")
     except Exception as e:
         print(f"\n❌ Error resuming workflow: {e}")
 

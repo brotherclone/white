@@ -10,7 +10,6 @@ from pydantic import BaseModel
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import ensure_config, RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
-from IPython.display import Image
 from uuid import uuid4
 
 from app.agents.black_agent import BlackAgent
@@ -63,9 +62,11 @@ class WhiteAgent(BaseModel):
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
         workflow.add_node("invoke_black_agent", self.invoke_black_agent)
         workflow.add_node("end", self.end)
+
         workflow.add_edge(START, "initiate_song_proposal")
         workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
         workflow.add_edge("end", END)
+
         return workflow.compile(checkpointer=check_points)
 
     def end(self):
@@ -98,23 +99,9 @@ class WhiteAgent(BaseModel):
             raise TypeError(f"Cannot normalize proposal of type {type(proposal)}")
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
-
+        """Invoke Black Agent to generate counter-proposal"""
         black_agent = BlackAgent(settings=self.settings)
         state = black_agent(state)
-        if state.pending_human_action:
-            pending = state.pending_human_action
-            if pending.get('agent') == 'black':
-                logging.warning("⏸️  Black Agent requires human ritual action - workflow paused")
-                logging.info(f"📋 Instructions:\n{pending.get('instructions')}")
-                for task in pending.get('pending_tasks', []):
-                    logging.info(f"   🜏 Task: {task.get('task_url')}")
-                state.workflow_paused = True
-                state.pause_reason = "Black Agent awaiting sigil charging ritual"
-
-                return state
-
-        logging.info("✓ Black Agent completed counter-proposal")
-
         return state
 
     @staticmethod
@@ -190,6 +177,9 @@ class WhiteAgent(BaseModel):
         claude = self._get_claude_supervisor()
         proposer = claude.with_structured_output(SongProposalIteration)
         try:
+            # Pass both specific iteration AND full history
+            # Black needs white_proposal to know what to respond to
+            # Black needs song_proposals to reference earlier ideas
             initial_proposal = proposer.invoke(prompt)
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
@@ -216,10 +206,8 @@ class WhiteAgent(BaseModel):
 
 
 if __name__ == "__main__":
-    print(os.getenv("MOCK_MODE"))
     white_agent = WhiteAgent(settings=AgentSettings())
     main_workflow = white_agent.build_workflow()
     initial_state = MainAgentState(thread_id="main_thread")
     runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
     main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
-    display = Image(main_workflow.get_graph().draw_mermaid())

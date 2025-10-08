@@ -1,5 +1,6 @@
 import logging
 import os
+import asyncio
 
 from todoist_api_python.api import TodoistAPI
 from todoist_api_python.models import Section, Task
@@ -12,9 +13,9 @@ TIME_OUT = 30.0
 EF_PROJECT_ID = "6CrfWqXrxppjhqMJ"
 
 logging.basicConfig(level=logging.INFO)
+
 load_dotenv()
 
-# Initialize API client once at module level
 _api_client: Optional[TodoistAPI] = None
 
 
@@ -290,3 +291,6 @@ def create_todoist_task_for_human_earthly_frame(
     except Exception as e:
         logging.error(f"Error creating task: {e}")
         raise
+
+if __name__ == "__main__":
+    mcp.run()
