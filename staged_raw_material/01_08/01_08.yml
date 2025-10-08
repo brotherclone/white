@@ -1,0 +1,12 @@
+bpm:
+manifest_id: '01_08'
+tempo:
+key:
+rainbow_color: Z
+title: Abandoner
+release_date: '2017-07-18'
+album_sequence: 8
+main_audio_file: 01_08_main.wav
+TRT: ''
+vocals: true
+lyrics: true

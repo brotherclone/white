@@ -1,4 +1,5 @@
 import os
+from abc import ABC
 
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
@@ -10,7 +11,7 @@ from app.agents.states.main_agent_state import MainAgentState
 
 load_dotenv()
 
-class IndigoAgent(BaseRainbowAgent):
+class IndigoAgent(BaseRainbowAgent, ABC):
 
     """Anagram/Hidden Pattern Decoder - Finds hidden information"""
 
@@ -39,22 +40,6 @@ class IndigoAgent(BaseRainbowAgent):
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
         print("💜 INDIGO AGENT: Decoding Hidden Patterns...")
-
-        # Mock output for now - fix the state access issue
-        state.indigo_content = {
-            "source_texts": [
-                text for content in [
-                    getattr(state, 'black_content', {}),
-                    getattr(state, 'red_content', {})
-                ]
-                for text in (content.values() if isinstance(content, dict) else [])
-                if isinstance(text, str)
-            ],
-            "discovered_anagrams": ["SPECTRAL SIGNS → LENS ACTS GRIPS", "EVP PHRASES → SHARP SEER VEP"],
-            "hidden_messages": "Every third word spells: THE FREQUENCY CALLS",
-            "conspiracy_interpretation": "The pattern suggests intentional encoding across multiple agent outputs..."
-        }
-
         return state
 
     def create_graph(self) -> StateGraph:
@@ -63,33 +48,13 @@ class IndigoAgent(BaseRainbowAgent):
 
         graph = StateGraph(IndigoAgentState)
 
-        # Add nodes for the IndigoAgent's workflow
-        graph.add_node("generate_rhymes", self._generate_rhymes_node)
-        graph.add_node("encode_text", self._encode_text_node)
-        graph.add_node("decode_patterns", self._decode_patterns_node)
-
-        # Define the workflow: generate rhymes → encode text → decode patterns
-        graph.set_entry_point("generate_rhymes")
-        graph.add_edge("generate_rhymes", "encode_text")
-        graph.add_edge("encode_text", "decode_patterns")
-        graph.add_edge("decode_patterns", END)
-
         return graph
 
-    def _generate_rhymes_node(self, state: IndigoAgentState) -> IndigoAgentState:
-        """Node for generating rhyming patterns"""
-        if not hasattr(state, 'rhyming_patterns'):
-            state.rhyming_patterns = ["Pattern A-B-A-B", "Pattern A-A-B-B"]
-        return state
+    def generate_document(self):
+        raise NotImplementedError("Subclasses must implement generate_document method")
 
-    def _encode_text_node(self, state: IndigoAgentState) -> IndigoAgentState:
-        """Node for encoding text patterns"""
-        if not hasattr(state, 'encoded_messages'):
-            state.encoded_messages = "Hidden message encoded using Caesar cipher"
-        return state
+    def generate_alternate_song_spec(self):
+        raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
 
-    def _decode_patterns_node(self, state: IndigoAgentState) -> IndigoAgentState:
-        """Node for decoding hidden patterns"""
-        if not hasattr(state, 'decoded_secrets'):
-            state.decoded_secrets = "Discovered anagram: LISTEN = SILENT"
-        return state
+    def contribute(self):
+        raise NotImplementedError("Subclasses must implement contribute method")

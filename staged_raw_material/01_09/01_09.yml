@@ -1,0 +1,12 @@
+bpm:
+manifest_id: '01_09'
+tempo:
+key:
+rainbow_color: Z
+title: A Seat at the Rainbow Table
+release_date: '2017-07-18'
+album_sequence: 9
+main_audio_file: 01_09_main.wav
+TRT: ''
+vocals: true
+lyrics: true
