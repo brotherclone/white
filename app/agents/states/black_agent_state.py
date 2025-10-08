@@ -1,5 +1,6 @@
 import uuid
 from typing import Optional, List, Dict, Any
+from pydantic import Field
 
 from app.agents.models.evp_artifact import EVPArtifact
 from app.agents.models.sigil_artifact import SigilArtifact
@@ -13,9 +14,10 @@ class BlackAgentState(BaseRainbowAgentState):
     song_proposal: SongProposal | None = None
     evp_artifact: EVPArtifact | None = None
     sigil_artifact: SigilArtifact | None = None
-    human_instructions: Optional[str]
-    pending_human_tasks: List[Dict[str, Any]]
-    awaiting_human_action: bool
+    human_instructions: Optional[str] = ""
+    pending_human_tasks: List[Dict[str, Any]] = Field(default_factory=list)
+    awaiting_human_action: bool = False
+    artifacts: List[Any] = Field(default_factory=list)
 
     def __init__(self, **data):
         super().__init__(**data)

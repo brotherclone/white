@@ -1,5 +1,7 @@
 import re
 from typing import List, Dict, Any
+import argparse
+import os
 
 def parse_lrc_time(time_str: str) -> float | None:
     """Parse LRC timestamp like [00:28.085] to seconds"""
@@ -112,4 +114,58 @@ def load_lrc(lrc_path: str) -> List[Dict[str, Any]]:
         print(f"ERROR loading LRC file {lrc_path}: {e}")
         return []
 
-    return None
+def smpte_to_lrc_timestamp(smpte: str, fps: int = 30) -> str:
+    """
+    Convert SMPTE timecode (HH:MM:SS:FF.ff) to LRC timestamp [mm:ss.ccc].
+    Assumes FF is frames, ff is subframes (fractional frames), default fps=30.
+    """
+    m = re.match(r"(\d{2}):(\d{2}):(\d{2}):(\d{2})\.(\d+)", smpte)
+    if not m:
+        return smpte  # Return unchanged if not SMPTE
+    hh, mm, ss, ff, sub = map(int, m.groups())
+    # Calculate total seconds
+    frame_fraction = ff / fps + int(sub) / (fps * 10 ** len(str(sub)))
+    total_seconds = hh * 3600 + mm * 60 + ss + frame_fraction
+    minutes = int(total_seconds // 60)
+    seconds = int(total_seconds % 60)
+    milliseconds = int((total_seconds - minutes * 60 - seconds) * 1000)
+    return f"[{minutes:02d}:{seconds:02d}.{milliseconds:03d}]"
+
+def convert_file_smpte_to_lrc_lines(lines, fps=30):
+    """
+    Convert all SMPTE timecodes in a list of lines to LRC timestamps.
+    Returns a new list of lines.
+    """
+    out = []
+    for line in lines:
+        line = line.rstrip()
+        m = re.match(r"(\d{2}:\d{2}:\d{2}:\d{2}\.\d+)", line)
+        if m:
+            out.append(smpte_to_lrc_timestamp(m.group(1), fps=fps))
+        else:
+            out.append(line)
+    return out
+
+def main():
+    parser = argparse.ArgumentParser(description="Convert SMPTE timecodes in a file to LRC timestamps.")
+    parser.add_argument("path", help="Path to input LRC or YAML file")
+    parser.add_argument("--fps", type=int, default=30, help="Frames per second (default: 30)")
+    parser.add_argument("--output", type=str, default=None, help="Output file path (default: <input>.converted.lrc)")
+    args = parser.parse_args()
+
+    if not os.path.isfile(args.path):
+        print(f"ERROR: File not found: {args.path}")
+        return
+
+    with open(args.path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    converted = convert_file_smpte_to_lrc_lines(lines, fps=args.fps)
+
+    out_path = args.output or f"{args.path}.converted.lrc"
+    with open(out_path, "w", encoding="utf-8") as f:
+        for line in converted:
+            f.write(line + "\n")
+    print(f"Converted file written to: {out_path}")
+
+if __name__ == "__main__":
+    main()

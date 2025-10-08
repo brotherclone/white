@@ -23,8 +23,7 @@ class SongProposalIteration(BaseModel):
 
 
 class SongProposal(BaseModel):
-
-    iterations: List[SongProposalIteration]
+    iterations: List[SongProposalIteration] = Field(default_factory=list)
 
     def __init__(self, **data):
         super().__init__(**data)
