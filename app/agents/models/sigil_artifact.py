@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from pydantic import Field
 
 from app.agents.enums.sigil_state import SigilState
 from app.agents.enums.sigil_type import SigilType
@@ -17,3 +18,5 @@ class SigilArtifact(ChainArtifact):
     glyph_components: List[str] | None = None
     activation_state: SigilState
     charging_instructions: str
+    chain_artifact_type: str = "sigil"
+    files: list = Field(default_factory=list)

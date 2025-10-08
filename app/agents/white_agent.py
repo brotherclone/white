@@ -1,3 +1,4 @@
+import logging
 import yaml
 import os
 
@@ -11,11 +12,11 @@ from langchain_core.runnables.config import ensure_config, RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 from IPython.display import Image
 from uuid import uuid4
+
 from app.agents.black_agent import BlackAgent
 from app.agents.models.agent_settings import AgentSettings
 from app.agents.red_agent import RedAgent
 from app.agents.orange_agent import OrangeAgent
-from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.yellow_agent import YellowAgent
 from app.agents.green_agent import GreenAgent
 from app.agents.blue_agent import BlueAgent
@@ -23,7 +24,9 @@ from app.agents.indigo_agent import IndigoAgent
 from app.agents.violet_agent import VioletAgent
 from app.agents.states.main_agent_state import MainAgentState
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
+from app.agents.workflow.resume_black_workflow import resume_black_agent_workflow
 
+logging.basicConfig(level=logging.INFO)
 
 class WhiteAgent(BaseModel):
 
@@ -79,7 +82,8 @@ class WhiteAgent(BaseModel):
             stop=self.settings.stop
         )
 
-    def _normalize_song_proposal(self, proposal):
+    @staticmethod
+    def _normalize_song_proposal(proposal):
         """
         Ensures proposal is a SongProposal instance.
         Accepts dict or SongProposal, returns SongProposal.
@@ -94,22 +98,61 @@ class WhiteAgent(BaseModel):
             raise TypeError(f"Cannot normalize proposal of type {type(proposal)}")
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
-        black_agent = self.agents.get("black")
-        if black_agent is None:
-            raise ValueError("Black agent not found in WhiteAgent's agents dictionary.")
-        proposal = self._normalize_song_proposal(state.song_proposal)
-        if not proposal.iterations:
-            raise ValueError("No song proposal found in the current state to pass to Black Agent.")
-        # Pass only serializable dict to BlackAgentState
-        black_agent_state = BlackAgentState(
-            thread_id=state.thread_id,
-            song_proposal=proposal.model_dump(),
-        )
-        black_workflow = black_agent.create_graph().compile()
-        result = black_workflow.invoke(black_agent_state)
-        sp = self._normalize_song_proposal(state.song_proposal)
-        sp.iterations.append(result)
-        state.song_proposal = sp.model_dump()
+
+        black_agent = BlackAgent(settings=self.settings)
+        state = black_agent(state)
+        if state.pending_human_action:
+            pending = state.pending_human_action
+            if pending.get('agent') == 'black':
+                logging.warning("⏸️  Black Agent requires human ritual action - workflow paused")
+                logging.info(f"📋 Instructions:\n{pending.get('instructions')}")
+                for task in pending.get('pending_tasks', []):
+                    logging.info(f"   🜏 Task: {task.get('task_url')}")
+                state.workflow_paused = True
+                state.pause_reason = "Black Agent awaiting sigil charging ritual"
+
+                return state
+
+        logging.info("✓ Black Agent completed counter-proposal")
+
+        return state
+
+    @staticmethod
+    def resume_after_black_agent_ritual(
+            state: MainAgentState
+    ) -> MainAgentState:
+        """
+        Resume White Agent workflow after Black Agent's ritual tasks are complete.
+        This should be called after human marks Todoist tasks complete.
+
+        Returns:
+            Updated state with Black Agent's counter-proposal integrated
+        """
+
+        if not state.pending_human_action:
+            logging.warning("No pending human action to resume from")
+            return state
+
+        pending = state.pending_human_action
+
+        if pending.get('agent') != 'black':
+            logging.warning(f"Pending action is for {pending.get('agent')}, not black agent")
+            return state
+        black_config = pending.get('black_config')
+        if not black_config:
+            raise ValueError("No black_config found in pending_human_action")
+        final_black_state = resume_black_agent_workflow(black_config, verify_tasks=True)
+        counter_proposal = final_black_state.get('counter_proposal')
+        if counter_proposal:
+            if not state.song_proposals:
+                state.song_proposals = SongProposal(iterations=[])
+            state.song_proposals.iterations.append(counter_proposal)
+            logging.info(f"✓ Integrated Black Agent counter-proposal: {counter_proposal.title}")
+        else:
+            logging.warning("Black Agent did not produce counter-proposal")
+        state.pending_human_action = None
+        state.workflow_paused = False
+        state.pause_reason = None
         return state
 
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
@@ -118,12 +161,11 @@ class WhiteAgent(BaseModel):
             with open("/Volumes/LucidNonsense/White/app/agents/mocks/white_initial_proposal.mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 proposal = SongProposalIteration(**data)
-                # Always work with dict for serialization
-                if not hasattr(state, "song_proposal") or state.song_proposal is None:
-                    state.song_proposal = SongProposal(iterations=[]).model_dump()
-                sp = self._normalize_song_proposal(state.song_proposal)
+                if not hasattr(state, "song_proposals") or state.song_proposals is None:
+                    state.song_proposals = SongProposal(iterations=[]).model_dump()
+                sp = self._normalize_song_proposal(state.song_proposals)
                 sp.iterations.append(proposal)
-                state.song_proposal = sp.model_dump()
+                state.song_proposals = sp.model_dump()
             return state
         prompt = f"""
         You, an instance of Anthropics's Claude model are creating the last avant-rock/art-pop album in The Rainbow Table
@@ -149,7 +191,6 @@ class WhiteAgent(BaseModel):
         proposer = claude.with_structured_output(SongProposalIteration)
         try:
             initial_proposal = proposer.invoke(prompt)
-            # If initial_proposal is a dict, convert to SongProposalIteration
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
@@ -166,18 +207,16 @@ class WhiteAgent(BaseModel):
                 genres=["art-pop"],
                 concept="Fallback stub because Anthropic model unavailable"
             )
-        # Always work with dict for serialization
-        if not hasattr(state, "song_proposal") or state.song_proposal is None:
-            state.song_proposal = SongProposal(iterations=[]).model_dump()
-        sp = self._normalize_song_proposal(state.song_proposal)
+        if not hasattr(state, "song_proposals") or state.song_proposals is None:
+            state.song_proposals = SongProposal(iterations=[]).model_dump()
+        sp = self._normalize_song_proposal(state.song_proposals)
         sp.iterations.append(initial_proposal)
-        state.song_proposal = sp.model_dump()
+        state.song_proposals = sp.model_dump()
         return state
 
 
 if __name__ == "__main__":
     print(os.getenv("MOCK_MODE"))
-
     white_agent = WhiteAgent(settings=AgentSettings())
     main_workflow = white_agent.build_workflow()
     initial_state = MainAgentState(thread_id="main_thread")
