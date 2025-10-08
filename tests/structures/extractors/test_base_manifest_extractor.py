@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from unittest.mock import patch, mock_open
-from app.structures.extractors.base_manifest_extractor import BaseManifestExtractor
+from app.structures.extractors.main_manifest_extractor import ManifestExtractor
 from pathlib import Path
 
 # --- Fixture to set MANIFEST_PATH for all tests ---
@@ -38,7 +38,7 @@ complete_manifest = {
 @patch('app.util.manifest_validator.validate_yaml_file', return_value=(True, []))
 @patch('app.util.manifest_loader.load_manifest', return_value={'manifest_id': '01_01', 'structure': [], 'title': 'Test'})
 def test_init_with_valid_manifest(mock_load_manifest, mock_validate):
-    extractor = BaseManifestExtractor(manifest_id='01_01')
+    extractor = ManifestExtractor(manifest_id='01_01')
     assert extractor.manifest is not None
     assert extractor.manifest_id == '01_01'
 
@@ -47,14 +47,14 @@ def test_init_with_valid_manifest(mock_load_manifest, mock_validate):
 @patch('app.util.manifest_loader.open', side_effect=FileNotFoundError())
 def test_init_with_invalid_manifest(mock_open, mock_load_manifest, mock_validate):
     with pytest.raises(FileNotFoundError):
-        BaseManifestExtractor(manifest_id='bad_id')
+        ManifestExtractor(manifest_id='bad_id')
 
 # --- parse_yaml_time ---
 @patch('app.util.manifest_validator.validate_yaml_file', return_value=(True, []))
 @patch('app.util.manifest_loader.load_manifest', return_value=complete_manifest)
 @patch('app.util.manifest_loader.open', new_callable=mock_open, read_data='bpm: 120\nmanifest_id: dummy\ntempo: 4/4\nkey: C major\nrainbow_color: R\ntitle: Test Song\nrelease_date: 2020-01-01\nalbum_sequence: 1\nmain_audio_file: main.wav\nTRT: "3:30"\nvocals: true\nlyrics: true\nstructure:\n  - section_name: Intro\n    start_time: 0:00\n    end_time: 0:10\n    description: desc\nmood:\n  - happy\nsounds_like:\n  - discogs_id: 1\n    name: reference\ngenres:\n  - rock\nlrc_file: lyrics.lrc\nconcept: A concept\naudio_tracks: []')
 def test_parse_yaml_time(mock_open_file, mock_load_manifest, mock_validate):
-    class DummyExtractor(BaseManifestExtractor):
+    class DummyExtractor(ManifestExtractor):
         def parse_lrc_time(self, time_str):
             return 42.0
     ext = DummyExtractor(manifest_id='dummy')
@@ -64,7 +64,7 @@ def test_parse_yaml_time(mock_open_file, mock_load_manifest, mock_validate):
 
 # --- determine_temporal_relationship ---
 def test_determine_temporal_relationship():
-    fn = BaseManifestExtractor.determine_temporal_relationship
+    fn = ManifestExtractor.determine_temporal_relationship
     assert fn(0, 10, 2, 8) == 'across' or fn(0, 10, 2, 8) is not None
     assert fn(0, 5, 2, 8) == 'bleed_in' or fn(0, 5, 2, 8) is not None
     assert fn(5, 12, 2, 8) == 'bleed_out' or fn(5, 12, 2, 8) is not None
@@ -80,7 +80,7 @@ def test_calculate_boundary_fluidity_score():
         'audio_features': {'attack_time': 0.05, 'decay_profile': [0.1, 0.2, 0.3]},
         'midi_features': {'rhythmic_regularity': 0.4, 'avg_polyphony': 3}
     }
-    score = BaseManifestExtractor._calculate_boundary_fluidity_score(segment)
+    score = ManifestExtractor._calculate_boundary_fluidity_score(segment)
     assert isinstance(score, float)
     assert score > 0
 
@@ -90,7 +90,7 @@ def test_calculate_boundary_fluidity_score():
 @patch('app.util.manifest_loader.load_manifest', return_value=complete_manifest)
 @patch('app.util.manifest_loader.open', new_callable=mock_open, read_data='bpm: 120\nmanifest_id: dummy\ntempo: 4/4\nkey: C major\nrainbow_color: R\ntitle: Test Song\nrelease_date: 2020-01-01\nalbum_sequence: 1\nmain_audio_file: main.wav\nTRT: "3:30"\nvocals: true\nlyrics: true\nstructure:\n  - section_name: Intro\n    start_time: 0:00\n    end_time: 0:10\n    description: desc\nmood:\n  - happy\nsounds_like:\n  - discogs_id: 1\n    name: reference\ngenres:\n  - rock\nlrc_file: lyrics.lrc\nconcept: A concept\naudio_tracks: []')
 def test_generate_multimodal_segments(mock_open_file, mock_load_manifest, mock_validate, mock_exists):
-    class DummyExtractor(BaseManifestExtractor):
+    class DummyExtractor(ManifestExtractor):
         def load_manifest(self, path):
             return complete_manifest
         def parse_yaml_time(self, t):

@@ -1,31 +1,32 @@
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel, Field
 
-from pydantic import Field
-from typing import Any, Dict, List, Optional
-from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.manifests.song_proposal import SongProposal
 
-class MainAgentState(BaseRainbowAgentState):
 
-    """Central state that flows through all color agents"""
+class MainAgentState(BaseModel):
 
-    # Input materials
-    audio_file: Optional[str] = None
-    input_text: Optional[str] = None
-    user_prompt: Optional[str] = None
+    """
+    Main state for White Agent (supervisor) coordinating all rainbow agents.
+    """
 
-    # Generated content by each agent
-    black_content: Dict[str, Any] = Field(default_factory=dict)  # EVP/Sigils
-    red_content: Dict[str, Any] = Field(default_factory=dict)  # Convoluted Literature
-    orange_content: Dict[str, Any] = Field(default_factory=dict)  # Sussex Mythology
-    yellow_content: Dict[str, Any] = Field(default_factory=dict)  # RPG Sessions
-    green_content: Dict[str, Any] = Field(default_factory=dict)  # Environmental Poetry
-    blue_content: Dict[str, Any] = Field(default_factory=dict)  # Alternate Lives
-    indigo_content: Dict[str, Any] = Field(default_factory=dict)  # Hidden Patterns
-    violet_content: Dict[str, Any] = Field(default_factory=dict)  # Mirror/Imitation
+    thread_id: str
+    song_proposals: SongProposal = Field(default_factory=SongProposal)
+    artifacts: List[Any] = []
+    workflow_paused: bool = False
+    pause_reason: Optional[str] = None
+    pending_human_action: Optional[Dict[str, Any]] = None
 
-    # Processing pipeline
-    cut_up_fragments: List[str] = Field(default_factory=list)
-    midi_data: Optional[Dict] = None
-
-    # Workflow control
-    active_agents: List[str] = Field(default_factory=list)
-    workflow_type: str = "single_agent"  # single_agent, chain, parallel, full_spectrum
+    """
+    Structure when workflow is paused:
+    {
+        "agent": "black" | "red" | etc.,
+        "action": "sigil_charging" | "emotional_review" | etc.,
+        "instructions": "Human-readable instructions",
+        "pending_tasks": [{"task_id": "...", "task_url": "...", ...}],
+        "black_config": {...},  # LangGraph config for resuming sub-agent
+        "resume_instructions": "How to resume after completion"
+    }
+    """
+    class Config:
+        arbitrary_types_allowed = True

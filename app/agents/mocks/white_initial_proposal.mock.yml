@@ -1,0 +1,13 @@
+iteration_id: 'MOCK001'
+bpm: 0
+tempo: 1/64
+key: A# minor
+rainbow_color: A
+title: White Initial Proposal
+mood:
+    - Even
+    - Unemotional
+genres:
+  - Mock Rock
+  - Mock Pop
+concept: This is a mock initial proposal for a musical piece, it gets passed along to each Rainbow Agent to add their own unique elements and styles.

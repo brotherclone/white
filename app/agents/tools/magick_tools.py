@@ -6,14 +6,14 @@ from typing import Dict, List, Tuple, Any
 
 from app.agents.enums.gnosis_method import GnosisMethod
 from app.agents.enums.sigil_type import SigilType
-from app.agents.models.sigil_record import SigilRecord
+from app.agents.models.sigil_artifact import SigilArtifact
 
 
 class SigilTools:
     """Austin Osman Spare-inspired sigil creation and management tools"""
 
     def __init__(self):
-        self.sigil_vault: Dict[str, SigilRecord] = {}
+        self.sigil_vault: Dict[str, SigilArtifact] = {}
         self.alphabet_of_desire: Dict[str, str] = {}
         self.paranoia_level = random.randint(7, 10)  # Black Agent's baseline paranoia
 
@@ -227,16 +227,9 @@ class SigilTools:
 
         return symbol_desc
 
-    def charge_sigil(self, sigil_id: str, method: GnosisMethod, duration_minutes: int = 10) -> Dict[str, Any]:
-        """
-        Simulate the charging/activation process for a sigil
-        """
-        if sigil_id not in self.sigil_vault:
-            raise ValueError(f"Sigil {sigil_id} not found in vault")
-
-        sigil = self.sigil_vault[sigil_id]
-
-        # Different charging methods have different effects
+    @staticmethod
+    def charge_sigil() -> str:
+        duration_minutes = random.randint(5, 45)  # minutes
         charging_instructions = {
             GnosisMethod.EXHAUSTION: f"Physical exhaustion method: {duration_minutes} minutes of intensive exercise until mental fatigue sets in",
             GnosisMethod.ECSTASY: f"Ecstatic method: {duration_minutes} minutes of rhythmic breathing, dancing, or intense focus until altered state",
@@ -245,56 +238,10 @@ class SigilTools:
             GnosisMethod.MEDITATION: f"Deep meditation: {duration_minutes} minutes of contemplating sigil while in meditative trance",
             GnosisMethod.CHAOS: f"Chaos method: {duration_minutes} minutes of random, unpredictable activities while holding sigil in awareness"
         }
-
-        # Update sigil record
-        sigil.activation_state = "charged"
-        sigil.charging_method = method
+        method = random.choice(list(GnosisMethod))
+        return charging_instructions[method]
 
 
 
-        return {
-            "status": "charged",
-
-        }
-
-    def forget_sigil(self, sigil_id: str) -> Dict[str, Any]:
-       pass
-
-    def create_full_sigil(self, raw_desire: str, sigil_type: SigilType = SigilType.WORD_METHOD) -> Dict[str, Any]:
-
-
-        sigil_id = hashlib.md5(f"{raw_desire}{datetime.now().isoformat()}".encode()).hexdigest()[:12]
-
-        # Create statement of intent
-        statement = self.create_statement_of_intent(raw_desire, agent_personality=True)
-
-        # Generate sigil based on type
-        if sigil_type == SigilType.WORD_METHOD:
-            glyph_description, components = self.generate_word_method_sigil(statement)
-            glyph_data = f"Word method glyph: {glyph_description}\nComponents: {components}"
-
-        elif sigil_type == SigilType.PICTORIAL:
-            glyph_data = self.generate_pictorial_sigil(statement)
-
-        elif sigil_type == SigilType.MANTRIC:
-            mantra, instructions = self.generate_mantric_sigil(statement)
-            glyph_data = f"Mantra: {mantra}\nInstructions: {instructions}"
-
-        elif sigil_type == SigilType.ALPHABET_OF_DESIRE:
-            # Extract key concept from statement
-            concept = raw_desire.split()[0] if raw_desire.split() else "unknown"
-            symbol = self.generate_alphabet_of_desire_symbol(concept)
-            glyph_data = symbol
-
-        # Create sigil record
-        sigil_record = SigilRecord(
-            sigil_id=sigil_id,
-            original_intent=statement,
-            creation_timestamp=datetime.now(),
-            charging_method=random.choice(list(GnosisMethod)),
-            sigil_type=sigil_type,
-            glyph_data=glyph_data,
-            activation_state="dormant"
-        )
 
 

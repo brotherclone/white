@@ -1,0 +1,126 @@
+bpm: 133
+manifest_id: '01_06'
+tempo: 4/4
+key: Ab major
+rainbow_color: Z
+title: Star Filter
+release_date: '2017-07-18'
+album_sequence: 6
+main_audio_file: 01_06_main.wav
+TRT: '[03:20.243]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:43.075]'
+    description: A Beach Boys type baritone opens the song and then gigantic 'Needles in the Camel's Eye' style guitars come in, with a dreamy, ethereal quality.
+  - section_name: Verse 1
+    start_time: '[00:43.076]'
+    end_time: '[00:57.184]'
+    description: The vocals enter, with a big reverb and echo effect. The guitars continue.
+  - section_name: Verse 2
+    start_time: '[00:57.185]'
+    end_time: '[01:12.044]'
+    description: The next phrase continues the story.
+  - section_name: Chorus 1
+    start_time: '[01:12.045]'
+    end_time: '[01:41.003]'
+    description: During the chorus the vocal refrain and lyrics overlap, creating a dreamy, ethereal texture.
+  - section_name: Verse 3
+    start_time: '[01:41.004]'
+    end_time: '[01:55.127]'
+    description: The vocals return to the verse, with the guitars.
+  - section_name: Verse 4
+    start_time: '[01:55.128]'
+    end_time: '[02:09.230]'
+    description: The fourth verse continues the story.
+  - section_name: Chorus 2
+    start_time: '[02:09.231]'
+    end_time: '[02:38.197]'
+    description: The chorus returns with the overlapping vocal refrain and lyrics, creating a dreamy, ethereal texture.
+  - section_name: Outro
+    start_time: '[02:38.198]'
+    end_time: '[03:20.243]'
+    description: The Bastl microgranular synth is introduced, along with a variety of synth pads and textures, creating an otherworldly soundscape that fades out to the end.
+mood:
+  - nostalgic
+  - dreamy
+  - ethereal
+  - experimental
+  - remorseful
+  - reflective
+sounds_like:
+  - name: Brian Eno
+    discogs_id: 634
+  - name: Brian Wilson
+    discogs_id: 189718
+genres:
+  - Indie Rock
+  - Experimental Rock
+  - Art Rock
+  - Noise Pop
+  - Post-Rock
+lrc_file: 01_06.lrc
+concept: I found out my friend Gordon Felton died when I got to my high school reunion in 2013. This song was about the escapist, magical nights we had in the 90s, and how those memories are now all I have left of him.
+audio_tracks:
+  - id: 6
+    description: Main Vocal
+    audio_file: 01_06_06_main_vocals.wav
+  - id: 7
+    description: Double Vocal
+    audio_file: 01_06_07_dbl_vocals.wav
+  - id: 8
+    description: Harmony Vocal 3
+    audio_file: 01_06_08_vocal_3.wav
+  - id: 9
+    description: Harmony Vocal 4
+    audio_file: 01_06_09_vocal_4.wav
+  - id: 2
+    description: Baritone Guitar
+    audio_file: 01_06_02_baritone_guitar.wav
+  - id: 3
+    description: Clean Electric Guitar
+    audio_file: 01_06_03_clean_guitar.wav
+  - id: 4
+    description: Lead Electric Guitar
+    audio_file: 01_06_04_lead_guitar.wav
+  - id: 5
+    description: Lead Electric Guitar Double
+    audio_file: 01_06_05_lead_guitar_dbl.wav
+  - id: 10
+    description: Synth Strings
+    audio_file: 01_06_10_strings.wav
+    midi_file: 01_06_08_strings.mid
+  - id: 11
+    description: Arpeggiator
+    audio_file: 01_06_12_arp.wav
+    midi_file: 01_06_11_arp.mid
+  - id: 12
+    description: Lead Synth
+    audio_file: 01_06_14_lead_synth.wav
+    midi_file: 01_06_13_lead_synth.mid
+  - id: 13
+    description: Organ
+    audio_file: 01_06_16_organ.wav
+    midi_file: 01_06_15_organ.mid
+  - id: 14
+    description: Microgranular Effect
+    audio_file: 01_06_17_microgran.wav
+  - id: 15
+    group: drums
+    description: Tambourine
+    audio_file: 01_06_18_tambourine.wav
+  - id: 16
+    group: drums
+    description: Shaker
+    audio_file: 01_06_19_shaker.wav
+  - id: 17
+    group: drums
+    description: Outboarded Kick
+    audio_file: 01_06_20_outboarded_kick.wav
+  - id: 18
+    group: drums
+    description: Kick
+    audio_file: 01_06_22_kick.wav
+    midi_file: 01_06_21_kick.mid
