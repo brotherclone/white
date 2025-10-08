@@ -5,19 +5,43 @@ from pydantic import Field
 from app.agents.models.evp_artifact import EVPArtifact
 from app.agents.models.sigil_artifact import SigilArtifact
 from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.manifests.song_proposal import SongProposal
+from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 class BlackAgentState(BaseRainbowAgentState):
+    """
+    State for Black Agent workflow.
+
+    Fields:
+    - white_proposal: The specific iteration Black is responding to
+    - song_proposals: Full negotiation history for context
+    - counter_proposal: Black's generated response
+    - artifacts: Generated sigils, EVPs, etc.
+    """
 
     thread_id: str = f"black_thread_{uuid.uuid4()}"
-    song_proposal: SongProposal | None = None
-    evp_artifact: EVPArtifact | None = None
-    sigil_artifact: SigilArtifact | None = None
+
+    # The specific iteration Black is responding to
+    white_proposal: Optional[SongProposalIteration] = None
+
+    # Full negotiation history for context
+    song_proposals: Optional[SongProposal] = None
+
+    # Black's generated counter-proposal (output)
+    counter_proposal: Optional[SongProposalIteration] = None
+
+    # Legacy field - can remove if not needed
+    song_proposal: Optional[SongProposal] = None
+
+    # Artifacts
+    artifacts: List[Any] = Field(default_factory=list)
+    evp_artifact: Optional[EVPArtifact] = None
+    sigil_artifact: Optional[SigilArtifact] = None
+
+    # Human-in-the-loop fields
     human_instructions: Optional[str] = ""
     pending_human_tasks: List[Dict[str, Any]] = Field(default_factory=list)
     awaiting_human_action: bool = False
-    artifacts: List[Any] = Field(default_factory=list)
 
     def __init__(self, **data):
         super().__init__(**data)
