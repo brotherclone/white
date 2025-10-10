@@ -29,4 +29,5 @@ dependencies = [
     "scipy>=1.16.1",
     "assemblyai>=0.44.3",
     "todoist-api-python>=3.1.0",
+    "pytest-cov>=7.0.0",
 ]

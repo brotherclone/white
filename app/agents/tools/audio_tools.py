@@ -72,7 +72,7 @@ def generate_noise(duration_seconds: float, noise_type: NoiseType,
     low, high = freq_low / nyquist, freq_high / nyquist
     b, a = signal.butter(4, [low, high], btype='band')
     filtered_noise = signal.filtfilt(b, a, working_noise)
-    filtered_noise = np.clip(filtered_noise / np.max(np.abs(filtered_noise)), -1, 1)
+    filtered_noise = _safe_normalize_and_clip(filtered_noise)
     filtered_noise *= mix_level
     return (filtered_noise * 32767).astype(np.int16).tobytes()
 
@@ -176,9 +176,11 @@ def bit_crush_audio_bytes(input_audio: bytes, intensity: float = 0.5) -> bytes:
     audio_array = np.frombuffer(input_audio, dtype=np.int16)
     max_val = 2 ** (target_bits - 1) - 1
     min_val = -2 ** (target_bits - 1)
-    audio_crushed = np.round(audio_array / 32767 * max_val)
+    if max_val <= 0:
+        return np.zeros_like(audio_array).tobytes()
+    audio_crushed = np.round(audio_array.astype(np.float32) / 32767.0 * max_val)
     audio_crushed = np.clip(audio_crushed, min_val, max_val)
-    return (audio_crushed / max_val * 32767).astype(np.int16).tobytes()
+    return (audio_crushed / max_val * 32767.0).astype(np.int16).tobytes()
 
 
 def apply_speech_hallucination_processing(input_audio: bytes,
@@ -426,6 +428,16 @@ def create_blended_audio_chain_artifact(mosaic: AudioChainArtifactFile, blend: f
     )
     blend_with_noise(mosaic.get_artifact_path(with_file_name=True), blend, artifact.get_artifact_path(with_file_name=False))
     return artifact
+
+def _safe_normalize_and_clip(x: np.ndarray) -> np.ndarray:
+    """Replace NaNs/infs, then normalize and clip safely to [-1, 1]."""
+    x = np.nan_to_num(x, nan=0.0, posinf=0.0, neginf=0.0)
+    if x.size == 0:
+        return x
+    max_abs = np.max(np.abs(x))
+    if max_abs > 0.0:
+        return np.clip(x / max_abs, -1.0, 1.0)
+    return np.zeros_like(x)
 
 
 if __name__ == "__main__":
