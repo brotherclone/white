@@ -63,3 +63,26 @@ class Manifest(BaseModel):
         if 'release_date' in data and isinstance(data['release_date'], str):
             data['release_date'] = datetime.strptime(data['release_date'], '%Y-%m-%d')
         super().__init__(**data)
+
+    def __getitem__(self, key):
+        """
+        Support manifest['something'] by first checking attributes,
+        then falling back to an internal _data mapping if available.
+        Raise KeyError for missing keys to match mapping behaviour.
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        if isinstance(self._data, dict) and key in self._data:
+            return self._data[key]
+        raise KeyError(key)
+
+    def __contains__(self, key):
+        if hasattr(self, key):
+            return True
+        return isinstance(self._data, dict) and key in self._data
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default

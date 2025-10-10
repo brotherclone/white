@@ -10,3 +10,23 @@ main_audio_file: 01_10_main.wav
 TRT: ''
 vocals: true
 lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: TK
+    description: TK
+mood:
+  - TK
+sounds_like:
+  - name: TK
+    discogs_id: TK
+genres:
+  - TK
+lrc_file: 01_10.lrc
+concept: TK
+audio_tracks:
+  - id: 1
+    description: TK
+    audio_file: TK
+    midi_file: TK
+    group: TK
