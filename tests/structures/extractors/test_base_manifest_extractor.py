@@ -2,7 +2,6 @@ import pytest
 import pandas as pd
 from unittest.mock import patch, mock_open
 from app.structures.extractors.main_manifest_extractor import ManifestExtractor
-from pathlib import Path
 
 # --- Fixture to set MANIFEST_PATH for all tests ---
 @pytest.fixture(autouse=True)
@@ -58,7 +57,6 @@ def test_parse_yaml_time(mock_open_file, mock_load_manifest, mock_validate):
         def parse_lrc_time(self, time_str):
             return 42.0
     ext = DummyExtractor(manifest_id='dummy')
-    print('DEBUG TRT:', ext.manifest.TRT)
     ext.manifest = {'structure': []}
     assert ext.parse_yaml_time('[00:28.086]') == 42.0
 

@@ -16,7 +16,7 @@ def dummy_audio_feature():
         is_mostly_silence=False
     )
 
-@patch('app.structures.extractors.base_manifest_extractor.load_manifest', return_value={})
+@patch('app.structures.extractors.main_manifest_extractor.load_manifest', return_value={})
 def test_load_raw_audio_segment_valid(mock_manifest, tmp_path, dummy_audio_feature):
     # Create a dummy wav file
     dummy_path = tmp_path / 'dummy.wav'
@@ -33,7 +33,7 @@ def test_load_raw_audio_segment_valid(mock_manifest, tmp_path, dummy_audio_featu
         assert isinstance(segment, np.ndarray)
         assert segment.shape[0] == sr
 
-@patch('app.structures.extractors.base_manifest_extractor.load_manifest', return_value={})
+@patch('app.structures.extractors.main_manifest_extractor.load_manifest', return_value={})
 def test_load_raw_audio_segment_missing_file(mock_manifest, dummy_audio_feature):
     dummy_audio_feature.audio_file_path = 'nonexistent.wav'
     segment_row = pd.Series({'audio_features': dummy_audio_feature})
@@ -42,7 +42,7 @@ def test_load_raw_audio_segment_missing_file(mock_manifest, dummy_audio_feature)
     assert isinstance(segment, np.ndarray)
     assert segment.size == 0
 
-@patch('app.structures.extractors.base_manifest_extractor.load_manifest', return_value={})
+@patch('app.structures.extractors.main_manifest_extractor.load_manifest', return_value={})
 def test_load_raw_audio_segment_none_path(mock_manifest, dummy_audio_feature):
     dummy_audio_feature.audio_file_path = None
     segment_row = pd.Series({'audio_features': dummy_audio_feature})
@@ -51,7 +51,7 @@ def test_load_raw_audio_segment_none_path(mock_manifest, dummy_audio_feature):
     assert isinstance(segment, np.ndarray)
     assert segment.size == 0
 
-@patch('app.structures.extractors.base_manifest_extractor.load_manifest', return_value={})
+@patch('app.structures.extractors.main_manifest_extractor.load_manifest', return_value={})
 def test_load_raw_audio_segment_missing_fields(mock_manifest):
     # Missing audio_features
     segment_row = pd.Series({})

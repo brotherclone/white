@@ -1,12 +1,32 @@
-bpm:
+bpm: 140
 manifest_id: '01_08'
-tempo:
-key:
+tempo: 4/4
+key: A minor
 rainbow_color: Z
 title: Abandoner
 release_date: '2017-07-18'
 album_sequence: 8
 main_audio_file: 01_08_main.wav
-TRT: ''
+TRT: TK
 vocals: true
 lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: TK
+    description: TK
+mood:
+  - TK
+sounds_like:
+  - name: TK
+    discogs_id: TK
+genres:
+  - TK
+lrc_file: 01_08.lrc
+concept: TK
+audio_tracks:
+  - id: 1
+    description: TK
+    audio_file: TK
+    midi_file: TK
+    group: TK

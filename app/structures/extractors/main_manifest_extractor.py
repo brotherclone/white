@@ -3,47 +3,66 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from dotenv import load_dotenv
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Union
 
 from app.structures.enums.temporal_relatioship import TemporalRelationship
 from app.util.manifest_loader import load_manifest
 from app.util.manifest_validator import validate_yaml_file
 from app.util.lrc_utils import load_lrc
 
+load_dotenv()
+
+Number = Union[int, float]
+
+def _min_float(a: Number, b: Number) -> float:
+    """Return the minimum as a float, avoiding int/float generic mismatch."""
+    return float(a) if float(a) <= float(b) else float(b)
+
+def _max_float(a: Number, b: Number) -> float:
+    """Return the maximum as a float, avoiding int/float generic mismatch."""
+    return float(a) if float(a) >= float(b) else float(b)
+
 class ManifestExtractor:
     """Main orchestrator class for extracting data from manifests using specialized extractors"""
 
-    def __init__(self, mani_id: str):
-        load_dotenv()
-        self.manifest_id = mani_id
-        self.manifest_path = os.path.join(
-            os.environ['MANIFEST_PATH'],
-            mani_id,
-            f"{mani_id}.yml"
-        )
+    def __init__(self, manifest_id: Optional[str] = None, load_manifest_on_init: bool = True, *args, **kwargs) -> None:
+        """
+        Initialize and optionally load the manifest. Delegate loading to the instance
+        method `load_manifest` (so subclasses in tests can override). If loading is
+        requested and returns None, raise FileNotFoundError.
+        """
+        self.manifest_id = manifest_id
+        self.manifest_path: Optional[str] = None
+        self.manifest: Optional[Dict[str, Any]] = None
 
-        if not os.path.exists(self.manifest_path):
-            raise ValueError(f"Manifest file not found: {self.manifest_path}")
-
-        # Validate the manifest
-        all_valid, errors = validate_yaml_file(self.manifest_path)
-        if all_valid:
-            print("YAML file valid.")
-        else:
-            print("YAML file has errors:")
-            for error in errors:
-                print(f" - {error}")
-
-        # Load the manifest
-        self.manifest = load_manifest(self.manifest_path)
-        if self.manifest is None:
-            raise ValueError("Manifest could not be loaded.")
-
-        # Initialize component extractors (will be imported when needed to avoid circular imports)
+        # lazy extractor placeholders
         self._concept_extractor = None
         self._lyric_extractor = None
         self._audio_extractor = None
         self._midi_extractor = None
+
+        # Allow tests or callers to opt out of manifest loading
+        if not load_manifest_on_init or not manifest_id:
+            return
+
+        # Use instance loader so subclasses (tests) can override behaviour
+        manifest = self.load_manifest(manifest_id)
+        if manifest is None:
+            raise FileNotFoundError(f"Manifest {manifest_id} not found")
+
+        self.manifest = manifest
+
+    def load_manifest(self, manifest_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Default loader delegates to the util-level load_manifest function via the
+        module so tests that patch `app.util.manifest_loader.load_manifest` will be honored.
+        """
+        try:
+            import app.util.manifest_loader as manifest_loader
+            return manifest_loader.load_manifest(manifest_id)
+        except Exception:
+            return None
+
 
     @property
     def concept_extractor(self):
@@ -81,7 +100,6 @@ class ManifestExtractor:
         """Parse YAML timestamp like '[00:28.086]' to seconds"""
         return self.parse_lrc_time(time_str)
 
-
     def parse_lrc_time(self, time_str: str) -> float:
         """Parse LRC timestamp like '[00:28.086]' to seconds"""
         try:
@@ -104,7 +122,6 @@ class ManifestExtractor:
             return TemporalRelationship.BLEED_OUT
         else:
             return TemporalRelationship.CONTAINED
-
 
     @staticmethod
     def _calculate_boundary_fluidity_score(segment: Dict[str, Any]) -> float:
@@ -156,8 +173,8 @@ class ManifestExtractor:
         """Load MIDI features for a specific time segment"""
         try:
             return self.midi_extractor.extract_segment_features(midi_path, start_time, end_time)
-        except Exception as e:
-            print(f"Warning: Could not load MIDI features: {e}")
+        except Exception as err:
+            print(f"Warning: Could not load MIDI features: {err}")
             return {
                 'note_density': 0.0,
                 'pitch_variety': 0.0,
@@ -175,12 +192,11 @@ class ManifestExtractor:
         print(f"MIDI: {mms_midi_path}")
 
         manifest = load_manifest(mms_yaml_path)
-        print(f"✅ Loaded manifest: {getattr(manifest,'title', 'Unknown')}")
+        print(f"Loaded manifest: {getattr(manifest,'title', 'Unknown')}")
 
         # Load lyrics using LyricExtractor if provided
-        intersecting_lyrics_by_section = {}
         if mms_lrc_path and Path(mms_lrc_path).exists():
-            print(f"✅ Using LyricExtractor for {mms_lrc_path}")
+            print(f"Using LyricExtractor for {mms_lrc_path}")
 
         all_segments = []
 
@@ -252,45 +268,45 @@ class ManifestExtractor:
             # Add audio features if audio file provided
             if mms_audio_path and Path(mms_audio_path).exists():
                 segment['audio_features'] = self.load_audio_segment(mms_audio_path, section_start, section_end)
-                print(f"✅ Added audio features for {section.section_name}")
+                print(f"Added audio features for {section.section_name}")
 
             # Add MIDI features if MIDI file provided
             if mms_midi_path and Path(mms_midi_path).exists():
                 segment['midi_features'] = self.load_midi_segment(mms_midi_path, section_start, section_end)
-                print(f"✅ Added MIDI features for {section.section_name}")
+                print(f"Added MIDI features for {section.section_name}")
 
             # Calculate boundary fluidity metrics across all modalities
             segment['rebracketing_score'] = self._calculate_boundary_fluidity_score(segment)
 
             all_segments.append(segment)
 
-        df = pd.DataFrame(all_segments)
+        dfrm = pd.DataFrame(all_segments)
 
         # Add computed multimodal metrics
-        df['lyric_count'] = df['lyrical_content'].apply(len)
-        df['has_temporal_bleeding'] = df['lyrical_content'].apply(
+        dfrm['lyric_count'] = dfrm['lyrical_content'].apply(len)
+        dfrm['has_temporal_bleeding'] = dfrm['lyrical_content'].apply(
             lambda x: any(l['temporal_relationship'] not in ['contained', 'exact_match'] for l in x)
         )
 
         if mms_audio_path:
-            df['audio_energy'] = df['audio_features'].apply(lambda x: x.get('rms_energy', 0))
-            df['spectral_complexity'] = df['audio_features'].apply(lambda x: x.get('spectral_centroid', 0))
+            dfrm['audio_energy'] = dfrm['audio_features'].apply(lambda x: x.get('rms_energy', 0))
+            dfrm['spectral_complexity'] = dfrm['audio_features'].apply(lambda x: x.get('spectral_centroid', 0))
 
         if mms_midi_path:
-            df['midi_density'] = df['midi_features'].apply(lambda x: x.get('note_density', 0))
-            df['pitch_complexity'] = df['midi_features'].apply(lambda x: x.get('pitch_variety', 0))
+            dfrm['midi_density'] = dfrm['midi_features'].apply(lambda x: x.get('note_density', 0))
+            dfrm['pitch_complexity'] = dfrm['midi_features'].apply(lambda x: x.get('pitch_variety', 0))
 
         print(f"\n=== MULTIMODAL ANALYSIS ===")
-        print(f"Total segments: {len(df)}")
-        print(f"Segments with lyrics: {(df['lyric_count'] > 0).sum()}")
-        print(f"Segments with temporal bleeding: {df['has_temporal_bleeding'].sum()}")
+        print(f"Total segments: {len(dfrm)}")
+        print(f"Segments with lyrics: {(dfrm['lyric_count'] > 0).sum()}")
+        print(f"Segments with temporal bleeding: {dfrm['has_temporal_bleeding'].sum()}")
 
         if mms_audio_path:
-            print(f"Average audio energy: {df['audio_energy'].mean():.4f}")
+            print(f"Average audio energy: {dfrm['audio_energy'].mean():.4f}")
         if mms_midi_path:
-            print(f"Average MIDI note density: {df['midi_density'].mean():.2f} notes/second")
+            print(f"Average MIDI note density: {dfrm['midi_density'].mean():.2f} notes/second")
 
-        return df
+        return dfrm
 
 
     def generate_enhanced_multimodal_segments(self, mm_yaml_path: str, mm_lrc_path: str = None,
@@ -303,7 +319,7 @@ class ManifestExtractor:
         print(f"MIDI: {mm_midi_path}")
 
         manifest = load_manifest(mm_yaml_path)
-        print(f"✅ Loaded manifest: {getattr(manifest, 'title', 'Unknown')}")
+        print(f"Loaded manifest: {getattr(manifest, 'title', 'Unknown')}")
         # Avoid circular import
         from app.structures.extractors.concept_extractor import ConceptExtractor
         # Initialize concept extractor for rebracketing analysis
@@ -311,14 +327,14 @@ class ManifestExtractor:
         rebracketing_features = concept_extractor.generate_rebracketing_training_features()
         concept_analysis = concept_extractor.concept_analysis
 
-        print(f"✅ Analyzed concept field - Rebracketing Type: {concept_analysis.rebracketing_type}")
-        print(f"   Memory Discrepancy: {concept_analysis.original_memory} → {concept_analysis.corrected_memory}")
+        print(f"Analyzed concept field - Rebracketing Type: {concept_analysis.rebracketing_type}")
+        print(f"Memory Discrepancy: {concept_analysis.original_memory} → {concept_analysis.corrected_memory}")
 
         # Load lyrics if provided
         lyrics = []
         if mm_lrc_path and Path(mm_lrc_path).exists():
             lyrics = load_lrc(mm_lrc_path)
-            print(f"✅ Loaded {len(lyrics)} lyrics")
+            print(f"Loaded {len(lyrics)} lyrics")
 
         all_segments = []
 
@@ -486,22 +502,26 @@ class ManifestExtractor:
 
     # Helper methods for rebracketing analysis
 
-    def _check_memory_references(self, text: str) -> bool:
+    @staticmethod
+    def _check_memory_references(text: str) -> bool:
         """Check if lyrics contain memory-related language"""
         memory_markers = ['remember', 'recall', 'memory', 'forget', 'used to', 'back then', 'was', 'were']
         return any(marker in text.lower() for marker in memory_markers)
 
-    def _check_temporal_markers(self, text: str) -> bool:
+    @staticmethod
+    def _check_temporal_markers(text: str) -> bool:
         """Check if lyrics contain temporal boundary language"""
         temporal_markers = ['time', 'then', 'now', 'when', 'once', 'before', 'after', 'years', 'ago']
         return any(marker in text.lower() for marker in temporal_markers)
 
-    def _check_rebracketing_language(self, text: str) -> bool:
+    @staticmethod
+    def _check_rebracketing_language(text: str) -> bool:
         """Check if lyrics contain language suggesting boundary dissolution"""
         rebracketing_markers = ['shift', 'change', 'blur', 'fade', 'cross', 'between', 'boundary', 'edge']
         return any(marker in text.lower() for marker in rebracketing_markers)
 
-    def _calculate_lyrical_boundary_fluidity(self, temporal_rel: str, confidence: float) -> float:
+    @staticmethod
+    def _calculate_lyrical_boundary_fluidity(temporal_rel: str, confidence: float) -> float:
         """Calculate how much lyrical content exhibits boundary fluidity"""
         base_fluidity = 0.0
 
@@ -517,7 +537,8 @@ class ManifestExtractor:
 
         return min(base_fluidity + confidence_adjustment, 1.0)
 
-    def _calculate_section_rebracketing_score(self, section: dict, lyrics: list, concept_analysis) -> float:
+    @staticmethod
+    def _calculate_section_rebracketing_score(section: dict, lyrics: list, concept_analysis) -> float:
         """Calculate rebracketing intensity for this specific section"""
         score = 0.0
 
@@ -538,7 +559,8 @@ class ManifestExtractor:
 
         return min(score, 1.0)
 
-    def _identify_boundary_crossing_indicators(self, section: dict, lyrics: list) -> list:
+    @staticmethod
+    def _identify_boundary_crossing_indicators(section: dict, lyrics: list) -> list:
         """Identify specific indicators of temporal/modal boundary crossing in this section"""
         indicators = []
 
@@ -561,7 +583,8 @@ class ManifestExtractor:
 
         return indicators
 
-    def _calculate_genre_instability_score(self, row) -> float:
+    @staticmethod
+    def _calculate_genre_instability_score(row) -> float:
         """Calculate genre instability score from audio and MIDI features"""
         score = 0.0
 
@@ -578,7 +601,8 @@ class ManifestExtractor:
 
         return min(score, 1.0)
 
-    def _calculate_comprehensive_rebracketing_score(self, segment: Dict[str, Any]) -> float:
+    @staticmethod
+    def _calculate_comprehensive_rebracketing_score(segment: Dict[str, Any]) -> float:
         """Calculate comprehensive rebracketing score across all modalities"""
         score = 0.0
 
@@ -603,7 +627,8 @@ class ManifestExtractor:
 
         return min(score, 1.0)
 
-    def _calculate_spectral_instability(self, audio_features: Dict[str, Any]) -> float:
+    @staticmethod
+    def _calculate_spectral_instability(audio_features: Dict[str, Any]) -> float:
         """Calculate spectral instability from audio features"""
         # Simple proxy for spectral instability
         spectral_centroid = audio_features.get('spectral_centroid', 0)
@@ -613,7 +638,8 @@ class ManifestExtractor:
         instability = min((spectral_centroid / 4000.0) * (rms_energy * 10), 1.0)
         return instability
 
-    def _calculate_temporal_discontinuity(self, audio_features: Dict[str, Any]) -> float:
+    @staticmethod
+    def _calculate_temporal_discontinuity(audio_features: Dict[str, Any]) -> float:
         """Calculate temporal discontinuity from audio features"""
         # Use attack time as proxy for temporal discontinuity
         attack_time = audio_features.get('attack_time', 0)
@@ -923,7 +949,7 @@ if __name__ == "__main__":
     midi_path = f"{os.getenv('MANIFEST_PATH')}/{manifest_id}/01_01_biotron.mid"
 
     # Initialize extractor
-    extractor = ManifestExtractor(mani_id=manifest_id)
+    extractor = ManifestExtractor(manifest_id=manifest_id)
     print("Loaded manifest:", extractor.manifest.title if extractor.manifest else "None")
 
     # Example: generate_multimodal_segments (if files exist)

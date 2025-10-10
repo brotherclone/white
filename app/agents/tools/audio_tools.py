@@ -3,10 +3,11 @@ import librosa
 import warnings
 import logging
 import os
+import io
 import random
 import soundfile as sf
 
-from typing import List
+from typing import List, Optional
 from dotenv import load_dotenv
 from scipy import signal
 from scipy.io import wavfile
@@ -98,15 +99,75 @@ def micro_stutter_audio_bytes(input_audio: bytes, stutter_probability: float = 0
     return np.array(output_audio, dtype=np.int16).tobytes()
 
 
-def gate_audio_bytes(input_audio: bytes, gate_probability: float = 0.05,
-                     gate_length_ms: int = 20, sample_rate: int = 44100) -> bytes:
-    audio_array = np.frombuffer(input_audio, dtype=np.int16)
-    window_samples = int(0.05 * sample_rate)
-    gate_samples = int(gate_length_ms / 1000.0 * sample_rate)
-    for i in range(0, len(audio_array) - gate_samples, window_samples):
-        if np.random.random() < gate_probability:
-            audio_array[i:i + gate_samples] = 0
-    return audio_array.tobytes()
+def gate_audio_bytes(wav_bytes: bytes,
+                     start_sec: float | None = None,
+                     end_sec: float | None = None,
+                     sample_rate: Optional[int] = None,
+                     gate_probability: Optional[float] = None,
+                     gate_length_ms: int = 100) -> bytes:
+    """
+    Zero-out audio between start_sec and end_sec, or perform probabilistic gating
+    when gate_probability is provided. Accepts either WAV container bytes or raw
+    PCM int16 bytes. Returns the same format as input.
+
+    Parameters:
+    - wav_bytes: input bytes (WAV file bytes or raw PCM int16)
+    - start_sec, end_sec: explicit gate window (seconds)
+    - sample_rate: required when input is raw PCM bytes (defaults to 44100)
+    - gate_probability: if provided, gate is applied with this probability
+    - gate_length_ms: gate window length in milliseconds when choosing random window
+    """
+
+    had_wav = True
+    try:
+        # Try to read as WAV file
+        with io.BytesIO(wav_bytes) as src:
+            data, file_sr = sf.read(src, dtype="float32", always_2d=False)
+    except Exception:
+        # Not a WAV container: treat as raw PCM int16
+        had_wav = False
+        file_sr = sample_rate or 44100
+        pcm = np.frombuffer(wav_bytes, dtype=np.int16)
+        # convert to float32 in -1.0..1.0
+        data = pcm.astype(np.float32) / 32767.0
+
+    # If gate_probability is provided, decide whether to gate and pick a random window
+    if gate_probability is not None:
+        if random.random() >= gate_probability:
+            return wav_bytes  # no gating this time
+        duration_seconds = data.shape[0] / file_sr
+        gate_dur_sec = gate_length_ms / 1000.0
+        max_start = max(0.0, duration_seconds - gate_dur_sec)
+        start_sec = start_sec if start_sec is not None else random.uniform(0.0, max_start)
+        end_sec = start_sec + gate_dur_sec if end_sec is None else end_sec
+
+    # If explicit window not provided, return original bytes
+    if start_sec is None or end_sec is None:
+        return wav_bytes
+
+    # Compute sample indices and clamp
+    start_idx = max(0, int(round(start_sec * file_sr)))
+    end_idx = max(0, int(round(end_sec * file_sr)))
+    end_idx = min(end_idx, data.shape[0])
+
+    # Ensure we have a writable array before assignment
+    data = data.copy()
+
+    # Zero the slice (handle mono or multi-channel)
+    if data.ndim == 1:
+        data[start_idx:end_idx] = 0.0
+    else:
+        data[start_idx:end_idx, :] = 0.0
+
+    # Write back to bytes in same format as input
+    if had_wav:
+        out_buf = io.BytesIO()
+        sf.write(out_buf, data, file_sr, format="WAV")
+        return out_buf.getvalue()
+    else:
+        # convert back to int16 PCM raw bytes
+        int_data = np.clip(data, -1.0, 1.0)
+        return (int_data * 32767).astype(np.int16).tobytes()
 
 
 def bit_crush_audio_bytes(input_audio: bytes, intensity: float = 0.5) -> bytes:
