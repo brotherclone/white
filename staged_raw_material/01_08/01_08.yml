@@ -7,26 +7,128 @@ title: Abandoner
 release_date: '2017-07-18'
 album_sequence: 8
 main_audio_file: 01_08_main.wav
-TRT: TK
+TRT: '[04:39.105]'
 vocals: true
 lyrics: true
 structure:
-  - section_name: TK
+  - section_name: Verse Intro
     start_time: '[00:00.000]'
-    end_time: TK
-    description: TK
+    end_time: '[00:14.142]'
+    description: The verse starts without vocals, flangy guitars and mellotrons give a classic pych sound
+  - section_name: Verse 1
+    start_time: '[00:14.143]'
+    end_time: '[01:08.142]'
+    description: The vocals come in at a relaxed pace, with a lot of space in between the lines
+  - section_name: The ask verse
+    start_time: '[01:08.142]'
+    end_time: '[02:03.105]'
+    description: This verse alternate still has a lot of room between lines but now has a little more call and response happening instrumentally
+  - section_name: Break
+    start_time: '[02:03.106]'
+    end_time: '[02:10.071]'
+    description: Most instruments drop out leaving the mellotron and synth bass to hold the space
+  - section_name: Abandoner Verse
+    start_time: '[02:10.072]'
+    end_time: '[03:05.034]'
+    description: This verse starts with a sort of confessional tone and degrades into a repeated mantra
+  - section_name: Outro
+    start_time: '[03:05.035]'
+    end_time: '[04:39.105]'
+    description: A processed loop kicks in and the mood lifts. The outro extends into jam band territory
 mood:
-  - TK
+  - serene
+  - dreamy
+  - introspective
+  - melancholic
+  - remorseful
+  - apologetic
+  - trippy
+  - spacey
+  - psychedelic
+  - rocking
 sounds_like:
-  - name: TK
-    discogs_id: TK
+  - name: Julian Cope
+    discogs_id: 114566
+  - name: Gary Walker & The Rain
+    discogs_id: 369452
+  - name: The Brian Jonestown Massacre
+    discogs_id: 371334
 genres:
-  - TK
+  - psychedelic rock
+  - art rock
+  - post-rock
 lrc_file: 01_08.lrc
-concept: TK
+concept: One way of escaping is simply to abandon everything and everyone. This song explores the feelings of remorse and apology that come with that decision.
 audio_tracks:
   - id: 1
-    description: TK
-    audio_file: TK
-    midi_file: TK
-    group: TK
+    description: Electric Guitar
+    audio_file: 01_08_02_electric_guitar.wav
+  - id: 2
+    description: Lead Guitar
+    audio_file: 01_08_04_lead_guitar.wav
+  - id: 3
+    description: Main Vocal
+    audio_file: 01_08_05_main_vocal.wav
+  - id: 4
+    description: Chorus Vocal
+    audio_file: 01_08_06_chorus_vocal.wav
+  - id: 5
+    description: Background Vocal
+    audio_file: 01_08_07_bg_vocal.wav
+  - id: 6
+    description: All Drums
+    audio_file: 01_08_08_all_drums.wav
+  - id: 7
+    description: Tambourine
+    audio_file: 01_08_09_tambourine.wav
+  - id: 8
+    description: Shaker
+    audio_file: 01_08_10_shaker.wav
+  - id: 9
+    description: Cymbals
+    audio_file: 01_08_11_cymbals.wav
+  - id: 10
+    description: HiHat
+    audio_file: 01_08_12_hihat.wav
+  - id: 11
+    description: Loop
+    audio_file: 01_08_13_loop.wav
+  - id: 12
+    description: Kick
+    midi_file: 01_08_14_kick.mid
+    audio_file: 01_08_15_kick.wav
+  - id: 13
+    description: Snare
+    midi_file: 01_08_16_snare.mid
+    audio_file: 01_08_17_snare.wav
+  - id: 14
+    description: HiHat
+    midi_file: 01_08_18_hihat.mid
+    audio_file: 01_08_19_hihat.wav
+  - id: 15
+    description: Cymbals
+    midi_file: 01_08_20_cymbals.mid
+    audio_file: 01_08_21_cymbals.wav
+  - id: 16
+    description: Toms
+    midi_file: 01_08_22_toms.mid
+    audio_file: 01_08_23_toms.wav
+  - id: 17
+    description: Twlerp
+    audio_file: 01_08_24_twlerp.wav
+  - id: 18
+    description: Bowing
+    midi_file: 01_08_25_bowing.mid
+    audio_file: 01_08_26_bowing.wav
+  - id: 19
+    description: Harpsichord
+    midi_file: 01_08_27_harpsichord.mid
+    audio_file: 01_08_28_harpsichord.wav
+  - id: 20
+    description: Mellotron
+    midi_file: 01_08_29_mellotron.mid
+    audio_file: 01_08_30_mellotron.wav
+  - id: 21
+    description: Synth Bass
+    midi_file: 01_08_31_synth_bass.mid
+    audio_file: 01_08_32_synth_bass.wav
