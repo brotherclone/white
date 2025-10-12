@@ -1,3 +1,4 @@
+import re
 from pydantic import BaseModel
 
 class Duration(BaseModel):
