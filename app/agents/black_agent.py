@@ -273,6 +273,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
         return state
 
+    @skip_chance(0.75)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
 
         """Generate a sigil artifact and create Todoist task for charging"""
@@ -373,6 +374,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         return state
 
     @staticmethod
+    @skip_chance(0.33)
     def generate_evp(state: BlackAgentState) -> BlackAgentState:
         """Generate EVP artifact and optionally create analysis task"""
 

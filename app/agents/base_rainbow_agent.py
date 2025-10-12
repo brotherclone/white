@@ -1,9 +1,13 @@
+import random
+
 from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional, List,Callable, Union
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
+from functools import wraps
+
 
 from app.agents.models.agent_settings import AgentSettings
 from app.agents.models.base_chain_artifact import ChainArtifact
@@ -11,6 +15,7 @@ from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
 
 load_dotenv()
 
+Chance = Union[float, Callable[[object], float]]
 
 class BaseRainbowAgent(BaseModel, ABC):
     """Base class for all Rainbow Agents"""
