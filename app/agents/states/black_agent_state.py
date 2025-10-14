@@ -20,25 +20,12 @@ class BlackAgentState(BaseRainbowAgentState):
     """
 
     thread_id: str = f"black_thread_{uuid.uuid4()}"
-
-    # The specific iteration Black is responding to
     white_proposal: Optional[SongProposalIteration] = None
-
-    # Full negotiation history for context
     song_proposals: Optional[SongProposal] = None
-
-    # Black's generated counter-proposal (output)
     counter_proposal: Optional[SongProposalIteration] = None
-
-    # Legacy field - can remove if not needed
-    song_proposal: Optional[SongProposal] = None
-
-    # Artifacts
     artifacts: List[Any] = Field(default_factory=list)
     evp_artifact: Optional[EVPArtifact] = None
     sigil_artifact: Optional[SigilArtifact] = None
-
-    # Human-in-the-loop fields
     human_instructions: Optional[str] = ""
     pending_human_tasks: List[Dict[str, Any]] = Field(default_factory=list)
     awaiting_human_action: bool = False

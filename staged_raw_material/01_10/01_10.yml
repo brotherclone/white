@@ -1,32 +1,106 @@
-bpm: 148
+bpm: 180
 manifest_id: '01_10'
-tempo: 4/4
-key: G# minor
+tempo: 5/4
+key: A minor
 rainbow_color: Z
 title: The Outer Loop
 release_date: '2017-07-18'
 album_sequence: 10
 main_audio_file: 01_10_main.wav
-TRT: '[03:02.043]'
+TRT: '[04:21.165]'
 vocals: true
 lyrics: true
 structure:
-  - section_name: TK
+  - section_name: Intro
     start_time: '[00:00.000]'
-    end_time: TK
-    description: TK
+    end_time: '[01:43.082]'
+    description: Drone-y synths and pads build a hypnotic atmosphere, setting the stage for the song's dreamy vibe.
+  - section_name: Verse
+    start_time: '[01:43.083]'
+    end_time: '[02:31.165]'
+    description: The vocals emerge, wandering not commiting to a temp or melody.
+  - section_name: Outro
+    start_time: '[02:31.166]'
+    end_time: '[04:21.165]'
+    description: The last word of the verse 'catches' and becomes a repeating loop blending into the outro drone.
 mood:
-  - TK
+  - psychedelic
+  - chill
+  - dreamy
+  - defiant
 sounds_like:
-  - name: TK
-    discogs_id: TK
+  - name: Panda Bear
+    discogs_id: 218809
+  - name: Washed Out
+    discogs_id: 1575877
 genres:
-  - TK
+  - Dream Pop
+  - Psychedelic Pop
+  - Indie Rock
+  - Electronic
+  - Chillwave
 lrc_file: 01_10.lrc
-concept: TK
+concept: Around this time I was commuting to work sometimes taking an hour-and-a-half each way. Stuck, in many senses, on the DC's outer loop. While stuck in traffic I imagined throwing my keys out the window and climbing down off the overpass as in 1q84. The song is about that feeling of being trapped but with liberation a step away.
 audio_tracks:
   - id: 1
-    description: TK
-    audio_file: TK
-    midi_file: TK
-    group: TK
+    description: Main Loop
+    audio_file: 01_10_02_harp.wav
+  - id: 2
+    description: Synth Strings
+    audio_file: 01_10_04_synth_strings.wav
+    midi_file: 01_10_03_synth_strings.mid
+  - id: 3
+    description: Bowed Synth
+    audio_file: 01_10_06_bow_synth.wav
+    midi_file: 01_10_05_bow_synth.mid
+  - id: 4
+    description: String Loop
+    audio_file: 01_10_07_string_loop.wav
+  - id: 5
+    description: Main Vocals
+    audio_file: 01_10_08_main_vox.wav
+  - id: 6
+    description: Vocal Layer 2
+    audio_file: 01_10_09_vocals_2.wav
+  - id: 7
+    description: Vocal Layer 3
+    audio_file: 01_10_10_vocals_3.wav
+  - id: 8
+    description: Vocal Layer 4
+    audio_file: 01_10_11_vocals_4.wav
+  - id: 9
+    description: Vocal Layer 5
+    audio_file: 01_10_12_vocals_5.wav
+  - id: 10
+    description: Vibes
+    audio_file: 01_10_14_vibes.wav
+    midi_file: 01_10_13_vibes.mid
+  - id: 11
+    description: Electric Guitar
+    audio_file: 01_10_15_electric_guitar.wav
+  - id: 12
+    description: Microgranular 1
+    audio_file: 01_10_16_microgran.wav
+  - id: 13
+    description: Microgranular 2
+    audio_file: 01_10_17_microgran2.wav
+  - id: 14
+    description: Drum Machine 1
+    audio_file: 01_10_19_drum_machine.wav
+    midi_file: 01_10_18_drum_machine.mid
+  - id: 15
+    description: Drum Machine 2
+    audio_file: 01_10_21_drum_machine2.wav
+    midi_file: 01_10_20_drum_machine2.mid
+  - id: 16
+    description: Kit
+    audio_file: 01_10_23_kit.wav
+    midi_file: 01_10_22_kit.mid
+  - id: 17
+    description: Spooky Synth
+    audio_file: 01_10_25_spooky_synth.wav
+    midi_file: 01_10_24_spooky_synth.mid
+  - id: 18
+    description: EZ Chord
+    audio_file: 01_10_27_ez_chord.wav
+    midi_file: 01_10_26_ez_chord.mid

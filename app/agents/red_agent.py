@@ -1,24 +1,40 @@
+import os
+import uuid
+import yaml
+import logging
+
 from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.graph.state import StateGraph
-
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.constants import START, END
+from langgraph.graph import StateGraph
 
 from app.agents.base_rainbow_agent import BaseRainbowAgent
+from app.agents.models.agent_settings import AgentSettings
 from app.agents.states.main_agent_state import MainAgentState
 from app.agents.states.red_agent_state import RedAgentState
+from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
+from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 class RedAgent(BaseRainbowAgent, ABC):
 
-    """Convoluted/Trashy Literature Generator - Baroque academic prose / Pulpy Scifi/Sexpliotations"""
+    """The Red Agent is the Light Reader. It specializes in generating convoluted literature and contributing
+     to the creation of complex narratives."""
 
     def __init__(self, **data):
-        # Ensure settings are initialized if not provided
         if 'settings' not in data or data['settings'] is None:
-            from app.agents.models.agent_settings import AgentSettings
             data['settings'] = AgentSettings()
+
+        super().__init__(**data)
+
+        if self.settings is None:
+            self.settings = AgentSettings()
+
         super().__init__(**data)
         self.llm = ChatAnthropic(
             temperature=self.settings.temperature,
@@ -31,23 +47,36 @@ class RedAgent(BaseRainbowAgent, ABC):
         self.state_graph = RedAgentState()
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
-        print("❤️ RED AGENT: Generating Convoluted Literature...")
 
+        """Entry point when White Agent invokes Red Agent"""
+        current_proposal = state.song_proposals.iterations[-1]
+
+        red_agent_state = RedAgentState(
+            white_proposal=current_proposal,
+            song_proposals=state.song_proposals,
+            thread_id=state.thread_id,
+            artifacts=[],
+            pending_human_tasks=[],
+            awaiting_human_action=False
+        )
+        if not hasattr(self, '_compiled_workflow'):
+            self._compiled_workflow = self.create_graph().compile(
+                checkpointer=MemorySaver(),
+                interrupt_before=["await_human_action"]
+            )
+        red_config = {"configurable": {"thread_id": f"{state.thread_id}"}}
+        snapshot = self._compiled_workflow.get_state(red_config)
+        if snapshot.next:
+            pass
+        else:
+            pass
         return state
 
     def create_graph(self) -> StateGraph:
-        """Create the RedAgent's internal workflow graph"""
 
 
         graph = StateGraph(RedAgentState)
 
         return graph
 
-    def generate_document(self):
-        raise NotImplementedError("Subclasses must implement generate_document method")
 
-    def generate_alternate_song_spec(self):
-        raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
-
-    def contribute(self):
-        raise NotImplementedError("Subclasses must implement contribute method")
