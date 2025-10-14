@@ -73,7 +73,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         current_proposal = state.song_proposals.iterations[-1]
         black_state = BlackAgentState(
             white_proposal=current_proposal,
-            song_proposals=state.song_proposals,  # ← Add this line!
+            song_proposals=state.song_proposals,
             thread_id=state.thread_id,
             artifacts=[],
             pending_human_tasks=[],
@@ -86,14 +86,14 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 interrupt_before=["await_human_action"]
             )
 
-        black_config = {"configurable": {"thread_id": f"black_{state.thread_id}"}}
-        result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
+        black_config = {"configurable": {"thread_id": f"{state.thread_id}"}}
+        #result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
         snapshot = self._compiled_workflow.get_state(black_config)
 
-        if snapshot.next:  # Interrupted for human action
+        if snapshot.next:
             final_black_state = snapshot.values
-            state.workflow_paused = True  # ← Add this
-            state.pause_reason = "Black Agent sigil charging required"  # ← Add this
+            state.workflow_paused = True
+            state.pause_reason = "Black Agent sigil charging required"
             state.pending_human_action = {
                 "agent": "black",
                 "action": "sigil_charging",
@@ -106,12 +106,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 2. Call resume_black_agent_workflow(black_config) to continue
                 """
             }
-        else:  # Completed without interruption
+        else:
             final_black_state = snapshot.values
-
-            # Update song_proposals from Black Agent's result
             state.song_proposals = SongProposal(**final_black_state["song_proposals"])  # ← Add this
-
             if final_black_state.get("counter_proposal"):
                 state.song_proposals.iterations.append(final_black_state["counter_proposal"])
 
