@@ -1,0 +1,78 @@
+bpm: 112
+manifest_id: '02_06'
+tempo: 4/4
+key: A minor
+rainbow_color: R
+title: The Architectural Mnemonics of M. Nodisks
+release_date: '2019-01-11'
+album_sequence: 6
+main_audio_file: 02_06_main.wav
+TRT: '[02:11.040]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: Onset
+    start_time: '[00:00.000]'
+    end_time: '[00:51.105]'
+    description: A slow group of chords played on an mechanical sounding synth
+  - section_name: March
+    start_time: '[00:51.106]'
+    end_time: '[01:17.034]'
+    description: A bleak miliary style drum patter marches the piece forward
+  - section_name: Transcendence
+    start_time: '[01:17.035]'
+    end_time: '[01:42.213]'
+    description: Strings soar and pads swell to create a sense of transcendence
+  - section_name: Denouement
+    start_time: '[01:42.214]'
+    end_time: '[02:11.040]'
+    description: The piece winds down with a return to the mechanical synths and a fading drone
+mood:
+    - bleak
+    - resolute
+    - mechanical
+    - transcendent
+    - somber
+    - cinematic
+    - atmospheric
+sounds_like:
+  - name: Popol Vuh
+    discogs_id: 81882
+  - name: Tangerine Dream
+    discogs_id: 10343
+  - name: John Carpenter
+    discogs_id: 32433
+genres:
+  - Electronic
+  - Ambient
+  - Soundtrack
+  - New Age
+  - Experimental
+  - New Classical
+concept: A book about building a memory palace. I imagined a lone man in winter European scene walking through a cityscape of brutalist architecture, each building representing a different memory or concept. The music reflects the stark, cold environment and the introspective journey of constructing and navigating this mental space.
+audio_tracks:
+  - id: 1
+    description: Crystal Nail Synth
+    audio_file: 02_06_03_crystal_nail.wav
+    midi_file: 02_06_02_crystal_nail.mid
+  - id: 2
+    description: Guitar
+    audio_file: 02_06_04_guitar.wav
+  - id: 3
+    description: Bass
+    audio_file: 02_06_05_bass.wav
+  - id: 4
+    description: Strings
+    audio_file: 02_06_07_strings.wav
+    midi_file: 02_06_06_strings.mid
+  - id: 5
+    description: Snare
+    audio_file: 02_06_09_snare.wav
+    midi_file: 02_06_08_snare.mid
+  - id: 6
+    description: Flute and Strings
+    audio_file: 02_06_11_flute_and_strings.wav
+    midi_file: 02_06_10_flute_and_strings.mid
+  - id: 7
+    description: Oscillator Drone (Unabled to export audio)
+    midi_file: 02_06_12_oscil.mid
