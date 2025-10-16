@@ -5,6 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from typing import Any, Dict, List, Optional, Union
 
+from app.structures.enums.player import RainbowPlayer
 from app.structures.enums.temporal_relatioship import TemporalRelationship
 from app.util.manifest_loader import load_manifest
 from app.util.manifest_validator import validate_yaml_file
@@ -184,11 +185,28 @@ class ManifestExtractor:
 
     def generate_multimodal_segments(self, mms_yaml_path: str, mms_lrc_path: str = None,
                                      mms_audio_path: str = None, mms_midi_path: str = None) -> pd.DataFrame:
-        """Generate complete multimodal training dataset"""
+        """
+        Generate complete multimodal training dataset
+
+        Args:
+            mms_yaml_path: Path to manifest YAML file
+            mms_lrc_path: Optional path to lyrics LRC file
+            mms_audio_path: DEPRECATED - audio tracks now loaded from manifest
+            mms_midi_path: Optional path to MIDI file
+
+        Returns:
+            DataFrame with multimodal segment data including:
+            - All audio tracks from manifest with player attribution
+            - Per-track and aggregate audio features
+            - MIDI features (if provided)
+            - Lyrical content with temporal relationships
+        """
+        if mms_audio_path:
+            print("⚠️  WARNING: mms_audio_path parameter is deprecated. Audio tracks are now loaded from manifest.")
+
         print(f"=== MULTIMODAL REBRACKETING TRAINING DATA GENERATION ===")
         print(f"YAML: {mms_yaml_path}")
         print(f"LRC:  {mms_lrc_path}")
-        print(f"Audio: {mms_audio_path}")
         print(f"MIDI: {mms_midi_path}")
 
         manifest = load_manifest(mms_yaml_path)
@@ -308,18 +326,18 @@ class ManifestExtractor:
 
         return dfrm
 
-
     def generate_enhanced_multimodal_segments(self, mm_yaml_path: str, mm_lrc_path: str = None,
                                               mm_audio_path: str = None, mm_midi_path: str = None) -> pd.DataFrame:
         """Generate multimodal training dataset with rebracketing methodology analysis"""
         print(f"=== ENHANCED MULTIMODAL REBRACKETING TRAINING DATA GENERATION ===")
         print(f"YAML: {mm_yaml_path}")
         print(f"LRC:  {mm_lrc_path}")
-        print(f"Audio: {mm_audio_path}")
+        # Removed single audio path - we'll load all from manifest
         print(f"MIDI: {mm_midi_path}")
 
         manifest = load_manifest(mm_yaml_path)
         print(f"Loaded manifest: {getattr(manifest, 'title', 'Unknown')}")
+
         # Avoid circular import
         from app.structures.extractors.concept_extractor import ConceptExtractor
         # Initialize concept extractor for rebracketing analysis
@@ -374,7 +392,8 @@ class ManifestExtractor:
                             'contains_memory_reference': self._check_memory_references(lyric['text']),
                             'contains_temporal_markers': self._check_temporal_markers(lyric['text']),
                             'contains_rebracketing_language': self._check_rebracketing_language(lyric['text']),
-                            'lyrical_boundary_fluidity': self._calculate_lyrical_boundary_fluidity(temporal_rel, confidence)
+                            'lyrical_boundary_fluidity': self._calculate_lyrical_boundary_fluidity(temporal_rel,
+                                                                                                   confidence)
                         }
                         intersecting_lyrics.append(lyric_data)
 
@@ -389,60 +408,93 @@ class ManifestExtractor:
                 'section_name': section['section_name'],
                 'section_description': section['description'],
                 'lyrical_content': intersecting_lyrics,
-
-                # Musical context
-                'bpm': getattr(manifest,'bpm'),
-                'time_signature':getattr(manifest,'tempo'),
-                'key': getattr(manifest,'key'),
-                'rainbow_color': getattr(manifest,'rainbow_color'),
-
-                # Enhanced metadata with rebracketing analysis
-                'title':getattr(manifest,'title'),
-                'mood_tags':getattr(manifest,'mood', []),
-                'concept': getattr(manifest,'concept', ''),
-
-                # NEW: Rebracketing methodology features
+                'bpm': getattr(manifest, 'bpm'),
+                'time_signature': getattr(manifest, 'tempo'),
+                'key': getattr(manifest, 'key'),
+                'rainbow_color': getattr(manifest, 'rainbow_color'),
+                'title': getattr(manifest, 'title'),
+                'mood_tags': getattr(manifest, 'mood', []),
+                'concept': getattr(manifest, 'concept', ''),
                 'rebracketing_features': rebracketing_features,
                 'concept_analysis': concept_analysis.__dict__ if concept_analysis else {},
                 'ontological_category': concept_analysis.ontological_category if concept_analysis else None,
                 'memory_discrepancy_severity': concept_analysis.memory_discrepancy_severity if concept_analysis else 0.0,
                 'temporal_complexity': rebracketing_features.get('temporal_rebracketing_complexity', 0.0),
-
-                # Section-specific rebracketing analysis
                 'section_rebracketing_score': self._calculate_section_rebracketing_score(
                     section, intersecting_lyrics, concept_analysis
                 ),
                 'boundary_crossing_indicators': self._identify_boundary_crossing_indicators(
                     section, intersecting_lyrics
                 )
-
             }
 
-            # Add audio features with rebracketing analysis
-            if mm_audio_path and Path(mm_audio_path).exists():
-                audio_features = self.load_audio_segment(mm_audio_path, section_start, section_end)
-                segment['audio_features'] = audio_features
+            # 👉 NEW: Load ALL audio tracks from manifest with enhanced rebracketing analysis
+            if hasattr(manifest, 'audio_tracks') and manifest.audio_tracks:
+                segment['audio_tracks_features'] = []
+                manifest_dir = os.path.dirname(mm_yaml_path)
 
-                # NEW: Audio-based rebracketing metrics
-                segment['audio_rebracketing_metrics'] = {
-                    'spectral_instability': self._calculate_spectral_instability(audio_features),
-                    'temporal_discontinuity': self._calculate_temporal_discontinuity(audio_features),
-                    'genre_shift_indicators': self._detect_genre_shift_indicators(audio_features, section)
-                }
-                print(f"✅ Added enhanced audio features for {section['section_name']}")
+                for track in manifest.audio_tracks:
+                    audio_path = os.path.join(manifest_dir, track.audio_file)
+
+                    if os.path.exists(audio_path):
+                        try:
+                            audio_features = self.load_audio_segment(audio_path, section_start, section_end)
+
+                            track_data = {
+                                'track_id': track.id,
+                                'description': track.description,
+                                'player': self._get_player_for_track(track),
+                                'audio_file': track.audio_file,
+                                **audio_features,
+                                # 👉 NEW: Per-track rebracketing metrics
+                                'spectral_instability': self._calculate_spectral_instability(audio_features),
+                                'temporal_discontinuity': self._calculate_temporal_discontinuity(audio_features),
+                                'genre_shift_indicators': self._detect_genre_shift_indicators(audio_features, section)
+                            }
+
+                            segment['audio_tracks_features'].append(track_data)
+                            print(f"  ✅ Track {track.id}: {track.description} - {track_data['player']}")
+
+                        except Exception as e:
+                            print(f"  ⚠️  Could not load track {track.id} ({track.audio_file}): {e}")
+                    else:
+                        print(f"  ⚠️  Audio file not found: {audio_path}")
+
+                # 👉 NEW: Aggregate audio rebracketing metrics across all tracks
+                if segment['audio_tracks_features']:
+                    segment['audio_rebracketing_metrics'] = {
+                        'avg_spectral_instability': np.mean(
+                            [t['spectral_instability'] for t in segment['audio_tracks_features']]),
+                        'avg_temporal_discontinuity': np.mean(
+                            [t['temporal_discontinuity'] for t in segment['audio_tracks_features']]),
+                        'max_spectral_instability': np.max(
+                            [t['spectral_instability'] for t in segment['audio_tracks_features']]),
+                        'max_temporal_discontinuity': np.max(
+                            [t['temporal_discontinuity'] for t in segment['audio_tracks_features']]),
+                        'genre_shift_indicators': list(set([
+                            indicator
+                            for t in segment['audio_tracks_features']
+                            for indicator in t['genre_shift_indicators']
+                        ])),
+                        'track_count': len(segment['audio_tracks_features']),
+                        'player_diversity': len(set([t['player'] for t in segment['audio_tracks_features']]))
+                    }
+                    print(f"  ✅ Added aggregate audio rebracketing metrics for {section['section_name']}")
+            else:
+                segment['audio_tracks_features'] = []
+                segment['audio_rebracketing_metrics'] = {}
+                print(f"  ℹ️  No audio tracks in manifest")
 
             # Add MIDI features with rebracketing analysis
             if mm_midi_path and Path(mm_midi_path).exists():
                 midi_features = self.load_midi_segment(mm_midi_path, section_start, section_end)
                 segment['midi_features'] = midi_features
-
-                # NEW: MIDI-based rebracketing metrics
                 segment['midi_rebracketing_metrics'] = {
                     'harmonic_discontinuity': self._calculate_harmonic_discontinuity(midi_features),
                     'rhythmic_rebracketing': self._calculate_rhythmic_rebracketing(midi_features),
                     'instrumental_genre_mixing': self._detect_instrumental_genre_mixing(midi_features)
                 }
-                print(f"✅ Added enhanced MIDI features for {section['section_name']}")
+                print(f"  ✅ Added enhanced MIDI features for {section['section_name']}")
 
             # Calculate comprehensive boundary fluidity across all modalities
             segment['comprehensive_rebracketing_score'] = self._calculate_comprehensive_rebracketing_score(segment)
@@ -471,13 +523,27 @@ class ManifestExtractor:
             lambda row: self._calculate_genre_instability_score(row), axis=1
         )
 
-        if mm_audio_path:
-            df['audio_energy'] = df['audio_features'].apply(lambda x: x.get('rms_energy', 0))
-            df['spectral_complexity'] = df['audio_features'].apply(lambda x: x.get('spectral_centroid', 0))
+        # 👉 NEW: Audio track metrics
+        df['audio_track_count'] = df['audio_tracks_features'].apply(len)
+        df['players'] = df['audio_tracks_features'].apply(
+            lambda tracks: list(set([t['player'] for t in tracks])) if tracks else []
+        )
+        df['player_count'] = df['players'].apply(len)
+
+        # Aggregate audio features and rebracketing metrics
+        if len(df) > 0 and df['audio_track_count'].sum() > 0:
+            df['avg_audio_energy'] = df['audio_tracks_features'].apply(
+                lambda tracks: np.mean([t.get('rms_energy', 0) for t in tracks]) if tracks else 0
+            )
+            df['avg_spectral_complexity'] = df['audio_tracks_features'].apply(
+                lambda tracks: np.mean([t.get('spectral_centroid', 0) for t in tracks]) if tracks else 0
+            )
             df['audio_rebracketing_intensity'] = df['audio_rebracketing_metrics'].apply(
-                lambda x: (x.get('spectral_instability', 0) + x.get('temporal_discontinuity', 0)) / 2
+                lambda x: (x.get('avg_spectral_instability', 0) + x.get('avg_temporal_discontinuity',
+                                                                        0)) / 2 if x else 0
             )
 
+        # MIDI metrics
         if mm_midi_path:
             df['midi_density'] = df['midi_features'].apply(lambda x: x.get('note_density', 0))
             df['pitch_complexity'] = df['midi_features'].apply(lambda x: x.get('pitch_variety', 0))
@@ -492,15 +558,21 @@ class ManifestExtractor:
         print(f"Segments with temporal bleeding: {df['has_temporal_bleeding'].sum()}")
         print(f"Average rebracketing score: {df['comprehensive_rebracketing_score'].mean():.4f}")
         print(f"Genre instability average: {df['genre_instability_score'].mean():.4f}")
+        print(f"Total audio tracks processed: {df['audio_track_count'].sum()}")
+        print(f"Unique players: {set([p for players in df['players'] for p in players])}")
 
-        if mm_audio_path:
+        if len(df) > 0 and df['audio_track_count'].sum() > 0:
             print(f"Average audio rebracketing intensity: {df['audio_rebracketing_intensity'].mean():.4f}")
         if mm_midi_path:
             print(f"Average harmonic rebracketing intensity: {df['harmonic_rebracketing_intensity'].mean():.4f}")
 
         return df
-
-    # Helper methods for rebracketing analysis
+    @staticmethod
+    def _get_player_for_track(track) -> str:
+        """Get player for audio track, defaulting to GABE"""
+        if hasattr(track, 'player') and track.player:
+            return track.player.value if isinstance(track.player, RainbowPlayer) else track.player
+        return RainbowPlayer.GABE.value
 
     @staticmethod
     def _check_memory_references(text: str) -> bool:
@@ -532,7 +604,6 @@ class ManifestExtractor:
         else:
             base_fluidity = 0.5
 
-        # Adjust by confidence - low confidence suggests more boundary ambiguity
         confidence_adjustment = (1.0 - confidence) * 0.3
 
         return min(base_fluidity + confidence_adjustment, 1.0)
@@ -606,20 +677,20 @@ class ManifestExtractor:
         """Calculate comprehensive rebracketing score across all modalities"""
         score = 0.0
 
-        # Lyrical rebracketing score
+        # Lyrical fluidity
         if segment.get('lyrical_content'):
             lyric_scores = [l.get('lyrical_boundary_fluidity', 0) for l in segment['lyrical_content']]
             if lyric_scores:
                 score += sum(lyric_scores) / len(lyric_scores) * 0.3
 
-        # Audio rebracketing score
+        # 👉 UPDATED: Audio fluidity from aggregate metrics
         if segment.get('audio_rebracketing_metrics'):
             audio_metrics = segment['audio_rebracketing_metrics']
-            audio_score = (audio_metrics.get('spectral_instability', 0) +
-                          audio_metrics.get('temporal_discontinuity', 0)) / 2
+            audio_score = (audio_metrics.get('avg_spectral_instability', 0) +
+                           audio_metrics.get('avg_temporal_discontinuity', 0)) / 2
             score += audio_score * 0.35
 
-        # MIDI rebracketing score
+        # MIDI fluidity (unchanged)
         if segment.get('midi_rebracketing_metrics'):
             midi_metrics = segment['midi_rebracketing_metrics']
             midi_score = midi_metrics.get('harmonic_discontinuity', 0)
@@ -804,60 +875,64 @@ class ManifestExtractor:
         """Flatten complex objects for parquet storage"""
         df_flat = df.copy()
 
-        # Convert numpy arrays to JSON strings for parquet compatibility
+        # Convert numpy arrays to lists
         array_columns = ['mfcc', 'chroma', 'spectral_contrast', 'onset_frames',
-                        'onset_strength', 'decay_profile']
-
+                         'onset_strength', 'decay_profile']
         for col in array_columns:
             if col in df_flat.columns:
                 df_flat[col] = df_flat[col].apply(
                     lambda x: x.tolist() if hasattr(x, 'tolist') else x
                 )
 
-        # Convert TimeSignature and other music21 objects to strings
+        # Convert music21 objects to strings
         if 'time_signature' in df_flat.columns:
             df_flat['time_signature'] = df_flat['time_signature'].apply(
                 lambda x: str(x) if x is not None else None
             )
-
-        # Convert Key objects to strings if present
         if 'key' in df_flat.columns:
             df_flat['key'] = df_flat['key'].apply(
                 lambda x: str(x) if x is not None else None
             )
-
-        # Convert RainbowTableColor objects to strings
         if 'rainbow_color' in df_flat.columns:
             df_flat['rainbow_color'] = df_flat['rainbow_color'].apply(
                 lambda x: str(x) if x is not None else None
             )
 
-        # Convert any other complex objects that might cause issues
+        # Convert any other complex objects
         for col in df_flat.columns:
             if df_flat[col].dtype == 'object':
-                # Check if any values in this column are complex objects
                 sample_val = df_flat[col].dropna().iloc[0] if len(df_flat[col].dropna()) > 0 else None
-                if sample_val is not None and hasattr(sample_val, '__class__') and hasattr(sample_val.__class__, '__module__'):
+                if sample_val is not None and hasattr(sample_val, '__class__') and hasattr(sample_val.__class__,
+                                                                                           '__module__'):
                     module_name = sample_val.__class__.__module__
-                    if module_name and ('music21' in module_name or 'pretty_midi' in module_name or 'app.structures' in module_name):
+                    if module_name and (
+                            'music21' in module_name or 'pretty_midi' in module_name or 'app.structures' in module_name):
                         df_flat[col] = df_flat[col].apply(
                             lambda x: str(x) if x is not None else None
                         )
 
-        # Flatten nested dictionaries
-        if 'audio_features' in df_flat.columns:
-            df_flat['audio_rms_energy'] = df_flat['audio_features'].apply(
-                lambda x: x.get('rms_energy', 0) if isinstance(x, dict) else 0
+        # 👉 NEW: Flatten audio tracks with player info
+        if 'audio_tracks_features' in df_flat.columns:
+            import json
+            df_flat['audio_tracks_json'] = df_flat['audio_tracks_features'].apply(
+                lambda x: json.dumps(x) if x else "[]"
             )
-            df_flat['audio_spectral_centroid'] = df_flat['audio_features'].apply(
-                lambda x: x.get('spectral_centroid', 0) if isinstance(x, dict) else 0
-            )
-            df_flat['audio_attack_time'] = df_flat['audio_features'].apply(
-                lambda x: x.get('attack_time', 0) if isinstance(x, dict) else 0
-            )
-            # Remove original complex column
-            df_flat = df_flat.drop('audio_features', axis=1)
 
+            # Create aggregate columns
+            df_flat['audio_track_count'] = df_flat['audio_tracks_features'].apply(len)
+            df_flat['players_csv'] = df_flat['audio_tracks_features'].apply(
+                lambda tracks: ','.join(sorted(set([t['player'] for t in tracks]))) if tracks else ''
+            )
+            df_flat['avg_rms_energy'] = df_flat['audio_tracks_features'].apply(
+                lambda tracks: float(np.mean([t.get('rms_energy', 0) for t in tracks])) if tracks else 0.0
+            )
+            df_flat['avg_spectral_centroid'] = df_flat['audio_tracks_features'].apply(
+                lambda tracks: float(np.mean([t.get('spectral_centroid', 0) for t in tracks])) if tracks else 0.0
+            )
+
+            df_flat = df_flat.drop('audio_tracks_features', axis=1)
+
+        # Flatten MIDI features
         if 'midi_features' in df_flat.columns:
             df_flat['midi_note_density'] = df_flat['midi_features'].apply(
                 lambda x: x.get('note_density', 0) if isinstance(x, dict) else 0
@@ -870,10 +945,22 @@ class ManifestExtractor:
             )
             df_flat = df_flat.drop('midi_features', axis=1)
 
-        # Flatten complex nested dictionaries and lists that might contain objects
-        complex_columns = ['rebracketing_features', 'concept_analysis', 'audio_rebracketing_metrics',
-                          'midi_rebracketing_metrics', 'boundary_crossing_indicators']
+        # 👉 NEW: Flatten audio_rebracketing_metrics
+        if 'audio_rebracketing_metrics' in df_flat.columns:
+            df_flat['audio_rebrack_avg_spectral_instability'] = df_flat['audio_rebracketing_metrics'].apply(
+                lambda x: x.get('avg_spectral_instability', 0) if isinstance(x, dict) else 0
+            )
+            df_flat['audio_rebrack_avg_temporal_discontinuity'] = df_flat['audio_rebracketing_metrics'].apply(
+                lambda x: x.get('avg_temporal_discontinuity', 0) if isinstance(x, dict) else 0
+            )
+            df_flat['audio_rebrack_player_diversity'] = df_flat['audio_rebracketing_metrics'].apply(
+                lambda x: x.get('player_diversity', 0) if isinstance(x, dict) else 0
+            )
+            df_flat = df_flat.drop('audio_rebracketing_metrics', axis=1)
 
+        # Flatten complex nested dictionaries
+        complex_columns = ['rebracketing_features', 'concept_analysis',
+                           'midi_rebracketing_metrics', 'boundary_crossing_indicators']
         for col in complex_columns:
             if col in df_flat.columns:
                 df_flat[f'{col}_json'] = df_flat[col].apply(
@@ -881,7 +968,7 @@ class ManifestExtractor:
                 )
                 df_flat = df_flat.drop(col, axis=1)
 
-        # Convert lyrical_content to string representation for parquet
+        # Convert lyrical_content to JSON string
         if 'lyrical_content' in df_flat.columns:
             import json
             df_flat['lyrical_content_json'] = df_flat['lyrical_content'].apply(
@@ -889,63 +976,120 @@ class ManifestExtractor:
             )
             df_flat = df_flat.drop('lyrical_content', axis=1)
 
+        # Flatten players list
+        if 'players' in df_flat.columns:
+            df_flat['players_csv'] = df_flat['players'].apply(
+                lambda x: ','.join(x) if isinstance(x, list) else str(x)
+            )
+            df_flat = df_flat.drop('players', axis=1)
+
         return df_flat
 
     def _unflatten_from_parquet(self, df_flat: pd.DataFrame) -> pd.DataFrame:
         """Reconstruct complex objects from flattened parquet data"""
         df = df_flat.copy()
 
-        # Reconstruct audio_features dict
-        audio_cols = [col for col in df.columns if col.startswith('audio_')]
-        if audio_cols:
-            df['audio_features'] = df.apply(lambda row: {
-                col.replace('audio_', ''): row[col] for col in audio_cols
-            }, axis=1)
-            df = df.drop(audio_cols, axis=1)
+        # 👉 NEW: Reconstruct audio_tracks_features from JSON
+        if 'audio_tracks_json' in df.columns:
+            import json
+            def safe_json_loads(x):
+                if not x or x == "[]":
+                    return []
+                try:
+                    return json.loads(x)
+                except (json.JSONDecodeError, ValueError, TypeError) as e:
+                    print(f"Warning: Could not parse JSON for audio_tracks: {e}")
+                    try:
+                        import ast
+                        return ast.literal_eval(x)
+                    except (ValueError, SyntaxError):
+                        print(f"Warning: Could not parse as literal either, returning empty list")
+                        return []
+
+            df['audio_tracks_features'] = df['audio_tracks_json'].apply(safe_json_loads)
+
+            # Drop the flattened columns
+            cols_to_drop = ['audio_tracks_json', 'audio_track_count', 'players_csv',
+                            'avg_rms_energy', 'avg_spectral_centroid']
+            for col in cols_to_drop:
+                if col in df.columns:
+                    df = df.drop(col, axis=1)
 
         # Reconstruct midi_features dict
-        midi_cols = [col for col in df.columns if col.startswith('midi_')]
+        midi_cols = [col for col in df.columns if col.startswith('midi_') and col != 'midi_features']
         if midi_cols:
             df['midi_features'] = df.apply(lambda row: {
                 col.replace('midi_', ''): row[col] for col in midi_cols
             }, axis=1)
             df = df.drop(midi_cols, axis=1)
 
+        # 👉 NEW: Reconstruct audio_rebracketing_metrics
+        audio_rebrack_cols = [col for col in df.columns if col.startswith('audio_rebrack_')]
+        if audio_rebrack_cols:
+            df['audio_rebracketing_metrics'] = df.apply(lambda row: {
+                col.replace('audio_rebrack_', ''): row[col] for col in audio_rebrack_cols
+            }, axis=1)
+            df = df.drop(audio_rebrack_cols, axis=1)
+
         # Reconstruct lyrical_content from JSON string
         if 'lyrical_content_json' in df.columns:
             import json
-            def safe_json_loads(x):
+            def safe_json_loads_lyrics(x):
                 if not x or x == "":
                     return []
                 try:
                     return json.loads(x)
                 except (json.JSONDecodeError, ValueError, TypeError) as e:
                     print(f"Warning: Could not parse JSON for lyrical_content: {e}")
-                    # Try to handle it as a string representation
                     try:
                         import ast
                         return ast.literal_eval(x)
                     except (ValueError, SyntaxError):
                         print(f"Warning: Could not parse as literal either, returning empty list")
-                        return []  # Add missing return statement
+                        return []
 
-            df['lyrical_content'] = df['lyrical_content_json'].apply(safe_json_loads)
+            df['lyrical_content'] = df['lyrical_content_json'].apply(safe_json_loads_lyrics)
             df = df.drop('lyrical_content_json', axis=1)
+
+        # 👉 NEW: Reconstruct players list from CSV
+        if 'players_csv' in df.columns and 'players' not in df.columns:
+            df['players'] = df['players_csv'].apply(
+                lambda x: x.split(',') if x else []
+            )
+            # Don't drop players_csv here since we might have dropped it above with audio_tracks
+
+        # Reconstruct other complex columns from JSON strings
+        json_columns = [col for col in df.columns if
+                        col.endswith('_json') and col not in ['audio_tracks_json', 'lyrical_content_json']]
+        for json_col in json_columns:
+            original_col = json_col.replace('_json', '')
+
+            def safe_parse(x):
+                if not x or x == "":
+                    return {}
+                try:
+                    import json
+                    return json.loads(x)
+                except:
+                    try:
+                        import ast
+                        return ast.literal_eval(x)
+                    except:
+                        return {}
+
+            df[original_col] = df[json_col].apply(safe_parse)
+            df = df.drop(json_col, axis=1)
 
         return df
 
-    # ...existing methods...
-
 if __name__ == "__main__":
-    import os
-    import pandas as pd
+
     print("=== ManifestExtractor Example Usage ===")
     # Set up environment for manifest loading
     os.environ['MANIFEST_PATH'] = '/Volumes/LucidNonsense/White/staged_raw_material'
     manifest_id = "01_01"
     yaml_path = f"{os.getenv('MANIFEST_PATH')}/{manifest_id}/{manifest_id}.yml"
     lrc_path = f"{os.getenv('MANIFEST_PATH')}/{manifest_id}/{manifest_id}.lrc"
-    audio_path = f"{os.getenv('MANIFEST_PATH')}/{manifest_id}/01_01_02.wav"
     midi_path = f"{os.getenv('MANIFEST_PATH')}/{manifest_id}/01_01_biotron.mid"
 
     # Initialize extractor
@@ -955,7 +1099,7 @@ if __name__ == "__main__":
     # Example: generate_multimodal_segments (if files exist)
     if os.path.exists(yaml_path):
         try:
-            df = extractor.generate_multimodal_segments(yaml_path, lrc_path, audio_path, midi_path)
+            df = extractor.generate_multimodal_segments(yaml_path, lrc_path, None, midi_path)
             print("\nGenerated multimodal segments DataFrame:")
             print(f"Shape: {df.shape}")
             print(f"Columns: {list(df.columns)}")
@@ -984,3 +1128,4 @@ if __name__ == "__main__":
             print(f"generate_multimodal_segments error: {e}")
     else:
         print(f"Manifest YAML not found: {yaml_path}")
+
