@@ -172,15 +172,19 @@ audio_tracks:
   - id: 26
     description: Marvin Main 1
     audio_file: 03_06_41_marvin_main_1.wav
+    player: MARVIN
   - id: 27
     description: Marvin Main 2
     audio_file: 03_06_42_marvin_main_2.wav
+    player: MARVIN
   - id: 28
     description: Marvin BG 1
     audio_file: 03_06_43_marvin_bg_1.wav
+    player: MARVIN
   - id: 29
     description: Marvin BG 2
     audio_file: 03_06_44_marvin_bg_2.wav
+    player: MARVIN
   - id: 30
     description: End Sounds - A Morphogene loaded with 70s television samples and triggered by LFO, then envelope filtered.
     audio_file: 03_06_45_end_sounds.wav
