@@ -12,6 +12,7 @@ from langgraph.graph import StateGraph
 
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.models.agent_settings import AgentSettings
+from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
 from app.agents.states.main_agent_state import MainAgentState
 from app.agents.states.red_agent_state import RedAgentState
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
@@ -80,3 +81,5 @@ class RedAgent(BaseRainbowAgent, ABC):
         return graph
 
 
+    def generate_alternate_song_spec(self, agent_state: RedAgentState) -> RedAgentState:
+        raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")

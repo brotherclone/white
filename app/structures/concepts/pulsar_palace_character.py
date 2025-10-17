@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.agents.tools.gaming_tools import roll_dice, no_repeat_roll_dice
 
 PULSAR_PALACE_IMAGE_BASE_PATH = "/Volumes/LucidNonsense/White/app/reference/gaming/img"
@@ -111,6 +111,8 @@ class PulsarPalaceCharacter(PulsarPalaceBaseCharacter):
     off_current: int | None
     player: PulsarPalacePlayer | None = None
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     def __init__(self, **data):
         super().__init__(**data)
 
@@ -140,4 +142,3 @@ class PulsarPalaceNonPlayerCharacter (PulsarPalaceBaseCharacter):
 
     def __init__(self, **data):
         super().__init__(**data)
-

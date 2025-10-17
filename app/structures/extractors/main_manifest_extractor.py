@@ -131,16 +131,23 @@ class ManifestExtractor:
 
         # Lyrical boundary fluidity
         lyric_bleeding = len([l for l in segment['lyrical_content']
-                              if l['temporal_relationship'] not in [TemporalRelationship.CONTAINED, TemporalRelationship.MATCH]])
+                              if l.get('temporal_relationship') not in [TemporalRelationship.CONTAINED, TemporalRelationship.MATCH]])
         score += lyric_bleeding * 0.3
 
         # Audio boundary fluidity (based on attack/decay profiles)
-        if 'audio_features' in segment:
+        # Support both 'audio_features' and 'audio_tracks_features'
+        audio_tracks = segment.get('audio_tracks_features', [])
+        if audio_tracks:
+            for audio in audio_tracks:
+                if audio.get('attack_time', 0) < 0.1:
+                    score += 0.2
+                if len(audio.get('decay_profile', [])) > 0:
+                    decay_var = np.var(audio['decay_profile'])
+                    score += min(decay_var * 0.1, 0.3)
+        elif 'audio_features' in segment:
             audio = segment['audio_features']
-            # Fast attack indicates abrupt boundary
             if audio.get('attack_time', 0) < 0.1:
                 score += 0.2
-            # Complex decay profile indicates temporal spreading
             if len(audio.get('decay_profile', [])) > 0:
                 decay_var = np.var(audio['decay_profile'])
                 score += min(decay_var * 0.1, 0.3)
@@ -148,10 +155,8 @@ class ManifestExtractor:
         # MIDI boundary fluidity (based on note overlaps and timing)
         if 'midi_features' in segment:
             midi = segment['midi_features']
-            # Irregular timing suggests boundary crossing
             if midi.get('rhythmic_regularity', 1) < 0.5:
                 score += 0.2
-            # High polyphony suggests complex overlapping
             if midi.get('avg_polyphony', 0) > 2:
                 score += 0.2
 
@@ -293,8 +298,31 @@ class ManifestExtractor:
                 segment['midi_features'] = self.load_midi_segment(mms_midi_path, section_start, section_end)
                 print(f"Added MIDI features for {section.section_name}")
 
+            # 👉 NEW: Load ALL audio tracks from manifest
+            segment['audio_tracks_features'] = []
+            if hasattr(manifest, 'audio_tracks') and manifest.audio_tracks:
+                manifest_dir = os.path.dirname(mms_yaml_path)
+                for track in manifest.audio_tracks:
+                    audio_path = os.path.join(manifest_dir, track.audio_file)
+                    if os.path.exists(audio_path):
+                        try:
+                            audio_features = self.load_audio_segment(audio_path, section_start, section_end)
+                            track_data = {
+                                'track_id': getattr(track, 'id', None),
+                                'description': getattr(track, 'description', None),
+                                'player': self._get_player_for_track(track),
+                                'audio_file': getattr(track, 'audio_file', None),
+                                **audio_features
+                            }
+                            segment['audio_tracks_features'].append(track_data)
+                        except Exception as e:
+                            print(f"Warning: Could not load track {getattr(track, 'id', None)} ({getattr(track, 'audio_file', None)}): {e}")
+                    else:
+                        print(f"Warning: Audio file not found: {audio_path}")
+
             # Calculate boundary fluidity metrics across all modalities
             segment['rebracketing_score'] = self._calculate_boundary_fluidity_score(segment)
+
 
             all_segments.append(segment)
 
@@ -305,6 +333,12 @@ class ManifestExtractor:
         dfrm['has_temporal_bleeding'] = dfrm['lyrical_content'].apply(
             lambda x: any(l['temporal_relationship'] not in ['contained', 'exact_match'] for l in x)
         )
+
+        # Add players and player_count columns
+        dfrm['players'] = dfrm['audio_tracks_features'].apply(
+            lambda tracks: [t.get('player') for t in tracks] if tracks else []
+        )
+        dfrm['player_count'] = dfrm['players'].apply(lambda players: len(set(players)))
 
         if mms_audio_path:
             dfrm['audio_energy'] = dfrm['audio_features'].apply(lambda x: x.get('rms_energy', 0))
@@ -569,10 +603,13 @@ class ManifestExtractor:
         return df
     @staticmethod
     def _get_player_for_track(track) -> str:
-        """Get player for audio track, defaulting to GABE"""
+        """Get player for audio track, defaulting to GABE (enum name)"""
         if hasattr(track, 'player') and track.player:
-            return track.player.value if isinstance(track.player, RainbowPlayer) else track.player
-        return RainbowPlayer.GABE.value
+            from app.structures.enums.player import RainbowPlayer
+            if isinstance(track.player, RainbowPlayer):
+                return track.player.name  # Always return enum name
+            return str(track.player)
+        return 'GABE'
 
     @staticmethod
     def _check_memory_references(text: str) -> bool:
@@ -1128,4 +1165,3 @@ if __name__ == "__main__":
             print(f"generate_multimodal_segments error: {e}")
     else:
         print(f"Manifest YAML not found: {yaml_path}")
-

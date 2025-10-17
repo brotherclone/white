@@ -32,6 +32,12 @@ from app.reference.mcp.todoist.main import (
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
+# Dummy skip_chance decorator for testing and import safety
+def skip_chance(x):
+    def decorator(f):
+        return f
+    return decorator
+
 
 class BlackAgent(BaseRainbowAgent, ABC):
 
@@ -239,7 +245,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
         Create a counter-proposal that enhances the artistic and thematic depth of this song.
         Focus on musical elements, lyrical themes, and production choices that express creative 
-        resistance and psychological liberation.
+        resistance and psychological liberation. Try to avoid being too "on the nose" or literal.
+        Ambiguity and subtlety are valued.
         """
 
         claude = self._get_claude()
@@ -371,9 +378,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
         return state
 
     @staticmethod
-    @skip_chance(0.33)
     def generate_evp(state: BlackAgentState) -> BlackAgentState:
-        """Generate EVP artifact and optionally create analysis task"""
+
+        """Generate an EVP artifact and optionally create an analysis task"""
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
@@ -417,9 +424,10 @@ class BlackAgent(BaseRainbowAgent, ABC):
     @staticmethod
     def await_human_action(state: BlackAgentState) -> BlackAgentState:
         """
-        Node that workflow interrupts at. When workflow resumes, this passes through.
-        This is where human completes ritual tasks before workflow continues.
+        Node that workflow interrupts at. When the workflow resumes, this passes through.
+        This is where a human completes ritual tasks before the workflow continues.
         """
+
         logging.info("⏸️  Workflow interrupted - awaiting human action on sigil charging")
 
         # This node just passes through - the interrupt happens BEFORE entering it
@@ -490,3 +498,4 @@ class BlackAgent(BaseRainbowAgent, ABC):
         logging.info(f"✓ Finalized counter-proposal: {counter_proposal.title}")
 
         return state
+
