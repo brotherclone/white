@@ -1,0 +1,139 @@
+bpm: 112
+manifest_id: '02_03'
+tempo: 4/4
+key: F minor
+rainbow_color: R
+title: She Waits For Yesterday
+release_date: '2019-01-11'
+album_sequence: 3
+main_audio_file: 02_03_main.wav
+TRT: '[03:32.221]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:08.142]'
+    description: Warbly, cheesy synths kick off this sci-fi-y song.
+  - section_name: Verse 1
+    start_time: '[00:08.143]'
+    end_time: '[00:25.176]'
+    description: Gabe's ragged vocals enter, setting the stage.
+  - section_name: Alterverse
+    start_time: '[00:25.177]'
+    end_time: '[00:57.213]'
+    description: This go a bit mellow and minor here as the song progresses.
+  - section_name: Bridge 1
+    start_time: '[00:57.214]'
+    end_time: '[01:45.000]'
+    description: The bridge gets a bit more laid back and melodic.
+  - section_name: Chorus 1
+    start_time: '[01:45.001]'
+    end_time: '[02:02.034]'
+    description: The chorus comes in with a mechanical, blunt pace and the vocals reach high tenor range
+  - section_name: Decohere 1
+    start_time: '[02:02.035]'
+    end_time: '[02:10.176]'
+    description: The word "docoherence" passes through a chopping filter with scrambles it.
+  - section_name: Interlude
+    start_time: '[02:10.177]'
+    end_time: '[02:36.105]'
+    description: A small synth-heavy interlude bridges the two main sections of the song.
+  - section_name: Verse 2
+    start_time: '[02:36.106]'
+    end_time: '[03:02.034]'
+    description: Back to the laid back vocals.
+  - section_name: Chorus 2
+    start_time: '[03:02.035]'
+    end_time: '[03:19.071]'
+    description: The chorus returns with more intensity.
+  - section_name: Decohere 2
+    start_time: '[03:19.072]'
+    end_time: '[03:32.221]'
+    description: The song ends with another passage of "docoherence" filtered and scrambled.
+mood:
+  - Kitschy
+  - Retro
+  - Pulpy
+  - Quirky
+  - Sci Fi
+  - Adventurous
+  - Weird
+sounds_like:
+  - name: Gary Numan
+    discogs_id: 12588
+  - name: Brian Eno
+    discogs_id: 634
+  - name: Devo
+    discogs_id: 12834
+genres:
+    - Synthpop
+    - Rock
+    - No Wave
+    - Noise Pop
+lrc_file: 02_03.lrc
+concept: Based on the Phillip K. Dick books that line my shelves, this song also plays with the Ray-Gun synth, 70s rock I love so much. I was given some very negative feedback on the mix but I think it was from some young kid who dreams of being a rock "professional".
+audio_tracks:
+  - id: 1
+    description: Warbly Synth
+    audio_file: 02_03_03_warble.wav
+    midi_file: 02_03_02_warble.mid
+  - id: 2
+    description: Synth Bass
+    audio_file: 02_03_05_synth_bass.wav
+    midi_file: 02_03_04_synth_bass.mid
+  - id: 3
+    description: Electric Guitar
+    audio_file: 02_03_06_electric_guitar.wav
+  - id: 4
+    description: DX7 Synth
+    audio_file: 02_03_08_dx7.wav
+    midi_file: 02_03_07_dx7.mid
+  - id: 5
+    description: Melody Guitar
+    audio_file: 02_03_09_melody_guitar.wav
+  - id: 6
+    description: Faux Drums
+    audio_file: 02_03_11_faux_drums.wav
+    midi_file: 02_03_10_faux_drums.mid
+    group: Drums
+  - id: 7
+    description: Hi-hat
+    audio_file: 02_03_12_hihat.wav
+    group: Drums
+  - id: 8
+    description: Floor Tom
+    audio_file: 02_03_13_floor_tom.wav
+    group: Drums
+  - id: 9
+    description: Kick
+    audio_file: 02_03_14_kick.wav
+    group: Drums
+  - id: 10
+    description: Weird Snare
+    audio_file: 02_03_15_weird_snare.wav
+    group: Drums
+  - id: 11
+    description: Overheads
+    audio_file: 02_03_16_overheads.wav
+    group: Drums
+  - id: 12
+    description: All Drums
+    audio_file: 02_03_17_all_drums.wav
+    group: Drums
+  - id: 13
+    description: Buchala Synth
+    audio_file: 02_03_19_buchala.wav
+    midi_file: 02_03_18_buchala.mid
+  - id: 14
+    description: Main Vox
+    audio_file: 02_03_20_main_vox.wav
+  - id: 15
+    description: Double Vox
+    audio_file: 02_03_21_dbl_vox.wav
+  - id: 16
+    description: Deep Vox
+    audio_file: 02_03_22_deep_vox.wav
+  - id: 17
+    description: BG Vox
+    audio_file: 02_03_23_bg_vox.wav

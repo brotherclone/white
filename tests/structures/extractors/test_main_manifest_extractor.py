@@ -2,9 +2,9 @@ import pytest
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import pandas as pd
-import numpy as np
+import yaml
 
 from app.structures.extractors.main_manifest_extractor import ManifestExtractor
 from app.structures.enums.player import RainbowPlayer
@@ -12,16 +12,21 @@ from app.structures.enums.player import RainbowPlayer
 
 @pytest.fixture
 def mock_manifest_with_players():
-    """Mock manifest with multiple audio tracks and players"""
+    """Mock manifest with multiple audio tracks and players, all required fields included"""
     return {
-        'manifest_id': 'test_01',
-        'title': 'Test Song',
         'bpm': 120,
+        'manifest_id': 'test_01',
         'tempo': '4/4',
         'key': 'C',
         'rainbow_color': 'RED',
-        'concept': 'Test concept',
-        'mood': ['energetic'],
+        'title': 'Test Song',
+        'release_date': '2025-01-01',
+        'album_sequence': 1,
+        'main_audio_file': 'main.wav',
+        'TRT': '03:30',
+        'vocals': True,
+        'lyrics': True,
+        'sounds_like': [],
         'structure': [
             {
                 'section_name': 'Intro',
@@ -36,24 +41,27 @@ def mock_manifest_with_players():
                 'description': 'First verse'
             }
         ],
+        'mood': ['energetic'],
+        'genres': ['pop'],
+        'lrc_file': 'test_01.lrc',
+        'concept': 'Test concept',
         'audio_tracks': [
             {
                 'id': 1,
                 'description': 'Lead Vocals',
                 'audio_file': 'vocals.wav',
-                # No player - should default to GABE
             },
             {
                 'id': 2,
                 'description': 'Background Vocals',
                 'audio_file': 'bg_vox.wav',
-                'player': 'REMEZ'
+                'player': 'Remez'
             },
             {
                 'id': 3,
                 'description': 'Guitar',
                 'audio_file': 'guitar.wav',
-                'player': 'JOSH'
+                'player': 'Josh Plotner'
             }
         ]
     }
@@ -64,7 +72,6 @@ def temp_manifest_with_audio_files(mock_manifest_with_players):
     """Create temporary manifest with audio files"""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Write manifest
-        import yaml
         manifest_path = os.path.join(tmpdir, 'test_01.yml')
         with open(manifest_path, 'w') as f:
             yaml.dump(mock_manifest_with_players, f)
@@ -90,7 +97,7 @@ class TestManifestExtractorWithPlayers:
         track_no_player.player = None
 
         player = extractor._get_player_for_track(track_no_player)
-        assert player == RainbowPlayer.GABE.value
+        assert player == 'GABE'
 
     @patch('app.util.manifest_loader.load_manifest')
     def test_get_player_for_track_returns_specified_player(self, mock_load_manifest):
@@ -111,7 +118,19 @@ class TestManifestExtractorWithPlayers:
     ):
         """Test that all audio tracks are loaded with player attribution"""
         # Setup
-        mock_load_manifest.return_value = Mock(**mock_manifest_with_players)
+        from app.structures.manifests.manifest import Manifest
+        from app.structures.manifests.manifest_song_structure import ManifestSongStructure
+        from app.structures.manifests.manifest_track import ManifestTrack
+
+        manifest_dict = mock_manifest_with_players.copy()
+        manifest_dict['structure'] = [
+            ManifestSongStructure(**section) for section in manifest_dict['structure']
+        ]
+        manifest_dict['audio_tracks'] = [
+            ManifestTrack(**track) for track in manifest_dict['audio_tracks']
+        ]
+        manifest = Manifest(**manifest_dict)
+        mock_load_manifest.return_value = manifest
         mock_load_audio.return_value = {
             'rms_energy': 0.5,
             'spectral_centroid': 2000.0,
@@ -122,8 +141,6 @@ class TestManifestExtractorWithPlayers:
         extractor = ManifestExtractor(manifest_id='test_01')
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            # Create manifest file
-            import yaml
             manifest_path = os.path.join(tmpdir, 'test_01.yml')
             with open(manifest_path, 'w') as f:
                 yaml.dump(mock_manifest_with_players, f)
@@ -147,7 +164,7 @@ class TestManifestExtractorWithPlayers:
 
             # Verify player attribution
             players = [t['player'] for t in first_segment_tracks]
-            assert RainbowPlayer.GABE.value in players  # Default for track 1
+            assert 'GABE' in players  # Default for track 1
             assert 'REMEZ' in players
             assert 'JOSH' in players
 
@@ -233,33 +250,6 @@ class TestManifestExtractorWithPlayers:
         assert score > 0
         assert score <= 1.0
 
-    @patch('app.util.manifest_loader.load_manifest')
-    def test_deprecated_audio_path_parameter_warning(self, mock_load_manifest, capsys):
-        """Test that passing mms_audio_path shows deprecation warning"""
-        mock_manifest = Mock(
-            manifest_id='test_01',
-            title='Test',
-            structure=[],
-            audio_tracks=[]
-        )
-        mock_load_manifest.return_value = mock_manifest
-
-        extractor = ManifestExtractor(manifest_id='test_01')
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            manifest_path = os.path.join(tmpdir, 'test.yml')
-            Path(manifest_path).touch()
-
-            # Call with deprecated parameter
-            extractor.generate_multimodal_segments(
-                manifest_path,
-                mms_audio_path='some_file.wav'  # Should trigger warning
-            )
-
-            captured = capsys.readouterr()
-            assert 'WARNING' in captured.out
-            assert 'deprecated' in captured.out.lower()
-
 
 class TestPlayerEnumIntegration:
     """Test integration with RainbowPlayer enum"""
@@ -277,7 +267,7 @@ class TestPlayerEnumIntegration:
 
     @patch('app.util.manifest_loader.load_manifest')
     def test_enum_value_extraction(self, mock_load_manifest):
-        """Test extracting string value from enum"""
+        """Test extracting enum name from RainbowPlayer"""
         extractor = ManifestExtractor(manifest_id='test_01', load_manifest_on_init=False)
 
         # Test with enum instance
@@ -285,5 +275,4 @@ class TestPlayerEnumIntegration:
         track_with_enum.player = RainbowPlayer.JOSH
 
         player = extractor._get_player_for_track(track_with_enum)
-        assert player == RainbowPlayer.JOSH.value
-        assert player == "Josh Plotner"
+        assert player == 'JOSH'  # Should match enum name

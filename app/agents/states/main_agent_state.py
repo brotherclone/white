@@ -1,5 +1,5 @@
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.structures.manifests.song_proposal import SongProposal
 
@@ -28,5 +28,4 @@ class MainAgentState(BaseModel):
         "resume_instructions": "How to resume after completion"
     }
     """
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
