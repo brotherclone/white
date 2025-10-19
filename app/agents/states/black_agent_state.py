@@ -27,6 +27,8 @@ class BlackAgentState(BaseRainbowAgentState):
     human_instructions: Optional[str] = ""
     pending_human_tasks: List[Dict[str, Any]] = Field(default_factory=list)
     awaiting_human_action: bool = False
+    should_update_proposal_with_evp: bool = False
+    should_update_proposal_with_sigil: bool = False
 
     def __init__(self, **data):
         super().__init__(**data)
