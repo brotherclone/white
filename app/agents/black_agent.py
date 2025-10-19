@@ -1,4 +1,5 @@
 import os
+import random
 import uuid
 import yaml
 import logging
@@ -6,6 +7,7 @@ import logging
 from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
+from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
@@ -92,131 +94,56 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 interrupt_before=["await_human_action"]
             )
 
-        black_config = {"configurable": {"thread_id": f"{state.thread_id}"}}
-        #result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
+        black_config: RunnableConfig = {"configurable": {"thread_id": f"{state.thread_id}"}}
+        result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
         snapshot = self._compiled_workflow.get_state(black_config)
-
         if snapshot.next:
-            final_black_state = snapshot.values
-            state.workflow_paused = True
-            state.pause_reason = "Black Agent sigil charging required"
-            state.pending_human_action = {
-                "agent": "black",
-                "action": "sigil_charging",
-                "instructions": final_black_state.get("human_instructions", "Black Agent needs human input"),
-                "pending_tasks": final_black_state.get("pending_human_tasks", []),
-                "black_config": black_config,
-                "resume_instructions": """
-                After completing the ritual tasks:
-                1. Mark all Todoist tasks as complete
-                2. Call resume_black_agent_workflow(black_config) to continue
-                """
-            }
+            pass
         else:
-            final_black_state = snapshot.values
-            state.song_proposals = SongProposal(**final_black_state["song_proposals"])  # ← Add this
-            if final_black_state.get("counter_proposal"):
-                state.song_proposals.iterations.append(final_black_state["counter_proposal"])
-
+            state.song_proposals = result.get("song_proposals") or state.song_proposals
+            if result.get("counter_proposal"):
+                state.song_proposals.iterations.append(result["counter_proposal"])
         return state
 
-    def route_after_spec(self, state: BlackAgentState) -> str:
-        """
-        Routing function (NOT a node!) - returns next node name as string.
-        Used in add_conditional_edges.
-
-        Logic:
-        1. If awaiting human action -> pause workflow
-        2. If no sigil yet -> generate sigil
-        3. If no EVP yet -> generate EVP
-        4. If have both artifacts -> finalize
-        5. Otherwise -> done
-        """
-        has_sigil = any(getattr(a, 'type', None) == "sigil" for a in state.artifacts)
-        has_evp = any(getattr(a, 'type', None) == "evp" for a in state.artifacts)
-
-        # Priority 1: If waiting for human, go to await node
-        if state.awaiting_human_action:
-            return "await_human"
-
-        # Priority 2: Generate missing artifacts
-        if not has_sigil:
-            return "need_sigil"
-        if not has_evp:
-            return "need_evp"
-
-        # Priority 3: Have all artifacts, finalize
-        if has_sigil and has_evp and not state.counter_proposal:
-            return "ready_for_proposal"
-
-        # Priority 4: Everything done
-        return "done"
-
     def create_graph(self) -> StateGraph:
-        """Create the BlackAgent's internal workflow graph"""
+        """
+        Create the BlackAgent's internal workflow graph
+        1. The black agent calls the llm to generate a counter-proposal
+        2. The black agent generates an EVP artifact
+        3. The black agent evaluates the EVP artifact for potential insights, if any go to 4 if none skip to 6
+        4. Using the EVP insights, the Black agent adjusts the counter-proposal to reflect the insights
+        5. The black agent returns the counter-proposal to the White Agent
+        6. The black agent may generate a sigil artifact to accompany the counter-proposal
+        7. The black agent creates a Todoist task for the human to charge the sigil
+        8. The black agent pauses the workflow, awaiting human action
+        9. Once the human completes the task, the black agent resumes
+        10. The black agent updates the counter-proposal to reflect the charged sigil if need be then goto 5.
+
+        """
 
         black_workflow = StateGraph(BlackAgentState)
 
-        # Add nodes (these MUST return updated state)
         black_workflow.add_node("generate_alternate_song_spec", self.generate_alternate_song_spec)
-        black_workflow.add_node("generate_sigil", self.generate_sigil)
         black_workflow.add_node("generate_evp", self.generate_evp)
+        black_workflow.add_node("evaluate_evp", self.evaluate_evp)
+        black_workflow.add_node("update_alternate_song_spec_with_evp", self.update_alternate_song_spec_with_evp)
+        black_workflow.add_node("generate_sigil", self.generate_sigil)
         black_workflow.add_node("await_human_action", self.await_human_action)
-        black_workflow.add_node("finalize_counter_proposal", self.finalize_counter_proposal)
+        black_workflow.add_node("update_alternate_song_spec_with_sigil", self.update_alternate_song_spec_with_sigil)
 
-        # Start with spec generation
         black_workflow.add_edge(START, "generate_alternate_song_spec")
-
-        # After initial spec, check what's needed
-        black_workflow.add_conditional_edges(
-            "generate_alternate_song_spec",
-            self.route_after_spec,
-            {
-                "need_sigil": "generate_sigil",
-                "need_evp": "generate_evp",
-                "await_human": "await_human_action",
-                "ready_for_proposal": "finalize_counter_proposal",
-                "done": END
-            }
-        )
-
-        # After generating sigil, check if we need EVP or should wait for human
-        black_workflow.add_conditional_edges(
-            "generate_sigil",
-            self.route_after_spec,
-            {
-                "need_sigil": END,  # Should never happen - prevent loop
-                "need_evp": "generate_evp",
-                "await_human": "await_human_action",
-                "ready_for_proposal": "finalize_counter_proposal",
-                "done": END
-            }
-        )
-
-        # After generating EVP, check if we need sigil or should finalize
-        black_workflow.add_conditional_edges(
-            "generate_evp",
-            self.route_after_spec,
-            {
-                "need_sigil": "generate_sigil",
-                "need_evp": END,  # Should never happen - prevent loop
-                "await_human": "await_human_action",
-                "ready_for_proposal": "finalize_counter_proposal",
-                "done": END
-            }
-        )
-
-        # Human action interrupts here, then finalizes when resumed
-        black_workflow.add_edge("await_human_action", "finalize_counter_proposal")
-
-        # Finalize and end
-        black_workflow.add_edge("finalize_counter_proposal", END)
+        black_workflow.add_edge("generate_alternate_song_spec", "generate_evp")
+        black_workflow.add_edge("generate_evp", "evaluate_evp")
+        black_workflow.add_edge("update_alternate_song_spec_with_evp", END)
+        black_workflow.add_edge("generate_sigil", "await_human_action")
+        black_workflow.add_edge("await_human_action", "update_alternate_song_spec_with_sigil")
+        black_workflow.add_edge("update_alternate_song_spec_with_sigil", END)
 
         return black_workflow
 
     def generate_alternate_song_spec(self, state: BlackAgentState) -> BlackAgentState:
 
-        """Generate initial counter-proposal or iterate on existing one"""
+        """Generate an initial counter-proposal"""
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
@@ -240,7 +167,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         Current song proposal:
         {state.white_proposal}
 
-        Reference works in this artist's style:
+        Reference works in this artist's style paying close attention to 'concept' property:
         {get_my_reference_proposals('Z')}
 
         Create a counter-proposal that enhances the artistic and thematic depth of this song.
@@ -280,7 +207,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
     @skip_chance(0.75)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
 
-        """Generate a sigil artifact and create Todoist task for charging"""
+        """Generate a sigil artifact and create a Todoist task for charging"""
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
@@ -388,7 +315,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_evp_artifact_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
             evp_artifact = EVPArtifact(**data)
-            evp_artifact.type = "evp"  # For routing
             state.artifacts.append(evp_artifact)
             return state
         current_proposal = state.counter_proposal
@@ -416,7 +342,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             audio_mosaic=mosaic,
             noise_blended_audio=blended,
             thread_id=state.thread_id,
-            type="evp"  # For routing
         )
         state.artifacts.append(evp_artifact)
         return state
@@ -431,71 +356,38 @@ class BlackAgent(BaseRainbowAgent, ABC):
         logging.info("⏸️  Workflow interrupted - awaiting human action on sigil charging")
 
         # This node just passes through - the interrupt happens BEFORE entering it
-        # When workflow is resumed, it will execute and move to next node
+        # When work flow is resumed, it will execute and move to the next node
 
         return state
 
-    def finalize_counter_proposal(self, state: BlackAgentState) -> BlackAgentState:
-        """
-        Create final counter-proposal incorporating sigil and EVP insights.
-        This runs AFTER human has charged the sigil.
-        """
 
-        current_proposal = state.counter_proposal
-        sigil = next((a for a in state.artifacts if getattr(a, 'type', None) == 'sigil'), None)
-        evp = next((a for a in state.artifacts if getattr(a, 'type', None) == 'evp'), None)
-        artifact_context = ""
-        if sigil:
-            artifact_context += f"\nCharged Sigil Wish: {sigil.wish}"
-            artifact_context += f"\nGlyph: {sigil.glyph_description}"
-        if evp:
-            transcript_text = evp.transcript.content if hasattr(evp.transcript, 'content') else str(evp.transcript)
-            artifact_context += f"\nEVP Transcript: {transcript_text}"
-
-        prompt = f"""
-        You are helping create a creative work of speculative fiction about artistic resistance.
-
-        In this narrative, a character creates symbolic art (sigils) as acts of creative defiance 
-        against oppressive systems. This is purely fictional world-building for an experimental 
-        music album concept.
-
-        For this song proposal, create a brief artistic intention statement (a "wish") that captures 
-        how the music could embody themes of liberation, authenticity, and resistance to control systems.
-
-        Song Proposal:
-        Title: {current_proposal.title}
-        Concept: {current_proposal.concept}
-        Mood: {', '.join(current_proposal.mood)}
-
-        Create a single-sentence artistic intention starting with "I will..." or "This song will..."
-
-        Examples:
-        - "I will encode frequencies that remind listeners of their autonomy"
-        - "This song will create space for authentic expression"
-        - "I will weave patterns that resist algorithmic prediction"
-
-        Focus on artistic and psychological liberation, not religious or occult content.
-        """
-
-        claude = self._get_claude()
-        proposer = claude.with_structured_output(SongProposalIteration)
-
-        try:
-            result = proposer.invoke(prompt)
-            if isinstance(result, dict):
-                result = self.normalize_song_proposal_data(result)
-                counter_proposal = SongProposalIteration(**result)
+    def evaluate_evp(self, state: BlackAgentState) -> BlackAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            roll = random.choice([0, 1])
+            if roll:
+               return self.update_alternate_song_spec_with_evp(state)
             else:
-                counter_proposal = result
-        except Exception as e:
-            logging.error(f"Failed to create final counter-proposal: {e}")
-            # Use the current proposal as fallback
-            counter_proposal = current_proposal
-
-        state.counter_proposal = counter_proposal
-        state.awaiting_human_action = False  # Done with human tasks
-
-        logging.info(f"✓ Finalized counter-proposal: {counter_proposal.title}")
-
+                return self.generate_sigil(state)
         return state
 
+    @staticmethod
+    def update_alternate_song_spec_with_evp(state: BlackAgentState) -> BlackAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_sigil_artifact_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+            return state
+        return state
+
+    @staticmethod
+    def update_alternate_song_spec_with_sigil(state: BlackAgentState) -> BlackAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_evp_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+            sigil_artifact = SigilArtifact(**data)
+            state.artifacts.append(sigil_artifact)
+            state.awaiting_human_action = True
+            return state
+        return state

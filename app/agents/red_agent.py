@@ -24,8 +24,7 @@ logging.basicConfig(level=logging.INFO)
 
 class RedAgent(BaseRainbowAgent, ABC):
 
-    """The Red Agent is the Light Reader. It specializes in generating convoluted literature and contributing
-     to the creation of complex narratives."""
+    """The Light Reader."""
 
     def __init__(self, **data):
         if 'settings' not in data or data['settings'] is None:
@@ -36,7 +35,6 @@ class RedAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
 
-        super().__init__(**data)
         self.llm = ChatAnthropic(
             temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
@@ -45,7 +43,15 @@ class RedAgent(BaseRainbowAgent, ABC):
             timeout=self.settings.timeout,
             stop=self.settings.stop
         )
-        self.state_graph = RedAgentState()
+        self.state_graph = RedAgentState(
+            thread_id=f"red_thread_{uuid.uuid4()}",
+            song_proposals=None,
+            black_to_white_proposal=None,
+            counter_proposal=None,
+            artifacts=[],
+            pending_human_tasks=[],
+            awaiting_human_action=False
+        )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
 
@@ -53,12 +59,10 @@ class RedAgent(BaseRainbowAgent, ABC):
         current_proposal = state.song_proposals.iterations[-1]
 
         red_agent_state = RedAgentState(
-            white_proposal=current_proposal,
+            black_to_white_proposal=current_proposal,
             song_proposals=state.song_proposals,
             thread_id=state.thread_id,
             artifacts=[],
-            pending_human_tasks=[],
-            awaiting_human_action=False
         )
         if not hasattr(self, '_compiled_workflow'):
             self._compiled_workflow = self.create_graph().compile(

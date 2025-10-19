@@ -109,7 +109,7 @@ class WhiteAgent(BaseModel):
             state: MainAgentState
     ) -> MainAgentState:
         """
-        Resume White Agent workflow after Black Agent's ritual tasks are complete.
+        Resume the White Agent workflow after Black Agent's ritual tasks are complete.
         This should be called after human marks Todoist tasks complete.
 
         Returns:
@@ -177,9 +177,6 @@ class WhiteAgent(BaseModel):
         claude = self._get_claude_supervisor()
         proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            # Pass both specific iteration AND full history
-            # Black needs white_proposal to know what to respond to
-            # Black needs song_proposals to reference earlier ideas
             initial_proposal = proposer.invoke(prompt)
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
