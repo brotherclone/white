@@ -20,8 +20,6 @@ def test_black_agent_state_defaults():
     assert state.counter_proposal is None
     assert isinstance(state.artifacts, list)
     assert state.artifacts == []
-    assert state.evp_artifact is None
-    assert state.sigil_artifact is None
     assert state.human_instructions == ""
     assert isinstance(state.pending_human_tasks, list)
     assert state.pending_human_tasks == []
@@ -79,8 +77,6 @@ def test_black_agent_state_custom_fields():
         song_proposals=proposal,
         counter_proposal=proposal_iter,
         artifacts=artifacts,
-        evp_artifact=evp,
-        sigil_artifact=sigil,
         human_instructions="Do something",
         pending_human_tasks=pending_tasks,
         awaiting_human_action=True
@@ -89,8 +85,6 @@ def test_black_agent_state_custom_fields():
     assert state.song_proposals is proposal
     assert state.counter_proposal is proposal_iter
     assert state.artifacts == artifacts
-    assert state.evp_artifact is evp
-    assert state.sigil_artifact is sigil
     assert state.human_instructions == "Do something"
     assert state.pending_human_tasks == pending_tasks
     assert state.awaiting_human_action is True

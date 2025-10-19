@@ -24,8 +24,6 @@ class BlackAgentState(BaseRainbowAgentState):
     song_proposals: Optional[SongProposal] = None
     counter_proposal: Optional[SongProposalIteration] = None
     artifacts: List[Any] = Field(default_factory=list)
-    evp_artifact: Optional[EVPArtifact] = None
-    sigil_artifact: Optional[SigilArtifact] = None
     human_instructions: Optional[str] = ""
     pending_human_tasks: List[Dict[str, Any]] = Field(default_factory=list)
     awaiting_human_action: bool = False

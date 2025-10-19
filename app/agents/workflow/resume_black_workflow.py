@@ -17,7 +17,7 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
         pending_tasks: List of task dictionaries with task_id
 
     Returns:
-        True if all tasks complete, False otherwise
+        True if all tasks are complete, False otherwise
     """
 
     try:
@@ -83,10 +83,10 @@ def resume_black_agent_workflow(
         Final state after workflow completion
 
     Example:
-        >>> # From main agent after human signals completion:
-        >>> black_config = state.pending_human_action['black_config']
-        >>> final_state = resume_black_agent_workflow(black_config)
-        >>> counter_proposal = final_state['counter_proposal']
+    From main agent after human signals completion:
+    black_config = state.pending_human_action['black_config']
+    final_state = resume_black_agent_workflow(black_config)
+    counter_proposal = final_state['counter_proposal']
     """
 
     # Recreate Black Agent (it's not serialized with the checkpoint)
