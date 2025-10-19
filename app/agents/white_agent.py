@@ -60,18 +60,35 @@ class WhiteAgent(BaseModel):
         check_points = InMemorySaver()
         workflow = StateGraph(MainAgentState)
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
+        workflow.add_node("choose_rainbow_agent", self.choose_rainbow_agent)
         workflow.add_node("invoke_black_agent", self.invoke_black_agent)
-        workflow.add_node("end", self.end)
+        workflow.add_node("invoke_red_agent", self.invoke_red_agent)
+        workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
+        workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
+        workflow.add_node("invoke_green_agent", self.invoke_green_agent)
+        workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
+        workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
+        workflow.add_node("invoke_violet_agent", self.invoke_violet_agent)
+        workflow.add_node("route_after_rainbow_agent", self.route_after_rainbow_agent)
+        workflow.add_node("evaluate_proposals", self.evaluate_proposals)
+        workflow.add_node("route_after_evaluating_proposals", self.route_after_evaluating_proposals)
+        workflow.add_node("create_integrated_proposal", self.create_integrated_proposal)
+        workflow.add_node("route_after_proposal_integration", self.route_after_rebracketing)
+        workflow.add_node("rebracket", self.rebracket)
+        workflow.add_node("route_after_rebracketing", self.route_after_rebracketing)
+
 
         workflow.add_edge(START, "initiate_song_proposal")
-        workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
-        workflow.add_edge("end", END)
+
+
+
+
+        #workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
+
 
         return workflow.compile(checkpointer=check_points)
 
-    def end(self):
-        print("White Agent workflow completed.")
-        pass
+
 
     def _get_claude_supervisor(self)-> ChatAnthropic:
         return ChatAnthropic(
@@ -200,6 +217,15 @@ class WhiteAgent(BaseModel):
         sp.iterations.append(initial_proposal)
         state.song_proposals = sp.model_dump()
         return state
+
+    def create_integrated_proposal(self):
+        pass
+
+    def rebracket(self):
+        pass
+
+    def evaluate_proposals(self):
+        pass
 
 
 if __name__ == "__main__":
