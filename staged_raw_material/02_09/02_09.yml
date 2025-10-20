@@ -1,0 +1,31 @@
+bpm: TK
+manifest_id: '02_09'
+tempo: TK
+key: TK
+rainbow_color: R
+title: A Dark Years History
+release_date: '2019-01-11'
+album_sequence: 9
+main_audio_file: 02_09_main.wav
+TRT: TK
+vocals: true
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: TK
+    description: TK
+mood:
+    - TK
+sounds_like:
+  - name: TK
+    discogs_id: TK
+genres:
+  - TK
+lrc_file: 02_09.lrc
+concept: TK
+audio_tracks:
+  - id: 1
+    description: TK
+    audio_file: TK
+    midi_file: TK

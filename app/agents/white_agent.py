@@ -60,35 +60,38 @@ class WhiteAgent(BaseModel):
         check_points = InMemorySaver()
         workflow = StateGraph(MainAgentState)
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
-        workflow.add_node("choose_rainbow_agent", self.choose_rainbow_agent)
         workflow.add_node("invoke_black_agent", self.invoke_black_agent)
+        workflow.add_node("process_black_agent_work", self.process_black_agent_work)
         workflow.add_node("invoke_red_agent", self.invoke_red_agent)
-        workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
-        workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
-        workflow.add_node("invoke_green_agent", self.invoke_green_agent)
-        workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
-        workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
-        workflow.add_node("invoke_violet_agent", self.invoke_violet_agent)
-        workflow.add_node("route_after_rainbow_agent", self.route_after_rainbow_agent)
-        workflow.add_node("evaluate_proposals", self.evaluate_proposals)
-        workflow.add_node("route_after_evaluating_proposals", self.route_after_evaluating_proposals)
-        workflow.add_node("create_integrated_proposal", self.create_integrated_proposal)
-        workflow.add_node("route_after_proposal_integration", self.route_after_rebracketing)
-        workflow.add_node("rebracket", self.rebracket)
-        workflow.add_node("route_after_rebracketing", self.route_after_rebracketing)
+        workflow.add_node("process_red_agent_work", self.process_red_agent_work)
+        # workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
+        # workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
+        # workflow.add_node("invoke_green_agent", self.invoke_green_agent)
+        # workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
+        # workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
+        # workflow.add_node("invoke_violet_agent", self.invoke_violet_agent)
+
 
 
         workflow.add_edge(START, "initiate_song_proposal")
+        workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
+        workflow.add_edge("invoke_black_agent", "process_black_agent_work")
+        workflow.add_conditional_edges(
+            "process_black_agent_work",
+            self.route_after_black,
+            {
+                "red": "invoke_red_agent",
+                "black": "invoke_black_agent",
+                "finish": END
+            }
+        )
+        workflow.add_edge("invoke_red_agent", "process_red_agent_work")
+        # Tmp
+        workflow.add_edge("process_red_agent_work", "finalize_song_proposal")
 
-
-
-
-        #workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
-
+        workflow.add_edge("finalize_song_proposal", END)
 
         return workflow.compile(checkpointer=check_points)
-
-
 
     def _get_claude_supervisor(self)-> ChatAnthropic:
         return ChatAnthropic(
@@ -117,9 +120,15 @@ class WhiteAgent(BaseModel):
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Black Agent to generate counter-proposal"""
-        black_agent = BlackAgent(settings=self.settings)
-        state = black_agent(state)
-        return state
+        if "black" not in self.agents:
+            self.agents["black"] = BlackAgent(settings=self.settings)
+        return self.agents["black"](state)
+
+    def invoke_red_agent(self, state: MainAgentState) -> MainAgentState:
+        """Invoke Red Agent with the first synthesized proposal from Black Agent"""
+        if "red" not in self.agents:
+            self.agents["red"] = BlackAgent(settings=self.settings)
+        return self.agents["red"](state)
 
     @staticmethod
     def resume_after_black_agent_ritual(
@@ -159,6 +168,7 @@ class WhiteAgent(BaseModel):
         state.pause_reason = None
         return state
 
+    # ToDo: Add 'lenses' for variation
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -218,14 +228,126 @@ class WhiteAgent(BaseModel):
         state.song_proposals = sp.model_dump()
         return state
 
-    def create_integrated_proposal(self):
-        pass
+    def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
 
-    def rebracket(self):
-        pass
 
-    def evaluate_proposals(self):
-        pass
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            # ToDo: Add mock data
+            pass
+
+        black_proposal = state.song_proposals.iterations[-1]
+        black_artifacts = state.artifacts or []
+        evp_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "evp"]
+        sigil_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "sigil"]
+
+        rebracketing_analysis = self._black_rebracketing_analysis(
+            black_proposal, evp_artifacts, sigil_artifacts
+        )
+        document_synthesis = self._synthesize_document_for_red(
+            rebracketing_analysis, black_proposal, black_artifacts
+        )
+        # ToDo: Modify state for these
+        state.rebracketing_analysis = rebracketing_analysis
+        state.document_synthesis = document_synthesis
+        state.ready_for_red = True
+
+        return state
+
+    def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
+        # ToDo: Add Red Agent work
+        return state
+
+    def _black_rebracketing_analysis(self, proposal, evp_artifacts, sigil_artifacts)-> str:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            # ToDo: Add mock data
+            pass
+
+        prompt = f"""
+            You are the White Agent performing a REBRACKETING operation.
+
+            You have received these artifacts from Black Agent:
+
+            **Counter-proposal:**
+            {proposal}
+
+            **EVP Transcript:** 
+            {evp_artifacts[0].transcript if evp_artifacts else "None"}
+
+            **Sigil Status:**
+            {sigil_artifacts[0].activation_state if sigil_artifacts else "None"}
+
+            **Your Task: REBRACKETING**
+
+            Black's content contains paradoxes and apparent contradictions.
+            Your job is to find alternative category boundaries that reveal hidden structure.
+
+            Questions to guide you:
+            - What patterns emerge when you parse this differently?
+            - What implicit frameworks are operating?
+            - Where can you draw new boundaries to make sense of chaos?
+            - What's the hidden coherence beneath the paradox?
+
+            Generate a rebracketed analysis that finds structure in Black's chaos.
+            Focus on revealing the underlying ORDER, not explaining away the paradox.
+            """
+
+        claude = self._get_claude()
+        response = claude.invoke(prompt)
+
+        return response.content
+
+    def _synthesize_document_for_red(self, rebracketed_analysis, black_proposal, artifacts):
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            # ToDo: Add mock data
+            pass
+
+        prompt = f"""
+            You are the White Agent creating a SYNTHESIZED DOCUMENT for Red Agent.
+
+            **Your Rebracketed Analysis:**
+            {rebracketed_analysis}
+
+            **Original Black Counter-Proposal:**
+            {black_proposal}
+
+            **Artifacts Present:**
+            {len(artifacts)} artifacts (EVP, sigil, etc.)
+
+            **Your Task: SYNTHESIS**
+
+            Create a coherent, actionable document that:
+            1. Preserves the insights from Black's chaos
+            2. Applies your rebracketed understanding
+            3. Creates clear creative direction
+            4. Can be understood by Red Agent (action-oriented, concrete)
+
+            This document will be the foundation for Red Agent's song proposals.
+            Make it practical while retaining the depth of insight.
+
+            Structure your synthesis as a clear creative brief.
+            """
+
+        claude = self._get_claude()
+        response = claude.invoke(prompt)
+
+        return response.content
+
+    @staticmethod
+    def route_after_black(state: MainAgentState) -> str:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            # ToDo: Add mock data
+            pass
+        # ToDo: Add checks for red, black, finish
+        if state.ready_for_red:
+            return "red"
+            # return "black"
+        return "finish"
+
+
 
 
 if __name__ == "__main__":

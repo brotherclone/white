@@ -1,0 +1,94 @@
+bpm: 113
+manifest_id: '02_07'
+tempo: 4/4
+key: F# minor
+rainbow_color: R
+title: End Timed Family
+release_date: '2019-01-11'
+album_sequence: 7
+main_audio_file: 02_07_main.wav
+TRT: '[02:50.007]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[01:20.175]'
+    description: Burbling modular synths slush in with a very slow drum beat.
+  - section_name: Shuffle
+    start_time: '[01:20.176]'
+    end_time: '[01:37.173]'
+    description: The music kicks into double time with giant synths and drums.
+  - section_name: Stretch
+    start_time: '[01:37.174]'
+    end_time: '[01:54.172]'
+    description: The music drops back down to a percolating rhythm with echoing synths.
+  - section_name: Verse 2
+    start_time: '[01:54.173]'
+    end_time: '[02:45.164]'
+    description: We return to the sluggish main part - vocals fall through to aux sends and bounce madly around the stereo field.
+  - section_name: Ring out
+    start_time: '[02:45.165]'
+    end_time: '[02:50.007]'
+    description: The music drops out leaving a lone synth behind.
+mood:
+    - surreal
+    - dreamy
+    - disturbing
+    - nightmarish
+sounds_like:
+  - name: Hood
+    discogs_id: 5047
+  - name: Oneohtrix Point Never
+    discogs_id: 1191704
+  - name: Throbbing Gristle
+    discogs_id: 12589
+genres:
+  - experimental
+  - noise pop
+  - post-rock
+  - art rock
+  - industrial rock
+lrc_file: 02_07.lrc
+concept: Since Light Reading was all about imagined books - I just had to do a cut up style lyric. I wandered around the house, randomly flipping open books and writing down fragments to form the lyrics of this song. The book that the song was based on was a Christain novel one of my dad's students wrote. He was a bit embarrassed of the dedication to the teacher who taught him how to write given the novel's subpar prose.
+audio_tracks:
+  - id: 1
+    description: Grandmother
+    audio_file: 02_07_03_grandmother.wav
+    midi_file: 02_07_02_grandmother.mid
+  - id: 2
+    description: NSynth
+    audio_file: 02_07_04_nsynth.wav
+  - id: 3
+    description: Vocals
+    audio_file: 02_07_05_vocals.wav
+  - id: 4
+    description: Microgran
+    audio_file: 02_07_06_microgran.wav
+  - id: 5
+    description: Mantis
+    audio_file: 02_07_07_mantis.wav
+  - id: 6
+    description: Mantis 2
+    audio_file: 02_07_08_mantis2.wav
+  - id: 7
+    description: Guitar
+    audio_file: 02_07_09_guitar.wav
+  - id: 8
+    description: Guitar 2
+    audio_file: 02_07_10_guitar2.wav
+  - id: 9
+    description: Guitar 3
+    audio_file: 02_07_11_guitar3.wav
+  - id: 10
+    description: Drum Machine
+    audio_file: 02_07_13_drum_machine.wav
+    midi_file: 02_07_12_drum_machine.mid
+  - id: 11
+    description: Drum Kit
+    audio_file: 02_07_15_drum_kit.wav
+    midi_file: 02_07_14_drum_kit.mid
+  - id: 12
+    description: Orchid Cargo Synth
+    audio_file: 02_07_17_orchid_cargo.wav
+    midi_file: 02_07_16_orchid_cargo.mid

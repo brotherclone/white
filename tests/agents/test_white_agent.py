@@ -22,16 +22,18 @@ def test_normalize_song_proposal(input_val, expected_type):
     result = WhiteAgent._normalize_song_proposal(input_val)
     assert isinstance(result, expected_type)
 
-@patch("app.agents.white_agent.BlackAgent")
-def test_invoke_black_agent(mock_black_agent):
+
+def test_invoke_black_agent():
     mock_state = MagicMock(spec=MainAgentState)
-    mock_black_instance = mock_black_agent.return_value
-    mock_black_instance.return_value = mock_state
+    mock_black_agent = MagicMock(return_value=mock_state)
+
     agent = WhiteAgent()
+    agent.agents["black"] = mock_black_agent  # Inject mock
+
     result = agent.invoke_black_agent(mock_state)
+
     assert result == mock_state
-    mock_black_agent.assert_called_with(settings=agent.settings)
-    mock_black_instance.assert_called_with(mock_state)
+    mock_black_agent.assert_called_once_with(mock_state)
 
 @patch("app.agents.white_agent.resume_black_agent_workflow")
 def test_resume_after_black_agent_ritual(mock_resume):
