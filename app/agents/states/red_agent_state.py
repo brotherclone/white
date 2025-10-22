@@ -13,6 +13,8 @@ class RedAgentState(BaseRainbowAgentState):
     song_proposals: Optional[SongProposal] = None
     counter_proposal: Optional[SongProposalIteration] = None
     artifacts: List[Any] = Field(default_factory=list)
+    should_respond_with_reaction_book: bool = False
+    reaction_level: int = 0
 
     def __init__(self, **data):
         super().__init__(**data)

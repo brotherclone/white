@@ -7,7 +7,7 @@ from langgraph.graph.state import CompiledStateGraph, StateGraph
 
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.states.indigo_agent_state import IndigoAgentState
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
 
 load_dotenv()
 

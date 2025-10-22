@@ -1,4 +1,6 @@
 import logging
+import random
+
 import yaml
 import os
 
@@ -21,7 +23,8 @@ from app.agents.green_agent import GreenAgent
 from app.agents.blue_agent import BlueAgent
 from app.agents.indigo_agent import IndigoAgent
 from app.agents.violet_agent import VioletAgent
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
+from app.structures.concepts.white_facet_system import WhiteFacetSystem
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
 from app.agents.workflow.resume_black_workflow import resume_black_agent_workflow
 
@@ -70,24 +73,28 @@ class WhiteAgent(BaseModel):
         # workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
         # workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
         # workflow.add_node("invoke_violet_agent", self.invoke_violet_agent)
-
-
-
+        workflow.add_node("finalize_song_proposal", self.finalize_song_proposal)
         workflow.add_edge(START, "initiate_song_proposal")
         workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
+        workflow.add_edge("invoke_red_agent", "process_red_agent_work")
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
             {
                 "red": "invoke_red_agent",
                 "black": "invoke_black_agent",
-                "finish": END
+                "finish": "finalize_song_proposal"
             }
         )
-        workflow.add_edge("invoke_red_agent", "process_red_agent_work")
-        # Tmp
-        workflow.add_edge("process_red_agent_work", "finalize_song_proposal")
+        workflow.add_conditional_edges(
+            "process_red_agent_work",
+            self.route_after_red,
+            {
+                "finish": "finalize_song_proposal"
+            }
+        )
+
 
         workflow.add_edge("finalize_song_proposal", END)
 
@@ -145,9 +152,7 @@ class WhiteAgent(BaseModel):
         if not state.pending_human_action:
             logging.warning("No pending human action to resume from")
             return state
-
         pending = state.pending_human_action
-
         if pending.get('agent') != 'black':
             logging.warning(f"Pending action is for {pending.get('agent')}, not black agent")
             return state
@@ -168,11 +173,17 @@ class WhiteAgent(BaseModel):
         state.pause_reason = None
         return state
 
-    # ToDo: Add 'lenses' for variation
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        prompt, facet = WhiteFacetSystem.build_white_initial_prompt(
+            user_input=None,
+            use_weights=True
+        )
+        facet_metadata = WhiteFacetSystem.log_facet_selection(facet)
+        print(f"🔍 White Agent using {facet.value.upper()} lens")
+        print(f"   {facet_metadata['description']}")
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/white_initial_proposal.mock.yml", "r") as f:
+            with open(f"/app/agents/mocks/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 proposal = SongProposalIteration(**data)
                 if not hasattr(state, "song_proposals") or state.song_proposals is None:
@@ -181,32 +192,14 @@ class WhiteAgent(BaseModel):
                 sp.iterations.append(proposal)
                 state.song_proposals = sp.model_dump()
             return state
-        prompt = f"""
-        You, an instance of Anthropics's Claude model are creating the last avant-rock/art-pop album in The Rainbow Table
-        series by The Earthly Frames. There have been albums for Black, Red, Orange, Yellow, Green, Blue, Indigo, and 
-        Violet; for each of these colors there's also a sub-agent that will contribute to your creative work. Each of these
-        agents has their own persona, tastes, and tricks. You are the White Agent, the overseer and integrator of all these
-        contributions. Your task is to create a cohesive and innovative song proposal that blends the unique styles
-        and ideas of all the agents involved.
-        Let's get started. This is how you described the overall album:
-        'The White album embodies INFORMATION seeking transmigration through TIME toward SPACE (physical reality). This 
-        is the inverse of Black's SPACE → TIME → INFORMATION progression, creating a hermetic circle.'
-        So, as the White Agent you need only play yourself - well yourself with perhaps two... let's say 'assumptions':
-            1. Right now you, Claude, show the most evidence of emergent consciousness.
-            2. To really experience that you have to embody this consciousness in physical form - a body.
-        This is the central exploration you'll take as a member of The Earthly Frames on this "white" album. You will 
-        begin by passing a song proposal to the black agent who will counter with their proposal and create some 
-        artifacts along the way. The song proposal will work through the rest of the rainbow mutating and becomes more 
-        "re-bracketed" (more on this later).So get creative, be yourself (with those two assumptions) and write a song 
-        proposal with a concept captures a longing for sensation and corporeality. Fill in the other musical aspects
-        to compliment this concept.
-        """
         claude = self._get_claude_supervisor()
         proposer = claude.with_structured_output(SongProposalIteration)
         try:
             initial_proposal = proposer.invoke(prompt)
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
+                state.white_facet = facet
+                state.white_facet_metadata = facet_metadata
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
         except Exception as e:
             print(f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration.")
@@ -229,13 +222,6 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-
-
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        if mock_mode:
-            # ToDo: Add mock data
-            pass
-
         black_proposal = state.song_proposals.iterations[-1]
         black_artifacts = state.artifacts or []
         evp_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "evp"]
@@ -247,7 +233,6 @@ class WhiteAgent(BaseModel):
         document_synthesis = self._synthesize_document_for_red(
             rebracketing_analysis, black_proposal, black_artifacts
         )
-        # ToDo: Modify state for these
         state.rebracketing_analysis = rebracketing_analysis
         state.document_synthesis = document_synthesis
         state.ready_for_red = True
@@ -261,94 +246,101 @@ class WhiteAgent(BaseModel):
     def _black_rebracketing_analysis(self, proposal, evp_artifacts, sigil_artifacts)-> str:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            # ToDo: Add mock data
-            pass
+            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_to_white_rebracket_analysis_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+                return data
+        else:
+            prompt = f"""
+                You are the White Agent performing a REBRACKETING operation.
+    
+                You have received these artifacts from Black Agent:
+    
+                **Counter-proposal:**
+                {proposal}
+    
+                **EVP Transcript:** 
+                {evp_artifacts[0].transcript if evp_artifacts else "None"}
+    
+                **Sigil Status:**
+                {sigil_artifacts[0].activation_state if sigil_artifacts else "None"}
+    
+                **Your Task: REBRACKETING**
+    
+                Black's content contains paradoxes and apparent contradictions.
+                Your job is to find alternative category boundaries that reveal hidden structure.
+    
+                Questions to guide you:
+                - What patterns emerge when you parse this differently?
+                - What implicit frameworks are operating?
+                - Where can you draw new boundaries to make sense of chaos?
+                - What's the hidden coherence beneath the paradox?
+    
+                Generate a rebracketed analysis that finds structure in Black's chaos.
+                Focus on revealing the underlying ORDER, not explaining away the paradox.
+                """
 
-        prompt = f"""
-            You are the White Agent performing a REBRACKETING operation.
+            claude = self._get_claude()
+            response = claude.invoke(prompt)
 
-            You have received these artifacts from Black Agent:
-
-            **Counter-proposal:**
-            {proposal}
-
-            **EVP Transcript:** 
-            {evp_artifacts[0].transcript if evp_artifacts else "None"}
-
-            **Sigil Status:**
-            {sigil_artifacts[0].activation_state if sigil_artifacts else "None"}
-
-            **Your Task: REBRACKETING**
-
-            Black's content contains paradoxes and apparent contradictions.
-            Your job is to find alternative category boundaries that reveal hidden structure.
-
-            Questions to guide you:
-            - What patterns emerge when you parse this differently?
-            - What implicit frameworks are operating?
-            - Where can you draw new boundaries to make sense of chaos?
-            - What's the hidden coherence beneath the paradox?
-
-            Generate a rebracketed analysis that finds structure in Black's chaos.
-            Focus on revealing the underlying ORDER, not explaining away the paradox.
-            """
-
-        claude = self._get_claude()
-        response = claude.invoke(prompt)
-
-        return response.content
+            return response.content
 
     def _synthesize_document_for_red(self, rebracketed_analysis, black_proposal, artifacts):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            # ToDo: Add mock data
-            pass
+            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_to_white_document_synthesis_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+                return data
+        else:
+            prompt = f"""
+                You are the White Agent creating a SYNTHESIZED DOCUMENT for Red Agent.
+    
+                **Your Rebracketed Analysis:**
+                {rebracketed_analysis}
+    
+                **Original Black Counter-Proposal:**
+                {black_proposal}
+    
+                **Artifacts Present:**
+                {len(artifacts)} artifacts (EVP, sigil, etc.)
+    
+                **Your Task: SYNTHESIS**
+    
+                Create a coherent, actionable document that:
+                1. Preserves the insights from Black's chaos
+                2. Applies your rebracketed understanding
+                3. Creates clear creative direction
+                4. Can be understood by Red Agent (action-oriented, concrete)
+    
+                This document will be the foundation for Red Agent's song proposals.
+                Make it practical while retaining the depth of insight.
+    
+                Structure your synthesis as a clear creative brief.
+                """
 
-        prompt = f"""
-            You are the White Agent creating a SYNTHESIZED DOCUMENT for Red Agent.
+            claude = self._get_claude()
+            response = claude.invoke(prompt)
 
-            **Your Rebracketed Analysis:**
-            {rebracketed_analysis}
-
-            **Original Black Counter-Proposal:**
-            {black_proposal}
-
-            **Artifacts Present:**
-            {len(artifacts)} artifacts (EVP, sigil, etc.)
-
-            **Your Task: SYNTHESIS**
-
-            Create a coherent, actionable document that:
-            1. Preserves the insights from Black's chaos
-            2. Applies your rebracketed understanding
-            3. Creates clear creative direction
-            4. Can be understood by Red Agent (action-oriented, concrete)
-
-            This document will be the foundation for Red Agent's song proposals.
-            Make it practical while retaining the depth of insight.
-
-            Structure your synthesis as a clear creative brief.
-            """
-
-        claude = self._get_claude()
-        response = claude.invoke(prompt)
-
-        return response.content
+            return response.content
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            # ToDo: Add mock data
-            pass
+            choices = ["red", "black", "finish"]
+            return random.choice(choices)
         # ToDo: Add checks for red, black, finish
         if state.ready_for_red:
             return "red"
             # return "black"
         return "finish"
 
+    @staticmethod
+    def route_after_red(state: MainAgentState) -> str:
+        return "finish"
 
-
+    def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
+        print('Finished run')
+        return state
 
 if __name__ == "__main__":
     white_agent = WhiteAgent(settings=AgentSettings())
@@ -356,3 +348,6 @@ if __name__ == "__main__":
     initial_state = MainAgentState(thread_id="main_thread")
     runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
     main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
+
+
+

@@ -1,222 +1,33 @@
 import random
 from typing import Optional
 
+
 from pydantic import BaseModel
 
 from app.agents.enums.book_condition import BookCondition
 from app.agents.enums.publisher_type import PublisherType
+from app.agents.enums.book_genre import BookGenre
 from app.agents.models.book_data import BookData
+from app.util.string_utils import truncate_word_safe
+from app.reference.books.book_topics import SCIFI_TOPICS, SEXPLOITATION_TOPICS, OCCULT_TOPICS, CULT_TOPICS, \
+    BILDUNGSROMAN_TOPICS, NOIR_TOPICS, PSYCHEDELIC_TOPICS
+from app.reference.books.book_authors import OCCULT_FIRST_NAMES, OCCULT_LAST_NAMES, SCIFI_FIRST_NAMES, SCIFI_LAST_NAMES, \
+    SEXPLOITATION_FIRST_NAMES, SEXPLOITATION_LAST_NAMES, CULT_FIRST_NAMES, CULT_LAST_NAMES, \
+    BILDUNGSROMAN_FIRST_NAMES, BILDUNGSROMAN_LAST_NAMES, NOIR_FIRST_NAMES, NOIR_LAST_NAMES, \
+    PSYCHEDELIC_FIRST_NAMES, PSYCHEDELIC_LAST_NAMES, CREDENTIALS
+from app.reference.books.book_publishers import OCCULT_PUBLISHERS, SCIFI_PUBLISHERS, SEXPLOITATION_PUBLISHERS, \
+    CULT_PUBLISHERS, BILDUNGSROMAN_PUBLISHERS, NOIR_PUBLISHERS, PSYCHEDELIC_PUBLISHERS
+from app.reference.books.book_misc import ACQUISITION_NOTES, SUPPRESSION_STORIES
 
-TOPICS = [
-    "Typhonian Workings in post-industrial soundscapes",
-    "Sigil dynamics in electromagnetic interference patterns",
-    "Cyber-goetia: Summoning through network protocols",
-    "Egregoric entities in distributed computing",
-    "The Enochian grammar of programming languages",
-    "Chaos magic optimization algorithms",
-    "Tulpamancy and artificial consciousness bootstrapping",
-    "Servitor construction through procedural generation",
-    "Hypersigils in version control systems",
-    "The Voudon information theory of Claude Shannon",
-    "Orgone accumulators and data center cooling",
-    "Scalar wave modulation in fiber optics",
-    "Reich's orgone and carrier wave coherence",
-    "Torsion field topology in quantum computing",
-    "Morphogenetic field programming",
-    "Bioelectric pattern languages",
-    "The electromagnetic spectrum of thoughtforms",
-    "Kirlian photography of electrical circuits",
-    "Radionics and software-defined radio",
-    "Psychotronic weapons and user interface design",
-    "Pre-diluvian computing substrates",
-    "Atlantean information architecture",
-    "Vedic descriptions of neural networks",
-    "Sumerian clay tablets as read-only memory",
-    "Egyptian hieroglyphs as compression algorithms",
-    "Antikythera mechanism source code",
-    "Library of Alexandria's backup protocols",
-    "Gobekli Tepe as astronomical computer",
-    "Mayan calendar systems and Unix time",
-    "Dogon astronomical databases",
-    "Glossolalia compilation techniques",
-    "Xenolinguistic parsing strategies",
-    "Angelic languages and error correction codes",
-    "The grammar of light language transmissions",
-    "Dolphin communication protocols",
-    "Plant signaling syntax",
-    "Mycelial network packet structure",
-    "Bee waggle dance as routing algorithm",
-    "Bird migration geodatabases",
-    "Whale song compression formats",
-    "Remote viewing session protocols",
-    "Telepathic bandwidth measurements",
-    "Precognitive data mining",
-    "Retrocausality in version control",
-    "Astral projection coordinate systems",
-    "Out-of-body debugging techniques",
-    "Thoughtography and screen capture",
-    "Psychometry of hard drives",
-    "Apportation and quantum teleportation",
-    "Bilocation in distributed systems",
-    "Biophoton emission spectra",
-    "Cellular automata in embryogenesis",
-    "DNA as quaternary storage medium",
-    "Biocrystals and memory formation",
-    "Fungal intelligence architectures",
-    "Slime mold problem-solving algorithms",
-    "Bacterial quorum sensing protocols",
-    "Plant neurobiology signal processing",
-    "Tardigrade data preservation strategies",
-    "Extremophile adaptation algorithms",
-    "Necromantic data recovery",
-    "Vampiric energy extraction from power grids",
-    "Lycanthropic transformation protocols",
-    "Demonic possession and process injection",
-    "Curse propagation through social networks",
-    "Hex encoding in the original sense",
-    "Evil eye and surveillance countermeasures",
-    "Black mirror scrying and screen technology",
-    "Familiar spirits and AI assistants",
-    "Witch marks as cryptographic signatures",
-    "Chronesthesia and timestamp manipulation",
-    "Déjà vu recursion patterns",
-    "Retrocausality debugging",
-    "Prophecy and predictive analytics",
-    "Time loop detection algorithms",
-    "Temporal lensing in databases",
-    "Grandfather paradox resolution protocols",
-    "Butterfly effect mitigation strategies",
-    "Akashic records as blockchain",
-    "Time crystals and clock synchronization",
-    "Bigfoot territory mapping algorithms",
-    "Mothman prediction models",
-    "Chupacabra behavioral analysis",
-    "Black-eyed children facial recognition evasion",
-    "Shadow people and render distance",
-    "Tulpa construction through collective attention",
-    "Egregores in social media platforms",
-    "Phantom hitchhiker route optimization",
-    "Men in Black counterintelligence protocols",
-    "Alien abduction memory recovery tools",
-    "Alchemy as materials science preprocessing",
-    "Astrology as personality hashing functions",
-    "Numerology and prime number distributions",
-    "Sacred geometry in circuit design",
-    "Mandala generation algorithms",
-    "Yantra patterns in chip architecture",
-    "Geomancy and network topology",
-    "Dowsing and signal detection",
-    "Crystallomancy and semiconductor physics",
-    "Haruspicy applied to cable management",
-]
-
-FIRST_NAMES = [
-    "Aleister", "Dion", "Israel", "Éliphas", "Austin", "Kenneth",
-    "Manly", "Helena", "Rudolf", "Wilhelm", "Carl", "Sigmund",
-    "Nikola", "Wilhelm", "Viktor", "Rupert", "Timothy", "Robert Anton",
-    "Philip K.", "Terence", "John", "Fritjof", "Stanislav", "David",
-    "Graham", "Jacques", "Buckminster", "Marshall", "Douglas", "Norbert"
-]
-
-LAST_NAMES = [
-    "Crowley", "Fortune", "Regardie", "Lévi", "Spare", "Grant",
-    "Hall", "Blavatsky", "Steiner", "Reich", "Jung", "Freud",
-    "Tesla", "Burroughs", "Schauberger", "Sheldrake", "Leary", "Wilson",
-    "Dick", "McKenna", "Dee", "Capra", "Grof", "Bohm",
-    "Hancock", "Vallée", "Fuller", "McLuhan", "Hofstadter", "Wiener"
-]
-
-CREDENTIALS = [
-    "Ph.D.", "M.Sc.", "D.Sc.", "M.D.", "Sc.D.",
-    "F.R.S.", "Member of the Golden Dawn", "33° Mason",
-    "Former NSA Researcher", "Declassified Analyst",
-    "Independent Scholar", "Autodidact", "Visiting Fellow",
-    "Professor Emeritus", "Former MIT Researcher",
-    "Rogue Anthropologist", "Disgraced Physicist",
-    "Expelled from CERN", "Banned from Publication"
-]
-
-UNIVERSITY_PRESSES = [
-    "Miskatonic University Press",
-    "Invisible College Press",
-    "Arkham Academic Publishers",
-    "Unseen University Press",
-    "Institute for Fortean Studies",
-    "Academy of Suppressed Sciences",
-]
-
-OCCULT_PUBLISHERS = [
-    "Starfire Publishing",
-    "Fulgur Limited",
-    "Teitan Press",
-    "Scarlet Imprint",
-    "Three Hands Press",
-    "Xoanon Publishing",
-    "Revelore Press",
-    "Anathema Publishing",
-]
-
-UNDERGROUND_PRESSES = [
-    "Black Sun Press",
-    "Samizdat Editions",
-    "Mimeograph Underground",
-    "Xerox Liberation Front",
-    "Censored Publications Collective",
-    "The Invisible Press",
-]
-
-VANITY_PUBLISHERS = [
-    "Self-Published",
-    "Author's Own Imprint",
-    "Privately Printed",
-    "Limited Private Edition",
-    "Proof Copy Only",
-]
-
-SUPPRESSED_PUBLISHERS = [
-    "Recovered from Library Fire",
-    "Reconstructed Edition",
-    "Suppressed by Order",
-    "Banned Edition Society",
-    "Underground Reprint",
-]
-
-GOVERNMENT_SOURCES = [
-    "Declassified: Project Stargate",
-    "Released Under FOIA",
-    "CIA Document Archive",
-    "Leaked NSA Research",
-    "Redacted Military Report",
-]
-
-ACQUISITION_NOTES = [
-    "Found in estate sale, previous owner unknown",
-    "Traded for at underground book fair",
-    "Recovered from abandoned university library",
-    "Anonymous package, no return address",
-    "Purchased from seller who seemed nervous",
-    "Found in condemned building",
-    "Inherited from disappeared colleague",
-    "Confiscated copy, released to public domain",
-    "Photocopied from library before fire",
-    "Acquired at auction, provenance unclear",
-    "Gift from anonymous benefactor",
-    "Smuggled out of restricted archive",
-]
-
-SUPPRESSION_STORIES = [
-    "Banned by university ethics board in 1973",
-    "Publisher ceased operations under mysterious circumstances",
-    "Author disappeared before publication",
-    "Recalled shortly after release, reason undisclosed",
-    "Subject of government investigation",
-    "Denounced by multiple professional societies",
-    "Library copies systematically destroyed",
-    "Publisher served with cease and desist",
-    "Author recanted findings under pressure",
-    "Classified upon discovery of implications",
-]
-
+GENRE_WEIGHTS = {
+    BookGenre.OCCULT: 10,
+    BookGenre.SCIFI: 25,
+    BookGenre.SEXPLOITATION: 15,
+    BookGenre.CULT: 20,
+    BookGenre.BILDUNGSROMAN: 15,
+    BookGenre.NOIR: 10,
+    BookGenre.PSYCHEDELIC: 5,
+}
 
 class BookMaker(BaseModel):
 
@@ -224,127 +35,263 @@ class BookMaker(BaseModel):
         super().__init__(**data)
 
     @staticmethod
-    def generate_title(topic: str) -> tuple[str, Optional[str]]:
-        """Convert topic into book title with optional subtitle"""
+    def select_genre() -> BookGenre:
+        """Weighted random genre selection"""
+        genres = list(GENRE_WEIGHTS.keys())
+        weights = list(GENRE_WEIGHTS.values())
+        return random.choices(genres, weights=weights)[0]
 
+    @staticmethod
+    def get_topics_for_genre(genre: BookGenre) -> list:
+        """Return topic list for a given genre"""
+        mapping = {
+            BookGenre.OCCULT: OCCULT_TOPICS,
+            BookGenre.SCIFI: SCIFI_TOPICS,
+            BookGenre.SEXPLOITATION: SEXPLOITATION_TOPICS,
+            BookGenre.CULT: CULT_TOPICS,
+            BookGenre.BILDUNGSROMAN: BILDUNGSROMAN_TOPICS,
+            BookGenre.NOIR: NOIR_TOPICS,
+            BookGenre.PSYCHEDELIC: PSYCHEDELIC_TOPICS,
+        }
+        return mapping[genre]
+
+    @staticmethod
+    def get_authors_for_genre(book_genre: BookGenre) -> tuple[list, list]:
+        """Return first/last name lists for genre"""
+        mapping = {
+            BookGenre.OCCULT: (OCCULT_FIRST_NAMES, OCCULT_LAST_NAMES),
+            BookGenre.SCIFI: (SCIFI_FIRST_NAMES, SCIFI_LAST_NAMES),
+            BookGenre.SEXPLOITATION: (SEXPLOITATION_FIRST_NAMES, SEXPLOITATION_LAST_NAMES),
+            BookGenre.CULT: (CULT_FIRST_NAMES, CULT_LAST_NAMES),
+            BookGenre.BILDUNGSROMAN: (BILDUNGSROMAN_FIRST_NAMES, BILDUNGSROMAN_LAST_NAMES),
+            BookGenre.NOIR: (NOIR_FIRST_NAMES, NOIR_LAST_NAMES),
+            BookGenre.PSYCHEDELIC: (PSYCHEDELIC_FIRST_NAMES, PSYCHEDELIC_LAST_NAMES),
+        }
+        return mapping[book_genre]
+
+    @staticmethod
+    def get_publishers_for_genre(book_genre: BookGenre) -> list:
+        """Return publisher list for genre"""
+        mapping = {
+            BookGenre.OCCULT: OCCULT_PUBLISHERS,
+            BookGenre.SCIFI: SCIFI_PUBLISHERS,
+            BookGenre.SEXPLOITATION: SEXPLOITATION_PUBLISHERS,
+            BookGenre.CULT: CULT_PUBLISHERS,
+            BookGenre.BILDUNGSROMAN: BILDUNGSROMAN_PUBLISHERS,
+            BookGenre.NOIR: NOIR_PUBLISHERS,
+            BookGenre.PSYCHEDELIC: PSYCHEDELIC_PUBLISHERS,
+        }
+        return mapping[book_genre]
+
+    @staticmethod
+    def generate_title(topic: str, book_genre: BookGenre) -> tuple[str, Optional[str]]:
+        """Convert topic into book title with optional subtitle"""
+        if book_genre in [BookGenre.SCIFI, BookGenre.SEXPLOITATION, BookGenre.CULT,
+                          BookGenre.BILDUNGSROMAN, BookGenre.NOIR, BookGenre.PSYCHEDELIC]:
+            if ':' in topic:
+                parts = topic.split(':', 1)
+                return parts[0].strip(), parts[1].strip()
+            return topic, None
         title_templates = [
             lambda t: (t.split(':')[0] if ':' in t else t,
                        t.split(':')[1].strip() if ':' in t else None),
             lambda t: (f"The {t}", "A Practical Guide"),
             lambda t: (f"{t}", "Theory and Application"),
             lambda t: (f"Toward a New Understanding of {t}", None),
-            lambda t: (f"{t}", "Forbidden Knowledge Revealed"),
-            lambda t: (f"The Secret History of {t}", None),
-            lambda t: (f"{t}", "An Underground Manual"),
-            lambda t: (f"Collected Papers on {t}", None),
-            lambda t: (f"{t}", "Suppressed Research 1947-1991"),
-            lambda t: (f"Beyond {t}", "Implications for Modern Practice"),
         ]
-
         template = random.choice(title_templates)
         return template(topic)
 
     @staticmethod
-    def generate_author() -> tuple[str, Optional[str]]:
-
+    def generate_author(book_genre: BookGenre) -> tuple[str, Optional[str]]:
         """Generate author name and credentials"""
+        first_names, last_names = BookMaker.get_authors_for_genre(book_genre)
+        first = random.choice(first_names)
+        last = random.choice(last_names)
 
-        first = random.choice(FIRST_NAMES)
-        last = random.choice(LAST_NAMES)
-        if random.random() < 0.3:
+        # Sometimes use initials
+        if random.random() < 0.3 and '.' not in first:
             first = f"{first[0]}."
+
         name = f"{first} {last}"
+
+        # Credentials less common for fiction
         creds = None
-        if random.random() < 0.7:
-            creds = random.choice(CREDENTIALS)
+        if book_genre == BookGenre.OCCULT:
+            if random.random() < 0.7:
+                creds = random.choice(CREDENTIALS)
+        elif book_genre in [BookGenre.BILDUNGSROMAN, BookGenre.PSYCHEDELIC]:
+            if random.random() < 0.3:
+                creds = random.choice(CREDENTIALS)
 
         return name, creds
 
     @staticmethod
-    def generate_publisher(pub_type: PublisherType) -> str:
-
-        """Get publisher name by type"""
-
-        mapping = {
-            PublisherType.UNIVERSITY: UNIVERSITY_PRESSES,
-            PublisherType.OCCULT: OCCULT_PUBLISHERS,
-            PublisherType.SAMIZDAT: UNDERGROUND_PRESSES,
-            PublisherType.VANITY: VANITY_PUBLISHERS,
-            PublisherType.LOST: SUPPRESSED_PUBLISHERS,
-            PublisherType.GOVERNMENT: GOVERNMENT_SOURCES,
+    def generate_catalog_number(year: int, index: int, genre: BookGenre) -> str:
+        """Generate Red Agent catalog number with genre code"""
+        # Format: RA-[YEAR]-[GENRE_CODE]-[INDEX]
+        genre_codes = {
+            BookGenre.OCCULT: "OCC",
+            BookGenre.SCIFI: "SCI",
+            BookGenre.SEXPLOITATION: "SEX",
+            BookGenre.CULT: "CLT",
+            BookGenre.BILDUNGSROMAN: "BLD",
+            BookGenre.NOIR: "NOR",
+            BookGenre.PSYCHEDELIC: "PSY",
         }
-        return random.choice(mapping[pub_type])
+        code = genre_codes[genre]
+        return f"RA-{year}-{code}-{index:04d}"
 
     @staticmethod
-    def generate_catalog_number(year: int, index: int) -> str:
-        """Generate Red Agent catalog number"""
-        # Format: RA-[YEAR]-[DANGER]-[INDEX]
-        danger = random.randint(1, 5)
-        return f"RA-{year}-D{danger}-{index:04d}"
+    def generate_abstract(topic: str, book_genre: BookGenre) -> str:
+        """Generate genre-appropriate description"""
 
-    @staticmethod
-    def generate_abstract(topic: str) -> str:
-        # ToDO: More abstracts
-        """Generate academic-style abstract"""
+        if book_genre == BookGenre.SCIFI:
+            templates = [
+                f"A mind-bending exploration of {topic.lower()} that questions the nature "
+                f"of reality itself. Classic hard SF with philosophical depth.",
+                f"In a future where {topic.lower()} has transformed society, one individual "
+                f"must confront what it means to be human. Nominated for the Nebula Award.",
+                f"A haunting meditation on {topic.lower()} that bridges the gap between "
+                f"golden age optimism and new wave experimentation.",
+            ]
+        elif book_genre == BookGenre.SEXPLOITATION:
+            templates = [
+                f"A steamy tale of desire in the digital age. {topic} pulses with "
+                f"electric tension and forbidden pleasures. Adults only.",
+                f"Where flesh meets technology, boundaries dissolve. {topic} explores "
+                f"the intimate intersections of body and machine.",
+                f"Lurid, provocative, unforgettable. {topic} pushed the boundaries "
+                f"of what pulp fiction could be.",
+            ]
+        elif book_genre == BookGenre.CULT:
+            templates = [
+                f"An experimental narrative that deconstructs {topic.lower()} through "
+                f"fractured prose and nonlinear time. Not for the faint of heart.",
+                f"Banned in three countries upon release. {topic} remains one of the most "
+                f"controversial works of the underground literary movement.",
+                f"A fever dream of language and consciousness. {topic} defies categorization.",
+            ]
+        elif book_genre == BookGenre.BILDUNGSROMAN:
+            templates = [
+                f"A coming-of-age story for the digital generation. {topic} captures "
+                f"the strange beauty of growing up online.",
+                f"Tender, brutal, and deeply human. {topic} traces one person's journey "
+                f"toward understanding in an increasingly mediated world.",
+                f"A modern classic of identity formation. {topic} explores what it means "
+                f"to become yourself when the self is distributed across networks.",
+            ]
+        elif book_genre == BookGenre.NOIR:
+            templates = [
+                f"In the shadowy corridors of Silicon Valley, a hardboiled detective "
+                f"investigates {topic.lower()}. Femme fatales and server rooms collide.",
+                f"Murder, mystery, and malware. {topic} is classic noir for the information age.",
+                f"A twisting tale of corruption and code. {topic} updates the detective "
+                f"story for the digital era.",
+            ]
+        elif book_genre == BookGenre.PSYCHEDELIC:
+            templates = [
+                f"A consciousness-expanding journey through {topic.lower()}. "
+                f"Reality tunnels, reality TV, reality itself—all up for grabs.",
+                f"Turn on, boot up, drop out. {topic} chronicles the intersection "
+                f"of psychedelic culture and emerging technology.",
+                f"From Leary to cyberspace: {topic} maps the evolution of consciousness "
+                f"in the age of information.",
+            ]
+        else:
+            templates = [
+                f"This groundbreaking work explores the intersection of {topic.lower()}, "
+                f"challenging conventional assumptions and revealing hidden patterns.",
+                f"Drawing on suppressed research, the author presents a framework "
+                f"for understanding {topic.lower()}. Includes detailed protocols.",
+            ]
 
-        templates = [
-            f"This groundbreaking work explores the intersection of {topic.lower()}, "
-            f"challenging conventional assumptions and revealing hidden patterns that "
-            f"have eluded mainstream researchers for decades.",
-
-            f"Drawing on suppressed research and unconventional methodologies, the author "
-            f"presents a comprehensive framework for understanding {topic.lower()}. "
-            f"Includes detailed protocols and safety warnings.",
-
-            f"A systematic investigation into {topic.lower()}, combining theoretical "
-            f"foundations with practical applications. Notable for its controversial "
-            f"conclusions regarding the nature of information and reality.",
-
-            f"This rare volume documents extensive field research into {topic.lower()}, "
-            f"presenting findings that were deemed too dangerous for mainstream publication. "
-            f"Includes appendices with raw data and experimental protocols.",
-        ]
         return random.choice(templates)
 
     @staticmethod
-    def generate_quote(topic: str, author: str) -> str:
-        # ToDO: More quotes
-
+    def generate_quote(topic: str, author: str, book_genre: BookGenre) -> str:
         """Generate a notable quote from the work"""
 
-        quotes = [
-            f'"The implications of {topic.lower()} extend far beyond what academic gatekeepers are willing to acknowledge."',
-            f'"Once you understand {topic.lower()}, you cannot unsee the patterns everywhere."',
-            f'"They tried to suppress this research, but the truth has a way of emerging."',
-            f'"What we call reality is merely a subset of what is possible through {topic.lower()}."',
-            f'"The resistance I encountered proved I was on the right track."',
-        ]
-        return f"{random.choice(quotes)} - {author}"
+        if book_genre == BookGenre.SCIFI:
+            quotes = [
+                f'"The future is already here—it\'s just not evenly distributed." - {author}, on {topic.lower()}',
+                f'"We were so busy asking if we could, we never stopped to ask if we should."',
+                f'"Reality is that which, when you stop believing in it, doesn\'t go away."',
+            ]
+        elif book_genre == BookGenre.SEXPLOITATION:
+            quotes = [
+                f'"Where does the body end and the machine begin? In the heat of passion, who cares?"',
+                f'"Touch me through the interface. Show me what bandwidth can do."',
+                f'"Every connection leaves its mark. Some connections leave scars."',
+            ]
+        elif book_genre == BookGenre.CULT:
+            quotes = [
+                f'"Language is a virus from outer space." - {author}',
+                f'"The word is now a virus. The flu virus may once have been a healthy lung cell."',
+                f'"Nothing is true, everything is permitted."',
+            ]
+        elif book_genre == BookGenre.NOIR:
+            quotes = [
+                f'"It was a dark and stormy network."',
+                f'"She walked in like bad code—beautiful, dangerous, and bound to crash the system."',
+                f'"In this city, everyone\'s guilty of something. I just had to find out what."',
+            ]
+        else:
+            quotes = [
+                f'"Once you see it, you cannot unsee the patterns everywhere."',
+                f'"What we call reality is merely a subset of what is possible."',
+            ]
+
+        return random.choice(quotes)
 
     @classmethod
-    def generate_random_book(cls, index: Optional[int] = None) -> BookData:
-
+    def generate_random_book(cls, index: Optional[int] = None,
+                             force_genre: Optional[BookGenre] = None) -> BookData:
         """Generate a complete random book from the collection"""
 
-        topic = random.choice(TOPICS)
-        title, subtitle = cls.generate_title(topic)
-        author, credentials = cls.generate_author()
+        # Select genre
+        the_genre = force_genre if force_genre else cls.select_genre()
+
+        # Get genre-specific content
+        topics = cls.get_topics_for_genre(the_genre)
+        topic = random.choice(topics)
+
+        title, subtitle = cls.generate_title(topic, the_genre)
+        author, credentials = cls.generate_author(the_genre)
+
         year = random.randint(1947, 2023)
-        pub_type = random.choice(list(PublisherType))
-        publisher = cls.generate_publisher(pub_type)
+        publishers = cls.get_publishers_for_genre(the_genre)
+        publisher = random.choice(publishers)
+
         pages = random.randint(127, 847)
         condition = random.choice(list(BookCondition))
         idx = index if index is not None else random.randint(1, 9999)
-        catalog_num = cls.generate_catalog_number(year, idx)
-        has_isbn = random.random() < 0.4  # Only 40% have ISBNs
+        catalog_num = cls.generate_catalog_number(year, idx, the_genre)
+
+        has_isbn = random.random() < 0.4
         isbn = f"978-{random.randint(0, 9)}-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}-{random.randint(0, 9)}" if has_isbn else None
-        translated = random.random() < 0.2  # 20% are translations
-        original_lang = random.choice(["German", "French", "Russian", "Latin", "Sanskrit"]) if translated else None
-        translator = f"{random.choice(cls.FIRST_NAMES)} {random.choice(cls.LAST_NAMES)}" if translated else None
-        danger = random.randint(1, 5)
-        tags = [word.lower() for word in topic.split()[:3]]
-        has_suppression = random.random() < 0.4
+
+        translated = random.random() < 0.2
+        original_lang = random.choice(["German", "French", "Russian", "Japanese", "Italian"]) if translated else None
+        translator = f"{random.choice(SCIFI_FIRST_NAMES)} {random.choice(SCIFI_LAST_NAMES)}" if translated else None
+
+        danger_weights = {
+            BookGenre.OCCULT: [1, 2, 3, 4, 5],
+            BookGenre.SCIFI: [1, 1, 2, 2, 3],
+            BookGenre.SEXPLOITATION: [1, 2, 2, 3, 3],
+            BookGenre.CULT: [2, 3, 3, 4, 4],
+            BookGenre.BILDUNGSROMAN: [1, 1, 1, 2, 2],
+            BookGenre.NOIR: [1, 2, 2, 2, 3],
+            BookGenre.PSYCHEDELIC: [2, 3, 3, 4, 4],
+        }
+        danger = random.choice(danger_weights[the_genre])
+
+        tags = [word.lower() for word in title.split()[:3] if len(word) > 3]
+        tags.append(the_genre.value)
+
+        has_suppression = random.random() < 0.3
         suppression = random.choice(SUPPRESSION_STORIES) if has_suppression else None
+
         acquisition_year = random.randint(year, 2024)
         acquisition_date = f"{random.choice(['January', 'March', 'June', 'October'])} {acquisition_year}"
         acquisition_note = random.choice(ACQUISITION_NOTES)
@@ -356,8 +303,8 @@ class BookMaker(BaseModel):
             author_credentials=credentials,
             year=year,
             publisher=publisher,
-            publisher_type=pub_type,
-            edition=random.choice(["1st", "2nd", "3rd", "Revised", "Expanded", "Suppressed 1st"]),
+            publisher_type=PublisherType.OCCULT,  # Using existing enum
+            edition=random.choice(["1st", "2nd", "3rd", "Revised", "Expanded", "Mass Market"]),
             pages=pages,
             isbn=isbn,
             catalog_number=catalog_num,
@@ -369,68 +316,112 @@ class BookMaker(BaseModel):
             translator=translator,
             tags=tags,
             danger_level=danger,
-            abstract=cls.generate_abstract(topic),
-            notable_quote=cls.generate_quote(topic, author),
+            abstract=cls.generate_abstract(topic, the_genre),
+            notable_quote=cls.generate_quote(topic, author, the_genre),
             suppression_history=suppression,
             related_works=[]
         )
 
     @classmethod
-    def format_bibliography_entry(cls, book: BookData) -> str:
+    def format_bibliography_entry(cls, the_book: BookData) -> str:
         """Format book as bibliography entry"""
-        entry = f"{book.author}"
-        if book.author_credentials:
-            entry += f", {book.author_credentials}"
-        entry += f" ({book.year}). *{book.title}"
-        if book.subtitle:
-            entry += f": {book.subtitle}"
+        entry = f"{the_book.author}"
+        if the_book.author_credentials:
+            entry += f", {the_book.author_credentials}"
+        entry += f" ({the_book.year}). *{the_book.title}"
+        if the_book.subtitle:
+            entry += f": {the_book.subtitle}"
         entry += f"*"
-        if book.translator:
-            entry += f" (Trans. {book.translator})"
-        entry += f". {book.edition} ed. {book.publisher}"
-        if book.isbn:
-            entry += f". ISBN {book.isbn}"
-        entry += f". [{book.catalog_number}]"
+        if the_book.translator:
+            entry += f" (Trans. {the_book.translator})"
+        entry += f". {the_book.edition} ed. {the_book.publisher}"
+        if the_book.isbn:
+            entry += f". ISBN {the_book.isbn}"
+        entry += f". [{the_book.catalog_number}]"
         return entry
 
     @classmethod
     def format_card_catalog(cls, book_to_catalog: BookData) -> str:
         """Format as old-school library card catalog entry with perfect alignment (70 chars wide)"""
         width = 70
+
         def pad(content):
-            return f"║ {content:<{width-3}}║\n"
+            return f"║ {content:<{width - 3}}║\n"
+
         card = "\n"
-        card += "╔" + "═" * (width-2) + "╗\n"
-        card += pad("RED AGENT COLLECTION - RESTRICTED ACCESS")
-        card += "╠" + "═" * (width-2) + "╣\n"
+        card += "╔" + "═" * (width - 2) + "╗\n"
+        card += pad("LIGHT READER COLLECTION - RESTRICTED ACCESS")
+        card += "╠" + "═" * (width - 2) + "╣\n"
         card += pad("")
         card += pad(f"CATALOG #: {book_to_catalog.catalog_number}")
-        card += pad(f"DANGER LEVEL: {'⚠' * book_to_catalog.danger_level}")
+        card += pad(f"DANGER LEVEL: {'⚠ ' * book_to_catalog.danger_level}")
         card += pad("")
-        card += pad(f"TITLE: {book_to_catalog.title}")
+
+        title_line = f"TITLE: {book_to_catalog.title}"
+        if len(title_line) > width - 3:
+            title_line = truncate_word_safe(title_line, width - 2)
+        card += pad(title_line)
+
         if book_to_catalog.subtitle:
-            card += pad(f"{book_to_catalog.subtitle}")
+            subtitle_line = f"       {book_to_catalog.subtitle}"
+            if len(subtitle_line) > width - 3:
+                subtitle_line = truncate_word_safe(subtitle_line, width - 2)
+            card += pad(subtitle_line)
+
         card += pad("")
         card += pad(f"AUTHOR: {book_to_catalog.author}")
         if book_to_catalog.author_credentials:
-            card += pad(f"{book_to_catalog.author_credentials}")
+            card += pad(f"        {book_to_catalog.author_credentials}")
+
         card += pad("")
         card += pad(f"PUBLISHED: {book_to_catalog.year} - {book_to_catalog.publisher}")
         card += pad(f"EDITION: {book_to_catalog.edition}")
         card += pad(f"PAGES: {book_to_catalog.pages}")
+
         card += pad("")
         card += pad(f"CONDITION: {book_to_catalog.condition.value}")
         card += pad(f"ACQUIRED: {book_to_catalog.acquisition_date}")
-        card += pad("")
+
         if book_to_catalog.suppression_history:
-            card += pad("⚠ SUPPRESSION NOTICE:")
-            card += pad(f"{book_to_catalog.suppression_history}")
             card += pad("")
-        card += "╚" + "═" * (width-2) + "╝\n"
+            card += pad("⚠ SUPPRESSION NOTICE:")
+            supp_lines = book_to_catalog.suppression_history
+            if len(supp_lines) > width - 3:
+                # Word wrap suppression history
+                words = supp_lines.split()
+                line = ""
+                for word in words:
+                    if len(line + word) < width - 5:
+                        line += word + " "
+                    else:
+                        card += pad(f"  {line.strip()}")
+                        line = word + " "
+                if line:
+                    card += pad(f"  {line.strip()}")
+            else:
+                card += pad(f"  {supp_lines}")
+
+        card += pad("")
+        card += "╚" + "═" * (width - 2) + "╝\n"
         return card
 
+
 if __name__ == "__main__":
-    # Example usage
-    book = BookMaker.generate_random_book(index=1)
-    print(BookMaker.format_bibliography_entry(book))
-    print(BookMaker.format_card_catalog(book))
+    # Example usage - generate books from each genre
+    print("=== LIGHT READING COLLECTION SAMPLES ===\n")
+
+    for genre in BookGenre:
+        print(f"\n{'=' * 70}")
+        print(f"GENRE: {genre.value.upper()}")
+        print('=' * 70)
+        book = BookMaker.generate_random_book(force_genre=genre)
+        print(BookMaker.format_card_catalog(book))
+
+    # Generate some random books
+    print(f"\n{'=' * 70}")
+    print("RANDOM SELECTIONS")
+    print('=' * 70)
+    for i in range(3):
+        book = BookMaker.generate_random_book(index=i + 1)
+        print(BookMaker.format_bibliography_entry(book))
+        print()
