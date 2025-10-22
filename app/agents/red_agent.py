@@ -13,7 +13,7 @@ from langgraph.graph import StateGraph
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.models.agent_settings import AgentSettings
 from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.red_agent_state import RedAgentState
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
@@ -49,41 +49,88 @@ class RedAgent(BaseRainbowAgent, ABC):
             black_to_white_proposal=None,
             counter_proposal=None,
             artifacts=[],
-            pending_human_tasks=[],
-            awaiting_human_action=False
+            should_respond_with_reaction_book=False,
+            reaction_level=0
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
 
         """Entry point when White Agent invokes Red Agent"""
-        current_proposal = state.song_proposals.iterations[-1]
 
-        red_agent_state = RedAgentState(
-            black_to_white_proposal=current_proposal,
-            song_proposals=state.song_proposals,
-            thread_id=state.thread_id,
-            artifacts=[],
-        )
-        if not hasattr(self, '_compiled_workflow'):
-            self._compiled_workflow = self.create_graph().compile(
-                checkpointer=MemorySaver(),
-                interrupt_before=["await_human_action"]
-            )
-        red_config = {"configurable": {"thread_id": f"{state.thread_id}"}}
-        snapshot = self._compiled_workflow.get_state(red_config)
-        if snapshot.next:
-            pass
-        else:
-            pass
         return state
 
     def create_graph(self) -> StateGraph:
+        """
+        1. Generate book
+        2. Generate a counterproposal based on the current book
+        3. Evaluate book and proposal
+        4. Route - write a reaction book then new proposal | new proposal | finish
+        :return:
+        """
+
+        red_workflow = StateGraph(RedAgentState)
+        red_workflow.add_node("generate_book", self.generate_book)
+        red_workflow.add_node("generate_alternate_song_spec", self.generate_alternate_song_spec)
+        red_workflow.add_node("evaluate_books_versus_proposals", self.evaluate_books_versus_proposals)
+        red_workflow.add_node("generate_reaction_book", self.generate_book)
+
+        red_workflow.add_edge(START, "generate_book")
+        red_workflow.add_edge("generate_book", "generate_alternate_song_spec")
+        red_workflow.add_edge("generate_alternate_song_spec", "evaluate_books_versus_proposals")
+        red_workflow.add_conditional_edges(
+            "evaluate_books_versus_proposals",
+            self.route_after_evaluate_books_versus_proposals,
+            {
+                "new_book": "generate_book",
+                "reaction_book": "generate_reaction_book",
+                "done": END
+            }
+        )
+        return red_workflow
 
 
-        graph = StateGraph(RedAgentState)
+    def generate_alternate_song_spec(self, state: RedAgentState) -> RedAgentState:
 
-        return graph
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
-
-    def generate_alternate_song_spec(self, agent_state: RedAgentState) -> RedAgentState:
+        if mock_mode:
+            with open("/Volumes/LucidNonsense/White/app/agents/mocks/red_counter_proposal_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+                counter_proposal = SongProposalIteration(**data)
+                state.counter_proposal = counter_proposal
+                return state
         raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
+
+    def generate_book(self, state: RedAgentState) -> RedAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+
+        if mock_mode:
+            pass
+        return state
+
+    def _generate_book_outline(self):
+        pass
+
+    def _generate_book_page(self):
+        pass
+
+    def generate_reaction_book(self, state: RedAgentState) -> RedAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+
+        if mock_mode:
+            pass
+        return state
+
+    def evaluate_books_versus_proposals(self, state: RedAgentState) -> RedAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+
+        if mock_mode:
+            pass
+        return state
+
+    def route_after_evaluate_books_versus_proposals(self, state: RedAgentState) -> str:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+
+        if mock_mode:
+            pass
+        return "done"

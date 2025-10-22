@@ -5,7 +5,7 @@ from langchain_anthropic import ChatAnthropic
 from langgraph.graph.state import  StateGraph
 
 from app.agents.base_rainbow_agent import BaseRainbowAgent
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.orange_rainbow_state import OrangeAgentState
 
 load_dotenv()

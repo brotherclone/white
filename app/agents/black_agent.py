@@ -19,7 +19,7 @@ from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.models.evp_artifact import EVPArtifact
 from app.agents.models.sigil_artifact import SigilArtifact
 from app.agents.states.black_agent_state import BlackAgentState
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
 from app.agents.tools.audio_tools import get_audio_segments_as_chain_artifacts, \
     create_audio_mosaic_chain_artifact, create_blended_audio_chain_artifact
 from app.agents.tools.magick_tools import SigilTools
@@ -35,11 +35,10 @@ from app.reference.mcp.todoist.main import (
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-
+# ToDo: Figure out of this can be moved
 def skip_chance(x):
     def decorator(f):
         return f
-
     return decorator
 
 
@@ -82,6 +81,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """Entry point when White Agent invokes Black Agent"""
 
         current_proposal = state.song_proposals.iterations[-1]
+        # ToDo: Why instantiate new BlackAgentState each time?
         black_state = BlackAgentState(
             white_proposal=current_proposal,
             song_proposals=state.song_proposals,
@@ -376,6 +376,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
         )
         state.artifacts.append(evp_artifact)
+        #ToDo: Save off as yml
         return state
 
     @staticmethod
@@ -508,7 +509,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
             sigil_counter_proposal = SongProposalIteration(**data)
             state.counter_proposal = sigil_counter_proposal
             return state
-        prompt = f"""
+        else:
+            # ToDo: Save off as yml
+            prompt = f"""
         You are helping a musician create a creative fiction song about an experimental musician 
         working in the experimental music space. You have just generated a sigil artifact and used a
         ToDoist task to have your human charge the sigil. Now, you need to update your song counter-proposal
@@ -560,17 +563,17 @@ class BlackAgent(BaseRainbowAgent, ABC):
         The counter-proposal and new updated counter-proposal should have the 'rainbow_color' property set to:
         {the_rainbow_table_colors['Z']}
         """
-        claude = self._get_claude()
-        proposer = claude.with_structured_output(SongProposalIteration)
-        try:
-            result = proposer.invoke(prompt)
-            if isinstance(result, dict):
-                result = self.normalize_song_proposal_data(result)
-                updated_proposal = SongProposalIteration(**result)
-                state.song_proposals.iterations.append(self.counter_proposal)
-                state.counter_proposal = updated_proposal
-                return state
-        except Exception as e:
-            logging.error(f"Anthropic model call failed: {e!s}")
+            claude = self._get_claude()
+            proposer = claude.with_structured_output(SongProposalIteration)
+            try:
+                result = proposer.invoke(prompt)
+                if isinstance(result, dict):
+                    result = self.normalize_song_proposal_data(result)
+                    updated_proposal = SongProposalIteration(**result)
+                    state.song_proposals.iterations.append(self.counter_proposal)
+                    state.counter_proposal = updated_proposal
+                    return state
+            except Exception as e:
+                logging.error(f"Anthropic model call failed: {e!s}")
 
-        return state
+            return state

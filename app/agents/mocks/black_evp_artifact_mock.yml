@@ -11,9 +11,9 @@ audio_segments:
         current_mode: 'None'
         transitory_mode: 'None'
         transcendental_mode: 'None'
-    base_path: "/mock/path"
-    artifact_path: "/mock/path/artifact.wav"
-    file_name: "artifact.wav"
+    base_path: "/Volumes/LucidNonsense/White/"
+    artifact_path: "app/agents/mocks/"
+    file_name: "mock.wav"
   - sample_rate: 1
     duration: 1.0
     channels: 1
@@ -26,9 +26,9 @@ audio_segments:
         current_mode: 'None'
         transitory_mode: 'None'
         transcendental_mode: 'None'
-    base_path: "/mock/path"
-    artifact_path: "/mock/path/artifact.wav"
-    file_name: "artifact.wav"
+    base_path: "/Volumes/LucidNonsense/White/"
+    artifact_path: "app/agents/mocks/"
+    file_name: "mock.wav"
 transcript:
   text_content: "This is a mock transcript for testing purposes."
   chain_artifact_file_type: 'md'
@@ -40,9 +40,9 @@ transcript:
       current_mode: 'None'
       transitory_mode: 'None'
       transcendental_mode: 'None'
-  base_path: "/mock/path"
-  artifact_path: "/mock/path/artifact.wav"
-  file_name: "artifact.wav"
+  base_path: "/Volumes/LucidNonsense/White/"
+  artifact_path: "app/agents/mocks/"
+  file_name: "mock.wav"
 audio_mosiac:
   sample_rate: 1
   duration: 1.0
@@ -56,9 +56,9 @@ audio_mosiac:
       current_mode: 'None'
       transitory_mode: 'None'
       transcendental_mode: 'None'
-  base_path: "/mock/path"
-  artifact_path: "/mock/path/artifact.wav"
-  file_name: "artifact.wav"
+  base_path: "/Volumes/LucidNonsense/White/"
+  artifact_path: "app/agents/mocks/"
+  file_name: "mock.wav"
 noise_blended_audio:
   sample_rate: 1
   duration: 1.0
@@ -72,8 +72,8 @@ noise_blended_audio:
       current_mode: 'None'
       transitory_mode: 'None'
       transcendental_mode: 'None'
-  base_path: "/mock/path"
-  artifact_path: "/mock/path/artifact.wav"
-  file_name: "artifact.wav"
+  base_path: "/Volumes/LucidNonsense/White/"
+  artifact_path: "app/agents/mocks/"
+  file_name: "mock.wav"
 chain_artifact_type: "BlackEVPArtifact"
 thread_id: 'MOCK-THREAD-ID-12345'

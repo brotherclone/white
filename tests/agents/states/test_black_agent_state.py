@@ -1,5 +1,3 @@
-import pytest
-
 from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.agents.models.audio_chain_artifact_file import AudioChainArtifactFile
 from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
@@ -24,6 +22,8 @@ def test_black_agent_state_defaults():
     assert isinstance(state.pending_human_tasks, list)
     assert state.pending_human_tasks == []
     assert state.awaiting_human_action is False
+    assert state.should_update_proposal_with_evp is False
+    assert state.should_update_proposal_with_sigil is False
 
 
 def test_black_agent_state_custom_fields():
@@ -68,7 +68,6 @@ def test_black_agent_state_custom_fields():
         glyph_description="A stylized glyph combining project initials",
         activation_state=SigilState.CREATED,
         charging_instructions="Charge during full moon",
-        files=[],
     )
     artifacts = [evp, sigil]
     pending_tasks = [{"task": "review"}]
@@ -79,7 +78,9 @@ def test_black_agent_state_custom_fields():
         artifacts=artifacts,
         human_instructions="Do something",
         pending_human_tasks=pending_tasks,
-        awaiting_human_action=True
+        awaiting_human_action=True,
+        should_update_proposal_with_evp=True,
+        should_update_proposal_with_sigil=True,
     )
     assert state.white_proposal is proposal_iter
     assert state.song_proposals is proposal
@@ -88,3 +89,5 @@ def test_black_agent_state_custom_fields():
     assert state.human_instructions == "Do something"
     assert state.pending_human_tasks == pending_tasks
     assert state.awaiting_human_action is True
+    assert state.should_update_proposal_with_evp is True
+    assert state.should_update_proposal_with_sigil is True

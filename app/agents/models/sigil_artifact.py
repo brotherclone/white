@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List
 from pydantic import Field
 
@@ -19,4 +18,3 @@ class SigilArtifact(ChainArtifact):
     activation_state: SigilState
     charging_instructions: str
     chain_artifact_type: str = "sigil"
-    files: list = Field(default_factory=list)

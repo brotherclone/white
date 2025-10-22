@@ -23,7 +23,7 @@ sounds_like:
 genres:
   - TK
 lrc_file: 02_09.lrc
-concept: TK
+concept: The book that the song was based on was a Christian novel one of my dad's students wrote. He was a bit embarrassed of the dedication to the teacher who taught him how to write given the novel's subpar prose.
 audio_tracks:
   - id: 1
     description: TK
