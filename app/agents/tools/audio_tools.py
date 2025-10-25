@@ -22,7 +22,6 @@ load_dotenv()
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 
-
 def generate_speech_like_noise(duration_seconds: float, sample_rate: int = 44100) -> bytes:
     samples = int(duration_seconds * sample_rate)
     t = np.linspace(0, duration_seconds, samples)
@@ -47,7 +46,6 @@ def generate_speech_like_noise(duration_seconds: float, sample_rate: int = 44100
     speech_like *= envelope
     speech_like = np.clip(speech_like / np.max(np.abs(speech_like)), -1.0, 1.0)
     return (speech_like * 32767).astype(np.int16).tobytes()
-
 
 def generate_noise(duration_seconds: float, noise_type: NoiseType,
                    mix_level: float = 0.25, sample_rate: int = 44100,
@@ -76,13 +74,11 @@ def generate_noise(duration_seconds: float, noise_type: NoiseType,
     filtered_noise *= mix_level
     return (filtered_noise * 32767).astype(np.int16).tobytes()
 
-
 def pitch_shift_audio_bytes(input_audio: bytes, cents: float = 50, sample_rate: int = 44100) -> bytes:
     audio_array = np.frombuffer(input_audio, dtype=np.int16).astype(np.float32) / 32767.0
     shifted_audio = librosa.effects.pitch_shift(audio_array, sr=sample_rate, n_steps=cents / 100.0)
     shifted_audio = np.clip(shifted_audio, -1.0, 1.0)
     return (shifted_audio * 32767).astype(np.int16).tobytes()
-
 
 def micro_stutter_audio_bytes(input_audio: bytes, stutter_probability: float = 0.1,
                               stutter_length_ms: int = 50, sample_rate: int = 44100) -> bytes:
@@ -97,7 +93,6 @@ def micro_stutter_audio_bytes(input_audio: bytes, stutter_probability: float = 0
             start_idx = np.random.randint(0, len(window) - stutter_samples)
             output_audio.extend(window[start_idx:start_idx + stutter_samples])
     return np.array(output_audio, dtype=np.int16).tobytes()
-
 
 def gate_audio_bytes(wav_bytes: bytes,
                      start_sec: float | None = None,
@@ -141,34 +136,25 @@ def gate_audio_bytes(wav_bytes: bytes,
         start_sec = start_sec if start_sec is not None else random.uniform(0.0, max_start)
         end_sec = start_sec + gate_dur_sec if end_sec is None else end_sec
 
-    # If explicit window not provided, return original bytes
+    # If an explicit window not provided, return original bytes
     if start_sec is None or end_sec is None:
         return wav_bytes
-
-    # Compute sample indices and clamp
     start_idx = max(0, int(round(start_sec * file_sr)))
     end_idx = max(0, int(round(end_sec * file_sr)))
     end_idx = min(end_idx, data.shape[0])
-
-    # Ensure we have a writable array before assignment
     data = data.copy()
-
     # Zero the slice (handle mono or multi-channel)
     if data.ndim == 1:
         data[start_idx:end_idx] = 0.0
     else:
         data[start_idx:end_idx, :] = 0.0
-
-    # Write back to bytes in same format as input
     if had_wav:
         out_buf = io.BytesIO()
         sf.write(out_buf, data, file_sr, format="WAV")
         return out_buf.getvalue()
     else:
-        # convert back to int16 PCM raw bytes
         int_data = np.clip(data, -1.0, 1.0)
         return (int_data * 32767).astype(np.int16).tobytes()
-
 
 def bit_crush_audio_bytes(input_audio: bytes, intensity: float = 0.5) -> bytes:
     original_bits = 16
@@ -181,7 +167,6 @@ def bit_crush_audio_bytes(input_audio: bytes, intensity: float = 0.5) -> bytes:
     audio_crushed = np.round(audio_array.astype(np.float32) / 32767.0 * max_val)
     audio_crushed = np.clip(audio_crushed, min_val, max_val)
     return (audio_crushed / max_val * 32767.0).astype(np.int16).tobytes()
-
 
 def apply_speech_hallucination_processing(input_audio: bytes,
                                           hallucination_intensity: float = 0.5,
@@ -230,12 +215,10 @@ def find_wav_files(root_dir: str, prefix: str | None) -> List[str]:
         if file_name.lower().endswith('.wav') and (prefix is None or file_name.startswith(prefix))
     ]
 
-
 def extract_non_silent_segments(audio: np.ndarray, sr: int, min_duration: float, top_db: int = 30) -> List[np.ndarray]:
     intervals = librosa.effects.split(audio, top_db=top_db)
     min_samples = int(min_duration * sr)
     return [audio[start:end] for start, end in intervals if end - start >= min_samples]
-
 
 def select_random_segment_audio(root_dir: str, min_duration: float, num_segments: int, output_dir: str) -> None:
     wav_files = find_wav_files(root_dir, None)
@@ -279,11 +262,10 @@ def select_random_segment_audio(root_dir: str, min_duration: float, num_segments
                 logging.error(f"Failed to write `{out_path}`: {e}")
     logging.info(f"Extracted {written} segments to `{output_dir}`.")
 
-
 def get_audio_segments_as_chain_artifacts(min_duration: float,
                                           num_segments: int,
                                           rainbow_color: RainbowTableColor,
-                                          thread_id: str = "t") -> list:
+                                          thread_id: str | None = None) -> list:
     wav_files = find_wav_files(os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix)
     random.shuffle(wav_files)
     all_segments = []
@@ -302,12 +284,12 @@ def get_audio_segments_as_chain_artifacts(min_duration: float,
     selected = all_segments[:num_segments]
     artifacts = []
     for idx, (seg, sr, wav_path) in enumerate(selected, start=1):
-        file_name = f"{thread_id}_segment_{idx}.wav"
         artifact = AudioChainArtifactFile(
+            thread_id=thread_id,
+            artifact_name=f"segment_{idx}.wav",
             base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
             rainbow_color=rainbow_color,
             chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-            file_name=file_name,
             artifact_path=wav_path,
             duration=len(seg) / sr,
             sample_rate=sr,
@@ -355,78 +337,78 @@ def create_random_audio_mosaic(root_dir: str, slice_duration_ms: int, target_len
 
 
 def create_audio_mosaic_chain_artifact(segments: List[AudioChainArtifactFile],
-                                      slice_duration_ms: int,
-                                      target_length_sec: int | float,
-                                      thread_id: str = "t") -> AudioChainArtifactFile | None:
-    if not segments:
-        raise ValueError("`segments` must contain at least one AudioChainArtifactFile")
-    wav_files = [seg.get_artifact_path() for seg in segments if os.path.exists(seg.get_artifact_path())]
-    if not wav_files:
-        raise FileNotFoundError("No segment files found.")
-    sample_rate = segments[0].sample_rate or librosa.get_samplerate(wav_files[0])
-    slice_samples = int(slice_duration_ms / 1000 * sample_rate)
-    target_samples = int(target_length_sec * sample_rate)
-    random.shuffle(wav_files)
-    collected_segments = []
-    total_samples = 0
-    while total_samples < target_samples and wav_files:
-        wav_path = random.choice(wav_files)
-        audio, sr = librosa.load(wav_path, sr=sample_rate)
-        if len(audio) < slice_samples:
-            continue
-        start = random.randint(0, len(audio) - slice_samples)
-        collected_segments.append(audio[start:start + slice_samples])
-        total_samples += slice_samples
-    if not collected_segments:
-        logging.info("No suitable slices could be extracted to build a mosaic")
-        return None
-    mosaic = np.concatenate(collected_segments)[:target_samples]
-    out_dir = os.path.join(os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "."), segments[0].rainbow_color.color_name, segments[0].chain_artifact_file_type.value)
-    os.makedirs(out_dir, exist_ok=True)
-    out_filename = f"{thread_id}_mosaic.wav"
-    out_path = os.path.join(out_dir, out_filename)
-    sf.write(out_path, mosaic, sample_rate, subtype='PCM_16')
-    logging.info(f"Writing audio mosaic to `{out_path}` (sr={sample_rate}, samples={len(mosaic)})")
-    artifact = AudioChainArtifactFile(
-        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-        rainbow_color=getattr(segments[0], "rainbow_color", the_rainbow_table_colors['Z']),
-        chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-        file_name=out_filename,
-        artifact_path=out_path,
-        duration=len(mosaic) / sample_rate,
-        sample_rate=sample_rate,
-        channels=1,
-        bit_depth=16
-    )
-    return artifact
+                                       slice_duration_ms: int,
+                                       target_length_sec: int | float,
+                                       thread_id: str | None = None) -> AudioChainArtifactFile | None:
+     if not segments:
+         raise ValueError("`segments` must contain at least one AudioChainArtifactFile")
+     wav_files = [seg.get_artifact_path() for seg in segments if os.path.exists(seg.get_artifact_path())]
+     if not wav_files:
+         raise FileNotFoundError("No segment files found.")
+     sample_rate = segments[0].sample_rate or librosa.get_samplerate(wav_files[0])
+     slice_samples = int(slice_duration_ms / 1000 * sample_rate)
+     target_samples = int(target_length_sec * sample_rate)
+     random.shuffle(wav_files)
+     collected_segments = []
+     total_samples = 0
+     while total_samples < target_samples and wav_files:
+         wav_path = random.choice(wav_files)
+         audio, sr = librosa.load(wav_path, sr=sample_rate)
+         if len(audio) < slice_samples:
+             continue
+         start = random.randint(0, len(audio) - slice_samples)
+         collected_segments.append(audio[start:start + slice_samples])
+         total_samples += slice_samples
+     if not collected_segments:
+         logging.info("No suitable slices could be extracted to build a mosaic")
+         return None
+     mosaic = np.concatenate(collected_segments)[:target_samples]
+     artifact = AudioChainArtifactFile(
+         thread_id=thread_id,
+         base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+         rainbow_color=getattr(segments[0], "rainbow_color", the_rainbow_table_colors['Z']),
+         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
+         artifact_name="mosiac",
+         duration=len(mosaic) / sample_rate,
+         sample_rate=sample_rate,
+         channels=1,
+         bit_depth=16
+     )
+     out_dir = artifact.get_artifact_path(False)
+     os.makedirs(out_dir, exist_ok=True)
+     out_path = os.path.join(out_dir, artifact.file_name)
+     sf.write(out_path, mosaic, sample_rate, subtype='PCM_16')
+     logging.info(f"Writing audio mosaic to `{out_path}` (sr={sample_rate}, samples={len(mosaic)})")
+     return artifact
 
-
-def blend_with_noise(input_path: str, blend: float, output_dir: str) -> str:
+def blend_with_noise(input_path: str, blend: float, blended_artifact: AudioChainArtifactFile):
     audio, sr = librosa.load(input_path, sr=None)
     duration_seconds = len(audio) / sr
     noise = np.frombuffer(generate_speech_like_noise(duration_seconds, sr), dtype=np.int16).astype(np.float32) / 32767.0
     if len(noise) != len(audio):
         noise = noise[:len(audio)] if len(noise) > len(audio) else np.pad(noise, (0, len(audio) - len(noise)), mode='constant')
-    blended = np.clip((1 - blend) * audio + blend * noise, -1.0, 1.0)
-    os.makedirs(output_dir, exist_ok=True)
-    out_path = os.path.join(output_dir, os.path.basename(input_path).replace('.wav', '_blended.wav'))
-    sf.write(out_path, blended, sr)
-    logging.info(f"Writing audio mosaic to `{out_path}` (sr={sr}, samples={len(blended)})")
-    return out_path
+    blended_audio = np.clip((1 - blend) * audio + blend * noise, -1.0, 1.0)
+    out_path = blended_artifact.get_artifact_path(True)
+    out_dir = os.path.dirname(out_path)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    # write as 16-bit PCM for consistency with other writers
+    sf.write(out_path, blended_audio, sr, subtype='PCM_16')
 
-
-def create_blended_audio_chain_artifact(mosaic: AudioChainArtifactFile, blend: float, thread_id: str = 't') -> AudioChainArtifactFile:
+def create_blended_audio_chain_artifact(mosaic: AudioChainArtifactFile, blend: float, thread_id: str) -> AudioChainArtifactFile:
     artifact = AudioChainArtifactFile(
+        thread_id=thread_id,
         base_path=mosaic.base_path,
         rainbow_color=mosaic.rainbow_color,
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-        file_name=f'{thread_id}_blended.wav',
-        artifact_path='',
+        artifact_name='blended',
         duration=mosaic.duration,
         sample_rate=mosaic.sample_rate,
         channels=mosaic.channels
     )
-    blend_with_noise(mosaic.get_artifact_path(with_file_name=True), blend, artifact.get_artifact_path(with_file_name=False))
+
+    blend_with_noise(mosaic.get_artifact_path(with_file_name=True), blend, artifact)
+    logging.info(f"Writing audio mosaic to `{artifact.get_artifact_path(True)}` (sr={artifact.sample_rate})")
     return artifact
 
 def _safe_normalize_and_clip(x: np.ndarray) -> np.ndarray:
@@ -443,4 +425,4 @@ def _safe_normalize_and_clip(x: np.ndarray) -> np.ndarray:
 if __name__ == "__main__":
     a = get_audio_segments_as_chain_artifacts(4.0, 3, the_rainbow_table_colors['Z'], '123443')
     m = create_audio_mosaic_chain_artifact(a, 50, 10, thread_id='123443')
-    b = create_blended_audio_chain_artifact(m, 0.4, thread_id='123443')
+    b = create_blended_audio_chain_artifact(m, 0.5, thread_id='123443')

@@ -4,6 +4,15 @@ from pydantic import BaseModel, Field
 
 from app.agents.enums.book_condition import BookCondition
 from app.agents.enums.publisher_type import PublisherType
+from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
+
+
+class BookDataPageCollection(BaseModel):
+    
+    pages: TextChainArtifactFile
+    
+    def __init__(self, **data):
+        super().__init__(**data)
 
 
 class BookData(BaseModel):
@@ -33,3 +42,6 @@ class BookData(BaseModel):
     notable_quote: Optional[str] = Field(None, description="Memorable excerpt")
     suppression_history: Optional[str] = Field(None, description="Censorship notes")
     related_works: List[str] = Field(default_factory=list, description="Related titles")
+
+    def __init__(self, **data):
+        super().__init__(**data)

@@ -42,7 +42,7 @@ transcript:
       transcendental_mode: 'None'
   base_path: "/Volumes/LucidNonsense/White/"
   artifact_path: "app/agents/mocks/"
-  file_name: "mock.wav"
+  file_name: "mock.md"
 audio_mosiac:
   sample_rate: 1
   duration: 1.0

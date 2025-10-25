@@ -2,6 +2,8 @@ import uuid
 from typing import Optional, List, Any
 
 from pydantic import Field
+
+from app.agents.models.book_artifact import BookArtifact
 from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
 
@@ -12,6 +14,7 @@ class RedAgentState(BaseRainbowAgentState):
     black_to_white_proposal: Optional[SongProposalIteration] = None
     song_proposals: Optional[SongProposal] = None
     counter_proposal: Optional[SongProposalIteration] = None
+    main_generated_book: BookArtifact | None = None
     artifacts: List[Any] = Field(default_factory=list)
     should_respond_with_reaction_book: bool = False
     reaction_level: int = 0

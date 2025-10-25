@@ -16,6 +16,9 @@ class ConcreteAgent(BaseRainbowAgent):
         # simple pass-through for testing
         return self.graph
 
+    def export_chain_artifacts(self, agent_state):
+        return self.graph
+
 
 def test_base_is_abstract():
     # Attempting to instantiate the abstract BaseRainbowAgent should raise TypeError

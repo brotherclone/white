@@ -18,6 +18,7 @@ from app.agents.models.agent_settings import AgentSettings
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.models.evp_artifact import EVPArtifact
 from app.agents.models.sigil_artifact import SigilArtifact
+from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
 from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.tools.audio_tools import get_audio_segments_as_chain_artifacts, \
@@ -81,7 +82,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """Entry point when White Agent invokes Black Agent"""
 
         current_proposal = state.song_proposals.iterations[-1]
-        # ToDo: Why instantiate new BlackAgentState each time?
+        # Reinitialize the BlackAgentState with the current song proposal
         black_state = BlackAgentState(
             white_proposal=current_proposal,
             song_proposals=state.song_proposals,
@@ -90,13 +91,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
             pending_human_tasks=[],
             awaiting_human_action=False
         )
-
         if not hasattr(self, '_compiled_workflow'):
             self._compiled_workflow = self.create_graph().compile(
                 checkpointer=MemorySaver(),
                 interrupt_before=["await_human_action"]
             )
-
         black_config: RunnableConfig = {"configurable": {"thread_id": f"{state.thread_id}"}}
         result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
         snapshot = self._compiled_workflow.get_state(black_config)
@@ -123,9 +122,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
         10. The black agent updates the counter-proposal to reflect the charged sigil if need be then goto 5.
 
         """
-
         black_workflow = StateGraph(BlackAgentState)
-
+        # Nodes
         black_workflow.add_node("generate_alternate_song_spec", self.generate_alternate_song_spec)
         black_workflow.add_node("generate_evp", self.generate_evp)
         black_workflow.add_node("evaluate_evp", self.evaluate_evp)
@@ -133,7 +131,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
         black_workflow.add_node("generate_sigil", self.generate_sigil)
         black_workflow.add_node("await_human_action", self.await_human_action)
         black_workflow.add_node("update_alternate_song_spec_with_sigil", self.update_alternate_song_spec_with_sigil)
-
+        black_workflow.add_node("export_chain_artifacts", self.export_chain_artifacts)
+        # Edges
         black_workflow.add_edge(START, "generate_alternate_song_spec")
         black_workflow.add_edge("generate_alternate_song_spec", "generate_evp")
         black_workflow.add_edge("generate_evp", "evaluate_evp")
@@ -151,11 +150,12 @@ class BlackAgent(BaseRainbowAgent, ABC):
             self.route_after_sigil_chance,
             {
                 "human": "await_human_action",
-                "done": END
+                "done": "export_chain_artifacts"
             }
         )
         black_workflow.add_edge("await_human_action", "update_alternate_song_spec_with_sigil")
-        black_workflow.add_edge("update_alternate_song_spec_with_sigil", END)
+        black_workflow.add_edge("update_alternate_song_spec_with_sigil", "export_chain_artifacts")
+        black_workflow.add_edge("export_chain_artifacts", END)
         return black_workflow
 
     @staticmethod
@@ -577,3 +577,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logging.error(f"Anthropic model call failed: {e!s}")
 
             return state
+
+    def export_chain_artifacts(self, state: BlackAgentState) -> BlackAgentState:
+        for artifact in state.artifacts:
+            print(artifact)
+        return state
