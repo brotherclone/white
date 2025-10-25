@@ -183,14 +183,17 @@ class WhiteAgent(BaseModel):
         print(f"🔍 White Agent using {facet.value.upper()} lens")
         print(f"   {facet_metadata['description']}")
         if mock_mode:
-            with open(f"/app/agents/mocks/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
-                data = yaml.safe_load(f)
-                proposal = SongProposalIteration(**data)
-                if not hasattr(state, "song_proposals") or state.song_proposals is None:
-                    state.song_proposals = SongProposal(iterations=[]).model_dump()
-                sp = self._normalize_song_proposal(state.song_proposals)
-                sp.iterations.append(proposal)
-                state.song_proposals = sp.model_dump()
+            try:
+                with open(f"/Volumes/LucidNonsense/White/app/agents/mocks/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
+                    data = yaml.safe_load(f)
+                    proposal = SongProposalIteration(**data)
+                    if not hasattr(state, "song_proposals") or state.song_proposals is None:
+                        state.song_proposals = SongProposal(iterations=[]).model_dump()
+                    sp = self._normalize_song_proposal(state.song_proposals)
+                    sp.iterations.append(proposal)
+                    state.song_proposals = sp.model_dump()
+            except Exception as e:
+                print(f"Mock initial proposal not found, returning stub SongProposalIteration:{e!s}")
             return state
         claude = self._get_claude_supervisor()
         proposer = claude.with_structured_output(SongProposalIteration)

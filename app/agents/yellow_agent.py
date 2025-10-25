@@ -50,3 +50,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
 
     def contribute(self):
         raise NotImplementedError("Subclasses must implement contribute method")
+
+    def export_chain_artifacts(self, state: YellowAgentState) -> YellowAgentState:
+        for artifact in state.artifacts:
+            print(artifact)
+        return state

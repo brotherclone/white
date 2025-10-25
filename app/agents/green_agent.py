@@ -54,3 +54,8 @@ class GreenAgent(BaseRainbowAgent, ABC):
         raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
     def contribute(self):
         raise NotImplementedError("Subclasses must implement contribute method")
+
+    def export_chain_artifacts(self, state: GreenAgentState) -> GreenAgentState:
+        for artifact in state.artifacts:
+            print(artifact)
+        return state

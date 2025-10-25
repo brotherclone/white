@@ -42,7 +42,7 @@ class BookMaker(BaseModel):
         return random.choices(genres, weights=weights)[0]
 
     @staticmethod
-    def get_topics_for_genre(genre: BookGenre) -> list:
+    def get_topics_for_genre(g: BookGenre) -> list:
         """Return topic list for a given genre"""
         mapping = {
             BookGenre.OCCULT: OCCULT_TOPICS,
@@ -53,7 +53,7 @@ class BookMaker(BaseModel):
             BookGenre.NOIR: NOIR_TOPICS,
             BookGenre.PSYCHEDELIC: PSYCHEDELIC_TOPICS,
         }
-        return mapping[genre]
+        return mapping[g]
 
     @staticmethod
     def get_authors_for_genre(book_genre: BookGenre) -> tuple[list, list]:
@@ -127,7 +127,7 @@ class BookMaker(BaseModel):
         return name, creds
 
     @staticmethod
-    def generate_catalog_number(year: int, index: int, genre: BookGenre) -> str:
+    def generate_catalog_number(year: int, index: int, g: BookGenre) -> str:
         """Generate Red Agent catalog number with genre code"""
         # Format: RA-[YEAR]-[GENRE_CODE]-[INDEX]
         genre_codes = {
@@ -139,7 +139,7 @@ class BookMaker(BaseModel):
             BookGenre.NOIR: "NOR",
             BookGenre.PSYCHEDELIC: "PSY",
         }
-        code = genre_codes[genre]
+        code = genre_codes[g]
         return f"RA-{year}-{code}-{index:04d}"
 
     @staticmethod

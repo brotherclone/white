@@ -15,6 +15,9 @@ class ConcreteAgent(BaseRainbowAgent):
     def generate_alternate_song_spec(self, agent_state):
         return None
 
+    def export_chain_artifacts(self, agent_state):
+        return None
+
 
 def test_get_claude_uses_settings(monkeypatch):
     # monkeypatch the ChatAnthropic used in the module to our DummyClaude

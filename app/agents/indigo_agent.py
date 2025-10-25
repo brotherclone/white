@@ -58,3 +58,8 @@ class IndigoAgent(BaseRainbowAgent, ABC):
 
     def contribute(self):
         raise NotImplementedError("Subclasses must implement contribute method")
+
+    def export_chain_artifacts(self, state: IndigoAgentState) -> IndigoAgentState:
+        for artifact in state.artifacts:
+            print(artifact)
+        return state
