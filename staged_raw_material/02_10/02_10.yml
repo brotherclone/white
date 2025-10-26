@@ -1,31 +1,100 @@
-bpm: TK
+bpm: 122
 manifest_id: '02_10'
-tempo: TK
-key: TK
+tempo: 4/4
+key: G# minor
 rainbow_color: R
 title: Getting Started in Tempography
 release_date: '2019-01-11'
 album_sequence: 10
 main_audio_file: 02_10_main.wav
-TRT: TK
+TRT: '[03:10.225]'
 vocals: false
 lyrics: false
 structure:
-  - section_name: TK
+  - section_name: Intro to Tempography
     start_time: '[00:00.000]'
-    end_time: TK
-    description: TK
+    end_time: '[00:33.109]'
+    description: Burbling modular synths slush in with a very slow drum beat
+  - section_name: Developing Fluid
+    start_time: '[00:33.110]'
+    end_time: '[01:48.046]'
+    description: Drums, guitars, and bass join into to  a fluid, rhythmic sound.
+  - section_name: Light Metering
+    start_time: '[01:48.047]'
+    end_time: '[02:47.051]'
+    description: A oddly timed Moog Grandmother blends in giving the music a transcendent vibe.
+  - section_name: F-Stop
+    start_time: '[02:47.052]'
+    end_time: '[03:10.225]'
+    description: We return to the burbling ooze from which we came.
 mood:
-    - TK
+    - Hypnotic
+    - Meditative
+    - Slow Motion
+    - Other-worldly
+    - Transcendent
 sounds_like:
-  - name: TK
-    discogs_id: TK
+  - name: Niton
+    discogs_id: 3548044
+  - name: Visible Cloaks
+    discogs_id: 4398429
+  - name: Tangerine Dream
+    discogs_id: 10343
 genres:
-  - TK
-concept: TK
+  - Ambient
+  - Electronic
+  - New Age
+  - Art Rock
+  - Experimental
+concept: A strange notion that still photography could capture a fourth and fifth dimension, and that this strange technology was available to the world, 'for dummies'
 audio_tracks:
   - id: 1
-    description: TK
-    audio_file: TK
-    midi_file: TK
-
+    description: DFAM
+    audio_file: 02_10_02_dfam.wav
+  - id: 2
+    description: All Drum Kit
+    audio_file: 02_10_03_all_drum_kit.wav
+    group: drums
+  - id: 3
+    description: Snare
+    audio_file: 02_10_04_snare.wav
+    group: drums
+  - id: 4
+    description: Overheads
+    audio_file: 02_10_05_overheads.wav
+    group: drums
+  - id: 5
+    description: Drum Machine
+    audio_file: 02_10_07_drum_machine.wav
+    midi_file: 02_10_06_drum_machine.mid
+  - id: 6
+    description: Free Run
+    audio_file: 02_10_08_free_run.wav
+  - id: 7
+    description: Modular
+    audio_file: 02_10_10_modular.wav
+    midi_file: 02_10_09_modular.mid
+  - id: 8
+    description: Buchala
+    audio_file: 02_10_12_buchala.wav
+    midi_file: 02_10_11_buchala.mid
+  - id: 9
+    description: Farfisa
+    audio_file: 02_10_14_farfisa.wav
+    midi_file: 02_10_13_farfisa.mid
+  - id: 10
+    description: Synth Bass
+    audio_file: 02_10_16_synth_bass.wav
+    midi_file: 02_10_15_synth_bass.mid
+  - id: 11
+    description: Rhythm Guitar
+    audio_file: 02_10_17_rhythm_guitar.wav
+  - id: 12
+    description: Rhythm Guitar 2
+    audio_file: 02_10_18_rhythm_guitar2.wav
+  - id: 13
+    description: Arp
+    audio_file: 02_10_19_arp.wav
+  - id: 14
+    description: Mantis
+    audio_file: 02_10_20_mantis.wav

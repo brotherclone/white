@@ -12,8 +12,8 @@ audio_segments:
         transitory_mode: 'None'
         transcendental_mode: 'None'
     base_path: "/Volumes/LucidNonsense/White/"
-    artifact_path: "app/agents/mocks/"
-    file_name: "mock.wav"
+    artifact_name: "mock"
+    file_name: "12345_black_mock.wav"
   - sample_rate: 1
     duration: 1.0
     channels: 1
@@ -28,7 +28,7 @@ audio_segments:
         transcendental_mode: 'None'
     base_path: "/Volumes/LucidNonsense/White/"
     artifact_path: "app/agents/mocks/"
-    file_name: "mock.wav"
+    file_name: "12345_black_mock.wav"
 transcript:
   text_content: "This is a mock transcript for testing purposes."
   chain_artifact_file_type: 'md'
@@ -41,8 +41,8 @@ transcript:
       transitory_mode: 'None'
       transcendental_mode: 'None'
   base_path: "/Volumes/LucidNonsense/White/"
-  artifact_path: "app/agents/mocks/"
-  file_name: "mock.md"
+  artifact_name: "mock"
+  file_name: "12345_black_mock.md"
 audio_mosiac:
   sample_rate: 1
   duration: 1.0
@@ -57,8 +57,8 @@ audio_mosiac:
       transitory_mode: 'None'
       transcendental_mode: 'None'
   base_path: "/Volumes/LucidNonsense/White/"
-  artifact_path: "app/agents/mocks/"
-  file_name: "mock.wav"
+  artifact_name: "mock"
+  file_name: "12345_black_mock.wav"
 noise_blended_audio:
   sample_rate: 1
   duration: 1.0
@@ -73,7 +73,7 @@ noise_blended_audio:
       transitory_mode: 'None'
       transcendental_mode: 'None'
   base_path: "/Volumes/LucidNonsense/White/"
-  artifact_path: "app/agents/mocks/"
-  file_name: "mock.wav"
+  artifact_name: "mock"
+  file_name: "12345_black_mock.wav"
 chain_artifact_type: "BlackEVPArtifact"
-thread_id: 'MOCK-THREAD-ID-12345'
+thread_id: '12345'

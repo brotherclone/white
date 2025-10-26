@@ -518,9 +518,140 @@ def check_no_tk_fields(data, path=""):
         tk_errors.append(f"Manifest field at '{path}' is set to 'TK' (to come)")
     return tk_errors
 
-def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
+def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """Perform stricter validation on common manifest field values.
+
+    Checks include:
+    - bpm is a positive integer
+    - tempo is either an int or a string like '4/4'
+    - rainbow_color is a known rainbow table key or color name
+    - main_audio_file and audio_tracks references are not placeholder 'TK'
+    - mood and genres are lists of strings
+    - sounds_like is a list of dicts with name and discogs_id
+    - top-level required fields are non-empty and not 'TK'
     """
-    Validates a single YAML file.
+    errors: List[str] = []
+
+    if not isinstance(yaml_data, dict):
+        return False, ["Invalid YAML structure: expected a dict"]
+
+    # bpm
+    bpm = yaml_data.get("bpm")
+    if bpm is None:
+        errors.append("bpm is missing")
+    else:
+        try:
+            if isinstance(bpm, str) and bpm.isdigit():
+                bpm_val = int(bpm)
+            else:
+                bpm_val = int(bpm)
+            if bpm_val <= 0:
+                errors.append(f"bpm must be a positive integer: {bpm}")
+        except Exception:
+            errors.append(f"bpm must be an integer: {bpm}")
+
+    # tempo: allow formats like '4/4' or integer beats per bar
+    tempo = yaml_data.get("tempo")
+    if tempo is None:
+        errors.append("tempo is missing")
+    else:
+        if isinstance(tempo, str):
+            if not re.match(r'^\d+(?:/\d+)?$', tempo.strip()):
+                errors.append(f"tempo must be numeric or in 'N/D' form (e.g. '4/4'): {tempo}")
+        elif isinstance(tempo, (int, float)):
+            pass
+        else:
+            errors.append(f"tempo has invalid type: {type(tempo).__name__}")
+
+    # rainbow_color: try to validate against the rainbow table keys or names
+    rc = yaml_data.get("rainbow_color")
+    if rc is None:
+        errors.append("rainbow_color is missing")
+    else:
+        try:
+            from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+            allowed_keys = set(the_rainbow_table_colors.keys())
+            allowed_names = {v.color_name for v in the_rainbow_table_colors.values()}
+            if isinstance(rc, str):
+                rc_clean = rc.strip()
+                if (len(rc_clean) == 1 and rc_clean in allowed_keys) or (rc_clean in allowed_names):
+                    pass
+                else:
+                    errors.append(f"rainbow_color '{rc}' is not a recognized key or color name")
+            else:
+                errors.append(f"rainbow_color has invalid type: {type(rc).__name__}")
+        except Exception:
+            # If rainbow table isn't importable, skip strict check but ensure it's not TK
+            if rc == "TK":
+                errors.append("rainbow_color must be set (found 'TK')")
+
+    # main_audio_file shouldn't be 'TK' or empty
+    main_audio = yaml_data.get("main_audio_file")
+    if not main_audio:
+        errors.append("main_audio_file is missing or empty")
+    elif isinstance(main_audio, str) and main_audio.strip() == "TK":
+        errors.append("main_audio_file is placeholder 'TK'")
+
+    # mood and genres must be lists of strings
+    for key in ("mood", "genres"):
+        val = yaml_data.get(key)
+        if val is None:
+            errors.append(f"{key} is missing")
+        elif not isinstance(val, list):
+            errors.append(f"{key} must be a list of strings")
+        else:
+            if not all(isinstance(x, str) and x.strip() != "" and x != "TK" for x in val):
+                errors.append(f"{key} contains invalid or placeholder entries")
+
+    # sounds_like list entries
+    sl = yaml_data.get("sounds_like")
+    if sl is None:
+        errors.append("sounds_like is missing")
+    elif not isinstance(sl, list):
+        errors.append("sounds_like must be a list")
+    else:
+        for i, artist in enumerate(sl):
+            if not isinstance(artist, dict):
+                errors.append(f"sounds_like[{i}] is not a dict")
+                continue
+            name = artist.get("name")
+            discogs_id = artist.get("discogs_id")
+            if not name or name == "TK":
+                errors.append(f"sounds_like[{i}].name missing or placeholder")
+            if not discogs_id or discogs_id == "TK":
+                errors.append(f"sounds_like[{i}].discogs_id missing or placeholder")
+
+    # audio_tracks validation
+    at = yaml_data.get("audio_tracks")
+    if at is None:
+        errors.append("audio_tracks is missing")
+    elif not isinstance(at, list):
+        errors.append("audio_tracks must be a list")
+    else:
+        for i, track in enumerate(at):
+            if not isinstance(track, dict):
+                errors.append(f"audio_tracks[{i}] is not a dict")
+                continue
+            # id
+            if "id" not in track:
+                errors.append(f"audio_tracks[{i}] missing id")
+            # ensure at least one file reference and not TK
+            files_present = False
+            for fkey in ("audio_file", "midi_file", "midi_group_file"):
+                if fkey in track and track[fkey] and track[fkey] != "TK":
+                    files_present = True
+            if not files_present:
+                errors.append(f"audio_tracks[{i}] has no valid file reference (audio_file/midi_file/midi_group_file)")
+
+    # Check for pervasive 'TK' placeholders anywhere
+    tk_errors = check_no_tk_fields(yaml_data)
+    for e in tk_errors:
+        errors.append(e)
+
+    return len(errors) == 0, errors
+
+def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
+    """Validates a single YAML file.
 
     Args:
         file_path: Path to the YAML file
@@ -538,6 +669,12 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
         is_valid, req_errors = validate_required_properties(yaml_data)
         if not is_valid:
             for err in req_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: stricter field values
+        is_valid, field_errors = validate_field_values(yaml_data)
+        if not is_valid:
+            for err in field_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
         # Run validation: lyrics has lrc

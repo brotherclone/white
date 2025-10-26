@@ -210,7 +210,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
-                    result = self.normalize_song_proposal_data(result)
                     counter_proposal = SongProposalIteration(**result)
                 else:
                     counter_proposal = result
@@ -491,7 +490,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
         try:
             result = proposer.invoke(prompt)
             if isinstance(result, dict):
-                result = self.normalize_song_proposal_data(result)
                 updated_proposal = SongProposalIteration(**result)
                 state.song_proposals.iterations.append(self.counter_proposal)
                 state.counter_proposal = updated_proposal
@@ -568,7 +566,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
-                    result = self.normalize_song_proposal_data(result)
                     updated_proposal = SongProposalIteration(**result)
                     state.song_proposals.iterations.append(self.counter_proposal)
                     state.counter_proposal = updated_proposal
