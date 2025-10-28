@@ -1,0 +1,14 @@
+text_content: "Page 1 mock"
+chain_artifact_file_type: 'md'
+artifact_id: '555'
+rainbow_color:
+  color_name: 'Red'
+  hex_value: 0xAE1E36
+  mnemonic_character_value: 'R'
+  temporal_mode: Past
+  objectional_mode: Thing
+  ontological_mode:
+    - Known
+base_path: "/Volumes/LucidNonsense/White/"
+artifact_name: "book"
+file_name: "412345_red_book.md"

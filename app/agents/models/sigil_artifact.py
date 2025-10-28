@@ -1,10 +1,10 @@
-from datetime import datetime
 from typing import List
 from pydantic import Field
 
 from app.agents.enums.sigil_state import SigilState
 from app.agents.enums.sigil_type import SigilType
 from app.agents.models.base_chain_artifact import ChainArtifact
+from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
 
 
 class SigilArtifact(ChainArtifact):
@@ -19,4 +19,4 @@ class SigilArtifact(ChainArtifact):
     activation_state: SigilState
     charging_instructions: str
     chain_artifact_type: str = "sigil"
-    files: list = Field(default_factory=list)
+    artifact_report: TextChainArtifactFile | None = None

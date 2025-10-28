@@ -1,0 +1,121 @@
+bpm: 124
+manifest_id: '02_05'
+tempo: 4/4
+key: G minor
+rainbow_color: R
+title: Dismantling Ubiquitous Monitoring Systems
+release_date: '2019-01-11'
+album_sequence: 5
+main_audio_file: 02_05_main.wav
+TRT: '[02:41.192]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:11.152]'
+    description: Big rock guitars kick in but they have all been passed through a strobing filter.
+  - section_name: Verse 1
+    start_time: '[00:11.153]'
+    end_time: '[00:27.023]'
+    description: The vocals with an accompanying vocoder describe some sort of hacking partisan conflict.
+  - section_name: Chorus 1
+    start_time: '[00:27.024]'
+    end_time: '[00:50.080]'
+    description: The chorus gets even larger with backing vocals and an accenting tabla.
+  - section_name: Interlude
+    start_time: '[00:50.081]'
+    end_time: '[01:05.201]'
+    description: The guitars play off each other and the song gets a bit more melodic.
+  - section_name: Verse 2
+    start_time: '[01:05.202]'
+    end_time: '[01:21.072]'
+    description: The second verse continues the story of the first verse with more intensity.
+  - section_name: Chorus 2
+    start_time: '[01:21.073]'
+    end_time: '[01:44.127]'
+    description: The second chorus ends with a hanging note over the next section.
+  - section_name: Outro
+    start_time: '[01:44.128]'
+    end_time: '[02:41.192]'
+    description: There's an interplay of synths and guitars until the song ends.
+mood:
+    - action-oriented
+    - intense
+    - high volume
+    - chaotic
+    - retro
+    - futuristic
+    - hi tech
+sounds_like:
+  - name: The Jesus And Mary Chain
+    discogs_id: 243280
+  - name: Happy Mondays
+    discogs_id: 12097
+  - name: Medicine (2)
+    discogs_id: 71224
+genres:
+  - Noise Pop
+  - Rock
+  - Post-Rock
+  - Alternative Rock
+  - Shoegaze
+concept: A bit of a continuation of "Sitting at the Rainbow Table" and a touch of Ubik by Philip K. Dick. This song imagines a world where nano-mesh can be sprayed into the air for surveillance.
+lrc_file: 02_05.lrc
+audio_tracks:
+  - id: 1
+    description: Synth Bass
+    audio_file: 02_05_03_synth_bass.wav
+    midi_file: 02_05_02_synth_bass.mid
+  - id: 2
+    description: Drum Kit
+    audio_file: 02_05_05_drum_kit.wav
+    midi_file: 02_05_04_drum_kit.mid
+  - id: 3
+    description: Tabla
+    audio_file: 02_05_07_tabla.wav
+    midi_file: 02_05_06_tabla.mid
+  - id: 4
+    description: Organ
+    audio_file: 02_05_09_organ.wav
+    midi_file: 02_05_08_organ.mid
+  - id: 5
+    description: Guitar
+    audio_file: 02_05_10_guitar.wav
+  - id: 6
+    description: Guitar 2
+    audio_file: 02_05_11_guitar2.wav
+  - id: 7
+    description: Guitar 3
+    audio_file: 02_05_12_guitar3.wav
+  - id: 8
+    description: Guitar 4
+    audio_file: 02_05_12_guitar4.wav
+  - id: 9
+    description: Mantis
+    audio_file: 02_05_13_mantis.wav
+  - id: 10
+    description: Stored Guitar
+    audio_file: 02_05_15_stored_guitar.wav
+    midi_file: 02_05_14_stored_guitar.mid
+  - id: 11
+    description: Stored Guitar 2
+    audio_file: 02_05_17_stored_guitar2.wav
+    midi_file: 02_05_16_stored_guitar2.mid
+  - id: 12
+    description: Flutes
+    audio_file: 02_05_19_flutes.wav
+    midi_file: 02_05_18_flutes.mid
+  - id: 13
+    description: Vocals
+    audio_file: 02_05_20_vocals.wav
+  - id: 14
+    description: Vocoder
+    audio_file: 02_05_22_vocoder.wav
+    midi_file: 02_05_21_vocoder.mid
+  - id: 15
+    description: Vocal 2
+    audio_file: 02_05_23_vocal2.wav
+  - id: 16
+    description: BG Vocals
+    audio_file: 02_05_24_bg_vocals.wav

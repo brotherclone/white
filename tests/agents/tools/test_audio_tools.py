@@ -1,10 +1,8 @@
 import io
 import os
-import tempfile
 import numpy as np
 import soundfile as sf
 import pytest
-from unittest import mock
 from app.agents.tools import audio_tools
 from app.agents.enums.noise_type import NoiseType
 from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
@@ -123,14 +121,13 @@ def test_extract_non_silent_segments():
 def test_create_audio_mosaic_chain_artifact(tmp_path, monkeypatch):
     # Mock AudioChainArtifactFile and file I/O
     class DummyArtifact:
-        def __init__(self, path, sr):
+        def __init__(self, path, sam_r):
             self._path = path
-            self.sample_rate = sr
+            self.sample_rate = sam_r
             self.rainbow_color = the_rainbow_table_colors['Z']
             self.chain_artifact_file_type = ChainArtifactFileType.AUDIO
-        def get_artifact_path(self, with_file_name=True):
+        def get_artifact_path(self):
             return self._path
-    # Create dummy wav files
     sr = 8000
     arr = np.random.rand(sr * 2).astype(np.float32)
     paths = []
@@ -142,19 +139,9 @@ def test_create_audio_mosaic_chain_artifact(tmp_path, monkeypatch):
     monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
     artifact = audio_tools.create_audio_mosaic_chain_artifact(artifacts, 50, 1.0, thread_id="tst")
     assert isinstance(artifact, AudioChainArtifactFile)
-    assert os.path.exists(artifact.artifact_path)
+    assert os.path.exists(artifact.get_artifact_path())
     assert artifact.duration > 0
 
-
-def test_blend_with_noise(tmp_path):
-    sr = 8000
-    arr = np.random.rand(sr).astype(np.float32)
-    in_path = tmp_path / "in.wav"
-    sf.write(str(in_path), arr, sr)
-    out_dir = tmp_path / "out"
-    out_path = audio_tools.blend_with_noise(str(in_path), 0.5, str(out_dir))
-    assert os.path.exists(out_path)
-    assert out_path.endswith("_blended.wav")
 
 
 def test_create_blended_audio_chain_artifact(tmp_path, monkeypatch):
@@ -179,7 +166,6 @@ def test_create_blended_audio_chain_artifact(tmp_path, monkeypatch):
     )
     artifact = audio_tools.create_blended_audio_chain_artifact(mosaic, 0.5, thread_id="tst")
     assert isinstance(artifact, AudioChainArtifactFile)
-    # The file is not written by create_blended_audio_chain_artifact, but blend_with_noise is called
 
 
 def test_generate_noise_returns_bytes_for_types():

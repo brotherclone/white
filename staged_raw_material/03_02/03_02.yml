@@ -140,3 +140,24 @@ audio_tracks:
   - id: 12
     description: Main vocals
     audio_file: 03_02_21_main_vox.wav
+  - id: 13
+    description: Double Track Vocals
+    audio_file: 03_02_22_dbl_vox.wav
+  - id: 14
+    description: Background Vocals
+    audio_file: 03_02_23_bg_vox.wav
+  - id: 15
+    description: Remez Background Vocal
+    audio_file: 03_02_24_bg_remez.wav
+    player: REMEZ
+  - id: 16
+    description: Boys Choir
+    audio_file: 03_02_26_boys.wav
+    midi_file: 03_02_25_boys.mid
+  - id: 17
+    description: Ladies Choir
+    audio_file: 03_02_28_ladies.wav
+    midi_file: 03_02_27_ladies.mid
+  - id: 18
+    description: Cassette recording of my high school band practicing
+    audio_file: 03_02_29_old_tape.wav

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
 
 
 class CutUpProcessor(BaseModel):

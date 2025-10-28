@@ -121,3 +121,6 @@ The White Album will thus complete the Rainbow Table series by demonstrating the
 ## Testing
 
 Run `PYTHONPATH=. pytest tests/ --maxfail=5 --disable-warnings -v`
+
+## Clearing Discogs Cache
+Run `rm ~/.earthly_frames/cache/discogs_validation_cache.json`
