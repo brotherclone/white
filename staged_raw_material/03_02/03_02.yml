@@ -1,0 +1,163 @@
+bpm: 134
+manifest_id: '03_02'
+tempo: 4/4
+key: G minor
+rainbow_color: O
+title: Broken Front Tooth
+release_date: '2020-06-23'
+album_sequence: 2
+main_audio_file: 03_02_main.wav
+TRT: '[04:17.114]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:14.081]'
+    description: Insanely distorted guitars like shoegaze with LFO modulation blast immediately - underneath we can hear a metronome or clock sound ticking away at 134 bpm.
+  - section_name: Intro 2
+    start_time: '[00:14.082]'
+    end_time: '[00:35.204]'
+    description: A bass guitar is added, but it's cheerful and bouncy like a Beach Boys bass. This juxtaposition of the heavy, distorted guitars and the upbeat bass creates a unique tension.
+  - section_name: Verse 1
+    start_time: '[00:35.205]'
+    end_time: '[00:51.234]'
+    description: The song shifts with more 60's guitar lines now with a back beat and a Farfisa organ and the vocals begin
+  - section_name: Bridge
+    start_time: '[00:51.235]'
+    end_time: '[01:00.233]'
+    description: A little Beatles-ish flourish moves the song into the chorus
+  - section_name: Chorus 1
+    start_time: '[01:00.234]'
+    end_time: '[01:15.054]'
+    description: The chorus starts the vocals hanging on the last not and overdubs picking up the next phrase
+  - section_name: Angelic Interlude
+    start_time: '[01:15.055]'
+    end_time: '[01:29.136]'
+    description: While the bass continues the rock instrumentation drops and we hear a heavenly female choir. It's a jolting and strange transition.
+  - section_name: Verse 2
+    start_time: '[01:29.137]'
+    end_time: '[01:40.073]'
+    description: Back full-scream ahead with the shoegaze guitars and the vocals continue
+  - section_name: Garage Punk Interlude
+    start_time: '[01:40.074]'
+    end_time: '[01:58.051]'
+    description: Okay, what is happening? The song veers into a 70s garage punk style with a raw, lo-fi aesthetic. The guitars are more aggressive and the energy is high. The vocals are shrill and snotty.
+  - section_name: Verse 3
+    start_time: '[01:58.052]'
+    end_time: '[02:12.133]'
+    description: And back to the neo-shoegaze stuff and if nothing happened.
+  - section_name: Bridge 2
+    start_time: '[02:12.134]'
+    end_time: '[02:21.122]'
+    description: Some Beatles-y guitar transitions again
+  - section_name: Chorus 2
+    start_time: '[02:21.123]'
+    end_time: '[02:35.204]'
+    description: Return to the chorus with similar vocal layering
+  - section_name: 1950s Interlude
+    start_time: '[02:35.205]'
+    end_time: '[03:11.160]'
+    description: Another odd shift - as if someone is listening to Buddy Holly and The Spiders from Mars between radio stations. There's snaps and claps and breaking style vocal.
+  - section_name: Angelic 1950s Interlude
+    start_time: '[03:11.161]'
+    end_time: '[03:40.073]'
+    description: The previously heavenly boys choir returns but now with a 1950s backing percussion. It's a surreal combination.
+  - section_name: Outro
+    start_time: '[03:40.074]'
+    end_time: '[04:08.237]'
+    description: Now here comes everybody, shoegazers, boys choir, garage punks and proto-rockers all jamming together in a glorious cacophony of sound that is both chaotic and strangely harmonious.
+  - section_name: An actual bit of cassette
+    start_time: '[04:08.238]'
+    end_time: '[04:17.114]'
+    description: The song ends with a snippet of cassette recording of my actual high school band practicing. It's lo-fi and nostalgic. The stop button snaps and ends the track abruptly.
+mood:
+    - chaotic
+    - nostalgic
+    - surreal
+    - intense
+    - eclectic
+    - energetic
+sounds_like:
+    - name: My Bloody Valentine
+      discogs_id: 6516
+    - name: The Dead Boys
+      discogs_id: 266431
+    - name: The Rolling Stones
+      discogs_id: 20991
+genres:
+    - Rock
+    - Shoegaze
+    - Garage Rock
+    - Punk
+    - Experimental
+    - Indie Rock
+    - Omnipop
+lrc_file: 03_02.lrc
+concept: A nostalgic reflection of my high school band days is re-bracketed in a surreal manner with abrupt genre shifts and eclectic instrumentation. The shoegaze guitars are anachronistic - filtered by LFO, Let It Bleed style boys choir buts up against 70s garage punk and 50s rock and roll. The song is a chaotic yet harmonious blend of these disparate elements, creating a unique soundscape that is both intense and eclectic. The past thing imagined is the broken front tooth which was incorrectly remembered as happening in an accident rather than on a beer bottle.
+audio_tracks:
+  - id: 1
+    description: Drums
+    audio_file: 03_02_03_drums.wav
+    midi_file: 03_02_04_drums.mid
+    group: drums
+  - id: 2
+    description: Hand claps and snaps
+    audio_file: 03_02_07_snaps.wav
+    midi_file: 03_02_06_snaps.mid
+    group: drums
+  - id: 3
+    description: Synth Bass
+    audio_file: 03_02_09_synth_bass.wav
+    midi_file: 03_02_08_synth_bass.mid
+  - id: 4
+    description: Bass Guitar
+    audio_file: 03_02_10_bass.wav
+  - id: 5
+    description: Farfisa Organ
+    audio_file: 03_02_12_farfisa.wav
+    midi_file: 03_02_11_farfisa.mid
+  - id: 6
+    description: Wurlitzer Electric Piano
+    audio_file: 03_02_14_wurlitzer.wav
+    midi_file: 03_02_13_wurlitzer.mid
+  - id: 7
+    description: Romantic string section
+    audio_file: 03_02_16_strings.wav
+    midi_file: 03_02_15_strings.mid
+  - id: 8
+    description: Electric Guitar with Re-amp
+    audio_file: 03_02_17_electric_guitar_1.wav
+  - id: 9
+    description: Electric Guitar with LFO modulation
+    audio_file: 03_02_18_electric_guitar_2.wav
+  - id: 10
+    description: Electric Guitar with LFO modulation and granular synthesis
+    audio_file: 03_02_19_electric_guitar_3.wav
+  - id: 11
+    description: Garage Punk Guitar
+    audio_file: 03_02_20_electric_guitar_4.wav
+  - id: 12
+    description: Main vocals
+    audio_file: 03_02_21_main_vox.wav
+  - id: 13
+    description: Double Track Vocals
+    audio_file: 03_02_22_dbl_vox.wav
+  - id: 14
+    description: Background Vocals
+    audio_file: 03_02_23_bg_vox.wav
+  - id: 15
+    description: Remez Background Vocal
+    audio_file: 03_02_24_bg_remez.wav
+    player: REMEZ
+  - id: 16
+    description: Boys Choir
+    audio_file: 03_02_26_boys.wav
+    midi_file: 03_02_25_boys.mid
+  - id: 17
+    description: Ladies Choir
+    audio_file: 03_02_28_ladies.wav
+    midi_file: 03_02_27_ladies.mid
+  - id: 18
+    description: Cassette recording of my high school band practicing
+    audio_file: 03_02_29_old_tape.wav

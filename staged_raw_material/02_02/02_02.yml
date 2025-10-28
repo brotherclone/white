@@ -1,0 +1,113 @@
+bpm: 140
+manifest_id: '02_02'
+tempo: 4/4
+key: F minor
+rainbow_color: R
+title: Underrepresented Harmonics
+release_date: '2019-01-11'
+album_sequence: 2
+main_audio_file: 02_02_main.wav
+TRT: '[03:34.071]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:27.105]'
+    description: A filtered submix of synths and guitars starts giving a strobing, futuristic vibe to the song. The drums kick in with driving beat.
+  - section_name: Verse 1
+    start_time: '[00:27.106]'
+    end_time: '[00:54.213]'
+    description: The vocals enter with a laid back, dreamy feel.
+  - section_name: Chorus 1
+    start_time: '[00:54.214]'
+    end_time: '[01:22.071]'
+    description: During the chorus the vocals echo through dub-like sends, ricocheting the synths.
+  - section_name: Bridge Jamz
+    start_time: '[01:22.072]'
+    end_time: '[01:42.213]'
+    description: A flurry of arps and drums give a space-cruising sound.
+  - section_name: Chorus 2
+    start_time: '[01:42.214]'
+    end_time: '[02:10.071]'
+    description: The vocals return with more intensity and the synths swell up.
+  - section_name: Verse 2
+    start_time: '[02:10.072]'
+    end_time: '[02:37.176]'
+    description: The vocals return this time with more urgency.
+  - section_name: Chorus Jamz
+    start_time: '[02:37.177]'
+    end_time: '[03:03.105]'
+    description: There's a guitar line turned up in the mix the struts its stuff
+  - section_name: Outro
+    start_time: '[03:03.106]'
+    end_time: '[03:34.071]'
+    description: All instruments plunge into the mad rush before the song fades.
+mood:
+  - liberating
+  - exciting
+  - dreamy
+  - floating
+  - cruising
+  - joyous
+  - skeptical
+sounds_like:
+  - name: Foo Fighters
+    discogs_id: 198282
+  - name: Swervedriver
+    discogs_id: 159997
+  - name: Steely Dan
+    discogs_id: 160906
+genres:
+  - Alternative Rock
+  - Noise Pop
+  - Post-Rock
+  - Rock
+lrc_file: 02_02.lrc
+concept: This song was based on a book about Black music the avant-garde - but it pivots to address the, at the time, successful steps BLM was making. Oh well here we are in 2025.
+audio_tracks:
+  - id: 1
+    description: Arp
+    audio_file: 02_02_03_arp.wav
+    midi_file: 02_02_02_arp.mid
+  - id: 2
+    description: Wurlitzer
+    audio_file: 02_02_05_wurlitzer.wav
+    midi_file: 02_02_04_wurlitzer.mid
+  - id: 3
+    description: Cello
+    audio_file: 02_02_09_cello.wav
+    midi_file: 02_02_08_cello.mid
+  - id: 4
+    description: MkII Strings
+    audio_file: 02_02_11_mkii_strings.wav
+    midi_file: 02_02_10_mkii_strings.mid
+  - id: 5
+    description: Lead Guitar
+    audio_file: 02_02_12_lead_guitar.wav
+  - id: 6
+    description: Rhythm Guitar
+    audio_file: 02_02_13_rhythm_guitar.wav
+  - id: 7
+    description: Baritone
+    audio_file: 02_02_14_baritone.wav
+  - id: 8
+    description: Synth Bass
+    audio_file: 02_02_16_synth_bass.wav
+    midi_file: 02_02_15_synth_bass.mid
+  - id: 9
+    description: Drums
+    audio_file: 02_02_19_drums.wav
+    midi_file: 02_02_18_drums.mid
+  - id: 10
+    description: Tambourine
+    audio_file: 02_02_20_tambourine.wav
+  - id: 11
+    description: Vocal 1
+    audio_file: 02_02_21_vocal_1.wav
+  - id: 12
+    description: Vocal 2
+    audio_file: 02_02_22_vocal_2.wav
+  - id: 13
+    description: Vocal 3
+    audio_file: 02_02_23_vocal_3.wav

@@ -1,0 +1,8 @@
+- name: "Drive way"
+  description: "It's as if you've always been here. Stuck in the back of this car. The faceless driver, silent and idling the car. The velvet-suited valets always opening the door for you and the passengers. But now the moment moves forward, time moves carrying you and your party along with it to disembark the silver limousine. You are [read the character's attributes]. You are joined by three others [read the other characters' attributes]. You step out of the car and into the grand estate before you. To the north: a grand entrance to a magnificent, yellow palace. The front yard is lush and green, with a fountain in the center. The front door is open, inviting you inside. Beyond the driveway, there's nothing. A yellow, pulsating abyss that this whole world is suspended in."
+  effects:
+    - "Disorientation - This lasts for the entire session deduce 1D4 from your highest stat (on or off)."
+  encounters:
+    - "If there is a Janitor in the party they may make a roll against their lowest stat to notice that none of the guests have tipped the valet. If they succeed, the valet thanks them (for either noticing or for a tip the party provides) and says to 'And a tip for you lot: Mind the mango juice.'"
+  connections:
+    - north: "Entrance"

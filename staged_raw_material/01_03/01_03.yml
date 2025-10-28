@@ -1,0 +1,114 @@
+bpm: 106
+manifest_id: '01_03'
+tempo: 18/32
+key: F major
+rainbow_color: Z
+title: An Unfortunate Conflict of Evidence
+release_date: '2017-07-18'
+album_sequence: 3
+main_audio_file: 01_03_main.wav
+TRT: '[02:40.175]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Instrumental 1
+    start_time: '[00:00.000]'
+    end_time: '[00:53.176]'
+    description: Droning Instrumental with psychedelic and comically alien sounds
+  - section_name: Verse 1
+    start_time: '[00:53.177]'
+    end_time: '[01:14.042]'
+    description: A space-age synth note hangs over the verse with thumping kick drums and stoned backup vocals
+  - section_name: Instrumental 2
+    start_time: '[01:14.043]'
+    end_time: '[01:44.215]'
+    description: Return to the instrumental alien chamber music with a synth note that hangs over the verse
+  - section_name: Verse 2
+    start_time: '[01:44.216]'
+    end_time: '[02:05.081]'
+    description: Back to the verse with more odd alien sounds and stoned backup vocals
+  - section_name: Instrumental 2
+    start_time: '[02:05.082]'
+    end_time: '[02:40.175]'
+    description: The alien chamber music takes us through to the end of the song
+mood:
+  - bizarre
+  - absurd
+  - surreal
+  - quirky
+  - whimsical
+  - playful
+  - eccentric
+  - alien
+  - otherworldly
+  - psychedelic
+  - spacey
+  - dreamy
+sounds_like:
+  - name: Solid Space (2)
+    discogs_id: 448701
+  - name: Joe Meek
+    discogs_id: 226551
+  - name: Bruce Haack
+    discogs_id: 26952
+  - name: The Beatles
+    discogs_id: 82730
+genres:
+  - Experimental
+  - Psychedelic
+  - Oddball
+  - Science Fiction
+  - Art Rock
+  - Avant-Garde
+lrc_file: 01_03.lrc
+concept: There's a song by Tom Rush called "Beam Me Up Scotty" that my dad used to play a lot growing up. During this dark era of 2016 I found myself thinking similar thoughts - but Iain M. Banks' Culture instead of Star Trek. The idea of being rescued from the mess humans are making of the planet by a benevolent, highly advanced alien civilization. I tried to share my Culture-inspired music with /r/Culture, but they didn't seem to care for it. What? Did I think I could make friends through music, silly me.
+audio_tracks:
+  - id: 1
+    description: Kick
+    audio_file: 01_03_03_kick.wav
+    midi_file: 01_03_02_kick.mid
+    group: drums
+  - id: 2
+    description: Hi-Hat
+    audio_file: 01_03_05_hihat.wav
+    midi_file: 01_03_04_hihat.mid
+    group: drums
+  - id: 3
+    description: Tambourine
+    audio_file: 01_03_06_tambourine.wav
+    group: drums
+  - id: 4
+    description: Oboe
+    audio_file: 01_03_08_oboe.wav
+    midi_file: 01_03_07_oboe.mid
+  - id: 5
+    description: C64 Synth
+    audio_file: 01_03_10_c64.wav
+    midi_file: 01_03_09_c64.mid
+  - id: 6
+    description: Stereo Guitars
+    audio_file: 01_03_11_stereo_guitars.wav
+  - id: 7
+    description: Thumb Piano
+    audio_file: 01_03_12_thumb_piano.wav
+  - id: 8
+    description: Bass
+    audio_file: 01_03_14_bass.wav
+    midi_file: 01_03_13_bass.mid
+  - id: 9
+    description: Punchy Synth
+    audio_file: 01_03_16_punchy_synth.wav
+    midi_file: 01_03_15_punchy_synth.mid
+  - id: 10
+    description: Soft Lead Synth
+    audio_file: 01_03_18_soft_lead_synth.wav
+    midi_file: 01_03_17_soft_lead_synth.mid
+  - id: 11
+    description: Main Vocals
+    audio_file: 01_03_19_main_vocals.wav
+  - id: 12
+    description: Background Vocals
+    audio_file: 01_03_20_bg_vocals.wav
+  - id: 13
+    description: Secondary Vocals
+    audio_file: 01_03_20_secondary_vocals.wav

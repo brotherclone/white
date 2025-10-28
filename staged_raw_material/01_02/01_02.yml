@@ -1,0 +1,153 @@
+bpm: 112
+manifest_id: '01_02'
+tempo: 4/4
+key: Bb minor
+rainbow_color: Z
+title: Everyday Sigils
+release_date: '2017-07-18'
+album_sequence: 2
+main_audio_file: 01_02_main.wav
+TRT: '[04:37.097]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[01:00.000]'
+    description: A goth tinged progression begins with echoing reverbed and pained vocals
+  - section_name: Chorus 1
+    start_time: '[01:00.001]'
+    end_time: '[01:37.071]'
+    description: The chorus becomes a bit more relaxed and introspective with lots of male background vocals
+  - section_name: Verse 2
+    start_time: '[01:37.072]'
+    end_time: '[02:12.213]'
+    description: Back to the verse - exploring more of the obsessive lyrical themes
+  - section_name: Chorus 2
+    start_time: '[02:12.214]'
+    end_time: '[02:47.034]'
+    description: The chorus returns with more intensity and layered vocals
+  - section_name: Breakdown
+    start_time: '[02:47.035]'
+    end_time: '[03:04.071]'
+    description: A brief breakdown with eerie synths and a haunting atmosphere
+  - section_name: Jams
+    start_time: '[03:04.072]'
+    end_time: '[04:37.097]'
+    description: Komishe style synth and guitars rock out with a novel combination psychedelic and goth elements
+mood:
+  - dark
+  - obsessive
+  - haunting
+  - ethereal
+  - ominous
+  - spooky
+  - eerie
+  - unsettling
+  - creepy
+  - chilling
+  - foreboding
+  - sinister
+  - desperate
+  - occult
+  - arcane
+sounds_like:
+  - name: David Bowie
+    discogs_id: 10263
+  - name: Blue Orchids
+    discogs_id: 198410
+  - name: Siouxsie & The Banshees
+    discogs_id: 80501
+  - name: Bauhaus
+    discogs_id: 85897
+  - name: Neu!
+    discogs_id: 12636
+genres:
+  - Experimental
+  - Psychedelic
+  - Post-Punk
+  - Art Rock
+  - Avant-Garde
+  - Dark Wave
+  - Gothic Rock
+lrc_file: 01_02.lrc
+concept: As the world grew more and more alienating I felt as if I was on the periphery of society, an outsider looking
+  in. I felt like I was being watched, like there were forces beyond my understanding that were shaping my reality. This
+  song is about that feeling of paranoia and alienation, and the desire to break free from it. It's also about obsession
+  -  romantically and the obsession with wanting some sort of empowerment through ritualistic behavior. The lyrics are
+  filled with references to sigils, which are symbols used in magic and occult practices. The song is about the desire
+  to find meaning and power in a world that often seems chaotic and senseless. The lyrics also are a prime example of my
+  'constellation' style of writing where a subject is danced around with missing wordplay. For example, 'I've picked up
+  the tic of the extra in passing, now the past is staged too' Never says it's about an actor - or feeling like one. 
+  Same with 'tricks in the booking' johns/prostitutes at the police station? What information is the narrator trying to 
+  get  from them? Whether being a hacker, druggie, occultist, dimensional hopper, or literal alien, the narrator is
+  trying to find a way out of their current reality.
+audio_tracks:
+  - id: 1
+    description: MK II Strings
+    audio_file: 01_02_03_mkII.m.wav
+    midi_file: 01_02_02_mkII.mid
+  - id: 2
+    description: Organ
+    audio_file: 01_02_05_organ.wav
+    midi_file: 01_02_04_organ.mid
+  - id: 3
+    description: Clavinet
+    audio_file: 01_02_07_clav.wav
+    midi_file: 01_02_06_clav.mid
+  - id: 4
+    description: Piano
+    audio_file: 01_02_09_piano.wav
+    midi_file: 01_02_08_piano.mid
+  - id: 5
+    description: Arp Glide
+    audio_file: 01_02_11_arp_glide.wav
+    midi_file: 01_02_10_arp_glide.mid
+  - id: 6
+    description: Pad
+    audio_file: 01_02_13_pad.wav
+    midi_file: 01_02_12_pad.mid
+  - id: 7
+    description: Baritone Guitar
+    audio_file: 01_02_14_baritone.wav
+  - id: 8
+    description: Rhythm Guitar
+    audio_file: 01_02_15_rhythm_guitar.wav
+  - id: 9
+    description: Lead Guitar
+    audio_file: 01_02_16_lead_guitar.wav
+  - id: 10
+    description: Bass Guitar
+    audio_file: 01_02_17_bass.wav
+  - id: 11
+    description: Synth Bass
+    audio_file: 01_02_19_synth_bass.wav
+    midi_file: 01_02_18_synth_bass.mid
+  - id: 12
+    description: Main Vocals
+    audio_file: 01_02_20_main_vocal.wav
+  - id: 13
+    description: Doubled Background Vocals
+    audio_file: 01_02_21_bg_dbl_vocal.wav
+  - id: 14
+    description: Background Vocals
+    audio_file: 01_02_22_bg_vocals.wav
+  - id: 15
+    description: Tambourine
+    audio_file: 01_02_24_tambourine.wav
+    midi_file: 01_02_23_tambourine.mid
+    group: drums
+  - id: 16
+    description: Toms
+    audio_file: 01_02_26_toms.wav
+    midi_file: 01_02_25_toms.mid
+    group: drums
+  - id: 17
+    description: Snare
+    audio_file: 01_02_28_snare.wav
+    midi_file: 01_02_27_snare.mid
+    group: drums
+  - id: 18
+    description: Kick
+    midi_file: 01_02_29_kick.mid
+    group: drums

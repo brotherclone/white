@@ -1,0 +1,148 @@
+bpm: 148
+manifest_id: '01_09'
+tempo: 4/4
+key: G# minor
+rainbow_color: Z
+title: A Seat at the Rainbow Table
+release_date: '2017-07-18'
+album_sequence: 9
+main_audio_file: 01_09_main.wav
+TRT: '[03:02.031]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:25.235]'
+    description: The song jumps right in with frantic tapped electric guitar and an almost fusion style groove
+  - section_name: Bridge 1
+    start_time: '[00:25.235]'
+    end_time: '[00:45.101]'
+    description: Mellotrons and biotrons galore as the narrator's perspective changes from hacker to concerned friend
+  - section_name: Chorus 1
+    start_time: '[00:45.101]'
+    end_time: '[01:04.214]'
+    description: The chorus repeats with drugged out backing vocals and a more insistent rhythm
+  - section_name: Verse 2
+    start_time: '[01:04.215]'
+    end_time:  '[01:24.080]'
+    description: Back to the frantic tapping and uneasy groove
+  - section_name: Bridge 2
+    start_time:  '[01:24.081]'
+    end_time: '[01:43.194]'
+    description: More mellotron madness and a sense of foreboding
+  - section_name: Chorus 2
+    start_time: '[01:43.195]'
+    end_time: '[02:03.060]'
+    description: The chorus repeats with drugged out backing vocals and a more insistent rhythm
+  - section_name: Outro
+    start_time:  '[02:03.061]'
+    end_time: '[03:02.031]'
+    description: Strange early 80s synths and a driving rhythm section take us out. We are left with a drum kit that's been lurking all along under the electronics.
+mood:
+  - paranoid
+  - edgy
+  - tense
+  - dark
+  - dramatic
+  - frenetic
+sounds_like:
+  - name: Nine Inch Nails
+    discogs_id: 3857
+  - name: David Bowie
+    discogs_id: 10263
+  - name: Pram
+    discogs_id: 3542
+genres:
+  - Post-Rock
+  - Industrial Rock
+  - Experimental Rock
+  - Alternative Rock
+  - Art Rock
+  - Electronic Rock
+lrc_file: 01_09.lrc
+concept: Like Neo in the Matrix before he takes the pill or Mr. Robot - this is a song about a hacker who has crossed the line and is now in deep shit. I was working for some folks that were not to be messed with at the time and this stoked my latent paranoia. A rainbow table is a list of brute force attacks and became the title of the ten year project The Rainbow Table. The notion that one would be sitting at it, a flowing, tabular code stream, like vikings in a Valhalla feast was both frightening and funny to me
+audio_tracks:
+  - id: 1
+    description: Main vocals
+    audio_file: 01_09_02_main_vocals.wav
+  - id: 2
+    description: Double tracked vocals
+    audio_file: 01_09_03_dbl_vocals.wav
+  - id: 3
+    description: Background vocals
+    audio_file: 01_09_04_bg_vocals.wav
+  - id: 4
+    description: All Drums
+    audio_file: 01_09_05_all_drums.wav
+    group: Drums
+  - id: 5
+    description: Kit hihat
+    audio_file: 01_09_06_hihat.wav
+    group: Drums
+  - id: 6
+    description: Kit Kick
+    audio_file: 01_09_07_kick_in.wav
+    group: Drums
+  - id: 7
+    description: Kit room mic
+    audio_file: 01_09_08_room.wav
+    group: Drums
+  - id: 8
+    description: Kit snare
+    audio_file: 01_09_09_snare.wav
+    group: Drums
+  - id: 9
+    description: Kick
+    midi_file: 01_09_10_kick.mid
+    audio_file: 01_09_11_kick.wav
+    group: Drums
+  - id: 10
+    description: Snare
+    midi_file: 01_09_12_snare.mid
+    audio_file: 01_09_13_snare.wav
+    group: Drums
+  - id: 11
+    description: Hihat
+    midi_file: 01_09_14_hihat.mid
+    audio_file: 01_09_15_hihat.wav
+    group: Drums
+  - id: 12
+    description: Drum machine
+    audio_file: 01_09_16_drum_machine.wav
+    midi_file: 01_09_17_drum_machine.mid
+    group: Drums
+  - id: 13
+    description: Tambourine
+    midi_file: 01_09_18_tambourine.mid
+    audio_file: 01_09_19_tambourine.wav
+    group: Drums
+  - id: 14
+    description: Organ
+    midi_file: 01_09_20_organ.mid
+    audio_file: 01_09_21_organ.wav
+  - id: 15
+    description: Mellotron
+    midi_file: 01_09_22_mellotron.mid
+    audio_file: 01_09_23_mellotron.wav
+  - id: 16
+    description: Log Jam Synth
+    midi_file: 01_09_24_log_jam_synth.mid
+    audio_file: 01_09_25_log_jam_synth.wav
+  - id: 17
+    description: Biotron
+    midi_file: 01_09_26_biotron.mid
+    audio_file: 01_09_27_biotron.wav
+  - id: 18
+    description: Tapped Guitar
+    audio_file: 01_09_28_tapped_guitar.wav
+  - id: 19
+    description: Guitar
+    audio_file: 01_09_29_guitar.wav
+  - id: 20
+    description: Synth Bass
+    midi_file: 01_09_30_synth_bass.mid
+    audio_file: 01_09_31_synth_bass.wav
+  - id: 21
+    description: Bass
+    audio_file: 01_09_32_bass.wav

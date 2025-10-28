@@ -1,0 +1,98 @@
+bpm: 120
+manifest_id: '02_11'
+tempo: 4/4
+key: D minor
+rainbow_color: R
+title: Eye on Ghost Singers
+release_date: '2019-01-11'
+album_sequence: 11
+main_audio_file: 02_11_main.wav
+TRT: '[03:30.171]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:32.000]'
+    description: Giant ringing modular percussion starts the song like a 1950s doorbell in slow motion.
+  - section_name: Verse 1
+    start_time: '[00:32.000]'
+    end_time: '[01:20.000]'
+    description: As the vocals begin, the background is decorating with long synth sounds like flying buttresses.
+  - section_name: Interlude 1
+    start_time: '[01:20.000]'
+    end_time: '[01:52.000]'
+    description: A slow, psychedelic passage unravels meditatively
+  - section_name: Verse 2
+    start_time: '[01:52.000]'
+    end_time: '[02:40.000]'
+    description: Back to the vocals, reprising the melody and lyrical themes
+  - section_name: Outro
+    start_time: '[02:40.000]'
+    end_time: '[03:30.171]'
+    description: An LFO-modulated guitar plays a melody line before the song fades out.
+mood:
+    - Nostalgic
+    - Haunting
+    - Cerebral
+    - Foreboding
+sounds_like:
+  - name: Pink Floyd
+    discogs_id: 45467
+  - name: Radiohead
+    discogs_id: 3840
+  - name: Kraftwerk
+    discogs_id: 4654
+genres:
+  - Rock
+  - Electronic
+  - Alternative Rock
+  - New Wave
+  - Psychedelic Rock
+lrc_file: 02_11.lrc
+concept: The idea of replacing vocals in a film and having the singer and actress be real-life friends gave me Persona-type chills. I never read the real ghost singer book though, shame.
+audio_tracks:
+  - id: 1
+    description: Mandika Kit
+    audio_file: 02_11_03_mandika.wav
+    midi_file: 02_11_02_mandika.mid
+  - id: 2
+    description: Drum Machine
+    audio_file: 02_11_05_drum_machine.wav
+    midi_file: 02_11_04_drum_machine.mid
+  - id: 3
+    description: CMI Bass
+    audio_file: 02_11_07_CMI_bass.wav
+    midi_file: 02_11_06_CMI_bass.mid
+  - id: 4
+    description: Bass
+    audio_file: 02_11_08_bass.wav
+  - id: 5
+    description: Guitar
+    audio_file: 02_11_09_guitar.wav
+  - id: 6
+    description: Echo Harp
+    audio_file: 02_11_11_echo_harp.wav
+    midi_file: 02_11_10_echo_harp.mid
+  - id: 7
+    description: String Synth
+    audio_file: 02_11_12_string_synth.wav
+    midi_file: 02_11_12_string_synth.mid
+  - id: 8
+    description: Air Synth
+    audio_file: 02_11_15_air_synth.wav
+    midi_file: 02_11_14_air_synth.mid
+  - id: 9
+    description: Motor Synth
+    audio_file: 02_11_17_motor_synth.wav
+    midi_file: 02_11_16_motor_synth.mid
+  - id: 10
+    description: Mini
+    audio_file: 02_11_19_mini.wav
+    midi_file: 02_11_18_mini.mid
+  - id: 11
+    description: Vocals
+    audio_file: 02_11_20_vocal.wav
+  - id: 12
+    description: Vocals 2
+    audio_file: 02_11_21_vocal2.wav
