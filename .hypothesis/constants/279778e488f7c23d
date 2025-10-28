@@ -1,4 +1,0 @@
-# file: /Volumes/LucidNonsense/White/app/structures/enums/temporal_relatioship.py
-# hypothesis_version: 6.142.4
-
-['bleeds_in', 'bleeds_out', 'contained', 'exact_match', 'spans_across', 'unknown']

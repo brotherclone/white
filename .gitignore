@@ -34,3 +34,7 @@ dist/
 **/dist/
 .benchmarks/
 /.coverage.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
