@@ -33,4 +33,4 @@ build/
 dist/
 **/dist/
 .benchmarks/
-/.coverage
+/.coverage.hypothesis/
