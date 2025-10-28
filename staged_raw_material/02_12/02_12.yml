@@ -1,30 +1,64 @@
-bpm: TK
+bpm: 98
 manifest_id: '02_12'
-tempo: TK
-key: TK
+tempo: 4/4
+key: C minor
 rainbow_color: R
 title: Time Moving in Light
 release_date: '2019-01-11'
 album_sequence: 12
 main_audio_file: 02_12_main.wav
-TRT: TK
+TRT: '[04:09.197]'
 vocals: false
 lyrics: false
 structure:
-  - section_name: TK
+  - section_name: Moving through Time
     start_time: '[00:00.000]'
-    end_time: TK
-    description: TK
+    end_time: '[04:09.197]'
+    description: An ambient soundscape that evokes the sensation of time flowing and shifting, with gentle melodies and evolving textures.
 mood:
-    - TK
+    - Calm
+    - Slow Motion
+    - Other-worldly
+    - Surreal
+    - Dreamy
 sounds_like:
-  - name: TK
-    discogs_id: TK
+  - name: Terry Riley
+    discogs_id: 32198
+  - name: Tangerine Dream
+    discogs_id: 10343
+  - name: Amp
+    discogs_id: 4090
 genres:
-  - TK
-concept: TK
+  - Ambient
+  - New Age
+  - Electronic
+  - New Classical
+  - Experimental
+concept: The book wasn't hidden very well here - Time Moving in Light was a book about Experimental Film that was assigned in school and that really changed my perspective on the world.
 audio_tracks:
   - id: 1
-    description: TK
-    audio_file: TK
-    midi_file: TK
+    description: Chantress Synth
+    audio_file: 02_12_03_chantress.wav
+    midi_file: 02_12_02_chantress.mid
+  - id: 2
+    description: Mellotron Synth
+    audio_file: 02_12_05_mellotron.wav
+    midi_file: 02_12_04_mellotron.mid
+    midi_group: Melody
+  - id: 3
+    description: Synclavier Synth
+    audio_file: 02_12_07_synclavier.wav
+    midi_file: 02_12_06_synclavier.mid
+  - id: 4
+    description: Jupiter Synth
+    audio_file: 02_12_08_jupiter_mello.wav
+    midi_group: Melody
+  - id: 5
+    description: Mantis Synth
+    audio_file: 02_12_09_mantis.wav
+  - id: 6
+    description: Guitar
+    audio_file: 02_12_10_guitar.wav
+  - id: 7
+    description: Bass
+    audio_file: 02_12_11_bass.wav
