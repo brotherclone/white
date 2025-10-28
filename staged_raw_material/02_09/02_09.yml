@@ -1,0 +1,137 @@
+bpm: 142
+manifest_id: '02_09'
+tempo: 4/4
+key: E major
+rainbow_color: R
+title: A Dark Years History
+release_date: '2019-01-11'
+album_sequence: 9
+main_audio_file: 02_09_main.wav
+TRT: '[02:42.073]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:20.070]'
+    description: Echoing keys reminiscent of Manfred Mann's cover of "Blinded by the Light" start the song.
+  - section_name: Chorus as Intro
+    start_time: '[00:20.071]'
+    end_time: '[00:33.200]'
+    description: A chewy synth with background vocals add a more 90s feel to the song.
+  - section_name: Verse 1
+    start_time: '[00:33.201]'
+    end_time: '[00:47.080]'
+    description: The song structure is odd, this passage seems to set the song rather than move it along.
+  - section_name: Chorus 1
+    start_time: '[00:47.081]'
+    end_time: '[01:07.151]'
+    description: This begins a pattern of scrunched overlapping vocal parts
+  - section_name: Interlude 1
+    start_time: '[01:07.152]'
+    end_time: '[01:14.091]'
+    description: A weird Droid type synth can be heard here.
+  - section_name: Verse as Jams
+    start_time: '[01:14.092]'
+    end_time: '[01:27.221]'
+    description: The previous verse is here sans-vocals
+  - section_name:  Chorus 2
+    start_time: '[01:27.222]'
+    end_time: '[01:48.041]'
+    description: Back to the overlapping vocal parts
+  - section_name:  Interlude 2
+    start_time: '[01:48.042]'
+    end_time: '[02:01.172]'
+    description: Another odd break with synths and drums.
+  - section_name:  Chorus 3
+    start_time: '[02:01.173]'
+    end_time: '[02:15.053]'
+    description: Back to the overlapping vocal parts
+  - section_name: Outro
+    start_time: '[02:15.054]'
+    end_time: '[02:42.073]'
+    description: The background vocals reach to a 70s style falsetto as the song fades.
+mood:
+    - Playful
+    - Dreamy
+    - Cozy
+    - Retro
+sounds_like:
+  - name: Television Personalities
+    discogs_id: 83074
+  - name: UILab
+    discogs_id: 93183
+  - name: Manfred Mann's Earth Band
+    discogs_id: 170358
+genres:
+  - Psychedelic Rock
+  - Rock
+  - Post-Rock
+lrc_file: 02_09.lrc
+concept: The book that the song was based on was a Christian novel one of my dad's students wrote. He was a bit embarrassed of the dedication to the teacher who taught him how to write given the novel's subpar prose.
+audio_tracks:
+  - id: 1
+    description: Noisy Synths
+    audio_file: 02_09_02_noisy_synths.wav
+  - id: 2
+    description: Synth Bass
+    audio_file: 02_09_04_synth_bass.wav
+    midi_file: 02_09_03_synth_bass.mid
+  - id: 3
+    description: Wurlitzer
+    audio_file: 02_09_06_wurlitzer.wav
+    midi_file: 02_09_05_wurlitzer.mid
+  - id: 4
+    description: Springs
+    audio_file: 02_09_08_springs.wav
+    midi_file: 02_09_07_springs.mid
+  - id: 5
+    description: Piano
+    audio_file: 02_09_10_piano.wav
+    midi_file: 02_09_09_piano.mid
+  - id: 6
+    description: Arp
+    audio_file: 02_09_12_arp.wav
+    midi_file: 02_09_11_arp.mid
+  - id: 7
+    description: Guitar
+    audio_file: 02_09_13_guitar.wav
+  - id: 8
+    description: All Drums
+    audio_file: 02_09_15_all_drums.wav
+    midi_file: 02_09_14_all_drums.mid
+    group: drums
+    midi_group: drums
+  - id: 9
+    description: Kick
+    audio_file: 02_09_17_kick.wav
+    midi_file: 02_09_16_kick.mid
+    group: drums
+    midi_group: drums
+  - id: 10
+    description: Snare
+    audio_file: 02_09_19_snare.wav
+    midi_file: 02_09_18_snare.mid
+    group: drums
+    midi_group: drums
+  - id: 11
+    description: Toms
+    audio_file: 02_09_21_toms.wav
+    midi_file: 02_09_20_toms.mid
+    group: drums
+    midi_group: drums
+  - id: 12
+    description: Baritone
+    audio_file: 02_09_22_baritone.wav
+  - id: 13
+    description: Vocals
+    audio_file: 02_09_23_vocals.wav
+  - id: 14
+    description: Vocals 2
+    audio_file: 02_09_24_vocals2.wav
+  - id: 15
+    description: Vocals 3
+    audio_file: 02_09_25_vocals3.wav
+  - id: 16
+    description: Vocals 4
+    audio_file: 02_09_26_vocals4.wav

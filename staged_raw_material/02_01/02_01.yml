@@ -69,14 +69,11 @@ mood:
   - hypnotic
 sounds_like:
   - name: Neu!
-    id: null
-    discogs_id: null
+    discogs_id: 12636
   - name: Gary Numan
-    id: null
-    discogs_id: null
+    discogs_id: 12588
   - name: Steely Dan
-    id: null
-    discogs_id: null
+    discogs_id: 160906
 genres:
   - Experimental
   - Psychedelic

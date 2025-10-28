@@ -1,0 +1,146 @@
+bpm: 141
+manifest_id: '01_04'
+tempo: 4/4
+key: B minor
+rainbow_color: Z
+title: All Basty
+release_date: '2017-07-18'
+album_sequence: 4
+main_audio_file: 01_04_main.wav
+TRT: '[03:00.212]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:07.056]'
+    description: A bouncy sort of psych-roll that borders on Bubblegum begins.
+  - section_name: Verse 1
+    start_time: '[00:07.057]'
+    end_time: '[00:27.039]'
+    description: The vocals begin along with a Billie Gentry-spired string line on a Melotron.
+  - section_name: Chorus 1
+    start_time: '[00:27.040]'
+    end_time: '[00:54.227]'
+    description: The chorus comes in with tons of guitar interplay
+  - section_name: Verse 2
+    start_time: '[00:54.228]'
+    end_time: '[01:15.078]'
+    description: We return to the verse - the vocals play with the deep echo effect.
+  - section_name: Chorus 2
+    start_time: '[01:15.079]'
+    end_time: '[01:42.136]'
+    description: The chorus returns with more urgency and interplay.
+  - section_name: Interrupting Bridge
+    start_time: '[01:42.137]'
+    end_time: '[01:56.020]'
+    description: A harsh, and dissonant bridge interrupts the flow of the song with a jarring effect.
+  - section_name: Chorus 3 Extended
+    start_time: '[01:56.021]'
+    end_time: '[02:37.042]'
+    description: The chorus returns a Vocoder joins in with a counter-chorus line.
+  - section_name: Interrupting Bridge as Outro
+    start_time: '[02:37.043]'
+    end_time: '[03:00.212]'
+    description: The harsh, and dissonant bridge returns to close out the song with a jarring effect.
+mood:
+  - coy
+  - trippy
+  - whimsical
+  - playful
+  - quirky
+  - dreamy
+  - surreal
+  - eccentric
+sounds_like:
+  - name: The Momes
+    discogs_id: 1416914
+  - name: Ariel Pink's Haunted Graffiti
+    discogs_id: 284349
+  - name: Lily Vakili
+    discogs_id: 12841037
+genres:
+  - Psychedelic
+  - Pych Rock
+  - Indie Rock
+  - Dream Pop
+  - Lo-Fi
+  - Experimental
+  - Art Rock
+  - Avant-Garde
+lrc_file: 01_04.lrc
+concept: Al Basti is the Sumerian name for Lilith, Adam's first wife who was made from the same earth as he. She was cast out of Eden for refusing to be subservient to him and became a demon who preyed on new mothers and infants. This song is from her perspective, her side really railing against the unfair treatment she received and YWH's unfair treatment of Eve. The song is playful and whimsical in tone, but the lyrics are dark and angry.
+audio_tracks:
+  - id: 1
+    description: Cymbals
+    audio_file: 01_04_03_cymbals.wav
+    midi_file: 01_04_02_cymbals.mid
+    group: drums
+  - id: 2
+    description: Snare
+    audio_file: 01_04_05_snare.wav
+    midi_file: 01_04_04_snare.mid
+    group: drums
+  - id: 3
+    description: Kick
+    audio_file: 01_04_07_kick.wav
+    midi_file: 01_04_06_kick.mid
+    group: drums
+  - id: 4
+    description: Hi-Hat
+    audio_file: 01_04_09hi_hat.wav
+    midi_file: 01_04_08_hi_hat.mid
+    group: drums
+  - id: 5
+    description: Full Drum Kit
+    audio_file: 01_04_10_drums.wav
+    group: drums
+  - id: 6
+    description: Bass
+    audio_file: 01_04_11_bass.wav
+  - id: 7
+    description: Main Vocals
+    audio_file: 01_04_12_main_vocal.wav
+  - id: 8
+    description: Double Vocals
+    audio_file: 01_04_13_dbl_vocal.wav
+  - id: 9
+    description: Background Vocals 1
+    audio_file: 01_04_14_bg1_vocal.wav
+  - id: 10
+    description: Background Vocals 2
+    audio_file: 01_04_15_bg2_vocal.wav
+  - id: 11
+    description: Background Vocals 3
+    audio_file: 01_04_16_bg3_vocal.m.wav
+  - id: 12
+    description: Vocoder
+    audio_file: 01_04_18_vocoder.wav
+    midi_file: 01_04_17_vocoder.mid
+  - id: 13
+    description: Noisy Guitar
+    audio_file: 01_04_19_noisy_guitar.wav
+  - id: 14
+    description: Backwards Guitar
+    audio_file: 01_04_20_backwards_guitar.wav
+  - id: 15
+    description: Smashy Guitar
+    audio_file: 01_04_21_smashy_guitar.wav
+  - id: 16
+    description: Bass 2
+    audio_file: 01_04_22_bass.wav
+  - id: 17
+    description: Main Guitar
+    audio_file: 01_04_23_main_guitar.wav
+  - id: 18
+    description: Mellotron Cello
+    audio_file: 01_04_25_mellotron_cello.wav
+    midi_file: 01_04_24_mellotron_cello.mid
+  - id: 19
+    description: Wurlitzer
+    audio_file: 01_04_27_wurlitzer.wav
+    midi_file: 01_04_26_wurlitzer.mid
+  - id: 20
+    description: Organ
+    audio_file: 01_04_29_organ.wav
+    midi_file: 01_04_28_organ.mid

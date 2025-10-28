@@ -1,0 +1,190 @@
+bpm: 120
+manifest_id: '03_06'
+tempo: 4/4
+key: D minor
+rainbow_color: O
+title: Newest of the Natural Senses
+release_date: '2020-06-23'
+album_sequence: 6
+main_audio_file: 03_06_01_main.wav
+TRT: '[04:07.124]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: NSynth intro
+    start_time: '[00:00.000]'
+    end_time: '[00:40.099]'
+    description: Woozy Magenta synths stray from sample to sample, creating a dreamy, otherworldly atmosphere.
+  - section_name: Verse 1
+    start_time: '[00:40.100]'
+    end_time: '[01:03.999]'
+    description: The first verse, with a more traditional indie rock meets 70s art rock arrangement
+  - section_name: Chorus 1
+    start_time: '[01:04.000]'
+    end_time: '[01:19.999]'
+    description: Extremely early Bowie sounding
+  - section_name: Bridge 1
+    start_time: '[01:20.000]'
+    end_time: '[01:35.999]'
+    description: Motown like backing vocals are added giving the song a another facet
+  - section_name: Verse 2
+    start_time: '[01:36.000]'
+    end_time: '[02:15.999]'
+    description: Back to the verse
+  - section_name: Special Bridge
+    start_time: '[02:16.000]'
+    end_time: '[02:31.999]'
+    description: The deep soulful singer and the snotty proto-punk singer sing together
+  - section_name: Verse 3
+    start_time: '[02:32.000]'
+    end_time: '[02:47.999]'
+    description: The third verse continues the lyrical story
+  - section_name: Bridge 3
+    start_time: '[02:48.000]'
+    end_time: '[03:03.999]'
+    description: The bridge is repeated again, now with more organ and synths
+  - section_name: Final Verse
+    start_time: '[03:04.000]'
+    end_time: '[03:51.222]'
+    description: The final verse, almost overloaded runs into the end of the song
+  - section_name: Outro
+    start_time: '[03:51.223]'
+    end_time: '[04:07.124]'
+    description: Strange samples and odd discussions leak through the noisy outro
+mood:
+  - frantic
+sounds_like:
+  - name: David Bowie
+    discogs_id: 10263
+  - name: The Boo Radleys
+    discogs_id: 7579
+  - name: Willie Hutch
+    discogs_id: 7153
+genres:
+  - indie rock
+  - shoegaze
+  - art rock
+  - motown
+lrc_file: 03_06.lrc
+concept: A sci-fi sort of song about down-and-out friends who sign up for a medical experiment for eyedrop vision correction. It causes them to go blind at first but then see 24 hours forward into the future. The forgotten item is the money they never collected.
+audio_tracks:
+  - id: 2
+    description: Shaker
+    audio_file: 03_06_03_shaker.wav
+    midi_file: 03_06_02_shaker.mid
+    midi_group: Drums
+    group: Drums
+  - id: 3
+    description: Cymbals
+    audio_file: 03_06_05_cymbals.wav
+    midi_file: 03_06_04_cymbals.mid
+    midi_group: Drums
+    group: Drums
+  - id: 4
+    description: Toms
+    audio_file: 03_06_07_toms.wav
+    midi_file: 03_06_06_toms.mid
+    midi_group: Drums
+    group: Drums
+  - id: 5
+    description: Hi-Hat
+    audio_file: 03_06_09_hihat.wav
+    midi_file: 03_06_08_hihat.mid
+    midi_group: Drums
+    group: Drums
+  - id: 6
+    description: Snare
+    audio_file: 03_06_11_snare.wav
+    midi_file: 03_06_10_snare.mid
+    midi_group: Drums
+    group: Drums
+  - id: 7
+    description: Kick
+    audio_file: 03_06_13_kick.wav
+    midi_file: 03_06_12_kick.mid
+    midi_group: Drums
+    group: Drums
+  - id: 8
+    description: B3 Organ
+    audio_file: 03_06_15_b3_organ.wav
+    midi_file: 03_06_14_b3_organ.mid
+  - id: 9
+    description: Electric Piano
+    audio_file: 03_06_17_electric_piano.wav
+    midi_file: 03_06_16_electric_piano.mid
+  - id: 10
+    description: Signs of Life Synth
+    audio_file: 03_06_19_signs_of_life_synth.wav
+    midi_file: 03_06_18_signs_of_life_synth.mid
+  - id: 11
+    description: Secret Light Synth
+    audio_file: 03_06_21_secret_light_synth.wav
+    midi_file: 03_06_20_secret_light_synth.mid
+  - id: 12
+    description: Mellotron
+    audio_file: 03_06_23_mellotron.wav
+    midi_file: 03_06_22_mellotron.mid
+  - id: 13
+    description: Acoustic Guitar
+    audio_file: 03_06_24_acoustic_guitar.wav
+  - id: 14
+    description: Corrupt Guitar
+    audio_file: 03_06_25_corrupt_guitar.wav
+  - id: 15
+    description: Shredder
+    audio_file: 03_06_27_shredder.wav
+    midi_file: 03_06_26_shredder.mid
+  - id: 16
+    description: Switch
+    audio_file: 03_06_29_switch.wav
+    midi_file: 03_06_28_switch.mid
+  - id: 17
+    description: Clicking
+    audio_file: 03_06_31_clicking.wav
+    midi_file: 03_06_30_clicking.mid
+  - id: 18
+    description: French Horns
+    audio_file: 03_06_33_french_horns.wav
+    midi_file: 03_06_32_french_horns.mid
+  - id: 19
+    description: Microgran
+    audio_file: 03_06_34_microgran.wav
+  - id: 20
+    description: NSynth
+    audio_file: 03_06_35_nsynth.wav
+  - id: 21
+    description: Vocal Filter Melody
+    midi_file: 03_06_36_vocal_filter_melody.mid
+    group: Filtered Vocals
+  - id: 22
+    description: Vocal Filtered
+    audio_file: 03_06_37_vocal_filtered.wav
+    group: Filtered Vocals
+  - id: 23
+    description: Vocal 1
+    audio_file: 03_06_38_vocal_1.wav
+  - id: 24
+    description: Vocal 2
+    audio_file: 03_06_39_vocal_2.wav
+  - id: 25
+    description: Vocal 3
+    audio_file: 03_06_40_vocal_3.wav
+  - id: 26
+    description: Marvin Main 1
+    audio_file: 03_06_41_marvin_main_1.wav
+    player: MARVIN
+  - id: 27
+    description: Marvin Main 2
+    audio_file: 03_06_42_marvin_main_2.wav
+    player: MARVIN
+  - id: 28
+    description: Marvin BG 1
+    audio_file: 03_06_43_marvin_bg_1.wav
+    player: MARVIN
+  - id: 29
+    description: Marvin BG 2
+    audio_file: 03_06_44_marvin_bg_2.wav
+    player: MARVIN
+  - id: 30
+    description: End Sounds - A Morphogene loaded with 70s television samples and triggered by LFO, then envelope filtered.
+    audio_file: 03_06_45_end_sounds.wav

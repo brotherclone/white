@@ -8,7 +8,7 @@ class TimeSignature(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
         if self.denominator not in [1, 2, 4, 8, 16, 32]:
-            raise ValueError("Denominator must be one of the following: 1, 2, 4, 8, 16. 32")
+            raise ValueError("Denominator must be one of the following: 1, 2, 4, 8, 16, 32")
 
     def __str__(self):
         return f"{self.numerator}/{self.denominator}"
