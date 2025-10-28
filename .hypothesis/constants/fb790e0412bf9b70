@@ -1,4 +1,0 @@
-# file: /Volumes/LucidNonsense/White/app/util/manifest_validator.py
-# hypothesis_version: 6.142.4
-
-[0.0, 1.0, 100.0, 100, 429, 1000, '**/*.yml', '.earthly_frames', ':', 'GABE', 'TK', 'TRT', 'USER_ACCESS_TOKEN', 'Unknown', '[]', '^\\d+(?:/\\d+)?$', '__main__', 'album_sequence', 'audio_file', 'audio_tracks', 'bpm', 'bpm is missing', 'cache', 'complete_tracks', 'concept', 'description', 'discogs_id', 'end_time', 'genres', 'has_all_audio', 'has_lrc', 'has_lyrics', 'has_main_audio', 'has_midi', 'id', 'incomplete_tracks', 'key', 'lrc', 'lrc_file', 'lyrics', 'main_audio_file', 'manifest_id', 'mid', 'midi_file', 'midi_group_file', 'missing', 'missing_audio', 'missing_files', 'missing_midi', 'mood', 'name', 'player', 'r', 'rainbow_color', 'release_date', 'section_name', 'sounds_like', 'start_time', 'structure', 'tempo', 'tempo is missing', 'title', 'total_tracks', 'unknown', 'vocals', 'w', 'wav', '⚠️', '✅', '❌']

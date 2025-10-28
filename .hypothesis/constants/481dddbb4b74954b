@@ -1,4 +1,0 @@
-# file: /Volumes/LucidNonsense/White/app/agents/tools/audio_tools.py
-# hypothesis_version: 6.142.4
-
-[-1.0, -0.2, 0.0, 1e-10, 0.03, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.7, 1.0, 4.0, 100.0, 1000.0, 32767.0, -32767, -300, -200, -100, 100, 120, 200, 300, 700, 1000, 1200, 2400, 3400, 32767, 44100, '.wav', '123443', 'MANIFEST_PATH', 'PCM_16', 'WAV', 'Z', '__main__', 'band', 'blended', 'constant', 'float32', 'ignore', 'mosiac', 'rainbow_color']

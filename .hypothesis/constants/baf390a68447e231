@@ -1,4 +1,0 @@
-# file: /Volumes/LucidNonsense/White/app/structures/extractors/audio_extractor.py
-# hypothesis_version: 6.142.4
-
-[-40.0, 0.0, 0.1, 0.9, 1.0, 2.0, 22050, '01_01', 'Loaded manifest:', 'MANIFEST_PATH', '__main__', 'attack_time', 'audio_features', 'decay_profile', 'ignore', 'is_mostly_silence', 'non_silence_ratio', 'non_silence_regions', 'peak_amplitude', 'rms_energy', 'silence_gaps', 'spectral_centroid']

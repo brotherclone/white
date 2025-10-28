@@ -1,4 +1,0 @@
-# file: /Volumes/LucidNonsense/White/app/agents/enums/work_flow_type.py
-# hypothesis_version: 6.142.4
-
-['chain', 'full_spectrum', 'parallel', 'single_agent']
