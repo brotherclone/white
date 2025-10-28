@@ -1,0 +1,4 @@
+# file: /Volumes/LucidNonsense/White/app/agents/enums/noise_type.py
+# hypothesis_version: 6.142.4
+
+['blue', 'brown', 'grey', 'pink', 'violet', 'white']

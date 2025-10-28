@@ -1,0 +1,4 @@
+# file: /Volumes/LucidNonsense/White/app/agents/models/book_data.py
+# hypothesis_version: 6.142.4
+
+['1st', 'Brief description', 'Censorship notes', 'Edition information', 'English', 'How it was acquired', 'ISBN if it exists', 'Memorable excerpt', 'Page count', 'Physical condition', 'Primary language', 'Publisher name', 'Related titles', 'Subject tags', 'Subtitle if present', 'Translator name', 'Type of publisher', 'When acquired', 'Year of publication']

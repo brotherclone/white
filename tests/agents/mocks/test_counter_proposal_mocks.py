@@ -1,6 +1,31 @@
 import yaml
 
 from app.structures.manifests.song_proposal import SongProposalIteration
+from hypothesis import given, strategies as st
+from copy import deepcopy
+
+
+@given(
+    moods=st.lists(st.text(min_size=1, max_size=12), min_size=1, max_size=4),
+    genres=st.lists(st.text(min_size=1, max_size=12), min_size=1, max_size=4),
+)
+def test_counter_proposals_varying_lists(moods, genres):
+    files = [
+        "/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_evp_mock.yml",
+        "/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_sigil_mock.yml",
+        "/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_mock.yml",
+        "/Volumes/LucidNonsense/White/app/agents/mocks/red_counter_proposal_mock.yml",
+    ]
+    for p in files:
+        with open(p, "r") as f:
+            base = yaml.safe_load(f)
+        candidate = deepcopy(base)
+        candidate["mood"] = moods
+        candidate["genres"] = genres
+        sp = SongProposalIteration(**candidate)
+        assert sp.mood == moods
+        assert sp.genres == genres
+
 
 def test_black_counter_proposal_mocks():
     with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_evp_mock.yml", "r") as f:

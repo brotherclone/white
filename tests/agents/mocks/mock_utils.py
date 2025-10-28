@@ -1,19 +1,21 @@
 """Test utilities for normalizing mock YAML data before Pydantic instantiation.
 
-Helpers convert bare enum-like tokens in the YAML fixtures (e.g. VANITY, RECONSTRUCTED)
-into actual Enum members, and provide small helpers for common mock shapes like book_data and
+Helpers convert bare enum-like tokens in the YAML fixtures (e.g., VANITY, RECONSTRUCTED)
+into actual Enum members and provide small helpers for common mock shapes like book_data and
 text pages.
 """
 from typing import Any, Dict, Type, Optional
 from enum import Enum
-
+from app.structures.concepts.rainbow_table_color import RainbowTableColor
+from app.agents.enums.publisher_type import PublisherType
+from app.agents.enums.book_condition import BookCondition
 
 def normalize_enum_field(d: Dict[str, Any], key: str, enum_cls: Type[Enum]) -> None:
     """If d[key] is a string, attempt to coerce it into an Enum member of enum_cls.
 
     Strategy (in order):
     - If value is already an instance of enum_cls, leave it.
-    - Try to lookup by member name (exact, then uppercased).
+    - Try to look up by member name (exact, then uppercased).
     - Try to construct enum by value (enum_cls(value)).
 
     The function mutates ``d`` in-place and returns None.
@@ -23,31 +25,29 @@ def normalize_enum_field(d: Dict[str, Any], key: str, enum_cls: Type[Enum]) -> N
     if key not in d:
         return
     val = d.get(key)
-    # already normalized
     if isinstance(val, enum_cls):
         return
     if not isinstance(val, str):
         return
     raw = val.strip()
-    # attempt lookup by name
     try:
         d[key] = enum_cls[raw]
         return
-    except Exception:
+    except (KeyError, ValueError) as e:
+        print(f"Failed to coerce {key} to {enum_cls}: {e}")
         pass
-    # try uppercased name (covers YAML that used lower/upper inconsistently)
     try:
         d[key] = enum_cls[raw.upper()]
         return
-    except Exception:
+    except (KeyError, ValueError) as e:
+        print(f"Failed to coerce {key} to {enum_cls}: {e}")
         pass
-    # attempt construction by value
     try:
         d[key] = enum_cls(raw)
         return
-    except Exception:
+    except ValueError as e:
+        print(f"Failed to coerce {key} to {enum_cls}: {e}")
         pass
-    # last attempt: try stripping quotes or common whitespace; leave as-is if all fail
     return
 
 
@@ -61,8 +61,8 @@ def normalize_enum_fields(d: Dict[str, Any], mapping: Dict[str, Type[Enum]]) -> 
     for k, enum_cls in mapping.items():
         try:
             normalize_enum_field(d, k, enum_cls)
-        except Exception:
-            # be forgiving in tests; leave original value to allow pydantic to raise if necessary
+        except ValueError:
+            print(f"Failed to coerce {k} to {enum_cls}")
             continue
     return d
 
@@ -78,12 +78,7 @@ def normalize_book_data_enums(data: Dict[str, Any]) -> Dict[str, Any]:
     bd = data.get("book_data")
     if not isinstance(bd, dict):
         return data
-    # import enums lazily to avoid import-time side effects during test collection
-    try:
-        from app.agents.enums.publisher_type import PublisherType
-        from app.agents.enums.book_condition import BookCondition
-    except Exception:
-        return data
+
 
     normalize_enum_fields(bd, {
         "publisher_type": PublisherType,
@@ -93,17 +88,18 @@ def normalize_book_data_enums(data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-def normalize_bookdata_dict_only(bd: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_book_data_dict_only(bd: Dict[str, Any]) -> Dict[str, Any]:
     """Normalize enum-like fields inside a BookData-shaped dict (no outer wrapper).
 
-    This is a thin wrapper around :func:`normalize_enum_fields`.
+    This is a thin wrapper around: func:`normalize_enum_fields`.
     """
     if not isinstance(bd, dict):
         return bd
     try:
         from app.agents.enums.publisher_type import PublisherType
         from app.agents.enums.book_condition import BookCondition
-    except Exception:
+    except ValueError:
+        print("Failed to import enums; skipping bookdata enum normalization")
         return bd
     return normalize_enum_fields(bd, {
         "publisher_type": PublisherType,
@@ -123,13 +119,11 @@ def normalize_text_page_defaults(d: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(d, dict):
         return d
     d.setdefault("base_path", "")
-    # attempt to coerce rainbow_color if supplied as a small dict
     rc = d.get("rainbow_color") or d.get("rainbowColor")
     if isinstance(rc, dict) and rc:
         try:
-            from app.structures.concepts.rainbow_table_color import RainbowTableColor
             d["rainbow_color"] = RainbowTableColor(**rc)
-        except Exception:
-            # be permissive in tests; leave as-is on failure
+        except ValueError:
+            print(f"Failed to coerce rainbow_color dict to RainbowTableColor: {rc}")
             pass
     return d

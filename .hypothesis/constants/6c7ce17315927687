@@ -1,0 +1,4 @@
+# file: /Volumes/LucidNonsense/White/app/agents/black_agent.py
+# hypothesis_version: 6.142.4
+
+[0.33, 0.75, 2.0, 120, 180, '4/4', 'C Major', 'Fallback: Black Song', 'MOCK_MODE', 'Z', '_compiled_workflow', 'answer', 'artifact_index', 'await_human_action', 'black', 'configurable', 'counter_proposal', 'dark', 'done', 'evaluate_evp', 'evp', 'experimental', 'false', 'generate_evp', 'generate_sigil', 'human', 'id', 'r', 'settings', 'sigil', 'sigil_charging', 'sigil_wish', 'song_proposals', 'target_length', 'task_id', 'task_url', 'thread_id', 'true', 'type', 'url']

@@ -36,10 +36,12 @@ from app.reference.mcp.todoist.main import (
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
+
 # ToDo: Figure out of this can be moved
 def skip_chance(x):
     def decorator(f):
         return f
+
     return decorator
 
 
@@ -131,7 +133,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
         black_workflow.add_node("generate_sigil", self.generate_sigil)
         black_workflow.add_node("await_human_action", self.await_human_action)
         black_workflow.add_node("update_alternate_song_spec_with_sigil", self.update_alternate_song_spec_with_sigil)
-        black_workflow.add_node("export_chain_artifacts", self.export_chain_artifacts)
         # Edges
         black_workflow.add_edge(START, "generate_alternate_song_spec")
         black_workflow.add_edge("generate_alternate_song_spec", "generate_evp")
@@ -150,12 +151,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
             self.route_after_sigil_chance,
             {
                 "human": "await_human_action",
-                "done": "export_chain_artifacts"
+                "done": END
             }
         )
         black_workflow.add_edge("await_human_action", "update_alternate_song_spec_with_sigil")
-        black_workflow.add_edge("update_alternate_song_spec_with_sigil", "export_chain_artifacts")
-        black_workflow.add_edge("export_chain_artifacts", END)
+        black_workflow.add_edge("await_human_action", END)
         return black_workflow
 
     @staticmethod
@@ -375,7 +375,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
         )
         state.artifacts.append(evp_artifact)
-        #ToDo: Save off as yml
+        # ToDo: Save off as yml
         return state
 
     @staticmethod
@@ -428,10 +428,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logging.error(f"Anthropic model call failed: {e!s}")
             return state
 
-    def update_alternate_song_spec_with_evp(self,state: BlackAgentState) -> BlackAgentState:
+    def update_alternate_song_spec_with_evp(self, state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_evp_mock.yml", "r") as f:
+            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_evp_mock.yml",
+                      "r") as f:
                 data = yaml.safe_load(f)
                 evp_counter_proposal = SongProposalIteration(**data)
                 state.counter_proposal = evp_counter_proposal
@@ -508,7 +509,19 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.counter_proposal = sigil_counter_proposal
             return state
         else:
-            # ToDo: Save off as yml
+            try:
+                previous_sigil_artifact = SigilArtifact(**state.artifacts[-1])
+                previous_sigil_artifact.artifact_type = f"""
+                    Wish:{previous_sigil_artifact.wish}
+                    Intent:{previous_sigil_artifact.statement_of_intent}
+                    Description:{previous_sigil_artifact.glyph_description}
+                    Type:{previous_sigil_artifact.sigil_type.value}
+                    Instructions:{previous_sigil_artifact.charging_instructions}
+                    Components: {",".join(previous_sigil_artifact.glyph_components or [])}
+                """
+            except Exception as e:
+                logging.error(f"Failed to parse sigil artifact: {e!s}")
+                return state
             prompt = f"""
         You are helping a musician create a creative fiction song about an experimental musician 
         working in the experimental music space. You have just generated a sigil artifact and used a
@@ -529,19 +542,10 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     a hole in his memory that he can't explain. As the song progresses, he begins to hear whispers and voices that seem to
                     come from the abyss of his forgotten memories. The song explores themes of memory, identity, and the unknown.
         
-        And this is an example of the sigil artifact:
+         Here's the Sigil you previously created:
             
-            wish: 'Quiet the inner thoughts that prevent me from making great music'
-            statement_of_intent: 'I will hear only the inner thoughts that help me from making great music'
-            glyph_description: 'A white color with a black border'
-            glyph_components: ['white', 'black']
-            sigil_type: WORD_METHOD
-            activation_state: CHARGED
-            charging_instructions: 'Stare at the sigil for ten minutes'
-            chain_artifact_type: sigil
-            files: ['/Volumes/LucidNonsense/White/app/agents/mocks/sigil_charging_task_mock.yml']
+            {state.artifacts[-1]}
 
-        
         Then your updated counter-proposal could be some like:
             
             bpm: 135
@@ -569,13 +573,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     updated_proposal = SongProposalIteration(**result)
                     state.song_proposals.iterations.append(self.counter_proposal)
                     state.counter_proposal = updated_proposal
+
                     return state
             except Exception as e:
                 logging.error(f"Anthropic model call failed: {e!s}")
 
             return state
-
-    def export_chain_artifacts(self, state: BlackAgentState) -> BlackAgentState:
-        for artifact in state.artifacts:
-            print(artifact)
-        return state

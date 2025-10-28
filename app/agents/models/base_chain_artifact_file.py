@@ -1,5 +1,6 @@
 import os
 import uuid
+from pathlib import Path
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -9,12 +10,13 @@ from app.structures.concepts.rainbow_table_color import RainbowTableColor
 
 load_dotenv()
 
+
 class BaseChainArtifactFile(BaseModel):
 
     artifact_id: uuid.UUID | str = None
     thread_id: str | None = None
     rainbow_color: RainbowTableColor | None = None
-    base_path: str
+    base_path: str | Path
     chain_artifact_file_type: ChainArtifactFileType
     artifact_name: str | None = None
     file_name: str | None = None
@@ -33,13 +35,18 @@ class BaseChainArtifactFile(BaseModel):
         return f"{self.artifact_id}_{col}_{self.artifact_name}.{self.chain_artifact_file_type.value}"
 
     def get_artifact_path(self, with_file_name: bool = True) -> str:
-        base = self.base_path or os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')
+        # Normalize base_path to a string path
+        base = str(self.base_path) if self.base_path else os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')
+        if base is None:
+            raise ValueError("Base path is required to build an artifact path.")
+        # Build using pathlib for cross-platform correctness
+        base_path = Path(base)
         if self.thread_id is None:
             raise ValueError("Thread ID is required to build an artifact path.")
         if self.chain_artifact_file_type is None:
             raise ValueError("Chain artifact file type is required to build an artifact path.")
         if with_file_name:
             filename = self.file_name if self.file_name else "unknown.txt"
-            return os.path.join(base, self.thread_id, self.chain_artifact_file_type.value, filename)
+            return str(base_path / self.thread_id / self.chain_artifact_file_type.value / filename)
         else:
-            return os.path.join(base, self.thread_id, self.chain_artifact_file_type.value)
+            return str(base_path / self.thread_id / self.chain_artifact_file_type.value)

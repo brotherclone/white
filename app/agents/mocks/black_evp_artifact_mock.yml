@@ -1,45 +1,32 @@
 audio_segments:
   - sample_rate: 1
+    artifact_id: '12345'
     duration: 1.0
     channels: 1
     chain_artifact_file_type: 'wav'
-    rainbowColor:
-      color_name:
-      hex_value: '#FFFFFF'
-      mnemonic_character_value: 'A'
+    rainbow_color:
+      color_name: 'Black'
+      hex_value: 0x231f20
+      mnemonic_character_value: 'Z'
       transmigrational_mode:
-        current_mode: 'None'
-        transitory_mode: 'None'
-        transcendental_mode: 'None'
+        current_mode: 'Objectional'
+        transitory_mode: 'Temporal'
+        transcendental_mode: 'Ontological'
     base_path: "/Volumes/LucidNonsense/White/"
-    artifact_name: "mock"
-    file_name: "12345_black_mock.wav"
-  - sample_rate: 1
-    duration: 1.0
-    channels: 1
-    chain_artifact_file_type: 'wav'
-    rainbowColor:
-      color_name:
-      hex_value: '#FFFFFF'
-      mnemonic_character_value: 'A'
-      transmigrational_mode:
-        current_mode: 'None'
-        transitory_mode: 'None'
-        transcendental_mode: 'None'
-    base_path: "/Volumes/LucidNonsense/White/"
-    artifact_path: "app/agents/mocks/"
-    file_name: "12345_black_mock.wav"
+    artifact_name: "segment"
+    file_name: "12345_black_segment.wav"
 transcript:
   text_content: "This is a mock transcript for testing purposes."
   chain_artifact_file_type: 'md'
-  rainbowColor:
-    color_name:
-    hex_value: '#FFFFFF'
-    mnemonic_character_value: 'A'
+  artifact_id: '12345'
+  rainbow_color:
+    color_name: 'Black'
+    hex_value: 0x231f20
+    mnemonic_character_value: 'Z'
     transmigrational_mode:
-      current_mode: 'None'
-      transitory_mode: 'None'
-      transcendental_mode: 'None'
+      current_mode: 'Objectional'
+      transitory_mode: 'Temporal'
+      transcendental_mode: 'Ontological'
   base_path: "/Volumes/LucidNonsense/White/"
   artifact_name: "mock"
   file_name: "12345_black_mock.md"
@@ -48,14 +35,15 @@ audio_mosiac:
   duration: 1.0
   channels: 1
   chain_artifact_file_type: 'wav'
-  rainbowColor:
-    color_name:
-    hex_value: '#FFFFFF'
-    mnemonic_character_value: 'A'
+  artifact_id: '12345'
+  rainbow_color:
+    color_name: 'Black'
+    hex_value: 0x231f20
+    mnemonic_character_value: 'Z'
     transmigrational_mode:
-      current_mode: 'None'
-      transitory_mode: 'None'
-      transcendental_mode: 'None'
+      current_mode: 'Objectional'
+      transitory_mode: 'Temporal'
+      transcendental_mode: 'Ontological'
   base_path: "/Volumes/LucidNonsense/White/"
   artifact_name: "mock"
   file_name: "12345_black_mock.wav"
@@ -64,14 +52,15 @@ noise_blended_audio:
   duration: 1.0
   channels: 1
   chain_artifact_file_type: 'wav'
-  rainbowColor:
-    color_name:
-    hex_value: '#FFFFFF'
-    mnemonic_character_value: 'A'
+  artifact_id: '12345'
+  rainbow_color:
+    color_name: 'Black'
+    hex_value: 0x231f20
+    mnemonic_character_value: 'Z'
     transmigrational_mode:
-      current_mode: 'None'
-      transitory_mode: 'None'
-      transcendental_mode: 'None'
+      current_mode: 'Objectional'
+      transitory_mode: 'Temporal'
+      transcendental_mode: 'Ontological'
   base_path: "/Volumes/LucidNonsense/White/"
   artifact_name: "mock"
   file_name: "12345_black_mock.wav"

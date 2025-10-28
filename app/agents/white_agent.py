@@ -134,7 +134,7 @@ class WhiteAgent(BaseModel):
     def invoke_red_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Red Agent with the first synthesized proposal from Black Agent"""
         if "red" not in self.agents:
-            self.agents["red"] = BlackAgent(settings=self.settings)
+            self.agents["red"] = RedAgent(settings=self.settings)
         return self.agents["red"](state)
 
     @staticmethod
@@ -329,12 +329,9 @@ class WhiteAgent(BaseModel):
     def route_after_black(state: MainAgentState) -> str:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            choices = ["red", "black", "finish"]
-            return random.choice(choices)
-        # ToDo: Add checks for red, black, finish
+            return "red"
         if state.ready_for_red:
             return "red"
-            # return "black"
         return "finish"
 
     @staticmethod

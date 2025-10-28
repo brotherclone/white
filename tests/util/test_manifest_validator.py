@@ -23,7 +23,7 @@ def valid_manifest(temp_manifest_dir):
     manifest_data = {
         'manifest_id': 'test_01',
         'title': 'Test Song',
-        'rainbow_color': 'RED',
+        'rainbow_color': 'R',
         'bpm': 120,
         'tempo': 120,
         'key': 'C',
@@ -33,7 +33,7 @@ def valid_manifest(temp_manifest_dir):
         'TRT': '00:03:00',
         'vocals': True,
         'lyrics': True,
-        'mood': 'Happy',
+        'mood': ['Happy'],
         'sounds_like': [{'name': 'Mongorillo Dreams', 'discogs_id': '12345'}],
         'genres': ['Pop'],
         'concept': 'Test concept',
@@ -132,7 +132,7 @@ def manifest_missing_audio(temp_manifest_dir):
 
 @pytest.fixture
 def manifest_missing_midi(temp_manifest_dir):
-    """Create a manifest with missing MIDI file"""
+    """Create a manifest with a missing MIDI file"""
     manifest_data = {
         'manifest_id': 'test_03',
         'title': 'Test Song with Missing MIDI',
