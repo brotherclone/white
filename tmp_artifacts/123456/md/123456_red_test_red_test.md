@@ -1,0 +1,1 @@
+This is an example content for the artifact.

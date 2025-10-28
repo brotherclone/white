@@ -18,7 +18,7 @@ from app.agents.models.book_data import BookDataPageCollection, BookData
 from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.red_agent_state import RedAgentState
-from app.agents.tools.text_tools import save_artifact_to_md
+from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
@@ -61,29 +61,34 @@ class RedAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
+            """Entry point when White Agent invokes Red Agent"""
 
-        """Entry point when White Agent invokes Red Agent"""
+            current_proposal = state.song_proposals.iterations[-1]
+            red_state = RedAgentState(
+                song_proposals=state.song_proposals,
+                black_to_white_proposal=current_proposal,
+                counter_proposal=None,
+                artifacts=[],
+                should_respond_with_reaction_book=False,
+                should_create_book=True,
+                reaction_level=0
+            )
 
-        current_proposal = state.song_proposals.iterations[-1]
-        red_state = RedAgentState(
-            song_proposals=state.song_proposals,
-            black_to_white_proposal=current_proposal,
-            counter_proposal=None,
-            artifacts=[],
-            should_respond_with_reaction_book=False,
-            should_create_book=True,
-            reaction_level=0
-        )
-        red_config: RunnableConfig = {"configurable": {"thread_id": f"{state.thread_id}"}}
-        result = self._compiled_workflow.invoke(red_state.model_dump(), config=red_config)
-        snapshot = self._compiled_workflow.get_state(red_config)
-        if snapshot.next:
-            pass
-        else:
-            state.song_proposals = result.get("song_proposals") or state.song_proposals
-            if result.get("counter_proposal"):
-                state.song_proposals.iterations.append(result["counter_proposal"])
-        return state
+            red_graph = self.create_graph()
+            compiled_graph = red_graph.compile()
+            result = compiled_graph.invoke(red_state.model_dump())
+
+            if isinstance(result, RedAgentState):
+                final_state = result
+            elif isinstance(result, dict):
+                final_state = RedAgentState(**result)
+            else:
+                raise TypeError(f"Unexpected result type: {type(result)}")
+
+            if final_state.counter_proposal:
+                state.song_proposals.iterations.append(final_state.counter_proposal)
+
+            return state
 
     def create_graph(self) -> StateGraph:
 
@@ -122,6 +127,12 @@ class RedAgent(BaseRainbowAgent, ABC):
             summary = self._format_books_for_prompt(state)
 
             prompt = f"""
+            You are the Light Reader, a hermitic keeper of books rare and unusual. For you, these books are your
+            only means of communicating to the outside world. You've been given a unique job today and that is
+            to create a proposal for a song. This proposal should take into consider the current proposal from
+            the Black Agent as well as the book you last authored. Create a counter proposal for a song that shares aspects
+            of the current proposal but ultimately is about your last book and works that reference it. Use the bank
+            of real 'red' song manifests to help you craft your counter proposal.
             
             Your Light Reading book plus reactions to your work in from the literature:
             {summary}
@@ -134,8 +145,6 @@ class RedAgent(BaseRainbowAgent, ABC):
             
             In your counter proposal your 'rainbow_color' property should always be:
             {the_rainbow_table_colors['R']}
-    
-           
             """
 
             claude = self._get_claude()
@@ -196,7 +205,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{book_data.author}_excerpt_1",
                     )
-                    save_artifact_to_md(page_1)
+                    save_artifact_file_to_md(page_1)
                     page_2 = TextChainArtifactFile(
                         text_content=result["page_2"],
                         thread_id=state.thread_id,
@@ -205,7 +214,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{book_data.author}_excerpt_2",
                     )
-                    save_artifact_to_md(page_2)
+                    save_artifact_file_to_md(page_2)
                     state.main_generated_book = BookArtifact(
                         book_data=book_data,
                         excerpts=[page_1, page_2],
@@ -273,7 +282,15 @@ class RedAgent(BaseRainbowAgent, ABC):
     def write_reaction_book_pages(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            pass
+            with open("/app/agents/mocks/red_reaction_book_page_1_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+                page_1 = TextChainArtifactFile(**data)
+            with open("/app/agents/mocks/red_reaction_book_page_2_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+                page_2 = TextChainArtifactFile(**data)
+            state.artifacts.append(page_1)
+            state.artifacts.append(page_2)
+            state.current_reaction_book = None
         else:
             prompt = f"""
                 Imagine yourself a small-time academic, novelist, or new-age writer. You have become obsessed with this book:
@@ -305,7 +322,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{state.current_reaction_book.author}_excerpt_1",
                     )
-                    save_artifact_to_md(page_1)
+                    save_artifact_file_to_md(page_1)
                     state.artifacts.append(page_1)
                     page_2 = TextChainArtifactFile(
                         text_content=result["page_2"],
@@ -315,7 +332,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{state.current_reaction_book.author}_excerpt_2",
                     )
-                    save_artifact_to_md(page_2)
+                    save_artifact_file_to_md(page_2)
                     state.artifacts.append(page_2)
                     state.current_reaction_book = None
                 else:
@@ -384,10 +401,10 @@ class RedAgent(BaseRainbowAgent, ABC):
                 logging.error(f"Anthropic model call failed: {e!s}")
         return state
 
-    def route_after_evaluate_books_versus_proposals(self) -> str:
-        if self.state.should_create_book:
+    def route_after_evaluate_books_versus_proposals(self, state: RedAgentState) -> str:
+        if state.should_create_book:
             return "new_book"
-        elif self.state.should_respond_with_reaction_book:
+        elif state.should_respond_with_reaction_book:
             return "reaction_book"
         else:
             return "done"

@@ -1,0 +1,4 @@
+# file: /Volumes/LucidNonsense/White/app/agents/models/agent_settings.py
+# hypothesis_version: 6.142.4
+
+[0.7, 120, '/tmp/agent_work', 'ANTHROPIC_API_KEY']

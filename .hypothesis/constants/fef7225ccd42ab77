@@ -1,0 +1,4 @@
+# file: /Volumes/LucidNonsense/White/app/structures/music/core/notes.py
+# hypothesis_version: 6.142.4
+
+[261, 277, 293, 311, 329, 349, 370, 392, 415, 440, 466, 493, 'A', 'A#', 'A♭', 'B', 'B♭', 'C', 'C#', 'D', 'D#', 'D♭', 'E', 'E♭', 'F', 'F#', 'G', 'G#', 'G♭', 'sharp']

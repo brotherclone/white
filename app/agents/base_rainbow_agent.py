@@ -38,10 +38,6 @@ class BaseRainbowAgent(BaseModel, ABC):
     def generate_alternate_song_spec(self, agent_state: BaseRainbowAgentState) -> StateGraph:
         raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
 
-    @abstractmethod
-    def export_chain_artifacts(self, agent_state: BaseRainbowAgentState) -> StateGraph:
-        raise NotImplementedError("Subclasses must implement export chain artifact method")
-
     def _get_claude(self) -> ChatAnthropic:
         return ChatAnthropic(
             model_name=self.settings.anthropic_sub_model_name,
