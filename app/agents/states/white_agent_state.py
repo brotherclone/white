@@ -1,8 +1,8 @@
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.structures.manifests.song_proposal import SongProposal
-
+from app.agents.enums.white_facet import WhiteFacet
 
 class MainAgentState(BaseModel):
 
@@ -16,6 +16,11 @@ class MainAgentState(BaseModel):
     workflow_paused: bool = False
     pause_reason: Optional[str] = None
     pending_human_action: Optional[Dict[str, Any]] = None
+    rebracketing_analysis: Optional[str] = None
+    document_synthesis: Optional[str] = None
+    ready_for_red: bool = False
+    white_facet: WhiteFacet | None = None
+    white_facet_metadata: str | Any = None
 
     """
     Structure when workflow is paused:
@@ -28,5 +33,4 @@ class MainAgentState(BaseModel):
         "resume_instructions": "How to resume after completion"
     }
     """
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)

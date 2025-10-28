@@ -30,4 +30,5 @@ dependencies = [
     "assemblyai>=0.44.3",
     "todoist-api-python>=3.1.0",
     "pytest-cov>=7.0.0",
+    "hypothesis>=6.0.0",
 ]

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph
 from app.agents.base_rainbow_agent import BaseRainbowAgent
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.violet_agent_state import VioletAgentState
 
 load_dotenv()
@@ -56,3 +56,8 @@ class VioletAgent(BaseRainbowAgent, ABC):
 
     def contribute(self):
         raise NotImplementedError("Subclasses must implement contribute method")
+
+    def export_chain_artifacts(self, state: VioletAgentState) -> VioletAgentState:
+        for artifact in state.artifacts:
+            print(artifact)
+        return state

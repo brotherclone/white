@@ -8,7 +8,7 @@ informational dimensions.
 """
 
 class RainbowColorModes(Enum):
-    """ Enum representing the modes of rainbow colors. A six dimensional perspective from which they are perceived in
+    """ Enum representing the modes of rainbow colors. A six-dimensional perspective from which they are perceived in
     The Rainbow Table."""
 
     TIME = "Temporal"

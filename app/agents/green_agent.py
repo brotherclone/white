@@ -6,7 +6,7 @@ from langgraph.graph.state import StateGraph
 
 from app.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.states.green_agent_state import GreenAgentState
-from app.agents.states.main_agent_state import MainAgentState
+from app.agents.states.white_agent_state import MainAgentState
 
 load_dotenv()
 
@@ -54,3 +54,8 @@ class GreenAgent(BaseRainbowAgent, ABC):
         raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
     def contribute(self):
         raise NotImplementedError("Subclasses must implement contribute method")
+
+    def export_chain_artifacts(self, state: GreenAgentState) -> GreenAgentState:
+        for artifact in state.artifacts:
+            print(artifact)
+        return state

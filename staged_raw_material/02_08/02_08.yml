@@ -1,0 +1,132 @@
+bpm: 99
+manifest_id: '02_08'
+tempo: 3/4
+key: A minor
+rainbow_color: R
+title: A Teleological Wind
+release_date: '2019-01-11'
+album_sequence: 8
+main_audio_file: 02_08_main.wav
+TRT: '[03:08.032]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:20.000]'
+    description: Arpeggio Clavinet and Tidal Synth open the song with a dreary, dreamy atmosphere.
+  - section_name:  Chorus 1
+    start_time: '[00:20.001]'
+    end_time: '[00:41.203]'
+    description: Lap steel and acoustic join the 60s folk rock vibe clashing a bit with the synths and drums machines
+  - section_name:  Verse 1
+    start_time: '[00:41.204]'
+    end_time: '[01:09.022]'
+    description: When the verse hits it's more like a chorus playing with the rearranging idea.
+  - section_name:  Bridge 1
+    start_time: '[01:09.023]'
+    end_time: '[01:21.203]'
+    description: During the bridge the lap steel and acoustic mixes with the synths and drums machines.
+  - section_name:  Transition  1
+    start_time: '[01:21.204]'
+    end_time: '[01:27.066]'
+    description: A tambourine joins bizarre psychedelic backing vocals
+  - section_name:  Chorus 2
+    start_time: '[01:27.067]'
+    end_time: '[01:41.203]'
+    description: The background vocals and tambourine remain in the mix.
+  - section_name:  Chorus 2 Outro
+    start_time: '[01:41.204]'
+    end_time: '[01:49.022]'
+    description: The background vocals and tambourine drop and the vocals from the 'chorus' and 'verse' overlap
+  - section_name:  Verse 2
+    start_time: '[01:49.023]'
+    end_time: '[02:03.157]'
+    description: Now the vocals are working in a weird counterpoint.
+  - section_name:  Bridge 2
+    start_time: '[02:03.158]'
+    end_time: '[02:14.135]'
+    description: The drums drop and the instruments busy themselves 'loading' the Young weapon to come.
+  - section_name:  Harvest Jam
+    start_time: '[02:14.136]'
+    end_time: '[02:43.157]'
+    description: The 'Young' weapon is unleashed - a single sustained lap steel note that rings out, like 'Harvest' but longer and more malicious. Insect like synth scurry around the periphery of the sound.
+  - section_name:  Outro
+    start_time: '[02:43.158]'
+    end_time: '[03:08.032]'
+    description: The song wraps - but... What's this? There's a sample of The Fool singing 'rainbow man' in the background, strangely connecting the dots between the song and Pynchon, who has informed so much of the project.
+mood:
+    - Remorseful
+    - Sad
+    - Lamenting
+    - Reflective
+    - Dreamy
+sounds_like:
+  - name: Your Team Ring
+    discogs_id: 317585
+  - name: Purple Mountains
+    discogs_id: 7149935
+  - name: The Olivia Tremor Control
+    discogs_id: 252619
+genres:
+  - Folk Rock
+  - Folktronica
+  - Rock
+  - Retro Rock
+  - Alternative Rock
+lrc_file: 02_08.lrc
+concept: This song, a sort of a mediation on 'rebracketing', has some odd allusions. It plays with the structure of the song (chorus verse) but then references Neil Young's single note guitar parts as if it was a weaponized thought beam. It ends with a loop from the The Fool's 1968 Rainbow Man - which may or may not be Tyrone Slothop.
+audio_tracks:
+  - id: 1
+    description: Tidal Synth
+    audio_file: 02_08_03_tidal_synth.wav
+    midi_file: 02_08_02_tidal_synth.mid
+  - id: 2
+    description: Clavinet
+    audio_file: 02_08_05_clav.wav
+    midi_file: 02_08_04_clav.mid
+  - id: 3
+    description: Wurlitzer
+    audio_file: 02_08_07_wurlitzer.wav
+    midi_file: 02_08_06_wurlitzer.mid
+  - id: 4
+    description: Jupiter Synth
+    audio_file: 02_08_09_jupiter_synth.wav
+    midi_file: 02_08_08_jupiter_synth.mid
+  - id: 5
+    description: Farfisa Bass
+    audio_file: 02_08_11_farfisa_bass.wav
+    midi_file: 02_08_10_farfisa_bass.mid
+  - id: 6
+    description: Electric Guitar
+    audio_file: 02_08_12_electric_guitar.wav
+  - id: 7
+    description: Lap steel
+    audio_file: 02_08_13_lapsteel.wav
+  - id: 8
+    description: Acoustic Guitar
+    audio_file: 02_08_14_acoustic.wav
+  - id: 9
+    description: Tambourine
+    audio_file: 02_08_15_tambourine.wav
+  - id: 10
+    description: Drums
+    audio_file: 02_08_17_drums.wav
+    midi_file: 02_08_16_drums.mid
+  - id: 11
+    description: Heartbeat
+    audio_file: 02_08_19_heartbeat.wav
+    midi_file: 02_08_18_heartbeat.mid
+  - id: 12
+    description: Slothrop
+    audio_file: 02_08_20_slothrop.wav
+  - id: 13
+    description: Vocal
+    audio_file: 02_08_21_vocal.wav
+  - id: 14
+    description: Vocal 2
+    audio_file: 02_08_22_vocal2.wav
+  - id: 15
+    description: BG Synth Vox
+    audio_file: 02_08_24_bg_synth_vox.wav
+    midi_file: 02_08_23_bg_synth_vox.mid

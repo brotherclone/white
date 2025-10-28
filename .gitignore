@@ -33,4 +33,8 @@ build/
 dist/
 **/dist/
 .benchmarks/
-/.coverage
+/.coverage.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/

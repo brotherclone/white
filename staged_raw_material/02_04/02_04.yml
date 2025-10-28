@@ -1,0 +1,132 @@
+bpm: 80
+manifest_id: '02_04'
+tempo: 4/4
+key: C Major
+rainbow_color: R
+title: The Imagined Lives of Shirley Kudirka
+release_date: '2019-01-11'
+album_sequence: 4
+main_audio_file: 02_04_main.wav
+TRT: '[03:12.225]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:48.000]'
+    description: The song jumps right into song describing a less-than-ideal boyfriend and her life.
+  - section_name: Chorus 1
+    start_time: '[00:48.001]'
+    end_time: '[01:12.000]'
+    description: We switch a bit into Shirley's head space. She's the only one who knows that 'the movie was better than the book'.
+  - section_name: Bridge 1
+    start_time: '[01:12.001]'
+    end_time: '[01:24.000]'
+    description: A woeful pair of saxophones are added to the mix.
+  - section_name: Chorus 2
+    start_time: '[01:24.001]'
+    end_time: '[02:08.101]'
+    description: The chorus returns with more intensity, as Shirley dreams of a better life.
+  - section_name: Verse 2
+    start_time: '[02:08.102]'
+    end_time: '[02:12.000]'
+    description: Shirley cleans up and carries on
+  - section_name: Bridge 2
+    start_time: '[02:12.001]'
+    end_time: '[02:36.000]'
+    description: The saxophones return, lamenting Shirley's plight.
+  - section_name: Break
+    start_time: '[02:36.001]'
+    end_time: '[02:42.000]'
+    description: An odd stop and start
+  - section_name: Outro Chorus Jamz
+    start_time: '[02:42.001]'
+    end_time: '[03:12.225]'
+    description: Then into a flurry of escalating guitars, saxes and synths.
+mood:
+  - Slinky
+  - Nostalgic
+  - Wistful
+  - Sad
+  - Romantic
+  - Soulful
+sounds_like:
+  - name: The Afghan Whigs
+    discogs_id: 89572
+  - name: The Smithereens
+    discogs_id: 377441
+  - name: The Church
+    discogs_id: 258153
+genres:
+  - Rock
+  - Blue-eyed Soul
+  - Alternative Rock
+lrc_file: 02_04.lrc
+concept: This one is a bit of a mystery in terms where it came from - but I imagined being a young woman, with talent and rich inner life being overlooked by her dull boyfriend. The "to underhood" became what the Vanity Press cover was supposed to be but the signature moved to back as streaming services don't allow additional text.
+audio_tracks:
+  - id: 1
+    description: Organ
+    audio_file: 02_04_03_organ.wav
+    midi_file: 02_04_02_organ.mid
+  - id: 2
+    description: Wurlitzer
+    audio_file: 02_04_05_wurlitzer.wav
+    midi_file: 02_04_04_wurlitzer.mid
+  - id: 3
+    description: MkII Strings
+    audio_file: 02_04_07_mkii.wav
+    midi_file: 02_04_06_mkii.mid
+  - id: 4
+    description: All horns
+    audio_file: 02_04_08_all_horns.wav
+    player: JOSH
+    group: horns
+  - id: 5
+    description: Baritone Sax
+    audio_file: 02_04_09_baritone_sax.wav
+    player: JOSH
+    group: horns
+  - id: 6
+    description: Baritone Sax 2
+    audio_file: 02_04_10_baritone_sax2.wav
+    player: JOSH
+    group: horns
+  - id: 7
+    description: Tenor Sax
+    audio_file: 02_04_11_tenor_sax.wav
+    player: JOSH
+  - id: 8
+    description: Tenor Sax 2
+    audio_file: 02_04_12_tenor_sax2.wav
+    player: JOSH
+  - id: 9
+    description: Guitar
+    audio_file: 02_04_13_guitar.wav
+  - id: 10
+    description: Guitar 2
+    audio_file: 02_04_14_guitar2.wav
+  - id: 11
+    description: Synth Bass
+    audio_file: 02_04_16_synth_bass.wav
+    midi_file: 02_04_15_synth_bass.mid
+  - id: 12
+    description: Bongo
+    audio_file: 02_04_17_bongo.wav
+    midi_file: 02_04_18_bongo.mid
+  - id: 13
+    description: Drums
+    audio_file: 02_04_20_drums.wav
+    midi_file: 02_04_19_drums.mid
+  - id: 14
+    description: Easel Weasel
+    audio_file: 02_04_22_easel.wav
+    midi_file: 02_04_21_easel.mid
+  - id: 15
+    description: Vocal 1
+    audio_file: 02_04_23_vocal.wav
+  - id: 16
+    description: Vocal 2
+    audio_file: 02_04_24_vocal_2.wav
+  - id: 17
+    description: Vocal 3
+    audio_file: 02_04_25_vocal_3.wav
