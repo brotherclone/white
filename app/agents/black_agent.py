@@ -25,6 +25,7 @@ from app.agents.tools.audio_tools import get_audio_segments_as_chain_artifacts, 
     create_audio_mosaic_chain_artifact, create_blended_audio_chain_artifact
 from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import chain_artifact_file_from_speech_to_text
+from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
@@ -350,17 +351,17 @@ class BlackAgent(BaseRainbowAgent, ABC):
             return state
         current_proposal = state.counter_proposal
         segments = get_audio_segments_as_chain_artifacts(
-            2.0, 9,
+            2.0, 4,
             the_rainbow_table_colors['Z'],
             state.thread_id
         )
         mosaic = create_audio_mosaic_chain_artifact(
-            segments, 50,
-            getattr(current_proposal, 'target_length', 180),  # Default 3 min
+            segments, 100,
+            getattr(current_proposal, 'target_length', 10),
             state.thread_id
         )
         blended = create_blended_audio_chain_artifact(
-            mosaic, 0.33,
+            mosaic, 0.66,
             state.thread_id
         )
         transcript = chain_artifact_file_from_speech_to_text(
@@ -375,7 +376,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
         )
         state.artifacts.append(evp_artifact)
-        # ToDo: Save off as yml
         return state
 
     @staticmethod

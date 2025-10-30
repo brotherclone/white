@@ -39,7 +39,6 @@ class BaseChainArtifactFile(BaseModel):
         base = str(self.base_path) if self.base_path else os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')
         if base is None:
             raise ValueError("Base path is required to build an artifact path.")
-        # Build using pathlib for cross-platform correctness
         base_path = Path(base)
         if self.thread_id is None:
             raise ValueError("Thread ID is required to build an artifact path.")
