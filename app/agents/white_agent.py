@@ -1,6 +1,4 @@
 import logging
-import random
-
 import yaml
 import os
 
@@ -203,6 +201,7 @@ class WhiteAgent(BaseModel):
                 initial_proposal = SongProposalIteration(**initial_proposal)
                 state.white_facet = facet
                 state.white_facet_metadata = facet_metadata
+                print(f"{facet}{facet_metadata} {initial_proposal}")
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
         except Exception as e:
             print(f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration.")
@@ -282,7 +281,7 @@ class WhiteAgent(BaseModel):
                 Focus on revealing the underlying ORDER, not explaining away the paradox.
                 """
 
-            claude = self._get_claude()
+            claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
 
             return response.content
@@ -320,7 +319,7 @@ class WhiteAgent(BaseModel):
                 Structure your synthesis as a clear creative brief.
                 """
 
-            claude = self._get_claude()
+            claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
 
             return response.content
@@ -345,8 +344,9 @@ class WhiteAgent(BaseModel):
 if __name__ == "__main__":
     white_agent = WhiteAgent(settings=AgentSettings())
     main_workflow = white_agent.build_workflow()
-    initial_state = MainAgentState(thread_id="main_thread")
-    runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
+    initial_state = MainAgentState(thread_id=str(uuid4()))
+    runnable_config = ensure_config(cast(RunnableConfig,
+                                         cast(object, {"configurable": {"thread_id": initial_state.thread_id}})))
     main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
 
 

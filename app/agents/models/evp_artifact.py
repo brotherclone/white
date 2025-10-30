@@ -7,10 +7,10 @@ from app.agents.models.base_chain_artifact import ChainArtifact
 
 class EVPArtifact(ChainArtifact):
 
-    audio_segments: List[AudioChainArtifactFile]
-    transcript: TextChainArtifactFile
-    audio_mosiac: AudioChainArtifactFile
-    noise_blended_audio: AudioChainArtifactFile
+    audio_segments: List[AudioChainArtifactFile] | None = None
+    transcript: TextChainArtifactFile | None = None
+    audio_mosiac: AudioChainArtifactFile | None = None
+    noise_blended_audio: AudioChainArtifactFile | None = None
     thread_id: str
 
     def __init__(self, **data):
