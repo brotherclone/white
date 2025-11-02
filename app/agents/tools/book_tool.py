@@ -4,10 +4,10 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.agents.enums.book_condition import BookCondition
-from app.agents.enums.publisher_type import PublisherType
-from app.agents.enums.book_genre import BookGenre
-from app.agents.models.book_data import BookData
+from app.structures.enums.book_condition import BookCondition
+from app.structures.enums.publisher_type import PublisherType
+from app.structures.enums.book_genre import BookGenre
+from app.structures.artifacts.book_data import BookData
 from app.util.string_utils import truncate_word_safe
 from app.reference.books.book_topics import SCIFI_TOPICS, SEXPLOITATION_TOPICS, OCCULT_TOPICS, CULT_TOPICS, \
     BILDUNGSROMAN_TOPICS, NOIR_TOPICS, PSYCHEDELIC_TOPICS

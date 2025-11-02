@@ -51,6 +51,7 @@ def test_manifest_invalid_key(minimal_manifest_data):
 
 def test_manifest_missing_optional_fields(minimal_manifest_data):
     data = minimal_manifest_data.copy()
-    data.pop('lrc_file')
-    with pytest.raises(Exception):
-        Manifest(**data)
+    data.pop('lrc_file', None)
+    manifest = Manifest(**data)
+    assert hasattr(manifest, 'lrc_file')
+    assert manifest.lrc_file is None

@@ -1,12 +1,14 @@
 import logging
 import os
-import asyncio
+
 
 from todoist_api_python.api import TodoistAPI
 from todoist_api_python.models import Section, Task
 from dotenv import load_dotenv
 from typing import Any, List, Optional, Dict
 from mcp.server.fastmcp import FastMCP
+
+from app.util.string_utils import resolve_name
 
 USER_AGENT = "earthly_frames_todoist/1.0"
 TIME_OUT = 30.0
@@ -18,7 +20,6 @@ load_dotenv()
 
 _api_client: Optional[TodoistAPI] = None
 
-
 def get_api_client() -> TodoistAPI:
     """Get or create TodoistAPI client singleton"""
     global _api_client
@@ -29,9 +30,7 @@ def get_api_client() -> TodoistAPI:
         _api_client = TodoistAPI(api_token)
     return _api_client
 
-
 mcp = FastMCP("earthly_frames_todoist")
-
 
 @mcp.tool()
 def get_earthly_frames_project_sections(project_id: str = EF_PROJECT_ID) -> List[Dict[str, Any]]:
@@ -39,21 +38,19 @@ def get_earthly_frames_project_sections(project_id: str = EF_PROJECT_ID) -> List
     Get all sections for the Earthly Frames Todoist project.
 
     Args:
-        project_id: Todoist project ID (defaults to Earthly Frames project)
+        project_id: Todoist project ID (defaults to The Earthly Frames project)
 
     Returns:
         List of section dictionaries with id, name, project_id, order
     """
     try:
         api = get_api_client()
-        sections: List[Section] = list(api.get_sections(project_id=project_id))  # type: ignore[arg-type]
-
-        # Convert Section objects to dictionaries
+        sections: List[Section] = list(api.get_sections(project_id=project_id))
         result: List[Dict[str, Any]] = []
         for section in sections:
             result.append({
                 "id": section.id,
-                "name": section.name,
+                "name": resolve_name(section),
                 "project_id": section.project_id,
                 "order": section.order
             })
@@ -82,45 +79,37 @@ def create_sigil_charging_task(
     Returns:
         Task dictionary with id, content, url, project_id, section_id
     """
+    sections: List[Section] = []
     try:
         api = get_api_client()
-
-        # Find or create the section
-        sections: List[Section] = list(api.get_sections(project_id=EF_PROJECT_ID))  # type: ignore[arg-type]
+        sections = list(api.get_sections(project_id=EF_PROJECT_ID))  # type: ignore[arg-type]
         section: Optional[Section] = None
         for s in sections:
-            if s.name == section_name:
+            name = resolve_name(s)
+            if name == section_name:
                 section = s
                 break
-
         if not section:
-            # Create section if it doesn't exist
             section = api.add_section(name=section_name, project_id=EF_PROJECT_ID)
-
-        # Format task content
         task_content = f"🜏 Charge Sigil for '{song_title}'"
         task_description = f"""
-**Sigil Glyph:**
-{sigil_description}
+                            **Sigil Glyph:**
+                            {sigil_description}
 
-**Charging Instructions:**
-{charging_instructions}
+                            **Charging Instructions:**
+                            {charging_instructions}
 
-**Song:** {song_title}
+                            **Song:** {song_title}
 
-Mark this task complete after the sigil has been charged and released.
-"""
-
-        # Create the task
+                            Mark this task complete after the sigil has been charged and released.
+                            """
         task: Task = api.add_task(
             content=task_content,
             description=task_description,
             project_id=EF_PROJECT_ID,
             section_id=section.id,
-            priority=3  # P2 priority (Black Agent's work is urgent)
+            priority=3
         )
-
-        # Convert Task object to dictionary
         return {
             "id": task.id,
             "content": task.content,
@@ -130,78 +119,9 @@ Mark this task complete after the sigil has been charged and released.
             "created_at": task.created_at
         }
 
-    except Exception as e:
-        logging.error(f"Error creating sigil charging task: {e}")
+    except Exception:
+        logging.exception("Failed creating sigil charging task; sections=%r", sections)
         raise
-
-
-@mcp.tool()
-def create_evp_analysis_task(
-        transcript: str,
-        audio_file_path: str,
-        song_title: str,
-        section_name: str = "Black Agent - EVP Analysis"
-) -> Dict[str, Any]:
-    """
-    Create a Todoist task for human to analyze EVP transcript.
-
-    Args:
-        transcript: The hallucinated transcript from EVP generation
-        audio_file_path: Path to the noise-blended audio file
-        song_title: Title of the song this EVP is for
-        section_name: Name of the Todoist section
-
-    Returns:
-        Task dictionary with id, content, url
-    """
-    try:
-        api = get_api_client()
-
-        # Find or create section
-        sections: List[Section] = list(api.get_sections(project_id=EF_PROJECT_ID))  # type: ignore[arg-type]
-        section: Optional[Section] = None
-        for s in sections:
-            if s.name == section_name:
-                section = s
-                break
-
-        if not section:
-            section = api.add_section(name=section_name, project_id=EF_PROJECT_ID)
-
-        task_content = f"👻 Review EVP for '{song_title}'"
-        task_description = f"""
-**EVP Transcript:**
-{transcript}
-
-**Audio File:**
-{audio_file_path}
-
-Listen to the blended audio and confirm if the transcript captures meaningful spirit messages.
-Adjust the counter-proposal based on what you hear.
-
-Mark complete after review.
-"""
-
-        task: Task = api.add_task(
-            content=task_content,
-            description=task_description,
-            project_id=EF_PROJECT_ID,
-            section_id=section.id,
-            priority=2  # P3 priority (analysis, not ritual)
-        )
-
-        return {
-            "id": task.id,
-            "content": task.content,
-            "url": task.url,
-            "project_id": task.project_id,
-            "section_id": task.section_id
-        }
-
-    except Exception as e:
-        logging.error(f"Error creating EVP analysis task: {e}")
-        raise
-
 
 @mcp.tool()
 def list_pending_black_agent_tasks(section_name: str = "Black Agent - Sigil Work") -> List[Dict[str, Any]]:
@@ -214,23 +134,19 @@ def list_pending_black_agent_tasks(section_name: str = "Black Agent - Sigil Work
     Returns:
         List of incomplete task dictionaries
     """
+    sections: List[Section] = []
     try:
         api = get_api_client()
-
-        # Get section ID
-        sections: List[Section] = list(api.get_sections(project_id=EF_PROJECT_ID))  # type: ignore[arg-type]
+        sections = list(api.get_sections(project_id=EF_PROJECT_ID))  # type: ignore[arg-type]
         section: Optional[Section] = None
         for s in sections:
-            if s.name == section_name:
+            if resolve_name(s) == section_name:
                 section = s
                 break
 
         if not section:
             return []
-
-        # Get all tasks in project
         tasks: List[Task] = list(api.get_tasks(project_id=EF_PROJECT_ID, section_id=section.id))  # type: ignore[arg-type]
-
         return [
             {
                 "id": task.id,
@@ -243,8 +159,8 @@ def list_pending_black_agent_tasks(section_name: str = "Black Agent - Sigil Work
             if not task.is_completed
         ]
 
-    except Exception as e:
-        logging.error(f"Error listing tasks: {e}")
+    except ValueError as e:
+        logging.exception(f"Error listing tasks;{e}; sections=%r", sections)
         return []
 
 
@@ -257,7 +173,7 @@ def create_todoist_task_for_human_earthly_frame(
         priority: int = 1
 ) -> Dict[str, Any]:
     """
-    Generic task creation function for Earthly Frames project.
+    Generic task creation function for The Earthly Frames project.
 
     Args:
         content: Task title/content
@@ -271,7 +187,6 @@ def create_todoist_task_for_human_earthly_frame(
     """
     try:
         api = get_api_client()
-
         task: Task = api.add_task(
             content=content,
             description=description,
@@ -279,7 +194,6 @@ def create_todoist_task_for_human_earthly_frame(
             section_id=section_id,
             priority=priority
         )
-
         return {
             "id": task.id,
             "content": task.content,

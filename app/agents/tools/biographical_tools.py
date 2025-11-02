@@ -7,7 +7,6 @@ For LangGraph agent use in exploring alternate timelines and quantum biographica
 import yaml
 import random
 from typing import Dict, List, Optional, Any
-from pathlib import Path
 import logging
 
 
@@ -82,39 +81,45 @@ def get_year_analysis(year: int, biographical_data: Optional[Dict] = None) -> Di
         }
     }
 
+def generate_what_if_scenarios(year_data: dict, prompts: dict, max_per_category: int = 4) -> dict:
+    """
+    Build \"global_what_ifs\" and \"personal_what_ifs\" lists, deduplicate
+    while preserving order, and limit each list to `max_per_category`.
+    """
+    def unique_limit(items):
+        seen = set()
+        out = []
+        for it in items:
+            if it not in seen:
+                seen.add(it)
+                out.append(it)
+        return out[:max_per_category]
 
-def generate_what_if_scenarios(year_data: Dict, prompts: Dict) -> Dict[str, List[str]]:
-    """Generate alternate timeline scenarios based on year data and prompt templates."""
-
+    # global items from world_events
     world_events = year_data.get("world_events", {})
+    global_items = []
+    for cat in ("major", "cultural", "technology"):
+        for ev in world_events.get(cat, []):
+            global_items.append(f"What if '{ev}' had unfolded differently?")
+
+    # append global prompts
+    global_items.extend(prompts.get("global_what_ifs", []))
+
+    # personal items from personal_context
     personal_context = year_data.get("personal_context", {})
-    choice_points = personal_context.get("choice_points", [])
+    personal_items = []
+    for cp in personal_context.get("choice_points", []):
+        # make choice point human-readable if underscore-separated
+        readable = cp.replace("_", " ")
+        personal_items.append(f"What if you had {readable}?")
 
-    # Global what-ifs based on actual world events
-    global_what_ifs = []
-    for category in ["major", "cultural", "technology"]:
-        events = world_events.get(category, [])
-        for event in events[:2]:  # Limit to avoid overwhelming output
-            global_what_ifs.append(f"What if '{event}' had unfolded differently?")
-
-    # Personal what-ifs based on choice points
-    personal_what_ifs = []
-    for choice_point in choice_points:
-        personal_what_ifs.append(f"What if you had chosen differently at: {choice_point}")
-
-    # Add template-based prompts
-    template_global = prompts.get("global_what_ifs", [])
-    template_personal = prompts.get("personal_what_ifs", [])
-
-    # Mix template prompts with specific ones
-    global_what_ifs.extend(random.sample(template_global, min(2, len(template_global))))
-    personal_what_ifs.extend(random.sample(template_personal, min(2, len(template_personal))))
+    # append personal prompts
+    personal_items.extend(prompts.get("personal_what_ifs", []))
 
     return {
-        "global_what_ifs": global_what_ifs,
-        "personal_what_ifs": personal_what_ifs
+        "global_what_ifs": unique_limit(global_items),
+        "personal_what_ifs": unique_limit(personal_items),
     }
-
 
 def analyze_cascade_effects(year_data: Dict, what_if_scenarios: Dict) -> Dict[str, Any]:
     """Analyze how alternate choices might cascade through time."""
@@ -272,8 +277,6 @@ def explore_alternate_timeline(year: int, choice_point_index: int = 0) -> Dict[s
     }
 
 
-# Tool registration for LangGraph
-@tool
 def blue_biographical_analysis(year: int) -> str:
     """
     Analyze a specific year using Blue album methodology for quantum biographical exploration.
@@ -290,7 +293,7 @@ def blue_biographical_analysis(year: int) -> str:
     return json.dumps(result, indent=2)
 
 
-@tool
+
 def explore_choice_point(year: int, choice_index: int = 0) -> str:
     """
     Deep dive into a specific alternate timeline branch from a choice point.

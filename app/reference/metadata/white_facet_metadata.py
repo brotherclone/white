@@ -1,4 +1,4 @@
-from app.agents.enums.white_facet import WhiteFacet
+from app.structures.enums.white_facet import WhiteFacet
 
 FACET_DESCRIPTIONS = {
     WhiteFacet.CATEGORICAL: "Taxonomist - organizes through classification and hierarchy",

@@ -30,7 +30,7 @@ class Manifest(BaseModel):
     mood: list[str]
     sounds_like: list[ManifestSoundsLike]
     genres: list[str]
-    lrc_file: str | None
+    lrc_file: str | None = None
     concept: str
     audio_tracks: list[ManifestTrack]
 
@@ -41,16 +41,24 @@ class Manifest(BaseModel):
                 data['tempo'] = TimeSignature(numerator=int(tempo[0]), denominator=int(tempo[1]))
             except ValueError:
                 print("Unable to parse tempo, defaulting to string")
-        if 'key' in data and isinstance(data['key'], str):
+        if 'key' in data:
             try:
-                key = data['key'].split(' ')
-                if len(key) != 2:
-                    raise ValueError("Key must be in the format 'Note Mode', e.g., 'C major'")
-                note = get_note(key[0])
-                mode = get_mode(key[1])
-                data['key'] = KeySignature(note=note, mode=mode)
-            except ValueError:
-                print("Unable to parse key, defaulting to string")
+                if isinstance(data['key'], str):
+                    key = data['key'].split(' ')
+                    if len(key) != 2:
+                        raise ValueError("Key must be in the format 'Note Mode', e.g., 'C major'")
+                    note = get_note(key[0])
+                    mode = get_mode(key[1])
+                    data['key'] = KeySignature(note=note, mode=mode)
+                elif isinstance(data['key'], dict):
+                    note_name = data['key']['note']['pitch_name']
+                    mode_name = data['key']['mode']['name']
+                    note = get_note(note_name)
+                    mode = get_mode(mode_name)
+                    data['key'] = KeySignature(note=note, mode=mode)
+
+            except (ValueError, KeyError, TypeError) as e:
+                print(f"Unable to parse key: {e}, defaulting to string")
         if 'rainbow_color' in data and isinstance(data['rainbow_color'], str):
             try:
                 color = data['rainbow_color']

@@ -2,9 +2,7 @@ import uuid
 from typing import Optional, List, Dict, Any
 from pydantic import Field
 
-from app.agents.models.evp_artifact import EVPArtifact
-from app.agents.models.sigil_artifact import SigilArtifact
-from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 

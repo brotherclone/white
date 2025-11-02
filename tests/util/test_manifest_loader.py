@@ -25,7 +25,6 @@ def test_load_manifest_invalid_yaml():
             load_manifest('bad.yml')
 
 def test_load_manifest_invalid_data():
-    # Valid YAML, but missing required fields for Manifest
     yaml_content = 'not_a_field: value'
     with patch('builtins.open', mock_open(read_data=yaml_content)), \
          patch('app.util.manifest_loader.Manifest', side_effect=Exception('validation error')):

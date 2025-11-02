@@ -1,6 +1,4 @@
 import logging
-import random
-
 import yaml
 import os
 
@@ -15,7 +13,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from uuid import uuid4
 
 from app.agents.black_agent import BlackAgent
-from app.agents.models.agent_settings import AgentSettings
+from app.structures.agents.agent_settings import AgentSettings
 from app.agents.red_agent import RedAgent
 from app.agents.orange_agent import OrangeAgent
 from app.agents.yellow_agent import YellowAgent
@@ -184,7 +182,7 @@ class WhiteAgent(BaseModel):
         print(f"   {facet_metadata['description']}")
         if mock_mode:
             try:
-                with open(f"/Volumes/LucidNonsense/White/app/agents/mocks/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
+                with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
                     data = yaml.safe_load(f)
                     proposal = SongProposalIteration(**data)
                     if not hasattr(state, "song_proposals") or state.song_proposals is None:
@@ -203,6 +201,7 @@ class WhiteAgent(BaseModel):
                 initial_proposal = SongProposalIteration(**initial_proposal)
                 state.white_facet = facet
                 state.white_facet_metadata = facet_metadata
+                print(f"{facet}{facet_metadata} {initial_proposal}")
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
         except Exception as e:
             print(f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration.")
@@ -215,7 +214,7 @@ class WhiteAgent(BaseModel):
                 title="Fallback: White Song",
                 mood=["reflective"],
                 genres=["art-pop"],
-                concept="Fallback stub because Anthropic model unavailable"
+                concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable."
             )
         if not hasattr(state, "song_proposals") or state.song_proposals is None:
             state.song_proposals = SongProposal(iterations=[]).model_dump()
@@ -249,7 +248,7 @@ class WhiteAgent(BaseModel):
     def _black_rebracketing_analysis(self, proposal, evp_artifacts, sigil_artifacts)-> str:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_to_white_rebracket_analysis_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_to_white_rebracket_analysis_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 return data
         else:
@@ -282,7 +281,7 @@ class WhiteAgent(BaseModel):
                 Focus on revealing the underlying ORDER, not explaining away the paradox.
                 """
 
-            claude = self._get_claude()
+            claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
 
             return response.content
@@ -290,7 +289,7 @@ class WhiteAgent(BaseModel):
     def _synthesize_document_for_red(self, rebracketed_analysis, black_proposal, artifacts):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_to_white_document_synthesis_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_to_white_document_synthesis_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 return data
         else:
@@ -320,7 +319,7 @@ class WhiteAgent(BaseModel):
                 Structure your synthesis as a clear creative brief.
                 """
 
-            claude = self._get_claude()
+            claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
 
             return response.content
@@ -345,8 +344,9 @@ class WhiteAgent(BaseModel):
 if __name__ == "__main__":
     white_agent = WhiteAgent(settings=AgentSettings())
     main_workflow = white_agent.build_workflow()
-    initial_state = MainAgentState(thread_id="main_thread")
-    runnable_config = ensure_config(cast(RunnableConfig, {"configurable": {"thread_id": initial_state.thread_id}}))
+    initial_state = MainAgentState(thread_id=str(uuid4()))
+    runnable_config = ensure_config(cast(RunnableConfig,
+                                         cast(object, {"configurable": {"thread_id": initial_state.thread_id}})))
     main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
 
 
