@@ -182,7 +182,7 @@ class WhiteAgent(BaseModel):
         print(f"   {facet_metadata['description']}")
         if mock_mode:
             try:
-                with open(f"/tests/mocks/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
+                with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
                     data = yaml.safe_load(f)
                     proposal = SongProposalIteration(**data)
                     if not hasattr(state, "song_proposals") or state.song_proposals is None:
@@ -248,7 +248,7 @@ class WhiteAgent(BaseModel):
     def _black_rebracketing_analysis(self, proposal, evp_artifacts, sigil_artifacts)-> str:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/black_to_white_rebracket_analysis_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_to_white_rebracket_analysis_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 return data
         else:
@@ -289,7 +289,7 @@ class WhiteAgent(BaseModel):
     def _synthesize_document_for_red(self, rebracketed_analysis, black_proposal, artifacts):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/black_to_white_document_synthesis_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_to_white_document_synthesis_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 return data
         else:

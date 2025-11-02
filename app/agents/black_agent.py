@@ -172,7 +172,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
-            with open("/tests/mocks/black_counter_proposal_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
             counter_proposal = SongProposalIteration(**data)
             state.counter_proposal = counter_proposal
@@ -237,7 +237,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
-            mock_path = "/tests/mocks/black_sigil_artifact_mock.yml"
+            mock_path = f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_sigil_artifact_mock.yml"
             if random.random() < 0.75:
                 state.should_update_proposal_with_sigil = False
                 return state
@@ -342,7 +342,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
-            with open("/tests/mocks/black_evp_artifact_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_evp_artifact_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
             evp_artifact = EVPArtifact(**data)
             state.artifacts.append(evp_artifact)
@@ -429,7 +429,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
     def update_alternate_song_spec_with_evp(self, state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/black_counter_proposal_after_evp_mock.yml",
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_after_evp_mock.yml",
                       "r") as f:
                 data = yaml.safe_load(f)
                 evp_counter_proposal = SongProposalIteration(**data)
@@ -500,7 +500,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
     def update_alternate_song_spec_with_sigil(self, state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/black_counter_proposal_after_sigil_mock.yml",
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_after_sigil_mock.yml",
                       "r") as f:
                 data = yaml.safe_load(f)
             sigil_counter_proposal = SongProposalIteration(**data)
