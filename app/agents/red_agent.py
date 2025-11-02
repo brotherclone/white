@@ -64,6 +64,7 @@ class RedAgent(BaseRainbowAgent, ABC):
 
             current_proposal = state.song_proposals.iterations[-1]
             red_state = RedAgentState(
+                thread_id=f"red_thread_{uuid.uuid4()}",
                 song_proposals=state.song_proposals,
                 black_to_white_proposal=current_proposal,
                 counter_proposal=None,
@@ -118,7 +119,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_alternate_song_spec(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_counter_proposal_mock.yml", "r") as f:
+            with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_counter_proposal_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 counter_proposal = SongProposalIteration(**data)
                 state.counter_proposal = counter_proposal
@@ -163,7 +164,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_book(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_book_artifact_mock.yml", "r") as f:
+            with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_book_artifact_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 book = ReactionBookArtifact(**data)
                 state.artifacts.append(book)
@@ -204,7 +205,14 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{book_data.author}_excerpt_1",
                     )
-                    save_artifact_file_to_md(page_1)
+                    try:
+                        save_artifact_file_to_md(page_1)
+                        logging.info(f"Saved artifact: {page_1.artifact_name} to {page_1.get_artifact_path()}")
+                    except ValueError as ve:
+                        logging.error(f"Failed to save artifact {page_1.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
+                    except Exception as se:
+                        logging.error(f"Unexpected error saving artifact {page_1.artifact_name}: {se}")
+
                     page_2 = TextChainArtifactFile(
                         text_content=result["page_2"],
                         thread_id=state.thread_id,
@@ -213,7 +221,14 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{book_data.author}_excerpt_2",
                     )
-                    save_artifact_file_to_md(page_2)
+                    try:
+                        save_artifact_file_to_md(page_2)
+                        logging.info(f"Saved artifact: {page_2.artifact_name} to {page_2.get_artifact_path()}")
+                    except ValueError as ve:
+                        logging.error(f"Failed to save artifact {page_2.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
+                    except Exception as se:
+                        logging.error(f"Unexpected error saving artifact {page_2.artifact_name}: {se}")
+
                     state.main_generated_book = BookArtifact(
                         book_data=book_data,
                         excerpts=[page_1, page_2],
@@ -231,7 +246,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_reaction_book(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_reaction_book_data_mock.yml", "r") as f:
+            with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_data_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 reaction_book = ReactionBookArtifact(**data)
                 state.artifacts.append(reaction_book)
@@ -281,10 +296,10 @@ class RedAgent(BaseRainbowAgent, ABC):
     def write_reaction_book_pages(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_reaction_book_page_1_mock.yml", "r") as f:
+            with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_page_1_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 page_1 = TextChainArtifactFile(**data)
-            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_reaction_book_page_2_mock.yml", "r") as f:
+            with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_page_2_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 page_2 = TextChainArtifactFile(**data)
             state.artifacts.append(page_1)
@@ -321,8 +336,15 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{state.current_reaction_book.author}_excerpt_1",
                     )
-                    save_artifact_file_to_md(page_1)
+                    try:
+                        save_artifact_file_to_md(page_1)
+                        logging.info(f"Saved artifact: {page_1.artifact_name} to {page_1.get_artifact_path()}")
+                    except ValueError as ve:
+                        logging.error(f"Failed to save artifact {page_1.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
+                    except Exception as se:
+                        logging.error(f"Unexpected error saving artifact {page_1.artifact_name}: {se}")
                     state.artifacts.append(page_1)
+
                     page_2 = TextChainArtifactFile(
                         text_content=result["page_2"],
                         thread_id=state.thread_id,
@@ -331,7 +353,13 @@ class RedAgent(BaseRainbowAgent, ABC):
                         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
                         artifact_name=f"{state.current_reaction_book.author}_excerpt_2",
                     )
-                    save_artifact_file_to_md(page_2)
+                    try:
+                        save_artifact_file_to_md(page_2)
+                        logging.info(f"Saved artifact: {page_2.artifact_name} to {page_2.get_artifact_path()}")
+                    except ValueError as ve:
+                        logging.error(f"Failed to save artifact {page_2.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
+                    except Exception as se:
+                        logging.error(f"Unexpected error saving artifact {page_2.artifact_name}: {se}")
                     state.artifacts.append(page_2)
                     state.current_reaction_book = None
                 else:
