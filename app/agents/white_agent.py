@@ -182,14 +182,14 @@ class WhiteAgent(BaseModel):
         print(f"   {facet_metadata['description']}")
         if mock_mode:
             try:
-                with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
+                with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/white_initial_proposal_{facet.value}_mock.yml", "r") as f:
                     data = yaml.safe_load(f)
                     proposal = SongProposalIteration(**data)
                     if not hasattr(state, "song_proposals") or state.song_proposals is None:
-                        state.song_proposals = SongProposal(iterations=[]).model_dump()
+                        state.song_proposals = SongProposal(iterations=[])
                     sp = self._normalize_song_proposal(state.song_proposals)
                     sp.iterations.append(proposal)
-                    state.song_proposals = sp.model_dump()
+                    state.song_proposals = sp
             except Exception as e:
                 print(f"Mock initial proposal not found, returning stub SongProposalIteration:{e!s}")
             return state
@@ -217,14 +217,16 @@ class WhiteAgent(BaseModel):
                 concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable."
             )
         if not hasattr(state, "song_proposals") or state.song_proposals is None:
-            state.song_proposals = SongProposal(iterations=[]).model_dump()
+            state.song_proposals = SongProposal(iterations=[])
         sp = self._normalize_song_proposal(state.song_proposals)
         sp.iterations.append(initial_proposal)
-        state.song_proposals = sp.model_dump()
+        state.song_proposals = sp
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-        black_proposal = state.song_proposals.iterations[-1]
+        # Normalize song_proposals to object before accessing
+        sp = self._normalize_song_proposal(state.song_proposals)
+        black_proposal = sp.iterations[-1]
         black_artifacts = state.artifacts or []
         evp_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "evp"]
         sigil_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "sigil"]
@@ -248,7 +250,7 @@ class WhiteAgent(BaseModel):
     def _black_rebracketing_analysis(self, proposal, evp_artifacts, sigil_artifacts)-> str:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_to_white_rebracket_analysis_mock.yml", "r") as f:
+            with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_white_rebracket_analysis_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 return data
         else:
@@ -289,7 +291,7 @@ class WhiteAgent(BaseModel):
     def _synthesize_document_for_red(self, rebracketed_analysis, black_proposal, artifacts):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_to_white_document_synthesis_mock.yml", "r") as f:
+            with open(f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_white_document_synthesis_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 return data
         else:
@@ -342,6 +344,10 @@ class WhiteAgent(BaseModel):
         return state
 
 if __name__ == "__main__":
+    # Optional: Disable LangSmith tracing if it's causing issues
+    # Uncomment the next line to disable tracing:
+    # os.environ["LANGCHAIN_TRACING_V2"] = "false"
+
     white_agent = WhiteAgent(settings=AgentSettings())
     main_workflow = white_agent.build_workflow()
     initial_state = MainAgentState(thread_id=str(uuid4()))
