@@ -223,7 +223,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     title="Fallback: Black Song",
                     mood=["dark"],
                     genres=["experimental"],
-                    concept="Fallback stub because Anthropic model unavailable"
+                    concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable."
                 )
 
             state.counter_proposal = counter_proposal
