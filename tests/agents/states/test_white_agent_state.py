@@ -1,4 +1,4 @@
-from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.agents.states.white_agent_state import MainAgentState
 
 

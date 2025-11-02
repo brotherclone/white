@@ -12,13 +12,12 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-from app.agents.enums.sigil_state import SigilState
-from app.agents.enums.sigil_type import SigilType
-from app.agents.models.agent_settings import AgentSettings
-from app.agents.base_rainbow_agent import BaseRainbowAgent
-from app.agents.models.evp_artifact import EVPArtifact
-from app.agents.models.sigil_artifact import SigilArtifact
-from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.enums.sigil_state import SigilState
+from app.structures.enums.sigil_type import SigilType
+from app.structures.agents.agent_settings import AgentSettings
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.structures.artifacts.evp_artifact import EVPArtifact
+from app.structures.artifacts.sigil_artifact import SigilArtifact
 from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.tools.audio_tools import get_audio_segments_as_chain_artifacts, \
@@ -27,7 +26,7 @@ from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import chain_artifact_file_from_speech_to_text
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
-from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
+from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals
 from app.reference.mcp.todoist.main import (
     create_sigil_charging_task
@@ -173,7 +172,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
             counter_proposal = SongProposalIteration(**data)
             state.counter_proposal = counter_proposal
@@ -224,7 +223,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     title="Fallback: Black Song",
                     mood=["dark"],
                     genres=["experimental"],
-                    concept="Fallback stub because Anthropic model unavailable"
+                    concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable."
                 )
 
             state.counter_proposal = counter_proposal
@@ -238,7 +237,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
-            mock_path = "/Volumes/LucidNonsense/White/app/agents/mocks/black_sigil_artifact_mock.yml"
+            mock_path = f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_sigil_artifact_mock.yml"
             if random.random() < 0.75:
                 state.should_update_proposal_with_sigil = False
                 return state
@@ -343,24 +342,24 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_evp_artifact_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_evp_artifact_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
             evp_artifact = EVPArtifact(**data)
             state.artifacts.append(evp_artifact)
             return state
         current_proposal = state.counter_proposal
         segments = get_audio_segments_as_chain_artifacts(
-            2.0, 9,
+            2.0, 4,
             the_rainbow_table_colors['Z'],
             state.thread_id
         )
         mosaic = create_audio_mosaic_chain_artifact(
-            segments, 50,
-            getattr(current_proposal, 'target_length', 180),  # Default 3 min
+            segments, 100,
+            getattr(current_proposal, 'target_length', 10),
             state.thread_id
         )
         blended = create_blended_audio_chain_artifact(
-            mosaic, 0.33,
+            mosaic, 0.66,
             state.thread_id
         )
         transcript = chain_artifact_file_from_speech_to_text(
@@ -375,7 +374,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
         )
         state.artifacts.append(evp_artifact)
-        # ToDo: Save off as yml
         return state
 
     @staticmethod
@@ -431,7 +429,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
     def update_alternate_song_spec_with_evp(self, state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_evp_mock.yml",
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_after_evp_mock.yml",
                       "r") as f:
                 data = yaml.safe_load(f)
                 evp_counter_proposal = SongProposalIteration(**data)
@@ -502,7 +500,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
     def update_alternate_song_spec_with_sigil(self, state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/black_counter_proposal_after_sigil_mock.yml",
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_after_sigil_mock.yml",
                       "r") as f:
                 data = yaml.safe_load(f)
             sigil_counter_proposal = SongProposalIteration(**data)

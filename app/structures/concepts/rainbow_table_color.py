@@ -1,6 +1,7 @@
-
 from enum import Enum
-from pydantic import BaseModel
+from typing import Optional
+
+from pydantic import BaseModel, Field
 
 """
 This is the heart of the Rainbow Table, the Newtonian colors echoing their occult origin in the temporal, spatial, and 
@@ -42,7 +43,7 @@ class RainbowTableTransmigrationalMode(BaseModel):
 
 class RainbowColorTemporalMode(Enum):
     """
-    Enum representing the temporal modes of rainbow colors. A fourth dimensional perspective from which they are
+    Enum representing the temporal modes of rainbow colors. A fourth-dimensional perspective from which they are
     perceived in The Rainbow Table.
     """
 
@@ -59,7 +60,7 @@ class RainbowColorTemporalMode(Enum):
 
 class RainbowColorObjectionalMode(Enum):
 
-    """ Enum representing the objectional modes of rainbow colors. A third dimensional perspective from which they are
+    """ Enum representing the objectional modes of rainbow colors. A third-dimensional perspective from which they are
     perceived in The Rainbow Table."""
 
     THING = "Thing"
@@ -75,7 +76,7 @@ class RainbowColorObjectionalMode(Enum):
 
 
 class RainbowColorOntologicalMode(Enum):
-    """ Enum representing the ontological modes of rainbow colors. A fifth dimensional perspective from which they are
+    """ Enum representing the ontological modes of rainbow colors. A fifth-dimensional perspective from which they are
     perceived in The Rainbow Table."""
 
     KNOWN = "Known"
@@ -91,15 +92,54 @@ class RainbowColorOntologicalMode(Enum):
 
 
 class RainbowTableColor(BaseModel):
-
-    color_name: str
-    hex_value: int
-    mnemonic_character_value: str
-    temporal_mode: RainbowColorTemporalMode | None = None
-    objectional_mode: RainbowColorObjectionalMode | None = None
-    ontological_mode: list[RainbowColorOntologicalMode] | None = None
-    transmigrational_mode: RainbowTableTransmigrationalMode | None = None
-    file_prefix: str | None = None
+    """
+    Represents a color in the Rainbow Table with its associated properties and modes.
+    """
+    color_name: str = Field(
+        description="Name of the rainbow color (Red, Orange, Yellow, Green, Blue, Indigo, Violet, White, Black)",
+        examples=["Indigo", "Red", "Violet", "Black"]
+    )
+    hex_value: int = Field(
+        description="Hexadecimal color value as integer",
+        examples=[4915330, 16711680, 65280],
+        ge=0,
+        le=16777215  # Max RGB value (0xFFFFFF)
+    )
+    mnemonic_character_value: str = Field(
+        description="Single character mnemonic for the color",
+        examples=["I", "R", "V", "B"],
+        min_length=1,
+        max_length=1
+    )
+    temporal_mode: Optional[RainbowColorTemporalMode] = Field(
+        default=None,
+        description="Temporal positioning: Past, Present, or Future",
+        examples=["Future", "Past", "Present"]
+    )
+    objectional_mode: Optional[RainbowColorObjectionalMode] = Field(
+        default=None,
+        description="Subject categorization: Thing, Place, or Person",
+        examples=["Person", "Place", "Thing"]
+    )
+    ontological_mode: Optional[list[RainbowColorOntologicalMode]] = Field(
+        default=None,
+        description="Existential status: Known, Imagined, or Forgotten",
+        examples=[["Known"], ["Imagined"], ["Forgotten"], ["Known", "Forgotten"]]
+    )
+    transmigrational_mode: Optional[RainbowTableTransmigrationalMode] = Field(
+        default=None,
+        description="Transmigrational modes between Earthly and Frame perspectives",
+        examples=[{
+            "current_mode": "Time",
+            "transitory_mode": "Space",
+            "transcendental_mode": "Information"
+        }]
+    )
+    file_prefix: Optional[str] = Field(
+        default=None,
+        description="File prefix associated with the color",
+        examples=["01", "02", "03"]
+    )
 
     def __init__(self, **data):
         super().__init__(**data)

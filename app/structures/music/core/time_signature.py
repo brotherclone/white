@@ -1,9 +1,23 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 
 class TimeSignature(BaseModel):
+    """
+    Represents a musical time signature.
+    """
 
-    numerator: int
-    denominator: int
+    numerator: int = Field(
+        description="Beats per measure (top number)",
+        examples=[4, 3, 6, 7],
+        ge=1,
+        le=16
+    )
+    denominator: int = Field(
+        description="Note value that gets the beat (bottom number, typically 4, 8, or 16)",
+        examples=[4, 8, 16],
+        ge=1,
+        le=32
+    )
 
     def __init__(self, **data):
         super().__init__(**data)

@@ -3,9 +3,9 @@ from typing import Optional, List, Any
 
 from pydantic import Field
 
-from app.agents.models.book_artifact import BookArtifact
-from app.agents.models.book_data import BookData
-from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.artifacts.book_artifact import BookArtifact
+from app.structures.artifacts.book_data import BookData
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
 
 
