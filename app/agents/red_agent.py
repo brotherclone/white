@@ -118,7 +118,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_alternate_song_spec(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/red_counter_proposal_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_counter_proposal_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 counter_proposal = SongProposalIteration(**data)
                 state.counter_proposal = counter_proposal
@@ -163,7 +163,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_book(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/red_book_artifact_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_book_artifact_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 book = ReactionBookArtifact(**data)
                 state.artifacts.append(book)
@@ -231,7 +231,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_reaction_book(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/app/agents/mocks/red_reaction_book_data_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_reaction_book_data_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 reaction_book = ReactionBookArtifact(**data)
                 state.artifacts.append(reaction_book)
@@ -281,10 +281,10 @@ class RedAgent(BaseRainbowAgent, ABC):
     def write_reaction_book_pages(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/app/agents/mocks/red_reaction_book_page_1_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_reaction_book_page_1_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 page_1 = TextChainArtifactFile(**data)
-            with open("/app/agents/mocks/red_reaction_book_page_2_mock.yml", "r") as f:
+            with open(f"{os.getenv("AGENT_MOCK_DATA_PATH")}/red_reaction_book_page_2_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 page_2 = TextChainArtifactFile(**data)
             state.artifacts.append(page_1)
