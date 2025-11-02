@@ -214,7 +214,7 @@ class WhiteAgent(BaseModel):
                 title="Fallback: White Song",
                 mood=["reflective"],
                 genres=["art-pop"],
-                concept="Fallback stub because Anthropic model unavailable"
+                concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable."
             )
         if not hasattr(state, "song_proposals") or state.song_proposals is None:
             state.song_proposals = SongProposal(iterations=[]).model_dump()
