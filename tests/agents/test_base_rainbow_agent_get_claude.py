@@ -1,6 +1,5 @@
-import pytest
-from app.agents.base_rainbow_agent import BaseRainbowAgent
-from app.agents.models.agent_settings import AgentSettings
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.structures.agents.agent_settings import AgentSettings
 
 
 class DummyClaude:
@@ -21,7 +20,7 @@ class ConcreteAgent(BaseRainbowAgent):
 
 def test_get_claude_uses_settings(monkeypatch):
     # monkeypatch the ChatAnthropic used in the module to our DummyClaude
-    import app.agents.base_rainbow_agent as bra
+    import app.structures.agents.base_rainbow_agent as bra
     monkeypatch.setattr(bra, "ChatAnthropic", DummyClaude)
 
     settings = AgentSettings()

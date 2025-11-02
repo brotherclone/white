@@ -3,10 +3,9 @@ import os
 import assemblyai as aai
 from dotenv import load_dotenv
 
-from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.agents.models.audio_chain_artifact_file import AudioChainArtifactFile
-from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
-from app.agents.tools.text_tools import save_artifact_file_to_md
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 
 load_dotenv()
 

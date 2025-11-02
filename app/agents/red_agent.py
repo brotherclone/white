@@ -6,22 +6,21 @@ import logging
 from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langchain_core.runnables import RunnableConfig
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-from app.agents.base_rainbow_agent import BaseRainbowAgent
-from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.agents.models.agent_settings import AgentSettings
-from app.agents.models.book_artifact import ReactionBookArtifact, BookArtifact
-from app.agents.models.book_data import BookDataPageCollection, BookData
-from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.agents.agent_settings import AgentSettings
+from app.structures.artifacts.book_artifact import ReactionBookArtifact, BookArtifact
+from app.structures.artifacts.book_data import BookDataPageCollection, BookData
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.red_agent_state import RedAgentState
 from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
-from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
+from app.structures.manifests.song_proposal import SongProposalIteration
 from app.agents.tools.book_tool import BookMaker
 from app.util.manifest_loader import get_my_reference_proposals
 
@@ -119,7 +118,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_alternate_song_spec(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/red_counter_proposal_mock.yml", "r") as f:
+            with open("/tests/mocks/red_counter_proposal_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 counter_proposal = SongProposalIteration(**data)
                 state.counter_proposal = counter_proposal
@@ -164,7 +163,7 @@ class RedAgent(BaseRainbowAgent, ABC):
     def generate_book(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/app/agents/mocks/red_book_artifact_mock.yml", "r") as f:
+            with open("/tests/mocks/red_book_artifact_mock.yml", "r") as f:
                 data = yaml.safe_load(f)
                 book = ReactionBookArtifact(**data)
                 state.artifacts.append(book)

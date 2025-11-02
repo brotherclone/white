@@ -2,7 +2,7 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 
 from app.structures.manifests.song_proposal import SongProposal
-from app.agents.enums.white_facet import WhiteFacet
+from app.structures.enums.white_facet import WhiteFacet
 
 class MainAgentState(BaseModel):
 

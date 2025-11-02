@@ -13,9 +13,9 @@ from scipy import signal
 from scipy.io import wavfile
 from scipy.fft import fft, ifft, fftfreq
 
-from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.agents.enums.noise_type import NoiseType
-from app.agents.models.audio_chain_artifact_file import AudioChainArtifactFile
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.noise_type import NoiseType
+from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
 from app.structures.concepts.rainbow_table_color import RainbowTableColor, the_rainbow_table_colors
 
 load_dotenv()
