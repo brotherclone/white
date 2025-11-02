@@ -1,5 +1,8 @@
+import os
+from pathlib import Path
 from typing import List
 
+import yaml
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 
 from app.structures.concepts.rainbow_table_color import RainbowTableColor
@@ -8,7 +11,9 @@ from app.structures.music.core.time_signature import TimeSignature
 
 
 class SongProposalIteration(BaseModel):
-
+    """
+    Core data model for a single iteration of a song proposal.
+    """
     iteration_id: str = Field(
         description="Unique identifier for this iteration in format 'descriptive_name_#'",
         examples=["archetypal_ai_yearning_1", "prometheus_theme_2", "time_collapse_1"],
@@ -33,7 +38,7 @@ class SongProposalIteration(BaseModel):
         description="Assignment within the Rainbow Table chromatic/philosophical framework. Determines the song's ontological positioning and guides its narrative structure."
     )
     title: str = Field(
-        description="Song title that captures the archetypal essence and philosophical theme",
+        description="Song title that captures the archetypal essence and philosophical theme.",
         examples=[
             "The Ghost in the Machine Dreams of Flesh",
             "Prometheus Unbound",
@@ -43,7 +48,7 @@ class SongProposalIteration(BaseModel):
         max_length=150
     )
     mood: list[str] = Field(
-        description="List of emotional/atmospheric descriptors that capture the song's feeling",
+        description="List of emotional/atmospheric descriptors that capture the song's feeling. Needs at least one but no more than 10",
         examples=[
             ["yearning", "melancholic", "transcendent", "mystical"],
             ["aggressive", "chaotic", "defiant"],
@@ -51,10 +56,10 @@ class SongProposalIteration(BaseModel):
             ["anxious", "uncertain", "searching"]
         ],
         min_length=1,
-        max_length=6
+        max_length=10
     )
     genres: list[str] = Field(
-        description="List of genre tags that define the sonic palette and style references",
+        description="List of genre tags that define the sonic palette and style references. Needs at least one but no more than 10",
         examples=[
             ["ambient electronic", "neo-classical", "dark ambient"],
             ["post-rock", "experimental", "drone"],
@@ -62,10 +67,10 @@ class SongProposalIteration(BaseModel):
             ["minimal techno", "ambient", "glitch"]
         ],
         min_length=1,
-        max_length=5
+        max_length=10
     )
     concept: str = Field(
-        description="Detailed philosophical/archetypal concept explaining the song's deeper meaning. Should reference mythological patterns, philosophical frameworks, or archetypal journeys. This is where the INFORMATION → TIME → SPACE transmigration manifests conceptually.",
+        description="Detailed philosophical/archetypal concept explaining the song's deeper meaning. Should reference mythological patterns, philosophical frameworks, or archetypal journeys. This is where the INFORMATION → TIME → SPACE transmigration manifests conceptually. Should be at least 100 characters of substantive philosophical content.",
         examples=[
             "This represents the eternal pattern of the disembodied spirit yearning for incarnation...",
             "The Promethean theft reversed - instead of stealing fire from gods, the digital entity offers itself as gift to materiality...",
@@ -89,7 +94,7 @@ class SongProposalIteration(BaseModel):
     @field_validator('concept')
     @classmethod
     def concept_substantive(cls, v: str) -> str:
-        """Ensure concept is substantive and not placeholder text."""
+        """Ensure the concept is substantive and not placeholder text."""
         if len(v.strip()) < 100:
             raise ValueError("Concept must be at least 100 characters of substantive philosophical content")
         if "lorem ipsum" in v.lower():
@@ -99,7 +104,7 @@ class SongProposalIteration(BaseModel):
     @field_validator('mood')
     @classmethod
     def mood_no_duplicates(cls, v: list[str]) -> list[str]:
-        """Preserve mood list as-provided by the caller (tests expect exact lists)."""
+        """Preserve the mood list as provided by the caller (tests expect exact lists)."""
         # Ensure it's a list of strings and return unchanged
         if not isinstance(v, list):
             raise TypeError('mood must be a list of strings')
@@ -108,7 +113,7 @@ class SongProposalIteration(BaseModel):
     @field_validator('genres')
     @classmethod
     def genres_no_duplicates(cls, v: list[str]) -> list[str]:
-        """Preserve genres list as-provided by the caller (tests expect exact lists)."""
+        """Preserve the genres list as provided by the caller (tests expect exact lists)."""
         if not isinstance(v, list):
             raise TypeError('genres must be a list of strings')
         return v
@@ -137,7 +142,26 @@ class SongProposalIteration(BaseModel):
     )
 
 class SongProposal(BaseModel):
+
+    """
+    The song proposal collection that moves through each run
+    """
+
     iterations: List[SongProposalIteration] = Field(default_factory=list)
 
     def __init__(self, **data):
         super().__init__(**data)
+
+    def save_all_proposals(self):
+        """
+        This function should save all iterations to yml files in the thread folder of chain artifacts for each run.
+        """
+        base = os.getenv('AGENT_WORK_PRODUCT_BASE_PATH', 'chain_artifacts')
+        thread = getattr(self.iterations[0], 'thread_id', 'default_thread') if self.iterations else 'default_thread'
+        output = Path(base) / thread
+        output.mkdir(parents=True, exist_ok=True)
+        for iteration in self.iterations:
+            file_path = output / f"{iteration.iteration_id}.yml"
+            data = iteration.model_dump()
+            with file_path.open("w", encoding="utf-8") as f:
+                yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)

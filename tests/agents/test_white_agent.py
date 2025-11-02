@@ -51,6 +51,7 @@ def test_resume_after_black_agent_ritual(mock_resume):
         genres=['mock'],
         concept="Test concept that should at least 100 characters long. It should contain some detail. Mock Concept that should at least 100 characters long. It should contain some detail."
     )}
+    state.workflow_paused = True
     updated_state = WhiteAgent.resume_after_black_agent_ritual(state)
     assert updated_state.song_proposals.iterations[-1].title == "Test"
     assert updated_state.pending_human_action is None

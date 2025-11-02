@@ -1,10 +1,13 @@
 import io
+import os
+
 import numpy as np
 import soundfile as sf
 
 from scipy.io import wavfile
 
 from app.agents.tools import audio_tools
+from app.agents.tools.audio_tools import find_wav_files_prioritized
 from app.structures.enums.noise_type import NoiseType
 
 
@@ -106,6 +109,61 @@ def test_find_wav_files_and_prefix(tmp_path):
     found_pref = audio_tools.find_wav_files(str(tmp_path), prefix="prefix_")
     assert any("prefix_b.wav" in f for f in found_pref)
     assert all(f.endswith(".wav") for f in found_pref)
+
+def _make_files(tmp_path, names):
+    for n in names:
+        p = tmp_path / n
+        p.write_bytes(b"")  # empty file is fine for filename-based tests
+    return [str(tmp_path / n) for n in names]
+
+def test_find_wav_files_prioritized_orders_priority_first(tmp_path):
+    names = [
+        "a.wav",
+        "lead_vox.wav",
+        "vocal_1.wav",
+        "vox_lead.wav",
+        "Vocal_solo.WAV",
+        "notwav.txt"
+    ]
+    created = _make_files(tmp_path, names)
+
+    found = find_wav_files_prioritized(str(tmp_path), prefix=None)
+
+    # All .wav files should be present
+    expected_wavs = sorted([p for p in created if p.lower().endswith(".wav")], key=lambda p: os.path.basename(p).lower())
+
+    # Compute expected prioritized-first ordering
+    priority_keywords = ["vocal", "vox"]
+    priority = [p for p in expected_wavs if any(k in os.path.basename(p).lower() for k in priority_keywords)]
+    non_priority = [p for p in expected_wavs if p not in priority]
+    expected_order = sorted(priority, key=lambda p: os.path.basename(p).lower()) + sorted(non_priority, key=lambda p: os.path.basename(p).lower())
+
+    assert found == expected_order
+
+def test_find_wav_files_prioritized_prefix_and_custom_keywords(tmp_path):
+    names = [
+        "vocal_a.wav",
+        "Vocal_b.wav",
+        "lead_file.wav",
+        "voice_lead.wav",
+        "other.wav"
+    ]
+    created = _make_files(tmp_path, names)
+
+    # prefix is case-sensitive in the implementation: only lowercase 'vocal_a.wav' should match prefix 'vocal'
+    found_prefix = find_wav_files_prioritized(str(tmp_path), prefix="vocal", priority_keywords=None)
+    assert found_prefix == [str(tmp_path / "vocal_a.wav")]
+
+    # custom priority keyword should prioritize 'lead' occurrences
+    found_custom = find_wav_files_prioritized(str(tmp_path), prefix=None, priority_keywords=["lead"])
+    # ensure files containing 'lead' come first
+    base_names = [os.path.basename(p).lower() for p in found_custom]
+    # both 'lead_file.wav' and 'voice_lead.wav' should be before other wavs
+    first_priority = [b for b in base_names if "lead" in b]
+    assert len(first_priority) == 2
+    # overall set matches all wavs present
+    expected_set = {str(tmp_path / n) for n in names if n.lower().endswith(".wav")}
+    assert set(found_custom) == expected_set
 
 
 def test_extract_non_silent_segments_detects_tone():

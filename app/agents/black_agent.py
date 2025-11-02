@@ -100,12 +100,29 @@ class BlackAgent(BaseRainbowAgent, ABC):
         black_config: RunnableConfig = {"configurable": {"thread_id": f"{state.thread_id}"}}
         result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
         snapshot = self._compiled_workflow.get_state(black_config)
+
         if snapshot.next:
-            pass
+            # Workflow is interrupted - waiting for human action
+            logging.info(f"⏸️  Black Agent workflow paused at: {snapshot.next}")
+            state.workflow_paused = True
+            state.pause_reason = "black_agent_ritual_tasks"
+            state.pending_human_action = {
+                "agent": "black",
+                "black_config": black_config,
+                "thread_id": state.thread_id,
+                "instructions": result.get("human_instructions", "Complete ritual tasks in Todoist"),
+                "tasks": result.get("pending_human_tasks", [])
+            }
+            # Store partial results
+            if result.get("artifacts"):
+                state.artifacts = result["artifacts"]
         else:
+            # Workflow completed successfully
             state.song_proposals = result.get("song_proposals") or state.song_proposals
             if result.get("counter_proposal"):
                 state.song_proposals.iterations.append(result["counter_proposal"])
+            if result.get("artifacts"):
+                state.artifacts = result["artifacts"]
         return state
 
     def create_graph(self) -> StateGraph:
@@ -154,7 +171,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             }
         )
         black_workflow.add_edge("await_human_action", "update_alternate_song_spec_with_sigil")
-        black_workflow.add_edge("await_human_action", END)
+        black_workflow.add_edge("update_alternate_song_spec_with_sigil", END)
         return black_workflow
 
     @staticmethod
@@ -234,6 +251,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
         """Generate a sigil artifact and create a Todoist task for charging"""
 
+        logging.info("🜏 Entering generate_sigil method")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
@@ -249,6 +267,15 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.awaiting_human_action = True
                 state.human_instructions = "MOCK: Sigil charging task would be created"
                 state.should_update_proposal_with_sigil = True
+
+                # Add mock task info
+                state.pending_human_tasks.append({
+                    "type": "sigil_charging",
+                    "task_id": "mock_task_123",
+                    "task_url": "https://todoist.com/app/task/mock_task_123",
+                    "artifact_index": len(state.artifacts) - 1,
+                    "sigil_wish": sigil_artifact.wish
+                })
                 return state
             except FileNotFoundError:
                 logging.warning(f"Mock file not found at {mock_path}, using real generation")
@@ -296,30 +323,48 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 section_name="Black Agent - Sigil Work"
             )
 
-            state.pending_human_tasks.append({
-                "type": "sigil_charging",
-                "task_id": task_result["id"],
-                "task_url": task_result["url"],
-                "artifact_index": len(state.artifacts) - 1,
-                "sigil_wish": wish_text
-            })
+            if task_result.get("success", False):
+                # Successfully created Todoist task
+                state.pending_human_tasks.append({
+                    "type": "sigil_charging",
+                    "task_id": task_result["id"],
+                    "task_url": task_result["url"],
+                    "artifact_index": len(state.artifacts) - 1,
+                    "sigil_wish": wish_text
+                })
 
-            state.awaiting_human_action = True
-            state.human_instructions = f"""
-                                        🜏 SIGIL CHARGING REQUIRED
-                                        A sigil has been generated for '{current_proposal.title}'.
-                                        **Todoist Task:** {task_result['url']}
-                                        **Wish:** {wish_text}
-                                        **Glyph:** {description}
-                                        **Instructions:**
-                                        {charging_instructions}
-                                        Mark the Todoist task complete after charging, then resume the workflow.
-                                        """
-            state.should_update_proposal_with_sigil = True
-            logging.info(f"✓ Created Todoist task for sigil charging: {task_result['id']}")
+                state.awaiting_human_action = True
+                state.human_instructions = f"""
+                                            🜏 SIGIL CHARGING REQUIRED
+                                            A sigil has been generated for '{current_proposal.title}'.
+                                            **Todoist Task:** {task_result['url']}
+                                            **Wish:** {wish_text}
+                                            **Glyph:** {description}
+                                            **Instructions:**
+                                            {charging_instructions}
+                                            Mark the Todoist task complete after charging, then resume the workflow.
+                                            """
+                state.should_update_proposal_with_sigil = True
+                logging.info(f"✓ Created Todoist task for sigil charging: {task_result['id']}")
+            else:
+                # Todoist task creation failed - provide manual instructions
+                error_msg = task_result.get("error", "Unknown error")
+                logging.warning(f"⚠️ Todoist task creation failed: {error_msg}")
+                state.awaiting_human_action = True
+                state.should_update_proposal_with_sigil = True
+                state.human_instructions = f"""
+                                            ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
+                                            
+                                            Manually charge the sigil for '{current_proposal.title}':
+                                            
+                                            **Wish:** {wish_text}
+                                            **Glyph:** {description}
+                                            
+                                            {charging_instructions}
+                                            """
 
         except Exception as e:
-            logging.error(f"✗ Failed to create Todoist task: {e}")
+            logging.error(f"✗ Unexpected error with Todoist integration: {e}")
             state.awaiting_human_action = True
             state.should_update_proposal_with_sigil = True
             state.human_instructions = f"""
@@ -381,7 +426,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """
         Node that workflow interrupts at.
         """
-        logging.info("⏸️  Workflow interrupted - awaiting human action on sigil charging")
+        logging.info("Workflow interrupted - awaiting human action on sigil charging")
         return state
 
     def evaluate_evp(self, state: BlackAgentState) -> BlackAgentState:
@@ -419,11 +464,15 @@ class BlackAgent(BaseRainbowAgent, ABC):
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
-                    state.should_update_proposal_with_evp = result["answer"]
+                    state.should_update_proposal_with_evp = result.get("answer", False)
+                elif isinstance(result, YesOrNo):
+                    state.should_update_proposal_with_evp = result.answer
                 else:
-                    return self.generate_sigil(state)
+                    logging.warning(f"EVP evaluation returned unexpected type: {type(result)}, defaulting to False")
+                    state.should_update_proposal_with_evp = False
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                logging.error(f"EVP evaluation failed: {e!s}, defaulting to no EVP update")
+                state.should_update_proposal_with_evp = False
             return state
 
     def update_alternate_song_spec_with_evp(self, state: BlackAgentState) -> BlackAgentState:
@@ -575,5 +624,4 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     return state
             except Exception as e:
                 logging.error(f"Anthropic model call failed: {e!s}")
-
             return state

@@ -215,6 +215,27 @@ def find_wav_files(root_dir: str, prefix: str | None) -> List[str]:
         if file_name.lower().endswith('.wav') and (prefix is None or file_name.startswith(prefix))
     ]
 
+def find_wav_files_prioritized(root_dir: str, prefix: Optional[str] = None,
+                               priority_keywords: Optional[List[str]] = None) -> List[str]:
+    """
+    Like find_wav_files but returns files with any of `priority_keywords` in the filename first.
+    """
+    if priority_keywords is None:
+        priority_keywords = ["vocal", "vox"]
+    matches: List[str] = []
+    for dirpath, _, filenames in os.walk(root_dir):
+        for file_name in filenames:
+            if not file_name.lower().endswith(".wav"):
+                continue
+            if prefix is not None and not file_name.startswith(prefix):
+                continue
+            matches.append(os.path.join(dirpath, file_name))
+    def has_priority(path: str) -> int:
+        name = os.path.basename(path).lower()
+        return 0 if any(k.lower() in name for k in priority_keywords) else 1
+    matches.sort(key=lambda p: (has_priority(p), os.path.basename(p).lower()))
+    return matches
+
 def extract_non_silent_segments(audio: np.ndarray, sr: int, min_duration: float, top_db: int = 30) -> List[np.ndarray]:
     intervals = librosa.effects.split(audio, top_db=top_db)
     min_samples = int(min_duration * sr)
@@ -266,7 +287,7 @@ def get_audio_segments_as_chain_artifacts(min_duration: float,
                                           num_segments: int,
                                           rainbow_color: RainbowTableColor,
                                           thread_id: str | None = None) -> list:
-    wav_files = find_wav_files(os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix)
+    wav_files = find_wav_files_prioritized(os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix)
     random.shuffle(wav_files)
     all_segments = []
     for wav_path in wav_files:
@@ -346,7 +367,8 @@ def create_audio_mosaic_chain_artifact(segments: List[AudioChainArtifactFile],
      if not wav_files:
          raise FileNotFoundError("No segment files found.")
      sample_rate = segments[0].sample_rate or librosa.get_samplerate(wav_files[0])
-     slice_samples = int(slice_duration_ms / 1000 * sample_rate)
+     random_slice_duration_ms = random.randint(slice_duration_ms - 50, slice_duration_ms + 50)
+     slice_samples = int(random_slice_duration_ms / 1000 * sample_rate)
      target_samples = int(target_length_sec * sample_rate)
      random.shuffle(wav_files)
      collected_segments = []
@@ -423,6 +445,6 @@ def _safe_normalize_and_clip(x: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    a = get_audio_segments_as_chain_artifacts(4.0, 3, the_rainbow_table_colors['Z'], '123443')
-    m = create_audio_mosaic_chain_artifact(a, 50, 10, thread_id='123443')
-    b = create_blended_audio_chain_artifact(m, 0.5, thread_id='123443')
+    a = get_audio_segments_as_chain_artifacts(0.25, 3, the_rainbow_table_colors['Z'], 'mock_101')
+    m = create_audio_mosaic_chain_artifact(a, 500, 5, thread_id='mock_101')
+    b = create_blended_audio_chain_artifact(m, 0.5, thread_id='mock_101')

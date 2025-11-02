@@ -92,8 +92,6 @@ class WhiteAgent(BaseModel):
                 "finish": "finalize_song_proposal"
             }
         )
-
-
         workflow.add_edge("finalize_song_proposal", END)
 
         return workflow.compile(checkpointer=check_points)
@@ -224,6 +222,11 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
+        # Check if workflow is paused waiting for human action
+        if state.workflow_paused and state.pending_human_action:
+            logging.info("⏸️  Workflow paused - waiting for human to complete ritual tasks")
+            return state
+
         # Normalize song_proposals to object before accessing
         sp = self._normalize_song_proposal(state.song_proposals)
         black_proposal = sp.iterations[-1]
@@ -328,6 +331,10 @@ class WhiteAgent(BaseModel):
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
+        # If workflow is paused for human action, end here
+        if state.workflow_paused and state.pending_human_action:
+            return "finish"
+
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             return "red"
@@ -339,21 +346,119 @@ class WhiteAgent(BaseModel):
     def route_after_red(state: MainAgentState) -> str:
         return "finish"
 
-    def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
-        print('Finished run')
+    @staticmethod
+    def finalize_song_proposal(state: MainAgentState) -> MainAgentState:
+        # If workflow is paused, provide instructions and don't save
+        if state.workflow_paused and state.pending_human_action:
+            pending = state.pending_human_action
+            logging.info("\n" + "="*60)
+            logging.info("⏸️  WORKFLOW PAUSED - HUMAN ACTION REQUIRED")
+            logging.info("="*60)
+            logging.info(f"Agent: {pending.get('agent', 'unknown')}")
+            logging.info(f"Reason: {state.pause_reason}")
+            logging.info(f"\nInstructions:\n{pending.get('instructions', 'No instructions')}")
+
+            tasks = pending.get('tasks', [])
+            if tasks:
+                logging.info(f"\nPending Tasks ({len(tasks)}):")
+                for task in tasks:
+                    logging.info(f"  - {task.get('type', 'unknown')}: {task.get('task_url', 'No URL')}")
+
+            logging.info("\nTo resume after completing tasks:")
+            logging.info("  from app.agents.white_agent import WhiteAgent")
+            logging.info(f"  state = WhiteAgent.resume_after_black_agent_ritual(state)")
+            logging.info("="*60)
+            return state
+
+        # Normal completion - save proposals
+        state.song_proposals.save_all_proposals()
+        logging.info("✓ Song proposals saved")
         return state
 
-if __name__ == "__main__":
-    # Optional: Disable LangSmith tracing if it's causing issues
-    # Uncomment the next line to disable tracing:
-    # os.environ["LANGCHAIN_TRACING_V2"] = "false"
+    @staticmethod
+    def resume_after_black_agent_ritual(paused_state: MainAgentState, white_agent_instance=None, verify_tasks: bool = True) -> MainAgentState:
+        """
+        Resume the White Agent workflow after Black Agent ritual tasks are completed.
 
-    white_agent = WhiteAgent(settings=AgentSettings())
-    main_workflow = white_agent.build_workflow()
-    initial_state = MainAgentState(thread_id=str(uuid4()))
-    runnable_config = ensure_config(cast(RunnableConfig,
-                                         cast(object, {"configurable": {"thread_id": initial_state.thread_id}})))
-    main_workflow.invoke(initial_state.model_dump(), config=runnable_config)
+        Args:
+            paused_state: The MainAgentState that was paused waiting for human action
+            white_agent_instance: The WhiteAgent instance that initiated the workflow (needed for checkpointer access)
+            verify_tasks: If True, verify all Todoist tasks are complete before resuming
 
+        Returns:
+            Updated MainAgentState after Black Agent workflow completion
+        """
+        # Use the module-level resume_black_agent_workflow (imported at top of file)
+        # This allows tests to patch `resume_black_agent_workflow` in this module.
 
+        if not paused_state.workflow_paused:
+            logging.warning("Workflow is not paused - nothing to resume")
+            return paused_state
 
+        if not paused_state.pending_human_action:
+            logging.warning("No pending human action found")
+            return paused_state
+
+        pending = paused_state.pending_human_action
+        if pending.get('agent') != 'black':
+            logging.warning(f"Cannot resume - pending action is for agent: {pending.get('agent')}")
+            return paused_state
+
+        black_config = pending.get('black_config')
+        if not black_config:
+            logging.error("No black_config found in pending_human_action")
+            return paused_state
+
+        # Get the BlackAgent instance from the white_agent
+        if white_agent_instance is None:
+            logging.warning("No white_agent_instance provided - creating new instance (checkpointer may not persist)")
+            white_agent_instance = WhiteAgent()
+
+        black_agent = white_agent_instance.agents.get('black')
+        if not black_agent:
+            logging.error("Black agent not found in white_agent instance")
+            return paused_state
+
+        logging.info("🔄 Resuming Black Agent workflow...")
+
+        try:
+            # Resume the Black Agent workflow. The function `resume_black_agent_workflow`
+            # is imported at module level and may be patched in tests.
+            final_black_state = resume_black_agent_workflow(black_config, verify_tasks=verify_tasks)
+
+            # Update the main state with Black Agent results
+            paused_state.workflow_paused = False
+            paused_state.pause_reason = None
+            paused_state.pending_human_action = None
+
+            if final_black_state.get('counter_proposal'):
+                paused_state.song_proposals.iterations.append(final_black_state['counter_proposal'])
+
+            if final_black_state.get('artifacts'):
+                paused_state.artifacts = final_black_state['artifacts']
+
+            logging.info("✓ Black Agent workflow resumed and completed")
+
+            # Now continue with the rest of the White Agent workflow
+            # Process the Black Agent's work
+            artifacts = getattr(paused_state, 'artifacts', []) or []
+            evp_artifacts = [a for a in artifacts if getattr(a, 'chain_artifact_type', None) == "evp"]
+            sigil_artifacts = [a for a in artifacts if getattr(a, 'chain_artifact_type', None) == "sigil"]
+
+            black_proposal = paused_state.song_proposals.iterations[-1]
+
+            paused_state.rebracketing_analysis = white_agent_instance._black_rebracketing_analysis(
+                black_proposal, evp_artifacts, sigil_artifacts
+            )
+            paused_state.document_synthesis = white_agent_instance._synthesize_document_for_red(
+                paused_state.rebracketing_analysis, black_proposal, artifacts
+            )
+            paused_state.ready_for_red = True
+
+            logging.info("✓ Processed Black Agent work - ready for Red Agent")
+
+            return paused_state
+
+        except Exception as e:
+            logging.error(f"Failed to resume Black Agent workflow: {e}")
+            raise
