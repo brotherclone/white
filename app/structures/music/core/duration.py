@@ -1,28 +1,28 @@
 import re
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
+from typing import Any
 
 class Duration(BaseModel):
 
     minutes: int
     seconds: float
 
+    @model_validator(mode='before')
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if isinstance(v, str):
+    def validate_duration(cls, data: Any) -> Any:
+        """Validate and parse duration strings in [MM:SS.mmm] format"""
+        if isinstance(data, str):
             # Strip brackets if present
-            clean_str = v.strip('[]')
+            clean_str = data.strip('[]')
             pattern = r'^(\d+):(\d+\.\d+)$'
             match = re.match(pattern, clean_str)
 
             if match:
-                minutes = int(match.group(1))
-                seconds = float(match.group(2))
-                return cls(minutes=minutes, seconds=seconds)
-        return v
+                return {
+                    'minutes': int(match.group(1)),
+                    'seconds': float(match.group(2))
+                }
+        return data
 
     def __str__(self):
         return f"[{self.minutes:02d}:{self.seconds:06.3f}]"

@@ -4,6 +4,7 @@ import os
 
 from todoist_api_python.api import TodoistAPI
 from todoist_api_python.models import Section, Task
+from requests.exceptions import HTTPError
 from dotenv import load_dotenv
 from typing import Any, List, Optional, Dict
 from mcp.server.fastmcp import FastMCP
@@ -55,6 +56,14 @@ def get_earthly_frames_project_sections(project_id: str = EF_PROJECT_ID) -> List
                 "order": section.order
             })
         return result
+    except HTTPError as e:
+        if hasattr(e, 'response') and e.response.status_code == 403:
+            logging.error(f"403 Forbidden: Access denied to project {project_id}. Check API token permissions.")
+        elif hasattr(e, 'response') and e.response.status_code == 401:
+            logging.error(f"401 Unauthorized: Invalid API token for project {project_id}.")
+        else:
+            logging.error(f"HTTP error fetching sections for project {project_id}: {e}")
+        return []
     except Exception as e:
         logging.error(f"Error fetching sections for project {project_id}: {e}")
         return []
@@ -119,6 +128,17 @@ def create_sigil_charging_task(
             "created_at": task.created_at
         }
 
+    except HTTPError as e:
+        if hasattr(e, 'response') and e.response.status_code == 403:
+            logging.error(f"403 Forbidden: Cannot create task in project {EF_PROJECT_ID}. Check API token permissions for project access and task creation.")
+            logging.exception("Failed creating sigil charging task; sections=%r", sections)
+        elif hasattr(e, 'response') and e.response.status_code == 401:
+            logging.error(f"401 Unauthorized: Invalid API token.")
+            logging.exception("Failed creating sigil charging task; sections=%r", sections)
+        else:
+            logging.error(f"HTTP error creating sigil charging task: {e}")
+            logging.exception("Failed creating sigil charging task; sections=%r", sections)
+        raise
     except Exception:
         logging.exception("Failed creating sigil charging task; sections=%r", sections)
         raise
@@ -159,6 +179,15 @@ def list_pending_black_agent_tasks(section_name: str = "Black Agent - Sigil Work
             if not task.is_completed
         ]
 
+    except HTTPError as e:
+        if hasattr(e, 'response') and e.response.status_code == 403:
+            logging.error(f"403 Forbidden: Cannot access tasks in project {EF_PROJECT_ID}. Check API token permissions.")
+        elif hasattr(e, 'response') and e.response.status_code == 401:
+            logging.error(f"401 Unauthorized: Invalid API token.")
+        else:
+            logging.error(f"HTTP error listing tasks: {e}")
+        logging.exception(f"Error listing tasks; sections=%r", sections)
+        return []
     except ValueError as e:
         logging.exception(f"Error listing tasks;{e}; sections=%r", sections)
         return []
@@ -202,6 +231,15 @@ def create_todoist_task_for_human_earthly_frame(
             "section_id": task.section_id,
             "created_at": task.created_at
         }
+    except HTTPError as e:
+        if hasattr(e, 'response') and e.response.status_code == 403:
+            logging.error(f"403 Forbidden: Cannot create task in project {project_id}. Check API token permissions for project access and task creation.")
+        elif hasattr(e, 'response') and e.response.status_code == 401:
+            logging.error(f"401 Unauthorized: Invalid API token.")
+        else:
+            logging.error(f"HTTP error creating task: {e}")
+        logging.error(f"Error creating task: {e}")
+        raise
     except Exception as e:
         logging.error(f"Error creating task: {e}")
         raise

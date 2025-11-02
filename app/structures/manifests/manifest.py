@@ -25,10 +25,9 @@ class Manifest(BaseModel):
     TRT: str | Duration
     vocals: bool
     lyrics: bool
-    sounds_like: ManifestSoundsLike
+    sounds_like: list[ManifestSoundsLike]
     structure: list[ManifestSongStructure]
     mood: list[str]
-    sounds_like: list[ManifestSoundsLike]
     genres: list[str]
     lrc_file: str | None = None
     concept: str
