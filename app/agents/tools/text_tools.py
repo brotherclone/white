@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 from enum import Enum
 from types import MappingProxyType
 
-from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.agents.models.base_chain_artifact import ChainArtifact
-from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.artifacts.base_chain_artifact import ChainArtifact
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 
 load_dotenv()
@@ -69,7 +69,7 @@ def save_artifact_file_to_md(artifact: TextChainArtifactFile):
 
 if __name__ == "__main__":
     a = TextChainArtifactFile(
-        base_path="/Volumes/LucidNonsense/White/app/agents/chain_artifacts",
+        base_path="/chain_artifacts",
         thread_id="123456",
         artifact_name="test",
         artifact_id="123456",

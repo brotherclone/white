@@ -1,12 +1,10 @@
 import hashlib
 import random
 import re
-from datetime import datetime
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple
 
-from app.agents.enums.gnosis_method import GnosisMethod
-from app.agents.enums.sigil_type import SigilType
-from app.agents.models.sigil_artifact import SigilArtifact
+from app.structures.enums.gnosis_method import GnosisMethod
+from app.structures.artifacts.sigil_artifact import SigilArtifact
 
 
 class SigilTools:
@@ -176,33 +174,33 @@ class SigilTools:
         return f"Pictorial sigil: {', '.join(symbolic_elements)} - {arrangement}"
 
     @staticmethod
-    def generate_mantric_sigil(statement: str) -> Tuple[str, str]:
-        """
-        Mantric method: create sound-based sigil from phonetic reduction
-        """
-        # Extract consonants and vowels
-        consonants = re.findall(r'[BCDFGHJKLMNPQRSTVWXYZ]', statement.upper())
-        vowels = re.findall(r'[AEIOU]', statement.upper())
+    def generate_mantric_sigil(statement: str) -> tuple[str, str]:
+        import re
+        import random
 
-        # Create phonetic reductions
+        s = statement.upper()
+        consonants = re.findall(r'[BCDFGHJKLMNPQRSTVWXYZ]', s)
+
+        # If no consonants, return a single default fragment (so tests expecting one of them pass)
+        if not consonants:
+            defaults = ['zos', 'kia', 'aos']
+            mantra = random.choice(defaults)
+            instruction = f"Repeat '{mantra}' until meaning dissolves into pure sound vibration"
+            return mantra, instruction
+
+        # Group consonants in chunks of up to 3 and build fragments with inserted vowels
         consonant_groups = [''.join(consonants[i:i + 3]) for i in range(0, len(consonants), 3)]
-        vowel_stream = ''.join(vowels)
-
-        # Generate nonsense mantra
         mantra_fragments = []
         for group in consonant_groups:
             if len(group) >= 2:
-                # Add vowel sounds between consonants
                 fragment = group[0] + random.choice('AEIOU') + group[1:]
-                mantra_fragments.append(fragment.lower())
-
-        if not mantra_fragments:
-            mantra_fragments = ['zos', 'kia', 'aos']  # Spare's default sounds
+            else:
+                # single consonant -> attach a vowel
+                fragment = group + random.choice('AEIOU')
+            mantra_fragments.append(fragment.lower())
 
         mantra = '-'.join(mantra_fragments)
-
         instruction = f"Repeat '{mantra}' until meaning dissolves into pure sound vibration"
-
         return mantra, instruction
 
     def generate_alphabet_of_desire_symbol(self, concept: str) -> str:

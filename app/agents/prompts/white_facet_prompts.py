@@ -1,4 +1,4 @@
-from app.agents.enums.white_facet import WhiteFacet
+from app.structures.enums.white_facet import WhiteFacet
 from typing import Dict
 
 FACET_SYSTEM_PROMPTS: Dict[WhiteFacet, str] = {

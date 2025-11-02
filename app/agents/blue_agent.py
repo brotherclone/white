@@ -1,12 +1,20 @@
+import logging
+import os
+import uuid
 from abc import ABC
 
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph
 
-from app.agents.base_rainbow_agent import BaseRainbowAgent
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.agents.states.blue_agent_state import BlueAgentState
 from app.agents.states.white_agent_state import MainAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+from app.structures.manifests.song_proposal import SongProposalIteration
+from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()
 
@@ -15,16 +23,14 @@ class BlueAgent(BaseRainbowAgent, ABC):
     """Alternate Life Branching - Biographical alternate histories"""
 
     def __init__(self, **data):
-        # Ensure settings are initialized if not provided
         if 'settings' not in data or data['settings'] is None:
-            from app.agents.models.agent_settings import AgentSettings
+            from app.structures.agents.agent_settings import AgentSettings
             data['settings'] = AgentSettings()
 
         super().__init__(**data)
 
-        # Verify settings are properly initialized
         if self.settings is None:
-            from app.agents.models.agent_settings import AgentSettings
+            from app.structures.agents.agent_settings import AgentSettings
             self.settings = AgentSettings()
 
         self.llm = ChatAnthropic(
@@ -38,23 +44,58 @@ class BlueAgent(BaseRainbowAgent, ABC):
         self.state_graph = BlueAgentState()
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
-        print("💙 BLUE AGENT: Generating Alternate Lives...")
         return state
 
     def create_graph(self) -> StateGraph:
         graph = StateGraph(BlueAgentState)
         return graph
 
-    def generate_document(self):
-        raise NotImplementedError("Subclasses must implement generate_document method")
+    def generate_alternate_song_spec(self, state: BlueAgentState) -> BlueAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open("/tests/mocks/blue_counter_proposal_mock.yml", "r") as f:
+                data = yaml.safe_load(f)
+            counter_proposal = SongProposalIteration(**data)
+            state.counter_proposal = counter_proposal
+            return state
+        else:
 
-    def generate_alternate_song_spec(self):
-        raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
+            prompt = f"""
+           
+                       Current song proposal:
+                       {state.white_proposal}
 
-    def contribute(self):
-        raise NotImplementedError("Subclasses must implement contribute method")
+                       Reference works in this artist's style paying close attention to 'concept' property:
+                       {get_my_reference_proposals('B')}
 
-    def export_chain_artifacts(self, state: BlueAgentState) -> BlueAgentState:
-        for artifact in state.artifacts:
-            print(artifact)
-        return state
+                       In your counter proposal your 'rainbow_color' property should always be:
+                       {the_rainbow_table_colors['B']}
+
+        
+                       """
+
+            claude = self._get_claude()
+            proposer = claude.with_structured_output(SongProposalIteration)
+
+            try:
+                result = proposer.invoke(prompt)
+                if isinstance(result, dict):
+                    counter_proposal = SongProposalIteration(**result)
+                else:
+                    counter_proposal = result
+            except Exception as e:
+                logging.error(f"Anthropic model call failed: {e!s}")
+                counter_proposal = SongProposalIteration(
+                    iteration_id=str(uuid.uuid4()),
+                    bpm=110,
+                    tempo="3/4",
+                    key="G Major",
+                    rainbow_color="blue",
+                    title="Fallback: Blue Song",
+                    mood=["melancholic"],
+                    genres=["folk rock"],
+                    concept="Fallback stub because Anthropic model unavailable"
+                )
+
+            state.counter_proposal = counter_proposal
+            return state

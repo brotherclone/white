@@ -3,7 +3,7 @@ from typing import Dict, Any
 
 from app.agents.black_agent import BlackAgent
 from app.agents.states.black_agent_state import BlackAgentState
-from app.agents.enums.sigil_state import SigilState
+from app.structures.enums.sigil_state import SigilState
 from app.reference.mcp.todoist.main import get_api_client
 
 logging.basicConfig(level=logging.INFO)
