@@ -87,6 +87,7 @@ def create_sigil_charging_task(
 
     Returns:
         Task dictionary with id, content, url, project_id, section_id
+        OR error dictionary with {"success": False, "error": "error message"}
     """
     sections: List[Section] = []
     try:
@@ -95,11 +96,15 @@ def create_sigil_charging_task(
         section: Optional[Section] = None
         for s in sections:
             name = resolve_name(s)
+            logging.debug(f"Checking section: {name} == {section_name}?")
             if name == section_name:
                 section = s
+                logging.info(f"Found existing section: {section_name} (id={section.id})")
                 break
         if not section:
+            logging.info(f"Section '{section_name}' not found, attempting to create...")
             section = api.add_section(name=section_name, project_id=EF_PROJECT_ID)
+            logging.info(f"Created new section: {section_name} (id={section.id})")
         task_content = f"🜏 Charge Sigil for '{song_title}'"
         task_description = f"""
                             **Sigil Glyph:**
@@ -120,6 +125,7 @@ def create_sigil_charging_task(
             priority=3
         )
         return {
+            "success": True,
             "id": task.id,
             "content": task.content,
             "url": task.url,
@@ -129,19 +135,31 @@ def create_sigil_charging_task(
         }
 
     except HTTPError as e:
+        error_msg = str(e)
         if hasattr(e, 'response') and e.response.status_code == 403:
-            logging.error(f"403 Forbidden: Cannot create task in project {EF_PROJECT_ID}. Check API token permissions for project access and task creation.")
-            logging.exception("Failed creating sigil charging task; sections=%r", sections)
+            error_msg = f"403 Forbidden: Cannot create task in project {EF_PROJECT_ID}. Check API token permissions for project access and task creation."
+            logging.error(error_msg)
+            logging.debug("Failed creating sigil charging task; sections=%r", sections)
         elif hasattr(e, 'response') and e.response.status_code == 401:
-            logging.error(f"401 Unauthorized: Invalid API token.")
-            logging.exception("Failed creating sigil charging task; sections=%r", sections)
+            error_msg = f"401 Unauthorized: Invalid API token."
+            logging.error(error_msg)
+            logging.debug("Failed creating sigil charging task; sections=%r", sections)
         else:
-            logging.error(f"HTTP error creating sigil charging task: {e}")
-            logging.exception("Failed creating sigil charging task; sections=%r", sections)
-        raise
-    except Exception:
+            error_msg = f"HTTP error creating sigil charging task: {e}"
+            logging.error(error_msg)
+            logging.debug("Failed creating sigil charging task; sections=%r", sections)
+        return {
+            "success": False,
+            "error": error_msg,
+            "status_code": e.response.status_code if hasattr(e, 'response') else None
+        }
+    except Exception as e:
+        error_msg = f"Unexpected error creating sigil charging task: {e}"
         logging.exception("Failed creating sigil charging task; sections=%r", sections)
-        raise
+        return {
+            "success": False,
+            "error": error_msg
+        }
 
 @mcp.tool()
 def list_pending_black_agent_tasks(section_name: str = "Black Agent - Sigil Work") -> List[Dict[str, Any]]:

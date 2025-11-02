@@ -90,11 +90,15 @@ def resume_black_agent_workflow(
     """
 
     # Recreate Black Agent (it's not serialized with the checkpoint)
+    from langgraph.checkpoint.memory import MemorySaver
+
     black_agent = BlackAgent()
 
-    if not hasattr(black_agent, '_compiled_workflow'):
+    # Create compiled workflow with checkpointer if it doesn't exist
+    if not hasattr(black_agent, '_compiled_workflow') or black_agent._compiled_workflow is None:
         black_agent._compiled_workflow = black_agent.create_graph().compile(
-            checkpointer=black_agent._compiled_workflow.checkpointer  # Reuse existing checkpointer
+            checkpointer=MemorySaver(),
+            interrupt_before=["await_human_action"]
         )
 
     # Get current state from checkpoint
@@ -127,7 +131,77 @@ def resume_black_agent_workflow(
     final_snapshot = black_agent._compiled_workflow.get_state(black_config)
     final_state = final_snapshot.values
 
-    logging.info(f"✓ Workflow completed: {final_state.get('counter_proposal', {}).get('title', 'Unknown')}")
+    # Handle counter_proposal which may be an object or dict
+    counter_proposal = final_state.get('counter_proposal')
+    if counter_proposal:
+        title = getattr(counter_proposal, 'title', None) or counter_proposal.get('title', 'Unknown')
+        logging.info(f"✓ Workflow completed: {title}")
+    else:
+        logging.info("✓ Workflow completed")
+
+    return final_state
+
+
+def resume_black_agent_workflow_with_agent(
+        black_agent,
+        black_config: Dict[str, Any],
+        verify_tasks: bool = True
+) -> Dict[str, Any]:
+    """
+    Resume Black Agent workflow using an existing Black Agent instance.
+
+    This version uses the provided black_agent instance which already has
+    a compiled workflow with checkpointer, ensuring state persistence.
+
+    Args:
+        black_agent: The BlackAgent instance that initiated the workflow
+        black_config: The config dict stored in state.pending_human_action['black_config']
+        verify_tasks: If True, verify all Todoist tasks are complete before resuming
+
+    Returns:
+        Final state after workflow completion
+    """
+
+    if not hasattr(black_agent, '_compiled_workflow') or black_agent._compiled_workflow is None:
+        raise ValueError("Black agent does not have a compiled workflow - cannot resume")
+
+    # Get current state from checkpoint
+    snapshot = black_agent._compiled_workflow.get_state(black_config)
+    current_state = snapshot.values
+
+    # Verify tasks complete if requested
+    if verify_tasks:
+        pending_tasks = current_state.get('pending_human_tasks', [])
+        if pending_tasks and not check_todoist_tasks_complete(pending_tasks):
+            raise ValueError(
+                "Cannot resume workflow: Not all Todoist tasks are marked complete. "
+                "Please complete all ritual tasks before resuming."
+            )
+
+    # Update sigil state to CHARGED
+    current_state_obj = update_sigil_state_to_charged(
+        BlackAgentState(**current_state)
+    )
+
+    logging.info("Resuming Black Agent workflow after human action...")
+
+    # Resume workflow - it will continue from 'await_human_action' node
+    # Pass None as input since we're resuming from checkpoint
+    result = black_agent._compiled_workflow.invoke(
+        None,  # Use None when resuming - state comes from checkpoint
+        config=black_config
+    )
+
+    final_snapshot = black_agent._compiled_workflow.get_state(black_config)
+    final_state = final_snapshot.values
+
+    # Handle counter_proposal which may be an object or dict
+    counter_proposal = final_state.get('counter_proposal')
+    if counter_proposal:
+        title = getattr(counter_proposal, 'title', None) or (counter_proposal.get('title', 'Unknown') if isinstance(counter_proposal, dict) else 'Unknown')
+        logging.info(f"✓ Workflow completed: {title}")
+    else:
+        logging.info("✓ Workflow completed")
 
     return final_state
 

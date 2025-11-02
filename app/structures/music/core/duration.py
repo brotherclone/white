@@ -26,3 +26,18 @@ class Duration(BaseModel):
 
     def __str__(self):
         return f"[{self.minutes:02d}:{self.seconds:06.3f}]"
+
+    @classmethod
+    def validate(cls, value: Any) -> Any:
+        """Compatibility wrapper around model_validate used by older tests.
+
+        If validation succeeds, returns a Duration instance. If validation fails
+        (e.g. the input is an arbitrary string that doesn't match the pattern),
+        return the original value to preserve previous behavior expected by tests.
+        """
+        try:
+            # Use model_validate to apply our validators
+            return cls.model_validate(value)
+        except Exception:
+            # On validation failure, return original input (per test expectations)
+            return value

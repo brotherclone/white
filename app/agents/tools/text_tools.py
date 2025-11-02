@@ -1,4 +1,5 @@
 import json
+import os
 import warnings
 import logging
 import yaml
@@ -69,7 +70,7 @@ def save_artifact_file_to_md(artifact: TextChainArtifactFile):
 
 if __name__ == "__main__":
     a = TextChainArtifactFile(
-        base_path="/chain_artifacts",
+        base_path=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/test",
         thread_id="123456",
         artifact_name="test",
         artifact_id="123456",

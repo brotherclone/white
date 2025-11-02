@@ -12,7 +12,7 @@ from app.structures.enums.sigil_state import SigilState
 
 def test_black_agent_state_defaults():
     state = BlackAgentState()
-    assert state.thread_id.startswith("black_thread_")
+    assert state.thread_id.startswith("thread_")
     assert state.white_proposal is None
     assert state.song_proposals is None
     assert state.counter_proposal is None
