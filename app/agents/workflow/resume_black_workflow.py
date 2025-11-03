@@ -90,14 +90,20 @@ def resume_black_agent_workflow(
     """
 
     # Recreate Black Agent (it's not serialized with the checkpoint)
-    from langgraph.checkpoint.memory import MemorySaver
+    from langgraph.checkpoint.sqlite import SqliteSaver
+    import sqlite3
+    import os
 
     black_agent = BlackAgent()
 
     # Create compiled workflow with checkpointer if it doesn't exist
     if not hasattr(black_agent, '_compiled_workflow') or black_agent._compiled_workflow is None:
+        # Use the same persistent checkpointer that was used during initial run
+        os.makedirs("checkpoints", exist_ok=True)
+        conn = sqlite3.connect("checkpoints/black_agent.db", check_same_thread=False)
+        checkpointer = SqliteSaver(conn)
         black_agent._compiled_workflow = black_agent.create_graph().compile(
-            checkpointer=MemorySaver(),
+            checkpointer=checkpointer,
             interrupt_before=["await_human_action"]
         )
 
@@ -122,9 +128,9 @@ def resume_black_agent_workflow(
     logging.info("Resuming Black Agent workflow after human action...")
 
     # Resume workflow - it will continue from 'await_human_action' node
-    # Pass None as input since we're resuming from checkpoint
+    # Pass empty dict when resuming - state comes from checkpoint
     result = black_agent._compiled_workflow.invoke(
-        None,  # Use None when resuming - state comes from checkpoint
+        {},  # Empty dict when resuming - state comes from checkpoint
         config=black_config
     )
 
@@ -163,7 +169,17 @@ def resume_black_agent_workflow_with_agent(
     """
 
     if not hasattr(black_agent, '_compiled_workflow') or black_agent._compiled_workflow is None:
-        raise ValueError("Black agent does not have a compiled workflow - cannot resume")
+        # Create compiled workflow with persistent checkpointer
+        from langgraph.checkpoint.sqlite import SqliteSaver
+        import sqlite3
+        import os
+        os.makedirs("checkpoints", exist_ok=True)
+        conn = sqlite3.connect("checkpoints/black_agent.db", check_same_thread=False)
+        checkpointer = SqliteSaver(conn)
+        black_agent._compiled_workflow = black_agent.create_graph().compile(
+            checkpointer=checkpointer,
+            interrupt_before=["await_human_action"]
+        )
 
     # Get current state from checkpoint
     snapshot = black_agent._compiled_workflow.get_state(black_config)
@@ -186,9 +202,9 @@ def resume_black_agent_workflow_with_agent(
     logging.info("Resuming Black Agent workflow after human action...")
 
     # Resume workflow - it will continue from 'await_human_action' node
-    # Pass None as input since we're resuming from checkpoint
+    # Pass empty dict when resuming - state comes from checkpoint
     result = black_agent._compiled_workflow.invoke(
-        None,  # Use None when resuming - state comes from checkpoint
+        {},  # Empty dict when resuming - state comes from checkpoint
         config=black_config
     )
 

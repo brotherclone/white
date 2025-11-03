@@ -26,6 +26,7 @@ def test_generate_evp_mock():
 
 
 def test_generate_sigil_mock_creates_artifact(monkeypatch):
+    """Test that sigil is created when skip chance doesn't trigger"""
     agent = BlackAgent()
     state = BlackAgentState()
     state.counter_proposal = SongProposalIteration(
@@ -39,8 +40,10 @@ def test_generate_sigil_mock_creates_artifact(monkeypatch):
         genres=["experimental"],
         concept="Mock Concept that should at least 100 characters long. It should contain some detail. Mock Concept that should at least 100 characters long. It should contain some detail."
     )
-    monkeypatch.setattr("app.agents.black_agent.random.random", lambda: 0.8)
+    monkeypatch.setattr("random.random", lambda: 0.8)
+
     result_state = agent.generate_sigil(state)
+
     if result_state.should_update_proposal_with_sigil:
         assert result_state.awaiting_human_action is True
         assert len(result_state.artifacts) >= 1
@@ -50,6 +53,7 @@ def test_generate_sigil_mock_creates_artifact(monkeypatch):
 
 
 def test_generate_sigil_mock_skips(monkeypatch):
+    """Test that sigil is skipped when skip chance triggers"""
     agent = BlackAgent()
     state = BlackAgentState()
     state.counter_proposal = SongProposalIteration(
@@ -63,8 +67,9 @@ def test_generate_sigil_mock_skips(monkeypatch):
         genres=["experimental"],
         concept="Mock Concept that should at least 100 characters long. It should contain some detail. Mock Concept that should at least 100 characters long. It should contain some detail."
     )
-    monkeypatch.setattr("app.agents.black_agent.random.random", lambda: 0.5)
+    monkeypatch.setattr("random.random", lambda: 0.5)
     result_state = agent.generate_sigil(state)
+    assert "generate_sigil" in result_state.skipped_nodes
     assert result_state.should_update_proposal_with_sigil is False
 
 

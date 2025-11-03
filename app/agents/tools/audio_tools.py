@@ -288,9 +288,15 @@ def get_audio_segments_as_chain_artifacts(min_duration: float,
                                           rainbow_color: RainbowTableColor,
                                           thread_id: str | None = None) -> list:
     wav_files = find_wav_files_prioritized(os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix)
-    random.shuffle(wav_files)
+    # Don't shuffle - keep vocal files prioritized at the front of the list
+    logging.info(f"Found {len(wav_files)} total files for prefix '{rainbow_color.file_prefix}'")
+    vocal_files = [f for f in wav_files if 'vocal' in os.path.basename(f).lower() or 'vox' in os.path.basename(f).lower()]
+    logging.info(f"Found {len(vocal_files)} vocal files, will be processed first")
+
     all_segments = []
     for wav_path in wav_files:
+        is_vocal = 'vocal' in os.path.basename(wav_path).lower() or 'vox' in os.path.basename(wav_path).lower()
+        logging.info(f"Processing {'[VOCAL]' if is_vocal else '[INSTRUMENT]'} file: {os.path.basename(wav_path)}")
         audio, sr = librosa.load(wav_path, sr=None)
         segments = extract_non_silent_segments(audio, sr, min_duration)
         if not segments:
