@@ -8,14 +8,15 @@ from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables import RunnableConfig
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
+import sqlite3
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 from app.structures.agents.agent_settings import AgentSettings
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
 from app.agents.states.black_agent_state import BlackAgentState
@@ -34,14 +35,6 @@ from app.reference.mcp.todoist.main import (
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
-
-
-# ToDo: Figure out of this can be moved
-def skip_chance(x):
-    def decorator(f):
-        return f
-
-    return decorator
 
 
 class BlackAgent(BaseRainbowAgent, ABC):
@@ -93,8 +86,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
             awaiting_human_action=False
         )
         if not hasattr(self, '_compiled_workflow'):
+            # Use SqliteSaver for persistent checkpointing across sessions
+            import os
+            os.makedirs("checkpoints", exist_ok=True)
+            conn = sqlite3.connect("checkpoints/black_agent.db", check_same_thread=False)
+            checkpointer = SqliteSaver(conn)
             self._compiled_workflow = self.create_graph().compile(
-                checkpointer=MemorySaver(),
+                checkpointer=checkpointer,
                 interrupt_before=["await_human_action"]
             )
         black_config: RunnableConfig = {"configurable": {"thread_id": f"{state.thread_id}"}}
@@ -248,7 +246,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
     @skip_chance(0.75)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
-
         """Generate a sigil artifact and create a Todoist task for charging"""
 
         logging.info("🜏 Entering generate_sigil method")
@@ -315,7 +312,29 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
         state.artifacts.append(sigil_artifact)
 
+        # ✅ IMPROVED ERROR HANDLING AND LOGGING
+        logging.info("📝 Attempting to create Todoist task for sigil charging...")
+
+        # Check if API token is available
+        todoist_token = os.getenv('TODOIST_API_TOKEN')
+        if not todoist_token:
+            logging.error("✗ TODOIST_API_TOKEN not found in environment variables!")
+            state.awaiting_human_action = True
+            state.should_update_proposal_with_sigil = True
+            state.human_instructions = f"""
+            ⚠️ SIGIL CHARGING REQUIRED (Todoist API token not configured)
+
+            Manually charge the sigil for '{current_proposal.title}':
+
+            **Wish:** {wish_text}
+            **Glyph:** {description}
+
+            {charging_instructions}
+            """
+            return state
+
         try:
+            logging.info(f"Creating task with title: 🜏 Charge Sigil for '{current_proposal.title}'")
             task_result = create_sigil_charging_task(
                 sigil_description=description,
                 charging_instructions=charging_instructions,
@@ -323,8 +342,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 section_name="Black Agent - Sigil Work"
             )
 
+            # ✅ CHECK THE RESULT DICTIONARY
             if task_result.get("success", False):
                 # Successfully created Todoist task
+                logging.info(f"✓ Created Todoist task successfully!")
+                logging.info(f"  Task ID: {task_result['id']}")
+                logging.info(f"  Task URL: {task_result['url']}")
+
                 state.pending_human_tasks.append({
                     "type": "sigil_charging",
                     "task_id": task_result["id"],
@@ -335,48 +359,57 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
                 state.awaiting_human_action = True
                 state.human_instructions = f"""
-                                            🜏 SIGIL CHARGING REQUIRED
-                                            A sigil has been generated for '{current_proposal.title}'.
-                                            **Todoist Task:** {task_result['url']}
-                                            **Wish:** {wish_text}
-                                            **Glyph:** {description}
-                                            **Instructions:**
-                                            {charging_instructions}
-                                            Mark the Todoist task complete after charging, then resume the workflow.
-                                            """
+                🜏 SIGIL CHARGING REQUIRED
+                A sigil has been generated for '{current_proposal.title}'.
+                **Todoist Task:** {task_result['url']}
+                **Wish:** {wish_text}
+                **Glyph:** {description}
+                **Instructions:**
+                {charging_instructions}
+                Mark the Todoist task complete after charging, then resume the workflow.
+                """
                 state.should_update_proposal_with_sigil = True
-                logging.info(f"✓ Created Todoist task for sigil charging: {task_result['id']}")
             else:
                 # Todoist task creation failed - provide manual instructions
                 error_msg = task_result.get("error", "Unknown error")
-                logging.warning(f"⚠️ Todoist task creation failed: {error_msg}")
+                status_code = task_result.get("status_code", "N/A")
+                logging.warning(f"⚠️ Todoist task creation failed!")
+                logging.warning(f"  Error: {error_msg}")
+                logging.warning(f"  Status code: {status_code}")
+
                 state.awaiting_human_action = True
                 state.should_update_proposal_with_sigil = True
                 state.human_instructions = f"""
-                                            ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
-                                            
-                                            Manually charge the sigil for '{current_proposal.title}':
-                                            
-                                            **Wish:** {wish_text}
-                                            **Glyph:** {description}
-                                            
-                                            {charging_instructions}
-                                            """
+                ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
+
+                Error: {error_msg}
+
+                Manually charge the sigil for '{current_proposal.title}':
+
+                **Wish:** {wish_text}
+                **Glyph:** {description}
+
+                {charging_instructions}
+                """
 
         except Exception as e:
             logging.error(f"✗ Unexpected error with Todoist integration: {e}")
+            logging.exception("Full traceback:")
             state.awaiting_human_action = True
             state.should_update_proposal_with_sigil = True
             state.human_instructions = f"""
-                                        ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
-                                        
-                                        Manually charge the sigil for '{current_proposal.title}':
-                                        
-                                        **Wish:** {wish_text}
-                                        **Glyph:** {description}
-                                        
-                                        {charging_instructions}
-                                        """
+            ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
+
+            Exception: {str(e)}
+
+            Manually charge the sigil for '{current_proposal.title}':
+
+            **Wish:** {wish_text}
+            **Glyph:** {description}
+
+            {charging_instructions}
+            """
+
         return state
 
     @staticmethod
@@ -393,32 +426,67 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.artifacts.append(evp_artifact)
             return state
         current_proposal = state.counter_proposal
-        segments = get_audio_segments_as_chain_artifacts(
-            2.0, 4,
-            the_rainbow_table_colors['Z'],
-            state.thread_id
-        )
-        mosaic = create_audio_mosaic_chain_artifact(
-            segments, 100,
-            getattr(current_proposal, 'target_length', 10),
-            state.thread_id
-        )
-        blended = create_blended_audio_chain_artifact(
-            mosaic, 0.66,
-            state.thread_id
-        )
-        transcript = chain_artifact_file_from_speech_to_text(
-            blended,
-            state.thread_id
-        )
-        evp_artifact = EVPArtifact(
-            audio_segments=segments,
-            transcript=transcript,
-            audio_mosaic=mosaic,
-            noise_blended_audio=blended,
-            thread_id=state.thread_id,
-        )
-        state.artifacts.append(evp_artifact)
+        try:
+            segments = get_audio_segments_as_chain_artifacts(
+                2.0, 4,
+                the_rainbow_table_colors['Z'],
+                state.thread_id
+            )
+
+            if not segments:
+                logging.warning("⚠️  No audio segments extracted - skipping EVP generation")
+                # Create a placeholder EVP artifact
+                evp_artifact = EVPArtifact(
+                    audio_segments=[],
+                    transcript=None,
+                    audio_mosaic=None,
+                    noise_blended_audio=None,
+                    thread_id=state.thread_id,
+                )
+                state.artifacts.append(evp_artifact)
+                return state
+
+            mosaic = create_audio_mosaic_chain_artifact(
+                segments, 100,
+                getattr(current_proposal, 'target_length', 10),
+                state.thread_id
+            )
+
+            blended = create_blended_audio_chain_artifact(
+                mosaic, 0.66,
+                state.thread_id
+            )
+
+            # This now handles None transcripts gracefully
+            transcript = chain_artifact_file_from_speech_to_text(
+                blended,
+                state.thread_id
+            )
+
+            evp_artifact = EVPArtifact(
+                audio_segments=segments,
+                transcript=transcript,
+                audio_mosaic=mosaic,
+                noise_blended_audio=blended,
+                thread_id=state.thread_id,
+            )
+
+            state.artifacts.append(evp_artifact)
+            logging.info(f"✓ Generated EVP artifact with {len(segments)} segments")
+
+        except Exception as e:
+            logging.error(f"✗ EVP generation failed: {e}")
+            logging.exception("Full traceback:")
+            # Create minimal placeholder artifact so workflow can continue
+            evp_artifact = EVPArtifact(
+                audio_segments=[],
+                transcript=None,
+                audio_mosaic=None,
+                noise_blended_audio=None,
+                thread_id=state.thread_id,
+            )
+            state.artifacts.append(evp_artifact)
+
         return state
 
     @staticmethod
@@ -439,26 +507,45 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.should_update_proposal_with_evp = False
             return state
         else:
+            if not state.artifacts:
+                logging.warning("No artifacts available for EVP evaluation")
+                state.should_update_proposal_with_evp = False
+                return state
+
+            last_artifact = state.artifacts[-1]
+
+            # ✅ CHECK IF TRANSCRIPT EXISTS AND HAS CONTENT
+            if not hasattr(last_artifact, 'transcript') or last_artifact.transcript is None:
+                logging.warning("EVP artifact has no transcript - skipping evaluation")
+                state.should_update_proposal_with_evp = False
+                return state
+
+            transcript_text = getattr(last_artifact.transcript, 'text_content', None)
+            if not transcript_text or transcript_text == "[EVP: No discernible speech detected]":
+                logging.info("EVP transcript empty or placeholder - skipping evaluation")
+                state.should_update_proposal_with_evp = False
+                return state
+
             prompt = f"""
-            You are helping a musician create a creative fiction song about an experimental musician 
-            working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
-            artifact consisting of audio segments and a transcript. Now, your task is to evaluate the transcript
-            and see if there are any surreal or lyrical results that could help you refocus your song proposal. At this point
-            you only need to reply with a True or False property.
-            
-            Here's an example of what might warrant a True response:
-            'do turn' 'caliphate murloc' 'a simple bloodline'
-            
-            Here's an example of what might warrant a False response which is more likely:
-            'i' 'me me' 'to' 'hi' 'be be'
-            
-            Here's your previous counter-proposal:
-            {state.counter_proposal}
-            
-            Here's the EVP transcript:
-            {state.artifacts[-1].transcript}
-            
-            """
+                   You are helping a musician create a creative fiction song about an experimental musician 
+                   working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
+                   artifact consisting of audio segments and a transcript. Now, your task is to evaluate the transcript
+                   and see if there are any surreal or lyrical results that could help you refocus your song proposal. At this point
+                   you only need to reply with a True or False property.
+
+                   Here's an example of what might warrant a True response:
+                   'do turn' 'caliphate murloc' 'a simple bloodline'
+
+                   Here's an example of what might warrant a False response which is more likely:
+                   'i' 'me me' 'to' 'hi' 'be be'
+
+                   Here's your previous counter-proposal:
+                   {state.counter_proposal}
+
+                   Here's the EVP transcript:
+                   {transcript_text}
+                   """
+
             claude = self._get_claude()
             proposer = claude.with_structured_output(YesOrNo)
             try:
@@ -473,6 +560,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             except Exception as e:
                 logging.error(f"EVP evaluation failed: {e!s}, defaulting to no EVP update")
                 state.should_update_proposal_with_evp = False
+
             return state
 
     def update_alternate_song_spec_with_evp(self, state: BlackAgentState) -> BlackAgentState:

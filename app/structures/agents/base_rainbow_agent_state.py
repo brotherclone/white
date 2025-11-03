@@ -16,6 +16,7 @@ class BaseRainbowAgentState(BaseModel):
     song_proposals: Optional[SongProposal] = None
     counter_proposal: Optional[SongProposalIteration] = None
     artifacts: List[Any] = Field(default_factory=list)
+    skipped_nodes: List[str] = Field(default_factory=list)
 
     def __init__(self, **data):
         super().__init__(**data)
