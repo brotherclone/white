@@ -1,17 +1,47 @@
-iteration_id: mock_012
-bpm: 120
-tempo: 1/64
-key: A# minor
-rainbow_color: A
-title: White Initial Proposal Comparative Mock
-mood:
-- Even
-- Unemotional
-genres:
-- Mock Rock
-- Mock Pop
-concept: The white agent comes up with a proposal for a musical piece in a comparative
-  fashion. The white agent comes up with a proposal for a musical piece in a comparative
-  fashion.The white agent comes up with a proposal for a musical piece in a comparative
-  fashion.The white agent comes up with a proposal for a musical piece in a comparative
-  fashion.
+iterations:
+- iteration_id: mock_012
+  bpm: 120
+  tempo: 1/64
+  key: A# minor
+  rainbow_color: A
+  title: White Initial Proposal Comparative Mock
+  mood:
+  - Even
+  - Unemotional
+  genres:
+  - Mock Rock
+  - Mock Pop
+  concept: The white agent comes up with a proposal for a musical piece in a comparative
+    fashion. The white agent comes up with a proposal for a musical piece in a comparative
+    fashion.The white agent comes up with a proposal for a musical piece in a comparative
+    fashion.The white agent comes up with a proposal for a musical piece in a comparative
+    fashion.
+- iteration_id: mock_001
+  bpm: 121
+  tempo: 4/4
+  key: G major
+  rainbow_color: Z
+  title: EVP influenced proposal
+  mood:
+  - Even
+  - Unemotional
+  genres:
+  - Mock Rock
+  - Mock Pop
+  concept: I heard, clearly, the words 'there is no window'. I heard, clearly, the
+    words 'there is no window'. I heard, clearly, the words 'there is no window'.
+    I heard, clearly, the words 'there is no window'.
+- iteration_id: mock_008
+  bpm: 110
+  tempo: 4/4
+  key: G# minor
+  rainbow_color: R
+  title: Red Counter Proposal
+  mood:
+  - Even
+  - Unemotional
+  genres:
+  - Mock Rock
+  - Mock Pop
+  concept: This is a mock counter proposal for a musical piece, it gets passed back
+    to the White Agent to refine and finalize the composition.

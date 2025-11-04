@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 from typing import List
 
@@ -86,7 +87,7 @@ class SongProposalIteration(BaseModel):
     @field_validator('title')
     @classmethod
     def title_not_empty(cls, v: str) -> str:
-        """Ensure title is not just whitespace."""
+        """Ensure the title is not just whitespace."""
         if not v.strip():
             raise ValueError("Title cannot be empty or whitespace only")
         return v.strip()
@@ -105,7 +106,6 @@ class SongProposalIteration(BaseModel):
     @classmethod
     def mood_no_duplicates(cls, v: list[str]) -> list[str]:
         """Preserve the mood list as provided by the caller (tests expect exact lists)."""
-        # Ensure it's a list of strings and return unchanged
         if not isinstance(v, list):
             raise TypeError('mood must be a list of strings')
         return v
@@ -113,10 +113,51 @@ class SongProposalIteration(BaseModel):
     @field_validator('genres')
     @classmethod
     def genres_no_duplicates(cls, v: list[str]) -> list[str]:
-        """Preserve the genres list as provided by the caller (tests expect exact lists)."""
+        """Preserve the genre list as provided by the caller (tests expect exact lists)."""
         if not isinstance(v, list):
             raise TypeError('genres must be a list of strings')
         return v
+
+    @field_validator('key')
+    @classmethod
+    def normalize_key_flats(cls, v: str | KeySignature) -> str | KeySignature:
+        """Convert flat note names (e.g. 'Bb') to enharmonic sharps (e.g. 'A#') and normalize mode tokens so KeySignature parsing accepts them."""
+        if isinstance(v, KeySignature):
+            return v
+        if not isinstance(v, str):
+            return v
+
+        s = v.strip()
+        m = re.match(r'^([A-Ga-g])([b#]?)(.*)$', s)
+        if not m:
+            return s
+
+        root, acc, rest = m.group(1).upper(), m.group(2), m.group(3)
+        note = root + acc
+        flats_to_sharps = {
+            'Bb': 'A#', 'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#',
+            'Cb': 'B', 'Fb': 'E'
+        }
+        if note in flats_to_sharps:
+            note = flats_to_sharps[note]
+        rest_str = (rest or "").strip()
+        rest_str = re.sub(r'^[\s:,\-–—]+', '', rest_str)
+        rest_str = re.sub(r'(?i)^\s*mode\s*[:\-\s]*', '', rest_str)
+
+        if rest_str:
+            parts = rest_str.split(None, 1)
+            first = parts[0]
+            tail = parts[1] if len(parts) > 1 else ''
+            mode_map = {
+                'maj': 'major', 'major': 'major', 'm': 'minor', 'min': 'minor', 'minor': 'minor',
+                'ionian': 'major', 'aeolian': 'minor', 'dorian': 'dorian', 'phrygian': 'phrygian',
+                'lydian': 'lydian', 'mixolydian': 'mixolydian', 'locrian': 'locrian'
+            }
+            canonical = mode_map.get(first.lower(), first.lower())
+            normalized = f"{note} {canonical}{(' ' + tail) if tail else ''}"
+        else:
+            normalized = note
+        return normalized
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -162,6 +203,6 @@ class SongProposal(BaseModel):
         output.mkdir(parents=True, exist_ok=True)
         for iteration in self.iterations:
             file_path = output / f"{iteration.iteration_id}.yml"
-            data = iteration.model_dump()
             with file_path.open("w", encoding="utf-8") as f:
-                yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
+                data_serializable = self.model_dump(mode='json')
+                yaml.safe_dump(data_serializable, f, sort_keys=False, allow_unicode=True)
