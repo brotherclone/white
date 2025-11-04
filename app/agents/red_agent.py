@@ -1,5 +1,4 @@
 import os
-import uuid
 import yaml
 import logging
 
@@ -19,7 +18,7 @@ from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.red_agent_state import RedAgentState
 from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.concepts.yes_or_no import YesOrNo
+from app.structures.concepts.book_evaluation import BookEvaluationDecision
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.agents.tools.book_tool import BookMaker
 from app.util.manifest_loader import get_my_reference_proposals
@@ -48,23 +47,14 @@ class RedAgent(BaseRainbowAgent, ABC):
             timeout=self.settings.timeout,
             stop=self.settings.stop
         )
-        self.state_graph = RedAgentState(
-            thread_id=f"red_thread_{uuid.uuid4()}",
-            song_proposals=None,
-            black_to_white_proposal=None,
-            counter_proposal=None,
-            main_generated_book=None,
-            artifacts=[],
-            should_respond_with_reaction_book=False,
-            reaction_level=0
-        )
+
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
             """Entry point when White Agent invokes Red Agent"""
 
             current_proposal = state.song_proposals.iterations[-1]
             red_state = RedAgentState(
-                thread_id=f"red_thread_{uuid.uuid4()}",
+                thread_id=state.thread_id,
                 song_proposals=state.song_proposals,
                 black_to_white_proposal=current_proposal,
                 counter_proposal=None,
@@ -96,7 +86,7 @@ class RedAgent(BaseRainbowAgent, ABC):
         red_workflow.add_node("generate_book", self.generate_book)
         red_workflow.add_node("generate_alternate_song_spec", self.generate_alternate_song_spec)
         red_workflow.add_node("evaluate_books_versus_proposals", self.evaluate_books_versus_proposals)
-        red_workflow.add_node("generate_reaction_book", self.generate_book)
+        red_workflow.add_node("generate_reaction_book", self.generate_reaction_book)
         red_workflow.add_node("write_reaction_book_pages", self.write_reaction_book_pages)
 
         red_workflow.add_edge(START, "generate_book")
@@ -196,50 +186,54 @@ class RedAgent(BaseRainbowAgent, ABC):
             proposer = claude.with_structured_output(BookDataPageCollection)
             try:
                 result = proposer.invoke(prompt)
-                if isinstance(result, dict):
-                    page_1 = TextChainArtifactFile(
-                        text_content=result["page_1"],
-                        thread_id=state.thread_id,
-                        rainbow_color=the_rainbow_table_colors['R'],
-                        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-                        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                        artifact_name=f"{book_data.author}_excerpt_1",
-                    )
-                    try:
-                        save_artifact_file_to_md(page_1)
-                        logging.info(f"Saved artifact: {page_1.artifact_name} to {page_1.get_artifact_path()}")
-                    except ValueError as ve:
-                        logging.error(f"Failed to save artifact {page_1.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
-                    except Exception as se:
-                        logging.error(f"Unexpected error saving artifact {page_1.artifact_name}: {se}")
-
-                    page_2 = TextChainArtifactFile(
-                        text_content=result["page_2"],
-                        thread_id=state.thread_id,
-                        rainbow_color=the_rainbow_table_colors['R'],
-                        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-                        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                        artifact_name=f"{book_data.author}_excerpt_2",
-                    )
-                    try:
-                        save_artifact_file_to_md(page_2)
-                        logging.info(f"Saved artifact: {page_2.artifact_name} to {page_2.get_artifact_path()}")
-                    except ValueError as ve:
-                        logging.error(f"Failed to save artifact {page_2.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
-                    except Exception as se:
-                        logging.error(f"Unexpected error saving artifact {page_2.artifact_name}: {se}")
-
-                    state.main_generated_book = BookArtifact(
-                        book_data=book_data,
-                        excerpts=[page_1, page_2],
-                        thread_id=state.thread_id
-                    )
-                    state.should_create_book = False
+                if isinstance(result, BookDataPageCollection):
+                    page_1_text = result.page_1
+                    page_2_text = result.page_2
+                elif isinstance(result, dict):
+                    page_1_text = result.get("page_1", "")
+                    page_2_text = result.get("page_2", "")
                 else:
-                    state.main_generated_book = None
-                    state.should_create_book = True
+                    logging.error(f"Unexpected result type: {type(result)}")
+                    state.should_create_book = False
+                    return state
+                page_1 = TextChainArtifactFile(
+                    text_content=page_1_text,
+                    thread_id=state.thread_id,
+                    rainbow_color=the_rainbow_table_colors['R'],
+                    base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+                    chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+                    artifact_name=f"{book_data.author}_main_book_page_1",
+                )
+                try:
+                    save_artifact_file_to_md(page_1)
+                    logging.info(f"✅ Saved main book page 1: {page_1.get_artifact_path()}")
+                except Exception as e:
+                    logging.error(f"Failed to save page 1: {e}")
+                page_2 = TextChainArtifactFile(
+                    text_content=page_2_text,
+                    thread_id=state.thread_id,
+                    rainbow_color=the_rainbow_table_colors['R'],
+                    base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+                    chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+                    artifact_name=f"{book_data.author}_main_book_page_2",
+                )
+                try:
+                    save_artifact_file_to_md(page_2)
+                    logging.info(f"✅ Saved main book page 2: {page_2.get_artifact_path()}")
+                except Exception as e:
+                    logging.error(f"Failed to save page 2: {e}")
+
+                state.main_generated_book = BookArtifact(
+                    book_data=book_data,
+                    excerpts=[page_1, page_2],
+                    thread_id=state.thread_id
+                )
+                state.should_create_book = False  # ✅ Success - don't loop
+
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                logging.error(f"Book generation failed: {e!s}")
+                state.should_create_book = False  # ✅ Don't loop on error!
+
             return state
 
 
@@ -283,14 +277,22 @@ class RedAgent(BaseRainbowAgent, ABC):
             proposer = claude.with_structured_output(BookData)
             try:
                 result = proposer.invoke(prompt)
-                if isinstance(result, dict):
+                if isinstance(result, BookData):
+                    state.current_reaction_book = result
+                    state.reaction_level += 1
+                elif isinstance(result, dict):
                     state.current_reaction_book = BookData(**result)
-                    state.reaction_level +=1
+                    state.reaction_level += 1
                 else:
+                    logging.error(f"Unexpected result type: {type(result)}")
                     state.current_reaction_book = None
+
                 state.should_respond_with_reaction_book = False
+
             except Exception as e:
                 logging.error(f"Anthropic model call failed: {e!s}")
+                state.current_reaction_book = None  # ✅ Set to None on error
+
             return state
 
     def write_reaction_book_pages(self, state: RedAgentState) -> RedAgentState:
@@ -327,46 +329,60 @@ class RedAgent(BaseRainbowAgent, ABC):
             proposer = claude.with_structured_output(BookDataPageCollection)
             try:
                 result = proposer.invoke(prompt)
-                if isinstance(result, dict):
-                    page_1 = TextChainArtifactFile(
-                        text_content=result["page_1"],
-                        thread_id=state.thread_id,
-                        rainbow_color=the_rainbow_table_colors['R'],
-                        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-                        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                        artifact_name=f"{state.current_reaction_book.author}_excerpt_1",
-                    )
-                    try:
-                        save_artifact_file_to_md(page_1)
-                        logging.info(f"Saved artifact: {page_1.artifact_name} to {page_1.get_artifact_path()}")
-                    except ValueError as ve:
-                        logging.error(f"Failed to save artifact {page_1.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
-                    except Exception as se:
-                        logging.error(f"Unexpected error saving artifact {page_1.artifact_name}: {se}")
-                    state.artifacts.append(page_1)
 
-                    page_2 = TextChainArtifactFile(
-                        text_content=result["page_2"],
-                        thread_id=state.thread_id,
-                        rainbow_color=the_rainbow_table_colors['R'],
-                        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-                        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                        artifact_name=f"{state.current_reaction_book.author}_excerpt_2",
-                    )
-                    try:
-                        save_artifact_file_to_md(page_2)
-                        logging.info(f"Saved artifact: {page_2.artifact_name} to {page_2.get_artifact_path()}")
-                    except ValueError as ve:
-                        logging.error(f"Failed to save artifact {page_2.artifact_name}: {ve}. Check thread_id={state.thread_id}, base_path={os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}")
-                    except Exception as se:
-                        logging.error(f"Unexpected error saving artifact {page_2.artifact_name}: {se}")
-                    state.artifacts.append(page_2)
-                    state.current_reaction_book = None
+                # ✅ Handle Pydantic model
+                if isinstance(result, BookDataPageCollection):
+                    page_1_text = result.page_1
+                    page_2_text = result.page_2
+                elif isinstance(result, dict):
+                    page_1_text = result.get("page_1", "")
+                    page_2_text = result.get("page_2", "")
                 else:
-                   pass
+                    logging.error(f"Unexpected result type: {type(result)}")
+                    state.current_reaction_book = None
+                    return state
+
+                # Create page 1 artifact
+                page_1 = TextChainArtifactFile(
+                    text_content=page_1_text,
+                    thread_id=state.thread_id,
+                    rainbow_color=the_rainbow_table_colors['R'],
+                    base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+                    chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+                    artifact_name=f"{state.current_reaction_book.author}_excerpt_1",
+                )
+                try:
+                    save_artifact_file_to_md(page_1)
+                    logging.info(f"✅ Saved page 1: {page_1.artifact_name} to {page_1.get_artifact_path()}")
+                except ValueError as ve:
+                    logging.error(f"Failed to save page 1 {page_1.artifact_name}: {ve}")
+                except Exception as se:
+                    logging.error(f"Unexpected error saving page 1: {se}")
+                state.artifacts.append(page_1)
+
+                # Create page 2 artifact
+                page_2 = TextChainArtifactFile(
+                    text_content=page_2_text,
+                    thread_id=state.thread_id,
+                    rainbow_color=the_rainbow_table_colors['R'],
+                    base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+                    chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+                    artifact_name=f"{state.current_reaction_book.author}_excerpt_2",
+                )
+                try:
+                    save_artifact_file_to_md(page_2)
+                    logging.info(f"✅ Saved page 2: {page_2.artifact_name} to {page_2.get_artifact_path()}")
+                except ValueError as ve:
+                    logging.error(f"Failed to save page 2 {page_2.artifact_name}: {ve}")
+                except Exception as se:
+                    logging.error(f"Unexpected error saving page 2: {se}")
+                state.artifacts.append(page_2)
+
+                state.current_reaction_book = None
+
             except Exception as e:
                 logging.error(f"Anthropic model call failed: {e!s}")
-        return state
+            return state
 
     @staticmethod
     def _format_books_for_prompt(state: RedAgentState) -> str:
@@ -387,45 +403,65 @@ class RedAgent(BaseRainbowAgent, ABC):
         return "\n\n".join(parts) if parts else "No books available."
 
     def evaluate_books_versus_proposals(self, state: RedAgentState) -> RedAgentState:
+        if state.reaction_level >= 3:
+            logging.info(f"🛑 Reaction limit reached ({state.reaction_level}), ending book generation")
+            state.should_create_book = False
+            state.should_respond_with_reaction_book = False
+            return state
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            if state.reaction_level==1:
+            if state.reaction_level == 1:
                 state.should_create_book = True
-            elif state.reaction_level==2:
+            elif state.reaction_level == 2:
                 state.should_create_book = False
                 state.should_respond_with_reaction_book = True
             elif state.reaction_level >= 3:
                 state.should_create_book = False
                 state.should_respond_with_reaction_book = False
         else:
-            answer_format = {
-                "new_book": YesOrNo,
-                "reaction_book": YesOrNo,
-                "done": YesOrNo,
-            }
             summary = self._format_books_for_prompt(state)
             prompt = f"""
+            You are evaluating whether to continue generating books or if you're satisfied with the current collection.
+
+            Current books and reactions:
             {summary}
+
+            Current counter proposal:
             {state.counter_proposal}
+
+            Decide:
+            - new_book: true if you want to generate an entirely new book
+            - reaction_book: true if you want to generate a reaction/response to an existing book
+            - done: true if you're satisfied and want to stop generating books
+
+            Usually you should set done=true after generating 2-3 books total.
             """
+
             claude = self._get_claude()
-            proposer = claude.with_structured_output(answer_format)
+            # ✅ FIXED: Use the proper Pydantic model
+            proposer = claude.with_structured_output(BookEvaluationDecision)
+
             try:
                 result = proposer.invoke(prompt)
+
+                # ✅ Handle both dict and Pydantic model responses
                 if isinstance(result, dict):
-                    if result.get("new_book") == YesOrNo.YES:
-                        state.should_create_book = True
-                    else:
-                        state.should_create_book = False
-                    if result.get("reaction_book") == YesOrNo.YES:
-                        state.should_respond_with_reaction_book = True
-                    else:
-                        state.should_respond_with_reaction_book = False
+                    state.should_create_book = result.get("new_book", False)
+                    state.should_respond_with_reaction_book = result.get("reaction_book", False)
+                elif isinstance(result, BookEvaluationDecision):
+                    state.should_create_book = result.new_book
+                    state.should_respond_with_reaction_book = result.reaction_book
                 else:
+                    logging.warning(f"Unexpected result type: {type(result)}")
                     state.should_create_book = False
                     state.should_respond_with_reaction_book = False
+
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                logging.error(f"Book evaluation failed: {e!s}")
+                # Default to done if evaluation fails
+                state.should_create_book = False
+                state.should_respond_with_reaction_book = False
+
         return state
 
     def route_after_evaluate_books_versus_proposals(self, state: RedAgentState) -> str:

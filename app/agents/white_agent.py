@@ -1,4 +1,6 @@
 import logging
+import time
+
 import yaml
 import os
 
@@ -251,8 +253,9 @@ class WhiteAgent(BaseModel):
             assert isinstance(initial_proposal, SongProposalIteration), f"Expected SongProposalIteration, got {type(initial_proposal)}"
         except Exception as e:
             print(f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration.")
+            timestamp = int(time.time() * 1000)
             initial_proposal = SongProposalIteration(
-                iteration_id=str(uuid4()),
+                iteration_id=f"fallback_error_{timestamp}",
                 bpm=120,
                 tempo="4/4",
                 key="C Major",

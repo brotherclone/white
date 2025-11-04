@@ -4,12 +4,12 @@ from pydantic import BaseModel, Field
 
 from app.structures.enums.book_condition import BookCondition
 from app.structures.enums.publisher_type import PublisherType
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 
 
 class BookDataPageCollection(BaseModel):
-    
-    pages: TextChainArtifactFile
+
+    page_1: str = Field(..., description="Text content of the first sample page")
+    page_2: str = Field(..., description="Text content of the second sample page")
     
     def __init__(self, **data):
         super().__init__(**data)

@@ -1,5 +1,6 @@
 import os
 import random
+import time
 import uuid
 import yaml
 import logging
@@ -58,18 +59,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             stop=self.settings.stop
         )
         self.current_session_sigils = []
-        self.state_graph = BlackAgentState(
-            thread_id=f"black_{uuid.uuid4()}",
-            song_proposal=None,
-            white_proposal=None,
-            counter_proposal=None,
-            artifacts=[],
-            awaiting_human_action=False,
-            human_instructions="",
-            pending_human_tasks=[],
-            should_update_proposal_with_evp=False,
-            should_update_proposal_with_sigil=False,
-        )
+
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
 
@@ -229,8 +219,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     counter_proposal = result
             except Exception as e:
                 logging.error(f"Anthropic model call failed: {e!s}")
+                timestamp = int(time.time() * 1000)
                 counter_proposal = SongProposalIteration(
-                    iteration_id=str(uuid.uuid4()),
+                    iteration_id=f"fallback_error_{timestamp}",
                     bpm=120,
                     tempo="4/4",
                     key="C Major",

@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 import uuid
 from abc import ABC
 
@@ -41,7 +42,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             timeout=self.settings.timeout,
             stop=self.settings.stop
         )
-        self.state_graph = BlueAgentState()
+
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
         return state
@@ -84,9 +85,10 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 else:
                     counter_proposal = result
             except Exception as e:
+                timestamp = int(time.time() * 1000)
                 logging.error(f"Anthropic model call failed: {e!s}")
                 counter_proposal = SongProposalIteration(
-                    iteration_id=str(uuid.uuid4()),
+                    iteration_id=f"fallback_error_{timestamp}",
                     bpm=110,
                     tempo="3/4",
                     key="G Major",
