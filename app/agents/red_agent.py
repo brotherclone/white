@@ -239,7 +239,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     )
                 except Exception as e:
                     logging.error(f"Failed to save page 2: {e}")
-
+                state.reaction_level += 1
                 state.main_generated_book = BookArtifact(
                     book_data=book_data,
                     excerpts=[page_1, page_2],

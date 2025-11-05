@@ -1,12 +1,17 @@
 import datetime
 from pathlib import Path
+from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ChainArtifact(BaseModel):
 
-    chain_artifact_type: str | None = None
+    chain_artifact_type: Optional[str] = Field(
+        description="Type of the chain artifact.",
+        default=None,
+        examples=["sigil", "book", "transcript"],
+    )
 
     def __init__(self, **data):
         super().__init__(**data)

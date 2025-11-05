@@ -49,7 +49,7 @@ def start_workflow(args):
 
     if final_state.workflow_paused:
         # Save the paused state
-        state_file = Path("paused_state.pkl")
+        state_file = Path("checkpoints/paused_state.pkl")
         with state_file.open("wb") as f:
             pickle.dump(final_state, f)
 
@@ -97,7 +97,7 @@ def resume_workflow(args):
     if args.state_file:
         state_file = Path(args.state_file)
     else:
-        state_file = Path("paused_state.pkl")
+        state_file = Path("checkpoints/paused_state.pkl")
 
     if not state_file.exists():
         logging.error(f"❌ State file not found: {state_file.absolute()}")

@@ -13,7 +13,9 @@ from app.structures.enums.sigil_type import SigilType
 class SigilArtifact(ChainArtifact):
     """Record of a created sigil for the Black Agent's paranoid tracking"""
 
-    thread_id: Optional[str] = None
+    thread_id: Optional[str] = Field(
+        default=None, description="Unique ID of the thread."
+    )
     wish: Optional[str] = None
     statement_of_intent: Optional[str] = None
     sigil_type: Optional[SigilType] = None

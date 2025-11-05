@@ -22,11 +22,13 @@ from app.agents.tools.audio_tools import (
 )
 from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import chain_artifact_file_from_speech_to_text
+from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.reference.mcp.todoist.main import create_sigil_charging_task
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
 from app.structures.enums.sigil_state import SigilState
@@ -321,12 +323,38 @@ class BlackAgent(BaseRainbowAgent, ABC):
             chain_artifact_type="sigil",
         )
 
+        sigil_text = f"""
+        # Sigil for '{current_proposal.title}'
+        ## Statement of Intent
+        {statement_of_intent}
+        
+        ## Glyph Description
+        {description}
+        
+        ## Glyph Components ({len(components)} forms)
+        {chr(10).join(f"- {comp}" for comp in components)}
+        
+        ## Charging Instructions
+        {charging_instructions}
+        
+        ## Sigil Type
+        {SigilType.WORD_METHOD.value}
+        
+        ## Activation State
+        {SigilState.CREATED.value} (awaiting charging)
+        """
+        sigil_report = TextChainArtifactFile(
+            artifact_id=sigil_artifact.artifact_id,  # or generate new UUID
+            text_content=sigil_text,
+            artifact_name=f"sigil_{current_proposal.title.replace(' ', '_')}",
+            file_name=f"sigil_{current_proposal.title.replace(' ', '_')}.md",
+            chain_artifact_file_type="text/markdown",
+            base_path="md",  # or wherever you want it saved
+        )
+        sigil_artifact.artifact_report = sigil_report
+        save_artifact_file_to_md(sigil_report)
         state.artifacts.append(sigil_artifact)
-
-        # ✅ IMPROVED ERROR HANDLING AND LOGGING
         logging.info("📝 Attempting to create Todoist task for sigil charging...")
-
-        # Check if API token is available
         todoist_token = os.getenv("TODOIST_API_TOKEN")
         if not todoist_token:
             logging.error("✗ TODOIST_API_TOKEN not found in environment variables!")
@@ -334,16 +362,12 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.should_update_proposal_with_sigil = True
             state.human_instructions = f"""
             ⚠️ SIGIL CHARGING REQUIRED (Todoist API token not configured)
-
             Manually charge the sigil for '{current_proposal.title}':
-
             **Wish:** {wish_text}
             **Glyph:** {description}
-
             {charging_instructions}
             """
             return state
-
         try:
             logging.info(
                 f"Creating task with title: 🜏 Charge Sigil for '{current_proposal.title}'"
@@ -354,14 +378,10 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 song_title=current_proposal.title,
                 section_name="Black Agent - Sigil Work",
             )
-
-            # ✅ CHECK THE RESULT DICTIONARY
             if task_result.get("success", False):
-                # Successfully created Todoist task
                 logging.info("✓ Created Todoist task successfully!")
                 logging.info(f"  Task ID: {task_result['id']}")
                 logging.info(f"  Task URL: {task_result['url']}")
-
                 state.pending_human_tasks.append(
                     {
                         "type": "sigil_charging",
@@ -371,7 +391,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
                         "sigil_wish": wish_text,
                     }
                 )
-
                 state.awaiting_human_action = True
                 state.human_instructions = f"""
                 🜏 SIGIL CHARGING REQUIRED
@@ -385,25 +404,19 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 """
                 state.should_update_proposal_with_sigil = True
             else:
-                # Todoist task creation failed - provide manual instructions
                 error_msg = task_result.get("error", "Unknown error")
                 status_code = task_result.get("status_code", "N/A")
                 logging.warning("⚠️ Todoist task creation failed!")
                 logging.warning(f"  Error: {error_msg}")
                 logging.warning(f"  Status code: {status_code}")
-
                 state.awaiting_human_action = True
                 state.should_update_proposal_with_sigil = True
                 state.human_instructions = f"""
-                ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
-
+                ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed with an unknown error)
                 Error: {error_msg}
-
                 Manually charge the sigil for '{current_proposal.title}':
-
                 **Wish:** {wish_text}
                 **Glyph:** {description}
-
                 {charging_instructions}
                 """
 
@@ -414,14 +427,10 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.should_update_proposal_with_sigil = True
             state.human_instructions = f"""
             ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
-
             Exception: {str(e)}
-
             Manually charge the sigil for '{current_proposal.title}':
-
             **Wish:** {wish_text}
             **Glyph:** {description}
-
             {charging_instructions}
             """
 
