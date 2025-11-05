@@ -530,15 +530,6 @@ wheels = [
 ]
 
 [[package]]
-name = "isort"
-version = "7.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/63/53/4f3c058e3bace40282876f9b553343376ee687f3c35a525dc79dbd450f88/isort-7.0.0.tar.gz", hash = "sha256:5513527951aadb3ac4292a41a16cbc50dd1642432f5e8c20057d414bdafb4187", size = 805049 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/ed/e3705d6d02b4f7aea715a353c8ce193efd0b5db13e204df895d38734c244/isort-7.0.0-py3-none-any.whl", hash = "sha256:1bcabac8bc3c36c7fb7b98a76c8abb18e0f841a3ba81decac7691008592499c1", size = 94672 },
-]
-
-[[package]]
 name = "jedi"
 version = "0.19.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2037,7 +2028,6 @@ dependencies = [
     { name = "httpx" },
     { name = "hypothesis" },
     { name = "ipython" },
-    { name = "isort" },
     { name = "langchain" },
     { name = "langchain-anthropic" },
     { name = "langchain-core" },
@@ -2070,7 +2060,6 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "hypothesis", specifier = ">=6.0.0" },
     { name = "ipython", specifier = ">=9.5.0" },
-    { name = "isort", specifier = ">=7.0.0" },
     { name = "langchain", specifier = ">=0.3.0" },
     { name = "langchain-anthropic", specifier = ">=0.2.0" },
     { name = "langchain-core", specifier = ">=0.3.0" },

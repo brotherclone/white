@@ -74,7 +74,6 @@ class WhiteAgent(BaseModel):
             >>> white = WhiteAgent()
             >>> final_state = white.start_workflow()
             >>> if final_state.workflow_paused:
-            >>>     # Complete the ritual tasks, then:
             >>>     resumed_state = white.resume_workflow(final_state)
         """
         workflow = self.build_workflow()
@@ -89,17 +88,12 @@ class WhiteAgent(BaseModel):
         )
 
         config = RunnableConfig(configurable={"thread_id": thread_id})
-
         logging.info(f"🎵 Starting White Agent workflow (thread_id: {thread_id})")
-
         result = workflow.invoke(initial_state, config)
-
-        # Convert dict result to MainAgentState if needed
         if isinstance(result, dict):
             final_state = MainAgentState(**result)
         else:
             final_state = result
-
         return final_state
 
     def resume_workflow(
@@ -123,23 +117,15 @@ class WhiteAgent(BaseModel):
         if not paused_state.workflow_paused:
             logging.warning("⚠️  Workflow is not paused - nothing to resume")
             return paused_state
-
         logging.info(f"🔄 Resuming workflow (thread_id: {paused_state.thread_id})")
-
-        # Resume Black Agent ritual completion
         updated_state = self.resume_after_black_agent_ritual(
             paused_state, verify_tasks=verify_tasks
         )
-
-        # Continue the workflow by invoking Red Agent if ready
         if updated_state.ready_for_red:
             logging.info("▶️  Continuing to Red Agent...")
             updated_state = self.invoke_red_agent(updated_state)
             updated_state = self.process_red_agent_work(updated_state)
-
-        # Finalize
         updated_state = self.finalize_song_proposal(updated_state)
-
         return updated_state
 
     def build_workflow(self) -> CompiledStateGraph:
@@ -176,7 +162,6 @@ class WhiteAgent(BaseModel):
             {"finish": "finalize_song_proposal"},
         )
         workflow.add_edge("finalize_song_proposal", END)
-
         return workflow.compile(checkpointer=check_points)
 
     def _get_claude_supervisor(self) -> ChatAnthropic:
@@ -281,14 +266,11 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-        # Check if workflow is paused waiting for human action
         if state.workflow_paused and state.pending_human_action:
             logging.info(
                 "⏸️  Workflow paused - waiting for human to complete ritual tasks"
             )
             return state
-
-        # Normalize song_proposals to object before accessing
         sp = self._normalize_song_proposal(state.song_proposals)
         black_proposal = sp.iterations[-1]
         black_artifacts = state.artifacts or []
@@ -296,7 +278,6 @@ class WhiteAgent(BaseModel):
         sigil_artifacts = [
             a for a in black_artifacts if a.chain_artifact_type == "sigil"
         ]
-
         rebracketing_analysis = self._black_rebracketing_analysis(
             black_proposal, evp_artifacts, sigil_artifacts
         )
@@ -306,12 +287,30 @@ class WhiteAgent(BaseModel):
         state.rebracketing_analysis = rebracketing_analysis
         state.document_synthesis = document_synthesis
         state.ready_for_red = True
-
         return state
 
     def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
-        # ToDo: Add Red Agent work
+        sp = self._normalize_song_proposal(state.song_proposals)
+        red_proposal = sp.iterations[-1]
+        black_and_red_artifacts = state.artifacts or []
+        # ToDo: Might be big flaw here!
+        book_artifacts = [
+            b for b in black_and_red_artifacts if b.chain_artifact_type == "book"
+        ]
+        rebracketing_analysis = self._red_rebracketing_analysis(
+            red_proposal, book_artifacts
+        )
+        document_synthesis = self._synthesize_document_for_red(
+            rebracketing_analysis, red_proposal, black_and_red_artifacts
+        )
+        state.rebracketing_analysis = rebracketing_analysis
+        state.document_synthesis = document_synthesis
+        state.ready_for_red = False
+        state.ready_for_orange = True
         return state
+
+    def _red_rebracketing_analysis(self, proposal, book_artifacts) -> str:
+        pass
 
     def _black_rebracketing_analysis(
         self, proposal, evp_artifacts, sigil_artifacts
@@ -325,6 +324,7 @@ class WhiteAgent(BaseModel):
                 data = yaml.safe_load(f)
                 return data
         else:
+            # ToDo: Not using sigil report!
             prompt = f"""
                 You are the White Agent performing a REBRACKETING operation.
     
@@ -353,12 +353,12 @@ class WhiteAgent(BaseModel):
                 Generate a rebracketed analysis that finds structure in Black's chaos.
                 Focus on revealing the underlying ORDER, not explaining away the paradox.
                 """
-
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-
+            # ToDo: Not being saved!
             return response.content
 
+    # ToDo: This is copypaste
     def _synthesize_document_for_red(
         self, rebracketed_analysis, black_proposal, artifacts
     ):
@@ -404,10 +404,8 @@ class WhiteAgent(BaseModel):
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
-        # If workflow is paused for human action, end here
         if state.workflow_paused and state.pending_human_action:
             return "finish"
-
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             return "red"
@@ -417,11 +415,11 @@ class WhiteAgent(BaseModel):
 
     @staticmethod
     def route_after_red(state: MainAgentState) -> str:
+        # ToDo: Goto Orange Agent
         return "finish"
 
     @staticmethod
     def finalize_song_proposal(state: MainAgentState) -> MainAgentState:
-        # If workflow is paused, provide instructions and don't save
         if state.workflow_paused and state.pending_human_action:
             pending = state.pending_human_action
             logging.info("\n" + "=" * 60)
@@ -432,7 +430,6 @@ class WhiteAgent(BaseModel):
             logging.info(
                 f"\nInstructions:\n{pending.get('instructions', 'No instructions')}"
             )
-
             tasks = pending.get("tasks", [])
             if tasks:
                 logging.info(f"\nPending Tasks ({len(tasks)}):")
@@ -440,14 +437,11 @@ class WhiteAgent(BaseModel):
                     logging.info(
                         f"  - {task.get('type', 'unknown')}: {task.get('task_url', 'No URL')}"
                     )
-
             logging.info("\nTo resume after completing tasks:")
             logging.info("  from app.agents.white_agent import WhiteAgent")
             logging.info("  state = WhiteAgent.resume_after_black_agent_ritual(state)")
             logging.info("=" * 60)
             return state
-
-        # Normal completion - save proposals
         state.song_proposals.save_all_proposals()
         logging.info("✓ Song proposals saved")
         return state
@@ -487,8 +481,6 @@ class WhiteAgent(BaseModel):
         if not black_config:
             logging.error("No black_config found in pending_human_action")
             return paused_state
-
-        # Use self to access the BlackAgent instance
         black_agent = self.agents.get("black")
         if not black_agent:
             logging.error("Black agent not found in white_agent instance")
@@ -531,7 +523,6 @@ class WhiteAgent(BaseModel):
             ]
 
             black_proposal = paused_state.song_proposals.iterations[-1]
-
             paused_state.rebracketing_analysis = self._black_rebracketing_analysis(
                 black_proposal, evp_artifacts, sigil_artifacts
             )
@@ -539,11 +530,8 @@ class WhiteAgent(BaseModel):
                 paused_state.rebracketing_analysis, black_proposal, artifacts
             )
             paused_state.ready_for_red = True
-
             logging.info("✓ Processed Black Agent work - ready for Red Agent")
-
             return paused_state
-
         except Exception as e:
             logging.error(f"Failed to resume Black Agent workflow: {e}")
             raise

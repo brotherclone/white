@@ -1,5 +1,5 @@
 audio_segments:
-  - sample_rate: 1
+  - sample_rate: 44100
     artifact_id: '12345'
     duration: 1.0
     channels: 1
@@ -31,9 +31,9 @@ transcript:
   artifact_name: "mock"
   file_name: "12345_black_mock.md"
 audio_mosiac:
-  sample_rate: 1
+  sample_rate: 44100
   duration: 1.0
-  channels: 1
+  channels: 2
   chain_artifact_file_type: 'wav'
   artifact_id: '12345'
   rainbow_color:
@@ -48,7 +48,7 @@ audio_mosiac:
   artifact_name: "mock"
   file_name: "12345_black_mock.wav"
 noise_blended_audio:
-  sample_rate: 1
+  sample_rate: 44100
   duration: 1.0
   channels: 1
   chain_artifact_file_type: 'wav'

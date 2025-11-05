@@ -12,7 +12,7 @@ from app.structures.manifests.song_proposal import SongProposal, SongProposalIte
 
 def test_black_agent_state_defaults():
     state = BlackAgentState()
-    assert state.thread_id.startswith("thread_")
+    assert state.thread_id is None
     assert state.white_proposal is None
     assert state.song_proposals is None
     assert state.counter_proposal is None

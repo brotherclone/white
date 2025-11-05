@@ -1,4 +1,6 @@
-from typing import List
+from typing import List, Optional
+
+from pydantic import Field
 
 from app.structures.artifacts.base_chain_artifact import ChainArtifact
 from app.structures.artifacts.book_data import BookData
@@ -7,7 +9,9 @@ from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactF
 
 class BookChainArtifact(ChainArtifact):
 
-    thread_id: str
+    thread_id: Optional[str] = Field(
+        default=None, description="Unique ID of the thread."
+    )
     book_data: BookData
     chain_artifact_type: str = "book"
     pages: List[TextChainArtifactFile] | None = []

@@ -1,9 +1,10 @@
 import os
 import uuid
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.structures.concepts.rainbow_table_color import RainbowTableColor
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
@@ -12,14 +13,55 @@ load_dotenv()
 
 
 class BaseChainArtifactFile(BaseModel):
-
-    artifact_id: uuid.UUID | str = None
-    thread_id: str | None = None
-    rainbow_color: RainbowTableColor | None = None
-    base_path: str | Path
-    chain_artifact_file_type: ChainArtifactFileType
-    artifact_name: str | None = None
-    file_name: str | None = None
+    artifact_id: Optional[uuid.UUID | str] = Field(
+        default=None, description="Unique ID of the artifact."
+    )
+    thread_id: Optional[str] = Field(
+        default=None, description="Unique ID of the thread."
+    )
+    rainbow_color: Optional[RainbowTableColor] = Field(
+        default=None,
+        description="Rainbow table color associated with the artifact.",
+        examples=[
+            {
+                "color_name": "Black",
+                "hex_value": "000000",
+                "mnemonic_character_value": "Z",
+                "transmigrational_mode": None,
+                "objectional_mode": None,
+                "ontological_mode": None,
+                "temporal_mode": None,
+                "file_prefix": "01",
+            },
+            {
+                "color_name": "Red",
+                "hex_value": "4915330",
+                "mnemonic_character_value": "R",
+                "temporal_mode": "Past",
+                "objectional_mode": "Thing",
+                "ontological_mode": ["Known"],
+                "transmigrational_mode": None,
+                "file_prefix": "02",
+            },
+        ],
+    )
+    base_path: str | Path = Field(
+        default="/", description="Base path for the artifact."
+    )
+    chain_artifact_file_type: ChainArtifactFileType = Field(
+        default=None,
+        description="Type of the chain artifact file.",
+        examples=["MARKDOWN", "WAV"],
+    )
+    artifact_name: Optional[str] = Field(
+        default=None,
+        description="Name of the artifact.",
+        examples=["sigil", "book", "transcript"],
+    )
+    file_name: Optional[str] = Field(
+        default=None,
+        description="Generated file name of the artifact. Do not set manually.",
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
