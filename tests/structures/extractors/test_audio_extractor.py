@@ -5,8 +5,9 @@ import pandas as pd
 import pytest
 
 from app.structures.extractors.audio_extractor import AudioExtractor
-from app.structures.music.rainbow_table.raindbow_audio_feature import \
-    RainbowAudioFeature
+from app.structures.music.rainbow_table.raindbow_audio_feature import (
+    RainbowAudioFeature,
+)
 
 
 @pytest.fixture

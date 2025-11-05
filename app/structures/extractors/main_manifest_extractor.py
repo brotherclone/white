@@ -80,8 +80,7 @@ class ManifestExtractor:
     def concept_extractor(self):
         """Lazy load concept extractor to avoid circular imports"""
         if self._concept_extractor is None:
-            from app.structures.extractors.concept_extractor import \
-                ConceptExtractor
+            from app.structures.extractors.concept_extractor import ConceptExtractor
 
             self._concept_extractor = ConceptExtractor(manifest_id=self.manifest_id)
         return self._concept_extractor
@@ -97,8 +96,7 @@ class ManifestExtractor:
     def audio_extractor(self):
         """Lazy load audio extractor to avoid circular imports"""
         if self._audio_extractor is None:
-            from app.structures.extractors.audio_extractor import \
-                AudioExtractor
+            from app.structures.extractors.audio_extractor import AudioExtractor
 
             self._audio_extractor = AudioExtractor(manifest_id=self.manifest_id)
         return self._audio_extractor
@@ -442,8 +440,7 @@ class ManifestExtractor:
         print(f"Loaded manifest: {getattr(manifest, 'title', 'Unknown')}")
 
         # Avoid circular import
-        from app.structures.extractors.concept_extractor import \
-            ConceptExtractor
+        from app.structures.extractors.concept_extractor import ConceptExtractor
 
         # Initialize concept extractor for rebracketing analysis
         concept_extractor = ConceptExtractor(manifest_id=self.manifest_id)

@@ -3,8 +3,7 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from app.structures.music.rainbow_table.rainbow_table_album import \
-    RainbowTableAlbum
+from app.structures.music.rainbow_table.rainbow_table_album import RainbowTableAlbum
 
 
 def test_rainbow_table_album():

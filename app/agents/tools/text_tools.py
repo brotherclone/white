@@ -10,10 +10,8 @@ import yaml
 from dotenv import load_dotenv
 
 from app.structures.artifacts.base_chain_artifact import ChainArtifact
-from app.structures.artifacts.text_chain_artifact_file import \
-    TextChainArtifactFile
-from app.structures.concepts.rainbow_table_color import \
-    the_rainbow_table_colors
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 load_dotenv()

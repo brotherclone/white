@@ -4,8 +4,7 @@ from typing import Any, List, Optional
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field
 
-from app.structures.manifests.song_proposal import (SongProposal,
-                                                    SongProposalIteration)
+from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 class BaseRainbowAgentState(BaseModel):

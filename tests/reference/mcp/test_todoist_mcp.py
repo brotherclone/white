@@ -40,8 +40,7 @@ def test_get_api_client_no_token():
 
 def test_get_earthly_frames_project_sections():
     """Test getting project sections"""
-    from app.reference.mcp.todoist.main import \
-        get_earthly_frames_project_sections
+    from app.reference.mcp.todoist.main import get_earthly_frames_project_sections
 
     mock_section = MagicMock()
     mock_section.id = "section-1"

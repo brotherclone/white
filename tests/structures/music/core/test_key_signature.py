@@ -1,7 +1,11 @@
 import pytest
 
-from app.structures.music.core.key_signature import (KeySignature, Mode,
-                                                     ModeName, get_mode)
+from app.structures.music.core.key_signature import (
+    KeySignature,
+    Mode,
+    ModeName,
+    get_mode,
+)
 from app.structures.music.core.notes import Note
 
 

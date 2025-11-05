@@ -2,8 +2,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import Field
 
-from app.structures.agents.base_rainbow_agent_state import \
-    BaseRainbowAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
 
 class BlackAgentState(BaseRainbowAgentState):

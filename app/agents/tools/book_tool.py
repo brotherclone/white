@@ -3,33 +3,42 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.reference.books.book_authors import (BILDUNGSROMAN_FIRST_NAMES,
-                                              BILDUNGSROMAN_LAST_NAMES,
-                                              CREDENTIALS, CULT_FIRST_NAMES,
-                                              CULT_LAST_NAMES,
-                                              NOIR_FIRST_NAMES,
-                                              NOIR_LAST_NAMES,
-                                              OCCULT_FIRST_NAMES,
-                                              OCCULT_LAST_NAMES,
-                                              PSYCHEDELIC_FIRST_NAMES,
-                                              PSYCHEDELIC_LAST_NAMES,
-                                              SCIFI_FIRST_NAMES,
-                                              SCIFI_LAST_NAMES,
-                                              SEXPLOITATION_FIRST_NAMES,
-                                              SEXPLOITATION_LAST_NAMES)
-from app.reference.books.book_misc import (ACQUISITION_NOTES,
-                                           SUPPRESSION_STORIES)
-from app.reference.books.book_publishers import (BILDUNGSROMAN_PUBLISHERS,
-                                                 CULT_PUBLISHERS,
-                                                 NOIR_PUBLISHERS,
-                                                 OCCULT_PUBLISHERS,
-                                                 PSYCHEDELIC_PUBLISHERS,
-                                                 SCIFI_PUBLISHERS,
-                                                 SEXPLOITATION_PUBLISHERS)
-from app.reference.books.book_topics import (BILDUNGSROMAN_TOPICS, CULT_TOPICS,
-                                             NOIR_TOPICS, OCCULT_TOPICS,
-                                             PSYCHEDELIC_TOPICS, SCIFI_TOPICS,
-                                             SEXPLOITATION_TOPICS)
+from app.reference.books.book_authors import (
+    BILDUNGSROMAN_FIRST_NAMES,
+    BILDUNGSROMAN_LAST_NAMES,
+    CREDENTIALS,
+    CULT_FIRST_NAMES,
+    CULT_LAST_NAMES,
+    NOIR_FIRST_NAMES,
+    NOIR_LAST_NAMES,
+    OCCULT_FIRST_NAMES,
+    OCCULT_LAST_NAMES,
+    PSYCHEDELIC_FIRST_NAMES,
+    PSYCHEDELIC_LAST_NAMES,
+    SCIFI_FIRST_NAMES,
+    SCIFI_LAST_NAMES,
+    SEXPLOITATION_FIRST_NAMES,
+    SEXPLOITATION_LAST_NAMES,
+)
+from app.reference.books.book_misc import ACQUISITION_NOTES, SUPPRESSION_STORIES
+from app.reference.books.book_publishers import (
+    BILDUNGSROMAN_PUBLISHERS,
+    CULT_PUBLISHERS,
+    NOIR_PUBLISHERS,
+    OCCULT_PUBLISHERS,
+    PSYCHEDELIC_PUBLISHERS,
+    SCIFI_PUBLISHERS,
+    SEXPLOITATION_PUBLISHERS,
+)
+from app.reference.books.book_topics import (
+    BILDUNGSROMAN_TOPICS,
+    CULT_TOPICS,
+    NOIR_TOPICS,
+    OCCULT_TOPICS,
+    PSYCHEDELIC_TOPICS,
+    SCIFI_TOPICS,
+    SEXPLOITATION_TOPICS,
+)
 from app.structures.artifacts.book_data import BookData
 from app.structures.enums.book_condition import BookCondition
 from app.structures.enums.book_genre import BookGenre

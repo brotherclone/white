@@ -4,8 +4,7 @@ import yaml
 from dotenv import load_dotenv
 
 from app.structures.manifests.manifest import Manifest
-from app.structures.manifests.song_proposal import (SongProposal,
-                                                    SongProposalIteration)
+from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 load_dotenv()
 

@@ -2,8 +2,10 @@ import random
 from typing import Optional
 
 from app.agents.prompts.white_facet_prompts import FACET_SYSTEM_PROMPTS
-from app.reference.metadata.white_facet_metadata import (FACET_DESCRIPTIONS,
-                                                         FACET_EXAMPLES)
+from app.reference.metadata.white_facet_metadata import (
+    FACET_DESCRIPTIONS,
+    FACET_EXAMPLES,
+)
 from app.structures.enums.white_facet import WhiteFacet
 
 

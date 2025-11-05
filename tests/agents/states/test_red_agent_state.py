@@ -1,6 +1,5 @@
 from app.agents.states.red_agent_state import RedAgentState
-from app.structures.agents.base_rainbow_agent_state import \
-    BaseRainbowAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
 
 def test_red_agent_defaults():

@@ -2,8 +2,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from app.structures.agents.base_rainbow_agent import (BaseRainbowAgent,
-                                                      skip_chance)
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.base_chain_artifact import ChainArtifact
 
 # A concrete agent to instantiate and test abstract behavior

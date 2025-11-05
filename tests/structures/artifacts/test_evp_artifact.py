@@ -1,8 +1,6 @@
-from app.structures.artifacts.audio_chain_artifact_file import \
-    AudioChainArtifactFile
+from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
-from app.structures.artifacts.text_chain_artifact_file import \
-    TextChainArtifactFile
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 

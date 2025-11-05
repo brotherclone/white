@@ -1,5 +1,4 @@
-from app.structures.artifacts.text_chain_artifact_file import \
-    TextChainArtifactFile
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 

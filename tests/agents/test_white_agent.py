@@ -5,8 +5,7 @@ import pytest
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.white_agent import WhiteAgent
 from app.structures.agents.agent_settings import AgentSettings
-from app.structures.manifests.song_proposal import (SongProposal,
-                                                    SongProposalIteration)
+from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 def test_white_agent_initialization():

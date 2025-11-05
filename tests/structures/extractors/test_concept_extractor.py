@@ -1,7 +1,9 @@
 import pytest
 
-from app.structures.extractors.concept_extractor import (ConceptExtractor,
-                                                         RebrackettingAnalysis)
+from app.structures.extractors.concept_extractor import (
+    ConceptExtractor,
+    RebrackettingAnalysis,
+)
 
 
 def test_concept_extractor():

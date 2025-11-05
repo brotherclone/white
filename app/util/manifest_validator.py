@@ -642,8 +642,9 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         errors.append("rainbow_color is missing")
     else:
         try:
-            from app.structures.concepts.rainbow_table_color import \
-                the_rainbow_table_colors
+            from app.structures.concepts.rainbow_table_color import (
+                the_rainbow_table_colors,
+            )
 
             allowed_keys = set(the_rainbow_table_colors.keys())
             allowed_names = {v.color_name for v in the_rainbow_table_colors.values()}

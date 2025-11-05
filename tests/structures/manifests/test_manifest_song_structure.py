@@ -1,8 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.structures.manifests.manifest_song_structure import \
-    ManifestSongStructure
+from app.structures.manifests.manifest_song_structure import ManifestSongStructure
 from app.structures.music.core.duration import Duration
 
 

@@ -4,7 +4,9 @@ from pydantic import BaseModel
 
 from app.agents.tools.gaming_tools import roll_dice
 from app.structures.concepts.pulsar_palace_character import (
-    PulsarPalaceCharacter, PulsarPalacePlayer)
+    PulsarPalaceCharacter,
+    PulsarPalacePlayer,
+)
 
 
 class PulsarPalaceRun(BaseModel):

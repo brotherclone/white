@@ -21,13 +21,13 @@ from app.agents.orange_agent import OrangeAgent
 from app.agents.red_agent import RedAgent
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.violet_agent import VioletAgent
-from app.agents.workflow.resume_black_workflow import \
-    resume_black_agent_workflow_with_agent
+from app.agents.workflow.resume_black_workflow import (
+    resume_black_agent_workflow_with_agent,
+)
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
-from app.structures.manifests.song_proposal import (SongProposal,
-                                                    SongProposalIteration)
+from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 logging.basicConfig(level=logging.INFO)
 

@@ -4,8 +4,7 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from app.structures.manifests.song_proposal import (SongProposal,
-                                                    SongProposalIteration)
+from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 def valid_iteration_data(**overrides):
