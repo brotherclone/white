@@ -21,12 +21,11 @@ import pickle
 import sys
 from pathlib import Path
 
-from app.agents.white_agent import WhiteAgent
 from app.agents.states.white_agent_state import MainAgentState
+from app.agents.white_agent import WhiteAgent
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
 
@@ -63,25 +62,29 @@ def start_workflow(args):
         if final_state.pending_human_action:
             pending = final_state.pending_human_action
             logging.info(f"\nAgent waiting: {pending.get('agent', 'unknown')}")
-            logging.info(f"\nInstructions:\n{pending.get('instructions', 'No instructions')}")
+            logging.info(
+                f"\nInstructions:\n{pending.get('instructions', 'No instructions')}"
+            )
 
-            tasks = pending.get('tasks', [])
+            tasks = pending.get("tasks", [])
             if tasks:
                 logging.info(f"\n📋 Pending Tasks ({len(tasks)}):")
                 for task in tasks:
                     logging.info(f"  - {task.get('content', 'Unknown task')}")
-                    if task.get('task_url'):
+                    if task.get("task_url"):
                         logging.info(f"    URL: {task.get('task_url')}")
 
         logging.info("\n▶️  To resume after completing tasks:")
-        logging.info(f"    python run_white_agent.py resume")
+        logging.info("    python run_white_agent.py resume")
         logging.info("=" * 60)
     else:
         logging.info("\n" + "=" * 60)
         logging.info("✅ WORKFLOW COMPLETED")
         logging.info("=" * 60)
         if final_state.song_proposals and final_state.song_proposals.iterations:
-            logging.info(f"Generated {len(final_state.song_proposals.iterations)} proposal iterations")
+            logging.info(
+                f"Generated {len(final_state.song_proposals.iterations)} proposal iterations"
+            )
 
     return final_state
 
@@ -132,7 +135,9 @@ def resume_workflow(args):
         logging.info("=" * 60)
 
         if final_state.song_proposals and final_state.song_proposals.iterations:
-            logging.info(f"Total proposal iterations: {len(final_state.song_proposals.iterations)}")
+            logging.info(
+                f"Total proposal iterations: {len(final_state.song_proposals.iterations)}"
+            )
 
         # Clean up the paused state file
         if args.cleanup:
@@ -164,30 +169,27 @@ Examples:
   
   # Resume and clean up state file
   python run_white_agent.py resume --cleanup
-        """
+        """,
     )
 
-    subparsers = parser.add_subparsers(dest='command', help='Command to execute')
-
-    # Start command
-    start_parser = subparsers.add_parser('start', help='Start a new workflow')
+    subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Resume command
-    resume_parser = subparsers.add_parser('resume', help='Resume a paused workflow')
+    resume_parser = subparsers.add_parser("resume", help="Resume a paused workflow")
     resume_parser.add_argument(
-        '--state-file',
+        "--state-file",
         type=str,
-        help='Path to the paused state file (default: paused_state.pkl)'
+        help="Path to the paused state file (default: paused_state.pkl)",
     )
     resume_parser.add_argument(
-        '--no-verify',
-        action='store_true',
-        help='Skip task verification (useful for testing)'
+        "--no-verify",
+        action="store_true",
+        help="Skip task verification (useful for testing)",
     )
     resume_parser.add_argument(
-        '--cleanup',
-        action='store_true',
-        help='Remove the paused state file after successful resume'
+        "--cleanup",
+        action="store_true",
+        help="Remove the paused state file after successful resume",
     )
 
     args = parser.parse_args()
@@ -196,12 +198,11 @@ Examples:
         parser.print_help()
         sys.exit(1)
 
-    if args.command == 'start':
+    if args.command == "start":
         start_workflow(args)
-    elif args.command == 'resume':
+    elif args.command == "resume":
         resume_workflow(args)
 
 
 if __name__ == "__main__":
     main()
-

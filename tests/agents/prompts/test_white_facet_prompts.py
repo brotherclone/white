@@ -1,5 +1,3 @@
-import pytest
-
 from app.agents.prompts.white_facet_prompts import FACET_SYSTEM_PROMPTS
 from app.structures.enums.white_facet import WhiteFacet
 
@@ -18,6 +16,6 @@ def test_prompts_are_strings_and_non_empty():
 def test_prompts_start_with_expected_phrase():
     for facet in WhiteFacet:
         prompt = FACET_SYSTEM_PROMPTS[facet]
-        assert prompt.lstrip().startswith(f"You are operating in {facet.name} mode"), (
-            f"Prompt for {facet} does not start with expected phrase"
-        )
+        assert prompt.lstrip().startswith(
+            f"You are operating in {facet.name} mode"
+        ), f"Prompt for {facet} does not start with expected phrase"

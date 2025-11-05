@@ -1,13 +1,14 @@
 # python
-from typing import List, Optional, Any, Dict
 import re
+from typing import Any, Dict, List, Optional
 
 from pydantic import Field, model_validator
 
+from app.structures.artifacts.base_chain_artifact import ChainArtifact
+from app.structures.artifacts.text_chain_artifact_file import \
+    TextChainArtifactFile
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
-from app.structures.artifacts.base_chain_artifact import ChainArtifact
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 
 
 class SigilArtifact(ChainArtifact):
@@ -28,7 +29,7 @@ class SigilArtifact(ChainArtifact):
     def _normalize_artifact_report(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         # Keys that should be treated as artifact-report-like after normalization
         def _normalize_key(k: str) -> str:
-            return re.sub(r'[^a-z0-9]', '', k.lower())
+            return re.sub(r"[^a-z0-9]", "", k.lower())
 
         def _is_report_key(k: str) -> bool:
             s = _normalize_key(k)
@@ -40,7 +41,14 @@ class SigilArtifact(ChainArtifact):
             )
 
         # Keys that indicate a dict is likely a BaseChainArtifactFile / TextChainArtifactFile
-        _expected_file_keys = {"artifact_id", "base_path", "chain_artifact_file_type", "artifact_name", "file_name", "text_content"}
+        _expected_file_keys = {
+            "artifact_id",
+            "base_path",
+            "chain_artifact_file_type",
+            "artifact_name",
+            "file_name",
+            "text_content",
+        }
 
         def _is_valid_report_candidate(obj: Any) -> bool:
             # Only dict-like objects with at least one expected key are valid candidates
@@ -53,7 +61,12 @@ class SigilArtifact(ChainArtifact):
                 # First, check direct keys on this dict for report-like keys that map to dicts
                 for k, v in obj.items():
                     try:
-                        if k and _is_report_key(k) and v is not None and _is_valid_report_candidate(v):
+                        if (
+                            k
+                            and _is_report_key(k)
+                            and v is not None
+                            and _is_valid_report_candidate(v)
+                        ):
                             return v
                     except Exception:
                         pass
@@ -83,6 +96,4 @@ class SigilArtifact(ChainArtifact):
 
         return values
 
-    model_config = {
-        "extra": "ignore"
-    }
+    model_config = {"extra": "ignore"}

@@ -1,24 +1,25 @@
-import random
+from abc import ABC, abstractmethod
+from typing import Callable, List, Optional, Union
 
+from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List,Callable, Union
-from abc import ABC, abstractmethod
-from dotenv import load_dotenv
 
 from app.structures.agents.agent_settings import AgentSettings
+from app.structures.agents.base_rainbow_agent_state import \
+    BaseRainbowAgentState
 from app.structures.artifacts.base_chain_artifact import ChainArtifact
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
 load_dotenv()
 
 Chance = Union[float, Callable[[object], float]]
 
+
 class BaseRainbowAgent(BaseModel, ABC):
     """Base class for all Rainbow Agents"""
 
-    model_config = ConfigDict(arbitrary_types_allowed=True, extra='allow')
+    model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
     settings: AgentSettings | None = None
     graph: Optional[StateGraph] = None
@@ -33,8 +34,12 @@ class BaseRainbowAgent(BaseModel, ABC):
         raise NotImplementedError("Subclasses must implement create_graph method")
 
     @abstractmethod
-    def generate_alternate_song_spec(self, agent_state: BaseRainbowAgentState) -> BaseRainbowAgentState:
-        raise NotImplementedError("Subclasses must implement generate_alternate_song_spec method")
+    def generate_alternate_song_spec(
+        self, agent_state: BaseRainbowAgentState
+    ) -> BaseRainbowAgentState:
+        raise NotImplementedError(
+            "Subclasses must implement generate_alternate_song_spec method"
+        )
 
     def _get_claude(self) -> ChatAnthropic:
         return ChatAnthropic(
@@ -43,14 +48,16 @@ class BaseRainbowAgent(BaseModel, ABC):
             temperature=self.settings.temperature,
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
-            stop=self.settings.stop
+            stop=self.settings.stop,
         )
 
-    
+
 def skip_chance(chance, rng=None):
     rng = rng or __import__("random").random
+
     def decorator(fn):
         from functools import wraps
+
         @wraps(fn)
         def wrapper(self, state, *args, **kwargs):
             p = chance(self) if callable(chance) else chance
@@ -60,7 +67,7 @@ def skip_chance(chance, rng=None):
                 setattr(state, "skipped_nodes", skipped)
                 return state
             return fn(self, state, *args, **kwargs)
+
         return wrapper
+
     return decorator
-
-

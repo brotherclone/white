@@ -2,7 +2,6 @@ from enum import Enum
 
 
 class BookCondition(str, Enum):
-
     """
     Physical condition of the tome
     1. Pristine: As new, flawless condition

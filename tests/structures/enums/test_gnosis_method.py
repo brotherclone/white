@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.gnosis_method import GnosisMethod
@@ -29,14 +30,17 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("exhaustion", GnosisMethod.EXHAUSTION),
-    ("ecstasy", GnosisMethod.ECSTASY),
-    ("obsession", GnosisMethod.OBSESSION),
-    ("sensory_overload", GnosisMethod.SENSORY_OVERLOAD),
-    ("meditation", GnosisMethod.MEDITATION),
-    ("chaos", GnosisMethod.CHAOS),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("exhaustion", GnosisMethod.EXHAUSTION),
+        ("ecstasy", GnosisMethod.ECSTASY),
+        ("obsession", GnosisMethod.OBSESSION),
+        ("sensory_overload", GnosisMethod.SENSORY_OVERLOAD),
+        ("meditation", GnosisMethod.MEDITATION),
+        ("chaos", GnosisMethod.CHAOS),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert GnosisMethod(value) is member
 

@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.temporal_relatioship import TemporalRelationship
@@ -29,14 +30,17 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("spans_across", TemporalRelationship.ACROSS),
-    ("bleeds_in", TemporalRelationship.BLEED_IN),
-    ("bleeds_out", TemporalRelationship.BLEED_OUT),
-    ("contained", TemporalRelationship.CONTAINED),
-    ("exact_match", TemporalRelationship.MATCH),
-    ("unknown", TemporalRelationship.UNKNOWN),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("spans_across", TemporalRelationship.ACROSS),
+        ("bleeds_in", TemporalRelationship.BLEED_IN),
+        ("bleeds_out", TemporalRelationship.BLEED_OUT),
+        ("contained", TemporalRelationship.CONTAINED),
+        ("exact_match", TemporalRelationship.MATCH),
+        ("unknown", TemporalRelationship.UNKNOWN),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert TemporalRelationship(value) is member
 
@@ -59,4 +63,3 @@ def test_values_are_unique():
 def test_enum_members_are_enum_instances():
     assert isinstance(TemporalRelationship.ACROSS, enum.Enum)
     assert isinstance(TemporalRelationship.UNKNOWN, enum.Enum)
-

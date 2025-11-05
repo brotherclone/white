@@ -17,7 +17,7 @@ class ManifestTrack(BaseModel):
         super().__init__(**data)
 
     @field_validator("player", mode="before")
-    def accept_name_or_value(cls,v):
+    def accept_name_or_value(cls, v):
         if v is None:
             return None
         if isinstance(v, RainbowPlayer):

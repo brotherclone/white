@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.chain_artifact_type import ChainArtifactType
@@ -30,22 +31,28 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("transcript", ChainArtifactType.TRANSCRIPT),
-    ("instructions_to_human", ChainArtifactType.INSTRUCTIONS_TO_HUMAN),
-    ("sigil_description", ChainArtifactType.SIGIL_DESCRIPTION),
-    ("doc", ChainArtifactType.DOCUMENT),
-    ("audio_mos", ChainArtifactType.AUDIO_MOSIAC),
-    ("col_audio_", ChainArtifactType.RANDOM_AUDIO_BY_COLOR_SEGMENT),
-    ("noise_mixed", ChainArtifactType.NOISE_MIXED_AUDIO),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("transcript", ChainArtifactType.TRANSCRIPT),
+        ("instructions_to_human", ChainArtifactType.INSTRUCTIONS_TO_HUMAN),
+        ("sigil_description", ChainArtifactType.SIGIL_DESCRIPTION),
+        ("doc", ChainArtifactType.DOCUMENT),
+        ("audio_mos", ChainArtifactType.AUDIO_MOSIAC),
+        ("col_audio_", ChainArtifactType.RANDOM_AUDIO_BY_COLOR_SEGMENT),
+        ("noise_mixed", ChainArtifactType.NOISE_MIXED_AUDIO),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert ChainArtifactType(value) is member
 
 
 def test_lookup_by_name():
     assert ChainArtifactType["DOCUMENT"] is ChainArtifactType.DOCUMENT
-    assert ChainArtifactType["RANDOM_AUDIO_BY_COLOR_SEGMENT"] is ChainArtifactType.RANDOM_AUDIO_BY_COLOR_SEGMENT
+    assert (
+        ChainArtifactType["RANDOM_AUDIO_BY_COLOR_SEGMENT"]
+        is ChainArtifactType.RANDOM_AUDIO_BY_COLOR_SEGMENT
+    )
 
 
 def test_invalid_value_raises_value_error():

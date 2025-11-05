@@ -1,11 +1,20 @@
 import os
 from pathlib import Path
-import tempfile
+
 from app.agents.tools import text_tools as tt
 
 
 class SimpleArtifact:
-    def __init__(self, base_path, thread_id, artifact_name, artifact_id, chain_artifact_file_type, text_content, rainbow_color=None):
+    def __init__(
+        self,
+        base_path,
+        thread_id,
+        artifact_name,
+        artifact_id,
+        chain_artifact_file_type,
+        text_content,
+        rainbow_color=None,
+    ):
         self.base_path = base_path
         self.thread_id = thread_id
         self.artifact_name = artifact_name
@@ -37,7 +46,7 @@ def test_save_artifact_file_to_md_writes_file(tmp_path):
     # ensure file exists and contains text
     expected = Path(art.get_artifact_path())
     assert expected.exists()
-    content = expected.read_text(encoding='utf-8')
+    content = expected.read_text(encoding="utf-8")
     assert "hello world" in content
 
     # cleanup
@@ -46,4 +55,3 @@ def test_save_artifact_file_to_md_writes_file(tmp_path):
         expected.parent.rmdir()
     if base.exists():
         os.rmdir(str(base))
-

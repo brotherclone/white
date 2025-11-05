@@ -1,9 +1,10 @@
 import types
+
 import pytest
 
+from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.workflow import resume_black_workflow as rbw
 from app.structures.enums.sigil_state import SigilState
-from app.agents.states.black_agent_state import BlackAgentState
 
 
 def test_check_todoist_tasks_complete_all_complete(monkeypatch):

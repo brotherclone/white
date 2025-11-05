@@ -1,5 +1,3 @@
-import os
-import pytest
 from app.util import lrc_utils as lu
 
 

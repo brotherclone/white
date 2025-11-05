@@ -1,6 +1,4 @@
-import re
 import random
-import pytest
 
 from app.agents.tools.magick_tools import SigilTools
 from app.structures.enums.gnosis_method import GnosisMethod
@@ -36,7 +34,9 @@ def test_reduce_to_unique_letters_ignores_non_letters_and_preserves_order():
 
 def test_generate_word_method_sigil_produces_expected_components(monkeypatch):
     # Choose a deterministic combination method
-    monkeypatch.setattr(random, "choice", lambda seq: "connect sequentially with flowing lines")
+    monkeypatch.setattr(
+        random, "choice", lambda seq: "connect sequentially with flowing lines"
+    )
     statement = "A b a z"
     glyph_desc, comps = SigilTools().generate_word_method_sigil(statement)
     assert "Combine 3 forms" in glyph_desc
@@ -47,8 +47,12 @@ def test_generate_word_method_sigil_produces_expected_components(monkeypatch):
 
 
 def test_generate_pictorial_sigil_with_explicit_symbols(monkeypatch):
-    monkeypatch.setattr(random, "choice", lambda seq: "layered with transparency effects")
-    s = SigilTools.generate_pictorial_sigil("ignored", symbolic_elements=["heart", "star"])
+    monkeypatch.setattr(
+        random, "choice", lambda seq: "layered with transparency effects"
+    )
+    s = SigilTools.generate_pictorial_sigil(
+        "ignored", symbolic_elements=["heart", "star"]
+    )
     assert "heart" in s
     assert "star" in s
     assert "layered with transparency effects" in s

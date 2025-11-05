@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.publisher_type import PublisherType
@@ -29,14 +30,17 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("University imprint", PublisherType.UNIVERSITY),
-    ("Occult cottage industry publisher", PublisherType.OCCULT),
-    ("Samizdat dead drop", PublisherType.SAMIZDAT),
-    ("Vanity press directly from author", PublisherType.VANITY),
-    ("Previously deemed lost", PublisherType.LOST),
-    ("Declassified document from FOIA request", PublisherType.GOVERNMENT),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("University imprint", PublisherType.UNIVERSITY),
+        ("Occult cottage industry publisher", PublisherType.OCCULT),
+        ("Samizdat dead drop", PublisherType.SAMIZDAT),
+        ("Vanity press directly from author", PublisherType.VANITY),
+        ("Previously deemed lost", PublisherType.LOST),
+        ("Declassified document from FOIA request", PublisherType.GOVERNMENT),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert PublisherType(value) is member
 

@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.player import RainbowPlayer
@@ -28,11 +29,14 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("Gabriel Walsh", RainbowPlayer.GABE),
-    ("Josh Plotner", RainbowPlayer.JOSH),
-    ("Remez", RainbowPlayer.REMEZ),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("Gabriel Walsh", RainbowPlayer.GABE),
+        ("Josh Plotner", RainbowPlayer.JOSH),
+        ("Remez", RainbowPlayer.REMEZ),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert RainbowPlayer(value) is member
 
@@ -55,4 +59,3 @@ def test_values_are_unique():
 def test_enum_members_are_enum_instances():
     assert isinstance(RainbowPlayer.GABE, enum.Enum)
     assert isinstance(RainbowPlayer.GRAHAM, enum.Enum)
-

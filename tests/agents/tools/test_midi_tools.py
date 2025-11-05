@@ -10,7 +10,9 @@ class FakeState:
 
 
 def test_midi_processor_adds_midi_data_when_missing():
-    state = FakeState(cut_up_fragments=["frag1", "frag2", "frag3"], session_id="sess123")
+    state = FakeState(
+        cut_up_fragments=["frag1", "frag2", "frag3"], session_id="sess123"
+    )
     proc = MidiProcessor()
     out = proc(state)
 

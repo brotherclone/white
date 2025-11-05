@@ -1,14 +1,8 @@
 import pytest
+
 from app.structures.concepts.rainbow_table_color import (
-    RainbowColorModes,
-    RainbowTableTransmigrationalMode,
-    RainbowTableColor,
-    RainbowColorTemporalMode,
-    RainbowColorObjectionalMode,
-    RainbowColorOntologicalMode,
-    get_rainbow_table_color,
-    the_rainbow_table_colors,
-)
+    RainbowColorModes, RainbowColorOntologicalMode,
+    RainbowTableTransmigrationalMode, get_rainbow_table_color)
 
 
 def test_enum_str_and_repr():
@@ -53,4 +47,3 @@ def test_ontological_mode_str_and_repr():
     mode = RainbowColorOntologicalMode.KNOWN
     assert str(mode) == "Known"
     assert "RainbowColorOntologicalMode.KNOWN" in repr(mode)
-

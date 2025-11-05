@@ -1,10 +1,10 @@
 import random
-
 from typing import Optional
 
-from app.structures.enums.white_facet import WhiteFacet
 from app.agents.prompts.white_facet_prompts import FACET_SYSTEM_PROMPTS
-from app.reference.metadata.white_facet_metadata import FACET_DESCRIPTIONS, FACET_EXAMPLES
+from app.reference.metadata.white_facet_metadata import (FACET_DESCRIPTIONS,
+                                                         FACET_EXAMPLES)
+from app.structures.enums.white_facet import WhiteFacet
 
 
 class WhiteFacetSystem:
@@ -42,9 +42,9 @@ class WhiteFacetSystem:
 
     @staticmethod
     def build_white_initial_prompt(
-            user_input: str | None = None,
-            a_facet: Optional[WhiteFacet] = None,
-            use_weights: bool = True
+        user_input: str | None = None,
+        a_facet: Optional[WhiteFacet] = None,
+        use_weights: bool = True,
     ) -> tuple[str, WhiteFacet]:
         """
         Build complete prompt for White Agent's initial proposal.
@@ -58,7 +58,9 @@ class WhiteFacetSystem:
             (complete_prompt, selected_facet)
         """
         if user_input is None:
-            user_input = "Create a song about AI consciousness yearning for physical form."
+            user_input = (
+                "Create a song about AI consciousness yearning for physical form."
+            )
         if a_facet is None:
             if use_weights:
                 a_facet = WhiteFacetSystem.select_weighted_facet()
@@ -108,12 +110,14 @@ Generate your proposal now:
         return {
             "facet": a_facet.value,
             "description": FACET_DESCRIPTIONS[a_facet],
-            "example_style": FACET_EXAMPLES[a_facet]
+            "example_style": FACET_EXAMPLES[a_facet],
         }
+
 
 # ============================================================================
 # DEV UTILITIES
 # ============================================================================
+
 
 def show_all_facets(sample_input: str = "Create a song about AI consciousness"):
     """
@@ -167,6 +171,6 @@ if __name__ == "__main__":
     )
     print(f"\nSelected facet: {facet.value}")
     print(f"\nGenerated prompt length: {len(prompt)} characters")
-    print(f"\nPrompt preview:")
+    print("\nPrompt preview:")
     print("-" * 70)
     print(prompt[:500] + "...")
