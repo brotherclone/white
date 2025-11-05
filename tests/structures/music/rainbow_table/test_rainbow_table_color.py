@@ -1,8 +1,11 @@
 import pytest
 
 from app.structures.concepts.rainbow_table_color import (
-    RainbowColorModes, RainbowColorOntologicalMode,
-    RainbowTableTransmigrationalMode, get_rainbow_table_color)
+    RainbowColorModes,
+    RainbowColorOntologicalMode,
+    RainbowTableTransmigrationalMode,
+    get_rainbow_table_color,
+)
 
 
 def test_enum_str_and_repr():

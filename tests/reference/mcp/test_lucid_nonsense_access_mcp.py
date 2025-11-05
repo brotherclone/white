@@ -34,8 +34,7 @@ def test_get_base_path_default():
 
 def test_search_white_project_files():
     """Test searching for white project files"""
-    from app.reference.mcp.lucid_nonsense_access.main import \
-        search_white_project_files
+    from app.reference.mcp.lucid_nonsense_access.main import search_white_project_files
 
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create some test files
@@ -57,8 +56,7 @@ def test_search_white_project_files():
 
 def test_search_white_project_files_error():
     """Test error handling when directory doesn't exist"""
-    from app.reference.mcp.lucid_nonsense_access.main import \
-        search_white_project_files
+    from app.reference.mcp.lucid_nonsense_access.main import search_white_project_files
 
     with patch(
         "app.reference.mcp.lucid_nonsense_access.main.get_base_path"
@@ -72,8 +70,7 @@ def test_search_white_project_files_error():
 
 def test_open_lucid_nonsense_file():
     """Test opening and reading a file"""
-    from app.reference.mcp.lucid_nonsense_access.main import \
-        open_lucid_nonsense_file
+    from app.reference.mcp.lucid_nonsense_access.main import open_lucid_nonsense_file
 
     with tempfile.TemporaryDirectory() as tmpdir:
         test_file = Path(tmpdir, "test.txt")
@@ -92,8 +89,7 @@ def test_open_lucid_nonsense_file():
 
 def test_open_lucid_nonsense_file_security():
     """Test security check prevents path traversal"""
-    from app.reference.mcp.lucid_nonsense_access.main import \
-        open_lucid_nonsense_file
+    from app.reference.mcp.lucid_nonsense_access.main import open_lucid_nonsense_file
 
     with tempfile.TemporaryDirectory() as tmpdir:
         with patch(
@@ -107,8 +103,7 @@ def test_open_lucid_nonsense_file_security():
 
 def test_open_lucid_nonsense_file_not_found():
     """Test error when file doesn't exist"""
-    from app.reference.mcp.lucid_nonsense_access.main import \
-        open_lucid_nonsense_file
+    from app.reference.mcp.lucid_nonsense_access.main import open_lucid_nonsense_file
 
     with tempfile.TemporaryDirectory() as tmpdir:
         with patch(

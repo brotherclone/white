@@ -3,9 +3,10 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.structures.concepts.rainbow_table_color import (
-    RainbowTableColor, get_rainbow_table_color)
-from app.structures.manifests.manifest_song_structure import \
-    ManifestSongStructure
+    RainbowTableColor,
+    get_rainbow_table_color,
+)
+from app.structures.manifests.manifest_song_structure import ManifestSongStructure
 from app.structures.manifests.manifest_sounds_like import ManifestSoundsLike
 from app.structures.manifests.manifest_track import ManifestTrack
 from app.structures.music.core.duration import Duration

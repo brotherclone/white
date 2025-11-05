@@ -2,8 +2,9 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from app.structures.music.rainbow_table.raindbow_audio_feature import \
-    RainbowAudioFeature
+from app.structures.music.rainbow_table.raindbow_audio_feature import (
+    RainbowAudioFeature,
+)
 
 
 def test_rainbow_audio_feature():

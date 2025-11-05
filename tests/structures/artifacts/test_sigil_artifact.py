@@ -1,6 +1,5 @@
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.artifacts.text_chain_artifact_file import \
-    TextChainArtifactFile
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType

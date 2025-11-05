@@ -1,5 +1,4 @@
-from app.structures.music.rainbow_table.rainbow_table_song import \
-    RainbowTableSong
+from app.structures.music.rainbow_table.rainbow_table_song import RainbowTableSong
 
 
 def test_rainbow_table_song():

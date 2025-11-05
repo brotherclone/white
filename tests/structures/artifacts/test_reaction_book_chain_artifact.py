@@ -2,10 +2,10 @@ import pytest
 from pydantic import ValidationError
 
 from app.structures.artifacts.book_data import BookData
-from app.structures.artifacts.reaction_book_chain_artifact import \
-    ReactionBookChainArtifact
-from app.structures.artifacts.text_chain_artifact_file import \
-    TextChainArtifactFile
+from app.structures.artifacts.reaction_book_chain_artifact import (
+    ReactionBookChainArtifact,
+)
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.enums.book_condition import BookCondition
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.publisher_type import PublisherType

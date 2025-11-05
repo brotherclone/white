@@ -14,14 +14,11 @@ from app.agents.tools.book_tool import BookMaker
 from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.artifacts.book_artifact import (BookArtifact,
-                                                    ReactionBookArtifact)
+from app.structures.artifacts.book_artifact import BookArtifact, ReactionBookArtifact
 from app.structures.artifacts.book_data import BookData, BookDataPageCollection
-from app.structures.artifacts.text_chain_artifact_file import \
-    TextChainArtifactFile
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.concepts.book_evaluation import BookEvaluationDecision
-from app.structures.concepts.rainbow_table_color import \
-    the_rainbow_table_colors
+from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals

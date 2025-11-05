@@ -7,11 +7,13 @@ from hypothesis import strategies as st
 
 from app.structures.artifacts.book_artifact import BookArtifact
 from app.structures.artifacts.book_data import BookData
-from app.structures.artifacts.text_chain_artifact_file import \
-    TextChainArtifactFile
+from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import (
-    RainbowColorObjectionalMode, RainbowColorOntologicalMode,
-    RainbowColorTemporalMode, RainbowTableColor)
+    RainbowColorObjectionalMode,
+    RainbowColorOntologicalMode,
+    RainbowColorTemporalMode,
+    RainbowTableColor,
+)
 from tests.mocks.mock_tests.mock_utils import normalize_book_data_enums
 
 

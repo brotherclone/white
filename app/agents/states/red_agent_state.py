@@ -1,5 +1,4 @@
-from app.structures.agents.base_rainbow_agent_state import \
-    BaseRainbowAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.structures.artifacts.book_artifact import BookArtifact
 from app.structures.artifacts.book_data import BookData
 

@@ -5,8 +5,10 @@ from pathlib import Path
 import pytest
 import yaml
 
-from app.util.manifest_validator import (validate_manifest_completeness,
-                                         validate_yaml_file)
+from app.util.manifest_validator import (
+    validate_manifest_completeness,
+    validate_yaml_file,
+)
 
 
 @pytest.fixture

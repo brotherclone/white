@@ -124,8 +124,9 @@ class TestManifestExtractorWithPlayers:
         """Test that all audio tracks are loaded with player attribution"""
         # Setup
         from app.structures.manifests.manifest import Manifest
-        from app.structures.manifests.manifest_song_structure import \
-            ManifestSongStructure
+        from app.structures.manifests.manifest_song_structure import (
+            ManifestSongStructure,
+        )
         from app.structures.manifests.manifest_track import ManifestTrack
 
         manifest_dict = mock_manifest_with_players.copy()

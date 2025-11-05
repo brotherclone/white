@@ -16,19 +16,18 @@ from langgraph.graph import StateGraph
 from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.tools.audio_tools import (
-    create_audio_mosaic_chain_artifact, create_blended_audio_chain_artifact,
-    get_audio_segments_as_chain_artifacts)
+    create_audio_mosaic_chain_artifact,
+    create_blended_audio_chain_artifact,
+    get_audio_segments_as_chain_artifacts,
+)
 from app.agents.tools.magick_tools import SigilTools
-from app.agents.tools.speech_tools import \
-    chain_artifact_file_from_speech_to_text
+from app.agents.tools.speech_tools import chain_artifact_file_from_speech_to_text
 from app.reference.mcp.todoist.main import create_sigil_charging_task
 from app.structures.agents.agent_settings import AgentSettings
-from app.structures.agents.base_rainbow_agent import (BaseRainbowAgent,
-                                                      skip_chance)
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.concepts.rainbow_table_color import \
-    the_rainbow_table_colors
+from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType

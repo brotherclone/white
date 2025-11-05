@@ -12,8 +12,7 @@ from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.yellow_agent_state import YellowAgentState
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.concepts.rainbow_table_color import \
-    the_rainbow_table_colors
+from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals
 

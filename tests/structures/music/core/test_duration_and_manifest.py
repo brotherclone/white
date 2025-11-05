@@ -4,8 +4,7 @@ import pytest
 
 from app.structures.concepts.rainbow_table_color import get_rainbow_table_color
 from app.structures.manifests.manifest import Manifest
-from app.structures.manifests.manifest_song_structure import \
-    ManifestSongStructure
+from app.structures.manifests.manifest_song_structure import ManifestSongStructure
 from app.structures.music.core.duration import Duration
 from app.structures.music.core.key_signature import get_mode
 from app.structures.music.core.notes import get_note
