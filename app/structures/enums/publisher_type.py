@@ -2,7 +2,6 @@ from enum import Enum
 
 
 class PublisherType(str, Enum):
-
     """Types of publishers for forbidden knowledge"""
 
     UNIVERSITY = "University imprint"

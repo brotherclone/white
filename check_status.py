@@ -8,6 +8,7 @@ Run this script to verify all fixes are in place and get started.
 import sys
 from pathlib import Path
 
+
 def check_files():
     """Check that all required files exist."""
     print("🔍 Checking file integrity...\n")
@@ -30,32 +31,31 @@ def check_files():
 
     return all_good
 
+
 def check_imports():
     """Check that key modules can be imported."""
     print("\n🔍 Checking imports...\n")
 
     try:
-        from app.agents.white_agent import WhiteAgent
         print("  ✓ WhiteAgent imported")
     except Exception as e:
         print(f"  ✗ Cannot import WhiteAgent: {e}")
         return False
 
     try:
-        from run_white_agent import ensure_state_object
         print("  ✓ ensure_state_object imported")
     except Exception as e:
         print(f"  ✗ Cannot import ensure_state_object: {e}")
         return False
 
     try:
-        from app.agents.states.white_agent_state import MainAgentState
         print("  ✓ MainAgentState imported")
     except Exception as e:
         print(f"  ✗ Cannot import MainAgentState: {e}")
         return False
 
     return True
+
 
 def check_fixes():
     """Check that both fixes are in place."""
@@ -86,29 +86,31 @@ def check_fixes():
 
     return True
 
+
 def show_quick_start():
     """Display quick start instructions."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎵 WHITE AGENT - READY TO USE")
-    print("="*60)
+    print("=" * 60)
     print("\nQUICK START:")
     print("\n  1. Start a new workflow:")
     print("     $ python run_white_agent.py start")
     print("\n  2. Complete the ritual tasks in Todoist")
     print("\n  3. Resume the workflow:")
     print("     $ python run_white_agent.py resume")
-    print("\n" + "-"*60)
+    print("\n" + "-" * 60)
     print("\nDOCUMENTATION:")
     print("  • Quick reference: QUICK_REFERENCE.txt")
     print("  • Complete guide: COMPLETE_FIX_GUIDE.md")
     print("  • Full docs: docs/WHITE_AGENT_USAGE.md")
     print("  • Status report: FINAL_STATUS_REPORT.txt")
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
+
 
 def main():
-    print("\n" + "╔" + "="*58 + "╗")
-    print("║" + " "*15 + "WHITE AGENT STATUS CHECK" + " "*19 + "║")
-    print("╚" + "="*58 + "╝\n")
+    print("\n" + "╔" + "=" * 58 + "╗")
+    print("║" + " " * 15 + "WHITE AGENT STATUS CHECK" + " " * 19 + "║")
+    print("╚" + "=" * 58 + "╝\n")
 
     files_ok = check_files()
     imports_ok = check_imports()
@@ -123,6 +125,6 @@ def main():
         print("\nPlease review the errors above and ensure all files are in place.")
         return 1
 
+
 if __name__ == "__main__":
     sys.exit(main())
-

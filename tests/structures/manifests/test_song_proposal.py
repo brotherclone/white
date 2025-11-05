@@ -1,10 +1,11 @@
-import yaml
-import pytest
 from pathlib import Path
 
+import pytest
+import yaml
 from pydantic import ValidationError
 
-from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
+from app.structures.manifests.song_proposal import (SongProposal,
+                                                    SongProposalIteration)
 
 
 def valid_iteration_data(**overrides):
@@ -20,7 +21,7 @@ def valid_iteration_data(**overrides):
             "mnemonic_character_value": "I",
             "temporal_mode": "Future",
             "ontological_mode": ["Imagined"],
-            "objectional_mode": "Person"
+            "objectional_mode": "Person",
         },
         "title": "A Valid Title",
         "mood": ["yearning"],

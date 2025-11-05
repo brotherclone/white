@@ -1,6 +1,7 @@
 from enum import Enum
 
-class NoiseType(str,Enum):
+
+class NoiseType(str, Enum):
     WHITE = "white"
     PINK = "pink"
     BROWN = "brown"

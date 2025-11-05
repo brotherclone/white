@@ -2,7 +2,8 @@ from typing import List
 
 from app.structures.artifacts.base_chain_artifact import ChainArtifact
 from app.structures.artifacts.book_data import BookData
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.artifacts.text_chain_artifact_file import \
+    TextChainArtifactFile
 
 
 class BookChainArtifact(ChainArtifact):

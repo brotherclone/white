@@ -1,15 +1,19 @@
 import os
+
 import pytest
 
-from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
-from app.structures.artifacts.image_chain_artifact_file import ImageChainArtifactFile
+from app.structures.artifacts.audio_chain_artifact_file import \
+    AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
+from app.structures.artifacts.image_chain_artifact_file import \
+    ImageChainArtifactFile
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.structures.enums.sigil_type import SigilType
-from app.structures.enums.sigil_state import SigilState
+from app.structures.artifacts.text_chain_artifact_file import \
+    TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import get_rainbow_table_color
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.sigil_state import SigilState
+from app.structures.enums.sigil_type import SigilType
 
 
 # Shared fixture (module-scoped) - mirrors the models folder setup
@@ -28,7 +32,7 @@ def shared(tmp_path_factory):
             thread_id=thread_id,
             base_path=base,
             rainbow_color=color,
-            chain_artifact_file_type=ChainArtifactFileType.AUDIO
+            chain_artifact_file_type=ChainArtifactFileType.AUDIO,
         )
         defaults.update(kwargs)
         return AudioChainArtifactFile(**defaults)
@@ -41,7 +45,7 @@ def shared(tmp_path_factory):
             thread_id=thread_id,
             base_path=base,
             chain_artifact_file_type=ChainArtifactFileType.JSON,
-            text_content="transcript"
+            text_content="transcript",
         )
         defaults.update(kwargs)
         return TextChainArtifactFile(**defaults)
@@ -68,7 +72,7 @@ def shared(tmp_path_factory):
         transcript=transcript,
         audio_mosiac=audio1,
         noise_blended_audio=audio2,
-        thread_id=thread_id
+        thread_id=thread_id,
     )
 
     sig = SigilArtifact(
@@ -79,7 +83,7 @@ def shared(tmp_path_factory):
         sigil_type=SigilType.WORD_METHOD,
         glyph_description="simple glyph",
         activation_state=SigilState.CREATED,
-        charging_instructions="do the thing"
+        charging_instructions="do the thing",
     )
 
     return dict(
@@ -113,7 +117,9 @@ def test_get_artifact_path_without_file_name_and_with_file_flag(shared):
     # when with_file_name=False we expect base/thread/type (no filename appended)
     ac = shared["make_audio"](file_name=None)
     p = ac.get_artifact_path(with_file_name=False)
-    assert p == os.path.join(shared["base"], shared["thread_id"], ChainArtifactFileType.AUDIO.value)
+    assert p == os.path.join(
+        shared["base"], shared["thread_id"], ChainArtifactFileType.AUDIO.value
+    )
 
 
 def test_get_artifact_path_missing_color_and_string_type(tmp_path):
@@ -124,10 +130,12 @@ def test_get_artifact_path_missing_color_and_string_type(tmp_path):
         base_path=base,
         rainbow_color=None,
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-        file_name=None
+        file_name=None,
     )
     p = ac.get_artifact_path()
-    expected = os.path.join(base, "thread-1", ChainArtifactFileType.AUDIO.value, "unknown.txt")
+    expected = os.path.join(
+        base, "thread-1", ChainArtifactFileType.AUDIO.value, "unknown.txt"
+    )
     assert p == expected
 
 
@@ -139,22 +147,30 @@ def test_get_artifact_path_uses_env_when_base_empty(monkeypatch, tmp_path):
         base_path="",
         rainbow_color=None,
         chain_artifact_file_type=ChainArtifactFileType.JSON,
-        artifact_name="data"
+        artifact_name="data",
     )
     p = ac.get_artifact_path()
-    expected = os.path.join(env_base, "thread-1", ChainArtifactFileType.JSON.value, ac.file_name)
+    expected = os.path.join(
+        env_base, "thread-1", ChainArtifactFileType.JSON.value, ac.file_name
+    )
     assert p == expected
 
 
 def test_text_image_audio_model_defaults(shared):
-    text = shared["make_text"](text_content="hello", artifact_name="doc", chain_artifact_file_type=ChainArtifactFileType.MARKDOWN)
+    text = shared["make_text"](
+        text_content="hello",
+        artifact_name="doc",
+        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+    )
     assert getattr(text, "text_content", None) == "hello"
     assert getattr(text, "file_name", "").endswith(".md")
 
     img = shared["make_image"](artifact_name="img")
     assert getattr(img, "file_name", "").endswith(".png")
 
-    audio = shared["make_audio"](artifact_name="test", chain_artifact_file_type=ChainArtifactFileType.AUDIO)
+    audio = shared["make_audio"](
+        artifact_name="test", chain_artifact_file_type=ChainArtifactFileType.AUDIO
+    )
     # allow for renamed sample rate property; default expected value preserved
     assert getattr(audio, "sample_rate", getattr(audio, "samplerate", 44100)) == 44100
 
@@ -170,11 +186,14 @@ def test_evp_and_sigil_artifact_instantiation(shared):
 
 
 # --- Color variation tests ---
-@pytest.mark.parametrize("color_key, expected_col", [
-    ("R", "red"),
-    ("G", "green"),
-    (None, "transparent"),
-])
+@pytest.mark.parametrize(
+    "color_key, expected_col",
+    [
+        ("R", "red"),
+        ("G", "green"),
+        (None, "transparent"),
+    ],
+)
 def test_file_name_generation_for_color_variations(tmp_path, color_key, expected_col):
     base = str(tmp_path)
     artifact_id = "artifact-42"
@@ -199,7 +218,11 @@ def test_file_name_generation_for_color_variations(tmp_path, color_key, expected
 
     # and the artifact path should include the file_name when with_file_name=True
     p = ac.get_artifact_path()
-    assert p.endswith("/" + ChainArtifactFileType.AUDIO.value + "/" + expected_file_name) or p.endswith("\\" + ChainArtifactFileType.AUDIO.value + "\\" + expected_file_name)
+    assert p.endswith(
+        "/" + ChainArtifactFileType.AUDIO.value + "/" + expected_file_name
+    ) or p.endswith(
+        "\\" + ChainArtifactFileType.AUDIO.value + "\\" + expected_file_name
+    )
 
 
 # --- Edge cases ---
@@ -239,9 +262,20 @@ def test_get_artifact_path_raises_when_chain_artifact_file_type_missing(tmp_path
 
 # --- Permutations (artifact id provided vs generated, multiple colors and file types) ---
 @pytest.mark.parametrize("artifact_provided", [True, False])
-@pytest.mark.parametrize("color_key, expected_col", [("R", "red"), ("G", "green"), (None, "transparent")])
-@pytest.mark.parametrize("file_type", [ChainArtifactFileType.AUDIO, ChainArtifactFileType.JSON, ChainArtifactFileType.MARKDOWN])
-def test_file_name_permutations(tmp_path, artifact_provided, color_key, expected_col, file_type):
+@pytest.mark.parametrize(
+    "color_key, expected_col", [("R", "red"), ("G", "green"), (None, "transparent")]
+)
+@pytest.mark.parametrize(
+    "file_type",
+    [
+        ChainArtifactFileType.AUDIO,
+        ChainArtifactFileType.JSON,
+        ChainArtifactFileType.MARKDOWN,
+    ],
+)
+def test_file_name_permutations(
+    tmp_path, artifact_provided, color_key, expected_col, file_type
+):
     base = str(tmp_path)
     artifact_id = "artifact-42"
     artifact_name = "mytrack"
@@ -283,4 +317,3 @@ def test_file_name_permutations(tmp_path, artifact_provided, color_key, expected
     # with file name included, path should end with file type directory + file_name
     p = ac.get_artifact_path()
     assert p.endswith(os.path.join(file_type.value, ac.file_name))
-

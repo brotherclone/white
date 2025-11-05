@@ -1,17 +1,14 @@
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+
 class BookEvaluationDecision(BaseModel):
     """Decision about what to do next with books"""
 
-    new_book: bool = Field(
-        description="Should we generate a new book?"
-    )
+    new_book: bool = Field(description="Should we generate a new book?")
     reaction_book: bool = Field(
         description="Should we generate a reaction book to an existing book?"
     )
-    done: bool = Field(
-        description="Are we done generating books?"
-    )
+    done: bool = Field(description="Are we done generating books?")
 
     @field_validator("*", mode="before")
     def ensure_bool(cls, v):

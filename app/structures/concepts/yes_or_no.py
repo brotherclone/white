@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class YesOrNo(BaseModel):
 
     answer: bool

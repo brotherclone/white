@@ -1,6 +1,6 @@
 import numpy as np
-
 from pydantic import BaseModel
+
 
 class RainbowAudioFeature(BaseModel):
 
@@ -19,19 +19,17 @@ class RainbowAudioFeature(BaseModel):
     spectral_centroid: float | None = None
     zero_crossing_rate: float | None = None
     tempo: float | None = None
-    mfcc: np.ndarray | None = None # type: ignore
-    chroma: np.ndarray | None = None # type: ignore
-    spectral_contrast: np.ndarray | None = None # type: ignore
-    onset_frames: np.ndarray | None = None # type: ignore
-    onset_strength: np.ndarray | None = None # type: ignore
+    mfcc: np.ndarray | None = None  # type: ignore
+    chroma: np.ndarray | None = None  # type: ignore
+    spectral_contrast: np.ndarray | None = None  # type: ignore
+    onset_frames: np.ndarray | None = None  # type: ignore
+    onset_strength: np.ndarray | None = None  # type: ignore
     harmonic_ratio: float | None = None
     attack_time: float | None = None
-    decay_profile: np.ndarray | None = None # type: ignore
+    decay_profile: np.ndarray | None = None  # type: ignore
     silence_confidence: float | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
 
-    model_config = {
-        "arbitrary_types_allowed": True
-    }
+    model_config = {"arbitrary_types_allowed": True}

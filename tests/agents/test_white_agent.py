@@ -1,9 +1,13 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
+from app.agents.states.white_agent_state import MainAgentState
 from app.agents.white_agent import WhiteAgent
 from app.structures.agents.agent_settings import AgentSettings
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
-from app.agents.states.white_agent_state import MainAgentState
+from app.structures.manifests.song_proposal import (SongProposal,
+                                                    SongProposalIteration)
+
 
 def test_white_agent_initialization():
     agent = WhiteAgent()
@@ -12,11 +16,15 @@ def test_white_agent_initialization():
     assert isinstance(agent.processors, dict)
     assert isinstance(agent.song_proposal, SongProposal)
 
-@pytest.mark.parametrize("input_val,expected_type", [
-    (SongProposal(iterations=[]), SongProposal),
-    ({"iterations": []}, SongProposal),
-    (None, SongProposal),
-])
+
+@pytest.mark.parametrize(
+    "input_val,expected_type",
+    [
+        (SongProposal(iterations=[]), SongProposal),
+        ({"iterations": []}, SongProposal),
+        (None, SongProposal),
+    ],
+)
 def test_normalize_song_proposal(input_val, expected_type):
     result = WhiteAgent._normalize_song_proposal(input_val)
     assert isinstance(result, expected_type)
@@ -36,7 +44,9 @@ def test_resume_after_black_agent_ritual(monkeypatch):
     """Test resuming workflow after black agent ritual completion"""
 
     monkeypatch.setenv("MOCK_MODE", "true")
-    with patch("app.agents.white_agent.resume_black_agent_workflow_with_agent") as mock_resume:
+    with patch(
+        "app.agents.white_agent.resume_black_agent_workflow_with_agent"
+    ) as mock_resume:
         mock_resume.return_value = {
             "counter_proposal": SongProposalIteration(
                 iteration_id="mock_123",
@@ -45,11 +55,11 @@ def test_resume_after_black_agent_ritual(monkeypatch):
                 key="C Major",
                 rainbow_color="black",
                 title="Black Counter Proposal",
-                mood=['dark'],
-                genres=['experimental'],
-                concept="Mock counter proposal concept. " * 10
+                mood=["dark"],
+                genres=["experimental"],
+                concept="Mock counter proposal concept. " * 10,
             ),
-            "artifacts": []
+            "artifacts": [],
         }
 
         agent = WhiteAgent()
@@ -62,9 +72,12 @@ def test_resume_after_black_agent_ritual(monkeypatch):
             artifacts=[],
             pending_human_action={
                 "agent": "black",
-                "black_config": {"configurable": {"thread_id": "test-thread-123"}}
-            }
+                "black_config": {"configurable": {"thread_id": "test-thread-123"}},
+            },
         )
         updated_state = agent.resume_after_black_agent_ritual(state, verify_tasks=False)
         assert updated_state.workflow_paused is False
-        assert updated_state.song_proposals.iterations[-1].title == "Black Counter Proposal"
+        assert (
+            updated_state.song_proposals.iterations[-1].title
+            == "Black Counter Proposal"
+        )

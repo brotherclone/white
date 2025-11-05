@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from app.structures.concepts.book_evaluation import BookEvaluationDecision
 
 

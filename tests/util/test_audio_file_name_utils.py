@@ -1,5 +1,3 @@
-import os
-from pathlib import Path
 from app.util import audio_file_name_utils as au
 
 
@@ -24,4 +22,3 @@ def test_rename_mid_audio_extensions(tmp_path):
     assert (root / "song2.aif").exists()
     # unchanged file remains
     assert (root / "already.wav").exists()
-

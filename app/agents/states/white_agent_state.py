@@ -1,11 +1,12 @@
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any, Dict, List, Optional
 
-from app.structures.manifests.song_proposal import SongProposal
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.structures.enums.white_facet import WhiteFacet
+from app.structures.manifests.song_proposal import SongProposal
+
 
 class MainAgentState(BaseModel):
-
     """
     Main state for White Agent (supervisor) coordinating all rainbow agents.
     """

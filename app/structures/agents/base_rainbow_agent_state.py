@@ -1,9 +1,11 @@
 import uuid
-from typing import List, Optional, Any
+from typing import Any, List, Optional
+
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field
 
-from app.structures.manifests.song_proposal import SongProposalIteration, SongProposal
+from app.structures.manifests.song_proposal import (SongProposal,
+                                                    SongProposalIteration)
 
 
 class BaseRainbowAgentState(BaseModel):
@@ -20,4 +22,3 @@ class BaseRainbowAgentState(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
-

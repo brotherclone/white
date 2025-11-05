@@ -1,4 +1,5 @@
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.agents.base_rainbow_agent_state import \
+    BaseRainbowAgentState
 
 
 class IndigoAgentState(BaseRainbowAgentState):

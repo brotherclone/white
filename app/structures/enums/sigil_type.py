@@ -1,7 +1,7 @@
 from enum import Enum
 
-class SigilType(str, Enum):
 
+class SigilType(str, Enum):
     """Different approaches to sigil creation"""
 
     WORD_METHOD = "word_method"

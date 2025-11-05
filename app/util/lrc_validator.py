@@ -1,7 +1,8 @@
+import os
 import re
 import sys
-import os
-from typing import Tuple, List
+from typing import List, Tuple
+
 from pydantic import BaseModel
 
 
@@ -21,15 +22,15 @@ class LRCValidator(BaseModel):
         errors = []
 
         # Check for required metadata
-        if not re.search(r'\[ti:\s*.+?\]', lrc_content):
+        if not re.search(r"\[ti:\s*.+?\]", lrc_content):
             errors.append("Missing title metadata [ti: title]")
-        if not re.search(r'\[ar:\s*.+?\]', lrc_content):
+        if not re.search(r"\[ar:\s*.+?\]", lrc_content):
             errors.append("Missing artist metadata [ar: artist]")
-        if not re.search(r'\[al:\s*.+?\]', lrc_content):
+        if not re.search(r"\[al:\s*.+?\]", lrc_content):
             errors.append("Missing album metadata [al: album]")
 
         # Extract and validate timestamps
-        timestamp_pattern = r'\[(\d{2}):(\d{2}\.\d{3})\]'
+        timestamp_pattern = r"\[(\d{2}):(\d{2}\.\d{3})\]"
         timestamps = []
 
         for i, line in enumerate(lrc_content.splitlines()):
@@ -48,7 +49,8 @@ class LRCValidator(BaseModel):
             for curr_time, curr_str, line_num in timestamps:
                 if curr_time < prev_time:
                     errors.append(
-                        f"Non-sequential timestamp at line {line_num}: {curr_str} comes before {prev_str} at line {prev_line}")
+                        f"Non-sequential timestamp at line {line_num}: {curr_str} comes before {prev_str} at line {prev_line}"
+                    )
 
                 prev_time, prev_str, prev_line = curr_time, curr_str, line_num
 
@@ -64,9 +66,9 @@ if __name__ == "__main__":
     validator = LRCValidator()
     for root, _, files in os.walk(directory_path):
         for file in files:
-            if file.endswith('.lrc'):
+            if file.endswith(".lrc"):
                 file_path = os.path.join(root, file)
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
                 is_valid, errors = validator.validate(content)
                 if is_valid:

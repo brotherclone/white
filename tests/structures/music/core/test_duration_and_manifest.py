@@ -1,16 +1,15 @@
-import pytest
 from datetime import datetime
-from app.structures.music.core.duration import Duration
-from app.structures.music.core.time_signature import TimeSignature
-from app.structures.manifests.manifest_song_structure import ManifestSongStructure
-from app.structures.manifests.manifest import Manifest
-from app.structures.manifests.manifest_sounds_like import ManifestSoundsLike
-from app.structures.manifests.manifest_track import ManifestTrack
-from app.structures.manifests.manifest_song_structure import ManifestSongStructure
-from app.structures.music.core.duration import Duration
+
+import pytest
+
 from app.structures.concepts.rainbow_table_color import get_rainbow_table_color
-from app.structures.music.core.notes import get_note
+from app.structures.manifests.manifest import Manifest
+from app.structures.manifests.manifest_song_structure import \
+    ManifestSongStructure
+from app.structures.music.core.duration import Duration
 from app.structures.music.core.key_signature import get_mode
+from app.structures.music.core.notes import get_note
+from app.structures.music.core.time_signature import TimeSignature
 
 
 def test_duration_str_formatting():
@@ -24,7 +23,11 @@ def test_time_signature_invalid_denominator_raises():
 
 
 def test_manifest_song_structure_duration_conversion_and_mapping():
-    ms = ManifestSongStructure(section_name="verse", start_time={"minutes": 0, "seconds": 5.0}, end_time={"minutes": 0, "seconds": 25.0})
+    ms = ManifestSongStructure(
+        section_name="verse",
+        start_time={"minutes": 0, "seconds": 5.0},
+        end_time={"minutes": 0, "seconds": 25.0},
+    )
     # ensure validator converted dict to Duration
     assert isinstance(ms.start_time, Duration)
     assert str(ms.start_time) == "[00:05.000]"
@@ -186,8 +189,6 @@ def test_manifest_tempo_invalid_keeps_string():
 
 
 def test_get_note_and_get_mode_invalid_raise():
-    from app.structures.music.core.notes import get_note
-    from app.structures.music.core.key_signature import get_mode
     with pytest.raises(ValueError):
         get_note("H")
     with pytest.raises(ValueError):

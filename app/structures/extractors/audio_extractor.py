@@ -1,14 +1,16 @@
-import librosa
 import os
+from pathlib import Path
+from typing import Any, Dict
+
+import librosa
 import numpy as np
 import pandas as pd
-from librosa import feature, beat
-from pathlib import Path
 from dotenv import load_dotenv
-from typing import Dict, Any
 
-from app.structures.music.rainbow_table.raindbow_audio_feature import RainbowAudioFeature
+from app.structures.music.rainbow_table.raindbow_audio_feature import \
+    RainbowAudioFeature
 from app.util.manifest_loader import load_manifest
+
 
 class AudioExtractor:
     """Standalone audio feature extractor"""
@@ -18,9 +20,7 @@ class AudioExtractor:
         self.manifest_id = manifest_id
         self.sample_rate = sample_rate
         self.manifest_path = os.path.join(
-            os.environ['MANIFEST_PATH'],
-            manifest_id,
-            f"{manifest_id}.yml"
+            os.environ["MANIFEST_PATH"], manifest_id, f"{manifest_id}.yml"
         )
 
         if os.path.exists(self.manifest_path):
@@ -28,70 +28,43 @@ class AudioExtractor:
         else:
             self.manifest = None
 
-    def extract_segment_features(self, audio_path: str, start_time: float, end_time: float) -> Dict[str, Any]:
+    def extract_segment_features(
+        self, audio_path: str, start_time: float, end_time: float
+    ) -> Dict[str, Any]:
         """Extract audio features for a specific time segment - this is the method ManifestExtractor expects"""
         try:
             rainbow_features = self.load_audio_segment(audio_path, start_time, end_time)
             # Convert RainbowAudioFeature to dictionary format expected by ManifestExtractor
             return {
-                'rms_energy': getattr(rainbow_features, 'rms_energy', 0.0),
-                'spectral_centroid': getattr(rainbow_features, 'spectral_centroid', 0.0),
-                'attack_time': getattr(rainbow_features, 'attack_time', 0.0),
-                'decay_profile': getattr(rainbow_features, 'decay_profile', [])
+                "rms_energy": getattr(rainbow_features, "rms_energy", 0.0),
+                "spectral_centroid": getattr(
+                    rainbow_features, "spectral_centroid", 0.0
+                ),
+                "attack_time": getattr(rainbow_features, "attack_time", 0.0),
+                "decay_profile": getattr(rainbow_features, "decay_profile", []),
             }
         except Exception as e:
             print(f"Error in extract_segment_features: {e}")
             return {
-                'rms_energy': 0.0,
-                'spectral_centroid': 0.0,
-                'attack_time': 0.0,
-                'decay_profile': []
+                "rms_energy": 0.0,
+                "spectral_centroid": 0.0,
+                "attack_time": 0.0,
+                "decay_profile": [],
             }
 
-    def load_audio_segment(self, audio_path: str, start_time: float, end_time: float,
-                           silence_threshold_db: float = -40.0, min_non_silence_ratio: float = 0.1) -> RainbowAudioFeature:
-        """Extract audio features for a temporal segment with silence detection"""
-        try:
-            # Load the full audio file
-            y, sr = librosa.load(audio_path, sr=self.sample_rate)
-
-            # Convert time to sample indices
-            start_sample = int(start_time * sr)
-            end_sample = int(end_time * sr)
-
-            # Extract the segment
-            segment = y[start_sample:end_sample]
-
-            if len(segment) == 0:
-                return self._empty_audio_features()
-
-            # Analyze silence content
-            silence_analysis = self._analyze_silence(segment, sr, silence_threshold_db)
-
-            # If segment is mostly silence, mark it appropriately
-            if silence_analysis['non_silence_ratio'] < min_non_silence_ratio:
-                audio_features = self._create_silence_features(audio_path, start_time, end_time, segment, silence_analysis)
-            else:
-                # Process as normal audio segment
-                audio_features = self._create_audio_features(audio_path, start_time, end_time, segment, sr, silence_analysis)
-
-            return audio_features
-
-        except Exception as e:
-            print(f"Error loading audio segment {start_time:.3f}s-{end_time:.3f}s: {e}")
-            return self._empty_audio_features()
-
     @staticmethod
-    def _analyze_silence(segment: np.ndarray, sr: int, threshold_db: float) -> Dict[str, Any]:
+    def _analyze_silence(
+        segment: np.ndarray, sr: int, threshold_db: float
+    ) -> Dict[str, Any]:
         """Analyze silence patterns in an audio segment - returns dict, not RainbowAudioFeature"""
         if len(segment) == 0:
             return {
-                'is_mostly_silence': True,
-                'non_silence_ratio': 0.0,
-                'silence_gaps': [],
-                'non_silence_regions': [],
-                'peak_amplitude': 0.0,
-                'rms_energy': 0.0
+                "is_mostly_silence": True,
+                "non_silence_ratio": 0.0,
+                "silence_gaps": [],
+                "non_silence_regions": [],
+                "peak_amplitude": 0.0,
+                "rms_energy": 0.0,
             }
 
         # Convert to dB
@@ -102,13 +75,11 @@ class AudioExtractor:
         non_silent_frames = rms_db > threshold_db
         non_silence_ratio = np.sum(non_silent_frames) / len(non_silent_frames)
 
-        # Find silence gaps and non-silence regions
-        silence_gaps = []
-        non_silence_regions = []
-
         # Convert frame indices back to time
         hop_length = sr // 20
-        frame_times = librosa.frames_to_time(np.arange(len(non_silent_frames)), sr=sr, hop_length=hop_length)
+        frame_times = librosa.frames_to_time(
+            np.arange(len(non_silent_frames)), sr=sr, hop_length=hop_length
+        )
 
         # Find transitions
         transitions = np.diff(non_silent_frames.astype(int))
@@ -121,7 +92,9 @@ class AudioExtractor:
         if non_silent_frames[0]:
             non_silence_starts = np.concatenate([[0], non_silence_starts])
         if non_silent_frames[-1]:
-            non_silence_ends = np.concatenate([non_silence_ends, [len(non_silent_frames)]])
+            non_silence_ends = np.concatenate(
+                [non_silence_ends, [len(non_silent_frames)]]
+            )
 
         if not non_silent_frames[0]:
             silence_starts = np.concatenate([[0], silence_starts])
@@ -146,17 +119,22 @@ class AudioExtractor:
                 non_silence_time_ranges.append((range_start, range_end))
 
         return {
-            'is_mostly_silence': non_silence_ratio < 0.1,
-            'non_silence_ratio': float(non_silence_ratio),
-            'silence_gaps': silence_gap_durations,  # Now list of floats (durations)
-            'non_silence_regions': non_silence_time_ranges,  # List of (start, end) tuples
-            'peak_amplitude': float(np.max(np.abs(segment))),
-            'rms_energy': float(np.sqrt(np.mean(segment ** 2)))
+            "is_mostly_silence": non_silence_ratio < 0.1,
+            "non_silence_ratio": float(non_silence_ratio),
+            "silence_gaps": silence_gap_durations,  # Now list of floats (durations)
+            "non_silence_regions": non_silence_time_ranges,  # List of (start, end) tuples
+            "peak_amplitude": float(np.max(np.abs(segment))),
+            "rms_energy": float(np.sqrt(np.mean(segment**2))),
         }
 
     @staticmethod
-    def _create_silence_features(audio_path: str, start_time: float, end_time: float,
-                                 segment: np.ndarray, silence_analysis: Dict[str, Any]) -> RainbowAudioFeature:
+    def _create_silence_features(
+        audio_path: str,
+        start_time: float,
+        end_time: float,
+        segment: np.ndarray,
+        silence_analysis: Dict[str, Any],
+    ) -> RainbowAudioFeature:
         """Create features for a mostly-silent segment"""
         duration = end_time - start_time
         return RainbowAudioFeature(
@@ -166,7 +144,7 @@ class AudioExtractor:
             duration=duration,
             duration_samples=len(segment),
             is_mostly_silence=True,
-            rms_energy=silence_analysis.get('rms_energy', 0.0),
+            rms_energy=silence_analysis.get("rms_energy", 0.0),
             spectral_centroid=0.0,
             zero_crossing_rate=0.0,
             tempo=0.0,
@@ -178,16 +156,22 @@ class AudioExtractor:
             harmonic_ratio=0.0,
             attack_time=0.0,
             decay_profile=np.array([]),
-            silence_confidence=1.0 - silence_analysis.get('non_silence_ratio', 0.0),
-            non_silence_ratio=silence_analysis.get('non_silence_ratio', 0.0),
-            silence_gaps=silence_analysis.get('silence_gaps', []),
-            non_silence_regions=silence_analysis.get('non_silence_regions', []),
-            peak_amplitude=silence_analysis.get('peak_amplitude', 0.0)
+            silence_confidence=1.0 - silence_analysis.get("non_silence_ratio", 0.0),
+            non_silence_ratio=silence_analysis.get("non_silence_ratio", 0.0),
+            silence_gaps=silence_analysis.get("silence_gaps", []),
+            non_silence_regions=silence_analysis.get("non_silence_regions", []),
+            peak_amplitude=silence_analysis.get("peak_amplitude", 0.0),
         )
 
     @staticmethod
-    def _create_audio_features(audio_path: str, start_time: float, end_time: float,
-                               segment: np.ndarray, sr: int, silence_analysis: Dict[str, Any]) -> RainbowAudioFeature:
+    def _create_audio_features(
+        audio_path: str,
+        start_time: float,
+        end_time: float,
+        segment: np.ndarray,
+        sr: int,
+        silence_analysis: Dict[str, Any],
+    ) -> RainbowAudioFeature:
         """Create full audio features for non-silent segments"""
         duration = end_time - start_time
 
@@ -198,17 +182,25 @@ class AudioExtractor:
             rms_energy = 0.0
 
         try:
-            spectral_centroid = float(librosa.feature.spectral_centroid(y=segment, sr=sr).mean())
+            spectral_centroid = float(
+                librosa.feature.spectral_centroid(y=segment, sr=sr).mean()
+            )
         except Exception:
             spectral_centroid = 0.0
 
         try:
-            zero_crossing_rate = float(librosa.feature.zero_crossing_rate(segment).mean())
+            zero_crossing_rate = float(
+                librosa.feature.zero_crossing_rate(segment).mean()
+            )
         except Exception:
             zero_crossing_rate = 0.0
 
         try:
-            tempo = float(librosa.feature.rhythm.tempo(y=segment, sr=sr)[0]) if len(segment) > sr else 0
+            tempo = (
+                float(librosa.feature.rhythm.tempo(y=segment, sr=sr)[0])
+                if len(segment) > sr
+                else 0
+            )
         except Exception:
             tempo = 0.0
 
@@ -220,6 +212,7 @@ class AudioExtractor:
         # Handle chroma with tuning issues - suppress warnings
         try:
             import warnings
+
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", UserWarning)
                 chroma = librosa.feature.chroma_stft(y=segment, sr=sr).T
@@ -260,10 +253,10 @@ class AudioExtractor:
             harmonic_ratio=AudioExtractor._calculate_harmonic_ratio(segment),
             attack_time=AudioExtractor._calculate_attack_time(segment, sr),
             decay_profile=AudioExtractor._calculate_decay_profile(segment, sr),
-            non_silence_ratio=silence_analysis.get('non_silence_ratio', 0.0),
-            silence_gaps=silence_analysis.get('silence_gaps', []),
-            non_silence_regions=silence_analysis.get('non_silence_regions', []),
-            peak_amplitude=silence_analysis.get('peak_amplitude', 0.0)
+            non_silence_ratio=silence_analysis.get("non_silence_ratio", 0.0),
+            silence_gaps=silence_analysis.get("silence_gaps", []),
+            non_silence_regions=silence_analysis.get("non_silence_regions", []),
+            peak_amplitude=silence_analysis.get("peak_amplitude", 0.0),
         )
 
     @staticmethod
@@ -293,7 +286,7 @@ class AudioExtractor:
             silence_gaps=None,
             non_silence_regions=None,
             peak_amplitude=None,
-            silence_confidence=None
+            silence_confidence=None,
         )
 
     @staticmethod
@@ -303,8 +296,8 @@ class AudioExtractor:
             # Ensure segment is a numpy array
             segment = np.asarray(segment)
             harmonic, percussive = librosa.effects.hpss(segment)
-            harmonic_energy = float(np.sum(harmonic ** 2))
-            percussive_energy = float(np.sum(percussive ** 2))
+            harmonic_energy = float(np.sum(harmonic**2))
+            percussive_energy = float(np.sum(percussive**2))
             total_energy = harmonic_energy + percussive_energy
             return float(harmonic_energy / total_energy) if total_energy > 0 else 0.0
         except Exception as e:
@@ -329,7 +322,6 @@ class AudioExtractor:
             return float(attack_samples[0] / sr)
         return 0.0
 
-
     @staticmethod
     def _calculate_decay_profile(segment: np.ndarray, sr: int) -> np.ndarray:
         """Calculate how the segment decays over time"""
@@ -341,33 +333,23 @@ class AudioExtractor:
         frame_length = sr // 10  # 100ms frames
 
         try:
-            rms_frames = librosa.feature.rms(y=segment,
-                                             frame_length=frame_length,
-                                             hop_length=hop_length)[0]
+            rms_frames = librosa.feature.rms(
+                y=segment, frame_length=frame_length, hop_length=hop_length
+            )[0]
             return rms_frames
         except Exception as e:
             print(f"Error calculating decay profile: {e}")
             return np.array([])
 
-    def load_raw_audio_segment(self, raw_audio_segment_row: pd.Series) -> np.ndarray:
-        """Load raw audio for a specific segment from the training data"""
-        audio_features = raw_audio_segment_row['audio_features']
-        audio_path = audio_features.audio_file_path
-        start_time = audio_features.segment_start_time
-        end_time = audio_features.segment_end_time
-
-        if not audio_path or not Path(audio_path).exists():
-            return np.array([])
-
-        y, sr = librosa.load(audio_path, sr=self.sample_rate)
-        start_sample = int(start_time * sr)
-        end_sample = int(end_time * sr)
-
-        return y[start_sample:end_sample]
-
     @staticmethod
-    def load_audio_segment(audio_path: str, start_time: float, end_time: float,
-                           sample_rate: int = None, silence_threshold_db: float = -40.0, min_non_silence_ratio: float = 0.1) -> RainbowAudioFeature:
+    def load_audio_segment(
+        audio_path: str,
+        start_time: float,
+        end_time: float,
+        sample_rate: int = None,
+        silence_threshold_db: float = -40.0,
+        min_non_silence_ratio: float = 0.1,
+    ) -> RainbowAudioFeature:
         """Standalone method to extract audio features for a temporal segment with silence detection"""
         try:
             # Load the full audio file
@@ -384,14 +366,20 @@ class AudioExtractor:
                 return AudioExtractor._empty_audio_features()
 
             # Analyze silence content
-            silence_analysis = AudioExtractor._analyze_silence(segment, sr, silence_threshold_db)
+            silence_analysis = AudioExtractor._analyze_silence(
+                segment, sr, silence_threshold_db
+            )
 
             # If segment is mostly silence, mark it appropriately
-            if silence_analysis['non_silence_ratio'] < min_non_silence_ratio:
-                audio_features = AudioExtractor._create_silence_features(audio_path, start_time, end_time, segment, silence_analysis)
+            if silence_analysis["non_silence_ratio"] < min_non_silence_ratio:
+                audio_features = AudioExtractor._create_silence_features(
+                    audio_path, start_time, end_time, segment, silence_analysis
+                )
             else:
                 # Process as normal audio segment
-                audio_features = AudioExtractor._create_audio_features(audio_path, start_time, end_time, segment, sr, silence_analysis)
+                audio_features = AudioExtractor._create_audio_features(
+                    audio_path, start_time, end_time, segment, sr, silence_analysis
+                )
 
             return audio_features
 
@@ -400,16 +388,18 @@ class AudioExtractor:
             return AudioExtractor._empty_audio_features()
 
     @staticmethod
-    def _analyze_silence(segment: np.ndarray, sr: int, threshold_db: float) -> Dict[str, Any]:
+    def _analyze_silence(
+        segment: np.ndarray, sr: int, threshold_db: float
+    ) -> Dict[str, Any]:
         """Analyze silence patterns in an audio segment - returns dict, not RainbowAudioFeature"""
         if len(segment) == 0:
             return {
-                'is_mostly_silence': True,
-                'non_silence_ratio': 0.0,
-                'silence_gaps': [],
-                'non_silence_regions': [],
-                'peak_amplitude': 0.0,
-                'rms_energy': 0.0
+                "is_mostly_silence": True,
+                "non_silence_ratio": 0.0,
+                "silence_gaps": [],
+                "non_silence_regions": [],
+                "peak_amplitude": 0.0,
+                "rms_energy": 0.0,
             }
 
         # Convert to dB
@@ -420,13 +410,11 @@ class AudioExtractor:
         non_silent_frames = rms_db > threshold_db
         non_silence_ratio = np.sum(non_silent_frames) / len(non_silent_frames)
 
-        # Find silence gaps and non-silence regions
-        silence_gaps = []
-        non_silence_regions = []
-
         # Convert frame indices back to time
         hop_length = sr // 20
-        frame_times = librosa.frames_to_time(np.arange(len(non_silent_frames)), sr=sr, hop_length=hop_length)
+        frame_times = librosa.frames_to_time(
+            np.arange(len(non_silent_frames)), sr=sr, hop_length=hop_length
+        )
 
         # Find transitions
         transitions = np.diff(non_silent_frames.astype(int))
@@ -439,7 +427,9 @@ class AudioExtractor:
         if non_silent_frames[0]:
             non_silence_starts = np.concatenate([[0], non_silence_starts])
         if non_silent_frames[-1]:
-            non_silence_ends = np.concatenate([non_silence_ends, [len(non_silent_frames)]])
+            non_silence_ends = np.concatenate(
+                [non_silence_ends, [len(non_silent_frames)]]
+            )
 
         if not non_silent_frames[0]:
             silence_starts = np.concatenate([[0], silence_starts])
@@ -464,17 +454,22 @@ class AudioExtractor:
                 non_silence_time_ranges.append((range_start, range_end))
 
         return {
-            'is_mostly_silence': non_silence_ratio < 0.1,
-            'non_silence_ratio': float(non_silence_ratio),
-            'silence_gaps': silence_gap_durations,  # Now list of floats (durations)
-            'non_silence_regions': non_silence_time_ranges,  # List of (start, end) tuples
-            'peak_amplitude': float(np.max(np.abs(segment))),
-            'rms_energy': float(np.sqrt(np.mean(segment ** 2)))
+            "is_mostly_silence": non_silence_ratio < 0.1,
+            "non_silence_ratio": float(non_silence_ratio),
+            "silence_gaps": silence_gap_durations,  # Now list of floats (durations)
+            "non_silence_regions": non_silence_time_ranges,  # List of (start, end) tuples
+            "peak_amplitude": float(np.max(np.abs(segment))),
+            "rms_energy": float(np.sqrt(np.mean(segment**2))),
         }
 
     @staticmethod
-    def _create_silence_features(audio_path: str, start_time: float, end_time: float,
-                                 segment: np.ndarray, silence_analysis: Dict[str, Any]) -> RainbowAudioFeature:
+    def _create_silence_features(
+        audio_path: str,
+        start_time: float,
+        end_time: float,
+        segment: np.ndarray,
+        silence_analysis: Dict[str, Any],
+    ) -> RainbowAudioFeature:
         """Create features for a mostly-silent segment"""
         duration = end_time - start_time
         return RainbowAudioFeature(
@@ -484,7 +479,7 @@ class AudioExtractor:
             duration=duration,
             duration_samples=len(segment),
             is_mostly_silence=True,
-            rms_energy=silence_analysis.get('rms_energy', 0.0),
+            rms_energy=silence_analysis.get("rms_energy", 0.0),
             spectral_centroid=0.0,
             zero_crossing_rate=0.0,
             tempo=0.0,
@@ -496,16 +491,22 @@ class AudioExtractor:
             harmonic_ratio=0.0,
             attack_time=0.0,
             decay_profile=np.array([]),
-            silence_confidence=1.0 - silence_analysis.get('non_silence_ratio', 0.0),
-            non_silence_ratio=silence_analysis.get('non_silence_ratio', 0.0),
-            silence_gaps=silence_analysis.get('silence_gaps', []),
-            non_silence_regions=silence_analysis.get('non_silence_regions', []),
-            peak_amplitude=silence_analysis.get('peak_amplitude', 0.0)
+            silence_confidence=1.0 - silence_analysis.get("non_silence_ratio", 0.0),
+            non_silence_ratio=silence_analysis.get("non_silence_ratio", 0.0),
+            silence_gaps=silence_analysis.get("silence_gaps", []),
+            non_silence_regions=silence_analysis.get("non_silence_regions", []),
+            peak_amplitude=silence_analysis.get("peak_amplitude", 0.0),
         )
 
     @staticmethod
-    def _create_audio_features(audio_path: str, start_time: float, end_time: float,
-                               segment: np.ndarray, sr: int, silence_analysis: Dict[str, Any]) -> RainbowAudioFeature:
+    def _create_audio_features(
+        audio_path: str,
+        start_time: float,
+        end_time: float,
+        segment: np.ndarray,
+        sr: int,
+        silence_analysis: Dict[str, Any],
+    ) -> RainbowAudioFeature:
         """Create full audio features for non-silent segments"""
         duration = end_time - start_time
 
@@ -516,17 +517,25 @@ class AudioExtractor:
             rms_energy = 0.0
 
         try:
-            spectral_centroid = float(librosa.feature.spectral_centroid(y=segment, sr=sr).mean())
+            spectral_centroid = float(
+                librosa.feature.spectral_centroid(y=segment, sr=sr).mean()
+            )
         except Exception:
             spectral_centroid = 0.0
 
         try:
-            zero_crossing_rate = float(librosa.feature.zero_crossing_rate(segment).mean())
+            zero_crossing_rate = float(
+                librosa.feature.zero_crossing_rate(segment).mean()
+            )
         except Exception:
             zero_crossing_rate = 0.0
 
         try:
-            tempo = float(librosa.feature.rhythm.tempo(y=segment, sr=sr)[0]) if len(segment) > sr else 0
+            tempo = (
+                float(librosa.feature.rhythm.tempo(y=segment, sr=sr)[0])
+                if len(segment) > sr
+                else 0
+            )
         except Exception:
             tempo = 0.0
 
@@ -538,6 +547,7 @@ class AudioExtractor:
         # Handle chroma with tuning issues - suppress warnings
         try:
             import warnings
+
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", UserWarning)
                 chroma = librosa.feature.chroma_stft(y=segment, sr=sr).T
@@ -578,10 +588,10 @@ class AudioExtractor:
             harmonic_ratio=AudioExtractor._calculate_harmonic_ratio(segment),
             attack_time=AudioExtractor._calculate_attack_time(segment, sr),
             decay_profile=AudioExtractor._calculate_decay_profile(segment, sr),
-            non_silence_ratio=silence_analysis.get('non_silence_ratio', 0.0),
-            silence_gaps=silence_analysis.get('silence_gaps', []),
-            non_silence_regions=silence_analysis.get('non_silence_regions', []),
-            peak_amplitude=silence_analysis.get('peak_amplitude', 0.0)
+            non_silence_ratio=silence_analysis.get("non_silence_ratio", 0.0),
+            silence_gaps=silence_analysis.get("silence_gaps", []),
+            non_silence_regions=silence_analysis.get("non_silence_regions", []),
+            peak_amplitude=silence_analysis.get("peak_amplitude", 0.0),
         )
 
     @staticmethod
@@ -611,7 +621,7 @@ class AudioExtractor:
             silence_gaps=None,
             non_silence_regions=None,
             peak_amplitude=None,
-            silence_confidence=None
+            silence_confidence=None,
         )
 
     @staticmethod
@@ -621,8 +631,8 @@ class AudioExtractor:
             # Ensure segment is a numpy array
             segment = np.asarray(segment)
             harmonic, percussive = librosa.effects.hpss(segment)
-            harmonic_energy = float(np.sum(harmonic ** 2))
-            percussive_energy = float(np.sum(percussive ** 2))
+            harmonic_energy = float(np.sum(harmonic**2))
+            percussive_energy = float(np.sum(percussive**2))
             total_energy = harmonic_energy + percussive_energy
             return float(harmonic_energy / total_energy) if total_energy > 0 else 0.0
         except Exception as e:
@@ -647,7 +657,6 @@ class AudioExtractor:
             return float(attack_samples[0] / sr)
         return 0.0
 
-
     @staticmethod
     def _calculate_decay_profile(segment: np.ndarray, sr: int) -> np.ndarray:
         """Calculate how the segment decays over time"""
@@ -659,9 +668,9 @@ class AudioExtractor:
         frame_length = sr // 10  # 100ms frames
 
         try:
-            rms_frames = librosa.feature.rms(y=segment,
-                                             frame_length=frame_length,
-                                             hop_length=hop_length)[0]
+            rms_frames = librosa.feature.rms(
+                y=segment, frame_length=frame_length, hop_length=hop_length
+            )[0]
             return rms_frames
         except Exception as e:
             print(f"Error calculating decay profile: {e}")
@@ -669,7 +678,7 @@ class AudioExtractor:
 
     def load_raw_audio_segment(self, raw_audio_segment_row: pd.Series) -> np.ndarray:
         """Load raw audio for a specific segment from the training data"""
-        audio_features = raw_audio_segment_row['audio_features']
+        audio_features = raw_audio_segment_row["audio_features"]
         audio_path = audio_features.audio_file_path
         start_time = audio_features.segment_start_time
         end_time = audio_features.segment_end_time
@@ -683,6 +692,7 @@ class AudioExtractor:
 
         return y[start_sample:end_sample]
 
+
 if __name__ == "__main__":
     # Set up a sample rate and manifest id
     sample_rate = 22050
@@ -691,21 +701,19 @@ if __name__ == "__main__":
     print("Loaded manifest:", audio_extractor.manifest)
 
     # Example audio file (update path as needed)
-    example_audio_path = "/Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01_02.wav"
+    example_audio_path = (
+        "/Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01_02.wav"
+    )
     if os.path.exists(example_audio_path):
         # Extract features from a segment (first 2 seconds)
         features = audio_extractor.load_audio_segment(
-            audio_path=example_audio_path,
-            start_time=0.0,
-            end_time=2.0
+            audio_path=example_audio_path, start_time=0.0, end_time=2.0
         )
         print("\nAudio segment features:")
         print(features)
 
         # Simulate a DataFrame row for load_raw_audio_segment
-        segment_row = pd.Series({
-            'audio_features': features
-        })
+        segment_row = pd.Series({"audio_features": features})
         raw_segment = audio_extractor.load_raw_audio_segment(segment_row)
         print("\nRaw audio segment shape:", raw_segment.shape)
     else:

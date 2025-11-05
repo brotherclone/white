@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.sigil_state import SigilState
@@ -29,14 +30,17 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("created", SigilState.CREATED),
-    ("awaiting charge", SigilState.AWAITING_CHARGE),
-    ("charging", SigilState.CHARGING),
-    ("charged", SigilState.CHARGED),
-    ("buried", SigilState.BURIED),
-    ("unknown", SigilState.UNKNOWN),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("created", SigilState.CREATED),
+        ("awaiting charge", SigilState.AWAITING_CHARGE),
+        ("charging", SigilState.CHARGING),
+        ("charged", SigilState.CHARGED),
+        ("buried", SigilState.BURIED),
+        ("unknown", SigilState.UNKNOWN),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert SigilState(value) is member
 
