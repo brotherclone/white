@@ -1,7 +1,0 @@
-My mother calls while I am deep in conversation with a woman in Seoul about the representation of African women in Western media. "Adaora," she says, using my real name like an anchor, "you've been on that computer for six hours." She pronounces 'computer' the way she might say 'opium den,' with the particular disdain reserved for addictions she doesn't understand.
-
-I want to explain to her that I have been doing important work—building bridges across continents, challenging misconceptions, finding my voice in ways that the physical world has never allowed. But how do you translate the significance of a retweet, the validation of a viral thread, the community found in comment sections to someone who still prints out emails?
-
-Instead, I tell her I'm researching for my book. This is not entirely a lie. Every interaction online becomes material, every digital persona a character study. I am collecting selves the way my grandmother collected shells on the beaches of her childhood—each one beautiful, each one carrying the echo of something larger.
-
-The woman in Seoul sends me a private message: "Your perspective on hybrid identity really resonates. Have you read Anzaldúa?" I have, of course, but @NnekaLagos2003 responds with enthusiasm as if discovering borderland theory for the first time. This, too, is a kind of truth.

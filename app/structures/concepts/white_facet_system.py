@@ -74,32 +74,32 @@ class WhiteFacetSystem:
 
         # Build complete prompt
         complete_prompt = f"""
-{facet_prompt}
-
-==================================================
-USER REQUEST
-==================================================
-
-{user_input}
-
-==================================================
-YOUR TASK
-==================================================
-
-Generate an initial proposal for this creative work, viewed through
-your current cognitive lens ({a_facet.value.upper()} mode).
-
-Your proposal should:
-1. Reflect the structural approach of your current facet
-2. Maintain White Agent's essential character (clear, informative, structured)
-3. Provide enough substance for Black Agent to challenge and subvert
-4. Feel distinctly {a_facet.value} in its organization
-
-Remember: You're still White Agent - the agent of INFORMATION, structure,
-and clarity. The facet simply determines HOW you structure that information.
-
-Generate your proposal now:
-"""
+        {facet_prompt}
+        
+        ==================================================
+        USER REQUEST
+        ==================================================
+        
+        {user_input}
+        
+        ==================================================
+        YOUR TASK
+        ==================================================
+        
+        Generate an initial proposal for this creative work, viewed through
+        your current cognitive lens ({a_facet.value.upper()} mode).
+        
+        Your proposal should:
+        1. Reflect the structural approach of your current facet
+        2. Maintain White Agent's essential character (clear, informative, structured)
+        3. Provide enough substance for Black Agent to challenge and subvert
+        4. Feel distinctly {a_facet.value} in its organization
+        
+        Remember: You're still White Agent - the agent of INFORMATION, structure,
+        and clarity. The facet simply determines HOW you structure that information.
+        
+        Generate your proposal now:
+        """
 
         return complete_prompt, a_facet
 

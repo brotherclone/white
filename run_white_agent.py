@@ -49,7 +49,7 @@ def start_workflow(args):
 
     if final_state.workflow_paused:
         # Save the paused state
-        state_file = Path("checkpoints/paused_state.pkl")
+        state_file = Path("paused_state.pkl")
         with state_file.open("wb") as f:
             pickle.dump(final_state, f)
 
@@ -97,7 +97,7 @@ def resume_workflow(args):
     if args.state_file:
         state_file = Path(args.state_file)
     else:
-        state_file = Path("checkpoints/paused_state.pkl")
+        state_file = Path("paused_state.pkl")
 
     if not state_file.exists():
         logging.error(f"❌ State file not found: {state_file.absolute()}")
@@ -152,6 +152,7 @@ def resume_workflow(args):
         sys.exit(1)
 
 
+# python
 def main():
     parser = argparse.ArgumentParser(
         description="White Agent Workflow Runner",
@@ -160,19 +161,22 @@ def main():
 Examples:
   # Start a new workflow
   python run_white_agent.py start
-  
+
   # Resume after completing ritual tasks
   python run_white_agent.py resume
-  
+
   # Resume without verifying tasks (for testing)
   python run_white_agent.py resume --no-verify
-  
+
   # Resume and clean up state file
   python run_white_agent.py resume --cleanup
         """,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
+
+    # Start command
+    subparsers.add_parser("start", help="Start a new workflow")
 
     # Resume command
     resume_parser = subparsers.add_parser("resume", help="Resume a paused workflow")

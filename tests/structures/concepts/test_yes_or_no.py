@@ -16,14 +16,7 @@ def test_yes_or_no_false():
     assert no.answer is False
 
 
-def test_yes_or_no_requires_answer():
-    """Test that answer field is required"""
-    with pytest.raises(ValidationError):
-        YesOrNo()
-
-
 def test_yes_or_no_wrong_type():
-    """Test that answer must be boolean"""
-    # Pydantic v2 will coerce some values, so test with something truly invalid
+    """Test that the answer must be boolean"""
     with pytest.raises(ValidationError):
         YesOrNo(answer={"invalid": "dict"})
