@@ -1,14 +1,16 @@
 import random
 
 from app.agents.tools.book_tool import BookMaker
-from app.structures.enums.book_genre import BookGenre
-from app.structures.enums.book_condition import BookCondition
-from app.structures.enums.publisher_type import PublisherType
 from app.structures.artifacts.book_data import BookData
+from app.structures.enums.book_condition import BookCondition
+from app.structures.enums.book_genre import BookGenre
+from app.structures.enums.publisher_type import PublisherType
 
 
 def test_select_genre_uses_choices(monkeypatch):
-    monkeypatch.setattr(random, "choices", lambda genres, weights=None: [BookGenre.SCIFI])
+    monkeypatch.setattr(
+        random, "choices", lambda genres, weights=None: [BookGenre.SCIFI]
+    )
     assert BookMaker.select_genre() is BookGenre.SCIFI
 
 
@@ -26,7 +28,9 @@ def test_generate_title_with_and_without_colon():
 
 def test_generate_author_initials_and_credentials(monkeypatch):
     # Make author lists deterministic (single entries)
-    monkeypatch.setattr(BookMaker, "get_authors_for_genre", lambda g: (["Alice"], ["Smith"]))
+    monkeypatch.setattr(
+        BookMaker, "get_authors_for_genre", lambda g: (["Alice"], ["Smith"])
+    )
     # Ensure initials and credentials branches trigger (random.random < thresholds)
     monkeypatch.setattr(random, "random", lambda: 0.05)
     # deterministic choice (pick first element)
@@ -82,7 +86,7 @@ def test_format_bibliography_entry_and_card_catalog():
         tags=["hidden", "net", "science"],
         danger_level=2,
         abstract="An exploration of hidden networks.",
-        notable_quote="\"We are all nodes.\"",
+        notable_quote='"We are all nodes."',
         suppression_history=None,
         related_works=[],
     )

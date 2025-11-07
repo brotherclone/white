@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 
+
 class LyricPair(BaseModel):
     """
     Represents a pair of lyrics with their corresponding timestamps.
     """
+
     lyric: str
-    timestamp: str # [00:23.196]
+    timestamp: str  # [00:23.196]
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -17,6 +19,7 @@ class LyricFile(BaseModel):
     """
     Represents a lyric file containing multiple lyric pairs.
     """
+
     title: str
     artist: str
     album: str
@@ -24,4 +27,3 @@ class LyricFile(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
-  

@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.noise_type import NoiseType
@@ -29,14 +30,17 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("white", NoiseType.WHITE),
-    ("pink", NoiseType.PINK),
-    ("brown", NoiseType.BROWN),
-    ("blue", NoiseType.BLUE),
-    ("violet", NoiseType.VIOLET),
-    ("grey", NoiseType.GREY),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("white", NoiseType.WHITE),
+        ("pink", NoiseType.PINK),
+        ("brown", NoiseType.BROWN),
+        ("blue", NoiseType.BLUE),
+        ("violet", NoiseType.VIOLET),
+        ("grey", NoiseType.GREY),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert NoiseType(value) is member
 

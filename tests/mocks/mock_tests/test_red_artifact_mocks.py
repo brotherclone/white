@@ -1,16 +1,29 @@
+from copy import deepcopy
+from pathlib import Path
+
+import yaml
+from hypothesis import given
+from hypothesis import strategies as st
+
 from app.structures.artifacts.book_artifact import BookArtifact
 from app.structures.artifacts.book_data import BookData
 from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
-from app.structures.concepts.rainbow_table_color import RainbowTableColor, RainbowColorTemporalMode, RainbowColorObjectionalMode, RainbowColorOntologicalMode
+from app.structures.concepts.rainbow_table_color import (
+    RainbowColorObjectionalMode,
+    RainbowColorOntologicalMode,
+    RainbowColorTemporalMode,
+    RainbowTableColor,
+)
 from tests.mocks.mock_tests.mock_utils import normalize_book_data_enums
-from hypothesis import given, strategies as st
-from pathlib import Path
-import yaml
-from copy import deepcopy
 
 
 def test_book_artifact_mocks():
-    path = Path(__file__).resolve().parents[3] / "tests" / "mocks" / "red_book_artifact_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "red_book_artifact_mock.yml"
+    )
     with path.open("r") as f:
         data = yaml.safe_load(f)
     data = normalize_book_data_enums(data)
@@ -45,7 +58,7 @@ def test_book_artifact_mocks():
     assert book.excerpts[0].rainbow_color.temporal_mode.value == "Past"
     assert book.excerpts[0].rainbow_color.objectional_mode.value == "Thing"
     assert book.excerpts[0].rainbow_color.ontological_mode[0].value == "Known"
-    assert book.excerpts[0].artifact_id == '555'
+    assert book.excerpts[0].artifact_id == "555"
     assert book.excerpts[0].artifact_name == "book"
     assert book.excerpts[0].file_name == "555_red_book.md"
 
@@ -53,10 +66,19 @@ def test_book_artifact_mocks():
 @given(
     temporal=st.sampled_from([m.value for m in RainbowColorTemporalMode]),
     objectional=st.sampled_from([m.value for m in RainbowColorObjectionalMode]),
-    ontological=st.lists(st.sampled_from([m.value for m in RainbowColorOntologicalMode]), min_size=1, max_size=2),
+    ontological=st.lists(
+        st.sampled_from([m.value for m in RainbowColorOntologicalMode]),
+        min_size=1,
+        max_size=2,
+    ),
 )
 def test_book_artifact_trans_modes(temporal, objectional, ontological):
-    path = Path(__file__).resolve().parents[3] /"tests" / "mocks" / "red_book_artifact_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "red_book_artifact_mock.yml"
+    )
     with path.open("r") as f:
         base = yaml.safe_load(f)
 
@@ -72,7 +94,12 @@ def test_book_artifact_trans_modes(temporal, objectional, ontological):
 
 
 def test_reaction_book_mocks():
-    path = Path(__file__).resolve().parents[3] / "tests" / "mocks" / "red_reaction_book_data_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "red_reaction_book_data_mock.yml"
+    )
     with path.open("r") as f:
         data = yaml.safe_load(f)
     data = normalize_book_data_enums(data)
@@ -81,7 +108,7 @@ def test_reaction_book_mocks():
     assert book.title == "Mock Book Title"
     assert book.author == "John Doe"
     assert book.publisher == "Mock Publishing House"
-    assert book.publisher_type.value =='Vanity press directly from author'
+    assert book.publisher_type.value == "Vanity press directly from author"
     assert book.pages == 250
     assert book.author_credentials == "PhD in Mock Studies"
     assert book.year == 2025
@@ -89,8 +116,14 @@ def test_reaction_book_mocks():
     assert book.catalog_number == "MOCK-CAT-001"
     assert book.acquisition_date == "2025-01-01"
 
+
 def test_reaction_book_page_1_mock():
-    path = Path(__file__).resolve().parents[3] / "tests" / "mocks" / "red_reaction_book_page_1_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "red_reaction_book_page_1_mock.yml"
+    )
     with path.open("r") as f:
         data = yaml.safe_load(f)
         page = TextChainArtifactFile(**data)
@@ -101,12 +134,18 @@ def test_reaction_book_page_1_mock():
     assert page.rainbow_color.temporal_mode.value == "Past"
     assert page.rainbow_color.objectional_mode.value == "Thing"
     assert page.rainbow_color.ontological_mode[0].value == "Known"
-    assert page.artifact_id == '555'
+    assert page.artifact_id == "555"
     assert page.artifact_name == "book"
     assert page.file_name == "555_red_book.md"
 
+
 def test_reaction_book_page_2_mock():
-    path = Path(__file__).resolve().parents[3] / "tests" / "mocks" / "red_reaction_book_page_2_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "red_reaction_book_page_2_mock.yml"
+    )
     with path.open("r") as f:
         data = yaml.safe_load(f)
         page = TextChainArtifactFile(**data)
@@ -117,6 +156,6 @@ def test_reaction_book_page_2_mock():
     assert page.rainbow_color.temporal_mode.value == "Past"
     assert page.rainbow_color.objectional_mode.value == "Thing"
     assert page.rainbow_color.ontological_mode[0].value == "Known"
-    assert page.artifact_id == '444'
+    assert page.artifact_id == "444"
     assert page.artifact_name == "book"
     assert page.file_name == "444_red_book.md"

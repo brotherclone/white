@@ -1,10 +1,12 @@
-import yaml
 import os
+from copy import deepcopy
 from pathlib import Path
 
+import yaml
+from hypothesis import given
+from hypothesis import strategies as st
+
 from app.structures.manifests.song_proposal import SongProposalIteration
-from hypothesis import given, strategies as st
-from copy import deepcopy
 
 MOCK_DIR = Path(os.getenv("AGENT_MOCK_DATA_PATH", "tests/mocks"))
 
@@ -43,7 +45,10 @@ def test_black_counter_proposal_mocks():
         assert counter_proposal.title == "EVP influenced proposal"
         assert counter_proposal.mood[0] == "Even"
         assert counter_proposal.genres[0] == "Mock Rock"
-        assert counter_proposal.concept == "I heard, clearly, the words 'there is no window'. I heard, clearly, the words 'there is no window'. I heard, clearly, the words 'there is no window'. I heard, clearly, the words 'there is no window'."
+        assert (
+            counter_proposal.concept
+            == "I heard, clearly, the words 'there is no window'. I heard, clearly, the words 'there is no window'. I heard, clearly, the words 'there is no window'. I heard, clearly, the words 'there is no window'."
+        )
     p = MOCK_DIR / "black_counter_proposal_after_sigil_mock.yml"
     with open(p, "r") as f:
         data = yaml.safe_load(f)
@@ -55,7 +60,10 @@ def test_black_counter_proposal_mocks():
         assert counter_proposal.title == "Sigil influenced proposal"
         assert counter_proposal.mood[0] == "Even"
         assert counter_proposal.genres[0] == "Mock Rock"
-        assert counter_proposal.concept == "Charged up and ready to forget.  Charged up and ready to forget. Charged up and ready to forget. Charged up and ready to forget. Charged up and ready to forget. Charged up and ready to forget."
+        assert (
+            counter_proposal.concept
+            == "Charged up and ready to forget.  Charged up and ready to forget. Charged up and ready to forget. Charged up and ready to forget. Charged up and ready to forget. Charged up and ready to forget."
+        )
     p = MOCK_DIR / "black_counter_proposal_mock.yml"
     with open(p, "r") as f:
         data = yaml.safe_load(f)
@@ -67,7 +75,10 @@ def test_black_counter_proposal_mocks():
         assert counter_proposal.title == "Black Counter Proposal"
         assert counter_proposal.mood[0] == "Even"
         assert counter_proposal.genres[0] == "Mock Rock"
-        assert counter_proposal.concept == "This is a mock counter proposal for a musical piece, it gets passed back to the White Agent to refine and finalize the composition."
+        assert (
+            counter_proposal.concept
+            == "This is a mock counter proposal for a musical piece, it gets passed back to the White Agent to refine and finalize the composition."
+        )
 
 
 def test_red_counter_proposal_mocks():
@@ -82,4 +93,7 @@ def test_red_counter_proposal_mocks():
         assert counter_proposal.title == "Red Counter Proposal"
         assert counter_proposal.mood[0] == "Even"
         assert counter_proposal.genres[0] == "Mock Rock"
-        assert counter_proposal.concept == "This is a mock counter proposal for a musical piece, it gets passed back to the White Agent to refine and finalize the composition."
+        assert (
+            counter_proposal.concept
+            == "This is a mock counter proposal for a musical piece, it gets passed back to the White Agent to refine and finalize the composition."
+        )

@@ -1,7 +1,9 @@
-from pydantic import BaseModel, model_validator
 from enum import Enum
 
+from pydantic import BaseModel, model_validator
+
 from app.structures.music.core.notes import Note
+
 
 class ModeName(Enum):
     MAJOR = "major"
@@ -28,7 +30,7 @@ class KeySignature(BaseModel):
     note: Note
     mode: Mode
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     @classmethod
     def parse_key_string(cls, data):
         """
@@ -36,7 +38,7 @@ class KeySignature(BaseModel):
         Handles YAML entries like: key: "C# minor"
         """
         # If already structured with note and mode, pass through
-        if isinstance(data, dict) and 'note' in data and 'mode' in data:
+        if isinstance(data, dict) and "note" in data and "mode" in data:
             return data
 
         # Parse string format: "NOTE MODE"
@@ -50,13 +52,23 @@ class KeySignature(BaseModel):
 
             # Note mapping: string -> (pitch_name, accidental)
             note_map = {
-                'C': ('C', None), 'C#': ('C', 'sharp'), 'Db': ('D', 'flat'),
-                'D': ('D', None), 'D#': ('D', 'sharp'), 'Eb': ('E', 'flat'),
-                'E': ('E', None),
-                'F': ('F', None), 'F#': ('F', 'sharp'), 'Gb': ('G', 'flat'),
-                'G': ('G', None), 'G#': ('G', 'sharp'), 'Ab': ('A', 'flat'),
-                'A': ('A', None), 'A#': ('A', 'sharp'), 'Bb': ('B', 'flat'),
-                'B': ('B', None)
+                "C": ("C", None),
+                "C#": ("C", "sharp"),
+                "Db": ("D", "flat"),
+                "D": ("D", None),
+                "D#": ("D", "sharp"),
+                "Eb": ("E", "flat"),
+                "E": ("E", None),
+                "F": ("F", None),
+                "F#": ("F", "sharp"),
+                "Gb": ("G", "flat"),
+                "G": ("G", None),
+                "G#": ("G", "sharp"),
+                "Ab": ("A", "flat"),
+                "A": ("A", None),
+                "A#": ("A", "sharp"),
+                "Bb": ("B", "flat"),
+                "B": ("B", None),
             }
 
             if note_str not in note_map:
@@ -66,35 +78,40 @@ class KeySignature(BaseModel):
 
             # Get the mode from tempered_modes to include intervals
             if mode_str not in tempered_modes:
-                raise ValueError(f"Invalid mode: {mode_str}. Must be one of: {', '.join(tempered_modes.keys())}")
+                raise ValueError(
+                    f"Invalid mode: {mode_str}. Must be one of: {', '.join(tempered_modes.keys())}"
+                )
 
             mode_obj = tempered_modes[mode_str]
 
             return {
-                'note': {
-                    'pitch_name': pitch_name,
-                    'accidental': accidental
+                "note": {"pitch_name": pitch_name, "accidental": accidental},
+                "mode": {
+                    "name": mode_obj.name.value,  # Convert enum to string for Pydantic
+                    "intervals": mode_obj.intervals,
                 },
-                'mode': {
-                    'name': mode_obj.name.value,  # Convert enum to string for Pydantic
-                    'intervals': mode_obj.intervals
-                }
             }
 
         return data
 
 
 tempered_modes = {
-    'major': Mode(name=ModeName.MAJOR, intervals=[2, 2, 1, 2, 2, 2, 1]),
-    'minor': Mode(name=ModeName.MINOR, intervals=[2, 1, 2, 2, 1, 2, 2]),
-    'dorian': Mode(name=ModeName.DORIAN, intervals=[2, 1, 2, 2, 2, 1, 2]),
-    'phrygian': Mode(name=ModeName.PHRYGIAN, intervals=[1, 2, 2, 2, 1, 2, 2]),
-    'lydian': Mode(name=ModeName.LYDIAN, intervals=[2, 2, 2, 1, 2, 2, 1]),
-    'mixolydian': Mode(name=ModeName.MIXOLYDIAN, intervals=[2, 2, 1, 2, 2, 1, 2]),
-    'aeolian': Mode(name=ModeName.AEOLIAN, intervals=[2, 1, 2, 2, 1, 2, 2]),
-    'locrian': Mode(name=ModeName.LOCRIAN, intervals=[1, 2, 2, 1, 2, 2, 2]),  # Added Locrian!
-    'harmonic_minor': Mode(name=ModeName.HARMONIC_MINOR, intervals=[2, 1, 2, 2, 1, 3, 1]),  # Added Harmonic Minor!
-    'melodic_minor': Mode(name=ModeName.MELODIC_MINOR, intervals=[2, 1, 2, 2, 2, 2, 1]),  # Added Melodic Minor!
+    "major": Mode(name=ModeName.MAJOR, intervals=[2, 2, 1, 2, 2, 2, 1]),
+    "minor": Mode(name=ModeName.MINOR, intervals=[2, 1, 2, 2, 1, 2, 2]),
+    "dorian": Mode(name=ModeName.DORIAN, intervals=[2, 1, 2, 2, 2, 1, 2]),
+    "phrygian": Mode(name=ModeName.PHRYGIAN, intervals=[1, 2, 2, 2, 1, 2, 2]),
+    "lydian": Mode(name=ModeName.LYDIAN, intervals=[2, 2, 2, 1, 2, 2, 1]),
+    "mixolydian": Mode(name=ModeName.MIXOLYDIAN, intervals=[2, 2, 1, 2, 2, 1, 2]),
+    "aeolian": Mode(name=ModeName.AEOLIAN, intervals=[2, 1, 2, 2, 1, 2, 2]),
+    "locrian": Mode(
+        name=ModeName.LOCRIAN, intervals=[1, 2, 2, 1, 2, 2, 2]
+    ),  # Added Locrian!
+    "harmonic_minor": Mode(
+        name=ModeName.HARMONIC_MINOR, intervals=[2, 1, 2, 2, 1, 3, 1]
+    ),  # Added Harmonic Minor!
+    "melodic_minor": Mode(
+        name=ModeName.MELODIC_MINOR, intervals=[2, 1, 2, 2, 2, 2, 1]
+    ),  # Added Melodic Minor!
 }
 
 

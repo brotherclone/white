@@ -1,11 +1,11 @@
 import pytest
 
 from app.structures.concepts.rainbow_table_color import (
+    RainbowColorModes,
+    RainbowTableColor,
+    RainbowTableTransmigrationalMode,
     get_rainbow_table_color,
     the_rainbow_table_colors,
-    RainbowColorModes,
-    RainbowTableTransmigrationalMode,
-    RainbowTableColor,
 )
 
 

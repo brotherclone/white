@@ -4,11 +4,14 @@ Helpers convert bare enum-like tokens in the YAML fixtures (e.g., VANITY, RECONS
 into actual Enum members and provide small helpers for common mock shapes like book_data and
 text pages.
 """
-from typing import Any, Dict, Type
+
 from enum import Enum
+from typing import Any, Dict, Type
+
 from app.structures.concepts.rainbow_table_color import RainbowTableColor
-from app.structures.enums.publisher_type import PublisherType
 from app.structures.enums.book_condition import BookCondition
+from app.structures.enums.publisher_type import PublisherType
+
 
 def normalize_enum_field(d: Dict[str, Any], key: str, enum_cls: Type[Enum]) -> None:
     """If d[key] is a string, attempt to coerce it into an Enum member of enum_cls.
@@ -51,7 +54,9 @@ def normalize_enum_field(d: Dict[str, Any], key: str, enum_cls: Type[Enum]) -> N
     return
 
 
-def normalize_enum_fields(d: Dict[str, Any], mapping: Dict[str, Type[Enum]]) -> Dict[str, Any]:
+def normalize_enum_fields(
+    d: Dict[str, Any], mapping: Dict[str, Type[Enum]]
+) -> Dict[str, Any]:
     """Normalize multiple enum-like fields in a dict using a mapping of key->Enum.
 
     Mutates and returns the dict for convenience.
@@ -79,11 +84,13 @@ def normalize_book_data_enums(data: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(bd, dict):
         return data
 
-
-    normalize_enum_fields(bd, {
-        "publisher_type": PublisherType,
-        "condition": BookCondition,
-    })
+    normalize_enum_fields(
+        bd,
+        {
+            "publisher_type": PublisherType,
+            "condition": BookCondition,
+        },
+    )
     data["book_data"] = bd
     return data
 
@@ -96,15 +103,18 @@ def normalize_book_data_dict_only(bd: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(bd, dict):
         return bd
     try:
-        from app.structures.enums.publisher_type import PublisherType
         from app.structures.enums.book_condition import BookCondition
+        from app.structures.enums.publisher_type import PublisherType
     except ValueError:
         print("Failed to import enums; skipping bookdata enum normalization")
         return bd
-    return normalize_enum_fields(bd, {
-        "publisher_type": PublisherType,
-        "condition": BookCondition,
-    })
+    return normalize_enum_fields(
+        bd,
+        {
+            "publisher_type": PublisherType,
+            "condition": BookCondition,
+        },
+    )
 
 
 def normalize_text_page_defaults(d: Dict[str, Any]) -> Dict[str, Any]:

@@ -1,17 +1,24 @@
+from copy import deepcopy
 from pathlib import Path
-import yaml
 
+import yaml
+from hypothesis import given
+from hypothesis import strategies as st
+
+from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import RainbowColorModes
-from copy import deepcopy
-from hypothesis import given, strategies as st
 
 
 def test_evp_artifact_mock():
-    path = Path(__file__).resolve().parents[3] / "tests" /  "mocks" / "black_evp_artifact_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "black_evp_artifact_mock.yml"
+    )
     with path.open("r") as f:
         data = yaml.safe_load(f)
     evp = EVPArtifact(**data)
@@ -22,9 +29,13 @@ def test_evp_artifact_mock():
     assert isinstance(evp.noise_blended_audio, AudioChainArtifactFile)
 
 
-
 def test_sigil_artifact_mock():
-    path = Path(__file__).resolve().parents[3] / "tests" /  "mocks" / "black_evp_artifact_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "black_evp_artifact_mock.yml"
+    )
     with path.open("r") as f:
         data = yaml.safe_load(f)
     sig = SigilArtifact(**data)
@@ -38,7 +49,12 @@ def test_sigil_artifact_mock():
     transcendental=st.sampled_from([m.value for m in RainbowColorModes]),
 )
 def test_evp_transmigrational_mode_properties(current, transitory, transcendental):
-    path = Path(__file__).resolve().parents[3] / "tests" /  "mocks" / "black_evp_artifact_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "black_evp_artifact_mock.yml"
+    )
     with path.open("r") as f:
         base = yaml.safe_load(f)
 
@@ -60,7 +76,12 @@ def test_evp_transmigrational_mode_properties(current, transitory, transcendenta
     transcendental=st.sampled_from([m.value for m in RainbowColorModes]),
 )
 def test_sigil_transmigrational_mode_properties(current, transitory, transcendental):
-    path = Path(__file__).resolve().parents[3] / "tests" / "mocks" / "black_evp_artifact_mock.yml"
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "tests"
+        / "mocks"
+        / "black_evp_artifact_mock.yml"
+    )
     with path.open("r") as f:
         base = yaml.safe_load(f)
 
@@ -73,9 +94,13 @@ def test_sigil_transmigrational_mode_properties(current, transitory, transcenden
 
     # Prefer setting on artifact_report; fall back to transcript; create artifact_report as last resort.
     if isinstance(candidate.get("artifact_report"), dict):
-        candidate["artifact_report"].setdefault("rainbow_color", {})["transmigrational_mode"] = tm
+        candidate["artifact_report"].setdefault("rainbow_color", {})[
+            "transmigrational_mode"
+        ] = tm
     elif isinstance(candidate.get("transcript"), dict):
-        candidate["transcript"].setdefault("rainbow_color", {})["transmigrational_mode"] = tm
+        candidate["transcript"].setdefault("rainbow_color", {})[
+            "transmigrational_mode"
+        ] = tm
     else:
         candidate["artifact_report"] = {"rainbow_color": {"transmigrational_mode": tm}}
 

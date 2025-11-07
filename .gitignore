@@ -38,3 +38,5 @@ dist/
 .coverage.*
 htmlcov/
 .hypothesis/
+*.pkl
+*.db

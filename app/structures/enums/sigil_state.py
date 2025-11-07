@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SigilState(str, Enum):
     CREATED = "created"
     AWAITING_CHARGE = "awaiting charge"

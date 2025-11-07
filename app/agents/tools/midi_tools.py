@@ -1,6 +1,6 @@
 from pydantic import BaseModel
+
 from app.agents.states.white_agent_state import MainAgentState
-from typing import Dict, Optional
 
 
 class MidiProcessor(BaseModel):
@@ -20,11 +20,11 @@ class MidiProcessor(BaseModel):
             "file_path": f"generated_music_{state.session_id}.mid",
             "bpm": 120,
             "time_signature": "4/4",
-            "key": "C minor"
+            "key": "C minor",
         }
 
         # Add MIDI data to state - need to add this field to MainAgentState
-        if not hasattr(state, 'midi_data'):
+        if not hasattr(state, "midi_data"):
             state.midi_data = midi_data
         else:
             state.midi_data = midi_data

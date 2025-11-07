@@ -1,8 +1,9 @@
+from types import SimpleNamespace
+
 import pytest
 
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.base_chain_artifact import ChainArtifact
-from types import SimpleNamespace
 
 # A concrete agent to instantiate and test abstract behavior
 GRAPH_SENTINEL = object()
@@ -39,7 +40,7 @@ def test__get_claude_uses_settings(monkeypatch):
         temperature=0.7,
         max_retries=2,
         timeout=30,
-        stop=["\n"]
+        stop=["\n"],
     )
 
     # Fake ChatAnthropic that captures init kwargs
@@ -49,7 +50,9 @@ def test__get_claude_uses_settings(monkeypatch):
         def __init__(self, **kwargs):
             captured.update(kwargs)
 
-    monkeypatch.setattr("app.structures.agents.base_rainbow_agent.ChatAnthropic", FakeChatAnthropic)
+    monkeypatch.setattr(
+        "app.structures.agents.base_rainbow_agent.ChatAnthropic", FakeChatAnthropic
+    )
 
     agent = ConcreteAgent.model_construct(settings=settings)
     result = agent._get_claude()
@@ -73,6 +76,7 @@ def test_chain_artifacts_instance_is_independent():
     assert len(a1.chain_artifacts) == 1
     assert a1.chain_artifacts[0].chain_artifact_type == "test-artifact"
     assert a2.chain_artifacts == []
+
 
 class _TestAgent:
     @skip_chance(1.0, rng=lambda: 0.0)  # force skip

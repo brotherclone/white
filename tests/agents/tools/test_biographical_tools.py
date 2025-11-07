@@ -1,5 +1,6 @@
 from app.agents.tools import biographical_tools as bt
 
+
 def make_sample_biographical_data():
     return {
         "years": {
@@ -7,40 +8,48 @@ def make_sample_biographical_data():
                 "world_events": {
                     "major": ["Event A", "Event B"],
                     "cultural": ["Culture X"],
-                    "technology": ["Tech Y"]
+                    "technology": ["Tech Y"],
                 },
                 "personal_context": {
                     "choice_points": ["chose_band", "moved_city"],
                     "influences": ["mentor", "scene"],
-                    "emotional_landscape": "nostalgic, reflective"
-                }
+                    "emotional_landscape": "nostalgic, reflective",
+                },
             }
         },
         "quantum_analysis_prompts": {
             "global_what_ifs": [
                 "If the world had turned differently...",
-                "Imagine an alternate geopolitics"
+                "Imagine an alternate geopolitics",
             ],
             "personal_what_ifs": [
                 "What if you hadn't left school?",
-                "What if you'd stayed in town?"
-            ]
+                "What if you'd stayed in town?",
+            ],
         },
         "song_inspiration_templates": {
             "experimental": {
                 "concept": "A {year} inspired sound collage",
                 "musical_approach": "lo-fi textures",
-                "lyrical_approach": "fragmented memory"
+                "lyrical_approach": "fragmented memory",
             }
-        }
+        },
     }
 
 
 def test_load_biographical_data_missing_file():
     data = bt.load_biographical_data("/this/path/does/not/exist.yml")
     assert isinstance(data, dict)
-    assert set(data.keys()) >= {"years", "quantum_analysis_prompts", "song_inspiration_templates"}
-    assert data["years"] == {} and data["quantum_analysis_prompts"] == {} and data["song_inspiration_templates"] == {}
+    assert set(data.keys()) >= {
+        "years",
+        "quantum_analysis_prompts",
+        "song_inspiration_templates",
+    }
+    assert (
+        data["years"] == {}
+        and data["quantum_analysis_prompts"] == {}
+        and data["song_inspiration_templates"] == {}
+    )
 
 
 def test_get_year_analysis_happy_path():
@@ -51,8 +60,17 @@ def test_get_year_analysis_happy_path():
     assert "year_data" in result and result["year_data"] == sample["years"]["1993"]
     assert "what_if_scenarios" in result
     what_if_scenarios = result["what_if_scenarios"]
-    assert "global_what_ifs" in what_if_scenarios and "personal_what_ifs" in what_if_scenarios
-    assert any("chose_band" in s or "moved_city" in s for s in what_if_scenarios["personal_what_ifs"]) or len(what_if_scenarios["personal_what_ifs"]) >= 1
+    assert (
+        "global_what_ifs" in what_if_scenarios
+        and "personal_what_ifs" in what_if_scenarios
+    )
+    assert (
+        any(
+            "chose_band" in s or "moved_city" in s
+            for s in what_if_scenarios["personal_what_ifs"]
+        )
+        or len(what_if_scenarios["personal_what_ifs"]) >= 1
+    )
     assert "cascade_analysis" in result and "quantum_metrics" in result
     ca = result["cascade_analysis"]
     assert "rebracketing_intensity" in ca and 0.0 <= ca["rebracketing_intensity"] <= 1.0
@@ -60,7 +78,10 @@ def test_get_year_analysis_happy_path():
     assert qm["choice_point_density"] == 2
     assert "taped_over_coefficient" in qm
     si = result["song_inspiration"]
-    assert any(str(1993) in s.get("title", "") or "Frequency 1993" in s.get("title", "") for s in si)
+    assert any(
+        str(1993) in s.get("title", "") or "Frequency 1993" in s.get("title", "")
+        for s in si
+    )
 
 
 def test_generate_what_if_scenarios_limits_and_types():
@@ -72,7 +93,10 @@ def test_generate_what_if_scenarios_limits_and_types():
     assert set(what_if_scenarios.keys()) == {"global_what_ifs", "personal_what_ifs"}
     assert len(what_if_scenarios["global_what_ifs"]) <= 4
     assert len(what_if_scenarios["personal_what_ifs"]) <= 4
-    for lst in (what_if_scenarios["global_what_ifs"], what_if_scenarios["personal_what_ifs"]):
+    for lst in (
+        what_if_scenarios["global_what_ifs"],
+        what_if_scenarios["personal_what_ifs"],
+    ):
         for item in lst:
             assert isinstance(item, str) and item.strip()
 
@@ -89,15 +113,19 @@ def test_calculate_quantum_metrics_edge_case_zero_choice_points():
 
 def test_explore_alternate_timeline_with_monkeypatch(monkeypatch):
     sample = make_sample_biographical_data()
+
     def fake_loader(path=None):
         return sample
+
     monkeypatch.setattr(bt, "load_biographical_data", fake_loader)
     out = bt.explore_alternate_timeline(1993, 0)
     assert isinstance(out, dict)
     assert out.get("year") == 1993
-    assert out.get("choice_point") == sample["years"]["1993"]["personal_context"]["choice_points"][0]
+    assert (
+        out.get("choice_point")
+        == sample["years"]["1993"]["personal_context"]["choice_points"][0]
+    )
     assert "song_concept" in out and "title" in out["song_concept"]
     out2 = bt.explore_alternate_timeline(1993, 99)
     assert isinstance(out2, dict)
     assert "error" in out2 and "available_choice_points" in out2
-

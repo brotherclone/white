@@ -1,5 +1,7 @@
 import enum
+
 import pytest
+
 from app.structures.enums.book_genre import BookGenre
 
 EXPECTED = {
@@ -21,15 +23,18 @@ def test_members_and_values():
         assert isinstance(member.value, str)
 
 
-@pytest.mark.parametrize("value,member", [
-    ("occult", BookGenre.OCCULT),
-    ("scifi", BookGenre.SCIFI),
-    ("sexploitation", BookGenre.SEXPLOITATION),
-    ("cult", BookGenre.CULT),
-    ("bildungsroman", BookGenre.BILDUNGSROMAN),
-    ("noir", BookGenre.NOIR),
-    ("psychedelic", BookGenre.PSYCHEDELIC),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("occult", BookGenre.OCCULT),
+        ("scifi", BookGenre.SCIFI),
+        ("sexploitation", BookGenre.SEXPLOITATION),
+        ("cult", BookGenre.CULT),
+        ("bildungsroman", BookGenre.BILDUNGSROMAN),
+        ("noir", BookGenre.NOIR),
+        ("psychedelic", BookGenre.PSYCHEDELIC),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert BookGenre(value) is member
 

@@ -1,5 +1,6 @@
-import os
 import argparse
+import os
+
 
 def rename_mid_audio_extensions(root_dir):
     """
@@ -16,38 +17,41 @@ def rename_mid_audio_extensions(root_dir):
         for filename in filenames:
             total_files_checked += 1
 
-            if filename.endswith('.mid.wav'):
+            if filename.endswith(".mid.wav"):
                 old_path = os.path.join(dirpath, filename)
-                new_filename = filename.replace('.mid.wav', '.wav')
+                new_filename = filename.replace(".mid.wav", ".wav")
                 new_path = os.path.join(dirpath, new_filename)
 
                 print(f"  Renaming: {filename} -> {new_filename}")
                 try:
                     os.rename(old_path, new_path)
                     renamed_count += 1
-                    print(f"    ✓ Success")
+                    print("    ✓ Success")
                 except Exception as e:
                     print(f"    ✗ Error: {e}")
 
-            elif filename.endswith('.mid.aif'):
+            elif filename.endswith(".mid.aif"):
                 old_path = os.path.join(dirpath, filename)
-                new_filename = filename.replace('.mid.aif', '.aif')
+                new_filename = filename.replace(".mid.aif", ".aif")
                 new_path = os.path.join(dirpath, new_filename)
 
                 print(f"  Renaming: {filename} -> {new_filename}")
                 try:
                     os.rename(old_path, new_path)
                     renamed_count += 1
-                    print(f"    ✓ Success")
+                    print("    ✓ Success")
                 except Exception as e:
                     print(f"    ✗ Error: {e}")
 
-    print(f"\nScan complete!")
+    print("\nScan complete!")
     print(f"Files checked: {total_files_checked}")
     print(f"Files renamed: {renamed_count}")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Recursively rename .mid.wav/.mid.aif files to .wav/.aif in a directory.")
+    parser = argparse.ArgumentParser(
+        description="Recursively rename .mid.wav/.mid.aif files to .wav/.aif in a directory."
+    )
     parser.add_argument("directory", type=str, help="Root directory to process.")
     args = parser.parse_args()
     print(f"Processing directory: {args.directory}")

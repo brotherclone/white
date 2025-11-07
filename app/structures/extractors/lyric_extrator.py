@@ -1,11 +1,11 @@
 import os
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from dotenv import load_dotenv
 
-from app.util.manifest_loader import load_manifest
-from app.util.lrc_utils import parse_lrc_time, load_lrc
+from app.util.lrc_utils import load_lrc
 from app.util.lrc_validator import LRCValidator
-
+from app.util.manifest_loader import load_manifest
 
 
 class LyricExtractor:
@@ -18,9 +18,7 @@ class LyricExtractor:
         load_dotenv()
         self.manifest_id = manifest_id
         self.manifest_path = os.path.join(
-            os.environ['MANIFEST_PATH'],
-            manifest_id,
-            f"{manifest_id}.yml"
+            os.environ["MANIFEST_PATH"], manifest_id, f"{manifest_id}.yml"
         )
 
         if not os.path.exists(self.manifest_path):
@@ -32,11 +30,13 @@ class LyricExtractor:
             raise ValueError("Manifest could not be loaded.")
 
         # Set up LRC path
-        self.lrc_path = os.path.join(
-            os.environ['MANIFEST_PATH'],
-            manifest_id,
-            self.manifest.lrc_file
-        ) if hasattr(self.manifest, 'lrc_file') else None
+        self.lrc_path = (
+            os.path.join(
+                os.environ["MANIFEST_PATH"], manifest_id, self.manifest.lrc_file
+            )
+            if hasattr(self.manifest, "lrc_file")
+            else None
+        )
 
         if self.lrc_path and os.path.isfile(self.lrc_path):
             with open(self.lrc_path, "r", encoding="utf-8") as f:
@@ -52,7 +52,9 @@ class LyricExtractor:
         else:
             print(f"LRC file not found or not specified: {self.lrc_path}")
 
-    def extract_segment_features(self, lrc_path: str, start_time: float, end_time: float) -> List[Dict[str, Any]]:
+    def extract_segment_features(
+        self, lrc_path: str, start_time: float, end_time: float
+    ) -> List[Dict[str, Any]]:
         """Extract lyric features for a specific time segment - matches the pattern of other extractors"""
         if not self.lyrics:
             # Load lyrics if not already loaded
@@ -62,17 +64,14 @@ class LyricExtractor:
         # Find lyrics that intersect with the time segment
         intersecting_lyrics = []
         for lyric in self.lyrics:
-            lyric_start = lyric['start_time']
-            lyric_end = lyric['end_time']
+            lyric_start = lyric["start_time"]
+            lyric_end = lyric["end_time"]
 
             # Check if lyric overlaps with segment
             if not (lyric_end <= start_time or lyric_start >= end_time):
                 intersecting_lyrics.append(lyric)
 
         return intersecting_lyrics
-
-
-
 
 
 if __name__ == "__main__":
