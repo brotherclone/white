@@ -4,26 +4,38 @@ PRESENT + PERSON + FORGOTTEN methodology
 For LangGraph agent use in exploring alternate timelines and quantum biographical possibilities
 """
 
-import yaml
-import random
-from typing import Dict, List, Optional, Any
 import logging
+from typing import Any, Dict, List, Optional
+
+import yaml
 
 
-def load_biographical_data(file_path: str = "/Volumes/LucidNonsense/White/app/reference/biographical/biographical_reference.yml") -> Dict[str, Any]:
+def load_biographical_data(
+    file_path: str = "/Volumes/LucidNonsense/White/app/reference/biographical/biographical_reference.yml",
+) -> Dict[str, Any]:
     """Load biographical timeline data from YAML file."""
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             return yaml.safe_load(file)
     except FileNotFoundError:
         logging.error(f"Biographical data file not found: {file_path}")
-        return {"years": {}, "quantum_analysis_prompts": {}, "song_inspiration_templates": {}}
+        return {
+            "years": {},
+            "quantum_analysis_prompts": {},
+            "song_inspiration_templates": {},
+        }
     except yaml.YAMLError as e:
         logging.error(f"Error parsing YAML file: {e}")
-        return {"years": {}, "quantum_analysis_prompts": {}, "song_inspiration_templates": {}}
+        return {
+            "years": {},
+            "quantum_analysis_prompts": {},
+            "song_inspiration_templates": {},
+        }
 
 
-def get_year_analysis(year: int, biographical_data: Optional[Dict] = None) -> Dict[str, Any]:
+def get_year_analysis(
+    year: int, biographical_data: Optional[Dict] = None
+) -> Dict[str, Any]:
     """
     Generate quantum biographical analysis for a specific year.
 
@@ -48,7 +60,7 @@ def get_year_analysis(year: int, biographical_data: Optional[Dict] = None) -> Di
     if year_str not in biographical_data.get("years", {}):
         return {
             "error": f"No biographical data found for year {year}",
-            "suggestion": f"Add {year} to biographical_timeline.yml with world_events and personal_context"
+            "suggestion": f"Add {year} to biographical_timeline.yml with world_events and personal_context",
         }
 
     year_data = biographical_data["years"][year_str]
@@ -77,15 +89,19 @@ def get_year_analysis(year: int, biographical_data: Optional[Dict] = None) -> Di
         "blue_album_themes": {
             "mode": "PRESENT + PERSON + FORGOTTEN",
             "concept": "How we 'tape over' our narratives with revised versions",
-            "focus": "Identity collapse and false narrative construction"
-        }
+            "focus": "Identity collapse and false narrative construction",
+        },
     }
 
-def generate_what_if_scenarios(year_data: dict, prompts: dict, max_per_category: int = 4) -> dict:
+
+def generate_what_if_scenarios(
+    year_data: dict, prompts: dict, max_per_category: int = 4
+) -> dict:
     """
     Build \"global_what_ifs\" and \"personal_what_ifs\" lists, deduplicate
     while preserving order, and limit each list to `max_per_category`.
     """
+
     def unique_limit(items):
         seen = set()
         out = []
@@ -121,33 +137,33 @@ def generate_what_if_scenarios(year_data: dict, prompts: dict, max_per_category:
         "personal_what_ifs": unique_limit(personal_items),
     }
 
+
 def analyze_cascade_effects(year_data: Dict, what_if_scenarios: Dict) -> Dict[str, Any]:
     """Analyze how alternate choices might cascade through time."""
 
     personal_context = year_data.get("personal_context", {})
-    influences = personal_context.get("influences", [])
 
     cascade_categories = {
         "creative_development": [
             "How might your artistic voice have evolved differently?",
             "What genres or mediums might you have explored instead?",
-            "How would your creative collaborations have changed?"
+            "How would your creative collaborations have changed?",
         ],
         "identity_formation": [
             "What aspects of personality might have developed differently?",
             "How would your worldview and values have shifted?",
-            "What 'forgotten' versions of yourself exist in collapsed timelines?"
+            "What 'forgotten' versions of yourself exist in collapsed timelines?",
         ],
         "relationship_networks": [
             "What different social/professional circles might you have joined?",
             "How would key relationships have formed or not formed?",
-            "What mentorship or influence patterns might have emerged?"
+            "What mentorship or influence patterns might have emerged?",
         ],
         "skill_acquisition": [
             "What different expertise would you have developed?",
             "How would your learning path have diverged?",
-            "What capabilities would you have instead of current ones?"
-        ]
+            "What capabilities would you have instead of current ones?",
+        ],
     }
 
     # Calculate "rebracketing intensity" - how much revision potential exists
@@ -157,12 +173,18 @@ def analyze_cascade_effects(year_data: Dict, what_if_scenarios: Dict) -> Dict[st
     return {
         "cascade_categories": cascade_categories,
         "rebracketing_intensity": min(rebracketing_intensity, 1.0),
-        "temporal_malleability": "high" if rebracketing_intensity > 0.6 else "medium" if rebracketing_intensity > 0.3 else "low",
-        "narrative_revision_potential": f"This period shows {rebracketing_intensity:.1%} revision potential"
+        "temporal_malleability": (
+            "high"
+            if rebracketing_intensity > 0.6
+            else "medium" if rebracketing_intensity > 0.3 else "low"
+        ),
+        "narrative_revision_potential": f"This period shows {rebracketing_intensity:.1%} revision potential",
     }
 
 
-def generate_song_inspiration(year: int, year_data: Dict, song_templates: Dict) -> List[Dict[str, str]]:
+def generate_song_inspiration(
+    year: int, year_data: Dict, song_templates: Dict
+) -> List[Dict[str, str]]:
     """Generate Blue album song concepts based on biographical analysis."""
 
     personal_context = year_data.get("personal_context", {})
@@ -177,7 +199,7 @@ def generate_song_inspiration(year: int, year_data: Dict, song_templates: Dict) 
             "concept": template_data.get("concept", "").format(year=year),
             "musical_approach": template_data.get("musical_approach", ""),
             "lyrical_approach": template_data.get("lyrical_approach", ""),
-            "emotional_source": emotional_landscape
+            "emotional_source": emotional_landscape,
         }
         inspirations.append(song_concept)
 
@@ -187,7 +209,7 @@ def generate_song_inspiration(year: int, year_data: Dict, song_templates: Dict) 
         "concept": f"Accessing the specific temporal frequency of {year} through creative collaboration",
         "musical_approach": "Layer period-appropriate sounds with modern production techniques",
         "lyrical_approach": "Present-tense narration that bleeds between then and now",
-        "emotional_source": emotional_landscape
+        "emotional_source": emotional_landscape,
     }
     inspirations.append(year_specific)
 
@@ -204,19 +226,28 @@ def calculate_quantum_metrics(year_data: Dict) -> Dict[str, Any]:
     metrics = {
         "choice_point_density": len(choice_points),
         "influence_complexity": len(influences),
-        "narrative_malleability": len(choice_points) * 0.2,  # How much revision potential
-        "temporal_significance": "high" if len(choice_points) > 3 else "medium" if len(choice_points) > 1 else "low",
-        "forgotten_self_potential": f"{len(choice_points) * 2} alternate timeline branches identified"
+        "narrative_malleability": len(choice_points)
+        * 0.2,  # How much revision potential
+        "temporal_significance": (
+            "high"
+            if len(choice_points) > 3
+            else "medium" if len(choice_points) > 1 else "low"
+        ),
+        "forgotten_self_potential": f"{len(choice_points) * 2} alternate timeline branches identified",
     }
 
     # Blue album specific metrics
     metrics["taped_over_coefficient"] = min(metrics["narrative_malleability"], 1.0)
-    metrics["identity_collapse_risk"] = "high" if metrics["choice_point_density"] > 4 else "moderate"
+    metrics["identity_collapse_risk"] = (
+        "high" if metrics["choice_point_density"] > 4 else "moderate"
+    )
 
     return metrics
 
 
-def explore_alternate_timeline(year: int, choice_point_index: int = 0) -> Dict[str, Any]:
+def explore_alternate_timeline(
+    year: int, choice_point_index: int = 0
+) -> Dict[str, Any]:
     """
     Deep dive into a specific alternate timeline branch.
 
@@ -240,7 +271,7 @@ def explore_alternate_timeline(year: int, choice_point_index: int = 0) -> Dict[s
     if choice_point_index >= len(choice_points):
         return {
             "error": f"Choice point index {choice_point_index} not found",
-            "available_choice_points": choice_points
+            "available_choice_points": choice_points,
         }
 
     selected_choice = choice_points[choice_point_index]
@@ -252,17 +283,17 @@ def explore_alternate_timeline(year: int, choice_point_index: int = 0) -> Dict[s
         "immediate_consequences": [
             "Different social circles and relationships",
             "Alternative skill development path",
-            "Shifted creative/professional trajectory"
+            "Shifted creative/professional trajectory",
         ],
         "long_term_ripples": [
             "Different geographic locations over time",
             "Alternative creative works and collaborations",
             "Different worldview and value development",
-            "Alternative present-day circumstances"
+            "Alternative present-day circumstances",
         ],
         "emotional_archaeology": "What feelings and experiences exist in this forgotten timeline?",
         "creative_potential": "How might this alternate self's creative work differ?",
-        "blue_album_relevance": f"Perfect material for exploring 'taped over' narratives and forgotten identity possibilities"
+        "blue_album_relevance": "Perfect material for exploring 'taped over' narratives and forgotten identity possibilities",
     }
 
     return {
@@ -272,8 +303,8 @@ def explore_alternate_timeline(year: int, choice_point_index: int = 0) -> Dict[s
         "song_concept": {
             "title": f'"The Other {year}"',
             "concept": f"A song comparing the actual {year} with the alternate timeline where {selected_choice} went differently",
-            "approach": "Dual-channel audio with 'actual' timeline in left ear, 'alternate' timeline in right ear"
-        }
+            "approach": "Dual-channel audio with 'actual' timeline in left ear, 'alternate' timeline in right ear",
+        },
     }
 
 
@@ -289,9 +320,9 @@ def blue_biographical_analysis(year: int) -> str:
         JSON string containing timeline analysis, what-if scenarios, and song inspiration
     """
     import json
+
     result = get_year_analysis(year)
     return json.dumps(result, indent=2)
-
 
 
 def explore_choice_point(year: int, choice_index: int = 0) -> str:
@@ -306,6 +337,7 @@ def explore_choice_point(year: int, choice_index: int = 0) -> str:
         JSON string containing detailed alternate timeline analysis
     """
     import json
+
     result = explore_alternate_timeline(year, choice_index)
     return json.dumps(result, indent=2)
 
@@ -316,11 +348,16 @@ if __name__ == "__main__":
     analysis_1993 = get_year_analysis(1993)
     print("=== 1993 Biographical Analysis ===")
     print(
-        f"Choice points identified: {len(analysis_1993.get('year_data', {}).get('personal_context', {}).get('choice_points', []))}")
+        f"Choice points identified: {len(analysis_1993.get('year_data', {}).get('personal_context', {}).get('choice_points', []))}"
+    )
     print(f"Quantum metrics: {analysis_1993.get('quantum_metrics', {})}")
 
     # Example alternate timeline exploration
-    if analysis_1993.get('year_data', {}).get('personal_context', {}).get('choice_points'):
+    if (
+        analysis_1993.get("year_data", {})
+        .get("personal_context", {})
+        .get("choice_points")
+    ):
         alternate = explore_alternate_timeline(1993, 0)
         print("\n=== Alternate Timeline Analysis ===")
         print(f"Original choice: {alternate.get('choice_point', 'N/A')}")

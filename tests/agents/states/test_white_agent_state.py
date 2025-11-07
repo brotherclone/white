@@ -1,5 +1,5 @@
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.agents.states.white_agent_state import MainAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
 
 def test_white_agent_defaults():

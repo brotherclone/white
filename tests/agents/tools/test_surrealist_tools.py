@@ -7,7 +7,9 @@ class FakeState:
         self.active_agents = ["red", "blue"]
         # Provide content attributes for agents
         self.red_content = {"notes": "word " * 60}  # should produce multiple fragments
-        self.blue_content = {"lines": ["alpha beta gamma delta epsilon zeta eta theta iota kappa"]}
+        self.blue_content = {
+            "lines": ["alpha beta gamma delta epsilon zeta eta theta iota kappa"]
+        }
 
 
 def test_cut_up_processor_generates_fragments():
@@ -21,4 +23,3 @@ def test_cut_up_processor_generates_fragments():
     assert len(frags) >= 1
     # Each fragment should be non-empty string
     assert all(isinstance(f, str) and f.strip() for f in frags)
-

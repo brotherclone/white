@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.work_flow_type import WorkflowType
@@ -27,12 +28,15 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("single_agent", WorkflowType.SINGLE_AGENT),
-    ("chain", WorkflowType.CHAIN),
-    ("parallel", WorkflowType.PARALLEL),
-    ("full_spectrum", WorkflowType.FULL_SPECTRUM),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("single_agent", WorkflowType.SINGLE_AGENT),
+        ("chain", WorkflowType.CHAIN),
+        ("parallel", WorkflowType.PARALLEL),
+        ("full_spectrum", WorkflowType.FULL_SPECTRUM),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert WorkflowType(value) is member
 

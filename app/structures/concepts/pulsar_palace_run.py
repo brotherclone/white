@@ -1,8 +1,13 @@
 from datetime import datetime
+
 from pydantic import BaseModel
 
-from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter, PulsarPalacePlayer
 from app.agents.tools.gaming_tools import roll_dice
+from app.structures.concepts.pulsar_palace_character import (
+    PulsarPalaceCharacter,
+    PulsarPalacePlayer,
+)
+
 
 class PulsarPalaceRun(BaseModel):
 
@@ -22,12 +27,14 @@ class PulsarPalaceRun(BaseModel):
                 first_name="Gary",
                 last_name="Stu",
                 biography="A brave adventurer.",
-                attitude="Wants to get home."
+                attitude="Wants to get home.",
             )
             character = PulsarPalaceCharacter.create_random()
             character.assign_player(player)
             self.characters.append(character)
-        return f"Run started at {self.run_data.isoformat()} with {num_players[0]} players."
+        return (
+            f"Run started at {self.run_data.isoformat()} with {num_players[0]} players."
+        )
 
     def add_segment(self, segment: str):
         self.run_segments.append(segment)

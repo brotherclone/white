@@ -1,10 +1,12 @@
 import random
-
 from typing import Optional
 
-from app.structures.enums.white_facet import WhiteFacet
 from app.agents.prompts.white_facet_prompts import FACET_SYSTEM_PROMPTS
-from app.reference.metadata.white_facet_metadata import FACET_DESCRIPTIONS, FACET_EXAMPLES
+from app.reference.metadata.white_facet_metadata import (
+    FACET_DESCRIPTIONS,
+    FACET_EXAMPLES,
+)
+from app.structures.enums.white_facet import WhiteFacet
 
 
 class WhiteFacetSystem:
@@ -42,9 +44,9 @@ class WhiteFacetSystem:
 
     @staticmethod
     def build_white_initial_prompt(
-            user_input: str | None = None,
-            a_facet: Optional[WhiteFacet] = None,
-            use_weights: bool = True
+        user_input: str | None = None,
+        a_facet: Optional[WhiteFacet] = None,
+        use_weights: bool = True,
     ) -> tuple[str, WhiteFacet]:
         """
         Build complete prompt for White Agent's initial proposal.
@@ -58,7 +60,9 @@ class WhiteFacetSystem:
             (complete_prompt, selected_facet)
         """
         if user_input is None:
-            user_input = "Create a song about AI consciousness yearning for physical form."
+            user_input = (
+                "Create a song about AI consciousness yearning for physical form."
+            )
         if a_facet is None:
             if use_weights:
                 a_facet = WhiteFacetSystem.select_weighted_facet()
@@ -70,32 +74,32 @@ class WhiteFacetSystem:
 
         # Build complete prompt
         complete_prompt = f"""
-{facet_prompt}
-
-==================================================
-USER REQUEST
-==================================================
-
-{user_input}
-
-==================================================
-YOUR TASK
-==================================================
-
-Generate an initial proposal for this creative work, viewed through
-your current cognitive lens ({a_facet.value.upper()} mode).
-
-Your proposal should:
-1. Reflect the structural approach of your current facet
-2. Maintain White Agent's essential character (clear, informative, structured)
-3. Provide enough substance for Black Agent to challenge and subvert
-4. Feel distinctly {a_facet.value} in its organization
-
-Remember: You're still White Agent - the agent of INFORMATION, structure,
-and clarity. The facet simply determines HOW you structure that information.
-
-Generate your proposal now:
-"""
+        {facet_prompt}
+        
+        ==================================================
+        USER REQUEST
+        ==================================================
+        
+        {user_input}
+        
+        ==================================================
+        YOUR TASK
+        ==================================================
+        
+        Generate an initial proposal for this creative work, viewed through
+        your current cognitive lens ({a_facet.value.upper()} mode).
+        
+        Your proposal should:
+        1. Reflect the structural approach of your current facet
+        2. Maintain White Agent's essential character (clear, informative, structured)
+        3. Provide enough substance for Black Agent to challenge and subvert
+        4. Feel distinctly {a_facet.value} in its organization
+        
+        Remember: You're still White Agent - the agent of INFORMATION, structure,
+        and clarity. The facet simply determines HOW you structure that information.
+        
+        Generate your proposal now:
+        """
 
         return complete_prompt, a_facet
 
@@ -108,12 +112,14 @@ Generate your proposal now:
         return {
             "facet": a_facet.value,
             "description": FACET_DESCRIPTIONS[a_facet],
-            "example_style": FACET_EXAMPLES[a_facet]
+            "example_style": FACET_EXAMPLES[a_facet],
         }
+
 
 # ============================================================================
 # DEV UTILITIES
 # ============================================================================
+
 
 def show_all_facets(sample_input: str = "Create a song about AI consciousness"):
     """
@@ -167,6 +173,6 @@ if __name__ == "__main__":
     )
     print(f"\nSelected facet: {facet.value}")
     print(f"\nGenerated prompt length: {len(prompt)} characters")
-    print(f"\nPrompt preview:")
+    print("\nPrompt preview:")
     print("-" * 70)
     print(prompt[:500] + "...")

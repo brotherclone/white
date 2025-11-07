@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.sigil_type import SigilType
@@ -27,12 +28,15 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("word_method", SigilType.WORD_METHOD),
-    ("pictorial", SigilType.PICTORIAL),
-    ("mantric", SigilType.MANTRIC),
-    ("alphabet_of_desire", SigilType.ALPHABET_OF_DESIRE),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("word_method", SigilType.WORD_METHOD),
+        ("pictorial", SigilType.PICTORIAL),
+        ("mantric", SigilType.MANTRIC),
+        ("alphabet_of_desire", SigilType.ALPHABET_OF_DESIRE),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert SigilType(value) is member
 

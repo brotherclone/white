@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class WorkflowType(str, Enum):
     """
     Types of workflows for Rainbow agents.
@@ -8,6 +9,7 @@ class WorkflowType(str, Enum):
     3. PARALLEL: Multiple color agents work simultaneously on the same input.
     4. FULL_SPECTRUM: All color agents collaborate in a complex workflow.
     """
+
     SINGLE_AGENT = "single_agent"
     CHAIN = "chain"
     PARALLEL = "parallel"

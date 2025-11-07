@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.white_facet import WhiteFacet
@@ -30,11 +31,14 @@ def test_members_are_str_and_enum_and_compare_to_value():
         assert member == member.value
 
 
-@pytest.mark.parametrize("value,member", [
-    ("categorical", WhiteFacet.CATEGORICAL),
-    ("relational", WhiteFacet.RELATIONAL),
-    ("procedural", WhiteFacet.PROCEDURAL),
-])
+@pytest.mark.parametrize(
+    "value,member",
+    [
+        ("categorical", WhiteFacet.CATEGORICAL),
+        ("relational", WhiteFacet.RELATIONAL),
+        ("procedural", WhiteFacet.PROCEDURAL),
+    ],
+)
 def test_lookup_by_value(value, member):
     assert WhiteFacet(value) is member
 

@@ -1,0 +1,7 @@
+The copper wiring beneath her skin pulsed with a rhythm that had nothing to do with heartbeat. Dr. Miranda Volt pressed her fingertips against the laboratory table, feeling the static charge build between flesh and metal. The experiment had gone beyond anything Westinghouse or Tesla had imagined in their wildest fever dreams.
+
+"Subject exhibits unprecedented bioelectrical conductivity," she whispered into the recording device, her voice crackling like a radio transmission from Mars. The needle on the voltmeter danced frantically as she approached the examination chair where Subject 47 lay unconscious, his body wrapped in a cocoon of gleaming electrodes.
+
+She had discovered it three months ago - the human nervous system wasn't just electrical, it was a complete circuit waiting to be activated. The right combination of voltage and frequency could transform ordinary flesh into something magnificent, something dangerous. Her colleagues at the Institute thought she was mad, but they hadn't seen what she'd seen in the basement laboratories after midnight.
+
+The storm outside provided perfect conditions. Lightning split the sky in jagged purple lines, and with each thunderclap, Subject 47's body responded with its own luminescent display. Blue sparks traced the pathways of his circulatory system, turning him into a living constellation.

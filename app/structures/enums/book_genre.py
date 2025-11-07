@@ -1,7 +1,7 @@
 from enum import Enum
 
-class BookGenre(str, Enum):
 
+class BookGenre(str, Enum):
     """
     Genre categories for Light Reading collections.
     1. Occult: For books that are about occult and mystical things

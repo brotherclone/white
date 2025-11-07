@@ -1,11 +1,13 @@
 import logging
 import os
+
 import assemblyai as aai
 from dotenv import load_dotenv
 
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 load_dotenv()
 
@@ -28,6 +30,10 @@ def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
     aai.settings.api_key = api_key
     full_path = f"{working_path}/{file_name}"
 
+    if not os.path.exists(full_path):
+        logging.error(f"Audio file not found: {full_path}")
+        return None
+
     aai_config = aai.TranscriptionConfig(
         speech_model=aai.SpeechModel.universal,
         filter_profanity=False,
@@ -44,53 +50,77 @@ def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
 
     logging.info("Starting aggressive AssemblyAI transcription...")
     transcriber = aai.Transcriber(config=aai_config)
-    evp_transcription = transcriber.transcribe(full_path)
-
-    if evp_transcription.status == 'error':
+    try:
+        evp_transcription = transcriber.transcribe(full_path)
+    except Exception as e:
+        logging.error(f"AssemblyAI transcription failed with exception: {e}")
+        return None
+    if evp_transcription.status == "error":
         logging.error(f"Transcription failed: {evp_transcription.error}")
-        raise RuntimeError(f"Transcription failed: {evp_transcription.error}")
+        return None
 
-    if evp_transcription.status == 'completed':
-        logging.info(f"Transcription completed!")
+    if evp_transcription.status == "completed":
+        logging.info("Transcription completed!")
         logging.info(f"Text: {evp_transcription.text}")
         logging.info(f"Confidence: {evp_transcription.confidence}")
-        if hasattr(evp_transcription, 'sentiment_analysis_results') and evp_transcription.sentiment_analysis_results:
+        if (
+            hasattr(evp_transcription, "sentiment_analysis_results")
+            and evp_transcription.sentiment_analysis_results
+        ):
             logging.info(f"Sentiment: {evp_transcription.sentiment_analysis_results}")
-        if hasattr(evp_transcription, 'entities') and evp_transcription.entities:
-            logging.info(f"Detected entities: {[e.text for e in evp_transcription.entities]}")
-        if hasattr(evp_transcription, 'summary') and evp_transcription.summary:
+        if hasattr(evp_transcription, "entities") and evp_transcription.entities:
+            logging.info(
+                f"Detected entities: {[e.text for e in evp_transcription.entities]}"
+            )
+        if hasattr(evp_transcription, "summary") and evp_transcription.summary:
             logging.info(f"Summary: {evp_transcription.summary}")
-        if hasattr(evp_transcription, 'utterances') and evp_transcription.utterances:
+        if hasattr(evp_transcription, "utterances") and evp_transcription.utterances:
             logging.info(f"Utterances: {len(evp_transcription.utterances)} detected")
             for utterance in evp_transcription.utterances[:3]:  # First 3
-                logging.info(f"  Utterance: '{utterance.text}' (confidence: {utterance.confidence})")
+                logging.info(
+                    f"  Utterance: '{utterance.text}' (confidence: {utterance.confidence})"
+                )
         if evp_transcription.text and evp_transcription.text.strip():
             return evp_transcription.text
-        elif hasattr(evp_transcription, 'utterances') and evp_transcription.utterances:
-            utterance_texts = [u.text for u in evp_transcription.utterances if u.text.strip()]
+        elif hasattr(evp_transcription, "utterances") and evp_transcription.utterances:
+            utterance_texts = [
+                u.text for u in evp_transcription.utterances if u.text.strip()
+            ]
             if utterance_texts:
                 combined_text = " ".join(utterance_texts)
                 logging.info(f"Using combined utterances: {combined_text}")
                 return combined_text
+
     logging.warning("No transcription text generated - AssemblyAI too conservative!")
     return None
 
 
-def chain_artifact_file_from_speech_to_text(audio: AudioChainArtifactFile,
-                                            thread_id: str) -> TextChainArtifactFile | None:
+def chain_artifact_file_from_speech_to_text(
+    audio: AudioChainArtifactFile, thread_id: str
+) -> TextChainArtifactFile | None:
 
-
-    transcript_text = evp_speech_to_text(audio.get_artifact_path(with_file_name=False), audio.file_name)
+    transcript_text = evp_speech_to_text(
+        audio.get_artifact_path(with_file_name=False), audio.file_name
+    )
     if transcript_text:
-        transcript = TextChainArtifactFile(
-            text_content=transcript_text,
-            thread_id=thread_id,
-            rainbow_color=audio.rainbow_color,
-            base_path=audio.base_path,
-            chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-            artifact_name=f"{audio.artifact_name}_transcript",
-        )
-        return transcript
+        logging.info(f"✓ Generated transcript with {len(transcript_text)} characters")
     else:
-        logging.warning("No transcript generated from audio.")
-        return None
+        logging.warning("⚠️  No transcript generated - using placeholder")
+        transcript_text = "[EVP: No discernible speech detected]"
+    transcript = TextChainArtifactFile(
+        text_content=transcript_text,
+        thread_id=thread_id,
+        rainbow_color=audio.rainbow_color,
+        base_path=audio.base_path,
+        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+        artifact_name=f"{audio.artifact_name}_transcript",
+    )
+    try:
+        save_artifact_file_to_md(transcript)
+        logging.info(
+            f"✓ Saved transcript to {transcript.get_artifact_path(with_file_name=True)}"
+        )
+    except Exception as e:
+        logging.error(f"✗ Failed to save transcript: {e}")
+
+    return transcript
