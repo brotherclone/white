@@ -3,6 +3,7 @@ import os
 import random
 import sqlite3
 import time
+import uuid
 from abc import ABC
 
 import yaml
@@ -31,6 +32,7 @@ from app.structures.artifacts.sigil_artifact import SigilArtifact
 from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 from app.structures.manifests.song_proposal import SongProposalIteration
@@ -344,17 +346,17 @@ class BlackAgent(BaseRainbowAgent, ABC):
         {SigilState.CREATED.value} (awaiting charging)
         """
         sigil_report = TextChainArtifactFile(
-            artifact_id=sigil_artifact.artifact_id,  # or generate new UUID
+            artifact_id=str(uuid.uuid4()),
             text_content=sigil_text,
             artifact_name=f"sigil_{current_proposal.title.replace(' ', '_')}",
-            file_name=f"sigil_{current_proposal.title.replace(' ', '_')}.md",
-            chain_artifact_file_type="text/markdown",
-            base_path="md",  # or wherever you want it saved
+            chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            thread_id=state.thread_id,
         )
         sigil_artifact.artifact_report = sigil_report
         save_artifact_file_to_md(sigil_report)
         state.artifacts.append(sigil_artifact)
-        logging.info("📝 Attempting to create Todoist task for sigil charging...")
+        logging.info("Attempting to create Todoist task for sigil charging...")
         todoist_token = os.getenv("TODOIST_API_TOKEN")
         if not todoist_token:
             logging.error("✗ TODOIST_API_TOKEN not found in environment variables!")
@@ -453,14 +455,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
         current_proposal = state.counter_proposal
         try:
             segments = get_audio_segments_as_chain_artifacts(
-                2.0, 4, the_rainbow_table_colors["Z"], state.thread_id
+                20.0, 8, the_rainbow_table_colors["Z"], state.thread_id
             )
 
             if not segments:
                 logging.warning(
                     "⚠️  No audio segments extracted - skipping EVP generation"
                 )
-                # Create a placeholder EVP artifact
                 evp_artifact = EVPArtifact(
                     audio_segments=[],
                     transcript=None,
@@ -473,18 +474,14 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
             mosaic = create_audio_mosaic_chain_artifact(
                 segments,
-                100,
+                300,
                 getattr(current_proposal, "target_length", 10),
                 state.thread_id,
             )
-
-            blended = create_blended_audio_chain_artifact(mosaic, 0.66, state.thread_id)
-
-            # This now handles None transcripts gracefully
+            blended = create_blended_audio_chain_artifact(mosaic, 0.6, state.thread_id)
             transcript = chain_artifact_file_from_speech_to_text(
                 blended, state.thread_id
             )
-
             evp_artifact = EVPArtifact(
                 audio_segments=segments,
                 transcript=transcript,
@@ -499,7 +496,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
         except Exception as e:
             logging.error(f"✗ EVP generation failed: {e}")
             logging.exception("Full traceback:")
-            # Create minimal placeholder artifact so workflow can continue
             evp_artifact = EVPArtifact(
                 audio_segments=[],
                 transcript=None,

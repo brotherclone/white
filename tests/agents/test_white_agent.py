@@ -39,6 +39,16 @@ def test_invoke_black_agent():
     mock_black_agent.assert_called_once_with(mock_state)
 
 
+def test_invoke_red_agent():
+    mock_state = MagicMock(spec=MainAgentState)
+    mock_red_agent = MagicMock(return_value=mock_state)
+    agent = WhiteAgent()
+    agent.agents["red"] = mock_red_agent  # Inject mock
+    result = agent.invoke_red_agent(mock_state)
+    assert result == mock_state
+    mock_red_agent.assert_called_once_with(mock_state)
+
+
 def test_resume_after_black_agent_ritual(monkeypatch):
     """Test resuming workflow after black agent ritual completion"""
 

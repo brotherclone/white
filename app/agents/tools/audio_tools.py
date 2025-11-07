@@ -542,6 +542,14 @@ def blend_with_noise(
 def create_blended_audio_chain_artifact(
     mosaic: AudioChainArtifactFile, blend: float, thread_id: str
 ) -> AudioChainArtifactFile:
+
+    is_vocal = (
+        "vocal" in mosaic.artifact_name.lower() or "vox" in mosaic.artifact_name.lower()
+    )
+
+    if is_vocal:
+        blend = 0.0
+
     artifact = AudioChainArtifactFile(
         thread_id=thread_id,
         base_path=mosaic.base_path,

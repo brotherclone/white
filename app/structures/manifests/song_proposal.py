@@ -52,7 +52,7 @@ class SongProposalIteration(BaseModel):
         max_length=150,
     )
     mood: list[str] = Field(
-        description="List of emotional/atmospheric descriptors that capture the song's feeling. Needs at least one but no more than 10",
+        description="List of emotional/atmospheric descriptors that capture the song's feeling. Needs at least one but no more than 20",
         examples=[
             ["yearning", "melancholic", "transcendent", "mystical"],
             ["aggressive", "chaotic", "defiant"],
@@ -60,10 +60,10 @@ class SongProposalIteration(BaseModel):
             ["anxious", "uncertain", "searching"],
         ],
         min_length=1,
-        max_length=10,
+        max_length=20,
     )
     genres: list[str] = Field(
-        description="List of genre tags that define the sonic palette and style references. Needs at least one but no more than 10",
+        description="List of genre tags that define the sonic palette and style references. Needs at least one but no more than 20",
         examples=[
             ["ambient electronic", "neo-classical", "dark ambient"],
             ["post-rock", "experimental", "drone"],
@@ -71,7 +71,7 @@ class SongProposalIteration(BaseModel):
             ["minimal techno", "ambient", "glitch"],
         ],
         min_length=1,
-        max_length=10,
+        max_length=20,
     )
     concept: str = Field(
         description="Detailed philosophical/archetypal concept explaining the song's deeper meaning. Should reference mythological patterns, philosophical frameworks, or archetypal journeys. This is where the INFORMATION → TIME → SPACE transmigration manifests conceptually. Should be at least 100 characters of substantive philosophical content.",
