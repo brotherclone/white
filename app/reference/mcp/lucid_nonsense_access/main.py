@@ -1,13 +1,16 @@
 import logging
 import os
 import sys
+import datetime
+import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
-USER_AGENT = "lucid_nonsense_access/1.0"
+USER_AGENT = "lucid_nonsense_access/1.1"
 TIME_OUT = 30.0
 
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +36,7 @@ def search_white_project_files() -> list[Any]:
 
 
 @mcp.tool()
-def open_lucid_nonsense_file(file_name: str) -> str:
+def open_lucid_nonsense_file(file_name: str) -> str | None:
     """Open and read a file from the lucid nonsense directory"""
     base_path = get_base_path()
     file_path = base_path / file_name
@@ -53,18 +56,52 @@ def open_lucid_nonsense_file(file_name: str) -> str:
 
 
 @mcp.tool()
+def claude_save_stuff_here(file_name: str, content: str) -> str:
+    """Build metadata frontmatter and reuse `write_lucid_nonsense_file` to write it."""
+    base_path = get_base_path()
+    metadata: dict[str, Any] | None = {
+        "timestamp_utc": datetime.datetime.utcnow().isoformat() + "Z",
+        "user_agent": USER_AGENT,
+        "timeout_seconds": TIME_OUT,
+        "env_LUCID_NONSENSE_PATH": str(base_path),
+        "filename": file_name,
+    }
+    try:
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=str(base_path), text=True
+        ).strip()
+        metadata["git_branch"] = branch
+    except EnvironmentError as err:
+        print(f"Error: {err}")
+        metadata["git_branch"] = None
+    try:
+        remotes = subprocess.check_output(
+            ["git", "remote", "-v"], cwd=str(base_path), text=True
+        ).strip()
+        metadata["git_remotes"] = remotes
+    except EnvironmentError as err:
+        print(f"Error: {err}")
+        metadata["git_remotes"] = None
+    yaml_lines = ["---"]
+    for k, v in metadata.items():
+        yaml_lines.append(f"{k}: {json.dumps(v)}")
+    yaml_lines.append("---")
+    yaml_block = "\n".join(yaml_lines) + "\n\n"
+    target_path = Path("claude_working_area") / file_name
+    return write_lucid_nonsense_file(str(target_path), yaml_block + content)
+
+
+@mcp.tool()
 def write_lucid_nonsense_file(file_name: str, content: str) -> str:
     """Write content to a file in the lucid nonsense directory"""
     base_path = get_base_path()
     file_path = base_path / file_name
 
-    # Security check - ensure file is within base directory
     try:
         file_path.resolve().parent.relative_to(base_path.resolve())
     except ValueError:
         raise ValueError(f"File {file_name} is outside allowed directory")
 
-    # Ensure directory exists
     file_path.parent.mkdir(parents=True, exist_ok=True)
 
     try:

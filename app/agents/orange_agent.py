@@ -42,7 +42,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
-        print("🧡 ORANGE AGENT: Mythologizing Sussex...")
+        print("Rows Bud, misrembering as mythology")
 
         return state
 
@@ -98,3 +98,25 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
             state.counter_proposal = counter_proposal
             return state
+
+
+"""
+Design notes:
+
+using some type of news API (lexus/nexus?) find articles that meet the following criteria:
+- Takes place in New Jersey
+- Takes place between 1975-1995
+- Must involve two of the following:
+    - Rock Bands
+    - Teenage/Youth Crime
+    - Teenage/Youth Mental Health
+    - Unexplained Phenomena
+    - Psychedelic Drugs
+    
+- Must have a "mythologizable" angle - something that can be exaggerated or fictionalized into a local legend
+
+- Create a resource of these stories
+- Have the agent pick a random story from the list and rewrite it with a mythologized Object that DID not exist in the story
+but could be seen as significant metaphorically, mythologically, or philosophically relevant to the story.
+- Rewrite the article in more of a Gonzo style with these new aspects
+"""
