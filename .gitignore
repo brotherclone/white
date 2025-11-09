@@ -42,3 +42,4 @@ htmlcov/
 *.db
 /chords/
 /claude_working_area/
+/app/reference/news_articles/clippings/
