@@ -41,3 +41,4 @@ htmlcov/
 *.pkl
 *.db
 /chords/
+/claude_working_area/

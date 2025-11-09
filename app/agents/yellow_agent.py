@@ -44,7 +44,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
-        print("💛 YELLOW AGENT: Running RPG Session...")
+        print("Lord Pulsimore of Pulsar Palace")
 
         return state
 
