@@ -1,13 +1,20 @@
-from pydantic import BaseModel
+from typing import Optional, List
+
+from pydantic import BaseModel, Field
 
 
 class Note(BaseModel):
 
     pitch_name: str
-    pitch_alias: list[str] | None = None  # e.g., ['C', 'Do']
-    accidental: str | None = None  # e.g., 'sharp', 'flat',
-    frequency: int | None = None
+    pitch_alias: Optional[List[str]] = Field(
+        default=None, description="Alternative names for the pitch."
+    )
+    accidental: Optional[str] = Field(
+        default=None, description="Accidental of the note (e.g., sharp, flat)."
+    )
+    frequency: Optional[int] = Field(default=None, description="Frequency in Hz.")
     octave: int | None = None
+    midi_note: Optional[int] = Field(default=None, description="MIDI note number.")
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -18,32 +25,99 @@ class Note(BaseModel):
 
 
 tempered_notes = {
-    "C": Note(pitch_name="C", pitch_alias=[], accidental=None, frequency=261, octave=4),
+    "C": Note(
+        pitch_name="C",
+        pitch_alias=[],
+        accidental=None,
+        frequency=261,
+        octave=4,
+        midi_note=60,
+    ),
     "C#": Note(
-        pitch_name="C", pitch_alias=["D♭"], accidental="sharp", frequency=277, octave=4
+        pitch_name="C",
+        pitch_alias=["D♭"],
+        accidental="sharp",
+        frequency=277,
+        octave=4,
+        midi_note=61,
     ),
-    "D": Note(pitch_name="D", pitch_alias=[], accidental=None, frequency=293, octave=4),
+    "D": Note(
+        pitch_name="D",
+        pitch_alias=[],
+        accidental=None,
+        frequency=293,
+        octave=4,
+        midi_note=62,
+    ),
     "D#": Note(
-        pitch_name="D", pitch_alias=["E♭"], accidental="sharp", frequency=311, octave=4
+        pitch_name="D",
+        pitch_alias=["E♭"],
+        accidental="sharp",
+        frequency=311,
+        octave=4,
+        midi_note=63,
     ),
-    "E": Note(pitch_name="E", pitch_alias=[], accidental=None, frequency=329, octave=4),
-    "F": Note(pitch_name="F", pitch_alias=[], accidental=None, frequency=349, octave=4),
+    "E": Note(
+        pitch_name="E",
+        pitch_alias=[],
+        accidental=None,
+        frequency=329,
+        octave=4,
+        midi_note=64,
+    ),
+    "F": Note(
+        pitch_name="F",
+        pitch_alias=[],
+        accidental=None,
+        frequency=349,
+        octave=4,
+        midi_note=65,
+    ),
     "F#": Note(
-        pitch_name="F", pitch_alias=["G♭"], accidental="sharp", frequency=370, octave=4
+        pitch_name="F",
+        pitch_alias=["G♭"],
+        accidental="sharp",
+        frequency=370,
+        octave=4,
+        midi_note=66,
     ),
-    "G": Note(pitch_name="G", pitch_alias=[], accidental=None, frequency=392, octave=4),
+    "G": Note(
+        pitch_name="G",
+        pitch_alias=[],
+        accidental=None,
+        frequency=392,
+        octave=4,
+        midi_note=67,
+    ),
     "G#": Note(
-        pitch_name="G", pitch_alias=["A♭"], accidental="sharp", frequency=415, octave=4
+        pitch_name="G",
+        pitch_alias=["A♭"],
+        accidental="sharp",
+        frequency=415,
+        octave=4,
+        midi_note=68,
     ),
     "A": Note(pitch_name="A", pitch_alias=[], accidental=None, frequency=440, octave=4),
     "A#": Note(
-        pitch_name="A", pitch_alias=["B♭"], accidental="sharp", frequency=466, octave=4
+        pitch_name="A",
+        pitch_alias=["B♭"],
+        accidental="sharp",
+        frequency=466,
+        octave=4,
+        midi_note=69,
     ),
-    "B": Note(pitch_name="B", pitch_alias=[], accidental=None, frequency=493, octave=4),
+    "B": Note(
+        pitch_name="B",
+        pitch_alias=[],
+        accidental=None,
+        frequency=493,
+        octave=4,
+        midi_note=70,
+    ),
 }
 
 
-def get_note(note_str: str) -> Note:
+def get_tempered_note(note_str: str) -> Note:
     if note_str in tempered_notes:
         return tempered_notes[note_str]
     else:

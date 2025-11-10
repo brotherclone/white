@@ -7,7 +7,7 @@ from app.structures.manifests.manifest import Manifest
 from app.structures.manifests.manifest_song_structure import ManifestSongStructure
 from app.structures.music.core.duration import Duration
 from app.structures.music.core.key_signature import get_mode
-from app.structures.music.core.notes import get_note
+from app.structures.music.core.notes import get_tempered_note
 from app.structures.music.core.time_signature import TimeSignature
 
 
@@ -189,6 +189,6 @@ def test_manifest_tempo_invalid_keeps_string():
 
 def test_get_note_and_get_mode_invalid_raise():
     with pytest.raises(ValueError):
-        get_note("H")
+        get_tempered_note("H")
     with pytest.raises(ValueError):
         get_mode("not_a_mode")

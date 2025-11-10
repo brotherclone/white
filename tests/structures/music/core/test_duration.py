@@ -1,7 +1,7 @@
 import pytest
 
 from app.structures.music.core.duration import Duration
-from app.structures.music.core.notes import Note, get_note
+from app.structures.music.core.notes import Note, get_tempered_note
 
 
 def test_duration_str():
@@ -29,11 +29,11 @@ def test_note_invalid_pitch():
 
 
 def test_get_note_valid():
-    n = get_note("C")
+    n = get_tempered_note("C")
     assert isinstance(n, Note)
     assert n.pitch_name == "C"
 
 
 def test_get_note_invalid():
     with pytest.raises(ValueError):
-        get_note("H")
+        get_tempered_note("H")
