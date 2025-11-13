@@ -29,7 +29,7 @@ from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType

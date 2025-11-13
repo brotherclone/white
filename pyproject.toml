@@ -38,4 +38,7 @@ dependencies = [
     "langgraph-checkpoint>=2.1.1",
     "langgraph-checkpoint-sqlite>=2.0.11",
     "internetarchive>=5.7.1",
+    "polars>=1.35.2",
+    "neo4j~=5.28.0",
+    "fastmcp>=2.13.0.2",
 ]

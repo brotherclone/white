@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.artifacts.base_chain_artifact import ChainArtifact
+from app.structures.artifacts.base_artifact import ChainArtifact
 
 load_dotenv()
 

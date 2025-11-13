@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from app.structures.artifacts.base_chain_artifact_file import BaseChainArtifactFile
+from app.structures.artifacts.base_artifact_file import BaseChainArtifactFile
 
 
 class AudioChainArtifactFile(BaseChainArtifactFile):

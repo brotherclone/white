@@ -1,4 +1,4 @@
-from app.structures.artifacts.image_chain_artifact_file import ImageChainArtifactFile
+from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 

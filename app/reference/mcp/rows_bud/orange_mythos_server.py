@@ -1,809 +1,382 @@
-#!/usr/bin/env python3
-"""
-Orange Agent MCP Server - Mytho-Temporal Rebracketing Engine
-
-Provides tools for:
-- Searching Internet Archive newspapers
-- Building mythologizable story corpus
-- Inserting symbolic objects
-- Gonzo-style narrative transformation
-"""
-
-import asyncio
-import json
 import os
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Optional
 
-# MCP SDK
-from mcp.server import Server
-from mcp.types import (
-    Resource,
-    Tool,
-    TextContent,
-)
-import mcp.server.stdio
+from typing import List, Optional, cast, Iterable, Any
+from anthropic import Anthropic
+from fastmcp import FastMCP
+from app.reference.mcp.rows_bud.orange_corpus import get_corpus
 
-# Internet Archive
-try:
-    from internetarchive import search_items
+mcp = FastMCP("Orange Mythos")
+anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-    IA_AVAILABLE = True
-except ImportError:
-    IA_AVAILABLE = False
-    print("Warning: internetarchive not installed. Run: pip install internetarchive")
-
-# Storage
-CORPUS_DIR = Path(os.getenv("ORANGE_CORPUS_DIR", "./orange_mythos_corpus"))
-CORPUS_FILE = CORPUS_DIR / "mythologizable_corpus.json"
-
-# Symbolic object categories
-SYMBOLIC_OBJECTS = {
-    "CIRCULAR_TIME": [
-        "Broken clock stuck at {time}",
-        "Möbius strip made of {material}",
-        "Mirror showing {temporal_variant}",
-        "Photograph that changes over time",
-        "Cassette tape that plays backwards",
-    ],
-    "INFORMATION_ARTIFACTS": [
-        "Notebook with impossible {pattern}",
-        "Blueprint of non-existent structure",
-        "Map to {liminal_place}",
-        "Diagram drawn repeatedly",
-        "Polaroid showing thirteen reflections",
-    ],
-    "LIMINAL_OBJECTS": [
-        "Key that fits no door",
-        "Ticket stub from event that never happened",
-        "Receipt from {impossible_location}",
-        "ID card with wrong photograph",
-        "Coin from {alternate_year}",
-    ],
-    "PSYCHOGEOGRAPHIC": [
-        "Stone from {significant_location}",
-        "Graffiti symbol appearing everywhere",
-        "Object found in wrong location",
-        "Fragment of {anachronistic_technology}",
-        "Souvenir from {mythical_place}",
-    ],
-}
-
-# Initialize MCP server
-server = Server("orange-mythos")
-
-# In-memory corpus cache
-_corpus_cache: Optional[dict] = None
+CORPUS_DIR = os.getenv("ORANGE_CORPUS_DIR")
+corpus = get_corpus(CORPUS_DIR)
 
 
-def ensure_corpus_dir():
-    """Ensure corpus directory exists"""
-    CORPUS_DIR.mkdir(parents=True, exist_ok=True)
-    if not CORPUS_FILE.exists():
-        CORPUS_FILE.write_text(
-            json.dumps(
-                {
-                    "stories": [],
-                    "metadata": {
-                        "created": datetime.now().isoformat(),
-                        "version": "1.0",
-                    },
-                },
-                indent=2,
-            )
-        )
-
-
-def load_corpus() -> dict:
-    """Load corpus from disk"""
-    global _corpus_cache
-    if _corpus_cache is None:
-        ensure_corpus_dir()
-        _corpus_cache = json.loads(CORPUS_FILE.read_text())
-    return _corpus_cache
-
-
-def save_corpus(corpus: dict):
-    """Save corpus to disk"""
-    global _corpus_cache
-    ensure_corpus_dir()
-    _corpus_cache = corpus
-    CORPUS_FILE.write_text(json.dumps(corpus, indent=2))
-
-
-def calculate_mythologization_score(story: dict) -> float:
+@mcp.tool()
+def add_story_to_corpus(
+    headline: str, date: str, source: str, text: str, location: str, tags: List[str]
+) -> dict:
     """
-    Score a story's mythologization potential (0.0-1.0)
+    Add a mythologizable story to the corpus with automatic scoring.
 
-    Factors:
-    - Ambiguity (unexplained elements)
-    - Temporal liminality (dusk/dawn/midnight)
-    - Youth involvement
-    - Multiple witnesses
-    - Symbolic resonance
+    Args:
+        headline: Story headline
+        date: Publication date (YYYY-MM-DD)
+        source: Newspaper name
+        text: Full article text
+        location: Specific NJ location
+        tags: Category tags (e.g., ["rock_bands", "youth_crime"])
+
+    Returns:
+        dict with story_id, score, and status
     """
-    score = 0.0
-    text = story.get("text", "").lower()
-    headline = story.get("headline", "").lower()
-
-    # Ambiguity indicators
-    ambiguity_terms = [
-        "unexplained",
-        "mysterious",
-        "strange",
-        "bizarre",
-        "unknown",
-        "unclear",
-        "investigators puzzled",
-    ]
-    score += sum(0.1 for term in ambiguity_terms if term in text) * 0.15
-
-    # Temporal liminality
-    liminal_times = ["midnight", "dawn", "dusk", "3 am", "witching hour"]
-    score += sum(0.15 for time in liminal_times if time in text) * 0.2
-
-    # Youth involvement
-    youth_terms = [
-        "teen",
-        "teenager",
-        "youth",
-        "student",
-        "high school",
-        "juvenile",
-        "adolescent",
-    ]
-    if any(term in headline or term in text for term in youth_terms):
-        score += 0.2
-
-    # Multiple witnesses
-    witness_terms = ["witnesses", "several people", "multiple", "group saw"]
-    score += sum(0.1 for term in witness_terms if term in text) * 0.15
-
-    # Symbolic resonance (already has object focus)
-    object_terms = ["found", "discovered", "artifact", "object", "item"]
-    score += sum(0.05 for term in object_terms if term in text) * 0.1
-
-    # Location specificity (specific places = better mythology)
-    if any(place in text for place in ["route ", "highway ", "avenue", "street"]):
-        score += 0.1
-
-    # Night occurrence
-    if any(term in text for term in ["night", "evening", "after dark"]):
-        score += 0.1
-
-    return min(score, 1.0)
-
-
-@server.list_resources()
-async def list_resources() -> list[Resource]:
-    """List available corpus resources"""
-    ensure_corpus_dir()
-
-    resources = [
-        Resource(
-            uri="orange://corpus/stats",
-            name="Corpus Statistics",
-            mimeType="application/json",
-            description="Statistics about the mythologizable story corpus",
-        )
-    ]
-
-    # Add resource for each story in corpus
-    corpus = load_corpus()
-    for story in corpus.get("stories", [])[:50]:  # Limit to 50 for performance
-        story_id = story.get("id", "unknown")
-        resources.append(
-            Resource(
-                uri=f"orange://story/{story_id}",
-                name=f"Story: {story.get('headline', 'Untitled')}",
-                mimeType="application/json",
-                description=f"{story.get('date', 'Unknown date')} - {story.get('source', 'Unknown source')}",
-            )
-        )
-
-    return resources
-
-
-@server.read_resource()
-async def read_resource(uri: str) -> str:
-    """Read a corpus resource"""
-    corpus = load_corpus()
-
-    if uri == "orange://corpus/stats":
-        stories = corpus.get("stories", [])
-        return json.dumps(
-            {
-                "total_stories": len(stories),
-                "date_range": {
-                    "earliest": min((s.get("date") for s in stories), default=None),
-                    "latest": max((s.get("date") for s in stories), default=None),
-                },
-                "mythologized_count": sum(
-                    1 for s in stories if s.get("mythologized", False)
-                ),
-                "avg_score": (
-                    sum(s.get("mythologization_score", 0) for s in stories)
-                    / len(stories)
-                    if stories
-                    else 0
-                ),
-                "top_tags": _count_tags(stories),
-            },
-            indent=2,
-        )
-
-    elif uri.startswith("orange://story/"):
-        story_id = uri.split("/")[-1]
-        story = next(
-            (s for s in corpus.get("stories", []) if s.get("id") == story_id), None
-        )
-        if story:
-            return json.dumps(story, indent=2)
-        else:
-            return json.dumps({"error": f"Story {story_id} not found"})
-
-    return json.dumps({"error": f"Unknown resource: {uri}"})
-
-
-def _count_tags(stories: list) -> dict:
-    """Count tag occurrences"""
-    tag_counts = {}
-    for story in stories:
-        for tag in story.get("tags", []):
-            tag_counts[tag] = tag_counts.get(tag, 0) + 1
-    return dict(sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)[:10])
-
-
-@server.list_tools()
-async def list_tools() -> list[Tool]:
-    """List available Orange Agent tools"""
-    return [
-        Tool(
-            name="search_internet_archive_newspapers",
-            description="""
-            Search Internet Archive for New Jersey newspapers (1975-1995).
-            Returns metadata about available newspaper issues.
-            
-            Parameters:
-            - keywords: Search terms (e.g., "punk rock", "unexplained", "teenage crime")
-            - date_range: Date range tuple (start_year, end_year)
-            - max_results: Maximum results to return (default 20)
-            """,
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "keywords": {"type": "string", "description": "Search keywords"},
-                    "start_year": {
-                        "type": "integer",
-                        "description": "Start year (1975-1995)",
-                        "minimum": 1975,
-                        "maximum": 1995,
-                    },
-                    "end_year": {
-                        "type": "integer",
-                        "description": "End year (1975-1995)",
-                        "minimum": 1975,
-                        "maximum": 1995,
-                    },
-                    "max_results": {
-                        "type": "integer",
-                        "description": "Maximum results",
-                        "default": 20,
-                    },
-                },
-                "required": ["keywords", "start_year", "end_year"],
-            },
-        ),
-        Tool(
-            name="add_story_to_corpus",
-            description="""
-            Add a mythologizable story to the corpus with automatic scoring.
-            
-            Parameters:
-            - headline: Story headline
-            - date: Publication date (YYYY-MM-DD)
-            - source: Newspaper name
-            - text: Full article text
-            - location: Specific NJ location
-            - tags: Category tags (e.g., ["rock_bands", "youth_crime"])
-            """,
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "headline": {"type": "string"},
-                    "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
-                    "source": {"type": "string"},
-                    "text": {"type": "string"},
-                    "location": {"type": "string"},
-                    "tags": {"type": "array", "items": {"type": "string"}},
-                },
-                "required": ["headline", "date", "source", "text", "location", "tags"],
-            },
-        ),
-        Tool(
-            name="search_corpus",
-            description="""
-            Search the mythologizable story corpus.
-            
-            Parameters:
-            - tags: Required tags (e.g., ["rock_bands", "youth_crime"])
-            - min_score: Minimum mythologization score (0.0-1.0)
-            - location: Specific NJ location
-            - date_range: Date range tuple (start, end) in YYYY-MM-DD format
-            - exclude_mythologized: Skip already mythologized stories (default true)
-            """,
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "tags": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "Required tags (must have at least 2)",
-                    },
-                    "min_score": {
-                        "type": "number",
-                        "description": "Minimum mythologization score",
-                        "minimum": 0.0,
-                        "maximum": 1.0,
-                        "default": 0.5,
-                    },
-                    "location": {"type": "string", "description": "NJ location filter"},
-                    "start_date": {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD)",
-                    },
-                    "end_date": {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD)",
-                    },
-                    "exclude_mythologized": {
-                        "type": "boolean",
-                        "description": "Exclude already mythologized stories",
-                        "default": True,
-                    },
-                },
-            },
-        ),
-        Tool(
-            name="insert_symbolic_object",
-            description="""
-            Insert a symbolic object into a story for mythologization.
-            
-            The object should NOT exist in the original story but should be:
-            - Contextually appropriate to time/place
-            - Metaphorically resonant with themes
-            - Mythologically significant
-            
-            Parameters:
-            - story_id: ID of story to mythologize
-            - object_category: One of: CIRCULAR_TIME, INFORMATION_ARTIFACTS, 
-                               LIMINAL_OBJECTS, PSYCHOGEOGRAPHIC
-            - custom_object: Optional custom object description
-            """,
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "story_id": {"type": "string"},
-                    "object_category": {
-                        "type": "string",
-                        "enum": [
-                            "CIRCULAR_TIME",
-                            "INFORMATION_ARTIFACTS",
-                            "LIMINAL_OBJECTS",
-                            "PSYCHOGEOGRAPHIC",
-                        ],
-                    },
-                    "custom_object": {
-                        "type": "string",
-                        "description": "Custom object description (overrides category template)",
-                    },
-                },
-                "required": ["story_id", "object_category"],
-            },
-        ),
-        Tool(
-            name="gonzo_rewrite",
-            description="""
-            Rewrite a mythologized story in gonzo journalism style.
-            
-            Style characteristics:
-            - First-person embedded journalism
-            - Paranoia and conspiracy undertones  
-            - Perception shifts and altered states
-            - Authority distrust
-            - Vivid sensory details
-            - Symbolic object becomes central
-            
-            Parameters:
-            - story_id: ID of mythologized story
-            - perspective: Narrative perspective (journalist, witness, investigator)
-            - intensity: Gonzo intensity level (1-5, where 5 is full Hunter S. Thompson)
-            """,
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "story_id": {"type": "string"},
-                    "perspective": {
-                        "type": "string",
-                        "enum": [
-                            "journalist",
-                            "witness",
-                            "investigator",
-                            "participant",
-                        ],
-                        "default": "journalist",
-                    },
-                    "intensity": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 5,
-                        "default": 3,
-                        "description": "Gonzo intensity (1=subtle, 5=full Thompson)",
-                    },
-                },
-                "required": ["story_id"],
-            },
-        ),
-        Tool(
-            name="get_corpus_stats",
-            description="""
-            Get statistics about the mythologizable story corpus.
-            
-            Returns:
-            - Total stories
-            - Date range coverage
-            - Tag distribution
-            - Mythologization status
-            - Average scores
-            """,
-            inputSchema={"type": "object", "properties": {}},
-        ),
-    ]
-
-
-@server.call_tool()
-async def call_tool(name: str, arguments: Any) -> list[TextContent]:
-    """Handle tool calls"""
-
-    if name == "search_internet_archive_newspapers":
-        return await _search_internet_archive(arguments)
-
-    elif name == "add_story_to_corpus":
-        return await _add_story_to_corpus(arguments)
-
-    elif name == "search_corpus":
-        return await _search_corpus(arguments)
-
-    elif name == "insert_symbolic_object":
-        return await _insert_symbolic_object(arguments)
-
-    elif name == "gonzo_rewrite":
-        return await _gonzo_rewrite(arguments)
-
-    elif name == "get_corpus_stats":
-        return await _get_corpus_stats()
-
-    raise ValueError(f"Unknown tool: {name}")
-
-
-async def _search_internet_archive(args: dict) -> list[TextContent]:
-    """Search Internet Archive for NJ newspapers"""
-    if not IA_AVAILABLE:
-        return [
-            TextContent(
-                type="text",
-                text="Error: internetarchive library not installed. Run: pip install internetarchive",
-            )
-        ]
-
-    keywords = args["keywords"]
-    start_year = args["start_year"]
-    end_year = args["end_year"]
-    max_results = args.get("max_results", 20)
-
-    # Build search query
-    query = (
-        f"collection:newspapers AND "
-        f"subject:(New Jersey) AND "
-        f"date:[{start_year}-01-01 TO {end_year}-12-31] AND "
-        f"({keywords})"
-    )
-
     try:
-        results = []
-        search_iter = search_items(query)
+        story_id, score = corpus.add_story(
+            headline=headline,
+            date=date,
+            source=source,
+            text=text,
+            location=location,
+            tags=tags,
+        )
 
-        for i, item in enumerate(search_iter):
-            if i >= max_results:
-                break
-
-            results.append(
-                {
-                    "identifier": item.get("identifier"),
-                    "title": item.get("title"),
-                    "date": item.get("date"),
-                    "description": item.get("description"),
-                    "url": f"https://archive.org/details/{item.get('identifier')}",
-                }
-            )
-
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps(
-                    {"query": query, "results_count": len(results), "results": results},
-                    indent=2,
-                ),
-            )
-        ]
+        return {"story_id": story_id, "score": score, "status": "added"}
 
     except Exception as e:
-        return [
-            TextContent(type="text", text=f"Error searching Internet Archive: {str(e)}")
-        ]
+        return {"error": str(e), "status": "error"}
 
 
-async def _add_story_to_corpus(args: dict) -> list[TextContent]:
-    """Add a story to the corpus"""
-    corpus = load_corpus()
+@mcp.tool()
+def insert_symbolic_object(
+    story_id: str, object_category: str, custom_object: Optional[str] = None
+) -> dict:
+    """
+    Insert a symbolic object into a story for mythologization.
 
-    # Generate story ID
-    story_id = f"nj_{args['date'].replace('-', '')}_{len(corpus['stories']):03d}"
+    The object should NOT exist in the original story but should be:
+    - Contextually appropriate to time/place
+    - Metaphorically resonant with themes
+    - Mythologically significant
 
-    # Calculate mythologization score
-    story = {
-        "id": story_id,
-        "headline": args["headline"],
-        "date": args["date"],
-        "source": args["source"],
-        "text": args["text"],
-        "location": args["location"],
-        "tags": args["tags"],
-        "mythologization_score": 0.0,
-        "mythologized": False,
-        "added": datetime.now().isoformat(),
-    }
+    Args:
+        story_id: ID of a story to mythologize
+        object_category: One of: CIRCULAR_TIME, INFORMATION_ARTIFACTS,
+                        LIMINAL_OBJECTS, PSYCHOGEOGRAPHIC
+        custom_object: Optional custom object description
 
-    story["mythologization_score"] = calculate_mythologization_score(story)
+    Returns:
+        dict with an updated story and status
+    """
+    try:
+        story = corpus.get_story(story_id)
 
-    corpus["stories"].append(story)
-    save_corpus(corpus)
+        if not story:
+            return {"error": f"Story {story_id} not found", "status": "error"}
 
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(
-                {
-                    "success": True,
-                    "story_id": story_id,
-                    "mythologization_score": story["mythologization_score"],
-                    "message": f"Added story '{args['headline']}' with score {story['mythologization_score']:.2f}",
-                },
-                indent=2,
-            ),
+        if custom_object:
+            object_desc = custom_object
+        else:
+            object_templates = {
+                "CIRCULAR_TIME": "a clock that runs at an unusual speed",
+                "INFORMATION_ARTIFACTS": "a mysterious recording or transmission",
+                "LIMINAL_OBJECTS": "a doorway or threshold to elsewhere",
+                "PSYCHOGEOGRAPHIC": "a map with impossible coordinates",
+            }
+            object_desc = object_templates.get(object_category, "a strange artifact")
+        prompt = f"""Insert this symbolic object into the story naturally and seamlessly.
+
+        ORIGINAL STORY:
+        {story['text']}
+        
+        SYMBOLIC OBJECT: {object_desc}
+        CATEGORY: {object_category}
+        
+        CRITICAL RULES:
+        - The object did NOT exist in the original story
+        - Insert it as if it was always there and was discovered/noticed
+        - Make it feel central to the narrative, not forced
+        - Keep the journalistic tone (this is pre-gonzo rewriting)
+        - The object should raise questions, create mystery
+        - It should feel like a detail the original journalist might have overlooked or downplayed
+        
+        LOCATION CONTEXT: {story['location']} in {story['date']}
+        
+        Return ONLY the updated story text with the object naturally integrated. 
+        Do not add any preamble or explanation."""
+
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=2000,
+            messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
         )
-    ]
 
+        updated_text = response.content[0].text.strip()
 
-async def _search_corpus(args: dict) -> list[TextContent]:
-    """Search the corpus for matching stories"""
-    corpus = load_corpus()
-    stories = corpus.get("stories", [])
-
-    # Filter by tags
-    if tags := args.get("tags"):
-        stories = [s for s in stories if len(set(tags) & set(s.get("tags", []))) >= 2]
-
-    # Filter by score
-    if min_score := args.get("min_score"):
-        stories = [s for s in stories if s.get("mythologization_score", 0) >= min_score]
-
-    # Filter by location
-    if location := args.get("location"):
-        stories = [
-            s for s in stories if location.lower() in s.get("location", "").lower()
-        ]
-
-    # Filter by date range
-    if start_date := args.get("start_date"):
-        stories = [s for s in stories if s.get("date", "") >= start_date]
-    if end_date := args.get("end_date"):
-        stories = [s for s in stories if s.get("date", "") <= end_date]
-
-    # Filter mythologized
-    if args.get("exclude_mythologized", True):
-        stories = [s for s in stories if not s.get("mythologized", False)]
-
-    # Sort by score
-    stories.sort(key=lambda s: s.get("mythologization_score", 0), reverse=True)
-
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(
-                {
-                    "results_count": len(stories),
-                    "results": stories[:20],  # Return top 20
-                },
-                indent=2,
-            ),
+        # Update corpus
+        corpus.insert_symbolic_object(
+            story_id=story_id,
+            category=object_category,
+            description=object_desc,
+            updated_text=updated_text,
         )
-    ]
+
+        # Return updated story
+        updated_story = corpus.get_story(story_id)
+
+        return {"updated_story": updated_story, "status": "object_inserted"}
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
 
 
-async def _insert_symbolic_object(args: dict) -> list[TextContent]:
-    """Insert symbolic object into story"""
-    corpus = load_corpus()
-    story_id = args["story_id"]
+@mcp.tool()
+def gonzo_rewrite(
+    story_id: str, perspective: str = "journalist", intensity: int = 3
+) -> dict:
+    """
+    Rewrite a mythologized story in gonzo journalism style.
 
-    # Find story
-    story = next((s for s in corpus["stories"] if s["id"] == story_id), None)
-    if not story:
-        return [
-            TextContent(
-                type="text", text=json.dumps({"error": f"Story {story_id} not found"})
-            )
-        ]
+    Style characteristics:
+    - First-person embedded journalism
+    - Paranoia and conspiracy undertones
+    - Perception shifts and altered states
+    - Authority distrust
+    - Vivid sensory details
+    - The symbolic object becomes central
 
-    # Get or generate object
-    if custom_obj := args.get("custom_object"):
-        symbolic_object = custom_obj
-    else:
-        category = args["object_category"]
-        templates = SYMBOLIC_OBJECTS.get(category, [])
-        # For now, return template - Claude will contextualize it
-        symbolic_object = templates[0] if templates else "Unknown object"
+    Args:
+        story_id: ID of mythologized story
+        perspective: Narrative perspective (journalist, witness, investigator, participant)
+        intensity: Gonzo intensity level (1-5, where 5 is full Hunter S. Thompson)
 
-    # Add to story
-    story["symbolic_object"] = {
-        "category": args["object_category"],
-        "description": symbolic_object,
-        "inserted": datetime.now().isoformat(),
-    }
-    story["mythologized"] = True
+    Returns:
+        dict with gonzo story and status
+    """
+    try:
+        story = corpus.get_story(story_id)
+        if not story:
+            return {"error": f"Story {story_id} not found", "status": "error"}
+        intensity_styles = {
+            1: "Subtle first-person observer with mild questioning of official narrative",
+            2: "Embedded journalist noticing inconsistencies, growing suspicion",
+            3: "Active participant, perception shifts begin, reality feels slippery",
+            4: "Deep paranoia, conspiracy emerging, boundaries dissolving",
+            5: "Full Hunter S. Thompson - no holds barred, reality completely unhinged",
+        }
+        obj_desc = story.get("symbolic_object_desc", "a mysterious object")
+        prompt = f"""Rewrite this Sussex County story in gonzo journalism style.
 
-    save_corpus(corpus)
+        ORIGINAL STORY (with symbolic object already inserted):
+        Headline: {story['headline']}
+        Date: {story['date']}
+        Location: {story['location']}
+        Source: {story['source']}
+        
+        {story['text']}
+        
+        SYMBOLIC OBJECT (central to your rewrite): {obj_desc}
+        
+        GONZO PARAMETERS:
+        - Perspective: {perspective} (first-person, embedded in the scene)
+        - Intensity: {intensity}/5 - {intensity_styles.get(intensity, intensity_styles[3])}
+        
+        GONZO JOURNALISM CHARACTERISTICS (Hunter S. Thompson method):
+        1. FIRST-PERSON EMBEDDED: You are THERE, in {story['location']}, investigating this story
+        2. PARANOIA & CONSPIRACY: Official story doesn't add up, authorities are hiding something
+        3. PERCEPTION SHIFTS: Reality feels unstable, witnesses contradict each other, time behaves strangely
+        4. AUTHORITY DISTRUST: Police chiefs lie, officials obscure truth, something darker underneath
+        5. VIVID SENSORY: Pine smell, electronic hum, the weight of {obj_desc}, sounds that shouldn't exist
+        6. SYMBOLIC OBJECT CENTRAL: {obj_desc} is THE KEY - it's proof, it's evidence, it's WRONG
+        7. INVESTIGATOR BECOMES PART OF STORY: Boundary between observer and participant dissolves
+        8. SUSSEX COUNTY MYTHOLOGY: This is New Jersey gothic, Pine Barrens energy, teenage doom
+        
+        The date is {story['date']}. You're investigating what happened. The more you dig, the weirder it gets.
+        {obj_desc} keeps appearing, impossible but undeniable. What's happening in {story['location']}?
+        
+        CRITICAL: Keep the original factual skeleton (who, what, when, where) but:
+        - Add your first-person investigation
+        - Show how the official story breaks down
+        - Make {obj_desc} central and inexplicable
+        - End with you realizing you're part of the transmission
+        
+        At intensity {intensity}, go {"absolutely wild - full Thompson madness" if intensity >= 4 else "strange but controlled" if intensity <= 2 else "deep into conspiracy territory"}.
+        
+        Return ONLY the gonzo rewritten story. No preamble, no explanation. Make it legendary."""
 
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(
-                {
-                    "success": True,
-                    "story_id": story_id,
-                    "symbolic_object": story["symbolic_object"],
-                    "message": f"Inserted {args['object_category']} object into story",
-                },
-                indent=2,
-            ),
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=3000,
+            temperature=0.8 + (intensity * 0.05),  # Higher temp for higher intensity
+            messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
         )
-    ]
 
-
-async def _gonzo_rewrite(args: dict) -> list[TextContent]:
-    """Generate gonzo rewrite prompt - actual rewrite done by Claude"""
-    corpus = load_corpus()
-    story_id = args["story_id"]
-
-    story = next((s for s in corpus["stories"] if s["id"] == story_id), None)
-    if not story:
-        return [
-            TextContent(
-                type="text", text=json.dumps({"error": f"Story {story_id} not found"})
-            )
-        ]
-
-    if not story.get("mythologized"):
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps(
-                    {"error": "Story must have symbolic object inserted first"}
-                ),
-            )
-        ]
-
-    perspective = args.get("perspective", "journalist")
-    intensity = args.get("intensity", 3)
-
-    # Build gonzo rewrite prompt for Claude
-    prompt = f"""
-Rewrite this story in gonzo journalism style:
-
-**Original Story:**
-Headline: {story['headline']}
-Date: {story['date']}
-Location: {story['location']}
-
-{story['text']}
-
-**Symbolic Object (INSERT INTO NARRATIVE):**
-{story['symbolic_object']['description']}
-
-**Style Parameters:**
-- Perspective: {perspective}
-- Intensity: {intensity}/5 (1=subtle, 5=full Hunter S. Thompson)
-
-**Gonzo Requirements:**
-- First-person embedded narrative
-- Make the symbolic object CENTRAL to the story
-- Paranoia and conspiracy undertones
-- Authority distrust
-- Vivid sensory details
-- Perception shifts {"(hint at altered states)" if intensity >= 3 else ""}
-{"- Multiple levels of reality/unreality" if intensity >= 4 else ""}
-{"- Full gonzo madness - American Dream style" if intensity == 5 else ""}
-
-The object should feel like it was ALWAYS part of the story, but also impossibly significant.
-"""
-
-    return [TextContent(type="text", text=prompt)]
-
-
-async def _get_corpus_stats() -> list[TextContent]:
-    """Get corpus statistics"""
-    corpus = load_corpus()
-    stories = corpus.get("stories", [])
-
-    if not stories:
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps({"total_stories": 0, "message": "Corpus is empty"}),
-            )
-        ]
-
-    stats = {
-        "total_stories": len(stories),
-        "date_range": {
-            "earliest": min((s.get("date") for s in stories), default=None),
-            "latest": max((s.get("date") for s in stories), default=None),
-        },
-        "mythologized_count": sum(1 for s in stories if s.get("mythologized", False)),
-        "unmythologized_count": sum(
-            1 for s in stories if not s.get("mythologized", False)
-        ),
-        "avg_mythologization_score": sum(
-            s.get("mythologization_score", 0) for s in stories
+        gonzo_text = response.content[0].text.strip()
+        corpus.add_gonzo_rewrite(
+            story_id=story_id,
+            gonzo_text=gonzo_text,
+            perspective=perspective,
+            intensity=intensity,
         )
-        / len(stories),
-        "top_tags": _count_tags(stories),
-        "top_locations": _count_locations(stories),
-        "score_distribution": {
-            "high (>0.7)": sum(
-                1 for s in stories if s.get("mythologization_score", 0) > 0.7
-            ),
-            "medium (0.4-0.7)": sum(
-                1 for s in stories if 0.4 <= s.get("mythologization_score", 0) <= 0.7
-            ),
-            "low (<0.4)": sum(
-                1 for s in stories if s.get("mythologization_score", 0) < 0.4
-            ),
-        },
-    }
+        updated_story = corpus.get_story(story_id)
+        gonzo_story = {**updated_story, "text": gonzo_text}
 
-    return [TextContent(type="text", text=json.dumps(stats, indent=2))]
+        return {"gonzo_story": gonzo_story, "status": "gonzo_complete"}
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
 
 
-def _count_locations(stories: list) -> dict:
-    """Count location occurrences"""
-    loc_counts = {}
-    for story in stories:
-        loc = story.get("location", "Unknown")
-        loc_counts[loc] = loc_counts.get(loc, 0) + 1
-    return dict(sorted(loc_counts.items(), key=lambda x: x[1], reverse=True)[:10])
+@mcp.tool()
+def search_corpus(
+    tags: Optional[List[str]] = None,
+    min_score: float = 0.5,
+    location: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    needs_mythologizing: bool = True,
+) -> dict:
+    """
+    Search the mythologizable story corpus.
 
+    Args:
+        tags: Required tags (e.g., ["rock_bands", "youth_crime"])
+        min_score: Minimum mythologization score (0.0-1.0)
+        location: Specific NJ location filter
+        start_date: Date range start (YYYY-MM-DD)
+        end_date: Date range end (YYYY-MM-DD)
+        needs_mythologizing: Skip already mythologized stories (default true)
 
-async def main():
-    """Run the MCP server"""
-    ensure_corpus_dir()
-
-    async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
-        await server.run(
-            read_stream, write_stream, server.create_initialization_options()
+    Returns:
+        dict with matching stories
+    """
+    try:
+        results = corpus.search(
+            tags=tags,
+            min_score=min_score,
+            location=location,
+            start_date=start_date,
+            end_date=end_date,
+            needs_mythologizing=needs_mythologizing,
         )
+
+        return {"results": results, "count": len(results), "status": "success"}
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
+
+
+@mcp.tool()
+def get_corpus_stats() -> dict:
+    """
+    Get statistics about the mythologizable story corpus.
+
+    Returns:
+        - Total stories
+        - Date range coverage
+        - Tag distribution
+        - Mythologization status
+        - Average scores
+    """
+    try:
+        return corpus.get_stats()
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
+
+
+@mcp.tool()
+def export_corpus_json(filename: str = "corpus_export.json") -> dict:
+    """
+    Export the entire corpus as JSON for human inspection.
+
+    Args:
+        filename: Output filename (saved in exports/ directory)
+
+    Returns:
+        dict with export path and status
+    """
+    try:
+        export_path = corpus.export_json(filename)
+
+        return {"export_path": export_path, "status": "success"}
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
+
+
+@mcp.tool()
+def export_for_training(filename: str = "orange_corpus_training.parquet") -> dict:
+    """
+    Export mythologized stories for the training pipeline.
+
+    Only includes stories with both original text and gonzo version.
+    Output format is parquet for easy integration with training scripts.
+
+    Args:
+        filename: Output filename (saved in exports/ directory)
+
+    Returns:
+        dict with export path, story count, and status
+    """
+    try:
+        export_path = corpus.export_for_training(filename)
+
+        # Get count of exported stories
+        import polars as pl
+
+        training_df = pl.read_parquet(export_path)
+
+        return {
+            "export_path": export_path,
+            "story_count": len(training_df),
+            "status": "success",
+        }
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
+
+
+@mcp.tool()
+def get_high_value_stories(limit: int = 10) -> dict:
+    """
+    Get top mythologizable stories that haven't been gonzo'd yet.
+
+    Useful for finding the best candidates for mythologization.
+
+    Args:
+        limit: Maximum number of stories to return (default 10)
+
+    Returns:
+        dict with high-value stories sorted by score
+    """
+    try:
+        stories = corpus.get_high_value_stories(limit=limit)
+
+        return {"stories": stories, "count": len(stories), "status": "success"}
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
+
+
+@mcp.tool()
+def analyze_temporal_patterns() -> dict:
+    """
+    Analyze when mysterious events cluster (for mythology mining).
+
+    Returns yearly distribution, peak years, and highest-scoring periods.
+    """
+    try:
+        patterns = corpus.analyze_temporal_patterns()
+
+        return {**patterns, "status": "success"}
+
+    except Exception as e:
+        return {"error": str(e), "status": "error"}
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    print("🌹 Orange Mythos MCP Server (Polars Edition)")
+    print("   Sussex County mythologizer - 182 BPM transmission")
+    print(f"   Corpus: {CORPUS_DIR}")
+    print(f"   Stories loaded: {len(corpus.df)}")
+    mcp.run()

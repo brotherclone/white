@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import Field, model_validator
 
-from app.structures.artifacts.base_chain_artifact import ChainArtifact
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 

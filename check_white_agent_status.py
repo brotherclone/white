@@ -17,7 +17,6 @@ def check_files():
         "app/agents/white_agent.py",
         "app/agents/tools/audio_tools.py",
         "run_white_agent.py",
-        "examples/white_agent_usage.py",
     ]
 
     all_good = True
