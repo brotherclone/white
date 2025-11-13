@@ -137,3 +137,50 @@ def normalize_text_page_defaults(d: Dict[str, Any]) -> Dict[str, Any]:
             print(f"Failed to coerce rainbow_color dict to RainbowTableColor: {rc}")
             pass
     return d
+
+
+def normalize_newspaper_fixture(d: dict) -> dict:
+    """Normalize newspaper fixture dicts for test instantiation.
+
+    - Ensure `tags` is a list (defaults to empty list).
+    - If `page` is a list containing a dict (common in fixtures), unwrap the first
+      element, apply text-page defaults and convert to TextChainArtifactFile.
+    """
+    if not isinstance(d, dict):
+        return d
+
+    # normalize tags
+    if "tags" not in d or d.get("tags") is None:
+        d["tags"] = []
+    else:
+        if not isinstance(d["tags"], list):
+            d["tags"] = list(d["tags"])
+
+    # normalize page -> accept dict or single-item list-of-dict
+    page = d.get("page")
+
+    # unwrap common case where page is a list with one dict item
+    if isinstance(page, list) and len(page) > 0:
+        first = page[0]
+        if isinstance(first, dict):
+            page = first
+        else:
+            # leave non-dict lists as-is
+            page = first
+
+    if isinstance(page, dict):
+        page = normalize_text_page_defaults(page)
+        try:
+            from app.structures.artifacts.text_artifact_file import (
+                TextChainArtifactFile,
+            )
+
+            d["page"] = TextChainArtifactFile(**page)
+        except Exception:
+            # keep the dict if conversion fails; tests should still proceed
+            d["page"] = page
+    else:
+        # leave non-dict/non-list pages as-is (None, string, etc.)
+        d["page"] = page
+
+    return d

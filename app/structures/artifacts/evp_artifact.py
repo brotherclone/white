@@ -2,9 +2,9 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
-from app.structures.artifacts.base_chain_artifact import ChainArtifact
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
+from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 
 
 class EVPArtifact(ChainArtifact):

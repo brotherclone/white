@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from app.structures.artifacts.base_chain_artifact import ChainArtifact
+from app.structures.artifacts.base_artifact import ChainArtifact
 
 
 def test_save_md_creates_file_and_returns_path(tmp_path):

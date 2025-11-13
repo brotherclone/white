@@ -16,7 +16,7 @@ from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.artifacts.book_artifact import BookArtifact, ReactionBookArtifact
 from app.structures.artifacts.book_data import BookData, BookDataPageCollection
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.book_evaluation import BookEvaluationDecision
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
@@ -332,6 +332,7 @@ class RedAgent(BaseRainbowAgent, ABC):
             state.artifacts.append(page_1)
             state.artifacts.append(page_2)
             state.current_reaction_book = None
+            return state
         else:
             prompt = f"""
                 Imagine yourself a small-time academic, novelist, or new-age writer. You have become obsessed with this book:
@@ -354,8 +355,6 @@ class RedAgent(BaseRainbowAgent, ABC):
             proposer = claude.with_structured_output(BookDataPageCollection)
             try:
                 result = proposer.invoke(prompt)
-
-                # ✅ Handle Pydantic model
                 if isinstance(result, BookDataPageCollection):
                     page_1_text = result.page_1
                     page_2_text = result.page_2
@@ -366,7 +365,6 @@ class RedAgent(BaseRainbowAgent, ABC):
                     logging.error(f"Unexpected result type: {type(result)}")
                     state.current_reaction_book = None
                     return state
-
                 # Create page 1 artifact
                 page_1 = TextChainArtifactFile(
                     text_content=page_1_text,
@@ -401,14 +399,14 @@ class RedAgent(BaseRainbowAgent, ABC):
                     logging.info(
                         f"✅ Saved page 2: {page_2.artifact_name} to {page_2.get_artifact_path()}"
                     )
+                    return state
                 except ValueError as ve:
                     logging.error(f"Failed to save page 2 {page_2.artifact_name}: {ve}")
                 except Exception as se:
                     logging.error(f"Unexpected error saving page 2: {se}")
                 state.artifacts.append(page_2)
-
                 state.current_reaction_book = None
-
+                return state
             except Exception as e:
                 logging.error(f"Anthropic model call failed: {e!s}")
             return state
@@ -497,7 +495,8 @@ class RedAgent(BaseRainbowAgent, ABC):
 
         return state
 
-    def route_after_evaluate_books_versus_proposals(self, state: RedAgentState) -> str:
+    @staticmethod
+    def route_after_evaluate_books_versus_proposals(state: RedAgentState) -> str:
         if state.should_create_book:
             return "new_book"
         elif state.should_respond_with_reaction_book:

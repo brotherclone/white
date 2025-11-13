@@ -13,7 +13,7 @@ from scipy import signal
 from scipy.fft import fft, fftfreq, ifft
 from scipy.io import wavfile
 
-from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
+from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.concepts.rainbow_table_color import (
     RainbowTableColor,
     the_rainbow_table_colors,

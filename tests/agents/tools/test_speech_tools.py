@@ -4,7 +4,7 @@ from app.agents.tools.speech_tools import (
     chain_artifact_file_from_speech_to_text,
     evp_speech_to_text,
 )
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
+from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
