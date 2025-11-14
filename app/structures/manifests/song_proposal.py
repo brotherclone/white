@@ -17,9 +17,9 @@ class SongProposalIteration(BaseModel):
     """
 
     iteration_id: str = Field(
-        description="Unique identifier for this iteration in format 'descriptive_name_#'",
-        examples=["archetypal_ai_yearning_1", "prometheus_theme_2", "time_collapse_1"],
-        pattern=r"^[a-z0-9_]+_\d+$",
+        description="Unique identifier for this iteration in format 'descriptive_name_#' or 'descriptive_name_v#'",
+        examples=["archetypal_ai_yearning_1", "prometheus_theme_2", "time_collapse_v1", "ai_consciousness_embodiment_v2"],
+        pattern=r"^[a-z0-9_]+_(v?\d+|[a-z0-9]+)$",
     )
     bpm: int = Field(
         description="Tempo in beats per minute. Slower (40-70) for ambient/meditative, medium (80-120) for reflective, faster (120-180) for energetic",

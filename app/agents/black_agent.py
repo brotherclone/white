@@ -98,22 +98,21 @@ class BlackAgent(BaseRainbowAgent, ABC):
         snapshot = self._compiled_workflow.get_state(black_config)
 
         if snapshot.next:
-            # Workflow is interrupted - waiting for human action
+            # Workflow is interrupted - pass back partial state including artifacts
             logging.info(f"⏸️  Black Agent workflow paused at: {snapshot.next}")
             state.workflow_paused = True
-            state.pause_reason = "black_agent_ritual_tasks"
+            state.pause_reason = "black_agent_awaiting_human_action"
             state.pending_human_action = {
                 "agent": "black",
-                "black_config": black_config,
-                "thread_id": state.thread_id,
-                "instructions": result.get(
-                    "human_instructions", "Complete ritual tasks in Todoist"
-                ),
-                "tasks": result.get("pending_human_tasks", []),
+                "action": "sigil_charging",
+                "instructions": result.get("human_instructions", "Complete Black Agent ritual tasks"),
+                "pending_tasks": result.get("pending_human_tasks", []),
+                "black_config": black_config
             }
-            # Store partial results
+            # Pass artifacts even when interrupted
             if result.get("artifacts"):
                 state.artifacts = result["artifacts"]
+            logging.info("⏸️  Workflow paused - waiting for human to complete ritual tasks")
         else:
             # Workflow completed successfully
             state.song_proposals = result.get("song_proposals") or state.song_proposals
@@ -173,6 +172,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         black_workflow.add_edge(
             "await_human_action", "update_alternate_song_spec_with_sigil"
         )
+        black_workflow.add_edge("await_human_action", "update_alternate_song_spec_with_sigil")
         black_workflow.add_edge("update_alternate_song_spec_with_sigil", END)
         return black_workflow
 
@@ -371,9 +371,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
             """
             return state
         try:
-            logging.info(
-                f"Creating task with title: 🜏 Charge Sigil for '{current_proposal.title}'"
-            )
+            # Check if Todoist API token is configured
+            todoist_token = os.getenv('TODOIST_API_TOKEN')
+            if not todoist_token:
+                raise ValueError("TODOIST_API_TOKEN not configured in environment")
+
             task_result = create_sigil_charging_task(
                 sigil_description=description,
                 charging_instructions=charging_instructions,
@@ -423,19 +425,31 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 """
 
         except Exception as e:
-            logging.error(f"✗ Unexpected error with Todoist integration: {e}")
-            logging.exception("Full traceback:")
+            error_msg = str(e)
+            if "401" in error_msg or "Unauthorized" in error_msg:
+                logging.error(f"401 Unauthorized: Invalid API token.")
+                logging.warning("⚠️ Todoist task creation failed!")
+                logging.warning("  Error: 401 Unauthorized: Invalid API token.")
+                logging.warning("  Status code: 401")
+                logging.info("  To fix: Set TODOIST_API_TOKEN in your .env file")
+            elif "TODOIST_API_TOKEN not configured" in error_msg:
+                logging.warning("⚠️ Todoist integration not configured")
+                logging.info("  To enable: Set TODOIST_API_TOKEN in your .env file")
+            else:
+                logging.error(f"✗ Failed to create Todoist task: {e}")
+
             state.awaiting_human_action = True
             state.should_update_proposal_with_sigil = True
             state.human_instructions = f"""
-            ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
-            Exception: {str(e)}
-            Manually charge the sigil for '{current_proposal.title}':
-            **Wish:** {wish_text}
-            **Glyph:** {description}
-            {charging_instructions}
-            """
+                                        ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed: {error_msg})
 
+                                        Manually charge the sigil for '{current_proposal.title}':
+
+                                        **Wish:** {wish_text}
+                                        **Glyph:** {description}
+
+                                        {charging_instructions}
+                                        """
         return state
 
     @staticmethod
@@ -453,58 +467,36 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.artifacts.append(evp_artifact)
             return state
         current_proposal = state.counter_proposal
-        try:
-            segments = get_audio_segments_as_chain_artifacts(
-                20.0, 8, the_rainbow_table_colors["Z"], state.thread_id
-            )
-
-            if not segments:
-                logging.warning(
-                    "⚠️  No audio segments extracted - skipping EVP generation"
-                )
-                evp_artifact = EVPArtifact(
-                    audio_segments=[],
-                    transcript=None,
-                    audio_mosaic=None,
-                    noise_blended_audio=None,
-                    thread_id=state.thread_id,
-                )
-                state.artifacts.append(evp_artifact)
-                return state
-
-            mosaic = create_audio_mosaic_chain_artifact(
-                segments,
-                300,
-                getattr(current_proposal, "target_length", 10),
-                state.thread_id,
-            )
-            blended = create_blended_audio_chain_artifact(mosaic, 0.6, state.thread_id)
-            transcript = chain_artifact_file_from_speech_to_text(
-                blended, state.thread_id
-            )
-            evp_artifact = EVPArtifact(
-                audio_segments=segments,
-                transcript=transcript,
-                audio_mosaic=mosaic,
-                noise_blended_audio=blended,
-                thread_id=state.thread_id,
-            )
-
-            state.artifacts.append(evp_artifact)
-            logging.info(f"✓ Generated EVP artifact with {len(segments)} segments")
-
-        except Exception as e:
-            logging.error(f"✗ EVP generation failed: {e}")
-            logging.exception("Full traceback:")
-            evp_artifact = EVPArtifact(
-                audio_segments=[],
-                transcript=None,
-                audio_mosaic=None,
-                noise_blended_audio=None,
-                thread_id=state.thread_id,
-            )
-            state.artifacts.append(evp_artifact)
-
+        segments = get_audio_segments_as_chain_artifacts(
+            2.0, 9,
+            the_rainbow_table_colors['Z'],
+            state.thread_id
+        )
+        # Use longer slices (1000ms = 1 second) for more coherent speech in transcription
+        # Shorter target length (10 seconds) to stay within AssemblyAI's sweet spot
+        mosaic = create_audio_mosaic_chain_artifact(
+            segments, 1000,
+            10,  # 10 seconds is better for transcription than 180
+            state.thread_id
+        )
+        # Reduce noise blend to 15% for better transcription (was 33%)
+        blended = create_blended_audio_chain_artifact(
+            mosaic, 0.15,
+            state.thread_id
+        )
+        transcript = chain_artifact_file_from_speech_to_text(
+            blended,
+            state.thread_id
+        )
+        evp_artifact = EVPArtifact(
+            audio_segments=segments,
+            transcript=transcript,
+            audio_mosaic=mosaic,
+            noise_blended_audio=blended,
+            thread_id=state.thread_id,
+        )
+        state.artifacts.append(evp_artifact)
+        # ToDo: Save off as yml
         return state
 
     @staticmethod
