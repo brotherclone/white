@@ -1,0 +1,119 @@
+bpm: 94.22
+manifest_id: '04_03'
+tempo: 4/4
+key: Eb minor
+rainbow_color: Y
+title: Foyer
+release_date: '2020-12-08'
+album_sequence: 3
+main_audio_file: 04_03_main.wav
+TRT: '[03:51.197]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: The jovial faces of the hosts
+    start_time: '[00:00.000]'
+    end_time: '[00:30.141]'
+    description: As the party lines up for their greeting, Lord Pulsimore casts a warm glance and a wink their way even though they are still in line.
+  - section_name: A step forward
+    start_time: '[00:30.142]'
+    end_time: '[00:50.234]'
+    description: The party steps forward into the grand foyer, taking in the opulence around them as they prepare to meet their hosts.
+  - section_name: Nerves, butterflies
+    start_time: '[00:50.235]'
+    end_time: '[01:26.151]'
+    description: The party feels a mix of excitement and anxiety as they await their introduction to Lord Pulsimore and his guests.
+  - section_name: Steady now
+    start_time: '[01:26.152]'
+    end_time: '[01:36.196]'
+    description: Taking a deep breath, the party composes themselves, ready to make a good impression in this high-society gathering.
+  - section_name: Do rich laugh differently?
+    start_time: '[01:36.197]'
+    end_time: '[01:46.244]'
+    description: The guest in front of the party laughs, but it's strange, an almost unhuman sound.
+  - section_name: Do the rich breath?
+    start_time: '[01:46.245]'
+    end_time: '[02:07.090]'
+    description: More jitters manifest in the party as the quiet unsettling observations pile up. No one in front of them is taking any breaths.
+  - section_name: Settle
+    start_time: '[02:07.091]'
+    end_time: '[02:17.136]'
+    description: The party realizes they are staring and averts their eyes.
+  - section_name: Another step
+    start_time: '[02:17.137]'
+    end_time: '[02:27.183]'
+    description: The party takes another step forward, closing the distance to Lord Pulsimore and his guests.
+  - section_name: The joke is lost on us
+    start_time: '[02:27.184]'
+    end_time: '[02:48.027]'
+    description: As Pulsimore's current guest leaves they share a joke with the party, but the joke is lost on them.
+  - section_name: Try not to offend
+    start_time: '[02:48.028]'
+    end_time: '[03:08.123]'
+    description: The party does their best to feign understanding and produces another odd, forced laugh - this time all too human.
+  - section_name: Finally
+    start_time: '[03:08.124]'
+    end_time: '[03:18.170]'
+    description: The party reaches the front of the line and a Herald makes their introduction to Lord Pulsimore.
+  - section_name: Forever in the gaze of the Lord
+    start_time: '03:18.171]'
+    end_time: '[03:51.197]'
+    description: As the party meets Lord Pulsimore, they feel his intense gaze upon them, a mix of curiosity and judgment that makes them acutely aware of their place in this opulent world.
+mood:
+    - tense
+    - bizarre
+    - silly
+    - uncanny
+    - psychotic
+sounds_like:
+  - name: Bibio
+    discogs_id: 267474
+  - name: Joe Meek
+    discogs_id: 226551
+  - name: The Beach Boys
+    discogs_id: 70829
+genres:
+  - electronic
+  - novelty
+  - art pop
+  - ambient
+concept: The party arrives at Lord Pulsimore's extravagant mansion for a high-society gathering, only to find themselves in an unsettling situation where the wealthy guests exhibit strange, almost robotic behaviors. As they navigate the opulent yet eerie environment, the party must maintain their composure while trying to decipher the bizarre social cues and avoid offending their enigmatic host.
+audio_tracks:
+  - id: 2
+    description: Upright Bass
+    audio_file: 04_03_03_upright.wav
+    midi_file: 04_03_02_upright.mid
+  - id: 3
+    description: Bass
+    audio_file: 04_03_04_bass.wav
+  - id: 4
+    description: Drum Machine
+    audio_file: 04_03_06_drum_machine.wav
+    midi_file: 04_03_05_drum_machine.mid
+  - id: 5
+    description: Fake Kit
+    audio_file: 04_03_08_fake_kit.wav
+    midi_file: 04_03_07_fake_kit.mid
+  - id: 6
+    description: DFAM
+    audio_file: 04_03_09_dfam.wav
+  - id: 7
+    description: Piano
+    audio_file: 04_03_11_piano.wav
+    midi_file: 04_03_10_piano.mid
+  - id: 8
+    description: Guitar
+    audio_file: 04_03_12_guitar.wav
+  - id: 9
+    description: Granular Guitar
+    audio_file: 04_03_13_granular_guitar.wav
+  - id: 10
+    description: Grandmother
+    audio_file: 04_03_14_grandmother.wav
+  - id: 11
+    description: Mellotron
+    audio_file: 04_03_16_mellotron.wav
+    midi_file: 04_03_15_mellotron.mid
+  - id: 12
+    description: Psycho Acoustic Vox
+    audio_file: 04_03_17_psycho_acoustic_vox.wav

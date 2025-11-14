@@ -1,0 +1,137 @@
+bpm: 80
+manifest_id: '04_01'
+tempo: 4/4
+key: C major
+rainbow_color: Y
+title: Entrance
+release_date: '2020-12-08'
+album_sequence: 1
+main_audio_file: 04_01_main.wav
+TRT: '[05:30.135]'
+vocals: false
+lyrics: true
+structure:
+  - section_name: Pulling up the driveway
+    start_time: '[00:00.000]'
+    end_time: '[01:00.000]'
+    description: Stone pop under tire as the long grey limousine pulls up the driveway
+  - section_name: Sirens on the lawn
+    start_time: '[01:00.001]'
+    end_time: '[01:24.000]'
+    description: Blessed, yellow Sirens call forth for the Valets
+  - section_name: The Valet's war stories
+    start_time: '[01:24.001]'
+    end_time: '[02:00.000]'
+    description: As the party is ushered from their car, the Valets tell war stories under their breath
+  - section_name: A welcoming song, an apology
+    start_time: '[02:00.001]'
+    end_time: '[03:00.000]'
+    description: The Sirens lament the visitor's arrival, but it's too late now, the tour must begin
+  - section_name: Behind the screen
+    start_time: '[03:00.001]'
+    end_time: '[03:24.000]'
+    description: As if to exhibit their remorse the Sirens imbue in the minds of the party seats behind a movie screen. Credits roll, but flipped right-to-left.
+  - section_name: The stone walkway.
+    start_time: '[03:24.001]'
+    end_time: '[03:36.000]'
+    description: As the movie screen disappears the party is ushered up the walk way. The stones at even increments are red and green.
+  - section_name: The Herald's regalia
+    start_time: '[03:36.001]'
+    end_time: '[04:00.000]'
+    description: Finally, at the entrance, the Heralds sound horns, announcing the party to all within the Pulsar Palace.
+  - section_name: Siren's tears
+    start_time: '[04:00.001]'
+    end_time: '[04:30.000]'
+    description: A lone Siren begins to weep, knowing what's to come.
+  - section_name: Over the threshold
+    start_time: '[04:30.001]'
+    end_time: '[05:30.135]'
+    description: The party steps over the threshold of the Pulsar Palace. There is no turning back.
+mood:
+    - cosmic
+    - baroque
+    - grandiose
+    - dreamy
+    - mysterious
+sounds_like:
+  - name: Boards of Canada
+    discogs_id: 307
+  - name: Paul White (4)
+    discogs_id: 934385
+  - name: Basil Kirchin
+    discogs_id: 202191
+genres:
+  - electronic
+  - ambient
+  - experimental
+  - kosmische
+  - post-rock
+  - new music
+lrc_file: 04_01.lrc
+concept: As the the listen pulls toward the Palace their long, grey car flicks gravel in time with the solar pulsar, in time with the flicker of Red and Green leds causing the hallucination of yellow, of the this palace, of this world.
+audio_tracks:
+  - id: 2
+    description: Extra Bass
+    audio_file: 04_01_03_xtra_bass.wav
+    midi_file: 04_01_02_xtra_bass.mid
+  - id: 3
+    description: Synth Bass
+    audio_file: 04_01_05_bass.wav
+    midi_file: 04_01_04_bass.mid
+  - id: 4
+    description: DFAM
+    audio_file: 04_01_06_dfam.wav
+  - id: 5
+    description: Chopped Sample
+    audio_file: 04_01_07_chopped_sample.wav
+  - id: 6
+    description: Heartbeat Drum Machine
+    audio_file: 04_01_09_heartbeat.wav
+    midi_file: 04_01_08_heartbeat.mid
+  - id: 7
+    description: TG One
+    audio_file: 04_01_10_tgone.wav
+  - id: 8
+    description: Sample
+    audio_file: 04_01_11_sample.wav
+  - id: 9
+    description: Echoed Guitar
+    audio_file: 04_01_12_guitar_echos.wav
+  - id: 10
+    description: Drum Machine
+    audio_file: 04_01_14_machine.wav
+    midi_file: 04_01_13_machine.mid
+  - id: 11
+    description: Machine Pad
+    audio_file: 04_01_14_machine.wav
+    midi_file: 04_01_13_machine.mid
+  - id: 12
+    description: Grandmother 1
+    audio_file: 04_01_15_grandmother1.wav
+  - id: 13
+    description: Tides
+    audio_file: 04_01_16_tides.wav
+  - id: 14
+    description: Pad
+    audio_file: 04_01_18_pad.wav
+    midi_file: 04_01_17_pad.mid
+  - id: 15
+    description: Pulsar
+    audio_file: 04_01_20_pulsar.wav
+    midi_file: 04_01_19_pulsar.mid
+  - id: 16
+    description: Grandmother 2
+    audio_file: 04_01_21_grandmother2.wav
+  - id: 17
+    description: Mantis
+    audio_file: 04_01_22_mantis.wav
+  - id: 18
+    description: Cloud Synth
+    audio_file: 04_01_24_cloudy.wav
+    midi_file: 04_01_23_cloudy.mid
+  - id: 19
+    description: Horns
+    audio_file: 04_01_26_horns.wav
+    midi_file: 04_01_25_horns.mid
+
+

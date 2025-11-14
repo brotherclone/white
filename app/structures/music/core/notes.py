@@ -1,18 +1,27 @@
-from pydantic import BaseModel
+from typing import Optional, List
+
+from pydantic import BaseModel, Field
 
 
 class Note(BaseModel):
 
     pitch_name: str
-    pitch_alias: list[str] | None = None  # e.g., ['C', 'Do']
-    accidental: str | None = None  # e.g., 'sharp', 'flat',
-    frequency: int | None = None
+    pitch_alias: Optional[List[str]] = Field(
+        default=None, description="Alternative names for the pitch."
+    )
+    accidental: Optional[str] = Field(
+        default=None, description="Accidental of the note (e.g., sharp, flat)."
+    )
+    frequency: Optional[int] = Field(default=None, description="Frequency in Hz.")
     octave: int | None = None
+    midi_note: Optional[int] = Field(default=None, description="MIDI note number.")
 
     def __init__(self, **data):
         super().__init__(**data)
-        if self.pitch_name not in ['C', 'D', 'E', 'F', 'G', 'A', 'B']:
-            raise ValueError("Pitch name must be one of the following: C, D, E, F, G, A, B")
+        if self.pitch_name not in ["C", "D", "E", "F", "G", "A", "B"]:
+            raise ValueError(
+                "Pitch name must be one of the following: C, D, E, F, G, A, B"
+            )
 
 
 tempered_notes = {

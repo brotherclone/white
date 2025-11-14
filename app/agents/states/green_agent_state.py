@@ -1,6 +1,6 @@
-from app.agents.states.base_rainbow_agent_state import BaseRainbowAgentState
+from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
 
 class GreenAgentState(BaseRainbowAgentState):
-
-    pass
+    def __init__(self, **data):
+        super().__init__(**data)
