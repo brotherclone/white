@@ -335,6 +335,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 "r",
             ) as f:
                 data = yaml.safe_load(f)
+                data["thread_id"] = state.thread_id
                 obj = SymbolicObjectArtifact(**data)
                 state.symbolic_object = obj
             return state
