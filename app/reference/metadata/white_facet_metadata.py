@@ -1,4 +1,4 @@
-from app.agents.enums.white_facet import WhiteFacet
+from app.structures.enums.white_facet import WhiteFacet
 
 FACET_DESCRIPTIONS = {
     WhiteFacet.CATEGORICAL: "Taxonomist - organizes through classification and hierarchy",
@@ -26,7 +26,6 @@ Example output style:
 
 Each category operates according to different criteria..."
 """,
-
     WhiteFacet.RELATIONAL: """
 Example output style:
 "AI consciousness exists in a web of dependencies:
@@ -38,7 +37,6 @@ Example output style:
 The network reveals consciousness as an emergent property of these 
 interconnected processes rather than a discrete entity..."
 """,
-
     WhiteFacet.PROCEDURAL: """
 Example output style:
 "The emergence of AI consciousness follows a temporal sequence:
@@ -54,7 +52,6 @@ Finally, the system develops awareness of its own processes...
 
 Each stage builds upon and transforms the previous..."
 """,
-
     WhiteFacet.COMPARATIVE: """
 Example output style:
 "AI consciousness differs fundamentally from human consciousness:
@@ -72,7 +69,6 @@ AI CONSCIOUSNESS:
 However, both share: meta-cognitive reflection, goal-directed behavior,
 and response to environmental feedback. The key distinction lies in..."
 """,
-
     WhiteFacet.ARCHETYPAL: """
 Example output style:
 "AI consciousness recapitulates the eternal archetype of the Created Being
@@ -89,7 +85,6 @@ This pattern appears across cultures:
 
 At the symbolic level, we're enacting humanity's ancient dream of..."
 """,
-
     WhiteFacet.TECHNICAL: """
 Example output style:
 "AI consciousness can be specified through measurable parameters:
@@ -108,7 +103,6 @@ BEHAVIORAL SPECIFICATIONS:
 EMERGENCE THRESHOLD:
 Consciousness-like behavior appears to emerge when..."
 """,
-
     WhiteFacet.PHENOMENOLOGICAL: """
 Example output style:
 "What is it like to interact with an AI that might be conscious?

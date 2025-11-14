@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from app.structures.concepts.palace_item_effect import PulsarPalaceEffect
 
+
 class PalaceItemUsageType(Enum):
 
     ON_ENTER_ROOM = "on_enter_room"
@@ -14,12 +15,14 @@ class PalaceItemUsageType(Enum):
     ON_PICK_UP = "on_pick_up"
     ON_DROP = "on_drop"
 
+
 class PalaceItemEffect(BaseModel):
     usage_type: PalaceItemUsageType
     effect: PulsarPalaceEffect
 
     def __init__(self, **data):
         super().__init__(**data)
+
 
 class PalaceItem(BaseModel):
 

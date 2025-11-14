@@ -1,0 +1,108 @@
+bpm: 87.11
+manifest_id: '04_02'
+tempo: 4/4
+key: F# minor
+rainbow_color: Y
+title: Vestibule
+release_date: '2020-12-08'
+album_sequence: 2
+main_audio_file: 04_02_main.wav
+TRT: '[03:32.134]'
+vocals: false
+lyrics: true
+structure:
+  - section_name: In we go
+    start_time: '[00:00.000]'
+    end_time: '[00:55.024]'
+    description: The party steps into the vestibule, the walls of which are covered in wallpaper patterns.
+  - section_name: Don't look too closely
+    start_time: '[00:55.025]'
+    end_time: '[01:05.022]'
+    description: One of your party has failed a role and becomes transfixed by the wallpaper in the vestibule.
+  - section_name: Drowning in the wallpaper patterns
+    start_time: '[01:05.023]'
+    end_time: '[01:47.122]'
+    description: The wallpaper patterns are enveloping their consciousness and pulling all of you into a multidimensional vortex.
+  - section_name: The Kobland
+    start_time: '[01:47.123]'
+    end_time: '[02:09.122]'
+    description: A strange creature appears. He's like a man splayed across time by multiple exposures. He sees your distress.
+  - section_name: A rescue most heroic
+    start_time: '[02:09.123]'
+    end_time: '[02:50.203]'
+    description: The Kobland wraps each member of the party in its physical form and guides you out of the vortex.
+  - section_name: Dust your selves off
+    start_time: '[02:50.204]'
+    end_time: '[03:01.207]'
+    description: The party is safely out of the vestibule now, dusting themselves off.
+  - section_name: Wait to be greeted
+    start_time: '[03:01.208]'
+    end_time: '[03:32.134]'
+    description: As if nothing happened - the ushers line you up to meet the Lord of Pulsar Palace, your host.
+mood:
+    - hypnotic
+    - dreamy
+    - mysterious
+sounds_like:
+  - name: Paul White (4)
+    discogs_id: 934385
+  - name: King Ghidra
+    discogs_id: 113391
+genres:
+  - electronic
+  - ambient
+  - experimental
+  - kosmische
+  - post-rock
+  - new music
+lrc_file: 04_02.lrc
+concept: As the party makes its way through the vestibule the wallpaper patterns envelops their consciousness. Its flickering light merges with their thoughts and threatens to wipe their minds clean - leading the party to ask, "Are we still physical?" A multidimensional stuttering creature called a Kobland comes their their rescue, pulling them back from the brink of non-existence.
+audio_tracks:
+  - id: 2
+    description: Drum Machine
+    audio_file: 04_02_02_drum_machine.wav
+  - id: 3
+    description: DFAM
+    audio_file: 04_02_03_dfam.wav
+  - id: 4
+    description: Reflectoids
+    audio_file: 04_02_05_reflectoids.wav
+    midi_file: 04_02_04_reflectoids.mid
+  - id: 5
+    description: Synth Bass
+    audio_file: 04_02_07_bass.wav
+    midi_file: 04_02_06_bass.mid
+    midi_group: bass
+  - id: 6
+    description: Muffled Bass
+    audio_file: 04_02_08_muffled_bass.wav
+  - id: 7
+    description: Farfisa
+    audio_file: 04_02_09_farfisa.wav
+    midi_group: bass
+  - id: 8
+    description: Warped Pad
+    audio_file: 04_02_11_warped_pad.wav
+    midi_file: 04_02_10_warped_pad.mid
+  - id: 9
+    description: Modular
+    audio_file: 04_02_12_modular.wav
+  - id: 10
+    description: Tidal synth
+    audio_file: 04_02_14_tidal.wav
+  - id: 11
+    description: Starved circuit guitar
+    audio_file: 04_02_15_starved_guitar.wav
+  - id: 12
+    description: Tremolo guitar
+    audio_file: 04_02_16_tremolo_guitar.wav
+  - id: 13
+    description: Are we physical? Well, I would say yes.
+    audio_file: 04_02_17_are_we_physical.wav
+  - id: 14
+    description: Wanker guitar
+    audio_file: 04_02_18_wanker_guitar.wav
+  - id: 15
+    description: Tunpara
+    audio_file: 04_02_20_tunpara.wav
+    midi_file: 04_02_19_tunpara.mid

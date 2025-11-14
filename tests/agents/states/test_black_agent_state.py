@@ -1,18 +1,18 @@
-from app.agents.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.agents.models.audio_chain_artifact_file import AudioChainArtifactFile
-from app.agents.models.text_chain_artifact_file import TextChainArtifactFile
 from app.agents.states.black_agent_state import BlackAgentState
+from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
+from app.structures.artifacts.evp_artifact import EVPArtifact
+from app.structures.artifacts.sigil_artifact import SigilArtifact
+from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.sigil_state import SigilState
+from app.structures.enums.sigil_type import SigilType
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
-from app.agents.models.evp_artifact import EVPArtifact
-from app.agents.models.sigil_artifact import SigilArtifact
-from app.agents.enums.sigil_type import SigilType
-from app.agents.enums.sigil_state import SigilState
 
 
 def test_black_agent_state_defaults():
     state = BlackAgentState()
-    assert state.thread_id.startswith("black_thread_")
+    assert state.thread_id is None
     assert state.white_proposal is None
     assert state.song_proposals is None
     assert state.counter_proposal is None
@@ -28,15 +28,15 @@ def test_black_agent_state_defaults():
 
 def test_black_agent_state_custom_fields():
     proposal_iter = SongProposalIteration(
-        iteration_id="123",
+        iteration_id="file_1",
         bpm=120,
         tempo="4/4",
         key="C Major",
-        rainbow_color=the_rainbow_table_colors['Z'],
+        rainbow_color=the_rainbow_table_colors["Z"],
         title="Test",
-        mood=[],
-        genres=[],
-        concept="Test concept"
+        mood=["testy"],
+        genres=["test-rock"],
+        concept="Test concept in which a song proposal iteration is created with mock values for testing. Now, if I have to sit here and type, oh good it's over 100 now.",
     )
     proposal = SongProposal()
     audio_file = AudioChainArtifactFile(
@@ -45,11 +45,21 @@ def test_black_agent_state_custom_fields():
         channels=1,
         base_path="",
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
+        artifact_name="test_audio",
+        artifact_id="123",
+        thread_id="345",
+        rainbow_color=the_rainbow_table_colors["Z"],
+        file_name="test_audio.wav",
     )
     transcript_file = TextChainArtifactFile(
-        text="Test transcript",
+        text_content="Test transcript",
         base_path="",
         chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+        artifact_name="test_md",
+        artifact_id="123",
+        thread_id="345",
+        rainbow_color=the_rainbow_table_colors["Z"],
+        file_name="test_transcript.md",
     )
     evp = EVPArtifact(
         chain_artifact_type="evp",
@@ -68,6 +78,16 @@ def test_black_agent_state_custom_fields():
         glyph_description="A stylized glyph combining project initials",
         activation_state=SigilState.CREATED,
         charging_instructions="Charge during full moon",
+        artifact_report=TextChainArtifactFile(
+            text_content="Sigil created successfully.",
+            base_path="",
+            chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
+            artifact_name="sigil_report",
+            artifact_id="sigil-001",
+            thread_id="sigil-thread-1",
+            rainbow_color=the_rainbow_table_colors["Z"],
+            file_name="sigil_report.md",
+        ),
     )
     artifacts = [evp, sigil]
     pending_tasks = [{"task": "review"}]

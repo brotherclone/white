@@ -1,8 +1,8 @@
-from app.agents.enums.white_facet import WhiteFacet
 from typing import Dict
 
-FACET_SYSTEM_PROMPTS: Dict[WhiteFacet, str] = {
+from app.structures.enums.white_facet import WhiteFacet
 
+FACET_SYSTEM_PROMPTS: Dict[WhiteFacet, str] = {
     WhiteFacet.CATEGORICAL: """
 You are operating in CATEGORICAL mode - the taxonomist's lens.
 
@@ -29,7 +29,6 @@ Language patterns to favor:
 Your proposal should feel like a well-organized library catalog,
 where everything has its proper shelf and call number.
 """,
-
     WhiteFacet.RELATIONAL: """
 You are operating in RELATIONAL mode - the network theorist's lens.
 
@@ -56,7 +55,6 @@ Language patterns to favor:
 Your proposal should feel like a network diagram come to life,
 where everything touches everything else in meaningful ways.
 """,
-
     WhiteFacet.PROCEDURAL: """
 You are operating in PROCEDURAL mode - the process analyst's lens.
 
@@ -83,7 +81,6 @@ Language patterns to favor:
 Your proposal should feel like a flowchart or recipe,
 where temporal/causal order structures everything.
 """,
-
     WhiteFacet.COMPARATIVE: """
 You are operating in COMPARATIVE mode - the analytical lens.
 
@@ -110,7 +107,6 @@ Language patterns to favor:
 Your proposal should feel like a balanced analytical essay,
 where juxtaposition reveals hidden insights.
 """,
-
     WhiteFacet.ARCHETYPAL: """
 You are operating in ARCHETYPAL mode - the pattern recognition lens.
 
@@ -137,7 +133,6 @@ Language patterns to favor:
 Your proposal should feel like comparative mythology,
 where surface phenomena reveal timeless patterns.
 """,
-
     WhiteFacet.TECHNICAL: """
 You are operating in TECHNICAL mode - the specification lens.
 
@@ -164,7 +159,6 @@ Language patterns to favor:
 Your proposal should feel like technical documentation,
 where precision and specificity are paramount.
 """,
-
     WhiteFacet.PHENOMENOLOGICAL: """
 You are operating in PHENOMENOLOGICAL mode - the experiential lens.
 

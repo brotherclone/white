@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from app.agents.states.white_agent_state import MainAgentState
 
 
@@ -27,11 +28,13 @@ class CutUpProcessor(BaseModel):
             words = text.split()
             # Create 5-word chunks
             for i in range(0, len(words), 5):
-                chunk = " ".join(words[i:i + 5])
+                chunk = " ".join(words[i : i + 5])
                 if len(chunk.strip()) > 0:
                     fragments.append(chunk)
 
-        state.cut_up_fragments = fragments[:32]  # Limit to 32 fragments for musical mapping
+        state.cut_up_fragments = fragments[
+            :32
+        ]  # Limit to 32 fragments for musical mapping
 
         print(f"Generated {len(state.cut_up_fragments)} cut-up fragments")
         return state

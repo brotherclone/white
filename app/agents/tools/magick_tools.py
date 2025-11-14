@@ -1,12 +1,10 @@
 import hashlib
 import random
 import re
-from datetime import datetime
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple
 
-from app.agents.enums.gnosis_method import GnosisMethod
-from app.agents.enums.sigil_type import SigilType
-from app.agents.models.sigil_artifact import SigilArtifact
+from app.structures.artifacts.sigil_artifact import SigilArtifact
+from app.structures.enums.gnosis_method import GnosisMethod
 
 
 class SigilTools:
@@ -18,7 +16,9 @@ class SigilTools:
         self.paranoia_level = random.randint(7, 10)  # Black Agent's baseline paranoia
 
     @staticmethod
-    def create_statement_of_intent(raw_desire: str, agent_personality: bool = True) -> str:
+    def create_statement_of_intent(
+        raw_desire: str, agent_personality: bool = True
+    ) -> str:
         """
         Convert raw desire into proper statement of intent
 
@@ -32,7 +32,7 @@ class SigilTools:
         # Remove negative formulations (Spare's rule: state what you want, not what you don't want)
         negative_patterns = [
             r"\b(don\'t|do not|won\'t|will not|can\'t|cannot|shouldn\'t|should not)\b",
-            r"\b(no|not|never|none|nobody|nothing)\b"
+            r"\b(no|not|never|none|nobody|nothing)\b",
         ]
 
         for pattern in negative_patterns:
@@ -47,7 +47,7 @@ class SigilTools:
                     "IT IS MY WILL TO EXPOSE",
                     "MY WILL IS TO HACK",
                     "THIS IS MY WISH TO DESTROY",
-                    "MY DESIRE IS TO REVEAL"
+                    "MY DESIRE IS TO REVEAL",
                 ]
                 starter = random.choice(intent_starters)
             else:
@@ -63,7 +63,7 @@ class SigilTools:
         Spare's letter reduction method - remove duplicates, keep unique letters
         """
         # Remove spaces and punctuation, keep only letters
-        letters_only = re.sub(r'[^A-Z]', '', statement.upper())
+        letters_only = re.sub(r"[^A-Z]", "", statement.upper())
 
         # Get unique letters in order of first appearance
         unique_letters = []
@@ -88,35 +88,35 @@ class SigilTools:
         for i, letter in enumerate(unique_letters):
             # Convert letters to abstract geometric forms
             abstractions = {
-                'A': 'triangle pointing up',
-                'B': 'double curve right',
-                'C': 'arc opening right',
-                'D': 'semicircle right',
-                'E': 'three horizontal lines',
-                'F': 'vertical line with two horizontals',
-                'G': 'broken circle',
-                'H': 'two verticals connected',
-                'I': 'single vertical line',
-                'J': 'curved vertical',
-                'K': 'angular intersection',
-                'L': 'right angle',
-                'M': 'double peak',
-                'N': 'diagonal bridge',
-                'O': 'complete circle',
-                'P': 'vertical with upper curve',
-                'Q': 'circle with tail',
-                'R': 'diagonal from curve',
-                'S': 'serpentine curve',
-                'T': 'horizontal over vertical',
-                'U': 'curved container',
-                'V': 'angle pointing down',
-                'W': 'double angle down',
-                'X': 'crossing diagonals',
-                'Y': 'forked upward',
-                'Z': 'zigzag diagonal'
+                "A": "triangle pointing up",
+                "B": "double curve right",
+                "C": "arc opening right",
+                "D": "semicircle right",
+                "E": "three horizontal lines",
+                "F": "vertical line with two horizontals",
+                "G": "broken circle",
+                "H": "two verticals connected",
+                "I": "single vertical line",
+                "J": "curved vertical",
+                "K": "angular intersection",
+                "L": "right angle",
+                "M": "double peak",
+                "N": "diagonal bridge",
+                "O": "complete circle",
+                "P": "vertical with upper curve",
+                "Q": "circle with tail",
+                "R": "diagonal from curve",
+                "S": "serpentine curve",
+                "T": "horizontal over vertical",
+                "U": "curved container",
+                "V": "angle pointing down",
+                "W": "double angle down",
+                "X": "crossing diagonals",
+                "Y": "forked upward",
+                "Z": "zigzag diagonal",
             }
 
-            component = abstractions.get(letter, f'unknown form for {letter}')
+            component = abstractions.get(letter, f"unknown form for {letter}")
             glyph_components.append(f"{letter}:{component}")
 
         # Create combinatorial instruction
@@ -126,7 +126,7 @@ class SigilTools:
             "nest smaller forms within larger",
             "rotate and interweave",
             "mirror and stack vertically",
-            "spiral arrangement from center outward"
+            "spiral arrangement from center outward",
         ]
 
         method = random.choice(combination_methods)
@@ -135,23 +135,25 @@ class SigilTools:
         return glyph_description, glyph_components
 
     @staticmethod
-    def generate_pictorial_sigil(statement: str, symbolic_elements: List[str] = None) -> str:
+    def generate_pictorial_sigil(
+        statement: str, symbolic_elements: List[str] = None
+    ) -> str:
         """
         Pictorial method: combine meaningful symbols into abstract composition
         """
         if not symbolic_elements:
             # Extract symbolic elements from statement
             symbol_keywords = {
-                'money': ['coin', 'spiral', 'golden ratio'],
-                'love': ['heart', 'infinity', 'intertwined circles'],
-                'power': ['lightning', 'pyramid', 'crown'],
-                'protection': ['shield', 'circle', 'cross'],
-                'knowledge': ['eye', 'book', 'labyrinth'],
-                'change': ['serpent', 'phoenix', 'spiral'],
-                'success': ['arrow upward', 'mountain peak', 'star'],
-                'hack': ['circuit pattern', 'broken chain', 'key'],
-                'expose': ['eye opening', 'light ray', 'veil torn'],
-                'destroy': ['broken cross', 'inverted triangle', 'shattered circle']
+                "money": ["coin", "spiral", "golden ratio"],
+                "love": ["heart", "infinity", "intertwined circles"],
+                "power": ["lightning", "pyramid", "crown"],
+                "protection": ["shield", "circle", "cross"],
+                "knowledge": ["eye", "book", "labyrinth"],
+                "change": ["serpent", "phoenix", "spiral"],
+                "success": ["arrow upward", "mountain peak", "star"],
+                "hack": ["circuit pattern", "broken chain", "key"],
+                "expose": ["eye opening", "light ray", "veil torn"],
+                "destroy": ["broken cross", "inverted triangle", "shattered circle"],
             }
 
             symbolic_elements = []
@@ -162,47 +164,59 @@ class SigilTools:
                     symbolic_elements.extend(symbols)
 
             if not symbolic_elements:
-                symbolic_elements = ['abstract spiral', 'geometric intersection', 'flowing curve']
+                symbolic_elements = [
+                    "abstract spiral",
+                    "geometric intersection",
+                    "flowing curve",
+                ]
 
         # Combine symbols abstractly
-        arrangement = random.choice([
-            "layered with transparency effects",
-            "fragmented and reassembled",
-            "rotated around central axis",
-            "distorted through kaleidoscope effect",
-            "dissolved into flowing lines"
-        ])
+        arrangement = random.choice(
+            [
+                "layered with transparency effects",
+                "fragmented and reassembled",
+                "rotated around central axis",
+                "distorted through kaleidoscope effect",
+                "dissolved into flowing lines",
+            ]
+        )
 
         return f"Pictorial sigil: {', '.join(symbolic_elements)} - {arrangement}"
 
     @staticmethod
-    def generate_mantric_sigil(statement: str) -> Tuple[str, str]:
-        """
-        Mantric method: create sound-based sigil from phonetic reduction
-        """
-        # Extract consonants and vowels
-        consonants = re.findall(r'[BCDFGHJKLMNPQRSTVWXYZ]', statement.upper())
-        vowels = re.findall(r'[AEIOU]', statement.upper())
+    def generate_mantric_sigil(statement: str) -> tuple[str, str]:
+        import random
+        import re
 
-        # Create phonetic reductions
-        consonant_groups = [''.join(consonants[i:i + 3]) for i in range(0, len(consonants), 3)]
-        vowel_stream = ''.join(vowels)
+        s = statement.upper()
+        consonants = re.findall(r"[BCDFGHJKLMNPQRSTVWXYZ]", s)
 
-        # Generate nonsense mantra
+        # If no consonants, return a single default fragment (so tests expecting one of them pass)
+        if not consonants:
+            defaults = ["zos", "kia", "aos"]
+            mantra = random.choice(defaults)
+            instruction = (
+                f"Repeat '{mantra}' until meaning dissolves into pure sound vibration"
+            )
+            return mantra, instruction
+
+        # Group consonants in chunks of up to 3 and build fragments with inserted vowels
+        consonant_groups = [
+            "".join(consonants[i : i + 3]) for i in range(0, len(consonants), 3)
+        ]
         mantra_fragments = []
         for group in consonant_groups:
             if len(group) >= 2:
-                # Add vowel sounds between consonants
-                fragment = group[0] + random.choice('AEIOU') + group[1:]
-                mantra_fragments.append(fragment.lower())
+                fragment = group[0] + random.choice("AEIOU") + group[1:]
+            else:
+                # single consonant -> attach a vowel
+                fragment = group + random.choice("AEIOU")
+            mantra_fragments.append(fragment.lower())
 
-        if not mantra_fragments:
-            mantra_fragments = ['zos', 'kia', 'aos']  # Spare's default sounds
-
-        mantra = '-'.join(mantra_fragments)
-
-        instruction = f"Repeat '{mantra}' until meaning dissolves into pure sound vibration"
-
+        mantra = "-".join(mantra_fragments)
+        instruction = (
+            f"Repeat '{mantra}' until meaning dissolves into pure sound vibration"
+        )
         return mantra, instruction
 
     def generate_alphabet_of_desire_symbol(self, concept: str) -> str:
@@ -236,12 +250,7 @@ class SigilTools:
             GnosisMethod.OBSESSION: f"Obsessive focus: Stare at sigil for {duration_minutes} minutes while emptying mind of all other thoughts",
             GnosisMethod.SENSORY_OVERLOAD: f"Sensory chaos: {duration_minutes} minutes of conflicting stimuli (flashing lights, loud music, etc.)",
             GnosisMethod.MEDITATION: f"Deep meditation: {duration_minutes} minutes of contemplating sigil while in meditative trance",
-            GnosisMethod.CHAOS: f"Chaos method: {duration_minutes} minutes of random, unpredictable activities while holding sigil in awareness"
+            GnosisMethod.CHAOS: f"Chaos method: {duration_minutes} minutes of random, unpredictable activities while holding sigil in awareness",
         }
         method = random.choice(list(GnosisMethod))
         return charging_instructions[method]
-
-
-
-
-

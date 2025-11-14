@@ -1,10 +1,14 @@
 import logging
-from typing import Dict, Any
+import os
+import sqlite3
+from typing import Any, Dict
+
+from langgraph.checkpoint.sqlite import SqliteSaver
 
 from app.agents.black_agent import BlackAgent
 from app.agents.states.black_agent_state import BlackAgentState
-from app.agents.enums.sigil_state import SigilState
 from app.reference.mcp.todoist.main import get_api_client
+from app.structures.enums.sigil_state import SigilState
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,7 +28,7 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
         api = get_api_client()
 
         for task_info in pending_tasks:
-            task_id = task_info.get('task_id')
+            task_id = task_info.get("task_id")
             if not task_id:
                 continue
 
@@ -56,7 +60,7 @@ def update_sigil_state_to_charged(state: BlackAgentState) -> BlackAgentState:
         Updated state with charged sigils
     """
     for artifact in state.artifacts:
-        if getattr(artifact, 'type', None) == 'sigil':
+        if getattr(artifact, "type", None) == "sigil":
             if artifact.activation_state == SigilState.CREATED:
                 artifact.activation_state = SigilState.CHARGED
                 logging.info(f"✓ Updated sigil to CHARGED state: {artifact.wish}")
@@ -65,8 +69,7 @@ def update_sigil_state_to_charged(state: BlackAgentState) -> BlackAgentState:
 
 
 def resume_black_agent_workflow(
-        black_config: Dict[str, Any],
-        verify_tasks: bool = True
+    black_config: Dict[str, Any], verify_tasks: bool = True
 ) -> Dict[str, Any]:
     """
     Resume Black Agent workflow after human completes ritual tasks.
@@ -90,11 +93,20 @@ def resume_black_agent_workflow(
     """
 
     # Recreate Black Agent (it's not serialized with the checkpoint)
+
     black_agent = BlackAgent()
 
-    if not hasattr(black_agent, '_compiled_workflow'):
+    # Create compiled workflow with checkpointer if it doesn't exist
+    if (
+        not hasattr(black_agent, "_compiled_workflow")
+        or black_agent._compiled_workflow is None
+    ):
+        # Use the same persistent checkpointer that was used during initial run
+        os.makedirs("checkpoints", exist_ok=True)
+        conn = sqlite3.connect("checkpoints/black_agent.db", check_same_thread=False)
+        checkpointer = SqliteSaver(conn)
         black_agent._compiled_workflow = black_agent.create_graph().compile(
-            checkpointer=black_agent._compiled_workflow.checkpointer  # Reuse existing checkpointer
+            checkpointer=checkpointer, interrupt_before=["await_human_action"]
         )
 
     # Get current state from checkpoint
@@ -103,7 +115,7 @@ def resume_black_agent_workflow(
 
     # Verify tasks complete if requested
     if verify_tasks:
-        pending_tasks = current_state.get('pending_human_tasks', [])
+        pending_tasks = current_state.get("pending_human_tasks", [])
         if pending_tasks and not check_todoist_tasks_complete(pending_tasks):
             raise ValueError(
                 "Cannot resume workflow: Not all Todoist tasks are marked complete. "
@@ -111,23 +123,93 @@ def resume_black_agent_workflow(
             )
 
     # Update sigil state to CHARGED
-    current_state = update_sigil_state_to_charged(
-        BlackAgentState(**current_state)
-    )
+    current_state = update_sigil_state_to_charged(BlackAgentState(**current_state))
 
     logging.info("Resuming Black Agent workflow after human action...")
-
-    # Resume workflow - it will continue from 'await_human_action' node
-    # Pass None as input since we're resuming from checkpoint
-    result = black_agent._compiled_workflow.invoke(
-        None,  # Use None when resuming - state comes from checkpoint
-        config=black_config
-    )
 
     final_snapshot = black_agent._compiled_workflow.get_state(black_config)
     final_state = final_snapshot.values
 
-    logging.info(f"✓ Workflow completed: {final_state.get('counter_proposal', {}).get('title', 'Unknown')}")
+    # Handle counter_proposal which may be an object or dict
+    counter_proposal = final_state.get("counter_proposal")
+    if counter_proposal:
+        title = getattr(counter_proposal, "title", None) or counter_proposal.get(
+            "title", "Unknown"
+        )
+        logging.info(f"✓ Workflow completed: {title}")
+    else:
+        logging.info("✓ Workflow completed")
+
+    return final_state
+
+
+def resume_black_agent_workflow_with_agent(
+    black_agent, black_config: Dict[str, Any], verify_tasks: bool = True
+) -> Dict[str, Any]:
+    """
+    Resume Black Agent workflow using an existing Black Agent instance.
+
+    This version uses the provided black_agent instance which already has
+    a compiled workflow with checkpointer, ensuring state persistence.
+
+    Args:
+        black_agent: The BlackAgent instance that initiated the workflow
+        black_config: The config dict stored in state.pending_human_action['black_config']
+        verify_tasks: If True, verify all Todoist tasks are complete before resuming
+
+    Returns:
+        Final state after workflow completion
+    """
+
+    if (
+        not hasattr(black_agent, "_compiled_workflow")
+        or black_agent._compiled_workflow is None
+    ):
+        # Create compiled workflow with persistent checkpointer
+        import os
+        import sqlite3
+
+        from langgraph.checkpoint.sqlite import SqliteSaver
+
+        os.makedirs("checkpoints", exist_ok=True)
+        conn = sqlite3.connect("checkpoints/black_agent.db", check_same_thread=False)
+        checkpointer = SqliteSaver(conn)
+        black_agent._compiled_workflow = black_agent.create_graph().compile(
+            checkpointer=checkpointer, interrupt_before=["await_human_action"]
+        )
+
+    # Get current state from checkpoint
+    snapshot = black_agent._compiled_workflow.get_state(black_config)
+    current_state = snapshot.values
+
+    # Verify tasks complete if requested
+    if verify_tasks:
+        pending_tasks = current_state.get("pending_human_tasks", [])
+        if pending_tasks and not check_todoist_tasks_complete(pending_tasks):
+            raise ValueError(
+                "Cannot resume workflow: Not all Todoist tasks are marked complete. "
+                "Please complete all ritual tasks before resuming."
+            )
+
+    logging.info("Resuming Black Agent workflow after human action...")
+
+    # Resume workflow - it will continue from 'await_human_action' node
+    # Pass empty dict when resuming - state comes from checkpoint
+
+    final_snapshot = black_agent._compiled_workflow.get_state(black_config)
+    final_state = final_snapshot.values
+
+    # Handle counter_proposal which may be an object or dict
+    counter_proposal = final_state.get("counter_proposal")
+    if counter_proposal:
+        title = getattr(counter_proposal, "title", None) or (
+            counter_proposal.get("title", "Unknown")
+            if isinstance(counter_proposal, dict)
+            else "Unknown"
+        )
+        logging.info(f"✓ Workflow completed: {title}")
+    else:
+        logging.info("✓ Workflow completed")
 
     return final_state
 
@@ -157,19 +239,21 @@ def manual_resume_from_cli(thread_id: str):
     print(f"📋 Pending tasks: {len(snapshot.values.get('pending_human_tasks', []))}")
 
     # Show pending tasks
-    for task in snapshot.values.get('pending_human_tasks', []):
+    for task in snapshot.values.get("pending_human_tasks", []):
         print(f"   - {task.get('type')}: {task.get('task_url')}")
 
     # Ask for confirmation
     confirm = input("\n⚠️  Resume workflow without verifying Todoist tasks? (yes/no): ")
-    if confirm.lower() != 'yes':
+    if confirm.lower() != "yes":
         print("❌ Resume cancelled")
         return
 
     try:
         final_state = resume_black_agent_workflow(black_config, verify_tasks=False)
-        print(f"\n✅ Workflow completed successfully!")
-        print(f"Final counter-proposal: {final_state.get('counter_proposal', {}).get('title')}")
+        print("\n✅ Workflow completed successfully!")
+        print(
+            f"Final counter-proposal: {final_state.get('counter_proposal', {}).get('title')}"
+        )
     except Exception as e:
         print(f"\n❌ Error resuming workflow: {e}")
 
@@ -181,4 +265,6 @@ if __name__ == "__main__":
         thread_id = sys.argv[2] if len(sys.argv) > 2 else "black_main_thread"
         manual_resume_from_cli(thread_id)
     else:
-        print("Usage: python -m app.agents.resume_black_workflow manual_resume_from_cli <thread_id>")
+        print(
+            "Usage: python -m app.agents.resume_black_workflow manual_resume_from_cli <thread_id>"
+        )
