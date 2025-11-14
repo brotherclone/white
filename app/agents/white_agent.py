@@ -225,6 +225,16 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
+        # If workflow is paused, skip processing
+        if state.workflow_paused:
+            logging.info("⏸️  Skipping Black Agent work processing - workflow is paused")
+            return state
+
+        # Check if we have any iterations
+        if not state.song_proposals or not state.song_proposals.iterations:
+            logging.warning("⚠️  No song proposals to process from Black Agent")
+            return state
+
         black_proposal = state.song_proposals.iterations[-1]
         black_artifacts = state.artifacts or []
         evp_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "evp"]
@@ -330,7 +340,15 @@ class WhiteAgent(BaseModel):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             return "red"
-        if state.ready_for_red:
+        # Access state attributes - handle both dict and model access
+        workflow_paused = getattr(state, 'workflow_paused', state.get('workflow_paused', False) if isinstance(state, dict) else False)
+        ready_for_red = getattr(state, 'ready_for_red', state.get('ready_for_red', False) if isinstance(state, dict) else False)
+
+        # If workflow is paused, we can't proceed - finish for now
+        if workflow_paused:
+            logging.info("⏸️  White Agent routing to finish because Black Agent is paused")
+            return "finish"
+        if ready_for_red:
             return "red"
         return "finish"
 
