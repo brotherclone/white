@@ -47,7 +47,9 @@ tempered_modes = {
 }
 
 def get_mode(mode_str: str) -> Mode:
-    if mode_str in tempered_modes:
-        return tempered_modes[mode_str]
+    # Make mode parsing case-insensitive
+    mode_str_lower = mode_str.lower()
+    if mode_str_lower in tempered_modes:
+        return tempered_modes[mode_str_lower]
     else:
         raise ValueError(f"Mode {mode_str} is not a valid tempered mode.")

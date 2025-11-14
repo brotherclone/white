@@ -43,6 +43,28 @@ tempered_notes = {
     }
 
 def get_note(note_str: str) -> Note:
+    # Normalize flat notation to sharp notation
+    flat_to_sharp = {
+        'Db': 'C#',
+        'D♭': 'C#',
+        'Eb': 'D#',
+        'E♭': 'D#',
+        'Gb': 'F#',
+        'G♭': 'F#',
+        'Ab': 'G#',
+        'A♭': 'G#',
+        'Bb': 'A#',
+        'B♭': 'A#',
+        'Cb': 'B',
+        'C♭': 'B',
+        'Fb': 'E',
+        'F♭': 'E'
+    }
+
+    # Convert flat notation to sharp if needed
+    if note_str in flat_to_sharp:
+        note_str = flat_to_sharp[note_str]
+
     if note_str in tempered_notes:
         return tempered_notes[note_str]
     else:

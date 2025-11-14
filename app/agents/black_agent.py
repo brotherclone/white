@@ -102,11 +102,27 @@ class BlackAgent(BaseRainbowAgent, ABC):
         result = self._compiled_workflow.invoke(black_state.model_dump(), config=black_config)
         snapshot = self._compiled_workflow.get_state(black_config)
         if snapshot.next:
-            pass
+            # Workflow is interrupted - pass back partial state including artifacts
+            logging.info(f"⏸️  Black Agent workflow paused at: {snapshot.next}")
+            state.workflow_paused = True
+            state.pause_reason = "black_agent_awaiting_human_action"
+            state.pending_human_action = {
+                "agent": "black",
+                "action": "sigil_charging",
+                "instructions": result.get("human_instructions", "Complete Black Agent ritual tasks"),
+                "pending_tasks": result.get("pending_human_tasks", []),
+                "black_config": black_config
+            }
+            # Pass artifacts even when interrupted
+            if result.get("artifacts"):
+                state.artifacts = result["artifacts"]
+            logging.info("⏸️  Workflow paused - waiting for human to complete ritual tasks")
         else:
             state.song_proposals = result.get("song_proposals") or state.song_proposals
             if result.get("counter_proposal"):
                 state.song_proposals.iterations.append(result["counter_proposal"])
+            if result.get("artifacts"):
+                state.artifacts = result["artifacts"]
         return state
 
     def create_graph(self) -> StateGraph:
@@ -155,7 +171,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             }
         )
         black_workflow.add_edge("await_human_action", "update_alternate_song_spec_with_sigil")
-        black_workflow.add_edge("await_human_action", END)
+        black_workflow.add_edge("update_alternate_song_spec_with_sigil", END)
         return black_workflow
 
     @staticmethod
@@ -290,6 +306,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
         state.artifacts.append(sigil_artifact)
 
         try:
+            # Check if Todoist API token is configured
+            todoist_token = os.getenv('TODOIST_API_TOKEN')
+            if not todoist_token:
+                raise ValueError("TODOIST_API_TOKEN not configured in environment")
+
             task_result = create_sigil_charging_task(
                 sigil_description=description,
                 charging_instructions=charging_instructions,
@@ -320,17 +341,29 @@ class BlackAgent(BaseRainbowAgent, ABC):
             logging.info(f"✓ Created Todoist task for sigil charging: {task_result['id']}")
 
         except Exception as e:
-            logging.error(f"✗ Failed to create Todoist task: {e}")
+            error_msg = str(e)
+            if "401" in error_msg or "Unauthorized" in error_msg:
+                logging.error(f"401 Unauthorized: Invalid API token.")
+                logging.warning("⚠️ Todoist task creation failed!")
+                logging.warning("  Error: 401 Unauthorized: Invalid API token.")
+                logging.warning("  Status code: 401")
+                logging.info("  To fix: Set TODOIST_API_TOKEN in your .env file")
+            elif "TODOIST_API_TOKEN not configured" in error_msg:
+                logging.warning("⚠️ Todoist integration not configured")
+                logging.info("  To enable: Set TODOIST_API_TOKEN in your .env file")
+            else:
+                logging.error(f"✗ Failed to create Todoist task: {e}")
+
             state.awaiting_human_action = True
             state.should_update_proposal_with_sigil = True
             state.human_instructions = f"""
-                                        ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed)
-                                        
+                                        ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed: {error_msg})
+
                                         Manually charge the sigil for '{current_proposal.title}':
-                                        
+
                                         **Wish:** {wish_text}
                                         **Glyph:** {description}
-                                        
+
                                         {charging_instructions}
                                         """
         return state
@@ -354,13 +387,16 @@ class BlackAgent(BaseRainbowAgent, ABC):
             the_rainbow_table_colors['Z'],
             state.thread_id
         )
+        # Use longer slices (1000ms = 1 second) for more coherent speech in transcription
+        # Shorter target length (10 seconds) to stay within AssemblyAI's sweet spot
         mosaic = create_audio_mosaic_chain_artifact(
-            segments, 50,
-            getattr(current_proposal, 'target_length', 180),  # Default 3 min
+            segments, 1000,
+            10,  # 10 seconds is better for transcription than 180
             state.thread_id
         )
+        # Reduce noise blend to 15% for better transcription (was 33%)
         blended = create_blended_audio_chain_artifact(
-            mosaic, 0.33,
+            mosaic, 0.15,
             state.thread_id
         )
         transcript = chain_artifact_file_from_speech_to_text(
