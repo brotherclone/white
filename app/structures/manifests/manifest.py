@@ -38,7 +38,10 @@ class Manifest(BaseModel):
     audio_tracks: list[ManifestTrack]
 
     def __init__(self, **data):
-        if "tempo" in data and isinstance(data["tempo"], str):
+        # Convert float BPM to integer
+        if 'bpm' in data and isinstance(data['bpm'], float):
+            data['bpm'] = int(round(data['bpm']))
+        if 'tempo' in data and isinstance(data['tempo'], str):
             try:
                 tempo = data["tempo"].split("/")
                 data["tempo"] = TimeSignature(
