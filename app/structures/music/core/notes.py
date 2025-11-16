@@ -25,49 +25,48 @@ class Note(BaseModel):
 
 
 tempered_notes = {
-    'C': Note(pitch_name='C', pitch_alias=[], accidental=None,
-              frequency=261, octave=4),
-    'C#': Note(pitch_name='C', pitch_alias=['D♭'], accidental='sharp',
-               frequency=277, octave=4),
-    'D': Note(pitch_name='D', pitch_alias=[], accidental=None,
-              frequency=293, octave=4),
-    'D#': Note(pitch_name='D', pitch_alias=['E♭'], accidental='sharp',
-               frequency=311, octave=4),
-    'E': Note(pitch_name='E', pitch_alias=[], accidental=None,
-              frequency=329, octave=4),
-    'F': Note(pitch_name='F', pitch_alias=[], accidental=None,
-              frequency=349, octave=4),
-    'F#': Note(pitch_name='F', pitch_alias=['G♭'], accidental='sharp',
-               frequency=370, octave=4),
-    'G': Note(pitch_name='G', pitch_alias=[], accidental=None,
-              frequency=392, octave=4),
-    'G#': Note(pitch_name='G', pitch_alias=['A♭'], accidental='sharp',
-               frequency=415, octave=4),
-    'A': Note(pitch_name='A', pitch_alias=[], accidental=None,
-              frequency=440, octave=4),
-    'A#': Note(pitch_name='A', pitch_alias=['B♭'], accidental='sharp',
-               frequency=466, octave=4),
-    'B': Note(pitch_name='B', pitch_alias=[], accidental=None,
-              frequency=493, octave=4)
-    }
+    "C": Note(pitch_name="C", pitch_alias=[], accidental=None, frequency=261, octave=4),
+    "C#": Note(
+        pitch_name="C", pitch_alias=["D♭"], accidental="sharp", frequency=277, octave=4
+    ),
+    "D": Note(pitch_name="D", pitch_alias=[], accidental=None, frequency=293, octave=4),
+    "D#": Note(
+        pitch_name="D", pitch_alias=["E♭"], accidental="sharp", frequency=311, octave=4
+    ),
+    "E": Note(pitch_name="E", pitch_alias=[], accidental=None, frequency=329, octave=4),
+    "F": Note(pitch_name="F", pitch_alias=[], accidental=None, frequency=349, octave=4),
+    "F#": Note(
+        pitch_name="F", pitch_alias=["G♭"], accidental="sharp", frequency=370, octave=4
+    ),
+    "G": Note(pitch_name="G", pitch_alias=[], accidental=None, frequency=392, octave=4),
+    "G#": Note(
+        pitch_name="G", pitch_alias=["A♭"], accidental="sharp", frequency=415, octave=4
+    ),
+    "A": Note(pitch_name="A", pitch_alias=[], accidental=None, frequency=440, octave=4),
+    "A#": Note(
+        pitch_name="A", pitch_alias=["B♭"], accidental="sharp", frequency=466, octave=4
+    ),
+    "B": Note(pitch_name="B", pitch_alias=[], accidental=None, frequency=493, octave=4),
+}
 
-def get_note(note_str: str) -> Note:
+
+def get_tempered_note(note_str: str) -> Note:
     # Normalize flat notation to sharp notation
     flat_to_sharp = {
-        'Db': 'C#',
-        'D♭': 'C#',
-        'Eb': 'D#',
-        'E♭': 'D#',
-        'Gb': 'F#',
-        'G♭': 'F#',
-        'Ab': 'G#',
-        'A♭': 'G#',
-        'Bb': 'A#',
-        'B♭': 'A#',
-        'Cb': 'B',
-        'C♭': 'B',
-        'Fb': 'E',
-        'F♭': 'E'
+        "Db": "C#",
+        "D♭": "C#",
+        "Eb": "D#",
+        "E♭": "D#",
+        "Gb": "F#",
+        "G♭": "F#",
+        "Ab": "G#",
+        "A♭": "G#",
+        "Bb": "A#",
+        "B♭": "A#",
+        "Cb": "B",
+        "C♭": "B",
+        "Fb": "E",
+        "F♭": "E",
     }
 
     # Convert flat notation to sharp if needed

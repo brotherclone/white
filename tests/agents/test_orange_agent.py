@@ -56,23 +56,26 @@ def test_add_to_corpus_success(monkeypatch):
     fake_corpus = SimpleNamespace(add_story=fake_add_story)
     dummy_self = SimpleNamespace(corpus=fake_corpus)
 
+    from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
+
     state = SimpleNamespace(
-        synthesized_story={
-            "headline": "Local Band Sparks Midnight Mystery",
-            "date": "1990-06-15",
-            "source": "Sussex County Independent",
-            "text": "A curious hum was reported after the late show.",
-            "location": "Newton, NJ",
-            "tags": ["music", "weird"],
-        },
+        synthesized_story=NewspaperArtifact(
+            thread_id="test-thread",
+            headline="Local Band Sparks Midnight Mystery",
+            date="1990-06-15",
+            source="Sussex County Independent",
+            text="A curious hum was reported after the late show.",
+            location="Newton, NJ",
+            tags=["music", "weird"],
+        ),
         selected_story_id=None,
     )
 
     result = OrangeAgent.add_to_corpus(dummy_self, state)
 
     assert result.selected_story_id == "story123"
-    assert captured["headline"] == state.synthesized_story["headline"]
-    assert captured["text"] == state.synthesized_story["text"]
+    assert captured["headline"] == state.synthesized_story.headline
+    assert captured["text"] == state.synthesized_story.text
 
 
 def test_add_to_corpus_failure_sets_fallback(monkeypatch):
@@ -84,15 +87,18 @@ def test_add_to_corpus_failure_sets_fallback(monkeypatch):
     fake_corpus = SimpleNamespace(add_story=failing_add_story)
     dummy_self = SimpleNamespace(corpus=fake_corpus)
 
+    from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
+
     state = SimpleNamespace(
-        synthesized_story={
-            "headline": "Strange Signals Near High School",
-            "date": "1988-09-01",
-            "source": "New Jersey Herald",
-            "text": "Residents reported unexplained electronic sounds.",
-            "location": "Sparta Township, NJ",
-            "tags": ["unexplained"],
-        },
+        synthesized_story=NewspaperArtifact(
+            thread_id="test-thread",
+            headline="Strange Signals Near High School",
+            date="1988-09-01",
+            source="New Jersey Herald",
+            text="Residents reported unexplained electronic sounds.",
+            location="Sparta Township, NJ",
+            tags=["unexplained"],
+        ),
         selected_story_id=None,
     )
 
@@ -146,18 +152,21 @@ def test_select_symbolic_object_non_mock(monkeypatch):
         corpus=fake_corpus, anthropic_client=fake_anthropic_client
     )
 
+    from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
+
     state = SimpleNamespace(
         selected_story_id="story-xyz",
-        synthesized_story={"text": "Original story text."},
+        synthesized_story=NewspaperArtifact(
+            thread_id="test-thread", text="Original story text."
+        ),
         symbolic_object=SimpleNamespace(
             name="Strange Compass", symbolic_object_category="instrument"
         ),
     )
-    state.state = state
 
     result = OrangeAgent.select_symbolic_object(dummy_self, state)
 
-    assert result.synthesized_story["text"] == updated_text
+    assert result.synthesized_story.text == updated_text
     assert captured["story_id"] == state.selected_story_id
     assert captured["category"] == state.symbolic_object.symbolic_object_category
     assert captured["description"] == state.symbolic_object.name
