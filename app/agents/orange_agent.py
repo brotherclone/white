@@ -139,13 +139,13 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             {state.white_proposal.model_dump_json(indent=2)}
 
             MYTHOLOGIZED STORY:
-            Headline: {state.mythologized_story['headline']}
-            Date: {state.mythologized_story['date']}
-            Location: {state.mythologized_story['location']}
+            Headline: {state.mythologized_story.headline}
+            Date: {state.mythologized_story.date}
+            Location: {state.mythologized_story.location}
             Symbolic Object: {state.symbolic_object.name if state.symbolic_object else 'N/A'}
 
             Story Text:
-            {state.mythologized_story['text']}
+            {state.mythologized_story.text}
 
             ORANGE'S METHODOLOGY:
             Orange mythologizes - transforms factual into legendary through:
@@ -309,12 +309,12 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         try:
             story = state.synthesized_story
             story_id, score = self.corpus.add_story(
-                headline=story["headline"],
-                date=story["date"],
-                source=story["source"],
-                text=story["text"],
-                location=story["location"],
-                tags=story["tags"],
+                headline=story.headline,
+                date=story.date,
+                source=story.source,
+                text=story.text,
+                location=story.location,
+                tags=story.tags,
             )
             state.selected_story_id = story_id
             print(f"   Added: {story_id} (score: {score:.2f})")
@@ -369,8 +369,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     description=state.symbolic_object.name,
                     updated_text=updated_text,
                 )
-                state.synthesized_story["text"] = updated_text
-                print(f"   Object inserted: {state.state.symbolic_object.name}")
+                state.synthesized_story.text = updated_text
+                print(f"   Object inserted: {state.symbolic_object.name}")
 
             except Exception as e:
                 logging.error(f"Object insertion failed: {e}")
@@ -390,7 +390,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 object_category=state.symbolic_object.symbolic_object_category,
                 custom_object=state.symbolic_object.name,
             )
-            print(f"Object inserted: {state.state.symbolic_object.name}")
+            print(f"Object inserted: {state.symbolic_object.name}")
         except Exception as e:
             logging.error(f"Object insertion failed: {e!s}")
 

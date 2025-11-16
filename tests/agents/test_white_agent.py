@@ -138,7 +138,21 @@ def test_process_black_agent_work_sets_analysis_and_ready_for_red(
 
     # Create a minimal state object
     state = SimpleNamespace(
-        song_proposals={"iterations": [{"iteration_id": "black-prop"}]},
+        song_proposals=SongProposal(
+            iterations=[
+                SongProposalIteration(
+                    iteration_id="test_black_prop_v1",
+                    bpm=120,
+                    tempo="4/4",
+                    key="C Major",
+                    rainbow_color="black",
+                    title="Test Black Proposal",
+                    mood=["dark"],
+                    genres=["rock"],
+                    concept="This is a test concept that explores the archetypal journey through darkness and rebirth, examining how the shadow self must be confronted and integrated before transcendence can occur in the alchemical process.",
+                )
+            ]
+        ),
         artifacts=[
             SimpleNamespace(chain_artifact_type="evp"),
             SimpleNamespace(chain_artifact_type="sigil"),

@@ -130,4 +130,4 @@ def test_export_json_and_training_parquet(tmp_path):
     assert parquet_path.exists()
     df = pl.read_parquet(parquet_path)
     assert len(df) == 1
-    assert df.to_series("story_id").to_list()[0] == story2_id
+    assert df["story_id"].to_list()[0] == story2_id
