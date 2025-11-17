@@ -8,7 +8,7 @@ from app.reference.mcp.rows_bud.orange_corpus import get_corpus
 mcp = FastMCP("Orange Mythos")
 anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-CORPUS_DIR = os.getenv("ORANGE_CORPUS_DIR")
+CORPUS_DIR = os.getenv("ORANGE_CORPUS_DIR", "./mythology_corpus")
 corpus = get_corpus(CORPUS_DIR)
 
 

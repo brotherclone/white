@@ -187,7 +187,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
-                f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_mock.yml",
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_mock.yml",
                 "r",
             ) as f:
                 data = yaml.safe_load(f)
@@ -256,7 +256,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
         if mock_mode:
             mock_path = (
-                f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_sigil_artifact_mock.yml"
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_sigil_artifact_mock.yml"
             )
             if random.random() < 0.75:
                 state.should_update_proposal_with_sigil = False
@@ -424,7 +424,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
         if mock_mode:
             with open(
-                f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_evp_artifact_mock.yml", "r"
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_evp_artifact_mock.yml", "r"
             ) as f:
                 data = yaml.safe_load(f)
             evp_artifact = EVPArtifact(**data)
@@ -544,7 +544,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
-                f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_after_evp_mock.yml",
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_after_evp_mock.yml",
                 "r",
             ) as f:
                 data = yaml.safe_load(f)
@@ -619,7 +619,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
-                f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_after_sigil_mock.yml",
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_after_sigil_mock.yml",
                 "r",
             ) as f:
                 data = yaml.safe_load(f)
