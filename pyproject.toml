@@ -1,11 +1,11 @@
 [tool.setuptools]
-packages = ["app", "training", "staged_raw_material"]
+packages = ["app", "staged_raw_material"]
 
 [project]
 name = "white"
 version = "0.1.0"
 description = "System for creation of White album in The Rainbow Table"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "discogs-client>=2.3.0",
     "httpx>=0.28.1",

@@ -5,12 +5,12 @@ import pytest
 from app.structures.enums.publisher_type import PublisherType
 
 EXPECTED = {
-    "UNIVERSITY": "University imprint",
-    "OCCULT": "Occult cottage industry publisher",
-    "SAMIZDAT": "Samizdat dead drop",
-    "VANITY": "Vanity press directly from author",
-    "LOST": "Previously deemed lost",
-    "GOVERNMENT": "Declassified document from FOIA request",
+    "UNIVERSITY": "university",
+    "OCCULT": "occult",
+    "SAMIZDAT": "samizdat",
+    "VANITY": "vanity",
+    "LOST": "lost",
+    "GOVERNMENT": "government",
 }
 
 
@@ -33,12 +33,12 @@ def test_members_are_str_and_enum_and_compare_to_value():
 @pytest.mark.parametrize(
     "value,member",
     [
-        ("University imprint", PublisherType.UNIVERSITY),
-        ("Occult cottage industry publisher", PublisherType.OCCULT),
-        ("Samizdat dead drop", PublisherType.SAMIZDAT),
-        ("Vanity press directly from author", PublisherType.VANITY),
-        ("Previously deemed lost", PublisherType.LOST),
-        ("Declassified document from FOIA request", PublisherType.GOVERNMENT),
+        ("university", PublisherType.UNIVERSITY),
+        ("occult", PublisherType.OCCULT),
+        ("samizdat", PublisherType.SAMIZDAT),
+        ("vanity", PublisherType.VANITY),
+        ("lost", PublisherType.LOST),
+        ("government", PublisherType.GOVERNMENT),
     ],
 )
 def test_lookup_by_value(value, member):
