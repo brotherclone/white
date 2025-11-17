@@ -76,7 +76,7 @@ if __name__ == "__main__":
     with open("/Volumes/LucidNonsense/White/tests/mocks/mock.wav", "rb") as f:
         audio_bytes = f.read()
     with open(
-        f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_evp_artifact_mock.yml", "r"
+        f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_evp_artifact_mock.yml", "r"
     ) as f:
         data = yaml.safe_load(f)
         evp_artifact = EVPArtifact(**data)
