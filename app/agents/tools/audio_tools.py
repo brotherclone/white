@@ -11,7 +11,7 @@ import soundfile as sf
 from dotenv import load_dotenv
 from scipy import signal
 from scipy.fft import fft, fftfreq, ifft
-from scipy.io import wavfile
+
 
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.concepts.rainbow_table_color import (
@@ -233,11 +233,6 @@ def apply_speech_hallucination_processing(
     if hallucination_intensity > 0.1:
         audio = bit_crush_audio_bytes(audio, 0.3 * hallucination_intensity)
     return audio
-
-
-def save_wav_from_bytes(filename: str, audio_bytes: bytes, sample_rate: int = 44100):
-    audio_array = np.frombuffer(audio_bytes, dtype=np.int16)
-    wavfile.write(filename, sample_rate, audio_array)
 
 
 def find_wav_files(root_dir: str, prefix: str | None) -> List[str]:

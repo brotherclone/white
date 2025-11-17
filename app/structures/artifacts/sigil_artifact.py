@@ -1,11 +1,12 @@
-# python
-import re
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import List, Optional
 
-from pydantic import Field, model_validator
+import yaml
+from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 
@@ -13,9 +14,8 @@ from app.structures.enums.sigil_type import SigilType
 class SigilArtifact(ChainArtifact):
     """Record of a created sigil for the Black Agent's paranoid tracking"""
 
-    thread_id: Optional[str] = Field(
-        default=None, description="Unique ID of the thread."
-    )
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.SIGIL
+    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     wish: Optional[str] = Field(default=None, description="Wish for the sigil.")
     statement_of_intent: Optional[str] = Field(
         default=None, description="Statement of intent for the sigil."
@@ -33,74 +33,64 @@ class SigilArtifact(ChainArtifact):
     charging_instructions: Optional[str] = Field(
         default=None, description="Instructions for charging the sigil."
     )
-    chain_artifact_type: str = "sigil"
-    artifact_report: Optional[TextChainArtifactFile] = Field(
-        default=None, description="Report file associated with the sigil."
-    )
 
-    @model_validator(mode="before")
-    def _normalize_artifact_report(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        def _normalize_key(k: str) -> str:
-            return re.sub(r"[^a-z0-9]", "", k.lower())
+    def __init__(self, **data):
+        super().__init__(**data)
 
-        def _is_report_key(k: str) -> bool:
-            s = _normalize_key(k)
-            # match keys like "artifact_report", "artifact-report-file", "artifactReport", "artifactfile", "report"
-            return (
-                ("artifact" in s and ("report" in s or "file" in s or "text" in s))
-                or s == "artifact"
-                or s == "report"
-            )
+    def save_file(self):
+        file = Path(self.file_path, self.file_name)
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file = Path(self.file_path, self.file_name)
+        data_to_save = {
+            "wish": self.wish,
+            "statement_of_intent": self.statement_of_intent,
+            "sigil_type": self.sigil_type.value if self.sigil_type else None,
+            "glyph_description": self.glyph_description,
+            "glyph_components": self.glyph_components,
+            "activation_state": (
+                self.activation_state.value if self.activation_state else None
+            ),
+            "charging_instructions": self.charging_instructions,
+        }
+        with open(file, "w") as f:
+            yaml.dump(data_to_save, f, default_flow_style=False, allow_unicode=True)
 
-        # Keys that indicate a dict is likely a BaseChainArtifactFile / TextChainArtifactFile
-        _expected_file_keys = {
-            "artifact_id",
-            "base_path",
-            "chain_artifact_file_type",
-            "artifact_name",
-            "file_name",
-            "text_content",
+    def flatten(self):
+        parent_data = super().flatten()
+        if parent_data is None:
+            parent_data = {}
+        return {
+            **parent_data,
+            "thread_id": self.thread_id,
+            "file_name": self.file_name,
+            "file_path": self.file_path,
+            "chain_artifact_type": self.chain_artifact_type,
+            "wish": self.wish,
+            "statement_of_intent": self.statement_of_intent,
+            "sigil_type": self.sigil_type.value if self.sigil_type else None,
+            "glyph_description": self.glyph_description,
+            "glyph_components": self.glyph_components,
+            "activation_state": (
+                self.activation_state.value if self.activation_state else None
+            ),
+            "charging_instructions": self.charging_instructions,
         }
 
-        def _is_valid_report_candidate(obj: Any) -> bool:
-            if not isinstance(obj, dict):
-                return False
-            return any(k in obj for k in _expected_file_keys)
 
-        def _find_in_structure(obj: Any) -> Optional[Any]:
-            if isinstance(obj, dict):
-                for k, v in obj.items():
-                    try:
-                        if (
-                            k
-                            and _is_report_key(k)
-                            and v is not None
-                            and _is_valid_report_candidate(v)
-                        ):
-                            return v
-                    except ValueError:
-                        pass
-                if _is_valid_report_candidate(obj):
-                    return obj
-                for k, v in obj.items():
-                    obj_found = _find_in_structure(v)
-                    if obj_found is not None:
-                        return obj_found
-            elif isinstance(obj, list):
-                for item in obj:
-                    obj_found = _find_in_structure(item)
-                    if obj_found is not None:
-                        return obj_found
-            return None
+if __name__ == "__main__":
+    sigil = SigilArtifact(
+        thread_id="test_thread_id",
+        chain_artifact_file_type="yml",
+        chain_artifact_type="sigil",
+        wish="hi",
+        statement_of_intent="hi",
+        sigil_type="pictorial",
+        glyph_description="hi",
+        glyph_components=["hi"],
+        activation_state="charging",
+        charging_instructions="hi",
+        base_path="/Volumes/LucidNonsense/White/chain_artifacts/",
+    )
 
-        if not isinstance(values, dict):
-            return values
-
-        if values.get("artifact_report") is None:
-            found = _find_in_structure(values)
-            if found is not None:
-                values["artifact_report"] = found
-
-        return values
-
-    model_config = {"extra": "ignore"}
+    sigil.save_file()
+    print(sigil.flatten())

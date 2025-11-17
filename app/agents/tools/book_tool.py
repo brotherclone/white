@@ -1,5 +1,5 @@
 import random
-from typing import Optional
+from typing import Optional, Any
 
 from pydantic import BaseModel
 
@@ -39,7 +39,7 @@ from app.reference.books.book_topics import (
     SCIFI_TOPICS,
     SEXPLOITATION_TOPICS,
 )
-from app.structures.artifacts.book_data import BookData
+from app.structures.artifacts.book_artifact import BookArtifact
 from app.structures.enums.book_condition import BookCondition
 from app.structures.enums.book_genre import BookGenre
 from app.structures.enums.publisher_type import PublisherType
@@ -288,7 +288,7 @@ class BookMaker(BaseModel):
     @classmethod
     def generate_random_book(
         cls, index: Optional[int] = None, force_genre: Optional[BookGenre] = None
-    ) -> BookData:
+    ) -> Any:
         """Generate a complete random book from the collection"""
 
         # Select genre
@@ -350,7 +350,7 @@ class BookMaker(BaseModel):
         acquisition_date = f"{random.choice(['January', 'March', 'June', 'October'])} {acquisition_year}"
         acquisition_note = random.choice(ACQUISITION_NOTES)
 
-        return BookData(
+        return BookArtifact(
             title=title,
             subtitle=subtitle,
             author=author,
@@ -379,7 +379,7 @@ class BookMaker(BaseModel):
         )
 
     @classmethod
-    def format_bibliography_entry(cls, the_book: BookData) -> str:
+    def format_bibliography_entry(cls, the_book: Any) -> str:
         """Format book as bibliography entry"""
         entry = f"{the_book.author}"
         if the_book.author_credentials:
@@ -397,7 +397,7 @@ class BookMaker(BaseModel):
         return entry
 
     @classmethod
-    def format_card_catalog(cls, book_to_catalog: BookData) -> str:
+    def format_card_catalog(cls, book_to_catalog: Any) -> str:
         """Format as old-school library card catalog entry with perfect alignment (70 chars wide)"""
         width = 70
 

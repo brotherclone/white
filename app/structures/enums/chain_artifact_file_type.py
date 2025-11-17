@@ -6,3 +6,4 @@ class ChainArtifactFileType(str, Enum):
     AUDIO = "wav"
     JSON = "json"
     PNG = "png"
+    YML = "yml"

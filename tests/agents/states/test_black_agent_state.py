@@ -1,10 +1,12 @@
+from pathlib import Path
+import librosa
 from app.agents.states.black_agent_state import BlackAgentState
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
@@ -39,38 +41,44 @@ def test_black_agent_state_custom_fields():
         concept="Test concept in which a song proposal iteration is created with mock values for testing. Now, if I have to sit here and type, oh good it's over 100 now.",
     )
     proposal = SongProposal()
+
+    # Load mock audio file
+    mock_audio_path = Path(__file__).parent.parent / "mocks" / "mock.wav"
+    audio_data, sample_rate = librosa.load(str(mock_audio_path), sr=None, mono=False)
+    duration = librosa.get_duration(y=audio_data, sr=sample_rate)
+    channels = 1 if audio_data.ndim == 1 else audio_data.shape[0]
+
     audio_file = AudioChainArtifactFile(
-        sample_rate=44100,
-        duration=1.0,
-        channels=1,
-        base_path="",
+        sample_rate=sample_rate,
+        duration=duration,
+        channels=channels,
+        base_path="/tmp/artifacts/",
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
         artifact_name="test_audio",
         artifact_id="123",
         thread_id="345",
         rainbow_color=the_rainbow_table_colors["Z"],
         file_name="test_audio.wav",
+        audio_data=audio_data,
     )
-    transcript_file = TextChainArtifactFile(
-        text_content="Test transcript",
-        base_path="",
-        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-        artifact_name="test_md",
-        artifact_id="123",
-        thread_id="345",
-        rainbow_color=the_rainbow_table_colors["Z"],
-        file_name="test_transcript.md",
-    )
+
     evp = EVPArtifact(
-        chain_artifact_type="evp",
+        chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
+        chain_artifact_file_type=ChainArtifactFileType.YML,
+        file_path="/tmp/artifacts/",
+        file_name="test_evp.yml",
         files=[audio_file],
         audio_segments=[audio_file],
-        transcript=transcript_file,
+        transcript="hi",
         audio_mosiac=audio_file,
         noise_blended_audio=audio_file,
         thread_id="123",
     )
     sigil = SigilArtifact(
+        chain_artifact_type=ChainArtifactType.SIGIL,
+        chain_artifact_file_type=ChainArtifactFileType.YML,
+        file_path="/tmp/artifacts/",
+        file_name="test_sigil.yml",
         thread_id="sigil-thread-1",
         wish="Manifest creative energy",
         statement_of_intent="To focus intent on project success",
@@ -78,16 +86,6 @@ def test_black_agent_state_custom_fields():
         glyph_description="A stylized glyph combining project initials",
         activation_state=SigilState.CREATED,
         charging_instructions="Charge during full moon",
-        artifact_report=TextChainArtifactFile(
-            text_content="Sigil created successfully.",
-            base_path="",
-            chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-            artifact_name="sigil_report",
-            artifact_id="sigil-001",
-            thread_id="sigil-thread-1",
-            rainbow_color=the_rainbow_table_colors["Z"],
-            file_name="sigil_report.md",
-        ),
     )
     artifacts = [evp, sigil]
     pending_tasks = [{"task": "review"}]

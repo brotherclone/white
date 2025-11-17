@@ -6,13 +6,10 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from app.structures.artifacts.book_artifact import BookArtifact
-from app.structures.artifacts.book_data import BookData
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import (
     RainbowColorObjectionalMode,
     RainbowColorOntologicalMode,
     RainbowColorTemporalMode,
-    RainbowTableColor,
 )
 from tests.mocks.mock_tests.mock_utils import normalize_book_data_enums
 
@@ -29,9 +26,6 @@ def test_book_artifact_mocks():
     data = normalize_book_data_enums(data)
     book = BookArtifact(**data)
     assert isinstance(book, BookArtifact)
-    assert isinstance(book.book_data, BookData)
-    assert isinstance(book.excerpts[0], TextChainArtifactFile)
-    assert isinstance(book.excerpts[0].rainbow_color, RainbowTableColor)
     assert book.book_data.publisher_type is not None
     assert book.book_data.condition is not None
     assert book.book_data.publisher_type.value == "Vanity press directly from author"
@@ -52,15 +46,6 @@ def test_book_artifact_mocks():
     assert book.book_data.abstract == "An abstract for the mock book used in testing."
     assert book.chain_artifact_type == "REDChainArtifactBook"
     assert book.thread_id == "412345"
-    assert book.excerpts[0].text_content == "This is a mock page for testing purposes."
-    assert book.excerpts[0].chain_artifact_file_type.value == "md"
-    assert book.excerpts[0].rainbow_color.mnemonic_character_value == "R"
-    assert book.excerpts[0].rainbow_color.temporal_mode.value == "Past"
-    assert book.excerpts[0].rainbow_color.objectional_mode.value == "Thing"
-    assert book.excerpts[0].rainbow_color.ontological_mode[0].value == "Known"
-    assert book.excerpts[0].artifact_id == "555"
-    assert book.excerpts[0].artifact_name == "book"
-    assert book.excerpts[0].file_name == "555_red_book.md"
 
 
 @given(
@@ -103,8 +88,8 @@ def test_reaction_book_mocks():
     with path.open("r") as f:
         data = yaml.safe_load(f)
     data = normalize_book_data_enums(data)
-    book = BookData(**data)
-    assert isinstance(book, BookData)
+    book = BookArtifact(**data)
+    assert isinstance(book, BookArtifact)
     assert book.title == "Mock Book Title"
     assert book.author == "John Doe"
     assert book.publisher == "Mock Publishing House"
@@ -115,47 +100,3 @@ def test_reaction_book_mocks():
     assert book.isbn == "123-4-567-89012-3"
     assert book.catalog_number == "MOCK-CAT-001"
     assert book.acquisition_date == "2025-01-01"
-
-
-def test_reaction_book_page_1_mock():
-    path = (
-        Path(__file__).resolve().parents[3]
-        / "tests"
-        / "mocks"
-        / "red_reaction_book_page_1_mock.yml"
-    )
-    with path.open("r") as f:
-        data = yaml.safe_load(f)
-        page = TextChainArtifactFile(**data)
-    assert isinstance(page, TextChainArtifactFile)
-    assert page.text_content == "Page 1 mock"
-    assert page.chain_artifact_file_type.value == "md"
-    assert page.rainbow_color.mnemonic_character_value == "R"
-    assert page.rainbow_color.temporal_mode.value == "Past"
-    assert page.rainbow_color.objectional_mode.value == "Thing"
-    assert page.rainbow_color.ontological_mode[0].value == "Known"
-    assert page.artifact_id == "555"
-    assert page.artifact_name == "book"
-    assert page.file_name == "555_red_book.md"
-
-
-def test_reaction_book_page_2_mock():
-    path = (
-        Path(__file__).resolve().parents[3]
-        / "tests"
-        / "mocks"
-        / "red_reaction_book_page_2_mock.yml"
-    )
-    with path.open("r") as f:
-        data = yaml.safe_load(f)
-        page = TextChainArtifactFile(**data)
-    assert isinstance(page, TextChainArtifactFile)
-    assert page.text_content == "Page 2 mock"
-    assert page.chain_artifact_file_type.value == "md"
-    assert page.rainbow_color.mnemonic_character_value == "R"
-    assert page.rainbow_color.temporal_mode.value == "Past"
-    assert page.rainbow_color.objectional_mode.value == "Thing"
-    assert page.rainbow_color.ontological_mode[0].value == "Known"
-    assert page.artifact_id == "444"
-    assert page.artifact_name == "book"
-    assert page.file_name == "444_red_book.md"

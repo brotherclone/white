@@ -23,7 +23,6 @@ def test_generate_evp_mock():
     assert len(result_state.artifacts) >= 1
     last = result_state.artifacts[-1]
     assert isinstance(last, EVPArtifact)
-    assert getattr(last, "transcript", None) is not None
 
 
 def test_generate_sigil_mock_creates_artifact(monkeypatch):

@@ -1,3 +1,7 @@
+chain_artifact_type: "symbolic_object"
+chain_artifact_file_type: 'md'
+thread_id: '412345'
+base_path: "/Volumes/LucidNonsense/White/chain_artifacts/"
 symbolic_object_category: 'information_artifacts'
 name: "a mocked mockery"
 description: "mock description"

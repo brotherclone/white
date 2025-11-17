@@ -1,7 +1,7 @@
 import random
 
 from app.agents.tools.book_tool import BookMaker
-from app.structures.artifacts.book_data import BookData
+from app.structures.artifacts.book_artifact import BookArtifact
 from app.structures.enums.book_condition import BookCondition
 from app.structures.enums.book_genre import BookGenre
 from app.structures.enums.publisher_type import PublisherType
@@ -27,13 +27,10 @@ def test_generate_title_with_and_without_colon():
 
 
 def test_generate_author_initials_and_credentials(monkeypatch):
-    # Make author lists deterministic (single entries)
     monkeypatch.setattr(
         BookMaker, "get_authors_for_genre", lambda g: (["Alice"], ["Smith"])
     )
-    # Ensure initials and credentials branches trigger (random.random < thresholds)
     monkeypatch.setattr(random, "random", lambda: 0.05)
-    # deterministic choice (pick first element)
     monkeypatch.setattr(random, "choice", lambda seq: seq[0])
 
     name, creds = BookMaker.generate_author(BookGenre.OCCULT)
@@ -50,7 +47,6 @@ def test_generate_catalog_number_format():
 
 
 def test_generate_random_book_properties(monkeypatch):
-    # Generate a book with force_genre and fixed index, check key invariants
     book = BookMaker.generate_random_book(index=7, force_genre=BookGenre.SCIFI)
 
     # Catalog number ends with the zero-padded index
@@ -65,7 +61,7 @@ def test_generate_random_book_properties(monkeypatch):
 
 
 def test_format_bibliography_entry_and_card_catalog():
-    sample = BookData(
+    sample = BookArtifact(
         title="The Hidden Net",
         subtitle="Protocols of Desire",
         author="J. Doe",
@@ -99,7 +95,6 @@ def test_format_bibliography_entry_and_card_catalog():
     assert "[RA-1999-XYZ-0001]" in bib
 
     card = BookMaker.format_card_catalog(sample)
-    # Basic sanity checks for expected sections
     assert "CATALOG #" in card
     assert "DANGER LEVEL" in card
     assert sample.catalog_number in card

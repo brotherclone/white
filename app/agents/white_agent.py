@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-import uuid
 import yaml
 
 from typing import Any, Dict
@@ -21,17 +20,14 @@ from app.agents.indigo_agent import IndigoAgent
 from app.agents.orange_agent import OrangeAgent
 from app.agents.red_agent import RedAgent
 from app.agents.states.white_agent_state import MainAgentState
-from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.agents.violet_agent import VioletAgent
 from app.agents.workflow.resume_black_workflow import (
     resume_black_agent_workflow_with_agent,
 )
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 logging.basicConfig(level=logging.INFO)
@@ -74,12 +70,6 @@ class WhiteAgent(BaseModel):
 
         Returns:
             The final state after workflow completion (or pause)
-
-        Example:
-            >>> white = WhiteAgent()
-            >>> final_state = white.start_workflow()
-            >>> if final_state.workflow_paused:
-            >>>     resumed_state = white.resume_workflow(final_state)
         """
         workflow = self.build_workflow()
         thread_id = str(uuid4())
@@ -154,6 +144,7 @@ class WhiteAgent(BaseModel):
             {
                 "red": "invoke_red_agent",
                 "black": "invoke_black_agent",
+                "finish": "finalize_song_proposal",
             },
         )
         workflow.add_conditional_edges(
@@ -284,21 +275,23 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-        # If workflow is paused, skip processing
         if state.workflow_paused:
             logging.info("⏸️  Skipping Black Agent work processing - workflow is paused")
             return state
-
-        # Check if we have any iterations
         if not state.song_proposals or not state.song_proposals.iterations:
             logging.warning("⚠️  No song proposals to process from Black Agent")
             return state
-
         black_proposal = state.song_proposals.iterations[-1]
         black_artifacts = state.artifacts or []
-        evp_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "evp"]
+        evp_artifacts = [
+            a
+            for a in black_artifacts
+            if a.chain_artifact_type == ChainArtifactType.EVP_ARTIFACT
+        ]
         sigil_artifacts = [
-            a for a in black_artifacts if a.chain_artifact_type == "sigil"
+            a
+            for a in black_artifacts
+            if a.chain_artifact_type == ChainArtifactType.SIGIL
         ]
         rebracketing_analysis = self._black_rebracketing_analysis(
             state, black_proposal, evp_artifacts, sigil_artifacts
@@ -315,7 +308,9 @@ class WhiteAgent(BaseModel):
         sp = self._normalize_song_proposal(state.song_proposals)
         red_proposal = sp.iterations[-1]
         red_artifacts = state.artifacts or []
-        book_artifacts = [b for b in red_artifacts if b.chain_artifact_type == "book"]
+        book_artifacts = [
+            b for b in red_artifacts if b.chain_artifact_type == ChainArtifactType.BOOK
+        ]
         rebracketing_analysis = self._red_rebracketing_analysis(
             state, red_proposal, book_artifacts
         )
@@ -333,7 +328,9 @@ class WhiteAgent(BaseModel):
         orange_proposal = sp.iterations[-1]
         orange_artifacts = state.artifacts or []
         newspaper_artifacts = [
-            n for n in orange_artifacts if n.chain_artifact_type == "newspaper_article"
+            n
+            for n in orange_artifacts
+            if n.chain_artifact_type == ChainArtifactType.NEWSPAPER_ARTICLE
         ]
         rebracketing_analysis = self._orange_rebracketing_analysis(
             state, orange_proposal, newspaper_artifacts
@@ -387,16 +384,6 @@ class WhiteAgent(BaseModel):
                        """
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            analysis = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="orange_to_white_rebracketing_analysis",
-            )
-            save_artifact_file_to_md(analysis)
             return response.content
 
     def _red_rebracketing_analysis(
@@ -438,16 +425,6 @@ class WhiteAgent(BaseModel):
                        """
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            analysis = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="red_to_white_rebracketing_analysis",
-            )
-            save_artifact_file_to_md(analysis)
             return response.content
 
     def _black_rebracketing_analysis(
@@ -492,16 +469,6 @@ class WhiteAgent(BaseModel):
                 """
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            analysis = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="black_to_white_rebracketing_analysis",
-            )
-            save_artifact_file_to_md(analysis)
             return response.content
 
     def _synthesize_document_for_red(
@@ -544,16 +511,6 @@ class WhiteAgent(BaseModel):
 
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            synthesized = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="black_to_white_artifact_synthesis",
-            )
-            save_artifact_file_to_md(synthesized)
             return response.content
 
     def _synthesize_document_for_orange(
@@ -596,16 +553,6 @@ class WhiteAgent(BaseModel):
 
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            synthesized = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="red_to_white_artifact_synthesis",
-            )
-            save_artifact_file_to_md(synthesized)
             return response.content
 
     def _synthesize_document_for_yellow(
@@ -648,32 +595,31 @@ class WhiteAgent(BaseModel):
 
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            synthesized = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="orange_to_white_artifact_synthesis",
-            )
-            save_artifact_file_to_md(synthesized)
             return response.content
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
-        if state.workflow_paused and state.pending_human_action:
-            return "finish"  # Is this right???
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if state.workflow_paused and state.pending_human_action:
+            return "finish"
         if mock_mode:
             return "red"
-        # Access state attributes - handle both dict and model access
-        workflow_paused = getattr(state, 'workflow_paused', state.get('workflow_paused', False) if isinstance(state, dict) else False)
-        ready_for_red = getattr(state, 'ready_for_red', state.get('ready_for_red', False) if isinstance(state, dict) else False)
+        workflow_paused = getattr(
+            state,
+            "workflow_paused",
+            state.get("workflow_paused", False) if isinstance(state, dict) else False,
+        )
+        ready_for_red = getattr(
+            state,
+            "ready_for_red",
+            state.get("ready_for_red", False) if isinstance(state, dict) else False,
+        )
 
         # If workflow is paused, we can't proceed - finish for now
         if workflow_paused:
-            logging.info("⏸️  White Agent routing to finish because Black Agent is paused")
+            logging.info(
+                "⏸️  White Agent routing to finish because Black Agent is paused"
+            )
             return "finish"
         if ready_for_red:
             return "red"
@@ -796,12 +742,15 @@ class WhiteAgent(BaseModel):
             # Process the Black Agent's work
             artifacts = getattr(paused_state, "artifacts", []) or []
             evp_artifacts = [
-                a for a in artifacts if getattr(a, "chain_artifact_type", None) == "evp"
+                a
+                for a in artifacts
+                if getattr(a, "chain_artifact_type", None)
+                == ChainArtifactType.EVP_ARTIFACT
             ]
             sigil_artifacts = [
                 a
                 for a in artifacts
-                if getattr(a, "chain_artifact_type", None) == "sigil"
+                if getattr(a, "chain_artifact_type", None) == ChainArtifactType.SIGIL
             ]
             black_proposal = paused_state.song_proposals.iterations[-1]
             paused_state.rebracketing_analysis = self._black_rebracketing_analysis(

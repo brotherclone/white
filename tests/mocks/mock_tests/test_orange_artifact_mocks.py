@@ -3,7 +3,6 @@ from pathlib import Path
 import yaml
 
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 
 
 def test_newspaper_mocks():
@@ -36,7 +35,6 @@ def test_newspaper_article_page():
     with path.open("r") as f:
         data = yaml.safe_load(f)
     article = NewspaperArtifact(**data)
-    assert isinstance(article.page, TextChainArtifactFile)
     assert article.page.chain_artifact_file_type.value == "md"
     assert article.page.rainbow_color.mnemonic_character_value == "O"
     assert article.page.rainbow_color.temporal_mode.value == "Past"
