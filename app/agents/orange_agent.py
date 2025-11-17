@@ -16,15 +16,12 @@ from pydantic import Field
 
 from app.agents.states.orange_agent_state import OrangeAgentState
 from app.agents.states.white_agent_state import MainAgentState
-from app.agents.tools.text_tools import save_artifact_to_md
 from app.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus, get_corpus
 from app.reference.mcp.rows_bud.orange_mythos_server import insert_symbolic_object
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
 from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals
 
@@ -273,15 +270,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                         result["thread_id"] = state.thread_id
                     state.synthesized_story = NewspaperArtifact(**result)
                     combined = state.synthesized_story.get_text_content()
-                    text_artifact = TextChainArtifactFile(
-                        thread_id=state.thread_id,
-                        text_content=combined,
-                        rainbow_color=the_rainbow_table_colors["O"],
-                        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-                        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                    )
-                    save_artifact_to_md(text_artifact)
-                    state.artifacts.append(text_artifact)
+                    state.synthesized_story.text = combined
                     state.artifacts.append(state.synthesized_story)
                     return state
                 else:
@@ -335,7 +324,6 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 "r",
             ) as f:
                 data = yaml.safe_load(f)
-                data["thread_id"] = state.thread_id
                 obj = SymbolicObjectArtifact(**data)
                 state.symbolic_object = obj
             return state
@@ -464,15 +452,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             )
             state.mythologized_story = NewspaperArtifact(**story, text=gonzo_text)
             combined = state.mythologized_story.get_text_content()
-            text_artifact = TextChainArtifactFile(
-                thread_id=state.thread_id,
-                text_content=combined,
-                rainbow_color=the_rainbow_table_colors["O"],
-                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-            )
-            save_artifact_to_md(text_artifact)
-            state.artifacts.append(text_artifact)
+            state.mythologized_story.text = combined
             state.artifacts.append(state.synthesized_story)
             return state
 

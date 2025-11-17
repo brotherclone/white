@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 import soundfile as sf
-from scipy.io import wavfile
 
 from app.agents.tools import audio_tools
 from app.agents.tools.audio_tools import find_wav_files_prioritized
@@ -60,7 +59,6 @@ def test_bit_crush_changes_samples_and_keeps_length():
     in_arr = np.frombuffer(pcm, dtype=np.int16)
     out_arr = np.frombuffer(out, dtype=np.int16)
     assert out_arr.shape == in_arr.shape
-    # high intensity should typically change values
     assert not np.array_equal(out_arr, in_arr)
 
 
@@ -72,38 +70,24 @@ def test_gate_audio_bytes_on_wav_container_zeroes_range(tmp_path):
     buf = io.BytesIO()
     sf.write(buf, wave, sr, format="WAV", subtype="PCM_16")
     wav_bytes = buf.getvalue()
-
     start_sec = 0.02
     end_sec = 0.04
     out_bytes = audio_tools.gate_audio_bytes(
         wav_bytes, start_sec=start_sec, end_sec=end_sec
     )
-    # read back as WAV
     out_buf = io.BytesIO(out_bytes)
     data, out_sr = sf.read(out_buf, dtype="float32", always_2d=False)
     assert out_sr == sr
     s_idx = int(round(start_sec * sr))
     e_idx = int(round(end_sec * sr))
-    # region should be (near) zero
     segment = data[s_idx:e_idx]
     assert np.allclose(segment, 0.0, atol=1e-4)
-
-
-def test_save_wav_from_bytes_writes_int16_and_readable(tmp_path):
-    sr = 8000
-    pcm = _sine_pcm_bytes(duration_s=0.05, sr=sr)
-    out_file = tmp_path / "out.wav"
-    audio_tools.save_wav_from_bytes(str(out_file), pcm, sample_rate=sr)
-    read_sr, data = wavfile.read(str(out_file))
-    assert read_sr == sr
-    assert data.dtype == np.int16
-    assert data.size > 0
 
 
 def _make_files(tmp_path, names):
     for n in names:
         p = tmp_path / n
-        p.write_bytes(b"")  # empty file is fine for filename-based tests
+        p.write_bytes(b"")
     return [str(tmp_path / n) for n in names]
 
 

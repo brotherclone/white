@@ -4,9 +4,7 @@ import pytest
 
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
-from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import get_rainbow_table_color
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.sigil_state import SigilState
@@ -34,33 +32,8 @@ def shared(tmp_path_factory):
         defaults.update(kwargs)
         return AudioChainArtifactFile(**defaults)
 
-    def make_text(**kwargs):
-        # give artifact_id/artifact_name so the model will compute a predictable file_name
-        defaults = dict(
-            artifact_id=artifact_id,
-            artifact_name=artifact_name,
-            thread_id=thread_id,
-            base_path=base,
-            chain_artifact_file_type=ChainArtifactFileType.JSON,
-            text_content="transcript",
-        )
-        defaults.update(kwargs)
-        return TextChainArtifactFile(**defaults)
-
-    def make_image(**kwargs):
-        defaults = dict(
-            artifact_id=artifact_id,
-            artifact_name=artifact_name,
-            thread_id=thread_id,
-            base_path=base,
-            chain_artifact_file_type=ChainArtifactFileType.PNG,
-        )
-        defaults.update(kwargs)
-        return ImageChainArtifactFile(**defaults)
-
     audio1 = make_audio()
     audio2 = make_audio()
-    transcript = make_text()
 
     evp = EVPArtifact(
         chain_artifact_type="evp",
@@ -81,22 +54,6 @@ def shared(tmp_path_factory):
         glyph_description="simple glyph",
         activation_state=SigilState.CREATED,
         charging_instructions="do the thing",
-    )
-
-    return dict(
-        base=base,
-        color=color,
-        artifact_id=artifact_id,
-        thread_id=thread_id,
-        artifact_name=artifact_name,
-        make_audio=make_audio,
-        make_text=make_text,
-        make_image=make_image,
-        audio1=audio1,
-        audio2=audio2,
-        transcript=transcript,
-        evp=evp,
-        sig=sig,
     )
 
 

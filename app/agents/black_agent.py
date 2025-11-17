@@ -3,10 +3,9 @@ import os
 import random
 import sqlite3
 import time
-import uuid
-from abc import ABC
-
 import yaml
+
+from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables import RunnableConfig
@@ -23,16 +22,13 @@ from app.agents.tools.audio_tools import (
 )
 from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import chain_artifact_file_from_speech_to_text
-from app.agents.tools.text_tools import save_artifact_file_to_md
 from app.reference.mcp.todoist.main import create_sigil_charging_task
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.artifacts.text_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 from app.structures.manifests.song_proposal import SongProposalIteration
@@ -68,7 +64,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """Entry point when White Agent invokes Black Agent"""
 
         current_proposal = state.song_proposals.iterations[-1]
-        # Reinitialize the BlackAgentState with the current song proposal
         black_state = BlackAgentState(
             white_proposal=current_proposal,
             song_proposals=state.song_proposals,
@@ -78,8 +73,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             awaiting_human_action=False,
         )
         if not hasattr(self, "_compiled_workflow"):
-            # Use SqliteSaver for persistent checkpointing across sessions
-            import os
 
             os.makedirs("checkpoints", exist_ok=True)
             conn = sqlite3.connect(
@@ -98,23 +91,24 @@ class BlackAgent(BaseRainbowAgent, ABC):
         snapshot = self._compiled_workflow.get_state(black_config)
 
         if snapshot.next:
-            # Workflow is interrupted - pass back partial state including artifacts
             logging.info(f"⏸️  Black Agent workflow paused at: {snapshot.next}")
             state.workflow_paused = True
             state.pause_reason = "black_agent_awaiting_human_action"
             state.pending_human_action = {
                 "agent": "black",
                 "action": "sigil_charging",
-                "instructions": result.get("human_instructions", "Complete Black Agent ritual tasks"),
+                "instructions": result.get(
+                    "human_instructions", "Complete Black Agent ritual tasks"
+                ),
                 "pending_tasks": result.get("pending_human_tasks", []),
-                "black_config": black_config
+                "black_config": black_config,
             }
-            # Pass artifacts even when interrupted
             if result.get("artifacts"):
                 state.artifacts = result["artifacts"]
-            logging.info("⏸️  Workflow paused - waiting for human to complete ritual tasks")
+            logging.info(
+                "⏸️  Workflow paused - waiting for human to complete ritual tasks"
+            )
         else:
-            # Workflow completed successfully
             state.song_proposals = result.get("song_proposals") or state.song_proposals
             if result.get("counter_proposal"):
                 state.song_proposals.iterations.append(result["counter_proposal"])
@@ -156,6 +150,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         )
         # Edges
         black_workflow.add_edge(START, "generate_alternate_song_spec")
+
         black_workflow.add_edge("generate_alternate_song_spec", "generate_evp")
         black_workflow.add_edge("generate_evp", "evaluate_evp")
         black_workflow.add_conditional_edges(
@@ -172,7 +167,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
         black_workflow.add_edge(
             "await_human_action", "update_alternate_song_spec_with_sigil"
         )
-        black_workflow.add_edge("await_human_action", "update_alternate_song_spec_with_sigil")
+        black_workflow.add_edge(
+            "await_human_action", "update_alternate_song_spec_with_sigil"
+        )
         black_workflow.add_edge("update_alternate_song_spec_with_sigil", END)
         return black_workflow
 
@@ -188,7 +185,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """Generate an initial counter-proposal"""
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-
         if mock_mode:
             with open(
                 f"{os.getenv("AGENT_MOCK_DATA_PATH")}/black_counter_proposal_mock.yml",
@@ -322,39 +318,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
             activation_state=SigilState.CREATED,  # Not charged yet!
             charging_instructions=charging_instructions,
             thread_id=state.thread_id,
-            chain_artifact_type="sigil",
         )
-
-        sigil_text = f"""
-        # Sigil for '{current_proposal.title}'
-        ## Statement of Intent
-        {statement_of_intent}
-        
-        ## Glyph Description
-        {description}
-        
-        ## Glyph Components ({len(components)} forms)
-        {chr(10).join(f"- {comp}" for comp in components)}
-        
-        ## Charging Instructions
-        {charging_instructions}
-        
-        ## Sigil Type
-        {SigilType.WORD_METHOD.value}
-        
-        ## Activation State
-        {SigilState.CREATED.value} (awaiting charging)
-        """
-        sigil_report = TextChainArtifactFile(
-            artifact_id=str(uuid.uuid4()),
-            text_content=sigil_text,
-            artifact_name=f"sigil_{current_proposal.title.replace(' ', '_')}",
-            chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-            thread_id=state.thread_id,
-        )
-        sigil_artifact.artifact_report = sigil_report
-        save_artifact_file_to_md(sigil_report)
+        sigil_artifact.save_file()
         state.artifacts.append(sigil_artifact)
         logging.info("Attempting to create Todoist task for sigil charging...")
         todoist_token = os.getenv("TODOIST_API_TOKEN")
@@ -371,8 +336,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             """
             return state
         try:
-            # Check if Todoist API token is configured
-            todoist_token = os.getenv('TODOIST_API_TOKEN')
+            todoist_token = os.getenv("TODOIST_API_TOKEN")
             if not todoist_token:
                 raise ValueError("TODOIST_API_TOKEN not configured in environment")
 
@@ -427,7 +391,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         except Exception as e:
             error_msg = str(e)
             if "401" in error_msg or "Unauthorized" in error_msg:
-                logging.error(f"401 Unauthorized: Invalid API token.")
+                logging.error("401 Unauthorized: Invalid API token.")
                 logging.warning("⚠️ Todoist task creation failed!")
                 logging.warning("  Error: 401 Unauthorized: Invalid API token.")
                 logging.warning("  Status code: 401")
@@ -466,28 +430,17 @@ class BlackAgent(BaseRainbowAgent, ABC):
             evp_artifact = EVPArtifact(**data)
             state.artifacts.append(evp_artifact)
             return state
-        current_proposal = state.counter_proposal
         segments = get_audio_segments_as_chain_artifacts(
-            2.0, 9,
-            the_rainbow_table_colors['Z'],
-            state.thread_id
+            2.0, 9, the_rainbow_table_colors["Z"], state.thread_id
         )
-        # Use longer slices (1000ms = 1 second) for more coherent speech in transcription
-        # Shorter target length (10 seconds) to stay within AssemblyAI's sweet spot
         mosaic = create_audio_mosaic_chain_artifact(
-            segments, 1000,
-            10,  # 10 seconds is better for transcription than 180
-            state.thread_id
+            segments,
+            1000,
+            10,
+            state.thread_id,
         )
-        # Reduce noise blend to 15% for better transcription (was 33%)
-        blended = create_blended_audio_chain_artifact(
-            mosaic, 0.15,
-            state.thread_id
-        )
-        transcript = chain_artifact_file_from_speech_to_text(
-            blended,
-            state.thread_id
-        )
+        blended = create_blended_audio_chain_artifact(mosaic, 0.15, state.thread_id)
+        transcript = chain_artifact_file_from_speech_to_text(blended)
         evp_artifact = EVPArtifact(
             audio_segments=segments,
             transcript=transcript,
@@ -495,8 +448,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
             noise_blended_audio=blended,
             thread_id=state.thread_id,
         )
+        evp_artifact.save_file()
         state.artifacts.append(evp_artifact)
-        # ToDo: Save off as yml
         return state
 
     @staticmethod
