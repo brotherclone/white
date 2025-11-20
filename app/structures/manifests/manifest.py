@@ -38,17 +38,17 @@ class Manifest(BaseModel):
     audio_tracks: list[ManifestTrack]
 
     def __init__(self, **data):
-        # Convert float BPM to integer
-        if 'bpm' in data and isinstance(data['bpm'], float):
-            data['bpm'] = int(round(data['bpm']))
-        if 'tempo' in data and isinstance(data['tempo'], str):
+        if "bpm" in data and isinstance(data["bpm"], float):
+            data["bpm"] = int(round(data["bpm"]))
+        if "tempo" in data and isinstance(data["tempo"], str):
             try:
                 tempo = data["tempo"].split("/")
                 data["tempo"] = TimeSignature(
                     numerator=int(tempo[0]), denominator=int(tempo[1])
                 )
             except ValueError:
-                print("Unable to parse tempo, defaulting to string")
+                # Unable to parse tempo string, leave as
+                pass
         if "key" in data:
             try:
                 if isinstance(data["key"], str):

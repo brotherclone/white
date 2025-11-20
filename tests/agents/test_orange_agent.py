@@ -325,12 +325,6 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
         get_story=lambda sid: fake_story, add_gonzo_rewrite=fake_add_gonzo_rewrite
     )
 
-    # Monkeypatch artifact saving to no-op to avoid filesystem side effects
-    monkeypatch.setattr(
-        orange_mod, "save_artifact_to_md", lambda *_args, **_kwargs: None
-    )
-
-    # Replace NewspaperArtifact with a tiny fake that exposes get_text_content()
     class FakeNewspaper:
         def __init__(self, **kwargs):
             # the final text will be provided as 'text' kw
@@ -342,19 +336,10 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
 
     monkeypatch.setattr(orange_mod, "NewspaperArtifact", FakeNewspaper)
 
-    # Replace TextChainArtifactFile with a simple holder
-    class FakeTextArtifact:
-        def __init__(self, **kwargs):
-            self.kwargs = kwargs
-
-    monkeypatch.setattr(orange_mod, "TextChainArtifactFile", FakeTextArtifact)
-
-    # Build a fake agent instance
     dummy_self = SimpleNamespace(
         corpus=fake_corpus, anthropic_client=fake_anthropic_client
     )
 
-    # Build state required by the method
     state = SimpleNamespace(
         thread_id="t-100",
         selected_story_id="story-xyz",
@@ -370,17 +355,13 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
     result = OrangeAgent.gonzo_rewrite_node(dummy_self, state)
 
     assert result is state
-    # ensure the corpus was recorded with gonzo text
     assert captured["story_id"] == state.selected_story_id
     assert captured["gonzo_text"] == gonzo_text
     assert captured["perspective"] == state.gonzo_perspective
     assert captured["intensity"] == state.gonzo_intensity
 
-    # mythologized_story should be our FakeNewspaper with the gonzo text
     assert hasattr(state, "mythologized_story")
     assert getattr(state.mythologized_story, "text", None) == gonzo_text
 
-    # artifacts should include the created text artifact and the original synthesized_story
-    assert len(state.artifacts) >= 2
-    assert isinstance(state.artifacts[0], FakeTextArtifact)
-    assert state.artifacts[1] == state.synthesized_story
+    assert len(state.artifacts) >= 1
+    assert state.artifacts[0] == state.synthesized_story

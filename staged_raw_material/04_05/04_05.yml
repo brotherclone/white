@@ -1,0 +1,56 @@
+bpm: 108.44
+manifest_id: '04_04'
+tempo: 4/4
+key: A minor
+rainbow_color: Y
+title: Guest Quarters
+release_date: '2020-12-08'
+album_sequence: 5
+main_audio_file: 04_05_main.wav
+TRT: TK
+vocals: false
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: '[01:01.241]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:01.242]'
+    end_time: '[01:37.094]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:37.095]'
+    end_time: '[02:12.196]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:12.197]'
+    end_time: '[02:21.161]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:21.162]'
+    end_time: '[02:39.086]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:39.087]'
+    end_time: '[03:06.121]'
+    description: TK
+mood:
+    - TK
+sounds_like:
+  - name: TK
+    discogs_id: 0
+genres:
+  - electronic
+  - novelty
+  - art pop
+  - ambient
+  - baroque pop
+concept: TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK
+
+

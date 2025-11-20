@@ -1,10 +1,11 @@
 import os
+import numpy as np
+import pandas as pd
+import librosa
+
 from pathlib import Path
 from typing import Any, Dict
 
-import librosa
-import numpy as np
-import pandas as pd
 from dotenv import load_dotenv
 
 from app.structures.music.rainbow_table.raindbow_audio_feature import (
@@ -353,8 +354,10 @@ class AudioExtractor:
     ) -> RainbowAudioFeature:
         """Standalone method to extract audio features for a temporal segment with silence detection"""
         try:
-            # Load the full audio file
-            y, sr = librosa.load(audio_path, sr=sample_rate)
+            # Load the full audio file using soundfile-backed helper
+            from app.util.audio_io import load_audio
+
+            y, sr = load_audio(audio_path, sr=sample_rate)
 
             # Convert time to sample indices
             start_sample = int(start_time * sr)
@@ -687,7 +690,18 @@ class AudioExtractor:
         if not audio_path or not Path(audio_path).exists():
             return np.array([])
 
-        y, sr = librosa.load(audio_path, sr=self.sample_rate)
+        # Prefer calling librosa.load (tests patch this). Import the module at
+        # call-time to ensure any test patching of `librosa.load` on the
+        # sys.modules object is respected.
+        try:
+            import importlib
+
+            librosa_mod = importlib.import_module("librosa")
+            y, sr = librosa_mod.load(audio_path, sr=self.sample_rate)
+        except Exception:
+            from app.util.audio_io import load_audio
+
+            y, sr = load_audio(audio_path, sr=self.sample_rate)
         start_sample = int(start_time * sr)
         end_sample = int(end_time * sr)
 

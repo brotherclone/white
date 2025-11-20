@@ -4,7 +4,7 @@ author: "John Doe"
 author_credentials: "PhD in Mock Studies"
 year: 2025
 publisher: "Mock Publishing House"
-publisher_type: "Vanity press directly from author"
+publisher_type: "vanity"
 edition: "First Edition"
 pages: 250
 isbn: "123-4-567-89012-3"
@@ -26,3 +26,6 @@ suppression_history: "No suppression history."
 related_works:
   - "Mock Work 1"
   - "Mock Work 2"
+excerpts:
+  - "This is a mock page for testing purposes."
+  - "This is another mock page for testing purposes."

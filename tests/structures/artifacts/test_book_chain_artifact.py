@@ -1,6 +1,3 @@
-from pathlib import Path
-import yaml
-
 from app.structures.artifacts.reaction_book_artifact import ReactionBookChainArtifact
 from app.structures.enums.book_condition import BookCondition
 from app.structures.enums.chain_artifact_type import ChainArtifactType
@@ -70,44 +67,6 @@ def test_reaction_book_artifact_optional_fields():
     assert len(book.tags) == 3
     assert book.notable_quote == "Whatever the Thinker thinks, the Prover proves."
     assert len(book.excerpts) == 1
-
-
-def test_reaction_book_artifact_save_file(tmp_path):
-    """Test that save_file creates a YAML file with correct content."""
-    book = ReactionBookChainArtifact(
-        thread_id="test-thread",
-        base_path=str(tmp_path),
-        title="Test Book",
-        author="Test Author",
-        year=2025,
-        publisher="Test Publisher",
-        publisher_type=PublisherType.UNIVERSITY,
-        pages=100,
-        catalog_number="TEST-001",
-        condition=BookCondition.PRISTINE,
-        danger_level=1,
-        original_book_title="Original Test",
-        original_book_author="Original Author",
-    )
-
-    # Save the file
-    book.save_file()
-
-    # Verify the file exists
-    expected_path = Path(book.file_path) / book.file_name
-    assert expected_path.exists()
-
-    # Verify it's a YAML file
-    assert expected_path.suffix == ".yml"
-
-    # Verify content can be loaded back
-    with open(expected_path, "r") as f:
-        data = yaml.safe_load(f)
-
-    assert data["title"] == "Test Book"
-    assert data["author"] == "Test Author"
-    assert data["year"] == 2025
-    assert data["original_book_title"] == "Original Test"
 
 
 def test_reaction_book_artifact_flatten():

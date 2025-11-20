@@ -13,6 +13,7 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 load_dotenv()
 
 
+# python
 class EVPArtifact(ChainArtifact):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.EVP_ARTIFACT
@@ -26,13 +27,22 @@ class EVPArtifact(ChainArtifact):
         super().__init__(**data)
 
     def save_file(self):
-        for file in self.audio_segments:
-            file.save_file()
-        self.audio_mosiac.save_file()
-        self.noise_blended_audio.save_file()
-        file = Path(self.file_path, self.file_name)
-        file.parent.mkdir(parents=True, exist_ok=True)
-        file = Path(self.file_path, self.file_name)
+        # Save child audio files only if they exist
+        if self.audio_segments:
+            for seg in self.audio_segments:
+                if seg is not None:
+                    seg.save_file()
+
+        if self.audio_mosiac is not None:
+            self.audio_mosiac.save_file()
+
+        if self.noise_blended_audio is not None:
+            self.noise_blended_audio.save_file()
+
+        file_path_obj = Path(self.file_path) if self.file_path else Path(".")
+        file_obj = Path(file_path_obj, self.file_name)
+        file_obj.parent.mkdir(parents=True, exist_ok=True)
+
         data_to_save = {
             "transcript": self.transcript,
             "audio_segments": (
@@ -45,7 +55,8 @@ class EVPArtifact(ChainArtifact):
                 self.noise_blended_audio.file_path if self.noise_blended_audio else None
             ),
         }
-        with open(file, "w") as f:
+
+        with open(file_obj, "w") as f:
             yaml.dump(data_to_save, f, default_flow_style=False, allow_unicode=True)
 
     def flatten(self):

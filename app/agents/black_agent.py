@@ -21,7 +21,7 @@ from app.agents.tools.audio_tools import (
     get_audio_segments_as_chain_artifacts,
 )
 from app.agents.tools.magick_tools import SigilTools
-from app.agents.tools.speech_tools import chain_artifact_file_from_speech_to_text
+from app.agents.tools.speech_tools import transcription_from_speech_to_text
 from app.reference.mcp.todoist.main import create_sigil_charging_task
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
@@ -183,7 +183,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
     def generate_alternate_song_spec(self, state: BlackAgentState) -> BlackAgentState:
         """Generate an initial counter-proposal"""
-
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
@@ -197,7 +197,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
         else:
             prompt = f"""
             You are writing creative fiction about an experimental musician creating concept albums.
-    
             Context: This character is an artist working in the experimental music space, creating 
             a concept album in 2016 after David Bowie's death and Trump's election. The character 
             uses themes of surveillance, control systems, and artistic resistance in their work.
@@ -219,41 +218,47 @@ class BlackAgent(BaseRainbowAgent, ABC):
             resistance and psychological liberation. Try to avoid being too "on the nose" or literal.
             Ambiguity and subtlety are valued.
             """
-
             claude = self._get_claude()
             proposer = claude.with_structured_output(SongProposalIteration)
-
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
-                else:
-                    counter_proposal = result
+                    state.counter_proposal = counter_proposal
+                    state.song_proposals.iterations.append(self.counter_proposal)
+                    return state
+                if not isinstance(result, SongProposalIteration):
+                    error_msg = f"Expected SongProposalIteration, got {type(result)}"
+                    if block_mode:
+                        raise TypeError(error_msg)
+                    logging.warning(error_msg)
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
-                timestamp = int(time.time() * 1000)
-                counter_proposal = SongProposalIteration(
-                    iteration_id=f"fallback_error_{timestamp}",
-                    bpm=120,
-                    tempo="4/4",
-                    key="C Major",
-                    rainbow_color="black",
-                    title="Fallback: Black Song",
-                    mood=["dark"],
-                    genres=["experimental"],
-                    concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable.",
+                print(
+                    f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration for black's first counter proposal."
                 )
-
-            state.counter_proposal = counter_proposal
+                if block_mode:
+                    raise Exception("Anthropic model call failed")
+                else:
+                    timestamp = int(time.time() * 1000)
+                    counter_proposal = SongProposalIteration(
+                        iteration_id=f"fallback_error_{timestamp}",
+                        bpm=120,
+                        tempo="4/4",
+                        key="C Major",
+                        rainbow_color="black",
+                        title="Fallback: Black Song",
+                        mood=["dark"],
+                        genres=["experimental"],
+                        concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable.",
+                    )
+                    state.counter_proposal = counter_proposal
             return state
 
     @skip_chance(0.75)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
         """Generate a sigil artifact and create a Todoist task for charging"""
-
         logging.info("🜏 Entering generate_sigil method")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-
         if mock_mode:
             mock_path = (
                 f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_sigil_artifact_mock.yml"
@@ -269,8 +274,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.awaiting_human_action = True
                 state.human_instructions = "MOCK: Sigil charging task would be created"
                 state.should_update_proposal_with_sigil = True
-
-                # Add mock task info
                 state.pending_human_tasks.append(
                     {
                         "type": "sigil_charging",
@@ -285,135 +288,137 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logging.warning(
                     f"Mock file not found at {mock_path}, using real generation"
                 )
-
-        sigil_maker = SigilTools()
-        current_proposal = state.counter_proposal
-
-        prompt = f"""
-        Distill this counter-proposal into a short, actionable wish statement that captures how 
-        the song could embody higher occult meaning and resistance against the Demiurge.
-
-        Counter-proposal:
-        Title: {current_proposal.title}
-        Concept: {current_proposal.concept}
-        Mood: {', '.join(current_proposal.mood)}
-
-        Format: A single sentence starting with "I will..." or "This song will..."
-        Example: "I will weave hidden frequencies that awaken dormant resistance."
-        """
-        claude = self._get_claude()
-        wish_response = claude.invoke(prompt)
-        wish_text = wish_response.content
-        statement_of_intent = sigil_maker.create_statement_of_intent(wish_text, True)
-        description, components = sigil_maker.generate_word_method_sigil(
-            statement_of_intent
-        )
-        charging_instructions = sigil_maker.charge_sigil()
-        sigil_artifact = SigilArtifact(
-            wish=wish_text,
-            statement_of_intent=statement_of_intent,
-            glyph_description=description,
-            glyph_components=components,
-            sigil_type=SigilType.WORD_METHOD,
-            activation_state=SigilState.CREATED,  # Not charged yet!
-            charging_instructions=charging_instructions,
-            thread_id=state.thread_id,
-        )
-        sigil_artifact.save_file()
-        state.artifacts.append(sigil_artifact)
-        logging.info("Attempting to create Todoist task for sigil charging...")
-        todoist_token = os.getenv("TODOIST_API_TOKEN")
-        if not todoist_token:
-            logging.error("✗ TODOIST_API_TOKEN not found in environment variables!")
-            state.awaiting_human_action = True
-            state.should_update_proposal_with_sigil = True
-            state.human_instructions = f"""
-            ⚠️ SIGIL CHARGING REQUIRED (Todoist API token not configured)
-            Manually charge the sigil for '{current_proposal.title}':
-            **Wish:** {wish_text}
-            **Glyph:** {description}
-            {charging_instructions}
+        else:
+            sigil_maker = SigilTools()
+            current_proposal = state.counter_proposal
+            prompt = f"""
+            Distill this counter-proposal into a short, actionable wish statement that captures how 
+            the song could embody higher occult meaning and resistance against the Demiurge.
+    
+            Counter-proposal:
+            Title: {current_proposal.title}
+            Concept: {current_proposal.concept}
+            Mood: {', '.join(current_proposal.mood)}
+    
+            Format: A single sentence starting with "I will..." or "This song will..."
+            Example: "I will weave hidden frequencies that awaken dormant resistance."
             """
-            return state
-        try:
+            claude = self._get_claude()
+            wish_response = claude.invoke(prompt)
+            wish_text = wish_response.content
+            statement_of_intent = sigil_maker.create_statement_of_intent(
+                wish_text, True
+            )
+            description, components = sigil_maker.generate_word_method_sigil(
+                statement_of_intent
+            )
+            charging_instructions = sigil_maker.charge_sigil()
+            sigil_artifact = SigilArtifact(
+                wish=wish_text,
+                statement_of_intent=statement_of_intent,
+                glyph_description=description,
+                glyph_components=components,
+                sigil_type=SigilType.WORD_METHOD,
+                activation_state=SigilState.CREATED,  # Not charged yet!
+                charging_instructions=charging_instructions,
+                thread_id=state.thread_id,
+            )
+            # CLAUDE - these aren't saving
+            sigil_artifact.save_file()
+            state.artifacts.append(sigil_artifact)
+            logging.info("Attempting to create Todoist task for sigil charging...")
             todoist_token = os.getenv("TODOIST_API_TOKEN")
             if not todoist_token:
-                raise ValueError("TODOIST_API_TOKEN not configured in environment")
-
-            task_result = create_sigil_charging_task(
-                sigil_description=description,
-                charging_instructions=charging_instructions,
-                song_title=current_proposal.title,
-                section_name="Black Agent - Sigil Work",
-            )
-            if task_result.get("success", False):
-                logging.info("✓ Created Todoist task successfully!")
-                logging.info(f"  Task ID: {task_result['id']}")
-                logging.info(f"  Task URL: {task_result['url']}")
-                state.pending_human_tasks.append(
-                    {
-                        "type": "sigil_charging",
-                        "task_id": task_result["id"],
-                        "task_url": task_result["url"],
-                        "artifact_index": len(state.artifacts) - 1,
-                        "sigil_wish": wish_text,
-                    }
-                )
-                state.awaiting_human_action = True
-                state.human_instructions = f"""
-                🜏 SIGIL CHARGING REQUIRED
-                A sigil has been generated for '{current_proposal.title}'.
-                **Todoist Task:** {task_result['url']}
-                **Wish:** {wish_text}
-                **Glyph:** {description}
-                **Instructions:**
-                {charging_instructions}
-                Mark the Todoist task complete after charging, then resume the workflow.
-                """
-                state.should_update_proposal_with_sigil = True
-            else:
-                error_msg = task_result.get("error", "Unknown error")
-                status_code = task_result.get("status_code", "N/A")
-                logging.warning("⚠️ Todoist task creation failed!")
-                logging.warning(f"  Error: {error_msg}")
-                logging.warning(f"  Status code: {status_code}")
+                logging.error("✗ TODOIST_API_TOKEN not found in environment variables!")
                 state.awaiting_human_action = True
                 state.should_update_proposal_with_sigil = True
                 state.human_instructions = f"""
-                ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed with an unknown error)
-                Error: {error_msg}
+                ⚠️ SIGIL CHARGING REQUIRED (Todoist API token not configured)
                 Manually charge the sigil for '{current_proposal.title}':
                 **Wish:** {wish_text}
                 **Glyph:** {description}
                 {charging_instructions}
                 """
+                return state
+            try:
+                todoist_token = os.getenv("TODOIST_API_TOKEN")
+                if not todoist_token:
+                    raise ValueError("TODOIST_API_TOKEN not configured in environment")
 
-        except Exception as e:
-            error_msg = str(e)
-            if "401" in error_msg or "Unauthorized" in error_msg:
-                logging.error("401 Unauthorized: Invalid API token.")
-                logging.warning("⚠️ Todoist task creation failed!")
-                logging.warning("  Error: 401 Unauthorized: Invalid API token.")
-                logging.warning("  Status code: 401")
-                logging.info("  To fix: Set TODOIST_API_TOKEN in your .env file")
-            elif "TODOIST_API_TOKEN not configured" in error_msg:
-                logging.warning("⚠️ Todoist integration not configured")
-                logging.info("  To enable: Set TODOIST_API_TOKEN in your .env file")
-            else:
-                logging.error(f"✗ Failed to create Todoist task: {e}")
+                task_result = create_sigil_charging_task(
+                    sigil_description=description,
+                    charging_instructions=charging_instructions,
+                    song_title=current_proposal.title,
+                    section_name="Black Agent - Sigil Work",
+                )
+                if task_result.get("success", False):
+                    logging.info("✓ Created Todoist task successfully!")
+                    logging.info(f"  Task ID: {task_result['id']}")
+                    logging.info(f"  Task URL: {task_result['url']}")
+                    state.pending_human_tasks.append(
+                        {
+                            "type": "sigil_charging",
+                            "task_id": task_result["id"],
+                            "task_url": task_result["url"],
+                            "artifact_index": len(state.artifacts) - 1,
+                            "sigil_wish": wish_text,
+                        }
+                    )
+                    state.awaiting_human_action = True
+                    state.human_instructions = f"""
+                    🜏 SIGIL CHARGING REQUIRED
+                    A sigil has been generated for '{current_proposal.title}'.
+                    **Todoist Task:** {task_result['url']}
+                    **Wish:** {wish_text}
+                    **Glyph:** {description}
+                    **Instructions:**
+                    {charging_instructions}
+                    Mark the Todoist task complete after charging, then resume the workflow.
+                    """
+                    state.should_update_proposal_with_sigil = True
+                else:
+                    error_msg = task_result.get("error", "Unknown error")
+                    status_code = task_result.get("status_code", "N/A")
+                    logging.warning("⚠️ Todoist task creation failed!")
+                    logging.warning(f"  Error: {error_msg}")
+                    logging.warning(f"  Status code: {status_code}")
+                    state.awaiting_human_action = True
+                    state.should_update_proposal_with_sigil = True
+                    state.human_instructions = f"""
+                    ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed with an unknown error)
+                    Error: {error_msg}
+                    Manually charge the sigil for '{current_proposal.title}':
+                    **Wish:** {wish_text}
+                    **Glyph:** {description}
+                    {charging_instructions}
+                    """
 
-            state.awaiting_human_action = True
-            state.should_update_proposal_with_sigil = True
-            state.human_instructions = f"""
-                                        ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed: {error_msg})
+            except Exception as e:
+                error_msg = str(e)
+                if "401" in error_msg or "Unauthorized" in error_msg:
+                    logging.error("401 Unauthorized: Invalid API token.")
+                    logging.warning("⚠️ Todoist task creation failed!")
+                    logging.warning("  Error: 401 Unauthorized: Invalid API token.")
+                    logging.warning("  Status code: 401")
+                    logging.info("  To fix: Set TODOIST_API_TOKEN in your .env file")
+                elif "TODOIST_API_TOKEN not configured" in error_msg:
+                    logging.warning("⚠️ Todoist integration not configured")
+                    logging.info("  To enable: Set TODOIST_API_TOKEN in your .env file")
+                else:
+                    logging.error(f"✗ Failed to create Todoist task: {e}")
 
-                                        Manually charge the sigil for '{current_proposal.title}':
-
-                                        **Wish:** {wish_text}
-                                        **Glyph:** {description}
-
-                                        {charging_instructions}
-                                        """
+                state.awaiting_human_action = True
+                state.should_update_proposal_with_sigil = True
+                state.human_instructions = f"""
+                                            ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed: {error_msg})
+    
+                                            Manually charge the sigil for '{current_proposal.title}':
+    
+                                            **Wish:** {wish_text}
+                                            **Glyph:** {description}
+    
+                                            {charging_instructions}
+                                            """
         return state
 
     @staticmethod
@@ -421,7 +426,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """Generate an EVP artifact and optionally create an analysis task"""
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        # CLAUDE - these are saving but to the wrong directories for the audio files
         if mock_mode:
             with open(
                 f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_evp_artifact_mock.yml", "r"
@@ -430,27 +436,34 @@ class BlackAgent(BaseRainbowAgent, ABC):
             evp_artifact = EVPArtifact(**data)
             state.artifacts.append(evp_artifact)
             return state
-        segments = get_audio_segments_as_chain_artifacts(
-            2.0, 9, the_rainbow_table_colors["Z"], state.thread_id
-        )
-        mosaic = create_audio_mosaic_chain_artifact(
-            segments,
-            1000,
-            10,
-            state.thread_id,
-        )
-        blended = create_blended_audio_chain_artifact(mosaic, 0.15, state.thread_id)
-        transcript = chain_artifact_file_from_speech_to_text(blended)
-        evp_artifact = EVPArtifact(
-            audio_segments=segments,
-            transcript=transcript,
-            audio_mosaic=mosaic,
-            noise_blended_audio=blended,
-            thread_id=state.thread_id,
-        )
-        evp_artifact.save_file()
-        state.artifacts.append(evp_artifact)
-        return state
+        else:
+            segments = get_audio_segments_as_chain_artifacts(
+                2.0, 9, "Z", state.thread_id
+            )
+            mosaic = create_audio_mosaic_chain_artifact(
+                segments,
+                1000,
+                10,
+                state.thread_id,
+            )
+            blended = create_blended_audio_chain_artifact(mosaic, 0.15, state.thread_id)
+            transcript = transcription_from_speech_to_text(blended)
+            if transcript is None and block_mode:
+                raise Exception(
+                    "Speech-to-text model call failed and BLOCK_MODE is enabled"
+                )
+            evp_artifact = EVPArtifact(
+                artifact_name="evp",
+                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+                audio_segments=segments,
+                transcript=transcript,
+                audio_mosaic=mosaic,
+                noise_blended_audio=blended,
+                thread_id=state.thread_id,
+            )
+            evp_artifact.save_file()
+            state.artifacts.append(evp_artifact)
+            return state
 
     @staticmethod
     def await_human_action(state: BlackAgentState) -> BlackAgentState:
@@ -476,17 +489,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 return state
 
             last_artifact = state.artifacts[-1]
-
-            # ✅ CHECK IF TRANSCRIPT EXISTS AND HAS CONTENT
-            if (
-                not hasattr(last_artifact, "transcript")
-                or last_artifact.transcript is None
-            ):
+            if not hasattr(last_artifact, "transcript") or not last_artifact.transcript:
                 logging.warning("EVP artifact has no transcript - skipping evaluation")
                 state.should_update_proposal_with_evp = False
                 return state
 
-            transcript_text = getattr(last_artifact.transcript, "text_content", None)
+            transcript_text = last_artifact.transcript.strip()
+
             if (
                 not transcript_text
                 or transcript_text == "[EVP: No discernible speech detected]"
@@ -497,22 +506,26 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.should_update_proposal_with_evp = False
                 return state
 
+            logging.info(
+                f"✓ Evaluating EVP transcript: '{transcript_text}' ({len(transcript_text)} chars)"
+            )
+
             prompt = f"""
-                   You are helping a musician create a creative fiction song about an experimental musician 
+                   You are helping a musician create a creative fiction song about an experimental musician
                    working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
                    artifact consisting of audio segments and a transcript. Now, your task is to evaluate the transcript
                    and see if there are any surreal or lyrical results that could help you refocus your song proposal. At this point
                    you only need to reply with a True or False property.
-
+    
                    Here's an example of what might warrant a True response:
                    'do turn' 'caliphate murloc' 'a simple bloodline'
-
+    
                    Here's an example of what might warrant a False response which is more likely:
                    'i' 'me me' 'to' 'hi' 'be be'
-
+    
                    Here's your previous counter-proposal:
                    {state.counter_proposal}
-
+    
                    Here's the EVP transcript:
                    {transcript_text}
                    """
@@ -535,7 +548,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     f"EVP evaluation failed: {e!s}, defaulting to no EVP update"
                 )
                 state.should_update_proposal_with_evp = False
-
             return state
 
     def update_alternate_song_spec_with_evp(

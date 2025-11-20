@@ -1,4 +1,14 @@
-#!/usr/bin/env python3
+import argparse
+import logging
+import pickle
+import sys
+import warnings
+
+from pathlib import Path
+
+from app.agents.states.white_agent_state import MainAgentState
+from app.agents.white_agent import WhiteAgent
+
 """
 White Agent Workflow Runner
 
@@ -15,14 +25,15 @@ Usage:
     python run_white_agent.py resume --state-file paused_state.pkl
 """
 
-import argparse
-import logging
-import pickle
-import sys
-from pathlib import Path
+# Add early-warning suppression so backport deprecation warnings are not
+# printed when third-party audio libraries import `aifc`/`sunau` on Python 3.13.
+# This is a low-risk convenience to keep logs clean. For a longer-term fix,
+# migrate audio I/O to maintained libraries such as `soundfile` or `pydub`.
 
-from app.agents.states.white_agent_state import MainAgentState
-from app.agents.white_agent import WhiteAgent
+
+warnings.filterwarnings("ignore", message=r".*aifc.*", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message=r".*sunau.*", category=DeprecationWarning)
+
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"

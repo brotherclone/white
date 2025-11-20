@@ -1,5 +1,4 @@
 from pathlib import Path
-import librosa
 from app.agents.states.black_agent_state import BlackAgentState
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
@@ -42,24 +41,19 @@ def test_black_agent_state_custom_fields():
     )
     proposal = SongProposal()
 
-    # Load mock audio file
-    mock_audio_path = Path(__file__).parent.parent / "mocks" / "mock.wav"
-    audio_data, sample_rate = librosa.load(str(mock_audio_path), sr=None, mono=False)
-    duration = librosa.get_duration(y=audio_data, sr=sample_rate)
-    channels = 1 if audio_data.ndim == 1 else audio_data.shape[0]
+    # Load mock audio file as bytes
+    mock_audio_path = Path(__file__).parent.parent.parent / "mocks" / "mock.wav"
+    with open(mock_audio_path, "rb") as f:
+        audio_bytes = f.read()
 
     audio_file = AudioChainArtifactFile(
-        sample_rate=sample_rate,
-        duration=duration,
-        channels=channels,
+        sample_rate=44100,
+        duration=5.0,
+        channels=2,
+        audio_bytes=audio_bytes,
         base_path="/tmp/artifacts/",
-        chain_artifact_file_type=ChainArtifactFileType.AUDIO,
         artifact_name="test_audio",
-        artifact_id="123",
         thread_id="345",
-        rainbow_color=the_rainbow_table_colors["Z"],
-        file_name="test_audio.wav",
-        audio_data=audio_data,
     )
 
     evp = EVPArtifact(
@@ -67,7 +61,6 @@ def test_black_agent_state_custom_fields():
         chain_artifact_file_type=ChainArtifactFileType.YML,
         file_path="/tmp/artifacts/",
         file_name="test_evp.yml",
-        files=[audio_file],
         audio_segments=[audio_file],
         transcript="hi",
         audio_mosiac=audio_file,

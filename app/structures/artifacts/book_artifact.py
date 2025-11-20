@@ -16,7 +16,7 @@ from app.structures.enums.publisher_type import PublisherType
 load_dotenv()
 
 
-class BookDataPageCollection(BaseModel):
+class BookPageCollection(BaseModel):
 
     page_1_text: str = Field(..., description="Page 1 of the book")
     page_2_text: str = Field(..., description="Page 2 of the book")
@@ -26,7 +26,13 @@ class BookDataPageCollection(BaseModel):
 
 
 class BookArtifact(ChainArtifact, ABC):
-    chain_artifact_type: ChainArtifactType = ChainArtifactType.BOOK
+    chain_artifact_type: str = Field(
+        default="REDChainArtifactBook",
+        description="Compatibility string identifier for Red Agent book artifacts",
+    )
+    rainbow_color_mnemonic_character_value: str = Field(
+        default="R", description="Always R for Red"
+    )
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     title: str = Field(..., description="Full title of the work")
     subtitle: Optional[str] = Field(None, description="Subtitle if present")
@@ -72,8 +78,8 @@ class BookArtifact(ChainArtifact, ABC):
         file.parent.mkdir(parents=True, exist_ok=True)
         file = Path(self.file_path, self.file_name)
         with open(file, "w") as f:
-            yaml.dump(
-                self.model_dump(mode="python"),
+            yaml.safe_dump(
+                self.model_dump(mode="json"),
                 f,
                 default_flow_style=False,
                 allow_unicode=True,
@@ -118,7 +124,6 @@ class BookArtifact(ChainArtifact, ABC):
 
 
 if __name__ == "__main__":
-
     with open(
         f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_book_artifact_mock.yml", "r"
     ) as f:

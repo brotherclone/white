@@ -35,11 +35,7 @@ def test_newspaper_article_page():
     with path.open("r") as f:
         data = yaml.safe_load(f)
     article = NewspaperArtifact(**data)
-    assert article.page.chain_artifact_file_type.value == "md"
-    assert article.page.rainbow_color.mnemonic_character_value == "O"
-    assert article.page.rainbow_color.temporal_mode.value == "Past"
-    assert article.page.rainbow_color.objectional_mode.value == "Thing"
-    assert article.page.rainbow_color.ontological_mode[0].value == "Known"
-    assert article.page.artifact_id == "019"
-    assert article.page.artifact_name == "article"
-    assert article.page.file_name == "019_orange_article.md"
+    assert article.chain_artifact_file_type.value == "md"
+    assert article.rainbow_color_mnemonic_character_value == "0"
+    assert article.artifact_name == "story"
+    assert article.chain_artifact_type == "newspaper_article"

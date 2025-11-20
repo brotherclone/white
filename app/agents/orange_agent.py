@@ -189,6 +189,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             state.counter_proposal = counter_proposal
             return state
 
+    # CLAUDE - Articles aren't saving
     def synthesize_base_story(self, state: OrangeAgentState) -> OrangeAgentState:
         """Synthesize a plausible Sussex County newspaper story (1975-1995)"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -383,6 +384,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             logging.error(f"Object insertion failed: {e!s}")
 
         return state
+
+    # CLAUDE - Gonzo Articles aren't saving
 
     def gonzo_rewrite_node(self, state: OrangeAgentState) -> OrangeAgentState:
         """Rewrite the story in gonzo journalism style via MCP tool"""

@@ -213,6 +213,7 @@ class WhiteAgent(BaseModel):
 
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         prompt, facet = WhiteFacetSystem.build_white_initial_prompt(
             user_input=None, use_weights=True
         )
@@ -248,13 +249,19 @@ class WhiteAgent(BaseModel):
                 initial_proposal = SongProposalIteration(**initial_proposal)
                 state.white_facet = facet
                 state.white_facet_metadata = facet_metadata
-            assert isinstance(
-                initial_proposal, SongProposalIteration
-            ), f"Expected SongProposalIteration, got {type(initial_proposal)}"
+            if not isinstance(initial_proposal, SongProposalIteration):
+                error_msg = (
+                    f"Expected SongProposalIteration, got {type(initial_proposal)}"
+                )
+                if block_mode:
+                    raise TypeError(error_msg)
+                logging.warning(error_msg)
         except Exception as e:
             print(
                 f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration."
             )
+            if block_mode:
+                raise Exception("Anthropic model call failed")
             timestamp = int(time.time() * 1000)
             initial_proposal = SongProposalIteration(
                 iteration_id=f"fallback_error_{timestamp}",
@@ -273,6 +280,8 @@ class WhiteAgent(BaseModel):
         sp.iterations.append(initial_proposal)
         state.song_proposals = sp
         return state
+
+    # CLAUDE - I want to save these too
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
         if state.workflow_paused:
@@ -304,6 +313,8 @@ class WhiteAgent(BaseModel):
         state.ready_for_red = True
         return state
 
+    # CLAUDE - I want to save these too
+
     def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
         sp = self._normalize_song_proposal(state.song_proposals)
         red_proposal = sp.iterations[-1]
@@ -323,6 +334,7 @@ class WhiteAgent(BaseModel):
         state.ready_for_orange = True
         return state
 
+    # CLAUDE - I want to save these too
     def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
         sp = self._normalize_song_proposal(state.song_proposals)
         orange_proposal = sp.iterations[-1]

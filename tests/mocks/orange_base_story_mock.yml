@@ -1,5 +1,6 @@
-chain_artifact_type: "newspaper_article"
+chain_artifact_type: newspaper_article
 chain_artifact_file_type: 'md'
+artifact_name: story
 thread_id: '412345'
 base_path: "/Volumes/LucidNonsense/White/chain_artifacts/"
 headline: Local Band Vanishes After Practice Session in Vernon Woods
@@ -15,3 +16,5 @@ text: "Four members of local rock band 'The Transmission' failed to return home
       around midnight. The band had been experimenting with synthesizers and had spoken 
       about recording 'alien frequencies' for their upcoming demo."
 tags: [rock_bands, unexplained, youth_crime]
+rainbow_color_mnemonic_character_value: "0"
+

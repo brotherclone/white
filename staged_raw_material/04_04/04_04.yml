@@ -7,37 +7,57 @@ title: Drawing Room
 release_date: '2020-12-08'
 album_sequence: 4
 main_audio_file: 04_04_main.wav
-TRT: TK
+TRT: '[03:09.117]'
 vocals: false
 lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: '[00:40.064]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:40.065]'
+    end_time: '[01:03.235]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:03.236]'
+    end_time: '[01:13.104]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:13.105]'
+    end_time: '[01:20.131]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:20.132]'
+    end_time: '[01:48.236]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:48.237]'
+    end_time: '[02:07.224]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:07.225]'
+    end_time: '[02:41.013]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:41.014]'
+    end_time: '[03:09.117]'
+    description: TK
+mood:
+    - TK
+sounds_like:
+  - name: TK
+    discogs_id: 0
+genres:
+  - electronic
+  - novelty
+  - art pop
+  - ambient
+  - baroque pop
+concept: TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK
 
-01:00:00:00.00	
-01:00:40:06.49	
-01:01:03:23.59	
-01:01:13:10.47	
-01:01:20:13.18	
-01:01:48:23.61	
-01:02:07:22.37	
-01:02:26:21.13	
-01:02:41:01.35	
-01:03:09:11.79
-
-
-04_04_02_dfam.wav
-04_04_03_kit.wav
-04_04_04_kit2.mid
-04_04_05_kit2.wav
-04_04_06_bass.mid
-04_04_07_bass.m.wav
-04_04_08_electric_bass.m.wav
-04_04_09_guitar.m.wav
-04_04_10_guitar2.m.wav
-04_04_11_matrix.mid
-04_04_12_matrix.wav
-04_04_13_piano.wav
-04_04_14_grandmother.wav
-04_04_15_morphagene.wav
-04_04_16_tides.wav
-04_04_17_counting.wav
-04_04_18_where_do.wav
-04_04_19_mind.wav

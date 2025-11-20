@@ -40,6 +40,8 @@ htmlcov/
 .hypothesis/
 *.pkl
 *.db
+*.parquet
+*.sqlite
 /chords/
 /claude_working_area/
 /app/reference/news_articles/clippings/

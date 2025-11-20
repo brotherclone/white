@@ -3,19 +3,18 @@ import logging
 import os
 import random
 import warnings
-from typing import List, Optional
+from fractions import Fraction
+from typing import List, Optional, Union, Tuple
 
-import librosa
 import numpy as np
 import soundfile as sf
 from dotenv import load_dotenv
 from scipy import signal
 from scipy.fft import fft, fftfreq, ifft
-
+from scipy.signal import resample_poly
 
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.concepts.rainbow_table_color import (
-    RainbowTableColor,
     the_rainbow_table_colors,
 )
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
@@ -24,6 +23,68 @@ from app.structures.enums.noise_type import NoiseType
 load_dotenv()
 warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO)
+
+
+def _get_agent_work_product_base_path() -> str:
+    """Return a safe base path for agent work products; fall back to cwd if env var missing."""
+    bp = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+    if not bp:
+        logging.warning(
+            "AGENT_WORK_PRODUCT_BASE_PATH not set; falling back to current working directory"
+        )
+        bp = os.getcwd()
+    return bp
+
+
+def load_audio(
+    path_or_bytes: Union[str, bytes], sr: Optional[int] = None
+) -> Tuple[np.ndarray, int]:
+    """
+    Load audio using soundfile. Accepts a file path or raw bytes and returns (audio, sample_rate).
+    - audio: float32 numpy array in range [-1.0, 1.0]. Shape is (n_samples,) for mono or (n_samples, n_channels).
+    - sr: if provided and differs from file sample rate, audio is resampled to this rate.
+
+    Uses scipy.signal.resample_poly for high-quality resampling.
+    """
+    # open as file-like for bytes, or pass path directly
+    src = (
+        io.BytesIO(path_or_bytes)
+        if isinstance(path_or_bytes, (bytes, bytearray))
+        else path_or_bytes
+    )
+
+    data, file_sr = sf.read(src, dtype="float32", always_2d=False)
+
+    # Ensure float32
+    data = data.astype(np.float32)
+
+    # If no resampling requested or already matches, return
+    if sr is None or sr == file_sr:
+        return data, file_sr
+
+    # Compute rational approximation for resample_poly
+    frac = Fraction(sr, file_sr).limit_denominator(1000)
+    up, down = frac.numerator, frac.denominator
+
+    # Resample mono or each channel separately for multi-channel
+    if data.ndim == 1:
+        resampled = resample_poly(data, up, down)
+    else:
+        # resample_poly operates on 1D arrays; process channels individually
+        resampled_channels = [
+            resample_poly(data[:, ch], up, down) for ch in range(data.shape[1])
+        ]
+        # stack back into shape (n_samples, n_channels)
+        resampled = np.stack(resampled_channels, axis=1)
+
+    # Cast and clip to safe range
+    resampled = np.asarray(resampled, dtype=np.float32)
+    if resampled.size:
+        max_abs = np.max(np.abs(resampled))
+        if max_abs > 1.0:
+            resampled = resampled / max_abs
+
+    return resampled, sr
 
 
 def generate_speech_like_noise(
@@ -90,6 +151,8 @@ def generate_noise(
 def pitch_shift_audio_bytes(
     input_audio: bytes, cents: float = 50, sample_rate: int = 44100
 ) -> bytes:
+    import librosa
+
     audio_array = (
         np.frombuffer(input_audio, dtype=np.int16).astype(np.float32) / 32767.0
     )
@@ -294,6 +357,8 @@ def find_wav_files_prioritized(
 def extract_non_silent_segments(
     audio: np.ndarray, sr: int, min_duration: float, top_db: int = 30
 ) -> List[np.ndarray]:
+    import librosa
+
     intervals = librosa.effects.split(audio, top_db=top_db)
     min_samples = int(min_duration * sr)
     return [audio[start:end] for start, end in intervals if end - start >= min_samples]
@@ -305,9 +370,11 @@ def select_random_segment_audio(
     wav_files = find_wav_files(root_dir, None)
     random.shuffle(wav_files)
     per_file_segments = {}
+    from app.util.audio_io import load_audio
+
     for wav_path in wav_files:
         try:
-            audio, sr = librosa.load(wav_path, sr=None)
+            audio, sr = load_audio(wav_path, sr=None)
         except Exception as e:
             logging.error(f"Failed to load `{wav_path}`: {e}")
             continue
@@ -349,9 +416,10 @@ def select_random_segment_audio(
 def get_audio_segments_as_chain_artifacts(
     min_duration: float,
     num_segments: int,
-    rainbow_color: RainbowTableColor,
+    rainbow_color_mnemonic_character_value: str,
     thread_id: str | None = None,
 ) -> list:
+    rainbow_color = the_rainbow_table_colors[rainbow_color_mnemonic_character_value]
     wav_files = find_wav_files_prioritized(
         os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix
     )
@@ -368,6 +436,8 @@ def get_audio_segments_as_chain_artifacts(
     logging.info(f"Found {len(vocal_files)} vocal files, will be processed first")
 
     all_segments = []
+    from app.util.audio_io import load_audio
+
     for wav_path in wav_files:
         is_vocal = (
             "vocal" in os.path.basename(wav_path).lower()
@@ -376,7 +446,7 @@ def get_audio_segments_as_chain_artifacts(
         logging.info(
             f"Processing {'[VOCAL]' if is_vocal else '[INSTRUMENT]'} file: {os.path.basename(wav_path)}"
         )
-        audio, sr = librosa.load(wav_path, sr=None)
+        audio, sr = load_audio(wav_path, sr=None)
         segments = extract_non_silent_segments(audio, sr, min_duration)
         if not segments:
             continue
@@ -392,9 +462,10 @@ def get_audio_segments_as_chain_artifacts(
     for idx, (seg, sr, wav_path) in enumerate(selected, start=1):
         artifact = AudioChainArtifactFile(
             thread_id=thread_id,
+            audio_bytes=seg.tobytes(),
             artifact_name=f"segment_{idx}.wav",
-            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-            rainbow_color=rainbow_color,
+            base_path=_get_agent_work_product_base_path(),
+            rainbow_color_mnemonic_character_value=rainbow_color_mnemonic_character_value,
             chain_artifact_file_type=ChainArtifactFileType.AUDIO,
             artifact_path=wav_path,
             duration=len(seg) / sr,
@@ -432,7 +503,7 @@ def create_random_audio_mosaic(
         if not wav_files:
             break
         wav_path = random.choice(wav_files)
-        audio, sr = librosa.load(wav_path, sr=None)
+        audio, sr = load_audio(wav_path, sr=None)
         if sample_rate is None:
             sample_rate = sr
             slice_samples = int(slice_duration_ms / 1000 * sample_rate)
@@ -464,7 +535,8 @@ def create_audio_mosaic_chain_artifact(
     ]
     if not wav_files:
         raise FileNotFoundError("No segment files found.")
-    sample_rate = segments[0].sample_rate or librosa.get_samplerate(wav_files[0])
+    # Prefer the recorded sample rate on the artifact; if missing, use soundfile
+    sample_rate = segments[0].sample_rate or sf.info(wav_files[0]).samplerate
     random_slice_duration_ms = random.randint(
         slice_duration_ms - 50, slice_duration_ms + 50
     )
@@ -475,7 +547,7 @@ def create_audio_mosaic_chain_artifact(
     total_samples = 0
     while total_samples < target_samples and wav_files:
         wav_path = random.choice(wav_files)
-        audio, sr = librosa.load(wav_path, sr=sample_rate)
+        audio, sr = load_audio(wav_path, sr=sample_rate)
         if len(audio) < slice_samples:
             continue
         start = random.randint(0, len(audio) - slice_samples)
@@ -487,9 +559,10 @@ def create_audio_mosaic_chain_artifact(
     mosaic = np.concatenate(collected_segments)[:target_samples]
     artifact = AudioChainArtifactFile(
         thread_id=thread_id,
-        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-        rainbow_color=getattr(
-            segments[0], "rainbow_color", the_rainbow_table_colors["Z"]
+        audio_bytes=mosaic.tobytes(),
+        base_path=_get_agent_work_product_base_path(),
+        rainbow_color_mnemonic_character_value=getattr(
+            segments[0], "rainbow_color_mnemonic_character_value", None
         ),
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
         artifact_name="mosiac",
@@ -511,7 +584,9 @@ def create_audio_mosaic_chain_artifact(
 def blend_with_noise(
     input_path: str, blend: float, blended_artifact: AudioChainArtifactFile
 ):
-    audio, sr = librosa.load(input_path, sr=None)
+    from app.util.audio_io import load_audio
+
+    audio, sr = load_audio(input_path, sr=None)
     duration_seconds = len(audio) / sr
     noise = (
         np.frombuffer(
@@ -548,7 +623,8 @@ def create_blended_audio_chain_artifact(
     artifact = AudioChainArtifactFile(
         thread_id=thread_id,
         base_path=mosaic.base_path,
-        rainbow_color=mosaic.rainbow_color,
+        audio_bytes=mosaic.audio_bytes,
+        rainbow_color_mnemonic_character_value=mosaic.rainbow_color_mnemonic_character_value,
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
         artifact_name="blended",
         duration=mosaic.duration,

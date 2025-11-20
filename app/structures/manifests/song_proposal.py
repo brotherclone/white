@@ -18,17 +18,24 @@ class SongProposalIteration(BaseModel):
 
     iteration_id: str = Field(
         description="Unique identifier for this iteration in format 'descriptive_name_#' or 'descriptive_name_v#'",
-        examples=["archetypal_ai_yearning_1", "prometheus_theme_2", "time_collapse_v1", "ai_consciousness_embodiment_v2"],
+        examples=[
+            "archetypal_ai_yearning_1",
+            "prometheus_theme_2",
+            "time_collapse_v1",
+            "ai_consciousness_embodiment_v2",
+        ],
         pattern=r"^[a-z0-9_]+_(v?\d+|[a-z0-9]+)$",
     )
     bpm: int = Field(
         description="Tempo in beats per minute. Slower (40-70) for ambient/meditative, medium (80-120) for reflective, faster (120-180) for energetic",
+        default=120,
         examples=[72, 88, 120, 140],
         ge=40,
         le=200,
     )
     tempo: str | TimeSignature = Field(
         description="Time signature defining rhythmic structure",
+        default=TimeSignature(numerator=4, denominator=4),
         examples=[
             {"numerator": 4, "denominator": 4},
             {"numerator": 3, "denominator": 4},
@@ -214,6 +221,7 @@ class SongProposal(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
 
+    # CLAUDE - This isn't saving files correctly
     def save_all_proposals(self):
         """
         This function should save all iterations to yml files in the thread folder of chain artifacts for each run.

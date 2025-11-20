@@ -92,7 +92,8 @@ def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
     return None
 
 
-def chain_artifact_file_from_speech_to_text(audio: AudioChainArtifactFile) -> str:
+def transcription_from_speech_to_text(audio: AudioChainArtifactFile) -> str:
+    block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
     transcript_text = evp_speech_to_text(
         audio.get_artifact_path(with_file_name=False), audio.file_name
     )
@@ -100,5 +101,7 @@ def chain_artifact_file_from_speech_to_text(audio: AudioChainArtifactFile) -> st
         logging.info(f"✓ Generated transcript with {len(transcript_text)} characters")
         return transcript_text
     else:
+        if block_mode:
+            raise Exception("No transcript generated - aborting workflow")
         logging.warning("⚠️  No transcript generated - using placeholder")
     return "[EVP: No discernible speech detected]"
