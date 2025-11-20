@@ -270,6 +270,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 with open(mock_path, "r") as f:
                     data = yaml.safe_load(f)
                 sigil_artifact = SigilArtifact(**data)
+                sigil_artifact.save_file()
                 state.artifacts.append(sigil_artifact)
                 state.awaiting_human_action = True
                 state.human_instructions = "MOCK: Sigil charging task would be created"
@@ -434,6 +435,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             ) as f:
                 data = yaml.safe_load(f)
             evp_artifact = EVPArtifact(**data)
+            evp_artifact.save_file()
             state.artifacts.append(evp_artifact)
             return state
         else:
