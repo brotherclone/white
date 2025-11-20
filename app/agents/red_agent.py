@@ -191,6 +191,7 @@ class RedAgent(BaseRainbowAgent, ABC):
             ) as f:
                 data = yaml.safe_load(f)
                 book = BookArtifact(**data)
+                book.save_file()
                 state.artifacts.append(book)
                 state.should_create_book = False
                 state.reaction_level += 1
@@ -269,6 +270,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                 book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
                 book_dict["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")
                 state.current_reaction_book = BookArtifact(**book_dict)
+                state.current_reaction_book.save_file()
                 state.artifacts.append(state.current_reaction_book)
                 state.reaction_level += 1
                 state.should_respond_with_reaction_book = False
@@ -309,6 +311,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     result["artifact_name"] = f"reaction_book_{state.reaction_level}"
                     result["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")
                     state.current_reaction_book = BookArtifact(**result)
+                    state.current_reaction_book.save_file()
                     state.artifacts.append(state.current_reaction_book)
                     state.reaction_level += 1
                     state.should_respond_with_reaction_book = False
@@ -347,6 +350,7 @@ class RedAgent(BaseRainbowAgent, ABC):
             ) as f:
                 page_2 = yaml.safe_load(f)
             state.current_reaction_book.excerpts = [page_1, page_2]
+            state.current_reaction_book.save_file()
             state.artifacts.append(state.current_reaction_book)
             return state
         else:
@@ -377,6 +381,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                         reaction_book_pages.page_1_text,
                         reaction_book_pages.page_2_text,
                     ]
+                    state.current_reaction_book.save_file()
                     state.artifacts.append(state.current_reaction_book)
                     return state
                 if not isinstance(result, BookPageCollection):
