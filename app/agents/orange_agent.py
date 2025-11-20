@@ -202,6 +202,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             ) as f:
                 data = yaml.safe_load(f)
                 story = NewspaperArtifact(**data)
+                story.save_file()
                 state.synthesized_story = story
                 state.artifacts.append(story)
             return state
@@ -272,6 +273,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     state.synthesized_story = NewspaperArtifact(**result)
                     combined = state.synthesized_story.get_text_content()
                     state.synthesized_story.text = combined
+                    state.synthesized_story.save_file()
                     state.artifacts.append(state.synthesized_story)
                     return state
                 else:
@@ -456,7 +458,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             state.mythologized_story = NewspaperArtifact(**story, text=gonzo_text)
             combined = state.mythologized_story.get_text_content()
             state.mythologized_story.text = combined
-            state.artifacts.append(state.synthesized_story)
+            state.mythologized_story.save_file()
+            state.artifacts.append(state.mythologized_story)
             return state
 
         except Exception as e:
