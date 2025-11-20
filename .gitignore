@@ -45,3 +45,4 @@ htmlcov/
 /chords/
 /claude_working_area/
 /app/reference/news_articles/clippings/
+*.parquet
