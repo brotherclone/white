@@ -1,3 +1,4 @@
+import logging
 import os
 import yaml
 
@@ -27,21 +28,35 @@ class EVPArtifact(ChainArtifact):
         super().__init__(**data)
 
     def save_file(self):
-        # Save child audio files only if they exist
         if self.audio_segments:
             for seg in self.audio_segments:
                 if seg is not None:
+                    logging.info(
+                        f"Saving audio segment to: {seg.base_path}"
+                    )  # ✅ Add this
+
                     seg.save_file()
 
         if self.audio_mosiac is not None:
+            logging.info(
+                f"Saving mosaic to: {self.audio_mosiac.base_path}"
+            )  # ✅ Add this
+
             self.audio_mosiac.save_file()
 
         if self.noise_blended_audio is not None:
+            logging.info(
+                f"Saving blended to: {self.noise_blended_audio.base_path}"
+            )  # ✅ Add this
             self.noise_blended_audio.save_file()
 
-        file_path_obj = Path(self.file_path) if self.file_path else Path(".")
-        file_obj = Path(file_path_obj, self.file_name)
-        file_obj.parent.mkdir(parents=True, exist_ok=True)
+        if self.base_path is None:
+            self.base_path = os.path.join(
+                os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"), self.thread_id
+            )
+        file_path_obj = Path(self.base_path) / "yml"
+        file_path_obj.mkdir(parents=True, exist_ok=True)
+        file_obj = file_path_obj / self.file_name
 
         data_to_save = {
             "transcript": self.transcript,

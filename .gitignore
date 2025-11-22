@@ -11,6 +11,7 @@
 .DS_Store
 *.pyc
 .env
+claude_desktop_config.json
 !**/*.lrc
 !**/*.yml
 /__pycache__/
@@ -45,5 +46,4 @@ htmlcov/
 /chords/
 /claude_working_area/
 /app/reference/news_articles/clippings/
-*.parquet
 /checkpoints

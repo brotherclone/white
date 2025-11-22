@@ -1,9 +1,6 @@
-import os
 import re
-from pathlib import Path
 from typing import List
 
-import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.structures.concepts.rainbow_table_color import RainbowTableColor
@@ -220,24 +217,3 @@ class SongProposal(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
-
-    # CLAUDE - This isn't saving files correctly
-    def save_all_proposals(self):
-        """
-        This function should save all iterations to yml files in the thread folder of chain artifacts for each run.
-        """
-        base = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
-        thread = (
-            getattr(self.iterations[0], "thread_id", "default_thread")
-            if self.iterations
-            else "default_thread"
-        )
-        output = Path(base) / thread
-        output.mkdir(parents=True, exist_ok=True)
-        for iteration in self.iterations:
-            file_path = output / f"{iteration.iteration_id}.yml"
-            with file_path.open("w", encoding="utf-8") as f:
-                data_serializable = self.model_dump(mode="json")
-                yaml.safe_dump(
-                    data_serializable, f, sort_keys=False, allow_unicode=True
-                )

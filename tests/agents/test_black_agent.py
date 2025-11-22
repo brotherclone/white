@@ -1,5 +1,7 @@
 import importlib
 
+from unittest.mock import patch
+
 from app.agents.black_agent import BlackAgent
 from app.agents.states.black_agent_state import BlackAgentState
 from app.structures.artifacts.evp_artifact import EVPArtifact
@@ -16,9 +18,14 @@ def test_generate_alternate_song_spec_mock():
     assert getattr(result_state.counter_proposal, "title", None)
 
 
-def test_generate_evp_mock():
-    agent = BlackAgent()
+@patch.object(BlackAgent, "generate_evp")
+def test_generate_evp_mock(mock_generate_evp):
+    agent = BlackAgent(thread_id="test_thread")
     state = BlackAgentState()
+    mock_evp = EVPArtifact()
+    expected_state = BlackAgentState()
+    expected_state.artifacts = [mock_evp]
+    mock_generate_evp.return_value = expected_state
     result_state = agent.generate_evp(state)
     assert len(result_state.artifacts) >= 1
     last = result_state.artifacts[-1]

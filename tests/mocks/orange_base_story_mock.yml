@@ -1,7 +1,7 @@
 chain_artifact_type: newspaper_article
 chain_artifact_file_type: 'md'
 artifact_name: story
-thread_id: '412345'
+thread_id: 'mock_thread_001'
 base_path: "/Volumes/LucidNonsense/White/chain_artifacts/"
 headline: Local Band Vanishes After Practice Session in Vernon Woods
 date: "1987-10-15"

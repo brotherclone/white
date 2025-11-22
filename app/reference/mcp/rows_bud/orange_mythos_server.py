@@ -1,14 +1,19 @@
 import os
+import sys
+from pathlib import Path
 
 from typing import List, Optional, cast, Iterable, Any
 from anthropic import Anthropic
 from fastmcp import FastMCP
 from app.reference.mcp.rows_bud.orange_corpus import get_corpus
 
+project_root = Path(__file__).parent.parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 mcp = FastMCP("Orange Mythos")
 anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-CORPUS_DIR = os.getenv("ORANGE_CORPUS_DIR", "./mythology_corpus")
+CORPUS_DIR = os.getenv("ORANGE_CORPUS_DIR", str(Path(__file__).parent))
 corpus = get_corpus(CORPUS_DIR)
 
 

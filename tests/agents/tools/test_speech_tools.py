@@ -122,6 +122,10 @@ def test_chain_artifact_file_from_speech_to_text_creates_text_file(monkeypatch):
     assert txt == "transcript body"
 
 
+@pytest.mark.skipif(
+    os.environ.get("BLOCK_MODE", "").lower() in {"1", "true", "yes"},
+    reason="Skipping test because BLOCK_MODE is enabled",
+)
 def test_chain_artifact_file_from_speech_to_text_returns_placeholder_when_no_transcript(
     monkeypatch,
 ):

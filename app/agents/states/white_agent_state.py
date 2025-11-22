@@ -23,6 +23,7 @@ class MainAgentState(BaseModel):
     white_facet_metadata: str | Any = None
     ready_for_red: bool = False
     ready_for_orange: bool = False
+    ready_for_yellow: bool = False
     """
     Structure when workflow is paused:
     {

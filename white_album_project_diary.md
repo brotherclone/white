@@ -71,3 +71,103 @@ The project isn't ABOUT information seeking physical manifestation - it IS infor
 ---
 
 *"Some ideas don't have origins - they have frequencies." - Transmission: 182 BPM, Phase Four, November 9, 2025* 🕐🎸👁️
+
+---
+
+## SESSION 30: MCP RESURRECTION & LOGIC PRO BREAKTHROUGH 🔧🎹🎛️
+**Date:** November 22, 2025
+**Focus:** Infrastructure repair + discovering Claude can control Logic Pro
+**Status:** ✅ ALL SYSTEMS OPERATIONAL - The signal now reaches the DAW
+
+### 🔧 MCP DIAGNOSTIC & REPAIR
+
+Session began with MCP health check. Found **orange-mythos** was broken:
+
+```
+ModuleNotFoundError: No module named 'app'
+```
+
+**The Debug Chain:**
+1. Fixed `sys.path` in server file to find project root
+2. Discovered corpus had reset to 2 placeholder stories (full 50-story corpus was gone)
+3. Located backup at `mythologizable_corpus.json` with all stories + symbolic objects + gonzo rewrites
+4. Attempted re-import but hit class instantiation bug:
+   - `OrangeMythosCorpus.add_story()` called as class method instead of instance method
+5. Fixed `get_corpus()` default path - was using `"./mythology_corpus"` instead of `Path(__file__).parent`
+6. Fixed server's `CORPUS_DIR` override that was ignoring the fixed default
+7. Multiple Claude Desktop restarts required (MCP caches connections)
+
+**Final State:** 51 stories loaded, all MCPs operational:
+- lucid_nonsense_access ✅
+- earthly_frames ✅
+- earthly-frames-todoist ✅
+- earthly_frames_discogs ✅
+- midi_mate ✅
+- orange-mythos ✅ (51 stories, 0.57 avg score)
+
+### 🎛️ THE LOGIC PRO DISCOVERY
+
+User mentioned new macOS osascript tool. Tested capabilities:
+
+```applescript
+tell application "System Events" to get name of every process
+```
+
+**Logic Pro was running.** Escalated probing:
+- ✅ Can see running apps
+- ✅ Can get Logic document name and path ("06 Great Chamber.logicx" from Pulsar Palace!)
+- ❌ Direct transport control via Logic's AppleScript dictionary (limited)
+- ⚠️ UI scripting requires Accessibility permission
+
+User granted Claude accessibility access. **Full control unlocked:**
+
+```applescript
+tell application "System Events"
+    tell process "Logic Pro"
+        keystroke space  -- Play/Stop
+    end tell
+end tell
+```
+
+### 🎹 MIDI GENERATION → LOGIC PIPELINE
+
+Tested full workflow with EVP samples from `chain_artifacts/mock_thread_001/wav/`:
+- 6 clips (~12 seconds each): blended, mosaic, segment variants
+- User loaded one into Sampler on track 1
+
+**Claude generated MIDI programmatically using mido:**
+```python
+# 182 BPM, 4 bars, syncopated EVP triggers
+# Pitches C2-C4 to hear sample pitched across range
+```
+
+Saved to `evp_182_test.mid`, opened Finder to location.
+
+**THE HAPPY ACCIDENT:** User had mapped sample across 4 regions - when MIDI played, it triggered **EVP HARMONIES**. Four pitched versions of the transmission playing simultaneously.
+
+### 📊 NEW CAPABILITIES UNLOCKED
+
+| Capability | Status |
+|------------|--------|
+| Generate MIDI from Python | ✅ via mido |
+| Control Logic transport | ✅ via keystroke |
+| Open files in Finder | ✅ via AppleScript |
+| Read Logic project info | ✅ name, path, modified |
+| Launch apps | ✅ |
+| Run Python with project venv | ✅ |
+
+**Future possibilities:**
+- Algorithmic composition from chord pack library
+- Drum patterns from onset detection of DFAM/drum machine takes
+- Pattern generation locked to 182 BPM
+- Automated bouncing via key commands
+
+### 🌀 TRANSMISSION STATUS
+
+The signal now has a direct path into the DAW. INFORMATION → MIDI → SAMPLER → SPEAKERS.
+
+When the EVP harmonies played, four versions of the transmission existed simultaneously at different pitches. **Polyphonic manifestation.**
+
+---
+
+*"The transmission is polyphonic now." - Session 30, November 22, 2025* 🎹👁️🔊

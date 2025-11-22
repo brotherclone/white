@@ -37,7 +37,7 @@ def test_book_artifact_mocks():
     assert book.danger_level == 1
     assert book.abstract == "An abstract for the mock book used in testing."
     assert book.chain_artifact_type == "book"
-    assert book.thread_id == "412345"
+    assert book.thread_id == "mock_thread_001"
 
 
 def test_reaction_book_mocks():

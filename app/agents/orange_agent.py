@@ -10,7 +10,7 @@ from typing import cast, Iterable, Any, Optional
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.constants import END, START
+from langgraph.constants import START
 from langgraph.graph.state import StateGraph
 from pydantic import Field
 
@@ -75,17 +75,14 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         orange_graph = self.create_graph()
         compiled_graph = orange_graph.compile()
         result = compiled_graph.invoke(orange_state.model_dump())
-
         if isinstance(result, OrangeAgentState):
             final_state = result
         elif isinstance(result, dict):
             final_state = OrangeAgentState(**result)
         else:
             raise TypeError(f"Unexpected result type: {type(result)}")
-
         if final_state.counter_proposal:
             state.song_proposals.iterations.append(final_state.counter_proposal)
-
         return state
 
     def create_graph(self) -> StateGraph:
@@ -111,7 +108,6 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         work_flow.add_edge("select_symbolic_object", "insert_symbolic_object_node")
         work_flow.add_edge("insert_symbolic_object_node", "gonzo_rewrite_node")
         work_flow.add_edge("gonzo_rewrite_node", "generate_alternate_song_spec")
-        work_flow.add_edge("generate_alternate_song_spec", END)
 
         return work_flow
 
@@ -189,7 +185,6 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             state.counter_proposal = counter_proposal
             return state
 
-    # CLAUDE - Articles aren't saving
     def synthesize_base_story(self, state: OrangeAgentState) -> OrangeAgentState:
         """Synthesize a plausible Sussex County newspaper story (1975-1995)"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -273,6 +268,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     state.synthesized_story = NewspaperArtifact(**result)
                     combined = state.synthesized_story.get_text_content()
                     state.synthesized_story.text = combined
+                    state.synthesized_story.base_path = (
+                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    )
                     state.synthesized_story.save_file()
                     state.artifacts.append(state.synthesized_story)
                     return state
@@ -296,24 +294,27 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         """Add a synthesized story to mythology corpus (optional, for training data)"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            print("[MOCK] Would call orange-mythos:add_story_to_corpus")
-            return state
-        try:
-            story = state.synthesized_story
-            story_id, score = self.corpus.add_story(
-                headline=story.headline,
-                date=story.date,
-                source=story.source,
-                text=story.text,
-                location=story.location,
-                tags=story.tags,
+            print(
+                f"[MOCK: {os.getenv('MOCK_MODE')}] Would call orange-mythos:add_story_to_corpus"
             )
-            state.selected_story_id = story_id
-            print(f"   Added: {story_id} (score: {score:.2f})")
-        except Exception as e:
-            logging.error(f"Corpus addition failed: {e}")
-            state.selected_story_id = f"fallback_{int(time.time() * 1000)}"
-        return state
+            return state
+        else:
+            try:
+                story = state.synthesized_story
+                story_id, score = self.corpus.add_story(
+                    headline=story.headline,
+                    date=story.date,
+                    source=story.source,
+                    text=story.text,
+                    location=story.location,
+                    tags=story.tags,
+                )
+                state.selected_story_id = story_id
+                print(f"   Added: {story_id} (score: {score:.2f})")
+            except Exception as e:
+                logging.error(f"Corpus addition failed: {e}")
+                state.selected_story_id = f"fallback_{int(time.time() * 1000)}"
+            return state
 
     def select_symbolic_object(self, state: OrangeAgentState) -> OrangeAgentState:
         """Analyze the story and select a symbolic object category"""
@@ -387,8 +388,6 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
         return state
 
-    # CLAUDE - Gonzo Articles aren't saving
-
     def gonzo_rewrite_node(self, state: OrangeAgentState) -> OrangeAgentState:
         """Rewrite the story in gonzo journalism style via MCP tool"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -455,9 +454,15 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 perspective=state.gonzo_perspective,
                 intensity=state.gonzo_intensity,
             )
-            state.mythologized_story = NewspaperArtifact(**story, text=gonzo_text)
+            story_without_text = {k: v for k, v in story.items() if k != "text"}
+            state.mythologized_story = NewspaperArtifact(
+                **story_without_text, text=gonzo_text
+            )
             combined = state.mythologized_story.get_text_content()
             state.mythologized_story.text = combined
+            state.mythologized_story.base_path = (
+                f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+            )
             state.mythologized_story.save_file()
             state.artifacts.append(state.mythologized_story)
             return state

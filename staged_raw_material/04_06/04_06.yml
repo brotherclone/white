@@ -1,0 +1,68 @@
+bpm: 116
+manifest_id: '04_04'
+tempo: 4/4
+key: Gb major
+rainbow_color: Y
+title: Great Chamber
+release_date: '2020-12-08'
+album_sequence: 6
+main_audio_file: 04_06_main.wav
+TRT: '[03:47.010]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: '[00:49.021]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:49.022]'
+    end_time: '[01:06.011]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:06.012]'
+    end_time: '[01:23.002]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:23.003]'
+    end_time: '[01:39.017]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:39.018]'
+    end_time: '[01:56.007]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:56.008]'
+    end_time: '[02:12.023]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:12.024]'
+    end_time: '[02:37.021]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:37.022]'
+    end_time: '[02:54.011]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:54.012]'
+    end_time: '[03:11.003]'
+    description: TK
+  - section_name: TK
+    start_time: '[03:11.004]'
+    end_time: '[03:47.010]'
+    description: TK
+sounds_like:
+  - name: TK
+    discogs_id: 0
+genres:
+  - electronic
+  - ambient
+  - baroque pop
+concept: TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK
+
+

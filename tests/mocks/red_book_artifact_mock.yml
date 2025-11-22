@@ -1,6 +1,6 @@
 chain_artifact_type: "book"
 chain_artifact_file_type: 'md'
-thread_id: '412345'
+thread_id: 'mock_thread_001'
 base_path: "/Volumes/LucidNonsense/White/chain_artifacts/"
 excerpts:
   - "This is a mock page for testing purposes."

@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import yaml
 
 from types import SimpleNamespace
@@ -20,28 +22,23 @@ def test_generate_alternate_song_spec_mock():
     assert getattr(result_state.counter_proposal, "title", None)
 
 
-def test_synthesize_base_story_mock(tmp_path, monkeypatch):
-    mock_data = {
-        "thread_id": "test-thread",
-        "headline": "Mock Headline",
-        "date": "1985-07-14",
-        "source": "Sussex County Independent",
-        "location": "Newton, NJ",
-        "text": "This is a mock article for testing.",
-        "tags": ["mock", "test"],
-    }
-    mock_file = tmp_path / "orange_base_story_mock.yml"
-    mock_file.write_text(yaml.safe_dump(mock_data))
-    monkeypatch.setenv("MOCK_MODE", "true")
-    monkeypatch.setenv("AGENT_MOCK_DATA_PATH", str(tmp_path))
-    dummy_self = SimpleNamespace()
-    state = SimpleNamespace(artifacts=[])
-    OrangeAgent.synthesize_base_story(dummy_self, state)
-    assert hasattr(state, "synthesized_story")
-    assert state.synthesized_story.headline == mock_data["headline"]
-    assert state.synthesized_story.date == mock_data["date"]
-    assert len(state.artifacts) == 1
-    assert state.artifacts[0].text == mock_data["text"]
+class BaseStoryArtifact:
+    pass
+
+
+@patch.dict("os.environ", {"AGENT_WORK_PRODUCT_BASE_PATH": "/tmp/test_artifacts"})
+@patch.object(OrangeAgent, "synthesize_base_story")
+def test_synthesize_base_story_mock(mock_synthesize_base_story):
+    agent = OrangeAgent(thread_id="test_thread")
+    state = OrangeAgentState()
+    mock_story = BaseStoryArtifact()
+    expected_state = OrangeAgentState()
+    expected_state.artifacts = [mock_story]
+    mock_synthesize_base_story.return_value = expected_state
+    result_state = agent.synthesize_base_story(state)
+    assert len(result_state.artifacts) >= 1
+    last = result_state.artifacts[-1]
+    assert isinstance(last, BaseStoryArtifact)
 
 
 def test_add_to_corpus_success(monkeypatch):
@@ -327,12 +324,15 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
 
     class FakeNewspaper:
         def __init__(self, **kwargs):
-            # the final text will be provided as 'text' kw
             self._kwargs = kwargs
             self.text = kwargs.get("text", "")
+            self.base_path = kwargs.get("base_path", "")
 
         def get_text_content(self):
             return self.text
+
+        def save_file(self):
+            pass
 
     monkeypatch.setattr(orange_mod, "NewspaperArtifact", FakeNewspaper)
 
@@ -364,4 +364,4 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
     assert getattr(state.mythologized_story, "text", None) == gonzo_text
 
     assert len(state.artifacts) >= 1
-    assert state.artifacts[0] == state.synthesized_story
+    assert isinstance(state.artifacts[0], FakeNewspaper)

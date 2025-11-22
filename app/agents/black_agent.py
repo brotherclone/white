@@ -25,10 +25,13 @@ from app.agents.tools.speech_tools import transcription_from_speech_to_text
 from app.reference.mcp.todoist.main import create_sigil_charging_task
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
+from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.yes_or_no import YesOrNo
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 from app.structures.manifests.song_proposal import SongProposalIteration
@@ -428,14 +431,67 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        # CLAUDE - these are saving but to the wrong directories for the audio files
         if mock_mode:
+            with open("/Volumes/LucidNonsense/White/tests/mocks/mock.wav", "rb") as f:
+                audio_bytes = f.read()
             with open(
                 f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_evp_artifact_mock.yml", "r"
             ) as f:
                 data = yaml.safe_load(f)
             evp_artifact = EVPArtifact(**data)
+            evp_artifact.thread_id = state.thread_id
+            evp_artifact.chain_artifact_file_type = ChainArtifactFileType.YML
+            evp_artifact.artifact_name = "evp"
+            evp_artifact.chain_artifact_type = ChainArtifactType.EVP_ARTIFACT
+            evp_artifact.base_path = os.path.join(
+                os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"), state.thread_id
+            )
+            evp_artifact.audio_segments = [
+                AudioChainArtifactFile(
+                    thread_id=state.thread_id,
+                    chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
+                    chain_artifact_file_type=ChainArtifactFileType.AUDIO,
+                    base_path=os.path.join(
+                        os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"),
+                        state.thread_id,
+                    ),
+                    artifact_name="test_audio_artifact_segment",
+                    sample_rate=44100,
+                    duration=5.0,
+                    audio_bytes=audio_bytes,
+                    channels=2,
+                )
+            ]
+            evp_artifact.audio_mosiac = AudioChainArtifactFile(
+                thread_id=state.thread_id,
+                chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
+                chain_artifact_file_type=ChainArtifactFileType.AUDIO,
+                base_path=os.path.join(
+                    os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"),
+                    state.thread_id,
+                ),
+                artifact_name="test_audio_artifact_mosaic",
+                sample_rate=44100,
+                duration=5.0,
+                audio_bytes=audio_bytes,
+                channels=2,
+            )
+            evp_artifact.noise_blended_audio = AudioChainArtifactFile(
+                thread_id=state.thread_id,
+                chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
+                chain_artifact_file_type=ChainArtifactFileType.AUDIO,
+                base_path=os.path.join(
+                    os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"),
+                    state.thread_id,
+                ),
+                artifact_name="test_audio_artifact_blended",
+                sample_rate=44100,
+                duration=5.0,
+                audio_bytes=audio_bytes,
+                channels=2,
+            )
             evp_artifact.save_file()
+            print(f"Mock EVP artifact saved to {evp_artifact.file_path}")
             state.artifacts.append(evp_artifact)
             return state
         else:

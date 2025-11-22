@@ -586,18 +586,6 @@ wheels = [
 ]
 
 [[package]]
-name = "dataclass-wizard"
-version = "0.35.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/f2/61/c432fc30841214df594c82e7c39dd8e46f6c60357b16d5e578e6258b178c/dataclass-wizard-0.35.1.tar.gz", hash = "sha256:18c780e3c574c3534cb2bbc447025cff140f0e640cd98e143a7d234c6445d09e", size = 295591 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/49/34/a66cfdd36d9155800c00800211ecc75059db71ad3e79100b50929ed87af0/dataclass_wizard-0.35.1-py2.py3-none-any.whl", hash = "sha256:30858e14d780a40792fa190d55220a12cd0ef02a3d8fb8373b1eb4363d4b5549", size = 176536 },
-]
-
-[[package]]
 name = "decorator"
 version = "5.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2886,20 +2874,6 @@ wheels = [
 ]
 
 [[package]]
-name = "todoist-api-python"
-version = "3.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "annotated-types" },
-    { name = "dataclass-wizard" },
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/db/7e31fa6e683cbdc5c823edaddfdb9437b0d37e817c919d0a54ef2a52b1a3/todoist_api_python-3.1.0.tar.gz", hash = "sha256:7cad732f58a4bdfbd1c073a1a8be1c1b4e13ae0c8be210bb7840fbba06eb987c", size = 20212 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/99/19c8fcaa0f691d41dc5687cb21432b7ea01175b9e4b4097a6caffedbe6b7/todoist_api_python-3.1.0-py3-none-any.whl", hash = "sha256:20ee2445983235566e7f2b2c82f769b9a265bb3fa6d7aad3fa73cf9e2d4cd787", size = 23102 },
-]
-
-[[package]]
 name = "tomli"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3149,7 +3123,6 @@ dependencies = [
     { name = "scipy-stubs" },
     { name = "sounddevice" },
     { name = "soundfile" },
-    { name = "todoist-api-python" },
 ]
 
 [package.metadata]
@@ -3188,7 +3161,6 @@ requires-dist = [
     { name = "scipy-stubs", specifier = "==1.16.2.0" },
     { name = "sounddevice", specifier = ">=0.5.2" },
     { name = "soundfile", specifier = ">=0.12.1" },
-    { name = "todoist-api-python", specifier = ">=3.1.0" },
 ]
 
 [[package]]

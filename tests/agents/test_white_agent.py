@@ -114,30 +114,26 @@ def test_resume_after_black_agent_ritual(monkeypatch):
 def test_process_black_agent_work_sets_analysis_and_ready_for_red(
     monkeypatch, white_agent
 ):
-    # Arrange
-    # Patch normalization to return a predictable proposal list
     monkeypatch.setattr(
         white_agent.__class__,
         "_normalize_song_proposal",
         lambda self, proposal: SimpleNamespace(
-            iterations=[{"iteration_id": "black-prop"}]
+            iterations=[{"iteration_id": "black-prop"}], thread_id="mock_thread_001"
         ),
     )
 
-    # Patch the analysis and synthesis helpers to return deterministic values
     monkeypatch.setattr(
         white_agent.__class__,
         "_black_rebracketing_analysis",
-        lambda self, state, proposal, evp_artifacts, sigil_artifacts: "BLACK_ANALYSIS",
+        lambda self, proposal, evp_artifacts, sigil_artifacts: "BLACK_ANALYSIS",
     )
     monkeypatch.setattr(
         white_agent.__class__,
         "_synthesize_document_for_red",
-        lambda self, state, rebracketed_analysis, black_proposal, artifacts: "BLACK_SYNTH",
+        lambda self, rebracketed_analysis, black_proposal, artifacts: "BLACK_SYNTH",
     )
-
-    # Create a minimal state object
     state = SimpleNamespace(
+        thread_id="mock_thread_001",
         song_proposals=SongProposal(
             iterations=[
                 SongProposalIteration(
@@ -154,18 +150,14 @@ def test_process_black_agent_work_sets_analysis_and_ready_for_red(
             ]
         ),
         artifacts=[
-            SimpleNamespace(chain_artifact_type="evp"),
-            SimpleNamespace(chain_artifact_type="sigil"),
+            SimpleNamespace(chain_artifact_type="evp", thread_id="mock_thread_001"),
+            SimpleNamespace(chain_artifact_type="sigil", thread_id="mock_thread_001"),
         ],
         workflow_paused=False,
         pending_human_action=None,
         ready_for_red=False,
     )
-
-    # Act
     result = white_agent.process_black_agent_work(state)
-
-    # Assert
     assert getattr(result, "rebracketing_analysis") == "BLACK_ANALYSIS"
     assert getattr(result, "document_synthesis") == "BLACK_SYNTH"
     assert result.ready_for_red is True
@@ -174,24 +166,23 @@ def test_process_black_agent_work_sets_analysis_and_ready_for_red(
 def test_process_red_agent_work_sets_analysis_and_ready_for_orange(
     monkeypatch, white_agent
 ):
-    # Arrange
     monkeypatch.setattr(
         white_agent.__class__,
         "_normalize_song_proposal",
         lambda self, proposal: SimpleNamespace(
-            iterations=[{"iteration_id": "red-prop"}]
+            iterations=[{"iteration_id": "red-prop"}], thread_id="mock_thread_001"
         ),
     )
 
     monkeypatch.setattr(
         white_agent.__class__,
         "_red_rebracketing_analysis",
-        lambda self, state, proposal, book_artifacts: "RED_ANALYSIS",
+        lambda self, proposal, book_artifacts: "RED_ANALYSIS",
     )
     monkeypatch.setattr(
         white_agent.__class__,
         "_synthesize_document_for_orange",
-        lambda self, state, rebracketed_analysis, red_proposal, artifacts: "RED_SYNTH",
+        lambda self, rebracketed_analysis, red_proposal, artifacts: "RED_SYNTH",
     )
 
     state = SimpleNamespace(
@@ -199,12 +190,9 @@ def test_process_red_agent_work_sets_analysis_and_ready_for_orange(
         artifacts=[SimpleNamespace(chain_artifact_type="book")],
         ready_for_orange=False,
         ready_for_red=True,
+        thread_id="mock_thread_001",
     )
-
-    # Act
     result = white_agent.process_red_agent_work(state)
-
-    # Assert
     assert getattr(result, "rebracketing_analysis") == "RED_ANALYSIS"
     assert getattr(result, "document_synthesis") == "RED_SYNTH"
     assert result.ready_for_orange is True
@@ -214,24 +202,23 @@ def test_process_red_agent_work_sets_analysis_and_ready_for_orange(
 def test_process_orange_agent_work_sets_analysis_and_ready_for_yellow(
     monkeypatch, white_agent
 ):
-    # Arrange
     monkeypatch.setattr(
         white_agent.__class__,
         "_normalize_song_proposal",
         lambda self, proposal: SimpleNamespace(
-            iterations=[{"iteration_id": "orange-prop"}]
+            iterations=[{"iteration_id": "orange-prop"}], thread_id="mock_thread_001"
         ),
     )
 
     monkeypatch.setattr(
         white_agent.__class__,
         "_orange_rebracketing_analysis",
-        lambda self, state, proposal, newspaper_artifacts: "ORANGE_ANALYSIS",
+        lambda self, proposal, newspaper_artifacts: "ORANGE_ANALYSIS",
     )
     monkeypatch.setattr(
         white_agent.__class__,
         "_synthesize_document_for_yellow",
-        lambda self, state, rebracketed_analysis, orange_proposal, artifacts: "ORANGE_SYNTH",
+        lambda self, rebracketed_analysis, orange_proposal, artifacts: "ORANGE_SYNTH",
     )
 
     state = SimpleNamespace(
@@ -239,12 +226,9 @@ def test_process_orange_agent_work_sets_analysis_and_ready_for_yellow(
         artifacts=[SimpleNamespace(chain_artifact_type="newspaper_article")],
         ready_for_orange=True,
         ready_for_yellow=False,
+        thread_id="mock_thread_001",
     )
-
-    # Act
     result = white_agent.process_orange_agent_work(state)
-
-    # Assert
     assert getattr(result, "rebracketing_analysis") == "ORANGE_ANALYSIS"
     assert getattr(result, "document_synthesis") == "ORANGE_SYNTH"
     assert result.ready_for_yellow is True

@@ -1,6 +1,7 @@
 import numpy as np
 from pydantic import Field
 from scipy.io import wavfile
+from pathlib import Path
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
@@ -24,8 +25,16 @@ class AudioChainArtifactFile(ChainArtifact):
         super().__init__(**data)
 
     def save_file(self):
+
+        if self.base_path:
+            file_path_obj = Path(self.base_path) / "wav"
+            file_path_obj.mkdir(parents=True, exist_ok=True)
+            file_path = file_path_obj / self.file_name
+        else:
+            file_path = Path(self.file_name)
+
         audio_array = np.frombuffer(self.audio_bytes, dtype=np.int16)
-        wavfile.write(self.file_name, self.sample_rate, audio_array)
+        wavfile.write(str(file_path), self.sample_rate, audio_array)
 
     def flatten(self):
         parent_data = super().flatten()

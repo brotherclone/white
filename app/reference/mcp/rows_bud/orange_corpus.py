@@ -459,6 +459,8 @@ class OrangeMythosCorpus:
 # ============================================================================
 
 
-def get_corpus(corpus_dir: str = "./mythology_corpus") -> OrangeMythosCorpus:
+def get_corpus(corpus_dir: str = None) -> OrangeMythosCorpus:
     """Get or create the corpus instance (singleton pattern)"""
+    if corpus_dir is None:
+        corpus_dir = Path(__file__).parent  # Same dir as this file
     return OrangeMythosCorpus(Path(corpus_dir))

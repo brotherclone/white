@@ -29,7 +29,6 @@ dependencies = [
     "scipy-stubs==1.16.2.0",
     "scipy>=1.16.1",
     "assemblyai>=0.46.0",
-    "todoist-api-python>=3.1.0",
     "pytest-cov>=7.0.0",
     "hypothesis>=6.0.0",
     "ruff>=0.14.3",

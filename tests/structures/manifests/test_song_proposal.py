@@ -1,10 +1,7 @@
-from pathlib import Path
-
 import pytest
-import yaml
 from pydantic import ValidationError
 
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
+from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 def valid_iteration_data(**overrides):
@@ -64,19 +61,3 @@ def test_mood_and_genres_type_validators():
 
     with pytest.raises(ValidationError):
         SongProposalIteration(**valid_iteration_data(genres="also-not-a-list"))
-
-
-def test_save_all_proposals_writes_yaml(tmp_path, monkeypatch):
-    monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
-    iteration_data = valid_iteration_data(iteration_id="write_test_1")
-    iteration = SongProposalIteration(**iteration_data)
-    proposal = SongProposal(iterations=[iteration])
-    proposal.save_all_proposals()
-    out_dir = Path(tmp_path) / "default_thread"
-    out_file = out_dir / f"{iteration.iteration_id}.yml"
-    assert out_file.exists()
-    with out_file.open("r", encoding="utf-8") as f:
-        loaded = yaml.safe_load(f)
-    assert "iterations" in loaded
-    assert loaded["iterations"][0]["iteration_id"] == "write_test_1"
-    assert loaded["iterations"][0]["key"] == proposal.iterations[0].key
