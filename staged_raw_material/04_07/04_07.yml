@@ -1,49 +1,45 @@
-bpm: 108.44
-manifest_id: '04_05'
+bpm: 123
+manifest_id: '04_07'
 tempo: 4/4
-key: A minor
+key: D major
 rainbow_color: Y
-title: Guest Quarters
+title: Study
 release_date: '2020-12-08'
-album_sequence: 5
-main_audio_file: 04_05_main.wav
-TRT: '[03:06.121]'
+album_sequence: 7
+main_audio_file: 04_07_main.wav
+TRT: '[03:07.010]'
 vocals: false
-lyrics: true
+lyrics: false
 structure:
   - section_name: TK
     start_time: '[00:00.000]'
-    end_time: '[01:01.241]'
+    end_time: '[00:54.019]'
     description: TK
   - section_name: TK
-    start_time: '[01:01.242]'
-    end_time: '[01:37.094]'
+    start_time: '[00:54.020]'
+    end_time: '[01:18.006]'
     description: TK
   - section_name: TK
-    start_time: '[01:37.095]'
-    end_time: '[02:12.196]'
+    start_time: '[01:18.007]'
+    end_time: '[01:41.018]'
     description: TK
   - section_name: TK
-    start_time: '[02:12.197]'
-    end_time: '[02:21.161]'
+    start_time: '[01:41.019]'
+    end_time: '[02:05.005]'
     description: TK
   - section_name: TK
-    start_time: '[02:21.162]'
-    end_time: '[02:39.086]'
+    start_time: '[02:05.005]'
+    end_time: '[02:28.017]'
     description: TK
   - section_name: TK
-    start_time: '[02:39.087]'
-    end_time: '[03:06.121]'
+    start_time: '[02:28.018]'
+    end_time: '[02:36.013]'
     description: TK
-mood:
-    - TK
 sounds_like:
   - name: TK
     discogs_id: 0
 genres:
   - electronic
-  - novelty
-  - art pop
   - ambient
   - baroque pop
 concept: TK

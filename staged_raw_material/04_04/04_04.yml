@@ -11,53 +11,104 @@ TRT: '[03:09.117]'
 vocals: false
 lyrics: true
 structure:
-  - section_name: TK
+  - section_name: Come in there's room
     start_time: '[00:00.000]'
     end_time: '[00:40.064]'
-    description: TK
-  - section_name: TK
+    description: The party perhaps has made a wrong turn and find themselves amongst a small crowd watching a presentation of some sort. Furs, coats and scarves are piled up upon chairs.
+  - section_name: Welcome; An introduction
     start_time: '[00:40.065]'
     end_time: '[01:03.235]'
-    description: TK
-  - section_name: TK
+    description: A man, who looks like a younger version of Pulsimore (a son or younger brother?) welcomes the guests and introduces the entertainment - Kilmet, the Mentalist
+  - section_name: Kilmet approaches
     start_time: '[01:03.236]'
     end_time: '[01:13.104]'
-    description: TK
-  - section_name: TK
+    description: A slight pause, then seemingly from behind the fireplace Kilmet emerges. He wears a worn turban and a long coat. He carries a small box.
+  - section_name: A flourish, a mouth
     start_time: '[01:13.105]'
     end_time: '[01:20.131]'
-    description: TK
-  - section_name: TK
+    description: Kilmet opens the box and shows the crowd a disembodied mouth, feminine, red lipped, with white, bright teeth
+  - section_name: A mouth, a choir
     start_time: '[01:20.132]'
     end_time: '[01:48.236]'
-    description: TK
-  - section_name: TK
+    description: The mouth in the box opens and looks as if to sing. Then the room is filled with the sounds of a choir. Where do the voices come from? A learned looking man on the couch, in an attempt to calm gasping guests remarks on the power of the mind to itself produce such illusions.
+  - section_name: A quick check for wires and deception
     start_time: '[01:48.237]'
     end_time: '[02:07.224]'
-    description: TK
-  - section_name: TK
+    description: Some guests murmur amongst themselves, suspicious of trickery. Kilmet opens the box again to show there are no wires or electronics inside.
+  - section_name: Speak once more
     start_time: '[02:07.225]'
     end_time: '[02:41.013]'
-    description: TK
-  - section_name: TK
+    description: As Kilmet turns the box back to toward the guests, he cups his hand to his ear and the mouth speaks, this time directly is a ghostly voice. 'In-trud-ers'
+  - section_name: Message received
     start_time: '[02:41.014]'
     end_time: '[03:09.117]'
-    description: TK
+    description: The party needs no hints to whom the box is addressing. They quickly scury through the back double door, closing it behind them.
 mood:
-    - TK
+    - spooky
+    - whimsical
+    - mysterious
+    - dreamy
 sounds_like:
-  - name: TK
-    discogs_id: 0
+  - name: The Caretaker
+    discogs_id: 7734
+  - name: Oneohtrix Point Never
+    discogs_id: 1191704
+  - name: Broadcast
+    discogs_id: 955
 genres:
   - electronic
   - novelty
   - art pop
   - ambient
   - baroque pop
-concept: TK
+lrc_file: 04_04.lrc
+concept: The party, perhaps misdirected, stumbles into a small drawing room where a mentalist named Kilmet is performing for a small audience. Kilmet produces a box containing a disembodied mouth that sings with the voices of a choir. A learned guest suggests that the mind can create such illusions on its own. When some guests express suspicion of trickery, Kilmet opens the box again to show there are no wires or electronics inside. The mouth then speaks a ghostly message - 'In-trud-ers,' prompting the party to quickly exit through a back door.
 audio_tracks:
   - id: 2
-    description: TK
-    audio_file: TK
-    midi_file: TK
-
+    description: DFAM
+    audio_file: 04_04_02_dfam.wav
+  - id: 3
+    description: Kit
+    audio_file: 04_04_03_kit.wav
+  - id: 4
+    description: Kit 2
+    audio_file: 04_04_05_kit2.wav
+    midi_file: 04_04_04_kit2.mid
+  - id: 5
+    description: Synth Bass
+    audio_file: 04_04_07_bass.wav
+    midi_file: 04_04_06_bass.mid
+  - id: 6
+    description: Electric Bass
+    audio_file: 04_04_08_electric_bass.wav
+  - id: 7
+    description: Guitar
+    audio_file: 04_04_09_guitar.wav
+  - id: 8
+    description: Guitar 2
+    audio_file: 04_04_10_guitar2.wav
+  - id: 9
+    description: Matrix
+    audio_file: 04_04_12_matrix.wav
+    midi_file: 04_04_11_matrix.mid
+  - id: 10
+    description: Piano
+    audio_file: 04_04_13_piano.wav
+  - id: 11
+    description: Grandmother
+    audio_file: 04_04_14_grandmother.wav
+  - id: 12
+    description: Morphagene
+    audio_file: 04_04_15_morphagene.wav
+  - id: 13
+    description: Tides
+    audio_file: 04_04_16_tides.wav
+  - id: 14
+    description: Counting
+    audio_file: 04_04_17_counting.wav
+  - id: 15
+    description: Where do the voices appear to come from?
+    audio_file: 04_04_18_where_do.wav
+  - id: 16
+    description: The mind becomes a dangerous instrument
+    audio_file: 04_04_19_mind.wav
