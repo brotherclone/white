@@ -11,43 +11,52 @@ TRT: '[03:06.121]'
 vocals: false
 lyrics: true
 structure:
-  - section_name: TK
+  - section_name: A friend you say
     start_time: '[00:00.000]'
     end_time: '[01:01.241]'
-    description: TK
-  - section_name: TK
+    description: As the group finds their way down a darkened corridor they see a lit threshold at the end of a passageway. A very large man holds a child's stuffed animal and waves beckoning the party forward.
+  - section_name: Jumping on the bed
     start_time: '[01:01.242]'
     end_time: '[01:37.094]'
-    description: TK
-  - section_name: TK
+    description: As the group rounds the corner they can see a group of people in a large bed in the middle of the room. They are dressed in fine, noble clothing and yet are acting like school children.
+  - section_name: Joining the party
     start_time: '[01:37.095]'
     end_time: '[02:12.196]'
-    description: TK
-  - section_name: TK
+    description: Some in the group join in the rollicking. They jump trying to match pace with the others. About five jumps in they get stuck, mid-air - seemingly frozen in time. A red ribbon emerges from the brow of a scholarly looking jumper. It winds its way around the frozen jumpers passing through their skulls. The scholarly jumper utters 'presumably from the telepaths'.
+  - section_name: Now in green
     start_time: '[02:12.197]'
     end_time: '[02:21.161]'
-    description: TK
-  - section_name: TK
+    description: Another ribbon emerges from a beautiful, stately woman whose arms and legs are bent in the air as if riding a horse. This ribbon emerges from her stomach and makes its way through the bed, impaling the jumpers as it goes. She says 'they tell me, not to go out, don't go out'.
+  - section_name: You've upset the big guy
     start_time: '[02:21.162]'
     end_time: '[02:39.086]'
-    description: TK
-  - section_name: TK
+    description: The large man begin screaming a guttural, pre-lingual roar. He stomps over toward the bed and grabs hold of the ribbons and pulls them towards him. As the ribbon pop out of the jumpers they fall back down onto the bed. The man screams 'no go out, don't go out'.'
+  - section_name: They tell me
     start_time: '[02:39.087]'
     end_time: '[03:06.121]'
-    description: TK
+    description: The jumpers recover, including those in the party. The large man becomes wrapped in the ribbons and is quickly constricted and compressed - with the ribbons cutting into flesh and bone. The guests, and the party run screaming from the room.
 mood:
-    - TK
+    - eerie
+    - playful
+    - mysterious
+    - whimsical
+    - unsettling
 sounds_like:
-  - name: TK
-    discogs_id: 0
+  - name: Bruce Haack
+    discogs_id: 26952
+  - name: The Books
+    discogs_id: 92547
+  - name: Matmos
+    discogs_id: 1926
 genres:
   - electronic
   - novelty
   - art pop
-  - ambient
+  - funk
+  - fusion
   - baroque pop
 lrc_file: 04_05.lrc
-concept: TK
+concept: The party is coaxed into a guest room by a large man. In the room upper class guests are behaving like children. A strangely anomaly of red and green ribbons pierce the bodies of the guests, angering the large man. He frees the jumpers but is taken by the ribbons himself.
 audio_tracks:
   - id: 2
     description:
@@ -72,7 +81,7 @@ audio_tracks:
     midi_file: 04_05_09_chords.mid
   - id: 8
     description: Sample - A friend you say
-    audio_file: 04_05_11_sample.wav
+    audio_file: 04_05_11_friend.wav
   - id: 9
     description: Sample - They tell me
     audio_file: 04_05_12_tell.wav
