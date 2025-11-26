@@ -14,19 +14,29 @@ structure:
   - section_name: Run
     start_time: '[00:00.000]'
     end_time: '[03:51.020]'
-    description: TK
+    description: The group runs towards the courtyard.
   - section_name: Into the flickering light
     start_time: '[03:51.021]'
     end_time: '[04:03.012]'
-    description: TK
+    description: The group is consumed by the pulsar's light.
 sounds_like:
   - name: Bowery Electric
-    discogs_id: 0
+    discogs_id: 3800
+  - name: Múm
+    discogs_id: 8298
+  - name: Tycho (3)
+    discogs_id: 71827
 genres:
   - electronic
   - ambient
   - baroque pop
-concept: TK
+  - shoegaze
+mood:
+  - dark
+  - terrifying
+  - panicked
+  - cosmic
+concept: Having crawled from the Cloak Room's secret entrance, the group steadies themselves and finds they are in a large, opulent garden with topiary sculptures, grand fountains, and a large, open courtyard. The group begins to hear the throbbing pulsar, much like the one that seemingly summoned them here. With each blast of the pulsar the palace and its surroundings begin to shake as if tossed around by a violent earthquake. The group simultaneously realizes they are in danger and begins running towards the courtyard. The sky, the light, their whole field of vision turns bright, pure yellow. As the run for their lives they realize their efforts are futile as the only thing that lies in their path is the all consuming pulsar.
 audio_tracks:
   - id: 2
     description: Pulsar
@@ -62,5 +72,5 @@ audio_tracks:
     midi_file: 04_10_16_kit.mid
   - id: 10
     description: Kick
-    audio_file: 04_10_19_kick.wav
-    midi_file: 04_10_18_kick.mid
+    audio_file: 04_10_19_kicks.wav
+    midi_file: 04_10_18_kicks.mid
