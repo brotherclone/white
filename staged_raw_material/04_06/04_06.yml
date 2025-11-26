@@ -61,8 +61,38 @@ genres:
 concept: TK
 audio_tracks:
   - id: 2
-    description: TK
-    audio_file: TK
-    midi_file: TK
-
+    description: Drums
+    audio_file: 04_06_04_drums.wav
+    midi_file: 04_06_02_drums.mid
+  - id: 3
+    description: Bass
+    audio_file: 04_06_05_bass.wav
+  - id: 4
+    description: Choir
+    audio_file: 04_06_07_choir.wav
+    midi_file: 04_06_06_choir.mid
+  - id: 5
+    description: Choir Mellotron
+    audio_file: 04_06_09_choir_o_tron.wav
+    midi_file: 04_06_08_choir_o_tron.mid
+  - id: 6
+    description: Main Bass
+    audio_file: 04_06_11_main_bass.wav
+    midi_file: 04_06_10_main_bass.mid
+  - id: 7
+    description: Synth
+    audio_file: 04_06_13_synth.wav
+    midi_file: 04_06_12_synth.mid
+  - id: 8
+    description: Drum Rack
+    audio_file: 04_06_14_drum_rack.wav
+  - id: 9
+    description: Guitar
+    audio_file: 04_06_15_guitar.wav
+  - id: 10
+    description: Echo Guitar
+    audio_file: 04_06_16_echo_guitar.wav
+  - id: 11
+    description: DFAM
+    audio_file: 04_06_17_dfam.wav
 

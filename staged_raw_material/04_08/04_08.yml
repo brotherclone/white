@@ -1,0 +1,85 @@
+bpm: 129.77
+manifest_id: '04_08'
+tempo: 4/4
+key: Bb minor
+rainbow_color: Y
+title: Nursery
+release_date: '2020-12-08'
+album_sequence: 8
+main_audio_file: 04_08_main.wav
+TRT: '[03:58.005]'
+vocals: false
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: '[01:13.024]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:13.025]'
+    end_time: '[01:58.009]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:58.010]'
+    end_time: '[02:13.003]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:13.004]'
+    end_time: '[03:58.005]'
+    description: TK
+sounds_like:
+  - name: TK
+    discogs_id: 0
+genres:
+  - electronic
+  - ambient
+  - baroque pop
+lrc_file: 04_08.lrc
+concept: TK
+audio_tracks:
+  - id: 2
+    description: Dobbs Kit
+    audio_file: 04_08_02_dobbs.wav
+  - id: 3
+    description: Swirls
+    audio_file: 04_08_04_swirls.wav
+    midi_file: 04_08_03_swirls.mid
+  - id: 4
+    description: Drums
+    audio_file: 04_08_06_drums.wav
+    midi_file: 04_08_05_drums.mid
+  - id: 5
+    description: Clicky Bass
+    audio_file: 04_08_08_click_bass.wav
+    midi_file: 04_08_07_click_bass.mid
+  - id: 6
+    description: SEM
+    audio_file: 04_08_10_sem.wav
+    midi_file: 04_08_09_sem.mid
+  - id: 7
+    description: Jupiter
+    audio_file: 04_08_12_jupiter.wav
+    midi_file: 04_08_11_jupiter.mid
+  - id: 8
+    description: Prophet
+    audio_file: 04_08_14_prophet.wav
+    midi_file: 04_08_13_prophet.mid
+  - id: 9
+    description: Guitar
+    audio_file: 04_08_15_guitar.wav
+  - id: 10
+    description: Drum Machine
+    audio_file: 04_08_17_drum_machine.wav
+    midi_file: 04_08_16_drum_machine.mid
+  - id: 11
+    description: Grandmother
+    audio_file: 04_08_18_grandmother.wav
+  - id: 12
+    description: Sample A
+    audio_file: 04_08_19_sampleA.wav
+  - id: 13
+    description: Sample B
+    audio_file: 04_08_20_sampleB.wav
+  - id: 14
+    description: Sample C
+    audio_file: 04_08_21_sampleC.wav

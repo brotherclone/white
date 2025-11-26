@@ -1,0 +1,100 @@
+bpm: 136.88
+manifest_id: '04_09'
+tempo: 4/4
+key: G minor
+rainbow_color: Y
+title: Cloak Room
+release_date: '2020-12-08'
+album_sequence: 9
+main_audio_file: 04_09_main.wav
+TRT: '[01:59.011]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: '[00:21.001]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:21.002]'
+    end_time: '[00:28.001]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:28.002]'
+    end_time: '[00:42.002]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:42.003]'
+    end_time: '[00:56.002]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:56.003]'
+    end_time: '[01:10.003]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:10.004]'
+    end_time: '[01:31.004]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:31.005]'
+    end_time: '[01:45.005]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:45.006]'
+    end_time: '[01:59.011]'
+    description: TK
+sounds_like:
+  - name: TK
+    discogs_id: 0
+genres:
+  - electronic
+  - ambient
+  - baroque pop
+concept: TK
+audio_tracks:
+  - id: 2
+    description: 808
+    audio_file: 04_09_02_808.wav
+  - id: 3
+    description: DFAM
+    audio_file: 04_09_03_dfam.wav
+  - id: 4
+    description: Put
+    audio_file: 04_09_04_put.wav
+  - id: 5
+    description: Plucky Bass
+    audio_file: 04_09_06_plucky.wav
+    midi_file: 04_09_05_plucky.mid
+  - id: 6
+    description: Bouncing Bass
+    audio_file: 04_09_07_bounce.wav
+  - id: 7
+    description: Chunky Synth
+    audio_file: 04_09_09_chunky.wav
+    midi_file: 04_09_08_chunky.mid
+  - id: 8
+    description: Modern Synth
+    audio_file: 04_09_11_modern.wav
+    midi_file: 04_09_10_modern.mid
+  - id: 9
+    description: Grandmother
+    audio_file: 04_09_12_grandmother.wav
+  - id: 10
+    description: Piano
+    audio_file: 04_09_13_piano.wav
+  - id: 11
+    description: Laughing Synth
+    audio_file: 04_09_14_laughing.wav
+  - id: 12
+    description: Modular
+    midi_file: 04_09_15_modular.mid
+  - id: 13
+    description: Envelop Guitar
+    audio_file: 04_09_16_envelop_guitar.wav
+  - id: 14
+    description: Sampled Vocal
+    midi_file: 04_09_17_sampled.mid
+
+
+
+

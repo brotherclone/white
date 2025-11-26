@@ -1,0 +1,66 @@
+bpm: 143.9
+manifest_id: '04_10'
+tempo: 4/4
+key: Bb minor
+rainbow_color: Y
+title: Back Gardens
+release_date: '2020-12-08'
+album_sequence: 10
+main_audio_file: 04_10_main.wav
+TRT: '[04:03.012]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: Run
+    start_time: '[00:00.000]'
+    end_time: '[03:51.020]'
+    description: TK
+  - section_name: Into the flickering light
+    start_time: '[03:51.021]'
+    end_time: '[04:03.012]'
+    description: TK
+sounds_like:
+  - name: Bowery Electric
+    discogs_id: 0
+genres:
+  - electronic
+  - ambient
+  - baroque pop
+concept: TK
+audio_tracks:
+  - id: 2
+    description: Pulsar
+    audio_file: 04_10_03_pulsar.wav
+    midi_file: 04_10_02_pulsar.mid
+  - id: 3
+    description: Ohm Synth
+    audio_file: 04_10_05_ohm.wav
+    midi_file: 04_10_04_ohm.mid
+  - id: 4
+    description: Mini
+    audio_file: 04_10_07_mini.wav
+    midi_file: 04_10_06_mini.mid
+  - id: 5
+    description: Banshee
+    audio_file: 04_10_09_banshee.wav
+    midi_file: 04_10_08_banshee.mid
+  - id: 6
+    description: Arp Bass
+    audio_file: 04_10_11_arp_bass.wav
+    midi_file: 04_10_10_arp_bass.mid
+  - id: 7
+    description: Fuzz Bass
+    audio_file: 04_10_13_fuzz_bass.wav
+    midi_file: 04_10_12_fuzz_bass.mid
+  - id: 8
+    description: Synth Strings
+    audio_file: 04_10_15_strings.wav
+    midi_file: 04_10_14_strings.mid
+  - id: 9
+    description: Drum Kit
+    audio_file: 04_10_17_kit.wav
+    midi_file: 04_10_16_kit.mid
+  - id: 10
+    description: Kick
+    audio_file: 04_10_19_kick.wav
+    midi_file: 04_10_18_kick.mid

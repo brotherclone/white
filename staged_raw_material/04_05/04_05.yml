@@ -46,11 +46,51 @@ genres:
   - art pop
   - ambient
   - baroque pop
+lrc_file: 04_05.lrc
 concept: TK
 audio_tracks:
   - id: 2
-    description: TK
-    audio_file: TK
-    midi_file: TK
-
-
+    description:
+    audio_file: 04_05_03_bass.wav
+    midi_file: 04_05_02_bass.mid
+  - id: 3
+    description: Puff Bass
+    audio_file: 04_05_04_puff_bass.wav
+  - id: 4
+    description: Drum Machine
+    audio_file: 04_05_06_drum_machine.wav
+    midi_file: 04_05_05_drum_machine.mid
+  - id: 5
+    description: SRC Kit
+    audio_file: 04_05_07_src_kit.wav
+  - id: 6
+    description: DFAM
+    audio_file: 04_05_08_dfam.wav
+  - id: 7
+    description: Piano
+    audio_file: 04_05_10_piano.wav
+    midi_file: 04_05_09_chords.mid
+  - id: 8
+    description: Sample - A friend you say
+    audio_file: 04_05_11_sample.wav
+  - id: 9
+    description: Sample - They tell me
+    audio_file: 04_05_12_tell.wav
+  - id: 10
+    description: Sample - Not
+    audio_file: 04_05_13_not.wav
+  - id: 11
+    description: Sample - Presumably from the telepaths
+    audio_file: 04_05_14_tele.wav
+  - id: 12
+    description: Guitar
+    audio_file: 04_05_15_guitar.wav
+  - id: 13
+    description: Granular Guitar
+    audio_file: 04_05_16_granular_guitar.wav
+  - id: 14
+    description: Grandmother
+    audio_file: 04_05_17_grandmother.wav
+  - id: 15
+    description: TG One
+    audio_file: 04_05_18_tg_one.wav

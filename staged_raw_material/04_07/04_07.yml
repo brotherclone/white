@@ -42,11 +42,52 @@ genres:
   - electronic
   - ambient
   - baroque pop
+lrc_file: 04_07.lrc
 concept: TK
 audio_tracks:
   - id: 2
-    description: TK
-    audio_file: TK
-    midi_file: TK
+    description: Drum Kit
+    audio_file: 04_07_02_drum_kit.wav
+  - id: 3
+    description: Bass
+    audio_file: 04_07_03_bass.wav
+  - id: 4
+    description: Guitar
+    audio_file: 04_07_04_guitar.wav
+  - id: 5
+    description: Guitar 2
+    audio_file: 04_07_05_guitar_2.wav
+  - id: 6
+    description: Grandmother
+    audio_file: 04_07_06_grandmother.wav
+  - id: 7
+    description: Iteras
+    audio_file: 04_07_07_iteras.wav
+  - id: 8
+    description: Tides
+    audio_file: 04_07_08_tides.wav
+  - id: 9
+    description: Arp
+    audio_file: 04_07_10_arp.wav
+    midi_file: 04_07_09_arp.mid
+  - id: 10
+    description: Piano
+    audio_file: 04_07_11_piano.wav
+  - id: 11
+    description: Come thou forth sample
+    audio_file: 04_07_12_come.wav
+  - id: 12
+    description: CS80
+    audio_file: 04_07_14_cs80.wav
+    midi_file: 04_07_13_cs80.mid
+  - id: 13
+    description: Motown Kit
+    audio_file: 04_07_16_motown_kit.wav
+    midi_file: 04_07_15_motown_kit.mid
+  - id: 14
+    description: Choir
+    audio_file: 04_07_18_choir.wav
+    midi_file: 04_07_17_choir.mid
+
 
 

@@ -56,7 +56,7 @@ structure:
     end_time: '[03:18.170]'
     description: The party reaches the front of the line and a Herald makes their introduction to Lord Pulsimore.
   - section_name: Forever in the gaze of the Lord
-    start_time: '03:18.171]'
+    start_time: '[03:18.171]'
     end_time: '[03:51.197]'
     description: As the party meets Lord Pulsimore, they feel his intense gaze upon them, a mix of curiosity and judgment that makes them acutely aware of their place in this opulent world.
 mood:
