@@ -11,46 +11,46 @@ TRT: '[03:47.010]'
 vocals: false
 lyrics: false
 structure:
-  - section_name: TK
+  - section_name: Get it together
     start_time: '[00:00.000]'
     end_time: '[00:49.021]'
-    description: TK
-  - section_name: TK
+    description: Stumbling free of the Guest Room the party tries to calm themselves knowing that their aire of shock may give them away as beings not from the outside world.
+  - section_name: Just around the corner
     start_time: '[00:49.022]'
     end_time: '[01:06.011]'
-    description: TK
-  - section_name: TK
+    description: They continue down the hallway. Around the corner it leads to the most cavernous room anyone in the group has ever seen. Ivory, Gold, Jewels and polished marble adorn every inch of the room with strange symbols and images. In the far corner a large, curved stair case is covered by the flowing dresses and capes of the guests who look up in adoration toward the top of the stairs.
+  - section_name: A heavenly reception
     start_time: '[01:06.012]'
     end_time: '[01:23.002]'
-    description: TK
-  - section_name: TK
+    description: The party steps into the room and is immediately noticed by the guests. All conversation stops as all eyes turn to the newcomers.
+  - section_name: Lord and Lady Pulsimore's grand entrance
     start_time: '[01:23.003]'
     end_time: '[01:39.017]'
-    description: TK
-  - section_name: TK
+    description: Just in time for the party to enter the room, Lord Pulsimore and Lady Pulsimore's grand entrance is played.' They decend the staircase to the adoration of the guests.
+  - section_name: Welcoming words
     start_time: '[01:39.018]'
     end_time: '[01:56.007]'
-    description: TK
-  - section_name: TK
+    description: Lord Pulsimore and Lady Pulsimore take turns giving a welcoming speech. Thanking the guest for their presence. Lady Pulsimore wraps up her speech by pointing upward toward the sprawling ceiling of the great chamber.
+  - section_name: Look to the ceiling
     start_time: '[01:56.008]'
     end_time: '[02:12.023]'
-    description: TK
-  - section_name: TK
+    description: The entire room looks up and sees what looks like several silent-era films, projected onto the ceiling. The films show scenes of nature, people dancing, and abstract shapes and colors.
+  - section_name: Not unnoticed
     start_time: '[02:12.024]'
     end_time: '[02:37.021]'
-    description: TK
-  - section_name: TK
+    description: While party looks up the hosts make their way, surprisingly toward the party, singling them out for a personal welcome.
+  - section_name: Kissed cheeks
     start_time: '[02:37.022]'
     end_time: '[02:54.011]'
-    description: TK
-  - section_name: TK
+    description: Lady Pulsimore kisses the cheeks of the party members. Her smile is so bright and so beautiful that the party can't help but smile back.'
+  - section_name: Whispered words
     start_time: '[02:54.012]'
     end_time: '[03:11.003]'
-    description: TK
-  - section_name: TK
+    description: She cups her hand on Lord Pulsimore's ear and whispers something to him. He nods and smiles at the party.
+  - section_name: A private tour?
     start_time: '[03:11.004]'
     end_time: '[03:47.010]'
-    description: TK
+    description: Lord Pulsimore offers to give the party a private tour of the great chamber and its many wonders.
 mood:
   - joyous
   - majestic
@@ -58,12 +58,19 @@ mood:
   - melancholy
 sounds_like:
   - name: Brian Wilson
-    discogs_id: 0
+    discogs_id: 189718
+  - name: Basil Kirchin
+    discogs_id: 202191
+  - name: His Name is Alive
+    discogs_id: 61796
 genres:
   - electronic
   - ambient
   - baroque pop
-concept: TK
+  - opulent
+  - beautiful
+  - ethereal
+concept: The party is welcomed into the Great Chamber by Lord Pulsimore and Lady Pulsimore. They offer to take a tour of the room and sing a song of praise to the greatness of the place. The music is grand and majestic, with a sense of wonder and awe at the beauty of the chamber.
 audio_tracks:
   - id: 2
     description: Drums
@@ -82,8 +89,8 @@ audio_tracks:
     midi_file: 04_06_08_choir_o_tron.mid
   - id: 6
     description: Main Bass
-    audio_file: 04_06_11_main_bass.wav
-    midi_file: 04_06_10_main_bass.mid
+    audio_file: 04_06_11_bass_main.wav
+    midi_file: 04_06_10_bass_main.mid
   - id: 7
     description: Synth
     audio_file: 04_06_13_synth.wav

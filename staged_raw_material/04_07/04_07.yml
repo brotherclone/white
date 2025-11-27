@@ -11,52 +11,53 @@ TRT: '[03:07.010]'
 vocals: false
 lyrics: true
 structure:
-  - section_name: TK
+  - section_name: Come thou forth
     start_time: '[00:00.000]'
     end_time: '[00:54.019]'
-    description: TK
-  - section_name: TK
+    description: Lord Pulsimore opens a set of intricately carved doors, this is his personal study with books stacked high and ritual artifacts on every one of the eight-sided walls.
+  - section_name: Books on all subjects
     start_time: '[00:54.020]'
     end_time: '[01:18.006]'
-    description: TK
-  - section_name: TK
+    description: Lord Pulsimore moves through his study, running his fingers along the spines of books on every subject imaginable, from ancient history to modern science. We can tell this study is his pride and joy.
+  - section_name: What stands out
     start_time: '[01:18.007]'
     end_time: '[01:41.018]'
-    description: TK
-  - section_name: TK
+    description: Amongst the ornately bound books one title, propped up on a lectern stands out to all twentieth-century party members. It's yellow pages of text with poorly rendered ads could only be a phone book.
+  - section_name: We now know why we are here
     start_time: '[01:41.019]'
     end_time: '[02:05.005]'
-    description: TK
-  - section_name: TK
+    description: A powerful bolt of insight strikes the party, a brief respite of lucidity. They now know why they are here. Page 123, they need to take this page back to where they came from.
+  - section_name: Before he sees
     start_time: '[02:05.005]'
     end_time: '[02:28.017]'
-    description: TK
-  - section_name: TK
+    description: The most deft of the party moves forward and takes a letter opener sitting next to phone book, turns to page 123 and slices it free - all before Lord Pulsimore sees it.
+  - section_name: Carry on
     start_time: '[02:28.018]'
     end_time: '[02:36.013]'
-    description: TK
+    description: Lord Pulsimore take one more look at the study in pride and ask the party to continue on with their tour of the property.
 mood:
   - spooky
   - dark
   - foreboding
   - dreamy
 sounds_like:
-  - name: Basil Kirchhoff
-    discogs_id: 0
+  - name: Basil Kirchin
+    discogs_id: 202191
   - name: Helios
-    discogs_id: 0
+    discogs_id: 121680
   - name: Boards of Canada
-    discogs_id: 0
+    discogs_id: 307
 genres:
   - electronic
   - ambient
   - baroque pop
 lrc_file: 04_07.lrc
-concept: TK
+concept:
+  Lord Pulsimore shows the party his personal study, filled with books on every subject imaginable. Amongst the books is a phone book, which holds the key to why the party is here. They must take page 123 back to where they came from, all before Lord Pulsimore notices.
 audio_tracks:
   - id: 2
     description: Drum Kit
-    audio_file: 04_07_02_drum_kit.wav
+    audio_file: 04_07_02_kit.wav
   - id: 3
     description: Bass
     audio_file: 04_07_03_bass.wav
@@ -65,7 +66,7 @@ audio_tracks:
     audio_file: 04_07_04_guitar.wav
   - id: 5
     description: Guitar 2
-    audio_file: 04_07_05_guitar_2.wav
+    audio_file: 04_07_05_guitar2.wav
   - id: 6
     description: Grandmother
     audio_file: 04_07_06_grandmother.wav
@@ -97,6 +98,3 @@ audio_tracks:
     description: Choir
     audio_file: 04_07_18_choir.wav
     midi_file: 04_07_17_choir.mid
-
-
-
