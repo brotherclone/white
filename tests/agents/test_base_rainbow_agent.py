@@ -3,10 +3,18 @@ from types import SimpleNamespace
 import pytest
 
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
-from app.structures.artifacts.base_chain_artifact import ChainArtifact
+from app.structures.artifacts.base_artifact import ChainArtifact
 
 # A concrete agent to instantiate and test abstract behavior
 GRAPH_SENTINEL = object()
+
+
+class DummyArtifact(ChainArtifact):
+    def save_file(self):
+        return None
+
+    def flatten(self):
+        return {}
 
 
 class ConcreteAgent(BaseRainbowAgent):
@@ -69,12 +77,10 @@ def test__get_claude_uses_settings(monkeypatch):
 def test_chain_artifacts_instance_is_independent():
     a1 = ConcreteAgent()
     a2 = ConcreteAgent()
-
-    # modify one instance's chain_artifacts and ensure the other is unaffected
-    artifact = ChainArtifact(chain_artifact_type="test-artifact")
+    artifact = DummyArtifact()
     a1.chain_artifacts.append(artifact)
     assert len(a1.chain_artifacts) == 1
-    assert a1.chain_artifacts[0].chain_artifact_type == "test-artifact"
+    assert a1.chain_artifacts[0].chain_artifact_type == "unknown"
     assert a2.chain_artifacts == []
 
 

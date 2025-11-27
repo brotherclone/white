@@ -1,12 +1,11 @@
-from unittest.mock import patch
+import os
+import pytest
 
 from app.agents.tools.speech_tools import (
-    chain_artifact_file_from_speech_to_text,
+    transcription_from_speech_to_text,
     evp_speech_to_text,
 )
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 
 def test_evp_returns_none_when_no_api_key(monkeypatch):
@@ -97,12 +96,12 @@ def test_evp_uses_utterances_when_no_text(monkeypatch):
     assert out == "first second"
 
 
-@patch(
-    "app.agents.tools.speech_tools.save_artifact_file_to_md"
-)  # ✅ ADD: Mock the save function
-def test_chain_artifact_file_from_speech_to_text_creates_text_file(
-    mock_save, monkeypatch
-):
+@pytest.mark.skipif(
+    os.environ.get("BLOCK_MODE", "").lower() in {"1", "true", "yes"},
+    reason="Skipping test because BLOCK_MODE is enabled",
+)
+def test_chain_artifact_file_from_speech_to_text_creates_text_file(monkeypatch):
+    """Test that speech-to-text returns the transcript string"""
     monkeypatch.setattr(
         "app.agents.tools.speech_tools.evp_speech_to_text",
         lambda wp, fn: "transcript body",
@@ -118,22 +117,19 @@ def test_chain_artifact_file_from_speech_to_text_creates_text_file(
             return "/tmp/base" if not with_file_name else "/tmp/base/audio.wav"
 
     audio = FakeAudio()
-    txt = chain_artifact_file_from_speech_to_text(audio, thread_id="thread-1")
-    assert isinstance(txt, TextChainArtifactFile)
-    assert txt.text_content == "transcript body"
-    assert txt.thread_id == "thread-1"
-    assert txt.chain_artifact_file_type is ChainArtifactFileType.MARKDOWN
-    assert txt.artifact_name.endswith("_transcript")
-    mock_save.assert_called_once_with(txt)
+    txt = transcription_from_speech_to_text(audio)
+    assert isinstance(txt, str)
+    assert txt == "transcript body"
 
 
-@patch(
-    "app.agents.tools.speech_tools.save_artifact_file_to_md"
-)  # ✅ ADD: Mock the save function
+@pytest.mark.skipif(
+    os.environ.get("BLOCK_MODE", "").lower() in {"1", "true", "yes"},
+    reason="Skipping test because BLOCK_MODE is enabled",
+)
 def test_chain_artifact_file_from_speech_to_text_returns_placeholder_when_no_transcript(
-    mock_save, monkeypatch
+    monkeypatch,
 ):
-    """Test that None transcript results in placeholder text, not None artifact"""
+    """Test that None transcript results in placeholder text, not None"""
     monkeypatch.setattr(
         "app.agents.tools.speech_tools.evp_speech_to_text", lambda wp, fn: None
     )
@@ -148,8 +144,7 @@ def test_chain_artifact_file_from_speech_to_text_returns_placeholder_when_no_tra
             return "/tmp/base" if not with_file_name else "/tmp/base/audio.wav"
 
     audio = FakeAudio()
-    out = chain_artifact_file_from_speech_to_text(audio, thread_id="t")
+    out = transcription_from_speech_to_text(audio)
     assert out is not None
-    assert isinstance(out, TextChainArtifactFile)
-    assert out.text_content == "[EVP: No discernible speech detected]"
-    mock_save.assert_called_once_with(out)
+    assert isinstance(out, str)
+    assert out == "[EVP: No discernible speech detected]"

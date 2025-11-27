@@ -4,10 +4,7 @@ import os
 import assemblyai as aai
 from dotenv import load_dotenv
 
-from app.agents.tools.text_tools import save_artifact_file_to_md
-from app.structures.artifacts.audio_chain_artifact_file import AudioChainArtifactFile
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 
 load_dotenv()
 
@@ -95,32 +92,16 @@ def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
     return None
 
 
-def chain_artifact_file_from_speech_to_text(
-    audio: AudioChainArtifactFile, thread_id: str
-) -> TextChainArtifactFile | None:
-
+def transcription_from_speech_to_text(audio: AudioChainArtifactFile) -> str:
+    block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
     transcript_text = evp_speech_to_text(
         audio.get_artifact_path(with_file_name=False), audio.file_name
     )
     if transcript_text:
         logging.info(f"✓ Generated transcript with {len(transcript_text)} characters")
+        return transcript_text
     else:
+        if block_mode:
+            raise Exception("No transcript generated - aborting workflow")
         logging.warning("⚠️  No transcript generated - using placeholder")
-        transcript_text = "[EVP: No discernible speech detected]"
-    transcript = TextChainArtifactFile(
-        text_content=transcript_text,
-        thread_id=thread_id,
-        rainbow_color=audio.rainbow_color,
-        base_path=audio.base_path,
-        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-        artifact_name=f"{audio.artifact_name}_transcript",
-    )
-    try:
-        save_artifact_file_to_md(transcript)
-        logging.info(
-            f"✓ Saved transcript to {transcript.get_artifact_path(with_file_name=True)}"
-        )
-    except Exception as e:
-        logging.error(f"✗ Failed to save transcript: {e}")
-
-    return transcript
+    return "[EVP: No discernible speech detected]"

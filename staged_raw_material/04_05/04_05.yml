@@ -1,0 +1,105 @@
+bpm: 108.44
+manifest_id: '04_05'
+tempo: 4/4
+key: A minor
+rainbow_color: Y
+title: Guest Quarters
+release_date: '2020-12-08'
+album_sequence: 5
+main_audio_file: 04_05_main.wav
+TRT: '[03:06.121]'
+vocals: false
+lyrics: true
+structure:
+  - section_name: A friend you say
+    start_time: '[00:00.000]'
+    end_time: '[01:01.241]'
+    description: As the group finds their way down a darkened corridor they see a lit threshold at the end of a passageway. A very large man holds a child's stuffed animal and waves beckoning the party forward.
+  - section_name: Jumping on the bed
+    start_time: '[01:01.242]'
+    end_time: '[01:37.094]'
+    description: As the group rounds the corner they can see a group of people in a large bed in the middle of the room. They are dressed in fine, noble clothing and yet are acting like school children.
+  - section_name: Joining the party
+    start_time: '[01:37.095]'
+    end_time: '[02:12.196]'
+    description: Some in the group join in the rollicking. They jump trying to match pace with the others. About five jumps in they get stuck, mid-air - seemingly frozen in time. A red ribbon emerges from the brow of a scholarly looking jumper. It winds its way around the frozen jumpers passing through their skulls. The scholarly jumper utters 'presumably from the telepaths'.
+  - section_name: Now in green
+    start_time: '[02:12.197]'
+    end_time: '[02:21.161]'
+    description: Another ribbon emerges from a beautiful, stately woman whose arms and legs are bent in the air as if riding a horse. This ribbon emerges from her stomach and makes its way through the bed, impaling the jumpers as it goes. She says 'they tell me, not to go out, don't go out'.
+  - section_name: You've upset the big guy
+    start_time: '[02:21.162]'
+    end_time: '[02:39.086]'
+    description: The large man begin screaming a guttural, pre-lingual roar. He stomps over toward the bed and grabs hold of the ribbons and pulls them towards him. As the ribbon pop out of the jumpers they fall back down onto the bed. The man screams 'no go out, don't go out'.'
+  - section_name: They tell me
+    start_time: '[02:39.087]'
+    end_time: '[03:06.121]'
+    description: The jumpers recover, including those in the party. The large man becomes wrapped in the ribbons and is quickly constricted and compressed - with the ribbons cutting into flesh and bone. The guests, and the party run screaming from the room.
+mood:
+    - eerie
+    - playful
+    - mysterious
+    - whimsical
+    - unsettling
+sounds_like:
+  - name: Bruce Haack
+    discogs_id: 26952
+  - name: The Books
+    discogs_id: 92547
+  - name: Matmos
+    discogs_id: 1926
+genres:
+  - electronic
+  - novelty
+  - art pop
+  - funk
+  - fusion
+  - baroque pop
+lrc_file: 04_05.lrc
+concept: The party is coaxed into a guest room by a large man. In the room upper class guests are behaving like children. A strangely anomaly of red and green ribbons pierce the bodies of the guests, angering the large man. He frees the jumpers but is taken by the ribbons himself.
+audio_tracks:
+  - id: 2
+    description:
+    audio_file: 04_05_03_bass.wav
+    midi_file: 04_05_02_bass.mid
+  - id: 3
+    description: Puff Bass
+    audio_file: 04_05_04_puff_bass.wav
+  - id: 4
+    description: Drum Machine
+    audio_file: 04_05_06_drum_machine.wav
+    midi_file: 04_05_05_drum_machine.mid
+  - id: 5
+    description: SRC Kit
+    audio_file: 04_05_07_src_kit.wav
+  - id: 6
+    description: DFAM
+    audio_file: 04_05_08_dfam.wav
+  - id: 7
+    description: Piano
+    audio_file: 04_05_10_piano.wav
+    midi_file: 04_05_09_chords.mid
+  - id: 8
+    description: Sample - A friend you say
+    audio_file: 04_05_11_friend.wav
+  - id: 9
+    description: Sample - They tell me
+    audio_file: 04_05_12_tell.wav
+  - id: 10
+    description: Sample - Not
+    audio_file: 04_05_13_not.wav
+  - id: 11
+    description: Sample - Presumably from the telepaths
+    audio_file: 04_05_14_tele.wav
+  - id: 12
+    description: Guitar
+    audio_file: 04_05_15_guitar.wav
+  - id: 13
+    description: Granular Guitar
+    audio_file: 04_05_16_granular_guitar.wav
+  - id: 14
+    description: Grandmother
+    audio_file: 04_05_17_grandmother.wav
+  - id: 15
+    description: TG One
+    audio_file: 04_05_18_tg_one.wav

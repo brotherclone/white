@@ -1,9 +1,6 @@
-import os
 import re
-from pathlib import Path
 from typing import List
 
-import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.structures.concepts.rainbow_table_color import RainbowTableColor
@@ -17,18 +14,25 @@ class SongProposalIteration(BaseModel):
     """
 
     iteration_id: str = Field(
-        description="Unique identifier for this iteration in format 'descriptive_name_#'",
-        examples=["archetypal_ai_yearning_1", "prometheus_theme_2", "time_collapse_1"],
-        pattern=r"^[a-z0-9_]+_\d+$",
+        description="Unique identifier for this iteration in format 'descriptive_name_#' or 'descriptive_name_v#'",
+        examples=[
+            "archetypal_ai_yearning_1",
+            "prometheus_theme_2",
+            "time_collapse_v1",
+            "ai_consciousness_embodiment_v2",
+        ],
+        pattern=r"^[a-z0-9_]+_(v?\d+|[a-z0-9]+)$",
     )
     bpm: int = Field(
         description="Tempo in beats per minute. Slower (40-70) for ambient/meditative, medium (80-120) for reflective, faster (120-180) for energetic",
+        default=120,
         examples=[72, 88, 120, 140],
         ge=40,
         le=200,
     )
     tempo: str | TimeSignature = Field(
         description="Time signature defining rhythmic structure",
+        default=TimeSignature(numerator=4, denominator=4),
         examples=[
             {"numerator": 4, "denominator": 4},
             {"numerator": 3, "denominator": 4},
@@ -213,23 +217,3 @@ class SongProposal(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
-
-    def save_all_proposals(self):
-        """
-        This function should save all iterations to yml files in the thread folder of chain artifacts for each run.
-        """
-        base = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
-        thread = (
-            getattr(self.iterations[0], "thread_id", "default_thread")
-            if self.iterations
-            else "default_thread"
-        )
-        output = Path(base) / thread
-        output.mkdir(parents=True, exist_ok=True)
-        for iteration in self.iterations:
-            file_path = output / f"{iteration.iteration_id}.yml"
-            with file_path.open("w", encoding="utf-8") as f:
-                data_serializable = self.model_dump(mode="json")
-                yaml.safe_dump(
-                    data_serializable, f, sort_keys=False, allow_unicode=True
-                )

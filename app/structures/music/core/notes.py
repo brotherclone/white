@@ -1,13 +1,20 @@
-from pydantic import BaseModel
+from typing import Optional, List
+
+from pydantic import BaseModel, Field
 
 
 class Note(BaseModel):
 
     pitch_name: str
-    pitch_alias: list[str] | None = None  # e.g., ['C', 'Do']
-    accidental: str | None = None  # e.g., 'sharp', 'flat',
-    frequency: int | None = None
+    pitch_alias: Optional[List[str]] = Field(
+        default=None, description="Alternative names for the pitch."
+    )
+    accidental: Optional[str] = Field(
+        default=None, description="Accidental of the note (e.g., sharp, flat)."
+    )
+    frequency: Optional[int] = Field(default=None, description="Frequency in Hz.")
     octave: int | None = None
+    midi_note: Optional[int] = Field(default=None, description="MIDI note number.")
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -43,7 +50,29 @@ tempered_notes = {
 }
 
 
-def get_note(note_str: str) -> Note:
+def get_tempered_note(note_str: str) -> Note:
+    # Normalize flat notation to sharp notation
+    flat_to_sharp = {
+        "Db": "C#",
+        "D♭": "C#",
+        "Eb": "D#",
+        "E♭": "D#",
+        "Gb": "F#",
+        "G♭": "F#",
+        "Ab": "G#",
+        "A♭": "G#",
+        "Bb": "A#",
+        "B♭": "A#",
+        "Cb": "B",
+        "C♭": "B",
+        "Fb": "E",
+        "F♭": "E",
+    }
+
+    # Convert flat notation to sharp if needed
+    if note_str in flat_to_sharp:
+        note_str = flat_to_sharp[note_str]
+
     if note_str in tempered_notes:
         return tempered_notes[note_str]
     else:

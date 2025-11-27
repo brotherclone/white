@@ -1,13 +1,20 @@
 import os
 import re
 import sys
-from typing import List, Tuple
 
+from typing import ClassVar, List, Tuple
 from pydantic import BaseModel
 
 
 class LRCValidator(BaseModel):
     """Validator for .lrc (Lyric) files"""
+
+    title_re: ClassVar[re.Pattern] = re.compile(r"\[ti:\s*.+?\]", re.IGNORECASE)
+    artist_re: ClassVar[re.Pattern] = re.compile(r"\[ar:\s*.+?\]", re.IGNORECASE)
+    album_re: ClassVar[re.Pattern] = re.compile(r"\[al:\s*.+?\]", re.IGNORECASE)
+    timestamp_pattern: ClassVar[re.Pattern] = re.compile(
+        r"\[(\d{1,2}):(\d{2}(?:\.\d{1,3})?)\]"
+    )
 
     def validate(self, lrc_content: str) -> Tuple[bool, List[str]]:
         """
@@ -19,61 +26,77 @@ class LRCValidator(BaseModel):
         Returns:
             Tuple of (is_valid, error_messages)
         """
-        errors = []
+        err: List[str] = []
+
+        lrc_content = lrc_content.lstrip("\ufeff")
 
         # Check for required metadata
-        if not re.search(r"\[ti:\s*.+?\]", lrc_content):
-            errors.append("Missing title metadata [ti: title]")
-        if not re.search(r"\[ar:\s*.+?\]", lrc_content):
-            errors.append("Missing artist metadata [ar: artist]")
-        if not re.search(r"\[al:\s*.+?\]", lrc_content):
-            errors.append("Missing album metadata [al: album]")
-
-        # Extract and validate timestamps
-        timestamp_pattern = r"\[(\d{2}):(\d{2}\.\d{3})\]"
-        timestamps = []
-
-        for i, line in enumerate(lrc_content.splitlines()):
-            match = re.match(timestamp_pattern, line)
-            if match:
-                minutes = int(match.group(1))
-                seconds = float(match.group(2))
+        if not self.title_re.search(lrc_content):
+            err.append("Missing title metadata [ti: title]")
+        if not self.artist_re.search(lrc_content):
+            err.append("Missing artist metadata [ar: artist]")
+        if not self.album_re.search(lrc_content):
+            err.append("Missing album metadata [al: album]")
+        timestamps = []  # list of tuples (total_seconds, ts_str, line_num)
+        for i, raw_line in enumerate(lrc_content.splitlines(), start=1):
+            line = raw_line.strip()
+            for m in self.timestamp_pattern.finditer(line):
+                minutes = int(m.group(1))
+                seconds = float(m.group(2))
                 total_seconds = minutes * 60 + seconds
-                timestamps.append((total_seconds, match.group(0), i + 1))
+                timestamps.append((total_seconds, m.group(0), i))
 
         if not timestamps:
-            errors.append("No valid timestamp entries found")
+            err.append("No valid timestamp entries found")
         else:
-            prev_time, prev_str, prev_line = -1, "[00:00.000]", 0
-
-            for curr_time, curr_str, line_num in timestamps:
+            prev_time, prev_str, prev_line = -1.0, "[00:00.000]", 0
+            for curr_time, curr_str, line_num in sorted(
+                timestamps, key=lambda x: (x[2], x[0])
+            ):
                 if curr_time < prev_time:
-                    errors.append(
+                    err.append(
                         f"Non-sequential timestamp at line {line_num}: {curr_str} comes before {prev_str} at line {prev_line}"
                     )
-
                 prev_time, prev_str, prev_line = curr_time, curr_str, line_num
 
-        is_valid = len(errors) == 0
-        return is_valid, errors
+        is_valid = len(err) == 0
+        return is_valid, err
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python lrc_validator.py <directory_path>")
+        print("Usage: python lrc_validator.py <directory_or_file_path>")
         sys.exit(1)
-    directory_path = sys.argv[1]
+
+    path = sys.argv[1]
     validator = LRCValidator()
-    for root, _, files in os.walk(directory_path):
-        for file in files:
-            if file.endswith(".lrc"):
-                file_path = os.path.join(root, file)
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                is_valid, errors = validator.validate(content)
-                if is_valid:
-                    print(f"{file_path}: Valid LRC file")
-                else:
-                    print(f"{file_path}: Invalid LRC file")
-                    for error in errors:
-                        print(f"  - {error}")
+
+    targets: List[str] = []
+    if os.path.isfile(path):
+        if path.lower().endswith(".lrc"):
+            targets = [path]
+    else:
+        for root, _, files in os.walk(path):
+            for file in files:
+                if file.lower().endswith(".lrc"):
+                    targets.append(os.path.join(root, file))
+
+    if not targets:
+        print(f"No .lrc files found at ` {path} `")
+        sys.exit(0)
+
+    for file_path in targets:
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+        except Exception as e:
+            print(f"{file_path}: Failed to read file: {e}")
+            continue
+
+        is_valid, errors = validator.validate(content)
+        if is_valid:
+            print(f"{file_path}: Valid LRC file")
+        else:
+            print(f"{file_path}: Invalid LRC file")
+            for error in errors:
+                print(f"  - {error}")

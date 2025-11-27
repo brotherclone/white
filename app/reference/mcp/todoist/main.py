@@ -1,36 +1,18 @@
 import logging
+import requests
 import os
 from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
-from requests.exceptions import HTTPError
-from todoist_api_python.api import TodoistAPI
-from todoist_api_python.models import Section, Task
 
-from app.util.string_utils import resolve_name
-
-USER_AGENT = "earthly_frames_todoist/1.0"
+USER_AGENT = "earthly_frames_todoist/1.2"
 TIME_OUT = 30.0
 EF_PROJECT_ID = "6CrfWqXrxppjhqMJ"
 
 logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
-
-_api_client: Optional[TodoistAPI] = None
-
-
-def get_api_client() -> TodoistAPI:
-    """Get or create TodoistAPI client singleton"""
-    global _api_client
-    if _api_client is None:
-        api_token = os.environ.get("TODOIST_API_TOKEN")
-        if not api_token:
-            raise ValueError("TODOIST_API_TOKEN not found in environment")
-        _api_client = TodoistAPI(api_token)
-    return _api_client
-
 
 mcp = FastMCP("earthly_frames_todoist")
 
@@ -49,25 +31,33 @@ def get_earthly_frames_project_sections(
         List of section dictionaries with id, name, project_id, order
     """
     try:
-        api = get_api_client()
-        sections: List[Section] = list(api.get_sections(project_id=project_id))
-        result: List[Dict[str, Any]] = []
-        for section in sections:
-            result.append(
-                {
-                    "id": section.id,
-                    "name": resolve_name(section),
-                    "project_id": section.project_id,
-                    "order": section.order,
-                }
-            )
-        return result
-    except HTTPError as e:
-        if hasattr(e, "response") and e.response.status_code == 403:
+        # Use direct REST API to avoid paginator hanging issue
+        token = os.environ.get("TODOIST_API_TOKEN")
+        headers = {"Authorization": f"Bearer {token}"}
+
+        response = requests.get(
+            f"https://api.todoist.com/rest/v2/sections?project_id={project_id}",
+            headers=headers,
+            timeout=TIME_OUT,
+        )
+        response.raise_for_status()
+
+        sections = response.json()
+        return [
+            {
+                "id": s["id"],
+                "name": s["name"],
+                "project_id": s["project_id"],
+                "order": s["order"],
+            }
+            for s in sections
+        ]
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
             logging.error(
                 f"403 Forbidden: Access denied to project {project_id}. Check API token permissions."
             )
-        elif hasattr(e, "response") and e.response.status_code == 401:
+        elif e.response.status_code == 401:
             logging.error(
                 f"401 Unauthorized: Invalid API token for project {project_id}."
             )
@@ -99,75 +89,104 @@ def create_sigil_charging_task(
         Task dictionary with id, content, url, project_id, section_id
         OR error dictionary with {"success": False, "error": "error message"}
     """
-    sections: List[Section] = []
     try:
-        api = get_api_client()
-        sections = list(api.get_sections(project_id=EF_PROJECT_ID))  # type: ignore[arg-type]
-        section: Optional[Section] = None
-        for s in sections:
-            name = resolve_name(s)
-            logging.debug(f"Checking section: {name} == {section_name}?")
-            if name == section_name:
-                section = s
-                logging.info(
-                    f"Found existing section: {section_name} (id={section.id})"
-                )
-                break
-        if not section:
-            logging.info(f"Section '{section_name}' not found, attempting to create...")
-            section = api.add_section(name=section_name, project_id=EF_PROJECT_ID)
-            logging.info(f"Created new section: {section_name} (id={section.id})")
-        task_content = f"🜏 Charge Sigil for '{song_title}'"
-        task_description = f"""
-                            **Sigil Glyph:**
-                            {sigil_description}
-
-                            **Charging Instructions:**
-                            {charging_instructions}
-
-                            **Song:** {song_title}
-
-                            Mark this task complete after the sigil has been charged and released.
-                            """
-        task: Task = api.add_task(
-            content=task_content,
-            description=task_description,
-            project_id=EF_PROJECT_ID,
-            section_id=section.id,
-            priority=3,
-        )
-        return {
-            "success": True,
-            "id": task.id,
-            "content": task.content,
-            "url": task.url,
-            "project_id": task.project_id,
-            "section_id": task.section_id,
-            "created_at": task.created_at,
+        token = os.environ.get("TODOIST_API_TOKEN")
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
         }
 
-    except HTTPError as e:
+        # Get sections using REST API
+        sections_response = requests.get(
+            f"https://api.todoist.com/rest/v2/sections?project_id={EF_PROJECT_ID}",
+            headers=headers,
+            timeout=TIME_OUT,
+        )
+        sections_response.raise_for_status()
+        sections = sections_response.json()
+
+        # Find or create the section
+        section_id = None
+        for s in sections:
+            if s["name"] == section_name:
+                section_id = s["id"]
+                logging.info(
+                    f"Found existing section: {section_name} (id={section_id})"
+                )
+                break
+
+        if not section_id:
+            # Create new section
+            logging.info(f"Section '{section_name}' not found, attempting to create...")
+            create_section_response = requests.post(
+                "https://api.todoist.com/rest/v2/sections",
+                headers=headers,
+                json={"name": section_name, "project_id": EF_PROJECT_ID},
+                timeout=TIME_OUT,
+            )
+            create_section_response.raise_for_status()
+            new_section = create_section_response.json()
+            section_id = new_section["id"]
+            logging.info(f"Created new section: {section_name} (id={section_id})")
+
+        task_content = f"🜏 Charge Sigil for '{song_title}'"
+        task_description = f"""
+**Sigil Glyph:**
+{sigil_description}
+
+**Charging Instructions:**
+{charging_instructions}
+
+**Song:** {song_title}
+
+Mark this task complete after the sigil has been charged and released.
+"""
+
+        # Create task using REST API
+        create_task_response = requests.post(
+            "https://api.todoist.com/rest/v2/tasks",
+            headers=headers,
+            json={
+                "content": task_content,
+                "description": task_description,
+                "project_id": EF_PROJECT_ID,
+                "section_id": section_id,
+                "priority": 3,
+            },
+            timeout=TIME_OUT,
+        )
+        create_task_response.raise_for_status()
+        task = create_task_response.json()
+
+        return {
+            "success": True,
+            "id": task["id"],
+            "content": task["content"],
+            "url": task["url"],
+            "project_id": task["project_id"],
+            "section_id": task.get("section_id"),
+            "created_at": task["created_at"],
+        }
+
+    except requests.exceptions.HTTPError as e:
         error_msg = str(e)
-        if hasattr(e, "response") and e.response.status_code == 403:
+        if e.response.status_code == 403:
             error_msg = f"403 Forbidden: Cannot create task in project {EF_PROJECT_ID}. Check API token permissions for project access and task creation."
             logging.error(error_msg)
-            logging.debug("Failed creating sigil charging task; sections=%r", sections)
-        elif hasattr(e, "response") and e.response.status_code == 401:
+        elif e.response.status_code == 401:
             error_msg = "401 Unauthorized: Invalid API token."
             logging.error(error_msg)
-            logging.debug("Failed creating sigil charging task; sections=%r", sections)
         else:
             error_msg = f"HTTP error creating sigil charging task: {e}"
             logging.error(error_msg)
-            logging.debug("Failed creating sigil charging task; sections=%r", sections)
         return {
             "success": False,
             "error": error_msg,
-            "status_code": e.response.status_code if hasattr(e, "response") else None,
+            "status_code": e.response.status_code,
         }
     except Exception as e:
         error_msg = f"Unexpected error creating sigil charging task: {e}"
-        logging.exception("Failed creating sigil charging task; sections=%r", sections)
+        logging.exception("Failed creating sigil charging task")
         return {"success": False, "error": error_msg}
 
 
@@ -184,44 +203,63 @@ def list_pending_black_agent_tasks(
     Returns:
         List of incomplete task dictionaries
     """
-    sections: List[Section] = []
     try:
-        api = get_api_client()
-        sections = list(api.get_sections(project_id=EF_PROJECT_ID))  # type: ignore[arg-type]
-        section: Optional[Section] = None
+        # Use direct REST API to avoid paginator issues
+        token = os.environ.get("TODOIST_API_TOKEN")
+        headers = {"Authorization": f"Bearer {token}"}
+
+        # Get sections
+        sections_response = requests.get(
+            f"https://api.todoist.com/rest/v2/sections?project_id={EF_PROJECT_ID}",
+            headers=headers,
+            timeout=TIME_OUT,
+        )
+        sections_response.raise_for_status()
+        sections = sections_response.json()
+
+        # Find the matching section
+        section_id = None
         for s in sections:
-            if resolve_name(s) == section_name:
-                section = s
+            if s["name"] == section_name:
+                section_id = s["id"]
                 break
 
-        if not section:
+        if not section_id:
             return []
-        tasks: List[Task] = list(api.get_tasks(project_id=EF_PROJECT_ID, section_id=section.id))  # type: ignore[arg-type]
+
+        # Get tasks for this section
+        tasks_response = requests.get(
+            f"https://api.todoist.com/rest/v2/tasks?project_id={EF_PROJECT_ID}&section_id={section_id}",
+            headers=headers,
+            timeout=TIME_OUT,
+        )
+        tasks_response.raise_for_status()
+        tasks = tasks_response.json()
+
         return [
             {
-                "id": task.id,
-                "content": task.content,
-                "is_completed": task.is_completed,
-                "url": task.url,
-                "created_at": task.created_at,
+                "id": task["id"],
+                "content": task["content"],
+                "is_completed": task.get("is_completed", False),
+                "url": task["url"],
+                "created_at": task["created_at"],
             }
             for task in tasks
-            if not task.is_completed
+            if not task.get("is_completed", False)
         ]
 
-    except HTTPError as e:
-        if hasattr(e, "response") and e.response.status_code == 403:
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
             logging.error(
                 f"403 Forbidden: Cannot access tasks in project {EF_PROJECT_ID}. Check API token permissions."
             )
-        elif hasattr(e, "response") and e.response.status_code == 401:
+        elif e.response.status_code == 401:
             logging.error("401 Unauthorized: Invalid API token.")
         else:
             logging.error(f"HTTP error listing tasks: {e}")
-        logging.exception("Error listing tasks; sections=%r", sections)
         return []
-    except ValueError as e:
-        logging.exception(f"Error listing tasks;{e}; sections=%r", sections)
+    except Exception as e:
+        logging.error(f"Error listing tasks: {e}")
         return []
 
 
@@ -247,28 +285,46 @@ def create_todoist_task_for_human_earthly_frame(
         Task dictionary with id, content, url
     """
     try:
-        api = get_api_client()
-        task: Task = api.add_task(
-            content=content,
-            description=description,
-            project_id=project_id,
-            section_id=section_id,
-            priority=priority,
-        )
-        return {
-            "id": task.id,
-            "content": task.content,
-            "url": task.url,
-            "project_id": task.project_id,
-            "section_id": task.section_id,
-            "created_at": task.created_at,
+        token = os.environ.get("TODOIST_API_TOKEN")
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
         }
-    except HTTPError as e:
-        if hasattr(e, "response") and e.response.status_code == 403:
+
+        task_data = {
+            "content": content,
+            "project_id": project_id,
+            "priority": priority,
+        }
+
+        if section_id:
+            task_data["section_id"] = section_id
+        if description:
+            task_data["description"] = description
+
+        response = requests.post(
+            "https://api.todoist.com/rest/v2/tasks",
+            headers=headers,
+            json=task_data,
+            timeout=TIME_OUT,
+        )
+        response.raise_for_status()
+        task = response.json()
+
+        return {
+            "id": task["id"],
+            "content": task["content"],
+            "url": task["url"],
+            "project_id": task["project_id"],
+            "section_id": task.get("section_id"),
+            "created_at": task["created_at"],
+        }
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
             logging.error(
                 f"403 Forbidden: Cannot create task in project {project_id}. Check API token permissions for project access and task creation."
             )
-        elif hasattr(e, "response") and e.response.status_code == 401:
+        elif e.response.status_code == 401:
             logging.error("401 Unauthorized: Invalid API token.")
         else:
             logging.error(f"HTTP error creating task: {e}")
@@ -279,5 +335,148 @@ def create_todoist_task_for_human_earthly_frame(
         raise
 
 
+def diagnose_todoist():
+    token = os.getenv("TODOIST_API_TOKEN")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Test basic connection
+    try:
+        response = requests.get(
+            "https://api.todoist.com/rest/v2/projects", headers=headers, timeout=10
+        )
+        print(f"Status Code: {response.status_code}")
+        print(f"Response: {response.json() if response.ok else response.text}")
+        return response.ok
+    except requests.exceptions.Timeout:
+        print("ERROR: Request timed out")
+        return False
+    except Exception as e:
+        print(f"ERROR: {type(e).__name__}: {e}")
+        return False
+
+
+# Compatibility shim: provide get_api_client() returning a small client
+# that exposes the minimal methods older code expects (get_task, get_sections,
+# get_tasks, add_task, add_section). Internally it uses the REST API already
+# used throughout this module.
+
+_api_client: Optional["TodoistCompat"] = None
+
+# Expose a TodoistAPI symbol for tests/legacy code to patch. If the real
+# SDK is available it can be assigned here; tests will patch it during unit tests.
+TodoistAPI: Optional[Any] = None
+
+
+class _AttrObj:
+    """Simple object to expose dict keys as attributes."""
+
+    def __init__(self, data: Dict[str, Any]):
+        for k, v in data.items():
+            setattr(self, k, v)
+
+    def __repr__(self) -> str:  # pragma: no cover - small helper
+        return f"_AttrObj({getattr(self, 'id', None)})"
+
+
+class TodoistCompat:
+    """Minimal compatibility wrapper around Todoist REST API.
+
+    Methods return simple objects with attributes (like the old Pydantic models)
+    so existing code that does `task.id` or `task.is_completed` continues to work.
+    """
+
+    def __init__(self, token: str):
+        self.token = token
+        self.headers = {"Authorization": f"Bearer {token}", "User-Agent": USER_AGENT}
+
+    def get_task(self, task_id: str) -> _AttrObj:
+        r = requests.get(
+            f"https://api.todoist.com/rest/v2/tasks/{task_id}",
+            headers=self.headers,
+            timeout=TIME_OUT,
+        )
+        r.raise_for_status()
+        return _AttrObj(r.json())
+
+    def get_sections(self, project_id: str):
+        r = requests.get(
+            f"https://api.todoist.com/rest/v2/sections?project_id={project_id}",
+            headers=self.headers,
+            timeout=TIME_OUT,
+        )
+        r.raise_for_status()
+        return [_AttrObj(s) for s in r.json()]
+
+    def get_tasks(
+        self, project_id: Optional[str] = None, section_id: Optional[str] = None
+    ):
+        url = "https://api.todoist.com/rest/v2/tasks"
+        params = []
+        if project_id:
+            params.append(f"project_id={project_id}")
+        if section_id:
+            params.append(f"section_id={section_id}")
+        if params:
+            url = url + "?" + "&".join(params)
+        r = requests.get(url, headers=self.headers, timeout=TIME_OUT)
+        r.raise_for_status()
+        return [_AttrObj(t) for t in r.json()]
+
+    def add_task(
+        self,
+        content: str,
+        description: Optional[str] = None,
+        project_id: Optional[str] = None,
+        section_id: Optional[str] = None,
+        priority: int = 1,
+    ) -> _AttrObj:
+        payload: Dict[str, Any] = {"content": content, "priority": priority}
+        if project_id:
+            payload["project_id"] = project_id
+        if section_id:
+            payload["section_id"] = section_id
+        if description:
+            payload["description"] = description
+        r = requests.post(
+            "https://api.todoist.com/rest/v2/tasks",
+            headers={**self.headers, "Content-Type": "application/json"},
+            json=payload,
+            timeout=TIME_OUT,
+        )
+        r.raise_for_status()
+        return _AttrObj(r.json())
+
+    def add_section(self, name: str, project_id: str) -> _AttrObj:
+        payload = {"name": name, "project_id": project_id}
+        r = requests.post(
+            "https://api.todoist.com/rest/v2/sections",
+            headers={**self.headers, "Content-Type": "application/json"},
+            json=payload,
+            timeout=TIME_OUT,
+        )
+        r.raise_for_status()
+        return _AttrObj(r.json())
+
+
+def get_api_client() -> "TodoistCompat":
+    """Return a singleton compatibility client for older code that imports get_api_client().
+
+    If a `TodoistAPI` symbol is provided at module level (tests may patch this),
+    it will be used to construct the client and its return value will be stored
+    in the singleton. Otherwise we use the internal `TodoistCompat` wrapper.
+    """
+    global _api_client
+    if _api_client is None:
+        token = os.environ.get("TODOIST_API_TOKEN")
+        if not token:
+            raise ValueError("TODOIST_API_TOKEN not found in environment")
+        # If a real TodoistAPI class is present (or patched in tests), use it.
+        if TodoistAPI is not None:
+            _api_client = TodoistAPI(token)
+        else:
+            _api_client = TodoistCompat(token)
+    return _api_client
+
+
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="stdio")

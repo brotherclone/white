@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -6,6 +7,14 @@ from app.agents.states.white_agent_state import MainAgentState
 from app.agents.white_agent import WhiteAgent
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
+
+
+@pytest.fixture
+def white_agent(monkeypatch):
+    # Prevent any heavy external calls by patching LLM helpers at class-level if needed.
+    # Return a fresh WhiteAgent instance for each test.
+    wa = WhiteAgent()
+    return wa
 
 
 def test_white_agent_initialization():
@@ -49,6 +58,16 @@ def test_invoke_red_agent():
     mock_red_agent.assert_called_once_with(mock_state)
 
 
+def test_invoke_orange_agent():
+    mock_state = MagicMock(spec=MainAgentState)
+    mock_orange_agent = MagicMock(return_value=mock_state)
+    agent = WhiteAgent()
+    agent.agents["orange"] = mock_orange_agent  # Inject mock
+    result = agent.invoke_orange_agent(mock_state)
+    assert result == mock_state
+    mock_orange_agent.assert_called_once_with(mock_state)
+
+
 def test_resume_after_black_agent_ritual(monkeypatch):
     """Test resuming workflow after black agent ritual completion"""
 
@@ -90,3 +109,127 @@ def test_resume_after_black_agent_ritual(monkeypatch):
             updated_state.song_proposals.iterations[-1].title
             == "Black Counter Proposal"
         )
+
+
+def test_process_black_agent_work_sets_analysis_and_ready_for_red(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "black-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_black_rebracketing_analysis",
+        lambda self, proposal, evp_artifacts, sigil_artifacts: "BLACK_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_red",
+        lambda self, rebracketed_analysis, black_proposal, artifacts: "BLACK_SYNTH",
+    )
+    state = SimpleNamespace(
+        thread_id="mock_thread_001",
+        song_proposals=SongProposal(
+            iterations=[
+                SongProposalIteration(
+                    iteration_id="test_black_prop_v1",
+                    bpm=120,
+                    tempo="4/4",
+                    key="C Major",
+                    rainbow_color="black",
+                    title="Test Black Proposal",
+                    mood=["dark"],
+                    genres=["rock"],
+                    concept="This is a test concept that explores the archetypal journey through darkness and rebirth, examining how the shadow self must be confronted and integrated before transcendence can occur in the alchemical process.",
+                )
+            ]
+        ),
+        artifacts=[
+            SimpleNamespace(chain_artifact_type="evp", thread_id="mock_thread_001"),
+            SimpleNamespace(chain_artifact_type="sigil", thread_id="mock_thread_001"),
+        ],
+        workflow_paused=False,
+        pending_human_action=None,
+        ready_for_red=False,
+    )
+    result = white_agent.process_black_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "BLACK_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "BLACK_SYNTH"
+    assert result.ready_for_red is True
+
+
+def test_process_red_agent_work_sets_analysis_and_ready_for_orange(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "red-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_red_rebracketing_analysis",
+        lambda self, proposal, book_artifacts: "RED_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_orange",
+        lambda self, rebracketed_analysis, red_proposal, artifacts: "RED_SYNTH",
+    )
+
+    state = SimpleNamespace(
+        song_proposals={"iterations": [{"iteration_id": "red-prop"}]},
+        artifacts=[SimpleNamespace(chain_artifact_type="book")],
+        ready_for_orange=False,
+        ready_for_red=True,
+        thread_id="mock_thread_001",
+    )
+    result = white_agent.process_red_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "RED_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "RED_SYNTH"
+    assert result.ready_for_orange is True
+    assert result.ready_for_red is False
+
+
+def test_process_orange_agent_work_sets_analysis_and_ready_for_yellow(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "orange-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_orange_rebracketing_analysis",
+        lambda self, proposal, newspaper_artifacts: "ORANGE_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_yellow",
+        lambda self, rebracketed_analysis, orange_proposal, artifacts: "ORANGE_SYNTH",
+    )
+
+    state = SimpleNamespace(
+        song_proposals={"iterations": [{"iteration_id": "orange-prop"}]},
+        artifacts=[SimpleNamespace(chain_artifact_type="newspaper_article")],
+        ready_for_orange=True,
+        ready_for_yellow=False,
+        thread_id="mock_thread_001",
+    )
+    result = white_agent.process_orange_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "ORANGE_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "ORANGE_SYNTH"
+    assert result.ready_for_yellow is True
+    assert result.ready_for_orange is False

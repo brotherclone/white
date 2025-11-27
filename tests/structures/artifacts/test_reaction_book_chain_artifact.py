@@ -1,19 +1,15 @@
-import pytest
-from pydantic import ValidationError
-
-from app.structures.artifacts.book_data import BookData
-from app.structures.artifacts.reaction_book_chain_artifact import (
+from app.structures.artifacts.reaction_book_artifact import (
     ReactionBookChainArtifact,
 )
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
 from app.structures.enums.book_condition import BookCondition
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.publisher_type import PublisherType
 
 
-def minimal_book_data():
-    """Helper to create minimal BookData"""
-    return BookData(
+def test_reaction_book_chain_artifact():
+    """Test basic ReactionBookChainArtifact creation"""
+    book = ReactionBookChainArtifact(
+        thread_id="m_1",
         title="Test Book",
         author="Test Author",
         year=2020,
@@ -23,58 +19,15 @@ def minimal_book_data():
         catalog_number="RA-0001",
         condition=list(BookCondition)[0],
         danger_level=1,
-    )
-
-
-def test_reaction_book_chain_artifact():
-    """Test basic ReactionBookChainArtifact creation"""
-    book_data = minimal_book_data()
-
-    artifact = ReactionBookChainArtifact(
-        thread_id="test-thread-book",
-        book_data=book_data,
         original_book_title="Original Title",
         original_book_author="Original Author",
+        excerpts=["Page 1 content", "Page 2 content"],
     )
-    assert artifact.thread_id == "test-thread-book"
-    assert artifact.chain_artifact_type == "book"
-    assert artifact.book_data.title == "Test Book"
-    assert artifact.original_book_title == "Original Title"
-    assert artifact.original_book_author == "Original Author"
+    assert book.thread_id == "m_1"
+    assert book.chain_artifact_type == ChainArtifactType.BOOK
+    assert book.title == "Test Book"
+    assert book.original_book_title == "Original Title"
 
-
-def test_reaction_book_chain_artifact_with_pages():
-    """Test ReactionBookChainArtifact with page content"""
-    book_data = minimal_book_data()
-
-    page1 = TextChainArtifactFile(
-        base_path="/tmp",
-        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-        text_content="Page 1 content",
-    )
-    page2 = TextChainArtifactFile(
-        base_path="/tmp",
-        chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-        text_content="Page 2 content",
-    )
-
-    artifact = ReactionBookChainArtifact(
-        thread_id="test-thread",
-        book_data=book_data,
-        original_book_title="Original",
-        original_book_author="Author",
-        pages=[page1, page2],
-    )
-    assert len(artifact.pages) == 2
-    assert artifact.pages[0].text_content == "Page 1 content"
-    assert artifact.pages[1].text_content == "Page 2 content"
-
-
-def test_reaction_book_chain_artifact_requires_book_data():
-    """Test that BookData is required"""
-    with pytest.raises(ValidationError):
-        ReactionBookChainArtifact(
-            thread_id="test-thread",
-            original_book_title="Title",
-            original_book_author="Author",
-        )
+    assert len(book.excerpts) == 2
+    assert book.excerpts[0] == "Page 1 content"
+    assert book.excerpts[1] == "Page 2 content"

@@ -1,4 +1,5 @@
 iteration_id: 'mock_001'
+thread_id: 'mock_thread_001'
 bpm: 121
 tempo: 4/4
 key: G major

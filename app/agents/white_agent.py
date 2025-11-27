@@ -1,11 +1,11 @@
 import logging
 import os
 import time
-import uuid
+import yaml
+
+from pathlib import Path
 from typing import Any, Dict
 from uuid import uuid4
-
-import yaml
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
@@ -21,17 +21,15 @@ from app.agents.indigo_agent import IndigoAgent
 from app.agents.orange_agent import OrangeAgent
 from app.agents.red_agent import RedAgent
 from app.agents.states.white_agent_state import MainAgentState
-from app.agents.tools.text_tools import save_artifact_file_to_md
+from app.agents.tools.text_tools import save_markdown
 from app.agents.violet_agent import VioletAgent
 from app.agents.workflow.resume_black_workflow import (
     resume_black_agent_workflow_with_agent,
 )
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
-from app.structures.artifacts.text_chain_artifact_file import TextChainArtifactFile
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 logging.basicConfig(level=logging.INFO)
@@ -52,8 +50,6 @@ class WhiteAgent(BaseModel):
         if "processors" not in data:
             data["processors"] = {}
         super().__init__(**data)
-        if self.settings is None:
-            self.settings = AgentSettings()
         self.agents = {
             "black": BlackAgent(),
             "red": RedAgent(),
@@ -74,13 +70,10 @@ class WhiteAgent(BaseModel):
 
         Returns:
             The final state after workflow completion (or pause)
-
-        Example:
-            >>> white = WhiteAgent()
-            >>> final_state = white.start_workflow()
-            >>> if final_state.workflow_paused:
-            >>>     resumed_state = white.resume_workflow(final_state)
         """
+        if user_input is not None:
+            logging.info(f"User input provided to White Agent: {user_input}")
+
         workflow = self.build_workflow()
         thread_id = str(uuid4())
 
@@ -91,9 +84,8 @@ class WhiteAgent(BaseModel):
             workflow_paused=False,
             ready_for_red=False,
         )
-
         config = RunnableConfig(configurable={"thread_id": thread_id})
-        logging.info(f"🎵 Starting White Agent workflow (thread_id: {thread_id})")
+        logging.info(f"Starting White Agent workflow (thread_id: {thread_id})")
         result = workflow.invoke(initial_state, config)
         if isinstance(result, dict):
             final_state = MainAgentState(**result)
@@ -104,32 +96,21 @@ class WhiteAgent(BaseModel):
     def resume_workflow(
         self, paused_state: MainAgentState, verify_tasks: bool = True
     ) -> MainAgentState:
-        """
-        Resume a paused workflow after human action is complete.
 
-        Args:
-            paused_state: The state that was returned when workflow paused
-            verify_tasks: If True, verify Todoist tasks are complete before resuming
-
-        Returns:
-            The final state after workflow completion
-
-        Example:
-            >>> # After completing ritual tasks:
-            >>> white = WhiteAgent()
-            >>> resumed_state = white.resume_workflow(paused_state)
-        """
         if not paused_state.workflow_paused:
-            logging.warning("⚠️  Workflow is not paused - nothing to resume")
+            logging.warning("⚠️ Workflow is not paused - nothing to resume")
             return paused_state
-        logging.info(f"🔄 Resuming workflow (thread_id: {paused_state.thread_id})")
+        logging.info(f"Resuming workflow (thread_id: {paused_state.thread_id})")
         updated_state = self.resume_after_black_agent_ritual(
             paused_state, verify_tasks=verify_tasks
         )
         if updated_state.ready_for_red:
-            logging.info("▶️  Continuing to Red Agent...")
+            logging.info("Continuing to Red Agent...")
             updated_state = self.invoke_red_agent(updated_state)
             updated_state = self.process_red_agent_work(updated_state)
+            if updated_state.ready_for_orange:
+                updated_state = self.invoke_orange_agent(updated_state)
+                updated_state = self.process_orange_agent_work(updated_state)
         updated_state = self.finalize_song_proposal(updated_state)
         return updated_state
 
@@ -141,7 +122,8 @@ class WhiteAgent(BaseModel):
         workflow.add_node("process_black_agent_work", self.process_black_agent_work)
         workflow.add_node("invoke_red_agent", self.invoke_red_agent)
         workflow.add_node("process_red_agent_work", self.process_red_agent_work)
-        # workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
+        workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
+        workflow.add_node("process_orange_agent_work", self.process_orange_agent_work)
         # workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
         # workflow.add_node("invoke_green_agent", self.invoke_green_agent)
         # workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
@@ -158,13 +140,30 @@ class WhiteAgent(BaseModel):
             {
                 "red": "invoke_red_agent",
                 "black": "invoke_black_agent",
+                "finish": "finalize_song_proposal",
             },
         )
         workflow.add_conditional_edges(
             "process_red_agent_work",
-            self.route_after_red,  # orange red
-            {"finish": "finalize_song_proposal"},
+            self.route_after_red,
+            {
+                "red": "invoke_red_agent",
+                "orange": "invoke_orange_agent",
+                "finish": "finalize_song_proposal",
+            },
         )
+        workflow.add_conditional_edges(
+            "process_orange_agent_work",
+            self.route_after_orange,
+            {
+                "orange": "invoke_orange_agent",
+                # "yellow": "invoke_yellow_agent",
+                "finish": "finalize_song_proposal",
+            },
+        )
+        # Last agent, remember to update
+        workflow.add_edge("process_orange_agent_work", "finalize_song_proposal")
+        #
         workflow.add_edge("finalize_song_proposal", END)
         return workflow.compile(checkpointer=check_points)
 
@@ -195,25 +194,36 @@ class WhiteAgent(BaseModel):
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Black Agent to generate counter-proposal"""
+        logging.info("Calling upon the Keeper of the Thread.")
         if "black" not in self.agents:
             self.agents["black"] = BlackAgent(settings=self.settings)
         return self.agents["black"](state)
 
     def invoke_red_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Red Agent with the first synthesized proposal from Black Agent"""
+        logging.info("Calling upon the Light Reader")
         if "red" not in self.agents:
             self.agents["red"] = RedAgent(settings=self.settings)
         return self.agents["red"](state)
 
+    def invoke_orange_agent(self, state: MainAgentState) -> MainAgentState:
+        """Invoke Orange Agent with the synthesized proposal"""
+        logging.info("Calling upon Rows Bud.")
+        if "orange" not in self.agents:
+            self.agents["orange"] = OrangeAgent(settings=self.settings)
+        return self.agents["orange"](state)
+
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         prompt, facet = WhiteFacetSystem.build_white_initial_prompt(
             user_input=None, use_weights=True
         )
         facet_metadata = WhiteFacetSystem.log_facet_selection(facet)
-        print(f"🔍 White Agent using {facet.value.upper()} lens")
-        print(f"   {facet_metadata['description']}")
+        logging.info(f" White Agent using {facet.value.upper()} lens")
+        logging.info(f" {facet_metadata['description']}")
         if mock_mode:
+            state.thread_id = "mock_thread_001"
             try:
                 with open(
                     f"{os.getenv('AGENT_MOCK_DATA_PATH')}/white_initial_proposal_{facet.value}_mock.yml",
@@ -230,7 +240,7 @@ class WhiteAgent(BaseModel):
                     sp.iterations.append(proposal)
                     state.song_proposals = sp
             except Exception as e:
-                print(
+                logging.info(
                     f"Mock initial proposal not found, returning stub SongProposalIteration:{e!s}"
                 )
             return state
@@ -242,13 +252,19 @@ class WhiteAgent(BaseModel):
                 initial_proposal = SongProposalIteration(**initial_proposal)
                 state.white_facet = facet
                 state.white_facet_metadata = facet_metadata
-            assert isinstance(
-                initial_proposal, SongProposalIteration
-            ), f"Expected SongProposalIteration, got {type(initial_proposal)}"
+            if not isinstance(initial_proposal, SongProposalIteration):
+                error_msg = (
+                    f"Expected SongProposalIteration, got {type(initial_proposal)}"
+                )
+                if block_mode:
+                    raise TypeError(error_msg)
+                logging.warning(error_msg)
         except Exception as e:
-            print(
+            logging.info(
                 f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration."
             )
+            if block_mode:
+                raise Exception("Anthropic model call failed")
             timestamp = int(time.time() * 1000)
             initial_proposal = SongProposalIteration(
                 iteration_id=f"fallback_error_{timestamp}",
@@ -269,49 +285,146 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-        if state.workflow_paused and state.pending_human_action:
-            logging.info(
-                "⏸️  Workflow paused - waiting for human to complete ritual tasks"
-            )
+        logging.info("Processing Black Agent work... ")
+        if state.workflow_paused:
+            logging.info("Skipping Black Agent work processing - workflow is paused")
             return state
-        sp = self._normalize_song_proposal(state.song_proposals)
-        black_proposal = sp.iterations[-1]
+        if not state.song_proposals or not state.song_proposals.iterations:
+            logging.warning("No song proposals to process from Black Agent")
+            return state
+        black_proposal = state.song_proposals.iterations[-1]
         black_artifacts = state.artifacts or []
-        evp_artifacts = [a for a in black_artifacts if a.chain_artifact_type == "evp"]
+        evp_artifacts = [
+            a
+            for a in black_artifacts
+            if a.chain_artifact_type == ChainArtifactType.EVP_ARTIFACT
+        ]
         sigil_artifacts = [
-            a for a in black_artifacts if a.chain_artifact_type == "sigil"
+            a
+            for a in black_artifacts
+            if a.chain_artifact_type == ChainArtifactType.SIGIL
         ]
         rebracketing_analysis = self._black_rebracketing_analysis(
-            state, black_proposal, evp_artifacts, sigil_artifacts
+            black_proposal, evp_artifacts, sigil_artifacts
         )
         document_synthesis = self._synthesize_document_for_red(
-            state, rebracketing_analysis, black_proposal, black_artifacts
+            rebracketing_analysis, black_proposal, black_artifacts
         )
         state.rebracketing_analysis = rebracketing_analysis
+        save_markdown(
+            state.rebracketing_analysis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_black_rebracketing_analysis.md",
+        )
         state.document_synthesis = document_synthesis
+        save_markdown(
+            state.document_synthesis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_black_document_synthesis.md",
+        )
         state.ready_for_red = True
         return state
 
     def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
+        logging.info("Processing Red Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         red_proposal = sp.iterations[-1]
         red_artifacts = state.artifacts or []
-        book_artifacts = [b for b in red_artifacts if b.chain_artifact_type == "book"]
+        book_artifacts = [
+            b for b in red_artifacts if b.chain_artifact_type == ChainArtifactType.BOOK
+        ]
         rebracketing_analysis = self._red_rebracketing_analysis(
-            state, red_proposal, book_artifacts
+            red_proposal, book_artifacts
         )
         document_synthesis = self._synthesize_document_for_orange(
-            state, rebracketing_analysis, red_proposal, red_artifacts
+            rebracketing_analysis, red_proposal, red_artifacts
         )
         state.rebracketing_analysis = rebracketing_analysis
+        save_markdown(
+            state.rebracketing_analysis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_red_rebracketing_analysis.md",
+        )
         state.document_synthesis = document_synthesis
+        save_markdown(
+            state.document_synthesis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_red_document_synthesis.md",
+        )
         state.ready_for_red = False
         state.ready_for_orange = True
         return state
 
-    def _red_rebracketing_analysis(
-        self, state: MainAgentState, proposal, book_artifacts
-    ) -> str:
+    def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
+        logging.info("Processing Orange Agent work... ")
+        sp = self._normalize_song_proposal(state.song_proposals)
+        orange_proposal = sp.iterations[-1]
+        orange_artifacts = state.artifacts or []
+        newspaper_artifacts = [
+            n
+            for n in orange_artifacts
+            if n.chain_artifact_type == ChainArtifactType.NEWSPAPER_ARTICLE
+        ]
+        rebracketing_analysis = self._orange_rebracketing_analysis(
+            orange_proposal, newspaper_artifacts
+        )
+        document_synthesis = self._synthesize_document_for_yellow(
+            rebracketing_analysis, orange_proposal, orange_artifacts
+        )
+        state.rebracketing_analysis = rebracketing_analysis
+        save_markdown(
+            state.rebracketing_analysis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_orange_rebracketing_analysis.md",
+        )
+        state.document_synthesis = document_synthesis
+        save_markdown(
+            state.document_synthesis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_orange_document_synthesis.md",
+        )
+        state.ready_for_orange = False
+        state.ready_for_yellow = True
+        return state
+
+    def _orange_rebracketing_analysis(self, proposal, newspaper_artifacts) -> str:
+        logging.info("Processing Orange Agent rebracketing analysis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_white_rebracket_analysis_mock.yml",
+                "r",
+            ) as f:
+                data = yaml.safe_load(f)
+                return data
+        else:
+            prompt = f"""
+                       You are the White Agent performing a REBRACKETING operation.
+
+                       You have received these artifacts from the Orange Agent:
+
+                       **Counter-proposal:**
+                       
+                       {proposal}
+
+                       **Articles:** 
+                        {newspaper_artifacts[newspaper_artifacts.count-1].page if newspaper_artifacts else "None"}
+
+                       **Your Task: REBRACKETING**
+
+                       Orange's content contains news articles taking place in New Jersey from 1975-1995.
+                       The Orange agent has mythologized these real stories into misremembered legends revolving around an object lost in space and time.
+                       Your job is to find alternative category boundaries that reveal hidden structures.
+
+                       Questions to guide you:
+                       - What patterns emerge when you parse this differently?
+                       - What is the significance of the item that the story seems to revolve around?
+                       - Where can you draw new boundaries to make sense of these layers of myth and fact?
+                       - What's the hidden coherence beneath the stories and objects?
+
+                       Generate a rebracketed analysis that finds structure in Orange's fragmented truth, fictions, and the objects that seem to encapsulate them.
+                       Focus on revealing the underlying ORDER, not explaining away the complexity.
+                       """
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
+
+    def _red_rebracketing_analysis(self, proposal, book_artifacts) -> str:
+        logging.info("Processing Red Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
@@ -348,21 +461,12 @@ class WhiteAgent(BaseModel):
                        """
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            analysis = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="red_to_white_rebracketing_analysis",
-            )
-            save_artifact_file_to_md(analysis)
             return response.content
 
     def _black_rebracketing_analysis(
-        self, state: MainAgentState, proposal, evp_artifacts, sigil_artifacts
+        self, proposal, evp_artifacts, sigil_artifacts
     ) -> str:
+        logging.info("Processing Black Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
@@ -402,21 +506,12 @@ class WhiteAgent(BaseModel):
                 """
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            analysis = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="black_to_white_rebracketing_analysis",
-            )
-            save_artifact_file_to_md(analysis)
             return response.content
 
     def _synthesize_document_for_red(
-        self, state: MainAgentState, rebracketed_analysis, black_proposal, artifacts
+        self, rebracketed_analysis, black_proposal, artifacts
     ):
+        logging.info("Processing Red Agent synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
@@ -454,21 +549,12 @@ class WhiteAgent(BaseModel):
 
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            synthesized = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="black_to_white_artifact_synthesis",
-            )
-            save_artifact_file_to_md(synthesized)
             return response.content
 
     def _synthesize_document_for_orange(
-        self, state: MainAgentState, rebracketed_analysis, red_proposal, artifacts
+        self, rebracketed_analysis, red_proposal, artifacts
     ):
+        logging.info("Processing Orange Agent synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             with open(
@@ -479,7 +565,7 @@ class WhiteAgent(BaseModel):
                 return data
         else:
             prompt = f"""
-                       You are the White Agent creating a SYNTHESIZED DOCUMENT for the Moonraker, Orange Agent.
+                       You are the White Agent creating a SYNTHESIZED DOCUMENT for the Rows Bud, Orange Agent.
 
                        **Your Rebracketed Analysis:**
                        {rebracketed_analysis}
@@ -506,41 +592,97 @@ class WhiteAgent(BaseModel):
 
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            synthesized = TextChainArtifactFile(
-                text_content=response.content,
-                artifact_id=uuid.uuid4(),
-                thread_id=state.thread_id,
-                rainbow_color=the_rainbow_table_colors["A"],
-                base_path=self._artifact_base_path(),
-                chain_artifact_file_type=ChainArtifactFileType.MARKDOWN,
-                artifact_name="red_to_white_artifact_synthesis",
-            )
-            save_artifact_file_to_md(synthesized)
+            return response.content
+
+    def _synthesize_document_for_yellow(
+        self, rebracketed_analysis, orange_proposal, artifacts
+    ):
+        logging.info("Processing Yellow Agent synthesis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_white_document_synthesis_mock.yml",
+                "r",
+            ) as f:
+                data = yaml.safe_load(f)
+                return data
+        else:
+            prompt = f"""
+                       You are the White Agent creating a SYNTHESIZED DOCUMENT for the Lord Pulsimore, Yellow Agent.
+
+                       **Your Rebracketed Analysis:**
+                       {rebracketed_analysis}
+
+                       **Original Orange Counter-Proposal:**
+                       {orange_proposal}
+
+                       **Artifacts Present:**
+                       {len(artifacts)} artifacts (Newspaper Articles, Clippings, etc.)
+
+                       **Your Task: SYNTHESIS**
+
+                       Create a coherent, actionable document that:
+                       1. Preserves the insights from Orange's corpus of mythologized articles
+                       2. Applies your rebracketed understanding
+                       3. Creates clear creative direction
+                       4. Can be understood by the Yellow Agent (action-oriented, concrete)
+
+                       This document will be the foundation for Yellow Agent's song proposals.
+                       Make it practical while retaining the depth of insight.
+
+                       Structure your synthesis as a clear creative brief.
+                       """
+
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
             return response.content
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
-        # This is incomplete fix to redo black
-        if state.workflow_paused and state.pending_human_action:
-            return "finish"  # Is this right???
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if state.workflow_paused and state.pending_human_action:
+            return "finish"
         if mock_mode:
             return "red"
-        if state.ready_for_red:
+        workflow_paused = getattr(
+            state,
+            "workflow_paused",
+            state.get("workflow_paused", False) if isinstance(state, dict) else False,
+        )
+        ready_for_red = getattr(
+            state,
+            "ready_for_red",
+            state.get("ready_for_red", False) if isinstance(state, dict) else False,
+        )
+
+        if workflow_paused:
+            logging.info("White Agent routing to finish because Black Agent is paused")
+            return "finish"
+        if ready_for_red:
             return "red"
-        return "finish"
+        else:
+            return "black"
 
     @staticmethod
     def route_after_red(state: MainAgentState) -> str:
-        # ToDo: Goto Orange Agent or back to red
-        return "finish"
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "orange"
+        if state.ready_for_orange:
+            return "orange"
+        else:
+            return "red"
 
     @staticmethod
-    def finalize_song_proposal(state: MainAgentState) -> MainAgentState:
+    def route_after_orange(state: MainAgentState) -> str:
+        return "finish"
+
+    def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
+        logging.info("Finalizing song proposals... ")
         if state.workflow_paused and state.pending_human_action:
             pending = state.pending_human_action
             logging.info("\n" + "=" * 60)
-            logging.info("⏸️  WORKFLOW PAUSED - HUMAN ACTION REQUIRED")
+            logging.info("WORKFLOW PAUSED - HUMAN ACTION REQUIRED")
             logging.info("=" * 60)
             logging.info(f"Agent: {pending.get('agent', 'unknown')}")
             logging.info(f"Reason: {state.pause_reason}")
@@ -559,8 +701,13 @@ class WhiteAgent(BaseModel):
             logging.info("  state = WhiteAgent.resume_after_black_agent_ritual(state)")
             logging.info("=" * 60)
             return state
-        state.song_proposals.save_all_proposals()
-        logging.info("✓ Song proposals saved")
+        else:
+            try:
+                self.save_all_proposals(state)
+                logging.info("✓ Song proposals saved")
+            except Exception as e:
+                logging.error(f"Finalization failed: {e}", exc_info=True)
+                raise
         return state
 
     def resume_after_black_agent_ritual(
@@ -576,9 +723,6 @@ class WhiteAgent(BaseModel):
         Returns:
             Updated MainAgentState after Black Agent workflow completion
         """
-        # Use the module-level resume_black_agent_workflow (imported at top of file)
-        # This allows tests to patch `resume_black_agent_workflow` in this module.
-
         if not paused_state.workflow_paused:
             logging.warning("Workflow is not paused - nothing to resume")
             return paused_state
@@ -603,57 +747,103 @@ class WhiteAgent(BaseModel):
             logging.error("Black agent not found in white_agent instance")
             return paused_state
 
-        logging.info("🔄 Resuming Black Agent workflow...")
+        logging.info("Resuming Black Agent workflow...")
 
         try:
-            # Resume the Black Agent workflow using the existing black_agent instance
-            # This ensures the checkpointer has the saved state
             final_black_state = resume_black_agent_workflow_with_agent(
                 black_agent, black_config, verify_tasks=verify_tasks
             )
-
-            # Update the main state with Black Agent results
             paused_state.workflow_paused = False
             paused_state.pause_reason = None
             paused_state.pending_human_action = None
-
             if final_black_state.get("counter_proposal"):
                 paused_state.song_proposals.iterations.append(
                     final_black_state["counter_proposal"]
                 )
-
             if final_black_state.get("artifacts"):
                 paused_state.artifacts = final_black_state["artifacts"]
-
-            logging.info("✓ Black Agent workflow resumed and completed")
-
-            # Now continue with the rest of the White Agent workflow
-            # Process the Black Agent's work
+            logging.info("Black Agent workflow resumed and completed")
             artifacts = getattr(paused_state, "artifacts", []) or []
             evp_artifacts = [
-                a for a in artifacts if getattr(a, "chain_artifact_type", None) == "evp"
+                a
+                for a in artifacts
+                if getattr(a, "chain_artifact_type", None)
+                == ChainArtifactType.EVP_ARTIFACT
             ]
             sigil_artifacts = [
                 a
                 for a in artifacts
-                if getattr(a, "chain_artifact_type", None) == "sigil"
+                if getattr(a, "chain_artifact_type", None) == ChainArtifactType.SIGIL
             ]
             black_proposal = paused_state.song_proposals.iterations[-1]
             paused_state.rebracketing_analysis = self._black_rebracketing_analysis(
-                paused_state, black_proposal, evp_artifacts, sigil_artifacts
+                black_proposal, evp_artifacts, sigil_artifacts
             )
             paused_state.document_synthesis = self._synthesize_document_for_red(
-                paused_state,
                 paused_state.rebracketing_analysis,
                 black_proposal,
                 artifacts,
             )
             paused_state.ready_for_red = True
-            logging.info("✓ Processed Black Agent work - ready for Red Agent")
+            logging.info("Processed Black Agent work - ready for Red Agent")
             return paused_state
         except Exception as e:
             logging.error(f"Failed to resume Black Agent workflow: {e}")
             raise
+
+    def save_all_proposals(self, state: MainAgentState):
+        """Save all song proposals in both YAML and Markdown formats"""
+        logging.info("Saving song proposals... ")
+        if not state.song_proposals or not state.song_proposals.iterations:
+            logging.warning("No song proposals to save")
+            return
+        thread_id = state.thread_id
+        base_path = self._artifact_base_path()
+        yaml_dir = Path(f"{base_path}/{thread_id}/yml")
+        md_dir = Path(f"{base_path}/{thread_id}/md")
+        yaml_dir.mkdir(parents=True, exist_ok=True)
+        md_dir.mkdir(parents=True, exist_ok=True)
+        for i, iteration in enumerate(state.song_proposals.iterations):
+            yaml_path = (
+                yaml_dir
+                / f"song_proposal_{iteration.rainbow_color}_{iteration.iteration_id}.yml"
+            )
+            with open(yaml_path, "w") as f:
+                yaml.safe_dump(
+                    iteration.model_dump(mode="json"),
+                    f,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
+            logging.info(f"Saved proposal {i+1}: {yaml_path}")
+        all_proposals_yaml = yaml_dir / f"all_song_proposals_{thread_id}.yml"
+        with open(all_proposals_yaml, "w") as f:
+            yaml.safe_dump(
+                state.song_proposals.model_dump(mode="json"),
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
+        logging.info(f"Saved all proposals: {all_proposals_yaml}")
+        md_content = "# Song Proposal Summary\n\n"
+        md_content += f"**Thread ID:** {thread_id}\n"
+        md_content += (
+            f"**Total Iterations:** {len(state.song_proposals.iterations)}\n\n"
+        )
+        for i, iteration in enumerate(state.song_proposals.iterations):
+            md_content += f"## Iteration {i+1}: {iteration.title}\n\n"
+            md_content += f"- **ID:** {iteration.iteration_id}\n"
+            md_content += f"- **Color:** {iteration.rainbow_color}\n"
+            md_content += f"- **Key:** {iteration.key}\n"
+            md_content += f"- **BPM:** {iteration.bpm}\n"
+            md_content += f"- **Tempo:** {iteration.tempo}\n"
+            md_content += f"- **Mood:** {', '.join(iteration.mood)}\n"
+            md_content += f"- **Genres:** {', '.join(iteration.genres)}\n\n"
+            md_content += f"**Concept:**\n{iteration.concept}\n\n"
+            md_content += "---\n\n"
+        md_path = md_dir / f"all_song_proposals_{thread_id}.md"
+        save_markdown(md_content, str(md_path))
+        logging.info(f"All proposals saved to {base_path}/{thread_id}/")
 
     @staticmethod
     def _artifact_base_path() -> str:

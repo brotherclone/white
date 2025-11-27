@@ -1,0 +1,94 @@
+bpm: 129.77
+manifest_id: '04_08'
+tempo: 4/4
+key: Bb minor
+rainbow_color: Y
+title: Nursery
+release_date: '2020-12-08'
+album_sequence: 8
+main_audio_file: 04_08_main.wav
+TRT: '[03:58.005]'
+vocals: false
+lyrics: true
+structure:
+  - section_name: Which type of nursery?
+    start_time: '[00:00.000]'
+    end_time: '[01:13.024]'
+    description: A Lord Pulsimore departs the party is left with the old woman, they stand awkwardly for a moment. One of the group asks her which type of nursery this is as their are empty cribs and empty greenhouse beds.
+  - section_name: A frame of mind
+    start_time: '[01:13.025]'
+    end_time: '[01:58.009]'
+    description: The old woman pulls two of the party members by the arms toward the lone lit greenhouse bed in the back. She says that the type of nursery depends on your frame of mind, 'A frame of mind which is a frame of mind'.
+  - section_name: An accusation, Labor
+    start_time: '[01:58.010]'
+    end_time: '[02:13.003]'
+    description: The party is stunned by what they see. A pair of blubbery legs emerge from the soil, they quiver in pain as blood gushes from between their legs. The old woman's grip tightens and she says, 'I know what you stole. She wants to confess.' Birthed from the severed torso a horrid, eggplant-skinned infant emerges. It slops to the ground, gathers itself, then turns its head toward the group. In a tortured voice it says, 'The page. Give it back.'
+  - section_name: The vine infant gives chase
+    start_time: '[02:13.004]'
+    end_time: '[03:58.005]'
+    description: The party backs away and turns to run from the nursery. But the vine infant, cracks its jaws open and begins chasing them.
+mood:
+  - dreamy
+  - mysterious
+  - eerie
+sounds_like:
+  - name: Boards of Canada
+    discogs_id: 307
+  - name: Pink Floyd
+    discogs_id: 45467
+  - name: Medicine (2)
+    discogs_id: 71224
+genres:
+  - electronic
+  - ambient
+  - baroque pop
+  - noise pop
+lrc_file: 04_08.lrc
+concept: The party having seemingly accomplished their goal unnoticed walks with Lord Pulsimore from the study. A blue-skinned butler, standing behind the study's threshold approaches Lord Pulsimore and whispers in his ear. Lord Pulsimore's expression sours, he says, 'Forgive me, but I have a matter to attend. Please, view the nursery - it is wonderful this time of year.' The party is left alone with an old woman who ushers them into a dimly lit nursery filled with empty cribs and greenhouse beds. Confused, the party asks her which type of nursery this is. The woman grabs the party by the arms and answers that the type of nursery it is depends on the frame of mind, 'A frame of mind which is a frame of mind'. She pulls the group toward the lone, lit greenhouse bed in the back. As they approach, a pair of blubbery legs emerge from the soil, quivering in pain as blood gushes from between their legs. The old woman tightens her grip and says, 'I know what you stole. She wants to confess.' From the severed torso a horrid, eggplant-skinned infant emerges. It slops to the ground, gathers itself, then turns its head toward the group. In a tortured voice it says, 'The page. Give it back.' The party, horrified, backs away and turns to run from the nursery. But the vine infant cracks its jaws open and begins chasing them.
+audio_tracks:
+  - id: 2
+    description: Dobbs Kit
+    audio_file: 04_08_02_dobbs.wav
+  - id: 3
+    description: Swirls
+    audio_file: 04_08_04_swirls.wav
+    midi_file: 04_08_03_swirls.mid
+  - id: 4
+    description: Drums
+    audio_file: 04_08_06_drums.wav
+    midi_file: 04_08_05_drums.mid
+  - id: 5
+    description: Clicky Bass
+    audio_file: 04_08_08_click_bass.wav
+    midi_file: 04_08_07_click_bass.mid
+  - id: 6
+    description: SEM
+    audio_file: 04_08_10_sem.wav
+    midi_file: 04_08_09_sem.mid
+  - id: 7
+    description: Jupiter
+    audio_file: 04_08_12_jupiter.wav
+    midi_file: 04_08_11_jupiter.mid
+  - id: 8
+    description: Prophet
+    audio_file: 04_08_14_prophet.wav
+    midi_file: 04_08_13_prophet.mid
+  - id: 9
+    description: Guitar
+    audio_file: 04_08_15_guitar.wav
+  - id: 10
+    description: Drum Machine
+    audio_file: 04_08_17_drum_machine.wav
+    midi_file: 04_08_16_drum_machine.mid
+  - id: 11
+    description: Grandmother
+    audio_file: 04_08_18_grandmother.wav
+  - id: 12
+    description: Sample A
+    audio_file: 04_08_19_sampleA.wav
+  - id: 13
+    description: Sample B
+    audio_file: 04_08_20_sampleB.wav
+  - id: 14
+    description: Sample C
+    audio_file: 04_08_21_sampleC.wav
