@@ -9,6 +9,7 @@ EXPECTED = {
     "PNG": "png",
     "MARKDOWN": "md",
     "JSON": "json",
+    "YML": "yml",
 }
 
 
@@ -35,6 +36,7 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("png", ChainArtifactFileType.PNG),
         ("md", ChainArtifactFileType.MARKDOWN),
         ("json", ChainArtifactFileType.JSON),
+        ("yml", ChainArtifactFileType.YML),
     ],
 )
 def test_lookup_by_value(value, member):

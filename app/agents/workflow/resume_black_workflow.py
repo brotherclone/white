@@ -1,14 +1,28 @@
 import logging
 import os
 import sqlite3
+import requests
 from typing import Any, Dict
 
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from app.agents.black_agent import BlackAgent
 from app.agents.states.black_agent_state import BlackAgentState
-from app.reference.mcp.todoist.main import get_api_client
 from app.structures.enums.sigil_state import SigilState
+
+# Provide a thin compatibility wrapper so callers/tests can patch `get_api_client`
+try:
+    from app.reference.mcp.todoist import main as _todoist_main
+
+    def get_api_client():
+        return _todoist_main.get_api_client()
+
+except Exception:
+    # If import fails at module import time (e.g., during isolated tests),
+    # define a placeholder that will raise if called.
+    def get_api_client():
+        raise RuntimeError("Todoist client not available")
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -25,19 +39,61 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
     """
 
     try:
-        api = get_api_client()
+        # First, try to use a compat client if available (tests monkeypatch this)
+        client = None
+        import sys
+
+        module = sys.modules.get(__name__)
+        getter = getattr(module, "get_api_client", None) if module is not None else None
+        if callable(getter):
+            try:
+                client = getter()
+            except Exception:
+                client = None
 
         for task_info in pending_tasks:
             task_id = task_info.get("task_id")
             if not task_id:
                 continue
 
-            # Check if task is completed
+            if client is not None:
+                # Use the client (returns object with .is_completed)
+                try:
+                    task = client.get_task(task_id)
+                    if not getattr(task, "is_completed", False):
+                        logging.warning(f"Task {task_id} is not yet complete")
+                        return False
+                    continue
+                except Exception as e:
+                    logging.debug(f"Compat client failed for task {task_id}: {e}")
+                    # fall through to REST approach
+
+            # Fallback: use REST API directly
+            token = os.environ.get("TODOIST_API_TOKEN")
+            if not token:
+                logging.error("TODOIST_API_TOKEN not found in environment")
+                return False
+
+            headers = {"Authorization": f"Bearer {token}"}
+
             try:
-                task = api.get_task(task_id)
-                if not task.is_completed:
+                response = requests.get(
+                    f"https://api.todoist.com/rest/v2/tasks/{task_id}",
+                    headers=headers,
+                    timeout=10,
+                )
+                response.raise_for_status()
+                task = response.json()
+
+                if not task.get("is_completed", False):
                     logging.warning(f"Task {task_id} is not yet complete")
                     return False
+            except requests.exceptions.HTTPError as e:
+                if e.response and e.response.status_code == 404:
+                    logging.error(f"Task {task_id} not found")
+                else:
+                    logging.error(f"Error checking task {task_id}: {e}")
+                return False
             except Exception as e:
                 logging.error(f"Error checking task {task_id}: {e}")
                 return False

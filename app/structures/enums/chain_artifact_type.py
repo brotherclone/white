@@ -3,10 +3,11 @@ from enum import Enum
 
 class ChainArtifactType(str, Enum):
 
-    TRANSCRIPT = "transcript"
+    EVP_ARTIFACT = "evp_artifact"
     INSTRUCTIONS_TO_HUMAN = "instructions_to_human"
-    SIGIL_DESCRIPTION = "sigil_description"
-    DOCUMENT = "doc"
-    AUDIO_MOSIAC = "audio_mos"
-    RANDOM_AUDIO_BY_COLOR_SEGMENT = "col_audio_"
-    NOISE_MIXED_AUDIO = "noise_mixed"
+    SIGIL = "sigil_description"
+    BOOK = "book"
+    NEWSPAPER_ARTICLE = "newspaper_article"
+    SYMBOLIC_OBJECT = "symbolic_object"
+    PROPOSAL = "proposal"
+    UNKNOWN = "unknown"

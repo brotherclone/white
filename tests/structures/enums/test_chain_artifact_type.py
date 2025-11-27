@@ -5,13 +5,14 @@ import pytest
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 EXPECTED = {
-    "TRANSCRIPT": "transcript",
+    "EVP_ARTIFACT": "evp_artifact",
     "INSTRUCTIONS_TO_HUMAN": "instructions_to_human",
-    "SIGIL_DESCRIPTION": "sigil_description",
-    "DOCUMENT": "doc",
-    "AUDIO_MOSIAC": "audio_mos",
-    "RANDOM_AUDIO_BY_COLOR_SEGMENT": "col_audio_",
-    "NOISE_MIXED_AUDIO": "noise_mixed",
+    "SIGIL": "sigil_description",
+    "BOOK": "book",
+    "NEWSPAPER_ARTICLE": "newspaper_article",
+    "SYMBOLIC_OBJECT": "symbolic_object",
+    "PROPOSAL": "proposal",
+    "UNKNOWN": "unknown",
 }
 
 
@@ -34,13 +35,14 @@ def test_members_are_str_and_enum_and_compare_to_value():
 @pytest.mark.parametrize(
     "value,member",
     [
-        ("transcript", ChainArtifactType.TRANSCRIPT),
+        ("evp_artifact", ChainArtifactType.EVP_ARTIFACT),
         ("instructions_to_human", ChainArtifactType.INSTRUCTIONS_TO_HUMAN),
-        ("sigil_description", ChainArtifactType.SIGIL_DESCRIPTION),
-        ("doc", ChainArtifactType.DOCUMENT),
-        ("audio_mos", ChainArtifactType.AUDIO_MOSIAC),
-        ("col_audio_", ChainArtifactType.RANDOM_AUDIO_BY_COLOR_SEGMENT),
-        ("noise_mixed", ChainArtifactType.NOISE_MIXED_AUDIO),
+        ("sigil_description", ChainArtifactType.SIGIL),
+        ("book", ChainArtifactType.BOOK),
+        ("newspaper_article", ChainArtifactType.NEWSPAPER_ARTICLE),
+        ("symbolic_object", ChainArtifactType.SYMBOLIC_OBJECT),
+        ("proposal", ChainArtifactType.PROPOSAL),
+        ("unknown", ChainArtifactType.UNKNOWN),
     ],
 )
 def test_lookup_by_value(value, member):
@@ -48,11 +50,8 @@ def test_lookup_by_value(value, member):
 
 
 def test_lookup_by_name():
-    assert ChainArtifactType["DOCUMENT"] is ChainArtifactType.DOCUMENT
-    assert (
-        ChainArtifactType["RANDOM_AUDIO_BY_COLOR_SEGMENT"]
-        is ChainArtifactType.RANDOM_AUDIO_BY_COLOR_SEGMENT
-    )
+    assert ChainArtifactType["PROPOSAL"] is ChainArtifactType.PROPOSAL
+    assert ChainArtifactType["SYMBOLIC_OBJECT"] is ChainArtifactType.SYMBOLIC_OBJECT
 
 
 def test_invalid_value_raises_value_error():
@@ -66,5 +65,5 @@ def test_values_are_unique():
 
 
 def test_enum_members_are_enum_instances():
-    assert isinstance(ChainArtifactType.AUDIO_MOSIAC, enum.Enum)
+    assert isinstance(ChainArtifactType.NEWSPAPER_ARTICLE, enum.Enum)
     assert isinstance(ChainArtifactType.INSTRUCTIONS_TO_HUMAN, enum.Enum)

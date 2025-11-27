@@ -46,7 +46,7 @@ class VioletAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
-        print("💜 VIOLET AGENT: Mirroring Conversation Style...")
+        print("Sol Loppis, like looking in the mirror")
 
         return state
 

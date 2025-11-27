@@ -11,7 +11,7 @@ from app.structures.manifests.manifest_sounds_like import ManifestSoundsLike
 from app.structures.manifests.manifest_track import ManifestTrack
 from app.structures.music.core.duration import Duration
 from app.structures.music.core.key_signature import KeySignature, get_mode
-from app.structures.music.core.notes import get_note
+from app.structures.music.core.notes import get_tempered_note
 from app.structures.music.core.time_signature import TimeSignature
 
 
@@ -38,6 +38,8 @@ class Manifest(BaseModel):
     audio_tracks: list[ManifestTrack]
 
     def __init__(self, **data):
+        if "bpm" in data and isinstance(data["bpm"], float):
+            data["bpm"] = int(round(data["bpm"]))
         if "tempo" in data and isinstance(data["tempo"], str):
             try:
                 tempo = data["tempo"].split("/")
@@ -45,7 +47,8 @@ class Manifest(BaseModel):
                     numerator=int(tempo[0]), denominator=int(tempo[1])
                 )
             except ValueError:
-                print("Unable to parse tempo, defaulting to string")
+                # Unable to parse tempo string, leave as
+                pass
         if "key" in data:
             try:
                 if isinstance(data["key"], str):
@@ -54,13 +57,13 @@ class Manifest(BaseModel):
                         raise ValueError(
                             "Key must be in the format 'Note Mode', e.g., 'C major'"
                         )
-                    note = get_note(key[0])
+                    note = get_tempered_note(key[0])
                     mode = get_mode(key[1])
                     data["key"] = KeySignature(note=note, mode=mode)
                 elif isinstance(data["key"], dict):
                     note_name = data["key"]["note"]["pitch_name"]
                     mode_name = data["key"]["mode"]["name"]
-                    note = get_note(note_name)
+                    note = get_tempered_note(note_name)
                     mode = get_mode(mode_name)
                     data["key"] = KeySignature(note=note, mode=mode)
 
