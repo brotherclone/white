@@ -11,46 +11,54 @@ TRT: '[01:59.011]'
 vocals: false
 lyrics: false
 structure:
-  - section_name: TK
+  - section_name: Any escape
     start_time: '[00:00.000]'
     end_time: '[00:21.001]'
-    description: TK
-  - section_name: TK
+    description: The group spots a plain door and ducks in.
+  - section_name: Tickets Please
     start_time: '[00:21.002]'
     end_time: '[00:28.001]'
-    description: TK
-  - section_name: TK
+    description: We see a counter and a woman with a long sparkling eye lashes. She asks for our tickets.
+  - section_name: Pleading for our lives
     start_time: '[00:28.002]'
     end_time: '[00:42.002]'
-    description: TK
-  - section_name: TK
+    description: The group begs her to give us a way out of the Palace.
+  - section_name: No ticket, no way out
     start_time: '[00:42.003]'
     end_time: '[00:56.002]'
-    description: TK
-  - section_name: TK
+    description: But she only smiles and says "No ticket, no way out."
+  - section_name: The yellow page?
     start_time: '[00:56.003]'
     end_time: '[01:10.003]'
-    description: TK
-  - section_name: TK
+    description: We take the yellow listing page taken from the Study and pass it to her as a poor, desperate substitute for a ticket.
+  - section_name: An understanding
     start_time: '[01:10.004]'
     end_time: '[01:31.004]'
-    description: TK
-  - section_name: TK
+    description: She examines it closely, then nods and says "I got you, honey," producing a green velvet cloak from beneath the counter.
+  - section_name: Is this one yours?
     start_time: '[01:31.005]'
     end_time: '[01:45.005]'
-    description: TK
-  - section_name: TK
+    description: She unfurls the cloak revealing a portal - the night sky can be seen in the distance. A thud is heard at the door, the vine infant is on our heels.
+  - section_name: Through and out
     start_time: '[01:45.006]'
     end_time: '[01:59.011]'
-    description: TK
+    description: The group glances at one and another in agreement and each leaps up on the counter and crawls through the portal in the cloak.
+mood:
+  - enigmatic
+  - dreamy
+  - whimsical
+  - melancholy
 sounds_like:
-  - name: TK
-    discogs_id: 0
+  - name: Sweet Valley
+    discogs_id: 3075580
+  - name: MF Doom
+    discogs_id: 25058
 genres:
   - electronic
   - ambient
   - baroque pop
-concept: TK
+  - funk
+concept: The vine infant and the group spill into back into the party, knocking over trays, guests, and furniture. In the chaos you spot a doorway that sticks out for its plainness and the group quickly ducks in while the room is distracted. A beautiful woman with long sparkling eye lashes stands a counter used for coat check. She looks at each of you expectantly and then asks you for your ticket. The group pleads with her for a way out of the Palace, but she only smiles and says "No ticket, no way out." Desperately you search your pockets and bags for anything that might resemble a ticket. You find a crumpled yellow page from a phone book and hold it up to her. She takes it, examines it closely, and then nods and hands you back your coats. "I got you, honey," she says cryptically and produces a green, velvet cloak from beneath the counter. As she unfurls the cloak you can see the night sky in the distance. A thud is heard at the door, the vine infant is on your heels. Quickly the party glances at one and another in agreement and each leaps up on the counter and crawls through the portal in the cloak.
 audio_tracks:
   - id: 2
     description: 808
@@ -93,8 +101,4 @@ audio_tracks:
     audio_file: 04_09_16_envelop_guitar.wav
   - id: 14
     description: Sampled Vocal
-    midi_file: 04_09_17_sampled.mid
-
-
-
-
+    midi_file: 04_09_17_sample.mid

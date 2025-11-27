@@ -27,6 +27,8 @@ structure:
     start_time: '[02:13.004]'
     end_time: '[03:58.005]'
     description: TK
+mood:
+  - dreamy
 sounds_like:
   - name: TK
     discogs_id: 0

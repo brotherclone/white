@@ -9,7 +9,7 @@ album_sequence: 7
 main_audio_file: 04_07_main.wav
 TRT: '[03:07.010]'
 vocals: false
-lyrics: false
+lyrics: true
 structure:
   - section_name: TK
     start_time: '[00:00.000]'
@@ -35,8 +35,17 @@ structure:
     start_time: '[02:28.018]'
     end_time: '[02:36.013]'
     description: TK
+mood:
+  - spooky
+  - dark
+  - foreboding
+  - dreamy
 sounds_like:
-  - name: TK
+  - name: Basil Kirchhoff
+    discogs_id: 0
+  - name: Helios
+    discogs_id: 0
+  - name: Boards of Canada
     discogs_id: 0
 genres:
   - electronic
