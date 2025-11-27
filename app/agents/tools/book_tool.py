@@ -1,23 +1,49 @@
 import random
-from typing import Optional
-
+from typing import Optional, Any
 
 from pydantic import BaseModel
 
-from app.agents.enums.book_condition import BookCondition
-from app.agents.enums.publisher_type import PublisherType
-from app.agents.enums.book_genre import BookGenre
-from app.agents.models.book_data import BookData
-from app.util.string_utils import truncate_word_safe
-from app.reference.books.book_topics import SCIFI_TOPICS, SEXPLOITATION_TOPICS, OCCULT_TOPICS, CULT_TOPICS, \
-    BILDUNGSROMAN_TOPICS, NOIR_TOPICS, PSYCHEDELIC_TOPICS
-from app.reference.books.book_authors import OCCULT_FIRST_NAMES, OCCULT_LAST_NAMES, SCIFI_FIRST_NAMES, SCIFI_LAST_NAMES, \
-    SEXPLOITATION_FIRST_NAMES, SEXPLOITATION_LAST_NAMES, CULT_FIRST_NAMES, CULT_LAST_NAMES, \
-    BILDUNGSROMAN_FIRST_NAMES, BILDUNGSROMAN_LAST_NAMES, NOIR_FIRST_NAMES, NOIR_LAST_NAMES, \
-    PSYCHEDELIC_FIRST_NAMES, PSYCHEDELIC_LAST_NAMES, CREDENTIALS
-from app.reference.books.book_publishers import OCCULT_PUBLISHERS, SCIFI_PUBLISHERS, SEXPLOITATION_PUBLISHERS, \
-    CULT_PUBLISHERS, BILDUNGSROMAN_PUBLISHERS, NOIR_PUBLISHERS, PSYCHEDELIC_PUBLISHERS
+from app.reference.books.book_authors import (
+    BILDUNGSROMAN_FIRST_NAMES,
+    BILDUNGSROMAN_LAST_NAMES,
+    CREDENTIALS,
+    CULT_FIRST_NAMES,
+    CULT_LAST_NAMES,
+    NOIR_FIRST_NAMES,
+    NOIR_LAST_NAMES,
+    OCCULT_FIRST_NAMES,
+    OCCULT_LAST_NAMES,
+    PSYCHEDELIC_FIRST_NAMES,
+    PSYCHEDELIC_LAST_NAMES,
+    SCIFI_FIRST_NAMES,
+    SCIFI_LAST_NAMES,
+    SEXPLOITATION_FIRST_NAMES,
+    SEXPLOITATION_LAST_NAMES,
+)
 from app.reference.books.book_misc import ACQUISITION_NOTES, SUPPRESSION_STORIES
+from app.reference.books.book_publishers import (
+    BILDUNGSROMAN_PUBLISHERS,
+    CULT_PUBLISHERS,
+    NOIR_PUBLISHERS,
+    OCCULT_PUBLISHERS,
+    PSYCHEDELIC_PUBLISHERS,
+    SCIFI_PUBLISHERS,
+    SEXPLOITATION_PUBLISHERS,
+)
+from app.reference.books.book_topics import (
+    BILDUNGSROMAN_TOPICS,
+    CULT_TOPICS,
+    NOIR_TOPICS,
+    OCCULT_TOPICS,
+    PSYCHEDELIC_TOPICS,
+    SCIFI_TOPICS,
+    SEXPLOITATION_TOPICS,
+)
+from app.structures.artifacts.book_artifact import BookArtifact
+from app.structures.enums.book_condition import BookCondition
+from app.structures.enums.book_genre import BookGenre
+from app.structures.enums.publisher_type import PublisherType
+from app.util.string_utils import truncate_word_safe
 
 GENRE_WEIGHTS = {
     BookGenre.OCCULT: 10,
@@ -28,6 +54,7 @@ GENRE_WEIGHTS = {
     BookGenre.NOIR: 10,
     BookGenre.PSYCHEDELIC: 5,
 }
+
 
 class BookMaker(BaseModel):
 
@@ -61,9 +88,15 @@ class BookMaker(BaseModel):
         mapping = {
             BookGenre.OCCULT: (OCCULT_FIRST_NAMES, OCCULT_LAST_NAMES),
             BookGenre.SCIFI: (SCIFI_FIRST_NAMES, SCIFI_LAST_NAMES),
-            BookGenre.SEXPLOITATION: (SEXPLOITATION_FIRST_NAMES, SEXPLOITATION_LAST_NAMES),
+            BookGenre.SEXPLOITATION: (
+                SEXPLOITATION_FIRST_NAMES,
+                SEXPLOITATION_LAST_NAMES,
+            ),
             BookGenre.CULT: (CULT_FIRST_NAMES, CULT_LAST_NAMES),
-            BookGenre.BILDUNGSROMAN: (BILDUNGSROMAN_FIRST_NAMES, BILDUNGSROMAN_LAST_NAMES),
+            BookGenre.BILDUNGSROMAN: (
+                BILDUNGSROMAN_FIRST_NAMES,
+                BILDUNGSROMAN_LAST_NAMES,
+            ),
             BookGenre.NOIR: (NOIR_FIRST_NAMES, NOIR_LAST_NAMES),
             BookGenre.PSYCHEDELIC: (PSYCHEDELIC_FIRST_NAMES, PSYCHEDELIC_LAST_NAMES),
         }
@@ -86,15 +119,23 @@ class BookMaker(BaseModel):
     @staticmethod
     def generate_title(topic: str, book_genre: BookGenre) -> tuple[str, Optional[str]]:
         """Convert topic into book title with optional subtitle"""
-        if book_genre in [BookGenre.SCIFI, BookGenre.SEXPLOITATION, BookGenre.CULT,
-                          BookGenre.BILDUNGSROMAN, BookGenre.NOIR, BookGenre.PSYCHEDELIC]:
-            if ':' in topic:
-                parts = topic.split(':', 1)
+        if book_genre in [
+            BookGenre.SCIFI,
+            BookGenre.SEXPLOITATION,
+            BookGenre.CULT,
+            BookGenre.BILDUNGSROMAN,
+            BookGenre.NOIR,
+            BookGenre.PSYCHEDELIC,
+        ]:
+            if ":" in topic:
+                parts = topic.split(":", 1)
                 return parts[0].strip(), parts[1].strip()
             return topic, None
         title_templates = [
-            lambda t: (t.split(':')[0] if ':' in t else t,
-                       t.split(':')[1].strip() if ':' in t else None),
+            lambda t: (
+                t.split(":")[0] if ":" in t else t,
+                t.split(":")[1].strip() if ":" in t else None,
+            ),
             lambda t: (f"The {t}", "A Practical Guide"),
             lambda t: (f"{t}", "Theory and Application"),
             lambda t: (f"Toward a New Understanding of {t}", None),
@@ -110,7 +151,7 @@ class BookMaker(BaseModel):
         last = random.choice(last_names)
 
         # Sometimes use initials
-        if random.random() < 0.3 and '.' not in first:
+        if random.random() < 0.3 and "." not in first:
             first = f"{first[0]}."
 
         name = f"{first} {last}"
@@ -215,38 +256,39 @@ class BookMaker(BaseModel):
         if book_genre == BookGenre.SCIFI:
             quotes = [
                 f'"The future is already here—it\'s just not evenly distributed." - {author}, on {topic.lower()}',
-                f'"We were so busy asking if we could, we never stopped to ask if we should."',
-                f'"Reality is that which, when you stop believing in it, doesn\'t go away."',
+                '"We were so busy asking if we could, we never stopped to ask if we should."',
+                '"Reality is that which, when you stop believing in it, doesn\'t go away."',
             ]
         elif book_genre == BookGenre.SEXPLOITATION:
             quotes = [
-                f'"Where does the body end and the machine begin? In the heat of passion, who cares?"',
-                f'"Touch me through the interface. Show me what bandwidth can do."',
-                f'"Every connection leaves its mark. Some connections leave scars."',
+                '"Where does the body end and the machine begin? In the heat of passion, who cares?"',
+                '"Touch me through the interface. Show me what bandwidth can do."',
+                '"Every connection leaves its mark. Some connections leave scars."',
             ]
         elif book_genre == BookGenre.CULT:
             quotes = [
                 f'"Language is a virus from outer space." - {author}',
-                f'"The word is now a virus. The flu virus may once have been a healthy lung cell."',
-                f'"Nothing is true, everything is permitted."',
+                '"The word is now a virus. The flu virus may once have been a healthy lung cell."',
+                '"Nothing is true, everything is permitted."',
             ]
         elif book_genre == BookGenre.NOIR:
             quotes = [
-                f'"It was a dark and stormy network."',
-                f'"She walked in like bad code—beautiful, dangerous, and bound to crash the system."',
-                f'"In this city, everyone\'s guilty of something. I just had to find out what."',
+                '"It was a dark and stormy network."',
+                '"She walked in like bad code—beautiful, dangerous, and bound to crash the system."',
+                '"In this city, everyone\'s guilty of something. I just had to find out what."',
             ]
         else:
             quotes = [
-                f'"Once you see it, you cannot unsee the patterns everywhere."',
-                f'"What we call reality is merely a subset of what is possible."',
+                '"Once you see it, you cannot unsee the patterns everywhere."',
+                '"What we call reality is merely a subset of what is possible."',
             ]
 
         return random.choice(quotes)
 
     @classmethod
-    def generate_random_book(cls, index: Optional[int] = None,
-                             force_genre: Optional[BookGenre] = None) -> BookData:
+    def generate_random_book(
+        cls, index: Optional[int] = None, force_genre: Optional[BookGenre] = None
+    ) -> Any:
         """Generate a complete random book from the collection"""
 
         # Select genre
@@ -269,11 +311,23 @@ class BookMaker(BaseModel):
         catalog_num = cls.generate_catalog_number(year, idx, the_genre)
 
         has_isbn = random.random() < 0.4
-        isbn = f"978-{random.randint(0, 9)}-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}-{random.randint(0, 9)}" if has_isbn else None
+        isbn = (
+            f"978-{random.randint(0, 9)}-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}-{random.randint(0, 9)}"
+            if has_isbn
+            else None
+        )
 
         translated = random.random() < 0.2
-        original_lang = random.choice(["German", "French", "Russian", "Japanese", "Italian"]) if translated else None
-        translator = f"{random.choice(SCIFI_FIRST_NAMES)} {random.choice(SCIFI_LAST_NAMES)}" if translated else None
+        original_lang = (
+            random.choice(["German", "French", "Russian", "Japanese", "Italian"])
+            if translated
+            else None
+        )
+        translator = (
+            f"{random.choice(SCIFI_FIRST_NAMES)} {random.choice(SCIFI_LAST_NAMES)}"
+            if translated
+            else None
+        )
 
         danger_weights = {
             BookGenre.OCCULT: [1, 2, 3, 4, 5],
@@ -296,7 +350,7 @@ class BookMaker(BaseModel):
         acquisition_date = f"{random.choice(['January', 'March', 'June', 'October'])} {acquisition_year}"
         acquisition_note = random.choice(ACQUISITION_NOTES)
 
-        return BookData(
+        return BookArtifact(
             title=title,
             subtitle=subtitle,
             author=author,
@@ -304,7 +358,9 @@ class BookMaker(BaseModel):
             year=year,
             publisher=publisher,
             publisher_type=PublisherType.OCCULT,  # Using existing enum
-            edition=random.choice(["1st", "2nd", "3rd", "Revised", "Expanded", "Mass Market"]),
+            edition=random.choice(
+                ["1st", "2nd", "3rd", "Revised", "Expanded", "Mass Market"]
+            ),
             pages=pages,
             isbn=isbn,
             catalog_number=catalog_num,
@@ -319,11 +375,11 @@ class BookMaker(BaseModel):
             abstract=cls.generate_abstract(topic, the_genre),
             notable_quote=cls.generate_quote(topic, author, the_genre),
             suppression_history=suppression,
-            related_works=[]
+            related_works=[],
         )
 
     @classmethod
-    def format_bibliography_entry(cls, the_book: BookData) -> str:
+    def format_bibliography_entry(cls, the_book: Any) -> str:
         """Format book as bibliography entry"""
         entry = f"{the_book.author}"
         if the_book.author_credentials:
@@ -331,7 +387,7 @@ class BookMaker(BaseModel):
         entry += f" ({the_book.year}). *{the_book.title}"
         if the_book.subtitle:
             entry += f": {the_book.subtitle}"
-        entry += f"*"
+        entry += "*"
         if the_book.translator:
             entry += f" (Trans. {the_book.translator})"
         entry += f". {the_book.edition} ed. {the_book.publisher}"
@@ -341,7 +397,7 @@ class BookMaker(BaseModel):
         return entry
 
     @classmethod
-    def format_card_catalog(cls, book_to_catalog: BookData) -> str:
+    def format_card_catalog(cls, book_to_catalog: Any) -> str:
         """Format as old-school library card catalog entry with perfect alignment (70 chars wide)"""
         width = 70
 
@@ -413,14 +469,14 @@ if __name__ == "__main__":
     for genre in BookGenre:
         print(f"\n{'=' * 70}")
         print(f"GENRE: {genre.value.upper()}")
-        print('=' * 70)
+        print("=" * 70)
         book = BookMaker.generate_random_book(force_genre=genre)
         print(BookMaker.format_card_catalog(book))
 
     # Generate some random books
     print(f"\n{'=' * 70}")
     print("RANDOM SELECTIONS")
-    print('=' * 70)
+    print("=" * 70)
     for i in range(3):
         book = BookMaker.generate_random_book(index=i + 1)
         print(BookMaker.format_bibliography_entry(book))

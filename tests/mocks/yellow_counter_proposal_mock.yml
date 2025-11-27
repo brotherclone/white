@@ -1,0 +1,14 @@
+iteration_id: 'mock_017'
+thread_id: 'mock_thread_001'
+bpm: 120
+tempo: 18/21
+key: G major
+rainbow_color: Y
+title: Yellow Counter Proposal
+mood:
+    - Even
+    - Unemotional
+genres:
+  - Mock Rock
+  - Mock Pop
+concept: This is a mock counter proposal for a musical piece, it gets passed back to the White Agent to refine and finalize the composition.

@@ -1,29 +1,29 @@
-import time
-import yaml
+import glob
+import json
+import os
 import re
 import sys
-import os
-import glob
-import discogs_client
-import json
-
-from dotenv import load_dotenv
-from typing import Dict, List, Tuple, Any
+import time
 from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import discogs_client
+import yaml
+from dotenv import load_dotenv
 
 
 def get_discogs_cache_path() -> Path:
     """Get path to Discogs validation cache"""
-    cache_dir = Path.home() / '.earthly_frames' / 'cache'
+    cache_dir = Path.home() / ".earthly_frames" / "cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    return cache_dir / 'discogs_validation_cache.json'
+    return cache_dir / "discogs_validation_cache.json"
 
 
 def load_discogs_cache() -> Dict[str, str]:
     """Load cached Discogs ID validations"""
     cache_path = get_discogs_cache_path()
     if cache_path.exists():
-        with open(cache_path, 'r') as f:
+        with open(cache_path, "r") as f:
             return json.load(f)
     return {}
 
@@ -31,12 +31,13 @@ def load_discogs_cache() -> Dict[str, str]:
 def save_discogs_cache(cache: Dict[str, str]) -> None:
     """Save Discogs ID validation cache"""
     cache_path = get_discogs_cache_path()
-    with open(cache_path, 'w') as f:
+    with open(cache_path, "w") as f:
         json.dump(cache, f, indent=2)
 
 
-def validate_discogs_ids(yaml_data: Dict[str, Any], rate_limit_delay: float = 1.0,
-                         use_cache: bool = True) -> Tuple[bool, List[str]]:
+def validate_discogs_ids(
+    yaml_data: Dict[str, Any], rate_limit_delay: float = 1.0, use_cache: bool = True
+) -> Tuple[bool, List[str]]:
     """
     Validates that the Discogs IDs match the artist names with caching support.
 
@@ -61,8 +62,7 @@ def validate_discogs_ids(yaml_data: Dict[str, Any], rate_limit_delay: float = 1.
         load_dotenv()
         user_agent = "earthly_frames_discogs/1.0"
         discogs = discogs_client.Client(
-            user_agent,
-            user_token=os.environ.get('USER_ACCESS_TOKEN')
+            user_agent, user_token=os.environ.get("USER_ACCESS_TOKEN")
         )
 
         total_artists = len(yaml_data["sounds_like"])
@@ -73,7 +73,9 @@ def validate_discogs_ids(yaml_data: Dict[str, Any], rate_limit_delay: float = 1.
                 continue
 
             if "name" not in artist or "discogs_id" not in artist:
-                discog_errors.append(f"Artist entry {i + 1} missing required 'name' or 'discogs_id' property")
+                discog_errors.append(
+                    f"Artist entry {i + 1} missing required 'name' or 'discogs_id' property"
+                )
                 continue
 
             artist_name = artist["name"]
@@ -82,16 +84,24 @@ def validate_discogs_ids(yaml_data: Dict[str, Any], rate_limit_delay: float = 1.
 
             if cache_key in cache:
                 api_artist_name = cache[cache_key]
-                print(f"  Checking artist {i + 1}/{total_artists}: {artist_name} (cached)...", end=' ')
+                print(
+                    f"  Checking artist {i + 1}/{total_artists}: {artist_name} (cached)...",
+                    end=" ",
+                )
 
                 if api_artist_name.lower() != artist_name.lower():
-                    discog_errors.append(f"Discogs ID {discogs_id} corresponds to '{api_artist_name}', not '{artist_name}'")
+                    discog_errors.append(
+                        f"Discogs ID {discogs_id} corresponds to '{api_artist_name}', not '{artist_name}'"
+                    )
                     print("❌")
                 else:
                     print("✅")
                 continue
             try:
-                print(f"  Checking artist {i + 1}/{total_artists}: {artist_name} (ID: {discogs_id})...", end=' ')
+                print(
+                    f"  Checking artist {i + 1}/{total_artists}: {artist_name} (ID: {discogs_id})...",
+                    end=" ",
+                )
 
                 discogs_artist = discogs.artist(discogs_id)
                 api_artist_name = discogs_artist.name
@@ -100,14 +110,19 @@ def validate_discogs_ids(yaml_data: Dict[str, Any], rate_limit_delay: float = 1.
                 cache_updated = True
 
                 if api_artist_name.lower() != artist_name.lower():
-                    discog_errors.append(f"Discogs ID {discogs_id} corresponds to '{api_artist_name}', not '{artist_name}'")
+                    discog_errors.append(
+                        f"Discogs ID {discogs_id} corresponds to '{api_artist_name}', not '{artist_name}'"
+                    )
                     print("❌")
                 else:
                     print("✅")
 
             except discogs_client.exceptions.HTTPError as e:
                 if e.status_code == 429:
-                    print(f"⏳ (rate limited, waiting {rate_limit_delay * 3}s)...", end=' ')
+                    print(
+                        f"⏳ (rate limited, waiting {rate_limit_delay * 3}s)...",
+                        end=" ",
+                    )
                     time.sleep(rate_limit_delay * 3)
                     try:
                         discogs_artist = discogs.artist(discogs_id)
@@ -117,18 +132,25 @@ def validate_discogs_ids(yaml_data: Dict[str, Any], rate_limit_delay: float = 1.
 
                         if api_artist_name.lower() != artist_name.lower():
                             discog_errors.append(
-                                f"Discogs ID {discogs_id} corresponds to '{api_artist_name}', not '{artist_name}'")
+                                f"Discogs ID {discogs_id} corresponds to '{api_artist_name}', not '{artist_name}'"
+                            )
                             print("❌")
                         else:
                             print("✅")
                     except Exception as retry_error:
-                        discog_errors.append(f"Error checking Discogs ID {discogs_id} (retry failed): {str(retry_error)}")
+                        discog_errors.append(
+                            f"Error checking Discogs ID {discogs_id} (retry failed): {str(retry_error)}"
+                        )
                         print("❌")
                 else:
-                    discog_errors.append(f"Error checking Discogs ID {discogs_id}: {str(e)}")
+                    discog_errors.append(
+                        f"Error checking Discogs ID {discogs_id}: {str(e)}"
+                    )
                     print("❌")
             except Exception as e:
-                discog_errors.append(f"Error checking Discogs ID {discogs_id}: {str(e)}")
+                discog_errors.append(
+                    f"Error checking Discogs ID {discogs_id}: {str(e)}"
+                )
                 print("❌")
 
             if i < total_artists - 1:
@@ -141,6 +163,7 @@ def validate_discogs_ids(yaml_data: Dict[str, Any], rate_limit_delay: float = 1.
         save_discogs_cache(cache)
 
     return len(discog_errors) == 0, discog_errors
+
 
 def validate_timestamp_format(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     """
@@ -171,9 +194,12 @@ def validate_timestamp_format(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str
             if key in section:
                 timestamp = section[key]
                 if not timestamp_pattern.match(timestamp):
-                    time_stamp_errors.append(f"Invalid timestamp format in section {i + 1} ({key}): {timestamp}")
+                    time_stamp_errors.append(
+                        f"Invalid timestamp format in section {i + 1} ({key}): {timestamp}"
+                    )
 
     return len(time_stamp_errors) == 0, time_stamp_errors
+
 
 def validate_lyrics_has_lrc(yaml_data: Dict[str, Any]) -> Tuple[bool, str]:
     """
@@ -193,6 +219,7 @@ def validate_lyrics_has_lrc(yaml_data: Dict[str, Any]) -> Tuple[bool, str]:
             return False, "Lyrics are marked as true, but no lrc_file is specified"
 
     return True, ""
+
 
 def validate_directory(directory_path: str) -> Tuple[bool, List[str]]:
     """
@@ -217,6 +244,7 @@ def validate_directory(directory_path: str) -> Tuple[bool, List[str]]:
 
     return dir_all_valid, all_errors
 
+
 def extract_file_references(yaml_data: Dict[str, Any]) -> Dict[str, List[str]]:
     """
     Extract all file references from the YAML data.
@@ -230,11 +258,7 @@ def extract_file_references(yaml_data: Dict[str, Any]) -> Dict[str, List[str]]:
     if not isinstance(yaml_data, dict):
         return {}
 
-    file_refs = {
-        "lrc": [],
-        "wav": [],
-        "mid": []
-    }
+    file_refs = {"lrc": [], "wav": [], "mid": []}
 
     if "lrc_file" in yaml_data and yaml_data["lrc_file"]:
         file_refs["lrc"].append(yaml_data["lrc_file"])
@@ -258,7 +282,10 @@ def extract_file_references(yaml_data: Dict[str, Any]) -> Dict[str, List[str]]:
 
     return file_refs
 
-def validate_file_existence(yaml_data: Dict[str, Any], yaml_dir: str) -> Tuple[bool, List[str]]:
+
+def validate_file_existence(
+    yaml_data: Dict[str, Any], yaml_dir: str
+) -> Tuple[bool, List[str]]:
     """
     Validates that all referenced files exist on disk.
     Returns errors with 'not found' in the message for consistency.
@@ -273,7 +300,9 @@ def validate_file_existence(yaml_data: Dict[str, Any], yaml_dir: str) -> Tuple[b
     if "main_audio_file" in yaml_data and yaml_data["main_audio_file"]:
         main_audio_path = os.path.join(yaml_dir, yaml_data["main_audio_file"])
         if not os.path.exists(main_audio_path):
-            file_reference_errors.append(f"Main audio file not found: {yaml_data['main_audio_file']}")
+            file_reference_errors.append(
+                f"Main audio file not found: {yaml_data['main_audio_file']}"
+            )
 
     if "audio_tracks" in yaml_data and isinstance(yaml_data["audio_tracks"], list):
         for i, a_track in enumerate(yaml_data["audio_tracks"]):
@@ -307,91 +336,103 @@ def validate_file_existence(yaml_data: Dict[str, Any], yaml_dir: str) -> Tuple[b
 
     return len(file_reference_errors) == 0, file_reference_errors
 
+
 def validate_manifest_completeness(yaml_file_path: str) -> Dict[str, Any]:
     """
     Get a summary of what's complete and what's missing in a manifest.
     Returns all keys expected by tests.
     """
 
-    with open(yaml_file_path, 'r') as f:
+    with open(yaml_file_path, "r") as f:
         yaml_data = yaml.safe_load(f)
     yaml_dir = os.path.dirname(yaml_file_path)
-    m_id = yaml_data.get('manifest_id', 'unknown')
+    m_id = yaml_data.get("manifest_id", "unknown")
 
     result = {
-        'manifest_id': m_id,
-        'has_lrc': False,
-        'has_main_audio': False,
-        'has_all_audio': True,
-        'has_midi': False,
-        'has_lyrics': yaml_data.get('lyrics', False),
-        'total_tracks': 0,
-        'complete_tracks': 0,
-        'incomplete_tracks': [],
-        'missing_audio': [],
-        'missing_midi': [],
-        'missing_files': [],
-        'completion_percentage': 0.0
+        "manifest_id": m_id,
+        "has_lrc": False,
+        "has_main_audio": False,
+        "has_all_audio": True,
+        "has_midi": False,
+        "has_lyrics": yaml_data.get("lyrics", False),
+        "total_tracks": 0,
+        "complete_tracks": 0,
+        "incomplete_tracks": [],
+        "missing_audio": [],
+        "missing_midi": [],
+        "missing_files": [],
+        "completion_percentage": 0.0,
     }
 
     # LRC
     if "lrc_file" in yaml_data and yaml_data["lrc_file"]:
         lrc_path = os.path.join(yaml_dir, yaml_data["lrc_file"])
-        result['has_lrc'] = os.path.exists(lrc_path)
-        if not result['has_lrc']:
-            result['missing_files'].append(f"LRC: {yaml_data['lrc_file']}")
+        result["has_lrc"] = os.path.exists(lrc_path)
+        if not result["has_lrc"]:
+            result["missing_files"].append(f"LRC: {yaml_data['lrc_file']}")
 
     # Main audio
     if "main_audio_file" in yaml_data and yaml_data["main_audio_file"]:
         main_path = os.path.join(yaml_dir, yaml_data["main_audio_file"])
-        result['has_main_audio'] = os.path.exists(main_path)
-        if not result['has_main_audio']:
-            result['missing_files'].append(f"Main audio: {yaml_data['main_audio_file']}")
+        result["has_main_audio"] = os.path.exists(main_path)
+        if not result["has_main_audio"]:
+            result["missing_files"].append(
+                f"Main audio: {yaml_data['main_audio_file']}"
+            )
 
     # Audio tracks
     if "audio_tracks" in yaml_data and isinstance(yaml_data["audio_tracks"], list):
-        result['total_tracks'] = len(yaml_data["audio_tracks"])
+        result["total_tracks"] = len(yaml_data["audio_tracks"])
         for audio_track in yaml_data["audio_tracks"]:
-            audio_file = audio_track.get('audio_file')
+            audio_file = audio_track.get("audio_file")
             if audio_file:
                 audio_path = os.path.join(yaml_dir, audio_file)
                 if not os.path.exists(audio_path):
-                    result['incomplete_tracks'].append(audio_file)
-                    result['missing_audio'].append(audio_file)
-        result['complete_tracks'] = result['total_tracks'] - len(result['incomplete_tracks'])
-        result['has_all_audio'] = len(result['incomplete_tracks']) == 0
+                    result["incomplete_tracks"].append(audio_file)
+                    result["missing_audio"].append(audio_file)
+        result["complete_tracks"] = result["total_tracks"] - len(
+            result["incomplete_tracks"]
+        )
+        result["has_all_audio"] = len(result["incomplete_tracks"]) == 0
 
     # MIDI
-    midi_file = yaml_data.get('midi_file')
+    midi_file = yaml_data.get("midi_file")
     if midi_file:
         midi_path = os.path.join(yaml_dir, midi_file)
-        result['has_midi'] = os.path.exists(midi_path)
-        if not result['has_midi']:
-            result['missing_midi'].append(midi_file)
+        result["has_midi"] = os.path.exists(midi_path)
+        if not result["has_midi"]:
+            result["missing_midi"].append(midi_file)
 
     # Also check for midi_file in audio_tracks
-    if 'audio_tracks' in yaml_data and isinstance(yaml_data['audio_tracks'], list):
-        for audio_track in yaml_data['audio_tracks']:
-            midi_file = audio_track.get('midi_file')
+    if "audio_tracks" in yaml_data and isinstance(yaml_data["audio_tracks"], list):
+        for audio_track in yaml_data["audio_tracks"]:
+            midi_file = audio_track.get("midi_file")
             if midi_file:
                 midi_path = os.path.join(yaml_dir, midi_file)
                 if not os.path.exists(midi_path):
-                    result['missing_midi'].append(midi_file)
+                    result["missing_midi"].append(midi_file)
 
     # Completion percentage calculation
     total_items = 1  # main audio
-    completed_items = 1 if result['has_main_audio'] else 0
-    if 'audio_tracks' in yaml_data and isinstance(yaml_data['audio_tracks'], list):
-        total_items += len(yaml_data['audio_tracks'])
-        completed_items += result['complete_tracks']
-    if yaml_data.get('midi_file') or any(at.get('midi_file') for at in yaml_data.get('audio_tracks', [])):
-        total_items += len(result['missing_midi']) + (1 if yaml_data.get('midi_file') else 0)
-        completed_items += (len(result['missing_midi']) == 0)
-    if yaml_data.get('lyrics'):
+    completed_items = 1 if result["has_main_audio"] else 0
+    if "audio_tracks" in yaml_data and isinstance(yaml_data["audio_tracks"], list):
+        total_items += len(yaml_data["audio_tracks"])
+        completed_items += result["complete_tracks"]
+    if yaml_data.get("midi_file") or any(
+        at.get("midi_file") for at in yaml_data.get("audio_tracks", [])
+    ):
+        total_items += len(result["missing_midi"]) + (
+            1 if yaml_data.get("midi_file") else 0
+        )
+        completed_items += len(result["missing_midi"]) == 0
+    if yaml_data.get("lyrics"):
         total_items += 1
-        completed_items += 1 if result['has_lrc'] else 0
-    result['completion_percentage'] = round(100.0 * completed_items / total_items, 2) if total_items > 0 else 0.0
+        completed_items += 1 if result["has_lrc"] else 0
+    result["completion_percentage"] = (
+        round(100.0 * completed_items / total_items, 2) if total_items > 0 else 0.0
+    )
     return result
+
 
 def timestamp_to_ms(timestamp: str) -> int:
     """
@@ -404,10 +445,10 @@ def timestamp_to_ms(timestamp: str) -> int:
         Time in milliseconds
     """
     # Remove brackets
-    timestamp = timestamp.strip('[]')
+    timestamp = timestamp.strip("[]")
 
     # Split by :
-    minutes_str, seconds_str = timestamp.split(':')
+    minutes_str, seconds_str = timestamp.split(":")
 
     # Convert to numbers
     minutes = int(minutes_str)
@@ -415,6 +456,7 @@ def timestamp_to_ms(timestamp: str) -> int:
 
     # Convert to milliseconds
     return int((minutes * 60 + seconds) * 1000)
+
 
 def validate_required_properties(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     """
@@ -430,10 +472,24 @@ def validate_required_properties(yaml_data: Dict[str, Any]) -> Tuple[bool, List[
 
     # Define required top-level properties
     required_properties = [
-        "bpm", "manifest_id", "tempo", "key", "rainbow_color", "title",
-        "release_date", "album_sequence", "main_audio_file", "TRT",
-        "vocals", "lyrics", "structure", "mood", "sounds_like",
-        "genres", "concept", "audio_tracks"
+        "bpm",
+        "manifest_id",
+        "tempo",
+        "key",
+        "rainbow_color",
+        "title",
+        "release_date",
+        "album_sequence",
+        "main_audio_file",
+        "TRT",
+        "vocals",
+        "lyrics",
+        "structure",
+        "mood",
+        "sounds_like",
+        "genres",
+        "concept",
+        "audio_tracks",
     ]
 
     for prop in required_properties:
@@ -449,7 +505,9 @@ def validate_required_properties(yaml_data: Dict[str, Any]) -> Tuple[bool, List[
             section_props = ["section_name", "start_time", "end_time", "description"]
             for prop in section_props:
                 if prop not in section:
-                    property_errors.append(f"Structure section {i + 1} missing required property: {prop}")
+                    property_errors.append(
+                        f"Structure section {i + 1} missing required property: {prop}"
+                    )
 
     if "audio_tracks" in yaml_data and isinstance(yaml_data["audio_tracks"], list):
         for i, audio_track in enumerate(yaml_data["audio_tracks"]):
@@ -457,15 +515,21 @@ def validate_required_properties(yaml_data: Dict[str, Any]) -> Tuple[bool, List[
                 property_errors.append(f"Audio track {i + 1} is not a dictionary")
                 continue
             if "id" not in audio_track:
-                property_errors.append(f"Audio track {i + 1} missing required property: id")
+                property_errors.append(
+                    f"Audio track {i + 1} missing required property: id"
+                )
             if "description" not in audio_track:
-                property_errors.append(f"Audio track {i + 1} missing required property: description")
+                property_errors.append(
+                    f"Audio track {i + 1} missing required property: description"
+                )
             file_types = ["audio_file", "midi_file", "midi_group_file"]
             if not any(file_type in audio_track for file_type in file_types):
                 property_errors.append(
-                    f"Audio track {i + 1} missing at least one file type (audio_file, midi_file, or midi_group_file)")
+                    f"Audio track {i + 1} missing at least one file type (audio_file, midi_file, or midi_group_file)"
+                )
 
     return len(property_errors) == 0, property_errors
+
 
 def validate_structure_timestamps(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     """
@@ -487,9 +551,13 @@ def validate_structure_timestamps(yaml_data: Dict[str, Any]) -> Tuple[bool, List
         return False, timestamp_structure_errors
 
     try:
-        sections = sorted(yaml_data["structure"], key=lambda x: timestamp_to_ms(x["start_time"]))
+        sections = sorted(
+            yaml_data["structure"], key=lambda x: timestamp_to_ms(x["start_time"])
+        )
     except (KeyError, ValueError) as e:
-        timestamp_structure_errors.append(f"Error parsing structure timestamps: {str(e)}")
+        timestamp_structure_errors.append(
+            f"Error parsing structure timestamps: {str(e)}"
+        )
         return False, timestamp_structure_errors
 
     # Check for overlaps
@@ -502,9 +570,11 @@ def validate_structure_timestamps(yaml_data: Dict[str, Any]) -> Tuple[bool, List
 
         if curr_start_ms < prev_end_ms:
             timestamp_structure_errors.append(
-                f"Overlapping sections: '{prev_section['section_name']}' ({prev_section['end_time']}) overlaps with '{curr_section['section_name']}' ({curr_section['start_time']})")
+                f"Overlapping sections: '{prev_section['section_name']}' ({prev_section['end_time']}) overlaps with '{curr_section['section_name']}' ({curr_section['start_time']})"
+            )
 
     return len(timestamp_structure_errors) == 0, timestamp_structure_errors
+
 
 def check_no_tk_fields(data, path=""):
     tk_errors = []
@@ -517,6 +587,7 @@ def check_no_tk_fields(data, path=""):
     elif data == "TK":
         tk_errors.append(f"Manifest field at '{path}' is set to 'TK' (to come)")
     return tk_errors
+
 
 def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     """Perform stricter validation on common manifest field values.
@@ -556,8 +627,10 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         errors.append("tempo is missing")
     else:
         if isinstance(tempo, str):
-            if not re.match(r'^\d+(?:/\d+)?$', tempo.strip()):
-                errors.append(f"tempo must be numeric or in 'N/D' form (e.g. '4/4'): {tempo}")
+            if not re.match(r"^\d+(?:/\d+)?$", tempo.strip()):
+                errors.append(
+                    f"tempo must be numeric or in 'N/D' form (e.g. '4/4'): {tempo}"
+                )
         elif isinstance(tempo, (int, float)):
             pass
         else:
@@ -569,15 +642,22 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         errors.append("rainbow_color is missing")
     else:
         try:
-            from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+            from app.structures.concepts.rainbow_table_color import (
+                the_rainbow_table_colors,
+            )
+
             allowed_keys = set(the_rainbow_table_colors.keys())
             allowed_names = {v.color_name for v in the_rainbow_table_colors.values()}
             if isinstance(rc, str):
                 rc_clean = rc.strip()
-                if (len(rc_clean) == 1 and rc_clean in allowed_keys) or (rc_clean in allowed_names):
+                if (len(rc_clean) == 1 and rc_clean in allowed_keys) or (
+                    rc_clean in allowed_names
+                ):
                     pass
                 else:
-                    errors.append(f"rainbow_color '{rc}' is not a recognized key or color name")
+                    errors.append(
+                        f"rainbow_color '{rc}' is not a recognized key or color name"
+                    )
             else:
                 errors.append(f"rainbow_color has invalid type: {type(rc).__name__}")
         except Exception:
@@ -600,7 +680,9 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         elif not isinstance(val, list):
             errors.append(f"{key} must be a list of strings")
         else:
-            if not all(isinstance(x, str) and x.strip() != "" and x != "TK" for x in val):
+            if not all(
+                isinstance(x, str) and x.strip() != "" and x != "TK" for x in val
+            ):
                 errors.append(f"{key} contains invalid or placeholder entries")
 
     # sounds_like list entries
@@ -641,7 +723,9 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
                 if fkey in track and track[fkey] and track[fkey] != "TK":
                     files_present = True
             if not files_present:
-                errors.append(f"audio_tracks[{i}] has no valid file reference (audio_file/midi_file/midi_group_file)")
+                errors.append(
+                    f"audio_tracks[{i}] has no valid file reference (audio_file/midi_file/midi_group_file)"
+                )
 
     # Check for pervasive 'TK' placeholders anywhere
     tk_errors = check_no_tk_fields(yaml_data)
@@ -649,6 +733,7 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         errors.append(e)
 
     return len(errors) == 0, errors
+
 
 def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
     """Validates a single YAML file.
@@ -662,7 +747,7 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
     errors = []
 
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             yaml_data = yaml.safe_load(file)
 
         # Run validation: required properties
@@ -743,21 +828,27 @@ if __name__ == "__main__":
     for yaml_file in sorted(yaml_files):
         try:
             completeness = validate_manifest_completeness(yaml_file)
-            manifest_id = completeness['manifest_id']
-            percentage = completeness['completion_percentage']
+            manifest_id = completeness["manifest_id"]
+            percentage = completeness["completion_percentage"]
 
             status = "✅" if percentage >= 100 else "⚠️"
-            print(f"\n{status} {manifest_id}: {percentage:.0f}% complete "
-                  f"({completeness['complete_tracks']}/{completeness['total_tracks']} tracks)")
+            print(
+                f"\n{status} {manifest_id}: {percentage:.0f}% complete "
+                f"({completeness['complete_tracks']}/{completeness['total_tracks']} tracks)"
+            )
 
-            if completeness['incomplete_tracks']:
-                print(f"  Missing files in tracks:")
-                for track in completeness['incomplete_tracks']:
-                    print(f"    - Track {track['id']} ({track['description']} - {track['player']}):")
-                    for missing in track['missing']:
+            if completeness["incomplete_tracks"]:
+                print("  Missing files in tracks:")
+                for track in completeness["incomplete_tracks"]:
+                    print(
+                        f"    - Track {track['id']} ({track['description']} - {track['player']}):"
+                    )
+                    for missing in track["missing"]:
                         print(f"        • {missing}")
         except Exception as e:
-            print(f"  ⚠️ Could not check completeness for {os.path.basename(yaml_file)}: {e}")
+            print(
+                f"  ⚠️ Could not check completeness for {os.path.basename(yaml_file)}: {e}"
+            )
 
     if not all_valid:
         sys.exit(1)

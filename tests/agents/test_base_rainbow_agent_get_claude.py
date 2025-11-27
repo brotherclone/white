@@ -1,6 +1,5 @@
-import pytest
-from app.agents.base_rainbow_agent import BaseRainbowAgent
-from app.agents.models.agent_settings import AgentSettings
+from app.structures.agents.agent_settings import AgentSettings
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 
 
 class DummyClaude:
@@ -21,19 +20,22 @@ class ConcreteAgent(BaseRainbowAgent):
 
 def test_get_claude_uses_settings(monkeypatch):
     # monkeypatch the ChatAnthropic used in the module to our DummyClaude
-    import app.agents.base_rainbow_agent as bra
+    import app.structures.agents.base_rainbow_agent as bra
+
     monkeypatch.setattr(bra, "ChatAnthropic", DummyClaude)
 
     settings = AgentSettings()
     # override a few values to ensure they're passed
-    settings = settings.model_copy(update={
-        "anthropic_sub_model_name": "submodel",
-        "anthropic_api_key": "sekrit",
-        "temperature": 0.2,
-        "max_retries": 1,
-        "timeout": 10,
-        "stop": ["\n"]
-    })
+    settings = settings.model_copy(
+        update={
+            "anthropic_sub_model_name": "submodel",
+            "anthropic_api_key": "sekrit",
+            "temperature": 0.2,
+            "max_retries": 1,
+            "timeout": 10,
+            "stop": ["\n"],
+        }
+    )
 
     agent = ConcreteAgent(settings=settings)
     claude = agent._get_claude()
@@ -77,4 +79,3 @@ def test_manifest_fallback_data_getitem_and_get():
     assert ("extra_key" in m) is True
     assert m.get("extra_key") == "extra_val"
     assert m.get("missing", "d") == "d"
-

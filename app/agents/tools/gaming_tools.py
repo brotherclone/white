@@ -15,6 +15,7 @@ def roll_dice(rolls):
         total += sum(dice)
     return total, results
 
+
 def no_repeat_roll_dice(roll_one, roll_two):
     while True:
         first_roll = roll_dice(roll_one)[0]
@@ -35,8 +36,5 @@ def infranym_seeder():
         "parts": parts,
         "tracks": tracks,
         "count": count,
-        "instructions": f"Create {count} seeds, each with {parts} parts, and {tracks} tracks."
+        "instructions": f"Create {count} seeds, each with {parts} parts, and {tracks} tracks.",
     }
-
-
-

@@ -1,11 +1,12 @@
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any, Dict, List, Optional
 
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.structures.enums.white_facet import WhiteFacet
 from app.structures.manifests.song_proposal import SongProposal
-from app.agents.enums.white_facet import WhiteFacet
+
 
 class MainAgentState(BaseModel):
-
     """
     Main state for White Agent (supervisor) coordinating all rainbow agents.
     """
@@ -18,10 +19,11 @@ class MainAgentState(BaseModel):
     pending_human_action: Optional[Dict[str, Any]] = None
     rebracketing_analysis: Optional[str] = None
     document_synthesis: Optional[str] = None
-    ready_for_red: bool = False
     white_facet: WhiteFacet | None = None
     white_facet_metadata: str | Any = None
-
+    ready_for_red: bool = False
+    ready_for_orange: bool = False
+    ready_for_yellow: bool = False
     """
     Structure when workflow is paused:
     {

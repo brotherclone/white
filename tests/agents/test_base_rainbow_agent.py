@@ -1,11 +1,20 @@
-import pytest
-from unittest import mock
-
-from app.agents.base_rainbow_agent import BaseRainbowAgent
 from types import SimpleNamespace
+
+import pytest
+
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
+from app.structures.artifacts.base_artifact import ChainArtifact
 
 # A concrete agent to instantiate and test abstract behavior
 GRAPH_SENTINEL = object()
+
+
+class DummyArtifact(ChainArtifact):
+    def save_file(self):
+        return None
+
+    def flatten(self):
+        return {}
 
 
 class ConcreteAgent(BaseRainbowAgent):
@@ -39,7 +48,7 @@ def test__get_claude_uses_settings(monkeypatch):
         temperature=0.7,
         max_retries=2,
         timeout=30,
-        stop=["\n"]
+        stop=["\n"],
     )
 
     # Fake ChatAnthropic that captures init kwargs
@@ -49,7 +58,9 @@ def test__get_claude_uses_settings(monkeypatch):
         def __init__(self, **kwargs):
             captured.update(kwargs)
 
-    monkeypatch.setattr("app.agents.base_rainbow_agent.ChatAnthropic", FakeChatAnthropic)
+    monkeypatch.setattr(
+        "app.structures.agents.base_rainbow_agent.ChatAnthropic", FakeChatAnthropic
+    )
 
     agent = ConcreteAgent.model_construct(settings=settings)
     result = agent._get_claude()
@@ -66,27 +77,11 @@ def test__get_claude_uses_settings(monkeypatch):
 def test_chain_artifacts_instance_is_independent():
     a1 = ConcreteAgent()
     a2 = ConcreteAgent()
-
-    # modify one instance's chain_artifacts and ensure the other is unaffected
-    a1.chain_artifacts.append("artifact-a")
-    assert a1.chain_artifacts == ["artifact-a"]
+    artifact = DummyArtifact()
+    a1.chain_artifacts.append(artifact)
+    assert len(a1.chain_artifacts) == 1
+    assert a1.chain_artifacts[0].chain_artifact_type == "unknown"
     assert a2.chain_artifacts == []
-
-def skip_chance(chance, rng=None):
-    rng = rng or __import__("random").random
-    def decorator(fn):
-        from functools import wraps
-        @wraps(fn)
-        def wrapper(self, state, *args, **kwargs):
-            p = chance(self) if callable(chance) else chance
-            if rng() < p:
-                skipped = getattr(state, "skipped_nodes", [])
-                skipped.append(fn.__name__)
-                setattr(state, "skipped_nodes", skipped)
-                return state
-            return fn(self, state, *args, **kwargs)
-        return wrapper
-    return decorator
 
 
 class _TestAgent:
@@ -101,7 +96,6 @@ def test_skip_method_records_and_skips():
     state = SimpleNamespace()
     agent = _TestAgent()
     result = agent.node_to_skip(state)
-    # should return same state instance and not have `was_run` set
     assert result is state
     assert not hasattr(state, "was_run")
     assert getattr(state, "skipped_nodes") == ["node_to_skip"]

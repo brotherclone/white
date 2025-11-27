@@ -1,11 +1,11 @@
 [tool.setuptools]
-packages = ["app", "training", "staged_raw_material"]
+packages = ["app", "staged_raw_material"]
 
 [project]
 name = "white"
 version = "0.1.0"
 description = "System for creation of White album in The Rainbow Table"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "discogs-client>=2.3.0",
     "httpx>=0.28.1",
@@ -25,10 +25,20 @@ dependencies = [
     "anthropic>=0.34.0",
     "ipython>=9.5.0",
     "sounddevice>=0.5.2",
+    "soundfile>=0.12.1",
     "scipy-stubs==1.16.2.0",
     "scipy>=1.16.1",
-    "assemblyai>=0.44.3",
-    "todoist-api-python>=3.1.0",
+    "assemblyai>=0.46.0",
     "pytest-cov>=7.0.0",
     "hypothesis>=6.0.0",
+    "ruff>=0.14.3",
+    "black>=25.9.0",
+    "pre-commit>=4.3.0",
+    "pytest-asyncio>=1.2.0",
+    "langgraph-checkpoint>=2.1.1",
+    "langgraph-checkpoint-sqlite>=2.0.11",
+    "internetarchive>=5.7.1",
+    "polars>=1.35.2",
+    "neo4j~=5.28.0",
+    "fastmcp>=2.13.0.2",
 ]
