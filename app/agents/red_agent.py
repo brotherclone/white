@@ -191,6 +191,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     state.counter_proposal = counter_proposal
         return state
 
+    # CLAUDE - Books aren't saving
     def generate_book(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
@@ -249,13 +250,12 @@ class RedAgent(BaseRainbowAgent, ABC):
                         page_1_text = ""
                         page_2_text = ""
                 state.reaction_level += 1
-                book_dict = self._ensure_dict(book_data)
+                book_dict = book_data.model_dump()
                 book_dict["excerpts"] = [page_1_text, page_2_text]
                 book_dict["thread_id"] = state.thread_id
-                book_dict["chain_artifact_file_type"] = "yml"
                 book_dict["artifact_name"] = "main_book"
-                book_dict["base_path"] = (
-                    f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                book_dict["base_path"] = os.getenv(
+                    "AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"
                 )
                 state.main_generated_book = BookArtifact(**book_dict)
                 state.artifacts.append(state.main_generated_book)
@@ -278,13 +278,11 @@ class RedAgent(BaseRainbowAgent, ABC):
                 "r",
             ) as f:
                 book_data = yaml.safe_load(f)
-                book_dict = self._ensure_dict(book_data)
+                book_dict = book_data.model_dump()
                 book_dict["thread_id"] = state.thread_id
-                book_dict["chain_artifact_file_type"] = "yml"
                 book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
-                book_dict["base_path"] = f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}"
+                book_dict["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")
                 state.current_reaction_book = BookArtifact(**book_dict)
-                state.current_reaction_book.save_file()
                 state.artifacts.append(state.current_reaction_book)
                 state.reaction_level += 1
                 state.should_respond_with_reaction_book = False
@@ -323,11 +321,8 @@ class RedAgent(BaseRainbowAgent, ABC):
 
                     result["thread_id"] = state.thread_id
                     result["artifact_name"] = f"reaction_book_{state.reaction_level}"
-                    result["base_path"] = (
-                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
-                    )
+                    result["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")
                     state.current_reaction_book = BookArtifact(**result)
-                    state.current_reaction_book.save_file()
                     state.artifacts.append(state.current_reaction_book)
                     state.reaction_level += 1
                     state.should_respond_with_reaction_book = False
@@ -366,7 +361,6 @@ class RedAgent(BaseRainbowAgent, ABC):
             ) as f:
                 page_2 = yaml.safe_load(f)
             state.current_reaction_book.excerpts = [page_1, page_2]
-            state.current_reaction_book.save_file()
             state.artifacts.append(state.current_reaction_book)
             return state
         else:
@@ -397,7 +391,6 @@ class RedAgent(BaseRainbowAgent, ABC):
                         reaction_book_pages.page_1_text,
                         reaction_book_pages.page_2_text,
                     ]
-                    state.current_reaction_book.save_file()
                     state.artifacts.append(state.current_reaction_book)
                     return state
                 if not isinstance(result, BookPageCollection):
