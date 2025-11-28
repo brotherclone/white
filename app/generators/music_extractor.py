@@ -1,14 +1,15 @@
 import random
 import re
-from typing import Dict, List
+from typing import List
 
 from app.structures.concepts.pulsar_palace_room import PulsarPalaceRoom
+from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 class MusicExtractor:
     """
-    Extracts musical elements (mood, BPM, key, structure) from Pulsar Palace room narratives.
-    Translates gameplay into musical concepts for the Yellow Agent.
+    Extracts musical elements (mood, BPM, key, genres, concept) from Pulsar Palace room narratives.
+    Translates gameplay into SongProposalIteration objects for the Yellow Agent.
     """
 
     def __init__(self):
@@ -50,15 +51,6 @@ class MusicExtractor:
             "dangerous": ["E major", "B major", "F# major", "C# major"],
         }
 
-        self.room_type_to_structure = {
-            "entrance": ["arrival", "threshold", "first_steps"],
-            "social": ["gathering", "interaction", "social_dance", "tension"],
-            "service": ["labor", "routine", "disruption"],
-            "private": ["intimacy", "revelation", "secrets"],
-            "mystical": ["ritual", "vision", "transformation"],
-            "transitional": ["passage", "journey", "crossing"],
-        }
-
         self.genres_base = [
             "electronic",
             "ambient",
@@ -73,10 +65,10 @@ class MusicExtractor:
             "dangerous": ["dark ambient", "drone", "post-industrial"],
         }
 
-    def extract_music_concept(
+    def extract_song_proposal(
         self, room: PulsarPalaceRoom, encounter_narrative: str
-    ) -> Dict:
-        """Extract complete musical concept from room and narrative"""
+    ) -> SongProposalIteration:
+        """Extract a song proposal from room and narrative"""
 
         atmosphere_type = room.atmosphere.split(" - ")[0]
 
@@ -86,24 +78,23 @@ class MusicExtractor:
 
         key = self._determine_key(atmosphere_type, mood)
 
-        structure = self._generate_structure(room, encounter_narrative)
-
         genres = self._determine_genres(atmosphere_type, mood)
 
         concept = self._generate_concept(room, encounter_narrative)
 
-        return {
-            "bpm": bpm,
-            "tempo": "4/4",
-            "key": key,
-            "rainbow_color": "Y",
-            "title": room.name,
-            "mood": mood,
-            "genres": genres,
-            "structure": structure,
-            "concept": concept,
-            "narrative_source": encounter_narrative,
-        }
+        iteration_id = self._generate_iteration_id(room.name, room.room_id)
+
+        return SongProposalIteration(
+            iteration_id=iteration_id,
+            bpm=bpm,
+            tempo="4/4",
+            key=key,
+            rainbow_color="Y",
+            title=room.name,
+            mood=mood,
+            genres=genres,
+            concept=concept,
+        )
 
     def _extract_mood(self, room: PulsarPalaceRoom, narrative: str) -> List[str]:
         """Extract mood descriptors from room and narrative"""
@@ -127,7 +118,7 @@ class MusicExtractor:
 
         return list(moods)[:5]
 
-    def _calculate_bpm(self, atmosphere_type: str, narrative: str) -> float:
+    def _calculate_bpm(self, atmosphere_type: str, narrative: str) -> int:
         """Calculate BPM based on atmosphere and narrative tension"""
 
         base_range = self.atmosphere_to_bpm.get(atmosphere_type, (90, 120))
@@ -148,9 +139,9 @@ class MusicExtractor:
         adjustment = (tension_score - calm_score) * 5
 
         base_bpm = random.uniform(*base_range)
-        final_bpm = max(60, min(180, base_bpm + adjustment))
+        final_bpm = max(40, min(200, base_bpm + adjustment))
 
-        return round(final_bpm, 2)
+        return int(round(final_bpm))
 
     def _determine_key(self, atmosphere_type: str, mood: List[str]) -> str:
         """Determine musical key based on atmosphere and mood"""
@@ -163,46 +154,6 @@ class MusicExtractor:
                 return random.choice(minor_keys)
 
         return random.choice(keys)
-
-    def _generate_structure(self, room: PulsarPalaceRoom, narrative: str) -> List[Dict]:
-        """Generate song structure sections from narrative"""
-
-        base_sections = self.room_type_to_structure.get(
-            room.room_type, ["intro", "development", "conclusion"]
-        )
-
-        sentences = [s.strip() for s in narrative.split(".") if s.strip()]
-
-        structure = []
-        time_cursor = 0.0
-        section_duration = 30.0
-
-        for i, section_name in enumerate(base_sections):
-            if i < len(sentences):
-                description = sentences[i]
-            else:
-                description = room.narrative_beat
-
-            start_time = f"[{self._format_time(time_cursor)}]"
-            time_cursor += section_duration
-            end_time = f"[{self._format_time(time_cursor)}]"
-
-            structure.append(
-                {
-                    "section_name": section_name.replace("_", " ").title(),
-                    "start_time": start_time,
-                    "end_time": end_time,
-                    "description": description,
-                }
-            )
-
-        return structure
-
-    def _format_time(self, seconds: float) -> str:
-        """Format time as MM:SS.mmm"""
-        minutes = int(seconds // 60)
-        secs = seconds % 60
-        return f"{minutes:02d}:{secs:06.3f}"
 
     def _determine_genres(self, atmosphere_type: str, mood: List[str]) -> List[str]:
         """Determine musical genres based on atmosphere and mood"""
@@ -224,15 +175,17 @@ class MusicExtractor:
         return list(set(genres))[:6]
 
     def _generate_concept(self, room: PulsarPalaceRoom, narrative: str) -> str:
-        """Generate a concept statement from room and narrative"""
+        """Generate a substantive concept statement from room and narrative (min 100 chars)"""
+
+        atmosphere_descriptor = room.atmosphere.split(" - ")[1]
 
         concept_parts = [
-            f"In the {room.name}, the party encounters {room.atmosphere.split(' - ')[1]} spaces.",
+            f"In the {room.name}, the party encounters {atmosphere_descriptor} spaces where the boundaries of reality become permeable."
         ]
 
         if room.inhabitants:
             concept_parts.append(
-                f"They interact with {', '.join(room.inhabitants[:2])}."
+                f"The presence of {', '.join(room.inhabitants[:2])} creates a tension between the organic and the cosmic, the temporal and the eternal."
             )
 
         key_phrase = self._extract_key_phrase(narrative)
@@ -240,10 +193,19 @@ class MusicExtractor:
             concept_parts.append(key_phrase)
 
         concept_parts.append(
-            "The pulsar's influence transforms the experience into sound."
+            f"The pulsar's rhythmic influence—flickering between red and green to create the illusion of yellow—transforms this narrative of {room.room_type} spaces into sonic architecture."
         )
 
-        return " ".join(concept_parts)
+        concept_parts.append(
+            "Each character action resonates with archetypal patterns: the disposition shapes emotional timbre, profession defines rhythmic approach, and temporal origin creates harmonic context."
+        )
+
+        concept = " ".join(concept_parts)
+
+        if len(concept) < 100:
+            concept += " This transmutation from gameplay to music embodies the Palace's nature as a liminal space where narrative becomes melody, action becomes rhythm, and experience crystallizes into sound."
+
+        return concept
 
     def _extract_key_phrase(self, narrative: str) -> str:
         """Extract a key dramatic phrase from the narrative"""
@@ -262,3 +224,15 @@ class MusicExtractor:
                 return match.group(1)
 
         return ""
+
+    def _generate_iteration_id(self, room_name: str, room_id: str) -> str:
+        """Generate iteration_id in format 'descriptive_name_v#'"""
+
+        name_part = room_name.lower().replace(" ", "_").replace("-", "_")
+
+        name_part = re.sub(r"[^a-z0-9_]", "", name_part)
+
+        number_match = re.search(r"(\d+)$", room_id)
+        version = number_match.group(1) if number_match else "1"
+
+        return f"pulsar_palace_{name_part}_v{version}"
