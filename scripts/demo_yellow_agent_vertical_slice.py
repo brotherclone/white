@@ -5,8 +5,8 @@ Yellow Agent Vertical Slice Demo
 This script demonstrates the full Yellow Agent flow:
 1. Generate a Pulsar Palace room using Markov chains (Marienbad × Ultraviolet Grasslands)
 2. Generate character actions based on disposition + profession + background
-3. Extract musical elements from the resulting narrative
-4. Output everything as a song concept
+3. Extract a SongProposalIteration from the resulting narrative
+4. Output the song proposal for the production pipeline
 
 Run with: python scripts/demo_yellow_agent_vertical_slice.py
 """
@@ -104,70 +104,37 @@ def main():
         print(f"  {i + 1}. {action}")
 
     print_section(
-        "STEP 4: Extract Musical Concepts",
-        "Translating narrative into musical elements (mood, BPM, key, structure)",
+        "STEP 4: Extract Song Proposal",
+        "Translating narrative into a SongProposalIteration (mood, BPM, key, genres, concept)",
     )
 
     music_extractor = MusicExtractor()
-    music_concept = music_extractor.extract_music_concept(room, encounter_narrative)
+    proposal = music_extractor.extract_song_proposal(room, encounter_narrative)
 
-    print(f"Title: {music_concept['title']}")
-    print(f"BPM: {music_concept['bpm']}")
-    print(f"Key: {music_concept['key']}")
-    print(f"Tempo: {music_concept['tempo']}")
-    print(f"Rainbow Color: {music_concept['rainbow_color']}")
-    print(f"\nMood: {', '.join(music_concept['mood'])}")
-    print(f"\nGenres: {', '.join(music_concept['genres'])}")
+    print(f"Iteration ID: {proposal.iteration_id}")
+    print(f"Title: {proposal.title}")
+    print(f"BPM: {proposal.bpm}")
+    print(f"Key: {proposal.key}")
+    print(f"Tempo: {proposal.tempo}")
+    print(f"Rainbow Color: {proposal.rainbow_color}")
+    print(f"\nMood: {', '.join(proposal.mood)}")
+    print(f"\nGenres: {', '.join(proposal.genres)}")
     print("\nConcept:")
-    print(f"  {music_concept['concept']}")
-    print("\nStructure:")
-    for section in music_concept["structure"]:
-        print(
-            f"  {section['start_time']}-{section['end_time']} | {section['section_name']}"
-        )
-        print(f"    {section['description']}")
+    concept_words = proposal.concept.split()
+    for i in range(0, len(concept_words), 12):
+        print(f"  {' '.join(concept_words[i:i+12])}")
 
     print_section(
-        "STEP 5: Output as YAML",
-        "Formatting as a song manifest (like 04_01.yml through 04_10.yml)",
+        "STEP 5: Song Proposal as JSON",
+        "SongProposalIteration object formatted for the Yellow Agent",
     )
 
-    yaml_output = f"""bpm: {music_concept['bpm']}
-manifest_id: 'yellow_generated_01'
-tempo: {music_concept['tempo']}
-key: {music_concept['key']}
-rainbow_color: {music_concept['rainbow_color']}
-title: {music_concept['title']}
-vocals: false
-lyrics: false
-structure:"""
+    print(json.dumps(proposal.model_dump(), indent=2))
 
-    for section in music_concept["structure"]:
-        yaml_output += f"""
-  - section_name: {section['section_name']}
-    start_time: '{section['start_time']}'
-    end_time: '{section['end_time']}'
-    description: {section['description']}"""
-
-    yaml_output += """
-mood:"""
-    for mood_item in music_concept["mood"]:
-        yaml_output += f"""
-  - {mood_item}"""
-
-    yaml_output += """
-genres:"""
-    for genre in music_concept["genres"]:
-        yaml_output += f"""
-  - {genre}"""
-
-    yaml_output += f"""
-concept: {music_concept['concept']}
-"""
-
-    print(yaml_output)
-
-    print_section("STEP 6: JSON Output", "Complete data structure for programmatic use")
+    print_section(
+        "STEP 6: Complete Session Data",
+        "Full context including room, characters, narrative, and song proposal",
+    )
 
     full_output = {
         "room": {
@@ -197,7 +164,7 @@ concept: {music_concept['concept']}
             for char in characters
         ],
         "encounter_narrative": encounter_narrative,
-        "music_concept": music_concept,
+        "song_proposal": proposal.model_dump(),
     }
 
     print(json.dumps(full_output, indent=2))
@@ -206,9 +173,9 @@ concept: {music_concept['concept']}
     print("The Yellow Agent successfully:")
     print("  ✓ Generated a room using Markov chains")
     print("  ✓ Created character actions from trait combinations")
-    print("  ✓ Extracted musical concepts from narrative")
-    print("  ✓ Produced song manifest compatible with existing YAML structure")
-    print("\nThis demonstrates the core gameplay → music translation pipeline.\n")
+    print("  ✓ Extracted a SongProposalIteration from the narrative")
+    print("  ✓ Produced a song proposal ready for the production pipeline")
+    print("\nThis demonstrates the core gameplay → song proposal pipeline.\n")
 
 
 if __name__ == "__main__":

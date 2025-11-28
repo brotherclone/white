@@ -37,18 +37,21 @@ Creates character actions by combining three trait dimensions:
 
 ### 3. Music Extractor (`app/generators/music_extractor.py`)
 
-Translates narrative content into musical metadata:
+Translates narrative content into `SongProposalIteration` objects:
 
 **Extracted Elements:**
-- **Mood**: Derived from keywords in narrative (baroque, cosmic, mysterious, etc.)
-- **BPM**: Calculated from atmosphere type and narrative tension
-- **Key**: Selected based on atmosphere and mood (major/minor)
-- **Structure**: Song sections mapped from narrative beats
-- **Genres**: Determined by atmosphere and mood combinations
-- **Concept**: Generated summary statement
+- **Iteration ID**: Generated from room name and ID (e.g., `pulsar_palace_bridge_v001`)
+- **Title**: Room name
+- **BPM**: Integer (40-200) calculated from atmosphere type and narrative tension
+- **Tempo**: Time signature (defaults to 4/4)
+- **Key**: Musical key selected based on atmosphere and mood (major/minor)
+- **Rainbow Color**: Always "Y" (Yellow) for Pulsar Palace content
+- **Mood**: List of 1-5 descriptors derived from keywords in narrative
+- **Genres**: List of 1-6 genres determined by atmosphere and mood combinations
+- **Concept**: Substantive philosophical statement (minimum 100 characters) explaining the song's archetypal meaning
 
 **Output Format:**
-Compatible with existing YAML song manifests (see `staged_raw_material/04_01` through `04_10`)
+Returns `SongProposalIteration` objects compatible with the Rainbow Table song proposal system. These are proposals only—not complete production manifests with structure sections and audio tracks.
 
 ## Data Structures
 
@@ -79,6 +82,21 @@ class PulsarPalaceEncounter:
     tension_level: int
 ```
 
+### SongProposalIteration (`app/structures/manifests/song_proposal.py`)
+
+```python
+class SongProposalIteration:
+    iteration_id: str
+    bpm: int  # 40-200
+    tempo: str | TimeSignature
+    key: str | KeySignature
+    rainbow_color: str | RainbowTableColor
+    title: str
+    mood: list[str]  # 1-20 items
+    genres: list[str]  # 1-20 items
+    concept: str  # min 100 chars, substantive philosophical content
+```
+
 ## Running the Demo
 
 ```bash
@@ -92,37 +110,37 @@ The script demonstrates the full pipeline:
 1. **Generate Characters**: Creates 3 random party members with dispositions, professions, and backgrounds
 2. **Generate Room**: Uses Markov chains to create a Pulsar Palace room
 3. **Generate Actions**: Creates character actions based on trait combinations
-4. **Extract Music**: Translates narrative into musical concepts
-5. **Output YAML**: Formats as a song manifest
-6. **Output JSON**: Provides complete data structure
+4. **Extract Song Proposal**: Translates narrative into a `SongProposalIteration`
+5. **Output Proposal**: Shows the proposal as JSON
+6. **Output Complete Session**: Provides full context (room + characters + narrative + proposal)
 
 ### Example Output
 
-```yaml
-bpm: 93.24
-manifest_id: 'yellow_generated_01'
-tempo: 4/4
-key: C major
-rainbow_color: Y
-title: Gallery
-mood:
-  - lush
-  - baroque
-  - rhythmic
-  - mysterious
-  - intense
-genres:
-  - art pop
-  - experimental
-  - kosmische
-  - ambient
-structure:
-  - section_name: Gathering
-    start_time: '[00:00.000]'
-    end_time: '[00:30.000]'
-    description: The party enters the space
-  # ... more sections
-concept: In the Gallery, the party encounters opulent spaces...
+```json
+{
+  "iteration_id": "pulsar_palace_bridge_v001",
+  "bpm": 151,
+  "tempo": "4/4",
+  "key": "E major",
+  "rainbow_color": "Y",
+  "title": "Bridge",
+  "mood": [
+    "hypnotic",
+    "rhythmic",
+    "classical",
+    "intense",
+    "ornate"
+  ],
+  "genres": [
+    "electronic",
+    "dark ambient",
+    "drone",
+    "ambient",
+    "experimental",
+    "kosmische"
+  ],
+  "concept": "In the Bridge, the party encounters pulsing spaces where the boundaries of reality become permeable. The presence of Nobles trapped mid-gesture, Cursed valets in perfect stillness creates a tension between the organic and the cosmic, the temporal and the eternal. The pulsar's rhythmic influence—flickering between red and green to create the illusion of yellow—transforms this narrative of transitional spaces into sonic architecture. Each character action resonates with archetypal patterns: the disposition shapes emotional timbre, profession defines rhythmic approach, and temporal origin creates harmonic context."
+}
 ```
 
 ## Integration with Existing Systems
@@ -134,12 +152,13 @@ Uses the existing `PulsarPalaceCharacter` structure from `app/structures/concept
 - ON/OFF stat system
 - Dice rolling utilities from `app/agents/tools/gaming_tools.py`
 
-### YAML Manifests
+### Song Proposal System
 
-Output format matches existing song manifests in `staged_raw_material/04_01` through `04_10`:
-- Same metadata fields (bpm, tempo, key, rainbow_color)
-- Compatible structure format
-- Matching mood and genre vocabularies
+Output is `SongProposalIteration` objects that feed into the production pipeline:
+- Metadata fields (bpm, tempo, key, rainbow_color) establish musical parameters
+- Mood and genre vocabularies draw inspiration from existing manifests (`staged_raw_material/04_01` through `04_10`)
+- Concept statements provide philosophical/archetypal grounding for later production work
+- **Important**: This is a proposal only—structure sections, audio tracks, and production details are handled by other agents
 
 ## Future Enhancements
 
@@ -153,10 +172,11 @@ Output format matches existing song manifests in `staged_raw_material/04_01` thr
 - Implement character interactions and relationships
 - Create action resolution mechanics
 
-### Music Extraction
-- Integrate with actual music generation (MIDI output)
-- Map narrative tension to dynamic BPM changes
-- Create leitmotifs for recurring characters/locations
+### Music Proposal Enhancement
+- Add more sophisticated concept generation with deeper archetypal analysis
+- Map narrative tension to additional musical parameters beyond BPM
+- Create character-specific musical signatures (leitmotifs)
+- Link proposals to player choices and session history
 
 ### Full Yellow Agent Integration
 - Connect to LangGraph workflow
@@ -165,11 +185,13 @@ Output format matches existing song manifests in `staged_raw_material/04_01` thr
 
 ## Design Philosophy
 
-This vertical slice embodies the Yellow Agent's core purpose: transforming procedurally generated gameplay into musical experiences. The Markov chain approach ensures:
+This vertical slice embodies the Yellow Agent's core purpose: transforming procedurally generated gameplay into song proposals. The Markov chain approach ensures:
 
 - **Reproducibility**: Same seed = same room
 - **Variety**: Large vocabulary space = unique experiences
 - **Coherence**: Curated transitions maintain aesthetic consistency
-- **Translation**: Narrative elements map cleanly to musical parameters
+- **Translation**: Narrative elements map cleanly to song proposal parameters
 
-The system demonstrates that gameplay can be both mechanically generated and artistically meaningful, with the "found poetry" of random combinations creating unexpected narrative moments that inspire musical expression.
+The system demonstrates that gameplay can be both mechanically generated and artistically meaningful, with the "found poetry" of random combinations creating unexpected narrative moments that inspire song proposals.
+
+**Key Distinction**: The Yellow Agent proposes songs based on gameplay narratives. It does **not** create complete production manifests with structure sections, timecodes, or audio tracks. Those are the responsibility of production agents downstream in the pipeline. The Yellow Agent's role is to translate the archetypal and emotional content of gameplay into musical metadata that other agents can use to create finished works.
