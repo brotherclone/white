@@ -124,7 +124,7 @@ class WhiteAgent(BaseModel):
         workflow.add_node("process_red_agent_work", self.process_red_agent_work)
         workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
         workflow.add_node("process_orange_agent_work", self.process_orange_agent_work)
-        # workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
+        workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
         # workflow.add_node("invoke_green_agent", self.invoke_green_agent)
         # workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
         # workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
@@ -134,6 +134,7 @@ class WhiteAgent(BaseModel):
         workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
         workflow.add_edge("invoke_red_agent", "process_red_agent_work")
+        workflow.add_edge("invoke_orange_agent", "process_orange_agent_work")
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
@@ -157,12 +158,12 @@ class WhiteAgent(BaseModel):
             self.route_after_orange,
             {
                 "orange": "invoke_orange_agent",
-                # "yellow": "invoke_yellow_agent",
+                "yellow": "invoke_yellow_agent",
                 "finish": "finalize_song_proposal",
             },
         )
         # Last agent, remember to update
-        workflow.add_edge("process_orange_agent_work", "finalize_song_proposal")
+        workflow.add_edge("process_yellow_agent_work", "finalize_song_proposal")
         #
         workflow.add_edge("finalize_song_proposal", END)
         return workflow.compile(checkpointer=check_points)
@@ -194,14 +195,14 @@ class WhiteAgent(BaseModel):
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Black Agent to generate counter-proposal"""
-        logging.info("Calling upon the Keeper of the Thread.")
+        logging.info("Calling upon ThreadKeepr.")
         if "black" not in self.agents:
             self.agents["black"] = BlackAgent(settings=self.settings)
         return self.agents["black"](state)
 
     def invoke_red_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Red Agent with the first synthesized proposal from Black Agent"""
-        logging.info("Calling upon the Light Reader")
+        logging.info("Calling upon the Light Reader.")
         if "red" not in self.agents:
             self.agents["red"] = RedAgent(settings=self.settings)
         return self.agents["red"](state)
@@ -212,6 +213,13 @@ class WhiteAgent(BaseModel):
         if "orange" not in self.agents:
             self.agents["orange"] = OrangeAgent(settings=self.settings)
         return self.agents["orange"](state)
+
+    def invoke_yellow_agent(self, state: MainAgentState) -> MainAgentState:
+        """Invoke Yellow Agent with the synthesized proposal"""
+        logging.info("Calling upon Lord Pulsimore.")
+        if "yellow" not in self.agents:
+            self.agents["yellow"] = YellowAgent(settings=self.settings)
+        return self.agents["yellow"](state)
 
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -380,6 +388,78 @@ class WhiteAgent(BaseModel):
         state.ready_for_orange = False
         state.ready_for_yellow = True
         return state
+
+    def process_yellow_agent_work(self, state: MainAgentState) -> MainAgentState:
+        logging.info("Processing Yellow Agent work... ")
+        sp = self._normalize_song_proposal(state.song_proposals)
+        yellow_proposal = sp.iterations[-1]
+        yellow_artifacts = state.artifacts or []
+        game_artifacts = [
+            n
+            for n in yellow_artifacts
+            if n.chain_artifact_type == ChainArtifactType.GAME_RUN
+        ]
+        rebracketing_analysis = self._yellow_rebracketing_analysis(
+            yellow_proposal, game_artifacts
+        )
+        document_synthesis = self._synthesize_document_for_green(
+            rebracketing_analysis, yellow_proposal, yellow_artifacts
+        )
+        state.rebracketing_analysis = rebracketing_analysis
+        save_markdown(
+            state.rebracketing_analysis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_yellow_rebracketing_analysis.md",
+        )
+        state.document_synthesis = document_synthesis
+        save_markdown(
+            state.document_synthesis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_yellow_document_synthesis.md",
+        )
+        state.ready_for_yellow = False
+        state.ready_for_green = True
+        return state
+
+    def _yellow_rebracketing_analysis(self, proposal, game_artifacts) -> str:
+        logging.info("Processing Yellow Agent rebracketing analysis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_white_rebracket_analysis_mock.yml",
+                "r",
+            ) as f:
+                data = yaml.safe_load(f)
+                return data
+        else:
+            prompt = f"""
+                          You are the White Agent performing a REBRACKETING operation.
+
+                          You have received these artifacts from the Yellow Agent:
+
+                          **Counter-proposal:**
+
+                          {proposal}
+
+                          **Articles:**
+                           {game_artifacts[game_artifacts.count - 1].page if game_artifacts else "None"}
+
+                          **Your Task: REBRACKETING**
+
+                          Yellow's content contains read outs from an RPG-style game that explores a pocket-dimension world.
+                          The Yellow agent is the lord of the Pulsar Palace, the realm which our adventures take place.
+                          Your job is to find alternative category boundaries that reveal hidden structures.
+
+                          Questions to guide you:
+                          - What patterns emerge when you parse this differently?
+                          - What is the significance of the item that the story seems to revolve around?
+                          - Where can you draw new boundaries to make sense of these layers of myth and fact?
+                          - What's the hidden coherence beneath the stories and objects?
+
+                          Generate a rebracketed analysis that finds structure in Yellow's terrifying and strange adventures.
+                          Focus on revealing the underlying ORDER, not explaining away the complexity.
+                          """
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
 
     def _orange_rebracketing_analysis(self, proposal, newspaper_artifacts) -> str:
         logging.info("Processing Orange Agent rebracketing analysis... ")
@@ -632,6 +712,49 @@ class WhiteAgent(BaseModel):
 
                        Structure your synthesis as a clear creative brief.
                        """
+
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
+
+    def _synthesize_document_for_green(
+        self, rebracketed_analysis, yellow_proposal, artifacts
+    ):
+        logging.info("Processing Yellow Agent synthesis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_white_document_synthesis_mock.yml",
+                "r",
+            ) as f:
+                data = yaml.safe_load(f)
+                return data
+        else:
+            prompt = f"""
+                              You are the White Agent creating a SYNTHESIZED DOCUMENT for the Accounter, Green Agent.
+
+                              **Your Rebracketed Analysis:**
+                              {rebracketed_analysis}
+
+                              **Original Yellow Counter-Proposal:**
+                              {yellow_proposal}
+
+                              **Artifacts Present:**
+                              {len(artifacts)} artifacts (Game Runs, RPG Logs, etc.)
+
+                              **Your Task: SYNTHESIS**
+
+                              Create a coherent, actionable document that:
+                              1. Preserves the insights from Yellow's game sessions.
+                              2. Applies your rebracketed understanding
+                              3. Creates clear creative direction
+                              4. Can be understood by the Green Agent (action-oriented, concrete)
+
+                              This document will be the foundation for Green Agent's song proposals.
+                              Make it practical while retaining the depth of insight.
+
+                              Structure your synthesis as a clear creative brief.
+                              """
 
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
