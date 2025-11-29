@@ -42,7 +42,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class BlackAgent(BaseRainbowAgent, ABC):
-    """Keeper of the Conjurer's Thread"""
+    """The ThreadKeepr"""
 
     def __init__(self, **data):
         if "settings" not in data or data["settings"] is None:
@@ -94,7 +94,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         snapshot = self._compiled_workflow.get_state(black_config)
 
         if snapshot.next:
-            logging.info(f"⏸️  Black Agent workflow paused at: {snapshot.next}")
+            logging.info(f"Black Agent workflow paused at: {snapshot.next}")
             state.workflow_paused = True
             state.pause_reason = "black_agent_awaiting_human_action"
             state.pending_human_action = {
@@ -108,9 +108,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             }
             if result.get("artifacts"):
                 state.artifacts = result["artifacts"]
-            logging.info(
-                "⏸️  Workflow paused - waiting for human to complete ritual tasks"
-            )
+            logging.info("Workflow paused - waiting for human to complete ritual tasks")
         else:
             state.song_proposals = result.get("song_proposals") or state.song_proposals
             if result.get("counter_proposal"):
@@ -199,7 +197,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             return state
         else:
             prompt = f"""
-            You are writing creative fiction about an experimental musician creating concept albums.
+            You are the ThreadKeepr, writing creative fiction about an experimental musician creating concept albums.
             Context: This character is an artist working in the experimental music space, creating 
             a concept album in 2016 after David Bowie's death and Trump's election. The character 
             uses themes of surveillance, control systems, and artistic resistance in their work.
@@ -568,7 +566,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             )
 
             prompt = f"""
-                   You are helping a musician create a creative fiction song about an experimental musician
+                   You are the ThreadKeepr, helping a musician create a creative fiction song about an experimental musician
                    working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
                    artifact consisting of audio segments and a transcript. Now, your task is to evaluate the transcript
                    and see if there are any surreal or lyrical results that could help you refocus your song proposal. At this point
@@ -621,7 +619,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.counter_proposal = evp_counter_proposal
             return state
         prompt = f"""
-                You are helping a musician create a creative fiction song about an experimental musician 
+                You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
                 working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
                 artifact consisting of audio segments and a transcript. Now, you need to update your song counter-proposal
                 to reflect the results of your EVP analysis. At this point you only need to reply with a counter-proposal
@@ -710,7 +708,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logging.error(f"Failed to parse sigil artifact: {e!s}")
                 return state
             prompt = f"""
-        You are helping a musician create a creative fiction song about an experimental musician 
+        You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
         working in the experimental music space. You have just generated a sigil artifact and used a
         ToDoist task to have your human charge the sigil. Now, you need to update your song counter-proposal
         to reflect the results of your sigil charge. At this point you only need to reply with a counter-proposal

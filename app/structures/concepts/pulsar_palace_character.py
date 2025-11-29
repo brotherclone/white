@@ -207,7 +207,7 @@ class PulsarPalacePlayer(BaseModel):
             self.initialized = True
 
     def get_example(self):
-        return f"Write a thumbnail sketch of the person playing as this character. You will be role-playing them role-playing their Pulsar Palace character. Here's an example {self.json_schema_extra["example"]}"
+        return f"Write a thumbnail sketch of the person playing as this character. You will be role-playing them role-playing their Pulsar Palace character. Here's an example {self.json_schema_extra['example']}"
 
     class Config:
         json_schema_extra = {
@@ -220,13 +220,7 @@ class PulsarPalacePlayer(BaseModel):
         }
 
 
-class PulsarPalaceBaseCharacter(BaseModel):
-
-    def __init__(self, **data):
-        super().__init__(**data)
-
-
-class PulsarPalaceCharacter(PulsarPalaceBaseCharacter):
+class PulsarPalaceCharacter(BaseModel):
 
     background: PulsarPalaceCharacterBackground | None
     disposition: PulsarPalaceCharacterDisposition | None
@@ -263,15 +257,3 @@ class PulsarPalaceCharacter(PulsarPalaceBaseCharacter):
             off_max=off_roll,
             off_current=off_roll,
         )
-
-    def assign_player(self, player: PulsarPalacePlayer):
-        self.player = player
-        print(
-            f"Assigned player {player.first_name} {player.last_name} to character {self.profession.profession}"
-        )
-
-
-class PulsarPalaceNonPlayerCharacter(PulsarPalaceBaseCharacter):
-
-    def __init__(self, **data):
-        super().__init__(**data)
