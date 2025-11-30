@@ -191,7 +191,6 @@ class RedAgent(BaseRainbowAgent, ABC):
                     state.counter_proposal = counter_proposal
         return state
 
-    # CLAUDE - Books aren't saving
     def generate_book(self, state: RedAgentState) -> RedAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
@@ -343,8 +342,6 @@ class RedAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception("Anthropic model call failed")
             return state
-
-    # CLAUDE - Reaction Books should save after pages
 
     def write_reaction_book_pages(self, state: RedAgentState) -> RedAgentState | None:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"

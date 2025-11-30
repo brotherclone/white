@@ -1,6 +1,12 @@
-from pydantic import BaseModel, ConfigDict
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.agents.tools.gaming_tools import no_repeat_roll_dice, roll_dice
+from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
+from app.structures.artifacts.pulsar_palace_character_sheet import (
+    PulsarPalaceCharacterSheet,
+)
 
 PULSAR_PALACE_IMAGE_BASE_PATH = "/Volumes/LucidNonsense/White/app/reference/gaming/img"
 
@@ -193,44 +199,48 @@ class PulsarPalaceCharacterProfession(BaseModel):
         super().__init__(**data)
 
 
-class PulsarPalacePlayer(BaseModel):
-
-    first_name: str | None
-    last_name: str | None
-    biography: str | None
-    attitude: str | None
-    initialized: bool = False
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        if self.first_name and self.last_name and self.biography and self.attitude:
-            self.initialized = True
-
-    def get_example(self):
-        return f"Write a thumbnail sketch of the person playing as this character. You will be role-playing them role-playing their Pulsar Palace character. Here's an example {self.json_schema_extra['example']}"
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "first_name": "Ben",
-                "last_name": "Quincy",
-                "biography": "Ben is an unemployed writer who's job was taken by AI. This game of Pulsar Palace is something he looks forward to as an escape from living in his parents' basement. Ben is 34 and divorced and loves to read science fiction novels.",
-                "attitude": "Ben is taking this game really seriously as its his only chance to socialize. So he's more than willing to explore and try all of the game's mechanics and completely finish it.",
-            }
-        }
-
-
 class PulsarPalaceCharacter(BaseModel):
 
-    background: PulsarPalaceCharacterBackground | None
-    disposition: PulsarPalaceCharacterDisposition | None
-    profession: PulsarPalaceCharacterProfession | None
-    on_max: int | None
-    off_max: int | None
-    on_current: int | None
-    off_current: int | None
-    player: PulsarPalacePlayer | None = None
-
+    background: PulsarPalaceCharacterBackground = Field(
+        default=None,
+        description="The background, time and place of origin, of the character.",
+    )
+    disposition: PulsarPalaceCharacterDisposition = Field(
+        default=None, description="The general disposition of the character."
+    )
+    profession: PulsarPalaceCharacterProfession = Field(
+        default=None, description="The profession or role of the character."
+    )
+    on_max: int = Field(
+        default=1,
+        description="The positive charge of the character at its maximum value",
+        ge=0,
+        le=30,
+    )
+    off_max: int = Field(
+        default=1,
+        description="The negative charge of the character at its maximum value",
+        ge=0,
+        le=30,
+    )
+    on_current: int = Field(
+        default=1,
+        description="The positive charge of the character at its current value",
+        ge=0,
+        le=50,
+    )
+    off_current: int = Field(
+        default=1,
+        description="The negative charge of the character at its current value",
+        ge=0,
+        le=50,
+    )
+    portrait: Optional[ImageChainArtifactFile] = Field(
+        default=None, description="Portrait of the character in png format"
+    )
+    character_sheet: Optional[PulsarPalaceCharacterSheet] = Field(
+        default=None, description="Character sheet of the character"
+    )
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(self, **data):
@@ -257,3 +267,11 @@ class PulsarPalaceCharacter(BaseModel):
             off_max=off_roll,
             off_current=off_roll,
         )
+
+    def create_portrait(self):
+        print(self.background.image_path)
+        print(self.profession.image_path)
+        print(self.disposition.image_path)
+
+    def create_character_sheet(self):
+        pass
