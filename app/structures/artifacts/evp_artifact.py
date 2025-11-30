@@ -14,7 +14,6 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 load_dotenv()
 
 
-# python
 class EVPArtifact(ChainArtifact):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.EVP_ARTIFACT

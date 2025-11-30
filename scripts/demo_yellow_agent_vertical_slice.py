@@ -17,9 +17,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.generators.character_action_generator import CharacterActionGenerator
-from app.generators.markov_room_generator import MarkovRoomGenerator
-from app.generators.music_extractor import MusicExtractor
+from app.structures.generators.character_action_generator import (
+    CharacterActionGenerator,
+)
+from app.structures.generators.markov_room_generator import MarkovRoomGenerator
+from app.structures.generators.music_extractor import MusicExtractor
 from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
 
 

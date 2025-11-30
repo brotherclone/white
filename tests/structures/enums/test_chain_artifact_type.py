@@ -12,6 +12,7 @@ EXPECTED = {
     "NEWSPAPER_ARTICLE": "newspaper_article",
     "SYMBOLIC_OBJECT": "symbolic_object",
     "PROPOSAL": "proposal",
+    "GAME_RUN": "game_run",
     "UNKNOWN": "unknown",
 }
 
