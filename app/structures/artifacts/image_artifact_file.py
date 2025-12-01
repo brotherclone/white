@@ -18,10 +18,24 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
         le=1000.0,
         default=1.0,
     )
-    image_file_type: str = Field(description="File type of the image", default="png")
 
     def __init__(self, **data):
         super().__init__(**data)
+
+    def flatten(self):
+        parent_data = super().flatten()
+        if parent_data is None:
+            parent_data = {}
+        return {
+            **parent_data,
+            "thread_id": self.thread_id,
+            "chain_artifact_type": self.chain_artifact_type.value,
+            "file_name": self.file_name,
+            "file_path": self.file_path,
+            "height": self.height,
+            "width": self.width,
+            "aspect_ratio": self.aspect_ratio,
+        }
 
     def save_file(self):
         if self.base_path:

@@ -12,4 +12,5 @@ class ChainArtifactType(str, Enum):
     PROPOSAL = "proposal"
     GAME_RUN = "game_run"
     CHARACTER_SHEET = "character_sheet"
+    CHARACTER_PORTRAIT = "character_portrait"
     UNKNOWN = "unknown"
