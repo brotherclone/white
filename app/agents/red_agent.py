@@ -49,7 +49,7 @@ class RedAgent(BaseRainbowAgent, ABC):
         red_state = RedAgentState(
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
-            black_to_white_proposal=current_proposal,
+            white_proposal=current_proposal,
             counter_proposal=None,
             artifacts=[],
             should_respond_with_reaction_book=False,
@@ -277,7 +277,16 @@ class RedAgent(BaseRainbowAgent, ABC):
                 "r",
             ) as f:
                 book_data = yaml.safe_load(f)
-                book_dict = book_data.model_dump()
+                if isinstance(book_data, dict):
+                    book_dict = book_data.copy()
+                elif hasattr(book_data, "model_dump"):
+                    book_dict = book_data.model_dump()
+                elif hasattr(book_data, "__dict__"):
+                    book_dict = dict(book_data.__dict__)
+                else:
+                    raise TypeError(
+                        f"Cannot convert book_data of type {type(book_data)} to dict"
+                    )
                 book_dict["thread_id"] = state.thread_id
                 book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
                 book_dict["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")

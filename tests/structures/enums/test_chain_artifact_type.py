@@ -13,6 +13,7 @@ EXPECTED = {
     "SYMBOLIC_OBJECT": "symbolic_object",
     "PROPOSAL": "proposal",
     "GAME_RUN": "game_run",
+    "CHARACTER_SHEET": "character_sheet",
     "UNKNOWN": "unknown",
 }
 

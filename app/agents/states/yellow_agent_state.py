@@ -14,7 +14,6 @@ class YellowAgentState(BaseRainbowAgentState):
 
     characters: List[PulsarPalaceCharacter] = Field(
         default_factory=list,
-        min_length=1,
         max_length=4,
         description="The Pulsar Palace RPG-style characters for a given game run.",
     )
@@ -34,9 +33,12 @@ class YellowAgentState(BaseRainbowAgentState):
     current_room_index: int = Field(
         default=0, description="Index of the current room in the story"
     )
-    should_add_to_game_run: bool = Field(
+    should_add_to_story: bool = Field(
         default=False,
         description="Whether the current run should be added to the game run",
+    )
+    max_rooms: Optional[int] = Field(
+        default=None, description="Maximum number of rooms"
     )
 
     def __init__(self, **data):

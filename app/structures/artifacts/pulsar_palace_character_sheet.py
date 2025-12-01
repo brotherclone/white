@@ -1,16 +1,43 @@
 from abc import ABC
+from pathlib import Path
+
+from pydantic import ConfigDict
 
 from app.structures.artifacts.base_artifact import ChainArtifact
-from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 
 class PulsarPalaceCharacterSheet(ChainArtifact, ABC):
 
-    character: PulsarPalaceCharacter
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.CHARACTER_SHEET
+    model_config = ConfigDict(extra="allow")
+    sheet_content: str = ""
 
     def __init__(self, **data):
         super().__init__(**data)
 
     def save_file(self):
-        """Return a little GI-Joe-esque profile care with a portrait"""
-        pass
+        file = Path(self.file_path, self.file_name)
+        file.parent.mkdir(parents=True, exist_ok=True)
+
+        content = self.sheet_content
+        if hasattr(content, "to_markdown") and callable(
+            getattr(content, "to_markdown")
+        ):
+            try:
+                md = content.to_markdown()
+            except ValueError:
+                md = str(content)
+        else:
+            md = content if isinstance(content, str) else str(content)
+
+        with open(file, "w", encoding="utf-8") as f:
+            f.write(md)
+
+    def flatten(self):
+        parent_data = super().flatten()
+        if parent_data is None:
+            parent_data = {}
+        return {
+            **parent_data,
+        }
