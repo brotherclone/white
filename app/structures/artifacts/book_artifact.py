@@ -33,7 +33,6 @@ class BookArtifact(ChainArtifact, ABC):
     rainbow_color_mnemonic_character_value: str = Field(
         default="R", description="Always R for Red"
     )
-    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     title: str = Field(..., description="Full title of the work")
     subtitle: Optional[str] = Field(None, description="Subtitle if present")
     author: str = Field(..., description="Author or attributed author")
@@ -73,17 +72,119 @@ class BookArtifact(ChainArtifact, ABC):
     def __init__(self, **data):
         super().__init__(**data)
 
+    def to_markdown(self) -> str:
+        """Convert book artifact to formatted markdown."""
+        md_lines = []
+
+        # Title and subtitle
+        md_lines.append(f"# {self.title}")
+        if self.subtitle:
+            md_lines.append(f"## {self.subtitle}")
+        md_lines.append("")
+
+        # Author and credentials
+        author_line = f"**Author:** {self.author}"
+        if self.author_credentials:
+            author_line += f" ({self.author_credentials})"
+        md_lines.append(author_line)
+        md_lines.append("")
+
+        # Publication info
+        md_lines.append(f"**Year:** {self.year}")
+        md_lines.append(
+            f"**Publisher:** {self.publisher} ({self.publisher_type.value})"
+        )
+        md_lines.append(f"**Edition:** {self.edition}")
+        md_lines.append(f"**Pages:** {self.pages}")
+        if self.isbn:
+            md_lines.append(f"**ISBN:** {self.isbn}")
+        md_lines.append("")
+
+        # Catalog and condition
+        md_lines.append(f"**Catalog Number:** {self.catalog_number}")
+        md_lines.append(f"**Condition:** {self.condition.value}")
+        md_lines.append(f"**Danger Level:** {self.danger_level}/5")
+        md_lines.append("")
+
+        # Acquisition
+        if self.acquisition_date or self.acquisition_notes:
+            md_lines.append("## Acquisition")
+            if self.acquisition_date:
+                md_lines.append(f"**Date:** {self.acquisition_date}")
+            if self.acquisition_notes:
+                md_lines.append(f"**Notes:** {self.acquisition_notes}")
+            md_lines.append("")
+
+        # Language and translation
+        md_lines.append(f"**Language:** {self.language}")
+        if self.translated_from:
+            md_lines.append(f"**Translated from:** {self.translated_from}")
+        if self.translator:
+            md_lines.append(f"**Translator:** {self.translator}")
+        md_lines.append("")
+
+        # Abstract
+        if self.abstract:
+            md_lines.append("## Abstract")
+            md_lines.append(self.abstract)
+            md_lines.append("")
+
+        # Notable quote
+        if self.notable_quote:
+            md_lines.append("## Notable Quote")
+            md_lines.append(f"> {self.notable_quote}")
+            md_lines.append("")
+
+        # Excerpts
+        if self.excerpts:
+            md_lines.append("## Excerpts")
+            for excerpt in self.excerpts:
+                md_lines.append(f"- {excerpt}")
+            md_lines.append("")
+
+        # Suppression history
+        if self.suppression_history:
+            md_lines.append("## Suppression History")
+            md_lines.append(self.suppression_history)
+            md_lines.append("")
+
+        # Related works
+        if self.related_works:
+            md_lines.append("## Related Works")
+            for work in self.related_works:
+                md_lines.append(f"- {work}")
+            md_lines.append("")
+
+        # Tags
+        if self.tags:
+            md_lines.append(f"**Tags:** {', '.join(self.tags)}")
+            md_lines.append("")
+
+        # Metadata footer
+        md_lines.append("---")
+        md_lines.append("## Metadata")
+        md_lines.append(f"- **Artifact ID:** {self.artifact_id}")
+        md_lines.append(f"- **Thread ID:** {self.thread_id}")
+        md_lines.append(
+            f"- **Rainbow Color:** {self.rainbow_color_mnemonic_character_value}"
+        )
+
+        return "\n".join(md_lines)
+
     def save_file(self):
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         file = Path(self.file_path, self.file_name)
         with open(file, "w") as f:
-            yaml.safe_dump(
-                self.model_dump(mode="json"),
-                f,
-                default_flow_style=False,
-                allow_unicode=True,
-            )
+            if self.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN:
+                f.write(self.to_markdown())
+            else:
+                yaml.safe_dump(
+                    self.model_dump(mode="json"),
+                    f,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
 
     def flatten(self):
         parent_data = super().flatten()
@@ -92,7 +193,7 @@ class BookArtifact(ChainArtifact, ABC):
         return {
             **parent_data,
             "thread_id": self.thread_id,
-            "chain_artifact_file_type": ChainArtifactFileType.YML.value,
+            "chain_artifact_file_type": self.chain_artifact_file_type.value,
             "file_name": self.file_name,
             "file_path": self.file_path,
             "chain_artifact_type": ChainArtifactType.BOOK.value,

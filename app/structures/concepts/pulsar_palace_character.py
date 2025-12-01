@@ -1,5 +1,6 @@
+import os
 from typing import Optional
-
+from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.agents.tools.gaming_tools import no_repeat_roll_dice, roll_dice
@@ -7,6 +8,10 @@ from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 from app.structures.artifacts.pulsar_palace_character_sheet import (
     PulsarPalaceCharacterSheet,
 )
+from app.agents.tools.image_tools import composite_character_portrait
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+
+load_dotenv()
 
 PULSAR_PALACE_IMAGE_BASE_PATH = "/Volumes/LucidNonsense/White/app/reference/gaming/img"
 
@@ -170,10 +175,12 @@ PULSAR_PALACE_PROFESSIONS = [
 
 class PulsarPalaceCharacterBackground(BaseModel):
 
-    rollId: int
-    time: int = None
-    place: str = None
-    image_path: str = None
+    rollId: int = Field(description="The roll ID of the background", ge=1, le=10)
+    time: int = Field(description="The year of the background", ge=0, le=10000)
+    place: str = Field(description="The place of the background")
+    image_path: Optional[str] = Field(
+        description="The path to the background image", default=None
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -181,9 +188,11 @@ class PulsarPalaceCharacterBackground(BaseModel):
 
 class PulsarPalaceCharacterDisposition(BaseModel):
 
-    rollId: int
-    disposition: str = None
-    image_path: str = None
+    rollId: int = Field(description="The roll ID of the disposition", ge=1, le=8)
+    disposition: str = Field(description="The disposition of the character")
+    image_path: Optional[str] = Field(
+        description="The path to the disposition image", default=None
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -191,9 +200,11 @@ class PulsarPalaceCharacterDisposition(BaseModel):
 
 class PulsarPalaceCharacterProfession(BaseModel):
 
-    rollId: int
-    profession: str = None
-    image_path: str = None
+    rollId: int = Field(description="The roll ID of the profession", ge=1, le=10)
+    profession: str = Field(description="The profession of the character")
+    image_path: Optional[str] = Field(
+        description="The path to the profession image", default=None
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -201,36 +212,40 @@ class PulsarPalaceCharacterProfession(BaseModel):
 
 class PulsarPalaceCharacter(BaseModel):
 
-    background: PulsarPalaceCharacterBackground = Field(
+    thread_id: str = Field(description="The ID of the thread this character belongs to")
+    encounter_id: str = Field(
+        description="The ID of the encounter this character belongs to"
+    )
+    background: Optional[PulsarPalaceCharacterBackground] = Field(
         default=None,
         description="The background, time and place of origin, of the character.",
     )
-    disposition: PulsarPalaceCharacterDisposition = Field(
+    disposition: Optional[PulsarPalaceCharacterDisposition] = Field(
         default=None, description="The general disposition of the character."
     )
-    profession: PulsarPalaceCharacterProfession = Field(
+    profession: Optional[PulsarPalaceCharacterProfession] = Field(
         default=None, description="The profession or role of the character."
     )
-    on_max: int = Field(
-        default=1,
+    on_max: Optional[int] = Field(
+        default=None,
         description="The positive charge of the character at its maximum value",
         ge=0,
         le=30,
     )
-    off_max: int = Field(
-        default=1,
+    off_max: Optional[int] = Field(
+        default=None,
         description="The negative charge of the character at its maximum value",
         ge=0,
         le=30,
     )
-    on_current: int = Field(
-        default=1,
+    on_current: Optional[int] = Field(
+        default=None,
         description="The positive charge of the character at its current value",
         ge=0,
         le=50,
     )
-    off_current: int = Field(
-        default=1,
+    off_current: Optional[int] = Field(
+        default=None,
         description="The negative charge of the character at its current value",
         ge=0,
         le=50,
@@ -247,7 +262,7 @@ class PulsarPalaceCharacter(BaseModel):
         super().__init__(**data)
 
     @classmethod
-    def create_random(cls):
+    def create_random(cls, thread_id: str, encounter_id: str):
         bg = PulsarPalaceCharacterBackground(
             **PULSAR_PALACE_BACKGROUNDS[roll_dice([(1, 10)])[0] - 1]
         )
@@ -259,6 +274,8 @@ class PulsarPalaceCharacter(BaseModel):
         )
         on_roll, off_roll = no_repeat_roll_dice([(1, 20)], [(1, 20)])
         return cls(
+            thread_id=thread_id,
+            encounter_id=encounter_id,
             background=bg,
             disposition=disp,
             profession=prof,
@@ -269,9 +286,31 @@ class PulsarPalaceCharacter(BaseModel):
         )
 
     def create_portrait(self):
-        print(self.background.image_path)
-        print(self.profession.image_path)
-        print(self.disposition.image_path)
+        png = composite_character_portrait(
+            self.background.image_path,
+            [self.profession.image_path, self.disposition.image_path],
+            f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{self.thread_id}/{ChainArtifactFileType.PNG.value}/",
+        )
+        self.portrait = ImageChainArtifactFile(
+            thread_id=self.thread_id,
+            file_name="character_portrait.png",
+            base_path=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{self.thread_id}/{ChainArtifactFileType.PNG.value}/",
+            file_path=png,
+        )
 
     def create_character_sheet(self):
-        pass
+        template = f"""
+        ![{self.disposition.disposition} {self.profession.profession}]({self.portrait.file_path})
+        #{self.disposition.disposition} {self.profession.profession}
+        ## from {self.background.time}, {self.background.place}
+        ### ON
+        {self.on_current} / {self.on_max}
+        ### OFF
+        {self.off_current} / {self.off_max}
+        """
+        self.character_sheet = PulsarPalaceCharacterSheet(
+            thread_id=self.thread_id,
+            sheet_content=template,
+            base_path=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{self.thread_id}/{ChainArtifactFileType.MARKDOWN.value}/",
+        )
+        self.character_sheet.save_file()

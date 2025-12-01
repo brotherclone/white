@@ -1,9 +1,8 @@
 import logging
 import os
-import time
-from abc import ABC
-
 import yaml
+
+from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import START, END
@@ -39,10 +38,6 @@ class YellowAgent(BaseRainbowAgent, ABC):
     action_generator: CharacterActionGenerator = Field(
         default_factory=CharacterActionGenerator
     )
-    max_rooms: int = Field(
-        default=4,
-        description="Maximum number of rooms to generate in a single RPG run.",
-    )
 
     def __init__(self, **data):
         # Ensure settings are initialized if not provided
@@ -66,7 +61,32 @@ class YellowAgent(BaseRainbowAgent, ABC):
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
         print("Lord Pulsimore of Pulsar Palace")
-
+        current_proposal = state.song_proposals.iterations[-1]
+        yellow_state = YellowAgentState(
+            thread_id=state.thread_id,
+            song_proposals=state.song_proposals,
+            counter_proposal=None,
+            artifacts=[],
+            white_proposal=current_proposal,
+            rooms=[],
+            current_room_index=0,
+            characters=[],
+            encounter_narrative_artifact=None,
+            story_elaboration_level=0,
+            should_add_to_story=False,
+            max_rooms=4,
+        )
+        yellow_graph = self.create_graph()
+        compiled_graph = yellow_graph.compile()
+        result = compiled_graph.invoke(yellow_state.model_dump())
+        if isinstance(result, YellowAgentState):
+            final_state = result
+        elif isinstance(result, dict):
+            final_state = YellowAgentState(**result)
+        else:
+            raise TypeError(f"Unexpected result type: {type(result)}")
+        if final_state.counter_proposal:
+            state.song_proposals.iterations.append(final_state.counter_proposal)
         return state
 
     def create_graph(self) -> StateGraph:
@@ -79,6 +99,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
         5. Evaluate the Proposal to submit or add to the RPG Run
         :return:
         """
+        logging.info("Creating Yellow Agent workflow")
         work_flow = StateGraph(YellowAgentState)
         # Nodes
         work_flow.add_node("generate_characters", self.generate_characters)
@@ -108,16 +129,21 @@ class YellowAgent(BaseRainbowAgent, ABC):
         work_flow.add_edge("render_game_run", END)
         return work_flow
 
-    def generate_characters(self, state: YellowAgentState) -> YellowAgentState:
+    @staticmethod
+    def generate_characters(state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-
         if mock_mode:
-            with open("/tests/mocks/yellow_character_one_mock.yml", "r") as file_one:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_one_mock.yml",
+                "r",
+            ) as file_one:
                 data_one = yaml.safe_load(file_one)
                 character_one = PulsarPalaceCharacter(**data_one)
                 state.characters.append(character_one)
-            with open("/tests/mocks/yellow_character_two_mock.yml", "r") as file_two:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_two_mock.yml",
+                "r",
+            ) as file_two:
                 data_two = yaml.safe_load(file_two)
                 character_two = PulsarPalaceCharacter(**data_two)
                 state.characters.append(character_two)
@@ -132,13 +158,16 @@ class YellowAgent(BaseRainbowAgent, ABC):
 
     def generate_environment(self, state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/yellow_room_one_mock.yml", "r") as file_one:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_room_one_mock.yml", "r"
+            ) as file_one:
                 data_one = yaml.safe_load(file_one)
                 room_one = PulsarPalaceRoom(**data_one)
                 state.rooms.append(room_one)
-            with open("/tests/mocks/yellow_room_two_mock.yml", "r") as file_two:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_room_two_mock.yml", "r"
+            ) as file_two:
                 data_two = yaml.safe_load(file_two)
                 room_two = PulsarPalaceRoom(**data_two)
                 state.rooms.append(room_two)
@@ -152,16 +181,17 @@ class YellowAgent(BaseRainbowAgent, ABC):
         return state
 
     def generate_story(self, state: YellowAgentState) -> YellowAgentState:
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        for i, char in enumerate(self.characters):
-            print(self.character_action_generator.generate_action(char))
-            # Where do these go?
-        story = self.character_action_generator.generate_story(
-            state.characters, state.rooms[state.current_room_index]
+        current_room = state.rooms[state.current_room_index]
+        story = self.action_generator.generate_encounter_narrative(
+            room_description=current_room.description, characters=state.characters
         )
         encounter_artifact = PulsarPalaceEncounterArtifact(
-            characters=state.characters, rooms=state.rooms, story=story
+            thread_id=state.thread_id,
+            base_path=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH', 'chain_artifacts')}",
+            artifact_name="pulsar_palace_game_run",
+            characters=state.characters,
+            rooms=state.rooms,
+            story=[story],
         )
         state.encounter_narrative_artifact = encounter_artifact
         state.story_elaboration_level = 1
@@ -169,7 +199,6 @@ class YellowAgent(BaseRainbowAgent, ABC):
 
     def evaluate_song_proposal(self, state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             state.should_add_to_story = True
         else:
@@ -206,27 +235,25 @@ class YellowAgent(BaseRainbowAgent, ABC):
         return state
 
     def add_to_story(self, state: YellowAgentState) -> YellowAgentState:
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        """Continue the story in the next room."""
         state.current_room_index += 1
-        for i, char in enumerate(self.characters):
-            print(self.character_action_generator.generate_action(char))
-            # Where do these go?
-        story = self.character_action_generator.generate_story(
-            state.characters, state.rooms[state.current_room_index]
+        current_room = state.rooms[state.current_room_index]
+        story = self.action_generator.generate_encounter_narrative(
+            room_description=current_room.description, characters=state.characters
         )
         state.encounter_narrative_artifact.story.append(story)
         state.story_elaboration_level += 1
         state.should_add_to_story = False
         return state
 
-    def route_after_evaluate_proposal(self) -> str:
+    @staticmethod
+    def route_after_evaluate_proposal(state: YellowAgentState) -> str:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             return "done"
         else:
-            if self.state.story_elaboration_level < self.max_rooms:
-                if self.state.should_add_to_story:
+            if state.story_elaboration_level < state.max_rooms:
+                if state.should_add_to_story:
                     return "add"
             return "done"
 
@@ -234,29 +261,49 @@ class YellowAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/yellow_counter_proposal_mock.yml", "r") as f:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_counter_proposal_mock.yml",
+                "r",
+            ) as f:
                 data = yaml.safe_load(f)
             counter_proposal = SongProposalIteration(**data)
             state.counter_proposal = counter_proposal
             return state
         else:
+            primary_room = state.rooms[0]
+            full_narrative = " ".join(state.encounter_narrative_artifact.story)
+            base_proposal = self.music_extractor.extract_song_proposal(
+                room=primary_room, encounter_narrative=full_narrative
+            )
             prompt = f"""
                     You are Lord Pulsimore, resplendent ruler of the Pulsar Palace and the yellow void that exists between space and time.
-                    This proposal should take into consideration the current synthesized proposal from the White agent. Create a counter
-                    proposal for a song that shares aspects of the current proposal but ultimately is about the record of the game that
-                    has just been played inside the Palace.
 
-                    The last set of travelers who ventured into the Palace:
-                    {state.encounter_narrative_artifact}
+                    A game session has just completed in the Palace. Musical parameters have been procedurally extracted:
+                    - BPM: {base_proposal.bpm}
+                    - Key: {base_proposal.key}
+                    - Mood: {base_proposal.mood}
+                    - Genres: {base_proposal.genres}
 
-                    Current song proposal:
+                    The full narrative of what transpired:
+                    {full_narrative}
+
+                    Current synthesized White Agent proposal:
                     {state.white_proposal}
 
-                    Reference works in this artist's style paying close attention to 'concept' property:
+                    Reference works in this artist's style:
                     {get_my_reference_proposals('Y')}
 
-                    In your counter proposal your 'rainbow_color' property should always be:
-                    {the_rainbow_table_colors['Y']}
+                    Create a counter-proposal that:
+                    1. Uses the procedurally generated musical parameters above
+                    2. Synthesizes the White Agent's themes with the game narrative
+                    3. Writes a concept that captures how this RPG session becomes music
+                    4. Maintains the Yellow Album's ontological mode: PRESENT + PLACE + IMAGINED
+
+                    Your response should be a SongProposalIteration with:
+                    - rainbow_color: {the_rainbow_table_colors['Y']}
+                    - The procedural BPM, key, mood, genres above
+                    - A creative title (not just the room name)
+                    - An enhanced concept that connects game → music → White Agent themes
                     """
             claude = self._get_claude()
             proposer = claude.with_structured_output(SongProposalIteration)
@@ -264,7 +311,11 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
-                    state.song_proposals.iterations.append(self.counter_proposal)
+                    counter_proposal.bpm = base_proposal.bpm
+                    counter_proposal.key = base_proposal.key
+                    counter_proposal.mood = base_proposal.mood
+                    counter_proposal.genres = base_proposal.genres
+                    state.song_proposals.iterations.append(counter_proposal)
                     state.counter_proposal = counter_proposal
                     return state
                 if not isinstance(result, SongProposalIteration):
@@ -274,22 +325,32 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     logging.warning(error_msg)
             except Exception as e:
                 print(
-                    f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration for red's counter proposal after authoring a book."
+                    f"Anthropic model call failed: {e!s}; falling back to pure MusicExtractor output"
                 )
                 if block_mode:
                     raise Exception("Anthropic model call failed")
                 else:
-                    timestamp = int(time.time() * 1000)
-                    counter_proposal = SongProposalIteration(
-                        iteration_id=f"fallback_error_{timestamp}",
-                        bpm=133.33,
-                        tempo="4/4",
-                        key="Gb Major",
-                        rainbow_color="yellow",
-                        title="Fallback: Yellow Song",
-                        mood=["obscure"],
-                        genres=["electronic"],
-                        concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable.",
-                    )
-                    state.counter_proposal = counter_proposal
+                    state.counter_proposal = base_proposal
         return state
+
+    @staticmethod
+    def render_game_run(state: YellowAgentState) -> YellowAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            with open(
+                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_encounter_narrative_artifact_mock.yml",
+                "r",
+            ) as f:
+                data = yaml.safe_load(f)
+            encounter = PulsarPalaceEncounterArtifact(**data)
+            state.encounter_narrative_artifact = encounter
+            state.artifacts.append(encounter)
+            return state
+        else:
+            if state.encounter_narrative_artifact:
+                state.encounter_narrative_artifact.save_file()
+                state.artifacts.append(state.encounter_narrative_artifact)
+                logging.info(
+                    f"Saved game run artifact: {state.encounter_narrative_artifact.get_artifact_path()}"
+                )
+            return state

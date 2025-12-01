@@ -1,0 +1,18 @@
+room_id: room_002
+name: Mock Room
+room_type: social
+atmosphere: dangerous and corrupted
+description: A corrupted conservatory stretches before the party. The space is dominated by baroque mirror arrangements. Near the edges, impossible geometric statues create an unsettling ambiance. Nobles trapped mid-gesture occupy the chamber. The party notices time-frozen servants.
+narrative_beat: The social gathering conceals predatory intent.
+features:
+      - baroque mirror arrangements
+      - impossible geometric statues
+      - time-frozen servants
+      - windows showing other times
+inhabitants:
+      - Nobles trapped mid-gesture
+      - Large childlike guardians
+exits:
+      - east
+      - across the pulsar threshold
+      - north

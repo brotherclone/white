@@ -125,6 +125,7 @@ class WhiteAgent(BaseModel):
         workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
         workflow.add_node("process_orange_agent_work", self.process_orange_agent_work)
         workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
+        workflow.add_node("process_yellow_agent_work", self.process_yellow_agent_work)
         # workflow.add_node("invoke_green_agent", self.invoke_green_agent)
         # workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
         # workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
@@ -398,6 +399,7 @@ class WhiteAgent(BaseModel):
             n
             for n in yellow_artifacts
             if n.chain_artifact_type == ChainArtifactType.GAME_RUN
+            or n.chain_artifact_type == ChainArtifactType.CHARACTER_SHEET
         ]
         rebracketing_analysis = self._yellow_rebracketing_analysis(
             yellow_proposal, game_artifacts
@@ -798,7 +800,13 @@ class WhiteAgent(BaseModel):
 
     @staticmethod
     def route_after_orange(state: MainAgentState) -> str:
-        return "finish"
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "yellow"
+        if state.ready_for_yellow:
+            return "yellow"
+        else:
+            return "orange"
 
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
         logging.info("Finalizing song proposals... ")
