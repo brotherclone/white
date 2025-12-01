@@ -126,13 +126,19 @@ class RedAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_counter_proposal_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                counter_proposal = SongProposalIteration(**data)
-                state.counter_proposal = counter_proposal
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_counter_proposal_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    counter_proposal = SongProposalIteration(**data)
+                    state.counter_proposal = counter_proposal
+            except Exception as e:
+                error_msg = f"Failed to read mock counter proposal: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
         else:
             summary = self._format_books_for_prompt(state)
             prompt = f"""
@@ -195,19 +201,27 @@ class RedAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_book_artifact_mock.yml", "r"
-            ) as f:
-                data = yaml.safe_load(f)
-                book = BookArtifact(**data)
-                book.base_path = (
-                    f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
-                )
-                book.save_file()
-                state.artifacts.append(book)
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_book_artifact_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    book = BookArtifact(**data)
+                    book.base_path = (
+                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    )
+                    book.save_file()
+                    state.artifacts.append(book)
+                    state.should_create_book = False
+                    state.reaction_level += 1
+            except Exception as e:
+                error_msg = f"Failed to read or save mock book artifact: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
                 state.should_create_book = False
-                state.reaction_level += 1
-                return state
+            return state
         else:
             book_data = BookMaker.generate_random_book()
             prompt = f"""
@@ -258,7 +272,13 @@ class RedAgent(BaseRainbowAgent, ABC):
                 )
                 state.main_generated_book = BookArtifact(**book_dict)
                 state.artifacts.append(state.main_generated_book)
-                state.main_generated_book.save_file()
+                try:
+                    state.main_generated_book.save_file()
+                except Exception as e:
+                    error_msg = f"Failed to save book artifact file: {e!s}"
+                    logging.error(error_msg)
+                    if block_mode:
+                        raise Exception(error_msg)
                 state.should_create_book = False
                 return state
             except Exception as e:
@@ -272,29 +292,41 @@ class RedAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_data_mock.yml",
-                "r",
-            ) as f:
-                book_data = yaml.safe_load(f)
-                if isinstance(book_data, dict):
-                    book_dict = book_data.copy()
-                elif hasattr(book_data, "model_dump"):
-                    book_dict = book_data.model_dump()
-                elif hasattr(book_data, "__dict__"):
-                    book_dict = dict(book_data.__dict__)
-                else:
-                    raise TypeError(
-                        f"Cannot convert book_data of type {type(book_data)} to dict"
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_data_mock.yml",
+                    "r",
+                ) as f:
+                    book_data = yaml.safe_load(f)
+                    if isinstance(book_data, dict):
+                        book_dict = book_data.copy()
+                    elif hasattr(book_data, "model_dump"):
+                        book_dict = book_data.model_dump()
+                    elif hasattr(book_data, "__dict__"):
+                        book_dict = dict(book_data.__dict__)
+                    else:
+                        error_msg = f"Cannot convert book_data of type {type(book_data)} to dict"
+                        logging.error(error_msg)
+                        if block_mode:
+                            raise TypeError(error_msg)
+                        state.should_respond_with_reaction_book = False
+                        return state
+                    book_dict["thread_id"] = state.thread_id
+                    book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
+                    book_dict["base_path"] = os.getenv(
+                        "AGENT_ARTIFACTS_PATH", "artifacts"
                     )
-                book_dict["thread_id"] = state.thread_id
-                book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
-                book_dict["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")
-                state.current_reaction_book = BookArtifact(**book_dict)
-                state.artifacts.append(state.current_reaction_book)
-                state.reaction_level += 1
+                    state.current_reaction_book = BookArtifact(**book_dict)
+                    state.artifacts.append(state.current_reaction_book)
+                    state.reaction_level += 1
+                    state.should_respond_with_reaction_book = False
+            except Exception as e:
+                error_msg = f"Failed to read mock reaction book data: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
                 state.should_respond_with_reaction_book = False
-                return state
+            return state
         else:
             prompt = f"""
             Imagine yourself a small-time academic, novelist, or new-age writer. You come across this book:
@@ -356,18 +388,24 @@ class RedAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_page_1_mock.yml",
-                "r",
-            ) as f:
-                page_1 = yaml.safe_load(f)
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_page_2_mock.yml",
-                "r",
-            ) as f:
-                page_2 = yaml.safe_load(f)
-            state.current_reaction_book.excerpts = [page_1, page_2]
-            state.artifacts.append(state.current_reaction_book)
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_page_1_mock.yml",
+                    "r",
+                ) as f:
+                    page_1 = yaml.safe_load(f)
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_reaction_book_page_2_mock.yml",
+                    "r",
+                ) as f:
+                    page_2 = yaml.safe_load(f)
+                state.current_reaction_book.excerpts = [page_1, page_2]
+                state.artifacts.append(state.current_reaction_book)
+            except Exception as e:
+                error_msg = f"Failed to read mock reaction book pages: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
             prompt = f"""

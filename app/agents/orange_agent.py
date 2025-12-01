@@ -113,17 +113,24 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
     def generate_alternate_song_spec(self, state: OrangeAgentState) -> OrangeAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                os.path.join(
-                    os.getenv("AGENT_MOCK_DATA_PATH"),
-                    "orange_counter_proposal_mock.yml",
-                ),
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-            counter_proposal = SongProposalIteration(**data)
-            state.counter_proposal = counter_proposal
+            try:
+                with open(
+                    os.path.join(
+                        os.getenv("AGENT_MOCK_DATA_PATH"),
+                        "orange_counter_proposal_mock.yml",
+                    ),
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                counter_proposal = SongProposalIteration(**data)
+                state.counter_proposal = counter_proposal
+            except Exception as e:
+                error_msg = f"Failed to read mock counter proposal: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
             prompt = f"""Generate Orange's counter-proposal based on the mythologized story.
@@ -165,10 +172,30 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
-                else:
+                elif isinstance(result, SongProposalIteration):
                     counter_proposal = result
+                else:
+                    error_msg = f"Expected SongProposalIteration, got {type(result)}"
+                    logging.error(error_msg)
+                    if block_mode:
+                        raise TypeError(error_msg)
+                    timestamp = int(time.time() * 1000)
+                    counter_proposal = SongProposalIteration(
+                        iteration_id=f"fallback_error_{timestamp}",
+                        bpm=110,
+                        tempo="4/4",
+                        key="D Major",
+                        rainbow_color="orange",
+                        title="Fallback: Orange Song",
+                        mood=["nostalgic"],
+                        genres=["alternative"],
+                        concept="Fallback stub because Anthropic model unavailable",
+                    )
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                error_msg = f"Orange counter proposal LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
                 timestamp = int(time.time() * 1000)
                 counter_proposal = SongProposalIteration(
                     iteration_id=f"fallback_error_{timestamp}",
@@ -188,18 +215,25 @@ class OrangeAgent(BaseRainbowAgent, ABC):
     def synthesize_base_story(self, state: OrangeAgentState) -> OrangeAgentState:
         """Synthesize a plausible Sussex County newspaper story (1975-1995)"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                os.path.join(
-                    os.getenv("AGENT_MOCK_DATA_PATH"), "orange_base_story_mock.yml"
-                ),
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                story = NewspaperArtifact(**data)
-                story.save_file()
-                state.synthesized_story = story
-                state.artifacts.append(story)
+            try:
+                with open(
+                    os.path.join(
+                        os.getenv("AGENT_MOCK_DATA_PATH"), "orange_base_story_mock.yml"
+                    ),
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    story = NewspaperArtifact(**data)
+                    story.save_file()
+                    state.synthesized_story = story
+                    state.artifacts.append(story)
+            except Exception as e:
+                error_msg = f"Failed to read or save mock base story: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
             start_date = datetime(1975, 1, 1)
@@ -271,10 +305,33 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     state.synthesized_story.base_path = (
                         f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
                     )
-                    state.synthesized_story.save_file()
+                    try:
+                        state.synthesized_story.save_file()
+                    except Exception as e:
+                        error_msg = f"Failed to save synthesized story file: {e!s}"
+                        logging.error(error_msg)
+                        if block_mode:
+                            raise Exception(error_msg)
+                    state.artifacts.append(state.synthesized_story)
+                    return state
+                elif isinstance(result, NewspaperArtifact):
+                    state.synthesized_story = result
+                    try:
+                        state.synthesized_story.save_file()
+                    except Exception as e:
+                        error_msg = f"Failed to save synthesized story file: {e!s}"
+                        logging.error(error_msg)
+                        if block_mode:
+                            raise Exception(error_msg)
                     state.artifacts.append(state.synthesized_story)
                     return state
                 else:
+                    error_msg = (
+                        f"Expected NewspaperArtifact or dict, got {type(result)}"
+                    )
+                    logging.error(error_msg)
+                    if block_mode:
+                        raise TypeError(error_msg)
                     fallback_story = NewspaperArtifact(
                         thread_id=state.thread_id,
                         headline="Strange Frequencies Reported Near High School Band Room",
@@ -287,7 +344,10 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     state.synthesized_story = fallback_story
                     return state
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                error_msg = f"Base story synthesis LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
         return state
 
     def add_to_corpus(self, state: OrangeAgentState) -> OrangeAgentState:
@@ -319,17 +379,24 @@ class OrangeAgent(BaseRainbowAgent, ABC):
     def select_symbolic_object(self, state: OrangeAgentState) -> OrangeAgentState:
         """Analyze the story and select a symbolic object category"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                os.path.join(
-                    os.getenv("AGENT_MOCK_DATA_PATH"),
-                    "orange_mock_object_selection.yml",
-                ),
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                obj = SymbolicObjectArtifact(**data)
-                state.symbolic_object = obj
+            try:
+                with open(
+                    os.path.join(
+                        os.getenv("AGENT_MOCK_DATA_PATH"),
+                        "orange_mock_object_selection.yml",
+                    ),
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    obj = SymbolicObjectArtifact(**data)
+                    state.symbolic_object = obj
+            except Exception as e:
+                error_msg = f"Failed to read mock symbolic object: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
             try:
@@ -391,16 +458,23 @@ class OrangeAgent(BaseRainbowAgent, ABC):
     def gonzo_rewrite_node(self, state: OrangeAgentState) -> OrangeAgentState:
         """Rewrite the story in gonzo journalism style via MCP tool"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                os.path.join(
-                    os.getenv("AGENT_MOCK_DATA_PATH"), "orange_gonzo_rewrite.yml"
-                ),
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                new_article = NewspaperArtifact(**data)
-                state.mythologized_story = new_article
+            try:
+                with open(
+                    os.path.join(
+                        os.getenv("AGENT_MOCK_DATA_PATH"), "orange_gonzo_rewrite.yml"
+                    ),
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    new_article = NewspaperArtifact(**data)
+                    state.mythologized_story = new_article
+            except Exception as e:
+                error_msg = f"Failed to read mock gonzo rewrite: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         try:
             story = self.corpus.get_story(state.selected_story_id)
@@ -463,12 +537,21 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             state.mythologized_story.base_path = (
                 f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
             )
-            state.mythologized_story.save_file()
+            try:
+                state.mythologized_story.save_file()
+            except Exception as e:
+                error_msg = f"Failed to save mythologized story file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             state.artifacts.append(state.mythologized_story)
             return state
 
         except Exception as e:
-            logging.error(f"Gonzo rewrite failed: {e}")
+            error_msg = f"Gonzo rewrite LLM call failed: {e!s}"
+            logging.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
             state.mythologized_story = state.synthesized_story
 
         return state

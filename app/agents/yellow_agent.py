@@ -132,21 +132,28 @@ class YellowAgent(BaseRainbowAgent, ABC):
     @staticmethod
     def generate_characters(state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_one_mock.yml",
-                "r",
-            ) as file_one:
-                data_one = yaml.safe_load(file_one)
-                character_one = PulsarPalaceCharacter(**data_one)
-                state.characters.append(character_one)
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_two_mock.yml",
-                "r",
-            ) as file_two:
-                data_two = yaml.safe_load(file_two)
-                character_two = PulsarPalaceCharacter(**data_two)
-                state.characters.append(character_two)
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_one_mock.yml",
+                    "r",
+                ) as file_one:
+                    data_one = yaml.safe_load(file_one)
+                    character_one = PulsarPalaceCharacter(**data_one)
+                    state.characters.append(character_one)
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_two_mock.yml",
+                    "r",
+                ) as file_two:
+                    data_two = yaml.safe_load(file_two)
+                    character_two = PulsarPalaceCharacter(**data_two)
+                    state.characters.append(character_two)
+            except Exception as e:
+                error_msg = f"Failed to read mock character files: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
         else:
             num_characters = roll_dice([(1, 4)])
             for i in range(num_characters):
@@ -158,20 +165,27 @@ class YellowAgent(BaseRainbowAgent, ABC):
 
     def generate_environment(self, state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_room_one_mock.yml", "r"
-            ) as file_one:
-                data_one = yaml.safe_load(file_one)
-                room_one = PulsarPalaceRoom(**data_one)
-                state.rooms.append(room_one)
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_room_two_mock.yml", "r"
-            ) as file_two:
-                data_two = yaml.safe_load(file_two)
-                room_two = PulsarPalaceRoom(**data_two)
-                state.rooms.append(room_two)
-            state.story_elaboration_level = 2
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_room_one_mock.yml", "r"
+                ) as file_one:
+                    data_one = yaml.safe_load(file_one)
+                    room_one = PulsarPalaceRoom(**data_one)
+                    state.rooms.append(room_one)
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_room_two_mock.yml", "r"
+                ) as file_two:
+                    data_two = yaml.safe_load(file_two)
+                    room_two = PulsarPalaceRoom(**data_two)
+                    state.rooms.append(room_two)
+                state.story_elaboration_level = 2
+            except Exception as e:
+                error_msg = f"Failed to read mock room files: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
         else:
             room_count = roll_dice([(1, self.max_rooms)])
             state.story_elaboration_level = room_count
@@ -261,13 +275,19 @@ class YellowAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_counter_proposal_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-            counter_proposal = SongProposalIteration(**data)
-            state.counter_proposal = counter_proposal
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_counter_proposal_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                counter_proposal = SongProposalIteration(**data)
+                state.counter_proposal = counter_proposal
+            except Exception as e:
+                error_msg = f"Failed to read mock counter proposal: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
             primary_room = state.rooms[0]
@@ -336,21 +356,34 @@ class YellowAgent(BaseRainbowAgent, ABC):
     @staticmethod
     def render_game_run(state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_encounter_narrative_artifact_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-            encounter = PulsarPalaceEncounterArtifact(**data)
-            state.encounter_narrative_artifact = encounter
-            state.artifacts.append(encounter)
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_encounter_narrative_artifact_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                encounter = PulsarPalaceEncounterArtifact(**data)
+                state.encounter_narrative_artifact = encounter
+                state.artifacts.append(encounter)
+            except Exception as e:
+                error_msg = f"Failed to read mock encounter narrative artifact: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
             if state.encounter_narrative_artifact:
-                state.encounter_narrative_artifact.save_file()
-                state.artifacts.append(state.encounter_narrative_artifact)
-                logging.info(
-                    f"Saved game run artifact: {state.encounter_narrative_artifact.get_artifact_path()}"
-                )
+                try:
+                    state.encounter_narrative_artifact.save_file()
+                    state.artifacts.append(state.encounter_narrative_artifact)
+                    logging.info(
+                        f"Saved game run artifact: {state.encounter_narrative_artifact.get_artifact_path()}"
+                    )
+                except Exception as e:
+                    error_msg = f"Failed to save encounter narrative artifact: {e!s}"
+                    logging.error(error_msg)
+                    if block_mode:
+                        raise Exception(error_msg)
             return state
