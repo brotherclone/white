@@ -5,13 +5,16 @@ from typing import Optional
 from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 
 class ImageChainArtifactFile(ChainArtifact, ABC):
 
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.CHARACTER_PORTRAIT
+    artifact_name: str = "character_portrait"
     file_path: Path = Field(description="Path to the image file")
-    height: int = Field(description="Height of the image in pixels", ge=0, le=1000)
-    width: int = Field(description="Width of the image in pixels", ge=0, le=1000)
+    height: int = Field(description="Height of the image in pixels", ge=0, le=10000)
+    width: int = Field(description="Width of the image in pixels", ge=0, le=10000)
     aspect_ratio: Optional[float] = Field(
         description="Aspect ratio of the image (width / height)",
         ge=0.0,
@@ -20,7 +23,12 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
     )
 
     def __init__(self, **data):
+        # Store the file_path if explicitly provided before parent __init__ overwrites it
+        explicit_file_path = data.get("file_path")
         super().__init__(**data)
+        # Restore the explicit file_path if it was provided
+        if explicit_file_path is not None:
+            self.file_path = explicit_file_path
 
     def flatten(self):
         parent_data = super().flatten()

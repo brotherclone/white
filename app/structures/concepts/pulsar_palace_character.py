@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field
@@ -286,31 +287,49 @@ class PulsarPalaceCharacter(BaseModel):
         )
 
     def create_portrait(self):
+        from PIL import Image
+
+        portrait_filename = f"character_portrait_{self.encounter_id}.png"
+        output_path = os.path.join(
+            os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            self.thread_id,
+            ChainArtifactFileType.PNG.value,
+            portrait_filename,
+        )
         png = composite_character_portrait(
             self.background.image_path,
             [self.profession.image_path, self.disposition.image_path],
-            f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{self.thread_id}/{ChainArtifactFileType.PNG.value}/",
+            output_path,
         )
+
+        # Get image dimensions
+        with Image.open(png) as img:
+            width, height = img.size
+
         self.portrait = ImageChainArtifactFile(
             thread_id=self.thread_id,
-            file_name="character_portrait.png",
-            base_path=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{self.thread_id}/{ChainArtifactFileType.PNG.value}/",
+            file_name=portrait_filename,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
             file_path=png,
+            width=width,
+            height=height,
         )
 
     def create_character_sheet(self):
-        template = f"""
-        ![{self.disposition.disposition} {self.profession.profession}]({self.portrait.file_path})
-        #{self.disposition.disposition} {self.profession.profession}
-        ## from {self.background.time}, {self.background.place}
-        ### ON
-        {self.on_current} / {self.on_max}
-        ### OFF
-        {self.off_current} / {self.off_max}
-        """
+        portrait_filename = Path(self.portrait.file_path).name
+        relative_portrait_path = f"../png/{portrait_filename}"
+
+        template = f"""![{self.disposition.disposition} {self.profession.profession}]({relative_portrait_path})
+# {self.disposition.disposition} {self.profession.profession}
+## from {self.background.time}, {self.background.place}
+### ON
+{self.on_current} / {self.on_max}
+### OFF
+{self.off_current} / {self.off_max}
+"""
         self.character_sheet = PulsarPalaceCharacterSheet(
             thread_id=self.thread_id,
             sheet_content=template,
-            base_path=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{self.thread_id}/{ChainArtifactFileType.MARKDOWN.value}/",
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
         )
         self.character_sheet.save_file()

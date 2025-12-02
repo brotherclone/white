@@ -16,15 +16,14 @@ from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
 )
-from app.structures.concepts.book_evaluation import BookEvaluationDecision
 from app.structures.concepts.game_evaluation import GameEvaluationDecision
 from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
 from app.structures.concepts.pulsar_palace_room import PulsarPalaceRoom
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.generators.character_action_generator import (
     CharacterActionGenerator,
 )
 from app.structures.generators.markov_room_generator import MarkovRoomGenerator
+from app.structures.generators.music_extractor import MusicExtractor
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals
 
@@ -38,6 +37,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
     action_generator: CharacterActionGenerator = Field(
         default_factory=CharacterActionGenerator
     )
+    music_extractor: MusicExtractor = Field(default_factory=MusicExtractor)
+    max_rooms: int = Field(default=4)
 
     def __init__(self, **data):
         # Ensure settings are initialized if not provided
@@ -141,6 +142,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 ) as file_one:
                     data_one = yaml.safe_load(file_one)
                     character_one = PulsarPalaceCharacter(**data_one)
+                    character_one.create_portrait()
+                    character_one.create_character_sheet()
                     state.characters.append(character_one)
                 with open(
                     f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_two_mock.yml",
@@ -148,6 +151,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 ) as file_two:
                     data_two = yaml.safe_load(file_two)
                     character_two = PulsarPalaceCharacter(**data_two)
+                    character_two.create_portrait()
+                    character_two.create_character_sheet()
                     state.characters.append(character_two)
             except Exception as e:
                 error_msg = f"Failed to read mock character files: {e!s}"
@@ -155,9 +160,11 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception(error_msg)
         else:
-            num_characters = roll_dice([(1, 4)])
+            num_characters = roll_dice([(1, 4)])[0]
             for i in range(num_characters):
-                char = PulsarPalaceCharacter.create_random()
+                char = PulsarPalaceCharacter.create_random(
+                    thread_id=state.thread_id, encounter_id=f"encounter_{i}"
+                )
                 char.create_portrait()
                 char.create_character_sheet()
                 state.characters.append(char)
@@ -187,7 +194,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception(error_msg)
         else:
-            room_count = roll_dice([(1, self.max_rooms)])
+            room_count = roll_dice([(1, self.max_rooms)])[0]
             state.story_elaboration_level = room_count
             for i in range(room_count):
                 room = self.room_generator.generate_room(room_number=i + 1)
@@ -238,7 +245,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
                     state.should_add_to_story = result.get("should_add_to_story", False)
-                elif isinstance(result, BookEvaluationDecision):
+                elif isinstance(result, GameEvaluationDecision):
                     state.should_add_to_story = result.should_add_to_story
                 else:
                     logging.warning(f"Unexpected result type: {type(result)}")
@@ -320,7 +327,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     4. Maintains the Yellow Album's ontological mode: PRESENT + PLACE + IMAGINED
 
                     Your response should be a SongProposalIteration with:
-                    - rainbow_color: {the_rainbow_table_colors['Y']}
+                    - rainbow_color: Y
                     - The procedural BPM, key, mood, genres above
                     - A creative title (not just the room name)
                     - An enhanced concept that connects game → music → White Agent themes
@@ -335,14 +342,22 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     counter_proposal.key = base_proposal.key
                     counter_proposal.mood = base_proposal.mood
                     counter_proposal.genres = base_proposal.genres
-                    state.song_proposals.iterations.append(counter_proposal)
+                    counter_proposal.rainbow_color = "Y"
                     state.counter_proposal = counter_proposal
-                    return state
-                if not isinstance(result, SongProposalIteration):
+                elif isinstance(result, SongProposalIteration):
+                    # Use the procedural parameters from base_proposal
+                    result.bpm = base_proposal.bpm
+                    result.key = base_proposal.key
+                    result.mood = base_proposal.mood
+                    result.genres = base_proposal.genres
+                    result.rainbow_color = "Y"
+                    state.counter_proposal = result
+                else:
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
                     logging.warning(error_msg)
+                    state.counter_proposal = base_proposal
             except Exception as e:
                 print(
                     f"Anthropic model call failed: {e!s}; falling back to pure MusicExtractor output"
@@ -365,8 +380,19 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 ) as f:
                     data = yaml.safe_load(f)
                 encounter = PulsarPalaceEncounterArtifact(**data)
+                # Update base_path to save to chain_artifacts instead of tests/mocks
+                encounter.base_path = os.getenv(
+                    "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                )
+                # Recalculate file_path based on new base_path
+                encounter.make_artifact_path()
                 state.encounter_narrative_artifact = encounter
+                # Save the mock artifact to chain_artifacts
+                encounter.save_file()
                 state.artifacts.append(encounter)
+                logging.info(
+                    f"Saved mock game run artifact: {encounter.get_artifact_path()}"
+                )
             except Exception as e:
                 error_msg = f"Failed to read mock encounter narrative artifact: {e!s}"
                 logging.error(error_msg)
