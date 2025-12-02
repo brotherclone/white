@@ -136,6 +136,7 @@ class WhiteAgent(BaseModel):
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
         workflow.add_edge("invoke_red_agent", "process_red_agent_work")
         workflow.add_edge("invoke_orange_agent", "process_orange_agent_work")
+        workflow.add_edge("invoke_yellow_agent", "process_yellow_agent_work")
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
@@ -418,7 +419,6 @@ class WhiteAgent(BaseModel):
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_yellow_document_synthesis.md",
         )
         state.ready_for_yellow = False
-        state.ready_for_green = True
         return state
 
     def _yellow_rebracketing_analysis(self, proposal, game_artifacts) -> str:

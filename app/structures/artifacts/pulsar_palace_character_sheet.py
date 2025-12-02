@@ -4,12 +4,15 @@ from pathlib import Path
 from pydantic import ConfigDict
 
 from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 
 class PulsarPalaceCharacterSheet(ChainArtifact, ABC):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.CHARACTER_SHEET
+    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.MARKDOWN
+    artifact_name: str = "character_sheet"
     model_config = ConfigDict(extra="allow")
     sheet_content: str = ""
 
