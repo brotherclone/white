@@ -9,3 +9,12 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
+
+  - repo: local
+    hooks:
+      - id: clean-mock-artifacts
+        name: Clean mock artifacts
+        entry: python -m app.util.clean_mock_artifacts --yes
+        language: system
+        pass_filenames: false
+        always_run: true

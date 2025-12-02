@@ -134,6 +134,10 @@ class YellowAgent(BaseRainbowAgent, ABC):
     def generate_characters(state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+
+        # ToDo:  Portrait Integration
+        # You're calling char.create_portrait() but the character_images field in the encounter artifact isn't populated:
+
         if mock_mode:
             try:
                 with open(
@@ -202,6 +206,18 @@ class YellowAgent(BaseRainbowAgent, ABC):
         return state
 
     def generate_story(self, state: YellowAgentState) -> YellowAgentState:
+
+        # ToDo: Generate story with character state mutations
+        # story, updated_characters = self.action_generator.generate_encounter_narrative(
+        #     room_description=current_room.description,
+        #     characters=state.characters,
+        #     return_character_updates=True  # New param
+        # )
+
+        # Update character states based on encounter
+        # state.characters = updated_characters
+        # ... rest of method
+
         current_room = state.rooms[state.current_room_index]
         story = self.action_generator.generate_encounter_narrative(
             room_description=current_room.description, characters=state.characters
