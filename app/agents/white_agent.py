@@ -125,6 +125,7 @@ class WhiteAgent(BaseModel):
         workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
         workflow.add_node("process_orange_agent_work", self.process_orange_agent_work)
         workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
+        workflow.add_node("process_yellow_agent_work", self.process_yellow_agent_work)
         # workflow.add_node("invoke_green_agent", self.invoke_green_agent)
         # workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
         # workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
@@ -135,6 +136,7 @@ class WhiteAgent(BaseModel):
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
         workflow.add_edge("invoke_red_agent", "process_red_agent_work")
         workflow.add_edge("invoke_orange_agent", "process_orange_agent_work")
+        workflow.add_edge("invoke_yellow_agent", "process_yellow_agent_work")
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
@@ -398,6 +400,7 @@ class WhiteAgent(BaseModel):
             n
             for n in yellow_artifacts
             if n.chain_artifact_type == ChainArtifactType.GAME_RUN
+            or n.chain_artifact_type == ChainArtifactType.CHARACTER_SHEET
         ]
         rebracketing_analysis = self._yellow_rebracketing_analysis(
             yellow_proposal, game_artifacts
@@ -416,19 +419,26 @@ class WhiteAgent(BaseModel):
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_yellow_document_synthesis.md",
         )
         state.ready_for_yellow = False
-        state.ready_for_green = True
         return state
 
     def _yellow_rebracketing_analysis(self, proposal, game_artifacts) -> str:
         logging.info("Processing Yellow Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_white_rebracket_analysis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_white_rebracket_analysis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                           You are the White Agent performing a REBRACKETING operation.
@@ -457,20 +467,35 @@ class WhiteAgent(BaseModel):
                           Generate a rebracketed analysis that finds structure in Yellow's terrifying and strange adventures.
                           Focus on revealing the underlying ORDER, not explaining away the complexity.
                           """
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Yellow rebracketing LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Yellow rebracketing unavailable"
 
     def _orange_rebracketing_analysis(self, proposal, newspaper_artifacts) -> str:
         logging.info("Processing Orange Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_white_rebracket_analysis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_white_rebracket_analysis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                        You are the White Agent performing a REBRACKETING operation.
@@ -478,10 +503,10 @@ class WhiteAgent(BaseModel):
                        You have received these artifacts from the Orange Agent:
 
                        **Counter-proposal:**
-                       
+
                        {proposal}
 
-                       **Articles:** 
+                       **Articles:**
                         {newspaper_artifacts[newspaper_artifacts.count-1].page if newspaper_artifacts else "None"}
 
                        **Your Task: REBRACKETING**
@@ -499,20 +524,35 @@ class WhiteAgent(BaseModel):
                        Generate a rebracketed analysis that finds structure in Orange's fragmented truth, fictions, and the objects that seem to encapsulate them.
                        Focus on revealing the underlying ORDER, not explaining away the complexity.
                        """
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Orange rebracketing LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Orange rebracketing unavailable"
 
     def _red_rebracketing_analysis(self, proposal, book_artifacts) -> str:
         logging.info("Processing Red Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_to_white_rebracket_analysis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_to_white_rebracket_analysis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                        You are the White Agent performing a REBRACKETING operation.
@@ -522,7 +562,7 @@ class WhiteAgent(BaseModel):
                        **Counter-proposal:**
                        {proposal}
 
-                       **Books:** 
+                       **Books:**
                         {book_artifacts[book_artifacts.count-1].artifact_report if book_artifacts else "None"}
 
                        **Your Task: REBRACKETING**
@@ -539,110 +579,154 @@ class WhiteAgent(BaseModel):
                        Generate a rebracketed analysis that finds structure in Red's labyrinth of text.
                        Focus on revealing the underlying ORDER, not explaining away the complexity.
                        """
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Red rebracketing LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Red rebracketing unavailable"
 
     def _black_rebracketing_analysis(
         self, proposal, evp_artifacts, sigil_artifacts
     ) -> str:
         logging.info("Processing Black Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_white_rebracket_analysis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_white_rebracket_analysis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                 You are the White Agent performing a REBRACKETING operation.
-    
+
                 You have received these artifacts from Black Agent:
-    
+
                 **Counter-proposal:**
                 {proposal}
-    
-                **EVP Transcript:** 
+
+                **EVP Transcript:**
                 {evp_artifacts[0].transcript if evp_artifacts else "None"}
-    
+
                 **Sigil:**
                 {sigil_artifacts[sigil_artifacts.count-1].artifact_report if sigil_artifacts else "None"}
-    
+
                 **Your Task: REBRACKETING**
-    
+
                 Black's content contains paradoxes and apparent contradictions.
                 Your job is to find alternative category boundaries that reveal hidden structure.
-    
+
                 Questions to guide you:
                 - What patterns emerge when you parse this differently?
                 - What implicit frameworks are operating?
                 - Where can you draw new boundaries to make sense of chaos?
                 - What's the hidden coherence beneath the paradox?
-    
+
                 Generate a rebracketed analysis that finds structure in Black's chaos.
                 Focus on revealing the underlying ORDER, not explaining away the paradox.
                 """
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Black rebracketing LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Black rebracketing unavailable"
 
     def _synthesize_document_for_red(
         self, rebracketed_analysis, black_proposal, artifacts
     ):
         logging.info("Processing Red Agent synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_white_document_synthesis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_white_document_synthesis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Light Reader, Red Agent.
-    
+
                 **Your Rebracketed Analysis:**
                 {rebracketed_analysis}
-    
+
                 **Original Black Counter-Proposal:**
                 {black_proposal}
-    
+
                 **Artifacts Present:**
                 {len(artifacts)} artifacts (EVP, sigil, etc.)
-    
+
                 **Your Task: SYNTHESIS**
-    
+
                 Create a coherent, actionable document that:
                 1. Preserves the insights from Black's chaos
                 2. Applies your rebracketed understanding
                 3. Creates clear creative direction
                 4. Can be understood by Red Agent (action-oriented, concrete)
-    
+
                 This document will be the foundation for Red Agent's song proposals.
                 Make it practical while retaining the depth of insight.
-    
+
                 Structure your synthesis as a clear creative brief.
                 """
-
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Red synthesis LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Red synthesis unavailable"
 
     def _synthesize_document_for_orange(
         self, rebracketed_analysis, red_proposal, artifacts
     ):
         logging.info("Processing Orange Agent synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_to_white_document_synthesis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_to_white_document_synthesis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                        You are the White Agent creating a SYNTHESIZED DOCUMENT for the Rows Bud, Orange Agent.
@@ -669,23 +753,37 @@ class WhiteAgent(BaseModel):
 
                        Structure your synthesis as a clear creative brief.
                        """
-
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Orange synthesis LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Orange synthesis unavailable"
 
     def _synthesize_document_for_yellow(
         self, rebracketed_analysis, orange_proposal, artifacts
     ):
         logging.info("Processing Yellow Agent synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_white_document_synthesis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_white_document_synthesis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                        You are the White Agent creating a SYNTHESIZED DOCUMENT for the Lord Pulsimore, Yellow Agent.
@@ -712,23 +810,37 @@ class WhiteAgent(BaseModel):
 
                        Structure your synthesis as a clear creative brief.
                        """
-
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Yellow synthesis LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Yellow synthesis unavailable"
 
     def _synthesize_document_for_green(
         self, rebracketed_analysis, yellow_proposal, artifacts
     ):
         logging.info("Processing Yellow Agent synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_white_document_synthesis_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                return data
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_white_document_synthesis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
         else:
             prompt = f"""
                               You are the White Agent creating a SYNTHESIZED DOCUMENT for the Accounter, Green Agent.
@@ -755,10 +867,16 @@ class WhiteAgent(BaseModel):
 
                               Structure your synthesis as a clear creative brief.
                               """
-
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Green synthesis LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Green synthesis unavailable"
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
@@ -798,7 +916,13 @@ class WhiteAgent(BaseModel):
 
     @staticmethod
     def route_after_orange(state: MainAgentState) -> str:
-        return "finish"
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "yellow"
+        if state.ready_for_yellow:
+            return "yellow"
+        else:
+            return "orange"
 
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
         logging.info("Finalizing song proposals... ")
@@ -917,6 +1041,7 @@ class WhiteAgent(BaseModel):
     def save_all_proposals(self, state: MainAgentState):
         """Save all song proposals in both YAML and Markdown formats"""
         logging.info("Saving song proposals... ")
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if not state.song_proposals or not state.song_proposals.iterations:
             logging.warning("No song proposals to save")
             return
@@ -924,30 +1049,52 @@ class WhiteAgent(BaseModel):
         base_path = self._artifact_base_path()
         yaml_dir = Path(f"{base_path}/{thread_id}/yml")
         md_dir = Path(f"{base_path}/{thread_id}/md")
-        yaml_dir.mkdir(parents=True, exist_ok=True)
-        md_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            yaml_dir.mkdir(parents=True, exist_ok=True)
+            md_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            error_msg = f"Failed to create directories: {e!s}"
+            logging.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
+            return
+
         for i, iteration in enumerate(state.song_proposals.iterations):
             yaml_path = (
                 yaml_dir
                 / f"song_proposal_{iteration.rainbow_color}_{iteration.iteration_id}.yml"
             )
-            with open(yaml_path, "w") as f:
+            try:
+                with open(yaml_path, "w") as f:
+                    yaml.safe_dump(
+                        iteration.model_dump(mode="json"),
+                        f,
+                        default_flow_style=False,
+                        allow_unicode=True,
+                    )
+                logging.info(f"Saved proposal {i+1}: {yaml_path}")
+            except Exception as e:
+                error_msg = f"Failed to write YAML file {yaml_path}: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+
+        all_proposals_yaml = yaml_dir / f"all_song_proposals_{thread_id}.yml"
+        try:
+            with open(all_proposals_yaml, "w") as f:
                 yaml.safe_dump(
-                    iteration.model_dump(mode="json"),
+                    state.song_proposals.model_dump(mode="json"),
                     f,
                     default_flow_style=False,
                     allow_unicode=True,
                 )
-            logging.info(f"Saved proposal {i+1}: {yaml_path}")
-        all_proposals_yaml = yaml_dir / f"all_song_proposals_{thread_id}.yml"
-        with open(all_proposals_yaml, "w") as f:
-            yaml.safe_dump(
-                state.song_proposals.model_dump(mode="json"),
-                f,
-                default_flow_style=False,
-                allow_unicode=True,
-            )
-        logging.info(f"Saved all proposals: {all_proposals_yaml}")
+            logging.info(f"Saved all proposals: {all_proposals_yaml}")
+        except Exception as e:
+            error_msg = f"Failed to write all proposals YAML: {e!s}"
+            logging.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
+
         md_content = "# Song Proposal Summary\n\n"
         md_content += f"**Thread ID:** {thread_id}\n"
         md_content += (
@@ -965,8 +1112,14 @@ class WhiteAgent(BaseModel):
             md_content += f"**Concept:**\n{iteration.concept}\n\n"
             md_content += "---\n\n"
         md_path = md_dir / f"all_song_proposals_{thread_id}.md"
-        save_markdown(md_content, str(md_path))
-        logging.info(f"All proposals saved to {base_path}/{thread_id}/")
+        try:
+            save_markdown(md_content, str(md_path))
+            logging.info(f"All proposals saved to {base_path}/{thread_id}/")
+        except Exception as e:
+            error_msg = f"Failed to write markdown file: {e!s}"
+            logging.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
 
     @staticmethod
     def _artifact_base_path() -> str:

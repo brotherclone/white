@@ -1,6 +1,6 @@
-from pathlib import Path
-
 import yaml
+
+from pathlib import Path
 
 from app.structures.artifacts.book_artifact import BookArtifact
 from tests.mocks.mock_tests.mock_utils import normalize_book_data_enums
