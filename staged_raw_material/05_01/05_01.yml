@@ -1,0 +1,78 @@
+bpm: 107
+manifest_id: '05_01'
+tempo: 5/4
+key: G minor
+rainbow_color: G
+title: M.E.E.
+release_date: '2021-09-07'
+album_sequence: 1
+main_audio_file: 05_01_main.wav
+TRT: '[12:03.023]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: Epoch 1
+    start_time: '[00:00.000]'
+    end_time: '[05:56.015]'
+    description: Life emerges then develops
+  - section_name: Mass Extinction Event 1
+    start_time: '[05:56.016]'
+    end_time: '[06:24.016]'
+    description: Life is nearly wiped out entirely
+  - section_name: Epoch 2
+    start_time: '[06:24.017]'
+    end_time: '[10:00.014]'
+    description: Life re-emerges and diversifies
+  - section_name: Mass Extinction Event 2
+    start_time: '[10:00.015]'
+    end_time: '[12:03.023]'
+    description: Life is nearly wiped out entirely again
+sounds_like:
+  - name: Krzysztof Penderecki
+    discogs_id: 227875
+  - name: Charles Ives
+    discogs_id: 202092
+  - name: György Ligeti
+    discogs_id: 190370
+genres:
+  - ambient
+  - modern classical
+  - experimental
+  - electronic
+mood:
+  - epic
+  - dark
+  - ominous
+  - dreamy
+concept: M.E.E. stands for Mass Extinction Event. The piece is structured around two cycles of life emerging, developing, and diversifying followed by near complete annihilation. The composition draws inspiration from modern classical composers such as Krzysztof Penderecki, Charles Ives, and György Ligeti, incorporating dissonant harmonies, unconventional structures, and experimental soundscapes to evoke the grandeur and fragility of life on Earth.
+audio_tracks:
+  - id: 2
+    description: Synth Pad
+    audio_file: 05_01_03_pad.wav
+    midi_file: 05_01_02_pad.mid
+  - id: 3
+    description: Violin
+    audio_file: 05_01_05_violin.wav
+    midi_file: 05_01_04_violin.mid
+    player: Maria Grigoryeva
+  - id: 4
+    description: Viola
+    audio_file: 05_01_07_viola.wav
+    midi_file: 05_01_06_viola.mid
+    player: Maria Grigoryeva
+  - id: 5
+    description: Cello
+    audio_file: 05_01_09_cello.wav
+    midi_file: 05_01_08_cello.mid
+    player: Lyudmila Kadyrbaeva
+  - id: 6
+    description: Double Bass
+    audio_file: 05_01_11_double_bass.wav
+    midi_file: 05_01_10_double_bass.mid
+    player: Zoltan Renaldi
+  - id: 7
+    description: Harmonium
+    audio_file: 05_01_12_harmonium.wav
+  - id: 8
+    description: Psalter
+    audio_file: 05_01_13_psalter.wav

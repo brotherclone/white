@@ -17,9 +17,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.generators.character_action_generator import CharacterActionGenerator
-from app.generators.markov_room_generator import MarkovRoomGenerator
-from app.generators.music_extractor import MusicExtractor
+from app.structures.generators.character_action_generator import (
+    CharacterActionGenerator,
+)
+from app.structures.generators.markov_room_generator import MarkovRoomGenerator
+from app.structures.generators.music_extractor import MusicExtractor
 from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
 
 
@@ -51,7 +53,10 @@ def main():
     num_characters = 3
     characters = []
     for i in range(num_characters):
-        char = PulsarPalaceCharacter.create_random()
+        char = PulsarPalaceCharacter.create_random(
+            thread_id="demo_thread", encounter_id=f"demo_encounter_{i}"
+        )
+        char.create_portrait()
         characters.append(char)
         print(f"Character {i + 1}:")
         print(f"  Disposition: {char.disposition.disposition}")
@@ -59,6 +64,7 @@ def main():
         print(f"  Background: {char.background.place} ({char.background.time})")
         print(f"  ON: {char.on_current}/{char.on_max}")
         print(f"  OFF: {char.off_current}/{char.off_max}")
+        print(f"  Portrait: {char.portrait.file_path}")
         print()
 
     print_section(
