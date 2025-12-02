@@ -1,0 +1,1 @@
+YELLOW_SYNTH

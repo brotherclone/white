@@ -1,0 +1,69 @@
+bpm: 16
+manifest_id: '05_02'
+tempo: 4/4
+key: F# minor
+rainbow_color: G
+title: Where There Are Rocks...
+release_date: '2021-09-07'
+album_sequence: 2
+main_audio_file: 05_02_main.wav
+TRT: '[06:09.093]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: Emerging from stone
+    start_time: '[00:00.000]'
+    end_time: '[06:09.093]'
+    description: Sentience emerges from the rock
+sounds_like:
+  - name: Robert Ashley
+    discogs_id: 32210
+  - name: Krzysztof Penderecki
+    discogs_id: 227875
+  - name: Throbbing Gristle
+    discogs_id: 12589
+genres:
+  - ambient
+  - modern classical
+  - experimental
+  - noise
+  - music concrete
+mood:
+  - epic
+  - dark
+  - ominous
+  - frightening
+concept: "Where there are rocks, watch out! Watch out, because the rocks are going to eventually come alive and they are going to have people crawling over them. It is only matter of time, just in the same way the acorn is eventually going to turn into the oak because it has the potentiality of that within it. Rocks are not dead. You see, it depends on what kind of attitude you want to take to the world. You cannot get an intelligent organism such as a human being out of an unintelligent universe. So in any lump of rock floating about in space, there is implicit human intelligence. Don’t differentiate yourself and standoff against this and say ‘I am a living organism in a world made of a lot of dead junk, rocks and stuff.’ It all goes together, those rocks are just as much you as your finger nails. - Alan Watts"
+audio_tracks:
+  - id: 2
+    description: Stone
+    audio_file: 05_02_02_earth.wav
+  - id: 3
+    description: Super bass
+    audio_file: 05_02_03_super_bass.wav
+  - id: 4
+    description: Goddess Choir Forward
+    midi_file: 05_02_04_goddess_emerge_L.mid
+    group: Choir
+  - id: 5
+    description: Goddess Choir Backward
+    midi_file: 05_02_05_goddess_emerge_R.mid
+    group: Choir
+  - id: 6
+    description: Goddess Choir
+    audio_file: 05_02_06_goddess_emerge_S.wav
+    group: Choir
+  - id: 7
+    description: Alp horns 1
+    midi_file: 05_02_07_alp_horns_1.mid
+    group: Alp horns
+  - id: 8
+    description: Alp horns 2
+    midi_file: 05_02_08_alp_horns_2.mid
+    group: Alp horns
+  - id: 9
+    description: Alp horns
+    audio_file: 05_02_09_alp_horns.wav
+  - id: 10
+    description: Modular Synth Tectonagram
+    audio_file: 05_02_10_tectonagram.wav
