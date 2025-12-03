@@ -1,0 +1,139 @@
+bpm: 222
+manifest_id: '05_04'
+tempo: 4/4
+key: D minor
+rainbow_color: G
+title: Just Warming Up
+release_date: '2021-09-07'
+album_sequence: 4
+main_audio_file: 05_04_main.wav
+TRT: '[08:15.010]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: 1870
+    start_time: '[00:00.000]'
+    end_time: '[00:31.008]'
+    description: 1870
+  - section_name: 1880
+    start_time: '[00:31.009]'
+    end_time: '[00:32.010]'
+    description: 1880
+  - section_name: 1890
+    start_time: '[00:32.011]'
+    end_time: '[01:04.021]'
+    description: 1890
+  - section_name: 1900
+    start_time: '[01:04.022]'
+    end_time: '[01:37.007]'
+    description: 1900
+  - section_name: 1910
+    start_time: '[01:37.008]'
+    end_time: '[02:09.018]'
+    description: 1910
+  - section_name: 1920
+    start_time: '[02:09.019]'
+    end_time: '[02:42.004]'
+    description: 1920
+  - section_name: 1930
+    start_time: '[02:42.005]'
+    end_time: '[03:14.014]'
+    description: 1930
+  - section_name: 1940
+    start_time: '[03:14.015]'
+    end_time: '[03:47.000]'
+    description: 1940
+  - section_name: 1950
+    start_time: '[03:47.001]'
+    end_time: '[04:19.011]'
+    description: 1950
+  - section_name: 1960
+    start_time: '[04:19.012]'
+    end_time: '[04:51.022]'
+    description: 1960
+  - section_name: 1970
+    start_time: '[04:51.023]'
+    end_time: '[05:24.008]'
+    description: 1970
+  - section_name: 1980
+    start_time: '[05:24.009]'
+    end_time: '[05:56.018]'
+    description: 1980
+  - section_name: 1990
+    start_time: '[05:56.019]'
+    end_time: '[06:29.004]'
+    description: 1990
+  - section_name: 2000
+    start_time: '[06:29.005]'
+    end_time: '[07:01.015]'
+    description: 2000
+  - section_name: 2010
+    start_time: '[07:01.016]'
+    end_time: '[07:34.001]'
+    description: 2010
+  - section_name: 2020
+    start_time: '[07:34.002]'
+    end_time: '[08:15.010]'
+    description: 2020
+sounds_like:
+  - name: Ryoji Ikeda
+    discogs_id: 11139
+  - name: Terry Riley
+    discogs_id: 32198
+  - name: Autechre
+    discogs_id: 41
+genres:
+  - experimental
+  - new composition
+  - data driven
+mood:
+  - apocalyptic
+  - dark
+  - unnerving
+concept: The ground temperature of the East Coast of the United States is transformed into this composition, which is a mix of ambient and experimental sounds. When we reach 2020 the portamento jump in pitch sounds like a global siren.
+audio_tracks:
+  - id: 2
+    description: Monthly Average Temperature
+    midi_file: 05_04_02_monthly.mid
+    midi_group: Monthly
+    group: Monthly
+  - id: 3
+    description: Yearly Average Temperature
+    midi_file: 05_04_03_yearly.mid
+    midi_group: Yearly
+    group: Yearly
+  - id: 4
+    description: Average Temperature by Decade
+    midi_file: 05_04_04_decades.mid
+    midi_group: Decades
+    group: Decades
+  - id: 5
+    description: Strings
+    audio_file: 05_04_05_strings_monthly.wav
+    midi_group: Monthly
+    group: Monthly
+  - id: 6
+    description: Synths
+    audio_file: 05_04_06_synths_monthly.wav
+    midi_group: Monthly
+    group: Monthly
+  - id: 7
+    description: Synth Pads
+    audio_file: 05_04_07_pads_yearly.wav
+    midi_group: Yearly
+    group: Yearly
+  - id: 8
+    description: Gamelan
+    audio_file: 05_04_08_gamelan_yearly.wav
+    midi_group: Yearly
+    group: Yearly
+  - id: 9
+    description: Alp horns
+    midi_file: 05_04_09_alp_horn_decade.wav
+    midi_group: Decades
+    group: Decades
+  - id: 10
+    description: Bass
+    audio_file: 05_04_10_bass_decade.wav
+    midi_group: Decades
+    group: Decades
