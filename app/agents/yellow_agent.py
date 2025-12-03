@@ -135,9 +135,6 @@ class YellowAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
 
-        # ToDo:  Portrait Integration
-        # You're calling char.create_portrait() but the character_images field in the encounter artifact isn't populated:
-
         if mock_mode:
             try:
                 with open(
@@ -206,27 +203,30 @@ class YellowAgent(BaseRainbowAgent, ABC):
         return state
 
     def generate_story(self, state: YellowAgentState) -> YellowAgentState:
+        current_room = state.rooms[state.current_room_index]
 
-        # ToDo: Generate story with character state mutations
-        # story, updated_characters = self.action_generator.generate_encounter_narrative(
-        #     room_description=current_room.description,
-        #     characters=state.characters,
-        #     return_character_updates=True  # New param
-        # )
+        # Generate story with character state mutations
+        story, updated_characters = self.action_generator.generate_encounter_narrative(
+            room_description=current_room.description,
+            characters=state.characters,
+            return_character_updates=True,
+        )
 
         # Update character states based on encounter
-        # state.characters = updated_characters
-        # ... rest of method
+        state.characters = updated_characters
 
-        current_room = state.rooms[state.current_room_index]
-        story = self.action_generator.generate_encounter_narrative(
-            room_description=current_room.description, characters=state.characters
-        )
+        # Collect character portraits for the encounter artifact
+        character_images = []
+        for char in state.characters:
+            if char.portrait:
+                character_images.append(char.portrait)
+
         encounter_artifact = PulsarPalaceEncounterArtifact(
             thread_id=state.thread_id,
             base_path=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH', 'chain_artifacts')}",
             artifact_name="pulsar_palace_game_run",
             characters=state.characters,
+            character_images=character_images,
             rooms=state.rooms,
             story=[story],
         )
@@ -272,12 +272,21 @@ class YellowAgent(BaseRainbowAgent, ABC):
         return state
 
     def add_to_story(self, state: YellowAgentState) -> YellowAgentState:
-        """Continue the story in the next room."""
+        """Continue the story in the next room with character state mutations."""
         state.current_room_index += 1
         current_room = state.rooms[state.current_room_index]
-        story = self.action_generator.generate_encounter_narrative(
-            room_description=current_room.description, characters=state.characters
+
+        # Generate story with character state mutations
+        story, updated_characters = self.action_generator.generate_encounter_narrative(
+            room_description=current_room.description,
+            characters=state.characters,
+            return_character_updates=True,
         )
+
+        # Update character states based on encounter
+        state.characters = updated_characters
+        state.encounter_narrative_artifact.characters = updated_characters
+
         state.encounter_narrative_artifact.story.append(story)
         state.story_elaboration_level += 1
         state.should_add_to_story = False

@@ -226,6 +226,12 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 ) as f:
                     data = yaml.safe_load(f)
                     story = NewspaperArtifact(**data)
+                    # Match non-mock processing
+                    combined = story.get_text_content()
+                    story.text = combined
+                    story.base_path = (
+                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    )
                     story.save_file()
                     state.synthesized_story = story
                     state.artifacts.append(story)
@@ -470,6 +476,21 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     data = yaml.safe_load(f)
                     new_article = NewspaperArtifact(**data)
                     state.mythologized_story = new_article
+                    # Match non-mock processing
+                    combined = state.mythologized_story.get_text_content()
+                    state.mythologized_story.text = combined
+                    state.mythologized_story.base_path = (
+                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    )
+                    try:
+                        state.mythologized_story.save_file()
+                    except Exception as e:
+                        # In mock mode, file save failures are non-fatal
+                        # (test mocks may not have complete file paths)
+                        logging.warning(
+                            f"Mock mode: Could not save mythologized story file: {e!s}"
+                        )
+                    state.artifacts.append(state.mythologized_story)
             except Exception as e:
                 error_msg = f"Failed to read mock gonzo rewrite: {e!s}"
                 logging.error(error_msg)
