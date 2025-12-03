@@ -1,0 +1,42 @@
+bpm: 120
+manifest_id: '05_06'
+tempo: 4/4
+key: C# minor
+rainbow_color: G
+title: Met with Great Malthusianism
+release_date: '2021-09-07'
+album_sequence: 6
+main_audio_file: 05_06_main.wav
+TRT: '[02:52.186]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: Mutation
+    start_time: '[00:00.000]'
+    end_time: '[02:52.186]'
+    description: DNA is read in shifted position and mutated
+sounds_like:
+  - name: Arthur Russell
+    discogs_id: 23524
+  - name: My Bloody Valentine
+    discogs_id: 6516
+genres:
+  - electronic
+  - experimental
+  - noise
+mood:
+  - hypnotic
+  - joyful
+  - eerie
+concept: The contents of M.E.E. are read in shifted position and mutated via a LFO and Morphagene.
+audio_tracks:
+  - id: 2
+    description: Morphagene
+    audio_file: 05_06_02_morphagene.wav
+  - id: 3
+    description: Morphagene 2
+    audio_file: 05_06_03_morphagene2.wav
+  - id: 4
+    description: Flutter
+    audio_file: 05_06_04_flutter.wav
+
