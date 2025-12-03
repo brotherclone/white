@@ -3,7 +3,7 @@ manifest_id: '05_06'
 tempo: 4/4
 key: C# minor
 rainbow_color: G
-title: Met with Great Malthusianism
+title: Reading Frame Shift
 release_date: '2021-09-07'
 album_sequence: 6
 main_audio_file: 05_06_main.wav
@@ -39,4 +39,3 @@ audio_tracks:
   - id: 4
     description: Flutter
     audio_file: 05_06_04_flutter.wav
-

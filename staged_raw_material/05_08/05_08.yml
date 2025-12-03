@@ -1,0 +1,12 @@
+bpm:
+manifest_id: '05_08'
+tempo:
+key:
+rainbow_color: G
+title: The Empty Fields
+release_date: '2021-09-07'
+album_sequence: 8
+main_audio_file: 05_08_main.wav
+TRT:
+vocals: false
+lyrics: false
