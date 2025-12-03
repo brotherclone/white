@@ -28,7 +28,7 @@ class SongProposalIteration(BaseModel):
         default=120,
         examples=[72, 88, 120, 140],
         ge=1,
-        le=200,
+        le=250,
     )
     tempo: str | TimeSignature = Field(
         description="Time signature defining rhythmic structure",
