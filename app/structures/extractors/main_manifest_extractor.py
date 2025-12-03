@@ -7,6 +7,7 @@ import pandas as pd
 from dotenv import load_dotenv
 
 import app.util.manifest_loader as manifest_loader
+from app.structures.concepts.multimodal_segment import MultimodalSegment
 from app.structures.enums.temporal_relatioship import TemporalRelationship
 from app.structures.extractors.lyric_extrator import LyricExtractor
 from app.structures.manifests.manifest import Manifest
@@ -306,7 +307,6 @@ class ManifestExtractor:
                     }
                 )
 
-            # ToDo: new class for Segment
             segment = {
                 "manifest_id": manifest.manifest_id,
                 "segment_type": "section",
@@ -1320,6 +1320,32 @@ class ManifestExtractor:
             df_flat = df_flat.drop("players", axis=1)
 
         return df_flat
+
+    @staticmethod
+    def dict_to_segment(segment_dict: Dict[str, Any]) -> MultimodalSegment:
+        """
+        Convert a segment dictionary to a MultimodalSegment object.
+
+        Args:
+            segment_dict: Dictionary containing segment data
+
+        Returns:
+            MultimodalSegment: Structured segment object
+        """
+        return MultimodalSegment.from_dict(segment_dict)
+
+    @staticmethod
+    def segments_to_objects(segments: List[Dict[str, Any]]) -> List[MultimodalSegment]:
+        """
+        Convert a list of segment dictionaries to MultimodalSegment objects.
+
+        Args:
+            segments: List of dictionaries containing segment data
+
+        Returns:
+            List of MultimodalSegment objects
+        """
+        return [MultimodalSegment.from_dict(seg) for seg in segments]
 
     def _unflatten_from_parquet(self, df_flat: pd.DataFrame) -> pd.DataFrame:
         """Reconstruct complex objects from flattened parquet data"""
