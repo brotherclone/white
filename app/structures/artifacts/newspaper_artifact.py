@@ -17,7 +17,6 @@ load_dotenv()
 class NewspaperArtifact(ChainArtifact):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.NEWSPAPER_ARTICLE
-    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     headline: Optional[str] = Field(
         default=None, description="Headline of the newspaper article."
     )
@@ -40,17 +39,66 @@ class NewspaperArtifact(ChainArtifact):
     def __init__(self, **data):
         super().__init__(**data)
 
+    def get_text_content(self) -> str:
+        """
+        Get the full text content of the article.
+        Returns the text field as-is. Used for compatibility with agent processing.
+        """
+        return self.text if self.text else ""
+
+    def to_markdown(self) -> str:
+        """Convert newspaper artifact to formatted markdown."""
+        md_lines = []
+
+        # Headline
+        if self.headline:
+            md_lines.append(f"# {self.headline}")
+            md_lines.append("")
+
+        # Metadata
+        if self.source:
+            md_lines.append(f"**Source:** {self.source}")
+        if self.date:
+            md_lines.append(f"**Date:** {self.date}")
+        if self.location:
+            md_lines.append(f"**Location:** {self.location}")
+        md_lines.append("")
+
+        # Article text
+        if self.text:
+            md_lines.append(self.text)
+            md_lines.append("")
+
+        # Tags
+        if self.tags:
+            md_lines.append(f"**Tags:** {', '.join(self.tags)}")
+            md_lines.append("")
+
+        # Metadata footer
+        md_lines.append("---")
+        md_lines.append("## Metadata")
+        md_lines.append(f"- **Artifact ID:** {self.artifact_id}")
+        md_lines.append(f"- **Thread ID:** {self.thread_id}")
+        md_lines.append(
+            f"- **Rainbow Color:** {self.rainbow_color_mnemonic_character_value}"
+        )
+
+        return "\n".join(md_lines)
+
     def save_file(self):
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         file = Path(self.file_path, self.file_name)
         with open(file, "w") as f:
-            yaml.dump(
-                self.model_dump(mode="python"),
-                f,
-                default_flow_style=False,
-                allow_unicode=True,
-            )
+            if self.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN:
+                f.write(self.to_markdown())
+            else:
+                yaml.dump(
+                    self.model_dump(mode="python"),
+                    f,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                )
 
     def flatten(self):
         parent_data = super().flatten()
@@ -59,7 +107,7 @@ class NewspaperArtifact(ChainArtifact):
         return {
             **parent_data,
             "thread_id": self.thread_id,
-            "chain_artifact_file_type": ChainArtifactFileType.YML.value,
+            "chain_artifact_file_type": self.chain_artifact_file_type.value,
             "file_name": self.file_name,
             "file_path": self.file_path,
             "chain_artifact_type": ChainArtifactType.NEWSPAPER_ARTICLE.value,

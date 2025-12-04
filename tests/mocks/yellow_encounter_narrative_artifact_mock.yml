@@ -1,0 +1,90 @@
+thread_id: "mock_thread_001"
+chain_artifact_type: game_run
+chain_artifact_file_type: md
+artifact_id: "mock_artifact_001"
+rainbow_color_mnemonic_character_value: Y
+base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
+artifact_name: game_run
+characters:
+  - thread_id: "mock_thread_001"
+    encounter_id: "mock_encounter_001"
+    background:
+      rollId: 1
+      place: New Mock City
+      time: 2121
+      image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+    disposition:
+      rollId: 1
+      disposition: Mocky
+      image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+    profession:
+      rollId: 1
+      profession: Mocktor
+      image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+    on_max: 10
+    off_max: 10
+    on_current: 10
+    off_current: 10
+  - thread_id: "mock_thread_001"
+    encounter_id: "mock_encounter_001"
+    background:
+      rollId: 1
+      place: New Mock City
+      time: 2121
+      image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+    disposition:
+      rollId: 1
+      disposition: Mocky
+      image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+    profession:
+      rollId: 1
+      profession: Mocktor
+      image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+    on_max: 10
+    off_max: 10
+    on_current: 10
+    off_current: 10
+character_images:
+  - thread_id: "mock_thread_001"
+    chainer_artifact_type: character_portrait
+    chain_artifact_file_type: png
+    artifact_id: "mock_picture_artifact_001"
+    rainbow_color_mnemonic_character_value: Y
+    base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
+    file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_one.png"
+    artifact_name: portrait_one
+    height: 100
+    width: 100
+  - thread_id: "mock_thread_001"
+    chainer_artifact_type: character_portrait
+    chain_artifact_file_type: png
+    artifact_id: "mock_picture_artifact_002"
+    rainbow_color_mnemonic_character_value: Y
+    base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
+    file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_two.png"
+    artifact_name: portrait_two
+    height: 100
+    width: 100
+rooms:
+  - room_id: room_001
+    name: Mock Room
+    room_type: social
+    atmosphere: dangerous and corrupted
+    description: A corrupted conservatory stretches before the party. The space is dominated by baroque mirror arrangements. Near the edges, impossible geometric statues create an unsettling ambiance. Nobles trapped mid-gesture occupy the chamber. The party notices time-frozen servants.
+    narrative_beat: The social gathering conceals predatory intent.
+    features:
+      - baroque mirror arrangements
+      - impossible geometric statues
+      - time-frozen servants
+      - windows showing other times
+    inhabitants:
+      - Nobles trapped mid-gesture
+      - Large childlike guardians
+    exits:
+      - east
+      - across the pulsar threshold
+      - north
+story:
+  - The party is in a room. This is a mocked encounter.
+  - Then something else happens.
+

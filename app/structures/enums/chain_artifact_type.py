@@ -10,4 +10,7 @@ class ChainArtifactType(str, Enum):
     NEWSPAPER_ARTICLE = "newspaper_article"
     SYMBOLIC_OBJECT = "symbolic_object"
     PROPOSAL = "proposal"
+    GAME_RUN = "game_run"
+    CHARACTER_SHEET = "character_sheet"
+    CHARACTER_PORTRAIT = "character_portrait"
     UNKNOWN = "unknown"

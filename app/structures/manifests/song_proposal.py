@@ -27,8 +27,8 @@ class SongProposalIteration(BaseModel):
         description="Tempo in beats per minute. Slower (40-70) for ambient/meditative, medium (80-120) for reflective, faster (120-180) for energetic",
         default=120,
         examples=[72, 88, 120, 140],
-        ge=40,
-        le=200,
+        ge=1,
+        le=250,
     )
     tempo: str | TimeSignature = Field(
         description="Time signature defining rhythmic structure",

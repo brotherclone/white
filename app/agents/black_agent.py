@@ -42,7 +42,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class BlackAgent(BaseRainbowAgent, ABC):
-    """Keeper of the Conjurer's Thread"""
+    """The ThreadKeepr"""
 
     def __init__(self, **data):
         if "settings" not in data or data["settings"] is None:
@@ -94,7 +94,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         snapshot = self._compiled_workflow.get_state(black_config)
 
         if snapshot.next:
-            logging.info(f"⏸️  Black Agent workflow paused at: {snapshot.next}")
+            logging.info(f"Black Agent workflow paused at: {snapshot.next}")
             state.workflow_paused = True
             state.pause_reason = "black_agent_awaiting_human_action"
             state.pending_human_action = {
@@ -108,9 +108,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             }
             if result.get("artifacts"):
                 state.artifacts = result["artifacts"]
-            logging.info(
-                "⏸️  Workflow paused - waiting for human to complete ritual tasks"
-            )
+            logging.info("Workflow paused - waiting for human to complete ritual tasks")
         else:
             state.song_proposals = result.get("song_proposals") or state.song_proposals
             if result.get("counter_proposal"):
@@ -199,7 +197,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             return state
         else:
             prompt = f"""
-            You are writing creative fiction about an experimental musician creating concept albums.
+            You are the ThreadKeepr, writing creative fiction about an experimental musician creating concept albums.
             Context: This character is an artist working in the experimental music space, creating 
             a concept album in 2016 after David Bowie's death and Trump's election. The character 
             uses themes of surveillance, control systems, and artistic resistance in their work.
@@ -262,6 +260,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """Generate a sigil artifact and create a Todoist task for charging"""
         logging.info("🜏 Entering generate_sigil method")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             mock_path = (
                 f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_sigil_artifact_mock.yml"
@@ -287,10 +286,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     }
                 )
                 return state
-            except FileNotFoundError:
-                logging.warning(
-                    f"Mock file not found at {mock_path}, using real generation"
-                )
+            except FileNotFoundError as e:
+                error_msg = f"Mock file not found at {mock_path}: {e!s}"
+                logging.warning(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
         else:
             sigil_maker = SigilTools()
             current_proposal = state.counter_proposal
@@ -306,9 +306,17 @@ class BlackAgent(BaseRainbowAgent, ABC):
             Format: A single sentence starting with "I will..." or "This song will..."
             Example: "I will weave hidden frequencies that awaken dormant resistance."
             """
-            claude = self._get_claude()
-            wish_response = claude.invoke(prompt)
-            wish_text = wish_response.content
+            block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+            try:
+                claude = self._get_claude()
+                wish_response = claude.invoke(prompt)
+                wish_text = wish_response.content
+            except Exception as e:
+                error_msg = f"LLM call for sigil wish generation failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                wish_text = "Fallback wish - LLM unavailable"
             statement_of_intent = sigil_maker.create_statement_of_intent(
                 wish_text, True
             )
@@ -326,8 +334,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 charging_instructions=charging_instructions,
                 thread_id=state.thread_id,
             )
-            # CLAUDE - these aren't saving
-            sigil_artifact.save_file()
+            try:
+                sigil_artifact.save_file()
+            except Exception as e:
+                error_msg = f"Failed to save sigil artifact file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             state.artifacts.append(sigil_artifact)
             logging.info("Attempting to create Todoist task for sigil charging...")
             todoist_token = os.getenv("TODOIST_API_TOKEN")
@@ -431,13 +444,24 @@ class BlackAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/Volumes/LucidNonsense/White/tests/mocks/mock.wav", "rb") as f:
-                audio_bytes = f.read()
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_evp_artifact_mock.yml", "r"
-            ) as f:
-                data = yaml.safe_load(f)
-            evp_artifact = EVPArtifact(**data)
+            try:
+                with open(
+                    "/Volumes/LucidNonsense/White/tests/mocks/mock.wav", "rb"
+                ) as f:
+                    audio_bytes = f.read()
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_evp_artifact_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                evp_artifact = EVPArtifact(**data)
+            except Exception as e:
+                error_msg = f"Failed to read mock files for EVP: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                # Return early with an error state
+                return state
             evp_artifact.thread_id = state.thread_id
             evp_artifact.chain_artifact_file_type = ChainArtifactFileType.YML
             evp_artifact.artifact_name = "evp"
@@ -489,8 +513,14 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 audio_bytes=audio_bytes,
                 channels=2,
             )
-            evp_artifact.save_file()
-            print(f"Mock EVP artifact saved to {evp_artifact.file_path}")
+            try:
+                evp_artifact.save_file()
+                print(f"Mock EVP artifact saved to {evp_artifact.file_path}")
+            except Exception as e:
+                error_msg = f"Failed to save EVP artifact file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             state.artifacts.append(evp_artifact)
             return state
         else:
@@ -518,7 +548,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 noise_blended_audio=blended,
                 thread_id=state.thread_id,
             )
-            evp_artifact.save_file()
+            try:
+                evp_artifact.save_file()
+            except Exception as e:
+                error_msg = f"Failed to save EVP artifact file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             state.artifacts.append(evp_artifact)
             return state
 
@@ -532,6 +568,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
     def evaluate_evp(self, state: BlackAgentState) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             roll = random.choice([0, 1])
             if roll:
@@ -568,21 +605,21 @@ class BlackAgent(BaseRainbowAgent, ABC):
             )
 
             prompt = f"""
-                   You are helping a musician create a creative fiction song about an experimental musician
+                   You are the ThreadKeepr, helping a musician create a creative fiction song about an experimental musician
                    working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
                    artifact consisting of audio segments and a transcript. Now, your task is to evaluate the transcript
                    and see if there are any surreal or lyrical results that could help you refocus your song proposal. At this point
                    you only need to reply with a True or False property.
-    
+
                    Here's an example of what might warrant a True response:
                    'do turn' 'caliphate murloc' 'a simple bloodline'
-    
+
                    Here's an example of what might warrant a False response which is more likely:
                    'i' 'me me' 'to' 'hi' 'be be'
-    
+
                    Here's your previous counter-proposal:
                    {state.counter_proposal}
-    
+
                    Here's the EVP transcript:
                    {transcript_text}
                    """
@@ -596,14 +633,18 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 elif isinstance(result, YesOrNo):
                     state.should_update_proposal_with_evp = result.answer
                 else:
-                    logging.warning(
-                        f"EVP evaluation returned unexpected type: {type(result)}, defaulting to False"
+                    error_msg = (
+                        f"EVP evaluation returned unexpected type: {type(result)}"
                     )
+                    logging.warning(error_msg)
+                    if block_mode:
+                        raise TypeError(error_msg)
                     state.should_update_proposal_with_evp = False
             except Exception as e:
-                logging.error(
-                    f"EVP evaluation failed: {e!s}, defaulting to no EVP update"
-                )
+                error_msg = f"EVP evaluation LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
                 state.should_update_proposal_with_evp = False
             return state
 
@@ -611,17 +652,24 @@ class BlackAgent(BaseRainbowAgent, ABC):
         self, state: BlackAgentState
     ) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_after_evp_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-                evp_counter_proposal = SongProposalIteration(**data)
-                state.counter_proposal = evp_counter_proposal
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_after_evp_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    evp_counter_proposal = SongProposalIteration(**data)
+                    state.counter_proposal = evp_counter_proposal
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         prompt = f"""
-                You are helping a musician create a creative fiction song about an experimental musician 
+                You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
                 working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
                 artifact consisting of audio segments and a transcript. Now, you need to update your song counter-proposal
                 to reflect the results of your EVP analysis. At this point you only need to reply with a counter-proposal
@@ -678,22 +726,37 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.song_proposals.iterations.append(self.counter_proposal)
                 state.counter_proposal = updated_proposal
                 return state
+            if not isinstance(result, SongProposalIteration):
+                error_msg = f"Expected SongProposalIteration, got {type(result)}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise TypeError(error_msg)
         except Exception as e:
-            logging.error(f"Anthropic model call failed: {e!s}")
+            error_msg = f"EVP update LLM call failed: {e!s}"
+            logging.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
         return state
 
     def update_alternate_song_spec_with_sigil(
         self, state: BlackAgentState
     ) -> BlackAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open(
-                f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_after_sigil_mock.yml",
-                "r",
-            ) as f:
-                data = yaml.safe_load(f)
-            sigil_counter_proposal = SongProposalIteration(**data)
-            state.counter_proposal = sigil_counter_proposal
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_after_sigil_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                sigil_counter_proposal = SongProposalIteration(**data)
+                state.counter_proposal = sigil_counter_proposal
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
             try:
@@ -710,7 +773,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logging.error(f"Failed to parse sigil artifact: {e!s}")
                 return state
             prompt = f"""
-        You are helping a musician create a creative fiction song about an experimental musician 
+        You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
         working in the experimental music space. You have just generated a sigil artifact and used a
         ToDoist task to have your human charge the sigil. Now, you need to update your song counter-proposal
         to reflect the results of your sigil charge. At this point you only need to reply with a counter-proposal
@@ -760,8 +823,15 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     updated_proposal = SongProposalIteration(**result)
                     state.song_proposals.iterations.append(self.counter_proposal)
                     state.counter_proposal = updated_proposal
-
                     return state
+                if not isinstance(result, SongProposalIteration):
+                    error_msg = f"Expected SongProposalIteration, got {type(result)}"
+                    logging.error(error_msg)
+                    if block_mode:
+                        raise TypeError(error_msg)
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                error_msg = f"Sigil update LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state

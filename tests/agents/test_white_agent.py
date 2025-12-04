@@ -42,7 +42,7 @@ def test_invoke_black_agent():
     mock_state = MagicMock(spec=MainAgentState)
     mock_black_agent = MagicMock(return_value=mock_state)
     agent = WhiteAgent()
-    agent.agents["black"] = mock_black_agent  # Inject mock
+    agent.agents["black"] = mock_black_agent
     result = agent.invoke_black_agent(mock_state)
     assert result == mock_state
     mock_black_agent.assert_called_once_with(mock_state)
@@ -52,7 +52,7 @@ def test_invoke_red_agent():
     mock_state = MagicMock(spec=MainAgentState)
     mock_red_agent = MagicMock(return_value=mock_state)
     agent = WhiteAgent()
-    agent.agents["red"] = mock_red_agent  # Inject mock
+    agent.agents["red"] = mock_red_agent
     result = agent.invoke_red_agent(mock_state)
     assert result == mock_state
     mock_red_agent.assert_called_once_with(mock_state)
@@ -62,10 +62,20 @@ def test_invoke_orange_agent():
     mock_state = MagicMock(spec=MainAgentState)
     mock_orange_agent = MagicMock(return_value=mock_state)
     agent = WhiteAgent()
-    agent.agents["orange"] = mock_orange_agent  # Inject mock
+    agent.agents["orange"] = mock_orange_agent
     result = agent.invoke_orange_agent(mock_state)
     assert result == mock_state
     mock_orange_agent.assert_called_once_with(mock_state)
+
+
+def test_invoke_yellow_agent():
+    mock_state = MagicMock(spec=MainAgentState)
+    mock_yellow_state = MagicMock(return_value=mock_state)
+    agent = WhiteAgent()
+    agent.agents["yellow"] = mock_yellow_state
+    result = agent.invoke_yellow_agent(mock_state)
+    assert result == mock_state
+    mock_yellow_state.assert_called_once_with(mock_state)
 
 
 def test_resume_after_black_agent_ritual(monkeypatch):
@@ -233,3 +243,41 @@ def test_process_orange_agent_work_sets_analysis_and_ready_for_yellow(
     assert getattr(result, "document_synthesis") == "ORANGE_SYNTH"
     assert result.ready_for_yellow is True
     assert result.ready_for_orange is False
+
+
+def test_process_yellow_agent_work_sets_analysis_and_ready_for_green(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "yellow-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_yellow_rebracketing_analysis",
+        lambda self, proposal, research_artifacts: "YELLOW_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_green",
+        lambda self, rebracketed_analysis, yellow_proposal, artifacts: "YELLOW_SYNTH",
+    )
+
+    state = SimpleNamespace(
+        song_proposals={"iterations": [{"iteration_id": "yellow-prop"}]},
+        artifacts=[SimpleNamespace(chain_artifact_type="game_run")],
+        ready_for_yellow=True,
+        ready_for_green=False,
+        thread_id="mock_thread_001",
+    )
+
+    result = white_agent.process_yellow_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "YELLOW_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "YELLOW_SYNTH"
+    # Change when Blue is added
+    # assert result.ready_for_green is True
+    assert result.ready_for_yellow is False
