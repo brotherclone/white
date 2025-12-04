@@ -1,12 +1,51 @@
-bpm:
+bpm: 132
 manifest_id: '05_08'
-tempo:
-key:
+tempo: 5/4
+key: F# minor
 rainbow_color: G
 title: The Empty Fields
 release_date: '2021-09-07'
 album_sequence: 8
 main_audio_file: 05_08_main.wav
-TRT:
+TRT: '[04:18.044]'
 vocals: false
 lyrics: false
+structure:
+  - section_name: Before the smoke
+    start_time: '[00:00.000]'
+    end_time: '[02:28.044]'
+    description: Expressive strings
+  - section_name: All burn
+    start_time: '[02:28.045]'
+    end_time: '[04:18.044]'
+    description: Aggressive, dissonant strings
+sounds_like:
+  - name: Malcolm Williamson
+    discogs_id: 1290977
+  - name: Iannis Xenakis
+    discogs_id: 32202
+  - name: Angela Morley
+    discogs_id: 562800
+mood:
+  - melancholic
+  - dark
+  - sad
+  - frightening
+  - joyous
+  - beautiful
+genres:
+  - classical
+concept: For string quartet, this title track veers from pastoral to apocalyptic, reflecting the changing landscapes affected by climate change.
+audio_tracks:
+  - id: 2
+    description: Violin
+    audio_file: 05_08_02_violin.wav
+  - id: 3
+    description: Viola
+    audio_file: 05_08_03_viola.wav
+  - id: 4
+    description: Cello
+    audio_file: 05_08_04_cello.wav
+  - id: 5
+    description: Double Bass
+    audio_file: 05_08_05_dbl_bass.wav
