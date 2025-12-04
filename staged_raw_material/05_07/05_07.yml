@@ -1,0 +1,49 @@
+bpm: 173
+manifest_id: '05_07'
+tempo: 4/4
+key: C major
+rainbow_color: G
+title: Fish nor Fowl
+release_date: '2021-09-07'
+album_sequence: 7
+main_audio_file: 05_07_main.wav
+TRT: '[02:27.012]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: Poison, boiling oceans
+    start_time: '[00:00.000]'
+    end_time: '[01:20.114]'
+    description: Each plink is a species disappeared from the ocean
+  - section_name: Poison, scalding air
+    start_time: '[01:20.115]'
+    end_time: '[02:27.012]'
+    description: Each plink is a species of bird disappeared from the air
+sounds_like:
+  - name: The Dead C
+    discogs_id: 103196
+  - name: Merzbow
+    discogs_id: 12551
+  - name: Pork Queen
+    discogs_id: 244274
+genres:
+  - noise
+  - experimental
+mood:
+  - dark
+  - violent
+  - eerie
+concept: Each plink in this piece represents a species that has disappeared from the oceans or the air due to human activity.
+audio_tracks:
+  - id: 2
+    description: Plinks
+    audio_file: 05_07_02_molecules.wav
+  - id: 3
+    description: Bird Calls Slowed
+    audio_file: 05_07_03_birds.wav
+  - id: 4
+    description: Bass and side-chained Matrix synth
+    audio_file: 05_07_04_bass.wav
+  - id: 5
+    description: Grandmother
+    audio_file: 05_07_05_grandmother.wav
