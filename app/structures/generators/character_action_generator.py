@@ -211,20 +211,111 @@ class CharacterActionGenerator:
             )
 
     def generate_encounter_narrative(
-        self, room_description: str, characters: List[PulsarPalaceCharacter]
-    ) -> str:
-        """Generate a full encounter narrative from room and characters"""
+        self,
+        room_description: str,
+        characters: List[PulsarPalaceCharacter],
+        return_character_updates: bool = False,
+    ):
+        """
+        Generate a full encounter narrative from room and characters
+
+        Args:
+            room_description: Description of the room
+            characters: List of characters in the encounter
+            return_character_updates: If True, returns (narrative, updated_characters)
+                                     If False, returns just narrative (default)
+
+        Returns:
+            str or tuple: Narrative string, or (narrative, updated_characters) if return_character_updates=True
+        """
 
         narrative_parts = [f"The party enters the space. {room_description}"]
+
+        # Create a copy of characters for potential mutations
+        updated_characters = characters if not return_character_updates else []
 
         for character in characters:
             action = self.generate_action(character)
             narrative_parts.append(action)
 
+            # Apply character state mutations if requested
+            if return_character_updates:
+                mutated_char = self._apply_encounter_mutations(character)
+                updated_characters.append(mutated_char)
+
         outcome = self._generate_outcome(len(characters))
         narrative_parts.append(outcome)
 
-        return " ".join(narrative_parts)
+        narrative = " ".join(narrative_parts)
+
+        if return_character_updates:
+            return narrative, updated_characters
+        return narrative
+
+    def _apply_encounter_mutations(
+        self, character: PulsarPalaceCharacter
+    ) -> PulsarPalaceCharacter:
+        """
+        Apply stat mutations to a character based on encounter outcomes.
+        Characters can gain or lose ON/OFF based on their disposition and actions.
+
+        Returns a modified copy of the character.
+        """
+        # Create a copy to avoid mutating the original
+        import copy
+
+        mutated = copy.deepcopy(character)
+
+        disposition = character.disposition.disposition
+
+        # Disposition-based stat changes
+        disposition_effects = {
+            "Angry": (-1, 2),  # Lose ON, gain OFF (anger burns energy, builds tension)
+            "Curious": (
+                1,
+                -1,
+            ),  # Gain ON, lose OFF (curiosity energizes, reduces negativity)
+            "Misguided": (
+                -2,
+                1,
+            ),  # Lose ON, gain OFF (mistakes drain energy, cause frustration)
+            "Clumsy": (
+                -1,
+                1,
+            ),  # Lose ON, gain OFF (accidents tire, create problems)
+            "Cursed": (
+                -2,
+                3,
+            ),  # Lose ON, gain OFF (curse drains vitality, amplifies darkness)
+            "Sick": (
+                -3,
+                2,
+            ),  # Lose ON, gain OFF (illness weakens, creates suffering)
+            "Vengeful": (
+                0,
+                2,
+            ),  # Neutral ON, gain OFF (vengeance feeds darkness)
+            "Crazed": (
+                -1,
+                -1,
+            ),  # Lose both (madness is chaotic and unstable)
+        }
+
+        on_change, off_change = disposition_effects.get(disposition, (0, 0))
+
+        # Apply random variance (-1 to +1)
+        on_change += random.randint(-1, 1)
+        off_change += random.randint(-1, 1)
+
+        # Update current stats (can't go below 0 or above max + 10)
+        mutated.on_current = max(
+            0, min(mutated.on_current + on_change, mutated.on_max + 10)
+        )
+        mutated.off_current = max(
+            0, min(mutated.off_current + off_change, mutated.off_max + 10)
+        )
+
+        return mutated
 
     def _generate_outcome(self, num_characters: int) -> str:
         """Generate an outcome based on the chaos level"""

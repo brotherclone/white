@@ -1,0 +1,51 @@
+bpm: 128
+manifest_id: '05_05'
+tempo: 4/4
+key: C major
+rainbow_color: G
+title: Met with Great Malthusianism
+release_date: '2021-09-07'
+album_sequence: 5
+main_audio_file: 05_05_main.wav
+TRT: '[01:01.300]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: Malthusianism
+    start_time: '[00:00.000]'
+    end_time: '[01:31.300]'
+    description: Denial, fear, and despair
+sounds_like:
+  - name: Kiln
+    discogs_id: 53514
+  - name: Fibreforms
+    discogs_id: 185564
+  - name: Morton Subotnick
+    discogs_id: 32196
+  - name: Your Team Ring
+    discogs_id: 317585
+genres:
+  - experimental
+  - ambient
+  - noise
+mood:
+  - hypnotic
+  - eerie
+  - unnerving
+concept: An autorun synth spells out the cycles of denial, fear, and despair.
+audio_tracks:
+  - id: 2
+    description: Auto despair runner
+    audio_file: 05_05_02_runner.wav
+  - id: 3
+    description: Cobra basket modular
+    audio_file: 05_05_03_cobra.wav
+  - id: 4
+    description: Umlaut Pad
+    audio_file: 05_05_04_pad.wav
+  - id: 5
+    description: Grandpa
+    audio_file: 05_05_05_grandpa.wav
+  - id: 6
+    description: Morphagene
+    audio_file: 05_05_06_morphagene.wav

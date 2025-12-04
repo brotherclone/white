@@ -39,6 +39,13 @@ class NewspaperArtifact(ChainArtifact):
     def __init__(self, **data):
         super().__init__(**data)
 
+    def get_text_content(self) -> str:
+        """
+        Get the full text content of the article.
+        Returns the text field as-is. Used for compatibility with agent processing.
+        """
+        return self.text if self.text else ""
+
     def to_markdown(self) -> str:
         """Convert newspaper artifact to formatted markdown."""
         md_lines = []

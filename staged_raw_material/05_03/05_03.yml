@@ -1,0 +1,49 @@
+bpm: 120
+manifest_id: '05_03'
+tempo: 4/4
+key: E minor
+rainbow_color: G
+title: Huayrachina
+release_date: '2021-09-07'
+album_sequence: 3
+main_audio_file: 05_03_main.wav
+TRT: '[01:13.124]'
+vocals: false
+lyrics: false
+structure:
+  - section_name: The Forge
+    start_time: '[00:00.000]'
+    end_time: '[01:13.124]'
+    description: The first pollution
+sounds_like:
+  - name: Brian Eno
+    discogs_id: 634
+  - name: Terry Riley
+    discogs_id: 32198
+genres:
+  - ambient
+  - experimental
+mood:
+  - dreamy
+  - gentle
+  - melancholic
+concept: Frozen in ice were trace amounts of lead and other impurities from human civilization's first pollution - an Incan forge or Huayrachina.
+audio_tracks:
+  - id: 2
+    description: Pad
+    audio_file: 05_03_02_pad.wav
+  - id: 3
+    description: Guitar
+    audio_file: 05_03_03_guitar.wav
+  - id: 4
+    description: Guitar 2
+    audio_file: 05_03_04_guitar2.wav
+  - id: 5
+    description: Synth
+    audio_file: 05_03_05_synth.wav
+  - id: 6
+    description: Modular
+    audio_file: 05_03_06_modular.wav
+  - id: 7
+    description: Flute
+    audio_file: 05_03_07_flute.wav
