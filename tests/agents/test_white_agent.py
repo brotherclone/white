@@ -223,7 +223,7 @@ def test_process_orange_agent_work_sets_analysis_and_ready_for_yellow(
     monkeypatch.setattr(
         white_agent.__class__,
         "_orange_rebracketing_analysis",
-        lambda self, proposal, newspaper_artifacts: "ORANGE_ANALYSIS",
+        lambda self, proposal, newspaper_artifacts, symbolic_object_artifacts: "ORANGE_ANALYSIS",
     )
     monkeypatch.setattr(
         white_agent.__class__,
@@ -259,7 +259,7 @@ def test_process_yellow_agent_work_sets_analysis_and_ready_for_green(
     monkeypatch.setattr(
         white_agent.__class__,
         "_yellow_rebracketing_analysis",
-        lambda self, proposal, research_artifacts: "YELLOW_ANALYSIS",
+        lambda self, proposal, game_run_artifacts, character_sheet_artifacts: "YELLOW_ANALYSIS",
     )
     monkeypatch.setattr(
         white_agent.__class__,
@@ -278,6 +278,43 @@ def test_process_yellow_agent_work_sets_analysis_and_ready_for_green(
     result = white_agent.process_yellow_agent_work(state)
     assert getattr(result, "rebracketing_analysis") == "YELLOW_ANALYSIS"
     assert getattr(result, "document_synthesis") == "YELLOW_SYNTH"
-    # Change when Blue is added
-    # assert result.ready_for_green is True
+    assert result.ready_for_green is True
     assert result.ready_for_yellow is False
+
+
+def test_process_green_agent_work_sets_analysis_and_ready_for_blue(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "green-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_green_rebracketing_analysis",
+        lambda self, proposal, species_artifacts, last_human_artifacts, narrative_artifacts, survey_artifacts: "GREEN_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_blue",
+        lambda self, rebracketed_analysis, green_proposal, artifacts: "GREEN_SYNTH",
+    )
+
+    state = SimpleNamespace(
+        song_proposals={"iterations": [{"iteration_id": "green-prop"}]},
+        artifacts=[SimpleNamespace(chain_artifact_type="species_extinction")],
+        ready_for_green=True,
+        ready_for_blue=False,
+        thread_id="mock_thread_001",
+    )
+
+    result = white_agent.process_green_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "GREEN_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "GREEN_SYNTH"
+    assert result.ready_for_green is False
+    # ToDo: Change with blue
+    # assert result.ready_for_blue is True
