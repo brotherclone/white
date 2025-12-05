@@ -1,0 +1,131 @@
+{
+  "corpus_version": "1.0.0",
+  "created_date": "2025-12-05",
+  "description": "The Empty Fields - Species extinction corpus for Green Agent climate fiction generation",
+  "total_entries": 1,
+  "entries": [
+    {
+      "species": {
+        "scientific_name": "Phocoena sinus",
+        "common_name": "Vaquita porpoise",
+        "taxonomic_group": "Marine mammal (cetacean)",
+        "iucn_status": "Critically Endangered (functionally extinct by 2028)",
+        "extinction_year": 2028,
+        "population_trajectory": [
+          {
+            "year": 1997,
+            "population": 600,
+            "source": "IUCN Red List",
+            "confidence": "medium"
+          },
+          {
+            "year": 2008,
+            "population": 245,
+            "source": "IUCN Red List",
+            "confidence": "high"
+          },
+          {
+            "year": 2015,
+            "population": 60,
+            "source": "CIRVA acoustic monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2018,
+            "population": 19,
+            "source": "CIRVA acoustic monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2020,
+            "population": 10,
+            "source": "CIRVA estimate",
+            "confidence": "high"
+          },
+          {
+            "year": 2028,
+            "population": 0,
+            "source": "projected",
+            "confidence": "high"
+          }
+        ],
+        "habitat": "Upper Gulf of California, Mexico",
+        "endemic": true,
+        "range_km2": 4000.0,
+        "primary_cause": "bycatch",
+        "secondary_causes": [
+          "Habitat degradation from trawling",
+          "Low genetic diversity",
+          "Reduced prey availability"
+        ],
+        "anthropogenic_factors": [
+          "Illegal gillnet fishing for totoaba",
+          "Totoaba swim bladder trade to China ($20,000+ per bladder)",
+          "Insufficient enforcement of marine protected areas",
+          "Economic desperation in fishing communities",
+          "Organized crime involvement in totoaba trade"
+        ],
+        "cascade_effects": [
+          "Gulf of California ecosystem predator-prey imbalance",
+          "Totoaba also critically endangered (swim bladders worth more than cocaine)",
+          "Fishing community economic collapse in San Felipe",
+          "Marine protected area credibility crisis",
+          "Loss of top predator creates trophic cascade"
+        ],
+        "ecosystem_role": "Top predator for small fish and squid in upper Gulf of California",
+        "symbolic_resonance": [
+          "Smallest cetacean - vulnerability at scale",
+          "Collateral damage (not targeted, just caught)",
+          "Endemic species (nowhere else to go)",
+          "Economic desperation driving extinction",
+          "Failed protected area despite international attention"
+        ],
+        "human_parallel_hints": [
+          "Fishing communities with no alternative livelihood",
+          "Collateral damage of economic systems",
+          "Endemic populations with nowhere to migrate",
+          "Entangled in systems not designed to kill them",
+          "Protected areas that exist on paper only"
+        ],
+        "narrative_potential_score": 0.95,
+        "symbolic_weight": 0.9,
+        "size_category": "small",
+        "lifespan_years": 20,
+        "movement_pattern": "resident"
+      },
+      "suggested_human_parallels": [
+        {
+          "vulnerability_type": "entanglement",
+          "scenario": "Mexican fishing family in San Felipe whose livelihood disappeared with gillnet ban, now choosing between starvation and illegal fishing",
+          "occupation": "Fisherman/fisherwoman",
+          "environmental_stressor": "Marine protected area eliminates traditional fishing grounds",
+          "symbolic_object": "Gillnet rolled up in garage, illegal to use but only tool they have"
+        },
+        {
+          "vulnerability_type": "economic_extinction",
+          "scenario": "Marine biologist who spent 20 years trying to save the vaquita, watching population collapse despite all efforts",
+          "occupation": "Conservation scientist",
+          "environmental_stressor": "Powerlessness against organized crime and economic desperation",
+          "symbolic_object": "Acoustic monitoring device that stopped detecting vaquita clicks"
+        },
+        {
+          "vulnerability_type": "isolation",
+          "scenario": "Last person in a dying fishing village who can't afford to leave",
+          "occupation": "Elder/community historian",
+          "environmental_stressor": "Economic collapse of entire region dependent on fishing",
+          "symbolic_object": "Empty houses where neighbors used to live"
+        }
+      ],
+      "musical_hints": {
+        "tempo_suggestion": "Slow, dirge-like (45-55 BPM)",
+        "key_suggestion": "D minor or microtonal variant",
+        "instrumentation": "Solo cello (whale song parallel), sparse piano (human parallel)",
+        "texture": "Long silences between phrases, underwater quality",
+        "silence_moments": "When population hits critical thresholds",
+        "emotional_arc": "Gradual diminishment, not sudden collapse"
+      },
+      "created_date": "2025-12-05T12:55:00Z",
+      "source_notes": "IUCN Red List, CIRVA (Comité Internacional para la Recuperación de la Vaquita), National Geographic coverage of totoaba trade"
+    }
+  ]
+}
