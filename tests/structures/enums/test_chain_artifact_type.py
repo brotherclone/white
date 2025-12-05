@@ -15,6 +15,10 @@ EXPECTED = {
     "GAME_RUN": "game_run",
     "CHARACTER_SHEET": "character_sheet",
     "CHARACTER_PORTRAIT": "character_portrait",
+    "ARBITRARYS_SURVEY": "arbitrary_survey",
+    "LAST_HUMAN": "last_human",
+    "LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE": "last_human_species_extinction_narrative",
+    "SPECIES_EXTINCTION": "species_extinction",
     "UNKNOWN": "unknown",
 }
 
@@ -45,6 +49,16 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("newspaper_article", ChainArtifactType.NEWSPAPER_ARTICLE),
         ("symbolic_object", ChainArtifactType.SYMBOLIC_OBJECT),
         ("proposal", ChainArtifactType.PROPOSAL),
+        ("game_run", ChainArtifactType.GAME_RUN),
+        ("character_sheet", ChainArtifactType.CHARACTER_SHEET),
+        ("character_portrait", ChainArtifactType.CHARACTER_PORTRAIT),
+        ("arbitrary_survey", ChainArtifactType.ARBITRARYS_SURVEY),
+        ("last_human", ChainArtifactType.LAST_HUMAN),
+        (
+            "last_human_species_extinction_narrative",
+            ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE,
+        ),
+        ("species_extinction", ChainArtifactType.SPECIES_EXTINCTION),
         ("unknown", ChainArtifactType.UNKNOWN),
     ],
 )
@@ -55,6 +69,8 @@ def test_lookup_by_value(value, member):
 def test_lookup_by_name():
     assert ChainArtifactType["PROPOSAL"] is ChainArtifactType.PROPOSAL
     assert ChainArtifactType["SYMBOLIC_OBJECT"] is ChainArtifactType.SYMBOLIC_OBJECT
+    assert ChainArtifactType["UNKNOWN"] is ChainArtifactType.UNKNOWN
+    assert ChainArtifactType["ARBITRARYS_SURVEY"] is ChainArtifactType.ARBITRARYS_SURVEY
 
 
 def test_invalid_value_raises_value_error():
@@ -70,3 +86,4 @@ def test_values_are_unique():
 def test_enum_members_are_enum_instances():
     assert isinstance(ChainArtifactType.NEWSPAPER_ARTICLE, enum.Enum)
     assert isinstance(ChainArtifactType.INSTRUCTIONS_TO_HUMAN, enum.Enum)
+    assert isinstance(ChainArtifactType.GAME_RUN, enum.Enum)
