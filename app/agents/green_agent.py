@@ -46,7 +46,18 @@ class GreenAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
-        print("💚 GREEN AGENT: Poeticizing Environmental Data...")
+        """
+        Sub-Arbitrary is the Green Agent. A small, sub-instance of Arbitrary from The Culture.
+        It's been studying Earth's anthropocene era and has developed a fascination with human creativity and self-destruction.
+        1. Load a random species from the extinction corpus
+        2. Generate a species extinction record artifact
+        3. Look at the current song proposal and generate a Last Human Artifact
+        4. Generate a Last Human Species Extinction Narrative Artifact
+        5. Use the Extinction Musical Parameters and the story to create a counter-proposal
+
+        :param state:
+        :return:
+        """
 
         return state
 
