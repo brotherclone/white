@@ -83,6 +83,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             raise TypeError(f"Unexpected result type: {type(result)}")
         if final_state.counter_proposal:
             state.song_proposals.iterations.append(final_state.counter_proposal)
+        if final_state.artifacts:
+            state.artifacts = final_state.artifacts
         return state
 
     def create_graph(self) -> StateGraph:

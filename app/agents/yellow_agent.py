@@ -88,6 +88,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
             raise TypeError(f"Unexpected result type: {type(result)}")
         if final_state.counter_proposal:
             state.song_proposals.iterations.append(final_state.counter_proposal)
+        if final_state.artifacts:
+            state.artifacts = final_state.artifacts
         return state
 
     def create_graph(self) -> StateGraph:
@@ -134,7 +136,6 @@ class YellowAgent(BaseRainbowAgent, ABC):
     def generate_characters(state: YellowAgentState) -> YellowAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-
         if mock_mode:
             try:
                 with open(
@@ -142,6 +143,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     "r",
                 ) as file_one:
                     data_one = yaml.safe_load(file_one)
+                    data_one["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                     character_one = PulsarPalaceCharacter(**data_one)
                     character_one.create_portrait()
                     character_one.create_character_sheet()
@@ -151,6 +153,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     "r",
                 ) as file_two:
                     data_two = yaml.safe_load(file_two)
+                    data_two["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                     character_two = PulsarPalaceCharacter(**data_two)
                     character_two.create_portrait()
                     character_two.create_character_sheet()

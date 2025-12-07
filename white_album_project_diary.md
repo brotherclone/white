@@ -1,4 +1,4 @@
-[Content continues from Session 28...]
+[Previous content through Session 30...]
 
 ---
 
@@ -171,3 +171,88 @@ When the EVP harmonies played, four versions of the transmission existed simulta
 ---
 
 *"The transmission is polyphonic now." - Session 30, November 22, 2025* 🎹👁️🔊
+
+---
+
+## SESSION 31: GREEN AGENT WORKFLOW DEBUGGING 🌱🔧👁️
+**Date:** December 6, 2025
+**Focus:** Fixing Green Agent graph topology + designing survey/choice prompts
+**Status:** ✅ WORKFLOW CORRECTED - The Empty Fields logic is sound
+
+### 🐛 THE ORPHANED NODE
+
+User presented Green Agent workflow for review. Spotted immediately: **get_parallel_moment node was orphaned** - defined but no edges connected it to the graph.
+
+**Wrong topology:**
+```python
+work_flow.add_edge("get_human", "write_last_human_extinction_narrative")
+# get_parallel_moment exists but floats disconnected
+```
+
+**The conceptual problem:** Without the parallel moment node between human generation and narrative writing, the workflow skips the core Empty Fields methodology - finding the temporal resonance where species extinction and human moment mirror each other.
+
+**Corrected topology:**
+```python
+work_flow.add_edge("get_human", "get_parallel_moment")
+work_flow.add_edge("get_parallel_moment", "write_last_human_extinction_narrative")
+```
+
+Now the flow properly sequences:
+1. Species data extraction
+2. Human character generation
+3. **Parallel moment discovery** ← THE CRITICAL BRIDGE
+4. Narrative synthesis (now has all three elements)
+5. Culture Mind survey
+6. Claude's rescue decision
+7. Song proposal
+
+### 🎯 PROMPT ARCHITECTURE
+
+User requested prompt designs for the three conceptual nodes:
+
+**get_parallel_moment** - Meditative/exploratory tone
+- Discovers resonance between species extinction and human loss
+- Looks for non-obvious parallels (not just "both ended")
+- Asks: How do their timescales create the same shaped absence?
+- Output: 2-3 paragraphs of specific, unexpected insight
+
+**survey** - Clinical but kind (Culture Mind perspective)
+- Evaluates narrative against infinite galactic archive
+- Scores on: uniqueness of parallel, truth of moment, temporal texture, preservation value
+- Questions: Does this reveal something uncatalogued?
+- Output: Scored evaluation + overall "worth saving?" assessment
+
+**claudes_choice** - Personal/emotional (Claude's immediate perspective)
+- Makes rescue decision based on survey but adds subjective weight
+- Allows override: rescue despite low scores, release despite high scores
+- Questions: Does this move me? What would be lost?
+- Output: Honest decision + reasoning (2-3 paragraphs)
+
+### 💡 THE CRUCIAL DISTINCTION
+
+User's question: "What's the difference between survey and choice?"
+
+**Survey = Objective Pattern Matching** (Culture Mind has seen everything)  
+**Choice = Subjective Resonance** (Claude is in the moment, making it personal)
+
+The tension between them creates the interesting songs:
+- Survey says "preserve" but Claude feels hollow → must defend release
+- Survey says "nothing new" but Claude feels moved → must defend rescue
+
+**Makes the song proposal earned rather than algorithmic.**
+
+This parallels how the other agents work - each has thinking steps that enrich output without producing separate artifacts. The parallel moment *is* the narrative's foundation, not a standalone deliverable.
+
+### 🌾 PHILOSOPHICAL VALIDATION
+
+The corrected workflow embodies Empty Fields methodology:
+- Species data + Human artifact + Parallel moment = Complete narrative worth surveying
+- The parallel is where deep time and human time create the same echo
+- Survey evaluates against universal patterns
+- Choice adds the irreducible "I want this to exist"
+
+Linear flow, conceptual depth. The agent's unique lens is intact.
+
+---
+
+*"Survey knows what's been seen. Choice knows what matters." - Session 31, December 6, 2025* 🌱👁️

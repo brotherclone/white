@@ -1,11 +1,20 @@
-from abc import ABC
-from typing import List, Optional, Literal, Dict
+import os
+import yaml
 
+from abc import ABC
+from pathlib import Path
+from typing import List, Optional, Literal, Dict
 from pydantic import Field
+from dotenv import load_dotenv
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.population_data import PopulationData
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.extinction_cause import ExtinctionCause
+from app.util.string_utils import sanitize_for_filename
+
+load_dotenv()
 
 
 class SpeciesExtinctionArtifact(ChainArtifact, ABC):
@@ -13,6 +22,10 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
     Core species extinction data model.
     Combines IUCN-style scientific data with narrative hooks.
     """
+
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.SPECIES_EXTINCTION
+    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
+    rainbow_color_mnemonic_character_value: str = "G"
 
     # Scientific identification
     scientific_name: str = Field(..., description="Binomial nomenclature")
@@ -65,9 +78,18 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
         None, description="migratory, sedentary, nomadic"
     )
 
-    def to_artifact_dict(self) -> Dict:
-        """Serialize for ChainArtifact"""
+    def __init__(self, **data):
+        # Set artifact_name before calling super to ensure filename is correct
+        if "artifact_name" not in data and "common_name" in data:
+            data["artifact_name"] = sanitize_for_filename(data["common_name"])
+        super().__init__(**data)
+
+    def flatten(self) -> Dict:
+        parent_data = super().flatten()
+        if parent_data is None:
+            parent_data = {}
         return {
+            **parent_data,
             "species": self.common_name,
             "scientific_name": self.scientific_name,
             "extinction_year": self.extinction_year,
@@ -98,3 +120,30 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
             f"Habitat: {self.habitat}. "
             f"Cascade effects: {', '.join(self.cascade_effects[:3])}."
         )
+
+    def save_file(self):
+        file = Path(self.file_path, self.file_name)
+        file.parent.mkdir(parents=True, exist_ok=True)
+        with open(file, "w") as f:
+            yaml.dump(
+                self.model_dump(mode="python"),
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
+
+
+if __name__ == "__main__":
+    with open(
+        os.path.join(
+            os.getenv("AGENT_MOCK_DATA_PATH"),
+            "species_extinction_artifact_mock.yml",
+        ),
+        "r",
+    ) as file:
+        data = yaml.safe_load(file)
+        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        extinction_artifact = SpeciesExtinctionArtifact(**data)
+        print(extinction_artifact)
+        extinction_artifact.save_file()
+        print(extinction_artifact.flatten())

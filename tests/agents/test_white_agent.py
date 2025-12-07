@@ -296,7 +296,7 @@ def test_process_green_agent_work_sets_analysis_and_ready_for_blue(
     monkeypatch.setattr(
         white_agent.__class__,
         "_green_rebracketing_analysis",
-        lambda self, proposal, species_artifacts, last_human_artifacts, narrative_artifacts, survey_artifacts: "GREEN_ANALYSIS",
+        lambda self, proposal, species_artifacts, last_human_artifacts, narrative_artifacts, survey_artifacts, claudes_choice: "GREEN_ANALYSIS",
     )
     monkeypatch.setattr(
         white_agent.__class__,

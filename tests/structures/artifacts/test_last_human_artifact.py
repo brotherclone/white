@@ -16,9 +16,6 @@ class ConcreteLastHumanArtifact(LastHumanArtifact):
 
     thread_id: str = "test-thread"
 
-    def flatten(self):
-        return self.model_dump()
-
     def save_file(self):
         pass
 
@@ -166,30 +163,59 @@ def test_age_validation():
 
 
 def test_year_documented_validation():
-    """Test year_documented validation (2020-2150)."""
+    """Test year_documented validation (1975 or 2028-2350)."""
     # Valid years
-    artifact_2020 = ConcreteLastHumanArtifact(
+    artifact_1975 = ConcreteLastHumanArtifact(
         thread_id="test",
-        name="Test 2020",
+        name="Test 1975",
         age=30,
         location="Test",
-        year_documented=2020,
+        year_documented=1975,
         parallel_vulnerability=LastHumanVulnerabilityType.TOXIC_EXPOSURE,
         vulnerability_details="Test",
         environmental_stressor="Test",
         documentation_type=LastHumanDocumentationType.DEATH,
         last_days_scenario="Test",
     )
-    assert artifact_2020.year_documented == 2020
+    assert artifact_1975.year_documented == 1975
 
-    # Invalid: too early
+    artifact_2028 = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test 2028",
+        age=30,
+        location="Test",
+        year_documented=2028,
+        parallel_vulnerability=LastHumanVulnerabilityType.TOXIC_EXPOSURE,
+        vulnerability_details="Test",
+        environmental_stressor="Test",
+        documentation_type=LastHumanDocumentationType.DEATH,
+        last_days_scenario="Test",
+    )
+    assert artifact_2028.year_documented == 2028
+
+    # Invalid: too early (not 1975 and before 2028)
     with pytest.raises(ValidationError):
         ConcreteLastHumanArtifact(
             thread_id="test",
             name="Invalid",
             age=30,
             location="Test",
-            year_documented=2019,
+            year_documented=2020,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="Test",
+            environmental_stressor="Test",
+            documentation_type=LastHumanDocumentationType.DEATH,
+            last_days_scenario="Test",
+        )
+
+    # Invalid: too late
+    with pytest.raises(ValidationError):
+        ConcreteLastHumanArtifact(
+            thread_id="test",
+            name="Invalid",
+            age=30,
+            location="Test",
+            year_documented=2351,
             parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
             vulnerability_details="Test",
             environmental_stressor="Test",
@@ -198,7 +224,7 @@ def test_year_documented_validation():
         )
 
 
-def test_to_artifact_dict():
+def test_flatten():
     """Test to_artifact_dict method."""
     artifact = ConcreteLastHumanArtifact(
         thread_id="test",
@@ -215,7 +241,7 @@ def test_to_artifact_dict():
         significant_object="Chalkboard eraser",
     )
 
-    artifact_dict = artifact.to_artifact_dict()
+    artifact_dict = artifact.flatten()
 
     assert artifact_dict["name"] == "Test Person"
     assert artifact_dict["age"] == 35
