@@ -1,0 +1,131 @@
+bpm: 92
+manifest_id: '06_02'
+tempo: 4/4
+key: B minor
+rainbow_color: B
+title: For a Blue Girl
+release_date: '2023-03-14'
+album_sequence: 2
+main_audio_file: 06_02_main.wav
+TRT: '[04:24.023]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:39.007]'
+    description: Laid back, melancholic, mellow
+  - section_name: Chorus 1
+    start_time: '[00:39.008]'
+    end_time: '[01:10.014]'
+    description: Chorus with 'Blue Girl' theme
+  - section_name: Play 1
+    start_time: '[01:10.015]'
+    end_time: '[01:18.010]'
+    description: A chorus-ending asking the Blue Girl to play
+  - section_name: Verse 2
+    start_time: '[01:18.011]'
+    end_time: '[01:44.012]'
+    description: Return to verse
+  - section_name: Chorus 2
+    start_time: '[01:44.013]'
+    end_time: '[02:05.009]'
+    description: Return to chorus
+  - section_name: Play 2
+    start_time: '[02:05.010]'
+    end_time: '[02:21.000]'
+    description: And back to the invitation to play
+  - section_name: Interlude
+    start_time: '[02:21.001]'
+    end_time: '[03:02.019]'
+    description: The sound falls apart and each string instrument rejoins
+  - section_name: Verse 3
+    start_time: '[03:02.020]'
+    end_time: '[03:28.021]'
+    description: The sad conclusion to the song
+  - section_name: Chorus 3
+    start_time: '[03:28.022]'
+    end_time: '[04:02.019]'
+    description: Final chorus
+  - section_name: Outro
+    start_time: '[04:02.020]'
+    end_time: '[04:15.020]'
+    description: A transcendent hopeful break
+  - section_name: Refrain
+    start_time: '[04:15.021]'
+    end_time: '[04:24.023]'
+    description: A last repeat of the chorus melody
+sounds_like:
+  - name: Timesbold
+    discogs_id: 319016
+  - name: George Harrison
+    discogs_id: 243955
+mood:
+  - melancholic
+  - regretful
+genres:
+  - folk
+  - folk rock
+concept: The was a girl at an in-hospital school my mom taught at. She was the only verbal student and would love when me and my sister could visit. She would hold both our hands - her touch was cold and her skin was blue from lack of circulation. She died shortly after the summer we spent with her. In this alternative timeline she lives a little longer and I visit her hospital room.
+lrc_file: 06_02.lrc
+audio_tracks:
+  - id: 2
+    description: Piano
+    audio_file: 06_02_03_piano.wav
+    midi_file: 06_02_02_piano.mid
+  - id: 3
+    description: Bass
+    audio_file: 06_02_04_bass.wav
+  - id: 4
+    description: Baritone
+    audio_file: 06_02_05_baritone.wav
+  - id: 5
+    description: Electric Guitar
+    audio_file: 06_02_06_electric_guitar.wav
+  - id: 6
+    description: 12-string Electric Guitar
+    audio_file: 06_02_07_twelve-string.wav
+  - id: 7
+    description: Lap steel guitar
+    audio_file: 06_02_08_lap_steel.wav
+  - id: 8
+    description: Harmonica
+    audio_file: 06_02_09_harmonica.wav
+  - id: 9
+    description: Acoustic Guitar
+    audio_file: 06_02_10_acoustic_guitar.wav
+  - id: 10
+    description: Banjo
+    audio_file: 06_02_11_banjo.wav
+  - id: 11
+    description: Drums
+    audio_file: 06_02_12_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 12
+    description: Kick
+    audio_file: 06_02_13_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 13
+    description: Snare
+    audio_file: 06_02_14_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 14
+    description: Hi-Hat
+    audio_file: 06_02_15_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 15
+    description: Toms
+    audio_file: 06_02_16_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 16
+    description: Vocals A
+    audio_file: 06_02_17_vox_1.wav
+  - id: 17
+    description: Vocals B
+    audio_file: 06_02_18_vox_2.wav
+

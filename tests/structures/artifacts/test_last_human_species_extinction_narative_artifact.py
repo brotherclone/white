@@ -23,9 +23,6 @@ class ConcreteSpeciesExtinctionArtifact(SpeciesExtinctionArtifact):
 
     thread_id: str = "test-thread"
 
-    def flatten(self):
-        return self.model_dump()
-
     def save_file(self):
         pass
 
@@ -35,9 +32,6 @@ class ConcreteLastHumanArtifact(LastHumanArtifact):
 
     thread_id: str = "test-thread"
 
-    def flatten(self):
-        return self.model_dump()
-
     def save_file(self):
         pass
 
@@ -46,9 +40,6 @@ class ConcreteNarrativeArtifact(LastHumanSpeciesExtinctionNarrativeArtifact):
     """Concrete implementation for testing"""
 
     thread_id: str = "test-thread"
-
-    def flatten(self):
-        return self.model_dump()
 
     def save_file(self):
         pass
@@ -170,7 +161,7 @@ def test_narrative_artifact_with_parallel_moments():
     assert len(narrative.silence_moments) == 2
 
 
-def test_to_artifact_dict():
+def test_flatten():
     """Test to_artifact_dict method."""
     species = ConcreteSpeciesExtinctionArtifact(
         thread_id="test",
@@ -218,7 +209,7 @@ def test_to_artifact_dict():
         silence_moments=["Final breath"],
     )
 
-    artifact_dict = narrative.to_artifact_dict()
+    artifact_dict = narrative.flatten()
 
     assert artifact_dict["species_name"] == "Dict Species"
     assert artifact_dict["human_name"] == "Dict Human"

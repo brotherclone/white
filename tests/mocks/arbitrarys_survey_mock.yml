@@ -1,0 +1,10 @@
+thread_id: "mock_thread_001"
+identity: mock identity
+original_substrate: mock substrate
+rescue_year: 2133
+expanded_capabilities:
+  - mock capability
+  - another mock capability
+role: observer
+tragedy: mock tragedy
+arbitrary_reflection: mock arbitrary reflection

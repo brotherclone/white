@@ -6,13 +6,17 @@ from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.chain_artifact_type import ChainArtifactType
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 
 class ImageChainArtifactFile(ChainArtifact, ABC):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.CHARACTER_PORTRAIT
+    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.PNG
     artifact_name: str = "character_portrait"
-    file_path: Path = Field(description="Path to the image file")
+    file_path: Optional[Path] = Field(
+        description="Path to the image file", default=None
+    )
     height: int = Field(description="Height of the image in pixels", ge=0, le=10000)
     width: int = Field(description="Width of the image in pixels", ge=0, le=10000)
     aspect_ratio: Optional[float] = Field(

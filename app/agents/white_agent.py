@@ -488,11 +488,17 @@ class WhiteAgent(BaseModel):
             for n in green_artifacts
             if n.chain_artifact_type == ChainArtifactType.SPECIES_EXTINCTION
         ]
+        rescue_decision_artifacts = [
+            n
+            for n in green_artifacts
+            if n.chain_artifact_type == ChainArtifactType.RESCUE_DECISION
+        ]
         green_merged_artifacts = (
             survey_artifacts
             + human_artifacts
             + narrative_artifacts
             + extinction_artifacts
+            + rescue_decision_artifacts
         )
         rebracketing_analysis = self._green_rebracketing_analysis(
             green_proposal,
@@ -500,6 +506,7 @@ class WhiteAgent(BaseModel):
             human_artifacts,
             narrative_artifacts,
             extinction_artifacts,
+            rescue_decision_artifacts,
         )
         document_synthesis = self._synthesize_document_for_blue(
             rebracketing_analysis, green_proposal, green_merged_artifacts
@@ -525,6 +532,7 @@ class WhiteAgent(BaseModel):
         human_artifacts,
         narrative_artifacts,
         extinction_artifacts,
+        rescue_decision_artifacts,
     ) -> str:
         logging.info("Processing Green Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -562,8 +570,11 @@ You have received these artifacts from the Green Agent:
 **The story of how that human's last days mimic the species extinction:**
 {narrative_artifacts[-1].artifact_report if narrative_artifacts else "None"}
 
-** The Culture Ship, Arbitrary, survey:**
+** The Culture Ship, Arbitrary's sub-instance, survey:**
 {survey_artifacts[-1].artifact_report if survey_artifacts else "None"}
+
+** Sub-Aribtrary's decision on whether to rescue the last humans:**
+{rescue_decision_artifacts[-1].artifact_report if rescue_decision_artifacts else "None"}
 
 **Your Task: REBRACKETING**
 
