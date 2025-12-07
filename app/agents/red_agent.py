@@ -67,6 +67,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             raise TypeError(f"Unexpected result type: {type(result)}")
         if final_state.counter_proposal:
             state.song_proposals.iterations.append(final_state.counter_proposal)
+        if final_state.artifacts:
+            state.artifacts = final_state.artifacts
         return state
 
     def _ensure_dict(self, obj):
@@ -314,7 +316,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     book_dict["thread_id"] = state.thread_id
                     book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
                     book_dict["base_path"] = os.getenv(
-                        "AGENT_ARTIFACTS_PATH", "artifacts"
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"
                     )
                     state.current_reaction_book = BookArtifact(**book_dict)
                     state.artifacts.append(state.current_reaction_book)

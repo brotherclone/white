@@ -19,9 +19,6 @@ class ConcreteArbitrarysSurveyArtifact(ArbitrarysSurveyArtifact):
 
     thread_id: str = "test-thread"
 
-    def flatten(self):
-        return self.model_dump()
-
     def save_file(self):
         pass
 
@@ -30,9 +27,6 @@ class ConcreteLastHumanArtifact(LastHumanArtifact):
     """Concrete implementation for testing"""
 
     thread_id: str = "test-thread"
-
-    def flatten(self):
-        return self.model_dump()
 
     def save_file(self):
         pass
@@ -43,9 +37,6 @@ class ConcreteSpeciesExtinctionArtifact(SpeciesExtinctionArtifact):
 
     thread_id: str = "test-thread"
 
-    def flatten(self):
-        return self.model_dump()
-
     def save_file(self):
         pass
 
@@ -54,9 +45,6 @@ class ConcreteRescueDecisionArtifact(RescueDecisionArtifact):
     """Concrete implementation for testing"""
 
     thread_id: str = "test-thread"
-
-    def flatten(self):
-        return self.model_dump()
 
     def save_file(self):
         pass
@@ -171,7 +159,7 @@ def test_rescue_decision_artifact_with_custom_fields():
     assert artifact.arbitrary_perspective == "Custom perspective on the tragedy"
 
 
-def test_to_artifact_dict():
+def test_flatten():
     """Test to_artifact_dict method."""
     rescued = ConcreteArbitrarysSurveyArtifact(
         thread_id="test",
@@ -230,7 +218,7 @@ def test_to_artifact_dict():
         arbitrary_perspective="Test perspective",
     )
 
-    artifact_dict = artifact.to_artifact_dict()
+    artifact_dict = artifact.flatten()
 
     assert artifact_dict["consciousness_rescued"] == 1
     assert artifact_dict["humans_documented"] == 2
@@ -256,7 +244,7 @@ def test_rescue_decision_empty_documentation():
     assert len(artifact.documented_humans) == 0
     assert len(artifact.documented_species) == 0
 
-    artifact_dict = artifact.to_artifact_dict()
+    artifact_dict = artifact.flatten()
     assert artifact_dict["humans_documented"] == 0
     assert artifact_dict["species_documented"] == 0
 

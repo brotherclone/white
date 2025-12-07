@@ -14,9 +14,6 @@ class ConcreteSpeciesExtinctionArtifact(SpeciesExtinctionArtifact):
 
     thread_id: str = "test-thread"
 
-    def flatten(self):
-        return self.model_dump()
-
     def save_file(self):
         pass
 
@@ -149,7 +146,7 @@ def test_extinction_year_validation():
             common_name="Test",
             taxonomic_group="bird",
             iucn_status="Extinct",
-            extinction_year=2019,
+            extinction_year=1919,
             habitat="Forest",
             primary_cause=ExtinctionCause.HABITAT_LOSS,
             ecosystem_role="Test",
@@ -163,7 +160,7 @@ def test_extinction_year_validation():
             common_name="Test",
             taxonomic_group="bird",
             iucn_status="Extinct",
-            extinction_year=2151,
+            extinction_year=4444,
             habitat="Forest",
             primary_cause=ExtinctionCause.HABITAT_LOSS,
             ecosystem_role="Test",
@@ -251,7 +248,7 @@ def test_size_category_literal():
         )
 
 
-def test_to_artifact_dict():
+def test_flatten():
     """Test to_artifact_dict method."""
     population_data = [
         PopulationData(year=2025, population=1000),
@@ -276,7 +273,7 @@ def test_to_artifact_dict():
         symbolic_weight=0.75,
     )
 
-    artifact_dict = artifact.to_artifact_dict()
+    artifact_dict = artifact.flatten()
 
     assert artifact_dict["species"] == "Test Species"
     assert artifact_dict["scientific_name"] == "Testus extinctus"

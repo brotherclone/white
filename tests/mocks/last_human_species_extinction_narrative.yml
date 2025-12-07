@@ -1,0 +1,52 @@
+thread_id: 'mock_thread_001'
+artifact_name: 'extinction_narrative_mock'
+species:
+  scientific_name: 'Mockus Mockulias'
+  common_name: 'Mock'
+  taxonomic_group: 'Mockery'
+  iucn_status: 'extinct'
+  extinction_year: 2020
+  habitat: 'mock habitat'
+  primary_cause: 'combined_factors'
+  ecosystem_role: 'mocker'
+human:
+  name: Gabriel Walsh
+  age: 72
+  pronouns: he/him
+  location: 'San Francisco, CA'
+  latitude: 37.7749295
+  longitude: -122.4194155
+  year_documented: 1975
+  parallel_vulnerability: entanglement
+  vulnerability_details: mock vulnerability details
+  occupation: mock occupation
+  family_situation: mock family situation
+  daily_routine: mock daily routine
+  environmental_stressor: mock environmental stressor
+  adaptation_attempts:
+    - new coffee pot
+    - a brisk morning walk
+  documentation_type: witness
+  last_days_scenario: mock last days scenario
+  significant_object: mock significant object
+  final_thought: mock final thought
+species_arc: mock species arc
+human_arc: mock human arc
+parallel_moments:
+  - species_moment: mock species moment
+    human_moment: mock human moment
+    thematic_connection: mock thematic connection
+    timestamp_relative: mock timestamp relative
+  - species_moment: mock species moment
+    human_moment: mock human moment
+    thematic_connection: mock thematic connection
+    timestamp_relative: mock timestamp relative
+elegiac_quality: mock elegiac quality
+opening_image: mock opening image
+closing_image: mock closing image
+emotional_curve:
+  - mock emotional moment
+  - another mock emotional moment
+silence_moments:
+  - mock silence moment
+  - another mock silence moment

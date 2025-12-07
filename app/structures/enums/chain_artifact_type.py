@@ -17,4 +17,5 @@ class ChainArtifactType(str, Enum):
     LAST_HUMAN = "last_human"
     LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE = "last_human_species_extinction_narrative"
     SPECIES_EXTINCTION = "species_extinction"
+    RESCUE_DECISION = "rescue_decision"
     UNKNOWN = "unknown"

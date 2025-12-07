@@ -10,7 +10,7 @@ from typing import Any
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
-USER_AGENT = "lucid_nonsense_access/1.1"
+USER_AGENT = "lucid_nonsense_access/2.0"
 TIME_OUT = 30.0
 
 logging.basicConfig(level=logging.INFO)
@@ -36,7 +36,111 @@ def search_white_project_files() -> list[Any]:
 
 
 @mcp.tool()
-def open_lucid_nonsense_file(file_name: str) -> str | None:
+def list_lucid_nonsense_directory(directory_path: str = "") -> list[str]:
+    """List contents of a directory in lucid nonsense.
+
+    Args:
+        directory_path: Relative path from base (e.g., "claude_working_area" or "")
+
+    Returns:
+        List of file/directory names (directories have trailing /)
+    """
+    base_path = get_base_path()
+    target_path = base_path / directory_path
+
+    # Security check
+    try:
+        target_path.resolve().relative_to(base_path.resolve())
+    except ValueError:
+        raise ValueError(f"Path {directory_path} is outside allowed directory")
+
+    if not target_path.exists():
+        raise FileNotFoundError(f"Directory {directory_path} not found")
+
+    if not target_path.is_dir():
+        raise ValueError(f"Path {directory_path} is not a directory")
+
+    try:
+        items = []
+        for item in target_path.iterdir():
+            # Add indicator for directories
+            name = item.name + "/" if item.is_dir() else item.name
+            items.append(name)
+        return sorted(items)
+    except OSError as e:
+        raise OSError(f"Error listing directory {directory_path}: {e}")
+
+
+@mcp.tool()
+def file_exists_in_lucid_nonsense(file_name: str) -> dict[str, Any]:
+    """Check if a file exists and get basic info without reading content.
+
+    Args:
+        file_name: Relative path from base
+
+    Returns:
+        Dict with: exists (bool), is_file (bool), is_dir (bool), size_bytes (int|None)
+    """
+    base_path = get_base_path()
+    file_path = base_path / file_name
+
+    # Security check
+    try:
+        file_path.resolve().relative_to(base_path.resolve())
+    except ValueError:
+        raise ValueError(f"File {file_name} is outside allowed directory")
+
+    result = {
+        "exists": file_path.exists(),
+        "is_file": file_path.is_file() if file_path.exists() else None,
+        "is_dir": file_path.is_dir() if file_path.exists() else None,
+        "size_bytes": (
+            file_path.stat().st_size
+            if file_path.exists() and file_path.is_file()
+            else None
+        ),
+    }
+    return result
+
+
+@mcp.tool()
+def find_files_in_lucid_nonsense(pattern: str, directory_path: str = "") -> list[str]:
+    """Find files matching a glob pattern.
+
+    Args:
+        pattern: Glob pattern (e.g., "*.json", "**/*.py" for recursive)
+        directory_path: Where to search from (default: base directory)
+
+    Returns:
+        List of matching file paths (relative to base)
+    """
+    base_path = get_base_path()
+    search_path = base_path / directory_path
+
+    # Security check
+    try:
+        search_path.resolve().relative_to(base_path.resolve())
+    except ValueError:
+        raise ValueError(f"Path {directory_path} is outside allowed directory")
+
+    if not search_path.exists():
+        raise FileNotFoundError(f"Search path {directory_path} not found")
+
+    try:
+        matches = []
+        for match in search_path.glob(pattern):
+            # Only include files, not directories
+            if match.is_file():
+                # Return path relative to base_path
+                rel_path = match.relative_to(base_path)
+                matches.append(str(rel_path))
+        return sorted(matches)
+    except Exception as e:
+        raise OSError(f"Error searching for pattern {pattern}: {e}")
+
+
+@mcp.tool()
+def open_lucid_nonsense_file(file_name: str) -> str:
     """Open and read a file from the lucid nonsense directory"""
     base_path = get_base_path()
     file_path = base_path / file_name
@@ -46,6 +150,21 @@ def open_lucid_nonsense_file(file_name: str) -> str | None:
         file_path.resolve().relative_to(base_path.resolve())
     except ValueError:
         raise ValueError(f"File {file_name} is outside allowed directory")
+
+    # Check existence with helpful error
+    if not file_path.exists():
+        # Suggest similar files if parent directory exists
+        parent = file_path.parent
+        if parent.exists() and parent.is_dir():
+            similar = [f.name for f in parent.iterdir() if file_path.stem in f.name]
+            if similar:
+                raise FileNotFoundError(
+                    f"File {file_name} not found. Did you mean one of these? {similar}"
+                )
+        raise FileNotFoundError(f"File {file_name} not found at {file_path}")
+
+    if not file_path.is_file():
+        raise ValueError(f"Path {file_name} is not a file (might be a directory)")
 
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -59,29 +178,32 @@ def open_lucid_nonsense_file(file_name: str) -> str | None:
 def claude_save_stuff_here(file_name: str, content: str) -> str:
     """Build metadata frontmatter and reuse `write_lucid_nonsense_file` to write it."""
     base_path = get_base_path()
-    metadata: dict[str, Any] | None = {
+    metadata: dict[str, Any] = {
         "timestamp_utc": datetime.datetime.utcnow().isoformat() + "Z",
         "user_agent": USER_AGENT,
         "timeout_seconds": TIME_OUT,
         "env_LUCID_NONSENSE_PATH": str(base_path),
         "filename": file_name,
+        "file_size_bytes": len(content),
+        "content_type": "json" if file_name.endswith(".json") else "text",
     }
     try:
         branch = subprocess.check_output(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=str(base_path), text=True
         ).strip()
         metadata["git_branch"] = branch
-    except EnvironmentError as err:
-        print(f"Error: {err}")
+    except Exception as err:
+        logging.debug(f"Git branch detection failed: {err}")
         metadata["git_branch"] = None
     try:
         remotes = subprocess.check_output(
             ["git", "remote", "-v"], cwd=str(base_path), text=True
         ).strip()
         metadata["git_remotes"] = remotes
-    except EnvironmentError as err:
-        print(f"Error: {err}")
+    except Exception as err:
+        logging.debug(f"Git remotes detection failed: {err}")
         metadata["git_remotes"] = None
+
     yaml_lines = ["---"]
     for k, v in metadata.items():
         yaml_lines.append(f"{k}: {json.dumps(v)}")
@@ -128,10 +250,14 @@ def get_project_diary() -> str:
         return "Project diary not found."
 
 
+# Register all tools
 mcp.tools = [
-    search_white_project_files,
     open_lucid_nonsense_file,
     write_lucid_nonsense_file,
+    claude_save_stuff_here,
+    list_lucid_nonsense_directory,
+    file_exists_in_lucid_nonsense,
+    find_files_in_lucid_nonsense,
 ]
 
 if __name__ == "__main__":

@@ -1,0 +1,70 @@
+thread_id: "mock_thread_001"
+rescued_consciousness:
+  identity: "mock_character_001"
+  original_substrate: "mock_substrate_A"
+  rescue_year: 2133
+  expanded_capabilities:
+    - "mock_capability_001"
+    - "mock_capability_002"
+documented_humans:
+  - name: Gabriel Walsh
+    age: 72
+    pronouns: he/him
+    location: 'San Francisco, CA'
+    latitude: 37.7749295
+    longitude: -122.4194155
+    year_documented: 1975
+    parallel_vulnerability: entanglement
+    vulnerability_details: mock vulnerability details
+    occupation: mock occupation
+    family_situation: mock family situation
+    daily_routine: mock daily routine
+    environmental_stressor: mock environmental stressor
+    adaptation_attempts:
+      - new coffee pot
+      - a brisk morning walk
+    documentation_type: witness
+    last_days_scenario: mock last days scenario
+    significant_object: mock significant object
+    final_thought: mock final thought
+  - name: Mockman Walsh
+    age: 72
+    pronouns: he/him
+    location: 'San Francisco, CA'
+    latitude: 37.7749295
+    longitude: -122.4194155
+    year_documented: 1975
+    parallel_vulnerability: entanglement
+    vulnerability_details: mock vulnerability details
+    occupation: mock occupation
+    family_situation: mock family situation
+    daily_routine: mock daily routine
+    environmental_stressor: mock environmental stressor
+    adaptation_attempts:
+      - new coffee pot
+      - a brisk morning walk
+    documentation_type: witness
+    last_days_scenario: mock last days scenario
+    significant_object: mock significant object
+    final_thought: mock final thought
+documented_species:
+  - scientific_name: 'Mockus Mockulias'
+    common_name: 'Mock'
+    taxonomic_group: 'Mockery'
+    iucn_status: 'extinct'
+    extinction_year: 2020
+    habitat: 'mock habitat'
+    primary_cause: 'combined_factors'
+    ecosystem_role: 'mocker'
+  - scientific_name: 'Pockus Mockulias'
+    common_name: 'Mock'
+    taxonomic_group: 'Mockery'
+    iucn_status: 'extinct'
+    extinction_year: 2020
+    habitat: 'mock habitat'
+    primary_cause: 'combined_factors'
+    ecosystem_role: 'mocker'
+rescue_justification: mock rescue justification
+role: observer
+rationale: mock rationale
+arbitrary_perspective: mock Sub-Arbitrary perspective

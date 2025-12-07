@@ -1,4 +1,29 @@
+import re
 from textwrap import shorten
+
+
+def sanitize_for_filename(s: str, max_length: int = 50) -> str:
+    """
+    Sanitize a string to be safe for use in filenames.
+    - Converts to lowercase
+    - Replaces spaces with underscores
+    - Removes or replaces invalid filename characters
+    - Truncates to max_length
+    """
+    if not s:
+        return "unnamed"
+    # Replace spaces with underscores
+    s = s.replace(" ", "_")
+    # Remove any character that's not alphanumeric, underscore, hyphen, or period
+    s = re.sub(r"[^a-zA-Z0-9_\-.]", "", s)
+    # Convert to lowercase
+    s = s.lower()
+    # Truncate if too long
+    if len(s) > max_length:
+        s = s[:max_length]
+    # Remove trailing underscores or hyphens
+    s = s.rstrip("_-")
+    return s if s else "unnamed"
 
 
 def truncate_simple(s: str, n: int) -> str:
