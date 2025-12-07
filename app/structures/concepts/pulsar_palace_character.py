@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field
@@ -10,7 +9,6 @@ from app.structures.artifacts.pulsar_palace_character_sheet import (
     PulsarPalaceCharacterSheet,
 )
 from app.agents.tools.image_tools import composite_character_portrait
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 load_dotenv()
 
@@ -289,26 +287,31 @@ class PulsarPalaceCharacter(BaseModel):
     def create_portrait(self):
         from PIL import Image
 
-        portrait_filename = f"character_portrait_{self.encounter_id}.png"
-        output_path = os.path.join(
-            os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-            self.thread_id,
-            ChainArtifactFileType.PNG.value,
-            portrait_filename,
+        # Let ImageChainArtifactFile generate the proper filename with UUID
+        # First create the artifact to get the filename
+        temp_portrait = ImageChainArtifactFile(
+            thread_id=self.thread_id,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            width=300,  # temporary values
+            height=300,
         )
+
+        # Use the generated filename for the composite
+        output_path = temp_portrait.get_artifact_path()
         png = composite_character_portrait(
             self.background.image_path,
             [self.profession.image_path, self.disposition.image_path],
             output_path,
         )
 
-        # Get image dimensions
+        # Get actual image dimensions
         with Image.open(png) as img:
             width, height = img.size
 
+        # Create the final portrait artifact with correct dimensions
         self.portrait = ImageChainArtifactFile(
             thread_id=self.thread_id,
-            file_name=portrait_filename,
+            artifact_id=temp_portrait.artifact_id,  # Use same UUID
             base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
             file_path=png,
             width=width,
@@ -316,7 +319,7 @@ class PulsarPalaceCharacter(BaseModel):
         )
 
     def create_character_sheet(self):
-        portrait_filename = Path(self.portrait.file_path).name
+        portrait_filename = self.portrait.file_name
         relative_portrait_path = f"../png/{portrait_filename}"
 
         template = f"""![{self.disposition.disposition} {self.profession.profession}]({relative_portrait_path})

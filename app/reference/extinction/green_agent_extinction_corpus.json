@@ -1,8 +1,8 @@
 {
-  "corpus_version": "1.0.0",
-  "created_date": "2025-12-05",
-  "description": "The Empty Fields - Species extinction corpus for Green Agent climate fiction generation",
-  "total_entries": 1,
+  "corpus_version": "1.1.0",
+  "created_date": "2025-12-06",
+  "description": "The Empty Fields - Expanded species extinction corpus for Green Agent climate fiction generation",
+  "total_entries": 6,
   "entries": [
     {
       "species": {
@@ -126,6 +126,612 @@
       },
       "created_date": "2025-12-05T12:55:00Z",
       "source_notes": "IUCN Red List, CIRVA (Comité Internacional para la Recuperación de la Vaquita), National Geographic coverage of totoaba trade"
+    },
+    {
+      "species": {
+        "scientific_name": "Acropora cervicornis",
+        "common_name": "Staghorn coral",
+        "taxonomic_group": "Scleractinian coral",
+        "iucn_status": "Critically Endangered (regional extinction Caribbean by 2035)",
+        "extinction_year": 2035,
+        "population_trajectory": [
+          {
+            "year": 1980,
+            "population": "abundant throughout Caribbean",
+            "source": "NOAA historical surveys",
+            "confidence": "high"
+          },
+          {
+            "year": 2005,
+            "population": "97% decline from 1980 baseline",
+            "source": "IUCN Red List assessment",
+            "confidence": "high"
+          },
+          {
+            "year": 2014,
+            "population": "98.7% decline, scattered remnant colonies",
+            "source": "Caribbean coral disease monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2024,
+            "population": "99.3% decline, genetic bottleneck reached",
+            "source": "NOAA coral reef monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2035,
+            "population": "functional extinction (Caribbean)",
+            "source": "projected based on warming trajectory",
+            "confidence": "medium-high"
+          }
+        ],
+        "habitat": "Shallow Caribbean reef systems, 5-25m depth",
+        "endemic": false,
+        "range_km2": 2700000.0,
+        "primary_cause": "ocean_warming",
+        "secondary_causes": [
+          "White band disease",
+          "Ocean acidification (pH decline)",
+          "Hurricane damage (increased intensity)",
+          "Algae overgrowth from nutrient pollution"
+        ],
+        "anthropogenic_factors": [
+          "Atmospheric CO2 levels exceeding 420ppm (2024)",
+          "Ocean temperature increase 1.5°C above pre-industrial",
+          "Agricultural runoff (nitrogen, phosphorus loading)",
+          "Coastal development destroying mangrove nurseries",
+          "Overfishing removing herbivorous fish that control algae",
+          "Sunscreen chemicals (oxybenzone) in tourist areas"
+        ],
+        "cascade_effects": [
+          "Loss of reef structure - 3D habitat collapses to 2D rubble field",
+          "25% of all marine species lose critical habitat",
+          "Caribbean fisheries collapse (600+ species depend on reef)",
+          "Coastal erosion accelerates without reef wave-breaking",
+          "Tourism economies collapse in 26 Caribbean nations",
+          "Protein source for 100+ million people disappears"
+        ],
+        "ecosystem_role": "Reef architect - fastest growing coral, creates 3D structure for entire ecosystem",
+        "symbolic_resonance": [
+          "Colonial organism - individuals can't survive alone",
+          "Builds structures that outlast individual polyps by centuries",
+          "Death by fever (bleaching from temperature)",
+          "Dissolving in the medium it evolved in (acidification)",
+          "Killed by the atmosphere (CO2 absorption)"
+        ],
+        "human_parallel_hints": [
+          "Communities whose infrastructure is crumbling",
+          "Fever dreams during climate events",
+          "Slowly dissolving institutional structures",
+          "Generational projects abandoned mid-construction",
+          "Tourism-dependent economies with no Plan B"
+        ],
+        "narrative_potential_score": 0.92,
+        "symbolic_weight": 0.95,
+        "size_category": "colonial/modular",
+        "lifespan_years": 10,
+        "movement_pattern": "sessile"
+      },
+      "suggested_human_parallels": [
+        {
+          "vulnerability_type": "infrastructure_collapse",
+          "scenario": "Jamaican hotel owner watching reef die, taking tourism industry with it, three generations of family business ending",
+          "occupation": "Small business owner (eco-tourism)",
+          "environmental_stressor": "Ocean warming destroying the ecosystem that sustained their livelihood",
+          "symbolic_object": "Underwater photos from the 1980s when reef was alive, shown to guests who ask where the fish are"
+        },
+        {
+          "vulnerability_type": "fever",
+          "scenario": "Marine biologist documenting bleaching events, experiencing heat exhaustion while snorkeling dying reefs during marine heatwave",
+          "occupation": "Coral reef ecologist",
+          "environmental_stressor": "Chronic heat stress, both human and ecological",
+          "symbolic_object": "Thermometer showing water temperature, rising every survey"
+        },
+        {
+          "vulnerability_type": "generational_abandonment",
+          "scenario": "Caribbean fisherman whose grandfather, father, and now he fished the same reef, telling teenage daughter there's no point learning the trade",
+          "occupation": "Artisanal fisherman",
+          "environmental_stressor": "Multi-generational knowledge becoming obsolete within single lifetime",
+          "symbolic_object": "Hand-carved fishing lure that no longer catches anything"
+        }
+      ],
+      "musical_hints": {
+        "tempo_suggestion": "Slow to停滞 (40-50 BPM, occasional pauses)",
+        "key_suggestion": "E major dissolving to E minor over course of piece",
+        "instrumentation": "Prepared piano (coral skeleton sounds), marimba (polyp clicks), synth pads (water)",
+        "texture": "Layered/colonial - many voices gradually thinning to silence",
+        "silence_moments": "Bleaching events - sudden drops to near-silence",
+        "emotional_arc": "From busy polyrhythmic complexity to empty drone"
+      },
+      "created_date": "2025-12-06T10:15:00Z",
+      "source_notes": "NOAA Coral Reef Watch, IUCN Red List, Caribbean coral disease monitoring network, Ocean acidification research (Hoegh-Guldberg)"
+    },
+    {
+      "species": {
+        "scientific_name": "Danaus plexippus",
+        "common_name": "Monarch butterfly (Eastern migratory population)",
+        "taxonomic_group": "Insect (Lepidoptera)",
+        "iucn_status": "Endangered (Eastern population near collapse by 2045)",
+        "extinction_year": 2045,
+        "population_trajectory": [
+          {
+            "year": 1996,
+            "population": "1 billion overwintering in Mexico",
+            "source": "WWF Mexico monarch monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2013,
+            "population": "33.5 million (96.6% decline)",
+            "source": "WWF Mexico monarch monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2020,
+            "population": "106 million (brief recovery)",
+            "source": "WWF Mexico monarch monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2024,
+            "population": "22 million (below extinction threshold)",
+            "source": "WWF Mexico monarch monitoring",
+            "confidence": "high"
+          },
+          {
+            "year": 2045,
+            "population": "functionally extinct (migration pattern collapse)",
+            "source": "projected",
+            "confidence": "medium"
+          }
+        ],
+        "habitat": "3000-mile migratory corridor: Canada/US breeding grounds to Mexican oyamel fir forests",
+        "endemic": false,
+        "range_km2": 5500000.0,
+        "primary_cause": "habitat_loss",
+        "secondary_causes": [
+          "Pesticide exposure (neonicotinoids, glyphosate)",
+          "Climate change disrupting migration timing",
+          "Illegal logging in Mexican overwintering sites",
+          "Milkweed eradication along migratory routes"
+        ],
+        "anthropogenic_factors": [
+          "Glyphosate herbicide eliminating 99% of Midwest milkweed (only host plant)",
+          "Neonicotinoid pesticides causing sub-lethal navigation damage",
+          "Industrial agriculture replacing diverse meadows with corn/soy monoculture",
+          "Illegal logging in Monarch Butterfly Biosphere Reserve despite protection",
+          "Climate change: spring arriving too early, monarchs emerge before milkweed",
+          "Subdivision development fragmenting migratory corridors"
+        ],
+        "cascade_effects": [
+          "Loss of iconic pollinator - cultural symbol extinction",
+          "Milkweed-dependent food web collapse (milkweed bugs, beetles, etc)",
+          "Ecotourism collapse in Mexican mountain communities",
+          "Proof of concept: multi-generational migration can be broken",
+          "Pollination services lost across 3000-mile corridor"
+        ],
+        "ecosystem_role": "Long-distance pollinator, connecting ecosystems across North America through multi-generational migration",
+        "symbolic_resonance": [
+          "Multi-generational journey - no individual completes full cycle",
+          "Cultural icon of transformation",
+          "Killed by the plants they depend on (milkweed sprayed)",
+          "Memory encoded across generations, erased in single lifetime",
+          "Migration disrupted by spring arriving at wrong time"
+        ],
+        "human_parallel_hints": [
+          "Migrant populations with broken generational transmission",
+          "Families whose homeland becomes uninhabitable",
+          "Jobs made obsolete mid-career",
+          "Cultural knowledge lost when elders die unexpectedly",
+          "Poisoned by the infrastructure meant to sustain us"
+        ],
+        "narrative_potential_score": 0.88,
+        "symbolic_weight": 0.93,
+        "size_category": "small",
+        "lifespan_years": 0.16,
+        "movement_pattern": "long-distance migrant"
+      },
+      "suggested_human_parallels": [
+        {
+          "vulnerability_type": "generational_knowledge_loss",
+          "scenario": "Mexican guide in Michoacán whose family has led monarch butterfly tours for 4 generations, watching numbers dwindle to nothing",
+          "occupation": "Ecotourism guide",
+          "environmental_stressor": "Income and cultural identity both disappearing",
+          "symbolic_object": "Childhood photo standing among millions of monarchs on the same tree that's now empty"
+        },
+        {
+          "vulnerability_type": "poisoning",
+          "scenario": "Iowa farmer who sprayed Roundup for 30 years, now diagnosed with non-Hodgkin's lymphoma, watching monarchs disappear from fields",
+          "occupation": "Industrial farmer",
+          "environmental_stressor": "Same chemicals poisoning both human and butterflies",
+          "symbolic_object": "Empty Roundup jug and empty milkweed field"
+        },
+        {
+          "vulnerability_type": "migration_disruption",
+          "scenario": "Child of migrant farmworkers, family following seasonal work patterns for generations, now disrupted by border policies and climate chaos",
+          "occupation": "Seasonal agricultural worker",
+          "environmental_stressor": "Traditional migration patterns made illegal or impossible",
+          "symbolic_object": "Map with traditional family routes, some now crossed out"
+        }
+      ],
+      "musical_hints": {
+        "tempo_suggestion": "Moderate, fluttering (72-84 BPM), gradually losing momentum",
+        "key_suggestion": "D major (hopeful) descending chromatically to D minor",
+        "instrumentation": "Glockenspiel (wing beats), vibraphone (shimmer), strings (wind currents)",
+        "texture": "Shimmering, delicate, masses reducing to scattered individuals",
+        "silence_moments": "Empty oyamel forests, silent spring",
+        "emotional_arc": "From collective shimmer to isolated, confused individuals"
+      },
+      "created_date": "2025-12-06T11:30:00Z",
+      "source_notes": "WWF Mexico monarch monitoring program, USDA milkweed surveys, Xerces Society pollinator conservation research"
+    },
+    {
+      "species": {
+        "scientific_name": "Bombus affinis",
+        "common_name": "Rusty patched bumble bee",
+        "taxonomic_group": "Insect (Hymenoptera)",
+        "iucn_status": "Critically Endangered (87% decline, near extinction by 2030)",
+        "extinction_year": 2030,
+        "population_trajectory": [
+          {
+            "year": 2000,
+            "population": "historically abundant across 28 US states and 2 Canadian provinces",
+            "source": "Xerces Society baseline surveys",
+            "confidence": "high"
+          },
+          {
+            "year": 2010,
+            "population": "87% decline, present in only 13 states",
+            "source": "USFWS species status assessment",
+            "confidence": "high"
+          },
+          {
+            "year": 2017,
+            "population": "Listed as federally endangered, scattered colonies",
+            "source": "USFWS endangered species listing",
+            "confidence": "high"
+          },
+          {
+            "year": 2024,
+            "population": "fewer than 100 colonies confirmed, genetic bottleneck",
+            "source": "Xerces Society monitoring",
+            "confidence": "medium"
+          },
+          {
+            "year": 2030,
+            "population": "functional extinction predicted",
+            "source": "projected based on decline rate",
+            "confidence": "medium-high"
+          }
+        ],
+        "habitat": "Grasslands, prairies, and woodlands across upper Midwest and Northeast US",
+        "endemic": false,
+        "range_km2": 2500000.0,
+        "primary_cause": "pesticides",
+        "secondary_causes": [
+          "Colony collapse from Nosema bombi pathogen",
+          "Habitat loss from agricultural intensification",
+          "Climate change disrupting queen emergence timing",
+          "Competition from invasive managed honeybees"
+        ],
+        "anthropogenic_factors": [
+          "Neonicotinoid pesticides (imidacloprid, clothianidin) - neuro-disruptive to bees",
+          "Fungicides interfering with gut microbiome",
+          "Conversion of prairie/grassland to corn/soy monoculture (90% habitat loss)",
+          "Intensive mowing regimes eliminating nesting sites",
+          "Light pollution disrupting navigation",
+          "Nosema bombi pathogen spread from commercial bumblebee operations"
+        ],
+        "cascade_effects": [
+          "Pollination failure for wild blueberries, cranberries, tomatoes",
+          "Co-evolved plant species (native prairie flowers) decline without specialist pollinator",
+          "Agricultural productivity decline - $3 billion pollination services lost",
+          "Proof that even common species can collapse rapidly",
+          "Death spiral: fewer bees → less pollination → fewer flowers → fewer bees"
+        ],
+        "ecosystem_role": "Native specialist pollinator for nightshade family, legumes, and native prairie plants; buzz pollination specialist",
+        "symbolic_resonance": [
+          "Named for rust-colored patch - visual marker of identity fading",
+          "Colony creature - queen is only survivor of each year's colony",
+          "Killed by chemicals meant to protect crops they pollinate",
+          "Common abundance to rare sighting in single generation",
+          "Buzz pollination - vibration at specific frequency, disrupted by pesticides"
+        ],
+        "human_parallel_hints": [
+          "Workers whose labor is essential but invisible until absent",
+          "Communities poisoned by the industries they serve",
+          "Neurodivergence made non-viable by environmental neurotoxins",
+          "Specialized knowledge that can't adapt fast enough",
+          "Distinctive identity marker fading into homogeneous decline"
+        ],
+        "narrative_potential_score": 0.85,
+        "symbolic_weight": 0.87,
+        "size_category": "small",
+        "lifespan_years": 0.08,
+        "movement_pattern": "local forager"
+      },
+      "suggested_human_parallels": [
+        {
+          "vulnerability_type": "poisoning",
+          "scenario": "Bee researcher developing early-onset Parkinson's after years of pesticide exposure while studying colony collapse",
+          "occupation": "Entomologist/agricultural scientist",
+          "environmental_stressor": "Neurotoxins affecting both human and bee nervous systems",
+          "symbolic_object": "Tremoring hands unable to handle the bees they're trying to save"
+        },
+        {
+          "vulnerability_type": "industrial_obsolescence",
+          "scenario": "Wisconsin dairy farmer forced to sell family farm to industrial agriculture, watching prairie wildflowers and bees disappear under monoculture corn",
+          "occupation": "Small-scale farmer",
+          "environmental_stressor": "Economic pressure to intensify agriculture to survive, destroying what gave work meaning",
+          "symbolic_object": "Jar of prairie seeds saved from grandmother's meadow, nowhere left to plant them"
+        },
+        {
+          "vulnerability_type": "invisible_labor",
+          "scenario": "Seasonal pollination worker, trucking managed honeybee hives between industrial farms, develops chronic illness from pesticide exposure",
+          "occupation": "Migratory apiculture worker",
+          "environmental_stressor": "Essential agricultural worker, completely disposable to system",
+          "symbolic_object": "GPS tracker showing 10,000-mile migration pattern following monoculture bloom cycles"
+        }
+      ],
+      "musical_hints": {
+        "tempo_suggestion": "Buzzing, agitated (110-140 BPM), gradually fragmenting",
+        "key_suggestion": "B-flat minor with microtonal pitch bends (neurotoxic disorientation)",
+        "instrumentation": "Bowed vibraphone (buzz pollination), prepared guitar (mechanical buzz), electronics (pesticide chaos)",
+        "texture": "Polyrhythmic swarm reducing to confused, erratic solo",
+        "silence_moments": "Colony collapse - sudden stop mid-phrase",
+        "emotional_arc": "From purposeful industriousness to disoriented stillness"
+      },
+      "created_date": "2025-12-06T12:45:00Z",
+      "source_notes": "Xerces Society for Invertebrate Conservation, USFWS species status assessment, neonicotinoid research (Goulson et al)"
+    },
+    {
+      "species": {
+        "scientific_name": "Ursus maritimus",
+        "common_name": "Polar bear",
+        "taxonomic_group": "Marine mammal (carnivore)",
+        "iucn_status": "Vulnerable (Southern Beaufort population collapsing, full extinction 2100)",
+        "extinction_year": 2100,
+        "population_trajectory": [
+          {
+            "year": 2001,
+            "population": "25000 global population, stable",
+            "source": "IUCN Polar Bear Specialist Group",
+            "confidence": "medium"
+          },
+          {
+            "year": 2015,
+            "population": "26000, Southern Beaufort subpopulation declining 40%",
+            "source": "USGS Alaska Science Center",
+            "confidence": "high"
+          },
+          {
+            "year": 2024,
+            "population": "22500, multiple subpopulations in decline",
+            "source": "PBSG status report",
+            "confidence": "medium-high"
+          },
+          {
+            "year": 2050,
+            "population": "projected 12000, ice-free summers becoming norm",
+            "source": "climate model projections",
+            "confidence": "medium"
+          },
+          {
+            "year": 2100,
+            "population": "near-complete extinction except captive populations",
+            "source": "IPCC warming scenario projections",
+            "confidence": "medium"
+          }
+        ],
+        "habitat": "Arctic sea ice platforms for hunting seals across circumpolar region",
+        "endemic": false,
+        "range_km2": 14000000.0,
+        "primary_cause": "climate_change",
+        "secondary_causes": [
+          "Sea ice loss - 13% per decade",
+          "Starvation during extended ice-free periods",
+          "Contaminants (PCBs, mercury) accumulating in food chain",
+          "Human-wildlife conflict in communities"
+        ],
+        "anthropogenic_factors": [
+          "Atmospheric CO2 at 422ppm (2024), tracking RCP8.5 worst-case",
+          "Arctic warming 2-4x faster than global average",
+          "Sea ice minimum declining 13% per decade (NASA data)",
+          "Industrial pollutants bio-accumulating in seal blubber (primary food)",
+          "Offshore oil development in critical habitat",
+          "Cruise ship tourism disturbing denning sites"
+        ],
+        "cascade_effects": [
+          "Apex predator loss destabilizes Arctic marine food web",
+          "Ringed seal populations change behavior, affecting ecosystem",
+          "Indigenous subsistence hunting cultures lose traditional species",
+          "Polar bear-human conflicts increase as bears forced ashore",
+          "Ecotourism industry collapse in Churchill, Svalbard, etc.",
+          "Extinction becomes symbol/proof of climate catastrophe"
+        ],
+        "ecosystem_role": "Apex predator regulating seal populations, structuring Arctic marine ecosystem",
+        "symbolic_resonance": [
+          "Icon of climate change - dying on melting foundation",
+          "Swimming to exhaustion searching for ice that no longer exists",
+          "Starving in a food-rich environment they can't access",
+          "Forced to feed on trash in human settlements",
+          "Most powerful Arctic predator made helpless by invisible gas"
+        ],
+        "human_parallel_hints": [
+          "Indigenous peoples watching traditional way of life melt away",
+          "Specialists whose entire skill set becomes obsolete",
+          "Swimming to exhaustion toward promises that vanish on approach",
+          "Powerful institutions made powerless by atmospheric change",
+          "Forced to scavenge from the civilization that displaced them"
+        ],
+        "narrative_potential_score": 0.78,
+        "symbolic_weight": 0.98,
+        "size_category": "large",
+        "lifespan_years": 25,
+        "movement_pattern": "wide-ranging nomad"
+      },
+      "suggested_human_parallels": [
+        {
+          "vulnerability_type": "foundation_collapse",
+          "scenario": "Inuit elder in Nunavut who learned ice navigation from grandfather, now GPS required because traditional ice knowledge no longer reliable",
+          "occupation": "Traditional hunter/community elder",
+          "environmental_stressor": "Multi-generational knowledge becoming actively dangerous as climate changes",
+          "symbolic_object": "Hand-drawn ice maps from 1960s showing thickness, currents - now dangerously inaccurate"
+        },
+        {
+          "vulnerability_type": "specialized_obsolescence",
+          "scenario": "Churchill, Manitoba tourism operator whose entire business model (polar bear viewing) collapsing as bears forced inland earlier each year",
+          "occupation": "Ecotourism operator",
+          "environmental_stressor": "Economic foundation melting beneath 30-year investment",
+          "symbolic_object": "Tundra buggy designed for ice roads, useless on thawed ground"
+        },
+        {
+          "vulnerability_type": "exhaustion",
+          "scenario": "Climate scientist who spent career documenting Arctic warming, experiencing burnout and depression watching projections come true ahead of schedule",
+          "occupation": "Arctic climate researcher",
+          "environmental_stressor": "Being proven right in worst possible way",
+          "symbolic_object": "Temperature graphs showing exponential curves leaving hockey stick behind"
+        }
+      ],
+      "musical_hints": {
+        "tempo_suggestion": "Slow, heavy (35-45 BPM), periodically stopping (exhaustion)",
+        "key_suggestion": "C minor descending to unfamiliar microtonal territory",
+        "instrumentation": "Double bass (massive, struggling), field recordings (ice cracking, water lapping), synth (atmospheric CO2 as drone)",
+        "texture": "Sparse, isolated, occasional distant echoes of other bears",
+        "silence_moments": "Swimming in open ocean, nothing but water in all directions",
+        "emotional_arc": "From powerful presence to exhausted disorientation to absence"
+      },
+      "created_date": "2025-12-06T13:30:00Z",
+      "source_notes": "IUCN Polar Bear Specialist Group, USGS Alaska Science Center, NASA Arctic sea ice monitoring, IPCC AR6 Arctic assessment"
+    },
+    {
+      "species": {
+        "scientific_name": "Lipotes vexillifer",
+        "common_name": "Baiji (Yangtze river dolphin)",
+        "taxonomic_group": "Marine mammal (cetacean)",
+        "iucn_status": "Critically Endangered (Possibly Extinct) - last confirmed sighting 2002, declared functionally extinct 2006",
+        "extinction_year": 2006,
+        "population_trajectory": [
+          {
+            "year": 1950,
+            "population": "6000 estimated",
+            "source": "historical records",
+            "confidence": "low"
+          },
+          {
+            "year": 1980,
+            "population": "400",
+            "source": "Yangtze survey",
+            "confidence": "medium"
+          },
+          {
+            "year": 1990,
+            "population": "200",
+            "source": "IUCN survey",
+            "confidence": "medium"
+          },
+          {
+            "year": 1997,
+            "population": "13 confirmed",
+            "source": "dedicated survey expedition",
+            "confidence": "high"
+          },
+          {
+            "year": 2002,
+            "population": "last confirmed sighting",
+            "source": "photographic evidence",
+            "confidence": "definitive"
+          },
+          {
+            "year": 2006,
+            "population": "functionally extinct declared",
+            "source": "exhaustive 6-week survey found zero individuals",
+            "confidence": "high"
+          }
+        ],
+        "habitat": "Yangtze River main channel, China - middle and lower reaches",
+        "endemic": true,
+        "range_km2": 1700.0,
+        "primary_cause": "habitat_degradation",
+        "secondary_causes": [
+          "Ship strike mortality",
+          "Entanglement in fishing gear (rolling hooks, nets)",
+          "Noise pollution (sonar disorientation)",
+          "Food web collapse from overfishing",
+          "Electrofishing accidents"
+        ],
+        "anthropogenic_factors": [
+          "Three Gorges Dam construction fragmenting habitat",
+          "Yangtze River industrialization - world's busiest waterway by 2000s",
+          "Underwater noise from ship traffic making echolocation impossible",
+          "Overfishing collapsed finless porpoise and fish populations",
+          "Electrofishing (illegal but widespread) - dolphins electrocuted",
+          "Chemical pollution from industrial development",
+          "Sand dredging destroying river bottom habitat"
+        ],
+        "cascade_effects": [
+          "First large aquatic mammal driven extinct by human activity",
+          "Yangtze ecosystem simplification - apex predator void",
+          "Proof that freshwater cetaceans more vulnerable than marine",
+          "Chinese conservation failure - national symbol lost",
+          "Finless porpoise (sympatric species) now also critically endangered",
+          "Precedent for Mekong, Indus, Ganges river dolphins"
+        ],
+        "ecosystem_role": "Apex predator, indicator species for Yangtze ecosystem health",
+        "symbolic_resonance": [
+          "'Goddess of the Yangtze' - cultural symbol extinguished",
+          "Evolutionary survivor for 20 million years, killed in 50",
+          "Echolocated in muddy water - blinded by noise pollution",
+          "First known by science 1918, extinct by 2006 (88 years)",
+          "Killed by progress - industrial development of homeland"
+        ],
+        "human_parallel_hints": [
+          "Indigenous languages drowned by dominant culture noise",
+          "Communities displaced by infrastructure megaprojects",
+          "Blinded by information overload, unable to navigate",
+          "Cultural symbols made extinct by economic development",
+          "Attempts to preserve in captivity failing (last died 2002)"
+        ],
+        "narrative_potential_score": 0.96,
+        "symbolic_weight": 0.91,
+        "size_category": "medium",
+        "lifespan_years": 24,
+        "movement_pattern": "river resident"
+      },
+      "suggested_human_parallels": [
+        {
+          "vulnerability_type": "displacement",
+          "scenario": "Fishing family evicted from Yangtze riverside home for Three Gorges Dam reservoir, resettled to city with no transferable skills",
+          "occupation": "Multi-generational river fisher",
+          "environmental_stressor": "Homeland literally underwater, traditional knowledge worthless in new context",
+          "symbolic_object": "Fishing net from grandfather, never used since relocation"
+        },
+        {
+          "vulnerability_type": "sensory_overwhelm",
+          "scenario": "Chinese conservation biologist who proposed Baiji captive breeding program in 1996, proposal blocked for 'not economically viable', watching last individuals disappear",
+          "occupation": "Conservation biologist",
+          "environmental_stressor": "Correct solution rejected, forced to document extinction could have prevented",
+          "symbolic_object": "Rejected funding proposal dated 1996, stamped 'insufficient economic justification'"
+        },
+        {
+          "vulnerability_type": "cultural_extinction",
+          "scenario": "Elder from riverside community where Baiji was sacred, last person who remembers the goddess-dolphin stories, children only know it from extinction news",
+          "occupation": "Cultural keeper/storyteller",
+          "environmental_stressor": "Living symbol of culture becoming museum curiosity before death",
+          "symbolic_object": "Children's book about the Goddess of the Yangtze, marked 'historical fiction' now"
+        }
+      ],
+      "musical_hints": {
+        "tempo_suggestion": "Flowing but increasingly turbulent (60-75 BPM, disrupted rhythm)",
+        "key_suggestion": "Pentatonic (Chinese traditional) dissolving into industrial noise",
+        "instrumentation": "Erhu (Chinese fiddle - dolphin voice), prepared piano (river), field recordings (ship engines, sonar pings)",
+        "texture": "Traditional melody drowned by increasing industrial sounds",
+        "silence_moments": "2006 survey - listening for echolocation that never comes",
+        "emotional_arc": "From ancient flowing presence to mechanical drowning to silence"
+      },
+      "created_date": "2025-12-06T14:15:00Z",
+      "source_notes": "IUCN Red List, 2006 Baiji survey expedition report (Turvey et al), Chinese Academy of Sciences extinction declaration"
     }
   ]
 }

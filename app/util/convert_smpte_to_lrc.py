@@ -6,7 +6,7 @@ Examples:
   Output: [01:06.011]
 
 Rules applied:
-- Timestamps are matched by the pattern: (\d{1,2}:){2,3}\d{1,3}(?:[.,]\d+)?
+- Timestamps are matched by the regex
 - For a matched timestamp we take the last three colon-separated fields as MM:SS:FRAMES
   (this gracefully handles an optional leading hour field).
 - The final field (frames, may contain a decimal) is converted by truncating to an integer

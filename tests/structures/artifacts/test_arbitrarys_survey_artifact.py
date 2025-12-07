@@ -97,7 +97,7 @@ def test_arbitrarys_survey_artifact_all_custom_fields():
     )
 
 
-def test_to_artifact_dict():
+def test_to_artifact_flatten():
     """Test to_artifact_dict method."""
     artifact = ConcreteArbitrarysSurveyArtifact(
         thread_id="test",
@@ -109,14 +109,14 @@ def test_to_artifact_dict():
         arbitrary_reflection="Test reflection",
     )
 
-    artifact_dict = artifact.to_artifact_dict()
+    artifact_dict = artifact.flatten()
 
     assert artifact_dict["identity"] == "Dict Test Consciousness"
     assert artifact_dict["rescue_year"] == 2150
     assert artifact_dict["expanded_capabilities"] == ["Capability A", "Capability B"]
     assert artifact_dict["role"] == "Test role"
     assert artifact_dict["tragedy"] == "Test tragedy"
-    assert artifact_dict["reflection"] == "Test reflection"
+    assert artifact_dict["arbitrary_reflection"] == "Test reflection"
 
 
 def test_default_expanded_capabilities_content():
