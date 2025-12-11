@@ -101,25 +101,25 @@ audio_tracks:
     audio_file: 02_09_15_all_drums.wav
     midi_file: 02_09_14_all_drums.mid
     group: drums
-    midi_group: drums
+    midi_group_file: 02_09_14_all_drums.mid
   - id: 9
     description: Kick
     audio_file: 02_09_17_kick.wav
     midi_file: 02_09_16_kick.mid
     group: drums
-    midi_group: drums
+    midi_group_file: 02_09_14_all_drums.mid
   - id: 10
     description: Snare
     audio_file: 02_09_19_snare.wav
     midi_file: 02_09_18_snare.mid
     group: drums
-    midi_group: drums
+    midi_group_file: 02_09_14_all_drums.mid
   - id: 11
     description: Toms
     audio_file: 02_09_21_toms.wav
     midi_file: 02_09_20_toms.mid
     group: drums
-    midi_group: drums
+    midi_group_file: 02_09_14_all_drums.mid
   - id: 12
     description: Baritone
     audio_file: 02_09_22_baritone.wav

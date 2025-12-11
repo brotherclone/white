@@ -38,6 +38,12 @@ class Manifest(BaseModel):
     audio_tracks: list[ManifestTrack]
 
     def __init__(self, **data):
+        # Convert string fields that might be parsed as other types (e.g., numeric titles like "808")
+        string_fields = ["title", "manifest_id", "main_audio_file", "concept"]
+        for field in string_fields:
+            if field in data and not isinstance(data[field], str):
+                data[field] = str(data[field])
+
         if "bpm" in data and isinstance(data["bpm"], float):
             data["bpm"] = int(round(data["bpm"]))
         if "tempo" in data and isinstance(data["tempo"], str):

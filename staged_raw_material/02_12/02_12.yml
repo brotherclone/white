@@ -44,15 +44,14 @@ audio_tracks:
     description: Mellotron Synth
     audio_file: 02_12_05_mellotron.wav
     midi_file: 02_12_04_mellotron.mid
-    midi_group: Melody
   - id: 3
     description: Synclavier Synth
     audio_file: 02_12_07_synclavier.wav
-    midi_file: 02_12_06_synclavier.mid
+    midi_group_file: 02_12_06_synclavier.mid
   - id: 4
     description: Jupiter Synth
     audio_file: 02_12_08_jupiter_mello.wav
-    midi_group: Melody
+    midi_group_file: 02_12_06_synclavier.mid
   - id: 5
     description: Mantis Synth
     audio_file: 02_12_09_mantis.wav

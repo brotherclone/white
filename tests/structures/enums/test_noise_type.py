@@ -1,5 +1,4 @@
 import enum
-
 import pytest
 
 from app.structures.enums.noise_type import NoiseType

@@ -72,37 +72,31 @@ audio_tracks:
     description: Shaker
     audio_file: 03_06_03_shaker.wav
     midi_file: 03_06_02_shaker.mid
-    midi_group: Drums
     group: Drums
   - id: 3
     description: Cymbals
     audio_file: 03_06_05_cymbals.wav
     midi_file: 03_06_04_cymbals.mid
-    midi_group: Drums
     group: Drums
   - id: 4
     description: Toms
     audio_file: 03_06_07_toms.wav
     midi_file: 03_06_06_toms.mid
-    midi_group: Drums
     group: Drums
   - id: 5
     description: Hi-Hat
     audio_file: 03_06_09_hihat.wav
     midi_file: 03_06_08_hihat.mid
-    midi_group: Drums
     group: Drums
   - id: 6
     description: Snare
     audio_file: 03_06_11_snare.wav
     midi_file: 03_06_10_snare.mid
-    midi_group: Drums
     group: Drums
   - id: 7
     description: Kick
     audio_file: 03_06_13_kick.wav
     midi_file: 03_06_12_kick.mid
-    midi_group: Drums
     group: Drums
   - id: 8
     description: B3 Organ
