@@ -4,12 +4,13 @@ import os
 import re
 import sys
 import time
-from pathlib import Path
-from typing import Any, Dict, List, Tuple
-
 import discogs_client
 import yaml
+
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 from dotenv import load_dotenv
+from pydantic import ValidationError
 
 
 def get_discogs_cache_path() -> Path:
@@ -735,6 +736,42 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
+def validate_pydantic_model(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """
+    Validates that the YAML data can be successfully cast to the Manifest Pydantic model.
+    This catches type casting issues like titles that are parsed as integers instead of strings.
+
+    Args:
+        yaml_data: Parsed YAML content
+
+    Returns:
+        Tuple of (is_valid, list_of_error_messages)
+    """
+    pydantic_errors = []
+
+    try:
+        from app.structures.manifests.manifest import Manifest
+
+        # Try to instantiate the Manifest model with the YAML data
+        # This will raise a ValidationError if the data can't be properly cast
+        _ = Manifest(**yaml_data)
+
+    except ValidationError as e:
+        # Parse Pydantic validation errors
+        for error in e.errors():
+            loc = " -> ".join(str(x) for x in error["loc"])
+            msg = error["msg"]
+            error_type = error["type"]
+            pydantic_errors.append(
+                f"Pydantic validation error at '{loc}': {msg} (type: {error_type})"
+            )
+    except Exception as e:
+        # Catch any other errors that might occur during model instantiation
+        pydantic_errors.append(f"Error casting to Pydantic model: {str(e)}")
+
+    return len(pydantic_errors) == 0, pydantic_errors
+
+
 def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
     """Validates a single YAML file.
 
@@ -754,6 +791,12 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
         is_valid, req_errors = validate_required_properties(yaml_data)
         if not is_valid:
             for err in req_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: Pydantic model casting
+        is_valid, pydantic_errors = validate_pydantic_model(yaml_data)
+        if not is_valid:
+            for err in pydantic_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
         # Run validation: stricter field values

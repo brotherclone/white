@@ -1,5 +1,7 @@
 import re
+from datetime import datetime, date
 from textwrap import shorten
+from typing import Any, Optional
 
 
 def sanitize_for_filename(s: str, max_length: int = 50) -> str:
@@ -68,3 +70,30 @@ def resolve_name(value):
     if isinstance(value, dict) and "name" in value:
         return value.get("name") or ""
     return str(value)
+
+
+def format_date(value: Any, fmt: str = "%Y-%m-%d") -> Optional[str]:
+    """
+    Return a formatted date string, or None.
+    - datetime -> ISO 8601 with time (use fmt to change)
+    - date -> formatted with strftime(fmt)
+    - ISO strings -> parsed via fromisoformat when possible
+    """
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.isoformat()  # or value.strftime(fmt) for date-only
+    if isinstance(value, date):
+        return value.strftime(fmt)
+    if isinstance(value, str):
+        try:
+            # accept ISO-formatted date/datetime strings
+            dt = datetime.fromisoformat(value)
+            return (
+                dt.isoformat()
+                if dt.time() != datetime.min.time()
+                else dt.date().strftime(fmt)
+            )
+        except ValueError:
+            return value  # leave as-is if parsing fails
+    return None

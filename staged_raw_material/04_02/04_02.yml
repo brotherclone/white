@@ -71,15 +71,14 @@ audio_tracks:
   - id: 5
     description: Synth Bass
     audio_file: 04_02_07_bass.wav
-    midi_file: 04_02_06_bass.mid
-    midi_group: bass
+    midi_group_file: 04_02_06_bass.mid
   - id: 6
     description: Muffled Bass
     audio_file: 04_02_08_muffled_bass.wav
   - id: 7
     description: Farfisa
     audio_file: 04_02_09_farfisa.wav
-    midi_group: bass
+    midi_group_file: 04_02_06_bass.mid
   - id: 8
     description: Warped Pad
     audio_file: 04_02_11_warped_pad.wav

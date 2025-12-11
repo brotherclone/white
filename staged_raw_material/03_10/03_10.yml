@@ -97,13 +97,11 @@ audio_tracks:
     audio_file: 03_10_04_shredder_1.wav
     midi_file: 03_10_03_shredder_1.mid
     group: Guitars
-    midi_group: Guitars
   - id: 5
     description: Shredder Guitar Synth 2
     audio_file: 03_10_06_shredder_2.wav
     midi_file: 03_10_05_shredder_2.mid
     group: Guitars
-    midi_group: Guitars
   - id: 11
     description: Bass
     audio_file: 03_10_11_bass.wav
@@ -117,13 +115,11 @@ audio_tracks:
     audio_file: 03_10_14_chords.wav
     midi_file: 03_10_13_chords.mid
     group: Synths
-    midi_group: Synths
   - id: 15
     description: Melody
     audio_file: 03_10_16_melody.wav
     midi_file: 03_10_15_melody.mid
     group: Synths
-    midi_group: Synths
   - id: 17
     description: Flange Goth
     audio_file: 03_10_17_flange_goth.wav
@@ -145,19 +141,16 @@ audio_tracks:
     audio_file: 03_10_22_paddy_synth.wav
     midi_file: 03_10_21_paddy_synth.mid
     group: Synths
-    midi_group: Synths
   - id: 23
     description: 88Oh
     audio_file: 03_10_24_88Oh.wav
     midi_file: 03_10_23_88Oh.mid
     group: Synths
-    midi_group: Synths
   - id: 25
     description: Cheesy Arp
     audio_file: 03_10_26_cheesy_arp.wav
     midi_file: 03_10_25_cheesy_arp.mid
     group: Synths
-    midi_group: Synths
   - id: 27
     description: Vocal 2
     audio_file: 03_10_27_vocal2.wav
