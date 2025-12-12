@@ -42,7 +42,7 @@ class BuildBaseManifestDB(BaseModel):
             raise ValueError("MANIFEST_PATH environment variable not set")
         self.manifest_path = Path(os.getenv("MANIFEST_PATH"))
         self.manifest_paths = self.get_manifests()
-        self.concept_extractor = ConceptExtractor()
+        # Don't overwrite concept_extractor if it was provided as a parameter
 
     def flatten_dict(
         self, d: Dict[str, Any], parent: str = "", sep: str = "_"

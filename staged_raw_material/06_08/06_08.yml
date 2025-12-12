@@ -1,0 +1,13 @@
+bpm:
+manifest_id: '06_08'
+tempo:
+key:
+rainbow_color: B
+title: You Got a New Dog
+release_date: '2023-03-14'
+album_sequence: 8
+main_audio_file: 06_08_main.wav
+TRT:
+vocals: true
+lyrics: true
+concept: Dedicated to Skittles
