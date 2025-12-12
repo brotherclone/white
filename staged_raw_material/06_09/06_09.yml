@@ -1,0 +1,13 @@
+bpm:
+manifest_id: '06_09'
+tempo:
+key:
+rainbow_color: B
+title: Pixels
+release_date: '2023-03-14'
+album_sequence: 9
+main_audio_file: 06_09_main.wav
+TRT:
+vocals: true
+lyrics: true
+concept: Dedicated to Russell Kirsch

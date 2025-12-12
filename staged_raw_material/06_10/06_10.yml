@@ -1,0 +1,13 @@
+bpm:
+manifest_id: '06_10'
+tempo:
+key:
+rainbow_color: B
+title: Watch Out for That One
+release_date: '2023-03-14'
+album_sequence: 10
+main_audio_file: 06_10_main.wav
+TRT:
+vocals: true
+lyrics: true
+concept: Dedicated to Craig

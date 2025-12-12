@@ -70,7 +70,7 @@ def test_full_extraction():
     # Test rebracketing analysis
     analysis = extractor.get_rebracketing_analysis()
     assert analysis.rebracketing_type in [
-        "casual",
+        "causal",
         "spatial",
         "temporal",
         "perceptual",

@@ -1,0 +1,13 @@
+bpm:
+manifest_id: '06_07'
+tempo:
+key:
+rainbow_color: B
+title: Irish Goodbye
+release_date: '2023-03-14'
+album_sequence: 7
+main_audio_file: 06_07_main.wav
+TRT:
+vocals: true
+lyrics: true
+concept: Dedicated to Dad
