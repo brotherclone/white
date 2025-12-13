@@ -7,6 +7,9 @@ from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
+from app.extractors.manifest_extractor.concept_extraction_result import (
+    ConceptExtractionResult,
+)
 from app.extractors.manifest_extractor.concept_extractor import ConceptExtractor
 from app.structures.concepts.rainbow_table_color import (
     RainbowTableColor,
@@ -21,7 +24,7 @@ from app.structures.manifests.manifest_track import ManifestTrack
 from app.structures.music.core.key_signature import KeySignature
 from app.structures.music.core.time_signature import TimeSignature
 from app.util.string_utils import format_date
-from app.util.lrc_utils import extract_lyrics_from_lrc
+from app.util.lrc_utils import extract_lyrics_from_lrc, parse_lrc_time
 
 load_dotenv()
 
@@ -42,7 +45,6 @@ class BuildBaseManifestDB(BaseModel):
             raise ValueError("MANIFEST_PATH environment variable not set")
         self.manifest_path = Path(os.getenv("MANIFEST_PATH"))
         self.manifest_paths = self.get_manifests()
-        # Don't overwrite concept_extractor if it was provided as a parameter
 
     def flatten_dict(
         self, d: Dict[str, Any], parent: str = "", sep: str = "_"
@@ -86,6 +88,32 @@ class BuildBaseManifestDB(BaseModel):
                     manifests.append(str((root_path / file_name).resolve()))
         return manifests
 
+    def _sanitize_value(self, v: Any) -> Any:
+        if v is None:
+            return None
+        if callable(v):
+            try:
+                v = v()
+            except TypeError:
+                return str(v)
+        if isinstance(v, Path):
+            return str(v)
+        if hasattr(v, "value") and not isinstance(v, (dict, list, tuple, set)):
+            return getattr(v, "value")
+        if isinstance(v, (list, tuple, set)):
+            sanitized = [self._sanitize_value(x) for x in v]
+            if all(
+                x is None or isinstance(x, (str, int, float, bool)) for x in sanitized
+            ):
+                return ", ".join(str(x) for x in sanitized if x is not None)
+            return sanitized
+        if isinstance(v, dict):
+            return {str(k): self._sanitize_value(val) for k, val in v.items()}
+        return v
+
+    def _sanitize_record(self, rec: dict[str, Any]) -> dict[str, Any]:
+        return {str(k): self._sanitize_value(v) for k, v in rec.items()}
+
     def process_manifests(self):
         all_records = []
         for manifest_path in self.manifest_paths:
@@ -102,17 +130,25 @@ class BuildBaseManifestDB(BaseModel):
                         sl = getattr(manifest, "sounds_like", None)
                         md = getattr(manifest, "mood", None)
                         gn = getattr(manifest, "genres", None)
+                        rb = None
                         if hasattr(manifest, "concept") and manifest.concept:
+                            try:
+                                extractor = ConceptExtractor(
+                                    track_id=str(manifest.manifest_id),
+                                    concept_text=manifest.concept,
+                                    rainbow_color_mnemonic=manifest.rainbow_color.mnemonic_character_value,
+                                    track_duration=parse_lrc_time(manifest.TRT),
+                                )
+                                rb: ConceptExtractionResult = extractor.extract()
 
-                            self.concept_extractor.load_model(
-                                concept_text=manifest.concept
-                            )
-                            rb = (
-                                self.concept_extractor.classify_concept_by_rebracketing_type()
-                            )
+                            except Exception as e:
+                                print(
+                                    f"Failed to extract concept for {manifest.manifest_id}: {e}"
+                                )
                         lrc_lyrics = None
                         if hasattr(manifest, "lrc_file") and manifest.lrc_file:
                             lrc_path = Path(manifest_path).parent / manifest.lrc_file
+                            print(f"Extracting lyrics from {lrc_path}")
                             lrc_lyrics = extract_lyrics_from_lrc(str(lrc_path))
                         record = {
                             "id": manifest.manifest_id,
@@ -163,7 +199,7 @@ class BuildBaseManifestDB(BaseModel):
                             "rainbow_color_ontological_mode": (
                                 ", ".join(
                                     [
-                                        mode.value
+                                        str(mode.value)
                                         for mode in manifest.rainbow_color.ontological_mode
                                     ]
                                 )
@@ -181,7 +217,6 @@ class BuildBaseManifestDB(BaseModel):
                             "release_date": format_date(
                                 getattr(manifest, "release_date", None)
                             ),
-                            "album_sequence": manifest.album_sequence,
                             "total_running_time": manifest.TRT,
                             "vocals": manifest.vocals,
                             "lyrics": manifest.lyrics,
@@ -200,14 +235,18 @@ class BuildBaseManifestDB(BaseModel):
                                 )
                             ),
                             "mood": (
-                                ", ".join(md) if isinstance(md, list) and md else md
+                                ", ".join(str(x) for x in md)
+                                if isinstance(md, list) and md
+                                else md
                             ),
                             "genres": (
-                                ", ".join(gn) if isinstance(gn, list) and gn else gn
+                                ", ".join(str(x) for x in gn)
+                                if isinstance(gn, list) and gn
+                                else gn
                             ),
                             "lrc_file": manifest.lrc_file,
                             "concept": manifest.concept,
-                            "rebracketing_type": rb,
+                            "training_data": rb.to_training_dict() if rb else None,
                         }
                         try:
                             song_structure = []
@@ -233,8 +272,16 @@ class BuildBaseManifestDB(BaseModel):
                                         **record,
                                         "track_id": track.id,
                                         "description": track.description,
-                                        "audio_file": track.audio_file,  # ToDo: full path
-                                        "midi_file": track.midi_file,  # ToDo: full path
+                                        "audio_file": (
+                                            f"{os.getenv('MANIFEST_PATH')}/{manifest.manifest_id}/{track.audio_file}"
+                                            if track.audio_file
+                                            else None
+                                        ),
+                                        "midi_file": (
+                                            f"{os.getenv('MANIFEST_PATH')}/{manifest.manifest_id}/{track.midi_file}"
+                                            if track.midi_file
+                                            else None
+                                        ),
                                         "group": track.group,
                                         "midi_group_file": (
                                             track.midi_group_file
@@ -252,7 +299,8 @@ class BuildBaseManifestDB(BaseModel):
                         )
             except TypeError as e:
                 print(f"Failed to read manifest: {manifest_path} with error: {e}")
-        df = pl.DataFrame(all_records, infer_schema_length=None)
+        sanitized = [self._sanitize_record(r) for r in all_records]
+        df = pl.DataFrame(sanitized, infer_schema_length=None)
         df.write_parquet(
             f"{os.getenv('BASE_MANIFEST_DB_PATH')}/base_manifest_db.parquet"
         )
