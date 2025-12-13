@@ -145,7 +145,6 @@ class ConceptExtractor(BaseModel):
             rainbow_color=get_rainbow_table_color(self.rainbow_color_mnemonic),
         )
 
-    # Convenience methods for backward compatibility
     def get_methodology_features(self) -> MethodologyFeature:
         """Backward compatible method"""
         return self._extract_methodology_features()
