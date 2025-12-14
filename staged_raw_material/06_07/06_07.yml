@@ -1,13 +1,132 @@
-bpm:
+bpm: 130
 manifest_id: '06_07'
-tempo:
-key:
+tempo: 4/4
+key: D major
 rainbow_color: B
 title: Irish Goodbye
 release_date: '2023-03-14'
 album_sequence: 7
 main_audio_file: 06_07_main.wav
-TRT:
+TRT: '[03:29.001]'
 vocals: true
 lyrics: true
-concept: Dedicated to Dad
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:28.003]'
+    description: A rollicking, drunken Irish-tinged rock band starts complete with uilleann pipes and fiddle
+  - section_name: Chorus 1
+    start_time: '[00:28.004]'
+    end_time: '[00:42.023]'
+    description: The narrator can't explain why he's leaving the party
+  - section_name: Bridge 1
+    start_time: '[00:42.024]'
+    end_time: '[00:54.000]'
+    description: A quiet transition to more minor instrumentation
+  - section_name: Instrumental
+    start_time: '[00:54.001]'
+    end_time: '[01:08.019]'
+    description: Mandolin and Fiddle break
+  - section_name: Verse 2
+    start_time: '[01:08.020]'
+    end_time: '[01:34.015]'
+    description: Less instrumentation and more vocals
+  - section_name: Verse Jams
+    start_time: '[01:34.016]'
+    end_time: '[01:47.013]'
+    description: The full mess of song kicks back up
+  - section_name: Chorus 2
+    start_time: '[01:47.014]'
+    end_time: '[02:02.007]'
+    description: More apologies
+  - section_name: Bridge
+    start_time: '[02:02.008]'
+    end_time: '[02:13.009]'
+    description: A breakdown of sorts
+  - section_name: Chorus 3
+    start_time: '[02:13.010]'
+    end_time: '[02:28.003]'
+    description: More apologies
+  - section_name: Verse 3
+    start_time: '[02:28.004]'
+    end_time: '[02:53.007]'
+    description: Back to a bit of celebratory reverie
+  - section_name: Chorus 4
+    start_time: '[02:53.008]'
+    end_time: '[03:08.019]'
+    description: But time to leave
+  - section_name: Bridge Outro
+    start_time: '[03:08.020]'
+    end_time: '[03:29.001]'
+    description: A lamenting embrace of the night air
+concept: In this alternate universe, I'm a jovial party goer much like my father, but there's old Gabe - his social battery drained, leaving out the back. Dedicated to Dad.
+lrc_file: 06_07.lrc
+sounds_like:
+  - name: The Waterboys
+    discogs_id: 125174
+  - name: The Pogues
+    discogs_id: 253234
+mood:
+  - joyful
+  - melancholic
+genres:
+  - folk rock
+  - celtic rock
+audio_tracks:
+  - id: 2
+    description: Bass
+    audio_file: 06_07_02_bass.wav
+  - id: 3
+    description: Accordion
+    audio_file: 06_07_03_accordion.wav
+    player: Daire Mulhearn
+  - id: 4
+    description: Fiddle
+    audio_file: 06_07_05_fiddle.wav
+    midi_file: 06_07_04_fiddle.mid
+    player: Neil FitzGibbon
+  - id: 5
+    description: Bodhran
+    audio_file: 06_07_06_bod.wav
+  - id: 6
+    description: Acoustic Guitar
+    audio_file: 06_07_07_acoustic.wav
+  - id: 7
+    description: Mandolin
+    audio_file: 06_07_08_mandolin.wav
+  - id: 8
+    description: Uilleann pipes
+    audio_file: 06_07_09_pipes.wav
+    player: David Stone
+  - id: 9
+    description: Drums
+    audio_file: 06_07_10_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 10
+    description: Kick
+    audio_file: 06_07_11_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 11
+    description: Snare
+    audio_file: 06_07_12_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 12
+    description: Hi-hat
+    audio_file: 06_07_13_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 13
+    description: Toms
+    audio_file: 06_07_14_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 14
+    description: Main Vocals
+    audio_file: 06_07_15_vox_main.wav
+  - id: 15
+    description: Double Vocals
+    audio_file: 06_07_16_vox_dbl.wav
+

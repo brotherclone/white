@@ -1,7 +1,7 @@
-bpm:
+bpm: 96
 manifest_id: '06_08'
-tempo:
-key:
+tempo: 4/4
+key: G major
 rainbow_color: B
 title: You Got a New Dog
 release_date: '2023-03-14'
@@ -10,4 +10,4 @@ main_audio_file: 06_08_main.wav
 TRT:
 vocals: true
 lyrics: true
-concept: Dedicated to Skittles
+concept: I once had a dog that was my best friend. This song is not too far from our normal world, but the loss of the dog leads to the loss of everything. Dedicated to Skittles
