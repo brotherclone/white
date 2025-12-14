@@ -96,3 +96,28 @@ audio_tracks:
   - id: 11
     description: Vocal 3
     audio_file: 06_08_12_vox3.wav
+  - id: 12
+    description: Drums
+    audio_file: 06_08_13_drums.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 13
+    description: Kick
+    audio_file: 06_08_14_kick.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 14
+    description: Snare
+    audio_file: 06_08_15_snare.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 15
+    description: Hi Hat
+    audio_file: 06_08_16_hh.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 16
+    description: Toms
+    audio_file: 06_08_17_toms.wav
+    group: drums
+    player: Graham Hopkins
