@@ -1,7 +1,7 @@
-bpm:
+bpm: 116
 manifest_id: '06_09'
-tempo:
-key:
+tempo: 6/8
+key: F major
 rainbow_color: B
 title: Pixels
 release_date: '2023-03-14'
