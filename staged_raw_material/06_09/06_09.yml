@@ -7,7 +7,112 @@ title: Pixels
 release_date: '2023-03-14'
 album_sequence: 9
 main_audio_file: 06_09_main.wav
-TRT:
+TRT: '[04:08.006]'
 vocals: true
 lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:23.006]'
+    description: Giant guitars and a down beat kick off the song.
+  - section_name: Chorus
+    start_time: '[00:23.007]'
+    end_time: '[01:12.023]'
+    description: The lyrics enter and have a 60s garage rock feel.
+  - section_name: Verse
+    start_time: '[01:12.024]'
+    end_time: '[01:25.008]'
+    description: The verse has layers of vocals that build to a frenzy
+  - section_name: Bridge
+    start_time: '[01:25.009]'
+    end_time: '[01:36.005]'
+    description: A brief, emotive bridge
+  - section_name: Chorus 2
+    start_time: '[01:36.006]'
+    end_time: '[02:13.011]'
+    description: Back to the chorus, more intense
+  - section_name: Verse 2
+    start_time: '[02:13.012]'
+    end_time: '[02:22.018]'
+    description: The verse returns
+  - section_name: Jams
+    start_time: '[02:22.019]'
+    end_time: '[04:08.006]'
+    description: A long meandering jam session to close out the track.
+sounds_like:
+  - name: The Monks
+    discogs_id: 153804
+  - name: Tomorrow (2)
+    discogs_id: 283141
+genres:
+  - rock
+  - indie rock
+mood:
+  - defiant
+  - restless
 concept: In this alternate timeline I allow myself to just walk away from tech and all its awfulness. Dedicated to Russell Kirsch
+lrc_file: 06_09.lrc
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 06_09_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 06_09_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 06_09_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-Hat
+    audio_file: 06_09_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 06_09_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Bass
+    audio_file: 06_09_07_bass.wav
+  - id: 8
+    description: Electric Piano
+    audio_file: 06_09_10_electric_piano.wav
+    midi_file: 06_09_09_electric_piano.mid
+  - id: 9
+    description: Electric Guitar
+    audio_file: 06_09_11_electric_guitar.wav
+  - id: 10
+    description: Organ
+    midi_file: 06_09_12_organ.mid
+    audio_file: 06_09_13_organ.wav
+  - id: 11
+    description: Twelve String
+    audio_file: 06_09_14_twelve_string.wav
+  - id: 12
+    description: Acoustic Guitar 1
+    audio_file: 06_09_15_acoustic.wav
+  - id: 13
+    description: Acoustic Guitar 2
+    audio_file: 06_09_16_acoustic2.wav
+  - id: 14
+    description: Layered Vocal 1
+    audio_file: 06_09_17_vox1.wav
+  - id: 15
+    description: Layered Vocal 2
+    audio_file: 06_09_18_vox2.wav
+  - id: 16
+    description: Layered Vocal 3
+    audio_file: 06_09_19_vox3.wav
+  - id: 17
+    description: Layered Vocal 4
+    audio_file: 06_09_20_vox4.wav
+  - id: 18
+    description: Layered Vocal 5
+    audio_file: 06_09_21_vox5.wav
