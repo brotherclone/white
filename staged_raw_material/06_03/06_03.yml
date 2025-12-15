@@ -1,0 +1,98 @@
+bpm: 105
+manifest_id: '06_03'
+tempo: 6/8
+key: C minor
+rainbow_color: B
+title: A Few Steps
+release_date: '2023-03-14'
+album_sequence: 3
+main_audio_file: 06_03_main.wav
+TRT: '[04:30.021]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:51.010]'
+    description: A roomy, straight-ahead folk rock song
+  - section_name: Interlude 1
+    start_time: '[00:51.011]'
+    end_time: '[01:01.017]'
+    description: A very delicate breakdown
+  - section_name: Chorus 1
+    start_time: '[01:01.018]'
+    end_time: '[01:18.021]'
+    description: The drums drop out - so far, so far
+  - section_name: Verse 2
+    start_time: '[01:18.022]'
+    end_time: '[02:10.007]'
+    description: return to the verse
+  - section_name: Interlude 2
+    start_time: '[02:10.008]'
+    end_time: '[02:20.014]'
+    description: So much room
+  - section_name: Chorus 2
+    start_time: '[02:20.015]'
+    end_time: '[02:37.017]'
+    description: Chorus is repeated
+  - section_name: Verse 3
+    start_time: '[02:37.018]'
+    end_time: '[03:29.003]'
+    description: The final verse
+  - section_name: Instrumental
+    start_time: '[03:29.004]'
+    end_time: '[03:56.014]'
+    description: Dancing, intertwined guitars
+  - section_name: Outro
+    start_time: '[03:56.015]'
+    end_time: '[04:30.021]'
+    description: Sad, lonesome harmonium ends the song
+sounds_like:
+  - name: Timesbold
+    discogs_id: 319016
+  - name: Julio Iglesias
+    discogs_id: 67331
+mood:
+  - melancholic
+  - paralyzed
+  - fragile
+genres:
+  - folk
+  - folk rock
+concept: Zeno's Paradox and the AA steps seemed a natural fit for this song. Although I've struggled this alternate universe has me checked in and it not taking. Dedicated to Jason.
+lrc_file: 06_03.lrc
+audio_tracks:
+  - id: 2
+    description: Piano
+    audio_file: 06_03_03_piano.wav
+    midi_file: 06_03_02_piano.mid
+  - id: 3
+    description: Bass
+    audio_file: 06_03_04_bass.wav
+  - id: 4
+    description: Baritone
+    audio_file: 06_03_05_baritone.wav
+  - id: 5
+    description: Electric Guitar
+    audio_file: 06_03_06_electric_guitar.wav
+  - id: 6
+    description: Harmonium
+    audio_file: 06_03_07_harmonium.wav
+  - id: 7
+    description: Acoustic Guitar
+    audio_file: 06_03_08_acoustic_guitar.wav
+  - id: 8
+    description: Lap Steel
+    audio_file: 06_03_09_lap_steel.wav
+  - id: 9
+    description: Drums
+    audio_file: 06_03_10_drums.wav
+  - id: 10
+    description: Main Vocals
+    audio_file: 06_03_11_vox_main.wav
+  - id: 11
+    description: Double Vocals
+    audio_file: 06_03_12_vox_dbl.wav
+  - id: 12
+    description: Harmony Vocals
+    audio_file: 06_03_13_vox_bg.wav

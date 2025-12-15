@@ -1,0 +1,117 @@
+bpm: 96
+manifest_id: '06_06'
+tempo: 4/4
+key: C# minor
+rainbow_color: B
+title: Dying, Yet Gaming
+release_date: '2023-03-14'
+album_sequence: 6
+main_audio_file: 06_06_main.wav
+TRT: '[04:20.000]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:12.012]'
+    description: Plinky percussion joins the folk-rock instrumentation
+  - section_name: Verse 1
+    start_time: '[00:12.013]'
+    end_time: '[00:52.012]'
+    description: The vocals begin, and the subject matter, Fallout and World of Warcraft, is at odds with the genre and itself
+  - section_name: Chorus
+    start_time: '[00:52.013]'
+    end_time: '[01:35.000]'
+    description: Sad strings back the chorus mixing yearning to live with the canned drama of video games
+  - section_name: Verse 2
+    start_time: '[01:35.001]'
+    end_time: '[02:15.000]'
+    description: The vocals return to the verse which now covers Destiny and Minecraft
+  - section_name: Chorus 2
+    start_time: '[02:15.001]'
+    end_time: '[03:07.012]'
+    description: The chorus returns ending with a bit of creepy Walsh stepping out from the curtain to sing 'dying takes much langer than I thought'
+  - section_name: Bridge
+    start_time: '[03:07.013]'
+    end_time: '[03:35.000]'
+    description: Video game reference mirror the fleeting moments of life for our dying narrator
+  - section_name: Chorus 3
+    start_time: '[03:35.001]'
+    end_time: '[04:20.000]'
+    description: The final chorus is snuffed out
+concept: A childhood friend was dying of cancer and told my family that 'Brian watches TV waiting to die' and I thought a lot about that playing Warcraft with my wife's friend who also died of cancer. In this alternate world which I could see so very clearly it was me who played games waiting for the end. Dedicated to Trisch
+lrc_file: 06_06.lrc
+sounds_like:
+  - name: The Mountain Goats
+    discogs_id: 95417
+  - name: Sufjan Stevens
+    discogs_id: 202598
+  - name: David Bowie
+    discogs_id: 10263
+mood:
+  - quirky
+  - sad
+  - devastating
+genres:
+  - indie folk
+  - folk rock
+audio_tracks:
+  - id: 2
+    description: Bass
+    audio_file: 06_06_02_bass.wav
+  - id: 3
+    description: Baritone
+    audio_file: 06_06_03_baritone.wav
+  - id: 4
+    description: Mandolin
+    audio_file: 06_06_04_mandolin.wav
+  - id: 5
+    description: Acoustic Guitar
+    audio_file: 06_06_05_acoustic.wav
+  - id: 6
+    description: Lap steel
+    audio_file: 06_06_06_lap_steel.wav
+  - id: 7
+    description: Piano
+    audio_file: 06_06_08_piano.wav
+    midi_file: 06_06_07_piano.mid
+  - id: 8
+    description: Xylophone
+    audio_file: 06_06_10_xylo.wav
+    midi_file: 06_06_09_xylo.mid
+  - id: 9
+    description: Woodblock
+    audio_file: 06_06_11_woodblock.wav
+    midi_file: 06_06_12_woodblock.mid
+  - id: 10
+    description: Drums
+    audio_file: 06_06_13_drums.wav
+    group: Drums
+  - id: 11
+    description: Kick
+    audio_file: 06_06_14_kick.wav
+    group: Drums
+  - id: 12
+    description: Snare
+    audio_file: 06_06_15_snare.wav
+    group: Drums
+  - id: 13
+    description: Cello
+    audio_file: 06_06_16_cello.wav
+    player: Lyudmila Kadyrbaeva
+  - id: 14
+    description: Violin
+    audio_file: 06_06_17_violin.wav
+    player: Maria Grigoryeva
+  - id: 15
+    description: Main vocals
+    audio_file: 06_06_18_vox_main.wav
+  - id: 16
+    description: Double vocals
+    audio_file: 06_06_19_vox_dbl.wav
+  - id: 17
+    description: Background vocals
+    audio_file: 06_06_20_vox_bg.wav
+
+
+

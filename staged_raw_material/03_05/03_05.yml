@@ -102,31 +102,26 @@ audio_tracks:
     description: Hybrid Kick
     audio_file: 03_05_07_hybrid_kick.wav
     midi_file: 03_05_08_hybrid_kick.mid
-    midi_group: Drums
     group: Drums
   - id: 6
     description: Snare
     audio_file: 03_05_10_snare.wav
     midi_file: 03_05_09_snare.mid
-    midi_group: Drums
     group: Drums
   - id: 7
     description: Hi-Hat
     audio_file: 03_05_12_hihat.wav
     midi_file: 03_05_11_hihat.mid
-    midi_group: Drums
     group: Drums
   - id: 8
     description: Toms
     audio_file: 03_05_14_toms.wav
     midi_file: 03_05_13_toms.mid
-    midi_group: Drums
     group: Drums
   - id: 9
     description: Cymbals
     audio_file: 03_05_16_cymbals.wav
     midi_file: 03_05_15_cymbals.mid
-    midi_group: Drums
     group: Drums
   - id: 10
     description: Farfisa Organ

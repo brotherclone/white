@@ -98,18 +98,13 @@ audio_tracks:
     description: Drum Machine
     audio_file: 03_08_04_dm.wav
     midi_file: 03_08_03_dm.mid
-    group: Drums
-    midi_group: Drums
   - id: 4
     description: Modular Drums
     audio_file: 03_08_05_modular_drums.wav
-    group: Drums
   - id: 5
     description: Drum Kit
     audio_file: 03_08_07_drum_kit.wav
     midi_file: 03_08_06_drum_kit.mid
-    group: Drums
-    midi_group: Drums
   - id: 6
     description: Wavering Pad
     audio_file: 03_08_09_wavering_pad.wav
