@@ -1,0 +1,132 @@
+bpm: 134
+manifest_id: '06_10'
+tempo: 4/4
+key: E major
+rainbow_color: B
+title: Watch Out for That One
+release_date: '2023-03-14'
+album_sequence: 10
+main_audio_file: 06_10_main.wav
+TRT: '[02:28.163]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:28.163]'
+    description: Electro-mechanical faux strings and mandolin jump right in for this 60s tinged intro
+  - section_name: Chorus 1
+    start_time: '[00:28.164]'
+    end_time: '[00:42.024]'
+    description: Layered vocals and bells continue the retro feel
+  - section_name: Verse 1
+    start_time: '[00:42.025]'
+    end_time: '[01:01.008]'
+    description: The verse has a bit of a start and stop feel
+  - section_name: Chorus 2
+    start_time: '[01:01.009]'
+    end_time: '[01:07.152]'
+    description: A quick single section chorus
+  - section_name: Verse 2
+    start_time: '[01:07.153]'
+    end_time: '[01:35.092]'
+    description: The verse continues expanding on the childhood tale
+  - section_name: Chorus 3
+    start_time: '[01:35.093]'
+    end_time: '[01:48.201]'
+    description: More vocal and instrumental interplay is added to the chorus
+  - section_name: Interlude
+    start_time: '[01:48.202]'
+    end_time: '[02:17.226]'
+    description: The twelve string and walking bass line counter the odd dub style drum echo
+  - section_name: Chorus 4
+    start_time: '[02:17.227]'
+    end_time: '[02:28.163]'
+    description: Back for a quick chorus then ending abruptly
+concept: In second grade a boy wanted to fight me and Craig stepped in to defend me. He got his arm pulled out of its socket in the process. He dropped out of school and became a bit of a town boogie man - but still I'd see him walking with a sling. In this world the roles are reversed and he's the wimpy shit and I'm the ghost boy. Dedicated to Craig.
+lrc_file: 06_10.lrc
+sounds_like:
+  - name: Bobb Trimble
+    discogs_id: 920076
+  - name: The Zombies
+    discogs_id: 262221
+mood:
+  - nostalgic
+  - retro
+  - unstable
+genres:
+  - indie rock
+  - oldies
+  - folk rock
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 06_10_02_drums.wav
+    group: drums
+  - id: 3
+    description: Hi-hat
+    audio_file: 06_10_03_hh.wav
+    group: drums
+  - id: 4
+    description: Snare
+    audio_file: 06_10_04_snare.wav
+    group: drums
+  - id: 5
+    description: Kick
+    audio_file: 06_10_05_kick.wav
+    group: drums
+  - id: 6
+    description: Toms
+    audio_file: 06_10_06_toms.wav
+    group: drums
+  - id: 7
+    description: Bass
+    audio_file: 06_10_07_bass.wav
+  - id: 8
+    description: Baritone Guitar
+    audio_file: 06_10_08_baritone.wav
+  - id: 9
+    description: Electric Guitar
+    audio_file: 06_10_09_guitar.wav
+  - id: 10
+    description: Electric Guitar 2
+    audio_file: 06_10_10_guitar2.wav
+  - id: 11
+    description: Twelve string Electric
+    audio_file: 06_10_11_twelve_string.wav
+  - id: 12
+    description: Acoustic Guitar
+    audio_file: 06_10_12_acoustic.wav
+  - id: 13
+    description: Mandolin
+    audio_file: 06_10_13_mandolin.wav
+  - id: 14
+    description: Bells
+    audio_file: 06_10_15_bells.wav
+    midi_file: 06_10_14_bells.mid
+  - id: 15
+    description: Organ
+    audio_file: 06_10_17_organ.wav
+    midi_file: 06_10_16_organ.mid
+  - id: 16
+    description: Optigan Strings
+    audio_file: 06_10_19_optigan_strings.wav
+    midi_file: 06_10_18_optigan_strings.mid
+  - id: 17
+    description: Tremolo Strings
+    audio_file: 06_10_21_tremolo_strings.wav
+    midi_file: 06_10_20_tremolo_strings.mid
+  - id: 18
+    description: Mellotron Strings
+    audio_file: 06_10_23_mellotron_strings.wav
+    midi_file: 06_10_22_mellotron_strings.mid
+  - id: 19
+    description: Layered Vocal 1
+    audio_file: 06_10_24_vox1.wav
+  - id: 20
+    description: Layered Vocal 2
+    audio_file: 06_10_25_vox2.wav
+  - id: 21
+    description: Layered Vocal 3
+    audio_file: 06_10_26_vox3.wav
+

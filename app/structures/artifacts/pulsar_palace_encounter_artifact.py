@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import List, Optional
-
+from pathlib import Path
 from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
@@ -15,6 +15,8 @@ class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.GAME_RUN
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.MARKDOWN
+    rainbow_color_mnemonic_character_value: str = "Y"
+    artifact_name: str = "pulsar_palace_game_run"
     encounter_id: Optional[str] = Field(
         default=None,
         description="The ID of the encounter.",
@@ -109,8 +111,6 @@ class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
         return "\n".join(md_lines)
 
     def save_file(self):
-        from pathlib import Path
-
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         with open(file, "w") as f:

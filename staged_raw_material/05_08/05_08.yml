@@ -40,12 +40,16 @@ audio_tracks:
   - id: 2
     description: Violin
     audio_file: 05_08_02_violin.wav
+    player: Maria Grigoryeva
   - id: 3
     description: Viola
     audio_file: 05_08_03_viola.wav
+    player: Maria Grigoryeva
   - id: 4
     description: Cello
     audio_file: 05_08_04_cello.wav
+    player: Lyudmila Kadyrbaeva
   - id: 5
     description: Double Bass
     audio_file: 05_08_05_dbl_bass.wav
+    player: Zoltan Renaldi

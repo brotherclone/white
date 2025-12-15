@@ -24,6 +24,8 @@ class MainAgentState(BaseModel):
     ready_for_red: bool = False
     ready_for_orange: bool = False
     ready_for_yellow: bool = False
+    ready_for_green: bool = False
+    ready_for_blue: bool = False
     """
     Structure when workflow is paused:
     {

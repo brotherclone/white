@@ -21,6 +21,7 @@
     },
     "lucid_nonsense_access": {
         "command": "uv",
+        "version": "2.0",
         "args": [
             "--directory",
             "/Volumes/LucidNonsense/White",

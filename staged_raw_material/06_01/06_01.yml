@@ -1,0 +1,132 @@
+bpm: 90
+manifest_id: '06_01'
+tempo: 4/4
+key: G major
+rainbow_color: B
+title: My Worst Self
+release_date: '2023-03-14'
+album_sequence: 1
+main_audio_file: 06_01_main.wav
+TRT: '[04:05.008]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:43.008]'
+    description: Strumming guitars build to bass and baritone interplay while the verse starts
+  - section_name: Chorus 1
+    start_time: '[00:43.009]'
+    end_time: '[01:04.016]'
+    description: The chorus is a regretful admission
+  - section_name: Verse 2
+    start_time: '[01:04.017]'
+    end_time: '[01:36.016]'
+    description: A daughter and divorce?
+  - section_name: Chorus 2
+    start_time: '[01:36.017]'
+    end_time: '[02:08.016]'
+    description: The chorus repeats with more intensity
+  - section_name: Breakdown
+    start_time: '[02:08.017]'
+    end_time: '[02:14.000]'
+    description: Instrumental interlude with lap steel and banjo
+  - section_name: Verse 3
+    start_time: '[02:14.001]'
+    end_time: '[02:35.008]'
+    description: Smoking? Drinking? Getting fired?
+  - section_name: Chorus 3
+    start_time: '[02:35.009]'
+    end_time: '[02:56.016]'
+    description: The chorus repeats
+  - section_name: Outro
+    start_time: '[02:56.017]'
+    end_time: '[04:05.008]'
+    description: A plucked banjo melody and harmonium give the jam a deep remorseful feel
+sounds_like:
+  - name: Timesbold
+    discogs_id: 319016
+  - name: The Paper Kites
+    discogs_id: 3456024
+  - name: Sufjan Stevens
+    discogs_id: 202598
+mood:
+  - melancholic
+  - introspective
+genres:
+  - indie rock
+  - folk rock
+concept: At the start of the blue album this song sets the tone - it alludes to Walsh's preveious band, Timesbold. And the song's narrative seems like it could fit right in with Ruine - rural, depressive tale of a broken family. However, this isn't the narrator's actual life story - it is parallel timeline run amok in his mind. The song explores themes of self-loathing, regret, and the desire for redemption. The narrator reflects on their past mistakes and the impact they have had on their relationships, particularly with a significant other. The lyrics convey a sense of vulnerability and a longing for forgiveness, as the narrator grapples with their own flaws and shortcomings. Dedicated to version 875.
+lrc_file: 06_01.lrc
+audio_tracks:
+  - id: 2
+    description: Bass
+    audio_file: 06_01_02_bass.wav
+    group: Bass
+  - id: 3
+    description: Re-amped Bass
+    audio_file: 06_01_03_bass_reamp.wav
+    group: Bass
+  - id: 4
+    description: Acoustic Guitar
+    audio_file: 06_01_04_acoustic_guitar.wav
+  - id: 5
+    description: Acoustic Guitar 2
+    audio_file: 06_01_05_acoustic_guitar_2.wav
+  - id: 6
+    description: Baritone Guitar
+    audio_file: 06_01_06_baritone.wav
+  - id: 7
+    description: Lap steel guitar
+    audio_file: 06_01_07_lap_steel.wav
+  - id: 8
+    description: Banjo
+    audio_file: 06_01_08_banjo.wav
+  - id: 9
+    description: Mandolin
+    audio_file: 06_01_09_mandolin.wav
+  - id: 10
+    description: Wurlitzer
+    audio_file: 06_01_11_wurlitzer.wav
+    midi_file: 06_01_10_wurlitzer.mid
+  - id: 11
+    description: Harmonium
+    audio_file: 06_01_12_harmonium.wav
+  - id: 12
+    description: Piano
+    audio_file: 06_01_14_piano.wav
+    midi_file: 06_01_13_piano.mid
+  - id: 13
+    description: Drums
+    audio_file: 06_01_15_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 14
+    description: Kick
+    audio_file: 06_01_16_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 15
+    description: Snare
+    audio_file: 06_01_17_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 16
+    description: Hi-Hat
+    audio_file: 06_01_18_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 17
+    description: Toms
+    audio_file: 06_01_19_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 18
+    description: Main Vocals
+    audio_file: 06_01_20_main_vox.wav
+  - id: 19
+    description: Double Vocals
+    audio_file: 06_01_21_dbl_vox.wav
+  - id: 20
+    description: Background Vocals
+    audio_file: 06_01_22_bg_vox.wav

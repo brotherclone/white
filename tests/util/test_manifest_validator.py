@@ -1,10 +1,9 @@
 import os
 import tempfile
-from pathlib import Path
-
 import pytest
 import yaml
 
+from pathlib import Path
 from app.util.manifest_validator import (
     validate_manifest_completeness,
     validate_yaml_file,
@@ -26,8 +25,8 @@ def valid_manifest(temp_manifest_dir):
         "title": "Test Song",
         "rainbow_color": "R",
         "bpm": 120,
-        "tempo": 120,
-        "key": "C",
+        "tempo": "3/4",
+        "key": "C major",
         "release_date": "2025-01-01",
         "album_sequence": 1,
         "main_audio_file": "vocals.wav",

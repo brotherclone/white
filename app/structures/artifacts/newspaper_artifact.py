@@ -10,6 +10,7 @@ from pydantic import Field
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
+from app.util.string_utils import sanitize_for_filename
 
 load_dotenv()
 
@@ -37,6 +38,9 @@ class NewspaperArtifact(ChainArtifact):
     )
 
     def __init__(self, **data):
+        # Set artifact_name before calling super to ensure filename is correct
+        if "artifact_name" not in data and "headline" in data and data["headline"]:
+            data["artifact_name"] = sanitize_for_filename(data["headline"])
         super().__init__(**data)
 
     def get_text_content(self) -> str:

@@ -1,0 +1,1 @@
+"""MIDI chord library prototype."""

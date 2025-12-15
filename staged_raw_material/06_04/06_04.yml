@@ -1,0 +1,137 @@
+bpm: 98
+manifest_id: '06_04'
+tempo: 4/4
+key: B minor
+rainbow_color: B
+title: Monocacy
+release_date: '2023-03-14'
+album_sequence: 4
+main_audio_file: 06_04_main.wav
+TRT: '[03:50.005]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:58.019]'
+    description: Old timey folk instrumentation with a regimented beat
+  - section_name: Chorus
+    start_time: '[00:58.020]'
+    end_time: '[01:18.009]'
+    description: Chorus with bombastic baritone guitar stops
+  - section_name: Interlude 1
+    start_time: '[01:18.010]'
+    end_time: '[01:28.004]'
+    description: Instrumental break with harmonica and baritone guitar
+  - section_name: Verse 2
+    start_time: '[01:28.005]'
+    end_time: '[01:57.013]'
+    description: Back to the old timey folk instrumentation
+  - section_name: Chorus
+    start_time: '[01:57.014]'
+    end_time: '[02:17.003]'
+    description: Lamenting tinged version of the chorus
+  - section_name: Interlude 2
+    start_time: '[02:17.004]'
+    end_time: '[02:46.013]'
+    description: Twelve String centric break
+  - section_name: Verse 3
+    start_time: '[02:46.014]'
+    end_time: '[03:25.017]'
+    description: Final verse with full instrumentation
+  - section_name: Chorus
+    start_time: '[03:25.018]'
+    end_time: '[03:50.005]'
+    description: Final chorus with instrumental developments
+sounds_like:
+  - name: Timesbold
+    discogs_id: 319016
+  - name: The Band
+    discogs_id: 254199
+  - name: The Beatles
+    discogs_id: 82730
+mood:
+  - reflective
+  - wistful
+  - historical
+  - nostalgic
+  - fearful
+  - resigned
+genres:
+  - folk
+  - folk rock
+  - americana
+concept: I drive past the battlefield all the time and in this parallel universe the new Trump confederates are at war again. Dedicated to Private Peter Larna.
+lrc_file: 06_04.lrc
+audio_tracks:
+  - id: 2
+    description: Piano
+    audio_file: 06_04_03_piano.wav
+    midi_file: 06_04_02_piano.mid
+  - id: 3
+    description: Drums
+    audio_file: 06_04_04_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Kick
+    audio_file: 06_04_05_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Snare
+    audio_file: 06_04_06_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Hi-Hat
+    audio_file: 06_04_07_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Toms
+    audio_file: 06_04_08_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 8
+    description: Bass
+    audio_file: 06_04_09_bass.wav
+  - id: 9
+    description: Baritone Guitar
+    audio_file: 06_04_10_baritone.wav
+  - id: 10
+    description: Acoustic Guitar
+    audio_file: 06_04_11_acoustic.wav
+  - id: 11
+    description: Mandolin
+    audio_file: 06_04_12_mandolin.wav
+  - id: 12
+    description: Banjo
+    audio_file: 06_04_13_banjo.wav
+  - id: 13
+    description: Twelve String Guitar
+    audio_file: 06_04_14_twelve_string.wav
+  - id: 14
+    description: Harmonica
+    audio_file: 06_04_15_harmonica.wav
+  - id: 15
+    description: Trombone
+    audio_file: 06_04_16_trombone.wav
+    player: Nikola Ristevski
+  - id: 16
+    description: Tuba
+    audio_file: 06_04_17_tuba.wav
+    player: Micko Damnjanovski
+  - id: 17
+    description: French Horn
+    audio_file: 06_04_18_french_horn.wav
+    player: Nikola Vlekovski
+  - id: 18
+    description: Main Vocals
+    audio_file: 06_04_19_vox_main.wav
+  - id: 19
+    description: Double Vocals
+    audio_file: 06_04_20_vox_dbl.wav
+  - id: 20
+    description: Background Vocals
+    audio_file: 06_04_21_vox_bg.wav

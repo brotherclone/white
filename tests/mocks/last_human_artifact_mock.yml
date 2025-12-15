@@ -1,0 +1,23 @@
+thread_id: 'mock_thread_001'
+artifact_name: 'last_human_mock'
+name: Gabriel Walsh
+age: 72
+pronouns: he/him
+location: 'San Francisco, CA'
+latitude: 37.7749295
+longitude: -122.4194155
+year_documented: 1975
+parallel_vulnerability: entanglement
+vulnerability_details: mock vulnerability details
+occupation: mock occupation
+family_situation: mock family situation
+daily_routine: mock daily routine
+environmental_stressor: mock environmental stressor
+adaptation_attempts:
+  - new coffee pot
+  - a brisk morning walk
+documentation_type: witness
+last_days_scenario: mock last days scenario
+significant_object: mock significant object
+final_thought: mock final thought
+
