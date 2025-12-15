@@ -59,7 +59,7 @@ lrc_file: 04_05.lrc
 concept: The party is coaxed into a guest room by a large man. In the room upper class guests are behaving like children. A strangely anomaly of red and green ribbons pierce the bodies of the guests, angering the large man. He frees the jumpers but is taken by the ribbons himself.
 audio_tracks:
   - id: 2
-    description:
+    description: Bass
     audio_file: 04_05_03_bass.wav
     midi_file: 04_05_02_bass.mid
   - id: 3

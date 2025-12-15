@@ -1,0 +1,129 @@
+bpm: 112
+manifest_id: '06_11'
+tempo: 3/4
+key: E minor
+rainbow_color: B
+title: Taped Over
+release_date: '2023-03-14'
+album_sequence: 11
+main_audio_file: 06_11_main.wav
+TRT: '[03:43.009]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Drums
+    start_time: '[00:00.000]'
+    end_time: '[00:08.014]'
+    description: The drums begin the song alone.
+  - section_name: Intro
+    start_time: '[00:08.015]'
+    end_time: '[00:23.000]'
+    description: A barrage of string instrument pelt the listener
+  - section_name: Interlude 1
+    start_time: '[00:23.001]'
+    end_time: '[00:27.021]'
+    description: 12 string and harpsichord play a psychedelic melody
+  - section_name: Verse 1
+    start_time: '[00:27.022]'
+    end_time: '[01:01.015]'
+    description: A strummy verse with banjo and mandolin accents
+  - section_name: Chorus 1
+    start_time: '[01:01.016]'
+    end_time: '[01:26.019]'
+    description: The lines end with a variation on taping over.
+  - section_name: Bridge
+    start_time: '[01:26.020]'
+    end_time: '[01:32.003]'
+    description: A brief instrumental bridge
+  - section_name: Verse 2
+    start_time: '[01:32.004]'
+    end_time: '[01:54.002]'
+    description: Another strummy verse
+  - section_name: Chorus 2
+    start_time: '[01:54.003]'
+    end_time: '[02:19.020]'
+    description: This chorus is much longer than the first
+  - section_name: Interlude 2
+    start_time: '[02:19.021]'
+    end_time: '[02:29.011]'
+    description: Another 12 string and harpsichord section
+  - section_name: Outro
+    start_time: '[02:29.012]'
+    end_time: '[03:08.014]'
+    description: The song ends with all string instruments frantically picking before resting, defeated.
+concept: With all these thoughts of alternate lives and timelines the horrid though came that we must override, tape over, our own experiences by choice, by collapsing the wave, or for self-preservation. What happens to the stories and lives lost? Dedicated to version 2.
+lrc_file: 06_11.lrc
+sounds_like:
+  - name: Timesbold
+    discogs_id: 319016
+  - name: Chris Gantry
+    discogs_id: 990239
+mood:
+  - frantic
+  - cerebral
+  - dizzying
+genres:
+  - folk rock
+  - indie folk
+  - art rock
+audio_tracks:
+  - id: 2
+    description: Piano
+    audio_file: 06_11_03_piano.wav
+    midi_file: 06_11_02_piano.mid
+  - id: 3
+    description: Banjo
+    audio_file: 06_11_04_banjo.wav
+  - id: 4
+    description: Mandolin
+    audio_file: 06_11_05_mandolin.wav
+  - id: 5
+    description: Acoustic Guitar
+    audio_file: 06_11_06_acoustic.wav
+  - id: 6
+    description: 12 String
+    audio_file: 06_11_07_twelve_string.wav
+  - id: 7
+    description: Harpsichord
+    audio_file: 06_11_09_harpsichord.wav
+    midi_file: 06_11_08_harpsichord.mid
+  - id: 8
+    description: Lap steel
+    audio_file: 06_11_10_lap_steel.wav
+  - id: 9
+    description: Baritone Guitar
+    audio_file: 06_11_11_baritone.wav
+  - id: 10
+    description: Bass
+    audio_file: 06_11_12_bass.wav
+  - id: 11
+    description: Drums
+    audio_file: 06_11_13_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 12
+    description: Kick
+    audio_file: 06_11_14_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 13
+    description: Snare
+    audio_file: 06_11_15_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 14
+    description: Hi-hat
+    audio_file: 06_11_16_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 15
+    description: Toms
+    audio_file: 06_11_17_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 16
+    description: Vocals Main
+    audio_file: 06_11_18_vox_main.wav
+  - id: 17
+    description: Double Vocals
+    audio_file: 06_11_19_vox_dbl.wav

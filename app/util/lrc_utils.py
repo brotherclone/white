@@ -1,7 +1,6 @@
-import argparse
-import os
 import re
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 def parse_lrc_time(time_str: str) -> float | None:
@@ -165,36 +164,29 @@ def convert_file_smpte_to_lrc_lines(lines, fps=30):
     return out
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Convert SMPTE timecodes in a file to LRC timestamps."
-    )
-    parser.add_argument("path", help="Path to input LRC or YAML file")
-    parser.add_argument(
-        "--fps", type=int, default=30, help="Frames per second (default: 30)"
-    )
-    parser.add_argument(
-        "--output",
-        type=str,
-        default=None,
-        help="Output file path (default: <input>.converted.lrc)",
-    )
-    args = parser.parse_args()
+def extract_lyrics_from_lrc(lrc_file_path: str) -> Optional[str]:
+    """
+    Read an LRC file and remove all LRC tags (timestamps and metadata),
+    returning just the lyrical content as a single string.
 
-    if not os.path.isfile(args.path):
-        print(f"ERROR: File not found: {args.path}")
-        return
+    Args:
+        lrc_file_path: Path to the LRC file
 
-    with open(args.path, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-    converted = convert_file_smpte_to_lrc_lines(lines, fps=args.fps)
+    Returns:
+        String containing just the lyrics, or None if file doesn't exist or is empty
+    """
+    try:
+        lrc_path = Path(lrc_file_path)
+        if not lrc_path.exists():
+            return None
 
-    out_path = args.output or f"{args.path}.converted.lrc"
-    with open(out_path, "w", encoding="utf-8") as f:
-        for line in converted:
-            f.write(line + "\n")
-    print(f"Converted file written to: {out_path}")
+        with open(lrc_path, "r", encoding="utf-8") as f:
+            content = f.read()
 
+        cleaned = re.sub(r"\[.*?]", "", content)
+        lines = [line.strip() for line in cleaned.split("\n") if line.strip()]
+        return " ".join(lines) if lines else None
 
-if __name__ == "__main__":
-    main()
+    except Exception as e:
+        print(f"Error reading LRC file {lrc_file_path}: {e}")
+        return None

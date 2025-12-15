@@ -1,9 +1,10 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.structures.enums.player import RainbowPlayer
 
 
 class ManifestTrack(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
     id: int
     description: str

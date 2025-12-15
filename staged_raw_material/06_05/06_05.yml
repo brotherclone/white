@@ -1,0 +1,130 @@
+bpm: 116
+manifest_id: '06_05'
+tempo: 4/4
+key: D minor
+rainbow_color: B
+title: Stay Strangers
+release_date: '2023-03-14'
+album_sequence: 5
+main_audio_file: 06_05_main.wav
+TRT: '[03:22.018]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:04.003]'
+    description: Drums kick off
+  - section_name: Verse 1
+    start_time: '[00:04.004]'
+    end_time: '[00:37.006]'
+    description: The verse kicks right in with many string instruments
+  - section_name: Interlude 1
+    start_time: '[00:37.007]'
+    end_time: '[00:45.012]'
+    description: A psych rock style small break
+  - section_name: Verse 2
+    start_time: '[00:45.013]'
+    end_time: '[01:02.001]'
+    description: Right back to the verse
+  - section_name: Bridge
+    start_time: '[01:02.002]'
+    end_time: '[01:10.008]'
+    description: Another sixties-tinged moment
+  - section_name: Chorus
+    start_time: '[01:10.009]'
+    end_time: '[01:31.000]'
+    description: A brief chorus with baritone and 12-string
+  - section_name: Verse 3
+    start_time: '[01:31.001]'
+    end_time: '[01:55.021]'
+    description: Back to the verse
+  - section_name: Interlude 2
+    start_time: '[01:55.022]'
+    end_time: '[02:04.003]'
+    description: A repeat of the melotron'd guitar break
+  - section_name: Chorus 2
+    start_time: '[02:04.004]'
+    end_time: '[02:43.011]'
+    description: The chorus returns with more vocal layers
+  - section_name: Jams
+    start_time: '[02:43.012]'
+    end_time: '[03:22.018]'
+    description: A mandolin and acoustic guitar jam out in the background
+concept: There were a couple of years where I spent hours in the Copenhagen airport delirious from jet-lag and bored out of my mind while waiting for the plane to Jutland. I began to see the same people over and over like a commuter, I always wanted to talk to them but was too reserved. In this alternative universe it's me who is being characteristically standoffish.  Dedicated to Passenger Jørgensen
+lrc_file: 06_05.lrc
+sounds_like:
+  - name: Small Faces
+    discogs_id: 152682
+  - name: The Waterboys
+    discogs_id: 125174
+  - name: John's Children
+    discogs_id: 377038
+mood:
+  - regretful
+  - nostalgic
+  - wistful
+genres:
+  - folk rock
+  - psychedelic rock
+audio_tracks:
+  - id: 2
+    description: Clavinet
+    audio_file: 06_05_03_clavinet.wav
+    midi_file: 06_05_02_clavinet.mid
+  - id: 3
+    description: Bass
+    audio_file: 06_05_04_bass.wav
+  - id: 4
+    description: Baritone Guitar
+    audio_file: 06_05_05_baritone.wav
+  - id: 5
+    description: Melotron'd Guitar
+    audio_file: 06_05_06_mel_guitar.wav
+  - id: 6
+    description: Guitar
+    audio_file: 06_05_07_guitar.wav
+  - id: 7
+    description: Twelve String
+    audio_file: 06_05_08_twelve_string.wav
+  - id: 8
+    description: Acoustic Guitar
+    audio_file: 06_05_09_acoustic.wav
+  - id: 9
+    description: Mandolin
+    audio_file: 06_05_10_mandolin.wav
+  - id: 10
+    description: Drums
+    audio_file: 06_05_11_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 11
+    description: Kick
+    audio_file: 06_05_12_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 12
+    description: Snare
+    audio_file: 06_05_13_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 13
+    description: Hi-Hat
+    audio_file: 06_05_18_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 14
+    description: Toms
+    audio_file: 06_05_14_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 15
+    description: Vocals Main
+    audio_file: 06_05_15_vox_main.wav
+  - id: 16
+    description: Vocals Double
+    audio_file: 06_05_16_vox_dbl.wav
+  - id: 17
+    description: Vocals Background
+    audio_file: 06_05_17_vox_bg.wav
+

@@ -1,0 +1,123 @@
+bpm: 96
+manifest_id: '06_08'
+tempo: 4/4
+key: G major
+rainbow_color: B
+title: You Got a New Dog
+release_date: '2023-03-14'
+album_sequence: 8
+main_audio_file: 06_08_main.wav
+TRT: '[02:39.009]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:30.000]'
+    description: The intro and first verse are melancholic and quieter than usual.
+  - section_name: Interlude
+    start_time: '[00:30.001]'
+    end_time: '[00:37.012]'
+    description: A small interlude
+  - section_name: Verse 2
+    start_time: '[00:37.013]'
+    end_time: '[00:52.012]'
+    description: Back to the verse
+  - section_name: Chorus 1
+    start_time: '[00:52.013]'
+    end_time: '[01:02.012]'
+    description: The chorus is a bit louder, more immediate
+  - section_name: Verse 3
+    start_time: '[01:02.013]'
+    end_time: '[01:25.000]'
+    description: To the verse
+  - section_name: Chorus 2
+    start_time: '[01:25.001]'
+    end_time: '[01:45.000]'
+    description: Back to the chorus
+  - section_name: Interlude
+    start_time: '[01:45.001]'
+    end_time: '[02:00.000]'
+    description: Harmonica heavy interlude
+  - section_name: Breakdown
+    start_time: '[02:00.001]'
+    end_time: '[02:15.000]'
+    description: The banjo is laid bare
+  - section_name: Outro
+    start_time: '[02:15.001]'
+    end_time: '[02:39.009]'
+    description: The lap steel leads the outro into a melancholic, sad ending.
+concept: I once had a dog that was my best friend. This song is not too far from our normal world, but the loss of the dog leads to the loss of everything. Dedicated to Skittles
+lrc_file: 06_08.lrc
+sounds_like:
+  - name: Timesbold
+    discogs_id: 319016
+  - name: Purple Mountains
+    discogs_id: 7149935
+  - name: Lambchop
+    discogs_id: 10551
+mood:
+  - depressed
+  - sad
+  - melancholic
+genres:
+  - folk rock
+  - indie folk
+audio_tracks:
+  - id: 2
+    description: Piano
+    audio_file: 06_08_03_piano.wav
+    midi_file: 06_08_02_piano.mid
+  - id: 3
+    description: Harmonica
+    audio_file: 06_08_04_harmonica.wav
+    player: Mike Ballard
+  - id: 4
+    description: Acoustic Guitar
+    audio_file: 06_08_05_acoustic.wav
+  - id: 5
+    description: Twelve String Electric
+    audio_file: 06_08_06_twelve_string.wav
+  - id: 6
+    description: Bass
+    audio_file: 06_08_07_bass.wav
+  - id: 7
+    description: Banjo
+    audio_file: 06_08_08_banjo.wav
+  - id: 8
+    description: Lap Steel
+    audio_file: 06_08_09_lap_steel.wav
+  - id: 9
+    description: Vocal 1
+    audio_file: 06_08_10_vox1.wav
+  - id: 10
+    description: Vocal 2
+    audio_file: 06_08_11_vox2.wav
+  - id: 11
+    description: Vocal 3
+    audio_file: 06_08_12_vox3.wav
+  - id: 12
+    description: Drums
+    audio_file: 06_08_13_drums.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 13
+    description: Kick
+    audio_file: 06_08_14_kick.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 14
+    description: Snare
+    audio_file: 06_08_15_snare.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 15
+    description: Hi Hat
+    audio_file: 06_08_16_hh.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 16
+    description: Toms
+    audio_file: 06_08_17_toms.wav
+    group: drums
+    player: Graham Hopkins

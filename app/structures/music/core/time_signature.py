@@ -33,3 +33,6 @@ class TimeSignature(BaseModel):
                 and self.denominator == other.denominator
             )
         return False
+
+    def __hash__(self):
+        return hash((self.numerator, self.denominator))
