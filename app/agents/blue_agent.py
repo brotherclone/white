@@ -1,9 +1,9 @@
 import logging
 import os
 import time
-from abc import ABC
-
 import yaml
+
+from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph
@@ -26,14 +26,11 @@ class BlueAgent(BaseRainbowAgent, ABC):
             from app.structures.agents.agent_settings import AgentSettings
 
             data["settings"] = AgentSettings()
-
         super().__init__(**data)
-
         if self.settings is None:
             from app.structures.agents.agent_settings import AgentSettings
 
             self.settings = AgentSettings()
-
         self.llm = ChatAnthropic(
             temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
@@ -44,35 +41,99 @@ class BlueAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
+        current_proposal = state.song_proposals.iterations[-1]
+        blue_state = BlueAgentState(
+            thread_id=state.thread_id,
+            song_proposals=state.song_proposals,
+            white_proposal=current_proposal,
+            counter_proposal=None,
+            artifacts=[],
+            biographical_timeline=None,
+            forgotten_periods=[],
+            selected_period=None,
+            alternate_history=None,
+            tape_label=None,
+        )
+        blue_graph = self.create_graph()
+        compiled_graph = blue_graph.compile()
+        result = compiled_graph.invoke(blue_state.model_dump())
+        if isinstance(result, BlueAgentState):
+            final_state = result
+        elif isinstance(result, dict):
+            final_state = BlueAgentState(**result)
+        else:
+            raise TypeError(f"Unexpected result type: {type(result)}")
+        if final_state.counter_proposal:
+            state.song_proposals.iterations.append(final_state.counter_proposal)
+        if final_state.artifacts:
+            state.artifacts = final_state.artifacts
         return state
 
     def create_graph(self) -> StateGraph:
-        graph = StateGraph(BlueAgentState)
-        return graph
+        work_flow = StateGraph(BlueAgentState)
+        # Nodes
+        work_flow.add_node(
+            "generate_alternate_song_spec", self.generate_alternate_song_spec
+        )
+        # Edges
+
+        return work_flow
+
+    def load_biographical_data(self, state: BlueAgentState) -> BlueAgentState:
+        pass
+
+    def select_year(self, state: BlueAgentState) -> BlueAgentState:
+        pass
+
+    def evaluate_timeline_frailty(self, state: BlueAgentState) -> BlueAgentState:
+        pass
+
+    def route_after_evaluate_timeline_frailty(self, state: BlueAgentState) -> str:
+        pass
+
+    def generate_alternate_history(self, state: BlueAgentState) -> BlueAgentState:
+        pass
+
+    def extract_musical_parameters(self, state: BlueAgentState) -> BlueAgentState:
+        pass
+
+    def generate_tape_label(self, state: BlueAgentState) -> BlueAgentState:
+        pass
 
     def generate_alternate_song_spec(self, state: BlueAgentState) -> BlueAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/blue_counter_proposal_mock.yml", "r") as f:
-                data = yaml.safe_load(f)
-            counter_proposal = SongProposalIteration(**data)
-            state.counter_proposal = counter_proposal
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/blue_counter_proposal_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                counter_proposal = SongProposalIteration(**data)
+                state.counter_proposal = counter_proposal
+                return state
+            except Exception as e:
+                error_msg = f"Failed to read mock counter proposal: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
 
             prompt = f"""
            
-                       Current song proposal:
-                       {state.white_proposal}
+Current song proposal:
+{state.white_proposal}
 
-                       Reference works in this artist's style paying close attention to 'concept' property:
-                       {get_my_reference_proposals('B')}
+Reference works in this artist's style paying close attention to 'concept' property:
+{get_my_reference_proposals('B')}
 
-                       In your counter proposal your 'rainbow_color' property should always be:
-                       {the_rainbow_table_colors['B']}
+In your counter proposal your 'rainbow_color' property should always be:
+{the_rainbow_table_colors['B']}
 
-        
-                       """
+
+           """
 
             claude = self._get_claude()
             proposer = claude.with_structured_output(SongProposalIteration)

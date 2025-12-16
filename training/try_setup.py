@@ -1,8 +1,8 @@
 """
-Test script to verify everything works before full training.
+try script to verify everything works before full training.
 
 Usage:
-    python test_setup.py --manifest ../data/base_manifest_db.parquet
+    python try_setup.py --manifest ../data/base_manifest_db.parquet
 """
 
 import argparse
@@ -16,10 +16,10 @@ from models.text_encoder import TextEncoder
 from models.classifier import BinaryClassifier, RainbowModel
 
 
-def test_data_loading(manifest_path: str):
-    """Test data loading and filtering."""
+def try_data_loading(manifest_path: str):
+    """try data loading and filtering."""
     print("\n" + "=" * 60)
-    print("TEST 1: Data Loading")
+    print("try 1: Data Loading")
     print("=" * 60)
 
     try:
@@ -55,10 +55,10 @@ def test_data_loading(manifest_path: str):
         return False
 
 
-def test_dataloader(manifest_path: str):
-    """Test dataloader creation and batching."""
+def try_dataloader(manifest_path: str):
+    """try dataloader creation and batching."""
     print("\n" + "=" * 60)
-    print("TEST 2: DataLoader")
+    print("try 2: DataLoader")
     print("=" * 60)
 
     try:
@@ -69,14 +69,14 @@ def test_dataloader(manifest_path: str):
             tokenizer=tokenizer,
             target_column="has_rebracketing_markers",
             batch_size=4,
-            num_workers=0,  # Single process for testing
+            num_workers=0,  # Single process for trying
         )
 
         print("✓ Created dataloaders")
         print(f"  Train batches: {len(train_loader)}")
         print(f"  Val batches: {len(val_loader)}")
 
-        # Test batch
+        # try batch
         batch = next(iter(train_loader))
         print("✓ Fetched batch")
         print(f"  Keys: {list(batch.keys())}")
@@ -94,10 +94,10 @@ def test_dataloader(manifest_path: str):
         return False
 
 
-def test_model():
-    """Test model initialization and forward pass."""
+def try_model():
+    """try model initialization and forward pass."""
     print("\n" + "=" * 60)
-    print("TEST 3: Model")
+    print("try 3: Model")
     print("=" * 60)
 
     try:
@@ -120,7 +120,7 @@ def test_model():
         model = RainbowModel(text_encoder, classifier)
         print("✓ Created combined model")
 
-        # Test forward pass
+        # try forward pass
         batch_size = 4
         seq_len = 128
         input_ids = torch.randint(0, 1000, (batch_size, seq_len))
@@ -147,10 +147,10 @@ def test_model():
         return False
 
 
-def test_training_step(manifest_path: str):
-    """Test a single training step."""
+def try_training_step(manifest_path: str):
+    """try a single training step."""
     print("\n" + "=" * 60)
-    print("TEST 4: Training Step")
+    print("try 4: Training Step")
     print("=" * 60)
 
     try:
@@ -209,7 +209,7 @@ def test_training_step(manifest_path: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Test Rainbow Pipeline setup")
+    parser = argparse.ArgumentParser(description="try Rainbow Pipeline setup")
     parser.add_argument(
         "--manifest",
         type=str,
@@ -225,26 +225,26 @@ def main():
         print("  Please provide correct path with --manifest")
         return
 
-    # Run tests
-    tests = [
-        ("Data Loading", lambda: test_data_loading(str(manifest_path))),
-        ("DataLoader", lambda: test_dataloader(str(manifest_path))),
-        ("Model", test_model),
-        ("Training Step", lambda: test_training_step(str(manifest_path))),
+    # Run trys
+    trys = [
+        ("Data Loading", lambda: try_data_loading(str(manifest_path))),
+        ("DataLoader", lambda: try_dataloader(str(manifest_path))),
+        ("Model", try_model),
+        ("Training Step", lambda: try_training_step(str(manifest_path))),
     ]
 
     results = []
-    for name, test_fn in tests:
+    for name, try_fn in trys:
         try:
-            result = test_fn()
+            result = try_fn()
             results.append((name, result))
         except Exception as e:
-            print(f"✗ Test '{name}' crashed: {e}")
+            print(f"✗ try '{name}' crashed: {e}")
             results.append((name, False))
 
     # Summary
     print("\n" + "=" * 60)
-    print("TEST SUMMARY")
+    print("try SUMMARY")
     print("=" * 60)
     for name, passed in results:
         status = "✓ PASS" if passed else "✗ FAIL"
@@ -253,9 +253,9 @@ def main():
     all_passed = all(r[1] for r in results)
     print()
     if all_passed:
-        print("🎉 All tests passed! Ready to train.")
+        print("🎉 All trys passed! Ready to train.")
     else:
-        print("❌ Some tests failed. Fix issues before training.")
+        print("❌ Some trys failed. Fix issues before training.")
 
 
 if __name__ == "__main__":
