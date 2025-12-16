@@ -1,0 +1,44 @@
+# RunPod GPU Training Environment
+# Based on PyTorch 2.1.2 with CUDA 12.1
+
+FROM runpod/pytorch:2.1.1-py3.10-cuda12.1.0-devel-ubuntu22.04
+
+# Set working directory
+WORKDIR /workspace
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    vim \
+    htop \
+    tmux \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+# Install additional GPU-optimized packages
+RUN pip install --no-cache-dir \
+    ninja \
+    flash-attn --no-build-isolation
+
+# Create directories
+RUN mkdir -p /workspace/data \
+    /workspace/output \
+    /workspace/logs
+
+# Copy training code (done by setup script, not in image)
+# This keeps the image smaller and allows hot-reloading code
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV TRANSFORMERS_CACHE=/workspace/.cache/huggingface
+ENV HF_HOME=/workspace/.cache/huggingface
+
+# Expose ports for Jupyter/tensorboard if needed
+EXPOSE 8888 6006
+
+# Default command
+CMD ["/bin/bash"]
