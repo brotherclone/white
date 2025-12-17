@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from pydantic import Field
 
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
@@ -23,6 +23,10 @@ class BlueAgentState(BaseRainbowAgentState):
     tape_label: Optional[QuantumTapeLabelArtifact] = None
     musical_params: Optional[QuantumTapeMusicalParameters] = None
     iteration_count: int = 0
+    biographical_data: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Container for biographical data in agent state",
+    )
 
     def __init__(self, **data):
         super().__init__(**data)

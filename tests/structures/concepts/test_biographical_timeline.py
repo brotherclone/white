@@ -11,11 +11,13 @@ def test_create_valid_model():
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="First period",
+        age_range=(20, 25),
     )
     period2 = BiographicalPeriod(
         start_date=datetime.date(1998, 1, 1),
         end_date=datetime.date(1998, 12, 31),
         description="Second period",
+        age_range=(25, 30),
     )
 
     m = BiographicalTimeline(periods=[period1, period2])
@@ -32,6 +34,7 @@ def test_with_optional_fields():
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="test",
+        age_range=(20, 25),
     )
 
     m = BiographicalTimeline(
@@ -60,16 +63,19 @@ def test_get_surrounding_periods_middle():
         start_date=datetime.date(1996, 1, 1),
         end_date=datetime.date(1996, 12, 31),
         description="First period",
+        age_range=(20, 25),
     )
     period2 = BiographicalPeriod(
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="Second period",
+        age_range=(25, 30),
     )
     period3 = BiographicalPeriod(
         start_date=datetime.date(1998, 1, 1),
         end_date=datetime.date(1998, 12, 31),
         description="Third period",
+        age_range=(30, 35),
     )
 
     timeline = BiographicalTimeline(periods=[period1, period2, period3])
@@ -84,11 +90,13 @@ def test_get_surrounding_periods_first():
         start_date=datetime.date(1996, 1, 1),
         end_date=datetime.date(1996, 12, 31),
         description="First period",
+        age_range=(20, 25),
     )
     period2 = BiographicalPeriod(
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="Second period",
+        age_range=(25, 30),
     )
 
     timeline = BiographicalTimeline(periods=[period1, period2])
@@ -103,11 +111,13 @@ def test_get_surrounding_periods_last():
         start_date=datetime.date(1996, 1, 1),
         end_date=datetime.date(1996, 12, 31),
         description="First period",
+        age_range=(20, 25),
     )
     period2 = BiographicalPeriod(
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="Second period",
+        age_range=(25, 30),
     )
 
     timeline = BiographicalTimeline(periods=[period1, period2])
@@ -122,6 +132,7 @@ def test_get_surrounding_periods_single_period():
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="Only period",
+        age_range=(20, 25),
     )
 
     timeline = BiographicalTimeline(periods=[period])
@@ -132,29 +143,26 @@ def test_get_surrounding_periods_single_period():
 
 
 def test_filter_by_age_range():
-    # Note: This test assumes age_range is set on the periods
-    # The model shows age_range as a property but doesn't show how it's computed
-    # For now, we'll test the method exists and can be called
     period1 = BiographicalPeriod(
         start_date=datetime.date(1996, 1, 1),
         end_date=datetime.date(1996, 12, 31),
         description="First period",
+        age_range=(18, 19),
     )
-    period1.age_range = range(18, 19)
 
     period2 = BiographicalPeriod(
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="Second period",
+        age_range=(22, 23),
     )
-    period2.age_range = range(22, 23)
 
     period3 = BiographicalPeriod(
         start_date=datetime.date(1998, 1, 1),
         end_date=datetime.date(1998, 12, 31),
         description="Third period",
+        age_range=(25, 26),
     )
-    period3.age_range = range(25, 26)
 
     timeline = BiographicalTimeline(periods=[period1, period2, period3])
 
@@ -169,22 +177,22 @@ def test_filter_by_age_range_multiple_matches():
         start_date=datetime.date(1996, 1, 1),
         end_date=datetime.date(1996, 12, 31),
         description="First period",
+        age_range=(22, 23),
     )
-    period1.age_range = range(22, 23)
 
     period2 = BiographicalPeriod(
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="Second period",
+        age_range=(23, 24),
     )
-    period2.age_range = range(23, 24)
 
     period3 = BiographicalPeriod(
         start_date=datetime.date(1998, 1, 1),
         end_date=datetime.date(1998, 12, 31),
         description="Third period",
+        age_range=(30, 31),
     )
-    period3.age_range = range(30, 31)
 
     timeline = BiographicalTimeline(periods=[period1, period2, period3])
 
@@ -200,8 +208,9 @@ def test_filter_by_age_range_no_matches():
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 12, 31),
         description="Period",
+        age_range=(20, 25),
     )
-    period.age_range = range(18, 19)
+    period.age_range = (18, 19)
 
     timeline = BiographicalTimeline(periods=[period])
 

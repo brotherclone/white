@@ -32,7 +32,7 @@ class BiographicalTimeline(BaseModel):
         self, min_age: int, max_age: int
     ) -> List[BiographicalPeriod]:
         """Get periods within age range."""
-        return [p for p in self.periods if min_age <= p.age_range.start <= max_age]
+        return [p for p in self.periods if min_age <= p.age_range[0] <= max_age]
 
 
 class BiographicalTimelineLoadResult(BaseModel):
