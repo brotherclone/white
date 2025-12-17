@@ -1,0 +1,82 @@
+artifact_id: bf036b54-92d2-47eb-a032-17f3daf04ec4
+artifact_name: UNKNOWN_ARTIFACT_NAME
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- unknown
+divergence_magnitude: 0.01
+divergence_point:
+  what_changed: mock change
+  when: mock date
+  why_plausible: mock reason
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- wistful
+file_name: bf036b54-92d2-47eb-a032-17f3daf04ec4_t_UNKNOWN_ARTIFACT_NAME.yml
+file_path: /Volumes/LucidNonsense/White/chain_artifacts/UNKNOWN_THREAD_ID/yml
+following_events:
+- Mock following event
+- Another mock following event
+key_differences:
+- Mock difference
+- Another mock difference
+mood_description: Mock mood description
+narrative: Mock narrative
+period:
+  age_range: !!python/object/apply:builtins.range
+  - 6
+  - 13
+  - 1
+  creative_output:
+  - Mock output
+  - Another mock output
+  description: Alternate timeline artifact mock
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - low
+  emotional_tone: mock tone
+  end_date: 2024-01-02
+  key_relationships:
+  - Mock relationship
+  - Another mock relationship
+  known_events:
+  - approximate_date: Jan 1st 2018
+    category: Mock category
+    date: 2018-01-01
+    description: Mock event
+    emotional_weight: 0.2
+    tags:
+    - mock
+    - test
+    year: 2018
+  - approximate_date: Jan 1st 2018
+    category: Mock category
+    date: 2018-01-01
+    description: Mock event
+    emotional_weight: 0.2
+    tags:
+    - mock
+    - test
+    year: 2018
+  location: Mock location
+  primary_activity: null
+  start_date: 2018-01-01
+  trauma_level: low
+plausibility_score: 0.01
+preceding_events:
+- Mock preceding event
+- Another mock preceding event
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: daily_routine
+  detail: a mock detail
+  sensory_elements:
+  - sight
+  - sound
+- category: career
+  detail: another mock detail
+  sensory_elements:
+  - touch
+  - smell
+specificity_score: 0.01
+thread_id: UNKNOWN_THREAD_ID
+title: Mock Timeline Artifact

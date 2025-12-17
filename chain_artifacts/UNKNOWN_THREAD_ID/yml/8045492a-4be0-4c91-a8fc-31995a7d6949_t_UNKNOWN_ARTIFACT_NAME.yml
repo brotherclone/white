@@ -1,0 +1,23 @@
+artifact_id: 8045492a-4be0-4c91-a8fc-31995a7d6949
+artifact_name: UNKNOWN_ARTIFACT_NAME
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- unknown
+counter_end: 921
+counter_start: 1
+date_range: 1990-2000
+file_name: 8045492a-4be0-4c91-a8fc-31995a7d6949_t_UNKNOWN_ARTIFACT_NAME.yml
+file_path: /Volumes/LucidNonsense/White/chain_artifacts/UNKNOWN_THREAD_ID/yml
+handwriting_style: mock style
+notes: This is a mock quantum tape label for testing purposes.
+original_label_text: Quantum Tape Label
+original_label_visible: true
+rainbow_color_mnemonic_character_value: T
+recording_quality: !!python/object/apply:app.structures.enums.quantum_tape_recording_quality.QuantumTapeRecordingQuality
+- sp
+tape_brand: Quantum Tape Brand
+tape_degradation: 0.4
+thread_id: UNKNOWN_THREAD_ID
+title: mock quantum tape label

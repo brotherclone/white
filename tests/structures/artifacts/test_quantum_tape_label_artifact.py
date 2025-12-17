@@ -26,7 +26,7 @@ def test_create_valid_model():
     assert m.original_label_visible is True
     assert m.original_label_text is None
     assert m.tape_degradation is None
-    assert m.tape_brand == "MEMOREX T-120"
+    assert m.tape_brand == "TASCAM 424-S"
     assert m.handwriting_style is None
     assert m.model_dump(exclude_none=True, exclude_unset=True)
 
@@ -208,7 +208,7 @@ def test_default_tape_brand():
         recording_quality=QuantumTapeRecordingQuality.SP,
         counter_start=0,
     )
-    assert m.tape_brand == "MEMOREX T-120"
+    assert m.tape_brand == "TASCAM 424-S"
 
 
 def test_default_original_label_visible():
