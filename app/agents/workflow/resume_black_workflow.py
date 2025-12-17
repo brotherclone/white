@@ -39,6 +39,9 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
     """
 
     try:
+        # Check if we're in MOCK_MODE - if so, skip verification for mock tasks
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+
         # First, try to use a compat client if available (tests monkeypatch this)
         client = None
         import sys
@@ -54,6 +57,13 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
         for task_info in pending_tasks:
             task_id = task_info.get("task_id")
             if not task_id:
+                continue
+
+            # Skip verification for mock tasks when in MOCK_MODE
+            if mock_mode and (task_id.startswith("mock_") or "mock" in task_id.lower()):
+                logging.info(
+                    f"MOCK_MODE: Skipping verification for mock task {task_id}"
+                )
                 continue
 
             if client is not None:

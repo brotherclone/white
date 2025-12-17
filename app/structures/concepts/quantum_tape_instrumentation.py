@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 
 class QuantumTapeInstrumentationConfig(BaseModel):
@@ -15,6 +15,7 @@ class QuantumTapeInstrumentationConfig(BaseModel):
     )
     color: List[str] = Field(default_factory=list)  # Additional textures
 
+    @computed_field
     @property
     def all_instruments(self) -> List[str]:
         return self.core + self.color

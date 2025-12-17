@@ -4,7 +4,7 @@ from abc import ABC
 from pathlib import Path
 from typing import List, Optional
 from dotenv import load_dotenv
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.alternate_life_detail import AlternateLifeDetail
@@ -43,6 +43,22 @@ class AlternateTimelineArtifact(ChainArtifact, ABC):
 
     def __init__(self, **data):
         super().__init__(**data)
+
+    @field_validator("narrative")
+    @classmethod
+    def validate_narrative_length(cls, v):
+        """Narrative must be substantive."""
+        if len(v.split()) < 100:
+            raise ValueError("Narrative too short (minimum 100 words)")
+        return v
+
+    @field_validator("specific_details")
+    @classmethod
+    def validate_enough_details(cls, v):
+        """Must have at least 5 specific details."""
+        if len(v) < 5:
+            raise ValueError(f"Not enough specific details ({len(v)}/5)")
+        return v
 
     def flatten(self):
         parent_data = super().flatten()

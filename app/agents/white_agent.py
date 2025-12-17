@@ -189,7 +189,7 @@ class WhiteAgent(BaseModel):
         )
         workflow.add_conditional_edges(
             "process_green_agent_work",
-            self.route_after_yellow,
+            self.route_after_green,
             {
                 "green": "invoke_green_agent",
                 "blue": "invoke_blue_agent",

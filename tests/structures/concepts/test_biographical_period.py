@@ -14,6 +14,11 @@ def test_create_valid_model():
         start_date=datetime.date(1997, 6, 1),
         end_date=datetime.date(1998, 8, 31),
         description="Working at Powell's Books",
+        detail_level=BiographicalTimelineDetailLevel.MEDIUM,
+        known_events=[],
+        key_relationships=[],
+        creative_output=[],
+        age_range=(20, 25),
     )
     assert isinstance(m, BiographicalPeriod)
     assert m.start_date == datetime.date(1997, 6, 1)
@@ -33,6 +38,7 @@ def test_with_events():
         end_date=datetime.date(1998, 8, 31),
         description="Working period",
         known_events=[event],
+        age_range=(20, 25),
     )
     assert len(m.known_events) == 1
     assert m.known_events[0].description == "Started job"
@@ -50,6 +56,7 @@ def test_with_all_optional_fields():
         creative_output=["poems", "short stories"],
         emotional_tone="optimistic",
         trauma_level="low",
+        age_range=(20, 25),
     )
     assert m.location == "Portland, OR"
     assert m.primary_activity == "studying"
@@ -78,6 +85,11 @@ def test_wrong_type_raises():
             start_date="not a date",
             end_date=datetime.date(1998, 8, 31),
             description="test",
+            detail_level=BiographicalTimelineDetailLevel.MEDIUM,
+            known_events=[],
+            key_relationships=[],
+            creative_output=[],
+            age_range=range(20, 25),
         )
 
 
@@ -86,6 +98,9 @@ def test_duration_months_property():
         start_date=datetime.date(1997, 6, 1),
         end_date=datetime.date(1998, 8, 31),
         description="test",
+        age_range=(20, 25),
+        detail_level=BiographicalTimelineDetailLevel.MEDIUM,
+        trauma_level="low",
     )
     assert m.duration_months == 14  # June 1997 to August 1998
 
@@ -95,6 +110,9 @@ def test_duration_months_same_year():
         start_date=datetime.date(1997, 1, 1),
         end_date=datetime.date(1997, 6, 30),
         description="test",
+        age_range=(20, 25),
+        detail_level=BiographicalTimelineDetailLevel.MEDIUM,
+        trauma_level="low",
     )
     assert m.duration_months == 5
 
@@ -106,6 +124,7 @@ def test_is_forgotten_property_true():
         description="test",
         detail_level=BiographicalTimelineDetailLevel.LOW,
         trauma_level="none",
+        age_range=(20, 25),
     )
     assert m.is_forgotten is True
 
@@ -117,6 +136,7 @@ def test_is_forgotten_property_minimal_detail():
         description="test",
         detail_level=BiographicalTimelineDetailLevel.MINIMAL,
         trauma_level="low",
+        age_range=(20, 25),
     )
     assert m.is_forgotten is True
 
@@ -128,6 +148,7 @@ def test_is_forgotten_property_false_high_detail():
         description="test",
         detail_level=BiographicalTimelineDetailLevel.HIGH,
         trauma_level="none",
+        age_range=(20, 25),
     )
     assert m.is_forgotten is False
 
@@ -139,6 +160,7 @@ def test_is_forgotten_property_false_high_trauma():
         description="test",
         detail_level=BiographicalTimelineDetailLevel.LOW,
         trauma_level="high",
+        age_range=(20, 25),
     )
     assert m.is_forgotten is False
 
@@ -150,6 +172,7 @@ def test_is_forgotten_property_false_short_duration():
         description="test",
         detail_level=BiographicalTimelineDetailLevel.LOW,
         trauma_level="none",
+        age_range=(20, 25),
     )
     assert m.is_forgotten is False  # Only 4 months, needs >= 6
 
@@ -161,6 +184,7 @@ def test_invalid_trauma_level_raises():
             end_date=datetime.date(1997, 7, 31),
             description="test",
             trauma_level="extreme",
+            age_range=(20, 25),
         )
 
 
@@ -172,6 +196,7 @@ def test_valid_trauma_levels():
             end_date=datetime.date(1997, 7, 31),
             description="test",
             trauma_level=level,
+            age_range=(20, 25),
         )
         assert m.trauma_level == level
 
