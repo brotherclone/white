@@ -1,0 +1,11 @@
+title: mock quantum tape label
+date_range: 1990-2000
+recording_quality: sp
+counter_start: 1
+counter_end: 921
+notes: This is a mock quantum tape label for testing purposes.
+original_label_visible: True
+original_label_text: "Quantum Tape Label"
+tape_degradation: 0.4
+tape_brand: "Quantum Tape Brand"
+handwriting_style: mock style

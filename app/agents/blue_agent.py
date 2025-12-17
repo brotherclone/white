@@ -6,6 +6,7 @@ import yaml
 from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
+from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
 from app.agents.states.blue_agent_state import BlueAgentState
@@ -75,7 +76,12 @@ class BlueAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
+        work_flow.add_node("load_biographical_data", self.load_biographical_data)
         # Edges
+        work_flow.add_edge(START, "load_biographical_data")
+        # FAKE
+        work_flow.add_edge("load_biographical_data", "generate_alternate_song_spec")
+        work_flow.add_edge("generate_alternate_song_spec", END)
 
         return work_flow
 

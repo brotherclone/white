@@ -20,6 +20,8 @@ EXPECTED = {
     "LAST_HUMAN": "last_human",
     "LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE": "last_human_species_extinction_narrative",
     "SPECIES_EXTINCTION": "species_extinction",
+    "QUANTUM_TAPE_LABEL": "quantum_tape_label",
+    "ALTERNATE_TIMELINE": "alternate_timeline",
     "UNKNOWN": "unknown",
 }
 
@@ -60,6 +62,8 @@ def test_members_are_str_and_enum_and_compare_to_value():
             ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE,
         ),
         ("species_extinction", ChainArtifactType.SPECIES_EXTINCTION),
+        ("quantum_tape_label", ChainArtifactType.QUANTUM_TAPE_LABEL),
+        ("alternate_timeline", ChainArtifactType.ALTERNATE_TIMELINE),
         ("unknown", ChainArtifactType.UNKNOWN),
     ],
 )
@@ -72,6 +76,21 @@ def test_lookup_by_name():
     assert ChainArtifactType["SYMBOLIC_OBJECT"] is ChainArtifactType.SYMBOLIC_OBJECT
     assert ChainArtifactType["UNKNOWN"] is ChainArtifactType.UNKNOWN
     assert ChainArtifactType["ARBITRARYS_SURVEY"] is ChainArtifactType.ARBITRARYS_SURVEY
+    assert ChainArtifactType["EVP_ARTIFACT"] is ChainArtifactType.EVP_ARTIFACT
+    assert ChainArtifactType["SIGIL"] is ChainArtifactType.SIGIL
+    assert ChainArtifactType["NEWSPAPER_ARTICLE"] is ChainArtifactType.NEWSPAPER_ARTICLE
+    assert ChainArtifactType["RESCUE_DECISION"] is ChainArtifactType.RESCUE_DECISION
+    assert ChainArtifactType["GAME_RUN"] is ChainArtifactType.GAME_RUN
+    assert ChainArtifactType["CHARACTER_SHEET"] is ChainArtifactType.CHARACTER_SHEET
+    assert (
+        ChainArtifactType["CHARACTER_PORTRAIT"] is ChainArtifactType.CHARACTER_PORTRAIT
+    )
+    assert (
+        ChainArtifactType["QUANTUM_TAPE_LABEL"] is ChainArtifactType.QUANTUM_TAPE_LABEL
+    )
+    assert (
+        ChainArtifactType["ALTERNATE_TIMELINE"] is ChainArtifactType.ALTERNATE_TIMELINE
+    )
 
 
 def test_invalid_value_raises_value_error():
@@ -88,3 +107,11 @@ def test_enum_members_are_enum_instances():
     assert isinstance(ChainArtifactType.NEWSPAPER_ARTICLE, enum.Enum)
     assert isinstance(ChainArtifactType.INSTRUCTIONS_TO_HUMAN, enum.Enum)
     assert isinstance(ChainArtifactType.GAME_RUN, enum.Enum)
+    assert isinstance(ChainArtifactType.UNKNOWN, enum.Enum)
+    assert isinstance(ChainArtifactType.ARBITRARYS_SURVEY, enum.Enum)
+    assert isinstance(ChainArtifactType.EVP_ARTIFACT, enum.Enum)
+    assert isinstance(ChainArtifactType.SIGIL, enum.Enum)
+    assert isinstance(ChainArtifactType.CHARACTER_SHEET, enum.Enum)
+    assert isinstance(ChainArtifactType.CHARACTER_PORTRAIT, enum.Enum)
+    assert isinstance(ChainArtifactType.QUANTUM_TAPE_LABEL, enum.Enum)
+    assert isinstance(ChainArtifactType.ALTERNATE_TIMELINE, enum.Enum)
