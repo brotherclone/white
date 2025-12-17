@@ -7,6 +7,7 @@ def test_find_mock_dirs_top_level_only(tmp_path: Path):
     # create top-level dirs
     (tmp_path / "mock_one").mkdir()
     (tmp_path / "AnotherMock").mkdir()
+    (tmp_path / "UNKNOWN_THREAD_ID").mkdir()
     (tmp_path / "unrelated").mkdir()
 
     # nested mock should not be discovered because find_mock_dirs only inspects top-level
@@ -16,7 +17,7 @@ def test_find_mock_dirs_top_level_only(tmp_path: Path):
 
     results = find_mock_dirs(tmp_path)
     names = sorted(p.name for p in results)
-    assert names == ["AnotherMock", "mock_one"]
+    assert names == ["AnotherMock", "UNKNOWN_THREAD_ID", "mock_one"]
 
 
 def test_delete_paths_handles_files_dirs_and_symlinks(tmp_path: Path):
@@ -64,5 +65,20 @@ def test_main_dry_run_and_force_delete(tmp_path: Path):
     rc2 = main(["--base", str(base), "-y"])  # -y to skip prompt
     assert rc2 == 0
     assert not mock_dir.exists()
+    # ensure non-mock dir remains
+    assert (base / "keep_dir").exists()
+
+
+def test_main_deletes_unknown_thread_id(tmp_path: Path):
+    base = tmp_path / "chain_artifacts"
+    base.mkdir()
+    (base / "keep_dir").mkdir()
+    unknown_thread_dir = base / "UNKNOWN_THREAD_ID"
+    unknown_thread_dir.mkdir()
+
+    # forced delete should remove UNKNOWN_THREAD_ID dir
+    rc = main(["--base", str(base), "-y"])
+    assert rc == 0
+    assert not unknown_thread_dir.exists()
     # ensure non-mock dir remains
     assert (base / "keep_dir").exists()
