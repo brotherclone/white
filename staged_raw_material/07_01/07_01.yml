@@ -1,0 +1,151 @@
+bpm: 131
+manifest_id: '07_01'
+tempo: 4/4
+key: E minor
+rainbow_color: I
+title: As Pop Omniscience
+release_date: '2024-06-04'
+album_sequence: 1
+main_audio_file: 07_01_main.wav
+TRT: '[03:40.007]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:29.019]'
+    description: Erie clavinet and a creepy vocal start the song.
+  - section_name: Chorus 1
+    start_time: '[00:29.020]'
+    end_time: '[00:59.002]'
+    description: A driving, pulsating beat with gloomy vocoded backup vocals align to the alien subject matter.
+  - section_name: Verse 2
+    start_time: '[00:59.003]'
+    end_time: '[01:13.018]'
+    description: The vocals return to the verse narrating as the alien surveyors
+  - section_name: Abushnu, you’re breaking up
+    start_time: '[01:13.019]'
+    end_time: '[01:43.001]'
+    description: A broken Zoom call? Or resurrection ray?
+  - section_name: Chorus 2
+    start_time: '[01:43.002]'
+    end_time: '[02:12.009]'
+    description: The chorus returns
+  - section_name: Verse 3
+    start_time: '[02:12.010]'
+    end_time: '[02:41.016]'
+    description: The verse returns with more narrative
+  - section_name: Check for dream state, baby.
+    start_time: '[02:41.017]'
+    end_time: '[02:47.004]'
+    description: A brief interlude - see if those humans are dreaming
+  - section_name: Chorus 3
+    start_time: '[02:47.005]'
+    end_time: '[03:31.003]'
+    description: During the final chorus the tone becomes more hypnotic and apocalyptic with the vocals reach new heights.
+  - section_name: Fallout
+    start_time: '[03:31.004]'
+    end_time: '[03:38.011]'
+    description: The instruments resonate although the song has stopped.
+  - section_name: A very special announcement
+    start_time: '[03:38.012]'
+    end_time: '[03:40.007]'
+    description: The song ends our first encoded infranym - a steganographic sound that hides a message in the audio.
+concept: Aliens detect human kind and by the time they pay a visit we've blown ourselves up. The aliens reflect on our art and culture, trying to understand us through the wasteland we left behind. Perhaps they will keep us as pets?
+lrc_file: 07_01.lrc
+sounds_like:
+  - name: The Momes
+    discogs_id: 1416914
+  - name: David Bowie
+    discogs_id: 10263
+  - name: Tears for Fears
+    discogs_id: 19814
+mood:
+  - terrifying
+  - nightmarish
+  - sci-fi
+  - dreamy
+  - apocalyptic
+genres:
+    - art pop
+    - experimental
+    - art rock
+    - post-rock
+    - industrial rock
+    - psychedelic rock
+audio_tracks:
+  - id: 2
+    description: Drum kit
+    audio_file: 07_01_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_01_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_01_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-Hat
+    audio_file: 07_01_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 07_01_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Drum machine
+    audio_file: 07_01_07_drum_machine.wav
+  - id: 8
+    description: SEM Synth Bass
+    audio_file: 07_01_08_synth_bass.wav
+    midi_file: 07_01_13_synth_bass.mid
+  - id: 9
+    description: Electric Bass
+    audio_file: 07_01_09_bass.wav
+  - id: 10
+    description: Vocal A
+    audio_file: 07_01_10_vox_a.wav
+  - id: 11
+    description: Vocal B
+    audio_file: 07_01_11_vox_b.wav
+  - id: 12
+    description: Background Vocal Array
+    audio_file: 07_01_12_vox_bg.wav
+  - id: 13
+    description: Clavinet
+    audio_file: 07_01_15_clav.wav
+    midi_file: 07_01_14_clav.mid
+    group: Clavinet
+  - id: 14
+    description: Clavinet through Modular
+    audio_file: 07_01_16_clav_to_desk.wav
+    group: Clavinet
+  - id: 15
+    description: Clavinet to Rainbow Machine Pedal
+    audio_file: 07_01_17_clav_to_sludge.wav
+    group: Clavinet
+  - id: 16
+    description: Electric Guitar
+    audio_file: 07_01_18_electric_guitar.wav
+  - id: 17
+    description: Abushnu's Zoom Call
+    audio_file: 07_01_19_breaking_up.wav
+  - id: 18
+    description: Lap steel through Grazer pedal
+    audio_file: 07_01_20_lap_steel_grazer.wav
+    group: Lap steel
+  - id: 19
+    description: Lap steel through Lossy pedal
+    audio_file: 07_01_21_lap_steel_lossy.wav
+    group: Lap steel
+  - id: 20
+    description: Wire radio and testing gear array
+    audio_file: 07_01_22_wire_noise.wav
+

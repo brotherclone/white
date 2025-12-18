@@ -23,6 +23,7 @@ class BlueAgentState(BaseRainbowAgentState):
     tape_label: Optional[QuantumTapeLabelArtifact] = None
     musical_params: Optional[QuantumTapeMusicalParameters] = None
     iteration_count: int = 0
+    max_iterations: int = 3
     biographical_data: Optional[Dict[str, Any]] = Field(
         default_factory=dict,
         description="Container for biographical data in agent state",

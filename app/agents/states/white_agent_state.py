@@ -37,4 +37,5 @@ class MainAgentState(BaseModel):
         "resume_instructions": "How to resume after completion"
     }
     """
+    # ToDo: Add current synthesis for another proposal re-write
     model_config = ConfigDict(arbitrary_types_allowed=True)

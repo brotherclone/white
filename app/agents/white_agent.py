@@ -126,6 +126,7 @@ class WhiteAgent(BaseModel):
     def build_workflow(self) -> CompiledStateGraph:
         check_points = InMemorySaver()
         workflow = StateGraph(MainAgentState)
+        # ToDo: Add re-write Nodes and Edges from synthesis
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
         workflow.add_node("invoke_black_agent", self.invoke_black_agent)
         workflow.add_node("process_black_agent_work", self.process_black_agent_work)
