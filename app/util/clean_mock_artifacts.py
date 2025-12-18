@@ -7,7 +7,7 @@ Usage examples:
 
 Features:
 - Defaults to <repo_root>/chain_artifacts
-- Matches directory names that contain 'mock' (case-insensitive)
+- Matches directory names that contain 'mock' (case-insensitive) or are named 'UNKNOWN_THREAD_ID'
 - Supports --dry-run to list candidates without deleting
 - Requires interactive confirmation unless --yes is provided
 - Safe deletion with exception handling and summary
@@ -23,14 +23,16 @@ from typing import List
 
 
 def find_mock_dirs(base_dir: Path) -> List[Path]:
-    """Return a list of directories under base_dir whose name contains 'mock' (case-insensitive)."""
+    """Return a list of directories under base_dir whose name contains 'mock' (case-insensitive) or is 'UNKNOWN_THREAD_ID'."""
     if not base_dir.exists():
         return []
     results: List[Path] = []
     for entry in base_dir.iterdir():
         # only top-level entries (folders) are considered
         try:
-            if entry.is_dir() and "mock" in entry.name.lower():
+            if entry.is_dir() and (
+                "mock" in entry.name.lower() or entry.name == "UNKNOWN_THREAD_ID"
+            ):
                 results.append(entry)
         except OSError:
             # skip entries we can't stat
@@ -64,7 +66,7 @@ def delete_paths(paths: List[Path], verbose: bool = False) -> int:
 
 def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Delete directories in <repo_root>/chain_artifacts whose names contain 'mock'",
+        description="Delete directories in <repo_root>/chain_artifacts whose names contain 'mock' or are named 'UNKNOWN_THREAD_ID'",
     )
     p.add_argument(
         "--base",

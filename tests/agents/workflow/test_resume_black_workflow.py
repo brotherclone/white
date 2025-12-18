@@ -40,6 +40,21 @@ def test_check_todoist_tasks_complete_error(monkeypatch):
     assert rbw.check_todoist_tasks_complete(tasks) is False
 
 
+def test_check_todoist_tasks_complete_mock_mode(monkeypatch):
+    """Test that mock tasks are skipped when MOCK_MODE is enabled"""
+    # Set MOCK_MODE environment variable
+    monkeypatch.setenv("MOCK_MODE", "true")
+
+    # Mock tasks should be skipped, so no API calls should be made
+    tasks = [
+        {"task_id": "mock_task_123"},
+        {"task_id": "mock_another_task"},
+    ]
+
+    # Should return True because all mock tasks are skipped in MOCK_MODE
+    assert rbw.check_todoist_tasks_complete(tasks) is True
+
+
 def test_update_sigil_state_to_charged():
     class Artifact:
         def __init__(self, _type, activation_state, wish=None):
