@@ -3,6 +3,9 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 
+# ToDo: Add for_prompt() tests
+# ToDo: Skimpy!
+
 
 def test_sigil_artifact():
     """Test basic SigilArtifact creation"""

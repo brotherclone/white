@@ -1,3 +1,4 @@
+from abc import ABC
 from pathlib import Path
 from typing import List, Optional
 
@@ -11,8 +12,10 @@ from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 
 
-class SigilArtifact(ChainArtifact):
+class SigilArtifact(ChainArtifact, ABC):
     """Record of a created sigil for the Black Agent's paranoid tracking"""
+
+    # ToDo: Needs a for_prompt() method
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.SIGIL
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML

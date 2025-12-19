@@ -78,6 +78,10 @@ class ChainArtifact(BaseModel, ABC):
     def flatten(self):
         pass
 
+    @abstractmethod
+    def for_prompt(self):
+        pass
+
     def get_file_name(self):
         if self.rainbow_color_mnemonic_character_value is None:
             col = "T"

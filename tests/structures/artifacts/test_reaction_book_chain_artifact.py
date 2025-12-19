@@ -5,6 +5,9 @@ from app.structures.enums.book_condition import BookCondition
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.publisher_type import PublisherType
 
+# ToDo: Add for_prompt() tests
+# ToDo: Skimpy!
+
 
 def test_reaction_book_chain_artifact():
     """Test basic ReactionBookChainArtifact creation"""

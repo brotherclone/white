@@ -125,3 +125,52 @@ def test_reaction_book_artifact_enum_values():
     flattened = book.flatten()
     assert flattened["publisher_type"] == "government"
     assert flattened["condition"] == "fragmentary"
+
+
+def test_for_prompt_returns_string_and_contains_key_fields():
+    book = ReactionBookChainArtifact(
+        thread_id="test-thread",
+        title="Prompt Test",
+        author="Prompt Author",
+        year=2024,
+        publisher="Prompt Pub",
+        publisher_type=PublisherType.VANITY,
+        pages=123,
+        catalog_number="PROMPT-001",
+        condition=BookCondition.GOOD,
+        danger_level=1,
+        original_book_title="Orig",
+        original_book_author="Orig Author",
+    )
+
+    output = book.for_prompt()
+    assert isinstance(output, str)
+    assert "Prompt Test" in output
+    assert "Prompt Author" in output
+    # file path should be included
+    assert book.get_artifact_path(with_file_name=True) in output
+
+
+def test_for_prompt_includes_optional_fields_when_present():
+    book = ReactionBookChainArtifact(
+        thread_id="test-thread",
+        title="Optional Fields Test",
+        subtitle="A Subtitle",
+        author="Optional Author",
+        year=2020,
+        publisher="Opt Pub",
+        publisher_type=PublisherType.SAMIZDAT,
+        pages=200,
+        catalog_number="OPT-001",
+        condition=BookCondition.WORN,
+        danger_level=2,
+        abstract="This is an abstract.",
+        notable_quote="A notable line.",
+        original_book_title="Orig",
+        original_book_author="Orig Author",
+    )
+
+    output = book.for_prompt()
+    assert "A Subtitle" in output
+    assert "This is an abstract." in output
+    assert "A notable line." in output

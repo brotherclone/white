@@ -24,14 +24,31 @@ class RescueDecisionArtifact(ChainArtifact, ABC):
     The Arbitrary's decision: one rescued, all others documented.
     """
 
-    chain_artifact_type: ChainArtifactType = ChainArtifactType.RESCUE_DECISION
-    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
-    rainbow_color_mnemonic_character_value: str = "G"
-    artifact_name: str = "rescue_decision"
+    chain_artifact_type: ChainArtifactType = Field(
+        default=ChainArtifactType.RESCUE_DECISION,
+        description="Compatibility string identifier for Arbitrary's rescue decision artifact",
+    )
+    chain_artifact_file_type: ChainArtifactFileType = Field(
+        default=ChainArtifactFileType.YML,
+        description="File format of the artifact: YAML",
+    )
+    rainbow_color_mnemonic_character_value: str = Field(
+        default="G", description="Mnemonic character for rainbow color coding: G always"
+    )
+    artifact_name: str = Field(
+        default="rescue_decision",
+        description="Artifact file name base: rescue_decision",
+    )
 
-    rescued_consciousness: ArbitrarysSurveyArtifact
-    documented_humans: List[LastHumanArtifact]
-    documented_species: List[SpeciesExtinctionArtifact]
+    rescued_consciousness: ArbitrarysSurveyArtifact = Field(
+        ..., description="The rescued consciousness"
+    )
+    documented_humans: List[LastHumanArtifact] = Field(
+        default_factory=list, description="The documented humans"
+    )
+    documented_species: List[SpeciesExtinctionArtifact] = Field(
+        default_factory=list, description="The documented species"
+    )
 
     rescue_justification: str = Field(
         default="Information-substrate compatibility allows ship integration. "
@@ -73,6 +90,21 @@ class RescueDecisionArtifact(ChainArtifact, ABC):
                 allow_unicode=True,
             )
 
+    def for_prompt(self) -> str:
+        """Format rescue decision for prompt - focuses on choice and reasoning."""
+        parts = [
+            "## The Arbitrary's Decision",
+            f"Rescued: {self.rescued_consciousness.identity}",
+            f"Documented (not rescued): {len(self.documented_humans)} humans, {len(self.documented_species)} species",
+            "\n## Justification",
+            self.rescue_justification,
+            "\n## Rationale",
+            self.rationale,
+            "\n## The Mind's Reflection",
+            self.arbitrary_perspective,
+        ]
+        return "\n".join(parts)
+
 
 if __name__ == "__main__":
     with open(
@@ -88,3 +120,5 @@ if __name__ == "__main__":
         print(claudes_choice)
         claudes_choice.save_file()
         print(claudes_choice.flatten())
+        p = claudes_choice.for_prompt()
+        print(p)

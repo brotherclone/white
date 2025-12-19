@@ -326,3 +326,109 @@ def test_exactly_5_details_passes():
 
     assert isinstance(m, AlternateTimelineArtifact)
     assert len(m.specific_details) == 5
+
+
+# python
+def test_for_prompt_event_bullets_align():
+    divergence = DivergencePoint(
+        when="After graduating college in 1997",
+        what_changed="Took the Greyhound to Portland instead of returning to NJ",
+        why_plausible="Had been offered a job at Powell's Books",
+    )
+
+    period = BiographicalPeriod(
+        start_date=datetime.date(1997, 6, 1),
+        end_date=datetime.date(1998, 8, 31),
+        description="Working at Powell's Books in Portland",
+        age_range=(20, 25),
+    )
+
+    m = AlternateTimelineArtifact(
+        period=period,
+        title="Alignment Test",
+        narrative=create_valid_narrative(),
+        divergence_point=divergence,
+        key_differences=["Living in Portland", "Working at bookstore"],
+        specific_details=create_valid_details(),
+        emotional_tone=QuantumTapeEmotionalTone.NOSTALGIC,
+        mood_description="Wistful",
+        preceding_events=["Graduated college", "Moved out of dorm"],
+        following_events=["Returned to NJ"],
+    )
+
+    output = m.for_prompt()
+    lines = output.splitlines()
+
+    event_lines = [ln for ln in lines if "⍿" in ln]
+    assert len(event_lines) == 3  # two preceding + one following
+
+    # All event lines should have the same leading-space count (aligned)
+    leading_space_counts = [len(ln) - len(ln.lstrip(" ")) for ln in event_lines]
+    assert len(set(leading_space_counts)) == 1
+
+    # Ensure specific text from inputs appears with the event bullet
+    assert any("⍿ Graduated college" in ln for ln in event_lines)
+    assert any("⍿ Returned to NJ" in ln for ln in event_lines)
+
+
+def test_for_prompt_renders_alternate_life_detail_detail_field():
+    divergence = DivergencePoint(when="test", what_changed="test", why_plausible="test")
+    period = BiographicalPeriod(
+        start_date=datetime.date(1997, 6, 1),
+        end_date=datetime.date(1998, 8, 31),
+        description="test",
+        age_range=(20, 25),
+    )
+
+    detail_obj = AlternateLifeDetail(
+        category="creative",
+        detail="Unique detail text for rendering",
+        sensory_elements=["scent"],
+    )
+
+    m = AlternateTimelineArtifact(
+        period=period,
+        title="Detail Render Test",
+        narrative=create_valid_narrative(),
+        divergence_point=divergence,
+        key_differences=["KD"],
+        specific_details=[detail_obj, detail_obj, detail_obj, detail_obj, detail_obj],
+        emotional_tone=QuantumTapeEmotionalTone.MELANCHOLY,
+        mood_description="test",
+        preceding_events=[],
+        following_events=[],
+    )
+
+    output = m.for_prompt()
+    assert "Unique detail text for rendering" in output
+    detail_line = next(
+        (ln for ln in output.splitlines() if "Unique detail text for rendering" in ln),
+        None,
+    )
+    assert detail_line is not None
+    assert detail_line.lstrip().startswith("✧")
+
+
+def test_format_items_empty_returns_empty_string():
+    divergence = DivergencePoint(when="test", what_changed="test", why_plausible="test")
+    period = BiographicalPeriod(
+        start_date=datetime.date(1997, 6, 1),
+        end_date=datetime.date(1998, 8, 31),
+        description="test",
+        age_range=(20, 25),
+    )
+
+    m = AlternateTimelineArtifact(
+        period=period,
+        title="Empty Format Test",
+        narrative=create_valid_narrative(),
+        divergence_point=divergence,
+        key_differences=["KD"],
+        specific_details=create_valid_details(),
+        emotional_tone=QuantumTapeEmotionalTone.MELANCHOLY,
+        mood_description="test",
+        preceding_events=[],
+        following_events=[],
+    )
+
+    assert m._format_items([], "⍿") == ""

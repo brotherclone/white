@@ -1,6 +1,9 @@
 from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
 from app.structures.enums.symbolic_object_category import SymbolicObjectCategory
 
+# ToDo: Add for_prompt() tests
+# ToDo: Skimpy!
+
 
 def test_symbolic_object_defaults():
     artifact = SymbolicObjectArtifact(thread_id="thread-1")

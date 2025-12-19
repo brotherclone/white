@@ -8,6 +8,8 @@ from app.structures.enums.quantum_tape_recording_quality import (
     QuantumTapeRecordingQuality,
 )
 
+# ToDo: Add for_prompt() tests
+
 
 def test_create_valid_model():
     m = QuantumTapeLabelArtifact(
@@ -179,8 +181,6 @@ def test_tape_degradation_validation():
         tape_degradation=1.0,
     )
     assert m2.tape_degradation == 1.0
-
-    # Invalid: too low
     with pytest.raises(ValidationError):
         QuantumTapeLabelArtifact(
             title="test",
@@ -189,8 +189,6 @@ def test_tape_degradation_validation():
             counter_start=0,
             tape_degradation=-0.1,
         )
-
-    # Invalid: too high
     with pytest.raises(ValidationError):
         QuantumTapeLabelArtifact(
             title="test",

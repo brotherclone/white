@@ -17,6 +17,8 @@ from app.structures.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
 )
 
+# ToDo: Add for_prompt() tests
+
 
 class ConcreteSpeciesExtinctionArtifact(SpeciesExtinctionArtifact):
     """Concrete implementation for testing"""

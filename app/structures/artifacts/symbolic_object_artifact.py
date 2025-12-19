@@ -1,4 +1,6 @@
 import os
+from abc import ABC
+
 import yaml
 from pathlib import Path
 from typing import Optional
@@ -13,8 +15,10 @@ from app.structures.enums.symbolic_object_category import SymbolicObjectCategory
 load_dotenv()
 
 
-class SymbolicObjectArtifact(ChainArtifact):
+class SymbolicObjectArtifact(ChainArtifact, ABC):
     """Symbolic object that has emerged from the nostalgia of Rows Bud, the orange agent"""
+
+    # ToDo: Needs a for_prompt() method
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.SYMBOLIC_OBJECT
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML

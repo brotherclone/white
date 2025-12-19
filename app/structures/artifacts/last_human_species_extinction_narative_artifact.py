@@ -118,7 +118,6 @@ class LastHumanSpeciesExtinctionNarrativeArtifact(ChainArtifact, ABC):
                 md += f"*Connection: {moment.thematic_connection}*\n"
 
         md += f"\n## Elegiac Quality\n{self.elegiac_quality}\n"
-
         return md
 
     def save_file(self):
@@ -152,6 +151,40 @@ class LastHumanSpeciesExtinctionNarrativeArtifact(ChainArtifact, ABC):
         with file_path.open("w", encoding="utf-8") as f:
             f.write(self.to_markdown())
 
+    def for_prompt(self) -> str:
+        """Format for prompt - includes the actual narrative for rebracketing."""
+        parts = [
+            f"# {self.species.common_name} / {self.human.name}",
+            f"\nOpening: {self.opening_image}",
+            f"\n## Species Arc\n{self.species_arc}",
+            f"\n## Human Arc\n{self.human_arc}",
+        ]
+        if self.parallel_moments:
+            parts.append(
+                f"\n## Parallel Moments ({len(self.parallel_moments)} key intersections)"
+            )
+            if len(self.parallel_moments) <= 3:
+                for moment in self.parallel_moments:
+                    parts.append(f"\n{moment.timestamp_relative}:")
+                    parts.append(f"  Species: {moment.species_moment}")
+                    parts.append(f"  Human: {moment.human_moment}")
+                    parts.append(f"  Connection: {moment.thematic_connection}")
+            else:
+                first = self.parallel_moments[0]
+                parts.append(f"\nFirst: {first.timestamp_relative}")
+                parts.append(f"  {first.thematic_connection}")
+                last = self.parallel_moments[-1]
+                parts.append(f"\nFinal: {last.timestamp_relative}")
+                parts.append(f"  {last.thematic_connection}")
+                parts.append(
+                    f"\n(+ {len(self.parallel_moments) - 2} intermediate moments)"
+                )
+        parts.append(f"\n## Elegiac Quality\n{self.elegiac_quality}")
+        parts.append(f"\nClosing: {self.closing_image}")
+        if self.emotional_curve:
+            parts.append(f"\nEmotional trajectory: {' → '.join(self.emotional_curve)}")
+        return "\n".join(parts)
+
 
 if __name__ == "__main__":
     with open(
@@ -169,3 +202,5 @@ if __name__ == "__main__":
         print(last_human_narrative_artifact)
         last_human_narrative_artifact.save_file()
         print(last_human_narrative_artifact.flatten())
+        p = last_human_narrative_artifact.for_prompt()
+        print(p)
