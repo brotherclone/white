@@ -119,14 +119,18 @@ class WhiteAgent(BaseModel):
             if updated_state.ready_for_blue:
                 updated_state = self.invoke_blue_agent(updated_state)
                 updated_state = self.process_blue_agent_work(updated_state)
-                # ToDo: Add indigo when ready
+            if updated_state.ready_for_indigo:
+                updated_state = self.invoke_indigo_agent(updated_state)
+                updated_state = self.process_indigo_agent_work(updated_state)
+            if updated_state.ready_for_violet:
+                updated_state = self.invoke_violet_agent(updated_state)
+                updated_state = self.process_violet_agent_work(updated_state)
         updated_state = self.finalize_song_proposal(updated_state)
         return updated_state
 
     def build_workflow(self) -> CompiledStateGraph:
         check_points = InMemorySaver()
         workflow = StateGraph(MainAgentState)
-        # ToDo: Add re-write Nodes and Edges from synthesis
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
         workflow.add_node("invoke_black_agent", self.invoke_black_agent)
         workflow.add_node("process_black_agent_work", self.process_black_agent_work)
@@ -140,66 +144,60 @@ class WhiteAgent(BaseModel):
         workflow.add_node("process_green_agent_work", self.process_green_agent_work)
         workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
         workflow.add_node("process_blue_agent_work", self.process_blue_agent_work)
-
-        # workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
-        # workflow.add_node("invoke_violet_agent", self.invoke_violet_agent)
+        workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
+        workflow.add_node("process_indigo_agent_work", self.process_indigo_agent_work)
+        workflow.add_node("invoke_violet_agent", self.invoke_violet_agent)
+        workflow.add_node("process_violet_agent_work", self.process_violet_agent_work)
+        workflow.add_node(
+            "rewrite_proposal_with_synthesis", self.rewrite_proposal_with_synthesis
+        )
         workflow.add_node("finalize_song_proposal", self.finalize_song_proposal)
         workflow.add_edge(START, "initiate_song_proposal")
         workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
+        workflow.add_edge("process_black_agent_work", "rewrite_proposal_with_synthesis")
         workflow.add_edge("invoke_red_agent", "process_red_agent_work")
+        workflow.add_edge("process_red_agent_work", "rewrite_proposal_with_synthesis")
         workflow.add_edge("invoke_orange_agent", "process_orange_agent_work")
+        workflow.add_edge(
+            "process_orange_agent_work", "rewrite_proposal_with_synthesis"
+        )
         workflow.add_edge("invoke_yellow_agent", "process_yellow_agent_work")
+        workflow.add_edge(
+            "process_yellow_agent_work", "rewrite_proposal_with_synthesis"
+        )
         workflow.add_edge("invoke_green_agent", "process_green_agent_work")
+        workflow.add_edge("process_green_agent_work", "rewrite_proposal_with_synthesis")
         workflow.add_edge("invoke_blue_agent", "process_blue_agent_work")
+        workflow.add_edge("process_blue_agent_work", "rewrite_proposal_with_synthesis")
+        workflow.add_edge("invoke_indigo_agent", "process_indigo_agent_work")
+        workflow.add_edge(
+            "process_indigo_agent_work", "rewrite_proposal_with_synthesis"
+        )
+        workflow.add_edge("invoke_violet_agent", "process_violet_agent_work")
+        workflow.add_edge(
+            "process_violet_agent_work", "rewrite_proposal_with_synthesis"
+        )
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
+            {"red": "rewrite_proposal_with_synthesis", "black": "invoke_black_agent"},
+        )
+        workflow.add_conditional_edges(
+            "rewrite_proposal_with_synthesis",
+            self.route_after_rewrite,
             {
-                "red": "invoke_red_agent",
                 "black": "invoke_black_agent",
-                "finish": "finalize_song_proposal",
-            },
-        )
-        workflow.add_conditional_edges(
-            "process_red_agent_work",
-            self.route_after_red,
-            {
                 "red": "invoke_red_agent",
                 "orange": "invoke_orange_agent",
-                "finish": "finalize_song_proposal",
-            },
-        )
-        workflow.add_conditional_edges(
-            "process_orange_agent_work",
-            self.route_after_orange,
-            {
-                "orange": "invoke_orange_agent",
                 "yellow": "invoke_yellow_agent",
-                "finish": "finalize_song_proposal",
-            },
-        )
-        workflow.add_conditional_edges(
-            "process_yellow_agent_work",
-            self.route_after_yellow,
-            {
-                "yellow": "invoke_yellow_agent",
-                "green": "invoke_green_agent",
-                "finish": "finalize_song_proposal",
-            },
-        )
-        workflow.add_conditional_edges(
-            "process_green_agent_work",
-            self.route_after_green,
-            {
                 "green": "invoke_green_agent",
                 "blue": "invoke_blue_agent",
+                "indigo": "invoke_indigo_agent",
+                "violet": "invoke_violet_agent",
                 "finish": "finalize_song_proposal",
             },
         )
-        # Last agent, remember to update
-        workflow.add_edge("process_blue_agent_work", "finalize_song_proposal")
-        #
         workflow.add_edge("finalize_song_proposal", END)
         return workflow.compile(checkpointer=check_points)
 
@@ -272,6 +270,20 @@ class WhiteAgent(BaseModel):
             self.agents["blue"] = BlueAgent(settings=self.settings)
         return self.agents["blue"](state)
 
+    def invoke_indigo_agent(self, state: MainAgentState) -> MainAgentState:
+        """Invoke Indigo Agent with the synthesized proposal"""
+        logging.info("📣  🩵  Calling upon Decider Tangents 🩵  📣")
+        if "indigo" not in self.agents:
+            self.agents["indigo"] = IndigoAgent(settings=self.settings)
+        return self.agents["indigo"](state)
+
+    def invoke_violet_agent(self, state: MainAgentState) -> MainAgentState:
+        """Invoke Violet Agent with the synthesized proposal"""
+        logging.info("📣  🟣  Calling upon The Sultan of Solipsism  🟣  📣")
+        if "violet" not in self.agents:
+            self.agents["violet"] = VioletAgent(settings=self.settings)
+        return self.agents["violet"](state)
+
     # 📣⚫📣🔴📣🟠📣🟡📣🟢📣🔵📣🩵📣🟣📣#
 
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
@@ -343,6 +355,54 @@ class WhiteAgent(BaseModel):
         sp = self._normalize_song_proposal(state.song_proposals)
         sp.iterations.append(initial_proposal)
         state.song_proposals = sp
+        return state
+
+    def rewrite_proposal_with_synthesis(self, state: MainAgentState) -> MainAgentState:
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            try:
+                # ToDo: Name and new mocks
+                # ToDo: add state.song_proposals = SongProposal(iterations=[])
+
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/white_initial_proposal__mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    proposal = SongProposalIteration(**data)
+                    if (
+                        not hasattr(state, "song_proposals")
+                        or state.song_proposals is None
+                    ):
+                        pass
+                        # ToDo: ?
+            except Exception as e:
+                logging.info(
+                    f"Mock initial proposal not found, returning stub SongProposalIteration:{e!s}"
+                )
+            return state
+        else:
+            prompt = """
+            """
+            claude = self._get_claude_supervisor()
+            proposer = claude.with_structured_output(SongProposalIteration)
+        try:
+            rewrite_proposal = proposer.invoke(prompt)
+            if isinstance(rewrite_proposal, dict):
+                rewrite_proposal = SongProposalIteration(**rewrite_proposal)
+            if not isinstance(rewrite_proposal, SongProposalIteration):
+                error_msg = (
+                    f"Expected SongProposalIteration, got {type(rewrite_proposal)}"
+                )
+                if block_mode:
+                    raise TypeError(error_msg)
+                logging.warning(error_msg)
+        except Exception as e:
+            logging.info(f"Anthropic model call failed: {e!s}.")
+            if block_mode:
+                raise Exception("Anthropic model call failed")
+
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -581,9 +641,169 @@ class WhiteAgent(BaseModel):
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_blue_document_synthesis.md",
         )
         state.ready_for_blue = False
-        # Remember to update
-        # state.ready_for_indigo = True
+        state.ready_for_indigo = True
         return state
+
+    def process_indigo_agent_work(self, state: MainAgentState) -> MainAgentState:
+        logging.info("Processing Indigo Agent work... ")
+        sp = self._normalize_song_proposal(state.song_proposals)
+        indigo_proposal = sp.iterations[-1]
+        indigo_artifacts = state.artifacts or []
+        midi_artifacts = [
+            m
+            for m in indigo_artifacts
+            if m.chain_artifact_type == ChainArtifactType.INFRANYM_MIDI
+        ]
+        audio_artifacts = [
+            a
+            for a in indigo_artifacts
+            if a.chain_artifact_type == ChainArtifactType.INFRANYM_AUDIO
+        ]
+        image_artifacts = [
+            i
+            for i in indigo_artifacts
+            if i.chain_artifact_type == ChainArtifactType.INFRANYM_IMAGE
+        ]
+        text_artifacts = [
+            t
+            for t in indigo_artifacts
+            if t.chain_artifact_type == ChainArtifactType.INFRANYM_TEXT
+        ]
+        indigo_merged_artifacts = (
+            midi_artifacts + audio_artifacts + image_artifacts + text_artifacts
+        )
+        rebracketing_analysis = self._indigo_rebracketing_analysis(
+            indigo_proposal,
+            midi_artifacts,
+            audio_artifacts,
+            image_artifacts,
+            text_artifacts,
+        )
+        document_synthesis = self._synthesize_document_for_violet(
+            rebracketing_analysis, indigo_proposal, indigo_merged_artifacts
+        )
+        state.rebracketing_analysis = rebracketing_analysis
+        save_markdown(
+            state.rebracketing_analysis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_indigo_rebracketing_analysis.md",
+        )
+        state.document_synthesis = document_synthesis
+        save_markdown(
+            state.document_synthesis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_indigo_document_synthesis.md",
+        )
+        state.ready_for_indigo = False
+        state.ready_for_violet = True
+        return state
+
+    def process_violet_agent_work(self, state: MainAgentState) -> MainAgentState:
+        logging.info("Processing Violet Agent work... ")
+        sp = self._normalize_song_proposal(state.song_proposals)
+        violet_proposal = sp.iterations[-1]
+        violet_artifacts = state.artifacts or []
+        interview_artifacts = [
+            i
+            for i in violet_artifacts
+            if i.chain_artifact_type == ChainArtifactType.CIRCLE_JERK_INTERVIEW
+        ]
+        rebracketing_analysis = self._violet_rebracketing_analysis(
+            violet_proposal, interview_artifacts
+        )
+        document_synthesis = self._synthesize_document_for_final_pass(
+            rebracketing_analysis, violet_proposal, interview_artifacts
+        )
+        state.rebracketing_analysis = rebracketing_analysis
+        save_markdown(
+            state.rebracketing_analysis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_violet_rebracketing_analysis.md",
+        )
+        state.document_synthesis = document_synthesis
+        save_markdown(
+            state.document_synthesis,
+            f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_violet_document_synthesis.md",
+        )
+        state.ready_for_violet = False
+        state.ready_for_white = True
+        return state
+
+    def _violet_rebracketing_analysis(self, proposal, interview_artifacts) -> str:
+        logging.info("Processing Violet Agent rebracketing analysis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        prompt = ""
+        if mock_mode:
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/violet_to_white_rebracket_analysis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
+        else:
+            # ToDo: Fill in prompt
+            prompt = f"""
+    **Counter-proposal:**
+    {proposal}
+    {interview_artifacts[-1].artifact_report if interview_artifacts else "None"}
+                """
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Violet rebracketing LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Violet rebracketing unavailable"
+
+    def _indigo_rebracketing_analysis(
+        self, proposal, midi_artifacts, audio_artifacts, image_artifacts, text_artifacts
+    ) -> str:
+        logging.info("Processing Indigo Agent rebracketing analysis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        prompt = ""
+        if mock_mode:
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/indigo_to_white_rebracket_analysis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
+        else:
+            # ToDo: Fill in prompt
+            prompt = f"""
+    **Counter-proposal:**
+    {proposal}
+    {midi_artifacts[-1].artifact_report if midi_artifacts else "None"}
+    {audio_artifacts[-1].artifact_report if audio_artifacts else "None"}
+    {image_artifacts[-1].artifact_report if midi_artifacts else "None"}
+    {text_artifacts[-1].artifact_report if text_artifacts else "None"}
+                """
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Indigo rebracketing LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Indigo rebracketing unavailable"
 
     def _blue_rebracketing_analysis(
         self,
@@ -905,6 +1125,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
             prompt = f"""
 You are the White Agent performing a REBRACKETING operation.
 
@@ -965,6 +1186,8 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
+
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Light Reader, Red Agent.
 
@@ -1022,6 +1245,8 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
+
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Rows Bud, Orange Agent.
 
@@ -1079,6 +1304,8 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
+
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Lord Pulsimore, Yellow Agent.
 
@@ -1136,6 +1363,8 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
+
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for Sub-Arbitrary, the Green Agent.
 
@@ -1193,6 +1422,8 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
+
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Print Thru, Blue Agent.
 
@@ -1250,6 +1481,8 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
+
             # ToDo: Fill in prompt
             prompt = f"""
 **Your Rebracketed Analysis:**
@@ -1300,44 +1533,9 @@ Structure your synthesis as a clear creative brief.
             return "black"
 
     @staticmethod
-    def route_after_red(state: MainAgentState) -> str:
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        if mock_mode:
-            return "orange"
-        if state.ready_for_orange:
-            return "orange"
-        else:
-            return "red"
-
-    @staticmethod
-    def route_after_orange(state: MainAgentState) -> str:
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        if mock_mode:
-            return "yellow"
-        if state.ready_for_yellow:
-            return "yellow"
-        else:
-            return "orange"
-
-    @staticmethod
-    def route_after_yellow(state: MainAgentState) -> str:
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        if mock_mode:
-            return "green"
-        if state.ready_for_green:
-            return "green"
-        else:
-            return "yellow"
-
-    @staticmethod
-    def route_after_green(state: MainAgentState) -> str:
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        if mock_mode:
-            return "blue"
-        if state.ready_for_blue:
-            return "blue"
-        else:
-            return "green"
+    def route_after_rewrite(state: MainAgentState) -> str:
+        # ToDo
+        pass
 
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
         logging.info("Finalizing song proposals... ")
@@ -1545,3 +1743,26 @@ Structure your synthesis as a clear creative brief.
         path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH") or "./chain_artifacts/unsorted"
         os.makedirs(path, exist_ok=True)
         return os.path.abspath(path)
+
+    @staticmethod
+    def _format_artifacts_for_prompt(
+        artifacts: list, separator: str = "\n\n---\n\n"
+    ) -> str:
+        """
+        Format multiple artifacts of the same type for prompt inclusion.
+
+        Args:
+            artifacts: List of ChainArtifact instances
+            separator: String to separate multiple artifacts
+
+        Returns:
+            Concatenated artifact reports
+        """
+        if not artifacts:
+            return "None"
+        if len(artifacts) == 1:
+            return artifacts[0].artifact_report
+        reports = [
+            f"## Artifact {i + 1}\n{a.artifact_report}" for i, a in enumerate(artifacts)
+        ]
+        return separator.join(reports)

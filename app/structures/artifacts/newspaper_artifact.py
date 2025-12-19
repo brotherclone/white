@@ -1,7 +1,7 @@
 import os
 import yaml
 
-
+from abc import ABC
 from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
@@ -15,7 +15,7 @@ from app.util.string_utils import sanitize_for_filename
 load_dotenv()
 
 
-class NewspaperArtifact(ChainArtifact):
+class NewspaperArtifact(ChainArtifact, ABC):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.NEWSPAPER_ARTICLE
     headline: Optional[str] = Field(
@@ -123,6 +123,28 @@ class NewspaperArtifact(ChainArtifact):
             "tags": self.tags,
         }
 
+    def for_prompt(self) -> str:
+        """Format for prompt - newspaper article with context."""
+        parts = []
+        if self.headline:
+            parts.append(self.headline)
+        metadata_parts = []
+        if self.source:
+            metadata_parts.append(self.source)
+        if self.date:
+            metadata_parts.append(self.date)
+        if self.location:
+            metadata_parts.append(self.location)
+        if metadata_parts:
+            parts.append(" | ".join(metadata_parts))
+        parts.append("")
+        if self.text:
+            parts.append(self.text)
+        if self.tags:
+            parts.append(f"\n[{', '.join(self.tags)}]")
+
+        return "\n".join(parts)
+
 
 if __name__ == "__main__":
     with open(
@@ -133,3 +155,5 @@ if __name__ == "__main__":
         newspaper_artifact = NewspaperArtifact(**data)
     newspaper_artifact.save_file()
     print(newspaper_artifact.flatten())
+    p = newspaper_artifact.for_prompt()
+    print(p)

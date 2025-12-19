@@ -3,6 +3,8 @@ from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
+# ToDo: Add tests for for_prompt()
+
 
 def test_evp_artifact():
     """Test EVPArtifact creation and attributes"""

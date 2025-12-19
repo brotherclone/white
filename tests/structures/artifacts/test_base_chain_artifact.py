@@ -1,8 +1,10 @@
 import os
+from abc import ABC
+
 from app.structures.artifacts.base_artifact import ChainArtifact
 
 
-class DummyArtifact(ChainArtifact):
+class DummyArtifact(ChainArtifact, ABC):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
