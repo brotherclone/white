@@ -18,7 +18,7 @@ class ChainArtifact(BaseModel, ABC):
     chain_artifact_type: ChainArtifactType = Field(
         description="Type of the chain artifact.",
         default=ChainArtifactType.UNKNOWN,
-        examples=["instructions_to_human", "sigil_description", "transcript"],
+        examples=["instructions_to_human", "sigil", "book"],
     )
 
     chain_artifact_file_type: ChainArtifactFileType = Field(

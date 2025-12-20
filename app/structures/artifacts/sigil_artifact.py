@@ -15,8 +15,6 @@ from app.structures.enums.sigil_type import SigilType
 class SigilArtifact(ChainArtifact, ABC):
     """Record of a created sigil for the Black Agent's paranoid tracking"""
 
-    # ToDo: Needs a for_prompt() method
-
     chain_artifact_type: ChainArtifactType = ChainArtifactType.SIGIL
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     wish: Optional[str] = Field(default=None, description="Wish for the sigil.")
@@ -79,6 +77,25 @@ class SigilArtifact(ChainArtifact, ABC):
             "charging_instructions": self.charging_instructions,
         }
 
+    def for_prompt(self):
+        prompt_parts = []
+        if self.wish:
+            prompt_parts.append(f"Wish: {self.wish}")
+        if self.statement_of_intent:
+            prompt_parts.append(f"Statement of Intent: {self.statement_of_intent}")
+        if self.sigil_type:
+            prompt_parts.append(f"Sigil Type: {self.sigil_type.value}")
+        if self.glyph_description:
+            prompt_parts.append(f"Glyph Description: {self.glyph_description}")
+        if self.glyph_components:
+            components = ", ".join(self.glyph_components)
+            prompt_parts.append(f"Glyph Components: {components}")
+        if self.activation_state:
+            prompt_parts.append(f"Activation State: {self.activation_state.value}")
+        if self.charging_instructions:
+            prompt_parts.append(f"Charging Instructions: {self.charging_instructions}")
+        return "\n".join(prompt_parts)
+
 
 if __name__ == "__main__":
     sigil = SigilArtifact(
@@ -97,3 +114,5 @@ if __name__ == "__main__":
 
     sigil.save_file()
     print(sigil.flatten())
+    p = sigil.for_prompt()
+    print(p)

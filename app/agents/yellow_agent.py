@@ -221,8 +221,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
         # Collect character portraits for the encounter artifact
         character_images = []
         for char in state.characters:
-            if char.portrait:
-                character_images.append(char.portrait)
+            if char.portrait_artifact:
+                character_images.append(char.portrait_artifact)
 
         encounter_artifact = PulsarPalaceEncounterArtifact(
             thread_id=state.thread_id,

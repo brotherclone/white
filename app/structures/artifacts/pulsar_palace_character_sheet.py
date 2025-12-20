@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 import yaml
 
@@ -11,6 +11,9 @@ from dotenv import load_dotenv
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
+
+if TYPE_CHECKING:
+    from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
 
 load_dotenv()
 
@@ -31,14 +34,19 @@ class PulsarPalaceCharacterSheet(ChainArtifact, ABC):
     rainbow_color_mnemonic_character_value: str = Field(
         default="Y", description="Mnemonic character for rainbow color coding: Y always"
     )
-    sheet_content: Optional[str] = Field(
+    sheet_content: Optional["PulsarPalaceCharacter"] = Field(
         default=None,
-        description="The content of the character sheet in markdown format",
+        description="The PulsarPalaceCharacter object representing the character data",
     )
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="allow", arbitrary_types_allowed=True)
 
     def __init__(self, **data):
+        # Rebuild model to resolve forward references if needed
+        if not hasattr(self.__class__, "_rebuilt"):
+
+            self.__class__.model_rebuild()
+            self.__class__._rebuilt = True
         super().__init__(**data)
 
     def build_sheet_content(
@@ -76,16 +84,34 @@ class PulsarPalaceCharacterSheet(ChainArtifact, ABC):
         parent_data = super().flatten()
         if parent_data is None:
             parent_data = {}
+
+        # Serialize PulsarPalaceCharacter if present
+        sheet_data = None
+        if self.sheet_content is not None:
+            if hasattr(self.sheet_content, "model_dump"):
+                sheet_data = self.sheet_content.model_dump()
+            elif hasattr(self.sheet_content, "dict"):
+                sheet_data = self.sheet_content.dict()
+            else:
+                sheet_data = str(self.sheet_content)
+
         return {
             **parent_data,
-            "sheet_content": self.sheet_content,
+            "sheet_content": sheet_data,
         }
 
     def for_prompt(self) -> str:
         """Plain text character sheet for prompt."""
         if self.sheet_content is None:
             return "No character sheet available."
-        return self.sheet_content
+
+        # Convert PulsarPalaceCharacter to formatted string
+        char = self.sheet_content
+        return f"""Character Sheet:
+Name: {char.disposition.disposition if char.disposition else 'Unknown'} {char.profession.profession if char.profession else 'Unknown'}
+Background: {char.background.place if char.background else 'Unknown'} ({char.background.time if char.background else 'Unknown'})
+ON: {char.on_current}/{char.on_max}
+OFF: {char.off_current}/{char.off_max}"""
 
 
 if __name__ == "__main__":

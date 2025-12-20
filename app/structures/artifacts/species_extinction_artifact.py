@@ -23,8 +23,6 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
     Combines IUCN-style scientific data with narrative hooks.
     """
 
-    # ToDo: Needs a for_prompt() method
-
     chain_artifact_type: ChainArtifactType = ChainArtifactType.SPECIES_EXTINCTION
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     rainbow_color_mnemonic_character_value: str = "G"
@@ -135,8 +133,12 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
             )
 
     def for_prompt(self):
-        # ToDo: Ask claude for level of detail
-        pass
+        prompt_parts = [
+            f"Species: {self.common_name}",
+            f"Extinction year: {self.extinction_year}",
+            self.summary_text(),
+        ]
+        return "\n".join(prompt_parts)
 
 
 if __name__ == "__main__":

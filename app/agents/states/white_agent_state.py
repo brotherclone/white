@@ -26,7 +26,7 @@ class MainAgentState(BaseModel):
     ready_for_yellow: bool = False
     ready_for_green: bool = False
     ready_for_blue: bool = False
-    ready_for_ingo: bool = False
+    ready_for_indigo: bool = False
     ready_for_violet: bool = False
     ready_for_white: bool = False
     run_finished: bool = False

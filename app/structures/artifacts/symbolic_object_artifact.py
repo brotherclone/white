@@ -18,8 +18,6 @@ load_dotenv()
 class SymbolicObjectArtifact(ChainArtifact, ABC):
     """Symbolic object that has emerged from the nostalgia of Rows Bud, the orange agent"""
 
-    # ToDo: Needs a for_prompt() method
-
     chain_artifact_type: ChainArtifactType = ChainArtifactType.SYMBOLIC_OBJECT
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     symbolic_object_category: SymbolicObjectCategory = Field(
@@ -65,6 +63,16 @@ class SymbolicObjectArtifact(ChainArtifact, ABC):
             "name": self.name,
             "description": self.description,
         }
+
+    def for_prompt(self):
+        prompt_parts = []
+        if self.name:
+            prompt_parts.append(f"Symbolic Object: {self.name}")
+        if self.description:
+            prompt_parts.append(f"{self.description}")
+        if self.symbolic_object_category:
+            prompt_parts.append(f"Category: {self.symbolic_object_category.value}")
+        return "\n".join(prompt_parts)
 
 
 if __name__ == "__main__":

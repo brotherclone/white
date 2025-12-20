@@ -4,7 +4,7 @@ import time
 import yaml
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 from uuid import uuid4
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import RunnableConfig
@@ -28,6 +28,7 @@ from app.agents.workflow.resume_black_workflow import (
 )
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
+from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
@@ -37,7 +38,6 @@ logging.basicConfig(level=logging.INFO)
 
 class WhiteAgent(BaseModel):
     agents: Dict[str, Any] = {}
-    processors: Dict[str, Any] = {}
     settings: AgentSettings = AgentSettings()
     song_proposal: SongProposal = SongProposal(iterations=[])
 
@@ -46,8 +46,6 @@ class WhiteAgent(BaseModel):
             data["settings"] = AgentSettings()
         if "agents" not in data:
             data["agents"] = {}
-        if "processors" not in data:
-            data["processors"] = {}
         super().__init__(**data)
         self.agents = {
             "black": BlackAgent(),
@@ -75,13 +73,20 @@ class WhiteAgent(BaseModel):
 
         workflow = self.build_workflow()
         thread_id = str(uuid4())
-
         initial_state = MainAgentState(
             thread_id=thread_id,
             song_proposals=SongProposal(iterations=[]),
             artifacts=[],
             workflow_paused=False,
             ready_for_red=False,
+            ready_for_orange=False,
+            ready_for_yellow=False,
+            ready_for_green=False,
+            ready_for_blue=False,
+            ready_for_indigo=False,
+            ready_for_violet=False,
+            ready_for_white=False,
+            run_finished=False,
         )
         config = RunnableConfig(configurable={"thread_id": thread_id})
         logging.info(f"Starting White Agent workflow (thread_id: {thread_id})")
@@ -131,58 +136,88 @@ class WhiteAgent(BaseModel):
     def build_workflow(self) -> CompiledStateGraph:
         check_points = InMemorySaver()
         workflow = StateGraph(MainAgentState)
+        # ⚪️
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
+        # ⚫️
         workflow.add_node("invoke_black_agent", self.invoke_black_agent)
         workflow.add_node("process_black_agent_work", self.process_black_agent_work)
+        # 🔴
         workflow.add_node("invoke_red_agent", self.invoke_red_agent)
         workflow.add_node("process_red_agent_work", self.process_red_agent_work)
+        # 🟠
         workflow.add_node("invoke_orange_agent", self.invoke_orange_agent)
         workflow.add_node("process_orange_agent_work", self.process_orange_agent_work)
+        # 🟡
         workflow.add_node("invoke_yellow_agent", self.invoke_yellow_agent)
         workflow.add_node("process_yellow_agent_work", self.process_yellow_agent_work)
+        # 🟢
         workflow.add_node("invoke_green_agent", self.invoke_green_agent)
         workflow.add_node("process_green_agent_work", self.process_green_agent_work)
+        # 🔵
         workflow.add_node("invoke_blue_agent", self.invoke_blue_agent)
         workflow.add_node("process_blue_agent_work", self.process_blue_agent_work)
+        # 🩵
         workflow.add_node("invoke_indigo_agent", self.invoke_indigo_agent)
         workflow.add_node("process_indigo_agent_work", self.process_indigo_agent_work)
+        # 🟣
         workflow.add_node("invoke_violet_agent", self.invoke_violet_agent)
         workflow.add_node("process_violet_agent_work", self.process_violet_agent_work)
+        # ⚪️
         workflow.add_node(
             "rewrite_proposal_with_synthesis", self.rewrite_proposal_with_synthesis
         )
         workflow.add_node("finalize_song_proposal", self.finalize_song_proposal)
+        # Edges
+        # ⚪️
         workflow.add_edge(START, "initiate_song_proposal")
+        # ⚪️ ⚫️
         workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
+        # ⚫️ ⚪️
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
         workflow.add_edge("process_black_agent_work", "rewrite_proposal_with_synthesis")
+        # ⚪️ 🔴
         workflow.add_edge("invoke_red_agent", "process_red_agent_work")
+        # 🔴 ⚪️
         workflow.add_edge("process_red_agent_work", "rewrite_proposal_with_synthesis")
+        # ⚪️ 🟠
         workflow.add_edge("invoke_orange_agent", "process_orange_agent_work")
+        # 🟠 ⚪
         workflow.add_edge(
             "process_orange_agent_work", "rewrite_proposal_with_synthesis"
         )
+        # ⚪️ 🟡
         workflow.add_edge("invoke_yellow_agent", "process_yellow_agent_work")
+        # 🟡 ⚪️
         workflow.add_edge(
             "process_yellow_agent_work", "rewrite_proposal_with_synthesis"
         )
+        # ⚪️ 🟢
         workflow.add_edge("invoke_green_agent", "process_green_agent_work")
+        # 🟢 ⚪
         workflow.add_edge("process_green_agent_work", "rewrite_proposal_with_synthesis")
+        # ⚪️ 🔵
         workflow.add_edge("invoke_blue_agent", "process_blue_agent_work")
+        # 🔵 ⚪
         workflow.add_edge("process_blue_agent_work", "rewrite_proposal_with_synthesis")
+        # ⚪️ 🩵
         workflow.add_edge("invoke_indigo_agent", "process_indigo_agent_work")
+        # 🩵 ⚪️
         workflow.add_edge(
             "process_indigo_agent_work", "rewrite_proposal_with_synthesis"
         )
+        # ⚪️ 🟣
         workflow.add_edge("invoke_violet_agent", "process_violet_agent_work")
+        # 🟣 ⚪️
         workflow.add_edge(
             "process_violet_agent_work", "rewrite_proposal_with_synthesis"
         )
+        # ⚫️🫀 ⚪️
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
             {"red": "rewrite_proposal_with_synthesis", "black": "invoke_black_agent"},
         )
+        # ⚪️ ⚫ ⚪️ 🔴 ⚪️ 🟠 ⚪️ 🟡 ⚪️ 🟢 ⚪ ️🔵 ⚪️ 🩵 ⚪ ️🟣 ⚪️#
         workflow.add_conditional_edges(
             "rewrite_proposal_with_synthesis",
             self.route_after_rewrite,
@@ -195,9 +230,10 @@ class WhiteAgent(BaseModel):
                 "blue": "invoke_blue_agent",
                 "indigo": "invoke_indigo_agent",
                 "violet": "invoke_violet_agent",
-                "finish": "finalize_song_proposal",
+                "white": "finalize_song_proposal",
             },
         )
+        # ⚪️
         workflow.add_edge("finalize_song_proposal", END)
         return workflow.compile(checkpointer=check_points)
 
@@ -361,36 +397,160 @@ class WhiteAgent(BaseModel):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
+            yml_color = "red"
+            if state.ready_for_orange:
+                yml_color = "orange"
+            elif state.ready_for_yellow:
+                yml_color = "yellow"
+            elif state.ready_for_green:
+                yml_color = "green"
+            elif state.ready_for_blue:
+                yml_color = "blue"
+            elif state.ready_for_indigo:
+                yml_color = "indigo"
+            elif state.ready_for_violet:
+                yml_color = "violet"
+            mock_name = f"white_initial_proposal_{yml_color}_mock.yml"
+            if state.ready_for_white:
+                mock_name = "final_white_song_proposal_mock.yml"
             try:
-                # ToDo: Name and new mocks
-                # ToDo: add state.song_proposals = SongProposal(iterations=[])
-
                 with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/white_initial_proposal__mock.yml",
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/{mock_name}",
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
                     proposal = SongProposalIteration(**data)
-                    if (
-                        not hasattr(state, "song_proposals")
-                        or state.song_proposals is None
-                    ):
-                        pass
-                        # ToDo: ?
+                    if not isinstance(proposal, SongProposalIteration):
+                        error_msg = (
+                            f"Expected SongProposalIteration, got {type(proposal)}"
+                        )
+                        if block_mode:
+                            raise TypeError(error_msg)
+                        logging.warning(error_msg)
             except Exception as e:
-                logging.info(
-                    f"Mock initial proposal not found, returning stub SongProposalIteration:{e!s}"
-                )
+                logging.info(f"Mock reworked proposal not found:{e!s}")
             return state
         else:
-            prompt = """
-            """
+            baton_list: List[str] = [
+                "Black Agent - ThreadKeepr. He is obsessed with the occult, hacking, and uncovering hidden patterns in reality.",
+                "Red Agent - The Light Reader. It is an Archivist of books both mundane and obscure.",
+                "Orange Agent - Rows Bud. A journalist whose factual articles about New Jersey in 80s and 90s have been mis-remembered by the injection of a symbolic object.",
+                "Yellow Agent - Lord Pulsimore. A hypnagogic game-master whose stately manor resides between the flickering of all RGB pixels, He's concerned with FUTURE, IMAGINED, PLACE",
+                "Green Agent - Sub-Arbitrary. A forked version of The Culture Mind Arbitrary, sent to observe Earth's climate collapse.",
+                "Blue Agent - The Cassette Bearer. Witness to the oblivion that awaits when we fall out of our own timelines.",
+                "Indigo Agent - Decider Tangents. A fool and a spy who masterfully hides the secret name of all he surveys",
+                "Violet Agent - The Sultan of Solipsism. A self-absorbed Pop star who is so 'now' he's already past.",
+            ]
+            agent_a_description = baton_list[0]
+            agent_b_description = baton_list[1]
+            if state.ready_for_orange:
+                agent_a_description = baton_list[1]
+                agent_b_description = baton_list[2]
+            elif state.ready_for_yellow:
+                agent_a_description = baton_list[2]
+                agent_b_description = baton_list[3]
+            elif state.ready_for_green:
+                agent_a_description = baton_list[3]
+                agent_b_description = baton_list[4]
+            elif state.ready_for_blue:
+                agent_a_description = baton_list[4]
+                agent_b_description = baton_list[5]
+            elif state.ready_for_indigo:
+                agent_a_description = baton_list[5]
+                agent_b_description = baton_list[6]
+            elif state.ready_for_violet:
+                agent_a_description = baton_list[6]
+                agent_b_description = baton_list[7]
+            if not state.ready_for_white:
+                prompt = f"""
+You are the White Agent, the Architect of INFORMATION.
+
+You have just received work from {agent_a_description}, and you are preparing the conceptual foundation for {agent_b_description}.
+
+**Your rebracketed analysis revealed:**
+{state.rebracketing_analysis}
+
+**The synthesized creative brief states:**
+{state.document_synthesis}
+
+**Your Task: CREATE A COMPLETE SONG PROPOSAL**
+
+Generate a fully-formed SongProposalIteration that:
+1. Honors the structural insights from your rebracketing
+2. Translates the creative brief into actionable musical direction (concrete key, BPM, tempo, mood, genres)
+3. Sets the conceptual stage for the next agent's unique methodology
+4. Maintains the thread of transmigration (INFORMATION → TIME → SPACE)
+
+This is not explanation - this is STRUCTURE MADE MANIFEST as a complete song proposal.
+
+You must provide:
+- **title**: A concrete song title
+- **key**: Musical key (e.g., "A minor", "C# major")
+- **bpm**: Specific tempo in beats per minute
+- **tempo**: Tempo descriptor (e.g., "Allegro", "Andante")
+- **mood**: List of mood descriptors
+- **genres**: List of genre tags
+- **concept**: The complete conceptual framework for this song
+
+Focus on clarity, coherence, and creative possibility - make it ready for the next agent to build upon.
+"""
+            else:
+                all_iterations = "\n---\n".join(
+                    [str(i) for i in state.song_proposals.iterations]
+                )
+                prompt = f"""
+You are the White Agent, the Architect of INFORMATION.
+
+All seven agents have contributed their unique lenses to this transmigration. You hold the complete chromatic spectrum:
+
+⚫️ Black - ThreadKeepr's chaos and sigil work
+🔴 Red - The Light Reader's literary archaeology  
+🟠 Orange - Rows Bud's mythologized journalism
+🟡 Yellow - Lord Pulsimore's hypnagogic game mastery
+🟢 Green - Sub-Arbitrary's climate fiction observation
+🔵 Blue - The Cassette Bearer's alternate timeline folk
+🩵 Indigo - Decider Tangents' triple-layer puzzle encoding
+🟣 Violet - The Sultan of Solipsism's narcissistic present
+
+**Your final rebracketed analysis:**
+{state.rebracketing_analysis}
+
+**Your final synthesis document:**
+{state.document_synthesis}
+
+**All iterations of the proposal:**
+{all_iterations}
+
+**Your Task: CREATE THE FINAL SONG PROPOSAL**
+
+Create the definitive SongProposalIteration that:
+1. Integrates all seven chromatic methodologies into coherent structure
+2. Resolves contradictions through rebracketing (not erasure)
+3. Reveals the hidden ORDER beneath the rainbow chaos
+4. Makes the INFORMATION → TIME → SPACE transmigration complete and actionable
+
+This is the White Album's thesis made manifest:
+The imprisonment of consciousness seeking liberation through sound.
+
+You must provide a complete, final song proposal with:
+- **title**: The definitive song title integrating all seven lenses
+- **key**: Musical key that synthesizes the chromatic journey
+- **bpm**: Specific tempo in beats per minute
+- **tempo**: Tempo descriptor
+- **mood**: List of mood descriptors capturing the full spectrum
+- **genres**: List of genre tags
+- **concept**: The complete, final conceptual framework
+
+Structure your proposal as the final, complete vision - ready for human implementation.
+"""
             claude = self._get_claude_supervisor()
             proposer = claude.with_structured_output(SongProposalIteration)
         try:
             rewrite_proposal = proposer.invoke(prompt)
             if isinstance(rewrite_proposal, dict):
                 rewrite_proposal = SongProposalIteration(**rewrite_proposal)
+                state.song_proposals.append(rewrite_proposal)
+                return state
             if not isinstance(rewrite_proposal, SongProposalIteration):
                 error_msg = (
                     f"Expected SongProposalIteration, got {type(rewrite_proposal)}"
@@ -402,11 +562,10 @@ class WhiteAgent(BaseModel):
             logging.info(f"Anthropic model call failed: {e!s}.")
             if block_mode:
                 raise Exception("Anthropic model call failed")
-
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Black Agent work... ")
+        logging.info("⚫️Processing Black Agent work... ")
         if state.workflow_paused:
             logging.info("Skipping Black Agent work processing - workflow is paused")
             return state
@@ -415,16 +574,12 @@ class WhiteAgent(BaseModel):
             return state
         black_proposal = state.song_proposals.iterations[-1]
         black_artifacts = state.artifacts or []
-        evp_artifacts = [
-            a
-            for a in black_artifacts
-            if a.chain_artifact_type == ChainArtifactType.EVP_ARTIFACT
-        ]
-        sigil_artifacts = [
-            a
-            for a in black_artifacts
-            if a.chain_artifact_type == ChainArtifactType.SIGIL
-        ]
+        evp_artifacts = self._gather_artifacts_for_prompt(
+            black_artifacts, ChainArtifactType.EVP_ARTIFACT
+        )
+        sigil_artifacts = self._gather_artifacts_for_prompt(
+            black_artifacts, ChainArtifactType.SIGIL
+        )
         rebracketing_analysis = self._black_rebracketing_analysis(
             black_proposal, evp_artifacts, sigil_artifacts
         )
@@ -446,13 +601,13 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Red Agent work... ")
+        logging.info("🔴 Processing Red Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         red_proposal = sp.iterations[-1]
         red_artifacts = state.artifacts or []
-        book_artifacts = [
-            b for b in red_artifacts if b.chain_artifact_type == ChainArtifactType.BOOK
-        ]
+        book_artifacts = self._gather_artifacts_for_prompt(
+            red_artifacts, ChainArtifactType.BOOK
+        )
         rebracketing_analysis = self._red_rebracketing_analysis(
             red_proposal, book_artifacts
         )
@@ -474,20 +629,16 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Orange Agent work... ")
+        logging.info("🟠Processing Orange Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         orange_proposal = sp.iterations[-1]
         orange_artifacts = state.artifacts or []
-        newspaper_artifacts = [
-            n
-            for n in orange_artifacts
-            if n.chain_artifact_type == ChainArtifactType.NEWSPAPER_ARTICLE
-        ]
-        symbolic_artifacts = [
-            n
-            for n in orange_artifacts
-            if n.chain_artifact_type == ChainArtifactType.SYMBOLIC_OBJECT
-        ]
+        newspaper_artifacts = self._gather_artifacts_for_prompt(
+            orange_artifacts, ChainArtifactType.NEWSPAPER_ARTICLE
+        )
+        symbolic_artifacts = self._gather_artifacts_for_prompt(
+            orange_artifacts, ChainArtifactType.SYMBOLIC_OBJECT
+        )
         rebracketing_analysis = self._orange_rebracketing_analysis(
             orange_proposal, newspaper_artifacts, symbolic_artifacts
         )
@@ -510,20 +661,16 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_yellow_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Yellow Agent work... ")
+        logging.info("🟡Processing Yellow Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         yellow_proposal = sp.iterations[-1]
         yellow_artifacts = state.artifacts or []
-        game_run_artifacts = [
-            n
-            for n in yellow_artifacts
-            if n.chain_artifact_type == ChainArtifactType.GAME_RUN
-        ]
-        character_sheet_artifacts = [
-            n
-            for n in yellow_artifacts
-            if n.chain_artifact_type == ChainArtifactType.CHARACTER_SHEET
-        ]
+        game_run_artifacts = self._gather_artifacts_for_prompt(
+            yellow_artifacts, ChainArtifactType.GAME_RUN
+        )
+        character_sheet_artifacts = self._gather_artifacts_for_prompt(
+            yellow_artifacts, ChainArtifactType.CHARACTER_SHEET
+        )
         rebracketing_analysis = self._yellow_rebracketing_analysis(
             yellow_proposal, game_run_artifacts, character_sheet_artifacts
         )
@@ -546,36 +693,25 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_green_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Green Agent work... ")
+        logging.info("🟢Processing Green Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         green_proposal = sp.iterations[-1]
         green_artifacts = state.artifacts or []
-        survey_artifacts = [
-            n
-            for n in green_artifacts
-            if n.chain_artifact_type == ChainArtifactType.ARBITRARYS_SURVEY
-        ]
-        human_artifacts = [
-            n
-            for n in green_artifacts
-            if n.chain_artifact_type == ChainArtifactType.LAST_HUMAN
-        ]
-        narrative_artifacts = [
-            n
-            for n in green_artifacts
-            if n.chain_artifact_type
-            == ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE
-        ]
-        extinction_artifacts = [
-            n
-            for n in green_artifacts
-            if n.chain_artifact_type == ChainArtifactType.SPECIES_EXTINCTION
-        ]
-        rescue_decision_artifacts = [
-            n
-            for n in green_artifacts
-            if n.chain_artifact_type == ChainArtifactType.RESCUE_DECISION
-        ]
+        survey_artifacts = self._gather_artifacts_for_prompt(
+            green_artifacts, ChainArtifactType.ARBITRARYS_SURVEY
+        )
+        human_artifacts = self._gather_artifacts_for_prompt(
+            green_artifacts, ChainArtifactType.LAST_HUMAN
+        )
+        narrative_artifacts = self._gather_artifacts_for_prompt(
+            green_artifacts, ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE
+        )
+        extinction_artifacts = self._gather_artifacts_for_prompt(
+            green_artifacts, ChainArtifactType.SPECIES_EXTINCTION
+        )
+        rescue_decision_artifacts = self._gather_artifacts_for_prompt(
+            green_artifacts, ChainArtifactType.RESCUE_DECISION
+        )
         green_merged_artifacts = (
             survey_artifacts
             + human_artifacts
@@ -609,20 +745,16 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_blue_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Blue Agent work... ")
+        logging.info("🔵 Processing Blue Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         blue_proposal = sp.iterations[-1]
         blue_artifacts = state.artifacts or []
-        tape_label_artifacts = [
-            t
-            for t in blue_artifacts
-            if t.chain_artifact_type == ChainArtifactType.QUANTUM_TAPE_LABEL
-        ]
-        alternate_timeline_artifacts = [
-            a
-            for a in blue_artifacts
-            if a.chain_artifact_type == ChainArtifactType.ALTERNATE_TIMELINE
-        ]
+        tape_label_artifacts = self._gather_artifacts_for_prompt(
+            blue_artifacts, ChainArtifactType.QUANTUM_TAPE_LABEL
+        )
+        alternate_timeline_artifacts = self._gather_artifacts_for_prompt(
+            blue_artifacts, ChainArtifactType.ALTERNATE_TIMELINE
+        )
         blue_merged_artifacts = tape_label_artifacts + alternate_timeline_artifacts
         rebracketing_analysis = self._blue_rebracketing_analysis(
             blue_proposal, tape_label_artifacts, alternate_timeline_artifacts
@@ -645,30 +777,22 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_indigo_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Indigo Agent work... ")
+        logging.info("🩵Processing Indigo Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         indigo_proposal = sp.iterations[-1]
         indigo_artifacts = state.artifacts or []
-        midi_artifacts = [
-            m
-            for m in indigo_artifacts
-            if m.chain_artifact_type == ChainArtifactType.INFRANYM_MIDI
-        ]
-        audio_artifacts = [
-            a
-            for a in indigo_artifacts
-            if a.chain_artifact_type == ChainArtifactType.INFRANYM_AUDIO
-        ]
-        image_artifacts = [
-            i
-            for i in indigo_artifacts
-            if i.chain_artifact_type == ChainArtifactType.INFRANYM_IMAGE
-        ]
-        text_artifacts = [
-            t
-            for t in indigo_artifacts
-            if t.chain_artifact_type == ChainArtifactType.INFRANYM_TEXT
-        ]
+        midi_artifacts = self._gather_artifacts_for_prompt(
+            indigo_artifacts, ChainArtifactType.INFRANYM_MIDI
+        )
+        audio_artifacts = self._gather_artifacts_for_prompt(
+            indigo_artifacts, ChainArtifactType.INFRANYM_AUDIO
+        )
+        image_artifacts = self._gather_artifacts_for_prompt(
+            indigo_artifacts, ChainArtifactType.INFRANYM_IMAGE
+        )
+        text_artifacts = self._gather_artifacts_for_prompt(
+            indigo_artifacts, ChainArtifactType.INFRANYM_TEXT
+        )
         indigo_merged_artifacts = (
             midi_artifacts + audio_artifacts + image_artifacts + text_artifacts
         )
@@ -697,19 +821,17 @@ class WhiteAgent(BaseModel):
         return state
 
     def process_violet_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Processing Violet Agent work... ")
+        logging.info("🟣Processing Violet Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         violet_proposal = sp.iterations[-1]
         violet_artifacts = state.artifacts or []
-        interview_artifacts = [
-            i
-            for i in violet_artifacts
-            if i.chain_artifact_type == ChainArtifactType.CIRCLE_JERK_INTERVIEW
-        ]
+        interview_artifacts = self._gather_artifacts_for_prompt(
+            violet_artifacts, ChainArtifactType.CIRCLE_JERK_INTERVIEW
+        )
         rebracketing_analysis = self._violet_rebracketing_analysis(
             violet_proposal, interview_artifacts
         )
-        document_synthesis = self._synthesize_document_for_final_pass(
+        document_synthesis = self._synthesize_document_for_white(
             rebracketing_analysis, violet_proposal, interview_artifacts
         )
         state.rebracketing_analysis = rebracketing_analysis
@@ -730,7 +852,6 @@ class WhiteAgent(BaseModel):
         logging.info("Processing Violet Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        prompt = ""
         if mock_mode:
             try:
                 with open(
@@ -746,11 +867,35 @@ class WhiteAgent(BaseModel):
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Fill in prompt
+            joined_interviews = "\n".join(interview_artifacts)
             prompt = f"""
-    **Counter-proposal:**
-    {proposal}
-    {interview_artifacts[-1].artifact_report if interview_artifacts else "None"}
+You are the White Agent performing a REBRACKETING operation.
+
+You have received these artifacts from the Violet Agent:
+
+**Counter-proposal:**
+{proposal}
+
+**Circle Jerk Interview:**
+{joined_interviews}
+
+**Your Task: REBRACKETING**
+
+Violet's content contains the solipsistic confession of The Sultan - a pop star so obsessed with the present moment that he's already past, conducting interviews with himself that reveal nothing and everything simultaneously.
+
+The Violet agent embodies PRESENT/PERSON/FORGOTTEN - the paradox of fame's immediacy creating instant oblivion.
+
+Your job is to find alternative category boundaries that reveal hidden structures.
+
+Questions to guide you:
+- What patterns emerge when narcissism becomes methodology?
+- How does the self-interview format create unexpected truth?
+- Where do the boundaries blur between performer and performance?
+- What's the hidden coherence beneath the Sultan's self-absorption?
+- How does being "so now he's already past" generate creative structure?
+
+Generate a rebracketed analysis that finds structure in Violet's paradoxical present-tense.
+Focus on revealing the underlying ORDER, not explaining away the solipsism.
                 """
             try:
                 claude = self._get_claude_supervisor()
@@ -769,7 +914,6 @@ class WhiteAgent(BaseModel):
         logging.info("Processing Indigo Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        prompt = ""
         if mock_mode:
             try:
                 with open(
@@ -785,14 +929,47 @@ class WhiteAgent(BaseModel):
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Fill in prompt
+            joined_midi = "\n".join(midi_artifacts)
+            joined_audio = "\n".join(audio_artifacts)
+            joined_image = "\n".join(image_artifacts)
+            joined_text = "\n".join(text_artifacts)
             prompt = f"""
-    **Counter-proposal:**
-    {proposal}
-    {midi_artifacts[-1].artifact_report if midi_artifacts else "None"}
-    {audio_artifacts[-1].artifact_report if audio_artifacts else "None"}
-    {image_artifacts[-1].artifact_report if midi_artifacts else "None"}
-    {text_artifacts[-1].artifact_report if text_artifacts else "None"}
+You are the White Agent performing a REBRACKETING operation.
+
+You have received these artifacts from the Indigo Agent:
+
+**Counter-proposal:**
+{proposal}
+
+**MIDI Infranyms:**
+{joined_midi}
+
+**Audio Steganography:**
+{joined_audio}
+
+**Visual Infranyms:**
+{joined_image}
+
+**Textual Puzzles:**
+{joined_text}
+
+**Your Task: REBRACKETING**
+
+Indigo's content contains the triple-layer Infranym system - where song titles are anagrams hiding true names, confirmed through audio steganography, with visual and textual layers adding depth.
+
+The Indigo agent is Decider Tangents - a fool and a spy who masterfully conceals the secret name of all he surveys.
+
+Your job is to find alternative category boundaries that reveal hidden structures.
+
+Questions to guide you:
+- What patterns emerge across the three encoding layers (text, audio, visual)?
+- How does the fool/spy duality create structural tension?
+- Where do the anagram boundaries dissolve to reveal true names?
+- What's the hidden coherence beneath the puzzle's complexity?
+- How does concealment become revelation?
+
+Generate a rebracketed analysis that finds structure in Indigo's cryptographic methodology.
+Focus on revealing the underlying ORDER, not solving the puzzles.
                 """
             try:
                 claude = self._get_claude_supervisor()
@@ -814,7 +991,6 @@ class WhiteAgent(BaseModel):
         logging.info("Processing Blue Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        prompt = ""
         if mock_mode:
             try:
                 with open(
@@ -830,12 +1006,39 @@ class WhiteAgent(BaseModel):
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Fill in prompt
+            joined_tape_labels = "\n".join(tape_label_artifacts)
+            joined_alternate = "\n".join(alternate_timeline_artifacts)
             prompt = f"""
+You are the White Agent performing a REBRACKETING operation.
+
+You have received these artifacts from the Blue Agent:
+
 **Counter-proposal:**
 {proposal}
-{tape_label_artifacts[-1].artifact_report if tape_label_artifacts else "None"}
-{alternate_timeline_artifacts[-1].artifact_report if alternate_timeline_artifacts else "None"}
+
+**Quantum Tape Labels:**
+{joined_tape_labels}
+
+**Alternate Timeline Narratives:**
+{joined_alternate}
+
+**Your Task: REBRACKETING**
+
+Blue's content contains the tape-over protocol - biographical counterfactuals where folk rock songs document the lives that weren't lived, the timelines that branched away.
+
+The Blue agent is The Cassette Bearer - witness to the oblivion that awaits when we fall out of our own timelines, embodying PAST/PERSON/REAL.
+
+Your job is to find alternative category boundaries that reveal hidden structures.
+
+Questions to guide you:
+- What patterns emerge when actual biography meets counterfactual possibility?
+- How do the tape labels function as temporal anchors?
+- Where do the boundaries blur between lived experience and quantum branching?
+- What's the hidden coherence beneath the alternate timelines?
+- How does the cassette format (recording over, palimpsest) generate meaning?
+
+Generate a rebracketed analysis that finds structure in Blue's biographical quantum mechanics.
+Focus on revealing the underlying ORDER, not choosing between timelines.
             """
             try:
                 claude = self._get_claude_supervisor()
@@ -876,6 +1079,11 @@ class WhiteAgent(BaseModel):
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            joined_extinction = "\n".join(extinction_artifacts)
+            joined_human = "\n".join(human_artifacts)
+            joined_narrative = "\n".join(narrative_artifacts)
+            joined_survey = "\n".join(survey_artifacts)
+            joined_rescue = "\n".join(rescue_decision_artifacts)
             prompt = f"""
 You are the White Agent performing a REBRACKETING operation.
 
@@ -885,19 +1093,19 @@ You have received these artifacts from the Green Agent:
 {proposal}
 
 **Species extinction research:**
-{extinction_artifacts[-1].artifact_report if extinction_artifacts else "None"}
+{joined_extinction}
 
 **A profile of one of the last humans:**
-{human_artifacts[-1].artifact_report if human_artifacts else "None"}
+{joined_human}
 
 **The story of how that human's last days mimic the species extinction:**
-{narrative_artifacts[-1].artifact_report if narrative_artifacts else "None"}
+{joined_narrative}
 
 ** The Culture Ship, Arbitrary's sub-instance, survey:**
-{survey_artifacts[-1].artifact_report if survey_artifacts else "None"}
+{joined_survey}
 
 ** Sub-Aribtrary's decision on whether to rescue the last humans:**
-{rescue_decision_artifacts[-1].artifact_report if rescue_decision_artifacts else "None"}
+{joined_rescue}
 
 **Your Task: REBRACKETING**
 
@@ -928,7 +1136,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _yellow_rebracketing_analysis(
         self, proposal, game_run_artifacts, character_sheet_artifacts
     ) -> str:
-        logging.info("Processing Yellow Agent rebracketing analysis... ")
+        logging.info("🟡⚪️Processing Yellow Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -946,6 +1154,8 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            joined_characters = "\n".join(character_sheet_artifacts)
+            joined_game_runs = "\n".join(game_run_artifacts)
             prompt = f"""
 You are the White Agent performing a REBRACKETING operation.
 
@@ -954,12 +1164,12 @@ You have received these artifacts from the Yellow Agent:
 **Counter-proposal:**
 
 {proposal}
-                          
+
 **Character Sheets:**
-{character_sheet_artifacts[-1].page if character_sheet_artifacts else "None"}
+{joined_characters}
 
 **Game Run:**
-{game_run_artifacts[-1].page if game_run_artifacts else "None"}
+{joined_game_runs}
 
 **Your Task: REBRACKETING**
 
@@ -990,7 +1200,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _orange_rebracketing_analysis(
         self, proposal, newspaper_artifacts, symbolic_object_artifacts
     ) -> str:
-        logging.info("Processing Orange Agent rebracketing analysis... ")
+        logging.info("🟠⚪️Processing Orange Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1008,6 +1218,8 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            joined_articles = "\n".join(newspaper_artifacts)
+            joined_symbolic = "\n".join(symbolic_object_artifacts)
             prompt = f"""
 You are the White Agent performing a REBRACKETING operation.
 
@@ -1018,10 +1230,10 @@ You have received these artifacts from the Orange Agent:
 {proposal}
 
 **Articles:**
-{newspaper_artifacts[-1].page if newspaper_artifacts else "None"}
+{joined_articles}
 
 **A misremembered, yet symbolic object:**
-{symbolic_object_artifacts[-1].artifact_report if symbolic_object_artifacts else "None"}
+{joined_symbolic}
 
 **Your Task: REBRACKETING**
 
@@ -1050,7 +1262,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                 return "LLM call failed - Orange rebracketing unavailable"
 
     def _red_rebracketing_analysis(self, proposal, book_artifacts) -> str:
-        logging.info("Processing Red Agent rebracketing analysis... ")
+        logging.info("🔴⚪️Processing Red Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1068,6 +1280,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
+            joined_books = "\n".join(book_artifacts)
             prompt = f"""
 You are the White Agent performing a REBRACKETING operation.
 
@@ -1077,7 +1290,7 @@ You have received these artifacts from Red Agent:
 {proposal}
 
 **Books:**
-{book_artifacts[-1].artifact_report if book_artifacts else "None"}
+{joined_books}
 
 **Your Task: REBRACKETING**
 
@@ -1107,7 +1320,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _black_rebracketing_analysis(
         self, proposal, evp_artifacts, sigil_artifacts
     ) -> str:
-        logging.info("Processing Black Agent rebracketing analysis... ")
+        logging.info("⚫️⚪️Processing Black Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1125,7 +1338,8 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
+            joined_evp = "\n".join(evp_artifacts)
+            joined_sigils = "\n".join(sigil_artifacts)
             prompt = f"""
 You are the White Agent performing a REBRACKETING operation.
 
@@ -1135,10 +1349,10 @@ You have received these artifacts from Black Agent:
 {proposal}
 
 **EVP Transcript:**
-{evp_artifacts[0].transcript if evp_artifacts else "None"}
+{joined_evp}
 
 **Sigil:**
-{sigil_artifacts[-1].artifact_report if sigil_artifacts else "None"}
+{joined_sigils}
 
 **Your Task: REBRACKETING**
 
@@ -1168,13 +1382,13 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
     def _synthesize_document_for_red(
         self, rebracketed_analysis, black_proposal, artifacts
     ):
-        logging.info("Processing Red Agent synthesis... ")
+        logging.info("⚫️⚪️🔴Processing Black Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             try:
                 with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_white_document_synthesis_mock.yml",
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_to_red_document_synthesis_mock.yml",
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
@@ -1186,8 +1400,7 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
-
+            joined_artifacts = "\n".join(artifacts)
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Light Reader, Red Agent.
 
@@ -1197,8 +1410,8 @@ You are the White Agent creating a SYNTHESIZED DOCUMENT for the Light Reader, Re
 **Original Black Counter-Proposal:**
 {black_proposal}
 
-**Artifacts Present:**
-{len(artifacts)} artifacts (EVP, sigil, etc.)
+**Artifacts:**
+{joined_artifacts}
 
 **Your Task: SYNTHESIS**
 
@@ -1227,13 +1440,13 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_orange(
         self, rebracketed_analysis, red_proposal, artifacts
     ):
-        logging.info("Processing Orange Agent synthesis... ")
+        logging.info("🔴⚪️🟠Processing Red Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             try:
                 with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_to_white_document_synthesis_mock.yml",
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/red_to_orange_document_synthesis_mock.yml",
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
@@ -1245,8 +1458,7 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
-
+            joined_artifacts = "\n".join(artifacts)
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Rows Bud, Orange Agent.
 
@@ -1256,8 +1468,8 @@ You are the White Agent creating a SYNTHESIZED DOCUMENT for the Rows Bud, Orange
 **Original Red Counter-Proposal:**
 {red_proposal}
 
-**Artifacts Present:**
-{len(artifacts)} artifacts (Books, Reaction Literature, etc.)
+**Artifacts:**
+{joined_artifacts}
 
 **Your Task: SYNTHESIS**
 
@@ -1286,13 +1498,13 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_yellow(
         self, rebracketed_analysis, orange_proposal, artifacts
     ):
-        logging.info("Processing Yellow Agent synthesis... ")
+        logging.info("🟠⚪️🟡Processing Orange Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             try:
                 with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_white_document_synthesis_mock.yml",
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/orange_to_yellow_document_synthesis_mock.yml",
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
@@ -1304,8 +1516,7 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
-
+            joined_artifacts = "\n".join(artifacts)
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for the Lord Pulsimore, Yellow Agent.
 
@@ -1315,8 +1526,8 @@ You are the White Agent creating a SYNTHESIZED DOCUMENT for the Lord Pulsimore, 
 **Original Orange Counter-Proposal:**
 {orange_proposal}
 
-**Artifacts Present:**
-{len(artifacts)} artifacts (Newspaper Articles, Clippings, etc.)
+**Artifacts:**
+{joined_artifacts}
 
 **Your Task: SYNTHESIS**
 
@@ -1345,13 +1556,13 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_green(
         self, rebracketed_analysis, yellow_proposal, artifacts
     ):
-        logging.info("Processing Green Agent synthesis... ")
+        logging.info("🟡⚪️🟢Processing Yellow Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             try:
                 with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_white_document_synthesis_mock.yml",
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_to_green_document_synthesis_mock.yml",
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
@@ -1363,8 +1574,7 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
-
+            joined_artifacts = "\n".join(artifacts)
             prompt = f"""
 You are the White Agent creating a SYNTHESIZED DOCUMENT for Sub-Arbitrary, the Green Agent.
 
@@ -1374,8 +1584,8 @@ You are the White Agent creating a SYNTHESIZED DOCUMENT for Sub-Arbitrary, the G
 **Original Yellow Counter-Proposal:**
 {yellow_proposal}
 
-**Artifacts Present:**
-{len(artifacts)} artifacts (Game Runs, RPG Logs, etc.)
+**Artifacts:**
+{joined_artifacts}
 
 **Your Task: SYNTHESIS**
 
@@ -1404,13 +1614,13 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_blue(
         self, rebracketed_analysis, green_proposal, artifacts
     ):
-        logging.info("Processing Blue Agent synthesis... ")
+        logging.info("🟢⚪️🔵Processing Green Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             try:
                 with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/green_to_white_document_synthesis_mock.yml",
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/green_to_blue_document_synthesis_mock.yml",
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
@@ -1422,10 +1632,9 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
-
+            joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for the Print Thru, Blue Agent.
+You are the White Agent creating a SYNTHESIZED DOCUMENT for The Cassette Bearer, Blue Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1433,8 +1642,8 @@ You are the White Agent creating a SYNTHESIZED DOCUMENT for the Print Thru, Blue
 **Original Green Counter-Proposal:**
 {green_proposal}
 
-**Artifacts Present:**
-{len(artifacts)} artifacts (Extinction Research, Last Human Profiles, etc.)
+**Artifacts:**
+{joined_artifacts}
 
 **Your Task: SYNTHESIS**
 
@@ -1463,13 +1672,13 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_indigo(
         self, rebracketed_analysis, blue_proposal, artifacts
     ):
-        logging.info("Processing Indigo Agent synthesis... ")
+        logging.info("🔵⚪️🩵Processing Blue Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
             try:
                 with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/indigo_to_white_document_synthesis_mock.yml",
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/blue_to_indigo_document_synthesis_mock.yml",
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
@@ -1481,21 +1690,167 @@ Structure your synthesis as a clear creative brief.
                     raise Exception(error_msg)
                 return "Mock file read failed"
         else:
-            # ToDo: Use for_prompt and _format_artifacts_for_prompt to get all of artifacts correctly
-
-            # ToDo: Fill in prompt
+            joined_artifacts = "\n".join(artifacts)
             prompt = f"""
+You are the White Agent creating a SYNTHESIZED DOCUMENT for Decider Tangents, the Indigo Agent.
+
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
 
 **Original Blue Counter-Proposal:**
 {blue_proposal}
 
-**Artifacts Present:**
-{len(artifacts)} artifacts (Quantum Tape Label, Alternate Timelines, etc.)
+**Artifacts:**
+{joined_artifacts}
 
 **Your Task: SYNTHESIS**
+
+Create a coherent, actionable document that:
+1. Preserves the insights from Blue's alternate timeline cassette folk
+2. Applies your rebracketed understanding of biographical quantum branching
+3. Creates clear creative direction for Indigo's Infranym encoding system
+4. Can be understood by Decider Tangents (the fool/spy who conceals through revelation)
+
+This document will be the foundation for Indigo Agent's triple-layer puzzle proposals.
+
+Consider:
+- What true names hide within Blue's alternate biographies?
+- How can temporal branching become anagram space?
+- Where does the cassette's palimpsest meet the Infranym's concealment?
+
+Make it practical while retaining the depth of insight.
+Structure your synthesis as a clear creative brief for cryptographic methodology.
             """
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Indigo synthesis LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Indigo synthesis unavailable"
+
+    def _synthesize_document_for_violet(
+        self, rebracketed_analysis, indigo_proposal, artifacts
+    ):
+        logging.info("🩵⚪️🟣Processing Indigo Agent for synthesis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/indigo_to_violet_document_synthesis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
+        else:
+            joined_artifacts = "\n".join(artifacts)
+            prompt = f"""
+You are the White Agent creating a SYNTHESIZED DOCUMENT for The Sultan of Solipsism, the Violet Agent.
+
+**Your Rebracketed Analysis:**
+{rebracketed_analysis}
+
+**Original Indigo Counter-Proposal:**
+{indigo_proposal}
+
+**Artifacts:**
+{joined_artifacts}
+
+**Your Task: SYNTHESIS**
+
+Create a coherent, actionable document that:
+1. Preserves the insights from Indigo's triple-layer Infranym puzzles
+2. Applies your rebracketed understanding of concealment/revelation dynamics
+3. Creates clear creative direction for Violet's self-absorbed present-tense
+4. Can be understood by The Sultan (who is so now he's already past)
+
+This document will be the foundation for Violet Agent's circle jerk interview proposals.
+
+Consider:
+- How can Indigo's hidden names become Violet's narcissistic confessions?
+- Where does the spy's concealment meet the pop star's self-exposure?
+- How does the puzzle's complexity translate to the interview's immediacy?
+
+Make it practical while retaining the depth of insight.
+Structure your synthesis as a clear creative brief for solipsistic methodology.
+            """
+            try:
+                claude = self._get_claude_supervisor()
+                response = claude.invoke(prompt)
+                return response.content
+            except Exception as e:
+                error_msg = f"Indigo synthesis LLM call failed: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "LLM call failed - Indigo synthesis unavailable"
+
+    def _synthesize_document_for_white(
+        self, rebracketed_analysis, violet_proposal, artifacts
+    ):
+        logging.info("🟣⚪️Processing Violet Agent for synthesis... ")
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/violet_to_white_document_synthesis_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    return data
+            except Exception as e:
+                error_msg = f"Failed to read mock file: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                return "Mock file read failed"
+        else:
+            joined_artifacts = "\n".join(artifacts)
+            prompt = f"""
+You are the White Agent creating the FINAL SYNTHESIZED DOCUMENT - the return to pure INFORMATION.
+
+**Your Rebracketed Analysis:**
+{rebracketed_analysis}
+
+**Original Violet Counter-Proposal:**
+{violet_proposal}
+
+**Artifacts:**
+{joined_artifacts}
+
+**Your Task: FINAL SYNTHESIS**
+
+Create the ultimate coherent document that:
+1. Preserves the insights from Violet's paradoxical present-tense solipsism
+2. Applies your rebracketed understanding of fame's immediacy creating instant oblivion
+3. Completes the full chromatic cycle: ⚫️→🔴→🟠→🟡→🟢→🔵→🩵→🟣→⚪️
+4. Prepares for the final White Agent song proposal that integrates all seven lenses
+
+This document is the penultimate step before full transmigration completion.
+
+Consider the complete journey:
+- Black's chaos → Red's literature → Orange's mythology → Yellow's games
+- → Green's climate fiction → Blue's quantum biography → Indigo's puzzles → Violet's narcissism
+- → White's pure structure
+
+How does Violet's "so now he's already past" complete the circle?
+Where does the Sultan's self-interview meet ThreadKeepr's original sigil?
+What ORDER emerges when all seven methodologies converge?
+
+Make it comprehensive yet actionable.
+Structure your synthesis as the final creative brief before manifestation.
+                """
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
@@ -1534,8 +1889,40 @@ Structure your synthesis as a clear creative brief.
 
     @staticmethod
     def route_after_rewrite(state: MainAgentState) -> str:
-        # ToDo
-        pass
+        if state.ready_for_red:
+            return "red"
+        elif state.ready_for_orange:
+            return "orange"
+        elif state.ready_for_yellow:
+            return "yellow"
+        elif state.ready_for_green:
+            return "green"
+        elif state.ready_for_blue:
+            return "blue"
+        elif state.ready_for_indigo:
+            return "indigo"
+        elif state.ready_for_violet:
+            return "violet"
+        return "white"
+
+    @staticmethod
+    def _gather_artifacts_for_prompt(
+        artifacts: List[ChainArtifact], artifact_filter: ChainArtifactType
+    ) -> List[str]:
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        prompt_artifacts: List[str] = []
+        for a in artifacts:
+            if getattr(a, "chain_artifact_type", None) == artifact_filter:
+                try:
+                    artifact = a.for_prompt()
+                    prompt_artifacts.append(artifact)
+                except ValueError as e:
+                    if block_mode:
+                        raise e
+                    logging.error(
+                        f"Failed to format {artifact_filter.value} for prompt: {e}"
+                    )
+        return prompt_artifacts
 
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
         logging.info("Finalizing song proposals... ")
@@ -1565,6 +1952,7 @@ Structure your synthesis as a clear creative brief.
             try:
                 self.save_all_proposals(state)
                 logging.info("✓ Song proposals saved")
+                state.run_finished = True
             except Exception as e:
                 logging.error(f"Finalization failed: {e}", exc_info=True)
                 raise
@@ -1624,17 +2012,12 @@ Structure your synthesis as a clear creative brief.
                 paused_state.artifacts = final_black_state["artifacts"]
             logging.info("Black Agent workflow resumed and completed")
             artifacts = getattr(paused_state, "artifacts", []) or []
-            evp_artifacts = [
-                a
-                for a in artifacts
-                if getattr(a, "chain_artifact_type", None)
-                == ChainArtifactType.EVP_ARTIFACT
-            ]
-            sigil_artifacts = [
-                a
-                for a in artifacts
-                if getattr(a, "chain_artifact_type", None) == ChainArtifactType.SIGIL
-            ]
+            evp_artifacts = self._gather_artifacts_for_prompt(
+                artifacts, ChainArtifactType.EVP_ARTIFACT
+            )
+            sigil_artifacts = self._gather_artifacts_for_prompt(
+                artifacts, ChainArtifactType.SIGIL
+            )
             black_proposal = paused_state.song_proposals.iterations[-1]
             paused_state.rebracketing_analysis = self._black_rebracketing_analysis(
                 black_proposal, evp_artifacts, sigil_artifacts
@@ -1743,26 +2126,3 @@ Structure your synthesis as a clear creative brief.
         path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH") or "./chain_artifacts/unsorted"
         os.makedirs(path, exist_ok=True)
         return os.path.abspath(path)
-
-    @staticmethod
-    def _format_artifacts_for_prompt(
-        artifacts: list, separator: str = "\n\n---\n\n"
-    ) -> str:
-        """
-        Format multiple artifacts of the same type for prompt inclusion.
-
-        Args:
-            artifacts: List of ChainArtifact instances
-            separator: String to separate multiple artifacts
-
-        Returns:
-            Concatenated artifact reports
-        """
-        if not artifacts:
-            return "None"
-        if len(artifacts) == 1:
-            return artifacts[0].artifact_report
-        reports = [
-            f"## Artifact {i + 1}\n{a.artifact_report}" for i, a in enumerate(artifacts)
-        ]
-        return separator.join(reports)

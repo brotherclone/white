@@ -21,7 +21,6 @@ def test_white_agent_initialization():
     agent = WhiteAgent()
     assert isinstance(agent.settings, AgentSettings)
     assert isinstance(agent.agents, dict)
-    assert isinstance(agent.processors, dict)
     assert isinstance(agent.song_proposal, SongProposal)
 
 
@@ -78,6 +77,46 @@ def test_invoke_yellow_agent():
     mock_yellow_state.assert_called_once_with(mock_state)
 
 
+def test_invoke_green_agent():
+    mock_state = MagicMock(spec=MainAgentState)
+    mock_green_agent = MagicMock(return_value=mock_state)
+    agent = WhiteAgent()
+    agent.agents["green"] = mock_green_agent
+    result = agent.invoke_green_agent(mock_state)
+    assert result == mock_state
+    mock_green_agent.assert_called_once_with(mock_state)
+
+
+def test_invoke_blue_agent():
+    mock_state = MagicMock(spec=MainAgentState)
+    mock_blue_agent = MagicMock(return_value=mock_state)
+    agent = WhiteAgent()
+    agent.agents["blue"] = mock_blue_agent
+    result = agent.invoke_blue_agent(mock_state)
+    assert result == mock_state
+    mock_blue_agent.assert_called_once_with(mock_state)
+
+
+def test_invoke_indigo_agent():
+    mock_state = MagicMock(spec=MainAgentState)
+    mock_indigo_agent = MagicMock(return_value=mock_state)
+    agent = WhiteAgent()
+    agent.agents["indigo"] = mock_indigo_agent
+    result = agent.invoke_indigo_agent(mock_state)
+    assert result == mock_state
+    mock_indigo_agent.assert_called_once_with(mock_state)
+
+
+def test_invoke_violet_agent():
+    mock_state = MagicMock(spec=MainAgentState)
+    mock_violet_agent = MagicMock(return_value=mock_state)
+    agent = WhiteAgent()
+    agent.agents["violet"] = mock_violet_agent
+    result = agent.invoke_violet_agent(mock_state)
+    assert result == mock_state
+    mock_violet_agent.assert_called_once_with(mock_state)
+
+
 def test_resume_after_black_agent_ritual(monkeypatch):
     """Test resuming workflow after black agent ritual completion"""
 
@@ -131,7 +170,11 @@ def test_process_black_agent_work_sets_analysis_and_ready_for_red(
             iterations=[{"iteration_id": "black-prop"}], thread_id="mock_thread_001"
         ),
     )
-
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
     monkeypatch.setattr(
         white_agent.__class__,
         "_black_rebracketing_analysis",
@@ -183,7 +226,11 @@ def test_process_red_agent_work_sets_analysis_and_ready_for_orange(
             iterations=[{"iteration_id": "red-prop"}], thread_id="mock_thread_001"
         ),
     )
-
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
     monkeypatch.setattr(
         white_agent.__class__,
         "_red_rebracketing_analysis",
@@ -219,7 +266,11 @@ def test_process_orange_agent_work_sets_analysis_and_ready_for_yellow(
             iterations=[{"iteration_id": "orange-prop"}], thread_id="mock_thread_001"
         ),
     )
-
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
     monkeypatch.setattr(
         white_agent.__class__,
         "_orange_rebracketing_analysis",
@@ -255,7 +306,11 @@ def test_process_yellow_agent_work_sets_analysis_and_ready_for_green(
             iterations=[{"iteration_id": "yellow-prop"}], thread_id="mock_thread_001"
         ),
     )
-
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
     monkeypatch.setattr(
         white_agent.__class__,
         "_yellow_rebracketing_analysis",
@@ -292,11 +347,15 @@ def test_process_green_agent_work_sets_analysis_and_ready_for_blue(
             iterations=[{"iteration_id": "green-prop"}], thread_id="mock_thread_001"
         ),
     )
-
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
     monkeypatch.setattr(
         white_agent.__class__,
         "_green_rebracketing_analysis",
-        lambda self, proposal, species_artifacts, last_human_artifacts, narrative_artifacts, survey_artifacts, claudes_choice: "GREEN_ANALYSIS",
+        lambda self, proposal, survey_artifacts, human_artifacts, narrative_artifacts, extinction_artifacts, rescue_decision_artifacts: "GREEN_ANALYSIS",
     )
     monkeypatch.setattr(
         white_agent.__class__,
@@ -316,5 +375,127 @@ def test_process_green_agent_work_sets_analysis_and_ready_for_blue(
     assert getattr(result, "rebracketing_analysis") == "GREEN_ANALYSIS"
     assert getattr(result, "document_synthesis") == "GREEN_SYNTH"
     assert result.ready_for_green is False
-    # ToDo: Change with blue
-    # assert result.ready_for_blue is True
+    assert result.ready_for_blue is True
+
+
+def test_process_blue_agent_work_sets_analysis_and_ready_for_indigo(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "blue-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_blue_rebracketing_analysis",
+        lambda self, proposal, tape_label_artifacts, alternate_timeline_artifacts: "BLUE_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_indigo",
+        lambda self, rebracketed_analysis, blue_proposal, artifacts: "BLUE_SYNTH",
+    )
+
+    state = SimpleNamespace(
+        song_proposals={"iterations": [{"iteration_id": "blue-prop"}]},
+        artifacts=[SimpleNamespace(chain_artifact_type="quantum_tape_label")],
+        ready_for_blue=True,
+        ready_for_indigo=False,
+        thread_id="mock_thread_001",
+    )
+
+    result = white_agent.process_blue_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "BLUE_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "BLUE_SYNTH"
+    assert result.ready_for_blue is False
+    assert result.ready_for_indigo is True
+
+
+def test_process_indigo_agent_work_sets_analysis_and_ready_for_violet(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "indigo-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_indigo_rebracketing_analysis",
+        lambda self, proposal, midi_artifacts, audio_artifacts, image_artifacts, text_artifacts: "INDIGO_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_violet",
+        lambda self, rebracketed_analysis, indigo_proposal, artifacts: "INDIGO_SYNTH",
+    )
+
+    state = SimpleNamespace(
+        song_proposals={"iterations": [{"iteration_id": "indigo-prop"}]},
+        artifacts=[SimpleNamespace(chain_artifact_type="infranym_midi")],
+        ready_for_indigo=True,
+        ready_for_violet=False,
+        thread_id="mock_thread_001",
+    )
+
+    result = white_agent.process_indigo_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "INDIGO_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "INDIGO_SYNTH"
+    assert result.ready_for_indigo is False
+    assert result.ready_for_violet is True
+
+
+def test_process_violet_agent_work_sets_analysis_and_ready_for_white(
+    monkeypatch, white_agent
+):
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_normalize_song_proposal",
+        lambda self, proposal: SimpleNamespace(
+            iterations=[{"iteration_id": "violet-prop"}], thread_id="mock_thread_001"
+        ),
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_gather_artifacts_for_prompt",
+        lambda self, artifacts, artifact_filter: ["mock_artifact"],
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_violet_rebracketing_analysis",
+        lambda self, proposal, interview_artifacts: "VIOLET_ANALYSIS",
+    )
+    monkeypatch.setattr(
+        white_agent.__class__,
+        "_synthesize_document_for_white",
+        lambda self, rebracketed_analysis, violet_proposal, artifacts: "VIOLET_SYNTH",
+    )
+
+    state = SimpleNamespace(
+        song_proposals={"iterations": [{"iteration_id": "violet-prop"}]},
+        artifacts=[SimpleNamespace(chain_artifact_type="circle_jerk_interview")],
+        ready_for_violet=True,
+        ready_for_white=False,
+        thread_id="mock_thread_001",
+    )
+
+    result = white_agent.process_violet_agent_work(state)
+    assert getattr(result, "rebracketing_analysis") == "VIOLET_ANALYSIS"
+    assert getattr(result, "document_synthesis") == "VIOLET_SYNTH"
+    assert result.ready_for_violet is False
+    assert result.ready_for_white is True
