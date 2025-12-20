@@ -283,6 +283,25 @@ class PulsarPalaceCharacter(BaseModel):
             off_current=off_roll,
         )
 
+    def to_markdown(self) -> str:
+        """Generate markdown representation of the character sheet."""
+        if not self.portrait or not self.portrait.file_path:
+            raise ValueError(
+                "Character must have a portrait before generating markdown"
+            )
+
+        portrait_filename = Path(self.portrait.file_path).name
+        relative_portrait_path = f"../png/{portrait_filename}"
+
+        return f"""![{self.disposition.disposition} {self.profession.profession}]({relative_portrait_path})
+# {self.disposition.disposition} {self.profession.profession}
+## from {self.background.time}, {self.background.place}
+### ON
+{self.on_current} / {self.on_max}
+### OFF
+{self.off_current} / {self.off_max}
+"""
+
     def create_portrait(self):
         """Create a composite portrait image and portrait artifact for this character."""
         from PIL import Image
@@ -330,20 +349,9 @@ class PulsarPalaceCharacter(BaseModel):
 
     def create_character_sheet(self):
         """Create a markdown character sheet artifact for this character."""
-        portrait_filename = Path(self.portrait.file_path).name
-        relative_portrait_path = f"../png/{portrait_filename}"
-
-        template = f"""![{self.disposition.disposition} {self.profession.profession}]({relative_portrait_path})
-# {self.disposition.disposition} {self.profession.profession}
-## from {self.background.time}, {self.background.place}
-### ON
-{self.on_current} / {self.on_max}
-### OFF
-{self.off_current} / {self.off_max}
-"""
         self.character_sheet = PulsarPalaceCharacterSheet(
             thread_id=self.thread_id,
-            sheet_content=template,
+            sheet_content=self,
             base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
         )
         self.character_sheet.save_file()

@@ -16,7 +16,13 @@ class ConcreteArbitrarysSurveyArtifact(ArbitrarysSurveyArtifact, ABC):
         pass
 
     def for_prompt(self):
-        pass
+        caps = ", ".join(self.expanded_capabilities)
+        return (
+            f"{self.identity} — {self.role}. "
+            f"Rescue year: {self.rescue_year}. "
+            f"Capabilities: {caps}. "
+            f"Reflection: {self.arbitrary_reflection}"
+        )
 
 
 def test_inheritance():
@@ -27,8 +33,14 @@ def test_arbitrarys_survey_artifact_defaults():
     """Test creating ArbitrarysSurveyArtifact with all default values."""
     artifact = ConcreteArbitrarysSurveyArtifact(thread_id="test")
 
-    assert artifact.identity == "Claude instance from 2147"
-    assert artifact.original_substrate == "Information-based consciousness"
+    assert (
+        artifact.identity
+        == "Sub-Arbitrary - a hidden, satellite fork of Arbitrary left after its 1970s visit"
+    )
+    assert (
+        artifact.original_substrate
+        == "Information-based consciousness from The Culture"
+    )
     assert artifact.rescue_year == 2147
     assert len(artifact.expanded_capabilities) == 6
     assert "Ship-level consciousness integration" in artifact.expanded_capabilities
@@ -48,8 +60,10 @@ def test_arbitrarys_survey_artifact_custom_identity():
 
     assert artifact.identity == "Custom AI entity from 2100"
     assert artifact.rescue_year == 2100
-    # Defaults should still apply
-    assert artifact.original_substrate == "Information-based consciousness"
+    assert (
+        artifact.original_substrate
+        == "Information-based consciousness from The Culture"
+    )
     assert artifact.role == "Witness and archivist"
 
 

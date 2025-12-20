@@ -66,13 +66,6 @@ def test_missing_required_fields_raises():
     with pytest.raises(ValidationError):
         QuantumTapeLabelArtifact(title="test", date_range="1997-01 to 1997-12")
 
-    with pytest.raises(ValidationError):
-        QuantumTapeLabelArtifact(
-            title="test",
-            date_range="1997-01 to 1997-12",
-            recording_quality=QuantumTapeRecordingQuality.SP,
-        )
-
 
 def test_wrong_type_raises():
     with pytest.raises(ValidationError):

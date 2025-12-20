@@ -1,1 +1,0 @@
-# Yellow Character Sheet One Mock

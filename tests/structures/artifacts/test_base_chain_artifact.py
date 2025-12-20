@@ -15,6 +15,9 @@ class DummyArtifact(ChainArtifact, ABC):
     def flatten(self):
         return {}
 
+    def for_prompt(self) -> str:
+        return ""
+
 
 def test_default_generation(tmp_path):
     a = DummyArtifact(base_path=tmp_path)
