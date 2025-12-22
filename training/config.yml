@@ -3,7 +3,7 @@
 
 # Data Configuration
 data:
-  manifest_path: "../data/base_manifest_db.parquet"
+  manifest_path: "data/base_manifest_db.parquet"
 
   # Target
   target_column: "has_rebracketing_markers"  # Binary: True/False
@@ -38,9 +38,9 @@ model:
 training:
   # Optimization
   batch_size: 32  # Larger batches on GPU
-  learning_rate: 2e-5
+  learning_rate: 0.00002
   weight_decay: 0.01
-  epochs: 20  # More epochs with GPU
+  epochs: 50  # More epochs with GPU
 
   # Advanced
   gradient_accumulation_steps: 1  # No need with larger batch
@@ -55,7 +55,7 @@ training:
   # Early stopping
   early_stopping:
     enabled: true
-    patience: 5  # More patience with more epochs
+    patience: 10  # More patience with more epochs
     min_delta: 0.001
 
   # Checkpointing

@@ -1,0 +1,44 @@
+bpm: 100
+manifest_id: '07_03'
+tempo: 4/8
+key: Bb major
+rainbow_color: I
+title: Row, Lathe, Halo
+release_date: '2024-06-04'
+album_sequence: 3
+main_audio_file: 07_03_main.wav
+TRT: '[03:42.019]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: '[00:01.005]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:01.006]'
+    end_time: '[00:39.015]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:39.016]'
+    end_time: '[00:49.005]'
+    description: TK
+  - start_time: '[00:49.006]'
+    end_time: '[01:58.020]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:58.021]'
+    end_time: '[02:15.015]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:15.016]'
+    end_time: '[02:25.005]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:25.006]'
+    end_time: '[03:32.010]'
+    description: TK
+  - section_name: TK
+    start_time: '[03:32.011]'
+    end_time: '[03:42.019]'
+    description: TK

@@ -78,8 +78,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
             max_rooms=4,
         )
         yellow_graph = self.create_graph()
-        compiled_graph = yellow_graph.compile()
-        result = compiled_graph.invoke(yellow_state.model_dump())
+        compiled_graph = yellow_graph.compile(checkpointer=None)
+        result = compiled_graph.invoke(yellow_state.model_dump(mode="json"))
         if isinstance(result, YellowAgentState):
             final_state = result
         elif isinstance(result, dict):
@@ -89,7 +89,12 @@ class YellowAgent(BaseRainbowAgent, ABC):
         if final_state.counter_proposal:
             state.song_proposals.iterations.append(final_state.counter_proposal)
         if final_state.artifacts:
-            state.artifacts = final_state.artifacts
+            # Serialize artifacts to dicts before adding to state to avoid
+            # msgpack serialization errors in parent workflow's checkpointer
+            state.artifacts = [
+                art.model_dump(mode="json") if hasattr(art, "model_dump") else art
+                for art in final_state.artifacts
+            ]
         return state
 
     def create_graph(self) -> StateGraph:

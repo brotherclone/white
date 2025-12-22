@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -10,10 +10,12 @@ from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 from app.structures.artifacts.character_portrait_artifact import (
     CharacterPortraitArtifact,
 )
-from app.structures.artifacts.pulsar_palace_character_sheet import (
-    PulsarPalaceCharacterSheet,
-)
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+
+if TYPE_CHECKING:
+    from app.structures.artifacts.pulsar_palace_character_sheet import (
+        PulsarPalaceCharacterSheet,
+    )
 
 load_dotenv()
 
@@ -251,12 +253,25 @@ class PulsarPalaceCharacter(BaseModel):
     portrait_artifact: Optional[CharacterPortraitArtifact] = Field(
         default=None, description="High-level portrait artifact with metadata"
     )
-    character_sheet: Optional[PulsarPalaceCharacterSheet] = Field(
+    character_sheet: Optional["PulsarPalaceCharacterSheet"] = Field(
         default=None, description="Character sheet of the character"
     )
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(self, **data):
+        # Rebuild model to resolve forward references if needed
+        if not hasattr(self.__class__, "_rebuilt"):
+            # Import at runtime to make PulsarPalaceCharacterSheet available for model_rebuild
+            from app.structures.artifacts.pulsar_palace_character_sheet import (
+                PulsarPalaceCharacterSheet as _PulsarPalaceCharacterSheet,
+            )
+
+            self.__class__.model_rebuild(
+                _types_namespace={
+                    "PulsarPalaceCharacterSheet": _PulsarPalaceCharacterSheet
+                }
+            )
+            self.__class__._rebuilt = True
         super().__init__(**data)
 
     @classmethod
@@ -349,6 +364,10 @@ class PulsarPalaceCharacter(BaseModel):
 
     def create_character_sheet(self):
         """Create a markdown character sheet artifact for this character."""
+        from app.structures.artifacts.pulsar_palace_character_sheet import (
+            PulsarPalaceCharacterSheet,
+        )
+
         self.character_sheet = PulsarPalaceCharacterSheet(
             thread_id=self.thread_id,
             sheet_content=self,
