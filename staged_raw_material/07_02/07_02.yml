@@ -1,0 +1,73 @@
+bpm: 112
+manifest_id: '07_02'
+tempo: 4/4
+key: G major
+rainbow_color: I
+title: BLOB-Given Sorcery
+release_date: '2024-06-04'
+album_sequence: 2
+main_audio_file: 07_02_main.wav
+TRT: '[04:01.001]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Kick start
+    start_time: '[00:00.000]'
+    end_time: '[00:01.001]'
+    description: The drums kick in with a slow kick drum beat.
+  - section_name: TK
+    start_time: '[00:01.002]'
+    end_time: '[00:09.002]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:09.002]'
+    end_time: '[00:35.008]'
+    description: TK
+  - section_name: TK
+    start_time: '[00:35.009]'
+    end_time: '[01:01.001]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:01.002]'
+    end_time: '[01:18.005]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:18.006]'
+    end_time: '[01:34.020]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:34.021]'
+    end_time: '[01:52.012]'
+    description: TK
+  - section_name: TK
+    start_time: '[01:52.013]'
+    end_time: '[02:09.016]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:09.017]'
+    end_time: '[02:26.019]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:26.020]'
+    end_time: '[02:43.023]'
+    description: TK
+  - section_name: TK
+    start_time: '[02:43.024]'
+    end_time: '[03:01.001]'
+    description: TK
+  - section_name: TK
+    start_time: '[03:01.002]'
+    end_time: '[03:18.005]'
+    description: TK
+  - section_name: TK
+    start_time: '[03:18.006]'
+    end_time: '[03:35.008]'
+    description: TK
+  - section_name: TK
+    start_time: '[03:35.008]'
+    end_time: '[03:56.019]'
+    description: TK
+  - section_name: TK
+    start_time: '[03:56.020]'
+    end_time: '[04:01.001]'
+    description: TK

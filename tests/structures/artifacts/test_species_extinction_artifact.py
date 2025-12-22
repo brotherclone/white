@@ -8,6 +8,8 @@ from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.population_data import PopulationData
 from app.structures.enums.extinction_cause import ExtinctionCause
 
+# ToDo: Add for_prompt() tests
+
 
 class ConcreteSpeciesExtinctionArtifact(SpeciesExtinctionArtifact):
     """Concrete implementation for testing"""

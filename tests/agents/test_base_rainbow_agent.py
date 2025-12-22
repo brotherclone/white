@@ -1,3 +1,4 @@
+from abc import ABC
 from types import SimpleNamespace
 
 import pytest
@@ -9,12 +10,15 @@ from app.structures.artifacts.base_artifact import ChainArtifact
 GRAPH_SENTINEL = object()
 
 
-class DummyArtifact(ChainArtifact):
+class DummyArtifact(ChainArtifact, ABC):
     def save_file(self):
         return None
 
     def flatten(self):
         return {}
+
+    def for_prompt(self) -> str:
+        return ""
 
 
 class ConcreteAgent(BaseRainbowAgent):

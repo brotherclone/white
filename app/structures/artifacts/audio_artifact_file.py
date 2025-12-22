@@ -1,4 +1,7 @@
+import os
 import numpy as np
+from dotenv import load_dotenv
+from abc import ABC
 from pydantic import Field
 from scipy.io import wavfile
 from pathlib import Path
@@ -6,9 +9,14 @@ from pathlib import Path
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
+load_dotenv()
 
-class AudioChainArtifactFile(ChainArtifact):
 
+class AudioChainArtifactFile(ChainArtifact, ABC):
+    chain_artifact_file_type: ChainArtifactFileType = Field(
+        default=ChainArtifactFileType.AUDIO,
+        description="Type of the chain artifact file should always be audio (.wav) in this case..",
+    )
     sample_rate: int = Field(
         description="Sample rate of the audio file", ge=24000, le=96000, default=44100
     )
@@ -53,6 +61,11 @@ class AudioChainArtifactFile(ChainArtifact):
             "channels": self.channels,
         }
 
+    def for_prompt(self):
+        return (
+            f"Audio file: {self.get_artifact_path(True)}, {self.duration} seconds long."
+        )
+
 
 if __name__ == "__main__":
     with open("/Volumes/LucidNonsense/White/tests/mocks/mock.wav", "rb") as f:
@@ -60,6 +73,7 @@ if __name__ == "__main__":
 
     audio_artifact = AudioChainArtifactFile(
         thread_id="test_thread_id",
+        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
         chain_artifact_type="unknown",
         chain_artifact_file_type="wav",
         sample_rate=44100,
@@ -70,3 +84,5 @@ if __name__ == "__main__":
 
     audio_artifact.save_file()
     print(audio_artifact.flatten())
+    p = audio_artifact.for_prompt()
+    print(p)

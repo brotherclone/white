@@ -10,9 +10,9 @@ import yaml
 from pathlib import Path
 import torch
 import torch.nn as nn
+from transformers import AutoTokenizer
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
-from transformers import AutoTokenizer
 from tqdm import tqdm
 import json
 
@@ -101,9 +101,22 @@ class Trainer:
         print("SETTING UP DATA")
         print("=" * 60)
 
+        # Resolve model name (preferred location: model.text_encoder.model_name)
+        model_name = self.config.get("model_name_or_path") or self.config.get(
+            "model", {}
+        ).get("text_encoder", {}).get("model_name")
+        if not model_name:
+            raise KeyError(
+                "model name not found in config; expected `model.text_encoder.model_name` "
+                "or top-level `model_name_or_path`."
+            )
+
         # Tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.config["model"]["text_encoder"]["model_name"]
+        self.tokenizer = self.load_tokenizer(
+            model_name,
+            cache_dir=self.config.get("cache_dir", None),
+            local_files_only=self.config.get("local_files_only", False),
+            trust_remote_code=self.config.get("trust_remote_code", False),
         )
 
         # Dataloaders
@@ -336,6 +349,67 @@ class Trainer:
         print("=" * 60)
         print(f"Best validation loss: {self.best_val_loss:.4f}")
         print(f"Checkpoints saved to: {self.output_dir}")
+
+    def load_tokenizer(self, pretrained_name_or_path: str, **kwargs) -> AutoTokenizer:
+        """
+        Load HF tokenizer with robust three-tier fallback system.
+
+        Tier 1: Fast tokenizer (preferred)
+        Tier 2: Slow tokenizer with add_prefix_space=False (DeBERTa-v3 fix)
+        Tier 3: Direct slow tokenizer class loading (bypass AutoTokenizer)
+        """
+        want_fast = kwargs.pop("use_fast", True)
+
+        # TIER 1: Try fast tokenizer
+        if want_fast:
+            try:
+                return AutoTokenizer.from_pretrained(
+                    pretrained_name_or_path, use_fast=True, **kwargs
+                )
+            except (AttributeError, Exception) as e:
+                msg = str(e)
+                if "has no attribute 'endswith'" in msg or "NoneType" in msg:
+                    print(
+                        f"⚠️  Fast tokenizer failed ({type(e).__name__}), falling back to slow tokenizer..."
+                    )
+                else:
+                    # Re-raise if it's a different error we should know about
+                    raise
+
+        # TIER 2: Slow tokenizer with DeBERTa-v3 fix
+        # Make sure use_fast isn't lingering in kwargs
+        kwargs_tier2 = kwargs.copy()
+        kwargs_tier2.pop("use_fast", None)
+
+        try:
+            return AutoTokenizer.from_pretrained(
+                pretrained_name_or_path,
+                use_fast=False,
+                add_prefix_space=False,  # Critical for DeBERTa-v3
+                **kwargs_tier2,
+            )
+        except Exception as e:
+            print(
+                f"⚠️  Slow tokenizer failed ({type(e).__name__}), bypassing AutoTokenizer..."
+            )
+
+        # TIER 3: NUCLEAR OPTION - Load slow tokenizer class directly
+        # AutoTokenizer is broken for this model, so we bypass it entirely
+        print(f"🔥 Loading tokenizer class directly for {pretrained_name_or_path}")
+
+        from transformers import DebertaV2Tokenizer
+
+        # Clean kwargs completely
+        kwargs_tier3 = {
+            "cache_dir": kwargs.get("cache_dir"),
+            "local_files_only": kwargs.get("local_files_only", False),
+        }
+        # Remove None values
+        kwargs_tier3 = {k: v for k, v in kwargs_tier3.items() if v is not None}
+
+        return DebertaV2Tokenizer.from_pretrained(
+            pretrained_name_or_path, add_prefix_space=False, **kwargs_tier3
+        )
 
 
 def main():

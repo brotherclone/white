@@ -1,67 +1,83 @@
+# python
 """
 Text encoder using DeBERTa.
 
 Wraps HuggingFace transformers with configurable pooling and layer freezing.
 """
-
+import re
 import torch
 import torch.nn as nn
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel
 
 
 class TextEncoder(nn.Module):
     """Text encoder using pre-trained transformer."""
 
-    def __init__(
-        self,
-        model_name: str = "microsoft/deberta-v3-base",
-        hidden_size: int = 768,
-        freeze_layers: int = 0,
-        pooling: str = "mean",
-    ):
+    def __init__(self, model_name: str, **kwargs):
         """
-        Args:
-            model_name: HuggingFace model identifier
-            hidden_size: Expected hidden size (for validation)
-            freeze_layers: Number of encoder layers to freeze (0 = fine-tune all)
-            pooling: How to pool token embeddings ("cls", "mean", "max")
+        Load model while preventing unexpected kwargs from being forwarded to the model __init__.
+        Supported custom kwargs (will be removed before calling the HF loader):
+          - pooling: 'cls' | 'mean' | 'max' (default: 'cls')
+          - freeze_layers: int (optional)
+          - use_safetensors: bool (default: True)
         """
         super().__init__()
 
-        self.model_name = model_name
-        self.hidden_size = hidden_size
-        self.pooling = pooling
+        # Handle and remove custom kwargs so they are not forwarded to model __init__
+        self.pooling = kwargs.pop("pooling", "cls")
+        use_safetensors = kwargs.pop("use_safetensors", True)
+        freeze_layers = kwargs.pop("freeze_layers", None)
 
-        # Load pre-trained model
-        print(f"Loading text encoder: {model_name}")
-        self.encoder = AutoModel.from_pretrained(model_name)
+        if self.pooling not in ("cls", "mean", "max"):
+            raise ValueError(f"Unknown pooling method: {self.pooling}")
 
-        # Validate hidden size
-        actual_hidden_size = self.encoder.config.hidden_size
-        if actual_hidden_size != hidden_size:
-            print(
-                f"Warning: Actual hidden size {actual_hidden_size} != expected {hidden_size}"
-            )
-            self.hidden_size = actual_hidden_size
+        # Load model (safetensors preferred)
+        self.encoder = AutoModel.from_pretrained(
+            model_name, use_safetensors=use_safetensors, **kwargs
+        )
 
-        # Freeze layers if requested
-        if freeze_layers > 0:
-            self._freeze_layers(freeze_layers)
+        # Expose hidden size for consumers
+        self.hidden_size = getattr(self.encoder.config, "hidden_size", None)
+
+        # Optionally freeze layers using the helper
+        if freeze_layers is not None:
+            try:
+                n = int(freeze_layers)
+            except Exception:
+                n = None
+            if n and n > 0:
+                self._freeze_layers(n)
 
     def _freeze_layers(self, num_layers: int):
         """Freeze the first N encoder layers."""
         print(f"Freezing first {num_layers} encoder layers")
 
-        # Freeze embeddings
-        for param in self.encoder.embeddings.parameters():
-            param.requires_grad = False
+        # Freeze embeddings if available
+        if hasattr(self.encoder, "embeddings"):
+            for param in self.encoder.embeddings.parameters():
+                param.requires_grad = False
 
-        # Freeze encoder layers
+        # Freeze encoder layers for common HF naming (e.g. encoder.layer)
         if hasattr(self.encoder, "encoder") and hasattr(self.encoder.encoder, "layer"):
             layers = self.encoder.encoder.layer
             for i in range(min(num_layers, len(layers))):
                 for param in layers[i].parameters():
                     param.requires_grad = False
+        else:
+            # Generic fallback: try to freeze by name pattern
+            for name, param in self.encoder.named_parameters():
+                m = re.search(r"\.layer\.(\d+)\.", name) or re.search(
+                    r"\.layers\.(\d+)\.", name
+                )
+                if not m and "encoder" in name:
+                    m = re.search(r"\.(\d+)\.", name)
+                if m:
+                    try:
+                        idx = int(m.group(1))
+                        if idx < num_layers:
+                            param.requires_grad = False
+                    except Exception:
+                        pass
 
     def forward(
         self,
@@ -78,31 +94,23 @@ class TextEncoder(nn.Module):
         Returns:
             Pooled embeddings [batch, hidden_size]
         """
-        # Get encoder outputs
-        outputs = self.encoder(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-        )
-
-        # Get sequence output (all token embeddings)
+        outputs = self.encoder(input_ids=input_ids, attention_mask=attention_mask)
         sequence_output = outputs.last_hidden_state  # [batch, seq_len, hidden]
 
-        # Pool to single vector
         if self.pooling == "cls":
-            # Use [CLS] token (first token)
             pooled = sequence_output[:, 0, :]
 
         elif self.pooling == "mean":
-            # Mean over non-padding tokens
-            mask_expanded = attention_mask.unsqueeze(-1).expand(sequence_output.size())
+            mask_expanded = (
+                attention_mask.unsqueeze(-1).expand_as(sequence_output).float()
+            )
             sum_embeddings = torch.sum(sequence_output * mask_expanded, dim=1)
             sum_mask = torch.clamp(mask_expanded.sum(dim=1), min=1e-9)
             pooled = sum_embeddings / sum_mask
 
         elif self.pooling == "max":
-            # Max over non-padding tokens
-            mask_expanded = attention_mask.unsqueeze(-1).expand(sequence_output.size())
-            sequence_output[mask_expanded == 0] = -1e9  # Mask padding
+            mask_expanded = attention_mask.unsqueeze(-1).expand_as(sequence_output)
+            sequence_output = sequence_output.masked_fill(mask_expanded == 0, -1e9)
             pooled = torch.max(sequence_output, dim=1)[0]
 
         else:

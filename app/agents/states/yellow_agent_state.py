@@ -42,4 +42,21 @@ class YellowAgentState(BaseRainbowAgentState):
     )
 
     def __init__(self, **data):
+        # Rebuild model to resolve forward references if needed
+        if not hasattr(self.__class__, "_rebuilt"):
+            # Import at runtime to ensure all forward references are resolved
+            from app.structures.artifacts.pulsar_palace_character_sheet import (
+                PulsarPalaceCharacterSheet as _PulsarPalaceCharacterSheet,
+            )
+            from app.structures.concepts.pulsar_palace_character import (
+                PulsarPalaceCharacter as _PulsarPalaceCharacter,
+            )
+
+            self.__class__.model_rebuild(
+                _types_namespace={
+                    "PulsarPalaceCharacter": _PulsarPalaceCharacter,
+                    "PulsarPalaceCharacterSheet": _PulsarPalaceCharacterSheet,
+                }
+            )
+            self.__class__._rebuilt = True
         super().__init__(**data)

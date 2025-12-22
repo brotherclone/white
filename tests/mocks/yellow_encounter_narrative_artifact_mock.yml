@@ -46,25 +46,41 @@ characters:
     off_current: 10
 character_images:
   - thread_id: "mock_thread_001"
-    chainer_artifact_type: character_portrait
+    chain_artifact_type: character_portrait
     chain_artifact_file_type: png
     artifact_id: "b2c3d4e5-6789-abcd-ef01-23456789abcd"
     rainbow_color_mnemonic_character_value: Y
     base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
-    file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_one.png"
     artifact_name: character_portrait
-    height: 100
-    width: 100
+    character_name: "Mocky Mocktor"
+    role: "Mocktor"
+    pose: "Mocky"
+    description: "From New Mock City (2121)"
+    image:
+      thread_id: "mock_thread_001"
+      file_name: "portrait_one.png"
+      base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
+      file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_one.png"
+      width: 100
+      height: 100
   - thread_id: "mock_thread_001"
-    chainer_artifact_type: character_portrait
+    chain_artifact_type: character_portrait
     chain_artifact_file_type: png
     artifact_id: "c3d4e5f6-789a-bcde-f012-3456789abcde"
     rainbow_color_mnemonic_character_value: Y
     base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
-    file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_two.png"
     artifact_name: character_portrait
-    height: 100
-    width: 100
+    character_name: "Mocky Mocktor"
+    role: "Mocktor"
+    pose: "Mocky"
+    description: "From New Mock City (2121)"
+    image:
+      thread_id: "mock_thread_001"
+      file_name: "portrait_two.png"
+      base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
+      file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_two.png"
+      width: 100
+      height: 100
 rooms:
   - room_id: room_001
     name: Mock Room

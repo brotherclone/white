@@ -1,4 +1,6 @@
 import os
+from abc import ABC
+
 import yaml
 from pathlib import Path
 from typing import Optional
@@ -13,7 +15,7 @@ from app.structures.enums.symbolic_object_category import SymbolicObjectCategory
 load_dotenv()
 
 
-class SymbolicObjectArtifact(ChainArtifact):
+class SymbolicObjectArtifact(ChainArtifact, ABC):
     """Symbolic object that has emerged from the nostalgia of Rows Bud, the orange agent"""
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.SYMBOLIC_OBJECT
@@ -61,6 +63,16 @@ class SymbolicObjectArtifact(ChainArtifact):
             "name": self.name,
             "description": self.description,
         }
+
+    def for_prompt(self):
+        prompt_parts = []
+        if self.name:
+            prompt_parts.append(f"Symbolic Object: {self.name}")
+        if self.description:
+            prompt_parts.append(f"{self.description}")
+        if self.symbolic_object_category:
+            prompt_parts.append(f"Category: {self.symbolic_object_category.value}")
+        return "\n".join(prompt_parts)
 
 
 if __name__ == "__main__":

@@ -30,48 +30,35 @@ class LastHumanArtifact(ChainArtifact, ABC):
     chain_artifact_type: ChainArtifactType = ChainArtifactType.LAST_HUMAN
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
     rainbow_color_mnemonic_character_value: str = "G"
-    # Identity
     name: str = Field(..., description="Full name")
     age: int = Field(..., ge=0, le=120)
     pronouns: str = Field(default="they/them")
-
-    # Location & time
     location: str = Field(..., description="Specific place, not just country")
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     year_documented: int = Field(
         ...,
         description="Arbitrary showed up in 1975 briefly, in this story comes back as a sub-instance in 2028",
-    )  #
-
-    # Vulnerability
+    )
     parallel_vulnerability: LastHumanVulnerabilityType
     vulnerability_details: str = Field(
         ..., description="Specific way this person's situation mirrors the species"
     )
-
-    # Life details
     occupation: Optional[str] = None
     family_situation: Optional[str] = None
     daily_routine: Optional[str] = Field(
         None, description="Ground in specificity - what did they do on a normal day?"
     )
-
-    # Climate impact
     environmental_stressor: str = Field(
         ..., description="Specific environmental change affecting them"
     )
     adaptation_attempts: List[str] = Field(
         default_factory=list, description="What they tried to do to survive/adapt"
     )
-
-    # Narrative arc
     documentation_type: LastHumanDocumentationType
     last_days_scenario: str = Field(
         ..., description="Intimate cli-fi narrative of their situation"
     )
-
-    # Symbolic elements
     significant_object: Optional[str] = Field(
         None, description="Physical object that represents their story"
     )
@@ -80,7 +67,6 @@ class LastHumanArtifact(ChainArtifact, ABC):
     )
 
     def __init__(self, **data):
-        # Set artifact_name before calling super to ensure filename is correct
         if "artifact_name" not in data and "name" in data:
             data["artifact_name"] = sanitize_for_filename(data["name"])
         super().__init__(**data)
@@ -88,7 +74,6 @@ class LastHumanArtifact(ChainArtifact, ABC):
     @field_validator("year_documented")
     @classmethod
     def _validate_year_documented(cls, v: int) -> int:
-        # allow exactly 1975, or any year from 2028 up to 2350 (inclusive)
         if v == 1975 or (2028 <= v <= 2350):
             return v
         raise ValueError(
@@ -134,6 +119,33 @@ class LastHumanArtifact(ChainArtifact, ABC):
                 allow_unicode=True,
             )
 
+    def for_prompt(self):
+        """Format for prompt - emphasizes the parallel structure."""
+        parts = [
+            f"{self.name}, age {self.age}",
+            f"Location: {self.location}, {self.year_documented}",
+        ]
+        if self.occupation:
+            parts.append(f"Occupation: {self.occupation}")
+        parts.append(f"\nParallel Vulnerability: {self.parallel_vulnerability.value}")
+        parts.append(f"{self.vulnerability_details}")
+        parts.append(f"\nEnvironmental Stressor: {self.environmental_stressor}")
+        if self.adaptation_attempts:
+            if len(self.adaptation_attempts) <= 3:
+                parts.append(
+                    f"Adaptation attempts: {', '.join(self.adaptation_attempts)}"
+                )
+            else:
+                parts.append(
+                    f"Adaptation attempts: {', '.join(self.adaptation_attempts[:3])} (and {len(self.adaptation_attempts) - 3} others)"
+                )
+        parts.append(f"\n{self.last_days_scenario}")
+        if self.significant_object:
+            parts.append(f"\nSignificant object: {self.significant_object}")
+        if self.final_thought:
+            parts.append(f'Final thought: "{self.final_thought}"')
+        return "\n".join(parts)
+
 
 if __name__ == "__main__":
     with open(
@@ -149,3 +161,5 @@ if __name__ == "__main__":
         print(last_human_artifact)
         last_human_artifact.save_file()
         print(last_human_artifact.flatten())
+        p = last_human_artifact.for_prompt()
+        print(p)

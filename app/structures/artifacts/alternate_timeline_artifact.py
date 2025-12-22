@@ -18,28 +18,50 @@ load_dotenv()
 class AlternateTimelineArtifact(ChainArtifact, ABC):
     """The fictional-but-plausible alternate life."""
 
-    # Core narrative
-    period: BiographicalPeriod
-    title: str  # "Summer in Portland, 1998"
-    narrative: str  # Full prose description
-
-    # Structure
-    divergence_point: DivergencePoint
-    key_differences: List[str]  # Bullet points of what changed
-    specific_details: List[AlternateLifeDetail]
-
-    # Tone
-    emotional_tone: QuantumTapeEmotionalTone
-    mood_description: str
-
-    # Context
-    preceding_events: List[str]  # What happened before in actual timeline
-    following_events: List[str]  # What happened after in actual timeline
-
-    # Quality metrics
-    plausibility_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    specificity_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    divergence_magnitude: Optional[float] = Field(None, ge=0.0, le=1.0)
+    period: BiographicalPeriod = Field(
+        alias="period", description="Biographical period of the alternate timeline."
+    )
+    title: str = Field(description="Title of the alternate timeline.")
+    narrative: str = Field(
+        description="Narrative of the alternate timeline.", min_length=100
+    )
+    divergence_point: DivergencePoint = Field(
+        alias="divergence_point",
+        description="Point of divergence between the original timeline and the alternate timeline.",
+    )
+    key_differences: List[str] = Field(
+        description="Key differences in the alternate timeline."
+    )
+    specific_details: List[AlternateLifeDetail] = Field(
+        description="Specific details of the alternate timeline."
+    )
+    emotional_tone: QuantumTapeEmotionalTone = Field(
+        alias="emotional_tone", description="Emotional tone of the alternate timeline."
+    )
+    mood_description: str = Field(
+        description="Phenomenological notes about the alternate timeline."
+    )
+    preceding_events: List[str] = Field(
+        description="Events that happened before the alternate timeline."
+    )
+    following_events: List[str] = Field(
+        description="Events that happened after the alternate timeline."
+    )
+    plausibility_score: Optional[float] = Field(
+        default=None, description="How plausible the divergent event is", ge=0.0, le=1.0
+    )
+    specificity_score: Optional[float] = Field(
+        default=None,
+        description="How specific the narrative details are",
+        ge=0.0,
+        le=1.0,
+    )
+    divergence_magnitude: Optional[float] = Field(
+        default=None,
+        description="How disruptive this event will be to other timelines",
+        ge=0.0,
+        le=1.0,
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -94,6 +116,54 @@ class AlternateTimelineArtifact(ChainArtifact, ABC):
                 allow_unicode=True,
             )
 
+    @staticmethod
+    def _format_items(
+        items: List[str] | List[AlternateLifeDetail], bullet: str, indent: int = 3
+    ) -> str:
+        """Return a consistently indented, newline-separated block of bullets.
+        - Empty lists return an empty string.
+        - AlternateLifeDetail items attempt `model_dump()` and fall back to `str()`."""
+        if not items:
+            return ""
+        prefix = " " * indent
+
+        def render(item):
+            if isinstance(item, AlternateLifeDetail):
+                item_data = item.model_dump()
+                return (
+                    item_data.get("text")
+                    or item_data.get("description")
+                    or item_data.get("detail")
+                    or (
+                        ", ".join(f"{k}: {v}" for k, v in item_data.items())
+                        if isinstance(item_data, dict)
+                        else str(item_data)
+                    )
+                )
+            return str(item)
+
+        return "\n".join(f"{prefix}{bullet} {render(it)}" for it in items)
+
+    def for_prompt(self):
+        preceding_block = self._format_items(self.preceding_events, "⍿", indent=3)
+        key_diff_block = self._format_items(self.key_differences, "≏", indent=8)
+        specific_block = self._format_items(self.specific_details, "✧", indent=8)
+        following_block = self._format_items(self.following_events, "⍿", indent=3)
+
+        artifact_for_prompt = (
+            f"Alternate Timeline:\n"
+            f"Title: {self.title} | {self.period.start_date} - {self.period.end_date} | Age: {self.period.age_range}\n\n"
+            f"{self.narrative}\n\n"
+            f"{preceding_block}\n"
+            f"⌇ Timeline Anomaly Level {self.divergence_magnitude}: {self.divergence_point.when}: {self.divergence_point.what_changed}\n"
+            f"    Key Differences:\n{key_diff_block}\n"
+            f"    Specific Details:\n{specific_block}\n"
+            f"    Emotional Tone: {self.emotional_tone.value}\n"
+            f"    Phenomenological Notes: {self.mood_description}\n"
+            f"{following_block}\n"
+        )
+        return artifact_for_prompt
+
 
 if __name__ == "__main__":
     with open(
@@ -105,3 +175,5 @@ if __name__ == "__main__":
         print(timeline)
         timeline.save_file()
         print(timeline.flatten())
+        p = timeline.for_prompt()
+        print(p)

@@ -1,3 +1,4 @@
+from abc import ABC
 from pathlib import Path
 from typing import List, Optional
 
@@ -11,7 +12,7 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.publisher_type import PublisherType
 
 
-class ReactionBookChainArtifact(ChainArtifact):
+class ReactionBookChainArtifact(ChainArtifact, ABC):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.BOOK
     chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
@@ -106,6 +107,33 @@ class ReactionBookChainArtifact(ChainArtifact):
             "related_works": self.related_works,
             "excerpts": self.excerpts,
         }
+
+    def for_prompt(self) -> str:
+        """Return a human-readable summary for prompting.
+
+        Includes title, subtitle (if present), author, year, publisher,
+        condition, danger level and the generated file path/name.
+        """
+        subtitle_part = f" — {self.subtitle}" if self.subtitle else ""
+        condition = getattr(self.condition, "value", str(self.condition))
+        file_info = f"{self.get_artifact_path(with_file_name=True)}"
+
+        parts = [
+            f"Book: {self.title}{subtitle_part}",
+            f"Author: {self.author}",
+            f"Year: {self.year}",
+            f"Publisher: {self.publisher} ({getattr(self.publisher_type, 'value', self.publisher_type)})",
+            f"Condition: {condition}",
+            f"Danger level: {self.danger_level}",
+            f"File: {file_info}",
+        ]
+
+        if self.abstract:
+            parts.append(f"Abstract: {self.abstract}")
+        if self.notable_quote:
+            parts.append(f"Notable quote: {self.notable_quote}")
+
+        return ", ".join(parts)
 
 
 if __name__ == "__main__":
