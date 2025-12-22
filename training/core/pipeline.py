@@ -7,6 +7,7 @@ Handles loading, preprocessing, and batching of training data.
 from pathlib import Path
 from typing import Dict, Tuple
 import pandas as pd
+import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 from transformers import AutoTokenizer
@@ -187,13 +188,45 @@ def build_dataloaders(
             .values
         )
 
-    # Convert to float
-    if isinstance(target_values[0], bool):
-        target_values = target_values.astype(float)
-    else:
-        target_values = (target_values == "True").astype(float)
+    # Convert to float - FIXED: handle boolean arrays properly
+    target_array = np.array(target_values)
 
-    pos_weight = (len(target_values) - target_values.sum()) / target_values.sum()
+    # Check dtype and convert appropriately
+    if target_array.dtype == bool or target_array.dtype == np.bool_:
+        # Direct boolean array: True → 1.0, False → 0.0
+        target_float = target_array.astype(float)
+    elif target_array.dtype == object:
+        # Object array (might be strings or mixed types)
+        # Try to convert each element
+        converted = []
+        for val in target_array:
+            if isinstance(val, bool):
+                converted.append(float(val))
+            elif isinstance(val, str):
+                # String "True"/"False"
+                converted.append(float(val == "True"))
+            else:
+                # Fallback - try to interpret as truthy
+                converted.append(float(bool(val)))
+        target_float = np.array(converted, dtype=float)
+    else:
+        # Numeric or other - just cast to float
+        target_float = target_array.astype(float)
+
+    # Compute pos_weight
+    num_positive = target_float.sum()
+    num_negative = len(target_float) - num_positive
+
+    if num_positive == 0:
+        print("⚠️  WARNING: No positive samples! Setting pos_weight=1.0")
+        pos_weight = 1.0
+    elif num_negative == 0:
+        print("⚠️  WARNING: No negative samples! Setting pos_weight=1.0")
+        pos_weight = 1.0
+    else:
+        pos_weight = num_negative / num_positive
+
+    print(f"Class balance: {num_positive:.0f} positive, {num_negative:.0f} negative")
 
     stats = {
         "total_samples": len(df),
@@ -213,7 +246,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
 
     train_loader, val_loader, stats = build_dataloaders(
-        manifest_path="../data/base_manifest_db.parquet",
+        manifest_path="/workspace/data/base_manifest_db.parquet",
         tokenizer=tokenizer,
         target_column="has_rebracketing_markers",
         batch_size=4,

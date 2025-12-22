@@ -44,8 +44,14 @@ class PulsarPalaceCharacterSheet(ChainArtifact, ABC):
     def __init__(self, **data):
         # Rebuild model to resolve forward references if needed
         if not hasattr(self.__class__, "_rebuilt"):
+            # Import at runtime to make PulsarPalaceCharacter available for model_rebuild
+            from app.structures.concepts.pulsar_palace_character import (
+                PulsarPalaceCharacter as _PulsarPalaceCharacter,
+            )
 
-            self.__class__.model_rebuild()
+            self.__class__.model_rebuild(
+                _types_namespace={"PulsarPalaceCharacter": _PulsarPalaceCharacter}
+            )
             self.__class__._rebuilt = True
         super().__init__(**data)
 

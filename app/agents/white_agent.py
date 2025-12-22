@@ -8,7 +8,6 @@ from typing import Any, Dict, List
 from uuid import uuid4
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import RunnableConfig
-from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.constants import START
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
@@ -134,7 +133,8 @@ class WhiteAgent(BaseModel):
         return updated_state
 
     def build_workflow(self) -> CompiledStateGraph:
-        check_points = InMemorySaver()
+        # Disable checkpointing to avoid serialization issues with complex Pydantic models
+        check_points = None
         workflow = StateGraph(MainAgentState)
         # ⚪️
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
@@ -215,7 +215,11 @@ class WhiteAgent(BaseModel):
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
-            {"red": "rewrite_proposal_with_synthesis", "black": "invoke_black_agent"},
+            {
+                "red": "rewrite_proposal_with_synthesis",
+                "black": "invoke_black_agent",
+                "finish": "finalize_song_proposal",
+            },
         )
         # ⚪️ ⚫ ⚪️ 🔴 ⚪️ 🟠 ⚪️ 🟡 ⚪️ 🟢 ⚪ ️🔵 ⚪️ 🩵 ⚪ ️🟣 ⚪️#
         workflow.add_conditional_edges(
