@@ -26,6 +26,7 @@ class BookPageCollection(BaseModel):
 
 
 class BookArtifact(ChainArtifact, ABC):
+
     chain_artifact_type: str = Field(
         default="REDChainArtifactBook",
         description="Compatibility string identifier for Red Agent book artifacts",
@@ -73,23 +74,15 @@ class BookArtifact(ChainArtifact, ABC):
         super().__init__(**data)
 
     def to_markdown(self) -> str:
-        """Convert book artifact to formatted markdown."""
-        md_lines = []
-
-        # Title and subtitle
-        md_lines.append(f"# {self.title}")
+        md_lines = [f"# {self.title}"]
         if self.subtitle:
             md_lines.append(f"## {self.subtitle}")
         md_lines.append("")
-
-        # Author and credentials
         author_line = f"**Author:** {self.author}"
         if self.author_credentials:
             author_line += f" ({self.author_credentials})"
         md_lines.append(author_line)
         md_lines.append("")
-
-        # Publication info
         md_lines.append(f"**Year:** {self.year}")
         md_lines.append(
             f"**Publisher:** {self.publisher} ({self.publisher_type.value})"
@@ -99,14 +92,10 @@ class BookArtifact(ChainArtifact, ABC):
         if self.isbn:
             md_lines.append(f"**ISBN:** {self.isbn}")
         md_lines.append("")
-
-        # Catalog and condition
         md_lines.append(f"**Catalog Number:** {self.catalog_number}")
         md_lines.append(f"**Condition:** {self.condition.value}")
         md_lines.append(f"**Danger Level:** {self.danger_level}/5")
         md_lines.append("")
-
-        # Acquisition
         if self.acquisition_date or self.acquisition_notes:
             md_lines.append("## Acquisition")
             if self.acquisition_date:
@@ -114,53 +103,37 @@ class BookArtifact(ChainArtifact, ABC):
             if self.acquisition_notes:
                 md_lines.append(f"**Notes:** {self.acquisition_notes}")
             md_lines.append("")
-
-        # Language and translation
         md_lines.append(f"**Language:** {self.language}")
         if self.translated_from:
             md_lines.append(f"**Translated from:** {self.translated_from}")
         if self.translator:
             md_lines.append(f"**Translator:** {self.translator}")
         md_lines.append("")
-
-        # Abstract
         if self.abstract:
             md_lines.append("## Abstract")
             md_lines.append(self.abstract)
             md_lines.append("")
-
-        # Notable quote
         if self.notable_quote:
             md_lines.append("## Notable Quote")
             md_lines.append(f"> {self.notable_quote}")
             md_lines.append("")
-
-        # Excerpts
         if self.excerpts:
             md_lines.append("## Excerpts")
             for excerpt in self.excerpts:
                 md_lines.append(f"- {excerpt}")
             md_lines.append("")
-
-        # Suppression history
         if self.suppression_history:
             md_lines.append("## Suppression History")
             md_lines.append(self.suppression_history)
             md_lines.append("")
-
-        # Related works
         if self.related_works:
             md_lines.append("## Related Works")
             for work in self.related_works:
                 md_lines.append(f"- {work}")
             md_lines.append("")
-
-        # Tags
         if self.tags:
             md_lines.append(f"**Tags:** {', '.join(self.tags)}")
             md_lines.append("")
-
-        # Metadata footer
         md_lines.append("---")
         md_lines.append("## Metadata")
         md_lines.append(f"- **Artifact ID:** {self.artifact_id}")
@@ -168,7 +141,6 @@ class BookArtifact(ChainArtifact, ABC):
         md_lines.append(
             f"- **Rainbow Color:** {self.rainbow_color_mnemonic_character_value}"
         )
-
         return "\n".join(md_lines)
 
     def save_file(self):
@@ -185,6 +157,29 @@ class BookArtifact(ChainArtifact, ABC):
                     default_flow_style=False,
                     allow_unicode=True,
                 )
+
+    def for_prompt(self) -> str:
+        """Format book for LLM prompt inclusion - content-focused."""
+        parts = [f"{self.title} by {self.author} ({self.year})"]
+        if self.subtitle:
+            parts.append(f"Subtitle: {self.subtitle}")
+        if self.danger_level >= 4:
+            parts.append(f"[Danger Level: {self.danger_level}/5]")
+        if self.tags:
+            parts.append(f"Tags: {', '.join(self.tags)}")
+        if self.abstract:
+            parts.append(f"\nAbstract:\n{self.abstract}")
+        if self.notable_quote:
+            parts.append(f'\nNotable Quote:\n"{self.notable_quote}"')
+        if self.excerpts:
+            parts.append("\nExcerpts:")
+            for excerpt in self.excerpts:
+                parts.append(f"  - {excerpt}")
+        if self.suppression_history:
+            parts.append(f"\nSuppression History: {self.suppression_history}")
+        if self.related_works:
+            parts.append(f"\nRelated Works: {', '.join(self.related_works)}")
+        return "\n".join(parts)
 
     def flatten(self):
         parent_data = super().flatten()
@@ -232,3 +227,5 @@ if __name__ == "__main__":
         book_artifact = BookArtifact(**data)
         book_artifact.save_file()
         print(book_artifact.flatten())
+        p = book_artifact.for_prompt()
+        print(p)

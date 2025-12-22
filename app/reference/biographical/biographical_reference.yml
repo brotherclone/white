@@ -32,7 +32,7 @@ years:
         - "My father was drafted away from a full scholarship to Stanford University. He was going to run to Canada but his cousins, both FBI agents, convinced him to serve."
         - "Watching headlight patterns on the ceiling as a baby."
       emotional_landscape: "My room was yellow."
-      choice_points: []  # No conscious choices yet
+      choice_points: []
 
   1976:
     world_events:
@@ -53,10 +53,14 @@ years:
         - "Laser printers developed"
     personal_context:
       summary: "Age 1 - early consciousness development"
-      key_events: ["I got carotene poisoning and turned orange from too many carrots.", "Loud music on the stereo."]
-      influences: ["Pot smoke filled the room from teenagers hanging out in the park behind the house.", "A wooden staircase I think I fell down from."]
+      key_events:
+        - "I got carotene poisoning and turned orange from too many carrots."
+        - "Loud music on the stereo."
+      influences:
+        - "Pot smoke filled the room from teenagers hanging out in the park behind the house."
+        - "A wooden staircase I think I fell down from."
       emotional_landscape: ["Odd sense of competition from parents"]
-      choice_points: ["I had a very vivid memory of flying at least hovering for a bit before landing under the dining room table, what if I believed this was just a dream?"]
+      choice_points: []
 
   1977:
     world_events:
@@ -76,11 +80,18 @@ years:
         - "Optical fiber communications"
         - "MRI technology developed"
     personal_context:
-      summary: "Age 2 - language and mobility development"
-      key_events: ["I pretend all the pots and pans I removed from the cabinet to play percussion with are too heavy to put back", "When the Doobie Brothers album is played I know we're having fish-sticks for dinner"]
-      influences: ["I seem to remember a baby sitter watching me while the family went to see Star Wars - but it must have been a second time round showing"]
-      emotional_landscape: ["I remember that I wanted to build a fortress in the bushes on the side of the house"]
-      choice_points: ["I remember my Aunt telling me that calling a woman eating an ice cream cone was 'fat' and she explaining that it was hurtful. What if I didn't take this to heart?"]
+      summary: "Age 2 - burgeoning awareness of environment"
+      key_events:
+        - "I pretend all the pots and pans I removed from the cabinet to play percussion with are too heavy to put back"
+        - "When the Doobie Brothers album is played I know we're having fish-sticks for dinner"
+      influences:
+        - "I seem to remember a baby sitter watching me while the family went to see Star Wars - but it must have been a second time round showing"
+      emotional_landscape:
+        - "I remember that I wanted to build a fortress in the bushes on the side of the house"
+      choice_points:
+        - "I had a very vivid memory of flying at least hovering for a bit before landing under the dining room table, what if I believed this was just a dream?"
+        - "I remember my Aunt telling me that calling a woman eating an ice cream cone was 'fat' and she explaining that it was hurtful. What if I didn't take this to heart?"
+        - "What if I did build a fortress in the bushes on the side of the house?"
 
   1978:
     world_events:
@@ -101,10 +112,21 @@ years:
         - "GPS testing begins"
     personal_context:
       summary: "Age 3 - personality emergence"
-      key_events: ["My sister, Erica, is born in December", "One of our dogs is hit by a car", "My father was trying to rekindle his theater career by directing a play at a community center across the street. The play was Drucula. When he wasn't paying attention I left the building and walked home almost being run down by a truck. My mother is furious with him. This deeply effects me as I'm (still) unable to reconcile the guilt of again ruining his artistic aspirations and what was clearly terrible neglect."]
-      influences: ["Electric Company", "A terrible Captain America made-for-tv movie"]
-      emotional_landscape: ["Guilt, confusion, desire for attention"]
-      choice_points: ["What if I didn't walk home?", "What if I was hit by the truck and maimed?"]
+      key_events:
+        - "I'm locked in an upsidedown playpen by a nun."
+        - "My sister, Erica, is born in December"
+        - "One of our dogs is hit by a car"
+        - "My father was trying to rekindle his theater career by directing a play at a community center across the street. The play was Dracula. When he wasn't paying attention I left the building and walked home almost being run down by a truck. My mother is furious with him. This deeply effects me as I'm (still) unable to reconcile the guilt of again ruining his artistic aspirations and what was clearly terrible neglect."
+      influences:
+        - "Electric Company"
+        - "A terrible Captain America made-for-tv movie"
+      emotional_landscape:
+        - "Guilt, confusion, desire for attention"
+      choice_points:
+        - "What if I didn't walk home?"
+        - "What if I was hit by the truck and maimed?"
+        - "What if I never had a sister?"
+        - "What if I had a brother instead?"
 
   1979:
     world_events:
@@ -125,10 +147,18 @@ years:
         - "Cellular phone testing"
     personal_context:
       summary: "Age 4 - early memory formation"
-      key_events: ["I'm locked in an upsidedown playpen by a nun."]
-      influences: ["I am obsessed with The Beatles after watching Yellow Submarine", "My first purchase, a nice price version of Sgt. Pepper on vinyl", "We move to 10 Judge Beach Road in Sussex, New Jersey - at the time it's called RD2 Box 26#A"]
-      emotional_landscape: ["I am allowed to run free in the woods behind the house and I love it"]
-      choice_points: ["What if I never moved here?", "What if I never saw Yellow Submarine?", "What if I didn't develop a distaste for religion at such an early age?"]
+      key_events:
+        - "We move from Rockaway to Wantage."
+      influences:
+        - "I am obsessed with The Beatles after watching Yellow Submarine"
+        - "My first purchase, a nice price version of Sgt. Pepper on vinyl from the local Jamesway"
+        - "We move to 10 Judge Beach Road in Sussex, New Jersey - at the time it's called RD2 Box 26#A"
+      emotional_landscape:
+        - "I am allowed to run free in the woods behind the house and I love it"
+      choice_points:
+        - "What if I never moved here?"
+        - "What if I never saw Yellow Submarine?"
+        - "What if I didn't develop a distaste for religion at such an early age?"
 
   1980:
     world_events:
@@ -149,10 +179,18 @@ years:
         - "Cable TV expansion"
     personal_context:
       summary: "Age 5 - school readiness and social awareness"
-      key_events: ["My kindergarten class was in the post office", "I walk home alone from the bus stop. One day a long, black sedan with a man and woman in it drives behind me, not passing going a few feet at a time. The people speak with an Eastern European accent and have matching bowl haircuts, and wear thick plastic sunglasses.Right around my driveway, my father catches all this and asks them what they are doing. They reply, 'We are looking at the black snake'.","That winter I remember it being warm in December and playing outside, in the lot across from my house there was a patch of wild strawberries. I would play Pepperland and eat the strawberries. One morning, I guess have been December 9th, I heard my mother screaming. When I got to the house she was sobbing 'they shot him, they shot him'. I didn't understand. It was only later I learned that John Lennon had been shot."]
-      influences: ["The beginning of many kinder-trauma movie viewings - starting with Han Solo being frozen", "Pac-Man/video game culture"]
-      emotional_landscape: ["I feel very isolated and prefer my own imaginary world"]
-      choice_points: ["What if I had been abducted or indoctrinated by the black snake people?", "What if John Lennon wasn't shot?", "What if I was more outgoing?"]
+      key_events:
+        - "My kindergarten class was in the post office"
+        - "I walk home alone from the bus stop. One day a long, black sedan with a man and woman in it drives behind me, not passing going a few feet at a time. The people speak with an Eastern European accent and have matching bowl haircuts, and wear thick plastic sunglasses.Right around my driveway, my father catches all this and asks them what they are doing. They reply, 'We are looking at the black snake'."
+        - "That winter I remember it being warm in December and playing outside, in the lot across from my house there was a patch of wild strawberries. I would play Pepperland and eat the strawberries. One morning, I guess have been December 9th, I heard my mother screaming. When I got to the house she was sobbing 'they shot him, they shot him'. I didn't understand. It was only later I learned that John Lennon had been shot."
+      influences:
+        - "The beginning of many kinder-trauma movie viewings - starting with Han Solo being frozen"
+      emotional_landscape:
+        - "I feel very isolated and prefer my own imaginary world"
+      choice_points:
+        - "What if I had been abducted or indoctrinated by the black snake people?"
+        - "What if John Lennon wasn't shot?"
+        - "What if I was more outgoing?"
 
   1981:
     world_events:
@@ -172,13 +210,15 @@ years:
         - "CD players in Japan"
         - "Space Shuttle program begins"
     personal_context:
-      summary: "Age 6 - formal education begins"
-
-      key_events: ["Elementary school experience", "Friend group formation"]
-      influences: ["MTV generation begins", "Video game culture impact"]
+      summary: "Age 6 - reading is fundamental"
+      key_events:
+        - "Playing an early computer game in the library which was loaded via cassette"
+      influences:
+        - "The Hobbit"
+        - "The Chronicles of Narnia"
       emotional_landscape: "Structured learning and social navigation"
-
-      choice_points: ["My mom makes a play date with a kid down the street and we become friends - although he teased my forever 'can you play with my little boy?' - What if my mom didn't foist me on other kids?"]
+      choice_points:
+        - "My mom makes a play date with a kid down the street and we become friends - although he teased my forever 'can you play with my little boy?' - What if my mom didn't foist me on other kids?"
 
   1982:
     world_events:
@@ -199,10 +239,16 @@ years:
         - "TCP/IP protocol standardized"
     personal_context:
       summary: "Age 7 - reasoning and cultural absorption"
-      key_events: ["Was kicked out of the gifted and talented program for spacing out too much", "Wrote a fantasy novel and the teacher threw it away"]
-      influences: ["Infocom's Wish-bringer and Suspended", "Dungeons & Dragons culture"]
-      emotional_landscape: "Wonder and imagination peak period - truly happy"
-      choice_points: ["As a present I received the electro-mechanical board game called Dark Tower - this ended up having a big impact on both my creative and professional work - always trying to blend the physical and the digital. What if I never played this game?", "I did all the boy stuff like scouts and little league - but was horrible at both - further isolating me, what if I took to these activities better?"]
+      key_events:
+        - "Was kicked out of the gifted and talented program for spacing out too much"
+        - "Wrote a fantasy novel and the teacher threw it away"
+      influences:
+        - "Infocom's Wish-bringer and Suspended"
+        - "Dungeons & Dragons culture"
+      emotional_landscape: "Wonder and imagination peak period - truly happy. But also first taste of creative rejection."
+      choice_points:
+        - "As a present I received the electro-mechanical board game called Dark Tower - this ended up having a big impact on both my creative and professional work - always trying to blend the physical and the digital. What if I never played this game?"
+        - "I did all the boy stuff like scouts and little league - but was horrible at both - further isolating me, what if I took to these activities better?"
 
   1983:
     world_events:
@@ -223,10 +269,16 @@ years:
         - "Cellular phone deployment"
     personal_context:
       summary: "Age 8 - independence and skill development"
-      key_events: ["Skill acquisition focus", "Independence milestones"]
-      influences: ["Star Wars trilogy completion", "MTV music video aesthetics"]
+      key_events:
+        - "Skill acquisition focus"
+        - "Independence milestones"
+      influences:
+        - "Star Wars trilogy completion"
+        - "MTV music video aesthetics"
       emotional_landscape: "Confidence building and skill mastery"
-      choice_points: ["Hobby deepening choices", "Social identity formation"]
+      choice_points:
+        - "Hobby deepening choices"
+        - "Social identity formation"
 
   1984:
     world_events:
@@ -247,10 +299,16 @@ years:
         - "DNA fingerprinting invented"
     personal_context:
       summary: "Age 9 - pre-adolescent awareness"
-      key_events: ["Growing cultural awareness", "Academic/social development"]
-      influences: ["Macintosh computer revolution", "Prince/pop music sophistication"]
+      key_events:
+        - "Growing cultural awareness"
+        - "Academic/social development"
+      influences:
+        - "Macintosh computer revolution"
+        - "Prince/pop music sophistication"
       emotional_landscape: "Cultural sophistication and social awareness growing"
-      choice_points: ["Technology engagement level", "Cultural taste formation"]
+      choice_points:
+        - "Technology engagement level"
+        - "Cultural taste formation"
 
   1985:
     world_events:
@@ -271,10 +329,16 @@ years:
         - "Desktop publishing begins"
     personal_context:
       summary: "Age 10 - late childhood sophistication"
-      key_events: ["Double-digit milestone", "Cultural sophistication development"]
-      influences: ["Back to the Future time concepts", "Nintendo generation begins"]
+      key_events:
+        - "Double-digit milestone"
+        - "Cultural sophistication development"
+      influences:
+        - "Back to the Future time concepts"
+        - "Nintendo generation begins"
       emotional_landscape: "Complexity and time awareness developing"
-      choice_points: ["Video game engagement level", "Music taste development"]
+      choice_points:
+        - "Video game engagement level"
+        - "Music taste development"
 
   1986:
     world_events:
@@ -295,10 +359,16 @@ years:
         - "Personal computer prices drop"
     personal_context:
       summary: "Age 11 - pre-adolescent transition"
-      key_events: ["Social complexity increasing", "Identity questions emerging"]
-      influences: ["Disaster awareness via media", "Pop culture sophistication"]
+      key_events:
+        - "Social complexity increasing"
+        - "Identity questions emerging"
+      influences:
+        - "Disaster awareness via media"
+        - "Pop culture sophistication"
       emotional_landscape: "Transitional awareness and complexity"
-      choice_points: ["Social group alignments", "Interest specialization"]
+      choice_points:
+        - "Social group alignments"
+        - "Interest specialization"
 
   1987:
     world_events:
@@ -319,10 +389,16 @@ years:
         - "Disposable cameras popular"
     personal_context:
       summary: "Age 12 - early adolescence begins"
-      key_events: ["Middle school transition", "Adolescent changes beginning"]
-      influences: ["Dance/romance culture awareness", "Quote culture participation"]
+      key_events:
+        - "Middle school transition"
+        - "Adolescent changes beginning"
+      influences:
+        - "Dance/romance culture awareness"
+        - "Quote culture participation"
       emotional_landscape: "Adolescent stirring and cultural engagement"
-      choice_points: ["Social identity choices", "Cultural participation level"]
+      choice_points:
+        - "Social identity choices"
+        - "Cultural participation level"
 
   1988:
     world_events:
@@ -343,10 +419,16 @@ years:
         - "Digital sampling affordable"
     personal_context:
       summary: "Age 13 - full adolescence emergence"
-      key_events: ["Teenage identity formation", "Social/romantic awareness"]
-      influences: ["Music taste solidification", "Countercultural awareness"]
+      key_events:
+        - "Teenage identity formation"
+        - "Social/romantic awareness"
+      influences:
+        - "Music taste solidification"
+        - "Countercultural awareness"
       emotional_landscape: "Intense identity formation and rebellion stirring"
-      choice_points: ["Music genre allegiances", "Social group identity"]
+      choice_points:
+        - "Music genre allegiances"
+        - "Social group identity"
 
   1989:
     world_events:
@@ -367,10 +449,16 @@ years:
         - "GPS satellites operational"
     personal_context:
       summary: "Age 14 - high school preparation"
-      key_events: ["High school transition approaching", "Identity solidification"]
-      influences: ["Berlin Wall freedom symbolism", "Batman dark culture"]
+      key_events:
+        - "High school transition approaching"
+        - "Identity solidification"
+      influences:
+        - "Berlin Wall freedom symbolism"
+        - "Batman dark culture"
       emotional_landscape: "Freedom concepts and identity crystallization"
-      choice_points: ["High school preparation choices", "Cultural identity decisions"]
+      choice_points:
+        - "High school preparation choices"
+        - "Cultural identity decisions"
 
   1990:
     world_events:
@@ -391,10 +479,16 @@ years:
         - "World Wide Web protocols"
     personal_context:
       summary: "Age 15 - high school years begin"
-      key_events: ["High school social navigation", "Academic/creative focus development"]
-      influences: ["Twin Peaks surrealism", "Grunge culture emerging"]
+      key_events:
+        - "High school social navigation"
+        - "Academic/creative focus development"
+      influences:
+        - "Twin Peaks surrealism"
+        - "Grunge culture emerging"
       emotional_landscape: "High school intensity and creative awakening"
-      choice_points: ["Academic focus areas", "Social/creative group alignment"]
+      choice_points:
+        - "Academic focus areas"
+        - "Social/creative group alignment"
 
   1991:
     world_events:
@@ -415,10 +509,16 @@ years:
         - "World Wide Web browsers"
     personal_context:
       summary: "Age 16 - peak high school experience"
-      key_events: ["Driving/independence milestones", "Creative/academic identity"]
-      influences: ["Nirvana generation defining moment", "Alternative culture mainstreaming"]
+      key_events:
+        - "Driving/independence milestones"
+        - "Creative/academic identity"
+      influences:
+        - "Nirvana generation defining moment"
+        - "Alternative culture mainstreaming"
       emotional_landscape: "Independence and creative identity crystallization"
-      choice_points: ["Transportation independence", "Creative expression choices"]
+      choice_points:
+        - "Transportation independence"
+        - "Creative expression choices"
 
   1992:
     world_events:
@@ -439,10 +539,16 @@ years:
         - "Internet growth accelerates"
     personal_context:
       summary: "Age 17 - late high school intensity"
-      key_events: ["College preparation stress", "Creative/social peak"]
-      influences: ["Wayne's World humor culture", "MTV Unplugged acoustic trends"]
+      key_events:
+        - "College preparation stress"
+        - "Creative/social peak"
+      influences:
+        - "Wayne's World humor culture"
+        - "MTV Unplugged acoustic trends"
       emotional_landscape: "High school climax and future anxiety"
-      choice_points: ["College/career direction", "Creative commitment level"]
+      choice_points:
+        - "College/career direction"
+        - "Creative commitment level"
 
   1993:
     world_events:
@@ -500,10 +606,16 @@ years:
         - "World Wide Web explosion"
     personal_context:
       summary: "Age 19 - post-graduation reality"
-      key_events: ["College freshman experience or alternative path", "Post-high school band evolution"]
-      influences: ["Kurt Cobain death impact on music culture", "Internet culture beginning"]
+      key_events:
+        - "College freshman experience or alternative path"
+        - "Post-high school band evolution"
+      influences:
+        - "Kurt Cobain death impact on music culture"
+        - "Internet culture beginning"
       emotional_landscape: "Post-graduation adjustment and identity solidification"
-      choice_points: ["College continuation decisions", "Music career vs academic focus"]
+      choice_points:
+        - "College continuation decisions"
+        - "Music career vs academic focus"
 
   1995:
     world_events:
@@ -524,10 +636,16 @@ years:
         - "Digital cameras affordable"
     personal_context:
       summary: "Age 20 - early adulthood establishment"
-      key_events: ["Young adult identity formation", "Career/education path clarification"]
-      influences: ["Windows 95 digital revolution", "Alanis Morissette emotional honesty"]
+      key_events:
+        - "Young adult identity formation"
+        - "Career/education path clarification"
+      influences:
+        - "Windows 95 digital revolution"
+        - "Alanis Morissette emotional honesty"
       emotional_landscape: "Young adult responsibility and creative expression balance"
-      choice_points: ["Career focus decisions", "Geographic/lifestyle choices"]
+      choice_points:
+        - "Career focus decisions"
+        - "Geographic/lifestyle choices"
 
   1996:
     world_events:
@@ -548,10 +666,16 @@ years:
         - "Palm Pilot PDAs"
     personal_context:
       summary: "Age 21 - legal adulthood milestone"
-      key_events: ["Legal drinking age milestone", "Full adult responsibilities"]
-      influences: ["Internet mainstream adoption", "Hip-hop culture complexity"]
+      key_events:
+        - "Legal drinking age milestone"
+        - "Full adult responsibilities"
+      influences:
+        - "Internet mainstream adoption"
+        - "Hip-hop culture complexity"
       emotional_landscape: "Full adulthood realization and responsibility"
-      choice_points: ["Adult lifestyle establishment", "Professional identity choices"]
+      choice_points:
+        - "Adult lifestyle establishment"
+        - "Professional identity choices"
 
   1997:
     world_events:
@@ -572,10 +696,16 @@ years:
         - "Wi-Fi standard developed"
     personal_context:
       summary: "Age 22 - young adult identity solidification"
-      key_events: ["Career/education progression", "Relationship development"]
-      influences: ["Radiohead sophistication", "Internet culture participation"]
+      key_events:
+        - "Career/education progression"
+        - "Relationship development"
+      influences:
+        - "Radiohead sophistication"
+        - "Internet culture participation"
       emotional_landscape: "Young adult complexity and cultural sophistication"
-      choice_points: ["Professional development paths", "Relationship commitment levels"]
+      choice_points:
+        - "Professional development paths"
+        - "Relationship commitment levels"
 
   1998:
     world_events:
@@ -596,10 +726,16 @@ years:
         - "Digital cameras mainstream"
     personal_context:
       summary: "Age 23 - career establishment phase"
-      key_events: ["Career development milestones", "Adult relationship navigation"]
-      influences: ["Google information revolution", "File sharing culture"]
+      key_events:
+        - "Career development milestones"
+        - "Adult relationship navigation"
+      influences:
+        - "Google information revolution"
+        - "File sharing culture"
       emotional_landscape: "Professional establishment and cultural engagement"
-      choice_points: ["Career advancement decisions", "Technology adoption level"]
+      choice_points:
+        - "Career advancement decisions"
+        - "Technology adoption level"
 
   1999:
     world_events:
@@ -620,10 +756,16 @@ years:
         - "Wireless internet development"
     personal_context:
       summary: "Age 24 - late twenties approach"
-      key_events: ["Quarter-life milestone approaches", "Adult identity solidification"]
-      influences: ["The Matrix reality questioning", "Napster music revolution"]
+      key_events:
+        - "Quarter-life milestone approaches"
+        - "Adult identity solidification"
+      influences:
+        - "The Matrix reality questioning"
+        - "Napster music revolution"
       emotional_landscape: "Approaching quarter-life reflection and reality questioning"
-      choice_points: ["Life direction evaluation", "Cultural participation vs creation"]
+      choice_points:
+        - "Life direction evaluation"
+        - "Cultural participation vs creation"
 
   2000:
     world_events:
@@ -644,10 +786,16 @@ years:
         - "Broadband internet growth"
     personal_context:
       summary: "Age 25 - quarter-life milestone"
-      key_events: ["Quarter-century milestone", "Career/life direction assessment"]
-      influences: ["Dot-com economy optimism", "Digital music revolution"]
+      key_events:
+        - "Quarter-century milestone"
+        - "Career/life direction assessment"
+      influences:
+        - "Dot-com economy optimism"
+        - "Digital music revolution"
       emotional_landscape: "Quarter-life evaluation and future planning"
-      choice_points: ["Major life direction decisions", "Technology career considerations"]
+      choice_points:
+        - "Major life direction decisions"
+        - "Technology career considerations"
 
   2001:
     world_events:
@@ -668,10 +816,16 @@ years:
         - "Broadband adoption accelerates"
     personal_context:
       summary: "Age 26 - post-9/11 worldview shift"
-      key_events: ["9/11 impact on worldview", "Career/relationship developments"]
-      influences: ["9/11 security culture shift", "iPod personal music revolution"]
+      key_events:
+        - "9/11 impact on worldview"
+        - "Career/relationship developments"
+      influences:
+        - "9/11 security culture shift"
+        - "iPod personal music revolution"
       emotional_landscape: "World complexity realization and personal priority reassessment"
-      choice_points: ["Security vs freedom lifestyle decisions", "Technology integration level"]
+      choice_points:
+        - "Security vs freedom lifestyle decisions"
+        - "Technology integration level"
 
   2002:
     world_events:
@@ -692,10 +846,16 @@ years:
         - "Satellite radio services"
     personal_context:
       summary: "Age 27 - late twenties establishment"
-      key_events: ["Career advancement milestones", "Adult relationship deepening"]
-      influences: ["Post-9/11 security culture", "Digital photography adoption"]
+      key_events:
+        - "Career advancement milestones"
+        - "Adult relationship deepening"
+      influences:
+        - "Post-9/11 security culture"
+        - "Digital photography adoption"
       emotional_landscape: "Adult establishment and security consciousness"
-      choice_points: ["Career specialization decisions", "Relationship commitment levels"]
+      choice_points:
+        - "Career specialization decisions"
+        - "Relationship commitment levels"
 
   2003:
     world_events:
@@ -716,10 +876,16 @@ years:
         - "Skype internet calling"
     personal_context:
       summary: "Age 28 - approaching thirty transition"
-      key_events: ["Approaching thirty milestone", "Professional/personal maturation"]
-      influences: ["Iraq War political awareness", "Social networking emergence"]
+      key_events:
+        - "Approaching thirty milestone"
+        - "Professional/personal maturation"
+      influences:
+        - "Iraq War political awareness"
+        - "Social networking emergence"
       emotional_landscape: "Approaching thirty reflection and priority setting"
-      choice_points: ["Thirty-approach life evaluation", "Social media participation level"]
+      choice_points:
+        - "Thirty-approach life evaluation"
+        - "Social media participation level"
 
   2004:
     world_events:
@@ -740,10 +906,16 @@ years:
         - "Portable media players mainstream"
     personal_context:
       summary: "Age 29 - final twenties year"
-      key_events: ["Last year of twenties", "Decade reflection preparation"]
-      influences: ["Facebook social revolution beginning", "Gmail communication shift"]
+      key_events:
+        - "Last year of twenties"
+        - "Decade reflection preparation"
+      influences:
+        - "Facebook social revolution beginning"
+        - "Gmail communication shift"
       emotional_landscape: "Twenties conclusion and thirty preparation"
-      choice_points: ["Thirty transition preparation", "Digital lifestyle choices"]
+      choice_points:
+        - "Thirty transition preparation"
+        - "Digital lifestyle choices"
 
   2005:
     world_events:
@@ -764,10 +936,16 @@ years:
         - "Google Maps street navigation"
     personal_context:
       summary: "Age 30 - major life milestone"
-      key_events: ["Thirty milestone reached", "Decade transition significance"]
-      influences: ["YouTube video culture beginning", "Katrina climate awareness"]
+      key_events:
+        - "Thirty milestone reached"
+        - "Decade transition significance"
+      influences:
+        - "YouTube video culture beginning"
+        - "Katrina climate awareness"
       emotional_landscape: "Thirty milestone reflection and next decade planning"
-      choice_points: ["Major life direction decisions", "Thirty milestone lifestyle choices"]
+      choice_points:
+        - "Major life direction decisions"
+        - "Thirty milestone lifestyle choices"
 
   2006:
     world_events:
@@ -788,10 +966,16 @@ years:
         - "Spotify music streaming begins"
     personal_context:
       summary: "Age 31 - early thirties establishment"
-      key_events: ["Thirties lifestyle establishment", "Professional advancement"]
-      influences: ["Twitter communication revolution", "Wii gaming innovation"]
+      key_events:
+        - "Thirties lifestyle establishment"
+        - "Professional advancement"
+      influences:
+        - "Twitter communication revolution"
+        - "Wii gaming innovation"
       emotional_landscape: "Thirties confidence and establishment"
-      choice_points: ["Social media engagement level", "Professional advancement paths"]
+      choice_points:
+        - "Social media engagement level"
+        - "Professional advancement paths"
 
   2007:
     world_events:
@@ -812,10 +996,16 @@ years:
         - "Android OS development"
     personal_context:
       summary: "Age 32 - smartphone era begins"
-      key_events: ["iPhone adoption impact", "Financial crisis awareness"]
-      influences: ["iPhone lifestyle change", "Financial crisis economic awareness"]
+      key_events:
+        - "iPhone adoption impact"
+        - "Financial crisis awareness"
+      influences:
+        - "iPhone lifestyle change"
+        - "Financial crisis economic awareness"
       emotional_landscape: "Technology integration and economic uncertainty"
-      choice_points: ["Smartphone adoption timing", "Economic crisis response"]
+      choice_points:
+        - "Smartphone adoption timing"
+        - "Economic crisis response"
 
   2008:
     world_events:
@@ -836,10 +1026,16 @@ years:
         - "Social media political influence"
     personal_context:
       summary: "Age 33 - financial crisis impact"
-      key_events: ["Financial crisis personal impact", "Obama election inspiration"]
-      influences: ["Obama campaign digital innovation", "Economic uncertainty adaptation"]
+      key_events:
+        - "Financial crisis personal impact"
+        - "Obama election inspiration"
+      influences:
+        - "Obama campaign digital innovation"
+        - "Economic uncertainty adaptation"
       emotional_landscape: "Economic anxiety and political hope mixture"
-      choice_points: ["Financial crisis adaptation strategies", "Political engagement level"]
+      choice_points:
+        - "Financial crisis adaptation strategies"
+        - "Political engagement level"
 
   2009:
     world_events:
@@ -860,10 +1056,16 @@ years:
         - "iPad development"
     personal_context:
       summary: "Age 34 - mid-thirties stability"
-      key_events: ["Mid-thirties professional/personal stability", "Financial recovery efforts"]
-      influences: ["Avatar 3D technology wonder", "Lady Gaga artistic boundary pushing"]
+      key_events:
+        - "Mid-thirties professional/personal stability"
+        - "Financial recovery efforts"
+      influences:
+        - "Avatar 3D technology wonder"
+        - "Lady Gaga artistic boundary pushing"
       emotional_landscape: "Mid-thirties stability and creative renewal"
-      choice_points: ["Career consolidation vs change", "Creative expression renewal"]
+      choice_points:
+        - "Career consolidation vs change"
+        - "Creative expression renewal"
 
   2010:
     world_events:
@@ -884,10 +1086,16 @@ years:
         - "3D TV technology push"
     personal_context:
       summary: "Age 35 - mid-thirties peak"
-      key_events: ["Mid-thirties career/life peak", "Digital lifestyle maturation"]
-      influences: ["iPad portable computing revolution", "Social Network digital culture commentary"]
+      key_events:
+        - "Mid-thirties career/life peak"
+        - "Digital lifestyle maturation"
+      influences:
+        - "iPad portable computing revolution"
+        - "Social Network digital culture commentary"
       emotional_landscape: "Mid-thirties confidence and technological fluency"
-      choice_points: ["Technology adoption leadership", "Creative vs professional balance"]
+      choice_points:
+        - "Technology adoption leadership"
+        - "Creative vs professional balance"
 
   2011:
     world_events:
@@ -908,10 +1116,16 @@ years:
         - "Siri voice assistant"
     personal_context:
       summary: "Age 36 - late thirties approach"
-      key_events: ["Late thirties transition beginning", "Digital native maturity"]
-      influences: ["Game of Thrones cultural sophistication", "Arab Spring social media power"]
+      key_events:
+        - "Late thirties transition beginning"
+        - "Digital native maturity"
+      influences:
+        - "Game of Thrones cultural sophistication"
+        - "Arab Spring social media power"
       emotional_landscape: "Late thirties wisdom and global awareness"
-      choice_points: ["Late thirties life direction", "Social media activism level"]
+      choice_points:
+        - "Late thirties life direction"
+        - "Social media activism level"
 
   2012:
     world_events:
@@ -932,10 +1146,16 @@ years:
         - "Raspberry Pi computing"
     personal_context:
       summary: "Age 37 - late thirties establishment"
-      key_events: ["Late thirties professional peak", "Digital culture mastery"]
-      influences: ["Avengers shared universe storytelling", "Gangnam Style global viral culture"]
+      key_events:
+        - "Late thirties professional peak"
+        - "Digital culture mastery"
+      influences:
+        - "Avengers shared universe storytelling"
+        - "Gangnam Style global viral culture"
       emotional_landscape: "Late thirties mastery and cultural fluency"
-      choice_points: ["Professional peak decisions", "Cultural engagement vs creation"]
+      choice_points:
+        - "Professional peak decisions"
+        - "Cultural engagement vs creation"
 
   2013:
     world_events:
@@ -956,10 +1176,16 @@ years:
         - "Vine video loops"
     personal_context:
       summary: "Age 38 - approaching forty transition"
-      key_events: ["Approaching forty awareness", "Privacy/surveillance consciousness"]
-      influences: ["Snowden privacy awakening", "Breaking Bad narrative sophistication"]
+      key_events:
+        - "Approaching forty awareness"
+        - "Privacy/surveillance consciousness"
+      influences:
+        - "Snowden privacy awakening"
+        - "Breaking Bad narrative sophistication"
       emotional_landscape: "Approaching forty reflection and privacy consciousness"
-      choice_points: ["Digital privacy decisions", "Forty approach preparation"]
+      choice_points:
+        - "Digital privacy decisions"
+        - "Forty approach preparation"
 
   2014:
     world_events:
@@ -980,10 +1206,16 @@ years:
         - "Twitch streaming platform"
     personal_context:
       summary: "Age 39 - final thirties year"
-      key_events: ["Last year of thirties", "Forty milestone preparation"]
-      influences: ["Guardians soundtrack nostalgia culture", "Podcast audio renaissance"]
+      key_events:
+        - "Last year of thirties"
+        - "Forty milestone preparation"
+      influences:
+        - "Guardians soundtrack nostalgia culture"
+        - "Podcast audio renaissance"
       emotional_landscape: "Thirties conclusion and forty transition anxiety/excitement"
-      choice_points: ["Forty transition preparation", "Decade reflection decisions"]
+      choice_points:
+        - "Forty transition preparation"
+        - "Decade reflection decisions"
 
   2015:
     world_events:

@@ -7,7 +7,8 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 EXPECTED = {
     "EVP_ARTIFACT": "evp_artifact",
     "INSTRUCTIONS_TO_HUMAN": "instructions_to_human",
-    "SIGIL": "sigil_description",
+    "SIGIL": "sigil",
+    "SIGIL_DESCRIPTION": "sigil_description",
     "BOOK": "book",
     "NEWSPAPER_ARTICLE": "newspaper_article",
     "SYMBOLIC_OBJECT": "symbolic_object",
@@ -22,6 +23,11 @@ EXPECTED = {
     "SPECIES_EXTINCTION": "species_extinction",
     "QUANTUM_TAPE_LABEL": "quantum_tape_label",
     "ALTERNATE_TIMELINE": "alternate_timeline",
+    "INFRANYM_MIDI": "infranym_midi",
+    "INFRANYM_AUDIO": "infranym_audio",
+    "INFRANYM_IMAGE": "infranym_image",
+    "INFRANYM_TEXT": "infranym_text",
+    "CIRCLE_JERK_INTERVIEW": "circle_jerk_interview",
     "UNKNOWN": "unknown",
 }
 
@@ -47,7 +53,8 @@ def test_members_are_str_and_enum_and_compare_to_value():
     [
         ("evp_artifact", ChainArtifactType.EVP_ARTIFACT),
         ("instructions_to_human", ChainArtifactType.INSTRUCTIONS_TO_HUMAN),
-        ("sigil_description", ChainArtifactType.SIGIL),
+        ("sigil", ChainArtifactType.SIGIL),
+        ("sigil_description", ChainArtifactType.SIGIL_DESCRIPTION),
         ("book", ChainArtifactType.BOOK),
         ("newspaper_article", ChainArtifactType.NEWSPAPER_ARTICLE),
         ("symbolic_object", ChainArtifactType.SYMBOLIC_OBJECT),
@@ -64,6 +71,11 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("species_extinction", ChainArtifactType.SPECIES_EXTINCTION),
         ("quantum_tape_label", ChainArtifactType.QUANTUM_TAPE_LABEL),
         ("alternate_timeline", ChainArtifactType.ALTERNATE_TIMELINE),
+        ("infranym_midi", ChainArtifactType.INFRANYM_MIDI),
+        ("infranym_audio", ChainArtifactType.INFRANYM_AUDIO),
+        ("infranym_image", ChainArtifactType.INFRANYM_IMAGE),
+        ("infranym_text", ChainArtifactType.INFRANYM_TEXT),
+        ("circle_jerk_interview", ChainArtifactType.CIRCLE_JERK_INTERVIEW),
         ("unknown", ChainArtifactType.UNKNOWN),
     ],
 )
@@ -91,6 +103,8 @@ def test_lookup_by_name():
     assert (
         ChainArtifactType["ALTERNATE_TIMELINE"] is ChainArtifactType.ALTERNATE_TIMELINE
     )
+    assert ChainArtifactType["INFRANYM_MIDI"] is ChainArtifactType.INFRANYM_MIDI
+    assert ChainArtifactType["INFRANYM_AUDIO"] is ChainArtifactType.INFRANYM_AUDIO
 
 
 def test_invalid_value_raises_value_error():
@@ -115,3 +129,8 @@ def test_enum_members_are_enum_instances():
     assert isinstance(ChainArtifactType.CHARACTER_PORTRAIT, enum.Enum)
     assert isinstance(ChainArtifactType.QUANTUM_TAPE_LABEL, enum.Enum)
     assert isinstance(ChainArtifactType.ALTERNATE_TIMELINE, enum.Enum)
+    assert isinstance(ChainArtifactType.INFRANYM_MIDI, enum.Enum)
+    assert isinstance(ChainArtifactType.INFRANYM_AUDIO, enum.Enum)
+    assert isinstance(ChainArtifactType.INFRANYM_IMAGE, enum.Enum)
+    assert isinstance(ChainArtifactType.INFRANYM_TEXT, enum.Enum)
+    assert isinstance(ChainArtifactType.CIRCLE_JERK_INTERVIEW, enum.Enum)

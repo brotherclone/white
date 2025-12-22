@@ -26,6 +26,10 @@ class MainAgentState(BaseModel):
     ready_for_yellow: bool = False
     ready_for_green: bool = False
     ready_for_blue: bool = False
+    ready_for_indigo: bool = False
+    ready_for_violet: bool = False
+    ready_for_white: bool = False
+    run_finished: bool = False
     """
     Structure when workflow is paused:
     {
@@ -37,5 +41,4 @@ class MainAgentState(BaseModel):
         "resume_instructions": "How to resume after completion"
     }
     """
-    # ToDo: Add current synthesis for another proposal re-write
     model_config = ConfigDict(arbitrary_types_allowed=True)

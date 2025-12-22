@@ -1,14 +1,21 @@
 import os
-from typing import Optional
+from pathlib import Path
+from typing import Optional, TYPE_CHECKING
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.agents.tools.gaming_tools import no_repeat_roll_dice, roll_dice
-from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
-from app.structures.artifacts.pulsar_palace_character_sheet import (
-    PulsarPalaceCharacterSheet,
-)
 from app.agents.tools.image_tools import composite_character_portrait
+from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
+from app.structures.artifacts.character_portrait_artifact import (
+    CharacterPortraitArtifact,
+)
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+
+if TYPE_CHECKING:
+    from app.structures.artifacts.pulsar_palace_character_sheet import (
+        PulsarPalaceCharacterSheet,
+    )
 
 load_dotenv()
 
@@ -181,9 +188,6 @@ class PulsarPalaceCharacterBackground(BaseModel):
         description="The path to the background image", default=None
     )
 
-    def __init__(self, **data):
-        super().__init__(**data)
-
 
 class PulsarPalaceCharacterDisposition(BaseModel):
 
@@ -193,9 +197,6 @@ class PulsarPalaceCharacterDisposition(BaseModel):
         description="The path to the disposition image", default=None
     )
 
-    def __init__(self, **data):
-        super().__init__(**data)
-
 
 class PulsarPalaceCharacterProfession(BaseModel):
 
@@ -204,9 +205,6 @@ class PulsarPalaceCharacterProfession(BaseModel):
     image_path: Optional[str] = Field(
         description="The path to the profession image", default=None
     )
-
-    def __init__(self, **data):
-        super().__init__(**data)
 
 
 class PulsarPalaceCharacter(BaseModel):
@@ -252,12 +250,28 @@ class PulsarPalaceCharacter(BaseModel):
     portrait: Optional[ImageChainArtifactFile] = Field(
         default=None, description="Portrait of the character in png format"
     )
-    character_sheet: Optional[PulsarPalaceCharacterSheet] = Field(
+    portrait_artifact: Optional[CharacterPortraitArtifact] = Field(
+        default=None, description="High-level portrait artifact with metadata"
+    )
+    character_sheet: Optional["PulsarPalaceCharacterSheet"] = Field(
         default=None, description="Character sheet of the character"
     )
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(self, **data):
+        # Rebuild model to resolve forward references if needed
+        if not hasattr(self.__class__, "_rebuilt"):
+            # Import at runtime to make PulsarPalaceCharacterSheet available for model_rebuild
+            from app.structures.artifacts.pulsar_palace_character_sheet import (
+                PulsarPalaceCharacterSheet as _PulsarPalaceCharacterSheet,
+            )
+
+            self.__class__.model_rebuild(
+                _types_namespace={
+                    "PulsarPalaceCharacterSheet": _PulsarPalaceCharacterSheet
+                }
+            )
+            self.__class__._rebuilt = True
         super().__init__(**data)
 
     @classmethod
@@ -284,45 +298,17 @@ class PulsarPalaceCharacter(BaseModel):
             off_current=off_roll,
         )
 
-    def create_portrait(self):
-        from PIL import Image
+    def to_markdown(self) -> str:
+        """Generate markdown representation of the character sheet."""
+        if not self.portrait or not self.portrait.file_path:
+            raise ValueError(
+                "Character must have a portrait before generating markdown"
+            )
 
-        # Let ImageChainArtifactFile generate the proper filename with UUID
-        # First create the artifact to get the filename
-        temp_portrait = ImageChainArtifactFile(
-            thread_id=self.thread_id,
-            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-            width=300,  # temporary values
-            height=300,
-        )
-
-        # Use the generated filename for the composite
-        output_path = temp_portrait.get_artifact_path()
-        png = composite_character_portrait(
-            self.background.image_path,
-            [self.profession.image_path, self.disposition.image_path],
-            output_path,
-        )
-
-        # Get actual image dimensions
-        with Image.open(png) as img:
-            width, height = img.size
-
-        # Create the final portrait artifact with correct dimensions
-        self.portrait = ImageChainArtifactFile(
-            thread_id=self.thread_id,
-            artifact_id=temp_portrait.artifact_id,  # Use same UUID
-            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-            file_path=png,
-            width=width,
-            height=height,
-        )
-
-    def create_character_sheet(self):
-        portrait_filename = self.portrait.file_name
+        portrait_filename = Path(self.portrait.file_path).name
         relative_portrait_path = f"../png/{portrait_filename}"
 
-        template = f"""![{self.disposition.disposition} {self.profession.profession}]({relative_portrait_path})
+        return f"""![{self.disposition.disposition} {self.profession.profession}]({relative_portrait_path})
 # {self.disposition.disposition} {self.profession.profession}
 ## from {self.background.time}, {self.background.place}
 ### ON
@@ -330,9 +316,61 @@ class PulsarPalaceCharacter(BaseModel):
 ### OFF
 {self.off_current} / {self.off_max}
 """
+
+    def create_portrait(self):
+        """Create a composite portrait image and portrait artifact for this character."""
+        from PIL import Image
+
+        portrait_filename = f"character_portrait_{self.encounter_id}.png"
+        output_path = os.path.join(
+            os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            self.thread_id,
+            ChainArtifactFileType.PNG.value,
+            portrait_filename,
+        )
+
+        # Composite the background and trait layers
+        png = composite_character_portrait(
+            self.background.image_path,
+            [self.profession.image_path, self.disposition.image_path],
+            output_path,
+        )
+
+        # Get image dimensions
+        with Image.open(png) as img:
+            width, height = img.size
+
+        # Create the low-level image artifact
+        self.portrait = ImageChainArtifactFile(
+            thread_id=self.thread_id,
+            file_name=portrait_filename,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            file_path=png,
+            width=width,
+            height=height,
+        )
+
+        # Create the high-level portrait artifact with metadata
+        character_name = f"{self.disposition.disposition} {self.profession.profession}"
+        self.portrait_artifact = CharacterPortraitArtifact(
+            thread_id=self.thread_id,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            character_name=character_name,
+            role=self.profession.profession,
+            pose=self.disposition.disposition,
+            description=f"From {self.background.place} ({self.background.time})",
+            image=self.portrait,
+        )
+
+    def create_character_sheet(self):
+        """Create a markdown character sheet artifact for this character."""
+        from app.structures.artifacts.pulsar_palace_character_sheet import (
+            PulsarPalaceCharacterSheet,
+        )
+
         self.character_sheet = PulsarPalaceCharacterSheet(
             thread_id=self.thread_id,
-            sheet_content=template,
+            sheet_content=self,
             base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
         )
         self.character_sheet.save_file()

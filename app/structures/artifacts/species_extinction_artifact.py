@@ -132,6 +132,14 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
                 allow_unicode=True,
             )
 
+    def for_prompt(self):
+        prompt_parts = [
+            f"Species: {self.common_name}",
+            f"Extinction year: {self.extinction_year}",
+            self.summary_text(),
+        ]
+        return "\n".join(prompt_parts)
+
 
 if __name__ == "__main__":
     with open(
@@ -147,3 +155,5 @@ if __name__ == "__main__":
         print(extinction_artifact)
         extinction_artifact.save_file()
         print(extinction_artifact.flatten())
+        p = extinction_artifact.for_prompt()
+        print(p)

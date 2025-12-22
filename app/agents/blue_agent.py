@@ -223,7 +223,11 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 logging.warning(msg)
                 state.selected_period = None
                 return state
-            state.selected_period = self._ensure_biographical_period(chosen_val)
+            # Try to convert to BiographicalPeriod, but if it's in YAML format, use the raw dict
+            converted = self._ensure_biographical_period(chosen_val)
+            state.selected_period = converted if converted is not None else chosen_val
+            state.selected_year = int(chosen_key)  # Store the year key
+            return state
         if isinstance(all_years, (list, tuple)):
             chosen = pick_non_null_from_sequence(all_years)
             if chosen is None:
@@ -245,6 +249,15 @@ class BlueAgent(BaseRainbowAgent, ABC):
         if isinstance(period, BiographicalPeriod):
             return period
         if isinstance(period, dict):
+            # Check if this is the YAML structure with world_events and personal_context
+            if "personal_context" in period:
+                # This is not a BiographicalPeriod, just return None
+                # The raw dict will be used in the state as-is
+                logging.info(
+                    "Biographical data is in YAML format (world_events/personal_context)"
+                )
+                return None
+
             required_keys = {"start_date", "end_date", "age_range", "description"}
             if not required_keys.issubset(period.keys()):
                 msg = f"Biographical period dict missing required keys: {required_keys - set(period.keys())}"
@@ -276,8 +289,16 @@ class BlueAgent(BaseRainbowAgent, ABC):
     def evaluate_timeline_frailty(self, state: BlueAgentState) -> BlueAgentState:
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         period = state.selected_period
-        year = period.start_date.year
-        analysis = get_year_analysis(year, self.biographical_data)
+        # Get year from state or from BiographicalPeriod object
+        if state.selected_year is not None:
+            year = state.selected_year
+        elif isinstance(period, dict):
+            # If period is a dict (YAML format), we need the year from state
+            year = state.selected_year  # Should have been set in select_year
+        else:
+            # Period is a BiographicalPeriod object
+            year = period.start_date.year
+        analysis = get_year_analysis(year, state.biographical_data)
         if "error" in analysis:
             state.evaluation_result = TimelineEvaluationResult(
                 is_suitable=False,
@@ -375,7 +396,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
         state.iteration_count += 1
         if (
             state.evaluation_result.is_suitable
-            and state.iteration_count < self.max_iterations
+            and state.iteration_count < state.max_iterations
         ):
             return "frail"
         return "healthy"
@@ -844,8 +865,8 @@ The tape has been recorded over. What life exists on it now?
             mood=f"{alternate.emotional_tone.value}_folk_rock",
             lyrical_themes=themes,
             reference_artists=sample_reference_artists(blue_artists),
-            narrative_style=random.sample(
-                ["intimate", "confessional", "melancholy", "reflective"], 1
+            narrative_style=random.choice(
+                ["intimate", "confessional", "melancholy", "reflective"]
             ),
         )
         state.musical_params = params
@@ -864,17 +885,23 @@ The tape has been recorded over. What life exists on it now?
 
     def generate_tape_label(self, state: BlueAgentState) -> BlueAgentState:
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        from app.structures.enums.quantum_tape_recording_quality import (
+            QuantumTapeRecordingQuality,
+        )
+
         alternate = state.alternate_history
         quality = random.choices(
             [
-                QuantumTapeProductionAesthetic.SP,
-                QuantumTapeProductionAesthetic.LP,
-                QuantumTapeProductionAesthetic.EP,
+                QuantumTapeRecordingQuality.SP,
+                QuantumTapeRecordingQuality.LP,
+                QuantumTapeRecordingQuality.EP,
             ],
             weights=[0.2, 0.6, 0.2],
         )[0]
         note = self._generate_a_cryptic_note(alternate)
         label = QuantumTapeLabelArtifact(
+            thread_id=state.thread_id,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
             title=alternate.title,
             date_range=f"{alternate.period.start_date} to {alternate.period.end_date}",
             recording_quality=quality,

@@ -1,6 +1,9 @@
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
+# ToDo: Add for_prompt() tests
+# ToDo: Skimpy!
+
 
 def test_newspaper_artifact_defaults():
     artifact = NewspaperArtifact(thread_id="thread-1")

@@ -2,6 +2,8 @@ from app.structures.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
 )
 
+# ToDo: You call this a test? :
+
 
 def test_game_run_artifact():
     game_run = PulsarPalaceEncounterArtifact(thread_id="test-thread")

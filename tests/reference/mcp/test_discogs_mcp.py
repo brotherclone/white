@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 
 def test_discogs_mcp():
     """Test Discogs MCP server imports and basic structure"""
@@ -10,6 +12,7 @@ def test_discogs_mcp():
     assert mcp.name == "earthly_frames_discogs"
 
 
+@pytest.mark.asyncio
 async def test_discogs_look_up_artist_by_name():
     """Test looking up artist by name"""
     from app.reference.mcp.discogs.main import look_up_artist_by_name
@@ -35,6 +38,7 @@ async def test_discogs_look_up_artist_by_name():
         assert result["id"] == 12345
 
 
+@pytest.mark.asyncio
 async def test_discogs_look_up_artist_no_results():
     """Test looking up artist with no results"""
     from app.reference.mcp.discogs.main import look_up_artist_by_name

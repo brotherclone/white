@@ -2,7 +2,7 @@ thread_id: "mock_thread_001"
 period:
   start_date: 2018-01-01T00:00:00Z
   end_date: 2024-01-02T00:00:00Z
-  age_range: "6..12"
+  age_range: [18, 20]
   description: Alternate timeline artifact mock
   known_events:
     - date: 2018-01-01T00:00:00Z
@@ -34,7 +34,7 @@ period:
   emotional_tone: mock tone
   trauma_level: low
 title: Mock Timeline Artifact
-narrative: Mock narrative
+narrative: Mock narrative Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
 divergence_point:
   when: mock date
   what_changed: mock change
@@ -43,6 +43,26 @@ key_differences:
   - Mock difference
   - Another mock difference
 specific_details:
+  - category: 'daily_routine'
+    detail: a mock detail
+    sensory_elements:
+      - sight
+      - sound
+  - category: 'career'
+    detail: another mock detail
+    sensory_elements:
+      - touch
+      - smell
+  - category: 'daily_routine'
+    detail: a mock detail
+    sensory_elements:
+      - sight
+      - sound
+  - category: 'career'
+    detail: another mock detail
+    sensory_elements:
+      - touch
+      - smell
   - category: 'daily_routine'
     detail: a mock detail
     sensory_elements:
