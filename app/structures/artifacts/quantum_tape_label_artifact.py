@@ -99,7 +99,9 @@ if __name__ == "__main__":
         f"{os.getenv('AGENT_MOCK_DATA_PATH')}/quantum_tape_label_mock.yml", "r"
     ) as a_file:
         data = yaml.safe_load(a_file)
-        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        data["base_path"] = base_path
+        data["image_path"] = f"{base_path}/img"
         label = QuantumTapeLabelArtifact(**data)
         print(label)
         label.save_file()

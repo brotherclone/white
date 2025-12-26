@@ -50,6 +50,13 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
         }
 
     def save_file(self):
+        # Check if image_bytes exists (it's dynamically added, not a declared field)
+        if not hasattr(self, "image_bytes") or self.image_bytes is None:
+            raise ValueError(
+                "Cannot save image file: image_bytes not set. "
+                "Set the image_bytes attribute before calling save_file()."
+            )
+
         if self.base_path:
             file_path_obj = Path(self.base_path) / "png"
             file_path_obj.mkdir(parents=True, exist_ok=True)
