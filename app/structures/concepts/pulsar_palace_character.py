@@ -368,9 +368,11 @@ class PulsarPalaceCharacter(BaseModel):
             PulsarPalaceCharacterSheet,
         )
 
+        base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
         self.character_sheet = PulsarPalaceCharacterSheet(
             thread_id=self.thread_id,
             sheet_content=self,
-            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            base_path=base_path,
+            image_path=f"{base_path}/img",
         )
         self.character_sheet.save_file()

@@ -390,16 +390,34 @@ class BlueAgent(BaseRainbowAgent, ABC):
         )
         for check, passed in checks_dict.items():
             logging.info(f"   {check}: {'✅' if passed else '❌'}")
+
+        # Increment iteration count in the node (not the router) so it persists
+        state.iteration_count += 1
+
         return state
 
     def route_after_evaluate_timeline_frailty(self, state: BlueAgentState) -> str:
-        state.iteration_count += 1
-        if (
-            state.evaluation_result.is_suitable
-            and state.iteration_count < state.max_iterations
-        ):
+        # If we found a suitable year, proceed immediately
+        if state.evaluation_result.is_suitable:
+            logging.info(
+                f"✅ Found suitable year after {state.iteration_count} attempts, proceeding"
+            )
             return "frail"
-        return "healthy"
+
+        # If not suitable but haven't hit max iterations, try another year
+        if state.iteration_count < state.max_iterations:
+            logging.info(
+                f"❌ Year not suitable, trying another ({state.iteration_count}/{state.max_iterations})"
+            )
+            return "healthy"
+
+        # If we've exhausted max iterations without finding a suitable year,
+        # force proceed with the last evaluated year
+        logging.warning(
+            f"⚠️ Failed to find suitable year after {state.max_iterations} attempts, "
+            f"forcing proceed with year {state.evaluation_result.year}"
+        )
+        return "frail"
 
     def generate_alternate_history(self, state: BlueAgentState) -> BlueAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -899,9 +917,11 @@ The tape has been recorded over. What life exists on it now?
             weights=[0.2, 0.6, 0.2],
         )[0]
         note = self._generate_a_cryptic_note(alternate)
+        base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
         label = QuantumTapeLabelArtifact(
             thread_id=state.thread_id,
-            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
+            base_path=base_path,
+            image_path=f"{base_path}/img",
             title=alternate.title,
             date_range=f"{alternate.period.start_date} to {alternate.period.end_date}",
             recording_quality=quality,

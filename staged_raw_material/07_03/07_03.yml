@@ -42,3 +42,16 @@ structure:
     start_time: '[03:32.011]'
     end_time: '[03:42.019]'
     description: TK
+sounds_like:
+  - name: TK
+    discogs_id: TK
+mood:
+  - TK
+genres:
+  - TK
+concept: TK
+lrc_file: 07_03.lrc
+audio_tracks:
+  - id: 1
+    description: TK
+    audio_file: TK

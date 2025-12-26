@@ -1,0 +1,19 @@
+# Anagram pairs for infranym fallback
+# Each pair consists of a secret name and its anagram (surface name)
+# Based on actual song titles from the Infranyms album and other sources
+
+anagram_pairs:
+  - secret: "Pop Omniscience"
+    surface: "As Pop Omniscience"
+  - secret: "Silent Storm"
+    surface: "Missiles Torn"
+  - secret: "Listen Close"
+    surface: "Sent Lisicle"
+  - secret: "Hidden Truth"
+    surface: "Dihutnt Herd"
+  - secret: "Secret Name"
+    surface: "Meant Crease"
+  - secret: "The Conjurer"
+    surface: "Jeer Contr Uh"
+  - secret: "Infranym Code"
+    surface: "Confirmed Any"

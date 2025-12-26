@@ -67,12 +67,12 @@ mood:
   - dreamy
   - apocalyptic
 genres:
-    - art pop
-    - experimental
-    - art rock
-    - post-rock
-    - industrial rock
-    - psychedelic rock
+  - art pop
+  - experimental
+  - art rock
+  - post-rock
+  - industrial rock
+  - psychedelic rock
 audio_tracks:
   - id: 2
     description: Drum kit

@@ -13,7 +13,7 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
     # If JPEG is added, remember to update the chain_artifact_file_type default value
     chain_artifact_file_type: ChainArtifactFileType = Field(
         default=ChainArtifactFileType.PNG,
-        description="Type of the chain artifact file should always be PNG in this case..",
+        description="Type of the chain artifact file should always be PNG in this case.",
     )
     artifact_name: str = "img"
     file_path: Optional[Path] = Field(

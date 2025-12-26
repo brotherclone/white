@@ -3,6 +3,7 @@ base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
 sheet_content:
   thread_id: "mock_thread_001"
   encounter_id: "mock_encounter_001"
+  image_path: "/Volumes/LucidNonsense/White/tests/mocks/"
   background:
     rollId: 4
     time: 1973

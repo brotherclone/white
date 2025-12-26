@@ -8,7 +8,11 @@ from pathlib import Path
 from pydantic import Field, ConfigDict
 from dotenv import load_dotenv
 
-from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.html_artifact_file import HtmlChainArtifactFile
+from app.structures.artifacts.template_renderer import (
+    get_template_path,
+    HTMLTemplateRenderer,
+)
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
@@ -18,15 +22,15 @@ if TYPE_CHECKING:
 load_dotenv()
 
 
-class PulsarPalaceCharacterSheet(ChainArtifact, ABC):
+class PulsarPalaceCharacterSheet(HtmlChainArtifactFile, ABC):
 
     chain_artifact_type: ChainArtifactType = Field(
         default=ChainArtifactType.CHARACTER_SHEET,
         description="Type of the chain artifact should always be CHARACTER_SHEET",
     )
     chain_artifact_file_type: ChainArtifactFileType = Field(
-        default=ChainArtifactFileType.MARKDOWN,
-        description="File format of the artifact: Markdown for text and images",
+        default=ChainArtifactFileType.HTML,
+        description="File format of the artifact: HTML for text and images",
     )
     artifact_name: str = Field(
         default="character_sheet", description="Name of the artifact"
@@ -68,22 +72,50 @@ class PulsarPalaceCharacterSheet(ChainArtifact, ABC):
         pass
 
     def save_file(self):
-        file = Path(self.file_path, self.file_name)
-        file.parent.mkdir(parents=True, exist_ok=True)
+        template_path = get_template_path("character_sheet")
+        renderer = HTMLTemplateRenderer(template_path)
 
-        content = self.sheet_content
-        if hasattr(content, "to_markdown") and callable(
-            getattr(content, "to_markdown")
-        ):
-            try:
-                md = content.to_markdown()
-            except ValueError:
-                md = str(content)
+        # Calculate percentages
+        # Exclude circular reference: sheet_content.character_sheet points back to self
+        data = self.model_dump(exclude={"sheet_content": {"character_sheet"}})
+
+        # Get character stats from sheet_content
+        char = self.sheet_content
+        if char:
+            data["on_percentage"] = (
+                int((char.on_current / char.on_max) * 100)
+                if char.on_max and char.on_max > 0
+                else 0
+            )
+            data["off_percentage"] = (
+                int((char.off_current / char.off_max) * 100)
+                if char.off_max and char.off_max > 0
+                else 0
+            )
         else:
-            md = content if isinstance(content, str) else str(content)
+            data["on_percentage"] = 0
+            data["off_percentage"] = 0
 
-        with open(file, "w", encoding="utf-8") as f:
-            f.write(md)
+        # Generate inventory slots HTML
+        inventory_html = []
+        inventory = getattr(self, "inventory", [])
+        for i in range(9):  # 3x3 grid
+            if i < len(inventory):
+                inventory_html.append(
+                    f'<div class="inventory-slot">{inventory[i]}</div>'
+                )
+            else:
+                inventory_html.append('<div class="inventory-slot empty">EMPTY</div>')
+        data["inventory_slots"] = "\n        ".join(inventory_html)
+
+        html_content = renderer.render(data)
+
+        file_path = Path(self.file_path)
+        file_path.mkdir(parents=True, exist_ok=True)
+
+        output_file = file_path / self.file_name
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(html_content)
 
     def flatten(self):
         """Flatten the character sheet for easier processing."""

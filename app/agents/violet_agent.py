@@ -6,12 +6,14 @@ from abc import ABC
 import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
+from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+from app.structures.concepts.vanity_persona import VanityPersona
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals
 
@@ -46,41 +48,78 @@ class VioletAgent(BaseRainbowAgent, ABC):
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
-        print("Sol Loppis, like looking in the mirror")
-
+        violet_state = VioletAgentState(
+            thread_id=state.thread_id,
+            song_proposals=state.song_proposals,
+            white_proposal=state.song_proposals.iterations[-1],
+            counter_proposal=None,
+            artifacts=[],
+            interview_collector=[],
+            interviewer_persona=VanityPersona(first_name="temp", last_name="temp"),
+            interviewee_persona=VanityPersona(first_name="temp", last_name="temp"),
+            interviewer_objectives=None,
+            interviewee_objectives=None,
+            circle_jerk_interview=None,
+        )
+        violet_graph = self.create_graph()
+        compiled_graph = violet_graph.compile()
+        result = compiled_graph.invoke(violet_state.model_dump())
+        if isinstance(result, VioletAgentState):
+            final_state = result
+        elif isinstance(result, dict):
+            final_state = VioletAgentState(**result)
+        else:
+            raise TypeError(f"Unexpected result type: {type(result)}")
+        if final_state.counter_proposal:
+            state.song_proposals.iterations.append(final_state.counter_proposal)
+        if final_state.artifacts:
+            state.artifacts = final_state.artifacts
         return state
 
     def create_graph(self) -> StateGraph:
         """Create the VioletAgent's internal workflow graph"""
 
-        graph = StateGraph(VioletAgentState)
-
-        return graph
+        work_flow = StateGraph(VioletAgentState)
+        work_flow.add_node(
+            "generate_alternate_song_spec", self.generate_alternate_song_spec
+        )
+        work_flow.add_edge(START, "generate_alternate_song_spec")
+        work_flow.add_edge("generate_alternate_song_spec", END)
+        return work_flow
 
     def generate_alternate_song_spec(self, state: VioletAgentState) -> VioletAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            with open("/tests/mocks/green_counter_proposal_mock.yml", "r") as f:
-                data = yaml.safe_load(f)
-            counter_proposal = SongProposalIteration(**data)
-            state.counter_proposal = counter_proposal
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/violet_counter_proposal_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                counter_proposal = SongProposalIteration(**data)
+                state.counter_proposal = counter_proposal
+                return state
+            except Exception as e:
+                error_msg = f"Failed to read mock counter proposal: {e!s}"
+                logging.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
             return state
         else:
 
             prompt = f"""
-                          Current song proposal:
-                          {state.white_proposal}
+Current song proposal:
+{state.white_proposal}
 
-                          Reference works in this artist's style paying close attention to 'concept' property:
-                          {get_my_reference_proposals('V')}
+Reference works in this artist's style paying close attention to 'concept' property:
+{get_my_reference_proposals('V')}
 
-                          In your counter proposal your 'rainbow_color' property should always be:
-                          {the_rainbow_table_colors['V']}
+In your counter proposal your 'rainbow_color' property should always be:
+{the_rainbow_table_colors['V']}
                """
-
             claude = self._get_claude()
             proposer = claude.with_structured_output(SongProposalIteration)
-
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
