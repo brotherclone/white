@@ -206,7 +206,7 @@ Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
                 ) as f:
                     data = yaml.safe_load(f)
                     secret_name = data["secret_name"]
-                    state.secret_name = "".join(sorted(secret_name))
+                    state.secret_name = secret_name
             except Exception as e:
                 error_msg = f"Failed to read mock letter bank: {e!s}"
                 logging.error(error_msg)
@@ -254,7 +254,7 @@ Respond with ONLY the secret name (proper capitalization, with spaces).
                 ) as f:
                     data = yaml.safe_load(f)
                     surface_name = data["surface_name"]
-                    state.surface_name = "".join(sorted(surface_name))
+                    state.surface_name = surface_name
             except Exception as e:
                 error_msg = f"Failed to read mock letter bank: {e!s}"
                 logging.error(error_msg)
@@ -332,6 +332,12 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
                 ) as f:
                     data = yaml.safe_load(f)
                 counter_proposal = SongProposalIteration(**data)
+                # Set tracking metadata for workflow routing
+                counter_proposal.agent_name = "indigo"
+                counter_proposal.iteration_number = (
+                    len(state.song_proposals.iterations) + 1
+                )
+                counter_proposal.timestamp = time.time()
                 state.counter_proposal = counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
@@ -404,7 +410,7 @@ Concept: [full concept explanation]
                 counter_proposal.iteration_number = (
                     len(state.song_proposals.iterations) + 1
                 )
-                counter_proposal.agent_name = "Indigo Agent (Decider Tangents)"
+                counter_proposal.agent_name = "indigo"
                 counter_proposal.timestamp = time.time()
                 state.counter_proposal = counter_proposal
                 logging.info(
@@ -425,7 +431,7 @@ Concept: [full concept explanation]
                     genres=previous_iteration.genres,
                     concept=f"FALLBACK: Infranym puzzle encoding {state.secret_name} → {state.surface_name}",
                     iteration_number=len(state.song_proposals.iterations) + 1,
-                    agent_name="Indigo Agent (Decider Tangents)",
+                    agent_name="indigo",
                     timestamp=time.time(),
                 )
                 return state
@@ -536,13 +542,21 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
         Implement the chosen infranym encoding.
         Creates triple-layer revelation system.
         """
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         logging.info(
             f"🩵 IndigoAgent: Implementing {state.infranym_medium.value} infranym"
         )
 
         try:
+            # In mock mode, use simple fallback instead of LLM calls
+            if mock_mode:
+                result = {
+                    "encoding_method": f"mock_{state.infranym_medium.value}",
+                    "mock_data": f"Mock implementation for {state.infranym_medium.value}",
+                    "decoding_hint": "This is mock data for testing",
+                }
             # Dispatch to specific implementation
-            if state.infranym_medium == InfranymMedium.MIDI:
+            elif state.infranym_medium == InfranymMedium.MIDI:
                 result = self._implement_midi_infranym(state)
                 state.infranym_midi = result
             elif state.infranym_medium == InfranymMedium.AUDIO:
@@ -592,13 +606,15 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
             )
             return state
 
-    def _is_valid_anagram(self, phrase1: str, phrase2: str) -> bool:
+    @staticmethod
+    def _is_valid_anagram(phrase1: str, phrase2: str) -> bool:
         """Validate that two phrases are true anagrams"""
         clean1 = "".join(c.upper() for c in phrase1 if c.isalnum())
         clean2 = "".join(c.upper() for c in phrase2 if c.isalnum())
         return sorted(clean1) == sorted(clean2) and len(clean1) > 0
 
-    def _generate_algorithmic_fallback(self, concepts: str) -> Dict[str, str]:
+    @staticmethod
+    def _generate_algorithmic_fallback(concepts: str) -> Dict[str, str]:
         """Generate simple anagram fallback when LLM fails"""
         # Load anagram pairs from resource file
         try:
@@ -632,9 +648,8 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
     # HELPER METHODS: Method Selection & Constraints
     # ========================================================================
 
-    def _analyze_encoding_constraints(
-        self, secret: str, surface: str
-    ) -> Dict[str, Any]:
+    @staticmethod
+    def _analyze_encoding_constraints(secret: str, surface: str) -> Dict[str, Any]:
         """Algorithmic analysis of viable encoding methods"""
         letter_count = len(secret.replace(" ", ""))
         word_count = len(secret.split())
@@ -681,7 +696,8 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
     # INFRANYM IMPLEMENTATIONS: The Four Encoding Methods
     # ========================================================================
 
-    def _implement_midi_infranym(self, state: IndigoAgentState) -> Dict[str, Any]:
+    @staticmethod
+    def _implement_midi_infranym(state: IndigoAgentState) -> Dict[str, Any]:
         """Encode secret name in MIDI"""
         secret = state.secret_name.replace(" ", "").upper()
         methods = ["note_cipher", "morse_duration", "tap_code_pitch"]

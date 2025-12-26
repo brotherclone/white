@@ -12,8 +12,12 @@ class MainAgentState(BaseModel):
     """
 
     thread_id: str
-    song_proposals: SongProposal = Field(default_factory=SongProposal)
-    artifacts: List[Any] = []
+    song_proposals: SongProposal = Field(
+        default_factory=lambda: SongProposal(iterations=[])
+    )
+    # Accepts both ChainArtifact instances and dict representations
+    # Rainbow agents serialize artifacts to dicts to avoid msgpack serialization issues
+    artifacts: List[Any] = Field(default_factory=list)
     workflow_paused: bool = False
     pause_reason: Optional[str] = None
     pending_human_action: Optional[Dict[str, Any]] = None
@@ -30,6 +34,20 @@ class MainAgentState(BaseModel):
     ready_for_violet: bool = False
     ready_for_white: bool = False
     run_finished: bool = False
+    enabled_agents: List[str] = Field(
+        default_factory=lambda: [
+            "black",
+            "red",
+            "orange",
+            "yellow",
+            "green",
+            "blue",
+            "indigo",
+            "violet",
+        ]
+    )
+    stop_after_agent: Optional[str] = None
+
     """
     Structure when workflow is paused:
     {

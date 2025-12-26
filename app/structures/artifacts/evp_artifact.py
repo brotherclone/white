@@ -64,13 +64,22 @@ class EVPArtifact(ChainArtifact, ABC):
         data_to_save = {
             "transcript": self.transcript,
             "audio_segments": (
-                [seg.file_path for seg in self.audio_segments]
+                [
+                    seg.get_artifact_path(with_file_name=True)
+                    for seg in self.audio_segments
+                ]
                 if self.audio_segments
                 else []
             ),
-            "audio_mosiac": self.audio_mosiac.file_path if self.audio_mosiac else None,
+            "audio_mosiac": (
+                self.audio_mosiac.get_artifact_path(with_file_name=True)
+                if self.audio_mosiac
+                else None
+            ),
             "noise_blended_audio": (
-                self.noise_blended_audio.file_path if self.noise_blended_audio else None
+                self.noise_blended_audio.get_artifact_path(with_file_name=True)
+                if self.noise_blended_audio
+                else None
             ),
         }
         with open(file_obj, "w") as f:
@@ -86,13 +95,22 @@ class EVPArtifact(ChainArtifact, ABC):
             "chain_artifact_file_type": "yaml",
             "transcript": self.transcript,
             "audio_segments": (
-                [seg.file_path for seg in self.audio_segments]
+                [
+                    seg.get_artifact_path(with_file_name=True)
+                    for seg in self.audio_segments
+                ]
                 if self.audio_segments
                 else []
             ),
-            "audio_mosiac": self.audio_mosiac.file_path if self.audio_mosiac else None,
+            "audio_mosiac": (
+                self.audio_mosiac.get_artifact_path(with_file_name=True)
+                if self.audio_mosiac
+                else None
+            ),
             "noise_blended_audio": (
-                self.noise_blended_audio.file_path if self.noise_blended_audio else None
+                self.noise_blended_audio.get_artifact_path(with_file_name=True)
+                if self.noise_blended_audio
+                else None
             ),
         }
 

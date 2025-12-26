@@ -87,6 +87,17 @@ class SongProposalIteration(BaseModel):
         min_length=25,
         max_length=2000,
     )
+    # Workflow tracking fields
+    agent_name: str | None = Field(
+        default=None,
+        description="Name of the agent that generated this iteration (e.g., 'Indigo Agent (Decider Tangents)', 'white')",
+    )
+    iteration_number: int | None = Field(
+        default=None, description="Sequential number of this iteration in the workflow"
+    )
+    timestamp: float | None = Field(
+        default=None, description="Unix timestamp when this iteration was created"
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
