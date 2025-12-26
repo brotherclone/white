@@ -225,14 +225,18 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
-                    state.counter_proposal = counter_proposal
-                    state.song_proposals.iterations.append(self.counter_proposal)
-                    return state
-                if not isinstance(result, SongProposalIteration):
+                elif isinstance(result, SongProposalIteration):
+                    counter_proposal = result
+                else:
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
                     logging.warning(error_msg)
+                    raise TypeError(error_msg)
+
+                state.counter_proposal = counter_proposal
+                state.song_proposals.iterations.append(counter_proposal)
+                return state
             except Exception as e:
                 print(
                     f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration for black's first counter proposal."
@@ -723,14 +727,18 @@ class BlackAgent(BaseRainbowAgent, ABC):
             result = proposer.invoke(prompt)
             if isinstance(result, dict):
                 updated_proposal = SongProposalIteration(**result)
-                state.song_proposals.iterations.append(self.counter_proposal)
-                state.counter_proposal = updated_proposal
-                return state
-            if not isinstance(result, SongProposalIteration):
+            elif isinstance(result, SongProposalIteration):
+                updated_proposal = result
+            else:
                 error_msg = f"Expected SongProposalIteration, got {type(result)}"
                 logging.error(error_msg)
                 if block_mode:
                     raise TypeError(error_msg)
+                return state
+
+            state.song_proposals.iterations.append(state.counter_proposal)
+            state.counter_proposal = updated_proposal
+            return state
         except Exception as e:
             error_msg = f"EVP update LLM call failed: {e!s}"
             logging.error(error_msg)
@@ -821,14 +829,18 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
                     updated_proposal = SongProposalIteration(**result)
-                    state.song_proposals.iterations.append(self.counter_proposal)
-                    state.counter_proposal = updated_proposal
-                    return state
-                if not isinstance(result, SongProposalIteration):
+                elif isinstance(result, SongProposalIteration):
+                    updated_proposal = result
+                else:
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
                     logging.error(error_msg)
                     if block_mode:
                         raise TypeError(error_msg)
+                    return state
+
+                state.song_proposals.iterations.append(state.counter_proposal)
+                state.counter_proposal = updated_proposal
+                return state
             except Exception as e:
                 error_msg = f"Sigil update LLM call failed: {e!s}"
                 logging.error(error_msg)

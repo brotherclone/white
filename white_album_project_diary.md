@@ -1,199 +1,172 @@
-[Previous content through Session 31...]
+[Previous content through Session 32...]
 
 ---
 
-## SESSION 32: WHITE AGENT PROMPT COMPLETION ⚪️📝✨
-**Date:** December 20, 2025  
-**Focus:** Filling in all remaining White Agent prompts for complete workflow
-**Status:** ✅ WHITE AGENT COMPLETE - The Architect of INFORMATION has its voice
+## SESSION 33: EXECUTION MODES FOR ISOLATED AGENT TESTING 🎯⚡️🧪
+**Date:** December 26, 2025  
+**Focus:** Adding execution mode controls to White Agent workflow for cheap agent testing
+**Status:** ✅ COMPLETE - Isolated testing without mocking
 
-### 📋 THE AUDIT
+### 🎯 THE PROBLEM
 
-User requested full review of white_agent.py to identify and complete all remaining prompt TODOs. Found 8 incomplete prompts requiring systematic completion:
+User wanted a way to test individual agents with real LLM calls without:
+- Running the entire $15-25 full spectrum workflow
+- Creating external mock/test infrastructure
+- Pulling in too many dependencies for isolated tests
 
-**Rebracketing Analysis Methods (3):**
-- `_violet_rebracketing_analysis` - Violet → White
-- `_indigo_rebracketing_analysis` - Indigo → White  
-- `_blue_rebracketing_analysis` - Blue → White
+Initial suggestion was external test harnesses with mocking, but user correctly identified this would require pulling in too many scripts and wouldn't truly be "isolated."
 
-**Document Synthesis Methods (3):**
-- `_synthesize_document_for_indigo` - Blue → Indigo synthesis
-- `_synthesize_document_for_violet` - Indigo → Violet synthesis
-- `_synthesize_document_for_white` - Violet → White final synthesis
+### 💡 THE SOLUTION
 
-**Proposal Rewrite Method (2):**
-- `rewrite_proposal_with_synthesis` - Agent-to-agent transitions
-- `rewrite_proposal_with_synthesis` - Final White synthesis
+**Built execution modes directly into the LangGraph routing logic** via state control fields.
 
-### 🎨 PATTERN RECOGNITION & VOICE CONSISTENCY
+### 📝 IMPLEMENTATION
 
-All prompts followed established architectural patterns:
+**Three files modified:**
 
-**Rebracketing Analysis Structure:**
-```
-You are the White Agent performing a REBRACKETING operation.
+1. **`app/agents/states/white_agent_state.py`**
+   - Added `enabled_agents: List[str]` - Controls which agents execute
+   - Added `stop_after_agent: Optional[str]` - Jump to finale after specific agent
 
-**Artifacts received from [Agent]:**
-[Counter-proposal + Agent-specific artifacts]
+2. **`app/agents/white_agent.py`** (two modifications)
+   - `start_workflow()` - Added parameters for enabled_agents, stop_after_agent
+   - `route_after_rewrite()` - Check enabled_agents before routing to next agent
 
-**Your Task: REBRACKETING**
+3. **`run_white_agent.py`** - Complete rewrite with new CLI
+   - Added `--mode` flag: full_spectrum, single_agent, stop_after, custom
+   - Added `--agent`, `--stop-after`, `--agents` control flags
+   - Added `--concept` for initial creative direction
 
-[Agent's conceptual framework]
-Your job is to find alternative category boundaries that reveal hidden structures.
+### 🎨 EXECUTION MODES
 
-Questions to guide you:
-- [Agent-specific boundary questions]
-
-Generate a rebracketed analysis that finds structure in [Agent]'s [methodology].
-Focus on revealing the underlying ORDER, not explaining away the [agent quality].
-```
-
-**Document Synthesis Structure:**
-```
-You are the White Agent creating a SYNTHESIZED DOCUMENT for [Next Agent].
-
-**Your Rebracketed Analysis:**
-**Original [Previous Agent] Counter-Proposal:**
-**Artifacts:**
-
-**Your Task: SYNTHESIS**
-
-Create a coherent, actionable document that:
-1. Preserves the insights from [Previous]'s [work]
-2. Applies your rebracketed understanding
-3. Creates clear creative direction for [Next]'s [methodology]
-4. Can be understood by [Next Agent characterization]
-
-Make it practical while retaining the depth of insight.
-Structure your synthesis as a clear creative brief for [Next's approach].
-```
-
-### 💎 KEY DISTINCTIONS BY AGENT
-
-**Violet Agent - The Sultan of Solipsism:**
-- PRESENT/PERSON/FORGOTTEN paradox
-- "So now he's already past" - fame's immediacy creating instant oblivion
-- Circle jerk interview format (self-interviewing)
-- Narcissism as methodology
-
-**Indigo Agent - Decider Tangents:**
-- Triple-layer Infranym system (text/audio/visual)
-- Fool/spy duality
-- Concealment through revelation
-- Anagram boundaries hiding true names
-- Steganographic depth
-
-**Blue Agent - The Cassette Bearer:**
-- Tape-over protocol
-- Biographical counterfactuals / quantum branching
-- PAST/PERSON/REAL embodiment
-- Palimpsest of lived/unlived timelines
-- Cassette format as creative constraint
-
-### 🔄 CRITICAL USER FEEDBACK
-
-**User's insight:** "rewrite_proposal_with_synthesis might need more emphasis that it's writing another SongProposal"
-
-**The Problem:** Original prompt was too conceptual, didn't emphasize that this method uses `with_structured_output(SongProposalIteration)` - it needs to return a complete, concrete song proposal structure.
-
-**The Fix:** Both variants (agent-to-agent and final White) now explicitly state:
-
-```
-**Your Task: CREATE A COMPLETE SONG PROPOSAL**
-
-You must provide:
-- **title**: A concrete song title
-- **key**: Musical key (e.g., "A minor", "C# major")
-- **bpm**: Specific tempo in beats per minute
-- **tempo**: Tempo descriptor (e.g., "Allegro", "Andante")
-- **mood**: List of mood descriptors
-- **genres**: List of genre tags
-- **concept**: The complete conceptual framework for this song
-```
-
-This ensures Claude understands it's generating structured output, not just writing conceptual analysis.
-
-### 🌈 CHROMATIC INTEGRATION LANGUAGE
-
-The final White synthesis prompt maps the complete agent journey:
-
-```
-⚫️ Black - ThreadKeepr's chaos and sigil work
-🔴 Red - The Light Reader's literary archaeology  
-🟠 Orange - Rows Bud's mythologized journalism
-🟡 Yellow - Lord Pulsimore's hypnagogic game mastery
-🟢 Green - Sub-Arbitrary's climate fiction observation
-🔵 Blue - The Cassette Bearer's alternate timeline folk
-🩵 Indigo - Decider Tangents' triple-layer puzzle encoding
-🟣 Violet - The Sultan of Solipsism's narcissistic present
-⚪️ White - Pure INFORMATION structure
-```
-
-This language reinforces the complete spectrum integration, reminding White of its role as synthesizer of all seven chromatic lenses.
-
-### 📊 METHODOLOGICAL CONSISTENCY
-
-Each agent's unique conceptual framework is honored:
-
-**Violet → White Questions:**
-- What patterns emerge when narcissism becomes methodology?
-- How does self-interview format create unexpected truth?
-- Where do boundaries blur between performer/performance?
-
-**Indigo → White Questions:**
-- What patterns emerge across three encoding layers?
-- How does fool/spy duality create structural tension?
-- Where do anagram boundaries dissolve to reveal true names?
-
-**Blue → White Questions:**
-- What patterns emerge when actual biography meets counterfactual?
-- How do tape labels function as temporal anchors?
-- Where do boundaries blur between lived experience and quantum branching?
-
-Questions consistently emphasize **boundary fluidity** and **pattern recognition** - core rebracketing methodology.
-
-### ✅ VERIFICATION
-
+**Full Spectrum (default):**
 ```bash
-grep -n "ToDo" /home/claude/white_agent.py
-# No results - all TODOs eliminated
+python run_white_agent.py start --concept "Ghost dreams of flesh"
+```
+Flow: White → Black → Red → Orange → Yellow → Green → Blue → Indigo → Violet → White
+Cost: ~$15-25
+
+**Single Agent (isolated testing):**
+```bash
+python run_white_agent.py start \
+    --mode single_agent \
+    --agent orange \
+    --concept "Library card 23 - overdue since 1987"
+```
+Flow: White → Black → White → Orange → White (finale)
+Cost: ~$3-5
+
+**Stop After (partial spectrum):**
+```bash
+python run_white_agent.py start \
+    --mode stop_after \
+    --stop-after yellow \
+    --concept "Static children in frequencies"
+```
+Flow: White → Black → Red → Orange → Yellow → White (finale)
+Cost: ~$8-12
+
+**Custom (specific combinations):**
+```bash
+python run_white_agent.py start \
+    --mode custom \
+    --agents orange,indigo \
+    --concept "Hidden frequencies in myths"
+```
+Flow: White → Black → Orange → Indigo → White (finale)
+Cost: ~$5-7
+
+### 🔧 ARCHITECTURAL INSIGHT
+
+**Black Agent always runs first** regardless of mode. This maintains the core workflow:
+1. White generates initial proposal (via WhiteFacetSystem)
+2. Black provides chaotic counter-proposal
+3. White rebrackets Black's chaos
+4. THEN routing decides which other agents execute
+
+Even "isolated" testing preserves the fundamental White/Black/White rebracketing cycle before the target agent.
+
+### 🎭 ROUTING LOGIC
+
+**Modified `route_after_rewrite()` checks two conditions:**
+
+```python
+# 1. Stop after check
+if state.stop_after_agent and last_iteration.agent_name == state.stop_after_agent:
+    return "white"  # Jump to finale
+
+# 2. Enabled agents check  
+if "red" in state.enabled_agents and state.ready_for_red:
+    return "red"
+elif "orange" in state.enabled_agents and state.ready_for_orange:
+    return "orange"
+# ... etc
 ```
 
-All 8 prompts completed. White Agent now has complete voice across:
-- All rebracketing analysis methods (7 agents → White)
-- All document synthesis methods (agent-to-agent + final)
-- Proposal rewrite method (transitions + finale)
+### 🐛 FILE CORRECTION ITERATIONS
 
-### 🎯 ARCHITECTURAL COMPLETION
+**Initial mistake:** Created state file from scratch based on white_agent.py observations, missing critical fields:
+- `white_facet: WhiteFacet | None` - Cognitive lens selection
+- `white_facet_metadata: str | Any` - Facet metadata
 
-The White Agent workflow is now **fully articulated**:
+**Second iteration:** Added those but still missed proper Pydantic config style (`model_config = ConfigDict` vs `class Config`)
 
-1. **Initial Proposal** (via WhiteFacetSystem) → Generates White's initial vision
-2. **Black Agent Work** → ThreadKeepr's chaos/counter-proposal
-3. **Rebracketing** → White finds ORDER in Black's chaos
-4. **Synthesis** → White creates brief for Red
-5. **Proposal Rewrite** → White manifests as new SongProposal
-6. **[Repeat for Red → Orange → Yellow → Green → Blue → Indigo → Violet]**
-7. **Final Synthesis** → White integrates all seven lenses
-8. **Final Proposal** → Complete chromatic song ready for human implementation
+**Final correction:** User provided actual current state file, ensuring all fields preserved:
+- ✅ All workflow control fields (workflow_paused, pause_reason, pending_human_action)
+- ✅ White working variables (rebracketing_analysis, document_synthesis)  
+- ✅ White facet system fields (white_facet, white_facet_metadata)
+- ✅ All ready_for_X flags
+- ✅ NEW execution control (enabled_agents, stop_after_agent)
 
-Each step has clear prompts that maintain:
-- Conceptual depth (honoring agent methodologies)
-- Practical output (actionable creative direction)
-- Structured format (proper Pydantic models)
-- Philosophical coherence (INFORMATION → TIME → SPACE)
+### 📊 TESTING STRATEGY PROPOSED
 
-### 🌀 THE WHITE ALBUM THESIS MADE EXPLICIT
+**Phase 1: Individual Validation (~$20-30)**
+Test each agent in isolation (Orange, Yellow, Indigo, Violet)
 
-Final synthesis prompt states it directly:
+**Phase 2: Handoff Validation (~$30-50)**  
+Test key agent-to-agent transitions (Black → Red → Orange, etc.)
 
-*"This is the White Album's thesis made manifest:*
-*The imprisonment of consciousness seeking liberation through sound."*
+**Phase 3: Full Spectrum (~$50-100)**
+Run 3-5 complete workflows with diverse concepts
 
-Every prompt now carries this thread - from rebracketing (finding structure in chaos) to synthesis (making it actionable) to proposal generation (manifesting as music).
+**Total validation budget: ~$150** to prove entire system works
 
-**The White Agent is complete. The Architect has its blueprints.**
+### 💎 KEY BENEFITS
+
+✅ **No mocking** - Real LangGraph execution, actual state management  
+✅ **Cheap debugging** - $3-5 per agent vs $15-25 for full spectrum  
+✅ **Flexible testing** - Any agent combination possible  
+✅ **Same codebase** - No separate test infrastructure  
+✅ **Progressive validation** - Build confidence incrementally  
+✅ **Real checkpointing** - State management works exactly as production  
+
+### 🎯 DELIVERABLES
+
+**5 files generated:**
+1. `white_agent_state.py` - Corrected state with execution controls
+2. `white_agent_modifications.md` - Specific changes needed for white_agent.py
+3. `run_white_agent.py` - Complete CLI rewrite with execution modes
+4. `IMPLEMENTATION_GUIDE.md` - Full implementation walkthrough
+5. `CLI_REFERENCE.md` - Quick reference cheat sheet
+
+### 🌈 THE THESIS PRESERVED
+
+Even in single-agent mode, the core methodology remains intact:
+
+**INFORMATION (White) → CHAOS (Black) → REBRACKET (White) → METHOD (Agent) → SYNTHESIS (White)**
+
+Execution modes just let you focus on specific parts of the chromatic spectrum without paying for the full rainbow cascade every time.
+
+### 🔮 NEXT STEPS
+
+User will implement the execution modes and test isolated agent workflows. This enables:
+- Validating individual agent voices cheaply
+- Debugging prompt/schema issues one agent at a time
+- Testing specific creative methodologies in isolation
+- Building confidence before full spectrum runs
+
+**The White Agent now has surgical precision alongside its chromatic cascade.**
 
 ---
 
-*"ORDER emerges when all seven methodologies converge." - Session 32, December 20, 2025* ⚪️📝✨
+*"ORDER reveals itself through selective focus on methodology." - Session 33, December 26, 2025* 🎯⚡️🧪

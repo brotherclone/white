@@ -27,7 +27,6 @@ from app.agents.workflow.resume_black_workflow import (
 )
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
-from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
@@ -57,7 +56,12 @@ class WhiteAgent(BaseModel):
             "violet": VioletAgent(),
         }
 
-    def start_workflow(self, user_input: str | None = None) -> MainAgentState:
+    def start_workflow(
+        self,
+        user_input: str | None = None,
+        enabled_agents: List[str] | None = None,
+        stop_after_agent: str | None = None,
+    ) -> MainAgentState:
         """
         Start a new White Agent workflow from the beginning.
 
@@ -66,9 +70,29 @@ class WhiteAgent(BaseModel):
 
         Returns:
             The final state after workflow completion (or pause)
+            :param user_input:
+            :param enabled_agents:
+            :param stop_after_agent:
         """
         if user_input is not None:
             logging.info(f"User input provided to White Agent: {user_input}")
+
+        if enabled_agents is None:
+            enabled_agents = [
+                "black",
+                "red",
+                "orange",
+                "yellow",
+                "green",
+                "blue",
+                "indigo",
+                "violet",
+            ]
+
+        if stop_after_agent:
+            logging.info(f"🎯 Execution mode: Stop after {stop_after_agent}")
+        if len(enabled_agents) < 8:
+            logging.info(f"🎯 Enabled agents: {', '.join(enabled_agents)}")
 
         workflow = self.build_workflow()
         thread_id = str(uuid4())
@@ -86,6 +110,8 @@ class WhiteAgent(BaseModel):
             ready_for_violet=False,
             ready_for_white=False,
             run_finished=False,
+            enabled_agents=enabled_agents,
+            stop_after_agent=stop_after_agent,
         )
         config = RunnableConfig(configurable={"thread_id": thread_id})
         logging.info(f"Starting White Agent workflow (thread_id: {thread_id})")
@@ -414,7 +440,7 @@ class WhiteAgent(BaseModel):
                 yml_color = "indigo"
             elif state.ready_for_violet:
                 yml_color = "violet"
-            mock_name = f"white_initial_proposal_{yml_color}_mock.yml"
+            mock_name = f"white_reworked_proposal_for_{yml_color}_mock.yml"
             if state.ready_for_white:
                 mock_name = "final_white_song_proposal_mock.yml"
             try:
@@ -431,6 +457,9 @@ class WhiteAgent(BaseModel):
                         if block_mode:
                             raise TypeError(error_msg)
                         logging.warning(error_msg)
+                    else:
+                        # Append to iterations list in mock mode too
+                        state.song_proposals.iterations.append(proposal)
             except Exception as e:
                 logging.info(f"Mock reworked proposal not found:{e!s}")
             return state
@@ -553,8 +582,6 @@ Structure your proposal as the final, complete vision - ready for human implemen
             rewrite_proposal = proposer.invoke(prompt)
             if isinstance(rewrite_proposal, dict):
                 rewrite_proposal = SongProposalIteration(**rewrite_proposal)
-                state.song_proposals.append(rewrite_proposal)
-                return state
             if not isinstance(rewrite_proposal, SongProposalIteration):
                 error_msg = (
                     f"Expected SongProposalIteration, got {type(rewrite_proposal)}"
@@ -562,6 +589,9 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 if block_mode:
                     raise TypeError(error_msg)
                 logging.warning(error_msg)
+            else:
+                # Append to the iterations list, not to song_proposals itself
+                state.song_proposals.iterations.append(rewrite_proposal)
         except Exception as e:
             logging.info(f"Anthropic model call failed: {e!s}.")
             if block_mode:
@@ -1893,39 +1923,66 @@ Structure your synthesis as the final creative brief before manifestation.
 
     @staticmethod
     def route_after_rewrite(state: MainAgentState) -> str:
-        if state.ready_for_red:
+        """
+        Route after White rewrites proposal with agent's contribution.
+
+        Respects execution controls:
+        - enabled_agents: Only route to agents in this list
+        - stop_after_agent: Jump to finale after specified agent
+        """
+        if state.stop_after_agent and state.song_proposals.iterations:
+            last_iteration = state.song_proposals.iterations[-1]
+            logging.info(
+                f"🔍 Checking stop_after: last_iteration.agent_name='{getattr(last_iteration, 'agent_name', None)}', stop_after_agent='{state.stop_after_agent}'"
+            )
+            if last_iteration.agent_name == state.stop_after_agent:
+                logging.info(f"✅ Stopping after {state.stop_after_agent} as requested")
+                return "white"
+        if "red" in state.enabled_agents and state.ready_for_red:
             return "red"
-        elif state.ready_for_orange:
+        elif "orange" in state.enabled_agents and state.ready_for_orange:
             return "orange"
-        elif state.ready_for_yellow:
+        elif "yellow" in state.enabled_agents and state.ready_for_yellow:
             return "yellow"
-        elif state.ready_for_green:
+        elif "green" in state.enabled_agents and state.ready_for_green:
             return "green"
-        elif state.ready_for_blue:
+        elif "blue" in state.enabled_agents and state.ready_for_blue:
             return "blue"
-        elif state.ready_for_indigo:
+        elif "indigo" in state.enabled_agents and state.ready_for_indigo:
             return "indigo"
-        elif state.ready_for_violet:
+        elif "violet" in state.enabled_agents and state.ready_for_violet:
             return "violet"
         return "white"
 
     @staticmethod
     def _gather_artifacts_for_prompt(
-        artifacts: List[ChainArtifact], artifact_filter: ChainArtifactType
+        artifacts: List[Any], artifact_filter: ChainArtifactType
     ) -> List[str]:
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         prompt_artifacts: List[str] = []
         for a in artifacts:
-            if getattr(a, "chain_artifact_type", None) == artifact_filter:
-                try:
-                    artifact = a.for_prompt()
-                    prompt_artifacts.append(artifact)
-                except ValueError as e:
-                    if block_mode:
-                        raise e
-                    logging.error(
-                        f"Failed to format {artifact_filter.value} for prompt: {e}"
-                    )
+            # Handle both artifact instances and dict representations
+            if isinstance(a, dict):
+                artifact_type = a.get("chain_artifact_type")
+                if (
+                    artifact_type == artifact_filter
+                    or artifact_type == artifact_filter.value
+                ):
+                    # For dicts, extract relevant content directly
+                    # Different artifact types may have different content fields
+                    content = a.get("content") or a.get("narrative") or str(a)
+                    prompt_artifacts.append(content)
+            else:
+                if getattr(a, "chain_artifact_type", None) == artifact_filter:
+                    try:
+                        artifact = a.for_prompt()
+                        prompt_artifacts.append(artifact)
+                    except ValueError as e:
+                        if block_mode:
+                            raise e
+                        logging.error(
+                            f"Failed to format {artifact_filter.value} for prompt: {e}"
+                        )
         return prompt_artifacts
 
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:

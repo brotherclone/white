@@ -13,3 +13,12 @@ class HtmlChainArtifactFile(ChainArtifact, ABC):
         description="Type of the chain artifact file should always be HTML in this case.",
     )
     image_path: str = Field(description="Path to the image file.")
+
+    def flatten(self):
+        pass
+
+    def save_file(self):
+        pass
+
+    def for_prompt(self):
+        pass
