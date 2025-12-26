@@ -174,7 +174,7 @@ class WhiteAgent(BaseModel):
         workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
         # ⚫️ ⚪️
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
-        workflow.add_edge("process_black_agent_work", "rewrite_proposal_with_synthesis")
+        # Note: process_black_agent_work uses conditional routing (see below)
         # ⚪️ 🔴
         workflow.add_edge("invoke_red_agent", "process_red_agent_work")
         # 🔴 ⚪️
@@ -266,7 +266,7 @@ class WhiteAgent(BaseModel):
         else:
             raise TypeError(f"Cannot normalize proposal of type {type(proposal)}")
 
-    # 📣⚫📣🔴📣🟠📣🟡📣🟢📣🔵📣🩵📣🟣📣#
+    # 📣 ⚫ 📣 🔴 📣 🟠 📣 🟡 📣 🟢 📣 🔵 📣 🩵 📣 🟣 📣#
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Black Agent to generate counter-proposal"""
@@ -324,7 +324,7 @@ class WhiteAgent(BaseModel):
             self.agents["violet"] = VioletAgent(settings=self.settings)
         return self.agents["violet"](state)
 
-    # 📣⚫📣🔴📣🟠📣🟡📣🟢📣🔵📣🩵📣🟣📣#
+    # 📣 ⚫ 📣 🔴 📣 🟠 📣 🟡 📣 🟢 📣 🔵 📣 🩵 📣 🟣 📣#
 
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"

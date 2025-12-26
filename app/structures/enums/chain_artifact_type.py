@@ -26,4 +26,5 @@ class ChainArtifactType(str, Enum):
     INFRANYM_IMAGE = "infranym_image"
     INFRANYM_TEXT = "infranym_text"
     CIRCLE_JERK_INTERVIEW = "circle_jerk_interview"
+    CARD_CATALOG = "card_catalog"
     UNKNOWN = "unknown"

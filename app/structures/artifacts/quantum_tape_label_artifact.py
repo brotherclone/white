@@ -7,7 +7,11 @@ from typing import Optional
 from pydantic import Field
 from dotenv import load_dotenv
 
-from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.html_artifact_file import HtmlChainArtifactFile
+from app.structures.artifacts.template_renderer import (
+    get_template_path,
+    HTMLTemplateRenderer,
+)
 from app.structures.enums.quantum_tape_recording_quality import (
     QuantumTapeRecordingQuality,
 )
@@ -15,7 +19,7 @@ from app.structures.enums.quantum_tape_recording_quality import (
 load_dotenv()
 
 
-class QuantumTapeLabelArtifact(ChainArtifact, ABC):
+class QuantumTapeLabelArtifact(HtmlChainArtifactFile, ABC):
     """VHS/Cassette tape label metadata."""
 
     title: str = Field(
@@ -70,15 +74,18 @@ class QuantumTapeLabelArtifact(ChainArtifact, ABC):
         }
 
     def save_file(self):
-        file = Path(self.file_path, self.file_name)
-        file.parent.mkdir(parents=True, exist_ok=True)
-        with open(file, "w") as f:
-            yaml.dump(
-                self.model_dump(mode="python"),
-                f,
-                default_flow_style=False,
-                allow_unicode=True,
-            )
+        """Render and save the HTML file."""
+        template_path = get_template_path("quantum_tape")
+        renderer = HTMLTemplateRenderer(template_path)
+
+        html_content = renderer.render_with_model(self)
+
+        file_path = Path(self.file_path)
+        file_path.mkdir(parents=True, exist_ok=True)
+
+        output_file = file_path / self.file_name
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(html_content)
 
     def for_prompt(self):
         prompt_parts = [f"Title: {self.title}", f"Date Range: {self.date_range}"]

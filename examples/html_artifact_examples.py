@@ -8,7 +8,7 @@ using the three available templates: Card Catalog, Character Sheet, and Quantum 
 import os
 from dotenv import load_dotenv
 
-from app.structures.artifacts.html_artifacts import (
+from app.structures.artifacts.html_artifact_file import (
     CardCatalogArtifact,
     CharacterSheetArtifact,
     QuantumTapeArtifact,
@@ -21,9 +21,11 @@ def example_card_catalog():
     """Example: Create a Card Catalog artifact for a forbidden book."""
     print("Creating Card Catalog artifact...")
 
+    base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "./chain_artifacts")
     catalog = CardCatalogArtifact(
         thread_id="example_thread_001",
-        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "./chain_artifacts"),
+        base_path=base_path,
+        image_path=f"{base_path}/img",
         danger_level=4,
         acquisition_date="DEC 15 2024",
         title="The Geometry of Forgotten Spaces",
@@ -78,9 +80,11 @@ def example_character_sheet():
     """Example: Create a Character Sheet for a Pulsar Palace character."""
     print("Creating Character Sheet artifact...")
 
+    base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "./chain_artifacts")
     sheet = CharacterSheetArtifact(
         thread_id="example_thread_001",
-        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "./chain_artifacts"),
+        base_path=base_path,
+        image_path=f"{base_path}/img",
         portrait_image_url="../png/portrait_example.png",
         disposition="Curious",
         profession="Detective",
@@ -106,9 +110,11 @@ def example_quantum_tape():
     """Example: Create a Quantum Tape artifact for Blue Album."""
     print("Creating Quantum Tape artifact...")
 
+    base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "./chain_artifacts")
     tape = QuantumTapeArtifact(
         thread_id="example_thread_001",
-        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "./chain_artifacts"),
+        base_path=base_path,
+        image_path=f"{base_path}/img",
         year_documented="2024",
         original_date="1980",
         original_title="John Lennon is shot outside the Dakota",
