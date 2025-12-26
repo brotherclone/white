@@ -15,3 +15,8 @@ class InfranymImageArtifact(ChainArtifact, ABC):
 
     def save_file(self):
         pass
+
+
+if __name__ == "__main__":
+    i = InfranymImageArtifact()
+    i.save_file()

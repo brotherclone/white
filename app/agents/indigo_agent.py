@@ -246,7 +246,6 @@ Respond with ONLY the secret name (proper capitalization, with spaces).
     def spy_arrange_surface(self, state: IndigoAgentState) -> IndigoAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-
         if mock_mode:
             try:
                 with open(
@@ -391,10 +390,7 @@ Concept: [full concept explanation]
             try:
                 chain = self.llm | StrOutputParser()
                 response = chain.invoke(proposal_prompt)
-
-                # Parse response into structured format
                 counter_proposal = self._parse_proposal_response(response)
-
                 # Add infranym metadata to concept
                 counter_proposal.concept += "\n\n**INFRANYM PROTOCOL:**\n"
                 counter_proposal.concept += (
@@ -404,16 +400,13 @@ Concept: [full concept explanation]
                 counter_proposal.concept += (
                     f"Decoding: {state.artifacts[0]['triple_layer']['decoding_hint']}"
                 )
-
                 # Add iteration metadata
                 counter_proposal.iteration_number = (
                     len(state.song_proposals.iterations) + 1
                 )
                 counter_proposal.agent_name = "Indigo Agent (Decider Tangents)"
                 counter_proposal.timestamp = time.time()
-
                 state.counter_proposal = counter_proposal
-
                 logging.info(
                     f"✅ Counter-proposal generated: '{counter_proposal.title}'"
                 )
@@ -423,7 +416,6 @@ Concept: [full concept explanation]
 
             except Exception as e:
                 logging.error(f"❌ Error generating proposal: {e}")
-                # Create minimal fallback
                 state.counter_proposal = SongProposalIteration(
                     title=state.surface_name,
                     key=previous_iteration.key,
@@ -438,7 +430,8 @@ Concept: [full concept explanation]
                 )
                 return state
 
-    def _should_retry_anagram(self, state: IndigoAgentState) -> str:
+    @staticmethod
+    def _should_retry_anagram(state: IndigoAgentState) -> str:
         if state.anagram_valid:
             return "continue"
         elif state.anagram_attempts < state.anagram_attempt_max:
@@ -518,23 +511,17 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
         try:
             chain = self.llm | StrOutputParser()
             chosen_method_str = chain.invoke(choice_prompt).strip().upper()
-
-            # Convert string to enum
             try:
                 chosen_method = InfranymMedium(chosen_method_str.lower())
             except ValueError:
                 chosen_method = None
-
-            # Validate choice
             if chosen_method not in available_methods:
                 logging.warning(
                     f"⚠️ Invalid choice '{chosen_method_str}', defaulting to TEXT"
                 )
                 chosen_method = InfranymMedium.TEXT  # TEXT is always viable
-
             state.infranym_medium = chosen_method
             state.method_constraints = constraints
-
             logging.info(f"🎯 Chosen method: {chosen_method.value}")
             return state
 

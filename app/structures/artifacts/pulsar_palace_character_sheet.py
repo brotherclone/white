@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Optional, TYPE_CHECKING
 
@@ -82,6 +83,25 @@ class PulsarPalaceCharacterSheet(HtmlChainArtifactFile, ABC):
         # Get character stats from sheet_content
         char = self.sheet_content
         if char:
+            # Extract basic character fields for template
+            data["disposition"] = (
+                char.disposition.disposition if char.disposition else "Unknown"
+            )
+            data["profession"] = (
+                char.profession.profession if char.profession else "Unknown"
+            )
+            data["background_place"] = (
+                char.background.place if char.background else "Unknown"
+            )
+            data["background_time"] = (
+                char.background.time if char.background else "Unknown"
+            )
+            data["on_current"] = char.on_current or 0
+            data["on_max"] = char.on_max or 0
+            data["off_current"] = char.off_current or 0
+            data["off_max"] = char.off_max or 0
+
+            # Calculate percentages
             data["on_percentage"] = (
                 int((char.on_current / char.on_max) * 100)
                 if char.on_max and char.on_max > 0
@@ -92,9 +112,38 @@ class PulsarPalaceCharacterSheet(HtmlChainArtifactFile, ABC):
                 if char.off_max and char.off_max > 0
                 else 0
             )
+            if hasattr(char, "portrait") and char.portrait:
+                try:
+                    data["portrait_image_url"] = f"../png/{char.portrait.file_name}"
+                except ValueError:
+                    logging.warn("could not get portrait image path:")
+                    data["portrait_image_url"] = ""
+            else:
+                data["portrait_image_url"] = ""
+            data["arrival_circumstances"] = getattr(
+                char, "arrival_circumstances", "Materialized in the Palace"
+            )
+            data["frequency_attunement"] = getattr(char, "frequency_attunement", 50)
+            data["current_location"] = getattr(
+                char, "current_location", "Pulsar Palace - Main Hall"
+            )
+            data["reality_anchor"] = getattr(char, "reality_anchor", "STABLE")
         else:
+            data["disposition"] = "Unknown"
+            data["profession"] = "Unknown"
+            data["background_place"] = "Unknown"
+            data["background_time"] = "Unknown"
+            data["on_current"] = 0
+            data["on_max"] = 0
+            data["off_current"] = 0
+            data["off_max"] = 0
             data["on_percentage"] = 0
             data["off_percentage"] = 0
+            data["portrait_image_url"] = ""
+            data["arrival_circumstances"] = "Unknown"
+            data["frequency_attunement"] = 0
+            data["current_location"] = "Unknown"
+            data["reality_anchor"] = "UNSTABLE"
 
         # Generate inventory slots HTML
         inventory_html = []
@@ -161,6 +210,11 @@ if __name__ == "__main__":
         "r",
     ) as f:
         data = yaml.safe_load(f)
+
+    base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+    data["base_path"] = base_path
+    data["image_path"] = f"{base_path}/img"
+
     sheet = PulsarPalaceCharacterSheet(**data)
     print(sheet)
     sheet.save_file()

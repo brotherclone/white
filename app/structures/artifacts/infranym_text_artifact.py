@@ -15,3 +15,8 @@ class InfranymTextArtifact(ChainArtifact, ABC):
 
     def save_file(self):
         pass
+
+
+if __name__ == "__main__":
+    i = InfranymTextArtifact()
+    print(i.flatten())

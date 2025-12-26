@@ -16,3 +16,9 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
 
     def save_file(self):
         pass
+
+
+if __name__ == "__main__":
+    i = CircleJerkInterviewArtifact()
+    print(i.flatten())
+    i.save_file()
