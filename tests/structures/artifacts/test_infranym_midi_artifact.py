@@ -1,2 +1,6 @@
+from app.structures.artifacts.infranym_midi_artifact import InfranymMidiArtifact
+
+
 def test_init():
-    raise NotImplementedError("No tests for InfranymMidiArtifact yet.")
+    artifact = InfranymMidiArtifact(thread_id="test")
+    assert artifact.thread_id == "test"

@@ -23,6 +23,7 @@ from app.structures.manifests.song_proposal import SongProposalIteration
 load_dotenv()
 
 
+# ToDo: Something ignore or not working with mock mode
 class IndigoAgent(BaseRainbowAgent, ABC):
     """Decider Tangents - Hides information"""
 
@@ -336,6 +337,8 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
                 counter_proposal.agent_name = "indigo"
                 counter_proposal.iteration_number = (
                     len(state.song_proposals.iterations) + 1
+                    if state.song_proposals
+                    else 1
                 )
                 counter_proposal.timestamp = time.time()
                 state.counter_proposal = counter_proposal

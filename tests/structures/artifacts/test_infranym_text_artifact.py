@@ -1,2 +1,6 @@
+from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
+
+
 def test_init():
-    raise NotImplementedError("No tests for InfranymTextArtifact yet.")
+    artifact = InfranymTextArtifact(thread_id="test")
+    assert artifact.thread_id == "test"

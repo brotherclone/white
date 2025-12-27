@@ -22,7 +22,7 @@ def get_random_species(species: dict) -> SpeciesExtinctionArtifact:
     """Get a random species from the corpus"""
     c = len(species["entries"])
     index = species["random"].randint(0, c - 1)
-    return parse_species_entry(corpus["entries"][index])
+    return parse_species_entry(species["entries"][index])
 
 
 def parse_species_entry(entry_dict: dict) -> SpeciesExtinctionArtifact:

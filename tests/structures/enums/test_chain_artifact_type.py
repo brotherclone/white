@@ -10,6 +10,7 @@ EXPECTED = {
     "SIGIL": "sigil",
     "SIGIL_DESCRIPTION": "sigil_description",
     "BOOK": "book",
+    "CARD_CATALOG": "card_catalog",
     "NEWSPAPER_ARTICLE": "newspaper_article",
     "SYMBOLIC_OBJECT": "symbolic_object",
     "PROPOSAL": "proposal",

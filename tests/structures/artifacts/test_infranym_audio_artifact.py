@@ -1,2 +1,6 @@
+from app.structures.artifacts.infranym_audio_artifact import InfranymAudioArtifact
+
+
 def test_init():
-    raise NotImplementedError("No tests for InfranymAudioArtifact yet.")
+    artifact = InfranymAudioArtifact(thread_id="test")
+    assert artifact.thread_id == "test"

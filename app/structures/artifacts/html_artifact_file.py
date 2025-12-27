@@ -12,7 +12,7 @@ class HtmlChainArtifactFile(ChainArtifact, ABC):
         default=ChainArtifactFileType.HTML,
         description="Type of the chain artifact file should always be HTML in this case.",
     )
-    image_path: str = Field(description="Path to the image file.")
+    image_path: str = Field(default="", description="Path to the image file.")
 
     def flatten(self):
         pass
