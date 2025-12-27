@@ -39,6 +39,7 @@ Usage:
 # This is a low-risk convenience to keep logs clean. For a longer-term fix,
 # migrate audio I/O to maintained libraries such as `soundfile` or `pydub`.
 
+# ToDo: Mock mode should be overridden by the agent
 
 warnings.filterwarnings("ignore", message=r".*aifc.*", category=DeprecationWarning)
 warnings.filterwarnings("ignore", message=r".*sunau.*", category=DeprecationWarning)

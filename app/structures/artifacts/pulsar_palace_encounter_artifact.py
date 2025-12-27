@@ -55,6 +55,36 @@ class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
     )
 
     def __init__(self, **data):
+        # Rebuild model to resolve forward references if needed
+        if not hasattr(self.__class__, "_rebuilt"):
+            # Import at runtime to make both PulsarPalaceCharacter and PulsarPalaceCharacterSheet available for model_rebuild
+            from app.structures.concepts.pulsar_palace_character import (
+                PulsarPalaceCharacter as _PulsarPalaceCharacter,
+            )
+            from app.structures.artifacts.pulsar_palace_character_sheet import (
+                PulsarPalaceCharacterSheet as _PulsarPalaceCharacterSheet,
+            )
+
+            # Rebuild all three models with the complete namespace
+            _PulsarPalaceCharacter.model_rebuild(
+                _types_namespace={
+                    "PulsarPalaceCharacterSheet": _PulsarPalaceCharacterSheet
+                }
+            )
+            _PulsarPalaceCharacter._rebuilt = True
+
+            _PulsarPalaceCharacterSheet.model_rebuild(
+                _types_namespace={"PulsarPalaceCharacter": _PulsarPalaceCharacter}
+            )
+            _PulsarPalaceCharacterSheet._rebuilt = True
+
+            self.__class__.model_rebuild(
+                _types_namespace={
+                    "PulsarPalaceCharacter": _PulsarPalaceCharacter,
+                    "PulsarPalaceCharacterSheet": _PulsarPalaceCharacterSheet,
+                }
+            )
+            self.__class__._rebuilt = True
         super().__init__(**data)
 
     def to_markdown(self) -> str:

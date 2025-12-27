@@ -27,24 +27,9 @@ def sample_species_entry():
             "iucn_status": "Extinct",
             "extinction_year": 2020,
             "population_trajectory": [
-                {
-                    "year": 2000,
-                    "population": 1000,
-                    "source": "estimated",
-                    "confidence": "medium",
-                },
-                {
-                    "year": 2010,
-                    "population": 500,
-                    "source": "estimated",
-                    "confidence": "medium",
-                },
-                {
-                    "year": 2020,
-                    "population": 0,
-                    "source": "confirmed",
-                    "confidence": "high",
-                },
+                {"year": 2000, "population": 1000, "source": "estimated", "confidence": "medium"},
+                {"year": 2010, "population": 500, "source": "estimated", "confidence": "medium"},
+                {"year": 2020, "population": 0, "source": "confirmed", "confidence": "high"},
             ],
             "habitat": "Test habitat",
             "endemic": True,
@@ -139,8 +124,6 @@ def test_get_random_species(sample_corpus, sample_species_entry):
     """Test getting a random species from corpus"""
     # Mock the random index
     sample_corpus["random"].randint.return_value = 0
-
-    result = get_random_species(sample_corpus)
 
     assert isinstance(result, SpeciesExtinctionArtifact)
     assert result.scientific_name == "Testus extinctus"
