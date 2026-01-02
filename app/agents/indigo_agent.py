@@ -23,7 +23,6 @@ from app.structures.manifests.song_proposal import SongProposalIteration
 load_dotenv()
 
 
-# ToDo: Something ignore or not working with mock mode
 class IndigoAgent(BaseRainbowAgent, ABC):
     """Decider Tangents - Hides information"""
 
@@ -51,7 +50,8 @@ class IndigoAgent(BaseRainbowAgent, ABC):
             artifacts=[],
             secret_name=None,
             infranym_method=None,
-            infranym_image=None,
+            infranym_encoded_image=None,
+            infranym_text_render=None,
             infranym_text=None,
             infranym_audio=None,
             infranym_midi=None,
@@ -480,10 +480,17 @@ Concept: [full concept explanation]
                 ) as f:
                     data = yaml.safe_load(f)
                     chosen_method = data["chosen_method"]
-                    # Convert string to enum if needed
                     if isinstance(chosen_method, str):
-                        chosen_method = InfranymMedium(chosen_method.lower())
-                    state.infranym_medium = chosen_method
+                        cm = chosen_method.strip().lower()
+                        try:
+                            chosen_enum = InfranymMedium(cm)
+                        except ValueError:
+                            chosen_enum = None
+                    else:
+                        chosen_enum = chosen_method
+                        # Set both fields for compatibility with other code paths
+                    state.infranym_medium = chosen_enum
+                    state.infranym_method = chosen_enum.value if chosen_enum else None
                     state.method_constraints = constraints
                     return state
             except Exception as e:

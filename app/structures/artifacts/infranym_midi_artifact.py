@@ -1,9 +1,9 @@
 from abc import ABC
 
-from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.midi_artifact_file import MidiArtifactFile
 
 
-class InfranymMidiArtifact(ChainArtifact, ABC):
+class InfranymMidiArtifact(MidiArtifactFile, ABC):
     def __init__(self, **data):
         super().__init__(**data)
 

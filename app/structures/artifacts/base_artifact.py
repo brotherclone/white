@@ -89,11 +89,30 @@ class ChainArtifact(BaseModel, ABC):
             col = self.rainbow_color_mnemonic_character_value.lower()
         self.file_name = f"{self.artifact_id}_{col}_{self.artifact_name}.{self.chain_artifact_file_type.value}"
 
-    def get_artifact_path(self, with_file_name: bool = True) -> str:
-        if with_file_name:
-            return os.path.join(self.file_path, self.file_name)
-        else:
-            return os.path.join(self.file_path)
+    def get_artifact_path(
+        self, with_file_name: bool = True, create_dirs: bool = False
+    ) -> str:
+        """
+        Get the artifact path, optionally creating directories.
+
+        Args:
+            with_file_name: If True, return a full path with filename. If False, return the directory only.
+            create_dirs: If True, create a directory structure if it doesn't exist.
+
+        Returns:
+            Path string
+        """
+        path = (
+            os.path.join(self.file_path, self.file_name)
+            if with_file_name
+            else self.file_path
+        )
+
+        if create_dirs:
+            dir_path = os.path.dirname(path) if with_file_name else path
+            os.makedirs(dir_path, exist_ok=True)
+
+        return path
 
     def make_artifact_path(self):
         self.file_path = os.path.join(

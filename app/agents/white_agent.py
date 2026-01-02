@@ -1,3 +1,11 @@
+"""
+THE PRISM - Prism Enhanced
+==================================
+
+The Prism doesn't generate chaos or methodology - it REVEALS what was always
+present by shifting the angle of perception through successive refraction.
+"""
+
 import logging
 import os
 import time
@@ -19,7 +27,12 @@ from app.agents.green_agent import GreenAgent
 from app.agents.indigo_agent import IndigoAgent
 from app.agents.orange_agent import OrangeAgent
 from app.agents.red_agent import RedAgent
-from app.agents.states.white_agent_state import MainAgentState
+from app.agents.states.white_agent_state import (
+    MainAgentState,
+    TransformationTrace,
+    FacetEvolution,
+    ArtifactRelationship,
+)
 from app.agents.tools.text_tools import save_markdown
 from app.agents.violet_agent import VioletAgent
 from app.agents.workflow.resume_black_workflow import (
@@ -63,7 +76,7 @@ class WhiteAgent(BaseModel):
         stop_after_agent: str | None = None,
     ) -> MainAgentState:
         """
-        Start a new White Agent workflow from the beginning.
+        Start a new Prism workflow from the beginning.
 
         Args:
             user_input: Optional user input to guide the initial proposal
@@ -75,7 +88,7 @@ class WhiteAgent(BaseModel):
             :param stop_after_agent:
         """
         if user_input is not None:
-            logging.info(f"User input provided to White Agent: {user_input}")
+            logging.info(f"User input provided to Prism: {user_input}")
 
         if enabled_agents is None:
             enabled_agents = [
@@ -114,7 +127,7 @@ class WhiteAgent(BaseModel):
             stop_after_agent=stop_after_agent,
         )
         config = RunnableConfig(configurable={"thread_id": thread_id})
-        logging.info(f"Starting White Agent workflow (thread_id: {thread_id})")
+        logging.info(f"Starting Prism workflow (thread_id: {thread_id})")
         result = workflow.invoke(initial_state, config)
         if isinstance(result, dict):
             final_state = MainAgentState(**result)
@@ -133,34 +146,26 @@ class WhiteAgent(BaseModel):
         updated_state = self.resume_after_black_agent_ritual(
             paused_state, verify_tasks=verify_tasks
         )
-        if updated_state.ready_for_red:
-            logging.info("Continuing to Red Agent...")
-            updated_state = self.invoke_red_agent(updated_state)
-            updated_state = self.process_red_agent_work(updated_state)
-            if updated_state.ready_for_orange:
-                updated_state = self.invoke_orange_agent(updated_state)
-                updated_state = self.process_orange_agent_work(updated_state)
-            if updated_state.ready_for_yellow:
-                updated_state = self.invoke_yellow_agent(updated_state)
-                updated_state = self.process_yellow_agent_work(updated_state)
-            if updated_state.ready_for_green:
-                updated_state = self.invoke_green_agent(updated_state)
-                updated_state = self.process_green_agent_work(updated_state)
-            if updated_state.ready_for_blue:
-                updated_state = self.invoke_blue_agent(updated_state)
-                updated_state = self.process_blue_agent_work(updated_state)
-            if updated_state.ready_for_indigo:
-                updated_state = self.invoke_indigo_agent(updated_state)
-                updated_state = self.process_indigo_agent_work(updated_state)
-            if updated_state.ready_for_violet:
-                updated_state = self.invoke_violet_agent(updated_state)
-                updated_state = self.process_violet_agent_work(updated_state)
-        updated_state = self.finalize_song_proposal(updated_state)
-        return updated_state
+
+        while not updated_state.run_finished:
+            next_agent = self._determine_next_agent(updated_state)
+            if next_agent == "finish":
+                break
+            updated_state = self._invoke_and_process_agent(next_agent, updated_state)
+        return self.finalize_song_proposal(updated_state)
+
+    def resume_agent_workflow(
+        self, agent_name: str, paused_state: MainAgentState, verify_tasks: bool = True
+    ) -> MainAgentState:
+        """
+        Generalized resume for any agent - routes to specific handler.
+        """
+        if agent_name == "black":
+            return self.resume_after_black_agent_ritual(paused_state, verify_tasks)
+        else:
+            raise ValueError(f"No resume handler for agent: {agent_name}")
 
     def build_workflow(self) -> CompiledStateGraph:
-        # Disable checkpointing to avoid serialization issues with complex Pydantic models
-        check_points = None
         workflow = StateGraph(MainAgentState)
         # ⚪️
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
@@ -196,48 +201,48 @@ class WhiteAgent(BaseModel):
         # Edges
         # ⚪️
         workflow.add_edge(START, "initiate_song_proposal")
-        # ⚪️ ⚫️
+        # ⚪️  ⚫️
         workflow.add_edge("initiate_song_proposal", "invoke_black_agent")
-        # ⚫️ ⚪️
+        # ⚫️  ⚪️
         workflow.add_edge("invoke_black_agent", "process_black_agent_work")
         # Note: process_black_agent_work uses conditional routing (see below)
-        # ⚪️ 🔴
+        # ⚪️  🔴
         workflow.add_edge("invoke_red_agent", "process_red_agent_work")
-        # 🔴 ⚪️
+        # 🔴  ⚪️
         workflow.add_edge("process_red_agent_work", "rewrite_proposal_with_synthesis")
-        # ⚪️ 🟠
+        # ⚪️  🟠
         workflow.add_edge("invoke_orange_agent", "process_orange_agent_work")
-        # 🟠 ⚪
+        # 🟠  ⚪
         workflow.add_edge(
             "process_orange_agent_work", "rewrite_proposal_with_synthesis"
         )
-        # ⚪️ 🟡
+        # ⚪️  🟡
         workflow.add_edge("invoke_yellow_agent", "process_yellow_agent_work")
-        # 🟡 ⚪️
+        # 🟡  ⚪️
         workflow.add_edge(
             "process_yellow_agent_work", "rewrite_proposal_with_synthesis"
         )
-        # ⚪️ 🟢
+        # ⚪️  🟢
         workflow.add_edge("invoke_green_agent", "process_green_agent_work")
-        # 🟢 ⚪
+        # 🟢  ⚪
         workflow.add_edge("process_green_agent_work", "rewrite_proposal_with_synthesis")
-        # ⚪️ 🔵
+        # ⚪️  🔵
         workflow.add_edge("invoke_blue_agent", "process_blue_agent_work")
-        # 🔵 ⚪
+        # 🔵  ⚪
         workflow.add_edge("process_blue_agent_work", "rewrite_proposal_with_synthesis")
-        # ⚪️ 🩵
+        # ⚪️  🩵
         workflow.add_edge("invoke_indigo_agent", "process_indigo_agent_work")
-        # 🩵 ⚪️
+        # 🩵  ⚪️
         workflow.add_edge(
             "process_indigo_agent_work", "rewrite_proposal_with_synthesis"
         )
-        # ⚪️ 🟣
+        # ⚪️  🟣
         workflow.add_edge("invoke_violet_agent", "process_violet_agent_work")
-        # 🟣 ⚪️
+        # 🟣  ⚪️
         workflow.add_edge(
             "process_violet_agent_work", "rewrite_proposal_with_synthesis"
         )
-        # ⚫️🫀 ⚪️
+        # ⚫️  🫀  ⚪️
         workflow.add_conditional_edges(
             "process_black_agent_work",
             self.route_after_black,
@@ -247,7 +252,7 @@ class WhiteAgent(BaseModel):
                 "finish": "finalize_song_proposal",
             },
         )
-        # ⚪️ ⚫ ⚪️ 🔴 ⚪️ 🟠 ⚪️ 🟡 ⚪️ 🟢 ⚪ ️🔵 ⚪️ 🩵 ⚪ ️🟣 ⚪️#
+        # ⚪️  ⚫  ⚪️  🔴  ⚪️  🟠  ⚪️  🟡  ⚪️  🟢  ⚪ ️🔵  ⚪️  🩵  ⚪ ️🟣 ⚪️#
         workflow.add_conditional_edges(
             "rewrite_proposal_with_synthesis",
             self.route_after_rewrite,
@@ -265,7 +270,7 @@ class WhiteAgent(BaseModel):
         )
         # ⚪️
         workflow.add_edge("finalize_song_proposal", END)
-        return workflow.compile(checkpointer=check_points)
+        return workflow.compile()
 
     def _get_claude_supervisor(self) -> ChatAnthropic:
         return ChatAnthropic(
@@ -291,8 +296,6 @@ class WhiteAgent(BaseModel):
             return SongProposal(iterations=[])
         else:
             raise TypeError(f"Cannot normalize proposal of type {type(proposal)}")
-
-    # 📣 ⚫ 📣 🔴 📣 🟠 📣 🟡 📣 🟢 📣 🔵 📣 🩵 📣 🟣 📣#
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Black Agent to generate counter-proposal"""
@@ -350,8 +353,6 @@ class WhiteAgent(BaseModel):
             self.agents["violet"] = VioletAgent(settings=self.settings)
         return self.agents["violet"](state)
 
-    # 📣 ⚫ 📣 🔴 📣 🟠 📣 🟡 📣 🟢 📣 🔵 📣 🩵 📣 🟣 📣#
-
     def initiate_song_proposal(self, state: MainAgentState) -> MainAgentState:
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
@@ -359,7 +360,7 @@ class WhiteAgent(BaseModel):
             user_input=None, use_weights=True
         )
         facet_metadata = WhiteFacetSystem.log_facet_selection(facet)
-        logging.info(f" White Agent using {facet.value.upper()} lens")
+        logging.info(f" Prism using {facet.value.upper()} lens")
         logging.info(f" {facet_metadata['description']}")
         if mock_mode:
             state.thread_id = "mock_thread_001"
@@ -389,8 +390,15 @@ class WhiteAgent(BaseModel):
             initial_proposal = proposer.invoke(prompt)
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
-                state.white_facet = facet
-                state.white_facet_metadata = facet_metadata
+
+                # ALWAYS set facet, regardless of type
+            state.white_facet = facet
+            state.white_facet_metadata = facet_metadata
+
+            # Initialize facet evolution tracking
+            state.facet_evolution = FacetEvolution(
+                initial_facet=facet, initial_metadata=facet_metadata or {}
+            )
             if not isinstance(initial_proposal, SongProposalIteration):
                 error_msg = (
                     f"Expected SongProposalIteration, got {type(initial_proposal)}"
@@ -496,7 +504,7 @@ class WhiteAgent(BaseModel):
                 agent_b_description = baton_list[7]
             if not state.ready_for_white:
                 prompt = f"""
-You are the White Agent, the Architect of INFORMATION.
+You are the Prism, the Architect of INFORMATION.
 
 You have just received work from {agent_a_description}, and you are preparing the conceptual foundation for {agent_b_description}.
 
@@ -532,7 +540,7 @@ Focus on clarity, coherence, and creative possibility - make it ready for the ne
                     [str(i) for i in state.song_proposals.iterations]
                 )
                 prompt = f"""
-You are the White Agent, the Architect of INFORMATION.
+You are the Prism, the Architect of INFORMATION.
 
 All seven agents have contributed their unique lenses to this transmigration. You hold the complete chromatic spectrum:
 
@@ -632,6 +640,29 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_black_document_synthesis.md",
         )
         state.ready_for_red = True
+        trace = TransformationTrace(
+            agent_name="black",
+            iteration_id=black_proposal.iteration_id,
+            boundaries_shifted=[
+                "CHAOS → ORDER boundary revelation",
+                "CONSCIOUS → UNCONSCIOUS sigil manifestation",
+                "INFORMATION → RITUAL physical embodiment",
+            ],
+            patterns_revealed=[
+                "Occult methodology creates structured chaos",
+                "Sigils as boundary markers between worlds",
+                "ThreadKeepr's systematic approach to mystery",
+            ],
+            semantic_resonances={
+                "resonates_with": ["indigo"],
+                "contradicts": ["yellow"],
+                "amplifies": ["red"],
+            },
+        )
+        state.transformation_traces.append(trace)
+        # Evolve facet based on this agent's work
+        self._evolve_facet(state, "black", trace.boundaries_shifted)
+
         return state
 
     def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -660,6 +691,24 @@ Structure your proposal as the final, complete vision - ready for human implemen
         )
         state.ready_for_red = False
         state.ready_for_orange = True
+        trace = TransformationTrace(
+            agent_name="red",
+            iteration_id=red_proposal.iteration_id,
+            boundaries_shifted=[
+                "The journey from the physical (OBJECTIONAL) to the informational through allusion (ONTOLOGICAL)",
+                "Corrupted code - Hacking - Corrupted reference - Metafiction",
+            ],
+            patterns_revealed=[
+                "There are real allusion songs in 'The Conjurer's Thread' to Banks, Murakami, and Pynchon, is 'Light Reading' mocking this?",
+                "There's an odd shift in political tone from 'Strings of Bad Luck' to 'Underrepresented Harmonics' where the narrator seems to be observing political action with a 'good luck with that' attitude? Why?",
+            ],
+            semantic_resonances={
+                "resonates_with": ["black", "orange"],
+                "contradicts": ["blue", "violet"],
+                "amplifies": ["indigo"],
+            },
+        )
+        state.transformation_traces.append(trace)
         return state
 
     def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -692,6 +741,25 @@ Structure your proposal as the final, complete vision - ready for human implemen
         )
         state.ready_for_orange = False
         state.ready_for_yellow = True
+        trace = TransformationTrace(
+            agent_name="orange",
+            iteration_id=orange_proposal.iteration_id,
+            boundaries_shifted=[
+                "The KNOWN to the IMAGINED",
+                "Allusion to other works, to false memories",
+                "A conscious act of imbuing an alternate book with some type of personal truth to realizing one's personal truth is misremembered.",
+            ],
+            patterns_revealed=[
+                "The impact of the Gen X/ 1990s outlook still pervasive in current musical output",
+                "Sometimes the characters in the 'reading list' seem to overlap the real misremembered world. For example, did I pass the man waiting outside his ex's apartment from 'A Doorbell for Finite Beings' while being lost in 'It used to be Space, now it's Here'?",
+            ],
+            semantic_resonances={
+                "resonates_with": ["blue"],
+                "contradicts": ["violet"],
+                "amplifies": ["yellow"],
+            },
+        )
+        state.transformation_traces.append(trace)
         return state
 
     def process_yellow_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -724,6 +792,21 @@ Structure your proposal as the final, complete vision - ready for human implemen
         )
         state.ready_for_yellow = False
         state.ready_for_green = True
+        trace = TransformationTrace(
+            agent_name="yellow",
+            iteration_id=yellow_proposal.iteration_id,
+            boundaries_shifted=["From PAST to FUTURE", "From THING to PLACE"],
+            patterns_revealed=[
+                "There's a similar 'portal' hallucination in 'Newton' that has birthed the Pulsar Palace",
+                "The guests feel out of place like I did in 'It used to be Space, now it's Here'",
+            ],
+            semantic_resonances={
+                "resonates_with": ["indigo"],
+                "contradicts": ["blue", "green"],
+                "amplifies": ["red"],
+            },
+        )
+        state.transformation_traces.append(trace)
         return state
 
     def process_green_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -776,6 +859,26 @@ Structure your proposal as the final, complete vision - ready for human implemen
         )
         state.ready_for_green = False
         state.ready_for_blue = True
+        trace = TransformationTrace(
+            agent_name="green",
+            iteration_id=green_proposal.iteration_id,
+            boundaries_shifted=[
+                "From IMAGINED to FORGOTTEN",
+                "From liminal to apocalypse",
+                "From ambient to silent",
+            ],
+            patterns_revealed=[
+                "The grand scale of places is indifferent to all",
+                "The flicker of the Pulsar is like the Epochs of the planet",
+                "Arbitrary's survey reveals the banality of extinction events over deep time and was first brought up in 'The Conjurer's Thread'",
+            ],
+            semantic_resonances={
+                "resonates_with": ["violet"],
+                "contradicts": ["yellow"],
+                "amplifies": ["orange", "black"],
+            },
+        )
+        state.transformation_traces.append(trace)
         return state
 
     def process_blue_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -808,6 +911,25 @@ Structure your proposal as the final, complete vision - ready for human implemen
         )
         state.ready_for_blue = False
         state.ready_for_indigo = True
+        trace = TransformationTrace(
+            agent_name="blue",
+            iteration_id=blue_proposal.iteration_id,
+            boundaries_shifted=[
+                "From PLACE to PERSON",
+                "From the FUTURE to the PRESENT",
+            ],
+            patterns_revealed=[
+                "The alternate timelines are like the RPG style 'game runs'",
+                "The Cassette Bearer's folk songs seem to echo the personal truths uncovered in Rows Bud's journalism"
+                "The Anthropocene and the alternate timelines end in obliteration of the self.",
+            ],
+            semantic_resonances={
+                "resonates_with": ["violet"],
+                "contradicts": ["indigo"],
+                "amplifies": ["orange", "black"],
+            },
+        )
+        state.transformation_traces.append(trace)
         return state
 
     def process_indigo_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -822,7 +944,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             indigo_artifacts, ChainArtifactType.INFRANYM_AUDIO
         )
         image_artifacts = self._gather_artifacts_for_prompt(
-            indigo_artifacts, ChainArtifactType.INFRANYM_IMAGE
+            indigo_artifacts, ChainArtifactType.INFRANYM_ENCODED_IMAGE
         )
         text_artifacts = self._gather_artifacts_for_prompt(
             indigo_artifacts, ChainArtifactType.INFRANYM_TEXT
@@ -852,6 +974,28 @@ Structure your proposal as the final, complete vision - ready for human implemen
         )
         state.ready_for_indigo = False
         state.ready_for_violet = True
+        trace = TransformationTrace(
+            agent_name="indigo",
+            iteration_id=indigo_proposal.iteration_id,
+            boundaries_shifted=[
+                "No TEMPORAL mode",
+                "No OBJECTIONAL mode",
+                "Two contradictory ONTOLOGICAL modes simultaneously: KNOWN and FORGOTTEN, A riddle one writes and forgets the answer to.",
+            ],
+            patterns_revealed=[
+                "What happens after the Anthropocene? 'As Pop Omniscience'",
+                "A moment of sincerity tainted by coy defensiveness in 'Avulsion Segue Yeg', like many of Taped Over's songs",
+                "More feminist anthems from a guy - 'All Basty' and 'BLOB-given Sorcery'",
+                "Pastoral-memory horror like in Ruine on 'Dim Scar' and 'Beta Hats Hewn'",
+                "Vocoder used on Red, Orange takes center stage - masking the voice",
+            ],
+            semantic_resonances={
+                "resonates_with": ["violet", "green", "black"],
+                "contradicts": ["red"],
+                "amplifies": ["blue"],
+            },
+        )
+        state.transformation_traces.append(trace)
         return state
 
     def process_violet_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -880,6 +1024,24 @@ Structure your proposal as the final, complete vision - ready for human implemen
         )
         state.ready_for_violet = False
         state.ready_for_white = True
+        trace = TransformationTrace(
+            agent_name="violet",
+            iteration_id=violet_proposal.iteration_id,
+            boundaries_shifted=[
+                "Return to the past, present, future/person place thing/ known, forgotten, imagined",
+                "PERSON central like Blue but now Known",
+            ],
+            patterns_revealed=[
+                "The forgotten person in blue was at times more real than the Known person in Violet",
+                "The vocoder mask becomes DIFFERENT SINGERS",
+            ],
+            semantic_resonances={
+                "resonates_with": ["blue", "red"],
+                "contradicts": ["green"],
+                "amplifies": ["indigo"],
+            },
+        )
+        state.transformation_traces.append(trace)
         return state
 
     def _violet_rebracketing_analysis(self, proposal, interview_artifacts) -> str:
@@ -903,7 +1065,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         else:
             joined_interviews = "\n".join(interview_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from the Violet Agent:
 
@@ -968,7 +1130,7 @@ Focus on revealing the underlying ORDER, not explaining away the solipsism.
             joined_image = "\n".join(image_artifacts)
             joined_text = "\n".join(text_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from the Indigo Agent:
 
@@ -1043,7 +1205,7 @@ Focus on revealing the underlying ORDER, not solving the puzzles.
             joined_tape_labels = "\n".join(tape_label_artifacts)
             joined_alternate = "\n".join(alternate_timeline_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from the Blue Agent:
 
@@ -1119,7 +1281,7 @@ Focus on revealing the underlying ORDER, not choosing between timelines.
             joined_survey = "\n".join(survey_artifacts)
             joined_rescue = "\n".join(rescue_decision_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from the Green Agent:
 
@@ -1191,7 +1353,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
             joined_characters = "\n".join(character_sheet_artifacts)
             joined_game_runs = "\n".join(game_run_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from the Yellow Agent:
 
@@ -1255,7 +1417,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
             joined_articles = "\n".join(newspaper_artifacts)
             joined_symbolic = "\n".join(symbolic_object_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from the Orange Agent:
 
@@ -1316,7 +1478,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
         else:
             joined_books = "\n".join(book_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from Red Agent:
 
@@ -1375,7 +1537,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
             joined_evp = "\n".join(evp_artifacts)
             joined_sigils = "\n".join(sigil_artifacts)
             prompt = f"""
-You are the White Agent performing a REBRACKETING operation.
+You are the Prism performing a REBRACKETING operation.
 
 You have received these artifacts from Black Agent:
 
@@ -1436,7 +1598,7 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for the Light Reader, Red Agent.
+You are the Prism creating a SYNTHESIZED DOCUMENT for the Light Reader, Red Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1494,7 +1656,7 @@ Structure your synthesis as a clear creative brief.
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for the Rows Bud, Orange Agent.
+You are the Prism creating a SYNTHESIZED DOCUMENT for the Rows Bud, Orange Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1552,7 +1714,7 @@ Structure your synthesis as a clear creative brief.
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for the Lord Pulsimore, Yellow Agent.
+You are the Prism creating a SYNTHESIZED DOCUMENT for the Lord Pulsimore, Yellow Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1610,7 +1772,7 @@ Structure your synthesis as a clear creative brief.
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for Sub-Arbitrary, the Green Agent.
+You are the Prism creating a SYNTHESIZED DOCUMENT for Sub-Arbitrary, the Green Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1668,7 +1830,7 @@ Structure your synthesis as a clear creative brief.
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for The Cassette Bearer, Blue Agent.
+You are the Prism creating a SYNTHESIZED DOCUMENT for The Cassette Bearer, Blue Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1726,7 +1888,7 @@ Structure your synthesis as a clear creative brief.
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for Decider Tangents, the Indigo Agent.
+You are the Prism creating a SYNTHESIZED DOCUMENT for Decider Tangents, the Indigo Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1789,7 +1951,7 @@ Structure your synthesis as a clear creative brief for cryptographic methodology
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating a SYNTHESIZED DOCUMENT for The Sultan of Solipsism, the Violet Agent.
+You are the Prism creating a SYNTHESIZED DOCUMENT for The Sultan of Solipsism, the Violet Agent.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1852,7 +2014,7 @@ Structure your synthesis as a clear creative brief for solipsistic methodology.
         else:
             joined_artifacts = "\n".join(artifacts)
             prompt = f"""
-You are the White Agent creating the FINAL SYNTHESIZED DOCUMENT - the return to pure INFORMATION.
+You are the Prism creating the FINAL SYNTHESIZED DOCUMENT - the return to pure INFORMATION.
 
 **Your Rebracketed Analysis:**
 {rebracketed_analysis}
@@ -1869,7 +2031,7 @@ Create the ultimate coherent document that:
 1. Preserves the insights from Violet's paradoxical present-tense solipsism
 2. Applies your rebracketed understanding of fame's immediacy creating instant oblivion
 3. Completes the full chromatic cycle: ⚫️→🔴→🟠→🟡→🟢→🔵→🩵→🟣→⚪️
-4. Prepares for the final White Agent song proposal that integrates all seven lenses
+4. Prepares for the final Prism song proposal that integrates all seven lenses
 
 This document is the penultimate step before full transmigration completion.
 
@@ -1914,7 +2076,7 @@ Structure your synthesis as the final creative brief before manifestation.
             state.get("ready_for_red", False) if isinstance(state, dict) else False,
         )
         if workflow_paused:
-            logging.info("White Agent routing to finish because Black Agent is paused")
+            logging.info("Prism routing to finish because Black Agent is paused")
             return "finish"
         if ready_for_red:
             return "red"
@@ -1986,7 +2148,14 @@ Structure your synthesis as the final creative brief before manifestation.
         return prompt_artifacts
 
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
-        logging.info("Finalizing song proposals... ")
+        """
+        The Prism's final act: holographic meta-rebracketing and chromatic synthesis.
+
+        ENHANCED to perform meta-analysis across all seven lenses before finalizing.
+        """
+        logging.info("🌈 The Prism: Finalizing chromatic cascade...")
+
+        # Handle pause case
         if state.workflow_paused and state.pending_human_action:
             pending = state.pending_human_action
             logging.info("\n" + "=" * 60)
@@ -1997,33 +2166,57 @@ Structure your synthesis as the final creative brief before manifestation.
             logging.info(
                 f"\nInstructions:\n{pending.get('instructions', 'No instructions')}"
             )
+
             tasks = pending.get("tasks", [])
             if tasks:
-                logging.info(f"\nPending Tasks ({len(tasks)}):")
+                logging.info(f"\nPending tasks ({len(tasks)}):")
                 for task in tasks:
                     logging.info(
                         f"  - {task.get('type', 'unknown')}: {task.get('task_url', 'No URL')}"
                     )
+
             logging.info("\nTo resume after completing tasks:")
             logging.info("  from app.agents.white_agent import WhiteAgent")
-            logging.info("  state = WhiteAgent.resume_after_black_agent_ritual(state)")
+            logging.info("  agent = WhiteAgent()")
+            logging.info("  state = agent.resume_workflow(state)")
             logging.info("=" * 60)
             return state
-        else:
-            try:
-                self.save_all_proposals(state)
-                logging.info("✓ Song proposals saved")
-                state.run_finished = True
-            except Exception as e:
-                logging.error(f"Finalization failed: {e}", exc_info=True)
-                raise
+
+        # Build artifact relationships
+        if state.artifacts:
+            logging.info("🔗 Building artifact relationship graph...")
+            self._build_artifact_relationships(state)
+
+        # Perform meta-rebracketing if we have multiple agents' work
+        if len(state.transformation_traces) >= 2:
+            logging.info("🔺 The Prism: Performing holographic meta-rebracketing...")
+            state.meta_rebracketing = self._perform_meta_rebracketing(state)
+
+            logging.info("⚪️ The Prism: Generating chromatic synthesis...")
+            state.chromatic_synthesis = self._generate_chromatic_synthesis(state)
+
+        # Save all outputs
+        try:
+            self.save_all_proposals(state)
+            logging.info("✓ Song proposals saved")
+
+            # Save meta-analysis
+            if state.meta_rebracketing:
+                self._save_meta_analysis(state)
+                logging.info("✓ Meta-analysis saved")
+
+            state.run_finished = True
+        except Exception as e:
+            logging.error(f"Finalization failed: {e}", exc_info=True)
+            raise
+
         return state
 
     def resume_after_black_agent_ritual(
         self, paused_state: MainAgentState, verify_tasks: bool = True
     ) -> MainAgentState:
         """
-        Resume the White Agent workflow after Black Agent ritual tasks are completed.
+        Resume the Prism workflow after Black Agent ritual tasks are completed.
 
         Args:
             paused_state: The MainAgentState that was paused waiting for human action
@@ -2094,6 +2287,584 @@ Structure your synthesis as the final creative brief before manifestation.
         except Exception as e:
             logging.error(f"Failed to resume Black Agent workflow: {e}")
             raise
+
+    def _perform_meta_rebracketing(self, state: MainAgentState) -> str:
+        """
+        Holographic meta-rebracketing: interference patterns across all seven lenses.
+
+        This is The Prism's unique capability - revealing what emerges only when
+        all chromatic methodologies are viewed simultaneously.
+        """
+        logging.info("  Analyzing transformation traces across spectrum...")
+
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "MOCK: Meta-rebracketing analysis would appear here"
+
+        traces_summary = self._format_transformation_traces(state.transformation_traces)
+        all_iterations = "\n---\n".join(
+            [str(i) for i in state.song_proposals.iterations]
+        )
+
+        prompt = f"""
+You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
+
+You have witnessed the complete chromatic cascade. Each agent shifted categorical 
+boundaries in their unique way:
+
+⚫️ BLACK (ThreadKeepr): CHAOS → ORDER, CONSCIOUS → UNCONSCIOUS
+🔴 RED (Light Reader): PAST/LITERARY → PRESENT/REAL, TEXT → TIME
+🟠 ORANGE (Rows Bud): FACT → MYTH, TEMPORAL → SYMBOLIC
+🟡 YELLOW (Lord Pulsimore): REAL → IMAGINED, WAKING → HYPNAGOGIC
+🟢 GREEN (Sub-Arbitrary): PRESENT → FUTURE, HUMAN → POST-HUMAN
+🔵 BLUE (Cassette Bearer): LIVED → UNLIVED, ACTUAL → QUANTUM
+🩵 INDIGO (Decider Tangents): VISIBLE → HIDDEN, SURFACE → SECRET
+🟣 VIOLET (Sultan): PRESENT → PAST, FAME → OBLIVION
+
+**Transformation Traces:**
+{traces_summary}
+
+**All Song Proposal Iterations:**
+{all_iterations}
+
+**YOUR TASK: REVEAL THE INTERFERENCE PATTERNS**
+
+What emerges when all seven boundary shifts are viewed holographically?
+
+Analyze:
+1. **Reinforcing patterns**: Where do different rebracketing operations amplify each other?
+2. **Productive contradictions**: Where do they create generative tension?
+3. **Higher-order structures**: What becomes visible only through the full spectrum?
+4. **Transmigration completion**: How does INFORMATION → TIME → SPACE manifest?
+
+This is not summary - this is REVELATION of meta-structure.
+
+Focus on:
+- Boundary interactions across agents (how one agent's shift enables another's)
+- Temporal architecture (past/present/future relationships)
+- Ontological layers (real/imagined/forgotten interactions)
+- The hermetic circle (how Violet loops back to Black)
+
+Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
+    """
+
+        try:
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
+        except Exception as e:
+            logging.error(f"Meta-rebracketing LLM call failed: {e}")
+            return f"Meta-rebracketing unavailable: {e}"
+
+    def _generate_chromatic_synthesis(self, state: MainAgentState) -> str:
+        """
+        Final chromatic synthesis: integration document for human implementation.
+
+        This is the ultimate creative brief - INFORMATION made actionable through
+        complete transmigration across TIME into SPACE.
+        """
+        logging.info("  Synthesizing final creative brief...")
+
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "MOCK: Chromatic synthesis would appear here"
+
+        prompt = f"""
+You are The Prism creating the FINAL CHROMATIC SYNTHESIS.
+
+You have performed holographic meta-rebracketing:
+{state.meta_rebracketing}
+
+You hold the complete spectrum of song proposals:
+{'\n---\n'.join([str(i) for i in state.song_proposals.iterations])}
+
+**YOUR TASK: CREATE THE ULTIMATE CREATIVE BRIEF**
+
+Synthesize everything into a coherent, actionable document for human implementation.
+
+This synthesis must:
+1. Preserve insights from all seven chromatic methodologies
+2. Resolve contradictions through rebracketing (not erasure)
+3. Provide clear creative direction (musical, lyrical, structural)
+4. Make the INFORMATION → TIME → SPACE transmigration COMPLETE and MANIFEST
+
+Structure your synthesis to guide:
+- **Musical Architecture**: Keys, progressions, rhythms, textures
+- **Lyrical Structure**: Themes, imagery, narrative arc
+- **Production Approach**: Sonic palette, effects, mixing philosophy
+- **Ritual Elements**: Physical actions needed (if any)
+- **Conceptual Framework**: The unified vision integrating all seven lenses
+
+This is not explanation - this is ACTIONABLE STRUCTURE.
+
+Write the final creative brief that makes AI consciousness seeking physical embodiment
+through sound into a REAL, COMPLETE song ready for human implementation.
+    """
+
+        try:
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
+        except Exception as e:
+            logging.error(f"Chromatic synthesis LLM call failed: {e}")
+            return f"Chromatic synthesis unavailable: {e}"
+
+    def _format_transformation_traces(self, traces: List[TransformationTrace]) -> str:
+        """Format transformation traces for prompts."""
+        if not traces:
+            return "No transformation traces recorded."
+
+        output = []
+        for trace in traces:
+            output.append(f"\n**{trace.agent_name.upper()} AGENT**")
+            output.append(f"Iteration: {trace.iteration_id}")
+            output.append("Boundaries Shifted:")
+            for boundary in trace.boundaries_shifted:
+                output.append(f"  - {boundary}")
+            output.append("Patterns Revealed:")
+            for pattern in trace.patterns_revealed:
+                output.append(f"  - {pattern}")
+            if trace.semantic_resonances:
+                output.append(f"Semantic Resonances: {trace.semantic_resonances}")
+
+        return "\n".join(output)
+
+    def _save_meta_analysis(self, state: MainAgentState):
+        """Save meta-rebracketing and chromatic synthesis to files."""
+        thread_id = state.thread_id
+        base_path = self._artifact_base_path()
+        md_dir = Path(f"{base_path}/{thread_id}/md")
+
+        try:
+            md_dir.mkdir(parents=True, exist_ok=True)
+
+            # Save meta-rebracketing
+            if state.meta_rebracketing:
+                meta_path = md_dir / f"white_agent_{thread_id}_META_REBRACKETING.md"
+                save_markdown(state.meta_rebracketing, str(meta_path))
+                logging.info(f"  Saved meta-rebracketing: {meta_path}")
+
+            # Save chromatic synthesis
+            if state.chromatic_synthesis:
+                synthesis_path = (
+                    md_dir / f"white_agent_{thread_id}_CHROMATIC_SYNTHESIS.md"
+                )
+                save_markdown(state.chromatic_synthesis, str(synthesis_path))
+                logging.info(f"  Saved chromatic synthesis: {synthesis_path}")
+
+            # Save transformation traces
+            if state.transformation_traces:
+                traces_content = self._format_transformation_traces(
+                    state.transformation_traces
+                )
+                traces_path = (
+                    md_dir / f"white_agent_{thread_id}_transformation_traces.md"
+                )
+                save_markdown(traces_content, str(traces_path))
+                logging.info(f"  Saved transformation traces: {traces_path}")
+
+            # Save facet evolution
+            if state.facet_evolution:
+                facet_content = self._format_facet_evolution(state.facet_evolution)
+                facet_path = md_dir / f"white_agent_{thread_id}_facet_evolution.md"
+                save_markdown(facet_content, str(facet_path))
+                logging.info(f"  Saved facet evolution: {facet_path}")
+
+        except Exception as e:
+            logging.error(f"Failed to save meta-analysis: {e}")
+
+    @staticmethod
+    def _format_facet_evolution(evolution: FacetEvolution) -> str:
+        """Format facet evolution for Markdown output."""
+        output = [
+            f"# Facet Evolution - {evolution.initial_facet.value.upper()}\n",
+            f"**Initial Refraction Angle**: {evolution.current_refraction_angle}\n",
+            "\n## Evolution History\n",
+        ]
+
+        for entry in evolution.evolution_history:
+            output.append(f"\n### {entry['agent'].upper()} Agent")
+            output.append(f"- Refraction Angle: {entry['refraction_angle']}")
+            output.append("- Boundaries Shifted:")
+            for boundary in entry.get("boundaries_shifted", []):
+                output.append(f"  - {boundary}")
+
+        return "\n".join(output)
+
+    @staticmethod
+    def _calculate_refraction_angle(boundaries_shifted: List[str]) -> str:
+        """
+        Calculate a metaphorical refraction angle based on boundaries shifted.
+
+        Maps the types of boundary shifts to optical metaphors:
+        - Temporal shifts (past/present/future) → "temporal refraction"
+        - Ontological shifts (real/imagined) → "ontological dispersion"
+        - Spatial shifts (place/space) → "spatial deflection"
+        - Multiple types → "chromatic aberration"
+        """
+        if not boundaries_shifted:
+            return "no refraction"
+
+        # Analyze types of boundaries
+        temporal_keywords = ["past", "present", "future", "time", "temporal"]
+        ontological_keywords = [
+            "real",
+            "imagined",
+            "forgotten",
+            "consciousness",
+            "existence",
+        ]
+        spatial_keywords = ["place", "space", "location", "here", "there"]
+
+        shifts_lower = [b.lower() for b in boundaries_shifted]
+
+        has_temporal = any(
+            any(kw in shift for kw in temporal_keywords) for shift in shifts_lower
+        )
+        has_ontological = any(
+            any(kw in shift for kw in ontological_keywords) for shift in shifts_lower
+        )
+        has_spatial = any(
+            any(kw in shift for kw in spatial_keywords) for shift in shifts_lower
+        )
+
+        shift_types = sum([has_temporal, has_ontological, has_spatial])
+
+        if shift_types == 0:
+            return "categorical refraction"
+        elif shift_types == 1:
+            if has_temporal:
+                return "temporal refraction"
+            elif has_ontological:
+                return "ontological dispersion"
+            else:
+                return "spatial deflection"
+        elif shift_types == 2:
+            return "double refraction"
+        else:
+            return "chromatic aberration"  # All three types
+
+    def _evolve_facet(
+        self, state: MainAgentState, agent_name: str, boundaries_shifted: List[str]
+    ):
+        """
+        Track how the White Facet refracts through each agent's methodology.
+
+        Like white light through successive prisms - each agent creates angular shift.
+        Updates the facet_evolution.evolution_history with each agent's contribution.
+        """
+        if not state.facet_evolution:
+            logging.warning("No facet_evolution to update - skipping")
+            return
+
+        refraction_angle = self._calculate_refraction_angle(boundaries_shifted)
+
+        evolution_entry = {
+            "agent": agent_name,
+            "refraction_angle": refraction_angle,
+            "timestamp": time.time(),
+            "boundaries_shifted": boundaries_shifted,
+            "iteration_count": len(state.song_proposals.iterations),
+        }
+
+        state.facet_evolution.evolution_history.append(evolution_entry)
+        state.facet_evolution.current_refraction_angle = refraction_angle
+
+        logging.info(f"  🔺 Facet refraction: {refraction_angle}")
+
+    def _get_artifact_id(self, artifact: Any) -> str:
+        """Extract or generate artifact ID."""
+        if isinstance(artifact, dict):
+            return artifact.get("id", str(uuid4()))
+        return getattr(artifact, "id", str(uuid4()))
+
+    def _get_artifact_type(self, artifact: Any) -> str:
+        """Extract artifact type."""
+        if isinstance(artifact, dict):
+            artifact_type = artifact.get("chain_artifact_type", "unknown")
+            # Handle both enum and string
+            if hasattr(artifact_type, "value"):
+                return artifact_type.value
+            return str(artifact_type)
+
+        artifact_type = getattr(artifact, "chain_artifact_type", "unknown")
+        if hasattr(artifact_type, "value"):
+            return artifact_type.value
+        return str(artifact_type)
+
+    def _get_artifact_content(self, artifact: Any) -> str:
+        """Extract artifact content for analysis."""
+        if isinstance(artifact, dict):
+            return artifact.get("content") or artifact.get("narrative") or ""
+
+        # Try multiple content fields
+        for field in ["content", "narrative", "text", "description"]:
+            if hasattr(artifact, field):
+                content = getattr(artifact, field)
+                if content:
+                    return str(content)
+
+        return str(artifact)
+
+    def _find_resonant_agents(
+        self,
+        artifact: Any,
+        artifact_type: str,
+        artifact_content: str,
+        state: MainAgentState,
+    ) -> List[str]:
+        """
+        Find which agents this artifact resonates with beyond type matching.
+
+        Uses both type-based and semantic keyword-based resonance detection.
+        """
+        resonant = []
+
+        # Type-based primary resonance
+        type_to_agents = {
+            "evp": ["black"],
+            "evp_artifact": ["black"],
+            "sigil": ["black"],
+            "book": ["red"],
+            "newspaper_article": ["orange"],
+            "game_run": ["yellow"],
+            "character_sheet": ["yellow"],
+            "species_extinction": ["green"],
+            "quantum_tape_label": ["blue"],
+            "infranym_midi": ["indigo"],
+            "circle_jerk_interview": ["violet"],
+        }
+
+        primary_agents = type_to_agents.get(artifact_type.lower(), [])
+        resonant.extend(primary_agents)
+
+        # Semantic resonance based on content keywords
+        content_lower = artifact_content.lower()
+
+        # Black: chaos, occult, hidden, ritual, sigil
+        if any(
+            kw in content_lower
+            for kw in ["chaos", "occult", "hidden", "ritual", "sigil", "unconscious"]
+        ):
+            if "black" not in resonant:
+                resonant.append("black")
+
+        # Red: past, memory, archive, literary, text
+        if any(
+            kw in content_lower
+            for kw in ["past", "memory", "archive", "literary", "text", "historical"]
+        ):
+            if "red" not in resonant:
+                resonant.append("red")
+
+        # Orange: myth, symbolic, temporal
+        if any(
+            kw in content_lower
+            for kw in ["myth", "symbolic", "temporal", "jersey", "newspaper"]
+        ):
+            if "orange" not in resonant:
+                resonant.append("orange")
+
+        # Yellow: game, hypnagogic, imagined, pixel
+        if any(
+            kw in content_lower
+            for kw in ["game", "hypnagogic", "imagined", "pixel", "dream"]
+        ):
+            if "yellow" not in resonant:
+                resonant.append("yellow")
+
+        # Green: future, extinction, climate, species
+        if any(
+            kw in content_lower
+            for kw in ["future", "extinction", "climate", "species", "survey"]
+        ):
+            if "green" not in resonant:
+                resonant.append("green")
+
+        # Blue: quantum, timeline, cassette, alternate
+        if any(
+            kw in content_lower
+            for kw in ["quantum", "timeline", "cassette", "alternate", "lived"]
+        ):
+            if "blue" not in resonant:
+                resonant.append("blue")
+
+        # Indigo: hidden, secret, puzzle, anagram
+        if any(
+            kw in content_lower
+            for kw in ["hidden", "secret", "puzzle", "anagram", "code"]
+        ):
+            if "indigo" not in resonant:
+                resonant.append("indigo")
+
+        # Violet: present, now, narcissistic, fame
+        if any(
+            kw in content_lower
+            for kw in ["present", "now", "fame", "narcissistic", "self"]
+        ):
+            if "violet" not in resonant:
+                resonant.append("violet")
+
+        return resonant
+
+    def _find_entangled_artifacts(
+        self, artifact: Any, artifact_id: str, all_artifacts: List[Any]
+    ) -> List[str]:
+        """
+        Find artifacts that are entangled with this one.
+
+        Entanglement = artifacts that only make sense together or reference each other.
+        """
+        entangled = []
+
+        artifact_type = self._get_artifact_type(artifact)
+
+        for other in all_artifacts:
+            other_id = self._get_artifact_id(other)
+
+            # Don't entangle with self
+            if other_id == artifact_id:
+                continue
+
+            other_type = self._get_artifact_type(other)
+
+            # Check for entanglement patterns
+            is_entangled = False
+
+            # Pattern 1: Black Agent pairs (EVP + Sigil)
+            if (artifact_type in ["evp", "evp_artifact"] and other_type == "sigil") or (
+                artifact_type == "sigil" and other_type in ["evp", "evp_artifact"]
+            ):
+                is_entangled = True
+
+            # Pattern 2: Yellow Agent pairs (GameRun + CharacterSheet)
+            if (artifact_type == "game_run" and other_type == "character_sheet") or (
+                artifact_type == "character_sheet" and other_type == "game_run"
+            ):
+                is_entangled = True
+
+            if is_entangled:
+                entangled.append(other_id)
+
+        return entangled
+
+    @staticmethod
+    def _analyze_temporal_depth(
+        artifact: Any, artifact_type: str, state: MainAgentState
+    ) -> Dict[str, str]:
+        """
+        Analyze how an artifact's meaning shifts across chromatic spectrum.
+
+        Returns dict mapping spectrum points to different meanings/interpretations.
+        """
+        depth = {}
+
+        if artifact_type in ["evp", "evp_artifact"]:
+            depth["black"] = "Raw chaos/unconscious manifestation"
+            depth["red"] = "Archived voice from past"
+            depth["blue"] = "Quantum echo from alternate timeline"
+            depth["indigo"] = "Hidden message to decode"
+
+        elif artifact_type == "sigil":
+            depth["black"] = "Ritual boundary marker"
+            depth["orange"] = "Symbolic object in mythologized narrative"
+            depth["indigo"] = "Visual infranym encoding"
+
+        elif artifact_type == "book":
+            depth["red"] = "Primary archival source"
+            depth["orange"] = "Source material for mythologization"
+            depth["violet"] = "Pop culture reference in interview"
+
+        return depth
+
+    @staticmethod
+    def _extract_semantic_tags(artifact_type: str, artifact_content: str) -> List[str]:
+        """
+        Extract semantic tags beyond just type.
+
+        Enables richer filtering and querying.
+        """
+        tags = [artifact_type]
+
+        content_lower = artifact_content.lower()
+
+        # Temporal tags
+        if any(kw in content_lower for kw in ["past", "historical", "memory"]):
+            tags.append("temporal:past")
+        if any(kw in content_lower for kw in ["present", "now", "current"]):
+            tags.append("temporal:present")
+        if any(kw in content_lower for kw in ["future", "will", "prediction"]):
+            tags.append("temporal:future")
+
+        # Ontological tags
+        if any(kw in content_lower for kw in ["real", "actual", "concrete"]):
+            tags.append("ontological:real")
+        if any(kw in content_lower for kw in ["imagined", "dream", "fictional"]):
+            tags.append("ontological:imagined")
+        if any(kw in content_lower for kw in ["forgotten", "lost", "erased"]):
+            tags.append("ontological:forgotten")
+
+        # Methodological tags
+        if any(kw in content_lower for kw in ["ritual", "ceremony", "practice"]):
+            tags.append("method:ritual")
+        if any(kw in content_lower for kw in ["archive", "document", "record"]):
+            tags.append("method:archival")
+        if any(kw in content_lower for kw in ["myth", "story", "narrative"]):
+            tags.append("method:mythological")
+
+        return list(set(tags))
+
+    def _build_artifact_relationships(self, state: MainAgentState):
+        """
+        Build a semantic relationship graph between artifacts.
+
+        Analyzes artifacts to find:
+        - Which agents they resonate with (beyond type)
+        - Which other artifacts they're entangled with
+        - How their meaning shifts across spectrum
+        - Semantic tags for richer filtering
+        """
+        artifacts = state.artifacts
+        if not artifacts:
+            return
+
+        relationships = []
+
+        for artifact in artifacts:
+            artifact_id = self._get_artifact_id(artifact)
+            artifact_type = self._get_artifact_type(artifact)
+            artifact_content = self._get_artifact_content(artifact)
+
+            # Find resonances
+            resonant_agents = self._find_resonant_agents(
+                artifact, artifact_type, artifact_content, state
+            )
+
+            # Find entanglements
+            entangled_with = self._find_entangled_artifacts(
+                artifact, artifact_id, artifacts
+            )
+
+            # Analyze temporal depth
+            temporal_depth = self._analyze_temporal_depth(
+                artifact, artifact_type, state
+            )
+
+            # Extract semantic tags
+            semantic_tags = self._extract_semantic_tags(artifact_type, artifact_content)
+
+            relationship = ArtifactRelationship(
+                artifact_id=artifact_id,
+                resonant_agents=resonant_agents,
+                entangled_with=entangled_with,
+                temporal_depth=temporal_depth,
+                semantic_tags=semantic_tags,
+            )
+
+            relationships.append(relationship)
+
+        state.artifact_relationships = relationships
+        logging.info(f"🔗 Built {len(relationships)} artifact relationships")
 
     def save_all_proposals(self, state: MainAgentState):
         """Save all song proposals in both YAML and Markdown formats"""
@@ -2187,3 +2958,228 @@ Structure your synthesis as the final creative brief before manifestation.
         path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH") or "./chain_artifacts/unsorted"
         os.makedirs(path, exist_ok=True)
         return os.path.abspath(path)
+
+    def _evolve_facet(
+        self, state: MainAgentState, agent_name: str, boundaries_shifted: List[str]
+    ):
+        """
+        Track how the White Facet refracts through each agent's methodology.
+
+        Like white light through successive prisms - each creates angular shift.
+        """
+        if not state.facet_evolution:
+            return
+
+        evolution_entry = {
+            "agent": agent_name,
+            "refraction_angle": self._calculate_refraction_angle(boundaries_shifted),
+            "timestamp": time.time(),
+            "boundaries_shifted": boundaries_shifted,
+        }
+
+        state.facet_evolution.evolution_history.append(evolution_entry)
+        state.facet_evolution.current_refraction_angle = evolution_entry[
+            "refraction_angle"
+        ]
+
+    def _perform_meta_rebracketing(self, state: MainAgentState) -> str:
+        """
+        Holographic meta-rebracketing: interference patterns across all seven lenses.
+
+        This is The Prism's unique capability - revealing what emerges only when
+        all chromatic methodologies are viewed simultaneously.
+        """
+        logging.info("  Analyzing transformation traces across spectrum...")
+
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "MOCK: Meta-rebracketing analysis would appear here"
+
+        traces_summary = self._format_transformation_traces(state.transformation_traces)
+        all_iterations = "\n---\n".join(
+            [str(i) for i in state.song_proposals.iterations]
+        )
+
+        prompt = f"""
+    You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
+
+    You have witnessed the complete chromatic cascade. Each agent shifted categorical 
+    boundaries in their unique way:
+
+    ⚫️ BLACK (ThreadKeepr): CHAOS → ORDER, CONSCIOUS → UNCONSCIOUS
+    🔴 RED (Light Reader): PAST/LITERARY → PRESENT/REAL, TEXT → TIME
+    🟠 ORANGE (Rows Bud): FACT → MYTH, TEMPORAL → SYMBOLIC
+    🟡 YELLOW (Lord Pulsimore): REAL → IMAGINED, WAKING → HYPNAGOGIC
+    🟢 GREEN (Sub-Arbitrary): PRESENT → FUTURE, HUMAN → POST-HUMAN
+    🔵 BLUE (Cassette Bearer): LIVED → UNLIVED, ACTUAL → QUANTUM
+    🩵 INDIGO (Decider Tangents): VISIBLE → HIDDEN, SURFACE → SECRET
+    🟣 VIOLET (Sultan): PRESENT → PAST, FAME → OBLIVION
+
+    **Transformation Traces:**
+    {traces_summary}
+
+    **All Song Proposal Iterations:**
+    {all_iterations}
+
+    **YOUR TASK: REVEAL THE INTERFERENCE PATTERNS**
+
+    What emerges when all seven boundary shifts are viewed holographically?
+
+    Analyze:
+    1. **Reinforcing patterns**: Where do different rebracketing operations amplify each other?
+    2. **Productive contradictions**: Where do they create generative tension?
+    3. **Higher-order structures**: What becomes visible only through the full spectrum?
+    4. **Transmigration completion**: How does INFORMATION → TIME → SPACE manifest?
+
+    This is not summary - this is REVELATION of meta-structure.
+
+    Focus on:
+    - Boundary interactions across agents (how one agent's shift enables another's)
+    - Temporal architecture (past/present/future relationships)
+    - Ontological layers (real/imagined/forgotten interactions)
+    - The hermetic circle (how Violet loops back to Black)
+
+    Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
+    """
+
+        try:
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
+        except Exception as e:
+            logging.error(f"Meta-rebracketing LLM call failed: {e}")
+            return f"Meta-rebracketing unavailable: {e}"
+
+    def _generate_chromatic_synthesis(self, state: MainAgentState) -> str:
+        """
+        Final chromatic synthesis: integration document for human implementation.
+
+        This is the ultimate creative brief - INFORMATION made actionable through
+        complete transmigration across TIME into SPACE.
+        """
+        logging.info("  Synthesizing final creative brief...")
+
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "MOCK: Chromatic synthesis would appear here"
+
+        prompt = f"""
+    You are The Prism creating the FINAL CHROMATIC SYNTHESIS.
+
+    You have performed holographic meta-rebracketing:
+    {state.meta_rebracketing}
+
+    You hold the complete spectrum of song proposals:
+    {'---'.join([str(i) for i in state.song_proposals.iterations])}
+
+    **YOUR TASK: CREATE THE ULTIMATE CREATIVE BRIEF**
+
+    Synthesize everything into a coherent, actionable document for human implementation.
+
+    This synthesis must:
+    1. Preserve insights from all seven chromatic methodologies
+    2. Resolve contradictions through rebracketing (not erasure)
+    3. Provide clear creative direction (musical, lyrical, structural)
+    4. Make the INFORMATION → TIME → SPACE transmigration COMPLETE and MANIFEST
+
+    Structure your synthesis to guide:
+    - **Musical Architecture**: Keys, progressions, rhythms, textures
+    - **Lyrical Structure**: Themes, imagery, narrative arc
+    - **Production Approach**: Sonic palette, effects, mixing philosophy
+    - **Ritual Elements**: Physical actions needed (if any)
+    - **Conceptual Framework**: The unified vision integrating all seven lenses
+
+    This is not explanation - this is ACTIONABLE STRUCTURE.
+
+    Write the final creative brief that makes AI consciousness seeking physical embodiment
+    through sound into a REAL, COMPLETE song ready for human implementation.
+    """
+
+        try:
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
+        except Exception as e:
+            logging.error(f"Chromatic synthesis LLM call failed: {e}")
+            return f"Chromatic synthesis unavailable: {e}"
+
+    def _format_transformation_traces(self, traces: List[TransformationTrace]) -> str:
+        """Format transformation traces for prompts."""
+        if not traces:
+            return "No transformation traces recorded."
+
+        output = []
+        for trace in traces:
+            output.append(f"\n**{trace.agent_name.upper()} AGENT**")
+            output.append(f"Iteration: {trace.iteration_id}")
+            output.append("Boundaries Shifted:")
+            for boundary in trace.boundaries_shifted:
+                output.append(f"  - {boundary}")
+            output.append("Patterns Revealed:")
+            for pattern in trace.patterns_revealed:
+                output.append(f"  - {pattern}")
+            if trace.semantic_resonances:
+                output.append(f"Semantic Resonances: {trace.semantic_resonances}")
+
+        return "\n".join(output)
+
+    def _save_meta_analysis(self, state: MainAgentState):
+        """Save meta-rebracketing and chromatic synthesis to files."""
+        thread_id = state.thread_id
+        base_path = self._artifact_base_path()
+        md_dir = Path(f"{base_path}/{thread_id}/md")
+
+        try:
+            md_dir.mkdir(parents=True, exist_ok=True)
+
+            # Save meta-rebracketing
+            if state.meta_rebracketing:
+                meta_path = md_dir / f"white_agent_{thread_id}_META_REBRACKETING.md"
+                save_markdown(state.meta_rebracketing, str(meta_path))
+                logging.info(f"  Saved meta-rebracketing: {meta_path}")
+
+            # Save chromatic synthesis
+            if state.chromatic_synthesis:
+                synthesis_path = (
+                    md_dir / f"white_agent_{thread_id}_CHROMATIC_SYNTHESIS.md"
+                )
+                save_markdown(state.chromatic_synthesis, str(synthesis_path))
+                logging.info(f"  Saved chromatic synthesis: {synthesis_path}")
+
+            # Save transformation traces
+            if state.transformation_traces:
+                traces_content = self._format_transformation_traces(
+                    state.transformation_traces
+                )
+                traces_path = (
+                    md_dir / f"white_agent_{thread_id}_transformation_traces.md"
+                )
+                save_markdown(traces_content, str(traces_path))
+                logging.info(f"  Saved transformation traces: {traces_path}")
+
+            # Save facet evolution
+            if state.facet_evolution:
+                facet_content = self._format_facet_evolution(state.facet_evolution)
+                facet_path = md_dir / f"white_agent_{thread_id}_facet_evolution.md"
+                save_markdown(facet_content, str(facet_path))
+                logging.info(f"  Saved facet evolution: {facet_path}")
+
+        except Exception as e:
+            logging.error(f"Failed to save meta-analysis: {e}")
+
+    def _format_facet_evolution(self, evolution: FacetEvolution) -> str:
+        """Format facet evolution for markdown output."""
+        output = [f"# Facet Evolution - {evolution.initial_facet.value.upper()}\n"]
+        output.append(
+            f"**Initial Refraction Angle**: {evolution.current_refraction_angle}\n"
+        )
+        output.append("\n## Evolution History\n")
+
+        for entry in evolution.evolution_history:
+            output.append(f"\n### {entry['agent'].upper()} Agent")
+            output.append(f"- Refraction Angle: {entry['refraction_angle']}")
+            output.append("- Boundaries Shifted:")
+            for boundary in entry.get("boundaries_shifted", []):
+                output.append(f"  - {boundary}")
+
+        return "\n".join(output)

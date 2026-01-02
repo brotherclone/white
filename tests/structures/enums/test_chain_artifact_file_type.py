@@ -11,6 +11,7 @@ EXPECTED = {
     "JSON": "json",
     "YML": "yml",
     "HTML": "html",
+    "MIDI": "midi",
 }
 
 
@@ -39,6 +40,7 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("json", ChainArtifactFileType.JSON),
         ("yml", ChainArtifactFileType.YML),
         ("html", ChainArtifactFileType.HTML),
+        ("midi", ChainArtifactFileType.MIDI),
     ],
 )
 def test_lookup_by_value(value, member):
@@ -70,3 +72,4 @@ def test_enum_members_are_enum_instances():
     assert isinstance(ChainArtifactFileType.YML, enum.Enum)
     assert isinstance(ChainArtifactFileType.MARKDOWN, enum.Enum)
     assert isinstance(ChainArtifactFileType.HTML, enum.Enum)
+    assert isinstance(ChainArtifactFileType.MIDI, enum.Enum)
