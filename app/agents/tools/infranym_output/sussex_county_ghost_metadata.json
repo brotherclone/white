@@ -1,0 +1,35 @@
+{
+  "title": "Sussex County Ghost Signal",
+  "duration_ms": 7430,
+  "tempo_bpm": 95,
+  "key_signature": "A minor",
+  "layers": {
+    "surface": {
+      "text": "Static children in dead frequencies, nineteen ninety three.",
+      "voice_profile": "distorted",
+      "duration_ms": 7430
+    },
+    "reverse": {
+      "text": "Newton still remembers every basement show.",
+      "voice_profile": "whisper",
+      "duration_ms": 7430
+    },
+    "submerged": {
+      "text": "Temporal rebracketing begins in teenage memory.",
+      "voice_profile": "ancient",
+      "duration_ms": 7430
+    }
+  },
+  "files": {
+    "composite": "infranym_output/sussex_county_ghost.wav",
+    "layers": {
+      "surface": "infranym_output/sussex_county_ghost_surface.wav",
+      "reverse": "infranym_output/sussex_county_ghost_reverse.wav",
+      "submerged": "infranym_output/sussex_county_ghost_submerged.wav"
+    }
+  },
+  "location": "Sussex County, NJ",
+  "time_period": "1990-1995",
+  "color_agent": "orange",
+  "rebracketing_type": "temporal"
+}

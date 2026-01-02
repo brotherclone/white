@@ -1,0 +1,34 @@
+{
+  "title": "Sigil Charging Instructions",
+  "duration_ms": 6582,
+  "tempo_bpm": 108,
+  "key_signature": "D# minor",
+  "layers": {
+    "surface": {
+      "text": "Focus intent. Merge symbol with desire. Release to the void.",
+      "voice_profile": "proclaim",
+      "duration_ms": 6582
+    },
+    "reverse": {
+      "text": "Chaos finds order through creative destruction.",
+      "voice_profile": "robotic",
+      "duration_ms": 6582
+    },
+    "submerged": {
+      "text": "Black agent offers truth through disruption.",
+      "voice_profile": "whisper",
+      "duration_ms": 6582
+    }
+  },
+  "files": {
+    "composite": "infranym_output/sigil_charging_ritual.wav",
+    "layers": {
+      "surface": "infranym_output/sigil_charging_ritual_surface.wav",
+      "reverse": "infranym_output/sigil_charging_ritual_reverse.wav",
+      "submerged": "infranym_output/sigil_charging_ritual_submerged.wav"
+    }
+  },
+  "ritual_type": "sigil_charging",
+  "color_agent": "black",
+  "chaos_method": "evp_analysis"
+}

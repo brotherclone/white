@@ -1,8 +1,8 @@
 import pytest
 import inspect
 
-MODULE_NAME = "app.agents.states.yellow_agent_state"
-CLASS_NAME = "YellowAgentState"
+MODULE_NAME = "app.agents.states.violet_agent_state"
+CLASS_NAME = "VioletAgentState"
 
 
 def _get_class_or_skip():
@@ -15,7 +15,7 @@ def _get_class_or_skip():
     return cls
 
 
-def test_yellow_agent_state_is_callable():
+def test_violet_agent_state_is_callable():
     cls = _get_class_or_skip()
     assert inspect.isclass(cls), f"{CLASS_NAME} should be a class"
     sig = inspect.signature(cls)
@@ -143,3 +143,61 @@ def test_next_state_return_type():
     assert isinstance(nxt, ok_types) or hasattr(
         nxt, "__class__"
     ), "next_state should return None, a state name, a class, or a state instance"
+
+
+def test_violet_agent_state_has_required_fields():
+    """Test that VioletAgentState has all required fields for the violet workflow."""
+    # Import the VanityPersona to create test instances
+    from app.structures.concepts.vanity_persona import VanityPersona
+
+    cls = _get_class_or_skip()
+
+    # Create test personas
+    interviewer = VanityPersona(first_name="Test", last_name="Interviewer")
+    interviewee = VanityPersona(first_name="Test", last_name="Interviewee")
+
+    try:
+        obj = cls(interviewer_persona=interviewer, interviewee_persona=interviewee)
+    except Exception as e:
+        pytest.skip(f"Could not instantiate {CLASS_NAME}: {e}")
+
+    # Check for violet agent specific fields
+    expected_fields = [
+        "interview_collector",
+        "interviewer_persona",
+        "interviewee_persona",
+        "interviewer_objectives",
+        "interviewee_objectives",
+        "circle_jerk_interview",
+    ]
+
+    for field in expected_fields:
+        assert hasattr(obj, field), f"VioletAgentState should have field '{field}'"
+
+
+def test_violet_agent_state_field_defaults():
+    """Test that VioletAgentState fields have correct defaults."""
+    from app.structures.concepts.vanity_persona import VanityPersona
+
+    cls = _get_class_or_skip()
+
+    # Create test personas
+    interviewer = VanityPersona(first_name="Test", last_name="Interviewer")
+    interviewee = VanityPersona(first_name="Test", last_name="Interviewee")
+
+    try:
+        obj = cls(interviewer_persona=interviewer, interviewee_persona=interviewee)
+    except Exception as e:
+        pytest.skip(f"Could not instantiate {CLASS_NAME}: {e}")
+
+    # Test list defaults
+    assert obj.interview_collector == []
+    assert obj.interviewer_objectives == []
+    assert obj.interviewee_objectives == []
+
+    # Test None default
+    assert obj.circle_jerk_interview is None
+
+    # Test required personas are set correctly
+    assert obj.interviewer_persona == interviewer
+    assert obj.interviewee_persona == interviewee
