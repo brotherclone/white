@@ -1,9 +1,9 @@
 from abc import ABC
 
-from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 
 
-class InfranymAudioArtifact(ChainArtifact, ABC):
+class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
     def __init__(self, **data):
         super().__init__(**data)
 

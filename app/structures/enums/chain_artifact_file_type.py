@@ -8,3 +8,4 @@ class ChainArtifactFileType(str, Enum):
     PNG = "png"
     YML = "yml"
     HTML = "html"
+    MIDI = "midi"

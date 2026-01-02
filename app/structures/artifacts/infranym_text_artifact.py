@@ -4,6 +4,7 @@ from app.structures.artifacts.base_artifact import ChainArtifact
 
 
 class InfranymTextArtifact(ChainArtifact, ABC):
+
     def __init__(self, **data):
         super().__init__(**data)
 
@@ -15,8 +16,3 @@ class InfranymTextArtifact(ChainArtifact, ABC):
 
     def save_file(self):
         pass
-
-
-if __name__ == "__main__":
-    i = InfranymTextArtifact()
-    print(i.flatten())

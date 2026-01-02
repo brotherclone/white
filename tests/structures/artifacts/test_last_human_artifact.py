@@ -1,5 +1,6 @@
-from pydantic import ValidationError
 import pytest
+
+from pydantic import ValidationError
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.artifacts.last_human_artifact import LastHumanArtifact
@@ -9,8 +10,6 @@ from app.structures.enums.last_human_vulnerability_type import (
 from app.structures.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
 )
-
-# ToDo: Add for_prompt() tests
 
 
 class ConcreteLastHumanArtifact(LastHumanArtifact):
@@ -304,3 +303,149 @@ def test_summary_text_without_occupation():
 
     assert "Anonymous" in summary
     assert "Local resident" in summary
+
+
+def test_for_prompt():
+    """Test for_prompt method."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Liu Wei",
+        age=50,
+        location="Coastal City, China",
+        year_documented=2060,
+        parallel_vulnerability=LastHumanVulnerabilityType.HEALTH_CASCADE,
+        vulnerability_details="Widespread disease due to polluted water",
+        occupation="Fisherman",
+        environmental_stressor="Severe water pollution",
+        documentation_type=LastHumanDocumentationType.RESILIENCE,
+        last_days_scenario="Fishing in contaminated waters",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "Liu Wei" in prompt
+    assert "50" in prompt
+    assert "Coastal City, China" in prompt
+    assert "Fisherman" in prompt
+    assert "Widespread disease due to polluted water" in prompt
+    assert "Severe water pollution" in prompt
+    assert "Fishing in contaminated waters" in prompt
+
+
+def test_for_prompt_with_many_adaptation_attempts():
+    """Test for_prompt with more than 3 adaptation attempts."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=45,
+        location="Test Location",
+        year_documented=2050,
+        parallel_vulnerability=LastHumanVulnerabilityType.RESOURCE_COLLAPSE,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.RESILIENCE,
+        last_days_scenario="Test scenario",
+        adaptation_attempts=[
+            "First attempt",
+            "Second attempt",
+            "Third attempt",
+            "Fourth attempt",
+            "Fifth attempt",
+        ],
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "First attempt" in prompt
+    assert "Second attempt" in prompt
+    assert "Third attempt" in prompt
+    assert "(and 2 others)" in prompt
+    assert "Fourth attempt" not in prompt
+    assert "Fifth attempt" not in prompt
+
+
+def test_for_prompt_with_final_thought():
+    """Test for_prompt with final_thought included."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=55,
+        location="Test Location",
+        year_documented=2045,
+        parallel_vulnerability=LastHumanVulnerabilityType.ISOLATION,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Test scenario",
+        final_thought="What will become of us?",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "What will become of us?" in prompt
+    assert "Final thought:" in prompt
+
+
+def test_for_prompt_with_significant_object():
+    """Test for_prompt with significant_object included."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=40,
+        location="Test Location",
+        year_documented=2040,
+        parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.DEATH,
+        last_days_scenario="Test scenario",
+        significant_object="Old family photograph",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "Old family photograph" in prompt
+    assert "Significant object:" in prompt
+
+
+def test_latitude_longitude():
+    """Test artifact with latitude and longitude values."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=35,
+        location="Test Location",
+        latitude=40.7128,
+        longitude=-74.0060,
+        year_documented=2045,
+        parallel_vulnerability=LastHumanVulnerabilityType.TOXIC_EXPOSURE,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Test scenario",
+    )
+
+    assert artifact.latitude == 40.7128
+    assert artifact.longitude == -74.0060
+
+
+def test_artifact_name_auto_generation():
+    """Test that artifact_name is auto-generated from name if not provided."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="María José García-López",
+        age=30,
+        location="Test Location",
+        year_documented=2040,
+        parallel_vulnerability=LastHumanVulnerabilityType.CLIMATE_REFUGEE,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.DISPLACEMENT,
+        last_days_scenario="Test scenario",
+    )
+
+    # artifact_name should be sanitized version of name
+    assert artifact.artifact_name is not None
+    assert " " not in artifact.artifact_name  # No spaces
+    # Should contain sanitized version of the name
+    assert len(artifact.artifact_name) > 0

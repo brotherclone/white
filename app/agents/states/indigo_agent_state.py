@@ -4,7 +4,12 @@ from pydantic import Field
 
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.structures.artifacts.infranym_audio_artifact import InfranymAudioArtifact
-from app.structures.artifacts.infranym_image_artifact import InfranymImageArtifact
+from app.structures.artifacts.infranym_encoded_image_artifact import (
+    InfranymEncodedImageArtifact,
+)
+from app.structures.artifacts.infranym_text_render_artifact import (
+    InfranymTextRenderArtifact,
+)
 from app.structures.artifacts.infranym_midi_artifact import InfranymMidiArtifact
 from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.enums.infranym_medium import InfranymMedium
@@ -22,8 +27,11 @@ class IndigoAgentState(BaseRainbowAgentState):
     infranym_method: Optional[InfranymMethod] = Field(
         default=None, description="The specific encoding method for the infranym."
     )
-    infranym_image: Optional[InfranymImageArtifact] = Field(
-        default=None, description="The image of the infranym method."
+    infranym_encoded_image: Optional[InfranymEncodedImageArtifact] = Field(
+        default=None, description="The encoded image of the infranym secret word."
+    )
+    infranym_text_render: Optional[InfranymTextRenderArtifact] = Field(
+        default=None, description="The image of the infranym secret word."
     )
     infranym_text: Optional[InfranymTextArtifact] = Field(
         default=None, description="The text of the infranym method."

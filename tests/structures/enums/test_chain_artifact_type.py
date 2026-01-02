@@ -26,8 +26,9 @@ EXPECTED = {
     "ALTERNATE_TIMELINE": "alternate_timeline",
     "INFRANYM_MIDI": "infranym_midi",
     "INFRANYM_AUDIO": "infranym_audio",
-    "INFRANYM_IMAGE": "infranym_image",
     "INFRANYM_TEXT": "infranym_text",
+    "INFRANYM_TEXT_RENDER": "infranym_text_render",
+    "INFRANYM_ENCODED_IMAGE": "infranym_encoded_image",
     "CIRCLE_JERK_INTERVIEW": "circle_jerk_interview",
     "UNKNOWN": "unknown",
 }
@@ -74,8 +75,9 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("alternate_timeline", ChainArtifactType.ALTERNATE_TIMELINE),
         ("infranym_midi", ChainArtifactType.INFRANYM_MIDI),
         ("infranym_audio", ChainArtifactType.INFRANYM_AUDIO),
-        ("infranym_image", ChainArtifactType.INFRANYM_IMAGE),
+        ("infranym_encoded_image", ChainArtifactType.INFRANYM_ENCODED_IMAGE),
         ("infranym_text", ChainArtifactType.INFRANYM_TEXT),
+        ("infranym_text_render", ChainArtifactType.INFRANYM_TEXT_RENDER),
         ("circle_jerk_interview", ChainArtifactType.CIRCLE_JERK_INTERVIEW),
         ("unknown", ChainArtifactType.UNKNOWN),
     ],
@@ -106,6 +108,19 @@ def test_lookup_by_name():
     )
     assert ChainArtifactType["INFRANYM_MIDI"] is ChainArtifactType.INFRANYM_MIDI
     assert ChainArtifactType["INFRANYM_AUDIO"] is ChainArtifactType.INFRANYM_AUDIO
+    assert (
+        ChainArtifactType["INFRANYM_ENCODED_IMAGE"]
+        is ChainArtifactType.INFRANYM_ENCODED_IMAGE
+    )
+    assert ChainArtifactType["INFRANYM_TEXT"] is ChainArtifactType.INFRANYM_TEXT
+    assert (
+        ChainArtifactType["INFRANYM_TEXT_RENDER"]
+        is ChainArtifactType.INFRANYM_TEXT_RENDER
+    )
+    assert (
+        ChainArtifactType["CIRCLE_JERK_INTERVIEW"]
+        is ChainArtifactType.CIRCLE_JERK_INTERVIEW
+    )
 
 
 def test_invalid_value_raises_value_error():
@@ -132,6 +147,7 @@ def test_enum_members_are_enum_instances():
     assert isinstance(ChainArtifactType.ALTERNATE_TIMELINE, enum.Enum)
     assert isinstance(ChainArtifactType.INFRANYM_MIDI, enum.Enum)
     assert isinstance(ChainArtifactType.INFRANYM_AUDIO, enum.Enum)
-    assert isinstance(ChainArtifactType.INFRANYM_IMAGE, enum.Enum)
+    assert isinstance(ChainArtifactType.INFRANYM_ENCODED_IMAGE, enum.Enum)
     assert isinstance(ChainArtifactType.INFRANYM_TEXT, enum.Enum)
+    assert isinstance(ChainArtifactType.INFRANYM_TEXT_RENDER, enum.Enum)
     assert isinstance(ChainArtifactType.CIRCLE_JERK_INTERVIEW, enum.Enum)
