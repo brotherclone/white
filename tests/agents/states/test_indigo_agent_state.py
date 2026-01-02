@@ -1,8 +1,8 @@
 import pytest
 import inspect
 
-MODULE_NAME = "app.agents.states.yellow_agent_state"
-CLASS_NAME = "YellowAgentState"
+MODULE_NAME = "app.agents.states.indigo_agent_state"
+CLASS_NAME = "IndigoAgentState"
 
 
 def _get_class_or_skip():
@@ -15,7 +15,7 @@ def _get_class_or_skip():
     return cls
 
 
-def test_yellow_agent_state_is_callable():
+def test_indigo_agent_state_is_callable():
     cls = _get_class_or_skip()
     assert inspect.isclass(cls), f"{CLASS_NAME} should be a class"
     sig = inspect.signature(cls)
@@ -143,3 +143,66 @@ def test_next_state_return_type():
     assert isinstance(nxt, ok_types) or hasattr(
         nxt, "__class__"
     ), "next_state should return None, a state name, a class, or a state instance"
+
+
+def test_indigo_agent_state_has_required_fields():
+    """Test that IndigoAgentState has all required fields for the indigo workflow."""
+    cls = _get_class_or_skip()
+    try:
+        obj = cls()
+    except Exception:
+        pytest.skip("Skipping because instantiation without args failed")
+
+    # Check for indigo agent specific fields
+    expected_fields = [
+        "secret_name",
+        "infranym_medium",
+        "infranym_method",
+        "infranym_encoded_image",
+        "infranym_text_render",
+        "infranym_text",
+        "infranym_audio",
+        "infranym_midi",
+        "concepts",
+        "letter_bank",
+        "surface_name",
+        "anagram_attempts",
+        "anagram_attempt_max",
+        "anagram_valid",
+        "method_constraints",
+    ]
+
+    for field in expected_fields:
+        assert hasattr(obj, field), f"IndigoAgentState should have field '{field}'"
+
+
+def test_indigo_agent_state_field_defaults():
+    """Test that IndigoAgentState fields have correct defaults."""
+    cls = _get_class_or_skip()
+    try:
+        obj = cls()
+    except Exception:
+        pytest.skip("Skipping because instantiation without args failed")
+
+    # Test None defaults
+    assert obj.secret_name is None
+    assert obj.infranym_medium is None
+    assert obj.infranym_method is None
+    assert obj.infranym_encoded_image is None
+    assert obj.infranym_text_render is None
+    assert obj.infranym_text is None
+    assert obj.infranym_audio is None
+    assert obj.infranym_midi is None
+    assert obj.concepts is None
+    assert obj.letter_bank is None
+    assert obj.surface_name is None
+
+    # Test integer defaults
+    assert obj.anagram_attempts == 0
+    assert obj.anagram_attempt_max == 3
+
+    # Test boolean default
+    assert obj.anagram_valid is False
+
+    # Test list/dict default (method_constraints has default_factory=list)
+    assert obj.method_constraints == []

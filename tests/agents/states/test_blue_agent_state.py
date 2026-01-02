@@ -1,8 +1,8 @@
 import pytest
 import inspect
 
-MODULE_NAME = "app.agents.states.yellow_agent_state"
-CLASS_NAME = "YellowAgentState"
+MODULE_NAME = "app.agents.states.blue_agent_state"
+CLASS_NAME = "BlueAgentState"
 
 
 def _get_class_or_skip():
@@ -15,7 +15,7 @@ def _get_class_or_skip():
     return cls
 
 
-def test_yellow_agent_state_is_callable():
+def test_blue_agent_state_is_callable():
     cls = _get_class_or_skip()
     assert inspect.isclass(cls), f"{CLASS_NAME} should be a class"
     sig = inspect.signature(cls)
@@ -143,3 +143,58 @@ def test_next_state_return_type():
     assert isinstance(nxt, ok_types) or hasattr(
         nxt, "__class__"
     ), "next_state should return None, a state name, a class, or a state instance"
+
+
+def test_blue_agent_state_has_required_fields():
+    """Test that BlueAgentState has all required fields for the blue workflow."""
+    cls = _get_class_or_skip()
+    try:
+        obj = cls()
+    except Exception:
+        pytest.skip("Skipping because instantiation without args failed")
+
+    # Check for blue agent specific fields
+    expected_fields = [
+        "biographical_timeline",
+        "forgotten_periods",
+        "selected_period",
+        "selected_year",
+        "evaluation_result",
+        "alternate_history",
+        "tape_label",
+        "musical_params",
+        "iteration_count",
+        "max_iterations",
+        "biographical_data",
+    ]
+
+    for field in expected_fields:
+        assert hasattr(obj, field), f"BlueAgentState should have field '{field}'"
+
+
+def test_blue_agent_state_field_defaults():
+    """Test that BlueAgentState fields have correct defaults."""
+    cls = _get_class_or_skip()
+    try:
+        obj = cls()
+    except Exception:
+        pytest.skip("Skipping because instantiation without args failed")
+
+    # Test None defaults
+    assert obj.biographical_timeline is None
+    assert obj.selected_period is None
+    assert obj.selected_year is None
+    assert obj.evaluation_result is None
+    assert obj.alternate_history is None
+    assert obj.tape_label is None
+    assert obj.musical_params is None
+
+    # Test list defaults
+    assert obj.forgotten_periods == []
+
+    # Test integer defaults
+    assert obj.iteration_count == 0
+    assert obj.max_iterations == 3
+
+    # Test dict default
+    assert obj.biographical_data == {}

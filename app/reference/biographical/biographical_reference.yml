@@ -1128,8 +1128,6 @@ years:
       emotional_landscape:
       choice_points:
 
-
-  # ToDo: Fill in 2014
   2014:
     world_events:
       major:
@@ -1150,9 +1148,19 @@ years:
     personal_context:
       summary: "Age 39 - final thirties year"
       key_events:
+        - "I am in the Google Glass test group. Yep. A glasshole."
+        - "We get a new dog which Silas names Henry Thomas Frosting"
       influences:
+        - "Adventure Time TV series"
+        - "Silas' imaginative play"
+        - "Silas' love of music"
       emotional_landscape:
+        - "Working at Huge is boring and they are pretentious"
+        - "Stress from a very long commute"
+        - "Wonder at how Glass could allow me to read in other languages but the pure hatred of it was surprising."
       choice_points:
+        - "What if I had taken a different job?"
+        - "What if I never signed up for the Google Glass?"
 
   # ToDo: Fill in 2015
   2015:

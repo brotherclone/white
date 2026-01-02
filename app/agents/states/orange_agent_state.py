@@ -19,23 +19,19 @@ class OrangeAgentState(BaseRainbowAgentState):
     selected_story_id: Optional[str] = Field(
         default=None, description="ID of the selected story from the corpus"
     )
-    symbolic_object: Optional[SymbolicObjectArtifact] = (
-        Field(default=None, description="Custom symbolic object description"),
+    symbolic_object: Optional[SymbolicObjectArtifact] = Field(
+        default=None, description="Custom symbolic object description"
     )
-    gonzo_perspective: Optional[str] = (
-        Field(
-            default=None,
-            description="Hunter S. Thompson style perspective on the story, such as a journalist, witness, authority, scholar",
-        ),
+    gonzo_perspective: Optional[str] = Field(
+        default=None,
+        description="Hunter S. Thompson style perspective on the story, such as a journalist, witness, authority, scholar",
     )
     gonzo_intensity: int = Field(
         default=3, description="How intense the gonzo perspective is"
     )
-    mythologized_story: Optional[NewspaperArtifact] = (
-        Field(
-            default=None,
-            description="Mythological story based on the story where the misremembered object has been added",
-        ),
+    mythologized_story: Optional[NewspaperArtifact] = Field(
+        default=None,
+        description="Mythological story based on the story where the misremembered object has been added",
     )
 
     def __init__(self, **data):

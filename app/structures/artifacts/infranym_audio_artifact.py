@@ -4,6 +4,7 @@ from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 
 
 class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
+
     def __init__(self, **data):
         super().__init__(**data)
 
@@ -18,5 +19,4 @@ class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
 
 
 if __name__ == "__main__":
-    i = InfranymAudioArtifact()
-    i.save_file()
+    pass

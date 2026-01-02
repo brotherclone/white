@@ -490,7 +490,7 @@ Concept: [full concept explanation]
                         chosen_enum = chosen_method
                         # Set both fields for compatibility with other code paths
                     state.infranym_medium = chosen_enum
-                    state.infranym_method = chosen_enum.value if chosen_enum else None
+                    # infranym_method will be set later when the specific encoding method is chosen
                     state.method_constraints = constraints
                     return state
             except Exception as e:
