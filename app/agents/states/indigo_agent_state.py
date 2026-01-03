@@ -1,5 +1,5 @@
-from typing import Optional, Dict, Any
-
+from typing import Optional, Dict, Any, List
+from langchain_anthropic import ChatAnthropic
 from pydantic import Field
 
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
@@ -64,6 +64,22 @@ class IndigoAgentState(BaseRainbowAgentState):
     )
     method_constraints: Optional[Dict[str, Any]] = Field(
         default_factory=list, description="The constraints for the infranym method."
+    )
+
+    text_infranym_method: Optional[str] = Field(
+        default=None, description="Text method chosen: acrostic/riddle/anagram"
+    )
+    generated_text_lines: Optional[List[str]] = Field(
+        default=None, description="LLM-generated acrostic lines (one per letter)"
+    )
+    generated_riddle_text: Optional[str] = Field(
+        default=None, description="LLM-generated riddle text"
+    )
+    text_infranym_difficulty: Optional[str] = Field(
+        default=None, description="Riddle difficulty level: easy/medium/hard"
+    )
+    llm: Optional[ChatAnthropic] = Field(
+        default=None, description="LLM instance passed from agent for text generation"
     )
 
     def __init__(self, **data):
