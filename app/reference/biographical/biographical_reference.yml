@@ -375,7 +375,6 @@ years:
         - "Social group alignments"
         - "Interest specialization"
 
-  # ToDo: Fill in 1987
   1987:
     world_events:
       major:
@@ -396,10 +395,17 @@ years:
     personal_context:
       summary: "Age 12 - early adolescence begins"
       key_events:
-        - "UK Trip"
+        - "My Dad gets a grant to study the William Blake lithographs in the UK and decides to take me along. At the British Museum I wasn't allowed into the rare book area so, for the first time in my life I'm given free reign - in a foreign city no less."
+        - "At the comic book shop I spot a weird looking, black and white comic called 'Teenage Mutant Ninja Turtles' and I buy it. It's a collection of 100 mutant ninja turtles that are supposed to be a teenager's best friend. I'm hooked."
       influences:
+        - "What is this underground comic book scene?"
+        - "Roleplaying games"
       emotional_landscape:
+        - "Proud of my UK adventures"
+        - "Interest in girls - but too much low self-esteem to act on it"
       choice_points:
+        - "What if I never bought TMNT #1? The whole notion of DIY culture might have been lost on me."
+        - "What if I hadn't gone to the UK with my Dad? I might not have gained a sense of independence from my parents."
 
 
   # ToDo: Fill in 1988

@@ -3,6 +3,7 @@ from abc import ABC
 from app.structures.artifacts.base_artifact import ChainArtifact
 
 
+# ToDo: Finish implementation
 class InfranymTextArtifact(ChainArtifact, ABC):
 
     def __init__(self, **data):

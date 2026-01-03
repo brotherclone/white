@@ -1,17 +1,155 @@
-# ToDo: Complete this manifest
-
 bpm: 112
-key: D major
+manifest_id: '07_05'
 tempo: 4/4
-[00:00.000]
-[00:25.017]	
-[00:38.014]	
-[00:51.010]	
-[01:08.014]	
-[01:21.010]	
-[01:34.007]	
-[01:51.010]	
-[02:10.017]	
-[02:53.014]	
-[03:10.017]	
-[03:25.017]
+key: D major
+rainbow_color: I
+title: Cicatrise Dud
+release_date: '2024-06-04'
+album_sequence: 5
+main_audio_file: 07_05_main.wav
+TRT: '[03:25.017]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:25.017]'
+    description: The vocals are a call and response and overlap - describing feeling drained emotionally and physically
+  - section_name: Bridge
+    start_time: '[00:25.018]'
+    end_time: '[00:38.014]'
+    description: The bridge provides a different longer vocal melody while the grooves continue
+  - section_name: Verse 2
+    start_time: '[00:38.015]'
+    end_time: '[00:51.010]'
+    description: Return to the call and response with a more relaxed vocal melody
+  - section_name: Chorus 1
+    start_time: '[00:51.011]'
+    end_time: '[01:08.014]'
+    description: An all out assault of vocoders, giant reverb guitars and beats make this a stand out chorus
+  - section_name: Verse 3
+    start_time: '[01:08.015]'
+    end_time: '[01:21.010]'
+    description: Back to the more chill verse
+  - section_name: Bridge 2
+    start_time: '[01:21.011]'
+    end_time: '[01:34.007]'
+    description: This time the bridge is used to build the energy a bit more
+  - section_name: Chorus 2
+    start_time: '[01:34.008]'
+    end_time: '[01:51.010]'
+    description: Return to the maximalist chorus
+  - section_name: Interlude
+    start_time: '[01:51.011]'
+    end_time: '[02:10.017]'
+    description: Guitars and 80s synths spare in this interlude
+  - section_name: Jams
+    start_time: '[02:10.018]'
+    end_time: '[02:53.014]'
+    description: A long psychedelic jam section with lots of effects and sonic exploration
+  - section_name: Chorus 3
+    start_time: '[02:53.015]'
+    end_time: '[03:10.017]'
+    description: The final chorus brings back all the elements for a big finish
+  - section_name: Infranym
+    start_time: '[03:10.018]'
+    end_time: '[03:25.017]'
+    description: Some type of hidden message in tap or Morse code
+sounds_like:
+  - name: Black Moth Super Rainbow
+    discogs_id: 165373
+  - name: Bruce Haack
+    discogs_id: 26952
+  - name: Happy Mondays
+    discogs_id: 12097
+mood:
+  - groovy
+  - joyous
+  - trippy
+  - mysterious
+genres:
+  - experimental
+  - indie rock
+  - art rock
+  - electronic dance
+concept: A song about healing and recovery, both physical and emotional, it's the manic to the previous song's depression. Interesting that the happy place is being more machine-like though.
+lrc_file: 07_05.lrc
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_05_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_05_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_05_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi Hat
+    audio_file: 07_05_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: CS80 Drum Machine
+    audio_file: 07_05_07_cs80_dm.wav
+    midi_file: 07_05_06_cs80_dm.mid
+  - id: 7
+    description: Drum Machine
+    audio_file: 07_05_08_dm.wav
+  - id: 8
+    description: Arp
+    audio_file: 07_05_10_arp.wav
+    midi_file: 07_05_09_arp.mid
+  - id: 9
+    description: Lead Synth
+    audio_file: 07_05_12_lead.wav
+    midi_file: 07_05_11_lead.mid
+  - id: 10
+    description: Mellotron Vibes
+    audio_file: 07_05_14_vibes.wav
+    midi_file: 07_05_13_vibes.mid
+  - id: 11
+    description: Mantis Modular and Grandmother
+    audio_file: 07_05_15_mantis_gm.wav
+  - id: 12
+    description: Stylus Synth
+    audio_file: 07_05_16_stylus.wav
+  - id: 13
+    description: Bass
+    audio_file: 07_05_17_bass.wav
+  - id: 14
+    description: Vocal A Layer 1
+    audio_file: 07_05_18_vox_a_layer_1.wav
+  - id: 15
+    description: Vocal A Layer 2
+    audio_file: 07_05_19_vox_a_layer_2.wav
+  - id: 16
+    description: Vocal B Layer 1
+    audio_file: 07_05_20_vox_b_layer_1.wav
+  - id: 17
+    description: Vocal B Layer 2
+    audio_file: 07_05_21_vox_b_layer_2.wav
+  - id: 18
+    description: Background Vocals
+    audio_file: 07_05_22_vox_bg.wav
+  - id: 19
+    description: Guitar
+    audio_file: 07_05_23_guitar.wav
+  - id: 20
+    description: Twelve String Guitar
+    audio_file: 07_05_24_twelve_string.wav
+  - id: 21
+    description: Modular Effected Guitar
+    audio_file: 07_05_25_desk_guitar.wav
+  - id: 22
+    description: Infranym
+    audio_file: 07_05_27_infranym.wav
+    midi_file: 07_05_26_infranym.mid
+
+
