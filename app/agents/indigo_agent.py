@@ -17,6 +17,7 @@ from app.agents.states.indigo_agent_state import IndigoAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.enums.infranym_medium import InfranymMedium
 from app.structures.manifests.song_proposal import SongProposalIteration
 
@@ -104,6 +105,12 @@ class IndigoAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
+
+        work_flow.add_node("choose_text_method", self.choose_text_method)
+        work_flow.add_node("generate_acrostic_lines", self.generate_acrostic_lines)
+        work_flow.add_node("generate_riddle_text", self.generate_riddle_text)
+        work_flow.add_node("assemble_text_artifact", self.assemble_text_artifact)
+
         work_flow.add_edge(START, "get_concepts")
         work_flow.add_edge("get_concepts", "spy_choose_letter_bank")
         work_flow.add_edge("spy_choose_letter_bank", "fool_arrange_secret")
@@ -121,6 +128,26 @@ class IndigoAgent(BaseRainbowAgent, ABC):
         work_flow.add_edge("algorithmic_fallback", "choose_infranym_method")
         work_flow.add_edge("choose_infranym_method", "implement_infranym_method")
         work_flow.add_edge("implement_infranym_method", "generate_alternate_song_spec")
+        work_flow.add_conditional_edges(
+            "choose_text_method",
+            self._should_generate_text_content,
+            {
+                "generate_acrostic_lines": "generate_acrostic_lines",
+                "generate_riddle_text": "generate_riddle_text",
+                "assemble_text_artifact": "assemble_text_artifact",
+            },
+        )
+        work_flow.add_conditional_edges(
+            "implement_infranym_method",
+            self._should_route_to_text_nodes,
+            {
+                "choose_text_method": "choose_text_method",
+                "generate_alternate_song_spec": "generate_alternate_song_spec",
+            },
+        )
+        work_flow.add_edge("generate_acrostic_lines", "assemble_text_artifact")
+        work_flow.add_edge("generate_riddle_text", "assemble_text_artifact")
+        work_flow.add_edge("assemble_text_artifact", "generate_alternate_song_spec")
         work_flow.add_edge("generate_alternate_song_spec", END)
         return work_flow
 
@@ -551,73 +578,51 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
             return state
 
     def implement_infranym_method(self, state: IndigoAgentState) -> IndigoAgentState:
-        """
-        Implement the chosen infranym encoding.
-        Creates triple-layer revelation system.
-        """
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        logging.info(
-            f"🩵 IndigoAgent: Implementing {state.infranym_medium.value} infranym"
-        )
+        """Route to appropriate infranym creation"""
+        logging.info(f"🎨 Implementing Infranym: {state.infranym_medium}")
 
-        try:
-            # In mock mode, use simple fallback instead of LLM calls
-            if mock_mode:
-                result = {
-                    "encoding_method": f"mock_{state.infranym_medium.value}",
-                    "mock_data": f"Mock implementation for {state.infranym_medium.value}",
-                    "decoding_hint": "This is mock data for testing",
-                }
-            # Dispatch to specific implementation
-            elif state.infranym_medium == InfranymMedium.MIDI:
-                result = self._implement_midi_infranym(state)
-                state.infranym_midi = result
-            elif state.infranym_medium == InfranymMedium.AUDIO:
-                result = self._implement_audio_infranym(state)
-                state.infranym_audio = result
-            elif state.infranym_medium == InfranymMedium.TEXT:
-                result = self._implement_text_infranym(state)
-                state.infranym_text = result
-            elif state.infranym_medium == InfranymMedium.IMAGE:
-                result = self._implement_image_infranym(state)
-                state.infranym_image = result
-            else:
-                raise ValueError(f"Unknown medium: {state.infranym_medium}")
+        if state.infranym_medium == InfranymMedium.AUDIO:
+            artifact = self._create_audio_infranym(state)
+            state.infranym_audio = artifact
 
-            # Add triple-layer revelation metadata
-            triple_layer = {
-                "layer_1_surface": f"Song appears to be about: {state.surface_name}",
-                "layer_2_method": f"Discover encoding method: {result['encoding_method']}",
-                "layer_3_secret": f"Reveals hidden name: {state.secret_name}",
-                "decoding_hint": result.get("decoding_hint", "Look deeper..."),
-            }
+        elif state.infranym_medium == InfranymMedium.IMAGE:
+            text_render = self._create_text_render(state)
+            encoded_image = self._create_encoded_image(state, text_render)
+            state.infranym_text_render = text_render
+            state.infranym_encoded_image = encoded_image
 
-            # Store in artifacts
-            artifact = {
-                "type": state.infranym_medium.value,
-                "encoding": result,
-                "triple_layer": triple_layer,
-                "fool_spy_protocol": "The Fool hides; the Spy ensures fairness",
-            }
+        elif state.infranym_medium == InfranymMedium.TEXT:
+            # NEW: Route to choose_text_method node instead of creating here!
+            # The graph will call: choose_text_method -> generate_X -> assemble
+            # We just need to ensure state.llm is set
+            state.llm = self.llm
+            # Don't create artifact here - let the nodes do it
 
-            state.artifacts.append(artifact)
+        elif state.infranym_medium == InfranymMedium.MIDI:
+            artifact = self._create_midi_infranym(state)
+            state.infranym_midi = artifact
 
-            logging.info(f"✅ {state.infranym_medium.value} infranym complete")
-            logging.info(f"🎯 Triple layer: {triple_layer['layer_1_surface']}")
+        # Collect artifacts
+        state.artifacts = [
+            a
+            for a in [
+                state.infranym_audio,
+                state.infranym_encoded_image,
+                state.infranym_text_render,
+                state.infranym_text,
+                state.infranym_midi,
+            ]
+            if a is not None
+        ]
 
-            return state
+        return state
 
-        except Exception as e:
-            logging.error(f"❌ Error implementing infranym: {e}")
-            # Create minimal fallback artifact
-            state.artifacts.append(
-                {
-                    "type": "ERROR",
-                    "error": str(e),
-                    "fallback": "Text-based simple anagram",
-                }
-            )
-            return state
+    def _should_route_to_text_nodes(self, state: IndigoAgentState) -> str:
+        """Routing: do we need text generation nodes?"""
+        if state.infranym_medium == InfranymMedium.TEXT:
+            return "choose_text_method"
+        else:
+            return "generate_alternate_song_spec"
 
     @staticmethod
     def _is_valid_anagram(phrase1: str, phrase2: str) -> bool:
@@ -656,10 +661,6 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
             "letters": letters,
             "note": "Algorithmic fallback used",
         }
-
-    # ========================================================================
-    # HELPER METHODS: Method Selection & Constraints
-    # ========================================================================
 
     @staticmethod
     def _analyze_encoding_constraints(secret: str, surface: str) -> Dict[str, Any]:
@@ -705,10 +706,6 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
             f"- {method.value.upper()}: {descriptions[method]}" for method in available
         )
 
-    # ========================================================================
-    # INFRANYM IMPLEMENTATIONS: The Four Encoding Methods
-    # ========================================================================
-
     @staticmethod
     def _implement_midi_infranym(state: IndigoAgentState) -> Dict[str, Any]:
         """Encode secret name in MIDI"""
@@ -733,8 +730,6 @@ Respond with ONLY the method name: MIDI, AUDIO, TEXT, or IMAGE
             }
 
         elif method == "morse_duration":
-            # Morse code via note durations
-            # Load morse code from resource file
             try:
                 with open("app/reference/encoding/morse_code.yml", "r") as f:
                     data = yaml.safe_load(f)
@@ -988,6 +983,180 @@ Write the lyrics NOW:
                 "decoding_hint": "Find the QR fragments hidden in the artwork. Reassemble them.",
                 "difficulty": "High - requires careful observation",
             }
+
+    def choose_text_method(self, state: IndigoAgentState) -> IndigoAgentState:
+        """Choose which text encoding method to use (acrostic/riddle/anagram)"""
+        methods = ["acrostic", "riddle", "anagram"]
+        chosen = random.choice(methods)
+        state.text_infranym_method = chosen
+        logging.info(f"📝 Chose text method: {chosen}")
+        return state
+
+    def generate_acrostic_lines(self, state: IndigoAgentState) -> IndigoAgentState:
+        """LLM NODE: Generate acrostic lyrics (TRACED!)"""
+        secret = state.secret_name
+        concepts = state.concepts
+
+        prompt = f"""
+Write acrostic lyrics where the FIRST LETTER of each line spells: "{secret}"
+
+Context: {concepts}
+
+Requirements:
+- {len(secret)} lines total (one per letter)
+- Flow naturally (not forced or obvious)
+- Each line stands alone as good lyric
+- Relates to the song's themes
+- NOT obviously an acrostic until discovered
+
+Write ONLY the lines (no numbers, no extra text):
+    """
+
+        logging.info(f"🤖 Generating acrostic for '{secret}'...")
+
+        # This LLM call is TRACED in LangSmith!
+        chain = self.llm | StrOutputParser()
+        response = chain.invoke(prompt).strip()
+
+        # Parse and validate
+        lines = [line.strip() for line in response.split("\n") if line.strip()]
+        if len(lines) != len(secret):
+            logging.warning(
+                f"Expected {len(secret)} lines, got {len(lines)}. Adjusting..."
+            )
+            lines = lines[: len(secret)]
+            while len(lines) < len(secret):
+                lines.append(f"{secret[len(lines)]}... (incomplete)")
+
+        state.generated_text_lines = lines
+        state.text_infranym_method = "acrostic"
+
+        logging.info(f"✅ Generated {len(lines)} acrostic lines")
+        return state
+
+    def generate_riddle_text(self, state: IndigoAgentState) -> IndigoAgentState:
+        """LLM NODE: Generate riddle-poem (TRACED!)"""
+        secret = state.secret_name
+        concepts = state.concepts
+        difficulty = random.choice(["medium", "hard"])
+
+        difficulty_guidance = {
+            "easy": "Make clues fairly direct (3-4 lines)",
+            "medium": "Make clues subtle but fair (4-6 lines)",
+            "hard": "Make clues cryptic and abstract (6-8 lines)",
+        }
+
+        prompt = f"""
+Write a cryptic riddle-poem whose answer is: "{secret}"
+
+Concepts to weave in: {concepts}
+Difficulty: {difficulty} - {difficulty_guidance[difficulty]}
+
+Requirements:
+- Poetic and lyrical (can be sung)
+- Each line gives a subtle clue
+- Answer is unambiguous once solved but requires thought
+- Make it {difficulty.upper()} but FAIR
+
+Write ONLY the riddle (no answer, no explanation):
+    """
+
+        logging.info(
+            f"🤖 Generating riddle for '{secret}' (difficulty: {difficulty})..."
+        )
+
+        # This LLM call is TRACED in LangSmith!
+        chain = self.llm | StrOutputParser()
+        riddle_text = chain.invoke(prompt).strip()
+
+        state.generated_riddle_text = riddle_text
+        state.text_infranym_difficulty = difficulty
+        state.text_infranym_method = "riddle"
+
+        logging.info(f"✅ Generated riddle ({len(riddle_text)} chars)")
+        return state
+
+    @staticmethod
+    def assemble_text_artifact(state: IndigoAgentState) -> IndigoAgentState:
+        """
+        Create the actual text infranym artifact from generated content.
+
+        No LLM calls here - just structural assembly.
+        """
+        from app.structures.artifacts.infranym_text_artifact import (
+            create_acrostic_encoding,
+            create_riddle_encoding,
+            create_anagram_encoding,
+        )
+        import os
+        import re
+
+        method = state.text_infranym_method
+
+        logging.info(f"🎨 Assembling text artifact: {method}")
+
+        # Create encoding based on method
+        if method == "acrostic":
+            encoding = create_acrostic_encoding(
+                secret_word=state.secret_name,
+                generated_lines=state.generated_text_lines,
+            )
+            usage = "verse"
+
+        elif method == "riddle":
+            encoding = create_riddle_encoding(
+                secret_word=state.secret_name,
+                generated_riddle=state.generated_riddle_text,
+                difficulty=state.text_infranym_difficulty or "medium",
+            )
+            usage = "bridge"
+
+        else:  # anagram
+            # Use SPY/FOOL generated names!
+            encoding = create_anagram_encoding(
+                secret_word=state.secret_name, surface_phrase=state.surface_name
+            )
+            usage = "chorus"
+
+        # Create the artifact
+        artifact = InfranymTextArtifact(
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+            thread_id=state.thread_id,
+            chain_artifact_file_type="txt",
+            chain_artifact_type="infranym_text",
+            rainbow_color_mnemonic_character_value="I",
+            artifact_name=re.sub(r"[^\w\-_]", "_", f"text_{state.secret_name}".lower()),
+            encoding=encoding,
+            concepts=state.concepts,
+            usage_context=usage,
+            bpm=state.white_proposal.bpm if state.white_proposal else 120,
+            key=state.white_proposal.key if state.white_proposal else None,
+        )
+
+        # Save the file
+        path = artifact.save_file()
+
+        # Store in state
+        state.infranym_text = artifact
+
+        logging.info(f"✅ Text infranym artifact saved: {path}")
+        return state
+
+    @staticmethod
+    def _should_generate_text_content(state: IndigoAgentState) -> str:
+        """
+        Routing function: which text generation method to use?
+
+        Returns node name to call next.
+        """
+        method = state.text_infranym_method
+
+        if method == "acrostic":
+            return "generate_acrostic_lines"
+        elif method == "riddle":
+            return "generate_riddle_text"
+        else:  # anagram
+            return "assemble_text_artifact"
 
 
 # ========================================================================

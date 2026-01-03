@@ -15,9 +15,7 @@ class InfranymVoiceLayer(BaseModel):
     rate: Optional[int] = Field(
         default=150, description="The pace of the speech", ge=50, le=300
     )
-    pitch: Optional[float] = Field(
-        default=1.0, description="Pitch shift multiplier", ge=0.5, le=2.25
-    )
+    pitch: Optional[float] = Field(default=1.0, description="Pitch shift multiplier")
     volume_db: Optional[float] = Field(
         default=0.0, description="Volume adjustment in dB"
     )

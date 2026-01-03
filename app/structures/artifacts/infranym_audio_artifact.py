@@ -1,8 +1,9 @@
 import os
 import random
+import yaml
+
 from abc import ABC
 from typing import Optional
-
 from dotenv import load_dotenv
 from pydantic import Field, ConfigDict
 
@@ -10,14 +11,17 @@ from app.agents.tools.infranym_audio_encoder import InfranymAudioEncoder
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.infranym_voice_composition import InfranymVoiceComposition
 from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
 
 load_dotenv()
 
-# ToDo: Finish implementation
-
 
 class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.INFRANYM_AUDIO
+    title: Optional[str] = Field(
+        default="Infranym Audio", description="Title of the audio"
+    )
     secret_word: str = Field(
         default="",
         description="Secret word",
@@ -41,9 +45,8 @@ class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.encoder = InfranymAudioEncoder(
-            output_dir=f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/infranym_audio_encoder"
-        )
+        artifact_dir = self.get_artifact_path(with_file_name=False, create_dirs=True)
+        self.encoder = InfranymAudioEncoder(output_dir=str(artifact_dir))
         self.surface_layer = self._get_random_synth_voice(
             is_reversed=False, is_filtered=False
         )
@@ -53,6 +56,7 @@ class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
         self.submerged_layer = self._get_random_synth_voice(
             is_reversed=False, is_filtered=True
         )
+        self.composition = self._generate_composition()
 
     def _get_random_synth_voice(
         self, is_reversed: bool, is_filtered
@@ -87,15 +91,63 @@ class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
             )
         return profile
 
+    def _generate_composition(self) -> InfranymVoiceComposition:
+        composition = InfranymVoiceComposition(
+            title=f"{self.thread_id}_audio_infranym",
+            tempo_bpm=self.bpm,
+            key_signature=self.key,
+            surface_layer=self.surface_layer,
+            reverse_layer=self.reverse_layer,
+            submerged_layer=self.submerged_layer,
+            metadata={
+                "puzzle_solution": self.secret_word,
+                "color_agent": "Indigo",
+                "album": "Untitled White Album",
+            },
+        )
+        return composition
+
     def flatten(self):
-        pass
+        parent_data = super().flatten()
+        if parent_data is None:
+            parent_data = {}
+        return {
+            **parent_data,
+            "secret_word": self.secret_word,
+            "bpm": self.bpm,
+            "key": self.key,
+            "composition": self.composition.model_dump(),
+            "surface_layer": self.surface_layer.model_dump(),
+            "reverse_layer": self.reverse_layer.model_dump(),
+            "submerged_layer": self.submerged_layer.model_dump(),
+            "title": self.title,
+            "metadata": self.composition.metadata,
+        }
 
     def for_prompt(self):
-        pass
+        prompt_parts = []
+        if self.title:
+            prompt_parts.append(f"Audio: {self.title}")
+        return "\n".join(prompt_parts)
 
     def save_file(self):
-        pass
+        filename_stem = self.artifact_name
+        self.encoder.encode_composition(
+            self.composition, output_filename=filename_stem, export_layers=True
+        )
 
 
 if __name__ == "__main__":
-    pass
+    with open("/Volumes/LucidNonsense/White/tests/mocks/mock.wav", "rb") as f:
+        audio_bytes = f.read()
+    with open(
+        f"{os.getenv('AGENT_MOCK_DATA_PATH')}/indigo_infranym_audio_mock.yml", "r"
+    ) as f:
+        data_i = yaml.safe_load(f)
+        data_i["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        data_i["audio_bytes"] = audio_bytes
+        infranym_audio_artifact = InfranymAudioArtifact(**data_i)
+        infranym_audio_artifact.save_file()
+        print(infranym_audio_artifact.flatten())
+        p = infranym_audio_artifact.for_prompt()
+        print(p)
