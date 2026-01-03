@@ -23,6 +23,9 @@ from app.structures.manifests.song_proposal import SongProposalIteration
 load_dotenv()
 
 
+# ToDo: Finish implementation - not using real artifacts yet
+
+
 class IndigoAgent(BaseRainbowAgent, ABC):
     """Decider Tangents - Hides information"""
 

@@ -50,7 +50,7 @@ def test_transformation_trace_creation(monkeypatch, white_agent):
     white_agent._synthesize_document_for_red = MagicMock(return_value="Mock synthesis")
 
     state = MainAgentState(
-        thread_id="test_123",
+        thread_id="mock_thread_001",
         song_proposals=SongProposal(
             iterations=[
                 SongProposalIteration(

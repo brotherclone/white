@@ -11,6 +11,10 @@ from pydantic import Field
 from stegano import lsb
 
 from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.infranym_text_render_artifact import (
+    InfranymTextRenderArtifact,
+)
+from app.structures.enums.image_text_style import ImageTextStyle
 
 load_dotenv()
 
@@ -59,8 +63,6 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
         """
         text_img = Image.open(text_render_path)
         width, height = text_img.size
-
-        # Calculate data size
         # Format: "width,height|base64_pixel_data"
         pixel_count = width * height * 3  # RGB
         pixel_data_size = pixel_count * 4 // 3  # base64 expansion
@@ -74,7 +76,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
         # LSB can hide 1 bit per pixel, need 3 channels
         required_pixels = total_bits // 3
 
-        # Assume square-ish image, add 20% safety margin
+        # Assume a square-ish image, add 20% safety margin
         required_pixels = int(required_pixels * 1.2)
         side = int(np.sqrt(required_pixels)) + 1
 
@@ -82,7 +84,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
 
     def encode(self) -> str:
         """
-        Embed all three layers into carrier image.
+        Embed all three layers into the carrier image.
 
         Returns:
             Path to the saved encoded puzzle image
@@ -140,7 +142,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             carrier_array, key=self.secret_word, message=self.solution
         )
 
-        # Save final encoded image
+        # Save the final encoded image
         final_img = Image.fromarray(final_array.astype("uint8"))
         output_path = self.get_artifact_path(with_file_name=True, create_dirs=True)
         final_img.save(output_path, format="PNG", pnginfo=metadata)
@@ -152,8 +154,9 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
 
         return output_path
 
+    @staticmethod
     def spread_spectrum_embed(
-        self, img_array: np.ndarray, key: str, message: str
+        img_array: np.ndarray, key: str, message: str
     ) -> np.ndarray:
         """
         Hide message using secret word as a pseudorandom key.
@@ -167,14 +170,11 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             Modified image array with an embedded message
         """
         np.random.seed(hash(key) % (2**32))  # Use word as a deterministic seed
-
         # Convert message to binary
         msg_bits = "".join(format(ord(c), "08b") for c in message)
-
         # Generate pseudorandom positions for a bit distribution
         flat = img_array.flatten()
         positions = np.random.permutation(len(flat))[: len(msg_bits)]
-
         # Embed bits at those positions
         for pos, bit in zip(positions, msg_bits):
             flat[pos] = (flat[pos] & 0xFE) | int(bit)
@@ -199,15 +199,12 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             return None
 
         try:
-            # Parse compact format: "width,height|base64_pixel_data"
             dimensions, pixel_b64 = compact_data.split("|")
             width, height = map(int, dimensions.split(","))
-
             pixel_bytes = base64.b64decode(pixel_b64)
             pixel_array = np.frombuffer(pixel_bytes, dtype=np.uint8)
             pixel_array = pixel_array.reshape((height, width, 3))
             text_img = Image.fromarray(pixel_array, mode="RGB")
-
             if save_revealed:
                 reveal_path = encoded_path.replace(".png", "_LAYER2_REVEALED.png")
                 text_img.save(reveal_path)
@@ -240,7 +237,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             img = Image.open(encoded_path)
             img_array = np.array(img)
 
-            # Use same seed as encoding
+            # Use the same seed as encoding
             np.random.seed(hash(secret_word_key) % (2**32))
 
             flat = img_array.flatten()
@@ -266,7 +263,6 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
 
         Expected format: word_SECRETWORD.png or similar
         """
-        import os
 
         filename = os.path.basename(path)
         # Try to extract word after "word_" prefix
@@ -301,10 +297,6 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
 
 
 if __name__ == "__main__":
-    from app.structures.artifacts.infranym_text_render_artifact import (
-        InfranymTextRenderArtifact,
-    )
-    from app.structures.enums.image_text_style import ImageTextStyle
 
     # Step 1: Render text with default 400x200 size
     text_render = InfranymTextRenderArtifact(
@@ -318,18 +310,14 @@ if __name__ == "__main__":
         image_text_style=ImageTextStyle.STATIC,
         # size defaults to (400, 200) - recommended!
     )
-    text_path = text_render.encode()
-
-    # Check required carrier size
+    txt_path = text_render.encode()
     solution = "The discontinuity occurs at bar 77 where memory fragments collide"
-    required_size = InfranymEncodedImageArtifact.calculate_required_carrier_size(
-        text_path, len(solution)
+    req_size = InfranymEncodedImageArtifact.calculate_required_carrier_size(
+        txt_path, len(solution)
     )
-    print("💜 Text render: 400x200 (default)")
-    print(f"💜 Required carrier: {required_size[0]}x{required_size[1]}")
-    print("💜 NOTE: Your carrier MUST be at least this size!")
-
-    # Step 2: Encode complete puzzle
+    print("Text render: 400x200 (default)")
+    print(f"Required carrier: {[0]}x{[1]}")
+    print("NOTE: Your carrier MUST be at least this size!")
     encoded = InfranymEncodedImageArtifact(
         base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
         thread_id="test_thread_002",
@@ -338,7 +326,7 @@ if __name__ == "__main__":
         rainbow_color_mnemonic_character_value="I",
         artifact_name="puzzle_card_23",
         carrier_image_path="/Volumes/LucidNonsense/White/tests/mocks/mock.png",
-        text_render_path=text_path,
+        text_render_path=txt_path,
         surface_clue="Card 23 - Dewey Decimal 811.54 - Row 7",
         solution=solution,
         # NO size parameter - not a field on this artifact!
@@ -347,19 +335,15 @@ if __name__ == "__main__":
     try:
         puzzle_path = encoded.encode()
         print(f"✅ Complete puzzle created: {puzzle_path}")
-
-        # Test extraction
         print("\n🔍 Testing Layer 2 extraction...")
-        text_img = encoded.extract_layer2_text()
-
+        txt_img = encoded.extract_layer2_text()
         print("\n🔐 Testing Layer 3 decryption...")
         solution = encoded.solve_layer3()
-        print(f"💜 Decrypted solution: {solution}")
-
+        print(f"Decrypted solution: {solution}")
         print(f"\n📄 Flattened: {encoded.flatten()}")
 
     except ValueError as e:
         print(f"\n❌ ERROR: {e}")
         print("\nSOLUTION:")
-        print(f"  1. Make mock.png at least {required_size[0]}x{required_size[1]}")
+        print(f"  1. Make mock.png at least {[0]}x{[1]}")
         print("  2. OR use smaller text render: size=(200, 100)")

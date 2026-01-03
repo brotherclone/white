@@ -69,7 +69,7 @@ def test_transformation_trace_creation(monkeypatch, white_agent):
     ):
 
         state = MainAgentState(
-            thread_id="test_123",
+            thread_id="mock_thread_001",
             song_proposals=SongProposal(
                 iterations=[
                     SongProposalIteration(
