@@ -1,0 +1,141 @@
+# ToDo: Complete this manifest
+
+bpm: 94
+manifest_id: '07_09'
+tempo: 4/4
+key: E minor
+rainbow_color: I
+title: Beta Hats Hewn
+release_date: '2024-06-04'
+album_sequence: 9
+main_audio_file: 07_09_main.wav
+TRT: '[03:25.013]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:56.004]'
+    description: A meandering verse with guitar and synths
+  - section_name: Chorus 1
+    start_time: '[00:56.005]'
+    end_time: '[01:42.003]'
+    description: Bizarre vocal effects and chord changes take a spooky turn
+  - section_name: Verse 2
+    start_time: '[01:42.004]'
+    end_time: '[02:02.013]'
+    description: Back to the meandering verse with gentle tom work
+  - section_name: Interlude
+    start_time: '[02:02.014]'
+    end_time: '[02:53.015]'
+    description: A warped little break heavy on the synths
+  - section_name: Verse 3
+    start_time: '[02:53.016]'
+    end_time: '[03:19.003]'
+    description: A little more minimal - with some more organ improvisation
+  - section_name: Outro
+    start_time: '[03:19.004]'
+    end_time: '[03:25.013]'
+    description: Stylus heavy outro with tom flourishes
+concept: This is the other song I felt achieved the Indigo goal of being a bit more experimental and stream-of-conscious. It describes a deconstructed romantic relationship. These lyrics also have some of the ad references from 'Here Comes the Mechanical Bridge' but, of course, obscured.
+lrc_file: 07_09.lrc
+sounds_like:
+  - name: Brian Eno
+    discogs_id: 634
+  - name: My Bloody Valentine
+    discogs_id: 6516
+mood:
+  - tender
+  - frightening
+  - bizarre
+  - creepy
+genres:
+  - art rock
+  - experimental rock
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_09_02_drums.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_09_03_kick.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_09_04_snare.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 5
+    description: Toms
+    audio_file: 07_09_05_toms.wav
+    group: drums
+    player: Graham Hopkins
+  - id: 6
+    description: SEM Synth Bass
+    audio_file: 07_09_07_SEM_bass.wav
+    midi_file: 07_09_06_SEM_bass.mid
+  - id: 7
+    description: Grandmother Synth Bass
+    audio_file: 07_09_08_grandmother_bass.wav
+  - id: 8
+    description: Bass Guitar
+    audio_file: 07_09_09_bass.wav
+  - id: 9
+    description: Vox 1
+    audio_file: 07_09_10_vox_1.wav
+  - id: 10
+    description: Vox 2
+    audio_file: 07_09_11_vox_2.wav
+  - id: 11
+    description: Vox 3
+    audio_file: 07_09_12_vox_3.wav
+  - id: 12
+    description: Background Vocals
+    audio_file: 07_09_13_vox_bg.wav
+  - id: 13
+    description: Stylus
+    audio_file: 07_09_14_stylus.wav
+  - id: 14
+    description: Lead Synth Farfisa
+    midi_group_file: 07_09_16_taffy.mid
+    audio_file: 07_09_17_taffy_farfisa.wav
+  - id: 15
+    description: Lead Synth Grandmother
+    midi_group_file: 07_09_16_taffy.mid
+    audio_file: 07_09_15_taffy_gm.wav
+  - id: 16
+    description: Guitar
+    audio_file: 07_09_18_guitar.wav
+  - id: 17
+    description: Lead Guitar
+    midi_group_file: 07_09_19_lead_guitar.wav
+  - id: 18
+    description: Prophet
+    audio_file: 07_09_21_prophet.wav
+    midi_group_file: 07_09_20_prophet.mid
+  - id: 19
+    description: Prophet to Grandmother 1
+    audio_file: 07_09_22_prophet_to_gm.wav
+    midi_group_file: 07_09_20_prophet.mid
+  - id: 20
+    description: Prophet to Grandmother 2
+    audio_file: 07_09_23_prophet_to_gm.wav
+    midi_group_file: 07_09_20_prophet.mid
+  - id: 21
+    description: SEM Bass Synth
+    audio_file: 07_09_24_SEM_bass.wav
+    midi_file: 07_09_23_SEM_bass.mid
+  - id: 22
+    description: Lead Synthi
+    audio_file: 07_09_26_lead_synthi.wav
+    midi_group_file: 07_09_25_lead.mid
+  - id: 23
+    description: Grandmother Synth Lead
+    audio_file: 07_09_27_lead_gm.wav
+    midi_group_file: 07_09_25_lead.mid
+  - id: 24
+    description: Infranym
+    audio_file: 07_09_28_infranym.wav

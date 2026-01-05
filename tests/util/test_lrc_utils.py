@@ -54,3 +54,139 @@ Intro
 
 def test_load_lrc_file_not_found():
     assert lu.load_lrc("/path/does/not/exist.lrc") == []
+
+
+def test_extract_lyrics_from_lrc_basic(tmp_path):
+    """Test extracting lyrics from LRC file."""
+    content = """[ti:Test Song]
+[ar:Test Artist]
+[00:00.000] First line
+[00:05.000] Second line
+[00:10.000] Third line
+"""
+    p = tmp_path / "lyrics.lrc"
+    p.write_text(content, encoding="utf-8")
+
+    lyrics = lu.extract_lyrics_from_lrc(str(p))
+    assert lyrics is not None
+    assert "First line" in lyrics
+    assert "Second line" in lyrics
+    assert "Third line" in lyrics
+    # Timestamps should be removed
+    assert "[00:00.000]" not in lyrics
+    assert "[ti:Test Song]" not in lyrics
+    assert "[ar:Test Artist]" not in lyrics
+
+
+def test_extract_lyrics_from_lrc_file_not_found():
+    """Test extract_lyrics_from_lrc with non-existent file."""
+    result = lu.extract_lyrics_from_lrc("/path/does/not/exist.lrc")
+    assert result is None
+
+
+def test_extract_lyrics_from_lrc_empty_file(tmp_path):
+    """Test extract_lyrics_from_lrc with empty file."""
+    p = tmp_path / "empty.lrc"
+    p.write_text("", encoding="utf-8")
+
+    result = lu.extract_lyrics_from_lrc(str(p))
+    assert result is None
+
+
+def test_extract_lyrics_from_lrc_only_metadata(tmp_path):
+    """Test extract_lyrics_from_lrc with only metadata tags."""
+    content = """[ti:Test Song]
+[ar:Test Artist]
+[al:Test Album]
+[by:Test Creator]
+"""
+    p = tmp_path / "metadata_only.lrc"
+    p.write_text(content, encoding="utf-8")
+
+    result = lu.extract_lyrics_from_lrc(str(p))
+    # Should return None since there's no actual lyrical content
+    assert result is None
+
+
+def test_parse_lrc_time_edge_cases():
+    """Test parse_lrc_time with various formats."""
+    # Valid cases
+    assert abs(lu.parse_lrc_time("[00:00.000]") - 0.0) < 1e-6
+    assert abs(lu.parse_lrc_time("[99:59.999]") - 5999.999) < 1e-6
+
+    # Invalid cases
+    assert lu.parse_lrc_time("00:00.000") is None  # Missing brackets
+    assert lu.parse_lrc_time("[0:0.0]") is None  # Wrong format
+    assert lu.parse_lrc_time("") is None  # Empty string
+    assert lu.parse_lrc_time("invalid") is None  # Invalid format
+
+
+def test_smpte_to_lrc_timestamp_edge_cases():
+    """Test smpte_to_lrc_timestamp with various inputs."""
+    # Basic conversion
+    assert lu.smpte_to_lrc_timestamp("00:00:00:00.0", fps=30) == "[00:00.000]"
+
+    # Hour conversion
+    assert lu.smpte_to_lrc_timestamp("01:00:00:00.0", fps=30) == "[60:00.000]"
+
+    # Invalid format should return unchanged
+    assert lu.smpte_to_lrc_timestamp("invalid") == "invalid"
+    assert lu.smpte_to_lrc_timestamp("00:00:00") == "00:00:00"
+
+
+def test_convert_file_smpte_to_lrc_lines_mixed_content():
+    """Test convert_file_smpte_to_lrc_lines with mixed content."""
+    lines = [
+        "00:00:00:15.0 Line with timecode",
+        "Plain text line",
+        "01:02:03:00.0 Another timecode line",
+        "",
+        "More plain text",
+    ]
+    result = lu.convert_file_smpte_to_lrc_lines(lines, fps=30)
+
+    # First line should be converted to LRC format
+    assert result[0].startswith("[")
+    # Second line should be unchanged
+    assert result[1] == "Plain text line"
+    # Third line should be converted
+    assert result[2].startswith("[")
+    # Empty and plain text should remain
+    assert result[3] == ""
+    assert result[4] == "More plain text"
+
+
+def test_load_lrc_with_metadata_tags(tmp_path):
+    """Test load_lrc skips metadata tags correctly."""
+    content = """[ti:Song Title]
+[ar:Artist Name]
+[al:Album Name]
+[by:Creator]
+[offset:+500]
+[00:00.000] First lyric
+[00:05.000] Second lyric
+"""
+    p = tmp_path / "with_metadata.lrc"
+    p.write_text(content, encoding="utf-8")
+
+    lyrics = lu.load_lrc(str(p))
+    # Should only have 2 lyrical entries, metadata should be skipped
+    assert len(lyrics) == 2
+    assert lyrics[0]["text"] == "First lyric"
+    assert lyrics[1]["text"] == "Second lyric"
+
+
+def test_load_lrc_inline_text(tmp_path):
+    """Test load_lrc with inline text (timestamp and text on same line)."""
+    content = """[00:00.000] Inline text one
+[00:05.000] Inline text two
+"""
+    p = tmp_path / "inline.lrc"
+    p.write_text(content, encoding="utf-8")
+
+    lyrics = lu.load_lrc(str(p))
+    assert len(lyrics) == 2
+    assert lyrics[0]["text"] == "Inline text one"
+    assert lyrics[1]["text"] == "Inline text two"
+    assert abs(lyrics[0]["start_time"] - 0.0) < 1e-6
+    assert abs(lyrics[1]["start_time"] - 5.0) < 1e-6

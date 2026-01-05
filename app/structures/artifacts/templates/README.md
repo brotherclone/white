@@ -65,7 +65,7 @@ Cassette tape label showing "taped over" memories/timelines.
 ### Basic Usage
 
 ```python
-from app.structures.artifacts.html_artifacts import CardCatalogArtifact
+from app.structures.artifacts.html_artifact_file import CardCatalogArtifact
 
 # Create an artifact
 artifact = CardCatalogArtifact(

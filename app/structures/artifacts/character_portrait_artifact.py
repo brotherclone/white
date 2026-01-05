@@ -1,12 +1,18 @@
 import logging
+import os
+from abc import ABC
 from typing import Optional
+
+from dotenv import load_dotenv
 from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 
+load_dotenv()
 
-class CharacterPortraitArtifact(ChainArtifact):
+
+class CharacterPortraitArtifact(ChainArtifact, ABC):
     """High-level artifact representing a character portrait and its metadata.
 
     This separates character metadata (name, role, pose, description) from the
@@ -24,10 +30,16 @@ class CharacterPortraitArtifact(ChainArtifact):
     def save_file(self):
         """If an image artifact is attached, delegate saving to it; otherwise do nothing."""
         if self.image:
+            # Ensure image has proper thread_id and base_path
             if getattr(self.image, "thread_id", None) is None:
                 self.image.thread_id = self.thread_id
-            if getattr(self.image, "base_path", None) is None:
+            if (
+                getattr(self.image, "base_path", None) is None
+                or self.image.base_path == "/"
+            ):
                 self.image.base_path = self.base_path
+                # Recalculate file_path with correct base_path
+                self.image.make_artifact_path()
             self.image.save_file()
 
     def flatten(self) -> dict:
@@ -63,3 +75,26 @@ class CharacterPortraitArtifact(ChainArtifact):
                 img_path = getattr(self.image, "file_path", None) or "<no-path>"
             parts.append(f"Image: {img_path}")
         return " ".join(parts)
+
+
+if __name__ == "__main__":
+    thread_id = "test_thread_001"
+    base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
+
+    cp = CharacterPortraitArtifact(
+        thread_id=thread_id,
+        base_path=base_path,
+        character_name="Test Character",
+        role="Test Role",
+        pose="Test Pose",
+        description="Test Description",
+        image=ImageChainArtifactFile(
+            thread_id=thread_id,
+            base_path=base_path,
+            file_name="mock.png",
+            height=100,
+            width=100,
+        ),
+    )
+    f = cp.flatten()
+    print(f)

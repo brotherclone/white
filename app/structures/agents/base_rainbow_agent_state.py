@@ -1,4 +1,5 @@
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Annotated
+from operator import add
 
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field
@@ -7,18 +8,30 @@ from app.structures.manifests.song_proposal import SongProposal, SongProposalIte
 
 
 class BaseRainbowAgentState(BaseModel):
+    """
+    Base state for Rainbow Table agents.
 
-    session_id: str | None = None
-    timestamp: str | None = None
-    messages: List[BaseMessage] = Field(default_factory=list)
-    thread_id: Optional[str] = Field(
+    All fields are Annotated to allow multiple nodes to write concurrently in LangGraph.
+    - Single-value fields use `lambda x, y: y or x` (take new value if present, else keep old)
+    - List fields use `add` operator (concatenate lists)
+    """
+
+    # Scalar fields - use "take last non-None" reducer
+    session_id: Annotated[Optional[str], lambda x, y: y or x] = None
+    timestamp: Annotated[Optional[str], lambda x, y: y or x] = None
+    thread_id: Annotated[Optional[str], lambda x, y: y or x] = Field(
         default=None, description="Unique ID of the thread."
     )
-    white_proposal: Optional[SongProposalIteration] = None
-    song_proposals: Optional[SongProposal] = None
-    counter_proposal: Optional[SongProposalIteration] = None
-    artifacts: List[Any] = Field(default_factory=list)
-    skipped_nodes: List[str] = Field(default_factory=list)
+    white_proposal: Annotated[Optional[SongProposalIteration], lambda x, y: y or x] = (
+        None
+    )
+    song_proposals: Annotated[Optional[SongProposal], lambda x, y: y or x] = None
+    counter_proposal: Annotated[
+        Optional[SongProposalIteration], lambda x, y: y or x
+    ] = None
+    messages: Annotated[List[BaseMessage], add] = Field(default_factory=list)
+    artifacts: Annotated[List[Any], add] = Field(default_factory=list)
+    skipped_nodes: Annotated[List[str], add] = Field(default_factory=list)
 
     def __init__(self, **data):
         super().__init__(**data)

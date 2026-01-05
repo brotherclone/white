@@ -109,19 +109,19 @@ def generate_what_if_scenarios(
         return out[:max_per_category]
 
     # global items from world_events
-    world_events = year_data.get("world_events", {})
+    world_events = year_data.get("world_events") or {}
     global_items = []
     for cat in ("major", "cultural", "technology"):
-        for ev in world_events.get(cat, []):
+        for ev in world_events.get(cat) or []:
             global_items.append(f"What if '{ev}' had unfolded differently?")
 
     # append global prompts
     global_items.extend(prompts.get("global_what_ifs", []))
 
     # personal items from personal_context
-    personal_context = year_data.get("personal_context", {})
+    personal_context = year_data.get("personal_context") or {}
     personal_items = []
-    for cp in personal_context.get("choice_points", []):
+    for cp in personal_context.get("choice_points") or []:
         # Choice points are already phrased as questions, use them directly
         personal_items.append(cp)
 
@@ -137,7 +137,7 @@ def generate_what_if_scenarios(
 def analyze_cascade_effects(year_data: Dict, what_if_scenarios: Dict) -> Dict[str, Any]:
     """Analyze how alternate choices might cascade through time."""
 
-    personal_context = year_data.get("personal_context", {})
+    personal_context = year_data.get("personal_context") or {}
 
     cascade_categories = {
         "creative_development": [
@@ -163,7 +163,7 @@ def analyze_cascade_effects(year_data: Dict, what_if_scenarios: Dict) -> Dict[st
     }
 
     # Calculate "rebracketing intensity" - how much revision potential exists
-    choice_points = personal_context.get("choice_points", [])
+    choice_points = personal_context.get("choice_points") or []
     rebracketing_intensity = len(choice_points) / 5.0  # Normalize to 0-1 scale
 
     return {
@@ -183,8 +183,8 @@ def generate_song_inspiration(
 ) -> List[Dict[str, str]]:
     """Generate Blue album song concepts based on biographical analysis."""
 
-    personal_context = year_data.get("personal_context", {})
-    emotional_landscape = personal_context.get("emotional_landscape", "")
+    personal_context = year_data.get("personal_context") or {}
+    emotional_landscape = personal_context.get("emotional_landscape") or ""
 
     inspirations = []
 
@@ -215,9 +215,9 @@ def generate_song_inspiration(
 def calculate_quantum_metrics(year_data: Dict) -> Dict[str, Any]:
     """Calculate metrics for quantum biographical analysis."""
 
-    personal_context = year_data.get("personal_context", {})
-    choice_points = personal_context.get("choice_points", [])
-    influences = personal_context.get("influences", [])
+    personal_context = year_data.get("personal_context") or {}
+    choice_points = personal_context.get("choice_points") or []
+    influences = personal_context.get("influences") or []
 
     metrics = {
         "choice_point_density": len(choice_points),
@@ -265,7 +265,8 @@ def explore_alternate_timeline(
         return year_analysis
 
     year_data = year_analysis["year_data"]
-    choice_points = year_data.get("personal_context", {}).get("choice_points", [])
+    personal_context = year_data.get("personal_context") or {}
+    choice_points = personal_context.get("choice_points") or []
 
     if choice_point_index >= len(choice_points):
         return {

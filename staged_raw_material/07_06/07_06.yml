@@ -1,0 +1,144 @@
+bpm: 118
+key: B minor
+tempo: 4/4
+manifest_id: '07_06'
+rainbow_color: I
+title: Aim It NE
+release_date: '2024-06-04'
+album_sequence: 6
+main_audio_file: 07_06_main.wav
+TRT: '[03:51.021]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:16.006]'
+    description: Pulsating bass synths and drums start the song.
+  - section_name: Instrumental Verse
+    start_time: '[00:16.007]'
+    end_time: '[00:32.013]'
+    description: A few bars of the verse are played without lyrics
+  - section_name: Verse 1
+    start_time: '[00:32.014]'
+    end_time: '[00:48.020]'
+    description: The first verse begins with vocals.
+  - section_name: Chorus 1
+    start_time: '[00:48.021]'
+    end_time: '[01:21.008]'
+    description: More vocals are added but the tone becomes more conversational
+  - section_name: Verse 2
+    start_time: '[01:21.009]'
+    end_time: '[01:53.022]'
+    description: Right back into the verse
+  - section_name: Chorus 2
+    start_time: '[01:53.023]'
+    end_time: '[02:26.011]'
+    description: The chorus returns with more intensity
+  - section_name: Breakdown
+    start_time: '[02:26.012]'
+    end_time: '[02:42.017]'
+    description: The drum machine, guitar, and organ play a pick-axe-swinging type rhythm
+  - section_name: Bass Build
+    start_time: '[02:42.018]'
+    end_time: '[02:58.024]'
+    description: The bass builds up the tension
+  - section_name: Jams
+    start_time: '[02:58.025]'
+    end_time: '[03:47.019]'
+    description: A crazy, noisy jam is released with warped instruments and a flurry of drums
+  - section_name: Infranym
+    start_time: '[03:47.020]'
+    end_time: '[03:51.021]'
+    description: The spoken hidden message can barely be heard.
+sounds_like:
+  - name: Stereolab
+    discogs_id: 388
+  - name: Mercury Rev
+    discogs_id: 9658
+  - name: 13th Floor Elevators
+    discogs_id: 304455
+mood:
+  - defiant
+  - angsty
+  - energetic
+  - dreamy
+genres:
+  - indie rock
+  - psychedelic rock
+concept: This song channels the frustrations of group-think or going along with a team you don't want to belong to. There's a perspective from a Moses-doubter sick of wandering the desert, and arguing over two options that aren't even defined correctly.
+lrc_file: 07_06.lrc
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_06_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_06_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_06_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-Hat
+    audio_file: 07_06_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 07_06_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Drum machine
+    audio_file: 07_06_07_dm.wav
+  - id: 8
+    description: Synth Bass
+    audio_file: 07_06_08_synth_bass.wav
+  - id: 9
+    description: Bass
+    audio_file: 07_06_09_bass.wav
+  - id: 10
+    description: Baritone Guitar
+    audio_file: 07_06_10_baritone.wav
+  - id: 11
+    description: Grandmother bass
+    audio_file: 07_06_11_grandmother_bass.wav
+  - id: 12
+    description: Vocals 1
+    audio_file: 07_06_12_vox_1.wav
+  - id: 13
+    description: Vocals 2
+    audio_file: 07_06_13_vox_2.wav
+  - id: 14
+    description: Background Vocals
+    audio_file: 07_06_14_vox_bg.wav
+  - id: 15
+    description: Organ
+    audio_file: 07_06_16_organ.wav
+    midifile: 07_06_15_organ.mid
+  - id: 16
+    description: Organ Lead
+    audio_file: 07_06_18_organ_lead.wav
+    midi_group_file: 07_06_17_organ_lead.mid
+  - id: 17
+    description: Grandmother Synth Lead
+    audio_file: 07_06_19_grandmother_lead.wav
+    midi_group_file: 07_06_17_organ_lead.mid
+  - id: 18
+    description: Modular Synth
+    audio_file: 07_06_20_mantis.wav
+  - id: 19
+    description: Guitar
+    audio_file: 07_06_21_guitar.wav
+  - id: 20
+    description: Lap steel
+    audio_file: 07_06_22_lap_steel.wav
+  - id: 21
+    description: Infranym
+    audio_file: 07_06_23_infranym.wav
