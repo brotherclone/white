@@ -1,5 +1,4 @@
 from typing import Optional, Dict, Any, List, Annotated
-from operator import add  # Added by auto_annotate
 from langchain_anthropic import ChatAnthropic
 from pydantic import Field
 
@@ -15,6 +14,17 @@ from app.structures.artifacts.infranym_midi_artifact import InfranymMidiArtifact
 from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.enums.infranym_medium import InfranymMedium
 from app.structures.enums.infranym_method import InfranymMethod
+
+
+def safe_add(x, y):
+    """Safely add two lists, handling None values"""
+    if x is None and y is None:
+        return None
+    if x is None:
+        return y
+    if y is None:
+        return x
+    return x + y
 
 
 class IndigoAgentState(BaseRainbowAgentState):
@@ -72,7 +82,7 @@ class IndigoAgentState(BaseRainbowAgentState):
     text_infranym_method: Annotated[Optional[str], lambda x, y: y or x] = Field(
         default=None, description="Text method chosen: acrostic/riddle/anagram"
     )
-    generated_text_lines: Annotated[Optional[List[str]], add] = Field(
+    generated_text_lines: Annotated[Optional[List[str]], safe_add] = Field(
         default=None, description="LLM-generated acrostic lines (one per letter)"
     )
     generated_riddle_text: Annotated[Optional[str], lambda x, y: y or x] = Field(

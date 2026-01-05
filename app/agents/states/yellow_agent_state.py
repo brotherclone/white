@@ -1,5 +1,4 @@
 from typing import List, Optional, Annotated
-from operator import add  # Added by auto_annotate
 
 from pydantic import Field
 
@@ -13,12 +12,14 @@ from app.structures.concepts.pulsar_palace_room import PulsarPalaceRoom
 
 class YellowAgentState(BaseRainbowAgentState):
 
-    characters: Annotated[List[PulsarPalaceCharacter], add] = Field(
-        default_factory=list,
-        max_length=4,
-        description="The Pulsar Palace RPG-style characters for a given game run.",
+    characters: Annotated[List[PulsarPalaceCharacter], lambda x, y: y if y else x] = (
+        Field(
+            default_factory=list,
+            max_length=4,
+            description="The Pulsar Palace RPG-style characters for a given game run.",
+        )
     )
-    rooms: Annotated[List[PulsarPalaceRoom], add] = Field(
+    rooms: Annotated[List[PulsarPalaceRoom], lambda x, y: y if y else x] = Field(
         default_factory=list,
         description="Room from the Pulsar Palace RPG-style game run available in the current run.",
     )
