@@ -128,7 +128,7 @@ class WhiteAgent(BaseModel):
             stop_after_agent=stop_after_agent,
         )
         config = RunnableConfig(
-            configurable={"thread_id": thread_id}, recursion_limit=25
+            configurable={"thread_id": thread_id}, recursion_limit=50
         )
         logging.info(f"Starting Prism workflow (thread_id: {thread_id})")
         result = workflow.invoke(initial_state, config)
@@ -2105,6 +2105,10 @@ Structure your synthesis as the final creative brief before manifestation.
         - enabled_agents: Only route to agents in this list
         - stop_after_agent: Jump to finale after specified agent
         """
+        logging.info(
+            f"🔀 Routing: red={state.ready_for_red}, orange={state.ready_for_orange}, yellow={state.ready_for_yellow}, "
+            f"green={state.ready_for_green}, blue={state.ready_for_blue}, indigo={state.ready_for_indigo}, violet={state.ready_for_violet}"
+        )
         if state.stop_after_agent and state.song_proposals.iterations:
             last_iteration = state.song_proposals.iterations[-1]
             logging.info(
@@ -2114,19 +2118,27 @@ Structure your synthesis as the final creative brief before manifestation.
                 logging.info(f"✅ Stopping after {state.stop_after_agent} as requested")
                 return "white"
         if "red" in state.enabled_agents and state.ready_for_red:
+            logging.info("→ Routing to red")
             return "red"
         elif "orange" in state.enabled_agents and state.ready_for_orange:
+            logging.info("→ Routing to orange")
             return "orange"
         elif "yellow" in state.enabled_agents and state.ready_for_yellow:
+            logging.info("→ Routing to yellow")
             return "yellow"
         elif "green" in state.enabled_agents and state.ready_for_green:
+            logging.info("→ Routing to green")
             return "green"
         elif "blue" in state.enabled_agents and state.ready_for_blue:
+            logging.info("→ Routing to blue")
             return "blue"
         elif "indigo" in state.enabled_agents and state.ready_for_indigo:
+            logging.info("→ Routing to indigo")
             return "indigo"
         elif "violet" in state.enabled_agents and state.ready_for_violet:
+            logging.info("→ Routing to violet")
             return "violet"
+        logging.info("→ Routing to white (finalization)")
         return "white"
 
     @staticmethod

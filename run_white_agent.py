@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import pickle
 import sys
 import warnings
@@ -8,6 +9,23 @@ from pathlib import Path
 
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.white_agent import WhiteAgent
+
+# Configure logging early
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Add early-warning suppression so backport deprecation warnings are not
+# printed when third-party audio libraries import `aifc`/`sunau` on Python 3.13.
+# This is a low-risk convenience to keep logs clean. For a longer-term fix,
+# migrate audio I/O to maintained libraries such as `soundfile` or `pydub`.
+warnings.filterwarnings("ignore", message=r".*aifc.*", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message=r".*sunau.*", category=DeprecationWarning)
+
+# Disable LangSmith tracing in mock mode to prevent huge payload errors
+if os.getenv("MOCK_MODE", "false").lower() == "true":
+    os.environ["LANGCHAIN_TRACING_V2"] = "false"
+    logging.info("🔇 LangSmith tracing disabled (MOCK_MODE is enabled)")
 
 """
 White Agent Workflow Runner
@@ -33,20 +51,6 @@ Usage:
     # Resume with a saved state file
     python run_white_agent.py resume --state-file paused_state.pkl
 """
-
-# Add early-warning suppression so backport deprecation warnings are not
-# printed when third-party audio libraries import `aifc`/`sunau` on Python 3.13.
-# This is a low-risk convenience to keep logs clean. For a longer-term fix,
-# migrate audio I/O to maintained libraries such as `soundfile` or `pydub`.
-
-# ToDo: Mock mode should be overridden by the agent
-
-warnings.filterwarnings("ignore", message=r".*aifc.*", category=DeprecationWarning)
-warnings.filterwarnings("ignore", message=r".*sunau.*", category=DeprecationWarning)
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 
 def ensure_state_object(state):
