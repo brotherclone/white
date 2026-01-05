@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Annotated
+from operator import add  # Added by auto_annotate
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -18,54 +19,62 @@ class MainAgentState(BaseModel):
     """
 
     thread_id: str
-    song_proposals: SongProposal = Field(
+    song_proposals: Annotated[SongProposal, lambda x, y: y or x] = Field(
         default_factory=lambda: SongProposal(iterations=[])
     )
 
     # Artifacts: Both ChainArtifact instances and dict representations
     # Rainbow agents serialize artifacts to dicts to avoid msgpack serialization issues
-    artifacts: List[Any] = Field(default_factory=list)
+    artifacts: Annotated[List[Any], add] = Field(default_factory=list)
 
     # Workflow control
-    workflow_paused: bool = False
-    pause_reason: Optional[str] = None
-    pending_human_action: Optional[Dict[str, Any]] = None
+    workflow_paused: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    pause_reason: Annotated[Optional[str], lambda x, y: y or x] = None
+    pending_human_action: Annotated[Optional[Dict[str, Any]], lambda x, y: y or x] = (
+        None
+    )
 
     # White Agent working variables (per-agent rebracketing)
-    rebracketing_analysis: Optional[str] = None
-    document_synthesis: Optional[str] = None
+    rebracketing_analysis: Annotated[Optional[str], lambda x, y: y or x] = None
+    document_synthesis: Annotated[Optional[str], lambda x, y: y or x] = None
 
-    meta_rebracketing: Optional[str] = (
+    meta_rebracketing: Annotated[Optional[str], lambda x, y: y or x] = (
         None  # The interference pattern across all seven lenses
     )
-    chromatic_synthesis: Optional[str] = None  # Final integration document
+    chromatic_synthesis: Annotated[Optional[str], lambda x, y: y or x] = (
+        None  # Final integration document
+    )
 
     # White Facet system (cognitive lens)
-    white_facet: WhiteFacet | None = None
-    white_facet_metadata: str | Any = None
-    facet_evolution: Optional[FacetEvolution] = None
+    white_facet: Annotated[WhiteFacet | None, lambda x, y: y or x] = None
+    white_facet_metadata: Annotated[str | Any, lambda x, y: y or x] = None
+    facet_evolution: Annotated[Optional[FacetEvolution], lambda x, y: y or x] = None
 
     # Transformation traces (what boundaries shifted per agent)
-    transformation_traces: List[TransformationTrace] = Field(default_factory=list)
+    transformation_traces: Annotated[List[TransformationTrace], add] = Field(
+        default_factory=list
+    )
 
     # Artifact relationship graph
-    artifact_relationships: List[ArtifactRelationship] = Field(default_factory=list)
+    artifact_relationships: Annotated[List[ArtifactRelationship], add] = Field(
+        default_factory=list
+    )
 
     # Agent readiness flags
-    ready_for_red: bool = False
-    ready_for_orange: bool = False
-    ready_for_yellow: bool = False
-    ready_for_green: bool = False
-    ready_for_blue: bool = False
-    ready_for_indigo: bool = False
-    ready_for_violet: bool = False
-    ready_for_white: bool = False
+    ready_for_red: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    ready_for_orange: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    ready_for_yellow: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    ready_for_green: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    ready_for_blue: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    ready_for_indigo: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    ready_for_violet: Annotated[bool, lambda x, y: y if y is not None else x] = False
+    ready_for_white: Annotated[bool, lambda x, y: y if y is not None else x] = False
 
     # Workflow completion
-    run_finished: bool = False
+    run_finished: Annotated[bool, lambda x, y: y if y is not None else x] = False
 
     # Execution mode controls
-    enabled_agents: List[str] = Field(
+    enabled_agents: Annotated[List[str], add] = Field(
         default_factory=lambda: [
             "black",
             "red",
@@ -77,5 +86,5 @@ class MainAgentState(BaseModel):
             "violet",
         ]
     )
-    stop_after_agent: Optional[str] = None
+    stop_after_agent: Annotated[Optional[str], lambda x, y: y or x] = None
     model_config = ConfigDict(arbitrary_types_allowed=True)

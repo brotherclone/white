@@ -16,6 +16,7 @@ from typing import Any, Dict, List
 from uuid import uuid4
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import RunnableConfig
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
@@ -126,7 +127,9 @@ class WhiteAgent(BaseModel):
             enabled_agents=enabled_agents,
             stop_after_agent=stop_after_agent,
         )
-        config = RunnableConfig(configurable={"thread_id": thread_id})
+        config = RunnableConfig(
+            configurable={"thread_id": thread_id}, recursion_limit=25
+        )
         logging.info(f"Starting Prism workflow (thread_id: {thread_id})")
         result = workflow.invoke(initial_state, config)
         if isinstance(result, dict):
@@ -166,6 +169,9 @@ class WhiteAgent(BaseModel):
             raise ValueError(f"No resume handler for agent: {agent_name}")
 
     def build_workflow(self) -> CompiledStateGraph:
+        disable_checkpoint = (
+            os.getenv("DISABLE_CHECKPOINTING", "false").lower() == "true"
+        )
         workflow = StateGraph(MainAgentState)
         # ⚪️
         workflow.add_node("initiate_song_proposal", self.initiate_song_proposal)
@@ -270,7 +276,10 @@ class WhiteAgent(BaseModel):
         )
         # ⚪️
         workflow.add_edge("finalize_song_proposal", END)
-        return workflow.compile()
+        if disable_checkpoint:
+            return workflow.compile()
+        else:
+            return workflow.compile(checkpointer=MemorySaver())
 
     def _get_claude_supervisor(self) -> ChatAnthropic:
         return ChatAnthropic(
@@ -364,6 +373,11 @@ class WhiteAgent(BaseModel):
         logging.info(f" {facet_metadata['description']}")
         if mock_mode:
             state.thread_id = "mock_thread_001"
+            state.white_facet = facet
+            state.white_facet_metadata = facet_metadata
+            state.facet_evolution = FacetEvolution(
+                initial_facet=facet, initial_metadata=facet_metadata or {}
+            )
             try:
                 with open(
                     f"{os.getenv('AGENT_MOCK_DATA_PATH')}/white_initial_proposal_{facet.value}_mock.yml",
@@ -390,12 +404,8 @@ class WhiteAgent(BaseModel):
             initial_proposal = proposer.invoke(prompt)
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
-
-                # ALWAYS set facet, regardless of type
             state.white_facet = facet
             state.white_facet_metadata = facet_metadata
-
-            # Initialize facet evolution tracking
             state.facet_evolution = FacetEvolution(
                 initial_facet=facet, initial_metadata=facet_metadata or {}
             )
@@ -536,7 +546,7 @@ You must provide:
 Focus on clarity, coherence, and creative possibility - make it ready for the next agent to build upon.
 """
             else:
-                all_iterations = "\n---\n".join(
+                all_iterations = "---".join(
                     [str(i) for i in state.song_proposals.iterations]
                 )
                 prompt = f"""
@@ -598,7 +608,6 @@ Structure your proposal as the final, complete vision - ready for human implemen
                     raise TypeError(error_msg)
                 logging.warning(error_msg)
             else:
-                # Append to the iterations list, not to song_proposals itself
                 state.song_proposals.iterations.append(rewrite_proposal)
         except Exception as e:
             logging.info(f"Anthropic model call failed: {e!s}.")
@@ -660,9 +669,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
-        # Evolve facet based on this agent's work
         self._evolve_facet(state, "black", trace.boundaries_shifted)
-
         return state
 
     def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -2060,7 +2067,13 @@ Structure your synthesis as the final creative brief before manifestation.
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
+        stop_after = getattr(state, "stop_after_agent", None)
+        if isinstance(stop_after, str) and stop_after.strip().lower() == "black":
+            logging.info("✋ Stopping after black agent")
+            return "finish"
+
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+
         if state.workflow_paused and state.pending_human_action:
             return "finish"
         if mock_mode:
@@ -2302,9 +2315,7 @@ Structure your synthesis as the final creative brief before manifestation.
             return "MOCK: Meta-rebracketing analysis would appear here"
 
         traces_summary = self._format_transformation_traces(state.transformation_traces)
-        all_iterations = "\n---\n".join(
-            [str(i) for i in state.song_proposals.iterations]
-        )
+        all_iterations = "---".join([str(i) for i in state.song_proposals.iterations])
 
         prompt = f"""
 You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
@@ -2376,7 +2387,7 @@ You have performed holographic meta-rebracketing:
 {state.meta_rebracketing}
 
 You hold the complete spectrum of song proposals:
-{'\n---\n'.join([str(i) for i in state.song_proposals.iterations])}
+{'---'.join([str(i) for i in state.song_proposals.iterations])}
 
 **YOUR TASK: CREATE THE ULTIMATE CREATIVE BRIEF**
 

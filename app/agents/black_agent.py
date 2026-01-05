@@ -65,7 +65,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
         """Entry point when White Agent invokes Black Agent"""
-
+        disable_checkpoint = (
+            os.getenv("DISABLE_CHECKPOINTING", "false").lower() == "true"
+        )
         current_proposal = state.song_proposals.iterations[-1]
         black_state = BlackAgentState(
             white_proposal=current_proposal,
@@ -76,45 +78,49 @@ class BlackAgent(BaseRainbowAgent, ABC):
             awaiting_human_action=False,
         )
         if not hasattr(self, "_compiled_workflow"):
-
-            os.makedirs("checkpoints", exist_ok=True)
-            conn = sqlite3.connect(
-                "checkpoints/black_agent.db", check_same_thread=False
-            )
-            checkpointer = SqliteSaver(conn)
-            self._compiled_workflow = self.create_graph().compile(
-                checkpointer=checkpointer, interrupt_before=["await_human_action"]
-            )
+            if disable_checkpoint:
+                self._compiled_workflow = self.create_graph().compile()
+            else:
+                os.makedirs("checkpoints", exist_ok=True)
+                conn = sqlite3.connect(
+                    "checkpoints/black_agent.db", check_same_thread=False
+                )
+                checkpointer = SqliteSaver(conn)
+                self._compiled_workflow = self.create_graph().compile(
+                    checkpointer=checkpointer, interrupt_before=["await_human_action"]
+                )
         black_config: RunnableConfig = {
             "configurable": {"thread_id": f"{state.thread_id}"}
         }
         result = self._compiled_workflow.invoke(
             black_state.model_dump(), config=black_config
         )
-        snapshot = self._compiled_workflow.get_state(black_config)
-
-        if snapshot.next:
-            logging.info(f"Black Agent workflow paused at: {snapshot.next}")
-            state.workflow_paused = True
-            state.pause_reason = "black_agent_awaiting_human_action"
-            state.pending_human_action = {
-                "agent": "black",
-                "action": "sigil_charging",
-                "instructions": result.get(
-                    "human_instructions", "Complete Black Agent ritual tasks"
-                ),
-                "pending_tasks": result.get("pending_human_tasks", []),
-                "black_config": black_config,
-            }
-            if result.get("artifacts"):
-                state.artifacts = result["artifacts"]
-            logging.info("Workflow paused - waiting for human to complete ritual tasks")
-        else:
-            state.song_proposals = result.get("song_proposals") or state.song_proposals
-            if result.get("counter_proposal"):
-                state.song_proposals.iterations.append(result["counter_proposal"])
-            if result.get("artifacts"):
-                state.artifacts = result["artifacts"]
+        if not disable_checkpoint:
+            snapshot = self._compiled_workflow.get_state(black_config)
+            if snapshot.next:
+                logging.info(f"Black Agent workflow paused at: {snapshot.next}")
+                state.workflow_paused = True
+                state.pause_reason = "black_agent_awaiting_human_action"
+                state.pending_human_action = {
+                    "agent": "black",
+                    "action": "sigil_charging",
+                    "instructions": result.get(
+                        "human_instructions", "Complete Black Agent ritual tasks"
+                    ),
+                    "pending_tasks": result.get("pending_human_tasks", []),
+                    "black_config": black_config,
+                }
+                if result.get("artifacts"):
+                    state.artifacts = result["artifacts"]
+                logging.info(
+                    "Workflow paused - waiting for human to complete ritual tasks"
+                )
+                return state
+        state.song_proposals = result.get("song_proposals") or state.song_proposals
+        if result.get("counter_proposal"):
+            state.song_proposals.iterations.append(result["counter_proposal"])
+        if result.get("artifacts"):
+            state.artifacts = result["artifacts"]
         return state
 
     def create_graph(self) -> StateGraph:
@@ -132,6 +138,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         10. The black agent updates the counter-proposal to reflect the charged sigil if need be then goto 5.
 
         """
+
         black_workflow = StateGraph(BlackAgentState)
         # Nodes
         black_workflow.add_node(
@@ -168,10 +175,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
         black_workflow.add_edge(
             "await_human_action", "update_alternate_song_spec_with_sigil"
         )
-        black_workflow.add_edge(
-            "await_human_action", "update_alternate_song_spec_with_sigil"
-        )
-        black_workflow.add_edge("update_alternate_song_spec_with_sigil", END)
         return black_workflow
 
     @staticmethod

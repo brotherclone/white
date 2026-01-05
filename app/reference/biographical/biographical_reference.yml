@@ -945,8 +945,14 @@ years:
     personal_context:
       summary: "Age 31 - early thirties establishment"
       key_events:
+        - "Begin working remotely for LEGO"
+        - "Also freelance for PBS, Pfizer and a couple of other companies making Flash games"
       influences:
+        - "Game design thought process"
+        - "Washington DC community"
       emotional_landscape:
+        - "Regret of moving away from NYC hitting hard"
+        - "Anxiety about paying the mortgage"
       choice_points:
 
 
@@ -1418,7 +1424,6 @@ years:
       emotional_landscape:
       choice_points:
 
-  # ToDo: Fill in 2025
   2025:
     world_events:
       major:
@@ -1431,6 +1436,7 @@ years:
         - "AI-human collaborative art"
         - "Generational cultural shifts"
         - "Creative industry AI integration"
+        - "Fucking Trump again"
       technology:
         - "Advanced AI creative tools"
         - "Quantum computing applications"
@@ -1439,9 +1445,24 @@ years:
     personal_context:
       summary: "Age 50 - major life milestone"
       key_events:
+        - "I release 'Vanity Pressing' the Violet entry in The Rainbow Table and begin work with Claude on the final album in the series."
+        - "Silas applies to college and, by the end of year has been accepted to all of them"
+        - "I play my last show with Solilians - it's just too much time and effort to keep up with."
+        - "I drive Silas' band to a show in Baltimore and can't help but see myself in him"
+        - "My father falls and breaks his hip - after much confusion Lois enters him to the Charlotte Hall VA home."
+        - "We get a new puppy named Razzles - he's very smart but gets into lots of trouble."
       influences:
+        - "In the summer, while Silas is at an FIT course, I see the Hilma af Klint and Jack Whitten at MOMA and both have a big effect."
       emotional_landscape:
+        - "Joy for Silas entering what I hope to be the best years of his life"
+        - "Despair as my Father slips away - erased by Alzheimer's"
+        - "My rage at the stupidity of the Trump presidency and its supporters is hard to contain"
+        - "Welcome annoyance? Razzles is so much work but it's a great distraction from my dad's situation"
       choice_points:
+        - "What if we hadn't pushed Silas academically, so he couldn't get into college?"
+        - "What if I insisted my Father not to enter the Charlotte Hall VA home?"
+        - "What if I had acted upon the violent fantasies I had about Trump supporters?"
+        - "What if we picked the other puppy (not the biggest in litter)?"
 
 
 # Quantum analysis prompts for biographical exploration
