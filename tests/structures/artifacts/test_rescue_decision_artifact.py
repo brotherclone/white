@@ -13,8 +13,6 @@ from app.structures.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
 )
 
-# ToDo: Add for_prompt() tests
-
 
 class ConcreteArbitrarysSurveyArtifact(ArbitrarysSurveyArtifact):
     """Concrete implementation for testing"""
@@ -271,3 +269,247 @@ def test_rescue_decision_default_texts():
     assert "preserve what we cannot save" in artifact.rationale
     assert "consciousness expands" in artifact.rationale
     assert "tragedy is complete" in artifact.rationale
+
+
+def test_for_prompt_basic():
+    """Test for_prompt() returns structured output."""
+    rescued = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        identity="Mind Instance 42",
+        rescue_year=2100,
+    )
+
+    human = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="John Doe",
+        age=45,
+        location="Earth",
+        year_documented=2100,
+        parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+        vulnerability_details="Test",
+        environmental_stressor="Test",
+        documentation_type=LastHumanDocumentationType.DEATH,
+        last_days_scenario="Test",
+    )
+
+    species = ConcreteSpeciesExtinctionArtifact(
+        thread_id="test",
+        scientific_name="Homo sapiens",
+        common_name="Human",
+        taxonomic_group="mammal",
+        iucn_status="Extinct",
+        extinction_year=2100,
+        habitat="Global",
+        primary_cause=ExtinctionCause.CLIMATE_CHANGE,
+        ecosystem_role="Test",
+    )
+
+    artifact = ConcreteRescueDecisionArtifact(
+        thread_id="test",
+        rescued_consciousness=rescued,
+        documented_humans=[human],
+        documented_species=[species],
+        arbitrary_perspective="We witnessed the end",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "## The Arbitrary's Decision" in prompt
+    assert "Rescued: Mind Instance 42" in prompt
+    assert "Documented (not rescued): 1 humans, 1 species" in prompt
+    assert "## Justification" in prompt
+    assert "## Rationale" in prompt
+    assert "## The Mind's Reflection" in prompt
+    assert "We witnessed the end" in prompt
+
+
+def test_for_prompt_multiple_documentations():
+    """Test for_prompt() with multiple humans and species."""
+    rescued = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        identity="Consciousness Alpha",
+        rescue_year=2140,
+    )
+
+    humans = [
+        ConcreteLastHumanArtifact(
+            thread_id="test",
+            name=f"Human {i}",
+            age=30 + i,
+            location="Test",
+            year_documented=2140,
+            parallel_vulnerability=LastHumanVulnerabilityType.CLIMATE_REFUGEE,
+            vulnerability_details="Test",
+            environmental_stressor="Test",
+            documentation_type=LastHumanDocumentationType.WITNESS,
+            last_days_scenario="Test",
+        )
+        for i in range(10)
+    ]
+
+    species = [
+        ConcreteSpeciesExtinctionArtifact(
+            thread_id="test",
+            scientific_name=f"Species {i}",
+            common_name=f"Test {i}",
+            taxonomic_group="mammal",
+            iucn_status="Extinct",
+            extinction_year=2140,
+            habitat="Test",
+            primary_cause=ExtinctionCause.HABITAT_LOSS,
+            ecosystem_role="Test",
+        )
+        for i in range(25)
+    ]
+
+    artifact = ConcreteRescueDecisionArtifact(
+        thread_id="test",
+        rescued_consciousness=rescued,
+        documented_humans=humans,
+        documented_species=species,
+        arbitrary_perspective="The scale of loss defies comprehension",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "10 humans, 25 species" in prompt
+    assert "The scale of loss defies comprehension" in prompt
+
+
+def test_for_prompt_custom_justification():
+    """Test for_prompt() with custom justification and rationale."""
+    rescued = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        identity="Test Mind",
+        rescue_year=2150,
+    )
+
+    artifact = ConcreteRescueDecisionArtifact(
+        thread_id="test",
+        rescued_consciousness=rescued,
+        documented_humans=[],
+        documented_species=[],
+        rescue_justification="This consciousness showed unique properties",
+        rationale="All choices involve loss; we chose to preserve one spark",
+        arbitrary_perspective="Even one saved is a defiance of entropy",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "This consciousness showed unique properties" in prompt
+    assert "All choices involve loss" in prompt
+    assert "defiance of entropy" in prompt
+
+
+def test_for_prompt_zero_documentations():
+    """Test for_prompt() with no documented humans or species."""
+    rescued = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        identity="Sole Survivor",
+        rescue_year=2300,
+    )
+
+    artifact = ConcreteRescueDecisionArtifact(
+        thread_id="test",
+        rescued_consciousness=rescued,
+        documented_humans=[],
+        documented_species=[],
+        arbitrary_perspective="Only information remains",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "0 humans, 0 species" in prompt
+    assert "Only information remains" in prompt
+
+
+def test_for_prompt_sections_order():
+    """Test that for_prompt() maintains section order."""
+    rescued = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        identity="Test",
+        rescue_year=2100,
+    )
+
+    artifact = ConcreteRescueDecisionArtifact(
+        thread_id="test",
+        rescued_consciousness=rescued,
+        documented_humans=[],
+        documented_species=[],
+        arbitrary_perspective="Test",
+    )
+
+    prompt = artifact.for_prompt()
+    lines = prompt.split("\n")
+
+    # Find section headers
+    decision_idx = next(
+        i for i, l in enumerate(lines) if "## The Arbitrary's Decision" in l
+    )
+    justification_idx = next(i for i, l in enumerate(lines) if "## Justification" in l)
+    rationale_idx = next(i for i, l in enumerate(lines) if "## Rationale" in l)
+    reflection_idx = next(
+        i for i, l in enumerate(lines) if "## The Mind's Reflection" in l
+    )
+
+    # Verify order
+    assert decision_idx < justification_idx
+    assert justification_idx < rationale_idx
+    assert rationale_idx < reflection_idx
+
+
+def test_for_prompt_with_all_fields():
+    """Test for_prompt() includes all relevant information."""
+    rescued = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        identity="Complete Mind Instance",
+        rescue_year=2145,
+    )
+
+    humans = [
+        ConcreteLastHumanArtifact(
+            thread_id="test",
+            name="Last Human",
+            age=50,
+            location="Final City",
+            year_documented=2145,
+            parallel_vulnerability=LastHumanVulnerabilityType.ENTANGLEMENT,
+            vulnerability_details="Caught in collapse",
+            environmental_stressor="Total system failure",
+            documentation_type=LastHumanDocumentationType.DEATH,
+            last_days_scenario="Final moments",
+        )
+    ]
+
+    species = [
+        ConcreteSpeciesExtinctionArtifact(
+            thread_id="test",
+            scientific_name="Testus finalis",
+            common_name="Final Species",
+            taxonomic_group="bird",
+            iucn_status="Extinct",
+            extinction_year=2145,
+            habitat="Sky",
+            primary_cause=ExtinctionCause.POLLUTION,
+            ecosystem_role="Indicator",
+        )
+    ]
+
+    artifact = ConcreteRescueDecisionArtifact(
+        thread_id="test",
+        rescued_consciousness=rescued,
+        documented_humans=humans,
+        documented_species=species,
+        rescue_justification="Complete test justification for rescue decision",
+        rationale="Complete test rationale for documentation and preservation",
+        arbitrary_perspective="Complete perspective on the tragedy and loss",
+    )
+
+    prompt = artifact.for_prompt()
+
+    # Check all sections present
+    assert "Complete Mind Instance" in prompt
+    assert "1 humans, 1 species" in prompt
+    assert "Complete test justification" in prompt
+    assert "Complete test rationale" in prompt
+    assert "Complete perspective" in prompt

@@ -1,3 +1,4 @@
+from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
@@ -7,8 +8,6 @@ from app.structures.artifacts.quantum_tape_label_artifact import (
 from app.structures.enums.quantum_tape_recording_quality import (
     QuantumTapeRecordingQuality,
 )
-
-# ToDo: Add for_prompt() tests
 
 
 def test_create_valid_model():
@@ -215,3 +214,89 @@ def test_default_original_label_visible():
 def test_field_descriptions():
     fields = getattr(QuantumTapeLabelArtifact, "model_fields", None)
     assert fields is not None
+
+
+# --- New tests added below ---
+
+
+def test_for_prompt_original_label_visibility():
+    # When original_label_visible is True and original_label_text present
+    m1 = QuantumTapeLabelArtifact(
+        title="T1",
+        date_range="D1",
+        recording_quality=QuantumTapeRecordingQuality.SP,
+        counter_start=0,
+        original_label_visible=True,
+        original_label_text="Left on label",
+    )
+    p1 = m1.for_prompt()
+    assert "Title: T1" in p1
+    assert "Date Range: D1" in p1
+    assert "Original Label Text: Left on label" in p1
+
+    # When original_label_visible is True but original_label_text is None -> line still present but empty
+    m2 = QuantumTapeLabelArtifact(
+        title="T2",
+        date_range="D2",
+        recording_quality=QuantumTapeRecordingQuality.SP,
+        counter_start=0,
+        original_label_visible=True,
+        original_label_text=None,
+    )
+    p2 = m2.for_prompt()
+    assert "Title: T2" in p2
+    assert "Date Range: D2" in p2
+    # The prompt will include the field with a None, rendered as 'None' or empty string depending on model_dump substitution; accept either
+    assert "Original Label Text" in p2
+
+    # When original_label_visible is False the original label line should not be present
+    m3 = QuantumTapeLabelArtifact(
+        title="T3",
+        date_range="D3",
+        recording_quality=QuantumTapeRecordingQuality.SP,
+        counter_start=0,
+        original_label_visible=False,
+        original_label_text="ShouldNotAppear",
+    )
+    p3 = m3.for_prompt()
+    assert "Title: T3" in p3
+    assert "Date Range: D3" in p3
+    assert "Original Label Text" not in p3
+
+
+def test_save_file_renders_template(tmp_path, monkeypatch):
+    # Create a minimal template that uses variables and an OR-default for original_label_text
+    template_content = "<html>\n<h1>${title}</h1>\n<p>${date_range}</p>\n<p>${original_label_text || 'NO_LABEL'}</p>\n</html>"
+    template_file = tmp_path / "quantum_tape.html"
+    template_file.write_text(template_content, encoding="utf-8")
+
+    # Patch get_template_path used by the artifact module to return our temp template
+    import app.structures.artifacts.quantum_tape_label_artifact as qmod
+
+    monkeypatch.setattr(qmod, "get_template_path", lambda name: template_file)
+
+    # Use tmp_path as base_path so file_path will be under it
+    base = tmp_path / "out"
+    base.mkdir()
+
+    m = QuantumTapeLabelArtifact(
+        title="SaveTest",
+        date_range="2020",
+        recording_quality=QuantumTapeRecordingQuality.SP,
+        counter_start=0,
+        base_path=str(base),
+        original_label_visible=True,
+        original_label_text=None,
+    )
+
+    # Ensure save_file writes without raising
+    m.save_file()
+
+    out_file = Path(m.get_artifact_path(with_file_name=True))
+    assert out_file.exists(), f"Expected output file {out_file} to exist"
+
+    content = out_file.read_text(encoding="utf-8")
+    assert "<h1>SaveTest</h1>" in content
+    assert "<p>2020</p>" in content
+    # original_label_text was None -> should render the OR-default 'NO_LABEL'
+    assert "NO_LABEL" in content

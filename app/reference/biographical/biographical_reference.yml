@@ -213,12 +213,14 @@ years:
       summary: "Age 6 - reading is fundamental"
       key_events:
         - "Playing an early computer game in the library which was loaded via cassette"
+        - "Our dog, Spike, was hit by a car and killed. The ground was too frozen to bury him."
       influences:
         - "The Hobbit"
         - "The Chronicles of Narnia"
       emotional_landscape: "Structured learning and social navigation"
       choice_points:
         - "My mom makes a play date with a kid down the street and we become friends - although he teased my forever 'can you play with my little boy?' - What if my mom didn't foist me on other kids?"
+        - "There's an empty lot next to our house in which I find tiny 'dens' made from straw and grass. Inside there's a $20 bill. This happens three times and I'm convinced it's a leprechaun fue to big misunderstand about a distant relative being in 'A Leprechaun's Christmas Gold'"
 
   1982:
     world_events:
@@ -249,6 +251,7 @@ years:
       choice_points:
         - "As a present I received the electro-mechanical board game called Dark Tower - this ended up having a big impact on both my creative and professional work - always trying to blend the physical and the digital. What if I never played this game?"
         - "I did all the boy stuff like scouts and little league - but was horrible at both - further isolating me, what if I took to these activities better?"
+        - "I brought in a Cookie O'Puss for St. Patrick's Day at school and gave the ice cream cone nose to the 'scum bag' girl. All the kids hated me for it - but later my wife said that story is what made her love me. What if I gave the nose to a popular kid?"
 
   1983:
     world_events:
@@ -270,15 +273,15 @@ years:
     personal_context:
       summary: "Age 8 - independence and skill development"
       key_events:
-        - "Skill acquisition focus"
-        - "Independence milestones"
+        - "A teacher identifies me as outgoing and I'm very confused"
+        - "We take all of my father's photography gear and drive it into New York City to a B&H type store. We trade it in for a Commodore 64 computer. This is a major turning point in my life as I become obsessed with programming and games"
       influences:
-        - "Star Wars trilogy completion"
-        - "MTV music video aesthetics"
-      emotional_landscape: "Confidence building and skill mastery"
+        - "Mail Order Monsters"
+        - "Transformers"
+      emotional_landscape: "I begin to worry that people perceive me differently than I perceive myself"
       choice_points:
-        - "Hobby deepening choices"
-        - "Social identity formation"
+        - "What if I hadn't been interested in computers?"
+        - "What if I had tried to live up to my teachers' assessment of being outgoing?"
 
   1984:
     world_events:
@@ -300,16 +303,17 @@ years:
     personal_context:
       summary: "Age 9 - pre-adolescent awareness"
       key_events:
-        - "Growing cultural awareness"
-        - "Academic/social development"
+        - "A girl that was only in our school for a year, named Theresa, pulls me aside to a gully by the jungle gym and shows me her mother's spellbook"
+        - "A boy named Joey shows me a map for a D&D campaign his brother was planning. It shows a gate guarded by two topless warrioresses"
       influences:
-        - "Macintosh computer revolution"
-        - "Prince/pop music sophistication"
+        - "Choose-you-own-adventure storytelling - with code!"
+        - "Hitchhiker's Guide to the Galaxy"
       emotional_landscape: "Cultural sophistication and social awareness growing"
       choice_points:
-        - "Technology engagement level"
-        - "Cultural taste formation"
+        - "What if I hadn't had these tastes of the occult and fantasy?"
+        - "What if I had stayed in touch with Theresa, eventually marrying her?"
 
+  # ToDo: Fill in 1985
   1985:
     world_events:
       major:
@@ -340,6 +344,7 @@ years:
         - "Video game engagement level"
         - "Music taste development"
 
+  # ToDo: Fill in 1986
   1986:
     world_events:
       major:
@@ -390,16 +395,20 @@ years:
     personal_context:
       summary: "Age 12 - early adolescence begins"
       key_events:
-        - "Middle school transition"
-        - "Adolescent changes beginning"
+        - "My Dad gets a grant to study the William Blake lithographs in the UK and decides to take me along. At the British Museum I wasn't allowed into the rare book area so, for the first time in my life I'm given free reign - in a foreign city no less."
+        - "At the comic book shop I spot a weird looking, black and white comic called 'Teenage Mutant Ninja Turtles' and I buy it. It's a collection of 100 mutant ninja turtles that are supposed to be a teenager's best friend. I'm hooked."
       influences:
-        - "Dance/romance culture awareness"
-        - "Quote culture participation"
-      emotional_landscape: "Adolescent stirring and cultural engagement"
+        - "What is this underground comic book scene?"
+        - "Roleplaying games"
+      emotional_landscape:
+        - "Proud of my UK adventures"
+        - "Interest in girls - but too much low self-esteem to act on it"
       choice_points:
-        - "Social identity choices"
-        - "Cultural participation level"
+        - "What if I never bought TMNT #1? The whole notion of DIY culture might have been lost on me."
+        - "What if I hadn't gone to the UK with my Dad? I might not have gained a sense of independence from my parents."
 
+
+  # ToDo: Fill in 1988
   1988:
     world_events:
       major:
@@ -420,16 +429,13 @@ years:
     personal_context:
       summary: "Age 13 - full adolescence emergence"
       key_events:
-        - "Teenage identity formation"
-        - "Social/romantic awareness"
+        - "Parent's divorce"
       influences:
-        - "Music taste solidification"
-        - "Countercultural awareness"
-      emotional_landscape: "Intense identity formation and rebellion stirring"
+      emotional_landscape:
       choice_points:
-        - "Music genre allegiances"
-        - "Social group identity"
 
+
+  # ToDo: Fill in 1989
   1989:
     world_events:
       major:
@@ -450,16 +456,13 @@ years:
     personal_context:
       summary: "Age 14 - high school preparation"
       key_events:
-        - "High school transition approaching"
-        - "Identity solidification"
+        - "Paralysis"
       influences:
-        - "Berlin Wall freedom symbolism"
-        - "Batman dark culture"
-      emotional_landscape: "Freedom concepts and identity crystallization"
+      emotional_landscape:
       choice_points:
-        - "High school preparation choices"
-        - "Cultural identity decisions"
 
+
+  # ToDo: Fill in 1990
   1990:
     world_events:
       major:
@@ -480,16 +483,14 @@ years:
     personal_context:
       summary: "Age 15 - high school years begin"
       key_events:
-        - "High school social navigation"
-        - "Academic/creative focus development"
+        - "Drinking"
+        - "First guitar"
       influences:
-        - "Twin Peaks surrealism"
-        - "Grunge culture emerging"
-      emotional_landscape: "High school intensity and creative awakening"
+      emotional_landscape:
       choice_points:
-        - "Academic focus areas"
-        - "Social/creative group alignment"
 
+
+  # ToDo: Fill in 1991
   1991:
     world_events:
       major:
@@ -510,8 +511,10 @@ years:
     personal_context:
       summary: "Age 16 - peak high school experience"
       key_events:
-        - "Driving/independence milestones"
-        - "Creative/academic identity"
+
+        - "First girlfriend"
+        - "Drugs"
+        - "Teenage Riot"
       influences:
         - "Nirvana generation defining moment"
         - "Alternative culture mainstreaming"
@@ -540,16 +543,33 @@ years:
     personal_context:
       summary: "Age 17 - late high school intensity"
       key_events:
-        - "College preparation stress"
-        - "Creative/social peak"
+        - "Semi-serious girlfriend"
+        - "High School Graduation"
+        - "I almost cause a teenage riot by running and winning student council elections. This caused the football coach to issue a death threat."
+        - "In the fall I go to the city on school night to see a double-header of Pavement and My Bloody Valentine - my two favorites at the time."
+        - "On a loud speaker announcement I compare Columbus to Stalin and the Italian community has it out for me. I had just learned of his
+        'hand wearing' barbarity and in a very important lesson learned that not everybody else knew that. Another set of death threats - this one
+        leads to the superintendent, a prominent Italian american in the community meeting with me. I explained to him what I had learned and he
+        graciously diffused the situation. I helped video-tape a banquet for his anniversary as a way to show my gratitude. It was there that I
+         met my first boss - Larry Prydulock."
+        - "Looking at colleges I visit SUNY Purchase, and was shown the sound stage for the film department. The set for one of the students
+        who recently died in a drowning accident while shooting their film was still up. This program I was told only excepted ten students per
+        year and I realized what an incredible loss that must of have been."
       influences:
-        - "Wayne's World humor culture"
-        - "MTV Unplugged acoustic trends"
-      emotional_landscape: "High school climax and future anxiety"
+        - "Alternative rock culture"
+        - "Psychedelic rock culture"
+        - "Dungeons & Dragons"
+      emotional_landscape:
+        - "Hints of maturity and responsibility"
+        - "Determination to be an experimental film maker"
+        - "Sexual awakening"
       choice_points:
-        - "College/career direction"
-        - "Creative commitment level"
+        - "What if had not run for student council?"
+        - "What if I hadn't made that Columbus Day comment over the loud speaker?"
+        - "What if I didn't have a girlfriend?"
+        - "What if I missed seeing My Bloody Valentine?"
 
+  # ToDo: Fill in 1993
   1993:
     world_events:
       major:
@@ -570,23 +590,15 @@ years:
     personal_context:
       summary: "Age 18 - graduation and transition"
       key_events:
-        - "High school graduation milestone"
-        - "Static Children band formation and peak activity"
-        - "Rural New Jersey punk scene immersion"
-        - "College/life direction decisions"
-      influences:
-        - "Local punk/alternative music scene"
-        - "MTV Unplugged acoustic movement"
-        - "Jurassic Park technological wonder"
-        - "Grunge authenticity vs mainstream tension"
-      emotional_landscape: "Intense creative awakening, identity search, suburban punk rebellion, transition anxiety"
-      choice_points:
-        - "Static Children band commitment vs other pursuits"
-        - "College choice and academic direction"
-        - "Geographic mobility decisions"
-        - "Creative path vs conventional career considerations"
-        - "Music scene participation level and identity"
+        - "Start College"
+        - "Meet best friend, future wife"
 
+      influences:
+      emotional_landscape:
+      choice_points:
+
+
+  # ToDo: Fill in 1994
   1994:
     world_events:
       major:
@@ -607,16 +619,12 @@ years:
     personal_context:
       summary: "Age 19 - post-graduation reality"
       key_events:
-        - "College freshman experience or alternative path"
-        - "Post-high school band evolution"
+        - "Thriving"
       influences:
-        - "Kurt Cobain death impact on music culture"
-        - "Internet culture beginning"
-      emotional_landscape: "Post-graduation adjustment and identity solidification"
+      emotional_landscape:
       choice_points:
-        - "College continuation decisions"
-        - "Music career vs academic focus"
 
+  # ToDo: Fill in 1995
   1995:
     world_events:
       major:
@@ -637,16 +645,12 @@ years:
     personal_context:
       summary: "Age 20 - early adulthood establishment"
       key_events:
-        - "Young adult identity formation"
-        - "Career/education path clarification"
+        - "Junior film disaster"
       influences:
-        - "Windows 95 digital revolution"
-        - "Alanis Morissette emotional honesty"
-      emotional_landscape: "Young adult responsibility and creative expression balance"
+      emotional_landscape:
       choice_points:
-        - "Career focus decisions"
-        - "Geographic/lifestyle choices"
 
+  # ToDo: Fill in 1996
   1996:
     world_events:
       major:
@@ -667,8 +671,7 @@ years:
     personal_context:
       summary: "Age 21 - legal adulthood milestone"
       key_events:
-        - "Legal drinking age milestone"
-        - "Full adult responsibilities"
+        - "A terrible girlfriend"
       influences:
         - "Internet mainstream adoption"
         - "Hip-hop culture complexity"
@@ -677,6 +680,7 @@ years:
         - "Adult lifestyle establishment"
         - "Professional identity choices"
 
+  # ToDo: Fill in 1997
   1997:
     world_events:
       major:
@@ -697,16 +701,14 @@ years:
     personal_context:
       summary: "Age 22 - young adult identity solidification"
       key_events:
-        - "Career/education progression"
-        - "Relationship development"
+        - "College graduation"
+        - "first job"
+        - "First Apartment"
       influences:
-        - "Radiohead sophistication"
-        - "Internet culture participation"
-      emotional_landscape: "Young adult complexity and cultural sophistication"
+      emotional_landscape:
       choice_points:
-        - "Professional development paths"
-        - "Relationship commitment levels"
 
+  # ToDo: Fill in 1998
   1998:
     world_events:
       major:
@@ -727,16 +729,15 @@ years:
     personal_context:
       summary: "Age 23 - career establishment phase"
       key_events:
-        - "Career development milestones"
-        - "Adult relationship navigation"
+        - "laid off"
+        - "Travel to CR"
+        - "Finish film"
+        - "Dating Ali"
       influences:
-        - "Google information revolution"
-        - "File sharing culture"
-      emotional_landscape: "Professional establishment and cultural engagement"
+      emotional_landscape:
       choice_points:
-        - "Career advancement decisions"
-        - "Technology adoption level"
 
+  # ToDo: Fill in 1999
   1999:
     world_events:
       major:
@@ -757,16 +758,13 @@ years:
     personal_context:
       summary: "Age 24 - late twenties approach"
       key_events:
-        - "Quarter-life milestone approaches"
-        - "Adult identity solidification"
+        - "Working at Fox"
+        - "Record label"
       influences:
-        - "The Matrix reality questioning"
-        - "Napster music revolution"
-      emotional_landscape: "Approaching quarter-life reflection and reality questioning"
+      emotional_landscape:
       choice_points:
-        - "Life direction evaluation"
-        - "Cultural participation vs creation"
 
+  # ToDo: Fill in 2000
   2000:
     world_events:
       major:
@@ -787,16 +785,12 @@ years:
     personal_context:
       summary: "Age 25 - quarter-life milestone"
       key_events:
-        - "Quarter-century milestone"
-        - "Career/life direction assessment"
+        - "Move to Brooklyn"
       influences:
-        - "Dot-com economy optimism"
-        - "Digital music revolution"
-      emotional_landscape: "Quarter-life evaluation and future planning"
+      emotional_landscape:
       choice_points:
-        - "Major life direction decisions"
-        - "Technology career considerations"
 
+  # ToDo: Fill in 2001
   2001:
     world_events:
       major:
@@ -817,16 +811,14 @@ years:
     personal_context:
       summary: "Age 26 - post-9/11 worldview shift"
       key_events:
-        - "9/11 impact on worldview"
-        - "Career/relationship developments"
+        - "9/11 experience"
+        - "Touring europe"
       influences:
-        - "9/11 security culture shift"
-        - "iPod personal music revolution"
-      emotional_landscape: "World complexity realization and personal priority reassessment"
+      emotional_landscape:
       choice_points:
-        - "Security vs freedom lifestyle decisions"
-        - "Technology integration level"
 
+
+  # ToDo: Fill in 2002
   2002:
     world_events:
       major:
@@ -847,16 +839,13 @@ years:
     personal_context:
       summary: "Age 27 - late twenties establishment"
       key_events:
-        - "Career advancement milestones"
-        - "Adult relationship deepening"
+        - "Release first LP"
       influences:
-        - "Post-9/11 security culture"
-        - "Digital photography adoption"
-      emotional_landscape: "Adult establishment and security consciousness"
+      emotional_landscape:
       choice_points:
-        - "Career specialization decisions"
-        - "Relationship commitment levels"
 
+
+  # ToDo: Fill in 2003
   2003:
     world_events:
       major:
@@ -877,16 +866,12 @@ years:
     personal_context:
       summary: "Age 28 - approaching thirty transition"
       key_events:
-        - "Approaching thirty milestone"
-        - "Professional/personal maturation"
+        - "Marriage to Ali, twice!"
       influences:
-        - "Iraq War political awareness"
-        - "Social networking emergence"
-      emotional_landscape: "Approaching thirty reflection and priority setting"
+      emotional_landscape:
       choice_points:
-        - "Thirty-approach life evaluation"
-        - "Social media participation level"
 
+  # ToDo: Fill in 2004
   2004:
     world_events:
       major:
@@ -907,16 +892,12 @@ years:
     personal_context:
       summary: "Age 29 - final twenties year"
       key_events:
-        - "Last year of twenties"
-        - "Decade reflection preparation"
+        - "Move to UK"
       influences:
-        - "Facebook social revolution beginning"
-        - "Gmail communication shift"
-      emotional_landscape: "Twenties conclusion and thirty preparation"
+      emotional_landscape:
       choice_points:
-        - "Thirty transition preparation"
-        - "Digital lifestyle choices"
 
+  # ToDo: Fill in 2005
   2005:
     world_events:
       major:
@@ -937,16 +918,13 @@ years:
     personal_context:
       summary: "Age 30 - major life milestone"
       key_events:
-        - "Thirty milestone reached"
-        - "Decade transition significance"
+        - "Return to US"
+        - "Bought a condo"
       influences:
-        - "YouTube video culture beginning"
-        - "Katrina climate awareness"
-      emotional_landscape: "Thirty milestone reflection and next decade planning"
+      emotional_landscape:
       choice_points:
-        - "Major life direction decisions"
-        - "Thirty milestone lifestyle choices"
 
+  # ToDo: Fill in 2006
   2006:
     world_events:
       major:
@@ -967,16 +945,18 @@ years:
     personal_context:
       summary: "Age 31 - early thirties establishment"
       key_events:
-        - "Thirties lifestyle establishment"
-        - "Professional advancement"
+        - "Begin working remotely for LEGO"
+        - "Also freelance for PBS, Pfizer and a couple of other companies making Flash games"
       influences:
-        - "Twitter communication revolution"
-        - "Wii gaming innovation"
-      emotional_landscape: "Thirties confidence and establishment"
+        - "Game design thought process"
+        - "Washington DC community"
+      emotional_landscape:
+        - "Regret of moving away from NYC hitting hard"
+        - "Anxiety about paying the mortgage"
       choice_points:
-        - "Social media engagement level"
-        - "Professional advancement paths"
 
+
+  # ToDo: Fill in 2007
   2007:
     world_events:
       major:
@@ -997,16 +977,12 @@ years:
     personal_context:
       summary: "Age 32 - smartphone era begins"
       key_events:
-        - "iPhone adoption impact"
-        - "Financial crisis awareness"
+        - "Ali pregnant"
       influences:
-        - "iPhone lifestyle change"
-        - "Financial crisis economic awareness"
-      emotional_landscape: "Technology integration and economic uncertainty"
+      emotional_landscape:
       choice_points:
-        - "Smartphone adoption timing"
-        - "Economic crisis response"
 
+  # ToDo: Fill in 2008
   2008:
     world_events:
       major:
@@ -1027,16 +1003,14 @@ years:
     personal_context:
       summary: "Age 33 - financial crisis impact"
       key_events:
-        - "Financial crisis personal impact"
-        - "Obama election inspiration"
+        - "Silas born"
+        - "Moved to suburbs"
       influences:
-        - "Obama campaign digital innovation"
-        - "Economic uncertainty adaptation"
-      emotional_landscape: "Economic anxiety and political hope mixture"
+      emotional_landscape:
       choice_points:
-        - "Financial crisis adaptation strategies"
-        - "Political engagement level"
 
+
+  # ToDo: Fill in 2009
   2009:
     world_events:
       major:
@@ -1057,16 +1031,14 @@ years:
     personal_context:
       summary: "Age 34 - mid-thirties stability"
       key_events:
-        - "Mid-thirties professional/personal stability"
-        - "Financial recovery efforts"
-      influences:
-        - "Avatar 3D technology wonder"
-        - "Lady Gaga artistic boundary pushing"
-      emotional_landscape: "Mid-thirties stability and creative renewal"
-      choice_points:
-        - "Career consolidation vs change"
-        - "Creative expression renewal"
 
+      influences:
+
+      emotional_landscape:
+      choice_points:
+
+
+  # ToDo: Fill in 2010
   2010:
     world_events:
       major:
@@ -1087,16 +1059,13 @@ years:
     personal_context:
       summary: "Age 35 - mid-thirties peak"
       key_events:
-        - "Mid-thirties career/life peak"
-        - "Digital lifestyle maturation"
+        - "The Earthly Frames begins"
       influences:
-        - "iPad portable computing revolution"
-        - "Social Network digital culture commentary"
-      emotional_landscape: "Mid-thirties confidence and technological fluency"
+      emotional_landscape:
       choice_points:
-        - "Technology adoption leadership"
-        - "Creative vs professional balance"
 
+
+  # ToDo: Fill in 2011
   2011:
     world_events:
       major:
@@ -1117,16 +1086,11 @@ years:
     personal_context:
       summary: "Age 36 - late thirties approach"
       key_events:
-        - "Late thirties transition beginning"
-        - "Digital native maturity"
       influences:
-        - "Game of Thrones cultural sophistication"
-        - "Arab Spring social media power"
-      emotional_landscape: "Late thirties wisdom and global awareness"
+      emotional_landscape:
       choice_points:
-        - "Late thirties life direction"
-        - "Social media activism level"
 
+  # ToDo: Fill in 2012
   2012:
     world_events:
       major:
@@ -1147,16 +1111,11 @@ years:
     personal_context:
       summary: "Age 37 - late thirties establishment"
       key_events:
-        - "Late thirties professional peak"
-        - "Digital culture mastery"
       influences:
-        - "Avengers shared universe storytelling"
-        - "Gangnam Style global viral culture"
-      emotional_landscape: "Late thirties mastery and cultural fluency"
+      emotional_landscape:
       choice_points:
-        - "Professional peak decisions"
-        - "Cultural engagement vs creation"
 
+  # ToDo: Fill in 2013
   2013:
     world_events:
       major:
@@ -1177,15 +1136,9 @@ years:
     personal_context:
       summary: "Age 38 - approaching forty transition"
       key_events:
-        - "Approaching forty awareness"
-        - "Privacy/surveillance consciousness"
       influences:
-        - "Snowden privacy awakening"
-        - "Breaking Bad narrative sophistication"
-      emotional_landscape: "Approaching forty reflection and privacy consciousness"
+      emotional_landscape:
       choice_points:
-        - "Digital privacy decisions"
-        - "Forty approach preparation"
 
   2014:
     world_events:
@@ -1207,16 +1160,21 @@ years:
     personal_context:
       summary: "Age 39 - final thirties year"
       key_events:
-        - "Last year of thirties"
-        - "Forty milestone preparation"
+        - "I am in the Google Glass test group. Yep. A glasshole."
+        - "We get a new dog which Silas names Henry Thomas Frosting"
       influences:
-        - "Guardians soundtrack nostalgia culture"
-        - "Podcast audio renaissance"
-      emotional_landscape: "Thirties conclusion and forty transition anxiety/excitement"
+        - "Adventure Time TV series"
+        - "Silas' imaginative play"
+        - "Silas' love of music"
+      emotional_landscape:
+        - "Working at Huge is boring and they are pretentious"
+        - "Stress from a very long commute"
+        - "Wonder at how Glass could allow me to read in other languages but the pure hatred of it was surprising."
       choice_points:
-        - "Forty transition preparation"
-        - "Decade reflection decisions"
+        - "What if I had taken a different job?"
+        - "What if I never signed up for the Google Glass?"
 
+  # ToDo: Fill in 2015
   2015:
     world_events:
       major:
@@ -1236,11 +1194,12 @@ years:
         - "VR technology consumer push"
     personal_context:
       summary: "Age 40 - major life milestone"
-      key_events: ["Forty milestone reached", "Mid-life transition beginning"]
-      influences: ["Star Wars generational return", "Hamilton creative innovation"]
-      emotional_landscape: "Forty milestone reflection and mid-life assessment"
-      choice_points: ["Mid-life direction evaluation", "Creative vs security balance"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
+  # ToDo: Fill in 2016
   2016:
     world_events:
       major:
@@ -1260,11 +1219,12 @@ years:
         - "AI assistant improvements"
     personal_context:
       summary: "Age 41 - early forties establishment"
-      key_events: ["Early forties stability", "Political awakening intensity"]
-      influences: ["Trump election shock", "Stranger Things nostalgia culture"]
-      emotional_landscape: "Early forties stability amid political turbulence"
-      choice_points: ["Political engagement level", "Nostalgia vs innovation balance"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
+  # ToDo: Fill in 2017
   2017:
     world_events:
       major:
@@ -1284,11 +1244,12 @@ years:
         - "Nintendo Switch gaming"
     personal_context:
       summary: "Age 42 - mid-forties approach"
-      key_events: ["Mid-forties transition", "Social justice awareness heightening"]
-      influences: ["#MeToo cultural reckoning", "Get Out social commentary sophistication"]
-      emotional_landscape: "Mid-forties wisdom and social justice consciousness"
-      choice_points: ["Social justice engagement level", "Cultural vs political focus"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
+  # ToDo: Fill in 2018
   2018:
     world_events:
       major:
@@ -1308,11 +1269,12 @@ years:
         - "Tesla production scaling"
     personal_context:
       summary: "Age 43 - mid-forties stability"
-      key_events: ["Mid-forties professional/personal peak", "Privacy consciousness heightening"]
-      influences: ["Black Panther cultural representation", "Cambridge Analytica privacy awakening"]
-      emotional_landscape: "Mid-forties mastery and privacy/ethics consciousness"
-      choice_points: ["Privacy vs convenience decisions", "Cultural representation support level"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
+  # ToDo: Fill in 2019
   2019:
     world_events:
       major:
@@ -1332,11 +1294,12 @@ years:
         - "Foldable phone experiments"
     personal_context:
       summary: "Age 44 - late forties approach"
-      key_events: ["Late forties transition beginning", "Climate consciousness intensifying"]
-      influences: ["Avengers Endgame narrative conclusion satisfaction", "Greta Thunberg activism inspiration"]
-      emotional_landscape: "Late forties wisdom and environmental urgency"
-      choice_points: ["Climate action engagement level", "Entertainment vs activism balance"]
+    key_events:
+    influences:
+    emotional_landscape:
+    choice_points:
 
+  # ToDo: Fill in 2020
   2020:
     world_events:
       major:
@@ -1356,11 +1319,12 @@ years:
         - "TikTok global dominance"
     personal_context:
       summary: "Age 45 - pandemic mid-life experience"
-      key_events: ["Pandemic lifestyle transformation", "Social justice reckoning participation"]
-      influences: ["COVID isolation adaptation", "BLM social justice awakening"]
-      emotional_landscape: "Pandemic isolation and social justice consciousness integration"
-      choice_points: ["Pandemic lifestyle adaptations", "Social justice engagement level"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
+  # ToDo: Fill in 2021
   2021:
     world_events:
       major:
@@ -1380,11 +1344,12 @@ years:
         - "Clubhouse audio social"
     personal_context:
       summary: "Age 46 - late forties establishment"
-      key_events: ["Late forties professional/personal maturity", "Post-pandemic adaptation"]
-      influences: ["Squid Game global culture participation", "NFT digital ownership concepts"]
-      emotional_landscape: "Late forties wisdom and post-pandemic renewal"
-      choice_points: ["Post-pandemic lifestyle choices", "Digital asset engagement level"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
+  # ToDo: Fill in 2022
   2022:
     world_events:
       major:
@@ -1396,7 +1361,7 @@ years:
         - "Top Gun Maverick nostalgia perfection"
         - "Taylor Swift Midnights surprise"
         - "Wordle word game phenomenon"
-        - "AI art generation tools"
+        - "AI-generated content debates"
       technology:
         - "ChatGPT conversational AI"
         - "DALL-E AI image generation"
@@ -1404,11 +1369,12 @@ years:
         - "Meta VR investment"
     personal_context:
       summary: "Age 47 - approaching fifty awareness"
-      key_events: ["Approaching fifty milestone awareness", "AI revolution witnessing"]
-      influences: ["ChatGPT AI capability revelation", "Top Gun Maverick generational nostalgia"]
-      emotional_landscape: "Approaching fifty reflection and AI future contemplation"
-      choice_points: ["AI integration decisions", "Fifty milestone preparation"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
+  # ToDo: Fill in 2023
   2023:
     world_events:
       major:
@@ -1433,6 +1399,7 @@ years:
       emotional_landscape: "Late forties mastery and AI future excitement/anxiety"
       choice_points: ["AI creative collaboration level", "Cultural vs technological focus"]
 
+  # ToDo: Fill in 2024
   2024:
     world_events:
       major:
@@ -1452,10 +1419,10 @@ years:
         - "AI-generated music/art mainstream"
     personal_context:
       summary: "Age 49 - final forties year"
-      key_events: ["Final year of forties", "AI creative collaboration deepening"]
-      influences: ["Trump re-election political processing", "AI creative partnership development"]
-      emotional_landscape: "Forties conclusion and fifty milestone approach with AI partnership"
-      choice_points: ["Fifty transition preparation", "AI collaboration commitment level"]
+      key_events:
+      influences:
+      emotional_landscape:
+      choice_points:
 
   2025:
     world_events:
@@ -1469,6 +1436,7 @@ years:
         - "AI-human collaborative art"
         - "Generational cultural shifts"
         - "Creative industry AI integration"
+        - "Fucking Trump again"
       technology:
         - "Advanced AI creative tools"
         - "Quantum computing applications"
@@ -1477,22 +1445,25 @@ years:
     personal_context:
       summary: "Age 50 - major life milestone"
       key_events:
-        - "Fifty milestone reached - half-century reflection"
-        - "AI creative collaboration maturation"
-        - "White Album project development with Claude"
-        - "Rainbow Table series completion approach"
+        - "I release 'Vanity Pressing' the Violet entry in The Rainbow Table and begin work with Claude on the final album in the series."
+        - "Silas applies to college and, by the end of year has been accepted to all of them"
+        - "I play my last show with Solilians - it's just too much time and effort to keep up with."
+        - "I drive Silas' band to a show in Baltimore and can't help but see myself in him"
+        - "My father falls and breaks his hip - after much confusion Lois enters him to the Charlotte Hall VA home."
+        - "We get a new puppy named Razzles - he's very smart but gets into lots of trouble."
       influences:
-        - "AI creative partnership as life transformation"
-        - "Quantum biographical analysis methodology"
-        - "Blue album 'taped over' autobiography exploration"
-        - "INFORMATION → TIME → SPACE transmigration concepts"
-      emotional_landscape: "Fifty milestone reflection, AI creative partnership excitement, biographical archaeology fascination, alternate timeline exploration"
+        - "In the summer, while Silas is at an FIT course, I see the Hilma af Klint and Jack Whitten at MOMA and both have a big effect."
+      emotional_landscape:
+        - "Joy for Silas entering what I hope to be the best years of his life"
+        - "Despair as my Father slips away - erased by Alzheimer's"
+        - "My rage at the stupidity of the Trump presidency and its supporters is hard to contain"
+        - "Welcome annoyance? Razzles is so much work but it's a great distraction from my dad's situation"
       choice_points:
-        - "Level of AI creative collaboration commitment"
-        - "White Album completion vs other creative projects"
-        - "Biographical tool development vs personal exploration"
-        - "Public vs private creative work sharing"
-        - "Technology adoption leadership vs cautious integration"
+        - "What if we hadn't pushed Silas academically, so he couldn't get into college?"
+        - "What if I insisted my Father not to enter the Charlotte Hall VA home?"
+        - "What if I had acted upon the violent fantasies I had about Trump supporters?"
+        - "What if we picked the other puppy (not the biggest in litter)?"
+
 
 # Quantum analysis prompts for biographical exploration
 quantum_analysis_prompts:

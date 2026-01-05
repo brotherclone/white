@@ -1,4 +1,5 @@
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Annotated
+from operator import add  # Added by auto_annotate
 
 from pydantic import Field
 
@@ -9,33 +10,33 @@ from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArti
 
 class OrangeAgentState(BaseRainbowAgentState):
 
-    synthesized_story: Optional[NewspaperArtifact] = Field(default=None)
-    search_results: Optional[List[Any]] = Field(
+    synthesized_story: Annotated[Optional[NewspaperArtifact], lambda x, y: y or x] = (
+        Field(default=None)
+    )
+    search_results: Annotated[Optional[List[Any]], add] = Field(
         default=None, description="Web search results."
     )
-    corpus_stories: Optional[List[Any]] = Field(
+    corpus_stories: Annotated[Optional[List[Any]], add] = Field(
         default=None, description="Matching stories from the orange mythology corpus"
     )
-    selected_story_id: Optional[str] = Field(
+    selected_story_id: Annotated[Optional[str], lambda x, y: y or x] = Field(
         default=None, description="ID of the selected story from the corpus"
     )
-    symbolic_object: Optional[SymbolicObjectArtifact] = (
-        Field(default=None, description="Custom symbolic object description"),
+    symbolic_object: Annotated[
+        Optional[SymbolicObjectArtifact], lambda x, y: y or x
+    ] = Field(default=None, description="Custom symbolic object description")
+    gonzo_perspective: Annotated[Optional[str], lambda x, y: y or x] = Field(
+        default=None,
+        description="Hunter S. Thompson style perspective on the story, such as a journalist, witness, authority, scholar",
     )
-    gonzo_perspective: Optional[str] = (
-        Field(
-            default=None,
-            description="Hunter S. Thompson style perspective on the story, such as a journalist, witness, authority, scholar",
-        ),
-    )
-    gonzo_intensity: int = Field(
+    gonzo_intensity: Annotated[int, lambda x, y: y if y is not None else x] = Field(
         default=3, description="How intense the gonzo perspective is"
     )
-    mythologized_story: Optional[NewspaperArtifact] = (
+    mythologized_story: Annotated[Optional[NewspaperArtifact], lambda x, y: y or x] = (
         Field(
             default=None,
             description="Mythological story based on the story where the misremembered object has been added",
-        ),
+        )
     )
 
     def __init__(self, **data):

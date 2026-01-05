@@ -1,0 +1,174 @@
+bpm: 113
+manifest_id: '07_04'
+tempo: 4/4
+key: E minor
+rainbow_color: I
+title: A Balk Respray
+release_date: '2024-06-04'
+album_sequence: 4
+main_audio_file: 07_04_main.wav
+TRT: '[03:31.008]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse 1
+    start_time: '[00:00.000]'
+    end_time: '[00:16.024]'
+    description: A radio static laden speaks the infranym and then the song is off with a laid back vibe.
+  - section_name: Bridge 1
+    start_time: '[00:16.025]'
+    end_time: '[00:33.024]'
+    description: The bridge is a slight variation on the verse with a different vocal treatment
+  - section_name: Chorus
+    start_time: '[00:33.025]'
+    end_time: '[01:07.024]'
+    description: The chorus has large vocal arrays followed by a lone voice break down - bit of ebb and flow.
+  - section_name: Interlude
+    start_time: '[01:07.025]'
+    end_time: '[01:16.011]'
+    description: A twelve string guitar line
+  - section_name: Verse 2
+    start_time: '[01:16.012]'
+    end_time: '[01:24.023]'
+    description: A quick, single verse
+  - section_name: Bridge 2
+    start_time: '[01:24.024]'
+    end_time: '[01:33.011]'
+    description: A quick single refrain bridge
+  - section_name: Chorus 2
+    start_time: '[01:33.012]'
+    end_time: '[02:07.010]'
+    description: The chorus returns you can hear more of the modular percussion
+  - section_name: Instrumental
+    start_time: '[02:07.011]'
+    end_time: '[02:15.023]'
+    description: In this longer version of the interlude, the twelve string now plays counter to an analog synth.
+  - section_name: Verse 3
+    start_time: '[02:15.024]'
+    end_time: '[02:24.010]'
+    description: Back to the verse
+  - section_name: Bridge 3
+    start_time: '[02:24.011]'
+    end_time: '[02:32.023]'
+    description: And back to the bridge
+  - section_name: Interlude 2
+    start_time: '[02:32.024]'
+    end_time: '[02:49.022]'
+    description: A reprise of the twelve string guitar line
+  - section_name: Chorus 3
+    start_time: '[02:49.023]'
+    end_time: '[03:23.022]'
+    description: The final chorus with big vocal arrays and modular percussion.
+  - section_name: Resonate
+    start_time: '[03:24.022]'
+    end_time: '[03:31.008]'
+    description: The instruments ring out for a moment before the song ends.
+sounds_like:
+  - name: Harry Nilsson
+    discogs_id: 152685
+  - name: The Beatles
+    discogs_id: 82730
+  - name: Bruce Haack
+    discogs_id: 26952
+mood:
+  - laid back
+  - remorseful
+  - self-critical
+genres:
+    - rock
+    - electronic
+concept: This song was meant to pair with Cicatrise Dud to explore some of the ups and downs of my self-esteem at the time. In this song there's barely a spark left only to be reconnected in the more manic song to follow. I tried to play with internal rhymes and stumbling phrasing.
+lrc_file: 07_04.lrc
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_04_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_04_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_04_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi Hat
+    audio_file: 07_04_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 07_04_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Bass
+    audio_file: 07_04_07_bass.wav
+  - id: 8
+    description: Baritone Guitar
+    audio_file: 07_04_08_baritone.wav
+  - id: 9
+    description: Prophet Synth
+    audio_file: 07_04_10_prophet.wav
+    midi_file: 07_04_09_prophet.mid
+  - id: 10
+    description: Wurlitzer
+    audio_file: 07_04_12_wurlitzer.wav
+    midi_file: 07_04_11_wurlitzer.mid
+  - id: 11
+    description: Vocals 1
+    audio_file: 07_04_13_vox_1.wav
+  - id: 12
+    description: Vocals 2
+    audio_file: 07_04_14_vox_2.wav
+  - id: 13
+    description: Vocals 3
+    audio_file: 07_04_15_vox_3.wav
+  - id: 14
+    description: Vocal 4 - Vocoder
+    audio_file: 07_04_16_vox_4_vocode.wav
+  - id: 15
+    description: Vocoder
+    audio_file: 07_04_17_vocoder.wav
+  - id: 16
+    description: Electric Guitar
+    audio_file: 07_04_18_electric.wav
+  - id: 17
+    description: Twelve String Guitar
+    audio_file: 07_04_19_twelve_string.wav
+  - id: 18
+    description: Modular Effected Guitar
+    audio_file: 07_04_20_modular_guitar.wav
+  - id: 19
+    description: Grandmother
+    audio_file: 07_04_21_grandmother.wav
+  - id: 20
+    description: Stylus
+    audio_file: 07_04_22_stylus.wav
+  - id: 21
+    description: TG-One
+    audio_file: 07_04_23_tg1.wav
+  - id: 22
+    description: Modular
+    audio_file: 07_04_24_mantis.wav
+  - id: 23
+    description: DFAM
+    audio_file: 07_04_25_dfam.wav
+  - id: 24
+    description: Emulator Synth
+    audio_file: 07_04_26_emulator.wav
+  - id: 25
+    description: Percussion
+    audio_file: 07_04_27_percussion.wav
+  - id: 26
+    description: Infranym
+    audio_file: 07_04_28_infranym.wav
+
+    
+
+
+

@@ -17,8 +17,6 @@ from app.structures.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
 )
 
-# ToDo: Add for_prompt() tests
-
 
 class ConcreteSpeciesExtinctionArtifact(SpeciesExtinctionArtifact):
     """Concrete implementation for testing"""
@@ -332,3 +330,63 @@ def test_to_markdown_no_parallel_moments():
     # Should not have parallel moments section if list is empty
     assert markdown.count("## Parallel Moments") == 0
     assert "## Elegiac Quality" in markdown
+
+
+def test_for_prompt():
+    """Test for_prompt produces a string including key narrative fields and parallel moments."""
+    species = ConcreteSpeciesExtinctionArtifact(
+        thread_id="test",
+        scientific_name="Promptus finalis",
+        common_name="Prompt Species",
+        taxonomic_group="insect",
+        iucn_status="Extinct",
+        extinction_year=2090,
+        habitat="Meadow",
+        primary_cause=ExtinctionCause.POLLUTION,
+        ecosystem_role="Pollinator",
+    )
+
+    human = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Prompt Human",
+        age=30,
+        location="Meadow Town",
+        year_documented=2090,
+        parallel_vulnerability=LastHumanVulnerabilityType.TOXIC_EXPOSURE,
+        vulnerability_details="Contaminated crops",
+        environmental_stressor="Agrochemical runoff",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Writing observations",
+    )
+
+    moment = LastHumanSpeciesExtinctionParallelMoment(
+        species_moment="Final swarm absent",
+        human_moment="Final harvest failed",
+        thematic_connection="Collapse of mutualism",
+        timestamp_relative="Months before extinction",
+    )
+
+    narrative = ConcreteNarrativeArtifact(
+        thread_id="test",
+        species=species,
+        human=human,
+        species_arc="Rapid collapse of pollinator populations",
+        human_arc="Community food shortages and migration",
+        parallel_moments=[moment],
+        elegiac_quality="Quiet erosion of livelihoods",
+        opening_image="Fields buzzing at dawn",
+        closing_image="Still fields at dusk",
+    )
+
+    prompt = narrative.for_prompt()
+
+    assert isinstance(prompt, str)
+    assert "Prompt Species" in prompt
+    assert "Prompt Human" in prompt
+    assert "Rapid collapse of pollinator populations" in prompt
+    assert "Community food shortages and migration" in prompt
+    assert "Final swarm absent" in prompt
+    assert "Final harvest failed" in prompt
+    assert "Quiet erosion of livelihoods" in prompt
+    assert "Fields buzzing at dawn" in prompt
+    assert "Still fields at dusk" in prompt

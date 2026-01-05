@@ -1,0 +1,130 @@
+bpm: 112
+manifest_id: '07_08'
+tempo: 4/4
+key: C# major
+rainbow_color: I
+title: Ageless Angels Tune
+release_date: '2024-06-04'
+album_sequence: 8
+main_audio_file: 07_08_main.wav
+TRT: '[03:27.021]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:34.007]'
+    description: A layered guitar motorik affair kicks in
+  - section_name: Verse 1
+    start_time: '[00:34.008]'
+    end_time: '[01:08.014]'
+    description: The instruments are layered and the vocals are more subdued than usual
+  - section_name: Chorus 1
+    start_time: '[01:08.015]'
+    end_time: '[01:42.021]'
+    description: The Velvet Underground vibe continues but it's like Cale is replaced with a robot voice
+  - section_name: Aside
+    start_time: '[01:42.022]'
+    end_time: '[02:00.000]'
+    description: A little aside bridging for another chorus
+  - section_name: Chorus 2
+    start_time: '[02:00.001]'
+    end_time: '[02:34.007]'
+    description: The second chorus continues the robotic vocal and layered guitars
+  - section_name: Aside
+    start_time: '[02:34.008]'
+    end_time: '[02:51.010]'
+    description: A little aside bridging for the final jams
+  - section_name: Jams
+    start_time: '[02:51.011]'
+    end_time: '[03:25.004]'
+    description: Big, unusually typical guitar jams
+  - section_name: Infranym
+    start_time: '[03:25.004]'
+    end_time: '[03:27.021]'
+    description: A mysterious message
+concept: Inspired by 'Arrival' this song images how a language without tenses could rewire the brain. My son plays for the first time on an Earthly Frames song!
+lrc_file: 07_08.lrc
+genres:
+  - rock
+  - indie rock
+mood:
+  - ethereal
+  - dreamy
+  - hypnotic
+  - motorik
+sounds_like:
+  - name: The Velvet Underground
+    discogs_id: 39766
+  - name: The Feelies
+    discogs_id: 152428
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_08_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_08_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_08_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-hat
+    audio_file: 07_08_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 07_08_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Drum Machine
+    audio_file: 07_08_07_dm.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 8
+    description: Baritone Guitar
+    audio_file: 07_08_08_baritone.wav
+  - id: 9
+    description: Bass
+    audio_file: 07_08_09_bass.wav
+  - id: 10
+    description: Lead Guitar
+    audio_file: 07_08_10_lead_guitar.wav
+  - id: 11
+    description: Rhythm Guitar
+    audio_file: 07_08_11_guitar.wav
+  - id: 12
+    description: Acoustic Guitar
+    audio_file: 07_08_12_acoustic.wav
+    player: Silas Walsh
+  - id: 13
+    description: Vocals 1
+    audio_file: 07_08_13_vox_1.wav
+  - id: 14
+    description: Vocals 2
+    audio_file: 07_08_14_vox_2.wav
+  - id: 15
+    description: Vocals 3
+    audio_file: 07_08_15_vox_3.wav
+  - id: 16
+    description: Vocals 4
+    audio_file: 07_08_16_vox_4.wav
+  - id: 17
+    description: Synthi
+    audio_file: 07_08_18_synthi.wav
+    midi_file: 07_08_17_synthi.mid
+  - id: 18
+    description: Farfisa Lead
+    audio_file: 07_08_20_farfisa_lead.wav
+    midi_file: 07_08_19_farfisa_lead.mid
+  - id: 19
+    description: Infranym
+    audio_file: 07_08_21_infranym.wav
