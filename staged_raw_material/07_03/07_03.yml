@@ -1,0 +1,129 @@
+bpm: 100
+manifest_id: '07_03'
+tempo: 4/8
+key: Bb major
+rainbow_color: I
+title: Row, Lathe, Halo
+release_date: '2024-06-04'
+album_sequence: 3
+main_audio_file: 07_03_main.wav
+TRT: '[03:42.019]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:01.005]'
+    description: Station to station allusion intro of gated, airy synths
+  - section_name: Verse 1
+    start_time: '[00:01.006]'
+    end_time: '[00:39.015]'
+    description: A very layered vocal plays with loads of synths, drums and noise tracks
+  - section_name: Interlude
+    start_time: '[00:39.016]'
+    end_time: '[00:49.005]'
+    description: Vocoder-intense break
+  - section_name: Verse 2
+    start_time: '[00:49.006]'
+    end_time: '[01:58.020]'
+    description: This verse starts with the vocals and minimal instrumentation (still a lot! ha!) Then kicks in with arps and full drum tracks
+  - section_name: Interlude 2
+    start_time: '[01:58.021]'
+    end_time: '[02:15.015]'
+    description: This interlude has some guitar-heavy jams
+  - section_name: Bridge
+    start_time: '[02:15.016]'
+    end_time: '[02:25.005]'
+    description: The guitars continue and guide us back to the main verse.
+  - section_name: Verse 3
+    start_time: '[02:25.006]'
+    end_time: '[03:32.010]'
+    description: The final verse brings back all the elements from before, with some added layers and intensity.
+  - section_name: Outro
+    start_time: '[03:32.011]'
+    end_time: '[03:42.019]'
+    description: Vocal harmony heavy ending that finishes the song on a brighter mood.
+sounds_like:
+  - name: Led Zeppelin
+    discogs_id: 34278
+  - name: Black Moth Super Rainbow
+    discogs_id: 165373
+  - name: David Bowie
+    discogs_id: 10263
+mood:
+  - ethereal
+  - hypnotic
+  - dreamy
+  - sci-fi
+  - adventure
+genres:
+  - electronic
+  - post-punk
+  - rock
+  - indie
+concept: This Jules Verne-inspired song describes a hollow-earth inhabited by waring factions of humans and aliens. The song describes the escape of a royal party to the Earth's surface.
+lrc_file: 07_03.lrc
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_03_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_03_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_03_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Toms
+    audio_file: 07_03_05_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Tambourine
+    audio_file: 07_03_06_tam.wav
+  - id: 7
+    description: Vocal 1
+    audio_file: 07_03_08_vox_1.wav
+    midi_file: 07_03_07_vox_1_vocoder.mid
+  - id: 8
+    description: Vocal 2
+    audio_file: 07_03_09_vox_2.wav
+  - id: 9
+    description: Vocal Backgrounds
+    audio_file: 07_03_10_vox_bg.wav
+  - id: 10
+    description: DX7 Synth
+    audio_file: 07_03_12_dx7.wav
+    midi_file: 07_03_11_dx7.mid
+  - id: 11
+    description: Prophet Synth
+    audio_file: 07_03_15_prophet.wav
+    midi_file: 07_03_14_prophet.mid
+  - id: 12
+    description: Farfisa
+    audio_file: 07_03_17_farfisa.wav
+    midi_file: 07_03_16_farfisa.mid
+  - id: 13
+    description: Bass
+    audio_file: 07_03_18_bass.wav
+  - id: 14
+    description: Baritone Guitar
+    audio_file: 07_03_19_baritone.wav
+  - id: 15
+    description: Guitar
+    audio_file: 07_03_20_guitar.wav
+  - id: 16
+    description: Drum machine
+    audio_file: 07_03_21_dm.wav
+  - id: 17
+    description: Noise
+    audio_file: 07_03_22_noise.wav
+  - id: 18
+    description: Infranym
+    audio_file: 07_03_23_infranym.wav

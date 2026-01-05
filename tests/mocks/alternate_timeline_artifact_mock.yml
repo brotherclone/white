@@ -1,0 +1,86 @@
+thread_id: "mock_thread_001"
+period:
+  start_date: 2018-01-01T00:00:00Z
+  end_date: 2024-01-02T00:00:00Z
+  age_range: [18, 20]
+  description: Alternate timeline artifact mock
+  known_events:
+    - date: 2018-01-01T00:00:00Z
+      year: 2018
+      approximate_date: Jan 1st 2018
+      description: Mock event
+      category: Mock category
+      emotional_weight: 0.2
+      tags:
+        - mock
+        - test
+    - date: 2018-01-01T00:00:00Z
+      year: 2018
+      approximate_date: Jan 1st 2018
+      description: Mock event
+      category: Mock category
+      emotional_weight: 0.2
+      tags:
+        - mock
+        - test
+  detail_level: low
+  location: Mock location
+  key_relationships:
+    - Mock relationship
+    - Another mock relationship
+  creative_output:
+    - Mock output
+    - Another mock output
+  emotional_tone: mock tone
+  trauma_level: low
+title: Mock Timeline Artifact
+narrative: Mock narrative Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+divergence_point:
+  when: mock date
+  what_changed: mock change
+  why_plausible: mock reason
+key_differences:
+  - Mock difference
+  - Another mock difference
+specific_details:
+  - category: 'daily_routine'
+    detail: a mock detail
+    sensory_elements:
+      - sight
+      - sound
+  - category: 'career'
+    detail: another mock detail
+    sensory_elements:
+      - touch
+      - smell
+  - category: 'daily_routine'
+    detail: a mock detail
+    sensory_elements:
+      - sight
+      - sound
+  - category: 'career'
+    detail: another mock detail
+    sensory_elements:
+      - touch
+      - smell
+  - category: 'daily_routine'
+    detail: a mock detail
+    sensory_elements:
+      - sight
+      - sound
+  - category: 'career'
+    detail: another mock detail
+    sensory_elements:
+      - touch
+      - smell
+emotional_tone: wistful
+mood_description: Mock mood description
+preceding_events:
+  - Mock preceding event
+  - Another mock preceding event
+following_events:
+  - Mock following event
+  - Another mock following event
+plausibility_score: 0.01
+specificity_score: 0.01
+divergence_magnitude: 0.01

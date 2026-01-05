@@ -1,0 +1,113 @@
+bpm: 131
+manifest_id: '07_07'
+key: G minor
+tempo: 6/4
+rainbow_color: I
+title: Dim Scar
+release_date: '2024-06-04'
+album_sequence: 7
+main_audio_file: 07_07_main.wav
+TRT: '[04:32.001]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse
+    start_time: '[00:00.000]'
+    end_time: '[01:33.010]'
+    description: Bizarre, warped synths accompany a vocoder-laden vocal.
+  - section_name: Interlude
+    start_time: '[01:33.011]'
+    end_time: '[02:09.004]'
+    description: The drums rest while the synths and bass support the vocal
+  - section_name: This isn't right
+    start_time: '[02:09.005]'
+    end_time: '[02:36.016]'
+    description: An intense build while the narrator realizes his own inability to comprehend he's living in a simulation.
+  - section_name: Bridge
+    start_time: '[02:36.017]'
+    end_time: '[02:42.003]'
+    description: A small bridge to change the intensity
+  - section_name: Verse 2
+    start_time: '[02:42.004]'
+    end_time: '[03:39.021]'
+    description: The second verse continues the surreal, stream-of-consciousness narration.
+  - section_name: Interlude
+    start_time: '[03:39.022]'
+    end_time: '[03:42.014]'
+    description: A small keyboard line resets the tempo
+  - section_name: Outro
+    start_time: '[03:42.015]'
+    end_time: '[04:32.001]'
+    description: Now the song is on a different upbeat as the narrator says his goodbyes
+concept: This song is the sound I set out to make for Infranyms - warbling, fragile ballads with a sort of Christopher Knowles-esque, stream of consciousness feel. It describes suicidal ideation as the narrator's sim card reveals that he's living in a simulation himself.
+lrc_file: 07_07.lrc
+sounds_like:
+  - name: Supercollider
+    discogs_id: 244281
+  - name: The Caretaker
+    discogs_id: 7734
+  - name: Laurie Anderson
+    discogs_id: 26050
+genres:
+  - electronic
+  - experimental
+  - post-rock
+  - art rock
+mood:
+  - dreamy
+  - mysterious
+  - surreal
+  - dark
+audio_tracks:
+  - id: 2
+    description: Bass
+    audio_file: 07_07_02_bass.wav
+  - id: 3
+    description: Modular Synth
+    audio_file: 07_07_04_modular.wav
+    midi_file: 07_07_03_modular.mid
+  - id: 4
+    description: Matrix Synth
+    audio_file: 07_07_06_matrix.wav
+    midi_file: 07_07_05_matrix.mid
+  - id: 5
+    description: Farfisa
+    audio_file: 07_07_08_farfisa.wav
+    midi_file: 07_07_07_farfisa.mid
+  - id: 6
+    description: Background Vocals
+    audio_file: 07_07_09_vox_bg.wav
+  - id: 7
+    description: Vocals Main
+    audio_file: 07_07_10_vox_main.wav
+  - id: 8
+    description: Vocals Doubles
+    audio_file: 07_07_11_vox_dbl.wav
+  - id: 9
+    description: Drums
+    audio_file: 07_07_12_drums.wav
+    group: Drums
+  - id: 10
+    description: Kick
+    audio_file: 07_07_13_kick.wav
+    group: Drums
+  - id: 11
+    description: Snare
+    audio_file: 07_07_14_snare.wav
+    group: Drums
+  - id: 12
+    description: Toms
+    audio_file: 07_07_15_toms.wav
+    group: Drums
+  - id: 13
+    description: Drum Machine
+    audio_file: 07_07_16_drum_machine.wav
+  - id: 14
+    description: Twelve String Guitar
+    audio_file: 07_07_17_twelve_string.wav
+  - id: 15
+    description: Mellotron with effects
+    audio_file: 07_07_18_mellotron_with_fx.wav
+  - id: 16
+    description: Infranym
+    audio_file: 07_07_19_infranym.wav

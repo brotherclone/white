@@ -5,15 +5,17 @@ from typing import Optional
 from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
-from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 
 class ImageChainArtifactFile(ChainArtifact, ABC):
 
-    chain_artifact_type: ChainArtifactType = ChainArtifactType.CHARACTER_PORTRAIT
-    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.PNG
-    artifact_name: str = "character_portrait"
+    # If JPEG is added, remember to update the chain_artifact_file_type default value
+    chain_artifact_file_type: ChainArtifactFileType = Field(
+        default=ChainArtifactFileType.PNG,
+        description="Type of the chain artifact file should always be PNG in this case.",
+    )
+    artifact_name: str = "img"
     file_path: Optional[Path] = Field(
         description="Path to the image file", default=None
     )
@@ -27,10 +29,8 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
     )
 
     def __init__(self, **data):
-        # Store the file_path if explicitly provided before parent __init__ overwrites it
         explicit_file_path = data.get("file_path")
         super().__init__(**data)
-        # Restore the explicit file_path if it was provided
         if explicit_file_path is not None:
             self.file_path = explicit_file_path
 
@@ -50,6 +50,13 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
         }
 
     def save_file(self):
+        # Check if image_bytes exists (it's dynamically added, not a declared field)
+        if not hasattr(self, "image_bytes") or self.image_bytes is None:
+            raise ValueError(
+                "Cannot save image file: image_bytes not set. "
+                "Set the image_bytes attribute before calling save_file()."
+            )
+
         if self.base_path:
             file_path_obj = Path(self.base_path) / "png"
             file_path_obj.mkdir(parents=True, exist_ok=True)
@@ -58,3 +65,6 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
             file_path = Path(self.file_name)
         with open(file_path, "wb") as f:
             f.write(self.image_bytes)
+
+    def for_prompt(self):
+        return f"Image of {self.artifact_name}"

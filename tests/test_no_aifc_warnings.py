@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -6,7 +7,8 @@ from pathlib import Path
 def test_run_entrypoint_no_aifc_warnings():
     """Run the CLI help and assert that aifc/sunau DeprecationWarnings are not on stderr."""
     project_root = Path.cwd()
-    env = dict(**{**dict(**{}), **{}})
+    # Copy current environment to preserve PATH and other necessary variables
+    env = os.environ.copy()
     # Ensure PYTHONPATH includes the project root so `sitecustomize.py` is loaded
     env.update({"PYTHONPATH": str(project_root)})
 

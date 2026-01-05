@@ -1,0 +1,156 @@
+bpm: 112
+manifest_id: '07_02'
+tempo: 4/4
+key: G major
+rainbow_color: I
+title: BLOB-Given Sorcery
+release_date: '2024-06-04'
+album_sequence: 2
+main_audio_file: 07_02_main.wav
+TRT: '[04:01.001]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Kick start
+    start_time: '[00:00.000]'
+    end_time: '[00:01.001]'
+    description: The drums kick in with a slow kick drum beat.
+  - section_name: Verse - Guitar Intro
+    start_time: '[00:01.002]'
+    end_time: '[00:09.002]'
+    description: A walking guitar line starts the song.
+  - section_name: Verse 1
+    start_time: '[00:09.002]'
+    end_time: '[00:35.008]'
+    description: The vocals enter over an upbeat rock affair
+  - section_name: Verse 1 Extension
+    start_time: '[00:35.009]'
+    end_time: '[01:01.001]'
+    description: The verse continues with more synths a shift in the vocal melody
+  - section_name: Interlude 1
+    start_time: '[01:01.002]'
+    end_time: '[01:18.005]'
+    description: Granular synths and guitars trade off in this interlude bring a more surreal sound
+  - section_name: Bridge
+    start_time: '[01:18.006]'
+    end_time: '[01:34.020]'
+    description: A bridge section with a change in chord progression and vocal delivery
+  - section_name: Chorus 1
+    start_time: '[01:34.021]'
+    end_time: '[01:52.012]'
+    description: The chorus is a wall of vocal harmonies and vocoders
+  - section_name: Verse 2
+    start_time: '[01:52.013]'
+    end_time: '[02:09.016]'
+    description: Return to a more minimal verse
+  - section_name: Interlude 2
+    start_time: '[02:09.017]'
+    end_time: '[02:26.019]'
+    description: Guitars and amorphic, gurgling synths add more oddity
+  - section_name: Chorus 2 - Vocal Wall
+    start_time: '[02:26.020]'
+    end_time: '[02:43.023]'
+    description: This chorus begins with just the wall of vocals
+  - section_name: Chorus 2 - Full Instrumentation
+    start_time: '[02:43.024]'
+    end_time: '[03:01.001]'
+    description: Then the full instrumentation comes in
+  - section_name: Breakdown
+    start_time: '[03:01.002]'
+    end_time: '[03:18.005]'
+    description: The guitar sadly strums alone with the organ
+  - section_name: Chorus Reprise
+    start_time: '[03:18.006]'
+    end_time: '[03:35.008]'
+    description: The chorus returns with a full wall of vocals
+  - section_name: Outro
+    start_time: '[03:35.008]'
+    end_time: '[03:56.019]'
+    description: A guitar line leads the song out
+  - section_name: Infranym
+    start_time: '[03:56.020]'
+    end_time: '[04:01.001]'
+    description: An encoded message is played in the background
+concept: A song about Hedy Lamarr. Who ran circles around the clever boys although they saw her as just a pretty face. She co-invented frequency hopping spread spectrum technology which is the basis for modern wireless communication including WiFi, Bluetooth and GPS. A song to celebrate her brilliance and creativity.
+lrc_file: 07_02.lrc
+sounds_like:
+  - name: 10cc
+    discogs_id: 39775
+  - name: Carpenters
+    discogs_id: 170357
+  - name: Electric Light Orchestra
+    discogs_id: 112154
+mood:
+  - saccharine
+  - melancholic
+  - surreal
+genres:
+  - Rock
+  - Art pop
+  - Soft rock
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_02_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_02_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_02_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-Hat
+    audio_file: 07_02_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 07_02_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Farfisa
+    audio_file: 07_02_08_farfisa.wav
+    midi_file: 07_02_07_farfisa.mid
+  - id: 8
+    description: Farfisa Lead
+    audio_file: 07_02_10_farfisa_lead.wav
+    midi_file: 07_02_09_farfisa_lead.mid
+  - id: 9
+    description: Vocals 1
+    audio_file: 07_02_11_vox_1.wav
+  - id: 10
+    description: Vocals 2
+    audio_file: 07_02_12_vox_2.wav
+  - id: 11
+    description: Vocals 3
+    audio_file: 07_02_13_vox_3.wav
+  - id: 12
+    description: Vocals 4
+    audio_file: 07_02_14_vox_4.wav
+  - id: 13
+    description: Vocals 5
+    audio_file: 07_02_15_vox_5.wav
+  - id: 14
+    description: Vocals Background
+    audio_file: 07_02_16_vox_bg.wav
+  - id: 15
+    description: Guitar
+    audio_file: 07_02_17_guitar.wav
+  - id: 16
+    description: Lead Guitar
+    audio_file: 07_02_18_lead_guitar.wav
+  - id: 17
+    description: Mellotron with noise
+    audio_file: 07_02_19_mellotron_with_noise.wav
+  - id: 18
+    description: Infranym
+    audio_file: 07_02_20_infranym.wav
+
+

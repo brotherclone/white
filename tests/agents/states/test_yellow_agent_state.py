@@ -1,7 +1,7 @@
 import pytest
 import inspect
 
-MODULE_NAME = "agents.states.yellow_agent_state"
+MODULE_NAME = "app.agents.states.yellow_agent_state"
 CLASS_NAME = "YellowAgentState"
 
 

@@ -5,7 +5,8 @@ class ChainArtifactType(str, Enum):
 
     EVP_ARTIFACT = "evp_artifact"
     INSTRUCTIONS_TO_HUMAN = "instructions_to_human"
-    SIGIL = "sigil_description"
+    SIGIL = "sigil"
+    SIGIL_DESCRIPTION = "sigil_description"  # Legacy value for backward compatibility
     BOOK = "book"
     NEWSPAPER_ARTICLE = "newspaper_article"
     SYMBOLIC_OBJECT = "symbolic_object"
@@ -18,4 +19,13 @@ class ChainArtifactType(str, Enum):
     LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE = "last_human_species_extinction_narrative"
     SPECIES_EXTINCTION = "species_extinction"
     RESCUE_DECISION = "rescue_decision"
+    QUANTUM_TAPE_LABEL = "quantum_tape_label"
+    ALTERNATE_TIMELINE = "alternate_timeline"
+    INFRANYM_MIDI = "infranym_midi"
+    INFRANYM_AUDIO = "infranym_audio"
+    INFRANYM_ENCODED_IMAGE = "infranym_encoded_image"
+    INFRANYM_TEXT = "infranym_text"
+    INFRANYM_TEXT_RENDER = "infranym_text_render"
+    CIRCLE_JERK_INTERVIEW = "circle_jerk_interview"
+    CARD_CATALOG = "card_catalog"
     UNKNOWN = "unknown"

@@ -2,9 +2,9 @@ import json
 import logging
 import os
 import time
-from abc import ABC
-
 import yaml
+
+from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import START, END
@@ -217,6 +217,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
                 if isinstance(result, dict):
                     result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                     current_human = LastHumanArtifact(**result)
+                    current_human.thread_id = state.thread_id
                     state.current_human = current_human
                     current_human.save_file()
                     state.artifacts.append(current_human)

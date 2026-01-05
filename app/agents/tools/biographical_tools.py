@@ -1,13 +1,8 @@
-"""
-Blue Album Biographical Timeline Tool
-PRESENT + PERSON + FORGOTTEN methodology
-For LangGraph agent use in exploring alternate timelines and quantum biographical possibilities
-"""
-
 import logging
-from typing import Any, Dict, List, Optional
-
 import yaml
+import json
+
+from typing import Any, Dict, List, Optional
 
 
 def load_biographical_data(
@@ -55,15 +50,17 @@ def get_year_analysis(
     if biographical_data is None:
         biographical_data = load_biographical_data()
 
-    year_str = str(year)
+    # Handle both int and string keys (YAML can load as either)
+    years = biographical_data.get("years", {})
+    year_key = year if year in years else str(year) if str(year) in years else None
 
-    if year_str not in biographical_data.get("years", {}):
+    if year_key is None:
         return {
             "error": f"No biographical data found for year {year}",
             "suggestion": f"Add {year} to biographical_timeline.yml with world_events and personal_context",
         }
 
-    year_data = biographical_data["years"][year_str]
+    year_data = years[year_key]
     prompts = biographical_data.get("quantum_analysis_prompts", {})
     song_templates = biographical_data.get("song_inspiration_templates", {})
 
@@ -112,22 +109,21 @@ def generate_what_if_scenarios(
         return out[:max_per_category]
 
     # global items from world_events
-    world_events = year_data.get("world_events", {})
+    world_events = year_data.get("world_events") or {}
     global_items = []
     for cat in ("major", "cultural", "technology"):
-        for ev in world_events.get(cat, []):
+        for ev in world_events.get(cat) or []:
             global_items.append(f"What if '{ev}' had unfolded differently?")
 
     # append global prompts
     global_items.extend(prompts.get("global_what_ifs", []))
 
     # personal items from personal_context
-    personal_context = year_data.get("personal_context", {})
+    personal_context = year_data.get("personal_context") or {}
     personal_items = []
-    for cp in personal_context.get("choice_points", []):
-        # make choice point human-readable if underscore-separated
-        readable = cp.replace("_", " ")
-        personal_items.append(f"What if you had {readable}?")
+    for cp in personal_context.get("choice_points") or []:
+        # Choice points are already phrased as questions, use them directly
+        personal_items.append(cp)
 
     # append personal prompts
     personal_items.extend(prompts.get("personal_what_ifs", []))
@@ -141,7 +137,7 @@ def generate_what_if_scenarios(
 def analyze_cascade_effects(year_data: Dict, what_if_scenarios: Dict) -> Dict[str, Any]:
     """Analyze how alternate choices might cascade through time."""
 
-    personal_context = year_data.get("personal_context", {})
+    personal_context = year_data.get("personal_context") or {}
 
     cascade_categories = {
         "creative_development": [
@@ -167,7 +163,7 @@ def analyze_cascade_effects(year_data: Dict, what_if_scenarios: Dict) -> Dict[st
     }
 
     # Calculate "rebracketing intensity" - how much revision potential exists
-    choice_points = personal_context.get("choice_points", [])
+    choice_points = personal_context.get("choice_points") or []
     rebracketing_intensity = len(choice_points) / 5.0  # Normalize to 0-1 scale
 
     return {
@@ -187,8 +183,8 @@ def generate_song_inspiration(
 ) -> List[Dict[str, str]]:
     """Generate Blue album song concepts based on biographical analysis."""
 
-    personal_context = year_data.get("personal_context", {})
-    emotional_landscape = personal_context.get("emotional_landscape", "")
+    personal_context = year_data.get("personal_context") or {}
+    emotional_landscape = personal_context.get("emotional_landscape") or ""
 
     inspirations = []
 
@@ -219,9 +215,9 @@ def generate_song_inspiration(
 def calculate_quantum_metrics(year_data: Dict) -> Dict[str, Any]:
     """Calculate metrics for quantum biographical analysis."""
 
-    personal_context = year_data.get("personal_context", {})
-    choice_points = personal_context.get("choice_points", [])
-    influences = personal_context.get("influences", [])
+    personal_context = year_data.get("personal_context") or {}
+    choice_points = personal_context.get("choice_points") or []
+    influences = personal_context.get("influences") or []
 
     metrics = {
         "choice_point_density": len(choice_points),
@@ -246,7 +242,7 @@ def calculate_quantum_metrics(year_data: Dict) -> Dict[str, Any]:
 
 
 def explore_alternate_timeline(
-    year: int, choice_point_index: int = 0
+    year: int, choice_point_index: int = 0, biographical_data: Optional[Dict] = None
 ) -> Dict[str, Any]:
     """
     Deep dive into a specific alternate timeline branch.
@@ -254,19 +250,23 @@ def explore_alternate_timeline(
     Args:
         year: Year to explore
         choice_point_index: Which choice point to explore alternate for
+        biographical_data: Preloaded biographical data (optional)
 
     Returns:
         Detailed alternate timeline analysis
     """
 
-    biographical_data = load_biographical_data()
+    if biographical_data is None:
+        biographical_data = load_biographical_data()
+
     year_analysis = get_year_analysis(year, biographical_data)
 
     if "error" in year_analysis:
         return year_analysis
 
     year_data = year_analysis["year_data"]
-    choice_points = year_data.get("personal_context", {}).get("choice_points", [])
+    personal_context = year_data.get("personal_context") or {}
+    choice_points = personal_context.get("choice_points") or []
 
     if choice_point_index >= len(choice_points):
         return {
@@ -319,7 +319,6 @@ def blue_biographical_analysis(year: int) -> str:
     Returns:
         JSON string containing timeline analysis, what-if scenarios, and song inspiration
     """
-    import json
 
     result = get_year_analysis(year)
     return json.dumps(result, indent=2)
@@ -345,20 +344,21 @@ def explore_choice_point(year: int, choice_index: int = 0) -> str:
 # Example usage:
 if __name__ == "__main__":
     # Test the tool
-    analysis_1993 = get_year_analysis(1993)
+    analysis_1979 = get_year_analysis(1979)
+    print(analysis_1979)
     print("=== 1993 Biographical Analysis ===")
     print(
-        f"Choice points identified: {len(analysis_1993.get('year_data', {}).get('personal_context', {}).get('choice_points', []))}"
+        f"Choice points identified: {len(analysis_1979.get('year_data', {}).get('personal_context', {}).get('choice_points', []))}"
     )
-    print(f"Quantum metrics: {analysis_1993.get('quantum_metrics', {})}")
+    print(f"Quantum metrics: {analysis_1979.get('quantum_metrics', {})}")
 
     # Example alternate timeline exploration
     if (
-        analysis_1993.get("year_data", {})
+        analysis_1979.get("year_data", {})
         .get("personal_context", {})
         .get("choice_points")
     ):
-        alternate = explore_alternate_timeline(1993, 0)
+        alternate = explore_alternate_timeline(1979, 0)
         print("\n=== Alternate Timeline Analysis ===")
         print(f"Original choice: {alternate.get('choice_point', 'N/A')}")
         print(f"Song concept: {alternate.get('song_concept', {}).get('title', 'N/A')}")

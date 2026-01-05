@@ -1,0 +1,89 @@
+# Rainbow Pipeline Training Configuration
+# Phase 1: Text-only binary classification (has_rebracketing_markers)
+
+# Data Configuration
+data:
+  manifest_path: "data/base_manifest_db.parquet"
+
+  # Target
+  target_column: "has_rebracketing_markers"  # Binary: True/False
+  target_type: "binary"  # Options: binary, multiclass, regression
+
+  # Splits
+  train_split: 0.8
+  val_split: 0.2
+  random_seed: 42
+
+  # Filtering
+  require_concept: true  # Only use tracks with concept text
+  min_concept_length: 50  # Minimum characters
+
+# Model Architecture
+model:
+  # Text encoder
+  text_encoder:
+    model_name: "microsoft/deberta-v3-base"
+    hidden_size: 768
+    max_length: 512
+    freeze_layers: 0  # Fine-tune all layers with GPU
+    pooling: "mean"
+
+  # Classifier head
+  classifier:
+    hidden_dims: [ 256, 128 ]  # MLP hidden layers
+    dropout: 0.3
+    activation: "relu"  # Options: relu, gelu, tanh
+
+# Training Configuration
+training:
+  # Optimization
+  batch_size: 32  # Larger batches on GPU
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  epochs: 50  # More epochs with GPU
+
+  # Advanced
+  gradient_accumulation_steps: 1  # No need with larger batch
+  max_grad_norm: 1.0
+  warmup_ratio: 0.1
+
+  # Hardware
+  device: "cuda"  # GPU on RunPod
+  mixed_precision: true  # Fast with GPU
+  num_workers: 4  # Parallel data loading
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 10  # More patience with more epochs
+    min_delta: 0.001
+
+  # Checkpointing
+  save_best_only: true
+  save_every_n_epochs: 1
+
+# Logging Configuration
+logging:
+  # Weights & Biases
+  wandb:
+    enabled: true  # Enable for RunPod runs
+    project: "rainbow-pipeline"
+    entity: null  # Set via env: export WANDB_ENTITY=yourname
+    name: null  # Auto-generated from timestamp
+
+  # Local logging
+  output_dir: "/workspace/output"  # RunPod persistent storage
+  log_every_n_steps: 10
+
+  # What to track
+  metrics:
+    - "loss"
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  deterministic: true  # Slower but reproducible

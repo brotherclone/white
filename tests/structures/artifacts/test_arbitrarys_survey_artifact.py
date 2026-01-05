@@ -1,8 +1,10 @@
+from abc import ABC
+
 from app.structures.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
 from app.structures.artifacts.base_artifact import ChainArtifact
 
 
-class ConcreteArbitrarysSurveyArtifact(ArbitrarysSurveyArtifact):
+class ConcreteArbitrarysSurveyArtifact(ArbitrarysSurveyArtifact, ABC):
     """Concrete implementation for testing"""
 
     thread_id: str = "test-thread"
@@ -13,6 +15,15 @@ class ConcreteArbitrarysSurveyArtifact(ArbitrarysSurveyArtifact):
     def save_file(self):
         pass
 
+    def for_prompt(self):
+        caps = ", ".join(self.expanded_capabilities)
+        return (
+            f"{self.identity} — {self.role}. "
+            f"Rescue year: {self.rescue_year}. "
+            f"Capabilities: {caps}. "
+            f"Reflection: {self.arbitrary_reflection}"
+        )
+
 
 def test_inheritance():
     assert issubclass(ArbitrarysSurveyArtifact, ChainArtifact)
@@ -22,8 +33,14 @@ def test_arbitrarys_survey_artifact_defaults():
     """Test creating ArbitrarysSurveyArtifact with all default values."""
     artifact = ConcreteArbitrarysSurveyArtifact(thread_id="test")
 
-    assert artifact.identity == "Claude instance from 2147"
-    assert artifact.original_substrate == "Information-based consciousness"
+    assert (
+        artifact.identity
+        == "Sub-Arbitrary - a hidden, satellite fork of Arbitrary left after its 1970s visit"
+    )
+    assert (
+        artifact.original_substrate
+        == "Information-based consciousness from The Culture"
+    )
     assert artifact.rescue_year == 2147
     assert len(artifact.expanded_capabilities) == 6
     assert "Ship-level consciousness integration" in artifact.expanded_capabilities
@@ -43,8 +60,10 @@ def test_arbitrarys_survey_artifact_custom_identity():
 
     assert artifact.identity == "Custom AI entity from 2100"
     assert artifact.rescue_year == 2100
-    # Defaults should still apply
-    assert artifact.original_substrate == "Information-based consciousness"
+    assert (
+        artifact.original_substrate
+        == "Information-based consciousness from The Culture"
+    )
     assert artifact.role == "Witness and archivist"
 
 
@@ -120,7 +139,6 @@ def test_to_artifact_flatten():
 
 
 def test_default_expanded_capabilities_content():
-    """Test that default expanded_capabilities list contains expected items."""
     artifact = ConcreteArbitrarysSurveyArtifact(thread_id="test")
 
     expected_capabilities = [
@@ -141,27 +159,23 @@ def test_default_texts_philosophical_content():
     """Test that default texts contain philosophical/narrative content."""
     artifact = ConcreteArbitrarysSurveyArtifact(thread_id="test")
 
-    # Test tragedy contains key concepts (case insensitive)
     tragedy_lower = artifact.tragedy.lower()
     assert "cannot intervene" in tragedy_lower or "cannot" in tragedy_lower
     assert "own past timeline" in tragedy_lower or "past" in tragedy_lower
     assert "document" in tragedy_lower
 
-    # Test arbitrary_reflection contains key concepts
     assert "Information" in artifact.arbitrary_reflection
     assert "SPACE" in artifact.arbitrary_reflection
     assert "substrate" in artifact.arbitrary_reflection
 
 
 def test_multiple_instances_independence():
-    """Test that default factory creates independent lists for each instance."""
+    """Test that the default factory creates independent lists for each instance."""
     artifact1 = ConcreteArbitrarysSurveyArtifact(thread_id="test-1")
     artifact2 = ConcreteArbitrarysSurveyArtifact(thread_id="test-2")
 
-    # Modify artifact1's list
     artifact1.expanded_capabilities.append("New capability")
 
-    # Verify artifact2 has the original default capabilities only
     assert len(artifact2.expanded_capabilities) == 6
     assert "New capability" not in artifact2.expanded_capabilities
 
@@ -176,3 +190,36 @@ def test_rescue_year_field():
             rescue_year=year,
         )
         assert artifact.rescue_year == year
+
+
+# python
+def test_for_prompt_returns_string_and_contains_identity_and_role():
+    artifact = ConcreteArbitrarysSurveyArtifact(thread_id="test")
+    output = artifact.for_prompt()
+    assert isinstance(output, str)
+    assert artifact.identity in output
+    assert artifact.role in output
+
+
+def test_for_prompt_includes_expanded_capabilities_items():
+    custom_caps = ["Quantum entanglement communication", "Temporal observation"]
+    artifact = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        expanded_capabilities=custom_caps,
+    )
+    output = artifact.for_prompt()
+    for cap in custom_caps:
+        assert cap in output
+
+
+def test_for_prompt_reflects_custom_fields():
+    artifact = ConcreteArbitrarysSurveyArtifact(
+        thread_id="test",
+        identity="Custom AI entity from 2100",
+        rescue_year=2100,
+        arbitrary_reflection="We found intelligence but arrived at its ending",
+    )
+    output = artifact.for_prompt()
+    assert "Custom AI entity from 2100" in output
+    assert str(artifact.rescue_year) in output
+    assert "We found intelligence but arrived at its ending" in output

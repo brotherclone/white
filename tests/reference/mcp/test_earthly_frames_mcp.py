@@ -1,3 +1,5 @@
+import pytest
+
 from unittest.mock import AsyncMock, patch
 
 
@@ -10,6 +12,7 @@ def test_earthly_frames_mcp():
     assert mcp.name == "earthly_frames"
 
 
+@pytest.mark.asyncio
 async def test_get_all_recordings():
     """Test getting all recordings"""
     from app.reference.mcp.earthly_frames.main import get_all_recordings
@@ -36,6 +39,7 @@ async def test_get_all_recordings():
         assert all(r["rainbow_table"] != "not_associated" for r in result_filtered)
 
 
+@pytest.mark.asyncio
 async def test_album_for_color():
     """Test getting album for specific color"""
     from app.reference.mcp.earthly_frames.main import album_for_color
@@ -57,6 +61,7 @@ async def test_album_for_color():
         assert all(a["rainbow_table"] == "red" for a in result)
 
 
+@pytest.mark.asyncio
 async def test_get_all_recordings_error():
     """Test error handling when service fails"""
     from app.reference.mcp.earthly_frames.main import get_all_recordings

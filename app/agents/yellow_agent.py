@@ -78,8 +78,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
             max_rooms=4,
         )
         yellow_graph = self.create_graph()
-        compiled_graph = yellow_graph.compile()
-        result = compiled_graph.invoke(yellow_state.model_dump())
+        compiled_graph = yellow_graph.compile(checkpointer=None)
+        result = compiled_graph.invoke(yellow_state.model_dump(mode="json"))
         if isinstance(result, YellowAgentState):
             final_state = result
         elif isinstance(result, dict):
@@ -89,7 +89,12 @@ class YellowAgent(BaseRainbowAgent, ABC):
         if final_state.counter_proposal:
             state.song_proposals.iterations.append(final_state.counter_proposal)
         if final_state.artifacts:
-            state.artifacts = final_state.artifacts
+            # Serialize artifacts to dicts before adding to state to avoid
+            # msgpack serialization errors in parent workflow's checkpointer
+            state.artifacts = [
+                art.model_dump(mode="json") if hasattr(art, "model_dump") else art
+                for art in final_state.artifacts
+            ]
         return state
 
     def create_graph(self) -> StateGraph:
@@ -144,6 +149,9 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 ) as file_one:
                     data_one = yaml.safe_load(file_one)
                     data_one["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    data_one["image_path"] = (
+                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/img"
+                    )
                     character_one = PulsarPalaceCharacter(**data_one)
                     character_one.create_portrait()
                     character_one.create_character_sheet()
@@ -154,6 +162,9 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 ) as file_two:
                     data_two = yaml.safe_load(file_two)
                     data_two["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    data_two["image_path"] = (
+                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/img"
+                    )
                     character_two = PulsarPalaceCharacter(**data_two)
                     character_two.create_portrait()
                     character_two.create_character_sheet()
@@ -221,8 +232,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
         # Collect character portraits for the encounter artifact
         character_images = []
         for char in state.characters:
-            if char.portrait:
-                character_images.append(char.portrait)
+            if char.portrait_artifact:
+                character_images.append(char.portrait_artifact)
 
         encounter_artifact = PulsarPalaceEncounterArtifact(
             thread_id=state.thread_id,
@@ -331,35 +342,35 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 room=primary_room, encounter_narrative=full_narrative
             )
             prompt = f"""
-                    You are Lord Pulsimore, resplendent ruler of the Pulsar Palace and the yellow void that exists between space and time.
+You are Lord Pulsimore, resplendent ruler of the Pulsar Palace and the yellow void that exists between space and time.
 
-                    A game session has just completed in the Palace. Musical parameters have been procedurally extracted:
-                    - BPM: {base_proposal.bpm}
-                    - Key: {base_proposal.key}
-                    - Mood: {base_proposal.mood}
-                    - Genres: {base_proposal.genres}
+A game session has just completed in the Palace. Musical parameters have been procedurally extracted:
+- BPM: {base_proposal.bpm}
+- Key: {base_proposal.key}
+- Mood: {base_proposal.mood}
+- Genres: {base_proposal.genres}
 
-                    The full narrative of what transpired:
-                    {full_narrative}
+The full narrative of what transpired:
+{full_narrative}
 
-                    Current synthesized White Agent proposal:
-                    {state.white_proposal}
+Current synthesized White Agent proposal:
+{state.white_proposal}
 
-                    Reference works in this artist's style:
-                    {get_my_reference_proposals('Y')}
+Reference works in this artist's style:
+{get_my_reference_proposals('Y')}
 
-                    Create a counter-proposal that:
-                    1. Uses the procedurally generated musical parameters above
-                    2. Synthesizes the White Agent's themes with the game narrative
-                    3. Writes a concept that captures how this RPG session becomes music
-                    4. Maintains the Yellow Album's ontological mode: PRESENT + PLACE + IMAGINED
+Create a counter-proposal that:
+1. Uses the procedurally generated musical parameters above
+2. Synthesizes the White Agent's themes with the game narrative
+3. Writes a concept that captures how this RPG session becomes music
+4. Maintains the Yellow Album's ontological mode: PRESENT + PLACE + IMAGINED
 
-                    Your response should be a SongProposalIteration with:
-                    - rainbow_color: Y
-                    - The procedural BPM, key, mood, genres above
-                    - A creative title (not just the room name)
-                    - An enhanced concept that connects game → music → White Agent themes
-                    """
+Your response should be a SongProposalIteration with:
+- rainbow_color: Y
+- The procedural BPM, key, mood, genres above
+- A creative title (not just the room name)
+- An enhanced concept that connects game → music → White Agent themes
+            """
             claude = self._get_claude()
             proposer = claude.with_structured_output(SongProposalIteration)
             try:

@@ -1,0 +1,146 @@
+bpm: 138
+manifest_id: '07_10'
+tempo: 4/4
+key: G minor
+rainbow_color: I
+title: Reclusive Knot
+release_date: '2024-06-04'
+album_sequence: 10
+main_audio_file: 07_10_main.wav
+TRT: '[03:25.021]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro Verse
+    start_time: '[00:00.000]'
+    end_time: '[00:06.023]'
+    description: Bass and arpeggiated synths briefly play the verse
+  - section_name: Verse 1
+    start_time: '[00:06.024]'
+    end_time: '[00:41.018]'
+    description: A pummeling drum machine and warped analog synths give this an 80s computer-vision feel
+  - section_name: Chorus rush
+    start_time: '[00:41.019]'
+    end_time: '[00:55.016]'
+    description: A 'here we go' mantra builds up the energy
+  - section_name: Chorus 1
+    start_time: '[00:55.017]'
+    end_time: '[01:09.014]'
+    description: However, the chorus levels out and becomes more minimal - a jerky ride for sure
+  - section_name: Bridge
+    start_time: '[01:09.015]'
+    end_time: '[01:23.011]'
+    description: The bridge is a weird little synthpop detour
+  - section_name: Verse 2
+    start_time: '[01:23.012]'
+    end_time: '[01:44.008]'
+    description: The verse is a little more melodic and the drums are a little more subtle
+  - section_name: Interlude
+    start_time: '[01:44.009]'
+    end_time: '[01:58.006]'
+    description: More Romantic rock fodder with octave-split vocal doubles
+  - section_name: Chorus Rush 2
+    start_time: '[01:58.007]'
+    end_time: '[02:26.002]'
+    description: The 'here we go' mantra builds up the energy again
+  - section_name: Chorus 2
+    start_time: '[02:26.003]'
+    end_time: '[02:53.022]'
+    description: Back to the chorus.
+  - section_name: Verse 3
+    start_time: '[02:53.023]'
+    end_time: '[03:07.020]'
+    description: The verse returns with more subdued and mellow
+  - section_name: Outro
+    start_time: '[03:07.021]'
+    end_time: '[03:25.021]'
+    description: The song ends with a little a Synthi run slowing things down.
+concept: A strange platonic computer world with an infinite plain is described as a meeting place for a couple. No landmarks can guide them back to each other.
+lrc_file: 07_10.lrc
+sounds_like:
+  - name: Severed Heads
+    discogs_id: 26212
+  - name: Bauhaus
+    discogs_id: 85897
+mood:
+  - corrupted computer
+  - Tron
+  - glitchy
+genres:
+  - electronic
+  - synthpop
+  - experimental
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_10_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_10_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_10_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-Hat
+    audio_file: 07_10_05_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 07_10_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Infranym
+    audio_file: 07_10_07_infranym.wav
+  - id: 8
+    description: Drum Loops
+    audio_file: 07_10_08_drum_loops.wav
+  - id: 9
+    description: Drummer from Another Mother
+    audio_file: 07_10_09_dfam.wav
+  - id: 10
+    description: Bass
+    audio_file: 07_10_10_bass.wav
+  - id: 11
+    description: Baritone Guitar
+    audio_file: 07_10_11_baritone.wav
+  - id: 12
+    description: Moog Mini
+    audio_file: 07_10_12_mini.wav
+  - id: 13
+    description: Easel Weasel
+    audio_file: 07_10_14_easel.wav
+    midi_file: 07_10_13_easel.mid
+  - id: 14
+    description: Lead Farfisa
+    audio_file: 07_10_16_lead_synth_farfisa.wav
+    midi_group_file: 07_10_15_lead_synth.mid
+  - id: 15
+    description: Lead Grandmother
+    audio_file: 07_10_17_lead_synth_grandmother.wav
+    midi_group_file: 07_10_15_lead_synth.mid
+  - id: 16
+    description: Stylus Synth
+    audio_file: 07_10_18_stylus.wav
+  - id: 17
+    description: Vocals 1
+    audio_file: 07_10_19_vox_1.wav
+  - id: 18
+    description: Vocals 2
+    audio_file: 07_10_20_vox_2.wav
+  - id: 19
+    description: Background Vocals
+    audio_file: 07_10_21_vox_bg.wav
+  - id: 20
+    description: Guitar
+    audio_file: 07_10_22_guitar.wav
+  - id: 21
+    description: Noise FX
+    audio_file: 07_10_23_noise.wav

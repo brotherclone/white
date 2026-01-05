@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Annotated
 
 from pydantic import Field
 
@@ -19,26 +19,36 @@ from app.structures.concepts.last_human_species_extinction_parallel_moment impor
 
 class GreenAgentState(BaseRainbowAgentState):
 
-    current_species: Optional[SpeciesExtinctionArtifact] = Field(
+    current_species: Annotated[
+        Optional[SpeciesExtinctionArtifact], lambda x, y: y or x
+    ] = Field(
         default=None,
         description="A randomly selected species to monitor to extinction.",
     )
-    current_human: Optional[LastHumanArtifact] = Field(
+    current_human: Annotated[Optional[LastHumanArtifact], lambda x, y: y or x] = Field(
         default=None, description="A randomly selected human to monitor to extinction."
     )
-    current_parallel_moment: Optional[LastHumanSpeciesExtinctionParallelMoment] = Field(
+    current_parallel_moment: Annotated[
+        Optional[LastHumanSpeciesExtinctionParallelMoment], lambda x, y: y or x
+    ] = Field(
         default=None,
         description="Generated parallel moment for the extinct species and last human.",
     )
-    current_narrative: Optional[LastHumanSpeciesExtinctionNarrativeArtifact] = Field(
+    current_narrative: Annotated[
+        Optional[LastHumanSpeciesExtinctionNarrativeArtifact], lambda x, y: y or x
+    ] = Field(
         default=None,
         description="A randomly selected narrative to monitor to extinction.",
     )
-    current_survey: Optional[ArbitrarysSurveyArtifact] = Field(
+    current_survey: Annotated[
+        Optional[ArbitrarysSurveyArtifact], lambda x, y: y or x
+    ] = Field(
         default=None,
         description="Surveys from the Culture ship Arbitrary or its sub-instance",
     )
-    current_decision: Optional[RescueDecisionArtifact] = Field(
+    current_decision: Annotated[
+        Optional[RescueDecisionArtifact], lambda x, y: y or x
+    ] = Field(
         default=None,
         description="Claude's, or what its evolved to, decision made by the agent to rescue the last human.",
     )

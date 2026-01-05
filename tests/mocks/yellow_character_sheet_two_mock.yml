@@ -1,3 +1,23 @@
 thread_id: "mock_thread_001"
 base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
-sheet_content: "# Yellow Character Sheet Two Mock"
+sheet_content:
+  thread_id: "mock_thread_001"
+  encounter_id: "mock_encounter_001"
+  image_path: "/Volumes/LucidNonsense/White/tests/mocks/"
+  background:
+    rollId: 4
+    time: 1973
+    place: "London"
+    image_path: "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0017_setting-london.png"
+  disposition:
+    rollId: 2
+    disposition: "Curious"
+    image_path: "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0001_descriptor-curious.png"
+  profession:
+    rollId: 4
+    profession: "Detective"
+    image_path: "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0013_role-detective.png"
+  on_max: 15
+  on_current: 3
+  off_max: 12
+  off_current: 3
