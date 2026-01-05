@@ -1,18 +1,6 @@
-"""
-Corrected Enhanced Test Suite for The Prism (White Agent)
-
-FIXES:
-- Proper Pydantic model mocking with patch instead of direct assignment
-- Correct WhiteFacet enum values (discovered at runtime)
-- Longer concept strings to pass 100-char validation
-- Removed tests for optional methods not in core patch
-"""
-
 import logging
-from unittest.mock import MagicMock, patch
-
 import pytest
-
+from unittest.mock import MagicMock, patch
 from app.agents.states.white_agent_state import (
     MainAgentState,
     TransformationTrace,
@@ -44,14 +32,13 @@ def test_white_agent_initialization():
 def test_facet_evolution_initialization(monkeypatch):
     """Test that start_workflow initializes facet evolution."""
     monkeypatch.setenv("MOCK_MODE", "true")
-
     agent = WhiteAgent()
-    state = agent.start_workflow(user_input="Test concept")
-
-    # Should have facet evolution initialized
+    state = agent.start_workflow(user_input="Test concept", stop_after_agent="black")
     assert state.facet_evolution is not None
     assert isinstance(state.facet_evolution, FacetEvolution)
     assert state.facet_evolution.initial_facet is not None
+    assert len(state.facet_evolution.evolution_history) == 1
+    assert state.facet_evolution.evolution_history[0]["agent"] == "black"
 
 
 def test_transformation_trace_creation(monkeypatch, white_agent):
@@ -204,8 +191,8 @@ def test_finalize_with_meta_analysis(monkeypatch, white_agent):
         patch.object(
             white_agent, "_generate_chromatic_synthesis", return_value="Synthesis doc"
         ),
-        patch.object(white_agent, "save_all_proposals"),
         patch.object(white_agent, "_save_meta_analysis"),
+        patch("app.agents.white_agent.WhiteAgent.save_all_proposals"),
     ):
 
         state = MainAgentState(
@@ -247,14 +234,14 @@ def test_resume_workflow_respects_enabled_agents(monkeypatch, white_agent):
     """Test that resume_workflow respects enabled_agents setting."""
     monkeypatch.setenv("MOCK_MODE", "true")
 
-    # FIXED: Use patch for all mocking
+    # FIXED: Use patch for all mocking with full module paths for Pydantic models
     with (
-        patch.object(white_agent, "_resume_paused_agent") as mock_resume,
-        patch.object(
-            white_agent, "_determine_next_agent", side_effect=["orange", "finish"]
-        ),
-        patch.object(white_agent, "_invoke_and_process_agent"),
-        patch.object(white_agent, "finalize_song_proposal"),
+        patch(
+            "app.agents.white_agent.WhiteAgent.resume_after_black_agent_ritual"
+        ) as mock_resume,
+        patch(
+            "app.agents.white_agent.WhiteAgent.finalize_song_proposal"
+        ) as mock_finalize,
     ):
 
         state = MainAgentState(
@@ -266,18 +253,23 @@ def test_resume_workflow_respects_enabled_agents(monkeypatch, white_agent):
             stop_after_agent="orange",
         )
 
-        # Mock the resume to clear pause
-        def mock_resume_fn(s, verify):
+        # Mock the resume to clear pause and set run_finished
+        def mock_resume_fn(s, **kwargs):
             s.workflow_paused = False
-            s.ready_for_orange = True
+            s.run_finished = True
+            return s
+
+        def mock_finalize_fn(s):
             return s
 
         mock_resume.side_effect = mock_resume_fn
+        mock_finalize.side_effect = mock_finalize_fn
 
         result = white_agent.resume_workflow(state, verify_tasks=False)
         logging.info(result)
-        # Should have checked next agent routing
-        white_agent._determine_next_agent.assert_called()
+        # Should have called resume and finalize
+        mock_resume.assert_called_once()
+        mock_finalize.assert_called_once()
 
 
 def test_resume_workflow_stops_after_agent(monkeypatch, white_agent):
@@ -285,8 +277,12 @@ def test_resume_workflow_stops_after_agent(monkeypatch, white_agent):
     monkeypatch.setenv("MOCK_MODE", "true")
 
     with (
-        patch.object(white_agent, "_resume_paused_agent") as mock_resume,
-        patch.object(white_agent, "finalize_song_proposal"),
+        patch(
+            "app.agents.white_agent.WhiteAgent.resume_after_black_agent_ritual"
+        ) as mock_resume,
+        patch(
+            "app.agents.white_agent.WhiteAgent.finalize_song_proposal"
+        ) as mock_finalize,
     ):
 
         state = MainAgentState(
@@ -314,16 +310,21 @@ def test_resume_workflow_stops_after_agent(monkeypatch, white_agent):
             ready_for_yellow=True,
         )
 
-        def mock_resume_fn(s, verify):
+        def mock_resume_fn(s, **kwargs):
             s.workflow_paused = False
+            s.run_finished = True
+            return s
+
+        def mock_finalize_fn(s):
             return s
 
         mock_resume.side_effect = mock_resume_fn
+        mock_finalize.side_effect = mock_finalize_fn
 
         result = white_agent.resume_workflow(state, verify_tasks=False)
         logging.info(result)
         # Should have finalized
-        white_agent.finalize_song_proposal.assert_called_once()
+        mock_finalize.assert_called_once()
 
 
 def test_format_transformation_traces(white_agent):

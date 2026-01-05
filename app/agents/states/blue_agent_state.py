@@ -1,4 +1,5 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Annotated
+from operator import add  # Added by auto_annotate
 from pydantic import Field
 
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
@@ -19,17 +20,33 @@ from app.structures.concepts.quantum_tape_musical_parameters import (
 
 
 class BlueAgentState(BaseRainbowAgentState):
-    biographical_timeline: Optional[BiographicalTimeline] = None
-    forgotten_periods: List[BiographicalPeriod] = Field(default_factory=list)
-    selected_period: Optional[BiographicalPeriod | Dict[str, Any]] = None
-    selected_year: Optional[int] = None  # Year key from biographical data
-    evaluation_result: Optional[TimelineEvaluationResult] = None
-    alternate_history: Optional[AlternateTimelineArtifact] = None
-    tape_label: Optional[QuantumTapeLabelArtifact] = None
-    musical_params: Optional[QuantumTapeMusicalParameters] = None
-    iteration_count: int = 0
-    max_iterations: int = 3
-    biographical_data: Optional[Dict[str, Any]] = Field(
+    biographical_timeline: Annotated[
+        Optional[BiographicalTimeline], lambda x, y: y or x
+    ] = None
+    forgotten_periods: Annotated[List[BiographicalPeriod], add] = Field(
+        default_factory=list
+    )
+    selected_period: Annotated[
+        Optional[BiographicalPeriod | Dict[str, Any]], lambda x, y: y or x
+    ] = None
+    selected_year: Annotated[Optional[int], lambda x, y: y or x] = (
+        None  # Year key from biographical data
+    )
+    evaluation_result: Annotated[
+        Optional[TimelineEvaluationResult], lambda x, y: y or x
+    ] = None
+    alternate_history: Annotated[
+        Optional[AlternateTimelineArtifact], lambda x, y: y or x
+    ] = None
+    tape_label: Annotated[Optional[QuantumTapeLabelArtifact], lambda x, y: y or x] = (
+        None
+    )
+    musical_params: Annotated[
+        Optional[QuantumTapeMusicalParameters], lambda x, y: y or x
+    ] = None
+    iteration_count: Annotated[int, lambda x, y: y if y is not None else x] = 0
+    max_iterations: Annotated[int, lambda x, y: y if y is not None else x] = 3
+    biographical_data: Annotated[Optional[Dict[str, Any]], lambda x, y: y or x] = Field(
         default_factory=dict,
         description="Container for biographical data in agent state",
     )

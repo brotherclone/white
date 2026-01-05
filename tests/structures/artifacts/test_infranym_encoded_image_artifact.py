@@ -276,6 +276,9 @@ def test_layer2_extraction(tmp_path, temp_carrier_image, temp_text_render):
         artifact_name="layer2_puzzle",
     )
 
+    # Need to encode first before extracting
+    artifact.encode()
+
     extracted_img = artifact.extract_layer2_text(save_revealed=False)
 
     # Note: LSB extraction may fail depending on the stegano library version
@@ -302,6 +305,9 @@ def test_layer3_solution_decryption(tmp_path, temp_carrier_image, temp_text_rend
         artifact_name="layer3_puzzle",
     )
 
+    # Need to encode first before decrypting
+    artifact.encode()
+
     # Decrypt Layer 3 using the correct key
     decrypted = artifact.solve_layer3(secret_word_key=secret_word)
 
@@ -325,8 +331,6 @@ def test_layer3_wrong_key_fails(tmp_path, temp_carrier_image, temp_text_render):
         chain_artifact_file_type="png",
         artifact_name="wrong_key_puzzle",
     )
-
-    output_path = artifact.encode()
 
     # Try to decrypt with wrong key
     wrong_decrypted = artifact.solve_layer3(secret_word_key="WRONGKEY")

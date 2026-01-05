@@ -477,6 +477,11 @@ class TestApplyPan:
         )
         stereo_audio._spawn.return_value = stereo_audio
         mono_audio.set_channels.return_value = stereo_audio
+
+        # Actually call the method being tested
+        InfranymAudioEncoder._apply_pan(mono_audio, 0.5)
+
+        # Now assert that set_channels was called
         mono_audio.set_channels.assert_called_with(2)
 
     def test_apply_pan_short_audio_skips(self):
@@ -706,6 +711,11 @@ class TestEncodeComposition:
         ):
 
             mock_silent.return_value = MagicMock(spec=AudioSegment)
+
+            # Actually call the method being tested
+            encoder.encode_composition(test_composition, "test_output")
+
+            # Now assert that silent was called at least 2 times (for padding shorter layers)
             assert mock_silent.call_count >= 2
 
 
