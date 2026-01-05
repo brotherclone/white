@@ -1,11 +1,40 @@
 # ToDo: Complete this manifest
+
 bpm: 94
-key_signature: E minor
-time_signature: 4/4
-01:00:00:00.00	
-01:00:56:04.20	
-01:01:42:03.15	
-01:02:02:13.66	
-01:02:53:15.34	
-01:03:19:03.57	
-01:03:25:13.23
+manifest_id: '07_09'
+tempo: 4/4
+key: E minor
+rainbow_color: I
+title: Beta Hats Hewn
+release_date: '2024-06-04'
+album_sequence: 9
+main_audio_file: 07_09_main.wav
+TRT: TK
+vocals: true
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: TK
+    description: TK
+    [00:00.000]
+    [00:56.004]
+    [01:42.003]
+    [02:02.013]
+    [02:53.015]
+    [03:19.003]
+    [03:25.013]
+concept: TK
+lrc_file: TK
+sounds_like:
+  - name: TK
+    discogs_id: TK
+mood:
+  - TK
+genres:
+  - TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+

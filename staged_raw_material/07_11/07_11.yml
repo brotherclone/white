@@ -1,1 +1,139 @@
-# ToDo: Complete this manifest
+bpm: 135
+manifest_id: '07_11'
+tempo: 4/4
+key: A major
+rainbow_color: I
+title: Avulsion Segue Yeg
+release_date: '2024-06-04'
+album_sequence: 11
+main_audio_file: 07_11_main.wav
+TRT: '[03:36.022]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Forward
+    start_time: '[00:00.000]'
+    end_time: '[00:28.011]'
+    description: The driving motorik beat is at once cliche and the purest Earthly Frames vibe
+  - section_name: Verse
+    start_time: '[00:28.012]'
+    end_time: '[00:42.016]'
+    description: The verse dies down for a bit
+  - section_name: Chorus
+    start_time: '[00:42.017]'
+    end_time: '[01:11.002]'
+    description: Then the chorus is an overwhelming layered blast of cryptic energy
+  - section_name: Direct to Consumer
+    start_time: '[01:11.003]'
+    end_time: '[01:39.013]'
+    description: The vocals directly address the listener's frustration with the puzzles and 'gimmicks'
+  - section_name: Bridge
+    start_time: '[01:39.014]'
+    end_time: '[02:08.000]'
+    description: A build up of synths and drums
+  - section_name: Forward Assault
+    start_time: '[02:08.001]'
+    end_time: '[02:22.005]'
+    description: Full on kraut-rock blast
+  - section_name: Infranym
+    start_time: '[02:22.006]'
+    end_time: '[03:36.022]'
+    description: A secret message
+concept: Possibly the most direct song in The Rainbow Table, of course about being indirect. This banger ends Infranyms with the anthemic 'Let them all keep guessing' - It acknowledges a potential listener's frustration with the puzzles and 'gimmicks' but ultimately encourages them to embrace the chaos and keep moving forward regardless.
+lrc_file: 07_11.lrc
+sounds_like:
+  - name: Stereolab
+    discogs_id: 388
+  - name: Neu!
+    discogs_id: 12636
+mood:
+  - driving
+  - expansive
+  - energetic
+  - hypnotic
+genres:
+  - kraut rock
+  - indie rock
+  - electronic
+  - post-rock
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 07_11_02_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 07_11_03_kick.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 07_11_04_snare.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-Hat
+    audio_file: 07_11_05_hihat.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 07_11_06_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Drum loop
+    audio_file: 07_11_07_drum_loops.wav
+  - id: 8
+    description: Bass
+    audio_file: 07_11_08_bass.wav
+  - id: 9
+    description: Baritone
+    audio_file: 07_11_09_baritone.wav
+  - id: 10
+    description: Grandmother Bass
+    audio_file: 07_11_10_gm_bass.wav
+  - id: 11
+    description: Vocal 1
+    audio_file: 07_11_11_vox_1.wav
+  - id: 12
+    description: Vocal 2
+    audio_file: 07_11_12_vox_2.wav
+  - id: 13
+    description: Vocal 3
+    audio_file: 07_11_13_vox_3.wav
+  - id: 14
+    description: Vocal 4
+    audio_file: 07_11_14_vox_4.wav
+  - id: 15
+    description: Background Vocals
+    audio_file: 07_11_15_vox_bg.wav
+  - id: 16
+    description: Electric Guitar 1
+    audio_file: 07_11_16_guitar_1.wav
+  - id: 17
+    description: Electric Guitar 2
+    audio_file: 07_11_17_guitar_2.wav
+  - id: 18
+    description: Arp
+    audio_file: 07_11_19_arp.wav
+    midi_file: 07_11_18_arp.mid
+  - id: 19
+    description: SEM Synth
+    audio_file: 07_11_21_sem.wav
+    midi_file: 07_11_20_sem.mid
+  - id: 20
+    description: Synth Lead
+    audio_file: 07_11_23_synth_lead.wav
+    midi_file: 07_11_22_synth_lead.mid
+  - id: 21
+    description: Final Synth
+    audio_file: 07_11_25_final_synth.wav
+    midi_file: 07_11_24_final_synth.mid
+  - id: 22
+    description: Pedal Sludge
+    audio_file: 07_11_26_sludge.wav
+  - id: 23
+    description: Infranym
+    audio_file: 07_11_27_infranym.wav

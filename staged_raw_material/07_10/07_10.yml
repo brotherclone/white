@@ -1,1 +1,47 @@
 # ToDo: Complete this manifest
+
+bpm: 138
+manifest_id: '07_10'
+tempo: 4/4
+key: G minor
+rainbow_color: I
+title: Reclusive Knot
+release_date: '2024-06-04'
+album_sequence: 10
+main_audio_file: 07_10_main.wav
+TRT: TK
+vocals: true
+lyrics: true
+structure:
+  - section_name: TK
+    start_time: '[00:00.000]'
+    end_time: TK
+    description: TK
+
+
+  [00:00.000]	 Intro
+  [00:06.023]	 Verse
+  [00:41.018]	 Chorus rush
+  [00:55.016]	 Chorus
+  [01:09.014]	 Bridge
+  [01:23.011]	 Verse
+  [01:44.008]	 Interlude
+  [01:58.006]	 Chorus Rush
+  [02:26.002]	 Chorus
+  [02:53.022]	 Verse
+  [03:07.020]	 Outro
+  [03:25.021]	 Marker 12
+
+concept: TK
+lrc_file: TK
+sounds_like:
+  - name: TK
+    discogs_id: TK
+mood:
+  - TK
+genres:
+  - TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
