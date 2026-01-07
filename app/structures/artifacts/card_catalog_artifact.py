@@ -20,6 +20,8 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class CardCatalogArtifact(HtmlChainArtifactFile, ABC):
     """
@@ -119,7 +121,7 @@ class CardCatalogArtifact(HtmlChainArtifactFile, ABC):
             file_path = Path(self.file_path)
             file_path.mkdir(parents=True, exist_ok=True)
         except (FileNotFoundError, OSError) as e:
-            logging.warning(
+            logger.warning(
                 f"Could not create directory `{self.file_path}`: {e!s}. Falling back to system temp directory."
             )
             fallback_dir = Path(tempfile.gettempdir()) / "agent_work_product"
@@ -127,7 +129,7 @@ class CardCatalogArtifact(HtmlChainArtifactFile, ABC):
                 fallback_dir.mkdir(parents=True, exist_ok=True)
                 file_path = fallback_dir
             except Exception as fallback_err:
-                logging.error(
+                logger.error(
                     f"Failed to create fallback directory `{fallback_dir}`: {fallback_err!s}. Using current working directory."
                 )
                 file_path = Path.cwd()
@@ -136,7 +138,7 @@ class CardCatalogArtifact(HtmlChainArtifactFile, ABC):
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(html_content)
 
-        logging.info(f"Wrote artifact to `{output_file}`")
+        logger.info(f"Wrote artifact to `{output_file}`")
 
     def flatten(self):
         """Flatten the artifact for easier processing."""

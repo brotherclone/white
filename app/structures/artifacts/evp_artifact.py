@@ -15,6 +15,8 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class EVPArtifact(ChainArtifact, ABC):
 
@@ -46,13 +48,13 @@ class EVPArtifact(ChainArtifact, ABC):
         if self.audio_segments:
             for seg in self.audio_segments:
                 if seg is not None:
-                    logging.info(f"Saving audio segment to: {seg.base_path}")
+                    logger.info(f"Saving audio segment to: {seg.base_path}")
                     seg.save_file()
         if self.audio_mosiac is not None:
-            logging.info(f"Saving mosaic to: {self.audio_mosiac.base_path}")
+            logger.info(f"Saving mosaic to: {self.audio_mosiac.base_path}")
             self.audio_mosiac.save_file()
         if self.noise_blended_audio is not None:
-            logging.info(f"Saving blended to: {self.noise_blended_audio.base_path}")
+            logger.info(f"Saving blended to: {self.noise_blended_audio.base_path}")
             self.noise_blended_audio.save_file()
         if self.base_path is None:
             self.base_path = os.path.join(

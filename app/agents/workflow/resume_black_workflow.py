@@ -26,6 +26,8 @@ except Exception:
 
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 
 def check_todoist_tasks_complete(pending_tasks: list) -> bool:
     """
@@ -61,9 +63,7 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
 
             # Skip verification for mock tasks when in MOCK_MODE
             if mock_mode and (task_id.startswith("mock_") or "mock" in task_id.lower()):
-                logging.info(
-                    f"MOCK_MODE: Skipping verification for mock task {task_id}"
-                )
+                logger.info(f"MOCK_MODE: Skipping verification for mock task {task_id}")
                 continue
 
             if client is not None:
@@ -71,17 +71,17 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
                 try:
                     task = client.get_task(task_id)
                     if not getattr(task, "is_completed", False):
-                        logging.warning(f"Task {task_id} is not yet complete")
+                        logger.warning(f"Task {task_id} is not yet complete")
                         return False
                     continue
                 except Exception as e:
-                    logging.debug(f"Compat client failed for task {task_id}: {e}")
+                    logger.debug(f"Compat client failed for task {task_id}: {e}")
                     # fall through to REST approach
 
             # Fallback: use REST API directly
             token = os.environ.get("TODOIST_API_TOKEN")
             if not token:
-                logging.error("TODOIST_API_TOKEN not found in environment")
+                logger.error("TODOIST_API_TOKEN not found in environment")
                 return False
 
             headers = {"Authorization": f"Bearer {token}"}
@@ -96,22 +96,22 @@ def check_todoist_tasks_complete(pending_tasks: list) -> bool:
                 task = response.json()
 
                 if not task.get("is_completed", False):
-                    logging.warning(f"Task {task_id} is not yet complete")
+                    logger.warning(f"Task {task_id} is not yet complete")
                     return False
             except requests.exceptions.HTTPError as e:
                 if e.response and e.response.status_code == 404:
-                    logging.error(f"Task {task_id} not found")
+                    logger.error(f"Task {task_id} not found")
                 else:
-                    logging.error(f"Error checking task {task_id}: {e}")
+                    logger.error(f"Error checking task {task_id}: {e}")
                 return False
             except Exception as e:
-                logging.error(f"Error checking task {task_id}: {e}")
+                logger.error(f"Error checking task {task_id}: {e}")
                 return False
 
         return True
 
     except Exception as e:
-        logging.error(f"Error checking Todoist tasks: {e}")
+        logger.error(f"Error checking Todoist tasks: {e}")
         return False
 
 
@@ -129,7 +129,7 @@ def update_sigil_state_to_charged(state: BlackAgentState) -> BlackAgentState:
         if getattr(artifact, "type", None) == "sigil":
             if artifact.activation_state == SigilState.CREATED:
                 artifact.activation_state = SigilState.CHARGED
-                logging.info(f"✓ Updated sigil to CHARGED state: {artifact.wish}")
+                logger.info(f"✓ Updated sigil to CHARGED state: {artifact.wish}")
 
     return state
 
@@ -191,7 +191,7 @@ def resume_black_agent_workflow(
     # Update sigil state to CHARGED
     current_state = update_sigil_state_to_charged(BlackAgentState(**current_state))
 
-    logging.info("Resuming Black Agent workflow after human action...")
+    logger.info("Resuming Black Agent workflow after human action...")
 
     final_snapshot = black_agent._compiled_workflow.get_state(black_config)
     final_state = final_snapshot.values
@@ -202,9 +202,9 @@ def resume_black_agent_workflow(
         title = getattr(counter_proposal, "title", None) or counter_proposal.get(
             "title", "Unknown"
         )
-        logging.info(f"✓ Workflow completed: {title}")
+        logger.info(f"✓ Workflow completed: {title}")
     else:
-        logging.info("✓ Workflow completed")
+        logger.info("✓ Workflow completed")
 
     return final_state
 
@@ -257,7 +257,7 @@ def resume_black_agent_workflow_with_agent(
                 "Please complete all ritual tasks before resuming."
             )
 
-    logging.info("Resuming Black Agent workflow after human action...")
+    logger.info("Resuming Black Agent workflow after human action...")
 
     # Resume workflow - it will continue from 'await_human_action' node
     # Pass empty dict when resuming - state comes from checkpoint
@@ -273,9 +273,9 @@ def resume_black_agent_workflow_with_agent(
             if isinstance(counter_proposal, dict)
             else "Unknown"
         )
-        logging.info(f"✓ Workflow completed: {title}")
+        logger.info(f"✓ Workflow completed: {title}")
     else:
-        logging.info("✓ Workflow completed")
+        logger.info("✓ Workflow completed")
 
     return final_state
 

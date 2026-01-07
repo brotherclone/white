@@ -40,6 +40,8 @@ from app.util.manifest_loader import get_my_reference_proposals
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 
 class BlackAgent(BaseRainbowAgent, ABC):
     """The ThreadKeepr"""
@@ -98,7 +100,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         if not disable_checkpoint:
             snapshot = self._compiled_workflow.get_state(black_config)
             if snapshot.next:
-                logging.info(f"Black Agent workflow paused at: {snapshot.next}")
+                logger.info(f"Black Agent workflow paused at: {snapshot.next}")
                 state.workflow_paused = True
                 state.pause_reason = "black_agent_awaiting_human_action"
                 state.pending_human_action = {
@@ -112,7 +114,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 }
                 if result.get("artifacts"):
                     state.artifacts = result["artifacts"]
-                logging.info(
+                logger.info(
                     "Workflow paused - waiting for human to complete ritual tasks"
                 )
                 return state
@@ -234,7 +236,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
                     raise TypeError(error_msg)
 
                 state.counter_proposal = counter_proposal
@@ -265,7 +267,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
     @skip_chance(0.75)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
         """Generate a sigil artifact and create a Todoist task for charging"""
-        logging.info("🜏 Entering generate_sigil method")
+        logger.info("🜏 Entering generate_sigil method")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -295,7 +297,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 return state
             except FileNotFoundError as e:
                 error_msg = f"Mock file not found at {mock_path}: {e!s}"
-                logging.warning(error_msg)
+                logger.warning(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -320,7 +322,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 wish_text = wish_response.content
             except Exception as e:
                 error_msg = f"LLM call for sigil wish generation failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 wish_text = "Fallback wish - LLM unavailable"
@@ -345,14 +347,14 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 sigil_artifact.save_file()
             except Exception as e:
                 error_msg = f"Failed to save sigil artifact file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             state.artifacts.append(sigil_artifact)
-            logging.info("Attempting to create Todoist task for sigil charging...")
+            logger.info("Attempting to create Todoist task for sigil charging...")
             todoist_token = os.getenv("TODOIST_API_TOKEN")
             if not todoist_token:
-                logging.error("✗ TODOIST_API_TOKEN not found in environment variables!")
+                logger.error("✗ TODOIST_API_TOKEN not found in environment variables!")
                 state.awaiting_human_action = True
                 state.should_update_proposal_with_sigil = True
                 state.human_instructions = f"""
@@ -375,9 +377,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     section_name="Black Agent - Sigil Work",
                 )
                 if task_result.get("success", False):
-                    logging.info("✓ Created Todoist task successfully!")
-                    logging.info(f"  Task ID: {task_result['id']}")
-                    logging.info(f"  Task URL: {task_result['url']}")
+                    logger.info("✓ Created Todoist task successfully!")
+                    logger.info(f"  Task ID: {task_result['id']}")
+                    logger.info(f"  Task URL: {task_result['url']}")
                     state.pending_human_tasks.append(
                         {
                             "type": "sigil_charging",
@@ -402,9 +404,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 else:
                     error_msg = task_result.get("error", "Unknown error")
                     status_code = task_result.get("status_code", "N/A")
-                    logging.warning("⚠️ Todoist task creation failed!")
-                    logging.warning(f"  Error: {error_msg}")
-                    logging.warning(f"  Status code: {status_code}")
+                    logger.warning("⚠️ Todoist task creation failed!")
+                    logger.warning(f"  Error: {error_msg}")
+                    logger.warning(f"  Status code: {status_code}")
                     state.awaiting_human_action = True
                     state.should_update_proposal_with_sigil = True
                     state.human_instructions = f"""
@@ -419,16 +421,16 @@ class BlackAgent(BaseRainbowAgent, ABC):
             except Exception as e:
                 error_msg = str(e)
                 if "401" in error_msg or "Unauthorized" in error_msg:
-                    logging.error("401 Unauthorized: Invalid API token.")
-                    logging.warning("⚠️ Todoist task creation failed!")
-                    logging.warning("  Error: 401 Unauthorized: Invalid API token.")
-                    logging.warning("  Status code: 401")
-                    logging.info("  To fix: Set TODOIST_API_TOKEN in your .env file")
+                    logger.error("401 Unauthorized: Invalid API token.")
+                    logger.warning("⚠️ Todoist task creation failed!")
+                    logger.warning("  Error: 401 Unauthorized: Invalid API token.")
+                    logger.warning("  Status code: 401")
+                    logger.info("  To fix: Set TODOIST_API_TOKEN in your .env file")
                 elif "TODOIST_API_TOKEN not configured" in error_msg:
-                    logging.warning("⚠️ Todoist integration not configured")
-                    logging.info("  To enable: Set TODOIST_API_TOKEN in your .env file")
+                    logger.warning("⚠️ Todoist integration not configured")
+                    logger.info("  To enable: Set TODOIST_API_TOKEN in your .env file")
                 else:
-                    logging.error(f"✗ Failed to create Todoist task: {e}")
+                    logger.error(f"✗ Failed to create Todoist task: {e}")
 
                 state.awaiting_human_action = True
                 state.should_update_proposal_with_sigil = True
@@ -464,7 +466,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 evp_artifact = EVPArtifact(**data)
             except Exception as e:
                 error_msg = f"Failed to read mock files for EVP: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 # Return early with an error state
@@ -525,7 +527,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 print(f"Mock EVP artifact saved to {evp_artifact.file_path}")
             except Exception as e:
                 error_msg = f"Failed to save EVP artifact file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             state.artifacts.append(evp_artifact)
@@ -559,7 +561,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 evp_artifact.save_file()
             except Exception as e:
                 error_msg = f"Failed to save EVP artifact file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             state.artifacts.append(evp_artifact)
@@ -570,7 +572,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         """
         Node that workflow interrupts at.
         """
-        logging.info("Workflow interrupted - awaiting human action on sigil charging")
+        logger.info("Workflow interrupted - awaiting human action on sigil charging")
         return state
 
     def evaluate_evp(self, state: BlackAgentState) -> BlackAgentState:
@@ -585,13 +587,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
             return state
         else:
             if not state.artifacts:
-                logging.warning("No artifacts available for EVP evaluation")
+                logger.warning("No artifacts available for EVP evaluation")
                 state.should_update_proposal_with_evp = False
                 return state
 
             last_artifact = state.artifacts[-1]
             if not hasattr(last_artifact, "transcript") or not last_artifact.transcript:
-                logging.warning("EVP artifact has no transcript - skipping evaluation")
+                logger.warning("EVP artifact has no transcript - skipping evaluation")
                 state.should_update_proposal_with_evp = False
                 return state
 
@@ -601,13 +603,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 not transcript_text
                 or transcript_text == "[EVP: No discernible speech detected]"
             ):
-                logging.info(
-                    "EVP transcript empty or placeholder - skipping evaluation"
-                )
+                logger.info("EVP transcript empty or placeholder - skipping evaluation")
                 state.should_update_proposal_with_evp = False
                 return state
 
-            logging.info(
+            logger.info(
                 f"✓ Evaluating EVP transcript: '{transcript_text}' ({len(transcript_text)} chars)"
             )
 
@@ -643,13 +643,13 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     error_msg = (
                         f"EVP evaluation returned unexpected type: {type(result)}"
                     )
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
                     if block_mode:
                         raise TypeError(error_msg)
                     state.should_update_proposal_with_evp = False
             except Exception as e:
                 error_msg = f"EVP evaluation LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 state.should_update_proposal_with_evp = False
@@ -671,7 +671,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     state.counter_proposal = evp_counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -734,7 +734,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 updated_proposal = result
             else:
                 error_msg = f"Expected SongProposalIteration, got {type(result)}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise TypeError(error_msg)
                 return state
@@ -744,7 +744,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             return state
         except Exception as e:
             error_msg = f"EVP update LLM call failed: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
         return state
@@ -765,7 +765,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.counter_proposal = sigil_counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -781,7 +781,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     Components: {",".join(previous_sigil_artifact.glyph_components or [])}
                 """
             except Exception as e:
-                logging.error(f"Failed to parse sigil artifact: {e!s}")
+                logger.error(f"Failed to parse sigil artifact: {e!s}")
                 return state
             prompt = f"""
         You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
@@ -836,7 +836,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     updated_proposal = result
                 else:
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
-                    logging.error(error_msg)
+                    logger.error(error_msg)
                     if block_mode:
                         raise TypeError(error_msg)
                     return state
@@ -846,7 +846,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 return state
             except Exception as e:
                 error_msg = f"Sigil update LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
