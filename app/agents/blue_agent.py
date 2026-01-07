@@ -76,6 +76,8 @@ from app.util.manifest_loader import (
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class BlueAgent(BaseRainbowAgent, ABC):
     """The Cassette Bearer - Biographical alternate histories"""
@@ -184,7 +186,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             if block_mode:
                 raise Exception("Failed to load biographical data")
             else:
-                logging.warning("Failed to load biographical data")
+                logger.warning("Failed to load biographical data")
         state.biographical_data = biographical_data
         return state
 
@@ -195,7 +197,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             msg = "No biographical years available"
             if block_mode:
                 raise Exception(msg)
-            logging.warning(msg)
+            logger.warning(msg)
             return state
 
         def pick_non_null_from_sequence(seq, tries=5):
@@ -212,7 +214,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 msg = "No non-null biographical data found in any year keys"
                 if block_mode:
                     raise Exception(msg)
-                logging.warning(msg)
+                logger.warning(msg)
                 state.selected_period = all_years[keys[0]]
                 return state
             chosen_val = all_years.get(chosen_key)
@@ -220,7 +222,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 msg = f"No biographical data for year key {chosen_key}"
                 if block_mode:
                     raise Exception(msg)
-                logging.warning(msg)
+                logger.warning(msg)
                 state.selected_period = None
                 return state
             # Try to convert to BiographicalPeriod, but if it's in YAML format, use the raw dict
@@ -234,7 +236,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 msg = "No non-null biographical period found in list/tuple"
                 if block_mode:
                     raise Exception(msg)
-                logging.warning(msg)
+                logger.warning(msg)
                 state.selected_period = all_years[0]
                 return state
             state.selected_period = chosen
@@ -253,7 +255,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             if "personal_context" in period:
                 # This is not a BiographicalPeriod, just return None
                 # The raw dict will be used in the state as-is
-                logging.info(
+                logger.info(
                     "Biographical data is in YAML format (world_events/personal_context)"
                 )
                 return None
@@ -263,7 +265,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 msg = f"Biographical period dict missing required keys: {required_keys - set(period.keys())}"
                 if block_mode:
                     raise ValueError(msg)
-                logging.warning(msg)
+                logger.warning(msg)
                 return None
             try:
                 return BiographicalPeriod(**period)
@@ -271,7 +273,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 msg = f"Failed to create BiographicalPeriod from dict: {e!s}"
                 if block_mode:
                     raise ValueError(msg)
-                logging.warning(msg)
+                logger.warning(msg)
                 return None
         if isinstance(period, (list, tuple)):
             for element in period:
@@ -282,7 +284,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
                     msg = f"Failed to ensure BiographicalPeriod from {element!r}"
                     if block_mode:
                         raise ValueError(msg)
-                    logging.warning(msg)
+                    logger.warning(msg)
                     return None
         return None
 
@@ -318,7 +320,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             if block_mode:
                 raise Exception(analysis["error"])
             else:
-                logging.warning(analysis["error"])
+                logger.warning(analysis["error"])
             return state
         qm = analysis["quantum_metrics"]
         taped_over = qm.get("taped_over_coefficient", 0.0)
@@ -377,19 +379,19 @@ class BlueAgent(BaseRainbowAgent, ABC):
             year=year,
             evaluation_timestamp=datetime.datetime.now(datetime.timezone.utc),
         )
-        logging.info(f"🔍 Breakage evaluation for {year}:")
-        logging.info(f"   {'✅ SUITABLE' if is_suitable else '❌ NOT SUITABLE'}")
-        logging.info(f"   Breakage score: {breakage_score:.2f}")
-        logging.info(f"   Taped-over coefficient: {taped_over:.2f}")
-        logging.info(f"   Narrative malleability: {malleability:.2f}")
-        logging.info(f"   Choice points: {choice_density}")
-        logging.info(f"   Temporal significance: {temporal_sig}")
-        logging.info(f"   Identity collapse risk: {collapse_risk}")
-        logging.info(
+        logger.info(f"🔍 Breakage evaluation for {year}:")
+        logger.info(f"   {'✅ SUITABLE' if is_suitable else '❌ NOT SUITABLE'}")
+        logger.info(f"   Breakage score: {breakage_score:.2f}")
+        logger.info(f"   Taped-over coefficient: {taped_over:.2f}")
+        logger.info(f"   Narrative malleability: {malleability:.2f}")
+        logger.info(f"   Choice points: {choice_density}")
+        logger.info(f"   Temporal significance: {temporal_sig}")
+        logger.info(f"   Identity collapse risk: {collapse_risk}")
+        logger.info(
             f"   Passed: {state.evaluation_result.passed_checks_count}/{state.evaluation_result.total_checks_count}"
         )
         for check, passed in checks_dict.items():
-            logging.info(f"   {check}: {'✅' if passed else '❌'}")
+            logger.info(f"   {check}: {'✅' if passed else '❌'}")
 
         # Increment iteration count in the node (not the router) so it persists
         state.iteration_count += 1
@@ -399,21 +401,21 @@ class BlueAgent(BaseRainbowAgent, ABC):
     def route_after_evaluate_timeline_frailty(self, state: BlueAgentState) -> str:
         # If we found a suitable year, proceed immediately
         if state.evaluation_result.is_suitable:
-            logging.info(
+            logger.info(
                 f"✅ Found suitable year after {state.iteration_count} attempts, proceeding"
             )
             return "frail"
 
         # If not suitable but haven't hit max iterations, try another year
         if state.iteration_count < state.max_iterations:
-            logging.info(
+            logger.info(
                 f"❌ Year not suitable, trying another ({state.iteration_count}/{state.max_iterations})"
             )
             return "healthy"
 
         # If we've exhausted max iterations without finding a suitable year,
         # force proceed with the last evaluated year
-        logging.warning(
+        logger.warning(
             f"⚠️ Failed to find suitable year after {state.max_iterations} attempts, "
             f"forcing proceed with year {state.evaluation_result.year}"
         )
@@ -438,7 +440,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -558,26 +560,26 @@ The tape has been recorded over. What life exists on it now?
                 error_msg = f"Expected AlternateTimelineArtifact, got {type(result)}"
                 if block_mode:
                     raise TypeError(error_msg)
-                logging.warning(error_msg)
+                logger.warning(error_msg)
                 timeline = result
             validation_result = self._validate_alternate_history(timeline, state)
             if not validation_result["is_valid"]:
-                logging.warning("⚠️ Alternate history failed validation:")
+                logger.warning("⚠️ Alternate history failed validation:")
                 for issue in validation_result["issues"]:
-                    logging.warning(f"   - {issue}")
+                    logger.warning(f"   - {issue}")
                 timeline.validation_issues = validation_result["issues"]
                 if block_mode:
                     raise ValueError(
                         f"Generated alternate history failed plausibility checks: {validation_result['issues']}"
                     )
                 else:
-                    logging.warning("Proceeding with alternate history despite issues")
+                    logger.warning("Proceeding with alternate history despite issues")
             else:
-                logging.info("✅ Alternate history passed validation")
-                logging.info(
+                logger.info("✅ Alternate history passed validation")
+                logger.info(
                     f"   Plausibility score: {validation_result['plausibility_score']:.2f}"
                 )
-                logging.info(
+                logger.info(
                     f"   Specificity score: {validation_result['specificity_score']:.2f}"
                 )
             timeline.save_file()
@@ -586,7 +588,7 @@ The tape has been recorded over. What life exists on it now?
         except Exception as e:
             if block_mode:
                 raise Exception(f"Anthropic model call failed: {e!s}") from e
-            logging.error(f"Anthropic model call failed: {e!s}")
+            logger.error(f"Anthropic model call failed: {e!s}")
         return state
 
     def _validate_alternate_history(
@@ -694,7 +696,7 @@ The tape has been recorded over. What life exists on it now?
                         f"but detail mentions {location}"
                     )
             if not alt_location and bio_region != "UNKNOWN":
-                logging.warning(
+                logger.warning(
                     f"Cannot verify geographic fit: alternate history has no explicit location, "
                     f"but biographical period was in {bio_location}"
                 )
@@ -897,7 +899,7 @@ The tape has been recorded over. What life exists on it now?
                 YOUR_TEAM_RING_TAPE_LYRIC_FRAGMENTS, history.divergence_magnitude
             )
         except Exception as e:
-            logging.warning(f"Failed to pick lyric fragment: {e!s}")
+            logger.warning(f"Failed to pick lyric fragment: {e!s}")
             note = random.choice(YOUR_TEAM_RING_TAPE_LYRIC_FRAGMENTS)
         return note
 
@@ -936,11 +938,11 @@ The tape has been recorded over. What life exists on it now?
             label.save_file()
             state.artifacts.append(label)
             state.tape_label = label
-            logging.info(f"Saved tape label artifact: {label.file_path}")
+            logger.info(f"Saved tape label artifact: {label.file_path}")
             return state
         except Exception as e:
             error_msg = f"Failed to save tape label artifact: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
         return state
@@ -1018,7 +1020,7 @@ The tape has been recorded over. What life exists on it now?
                 return state
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -1086,7 +1088,7 @@ dream into a song about THIS erased timeline - the one in your hands.
                     counter_proposal = result
             except Exception as e:
                 timestamp = int(time.time() * 1000)
-                logging.error(f"Anthropic model call failed: {e!s}")
+                logger.error(f"Anthropic model call failed: {e!s}")
                 counter_proposal = SongProposalIteration(
                     iteration_id=f"fallback_error_{timestamp}",
                     bpm=110,

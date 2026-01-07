@@ -18,6 +18,8 @@ from app.structures.enums.image_text_style import ImageTextStyle
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class InfranymEncodedImageArtifact(ChainArtifact, ABC):
     """
@@ -106,7 +108,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
                 f"Increase carrier size or reduce text render dimensions."
             )
 
-        logging.info(
+        logger.info(
             f"💜 Carrier size OK: {carrier.width}x{carrier.height} ({carrier_pixels:,} pixels)"
         )
 
@@ -147,10 +149,10 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
         output_path = self.get_artifact_path(with_file_name=True, create_dirs=True)
         final_img.save(output_path, format="PNG", pnginfo=metadata)
 
-        logging.info(f"💜 Encoded puzzle saved: {output_path}")
-        logging.info(f"   L1: {self.surface_clue[:50]}...")
-        logging.info(f"   L2: Text image from {self.text_render_path}")
-        logging.info(f"   L3: Solution encrypted with key '{self.secret_word}'")
+        logger.info(f"💜 Encoded puzzle saved: {output_path}")
+        logger.info(f"   L1: {self.surface_clue[:50]}...")
+        logger.info(f"   L2: Text image from {self.text_render_path}")
+        logger.info(f"   L3: Solution encrypted with key '{self.secret_word}'")
 
         return output_path
 
@@ -195,7 +197,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
         compact_data = lsb.reveal(encoded_path)
 
         if not compact_data:
-            logging.warning("No LSB data found in image")
+            logger.warning("No LSB data found in image")
             return None
 
         try:
@@ -208,11 +210,11 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             if save_revealed:
                 reveal_path = encoded_path.replace(".png", "_LAYER2_REVEALED.png")
                 text_img.save(reveal_path)
-                logging.info(f"🩵 Layer 2 text image revealed: {reveal_path}")
+                logger.info(f"🩵 Layer 2 text image revealed: {reveal_path}")
 
             return text_img
         except Exception as e:
-            logging.error(f"Error extracting Layer 2: {e}")
+            logger.error(f"Error extracting Layer 2: {e}")
             return None
 
     def solve_layer3(self, secret_word_key: Optional[str] = None) -> Optional[str]:
@@ -229,7 +231,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             secret_word_key = self.secret_word
 
         if not secret_word_key:
-            logging.error("No secret word provided to decrypt Layer 3")
+            logger.error("No secret word provided to decrypt Layer 3")
             return None
 
         try:
@@ -249,11 +251,11 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             chars = [chr(int(bits[i : i + 8], 2)) for i in range(0, len(bits), 8)]
             message = "".join(chars).split("\x00")[0]  # Stop at null terminator
 
-            logging.info(f" 🩵Layer 3 decrypted with key '{secret_word_key}'")
+            logger.info(f" 🩵Layer 3 decrypted with key '{secret_word_key}'")
             return message
 
         except Exception as e:
-            logging.error(f"Error solving Layer 3: {e}")
+            logger.error(f"Error solving Layer 3: {e}")
             return None
 
     @staticmethod

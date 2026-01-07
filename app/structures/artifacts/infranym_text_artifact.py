@@ -21,6 +21,8 @@ TextEncodingVariant = Union[AcrosticEncoding, RiddleEncoding, AnagramEncoding]
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class InfranymTextArtifact(ChainArtifact, ABC):
     """
@@ -180,9 +182,9 @@ class InfranymTextArtifact(ChainArtifact, ABC):
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("\n".join(content_lines))
 
-        logging.info(f"📝 Text infranym saved: {output_path}")
-        logging.info(f"   Method: {self.encoding.method.value}")
-        logging.info(f"   Secret: {self.encoding.secret_word}")
+        logger.info(f"📝 Text infranym saved: {output_path}")
+        logger.info(f"   Method: {self.encoding.method.value}")
+        logger.info(f"   Secret: {self.encoding.secret_word}")
 
         return output_path
 

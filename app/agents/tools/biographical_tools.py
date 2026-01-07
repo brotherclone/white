@@ -4,6 +4,8 @@ import json
 
 from typing import Any, Dict, List, Optional
 
+logger = logging.getLogger(__name__)
+
 
 def load_biographical_data(
     file_path: str = "/Volumes/LucidNonsense/White/app/reference/biographical/biographical_reference.yml",
@@ -13,14 +15,14 @@ def load_biographical_data(
         with open(file_path, "r", encoding="utf-8") as file:
             return yaml.safe_load(file)
     except FileNotFoundError:
-        logging.error(f"Biographical data file not found: {file_path}")
+        logger.error(f"Biographical data file not found: {file_path}")
         return {
             "years": {},
             "quantum_analysis_prompts": {},
             "song_inspiration_templates": {},
         }
     except yaml.YAMLError as e:
-        logging.error(f"Error parsing YAML file: {e}")
+        logger.error(f"Error parsing YAML file: {e}")
         return {
             "years": {},
             "quantum_analysis_prompts": {},

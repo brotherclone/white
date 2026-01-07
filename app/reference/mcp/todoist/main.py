@@ -12,6 +12,8 @@ EF_PROJECT_ID = "6CrfWqXrxppjhqMJ"
 
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 load_dotenv()
 
 mcp = FastMCP("earthly_frames_todoist")
@@ -54,18 +56,18 @@ def get_earthly_frames_project_sections(
         ]
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 403:
-            logging.error(
+            logger.error(
                 f"403 Forbidden: Access denied to project {project_id}. Check API token permissions."
             )
         elif e.response.status_code == 401:
-            logging.error(
+            logger.error(
                 f"401 Unauthorized: Invalid API token for project {project_id}."
             )
         else:
-            logging.error(f"HTTP error fetching sections for project {project_id}: {e}")
+            logger.error(f"HTTP error fetching sections for project {project_id}: {e}")
         return []
     except Exception as e:
-        logging.error(f"Error fetching sections for project {project_id}: {e}")
+        logger.error(f"Error fetching sections for project {project_id}: {e}")
         return []
 
 
@@ -110,14 +112,12 @@ def create_sigil_charging_task(
         for s in sections:
             if s["name"] == section_name:
                 section_id = s["id"]
-                logging.info(
-                    f"Found existing section: {section_name} (id={section_id})"
-                )
+                logger.info(f"Found existing section: {section_name} (id={section_id})")
                 break
 
         if not section_id:
             # Create new section
-            logging.info(f"Section '{section_name}' not found, attempting to create...")
+            logger.info(f"Section '{section_name}' not found, attempting to create...")
             create_section_response = requests.post(
                 "https://api.todoist.com/rest/v2/sections",
                 headers=headers,
@@ -127,7 +127,7 @@ def create_sigil_charging_task(
             create_section_response.raise_for_status()
             new_section = create_section_response.json()
             section_id = new_section["id"]
-            logging.info(f"Created new section: {section_name} (id={section_id})")
+            logger.info(f"Created new section: {section_name} (id={section_id})")
 
         task_content = f"🜏 Charge Sigil for '{song_title}'"
         task_description = f"""
@@ -172,13 +172,13 @@ Mark this task complete after the sigil has been charged and released.
         error_msg = str(e)
         if e.response.status_code == 403:
             error_msg = f"403 Forbidden: Cannot create task in project {EF_PROJECT_ID}. Check API token permissions for project access and task creation."
-            logging.error(error_msg)
+            logger.error(error_msg)
         elif e.response.status_code == 401:
             error_msg = "401 Unauthorized: Invalid API token."
-            logging.error(error_msg)
+            logger.error(error_msg)
         else:
             error_msg = f"HTTP error creating sigil charging task: {e}"
-            logging.error(error_msg)
+            logger.error(error_msg)
         return {
             "success": False,
             "error": error_msg,
@@ -186,7 +186,7 @@ Mark this task complete after the sigil has been charged and released.
         }
     except Exception as e:
         error_msg = f"Unexpected error creating sigil charging task: {e}"
-        logging.exception("Failed creating sigil charging task")
+        logger.exception("Failed creating sigil charging task")
         return {"success": False, "error": error_msg}
 
 
@@ -250,16 +250,16 @@ def list_pending_black_agent_tasks(
 
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 403:
-            logging.error(
+            logger.error(
                 f"403 Forbidden: Cannot access tasks in project {EF_PROJECT_ID}. Check API token permissions."
             )
         elif e.response.status_code == 401:
-            logging.error("401 Unauthorized: Invalid API token.")
+            logger.error("401 Unauthorized: Invalid API token.")
         else:
-            logging.error(f"HTTP error listing tasks: {e}")
+            logger.error(f"HTTP error listing tasks: {e}")
         return []
     except Exception as e:
-        logging.error(f"Error listing tasks: {e}")
+        logger.error(f"Error listing tasks: {e}")
         return []
 
 
@@ -321,17 +321,17 @@ def create_todoist_task_for_human_earthly_frame(
         }
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 403:
-            logging.error(
+            logger.error(
                 f"403 Forbidden: Cannot create task in project {project_id}. Check API token permissions for project access and task creation."
             )
         elif e.response.status_code == 401:
-            logging.error("401 Unauthorized: Invalid API token.")
+            logger.error("401 Unauthorized: Invalid API token.")
         else:
-            logging.error(f"HTTP error creating task: {e}")
-        logging.error(f"Error creating task: {e}")
+            logger.error(f"HTTP error creating task: {e}")
+        logger.error(f"Error creating task: {e}")
         raise
     except Exception as e:
-        logging.error(f"Error creating task: {e}")
+        logger.error(f"Error creating task: {e}")
         raise
 
 
