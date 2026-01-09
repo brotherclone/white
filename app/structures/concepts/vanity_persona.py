@@ -28,8 +28,8 @@ class VanityPersona(BaseModel):
     publication: Optional[str] = Field(
         default=None, description="The publication the persona is associated with"
     )
-    interviewer_type: VanityInterviewerType = Field(
-        default_factory=lambda: random.choice(list(VanityInterviewerType)),
+    interviewer_type: Optional[VanityInterviewerType] = Field(
+        default=None,
         description="The type of interviewer",
     )
     stance: Optional[str] = Field(default=None, description="The stance of the persona")
@@ -47,6 +47,10 @@ class VanityPersona(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
+        # Ensure interviewer_type is set before deriving dependent fields
+        if self.interviewer_type is None:
+            # random.choice needs a sequence, not the Enum class itself
+            self.interviewer_type = random.choice(list(VanityInterviewerType))
         self.get_interview_engagement_style()
         if self.publication is None:
             self.create_publication()

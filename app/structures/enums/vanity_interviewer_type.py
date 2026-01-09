@@ -1,7 +1,5 @@
 from enum import Enum
 
-# ToDo: Add tests
-
 
 class VanityInterviewerType(str, Enum):
     HOSTILE_SKEPTICAL = "hostile_skeptical"

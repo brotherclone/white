@@ -1,5 +1,3 @@
-"""Tests for YellowAgent"""
-
 from app.agents.states.yellow_agent_state import YellowAgentState
 from app.agents.yellow_agent import YellowAgent
 from app.structures.manifests.song_proposal import SongProposalIteration

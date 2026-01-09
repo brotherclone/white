@@ -152,22 +152,20 @@ def test_violet_agent_state_has_required_fields():
 
     cls = _get_class_or_skip()
 
-    # Create test personas
+    # Create test persona
     interviewer = VanityPersona(first_name="Test", last_name="Interviewer")
-    interviewee = VanityPersona(first_name="Test", last_name="Interviewee")
 
     try:
-        obj = cls(interviewer_persona=interviewer, interviewee_persona=interviewee)
+        obj = cls(interviewer_persona=interviewer)
     except Exception as e:
         pytest.skip(f"Could not instantiate {CLASS_NAME}: {e}")
 
-    # Check for violet agent specific fields
+    # Check for violet agent specific fields (updated to match current implementation)
     expected_fields = [
-        "interview_collector",
         "interviewer_persona",
-        "interviewee_persona",
-        "interviewer_objectives",
-        "interviewee_objectives",
+        "interview_questions",
+        "needs_human_interview",
+        "interview_responses",
         "circle_jerk_interview",
     ]
 
@@ -181,23 +179,21 @@ def test_violet_agent_state_field_defaults():
 
     cls = _get_class_or_skip()
 
-    # Create test personas
+    # Create test persona
     interviewer = VanityPersona(first_name="Test", last_name="Interviewer")
-    interviewee = VanityPersona(first_name="Test", last_name="Interviewee")
 
     try:
-        obj = cls(interviewer_persona=interviewer, interviewee_persona=interviewee)
+        obj = cls(interviewer_persona=interviewer)
     except Exception as e:
         pytest.skip(f"Could not instantiate {CLASS_NAME}: {e}")
 
-    # Test list defaults
-    assert obj.interview_collector == []
-    assert obj.interviewer_objectives == []
-    assert obj.interviewee_objectives == []
-
-    # Test None default
+    # Test None defaults for optional fields
+    assert obj.interview_questions is None
+    assert obj.interview_responses is None
     assert obj.circle_jerk_interview is None
 
-    # Test required personas are set correctly
+    # Test boolean default
+    assert obj.needs_human_interview is False
+
+    # Test required persona is set correctly
     assert obj.interviewer_persona == interviewer
-    assert obj.interviewee_persona == interviewee

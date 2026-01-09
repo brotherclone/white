@@ -754,6 +754,56 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
+def validate_manifest_id_consistency(
+    yaml_data: Dict[str, Any], file_path: str
+) -> Tuple[bool, List[str]]:
+    """
+    Validates that manifest_id matches the filename and album_sequence.
+
+    Args:
+        yaml_data: Parsed YAML content
+        file_path: Path to the YAML file
+
+    Returns:
+        Tuple of (is_valid, list_of_error_messages)
+    """
+    errors = []
+
+    if not isinstance(yaml_data, dict):
+        return False, ["Invalid YAML structure: not a dictionary"]
+
+    manifest_id = yaml_data.get("manifest_id")
+    album_sequence = yaml_data.get("album_sequence")
+
+    # Extract filename without extension
+    filename = os.path.basename(file_path)
+    filename_without_ext = os.path.splitext(filename)[0]
+
+    # Check if manifest_id matches filename
+    if manifest_id and manifest_id != filename_without_ext:
+        errors.append(
+            f"manifest_id '{manifest_id}' does not match filename '{filename_without_ext}'"
+        )
+
+    # Check if manifest_id song number matches album_sequence
+    if manifest_id and album_sequence is not None:
+        # Parse manifest_id to extract song number (e.g., '02' from '08_02')
+        match = re.match(r"^(\d+)_(\d+)$", str(manifest_id))
+        if match:
+            song_num_from_id = int(match.group(2))
+            if song_num_from_id != album_sequence:
+                errors.append(
+                    f"manifest_id '{manifest_id}' song number ({song_num_from_id}) "
+                    f"does not match album_sequence ({album_sequence})"
+                )
+        else:
+            errors.append(
+                f"manifest_id '{manifest_id}' does not follow expected format 'XX_YY'"
+            )
+
+    return len(errors) == 0, errors
+
+
 def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
     """Validates a single YAML file.
 
@@ -779,6 +829,12 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
         is_valid, field_errors = validate_field_values(yaml_data)
         if not is_valid:
             for err in field_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: manifest ID consistency
+        is_valid, id_errors = validate_manifest_id_consistency(yaml_data, file_path)
+        if not is_valid:
+            for err in id_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
         # Run validation: lyrics has lrc
