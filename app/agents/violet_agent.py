@@ -546,7 +546,7 @@ The revision should be INFORMED BY but not DEFEATED BY the criticism."""
     @staticmethod
     def route_after_roll(state: VioletAgentState) -> str:
         """Route to a human or simulated interview based on roll"""
-        if state.get("needs_human_interview", False):
+        if getattr(state, "needs_human_interview", False):
             return "human_interview"
         else:
             return "simulated_interview"

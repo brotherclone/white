@@ -102,12 +102,12 @@ audio_tracks:
   - id: 10
     description: Lead Vocal
     audio_file: 08_01_16_lead_vocal.wav
-    player: Shirley Kidurka
+    player: Shirley Kudirka
   - id: 11
     description: Vocal Harmonies
     audio_file: 08_01_17_vocal_harmonies.wav
-    player: Shirley Kidurka
+    player: Shirley Kudirka
   - id: 12
     description: Vocal Adlib
     audio_file: 08_01_18_vocal_adlib.wav
-    player: Shirley Kidurka
+    player: Shirley Kudirka
