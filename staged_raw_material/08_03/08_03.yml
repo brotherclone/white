@@ -15,34 +15,36 @@ structure:
   - section_name: Intro
     start_time: '[00:00.000]'
     end_time: '[00:08.000]'
-    description: TK
+    description: Organ and drum machine kick off
   - section_name: Verse
     start_time: '[00:08.001]'
     end_time: '[00:28.000]'
-    description: TK
+    description: The verse features a pop-corn sounding synth and soft vocals
   - section_name: Chorus
     start_time: '[00:28.001]'
     end_time: '[00:44.000]'
-    description: TK
+    description: The chorus gallops up a walking melody
   - section_name: Verse
     start_time: '[00:44.001]'
     end_time: '[01:04.000]'
-    description: TK
+    description: Back to the verse
   - section_name: Bridge
     start_time: '[01:04.001]'
     end_time: '[01:28.000]'
-    description: TK
+    description: A melancholic bridge with a focus on the vocals and synths
   - section_name: Verse
     start_time: '[01:28.001]'
     end_time: '[01:52.000]'
+    description: A muted guitar kicks us back into the verse
   - section_name: Chorus
     start_time: '[01:52.001]'
     end_time: '[02:08.000]'
-    description: TK
+    description: The final chorus with lots of energy
   - section_name: Jams
     start_time: '[02:08.001]'
     end_time: '[02:34.000]'
-concept: TK
+    description: A keyboard uses a guitar line as a side-chained carrier and both solo giving a neo 70s vibe.
+concept: A central song on the album, the idea of being self-centered is turned on its head and becomes a internal prison.
 lrc_file: 08_03.lrc
 sounds_like:
   - name: Lana Del Rey
@@ -112,19 +114,19 @@ audio_tracks:
     player: Katherine Koherence
   - id: 12
     description: Synth Chords
-    audio_file: TK
+    audio_file: 08_03_20_chords.wav
     midi_file: 08_03_08_chords.mid
   - id: 13
     description: Lead Synth
-    audio_file: 08_03_09_lead_synth.wav
+    audio_file: 08_03_27_key_lead.wav
     midi_file: 08_03_09_lead_synth.mid
   - id: 14
     description: Pad 1
-    audio_file: 08_03_10_pad_1.wav
+    audio_file: 08_03_28_pad.wav
     midi_file: 08_03_10_pad_1.mid
   - id: 15
     description: Pad 2
-    audio_file: 08_03_11_pad_2.wav
+    audio_file: 08_03_29_pad_2.wav
     midi_file: 08_03_11_pad_2.mid
   - id: 16
     description: Bass
