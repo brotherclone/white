@@ -1,1 +1,16 @@
 # ToDo: Complete this manifest
+bpm: 79
+tempo: 4/4
+key: F# minor
+
+01:00:00:00.00	 Intro	
+01:00:09:02.67	 Verse	
+01:00:18:05.55	 Chorus	
+01:00:42:13.23	 Verse	
+01:01:00:18.79	 Chorus	
+01:01:25:01.46	 Chorus Alt	
+01:01:37:05.30	 Chorus	
+01:02:01:12.78	 Verse	
+01:02:19:18.53	 Outro Bridge	
+01:02:31:22.37	 Outro	
+01:02:53:23.08	 END
