@@ -466,7 +466,6 @@ class TestProcessStagedRawMaterial:
 
         mock_process_multiple.return_value = {"total_tracks_processed": 2}
 
-        # Should only process tracks matching 08_*
         call_args = mock_process_multiple.call_args
         track_dirs = call_args[0][0]
         assert len(track_dirs) == 2

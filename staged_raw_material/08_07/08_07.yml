@@ -1,1 +1,40 @@
 # ToDo: Complete this manifest
+bpm: 117
+key: B minor
+tempo: 4/4
+
+[00:00.000]	 Intro	
+[00:08.005]	 Verse	
+[00:32.020]	 Chorus	
+[00:49.005]	 Verse	
+[01:05.016]	 Interlude	
+[01:13.021]	 Chorus	
+[01:46.016]	 Verse	
+[02:03.001]	 Vamp	
+[02:11.007]	 Jams	
+[02:58.011]	 Reprise	
+[03:26.016]	 END
+
+
+08_07_02_drums.wav
+08_07_03_hook.mid
+08_07_04_kick.mid
+08_07_05_dm.mid
+08_07_06_kick.wav
+08_07_07_snare.wav
+08_07_08_toms.wav
+08_07_09_hh.wav
+08_07_10_dm.wav
+08_07_11_bass.wav
+08_07_12_chords.wav
+08_07_13_hook.wav
+08_07_14_guitar_1.wav
+08_07_15_guitar_2.wav
+08_07_16_guitar_3.wav
+08_07_17_guitar_4.wav
+08_07_18_guitar_5.wav
+08_07_19_guitar_6.wav
+08_07_20_vox_main.wav
+08_07_21_vox_harmonies.wav
+08_07_22_vox_adlibs.wav
+08_07_main.wav

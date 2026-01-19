@@ -195,6 +195,12 @@ class TestWithMido:
 
         with patch("app.util.midi_segment_utils.segment_midi_file") as mock_segment:
             mock_segment.return_value = True
+
+            result = midi_segment_utils.segment_midi_with_audio(
+                str(audio_file), 0.0, 10.0, str(output_dir)
+            )
+
+            assert len(result) > 0
             mock_segment.assert_called()
 
     def test_segment_midi_with_audio_with_manifest(self, tmp_path):
