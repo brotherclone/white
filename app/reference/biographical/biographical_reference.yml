@@ -653,7 +653,6 @@ years:
       emotional_landscape:
       choice_points:
 
-  # ToDo: Fill in 1996
   1996:
     world_events:
       major:
@@ -674,14 +673,15 @@ years:
     personal_context:
       summary: "Age 21 - legal adulthood milestone"
       key_events:
-        - "A terrible girlfriend"
+        - "My junior film is ruined when sound forgot to roll and I didn't shoot enough coverage."
+        - "I start becoming really interested in digital art and installation video art."
       influences:
         - "Internet mainstream adoption"
         - "Hip-hop culture complexity"
       emotional_landscape: "Full adulthood realization and responsibility"
       choice_points:
-        - "Adult lifestyle establishment"
-        - "Professional identity choices"
+        - "What if I had gotten kicked out for my failure of a movie?"
+        - "What if I had gone 'experimental' focusing on emerging tech and instead of continuing with narrative filmmaking?"
 
   1997:
     world_events:
@@ -952,7 +952,6 @@ years:
       emotional_landscape:
       choice_points:
 
-  # ToDo: Fill in 2006
   2006:
     world_events:
       major:
@@ -975,13 +974,17 @@ years:
       key_events:
         - "Begin working remotely for LEGO"
         - "Also freelance for PBS, Pfizer and a couple of other companies making Flash games"
+        - "Attend analysis sessions with Larry Staples"
+        - "Release Mouse Mountain Flash Web game"
       influences:
         - "Game design thought process"
-        - "Washington DC community"
+        - "Washington DC community is boring and conservative"
       emotional_landscape:
         - "Regret of moving away from NYC hitting hard"
         - "Anxiety about paying the mortgage"
       choice_points:
+        - "What if I never got to release Mouse Mountain?"
+        - "What if I never got help from Larry?"
 
 
   # ToDo: Fill in 2007
@@ -1227,14 +1230,13 @@ years:
       emotional_landscape:
       choice_points:
 
-  # ToDo: Fill in 2016
   2016:
     world_events:
       major:
         - "Donald Trump elected"
         - "Brexit referendum"
         - "Pokémon Go augmented reality"
-        - "Prince dies"
+        - "David Bowie dies"
       cultural:
         - "Stranger Things 80s nostalgia"
         - "Pokémon Go AR phenomenon"
@@ -1248,9 +1250,23 @@ years:
     personal_context:
       summary: "Age 41 - early forties establishment"
       key_events:
+        - "A project I'm working on for the intelligence sector is ruined by the Trump election."
+        - "One of my 'three David' heroes passes away"
+        - "Our family travels to Ireland"
+        - "For spring break we go to the Bahamas - I fly out early to go to an Adobe thing in San Francisco, but Ali and Si are stuck because a huge snow storm"
+        - "Recording The Conjurer's Thread"
       influences:
+        - "Long commute to get to the SCIF"
+        - "Design thinking peak"
+        - "Grey intelligence space super interesting"
       emotional_landscape:
+         - "Despair at the election of Donald Trump"
+         - "Bowie's death was devastating"
+         - "Occult practices"
       choice_points:
+        - "What if I had just stopped recording The Conjurer's Thread, and never started The Rainbow Table"
+        - "What if I got stuck in the Bahamas for the entire trip and missed the Adobe conference?"
+        - "What if I moved to one of the intelligence agencies via Adobe work?"
 
   # ToDo: Fill in 2017
   2017:

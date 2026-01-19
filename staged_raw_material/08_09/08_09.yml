@@ -1,1 +1,17 @@
 # ToDo: Complete this manifest
+bpm: 126
+tempo: 4/4
+key: Gb major
+
+[00:00.000]	 Intro	
+[00:07.015]	 Chorus	
+[00:15.005]	 Verse	
+[00:30.011]	 Chorus	
+[00:38.002]	 Bridge	
+[00:45.017]	 Verse	
+[01:00.023]	 Chorus	
+[01:16.004]	 Interlude	
+[01:23.020]	 Chorus	
+[01:39.001]	 Interlude	
+[01:46.016]	 Outro	
+[02:05.017]	 END

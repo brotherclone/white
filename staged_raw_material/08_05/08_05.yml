@@ -1,13 +1,72 @@
 # ToDo: Complete this manifest
-bpm: 107
-temp: 4/4
-key: F# major
 
-[00:00.000]	 Intro	
-[00:08.024]	 Verse 1	
-[00:35.022]	 Chorus 1	
-[01:02.020]	 Verse 2	
-[01:20.018]	 Chorus 2	
-[01:47.016]	 Bridge	
-[02:21.007]	 Verse jams	
-[03:01.017]	 End
+bpm: 107
+manifest_id: '08_05'
+tempo: 4/4
+key: F# major
+rainbow_color: V
+title: Incompetence
+release_date: '2025-09-08'
+album_sequence: 5
+main_audio_file: 08_05_main.wav
+TRT: '[03:01.017]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:08.024]'
+    description: A driving, disco beat with cheesy faux orchestra starts the song
+  - section_name: Verse 1
+    start_time: '[00:08.025]'
+    end_time: '[00:35.022]'
+    description: TK
+  - section_name: Chorus 1
+    start_time: '[00:35.023]'
+    end_time: '[01:02.020]'
+    description: TK
+  - section_name: Verse 2
+    start_time: '[01:02.021]'
+    end_time: '[01:20.018]'
+    description: TK
+  - section_name: Chorus 2
+    start_time: '[01:20.019]'
+    end_time: '[01:47.016]'
+    description: TK
+  - section_name: Bridge
+    start_time: '[01:47.017]'
+    end_time: '[02:21.007]'
+    description: TK
+  - section_name: Verse jams
+    start_time: '[02:21.008]'
+    end_time: '[03:01.017]'
+    description: TK
+concept: TK
+lrc_file: 08_05.lrc
+sounds_like:
+  - name: Henry Mancini
+    discogs_id: TK
+  - name: Bee Gees
+    discogs_id: TK
+  - name: ABBA
+    discogs_id: TK
+  - name: Billie Eilish
+    discogs_id: TK
+mood:
+  - nostalgic
+  - disco
+  - ironic
+  - melancholic
+genres:
+  - electronic
+  - disco
+  - retro
+  - pop
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 08_05_30_drums.wav
+  - id: 3
+    description: Kick 1
+    audio_file: 08_05_02_kick1.wav
+    midi_file: 08_05_02_kick_1.mid

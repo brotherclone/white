@@ -1,1 +1,14 @@
 # ToDo: Complete this manifest
+bpm: 89
+tempo: 4/4
+key: G major
+
+
+01:00:00:00.00	 intro	
+01:00:10:19.53	 verse	
+01:00:51:05.71	 chorus	
+01:01:15:12.51	 verse	
+01:01:39:19.30	 chorus	
+01:02:04:01.09	 interlude	
+01:02:28:07.69	 verse	
+01:02:57:24.35	 End
