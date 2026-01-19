@@ -1,40 +1,127 @@
-# ToDo: Complete this manifest
 bpm: 117
-key: B minor
+manifest_id: '08_07'
 tempo: 4/4
-
-[00:00.000]	 Intro	
-[00:08.005]	 Verse	
-[00:32.020]	 Chorus	
-[00:49.005]	 Verse	
-[01:05.016]	 Interlude	
-[01:13.021]	 Chorus	
-[01:46.016]	 Verse	
-[02:03.001]	 Vamp	
-[02:11.007]	 Jams	
-[02:58.011]	 Reprise	
-[03:26.016]	 END
-
-
-08_07_02_drums.wav
-08_07_03_hook.mid
-08_07_04_kick.mid
-08_07_05_dm.mid
-08_07_06_kick.wav
-08_07_07_snare.wav
-08_07_08_toms.wav
-08_07_09_hh.wav
-08_07_10_dm.wav
-08_07_11_bass.wav
-08_07_12_chords.wav
-08_07_13_hook.wav
-08_07_14_guitar_1.wav
-08_07_15_guitar_2.wav
-08_07_16_guitar_3.wav
-08_07_17_guitar_4.wav
-08_07_18_guitar_5.wav
-08_07_19_guitar_6.wav
-08_07_20_vox_main.wav
-08_07_21_vox_harmonies.wav
-08_07_22_vox_adlibs.wav
-08_07_main.wav
+key: B minor
+rainbow_color: V
+title: Gallows Girls
+release_date: '2025-09-08'
+album_sequence: 7
+main_audio_file: 08_07_main.wav
+TRT: '[03:26.016]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:08.005]'
+    description: Percussion and a heavy bass line drop us right into the song.
+  - section_name: Verse
+    start_time: '[00:08.006]'
+    end_time: '[00:32.020]'
+    description: The verse plays with soul and psychedelic elements.
+  - section_name: Chorus
+    start_time: '[00:32.021]'
+    end_time: '[00:49.005]'
+    description: The chorus has a call and response vibe that's compounded by delay
+  - section_name: Interlude
+    start_time: '[00:49.006]'
+    end_time: '[01:05.016]'
+    description: The bass and guitar trade off without vocals
+  - section_name: Vamp
+    start_time: '[01:05.017]'
+    end_time: '[02:03.001]'
+    description: This section plays for time as if something big is happening in the background
+  - section_name: Jams
+    start_time: '[02:03.002]'
+    end_time: '[02:58.011]'
+    description: And sure enough, the 'big' part is an insane assault of guitars ending with a tape stop type effect on the overloaded sound.
+  - section_name: Reprise
+    start_time: '[02:58.012]'
+    end_time: '[03:26.016]'
+    description: The song ends with a single refrain of the chorus
+concept: Gallows Girls casts a Tale of Two Cities where it's the royals controlling the 'national razor' our hero doesn't give them the benefit of any righteousness as he awaits his fate.
+lrc_file: 08_07.lrc
+sounds_like:
+  - name: OutKast
+    discogs_id: 38561
+  - name: Steve Lacy (4)
+    discogs_id: 4740695
+  - name: Medicine (2)
+    discogs_id: 71224
+mood:
+  - defiant
+  - energetic
+  - empowering
+  - gritty
+genres:
+  - rock
+  - soul
+  - pop
+  - psychedelic
+  - shoegaze
+audio_tracks:
+  - id: 2
+    description: All drums
+    audio_file: 08_07_02_drums.wav
+    player: Graham Hopkins
+  - id: 3
+    description: Synth hook
+    audio_file: 08_07_13_hook.wav
+    midi_file: 08_07_03_hook.mid
+  - id: 4
+    description: Kick
+    audio_file: 08_07_06_kick.wav
+    midi_file: 08_07_04_kick.mid
+    player: Graham Hopkins
+  - id: 5
+    description: Drum machine
+    midi_file: 08_07_05_dm.mid
+    audio_file: 08_07_10_dm.wav
+  - id: 6
+    description: Snare
+    audio_file: 08_07_07_snare.wav
+    player: Graham Hopkins
+  - id: 7
+    description: Toms
+    audio_file: 08_07_08_toms.wav
+    player: Graham Hopkins
+  - id: 8
+    description: Hi Hat
+    audio_file: 08_07_09_hh.wav
+    player: Graham Hopkins
+  - id: 9
+    description: Bass
+    audio_file: 08_07_11_bass.wav
+  - id: 10
+    description: Chords
+    audio_file: 08_07_12_chords.wav
+  - id: 11
+    description: Guitar 1
+    audio_file: 08_07_14_guitar_1.wav
+  - id: 12
+    description: Guitar 2
+    audio_file: 08_07_15_guitar_2.wav
+  - id: 13
+    description: Guitar 3
+    audio_file: 08_07_16_guitar_3.wav
+  - id: 14
+    description: Guitar 4
+    audio_file: 08_07_17_guitar_4.wav
+  - id: 15
+    description: Guitar 5
+    audio_file: 08_07_18_guitar_5.wav
+  - id: 16
+    description: Guitar 6
+    audio_file: 08_07_19_guitar_6.wav
+  - id: 17
+    description: Vocals Main
+    audio_file: 08_07_20_vox_main.wav
+    player: Busayo Oninla
+  - id: 18
+    description: Vocals Harmonies
+    audio_file: 08_07_21_vox_harmonies.wav
+    player: Busayo Oninla
+  - id: 19
+    description: Vocals Ad libs
+    audio_file: 08_07_22_vox_adlibs.wav
+    player: Busayo Oninla

@@ -145,18 +145,22 @@ audio_tracks:
   - id: 21
     description: Lead Vocals
     audio_file: 08_06_41_lead_vox.wav
+    player: Aloysius Fortune
   - id: 22
     description: Double Vocals 1
     audio_file: 08_06_42_vox_dbl.wav
+    player: Aloysius Fortune
   - id: 23
     description: Double Vocals 2
     audio_file: 08_06_43_vox_dbl_2.wav
   - id: 24
     description: Vocal Harmonies
     audio_file: 08_06_44_vox_harm.wav
+    player: Aloysius Fortune
   - id: 25
     description: Vocal Harmonies 2
     audio_file: 08_06_45_vox_harm_2.wav
   - id: 26
     description: Vocal Ad-libs
     audio_file: 08_06_46_vox_adlibs.wav
+    player: Aloysius Fortune
