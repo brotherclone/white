@@ -1,60 +1,162 @@
-# ToDo: Complete this manifest
 bpm: 79
+manifest_id: '08_06'
 tempo: 4/4
 key: F# minor
-
-[00:00.000]	 Intro	
-[00:09.002]	 Verse	
-[00:18.005]	 Chorus	
-[00:42.013]	 Verse	
-[01:00.018]	 Chorus	
-[01:25.001]	 Bridge	
-[01:37.005]	 Verse	
-[01:49.009]	 Verse Breakdown	
-[02:01.012]	 Chorus Alt	
-[02:19.018]	 Finale	
-[02:50.003]	 End
-
-08_06_02_opxa.mid
-08_06_03_arp.mid
-08_06_04_bass.mid
-08_06_05_bass_2.mid
-08_06_06_kick.mid
-08_06_07_snare.mid
-08_06_08_clap.mid
-08_06_09_hh.mid
-08_06_10_crash.mid
-08_06_11_ride.mid
-08_06_12_shaker.mid
-08_06_13_tam.mid
-08_06_14_perc.mid
-08_06_16_keys.wav
-08_06_17_opxa.wav
-08_06_18_arp.wav
-08_06_19_synth_bass.wav
-08_06_20_synth_bass_2.wav
-08_06_21_dm.wav
-08_06_22_kick_1.wav
-08_06_23_kick_2.wav
-08_06_24_snare_1.wav
-08_06_25_rim.wav
-08_06_26_clap_1.wav
-08_06_27_clap_2.wav
-08_06_28_hh_1.wav
-08_06_29_hh_2.wav
-08_06_30_hh_3.wav
-08_06_31_crash.wav
-08_06_33_ride.wav
-08_06_35_shaker.wav
-08_06_36_tam.wav
-08_06_37_perc.wav
-08_06_38_guitar.wav
-08_06_39_lead_guitar.wav
-08_06_40_vox.wav
-08_06_41_lead_vox.wav
-08_06_42_vox_dbl.wav
-08_06_43_vox_dbl_2.wav
-08_06_44_vox_harm.wav
-08_06_45_vox_harm_2.wav
-08_06_46_vox_adlibs.wav
-08_06_main.wav
+rainbow_color: V
+title: Beautiful Tyrant
+release_date: '2025-09-08'
+album_sequence: 6
+main_audio_file: 08_06_main.wav
+TRT: '[02:50.003]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:09.002]'
+    description: Warped electronics and a heavy kick give the song an minimal, modern feel.
+  - section_name: Verse
+    start_time: '[00:09.003]'
+    end_time: '[00:18.005]'
+    description: A pained, tenor voice sings a short verse
+  - section_name: Chorus
+    start_time: '[00:18.006]'
+    end_time: '[00:42.013]'
+    description: The chorus takes a turn toward more pop sensibility with lush vocal harmonies.
+  - section_name: Verse
+    start_time: '[00:42.014]'
+    end_time: '[01:00.018]'
+    description: This verse is a bit less busy
+  - section_name: Chorus
+    start_time: '[01:00.019]'
+    end_time: '[01:25.001]'
+    description: Back to the chorus
+  - section_name: Bridge
+    start_time: '[01:25.002]'
+    end_time: '[01:37.005]'
+    description: A small bridge section that breaks up the verses
+  - section_name: Verse
+    start_time: '[01:37.006]'
+    end_time: '[01:49.009]'
+    description: Back to the verse with a bit of variation thrown off balance by the bridge
+  - section_name: Verse Breakdown
+    start_time: '[01:49.010]'
+    end_time: '[02:01.012]'
+    description: Now only the guitar and synth riff accompany the verse
+  - section_name: Chorus Alt
+    start_time: '[02:01.013]'
+    end_time: '[02:19.018]'
+    description: A chorus with a small variation setting up the ending
+  - section_name: Finale
+    start_time: '[02:19.019]'
+    end_time: '[02:50.003]'
+    description: An emotional ending, perhaps over cooked, trades melodies with a roto-speaker guitar
+concept: This song plays with introspection and self-doubt in an over-the-top emo way, exploring themes of self-doubt and vulnerability through a blend of electronic and rock elements.
+lrc_file: 08_06.lrc
+sounds_like:
+  - name: James Blake
+    discogs_id: 1500084
+  - name: Harry Styles
+    discogs_id: 2508414
+mood:
+  - self-pitying
+  - melancholy
+  - introspective
+  - emotional
+genres:
+  - electronic
+  - rock
+  - pop
+audio_tracks:
+  - id: 2
+    description: OPX-A Synth
+    audio_file: 08_06_17_opxa.wav
+    midi_file: 08_06_02_opxa.mid
+  - id: 3
+    description: Arp
+    audio_file: 08_06_18_arp.wav
+    midi_file: 08_06_03_arp.mid
+  - id: 4
+    description: Bass
+    audio_file: 08_06_19_synth_bass.wav
+    midi_file: 08_06_04_bass.mid
+  - id: 5
+    description: Bass 2
+    audio_file: 08_06_20_synth_bass_2.wav
+    midi_file: 08_06_05_bass_2.mid
+  - id: 6
+    description: Kick 1
+    audio_file: 08_06_22_kick_1.wav
+    midi_group_file: 08_06_06_kick.mid
+  - id: 7
+    description: Kick 2
+    audio_file: 08_06_23_kick_2.wav
+    midi_group_file: 08_06_06_kick.mid
+  - id: 8
+    description: Snare
+    audio_file: 08_06_24_snare_1.wav
+    midi_file: 08_06_07_snare.mid
+  - id: 9
+    description: Clap 1
+    audio_file: 08_06_26_clap_1.wav
+    midi_group_file: 08_06_08_clap.mid
+  - id: 10
+    description: Clap 2
+    audio_file: 08_06_27_clap_2.wav
+    midi_group_file: 08_06_08_clap.mid
+  - id: 11
+    description: Hi hat
+    audio_file: 08_06_28_hh_1.wav
+    midi_group_file: 08_06_09_hh.mid
+  - id: 12
+    description: Hi hat 2
+    audio_file: 08_06_29_hh_2.wav
+    midi_group_file: 08_06_09_hh.mid
+  - id: 13
+    description: Hi hat 3
+    audio_file: 08_06_30_hh_3.wav
+    midi_group_file: 08_06_09_hh.mid
+  - id: 14
+    description: Crash
+    audio_file: 08_06_31_crash.wav
+    midi_file: 08_06_10_crash.mid
+  - id: 15
+    description: Ride
+    audio_file: 08_06_33_ride.wav
+    midi_file: 08_06_11_ride.mid
+  - id: 16
+    description: Shaker
+    audio_file: 08_06_35_shaker.wav
+    midi_file: 08_06_12_shaker.mid
+  - id: 17
+    description: Tambourine
+    audio_file: 08_06_36_tam.wav
+    midi_file: 08_06_13_tam.mid
+  - id: 18
+    description: Percussion
+    audio_file: 08_06_37_perc.wav
+    midi_file: 08_06_14_perc.mid
+  - id: 19
+    description: Guitar
+    audio_file: 08_06_38_guitar.wav
+  - id: 20
+    description: Lead Guitar
+    audio_file: 08_06_39_lead_guitar.wav
+  - id: 21
+    description: Lead Vocals
+    audio_file: 08_06_41_lead_vox.wav
+  - id: 22
+    description: Double Vocals 1
+    audio_file: 08_06_42_vox_dbl.wav
+  - id: 23
+    description: Double Vocals 2
+    audio_file: 08_06_43_vox_dbl_2.wav
+  - id: 24
+    description: Vocal Harmonies
+    audio_file: 08_06_44_vox_harm.wav
+  - id: 25
+    description: Vocal Harmonies 2
+    audio_file: 08_06_45_vox_harm_2.wav
+  - id: 26
+    description: Vocal Ad-libs
+    audio_file: 08_06_46_vox_adlibs.wav
