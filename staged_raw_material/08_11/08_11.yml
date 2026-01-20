@@ -1,1 +1,84 @@
 # ToDo: Complete this manifest
+bpm: 128
+manifest_id: '08_11'
+tempo: 4/4
+key: G major
+rainbow_color: V
+title: Ill ☆'d
+release_date: '2025-09-08'
+album_sequence: 11
+main_audio_file: 08_11_main.wav
+TRT: '[03:07.012]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro Chorus
+    start_time: '[00:00.000]'
+    end_time: '[00:07.012]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[00:07.013]'
+    end_time: '[00:15.000]'
+    description: TK
+  - section_name: Verse
+    start_time: '[00:15.001]'
+    end_time: '[00:30.000]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[00:30.001]'
+    end_time: '[00:45.000]'
+    description: TK
+  - section_name: Bridge
+    start_time: '[00:45.001]'
+    end_time: '[01:01.021]'
+    description: TK
+  - section_name: Verse
+    start_time: '[01:01.022]'
+    end_time: '[01:16.021]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[01:16.022]'
+    end_time: '[01:31.021]'
+    description: TK
+  - section_name: Bridge
+    start_time: '[01:31.022]'
+    end_time: '[01:46.021]'
+    description: TK
+  - section_name: Instrumental
+    start_time: '[01:46.022]'
+    end_time: '[02:01.021]'
+    description: TK
+  - section_name: Verse
+    start_time: '[02:01.022]'
+    end_time: '[02:16.021]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[02:16.022]'
+    end_time: '[02:31.021]'
+    description: TK
+  - section_name: Bridge
+    start_time: '[02:31.022]'
+    end_time: '[02:46.021]'
+    description: TK
+  - section_name: Instrumental
+    start_time: '[02:46.022]'
+    end_time: '[03:07.012]'
+    description: TK
+concept: TK
+lrc_file: 08_11.lrc
+sounds_like:
+  - name: The Weeknd
+    discogs_id: 2171152
+  - name: Frank Ocean
+    discogs_id: 2013868
+mood:
+  - TK
+genres:
+  - TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK
+
+

@@ -1,17 +1,76 @@
 # ToDo: Complete this manifest
 bpm: 126
+manifest_id: '08_09'
 tempo: 4/4
 key: Gb major
-
-[00:00.000]	 Intro	
-[00:07.015]	 Chorus	
-[00:15.005]	 Verse	
-[00:30.011]	 Chorus	
-[00:38.002]	 Bridge	
-[00:45.017]	 Verse	
-[01:00.023]	 Chorus	
-[01:16.004]	 Interlude	
-[01:23.020]	 Chorus	
-[01:39.001]	 Interlude	
-[01:46.016]	 Outro	
-[02:05.017]	 END
+rainbow_color: V
+title: Recoup DeVille
+release_date: '2025-09-08'
+album_sequence: 9
+main_audio_file: 08_09_main.wav
+TRT: '[02:05.017]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:07.015]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[00:07.016]'
+    end_time: '[00:15.005]'
+    description: TK
+  - section_name: Verse
+    start_time: '[00:15.006]'
+    end_time: '[00:30.011]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[00:30.012]'
+    end_time: '[00:38.002]'
+    description: TK
+  - section_name: Bridge
+    start_time: '[00:38.003]'
+    end_time: '[00:45.017]'
+    description: TK
+  - section_name: Verse
+    start_time: '[00:45.018]'
+    end_time: '[01:00.023]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[01:00.024]'
+    end_time: '[01:16.004]'
+    description: TK
+  - section_name: Interlude
+    start_time: '[01:16.005]'
+    end_time: '[01:23.020]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[01:23.021]'
+    end_time: '[01:39.001]'
+    description: TK
+  - section_name: Interlude
+    start_time: '[01:39.002]'
+    end_time: '[01:46.016]'
+    description: TK
+  - section_name: Outro
+    start_time: '[01:46.017]'
+    end_time: '[02:05.017]'
+    description: TK
+concept: TK
+lrc_file: 08_09.lrc
+sounds_like:
+  - name: Jessica Pratt
+    discogs_id: 2084222
+  - name: His Name is Alive
+    discogs_id: 61796
+  - name: Halsey
+    discogs_id: 4298621
+mood:
+  - TK
+genres:
+  - TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK

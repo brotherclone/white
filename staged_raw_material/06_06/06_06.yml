@@ -81,8 +81,8 @@ audio_tracks:
     midi_file: 06_06_09_xylo.mid
   - id: 9
     description: Woodblock
-    audio_file: 06_06_11_woodblock.wav
-    midi_file: 06_06_12_woodblock.mid
+    audio_file: 06_06_12_woodblock.wav
+    midi_file: 06_06_11_woodblock.mid
   - id: 10
     description: Drums
     audio_file: 06_06_13_drums.wav
