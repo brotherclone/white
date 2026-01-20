@@ -1,14 +1,58 @@
 # ToDo: Complete this manifest
 bpm: 101
-key: Db major
+manifest_id: '08_10'
 tempo: 4/4
-
-[00:00.000]	 Verse	
-[00:38.000]	 Alt Verse	
-[00:57.000]	 Verse	
-[01:25.013]	 Vocal Interlude	
-[01:44.013]	 Alt Verse	
-[02:03.014]	 Chorus	
-[02:41.022]	 Jams	
-[03:24.008]	 End
-
+key: Db major
+rainbow_color: V
+title: Warren
+release_date: '2025-09-08'
+album_sequence: 10
+main_audio_file: 08_10_main.wav
+TRT: '[03:24.008]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse
+    start_time: '[00:00.000]'
+    end_time: '[00:38.000]'
+    description: TK
+  - section_name: Alt Verse
+    start_time: '[00:38.001]'
+    end_time: '[00:57.000]'
+    description: TK
+  - section_name: Verse
+    start_time: '[00:57.001]'
+    end_time: '[01:25.013]'
+    description: TK
+  - section_name: Vocal Interlude
+    start_time: '[01:25.014]'
+    end_time: '[01:44.013]'
+    description: TK
+  - section_name: Alt Verse
+    start_time: '[01:44.014]'
+    end_time: '[02:03.014]'
+    description: TK
+  - section_name: Chorus
+    start_time: '[02:03.015]'
+    end_time: '[02:41.022]'
+    description: TK
+  - section_name: Jams
+    start_time: '[02:41.023]'
+    end_time: '[03:24.008]'
+    description: TK
+concept: TK
+lrc_file: 08_10.lrc
+sounds_like:
+  - name: James Blake
+    discogs_id: 1500084
+  - name: Perfume Genius
+    discogs_id: 1741195
+mood:
+  - TK
+genres:
+  - TK
+audio_tracks:
+  - id: 2
+    description: TK
+    audio_file: TK
+    midi_file: TK

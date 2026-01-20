@@ -1,14 +1,117 @@
 # ToDo: Complete this manifest
 bpm: 89
 tempo: 4/4
+manifest_id: '08_08'
 key: G major
-
-
-01:00:00:00.00	 intro	
-01:00:10:19.53	 verse	
-01:00:51:05.71	 chorus	
-01:01:15:12.51	 verse	
-01:01:39:19.30	 chorus	
-01:02:04:01.09	 interlude	
-01:02:28:07.69	 verse	
-01:02:57:24.35	 End
+rainbow_color: V
+title: Birthday Effect
+release_date: '2025-09-08'
+album_sequence: 8
+main_audio_file: 08_08_main.wav
+TRT: '[02:57.024]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:10.019]'
+    description: A lonely electric guitar and bass start off the song
+  - section_name: Verse
+    start_time: '[00:10.020]'
+    end_time: '[00:51.005]'
+    description: Joining in, drum machines and sad vocals
+  - section_name: Chorus
+    start_time: '[00:51.006]'
+    end_time: '[01:15.012]'
+    description: The song's chorus is of a more pop nature
+  - section_name: Verse
+    start_time: '[01:15.013]'
+    end_time: '[01:39.019]'
+    description: We shift back to the darker mood
+  - section_name: Chorus
+    start_time: '[01:39.020]'
+    end_time: '[02:04.001]'
+    description: And then are lifted a bit again by the chorus
+  - section_name: Interlude
+    start_time: '[02:04.002]'
+    end_time: '[02:28.007]'
+    description: This interlude has a strange prancing sound and filled sparkling synths
+  - section_name: Verse
+    start_time: '[02:28.008]'
+    end_time: '[02:57.024]'
+    description: Final verse and outro
+concept: This song was released on my 50th birthday and a reflection on aging, time, and the bittersweet nature of life.
+lrc_file: 08_08.lrc
+sounds_like:
+  - name: Lana Del Rey
+    discogs_id: 2445772
+  - name: Billie Eilish
+    discogs_id: 5590213
+  - name: Mazzy Star
+    discogs_id: 15262
+mood:
+  - ethereal
+  - melancholic
+  - reflective
+genres:
+  - pop
+  - electronic
+  - rock
+audio_tracks:
+  - id: 2
+    description: Bass
+    audio_file: 08_08_08_mini_bass.wav
+    midi_group_file: 08_08_02_bass.mid
+  - id: 2
+    description: Grandmother Bass
+    audio_file: 08_08_09_grandmother_bass.wav
+    midi_group_file: 08_08_02_bass.mid
+  - id: 3
+    description: Modular Bass
+    audio_file: 08_08_13_modular.wav
+    midi_group_file: 08_08_02_bass.mid
+  - id: 3
+    description: Moog Mini
+    audio_file: 08_08_12_mini.wav
+    midi_file: 08_08_03_mini.mid
+  - id: 4
+    description: Synth
+    audio_file: 08_08_14_synth.wav
+    midi_file: 08_08_04_synth.mid
+  - id: 5
+    description: Hi hats
+    audio_file: 08_08_16_hats.wav
+    midi_file: 08_08_05_hh.mid
+  - id: 6
+    description: Drum Machine
+    audio_file: 08_08_17_dm.wav
+    midi_file: 08_08_06_dm.mid
+  - id: 7
+    description: Percussion
+    audio_file: 08_08_18_perc.wav
+    midi_file: 08_08_07_perc.mid
+  - id: 8
+    description: Guitar
+    audio_file: 08_08_11_guitar.wav
+  - id: 9
+    description: Drums
+    audio_file: 08_08_15_drums.wav
+  - id: 10
+    description: Bass
+    audio_file: 08_08_10_bass.wav
+  - id: 11
+    description: Lead Vocal
+    audio_file: 08_08_19_vox_lead.wav
+    player: Shirley Kudirka
+  - id: 12
+    description: Harmonic FX Vocal
+    audio_file: 08_08_20_vox_lead_harmonic.wav
+    player: Shirley Kudirka
+  - id: 13
+    description: Harmony Vocal
+    audio_file: 08_08_21_vox_harmony.wav
+    player: Shirley Kudirka
+  - id: 14
+    description: Harmony Vocal 2
+    audio_file: 08_08_22_vox_harmony_2.wav
+    player: Shirley Kudirka
