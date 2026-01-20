@@ -939,7 +939,6 @@ Concept: [full concept explanation]
         clean2 = "".join(c.upper() for c in phrase2 if c.isalnum())
         return sorted(clean1) == sorted(clean2) and len(clean1) > 0
 
-    # ToDo: What was concepts going to be used for?
     @staticmethod
     def _generate_algorithmic_fallback(concepts: str) -> Dict[str, str]:
         """Generate a simple anagram fallback when LLM fails"""

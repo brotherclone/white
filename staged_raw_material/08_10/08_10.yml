@@ -1,4 +1,3 @@
-# ToDo: Complete this manifest
 bpm: 101
 manifest_id: '08_10'
 tempo: 4/4
@@ -15,32 +14,32 @@ structure:
   - section_name: Verse
     start_time: '[00:00.000]'
     end_time: '[00:38.000]'
-    description: TK
+    description: The breathy, intimate vocal are laid over some experimental-tinged beats and electronics
   - section_name: Alt Verse
     start_time: '[00:38.001]'
     end_time: '[00:57.000]'
-    description: TK
+    description: The alternate verse is a bit brighter and melodic
   - section_name: Verse
     start_time: '[00:57.001]'
     end_time: '[01:25.013]'
-    description: TK
+    description: Back to the desolate, lonely verse
   - section_name: Vocal Interlude
     start_time: '[01:25.014]'
     end_time: '[01:44.013]'
-    description: TK
+    description: A special shift up bridging the gap between the two verses
   - section_name: Alt Verse
     start_time: '[01:44.014]'
     end_time: '[02:03.014]'
-    description: TK
+    description: The alternate verse returns with a bit more energy
   - section_name: Chorus
     start_time: '[02:03.015]'
     end_time: '[02:41.022]'
-    description: TK
+    description: The chorus is kicked off by an array of echoing almost inhuman vocals stretching across synth work
   - section_name: Jams
     start_time: '[02:41.023]'
     end_time: '[03:24.008]'
-    description: TK
-concept: TK
+    description: As the echoing vocals proceed a melodic synth line plays the song out
+concept: This is another song on Vanity Pressing about withdrawing into ones self and shutting out the outside world - giving a strange meaning to self-obession.
 lrc_file: 08_10.lrc
 sounds_like:
   - name: James Blake
@@ -48,11 +47,66 @@ sounds_like:
   - name: Perfume Genius
     discogs_id: 1741195
 mood:
-  - TK
+  - creepy
+  - ghostly
+  - digital
+  - synthetic
 genres:
-  - TK
+  - pop
+  - electronic
+  - synthwave
 audio_tracks:
   - id: 2
-    description: TK
-    audio_file: TK
-    midi_file: TK
+    description: Drum Machine
+    audio_file: 08_10_02_dm.wav
+    midi_file: 08_10_02_dm.mid
+  - id: 3
+    description: Guitar with many Pedals
+    audio_file: 08_10_03_guitar_fx.wav
+  - id: 4
+    description: Synth Bass
+    audio_file: 08_10_06_synth_bass.wav
+    midi_file: 08_10_03_synth_bass.mid
+  - id: 5
+    description: Guitar Lead
+    audio_file: 08_10_04_guitar_lead.wav
+  - id: 6
+    description: Hook
+    audio_file: 08_10_07_hook.wav
+    midi_file: 08_10_04_hook.mid
+  - id: 7
+    description: Bass
+    audio_file: 08_10_05_bass.wav
+  - id: 8
+    description: Chords
+    audio_file: 08_10_08_chords.wav
+    midi_file: 08_10_05_chords.mid
+  - id: 9
+    description: Lead Synth
+    audio_file: 08_10_09_lead_synth.wav
+    midi_file: 08_10_06_lead_synth.mid
+  - id: 10
+    description: Lead Synth Undertone
+    audio_file: 08_10_10_lead_synth_undertone.wav
+    midi_file: 08_10_07_lead_synth_undertone.mid
+  - id: 11
+    description: Vocoder
+    audio_file: 08_10_14_vocoder.wav
+    midi_file: 08_10_08_vocoder.mid
+    player: Aloysius Fortune
+  - id: 12
+    description: Vocals main
+    audio_file: 08_10_11_vox_main.wav
+    player: Aloysius Fortune
+  - id: 13
+    description: Vocals harmonies
+    audio_file: 08_10_12_vox_harmonies.wav
+    player: Aloysius Fortune
+  - id: 14
+    description: Vocals doubles
+    audio_file: 08_10_13_vox_dbl.wav
+    player: Aloysius Fortune
+  - id: 15
+    description: Vocals freeze
+    audio_file: 08_10_15_vox_freeze.wav
+    player: Aloysius Fortune

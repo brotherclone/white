@@ -1,5 +1,3 @@
-# ToDo: Complete this manifest
-
 bpm: 117
 manifest_id: '08_12'
 tempo: 4/4
@@ -135,6 +133,6 @@ audio_tracks:
     audio_file: 08_12_30_vox_harmony_dbl.wav
     player: Shirley Kudirka
   - id: 19
-    description: Vocals Adlibs
+    description: Vocals Ad libs
     audio_file: 08_12_31_vox_adlibs.wav
     player: Shirley Kudirka
