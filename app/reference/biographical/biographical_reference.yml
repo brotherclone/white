@@ -601,7 +601,6 @@ years:
       choice_points:
 
 
-  # ToDo: Fill in 1994
   1994:
     world_events:
       major:
@@ -622,10 +621,19 @@ years:
     personal_context:
       summary: "Age 19 - post-graduation reality"
       key_events:
-        - "Thriving"
+        - "I propose making a faux documentary about archeologist digging up an artifact - but it's a live prize fighter. This was soundly rejected."
+        - "Close call - my freshman film was very poorly received and I think I nearly got kicked out of the film department."
+        - "Settling into friend group at college - mostly Maryland transplants"
       influences:
+        - "Indie rock peak"
+        - "Playing in lots of bands"
       emotional_landscape:
+        - "Despite finally being with people I get along with, I'm still introverted and depressed."
+        - "Feelings of inadequacy do to being the youngest person in the film department."
       choice_points:
+        - "What if I made the weirder movie I wanted to make?"
+        - "What if I got kicked out of the film department?"
+        - "What if I decided to be in a band full time?"
 
   # ToDo: Fill in 1995
   1995:
@@ -648,7 +656,7 @@ years:
     personal_context:
       summary: "Age 20 - early adulthood establishment"
       key_events:
-        - "?"
+        - "Thriving"
       influences:
       emotional_landscape:
       choice_points:
@@ -1205,7 +1213,6 @@ years:
         - "What if I had taken a different job?"
         - "What if I never signed up for the Google Glass?"
 
-  # ToDo: Fill in 2015
   2015:
     world_events:
       major:
@@ -1226,9 +1233,18 @@ years:
     personal_context:
       summary: "Age 40 - major life milestone"
       key_events:
+        - "Received security clearance for work"
+        - "Solidified being a developer / designer"
       influences:
+        - "Intelligence culture"
+        - "Frederator cartoons"
+        - "Skylanders games"
       emotional_landscape:
+        - "Very happy to be working at Adobe"
+        - "Enjoying reliving childhood through Silas' play"
       choice_points:
+        - "What if I never got a security clearance?"
+        - "What if I decided to go for a higher level of clearance?"
 
   2016:
     world_events:
@@ -1255,6 +1271,7 @@ years:
         - "Our family travels to Ireland"
         - "For spring break we go to the Bahamas - I fly out early to go to an Adobe thing in San Francisco, but Ali and Si are stuck because a huge snow storm"
         - "Recording The Conjurer's Thread"
+        - "I come up with an idea for a cartoon series called Wicker Wonder which pre-dated Rick and Morty - and was less evil."
       influences:
         - "Long commute to get to the SCIF"
         - "Design thinking peak"
@@ -1268,7 +1285,6 @@ years:
         - "What if I got stuck in the Bahamas for the entire trip and missed the Adobe conference?"
         - "What if I moved to one of the intelligence agencies via Adobe work?"
 
-  # ToDo: Fill in 2017
   2017:
     world_events:
       major:
@@ -1289,9 +1305,19 @@ years:
     personal_context:
       summary: "Age 42 - mid-forties approach"
       key_events:
+        - "Peter, my boss from LEGO convinces me to come work for him at Moleskine creating a creativity AI platform"
+        - "I make my first of many journies to Italy for Moleskine"
+        - "The Conjurer's Thread is released and I start the next album, Light Reading"
       influences:
+        - "Resistance culture"
+        - "The Moleskine creative vibes and outlook"
+        - "Heavy AI experimentation"
       emotional_landscape:
+        - "Overwhelmed by the possibility of making a creativity platform"
+        - "Rejected again for my cartoon ideas"
       choice_points:
+        - "What if I had gotten some support for Wicker Wonder?"
+        - "What if I had made a more unique discovery with AI/Creative AI?"
 
   # ToDo: Fill in 2018
   2018:
