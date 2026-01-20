@@ -1343,7 +1343,6 @@ years:
     emotional_landscape:
     choice_points:
 
-  # ToDo: Fill in 2020
   2020:
     world_events:
       major:
@@ -1364,9 +1363,21 @@ years:
     personal_context:
       summary: "Age 45 - pandemic mid-life experience"
       key_events:
+        - "I was on the walk to the airport in February and was called by my boss to tell me that 'Milan has fallen' and that the virus was sweeping through the city causing mass casualties."
+        - "I tell everyone I know that lockdown may last years - but nobody believes me."
+        - "That spring, Silas is pulled from school and the world closed down."
       influences:
+        - "The sudden change to remote work and life"
+        - "The anxiety of the pandemic"
+        - "The political turmoil in the US"
       emotional_landscape:
+        - "The anxiety of the pandemic"
+        - "The fear of the virus"
+        - "Fear of losing my job"
       choice_points:
+        - "What if I did go to Milan?"
+        - "What if I got to Milan but could not get back for months?"
+        - "What if I got COVID in Milan and was very sick?"
 
   # ToDo: Fill in 2021
   2021:

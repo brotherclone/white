@@ -433,8 +433,6 @@ class InfranymAudioEncoder:
 
         if composition.metadata:
             metadata.update(composition.metadata)
-
-        # ToDo: Move to save file
         metadata_path = self.output_dir / f"{output_filename}_metadata.json"
         with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
@@ -460,7 +458,6 @@ class InfranymAudioEncoder:
     def _export_layer(
         self, audio: AudioSegment, base_filename: str, layer_name: str
     ) -> str:
-        # ToDo: Move to save file
         """Export individual layer to file"""
         path = self.output_dir / f"{base_filename}_{layer_name}.wav"
         audio.export(path, format="wav")
