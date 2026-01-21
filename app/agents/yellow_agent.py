@@ -29,6 +29,8 @@ from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class YellowAgent(BaseRainbowAgent, ABC):
     """Pulsar Palace RPG Runner - Automated RPG sessions"""
@@ -107,7 +109,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
         5. Evaluate the Proposal to submit or add to the RPG Run
         :return:
         """
-        logging.info("Creating Yellow Agent workflow")
+        logger.info("Creating Yellow Agent workflow")
         work_flow = StateGraph(YellowAgentState)
         # Nodes
         work_flow.add_node("generate_characters", self.generate_characters)
@@ -171,7 +173,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     state.characters.append(character_two)
             except Exception as e:
                 error_msg = f"Failed to read mock character files: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -205,7 +207,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 state.story_elaboration_level = 2
             except Exception as e:
                 error_msg = f"Failed to read mock room files: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -278,10 +280,10 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 elif isinstance(result, GameEvaluationDecision):
                     state.should_add_to_story = result.should_add_to_story
                 else:
-                    logging.warning(f"Unexpected result type: {type(result)}")
+                    logger.warning(f"Unexpected result type: {type(result)}")
                     state.should_add_to_story = False
             except Exception as e:
-                logging.error(f"Game evaluation failed: {e!s}")
+                logger.error(f"Game evaluation failed: {e!s}")
                 state.should_add_to_story = False
         return state
 
@@ -331,7 +333,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 state.counter_proposal = counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -395,7 +397,7 @@ Your response should be a SongProposalIteration with:
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
                     state.counter_proposal = base_proposal
             except Exception as e:
                 print(
@@ -429,12 +431,12 @@ Your response should be a SongProposalIteration with:
                 # Save the mock artifact to chain_artifacts
                 encounter.save_file()
                 state.artifacts.append(encounter)
-                logging.info(
+                logger.info(
                     f"Saved mock game run artifact: {encounter.get_artifact_path()}"
                 )
             except Exception as e:
                 error_msg = f"Failed to read mock encounter narrative artifact: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -443,12 +445,12 @@ Your response should be a SongProposalIteration with:
                 try:
                     state.encounter_narrative_artifact.save_file()
                     state.artifacts.append(state.encounter_narrative_artifact)
-                    logging.info(
+                    logger.info(
                         f"Saved game run artifact: {state.encounter_narrative_artifact.get_artifact_path()}"
                     )
                 except Exception as e:
                     error_msg = f"Failed to save encounter narrative artifact: {e!s}"
-                    logging.error(error_msg)
+                    logger.error(error_msg)
                     if block_mode:
                         raise Exception(error_msg)
             return state

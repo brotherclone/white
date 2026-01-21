@@ -47,6 +47,8 @@ from app.structures.manifests.song_proposal import SongProposal, SongProposalIte
 
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 
 class WhiteAgent(BaseModel):
     agents: Dict[str, Any] = {}
@@ -89,7 +91,7 @@ class WhiteAgent(BaseModel):
             :param stop_after_agent:
         """
         if user_input is not None:
-            logging.info(f"User input provided to Prism: {user_input}")
+            logger.info(f"User input provided to Prism: {user_input}")
 
         if enabled_agents is None:
             enabled_agents = [
@@ -104,9 +106,9 @@ class WhiteAgent(BaseModel):
             ]
 
         if stop_after_agent:
-            logging.info(f"🎯 Execution mode: Stop after {stop_after_agent}")
+            logger.info(f"🎯 Execution mode: Stop after {stop_after_agent}")
         if len(enabled_agents) < 8:
-            logging.info(f"🎯 Enabled agents: {', '.join(enabled_agents)}")
+            logger.info(f"🎯 Enabled agents: {', '.join(enabled_agents)}")
 
         workflow = self.build_workflow()
         thread_id = str(uuid4())
@@ -130,7 +132,7 @@ class WhiteAgent(BaseModel):
         config = RunnableConfig(
             configurable={"thread_id": thread_id}, recursion_limit=50
         )
-        logging.info(f"Starting Prism workflow (thread_id: {thread_id})")
+        logger.info(f"Starting Prism workflow (thread_id: {thread_id})")
         result = workflow.invoke(initial_state, config)
         if isinstance(result, dict):
             final_state = MainAgentState(**result)
@@ -143,9 +145,9 @@ class WhiteAgent(BaseModel):
     ) -> MainAgentState:
 
         if not paused_state.workflow_paused:
-            logging.warning("⚠️ Workflow is not paused - nothing to resume")
+            logger.warning("⚠️ Workflow is not paused - nothing to resume")
             return paused_state
-        logging.info(f"Resuming workflow (thread_id: {paused_state.thread_id})")
+        logger.info(f"Resuming workflow (thread_id: {paused_state.thread_id})")
         updated_state = self.resume_after_black_agent_ritual(
             paused_state, verify_tasks=verify_tasks
         )
@@ -308,56 +310,56 @@ class WhiteAgent(BaseModel):
 
     def invoke_black_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Black Agent to generate counter-proposal"""
-        logging.info("  📣  ⚫  Calling upon ThreadKeepr  ⚫️  📣")
+        logger.info("  📣  ⚫  Calling upon ThreadKeepr  ⚫️  📣")
         if "black" not in self.agents:
             self.agents["black"] = BlackAgent(settings=self.settings)
         return self.agents["black"](state)
 
     def invoke_red_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Red Agent with the first synthesized proposal from Black Agent"""
-        logging.info("📣  🔴  Calling upon The Light Reader  🔴  📣")
+        logger.info("📣  🔴  Calling upon The Light Reader  🔴  📣")
         if "red" not in self.agents:
             self.agents["red"] = RedAgent(settings=self.settings)
         return self.agents["red"](state)
 
     def invoke_orange_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Orange Agent with the synthesized proposal"""
-        logging.info("📣  🟠  Calling upon Rows Bud  🟠  📣")
+        logger.info("📣  🟠  Calling upon Rows Bud  🟠  📣")
         if "orange" not in self.agents:
             self.agents["orange"] = OrangeAgent(settings=self.settings)
         return self.agents["orange"](state)
 
     def invoke_yellow_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Yellow Agent with the synthesized proposal"""
-        logging.info("📣  🟡  Calling upon Lord Pulsimore  🟡  📣")
+        logger.info("📣  🟡  Calling upon Lord Pulsimore  🟡  📣")
         if "yellow" not in self.agents:
             self.agents["yellow"] = YellowAgent(settings=self.settings)
         return self.agents["yellow"](state)
 
     def invoke_green_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Green Agent with the synthesized proposal"""
-        logging.info("📣  🟢  Calling upon Sub-Arbitrary  🟢  📣")
+        logger.info("📣  🟢  Calling upon Sub-Arbitrary  🟢  📣")
         if "green" not in self.agents:
             self.agents["green"] = GreenAgent(settings=self.settings)
         return self.agents["green"](state)
 
     def invoke_blue_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Blue Agent with the synthesized proposal"""
-        logging.info("📣  🔵  Calling upon The Cassette Bearer  🔵  📣")
+        logger.info("📣  🔵  Calling upon The Cassette Bearer  🔵  📣")
         if "blue" not in self.agents:
             self.agents["blue"] = BlueAgent(settings=self.settings)
         return self.agents["blue"](state)
 
     def invoke_indigo_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Indigo Agent with the synthesized proposal"""
-        logging.info("📣  🩵  Calling upon Decider Tangents 🩵  📣")
+        logger.info("📣  🩵  Calling upon Decider Tangents 🩵  📣")
         if "indigo" not in self.agents:
             self.agents["indigo"] = IndigoAgent(settings=self.settings)
         return self.agents["indigo"](state)
 
     def invoke_violet_agent(self, state: MainAgentState) -> MainAgentState:
         """Invoke Violet Agent with the synthesized proposal"""
-        logging.info("📣  🟣  Calling upon The Sultan of Solipsism  🟣  📣")
+        logger.info("📣  🟣  Calling upon The Sultan of Solipsism  🟣  📣")
         if "violet" not in self.agents:
             self.agents["violet"] = VioletAgent(settings=self.settings)
         return self.agents["violet"](state)
@@ -369,8 +371,8 @@ class WhiteAgent(BaseModel):
             user_input=None, use_weights=True
         )
         facet_metadata = WhiteFacetSystem.log_facet_selection(facet)
-        logging.info(f" Prism using {facet.value.upper()} lens")
-        logging.info(f" {facet_metadata['description']}")
+        logger.info(f" Prism using {facet.value.upper()} lens")
+        logger.info(f" {facet_metadata['description']}")
         if mock_mode:
             state.thread_id = "mock_thread_001"
             state.white_facet = facet
@@ -394,7 +396,7 @@ class WhiteAgent(BaseModel):
                     sp.iterations.append(proposal)
                     state.song_proposals = sp
             except Exception as e:
-                logging.info(
+                logger.info(
                     f"Mock initial proposal not found, returning stub SongProposalIteration:{e!s}"
                 )
             return state
@@ -415,9 +417,9 @@ class WhiteAgent(BaseModel):
                 )
                 if block_mode:
                     raise TypeError(error_msg)
-                logging.warning(error_msg)
+                logger.warning(error_msg)
         except Exception as e:
-            logging.info(
+            logger.info(
                 f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration."
             )
             if block_mode:
@@ -474,12 +476,12 @@ class WhiteAgent(BaseModel):
                         )
                         if block_mode:
                             raise TypeError(error_msg)
-                        logging.warning(error_msg)
+                        logger.warning(error_msg)
                     else:
                         # Append to iterations list in mock mode too
                         state.song_proposals.iterations.append(proposal)
             except Exception as e:
-                logging.info(f"Mock reworked proposal not found:{e!s}")
+                logger.info(f"Mock reworked proposal not found:{e!s}")
             return state
         else:
             baton_list: List[str] = [
@@ -606,22 +608,22 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 )
                 if block_mode:
                     raise TypeError(error_msg)
-                logging.warning(error_msg)
+                logger.warning(error_msg)
             else:
                 state.song_proposals.iterations.append(rewrite_proposal)
         except Exception as e:
-            logging.info(f"Anthropic model call failed: {e!s}.")
+            logger.info(f"Anthropic model call failed: {e!s}.")
             if block_mode:
                 raise Exception("Anthropic model call failed")
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("⚫️Processing Black Agent work... ")
+        logger.info("⚫️Processing Black Agent work... ")
         if state.workflow_paused:
-            logging.info("Skipping Black Agent work processing - workflow is paused")
+            logger.info("Skipping Black Agent work processing - workflow is paused")
             return state
         if not state.song_proposals or not state.song_proposals.iterations:
-            logging.warning("No song proposals to process from Black Agent")
+            logger.warning("No song proposals to process from Black Agent")
             return state
         black_proposal = state.song_proposals.iterations[-1]
         black_artifacts = state.artifacts or []
@@ -673,7 +675,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_red_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("🔴 Processing Red Agent work... ")
+        logger.info("🔴 Processing Red Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         red_proposal = sp.iterations[-1]
         red_artifacts = state.artifacts or []
@@ -719,7 +721,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("🟠Processing Orange Agent work... ")
+        logger.info("🟠Processing Orange Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         orange_proposal = sp.iterations[-1]
         orange_artifacts = state.artifacts or []
@@ -770,7 +772,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_yellow_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("🟡Processing Yellow Agent work... ")
+        logger.info("🟡Processing Yellow Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         yellow_proposal = sp.iterations[-1]
         yellow_artifacts = state.artifacts or []
@@ -817,7 +819,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_green_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("🟢Processing Green Agent work... ")
+        logger.info("🟢Processing Green Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         green_proposal = sp.iterations[-1]
         green_artifacts = state.artifacts or []
@@ -889,7 +891,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_blue_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("🔵 Processing Blue Agent work... ")
+        logger.info("🔵 Processing Blue Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         blue_proposal = sp.iterations[-1]
         blue_artifacts = state.artifacts or []
@@ -940,7 +942,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_indigo_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("🩵Processing Indigo Agent work... ")
+        logger.info("🩵Processing Indigo Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         indigo_proposal = sp.iterations[-1]
         indigo_artifacts = state.artifacts or []
@@ -1006,7 +1008,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_violet_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logging.info("🟣Processing Violet Agent work... ")
+        logger.info("🟣Processing Violet Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         violet_proposal = sp.iterations[-1]
         violet_artifacts = state.artifacts or []
@@ -1052,7 +1054,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def _violet_rebracketing_analysis(self, proposal, interview_artifacts) -> str:
-        logging.info("Processing Violet Agent rebracketing analysis... ")
+        logger.info("Processing Violet Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1065,7 +1067,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1106,7 +1108,7 @@ Focus on revealing the underlying ORDER, not explaining away the solipsism.
                 return response.content
             except Exception as e:
                 error_msg = f"Violet rebracketing LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Violet rebracketing unavailable"
@@ -1114,7 +1116,7 @@ Focus on revealing the underlying ORDER, not explaining away the solipsism.
     def _indigo_rebracketing_analysis(
         self, proposal, midi_artifacts, audio_artifacts, image_artifacts, text_artifacts
     ) -> str:
-        logging.info("Processing Indigo Agent rebracketing analysis... ")
+        logger.info("Processing Indigo Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1127,7 +1129,7 @@ Focus on revealing the underlying ORDER, not explaining away the solipsism.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1180,7 +1182,7 @@ Focus on revealing the underlying ORDER, not solving the puzzles.
                 return response.content
             except Exception as e:
                 error_msg = f"Indigo rebracketing LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Indigo rebracketing unavailable"
@@ -1191,7 +1193,7 @@ Focus on revealing the underlying ORDER, not solving the puzzles.
         tape_label_artifacts,
         alternate_timeline_artifacts,
     ) -> str:
-        logging.info("Processing Blue Agent rebracketing analysis... ")
+        logger.info("Processing Blue Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1204,7 +1206,7 @@ Focus on revealing the underlying ORDER, not solving the puzzles.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1249,7 +1251,7 @@ Focus on revealing the underlying ORDER, not choosing between timelines.
                 return response.content
             except Exception as e:
                 error_msg = f"Blue rebracketing LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Blue rebracketing unavailable"
@@ -1263,7 +1265,7 @@ Focus on revealing the underlying ORDER, not choosing between timelines.
         extinction_artifacts,
         rescue_decision_artifacts,
     ) -> str:
-        logging.info("Processing Green Agent rebracketing analysis... ")
+        logger.info("Processing Green Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         prompt = ""
@@ -1277,7 +1279,7 @@ Focus on revealing the underlying ORDER, not choosing between timelines.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1331,7 +1333,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
             return response.content
         except Exception as e:
             error_msg = f"Green rebracketing LLM call failed: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
             return "LLM call failed - Green rebracketing unavailable"
@@ -1339,7 +1341,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _yellow_rebracketing_analysis(
         self, proposal, game_run_artifacts, character_sheet_artifacts
     ) -> str:
-        logging.info("🟡⚪️Processing Yellow Agent rebracketing analysis... ")
+        logger.info("🟡⚪️Processing Yellow Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1352,7 +1354,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1395,7 +1397,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                 return response.content
             except Exception as e:
                 error_msg = f"Yellow rebracketing LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Yellow rebracketing unavailable"
@@ -1403,7 +1405,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _orange_rebracketing_analysis(
         self, proposal, newspaper_artifacts, symbolic_object_artifacts
     ) -> str:
-        logging.info("🟠⚪️Processing Orange Agent rebracketing analysis... ")
+        logger.info("🟠⚪️Processing Orange Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1416,7 +1418,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1459,13 +1461,13 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                 return response.content
             except Exception as e:
                 error_msg = f"Orange rebracketing LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Orange rebracketing unavailable"
 
     def _red_rebracketing_analysis(self, proposal, book_artifacts) -> str:
-        logging.info("🔴⚪️Processing Red Agent rebracketing analysis... ")
+        logger.info("🔴⚪️Processing Red Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1478,7 +1480,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1515,7 +1517,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                 return response.content
             except Exception as e:
                 error_msg = f"Red rebracketing LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Red rebracketing unavailable"
@@ -1523,7 +1525,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _black_rebracketing_analysis(
         self, proposal, evp_artifacts, sigil_artifacts
     ) -> str:
-        logging.info("⚫️⚪️Processing Black Agent rebracketing analysis... ")
+        logger.info("⚫️⚪️Processing Black Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1536,7 +1538,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1577,7 +1579,7 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
                 return response.content
             except Exception as e:
                 error_msg = f"Black rebracketing LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Black rebracketing unavailable"
@@ -1585,7 +1587,7 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
     def _synthesize_document_for_red(
         self, rebracketed_analysis, black_proposal, artifacts
     ):
-        logging.info("⚫️⚪️🔴Processing Black Agent for synthesis... ")
+        logger.info("⚫️⚪️🔴Processing Black Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1598,7 +1600,7 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1635,7 +1637,7 @@ Structure your synthesis as a clear creative brief.
                 return response.content
             except Exception as e:
                 error_msg = f"Red synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Red synthesis unavailable"
@@ -1643,7 +1645,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_orange(
         self, rebracketed_analysis, red_proposal, artifacts
     ):
-        logging.info("🔴⚪️🟠Processing Red Agent for synthesis... ")
+        logger.info("🔴⚪️🟠Processing Red Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1656,7 +1658,7 @@ Structure your synthesis as a clear creative brief.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1693,7 +1695,7 @@ Structure your synthesis as a clear creative brief.
                 return response.content
             except Exception as e:
                 error_msg = f"Orange synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Orange synthesis unavailable"
@@ -1701,7 +1703,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_yellow(
         self, rebracketed_analysis, orange_proposal, artifacts
     ):
-        logging.info("🟠⚪️🟡Processing Orange Agent for synthesis... ")
+        logger.info("🟠⚪️🟡Processing Orange Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1714,7 +1716,7 @@ Structure your synthesis as a clear creative brief.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1751,7 +1753,7 @@ Structure your synthesis as a clear creative brief.
                 return response.content
             except Exception as e:
                 error_msg = f"Yellow synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Yellow synthesis unavailable"
@@ -1759,7 +1761,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_green(
         self, rebracketed_analysis, yellow_proposal, artifacts
     ):
-        logging.info("🟡⚪️🟢Processing Yellow Agent for synthesis... ")
+        logger.info("🟡⚪️🟢Processing Yellow Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1772,7 +1774,7 @@ Structure your synthesis as a clear creative brief.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1809,7 +1811,7 @@ Structure your synthesis as a clear creative brief.
                 return response.content
             except Exception as e:
                 error_msg = f"Green synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Green synthesis unavailable"
@@ -1817,7 +1819,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_blue(
         self, rebracketed_analysis, green_proposal, artifacts
     ):
-        logging.info("🟢⚪️🔵Processing Green Agent for synthesis... ")
+        logger.info("🟢⚪️🔵Processing Green Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1830,7 +1832,7 @@ Structure your synthesis as a clear creative brief.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1867,7 +1869,7 @@ Structure your synthesis as a clear creative brief.
                 return response.content
             except Exception as e:
                 error_msg = f"Blue synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Blue synthesis unavailable"
@@ -1875,7 +1877,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_indigo(
         self, rebracketed_analysis, blue_proposal, artifacts
     ):
-        logging.info("🔵⚪️🩵Processing Blue Agent for synthesis... ")
+        logger.info("🔵⚪️🩵Processing Blue Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1888,7 +1890,7 @@ Structure your synthesis as a clear creative brief.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1930,7 +1932,7 @@ Structure your synthesis as a clear creative brief for cryptographic methodology
                 return response.content
             except Exception as e:
                 error_msg = f"Indigo synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Indigo synthesis unavailable"
@@ -1938,7 +1940,7 @@ Structure your synthesis as a clear creative brief for cryptographic methodology
     def _synthesize_document_for_violet(
         self, rebracketed_analysis, indigo_proposal, artifacts
     ):
-        logging.info("🩵⚪️🟣Processing Indigo Agent for synthesis... ")
+        logger.info("🩵⚪️🟣Processing Indigo Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1951,7 +1953,7 @@ Structure your synthesis as a clear creative brief for cryptographic methodology
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -1993,7 +1995,7 @@ Structure your synthesis as a clear creative brief for solipsistic methodology.
                 return response.content
             except Exception as e:
                 error_msg = f"Indigo synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Indigo synthesis unavailable"
@@ -2001,7 +2003,7 @@ Structure your synthesis as a clear creative brief for solipsistic methodology.
     def _synthesize_document_for_white(
         self, rebracketed_analysis, violet_proposal, artifacts
     ):
-        logging.info("🟣⚪️Processing Violet Agent for synthesis... ")
+        logger.info("🟣⚪️Processing Violet Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -2014,7 +2016,7 @@ Structure your synthesis as a clear creative brief for solipsistic methodology.
                     return data
             except Exception as e:
                 error_msg = f"Failed to read mock file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "Mock file read failed"
@@ -2060,7 +2062,7 @@ Structure your synthesis as the final creative brief before manifestation.
                 return response.content
             except Exception as e:
                 error_msg = f"Indigo synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 return "LLM call failed - Indigo synthesis unavailable"
@@ -2069,7 +2071,7 @@ Structure your synthesis as the final creative brief before manifestation.
     def route_after_black(state: MainAgentState) -> str:
         stop_after = getattr(state, "stop_after_agent", None)
         if isinstance(stop_after, str) and stop_after.strip().lower() == "black":
-            logging.info("✋ Stopping after black agent")
+            logger.info("✋ Stopping after black agent")
             return "finish"
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -2089,7 +2091,7 @@ Structure your synthesis as the final creative brief before manifestation.
             state.get("ready_for_red", False) if isinstance(state, dict) else False,
         )
         if workflow_paused:
-            logging.info("Prism routing to finish because Black Agent is paused")
+            logger.info("Prism routing to finish because Black Agent is paused")
             return "finish"
         if ready_for_red:
             return "red"
@@ -2105,40 +2107,40 @@ Structure your synthesis as the final creative brief before manifestation.
         - enabled_agents: Only route to agents in this list
         - stop_after_agent: Jump to finale after specified agent
         """
-        logging.info(
+        logger.info(
             f"🔀 Routing: red={state.ready_for_red}, orange={state.ready_for_orange}, yellow={state.ready_for_yellow}, "
             f"green={state.ready_for_green}, blue={state.ready_for_blue}, indigo={state.ready_for_indigo}, violet={state.ready_for_violet}"
         )
         if state.stop_after_agent and state.song_proposals.iterations:
             last_iteration = state.song_proposals.iterations[-1]
-            logging.info(
+            logger.info(
                 f"🔍 Checking stop_after: last_iteration.agent_name='{getattr(last_iteration, 'agent_name', None)}', stop_after_agent='{state.stop_after_agent}'"
             )
             if last_iteration.agent_name == state.stop_after_agent:
-                logging.info(f"✅ Stopping after {state.stop_after_agent} as requested")
+                logger.info(f"✅ Stopping after {state.stop_after_agent} as requested")
                 return "white"
         if "red" in state.enabled_agents and state.ready_for_red:
-            logging.info("→ Routing to red")
+            logger.info("→ Routing to red")
             return "red"
         elif "orange" in state.enabled_agents and state.ready_for_orange:
-            logging.info("→ Routing to orange")
+            logger.info("→ Routing to orange")
             return "orange"
         elif "yellow" in state.enabled_agents and state.ready_for_yellow:
-            logging.info("→ Routing to yellow")
+            logger.info("→ Routing to yellow")
             return "yellow"
         elif "green" in state.enabled_agents and state.ready_for_green:
-            logging.info("→ Routing to green")
+            logger.info("→ Routing to green")
             return "green"
         elif "blue" in state.enabled_agents and state.ready_for_blue:
-            logging.info("→ Routing to blue")
+            logger.info("→ Routing to blue")
             return "blue"
         elif "indigo" in state.enabled_agents and state.ready_for_indigo:
-            logging.info("→ Routing to indigo")
+            logger.info("→ Routing to indigo")
             return "indigo"
         elif "violet" in state.enabled_agents and state.ready_for_violet:
-            logging.info("→ Routing to violet")
+            logger.info("→ Routing to violet")
             return "violet"
-        logging.info("→ Routing to white (finalization)")
+        logger.info("→ Routing to white (finalization)")
         return "white"
 
     @staticmethod
@@ -2167,7 +2169,7 @@ Structure your synthesis as the final creative brief before manifestation.
                     except ValueError as e:
                         if block_mode:
                             raise e
-                        logging.error(
+                        logger.error(
                             f"Failed to format {artifact_filter.value} for prompt: {e}"
                         )
         return prompt_artifacts
@@ -2178,61 +2180,61 @@ Structure your synthesis as the final creative brief before manifestation.
 
         ENHANCED to perform meta-analysis across all seven lenses before finalizing.
         """
-        logging.info("🌈 The Prism: Finalizing chromatic cascade...")
+        logger.info("🌈 The Prism: Finalizing chromatic cascade...")
 
         # Handle pause case
         if state.workflow_paused and state.pending_human_action:
             pending = state.pending_human_action
-            logging.info("\n" + "=" * 60)
-            logging.info("WORKFLOW PAUSED - HUMAN ACTION REQUIRED")
-            logging.info("=" * 60)
-            logging.info(f"Agent: {pending.get('agent', 'unknown')}")
-            logging.info(f"Reason: {state.pause_reason}")
-            logging.info(
+            logger.info("\n" + "=" * 60)
+            logger.info("WORKFLOW PAUSED - HUMAN ACTION REQUIRED")
+            logger.info("=" * 60)
+            logger.info(f"Agent: {pending.get('agent', 'unknown')}")
+            logger.info(f"Reason: {state.pause_reason}")
+            logger.info(
                 f"\nInstructions:\n{pending.get('instructions', 'No instructions')}"
             )
 
             tasks = pending.get("tasks", [])
             if tasks:
-                logging.info(f"\nPending tasks ({len(tasks)}):")
+                logger.info(f"\nPending tasks ({len(tasks)}):")
                 for task in tasks:
-                    logging.info(
+                    logger.info(
                         f"  - {task.get('type', 'unknown')}: {task.get('task_url', 'No URL')}"
                     )
 
-            logging.info("\nTo resume after completing tasks:")
-            logging.info("  from app.agents.white_agent import WhiteAgent")
-            logging.info("  agent = WhiteAgent()")
-            logging.info("  state = agent.resume_workflow(state)")
-            logging.info("=" * 60)
+            logger.info("\nTo resume after completing tasks:")
+            logger.info("  from app.agents.white_agent import WhiteAgent")
+            logger.info("  agent = WhiteAgent()")
+            logger.info("  state = agent.resume_workflow(state)")
+            logger.info("=" * 60)
             return state
 
         # Build artifact relationships
         if state.artifacts:
-            logging.info("🔗 Building artifact relationship graph...")
+            logger.info("🔗 Building artifact relationship graph...")
             self._build_artifact_relationships(state)
 
         # Perform meta-rebracketing if we have multiple agents' work
         if len(state.transformation_traces) >= 2:
-            logging.info("🔺 The Prism: Performing holographic meta-rebracketing...")
+            logger.info("🔺 The Prism: Performing holographic meta-rebracketing...")
             state.meta_rebracketing = self._perform_meta_rebracketing(state)
 
-            logging.info("⚪️ The Prism: Generating chromatic synthesis...")
+            logger.info("⚪️ The Prism: Generating chromatic synthesis...")
             state.chromatic_synthesis = self._generate_chromatic_synthesis(state)
 
         # Save all outputs
         try:
             self.save_all_proposals(state)
-            logging.info("✓ Song proposals saved")
+            logger.info("✓ Song proposals saved")
 
             # Save meta-analysis
             if state.meta_rebracketing:
                 self._save_meta_analysis(state)
-                logging.info("✓ Meta-analysis saved")
+                logger.info("✓ Meta-analysis saved")
 
             state.run_finished = True
         except Exception as e:
-            logging.error(f"Finalization failed: {e}", exc_info=True)
+            logger.error(f"Finalization failed: {e}", exc_info=True)
             raise
 
         return state
@@ -2251,30 +2253,30 @@ Structure your synthesis as the final creative brief before manifestation.
             Updated MainAgentState after Black Agent workflow completion
         """
         if not paused_state.workflow_paused:
-            logging.warning("Workflow is not paused - nothing to resume")
+            logger.warning("Workflow is not paused - nothing to resume")
             return paused_state
 
         if not paused_state.pending_human_action:
-            logging.warning("No pending human action found")
+            logger.warning("No pending human action found")
             return paused_state
 
         pending = paused_state.pending_human_action
         if pending.get("agent") != "black":
-            logging.warning(
+            logger.warning(
                 f"Cannot resume - pending action is for agent: {pending.get('agent')}"
             )
             return paused_state
 
         black_config = pending.get("black_config")
         if not black_config:
-            logging.error("No black_config found in pending_human_action")
+            logger.error("No black_config found in pending_human_action")
             return paused_state
         black_agent = self.agents.get("black")
         if not black_agent:
-            logging.error("Black agent not found in white_agent instance")
+            logger.error("Black agent not found in white_agent instance")
             return paused_state
 
-        logging.info("Resuming Black Agent workflow...")
+        logger.info("Resuming Black Agent workflow...")
 
         try:
             final_black_state = resume_black_agent_workflow_with_agent(
@@ -2289,7 +2291,7 @@ Structure your synthesis as the final creative brief before manifestation.
                 )
             if final_black_state.get("artifacts"):
                 paused_state.artifacts = final_black_state["artifacts"]
-            logging.info("Black Agent workflow resumed and completed")
+            logger.info("Black Agent workflow resumed and completed")
             artifacts = getattr(paused_state, "artifacts", []) or []
             evp_artifacts = self._gather_artifacts_for_prompt(
                 artifacts, ChainArtifactType.EVP_ARTIFACT
@@ -2307,10 +2309,10 @@ Structure your synthesis as the final creative brief before manifestation.
                 artifacts,
             )
             paused_state.ready_for_red = True
-            logging.info("Processed Black Agent work - ready for Red Agent")
+            logger.info("Processed Black Agent work - ready for Red Agent")
             return paused_state
         except Exception as e:
-            logging.error(f"Failed to resume Black Agent workflow: {e}")
+            logger.error(f"Failed to resume Black Agent workflow: {e}")
             raise
 
     def _perform_meta_rebracketing(self, state: MainAgentState) -> str:
@@ -2320,7 +2322,7 @@ Structure your synthesis as the final creative brief before manifestation.
         This is The Prism's unique capability - revealing what emerges only when
         all chromatic methodologies are viewed simultaneously.
         """
-        logging.info("  Analyzing transformation traces across spectrum...")
+        logger.info("  Analyzing transformation traces across spectrum...")
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -2376,7 +2378,7 @@ Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
             response = claude.invoke(prompt)
             return response.content
         except Exception as e:
-            logging.error(f"Meta-rebracketing LLM call failed: {e}")
+            logger.error(f"Meta-rebracketing LLM call failed: {e}")
             return f"Meta-rebracketing unavailable: {e}"
 
     def _generate_chromatic_synthesis(self, state: MainAgentState) -> str:
@@ -2386,7 +2388,7 @@ Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
         This is the ultimate creative brief - INFORMATION made actionable through
         complete transmigration across TIME into SPACE.
         """
-        logging.info("  Synthesizing final creative brief...")
+        logger.info("  Synthesizing final creative brief...")
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -2429,7 +2431,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             response = claude.invoke(prompt)
             return response.content
         except Exception as e:
-            logging.error(f"Chromatic synthesis LLM call failed: {e}")
+            logger.error(f"Chromatic synthesis LLM call failed: {e}")
             return f"Chromatic synthesis unavailable: {e}"
 
     def _format_transformation_traces(self, traces: List[TransformationTrace]) -> str:
@@ -2465,7 +2467,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             if state.meta_rebracketing:
                 meta_path = md_dir / f"white_agent_{thread_id}_META_REBRACKETING.md"
                 save_markdown(state.meta_rebracketing, str(meta_path))
-                logging.info(f"  Saved meta-rebracketing: {meta_path}")
+                logger.info(f"  Saved meta-rebracketing: {meta_path}")
 
             # Save chromatic synthesis
             if state.chromatic_synthesis:
@@ -2473,7 +2475,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                     md_dir / f"white_agent_{thread_id}_CHROMATIC_SYNTHESIS.md"
                 )
                 save_markdown(state.chromatic_synthesis, str(synthesis_path))
-                logging.info(f"  Saved chromatic synthesis: {synthesis_path}")
+                logger.info(f"  Saved chromatic synthesis: {synthesis_path}")
 
             # Save transformation traces
             if state.transformation_traces:
@@ -2484,17 +2486,17 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                     md_dir / f"white_agent_{thread_id}_transformation_traces.md"
                 )
                 save_markdown(traces_content, str(traces_path))
-                logging.info(f"  Saved transformation traces: {traces_path}")
+                logger.info(f"  Saved transformation traces: {traces_path}")
 
             # Save facet evolution
             if state.facet_evolution:
                 facet_content = self._format_facet_evolution(state.facet_evolution)
                 facet_path = md_dir / f"white_agent_{thread_id}_facet_evolution.md"
                 save_markdown(facet_content, str(facet_path))
-                logging.info(f"  Saved facet evolution: {facet_path}")
+                logger.info(f"  Saved facet evolution: {facet_path}")
 
         except Exception as e:
-            logging.error(f"Failed to save meta-analysis: {e}")
+            logger.error(f"Failed to save meta-analysis: {e}")
 
     @staticmethod
     def _format_facet_evolution(evolution: FacetEvolution) -> str:
@@ -2577,7 +2579,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         Updates the facet_evolution.evolution_history with each agent's contribution.
         """
         if not state.facet_evolution:
-            logging.warning("No facet_evolution to update - skipping")
+            logger.warning("No facet_evolution to update - skipping")
             return
 
         refraction_angle = self._calculate_refraction_angle(boundaries_shifted)
@@ -2593,7 +2595,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         state.facet_evolution.evolution_history.append(evolution_entry)
         state.facet_evolution.current_refraction_angle = refraction_angle
 
-        logging.info(f"  🔺 Facet refraction: {refraction_angle}")
+        logger.info(f"  🔺 Facet refraction: {refraction_angle}")
 
     def _get_artifact_id(self, artifact: Any) -> str:
         """Extract or generate artifact ID."""
@@ -2887,14 +2889,14 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             relationships.append(relationship)
 
         state.artifact_relationships = relationships
-        logging.info(f"🔗 Built {len(relationships)} artifact relationships")
+        logger.info(f"🔗 Built {len(relationships)} artifact relationships")
 
     def save_all_proposals(self, state: MainAgentState):
         """Save all song proposals in both YAML and Markdown formats"""
-        logging.info("Saving song proposals... ")
+        logger.info("Saving song proposals... ")
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if not state.song_proposals or not state.song_proposals.iterations:
-            logging.warning("No song proposals to save")
+            logger.warning("No song proposals to save")
             return
         thread_id = state.thread_id
         base_path = self._artifact_base_path()
@@ -2905,7 +2907,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             md_dir.mkdir(parents=True, exist_ok=True)
         except Exception as e:
             error_msg = f"Failed to create directories: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
             return
@@ -2923,10 +2925,10 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                         default_flow_style=False,
                         allow_unicode=True,
                     )
-                logging.info(f"Saved proposal {i + 1}: {yaml_path}")
+                logger.info(f"Saved proposal {i + 1}: {yaml_path}")
             except Exception as e:
                 error_msg = f"Failed to write YAML file {yaml_path}: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
 
@@ -2939,10 +2941,10 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                     default_flow_style=False,
                     allow_unicode=True,
                 )
-            logging.info(f"Saved all proposals: {all_proposals_yaml}")
+            logger.info(f"Saved all proposals: {all_proposals_yaml}")
         except Exception as e:
             error_msg = f"Failed to write all proposals YAML: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
 
@@ -2965,10 +2967,10 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         md_path = md_dir / f"all_song_proposals_{thread_id}.md"
         try:
             save_markdown(md_content, str(md_path))
-            logging.info(f"All proposals saved to {base_path}/{thread_id}/")
+            logger.info(f"All proposals saved to {base_path}/{thread_id}/")
         except Exception as e:
             error_msg = f"Failed to write markdown file: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
 
@@ -3012,7 +3014,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         This is The Prism's unique capability - revealing what emerges only when
         all chromatic methodologies are viewed simultaneously.
         """
-        logging.info("  Analyzing transformation traces across spectrum...")
+        logger.info("  Analyzing transformation traces across spectrum...")
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -3070,7 +3072,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             response = claude.invoke(prompt)
             return response.content
         except Exception as e:
-            logging.error(f"Meta-rebracketing LLM call failed: {e}")
+            logger.error(f"Meta-rebracketing LLM call failed: {e}")
             return f"Meta-rebracketing unavailable: {e}"
 
     def _generate_chromatic_synthesis(self, state: MainAgentState) -> str:
@@ -3080,7 +3082,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         This is the ultimate creative brief - INFORMATION made actionable through
         complete transmigration across TIME into SPACE.
         """
-        logging.info("  Synthesizing final creative brief...")
+        logger.info("  Synthesizing final creative brief...")
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -3123,7 +3125,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             response = claude.invoke(prompt)
             return response.content
         except Exception as e:
-            logging.error(f"Chromatic synthesis LLM call failed: {e}")
+            logger.error(f"Chromatic synthesis LLM call failed: {e}")
             return f"Chromatic synthesis unavailable: {e}"
 
     def _format_transformation_traces(self, traces: List[TransformationTrace]) -> str:
@@ -3159,7 +3161,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             if state.meta_rebracketing:
                 meta_path = md_dir / f"white_agent_{thread_id}_META_REBRACKETING.md"
                 save_markdown(state.meta_rebracketing, str(meta_path))
-                logging.info(f"  Saved meta-rebracketing: {meta_path}")
+                logger.info(f"  Saved meta-rebracketing: {meta_path}")
 
             # Save chromatic synthesis
             if state.chromatic_synthesis:
@@ -3167,7 +3169,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                     md_dir / f"white_agent_{thread_id}_CHROMATIC_SYNTHESIS.md"
                 )
                 save_markdown(state.chromatic_synthesis, str(synthesis_path))
-                logging.info(f"  Saved chromatic synthesis: {synthesis_path}")
+                logger.info(f"  Saved chromatic synthesis: {synthesis_path}")
 
             # Save transformation traces
             if state.transformation_traces:
@@ -3178,17 +3180,17 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                     md_dir / f"white_agent_{thread_id}_transformation_traces.md"
                 )
                 save_markdown(traces_content, str(traces_path))
-                logging.info(f"  Saved transformation traces: {traces_path}")
+                logger.info(f"  Saved transformation traces: {traces_path}")
 
             # Save facet evolution
             if state.facet_evolution:
                 facet_content = self._format_facet_evolution(state.facet_evolution)
                 facet_path = md_dir / f"white_agent_{thread_id}_facet_evolution.md"
                 save_markdown(facet_content, str(facet_path))
-                logging.info(f"  Saved facet evolution: {facet_path}")
+                logger.info(f"  Saved facet evolution: {facet_path}")
 
         except Exception as e:
-            logging.error(f"Failed to save meta-analysis: {e}")
+            logger.error(f"Failed to save meta-analysis: {e}")
 
     def _format_facet_evolution(self, evolution: FacetEvolution) -> str:
         """Format facet evolution for markdown output."""

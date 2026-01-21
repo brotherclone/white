@@ -16,6 +16,8 @@ from app.structures.concepts.pulsar_palace_room import PulsarPalaceRoom
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
+logger = logging.getLogger(__name__)
+
 
 class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
     chain_artifact_type: ChainArtifactType = Field(
@@ -107,7 +109,7 @@ class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
                         f"- **Portrait:** {char.portrait_artifact.for_prompt()}"
                     )
                 except ValueError as e:
-                    logging.error(f"Error getting portrait path: {e}")
+                    logger.error(f"Error getting portrait path: {e}")
                     img = getattr(
                         getattr(char, "portrait_artifact", None), "image", None
                     )
