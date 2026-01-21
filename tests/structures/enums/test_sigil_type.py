@@ -1,5 +1,4 @@
 import enum
-
 import pytest
 
 from app.structures.enums.sigil_type import SigilType

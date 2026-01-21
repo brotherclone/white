@@ -1,1 +1,130 @@
-# ToDo: Complete this manifest
+bpm: 126
+manifest_id: '08_09'
+tempo: 4/4
+key: Gb major
+rainbow_color: V
+title: Recoup DeVille
+release_date: '2025-09-08'
+album_sequence: 9
+main_audio_file: 08_09_main.wav
+TRT: '[02:05.017]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:07.015]'
+    description: The song kicks right with a mysterious vocal improve - we hear drum machines and real drums playing off each other
+  - section_name: Chorus
+    start_time: '[00:07.016]'
+    end_time: '[00:15.005]'
+    description: The chorus pairs a twelve-string guitar with a harpsichord - giving a 60s feel to the song
+  - section_name: Verse
+    start_time: '[00:15.006]'
+    end_time: '[00:30.011]'
+    description: Back to the verses, the song is a bit more traditional, with a few more chords and a bit of a more mellow sound
+  - section_name: Chorus
+    start_time: '[00:30.012]'
+    end_time: '[00:38.002]'
+    description: Another round of feel-good sounds conflicting with meditation on creative limitations
+  - section_name: Bridge
+    start_time: '[00:38.003]'
+    end_time: '[00:45.017]'
+    description: A bridge section gets a bit more saddening, with a few more chords and a bit of a more mellow sound
+  - section_name: Verse
+    start_time: '[00:45.018]'
+    end_time: '[01:00.023]'
+    description: The verses return for a brief reprise, we hear the contradicting electro and roots rock intersecting
+  - section_name: Chorus
+    start_time: '[01:00.024]'
+    end_time: '[01:16.004]'
+    description: The chorus returns, bringing back the upbeat feel-good sounds counterpointed with meditation on creative failings
+  - section_name: Interlude
+    start_time: '[01:16.005]'
+    end_time: '[01:23.020]'
+    description: In this instrumental interlude the drumming and combo twelve-string / harpsichord pairing raise up the energy
+  - section_name: Chorus
+    start_time: '[01:23.021]'
+    end_time: '[01:39.001]'
+    description: But now the chorus is back and the pop sound we heard before is definitely more of a downer.
+  - section_name: Interlude
+    start_time: '[01:39.002]'
+    end_time: '[01:46.016]'
+    description: A final instrumental interlude brings back the upbeat energy of the earlier sections
+  - section_name: Outro
+    start_time: '[01:46.017]'
+    end_time: '[02:05.017]'
+    description: The song closes out with a synth and guitar lines intersecting
+concept: The first song written for the album which aimed to combine red, blue, and indigo albums to one song with a pop vocalist.
+lrc_file: 08_09.lrc
+sounds_like:
+  - name: Jessica Pratt
+    discogs_id: 2084222
+  - name: His Name is Alive
+    discogs_id: 61796
+  - name: Halsey
+    discogs_id: 4298621
+mood:
+  - bittersweet
+  - energetic
+  - melancholic
+  - contradictory
+genres:
+  - electronic
+  - roots rock
+  - indie rock
+  - classic rock
+  - pop
+audio_tracks:
+  - id: 2
+    description: Kick
+    audio_file: 08_09_03_kick.wav
+    midi_file: 08_09_02_kick.mid
+  - id: 3
+    description: Snare
+    audio_file: 08_09_04_snare.wav
+  - id: 4
+    description: Hi Hat
+    audio_file: 08_09_05_hh.wav
+  - id: 5
+    description: Drum Machine
+    audio_file: 08_09_06_dm.wav
+  - id: 6
+    description: Bass
+    audio_file: 08_09_07_bass.wav
+  - id: 7
+    description: Guitar
+    audio_file: 08_09_08_guitar.wav
+  - id: 8
+    description: Twelve String
+    audio_file: 08_09_09_twelve_string.wav
+  - id: 9
+    description: Lap Steel
+    audio_file: 08_09_10_lap_steel.wav
+  - id: 10
+    description: Synth chords
+    audio_file: 08_09_11_chords.wav
+  - id: 11
+    description: Harpsichord
+    audio_file: 08_09_13_harpsicord.wav
+    midi_file: 08_09_12_harpsicord.mid
+  - id: 12
+    description: Synth Pad
+    audio_file: 08_09_15_pad.wav
+    midi_file: 08_09_14_pad.mid
+  - id: 13
+    description: Arp with Guitar
+    audio_file: 08_09_17_arp_guitar.wav
+    midi_file: 08_09_16_arp_guitar.mid
+  - id: 14
+    description: Synth Melody
+    audio_file: 08_09_178_melody.wav
+    midi_file: 08_09_19_melody.mid
+  - id: 15
+    description: Main vocals
+    audio_file: 08_09_19_vox_main.wav
+    player: Kate Koherence
+  - id: 16
+    description: Background vocals
+    audio_file: 08_09_20_vox_bg.wav
+    player: Kate Koherence

@@ -1,9 +1,14 @@
-from unittest.mock import mock_open, patch
+from unittest.mock import mock_open, patch, MagicMock
 
 import pytest
 import yaml
 
-from app.util.manifest_loader import load_manifest, sample_reference_artists
+from app.util.manifest_loader import (
+    load_manifest,
+    sample_reference_artists,
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+)
 
 
 def test_load_manifest_success():
@@ -107,3 +112,222 @@ class TestSampleReferenceArtists:
             # Should be limited to 3 (the list size) since duplicates not allowed
             assert len(result) == 3
             assert len(set(result)) == 3  # All unique
+
+
+class TestGetMyReferenceProposals:
+    @patch("os.walk")
+    @patch("app.util.manifest_loader.load_manifest")
+    @patch("os.getenv")
+    def test_get_my_reference_proposals_no_matches(
+        self, mock_getenv, mock_load_manifest, mock_walk
+    ):
+        """Test when no manifests match the color."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], ["test.yml"])]
+
+        # Create a mock manifest with different color
+        mock_manifest = MagicMock()
+        mock_manifest.rainbow_color.mnemonic_character_value = "R"
+        mock_load_manifest.return_value = mock_manifest
+
+        result = get_my_reference_proposals("B")
+
+        assert len(result.iterations) == 0
+
+    @patch("os.walk")
+    @patch("app.util.manifest_loader.load_manifest")
+    @patch("os.getenv")
+    @patch("app.util.manifest_loader.SongProposalIteration")
+    def test_get_my_reference_proposals_with_matches(
+        self, mock_iteration_class, mock_getenv, mock_load_manifest, mock_walk
+    ):
+        """Test when manifests match the color."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], ["test1.yml", "test2.yml"])]
+
+        # Create mock manifests
+        mock_rainbow_color = MagicMock()
+        mock_rainbow_color.mnemonic_character_value = "B"
+
+        mock_manifest = MagicMock()
+        mock_manifest.rainbow_color = mock_rainbow_color
+        mock_manifest.manifest_id = "test_v001"
+        mock_manifest.bpm = 120
+        mock_manifest.tempo = "Moderate"
+        mock_manifest.key = "C major"
+        mock_manifest.title = "Test Song"
+        mock_manifest.mood = ["Happy"]
+        mock_manifest.genres = ["Rock"]
+        mock_manifest.concept = "Test concept for this musical piece"
+
+        mock_load_manifest.return_value = mock_manifest
+
+        # Mock the SongProposalIteration instance
+        mock_iteration = MagicMock()
+        mock_iteration.iteration_id = "test_v001"
+        mock_iteration.bpm = 120
+        mock_iteration_class.return_value = mock_iteration
+
+        result = get_my_reference_proposals("B")
+
+        assert len(result.iterations) == 2
+        assert result.iterations[0].iteration_id == "test_v001"
+        assert result.iterations[0].bpm == 120
+
+    @patch("os.walk")
+    @patch("app.util.manifest_loader.load_manifest")
+    @patch("os.getenv")
+    @patch("app.util.manifest_loader.SongProposalIteration")
+    def test_get_my_reference_proposals_with_exception(
+        self, mock_iteration_class, mock_getenv, mock_load_manifest, mock_walk
+    ):
+        """Test handling of exceptions during manifest loading."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], ["bad.yml", "good.yml"])]
+
+        # First call raises exception, second succeeds
+        mock_rainbow_color = MagicMock()
+        mock_rainbow_color.mnemonic_character_value = "B"
+
+        mock_manifest = MagicMock()
+        mock_manifest.rainbow_color = mock_rainbow_color
+        mock_manifest.manifest_id = "test_v001"
+        mock_manifest.bpm = 120
+        mock_manifest.tempo = "Moderate"
+        mock_manifest.key = "C major"
+        mock_manifest.title = "Test Song"
+        mock_manifest.mood = ["Happy"]
+        mock_manifest.genres = ["Rock"]
+        mock_manifest.concept = "Test concept for this musical piece"
+
+        mock_load_manifest.side_effect = [Exception("Bad file"), mock_manifest]
+
+        # Mock the SongProposalIteration instance
+        mock_iteration = MagicMock()
+        mock_iteration.iteration_id = "test_v001"
+        mock_iteration.bpm = 120
+        mock_iteration_class.return_value = mock_iteration
+
+        result = get_my_reference_proposals("B")
+
+        # Should skip the bad file and process the good one
+        assert len(result.iterations) == 1
+
+    @patch("os.walk")
+    @patch("os.getenv")
+    def test_get_my_reference_proposals_no_yml_files(self, mock_getenv, mock_walk):
+        """Test when no YAML files are found."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], [])]
+
+        result = get_my_reference_proposals("B")
+
+        assert len(result.iterations) == 0
+
+
+class TestGetSoundsLikeByColor:
+    @patch("os.walk")
+    @patch("app.util.manifest_loader.load_manifest")
+    @patch("os.getenv")
+    def test_get_sounds_like_by_color_no_matches(
+        self, mock_getenv, mock_load_manifest, mock_walk
+    ):
+        """Test when no manifests match the color."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], ["test.yml"])]
+
+        mock_manifest = MagicMock()
+        mock_manifest.rainbow_color.mnemonic_character_value = "R"
+        mock_load_manifest.return_value = mock_manifest
+
+        result = get_sounds_like_by_color("B")
+
+        assert result == []
+
+    @patch("os.walk")
+    @patch("app.util.manifest_loader.load_manifest")
+    @patch("os.getenv")
+    def test_get_sounds_like_by_color_with_matches(
+        self, mock_getenv, mock_load_manifest, mock_walk
+    ):
+        """Test when manifests match and have sounds_like entries."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], ["test.yml"])]
+
+        # Create mock sounds_like entries
+        sound1 = MagicMock()
+        sound1.name = "Artist A"
+        sound2 = MagicMock()
+        sound2.name = "Artist B"
+
+        mock_manifest = MagicMock()
+        mock_manifest.rainbow_color.mnemonic_character_value = "B"
+        mock_manifest.sounds_like = [sound1, sound2]
+        mock_load_manifest.return_value = mock_manifest
+
+        result = get_sounds_like_by_color("B")
+
+        assert len(result) == 2
+        assert "Artist A" in result
+        assert "Artist B" in result
+
+    @patch("os.walk")
+    @patch("app.util.manifest_loader.load_manifest")
+    @patch("os.getenv")
+    def test_get_sounds_like_by_color_with_exception(
+        self, mock_getenv, mock_load_manifest, mock_walk
+    ):
+        """Test handling of exceptions during manifest loading."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], ["bad.yml", "good.yml"])]
+
+        # First call raises exception, second succeeds
+        sound1 = MagicMock()
+        sound1.name = "Artist A"
+
+        mock_manifest = MagicMock()
+        mock_manifest.rainbow_color.mnemonic_character_value = "B"
+        mock_manifest.sounds_like = [sound1]
+
+        mock_load_manifest.side_effect = [Exception("Bad file"), mock_manifest]
+
+        result = get_sounds_like_by_color("B")
+
+        # Should skip the bad file and process the good one
+        assert len(result) == 1
+        assert result[0] == "Artist A"
+
+    @patch("os.walk")
+    @patch("app.util.manifest_loader.load_manifest")
+    @patch("os.getenv")
+    def test_get_sounds_like_by_color_multiple_manifests(
+        self, mock_getenv, mock_load_manifest, mock_walk
+    ):
+        """Test aggregating sounds_like from multiple manifests."""
+        mock_getenv.return_value = "/test/path"
+        mock_walk.return_value = [("/test/path", [], ["test1.yml", "test2.yml"])]
+
+        # Create two manifests with different sounds_like
+        sound1 = MagicMock()
+        sound1.name = "Artist A"
+        sound2 = MagicMock()
+        sound2.name = "Artist B"
+        sound3 = MagicMock()
+        sound3.name = "Artist C"
+
+        mock_manifest1 = MagicMock()
+        mock_manifest1.rainbow_color.mnemonic_character_value = "B"
+        mock_manifest1.sounds_like = [sound1, sound2]
+
+        mock_manifest2 = MagicMock()
+        mock_manifest2.rainbow_color.mnemonic_character_value = "B"
+        mock_manifest2.sounds_like = [sound3]
+
+        mock_load_manifest.side_effect = [mock_manifest1, mock_manifest2]
+
+        result = get_sounds_like_by_color("B")
+
+        assert len(result) == 3
+        assert "Artist A" in result
+        assert "Artist B" in result
+        assert "Artist C" in result

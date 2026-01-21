@@ -1,1 +1,160 @@
-# ToDo: Complete this manifest
+bpm: 105
+manifest_id: '08_04'
+tempo: 4/4
+key: D major
+rainbow_color: V
+title: Blood Sugar
+release_date: '2025-09-08'
+album_sequence: 4
+main_audio_file: 08_04_main.wav
+TRT: '[03:05.003]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:27.010]'
+    description: Warped, soul tinged synths start the song
+  - section_name: Verse
+    start_time: '[00:27.011]'
+    end_time: '[00:36.014]'
+    description: We hear pop, R&B voice of Busayo Oninla
+  - section_name: Verse Alt
+    start_time: '[00:36.015]'
+    end_time: '[00:45.017]'
+    description: A slight shift in chord progression
+  - section_name: Chorus
+    start_time: '[00:45.018]'
+    end_time: '[00:54.021]'
+    description: The song's chorus kicks in with shifting staccato and long vocal lines
+  - section_name: Verse Alt
+    start_time: '[00:54.022]'
+    end_time: '[01:04.000]'
+    description: Back to the alt verse
+  - section_name: Chorus
+    start_time: '[01:04.001]'
+    end_time: '[01:13.003]'
+    description: And to the chorus
+  - section_name: Bridge
+    start_time: '[01:13.004]'
+    end_time: '[01:31.010]'
+    description: Some jams with strange, psychedelic synths
+  - section_name: Chorus
+    start_time: '[01:31.011]'
+    end_time: '[01:40.014]'
+    description: And back to the chorus
+  - section_name: Verse
+    start_time: '[01:40.015]'
+    end_time: '[01:49.017]'
+    description: To the verse
+  - section_name: Verse Alt
+    start_time: '[01:49.018]'
+    end_time: '[01:58.021]'
+    description: Slight shift in chord progression again
+  - section_name: Bridge Alt
+    start_time: '[01:58.022]'
+    end_time: '[02:12.014]'
+    description: The bridge version has a bit more instrumental explorations
+  - section_name: Bridge
+    start_time: '[02:12.015]'
+    end_time: '[02:30.021]'
+    description: Then transitions back to the original bridge
+  - section_name: Chorus
+    start_time: '[02:30.022]'
+    end_time: '[02:40.000]'
+    description: To the chorus
+  - section_name: Verse Alt
+    start_time: '[02:40.001]'
+    end_time: '[02:49.003]'
+    description: And the alt verse, coming first
+  - section_name: Bridge Alt
+    start_time: '[02:49.004]'
+    end_time: '[03:05.003]'
+    description: Ending with the alt bridge
+concept: A synth-heavy, dreamy track that explores themes of longing and introspection through lush soundscapes and soulful vocals. There's a touch of danger in the sweetness of lustful abandon.
+lrc_file: 08_04.lrc
+sounds_like:
+  - name: Toro Y Moi
+    discogs_id: 1362799
+  - name: Tame Impala
+    discogs_id: 1245513
+  - name: The Weeknd
+    discogs_id: 2171152
+mood:
+  - sad
+  - melancholy
+  - dreamy
+  - regretful
+genres:
+  - synthpop
+  - dream pop
+  - soul
+audio_tracks:
+  - id: 2
+    description: Synth Bass
+    audio_file: 08_04_07_bass.wav
+    midi_file: 08_04_02_bass.mid
+  - id: 3
+    description: Synth chords
+    audio_file: 08_04_12_chords_1.wav
+    midi_file: 08_04_03_chords.mid
+  - id: 4
+    description: Synth chords 2
+    audio_file: 08_04_13_chords_2.wav
+    midi_file: 08_04_06_chords_2.mid
+  - id: 5
+    description: Rift Riff
+    audio_file: 08_04_10_riff_1.wav
+    midi_file: 08_04_04_rift.mid
+  - id: 6
+    description: Faux Drums
+    audio_file: 08_04_14_drums.wav
+    midi_group_file: 08_04_05_drummer.mid
+  - id: 7
+    description: Bass
+    audio_file: 08_04_07_bass.wav
+  - id: 8
+    description: Modular Bass
+    audio_file: 08_04_08_mod_bass.wav
+  - id: 9
+    description: Electric piano
+    audio_file: 08_04_09_electric_piano.wav
+  - id: 10
+    description: Kick
+    audio_file: 08_04_15_kick.wav
+    midi_group_file: 08_04_05_drummer.mid
+  - id: 11
+    description: Snare
+    audio_file: 08_04_16_snare.wav
+    midi_group_file: 08_04_05_drummer.mid
+  - id: 12
+    description: Hi Hat
+    audio_file: 08_04_17_hh.wav
+    midi_group_file: 08_04_05_drummer.mid
+  - id: 13
+    description: Toms
+    audio_file: 08_04_18_toms.wav
+    midi_group_file: 08_04_05_drummer.mid
+  - id: 14
+    description: Vocal Lead
+    audio_file: 08_04_20_vox_lead.wav
+    player: Busayo Oninla
+  - id: 15
+    description: Vocal harmonies
+    audio_file: 08_04_21_vox_harmony.wav
+    player: Busayo Oninla
+  - id: 16
+    description: Vocal adlib
+    audio_file: 08_04_22_vox_adlib.wav
+    player: Busayo Oninla
+
+
+
+
+
+
+
+
+
+
+

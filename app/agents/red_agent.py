@@ -23,6 +23,8 @@ from app.util.manifest_loader import get_my_reference_proposals
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 
 class RedAgent(BaseRainbowAgent, ABC):
     """The Light Reader."""
@@ -138,7 +140,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     state.counter_proposal = counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -176,7 +178,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
             except Exception as e:
                 print(
                     f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration for red's counter proposal after authoring a book."
@@ -219,7 +221,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     state.reaction_level += 1
             except Exception as e:
                 error_msg = f"Failed to read or save mock book artifact: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 state.should_create_book = False
@@ -257,11 +259,11 @@ class RedAgent(BaseRainbowAgent, ABC):
                     page_1_text = result.get("page_1_text", "")
                     page_2_text = result.get("page_2_text", "")
                 else:
-                    logging.error(f"Unexpected result type: {type(result)}")
+                    logger.error(f"Unexpected result type: {type(result)}")
                     if block_mode:
                         raise TypeError(f"Unexpected result type: {type(result)}")
                     else:
-                        logging.warning(f"Unexpected result type: {type(result)}")
+                        logger.warning(f"Unexpected result type: {type(result)}")
                         page_1_text = ""
                         page_2_text = ""
                 state.reaction_level += 1
@@ -278,13 +280,13 @@ class RedAgent(BaseRainbowAgent, ABC):
                     state.main_generated_book.save_file()
                 except Exception as e:
                     error_msg = f"Failed to save book artifact file: {e!s}"
-                    logging.error(error_msg)
+                    logger.error(error_msg)
                     if block_mode:
                         raise Exception(error_msg)
                 state.should_create_book = False
                 return state
             except Exception as e:
-                logging.error(f"Book generation failed: {e!s}")
+                logger.error(f"Book generation failed: {e!s}")
                 state.should_create_book = False
                 if block_mode:
                     raise Exception("Anthropic model call failed")
@@ -308,7 +310,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                         book_dict = dict(book_data.__dict__)
                     else:
                         error_msg = f"Cannot convert book_data of type {type(book_data)} to dict"
-                        logging.error(error_msg)
+                        logger.error(error_msg)
                         if block_mode:
                             raise TypeError(error_msg)
                         state.should_respond_with_reaction_book = False
@@ -324,7 +326,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     state.should_respond_with_reaction_book = False
             except Exception as e:
                 error_msg = f"Failed to read mock reaction book data: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 state.should_respond_with_reaction_book = False
@@ -371,13 +373,13 @@ class RedAgent(BaseRainbowAgent, ABC):
                     return state
                 else:
                     error_msg = f"Expected BookArtifact, got {type(result)}"
-                    logging.error(error_msg)
+                    logger.error(error_msg)
                     state.current_reaction_book = None
                     if block_mode:
                         raise TypeError(error_msg)
                 state.should_respond_with_reaction_book = False
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                logger.error(f"Anthropic model call failed: {e!s}")
                 state.current_reaction_book = None
                 print(
                     f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration for black's first counter proposal."
@@ -405,7 +407,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                 state.artifacts.append(state.current_reaction_book)
             except Exception as e:
                 error_msg = f"Failed to read mock reaction book pages: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -443,7 +445,7 @@ class RedAgent(BaseRainbowAgent, ABC):
                     error_msg = f"Expected BookPageCollection, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
             except Exception as e:
                 print(
                     f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration for writing reaction book pages after authoring a book."
@@ -472,7 +474,7 @@ class RedAgent(BaseRainbowAgent, ABC):
 
     def evaluate_books_versus_proposals(self, state: RedAgentState) -> RedAgentState:
         if state.reaction_level >= 3:
-            logging.info(
+            logger.info(
                 f"🛑 Reaction limit reached ({state.reaction_level}), ending book generation"
             )
             state.should_create_book = False
@@ -520,12 +522,12 @@ class RedAgent(BaseRainbowAgent, ABC):
                     state.should_create_book = result.new_book
                     state.should_respond_with_reaction_book = result.reaction_book
                 else:
-                    logging.warning(f"Unexpected result type: {type(result)}")
+                    logger.warning(f"Unexpected result type: {type(result)}")
                     state.should_create_book = False
                     state.should_respond_with_reaction_book = False
 
             except Exception as e:
-                logging.error(f"Book evaluation failed: {e!s}")
+                logger.error(f"Book evaluation failed: {e!s}")
                 state.should_create_book = False
                 state.should_respond_with_reaction_book = False
         return state

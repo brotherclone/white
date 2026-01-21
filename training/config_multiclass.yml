@@ -1,0 +1,135 @@
+# Rainbow Pipeline Training Configuration
+# Phase 2: Multi-class rebracketing type classification
+
+# Data Configuration
+data:
+  manifest_path: "data/base_manifest_db.parquet"
+
+  # Target
+  target_column: "rebracketing_type"  # Multi-class: spatial, temporal, causal, etc.
+  target_type: "multiclass"  # Options: binary, multiclass, regression
+
+  # Class mapping (rebracketing type taxonomy)
+  # Maps string labels to class indices
+  class_mapping:
+    spatial: 0
+    temporal: 1
+    causal: 2
+    perceptual: 3
+    memory: 4
+    ontological: 5
+    narrative: 6
+    identity: 7
+
+  # Splits
+  train_split: 0.8
+  val_split: 0.2
+  random_seed: 42
+  stratified: true  # Ensure balanced class distribution in splits
+
+  # Filtering
+  require_concept: true  # Only use tracks with concept text
+  min_concept_length: 50  # Minimum characters
+  filter_unknown_types: true  # Exclude segments with unknown rebracketing types
+
+# Model Architecture
+model:
+  # Text encoder
+  text_encoder:
+    model_name: "microsoft/deberta-v3-base"
+    hidden_size: 768
+    max_length: 512
+    freeze_layers: 0  # Fine-tune all layers with GPU
+    pooling: "mean"
+
+  # Classifier head
+  classifier:
+    type: "multiclass"  # Options: binary, multiclass
+    num_classes: 8  # Number of rebracketing types
+    hidden_dims: [256, 128]  # MLP hidden layers
+    dropout: 0.3
+    activation: "relu"  # Options: relu, gelu, tanh
+    multi_label: false  # Single-label classification (one type per segment)
+    class_weights: "balanced"  # Options: balanced, uniform, or manual list
+
+# Training Configuration
+training:
+  # Loss function
+  loss:
+    type: "cross_entropy"  # CrossEntropyLoss for single-label multiclass
+    label_smoothing: 0.0  # Optional label smoothing
+
+  # Optimization
+  batch_size: 32  # Larger batches on GPU
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  epochs: 50  # More epochs with GPU
+
+  # Advanced
+  gradient_accumulation_steps: 1  # No need with larger batch
+  max_grad_norm: 1.0
+  warmup_ratio: 0.1
+
+  # Hardware
+  device: "cuda"  # GPU on RunPod
+  mixed_precision: true  # Fast with GPU
+  num_workers: 4  # Parallel data loading
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 10  # More patience with more epochs
+    min_delta: 0.001
+    metric: "val_macro_f1"  # Use macro F1 for multiclass
+
+  # Checkpointing
+  save_best_only: true
+  save_every_n_epochs: 1
+
+# Evaluation Configuration
+evaluation:
+  metrics:
+    # Per-class metrics
+    - "per_class_f1"
+    - "per_class_precision"
+    - "per_class_recall"
+
+    # Aggregate metrics
+    - "macro_f1"  # Unweighted average across classes
+    - "micro_f1"  # Weighted by class frequency
+    - "weighted_f1"  # Weighted by support
+
+    # Other
+    - "accuracy"
+    - "confusion_matrix"
+
+  # Confusion matrix visualization
+  confusion_matrix:
+    enabled: true
+    normalize: "true"  # Options: true, pred, all, null
+    save_path: "confusion_matrix.png"
+
+# Logging Configuration
+logging:
+  # Weights & Biases
+  wandb:
+    enabled: true  # Enable for RunPod runs
+    project: "rainbow-pipeline-multiclass"
+    entity: null  # Set via env: export WANDB_ENTITY=yourname
+    name: null  # Auto-generated from timestamp
+    tags:
+      - "multiclass"
+      - "rebracketing-types"
+      - "phase-2"
+
+  # Local logging
+  output_dir: "/workspace/output"  # RunPod persistent storage
+  log_every_n_steps: 10
+
+  # Per-class metrics logging
+  log_per_class_metrics: true
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  deterministic: true  # Slower but reproducible
