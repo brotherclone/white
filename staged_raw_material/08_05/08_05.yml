@@ -1,1 +1,210 @@
-# ToDo: Complete this manifest
+bpm: 107
+manifest_id: '08_05'
+tempo: 4/4
+key: F# major
+rainbow_color: V
+title: Incompetence
+release_date: '2025-09-08'
+album_sequence: 5
+main_audio_file: 08_05_main.wav
+TRT: '[03:01.017]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:08.024]'
+    description: A driving, disco beat with cheesy faux orchestra starts the song
+  - section_name: Verse 1
+    start_time: '[00:08.025]'
+    end_time: '[00:35.022]'
+    description: A sad melancholic singer steps in over the disco beat
+  - section_name: Chorus 1
+    start_time: '[00:35.023]'
+    end_time: '[01:02.020]'
+    description: The chorus continues the melancholic disco
+  - section_name: Verse 2
+    start_time: '[01:02.021]'
+    end_time: '[01:20.018]'
+    description: Back to the verse, with a little less instrumentation
+  - section_name: Chorus 2
+    start_time: '[01:20.019]'
+    end_time: '[01:47.016]'
+    description: Returning to the chorus, the singers last note stretches over the next section
+  - section_name: Bridge
+    start_time: '[01:47.017]'
+    end_time: '[02:21.007]'
+    description: A full, cheesy orchatreactration, straight out of 70s television
+  - section_name: Verse jams
+    start_time: '[02:21.008]'
+    end_time: '[03:01.017]'
+    description: The song ends with the verse being repeated as an instrumental jam
+concept: This song captures the feeling of staying home, depressed, pretending to be sick in the early 1980s with 'Charlie's Angels' being the only show to watch
+lrc_file: 08_05.lrc
+sounds_like:
+  - name: Henry Mancini
+    discogs_id: 10529
+  - name: ABBA
+    discogs_id: 69866
+  - name: Billie Eilish
+    discogs_id: 5590213
+mood:
+  - nostalgic
+  - disco
+  - ironic
+  - melancholic
+genres:
+  - electronic
+  - disco
+  - retro
+  - pop
+audio_tracks:
+  - id: 2
+    description: All drums
+    audio_file: 08_05_30_drums.wav
+    group: drums
+  - id: 3
+    description: Kick 1
+    audio_file: 08_05_31_kick_1.wav
+    midi_file: 08_05_02_kick_1.mid
+    group: drums
+  - id: 4
+    description: Kick 2
+    audio_file: 08_05_32_kick_2.wav
+    midi_file: 08_05_03_kick_2.mid
+    group: drums
+  - id: 5
+    description: Kick 3
+    audio_file: 08_05_33_kick_3.wav
+    midi_file: 08_05_04_kick_3.mid
+    group: drums
+  - id: 6
+    description: Kick 4
+    audio_file: 08_05_34_kick_4.wav
+    midi_file: 08_05_05_kick_4.mid
+    group: drums
+  - id: 7
+    description: Snare 1
+    audio_file: 08_05_35_snare_1.wav
+    midi_file: 08_05_06_snare_1.mid
+    group: drums
+  - id: 8
+    description: Snare 2
+    audio_file: 08_05_36_snare_2.wav
+    midi_file: 08_05_07_snare_2.mid
+    group: drums
+  - id: 9
+    description: Snare rim
+    audio_file: 08_05_37_snare_rim.wav
+    midi_file: 08_05_08_snare_rim.mid
+    group: drums
+  - id: 10
+    description: Snare 3
+    audio_file: 08_05_38_snare_3.wav
+    midi_file: 08_05_09_snare_3.mid
+    group: drums
+  - id: 11
+    description: Clap 1
+    audio_file: 08_05_39_clap_1.wav
+    midi_file: 08_05_10_clap_1.mid
+    group: drums
+  - id: 12
+    description: Clap 2
+    audio_file: 08_05_40_clap_2.wav
+    midi_file: 08_05_11_clap_2.mid
+    group: drums
+  - id: 13
+    description: Hi-hat 1
+    audio_file: 08_05_41_hh_1.wav
+    midi_file: 08_05_12_hh_1.mid
+    group: drums
+  - id: 14
+    description: Hi-hat 2
+    audio_file: 08_05_42_hh_2.wav
+    midi_file: 08_05_13_hh_2.mid
+    group: drums
+  - id: 15
+    description: Crash
+    audio_file: 08_05_44_crash.wav
+    midi_file: 08_05_15_crash.mid
+    group: drums
+  - id: 16
+    description: Ride
+    audio_file: 08_05_45_ride.wav
+    midi_file: 08_05_16_ride.mid
+    group: drums
+  - id: 17
+    description: Floor tom
+    audio_file: 08_05_46_floor_tom.wav
+    midi_file: 08_05_17_floor_tom.mid
+    group: drums
+  - id: 18
+    description: Rack tom low
+    audio_file: 08_05_47_lo_tom.wav
+    midi_file: 08_05_18_rack_lo_tom.mid
+    group: drums
+  - id: 19
+    description: Rack tom high
+    audio_file: 08_05_48_hi_tom.wav
+    midi_file: 08_05_19_rack_hi_tom.mid
+    group: drums
+  - id: 20
+    description: Clavinet
+    audio_file: 08_05_51_clavinet.wav
+    midi_file: 08_05_20_clavinet.mid
+  - id: 21
+    description: Tremolo strings
+    audio_file: 08_05_52_orchestra.wav
+    midi_file: 08_05_21_string_tremolo.mid
+    group: orchestra
+  - id: 22
+    description: Disco strings main
+    audio_file: 08_05_52_orchestra.wav
+    midi_file: 08_05_23_string_main.mid
+    group: orchestra
+  - id: 23
+    description: Melotron strings
+    audio_file: 08_05_52_orchestra.wav
+    midi_file: 08_05_24_mellotron_strings.mid
+    group: orchestra
+  - id: 24
+    description: Portamento Strings
+    audio_file: 08_05_52_orchestra.wav
+    midi_file: 08_05_25_strings_portamento.mid
+    group: orchestra
+  - id: 25
+    description: Melotron French Horn
+    audio_file: 08_05_52_orchestra.wav
+    midi_file: 08_05_26_tape_frenchy.mid
+    group: orchestra
+  - id: 26
+    description: Mellotron Trumpet
+    audio_file: 08_05_52_orchestra.wav
+    midi_file: 08_05_27_tape_trumpet.mid
+    group: orchestra
+  - id: 27
+    description: Pad 1
+    audio_file: 08_05_53_pad.wav
+    midi_file: 08_05_28_pad_1.mid
+  - id: 28
+    description: Pad 2
+    audio_file: 08_05_53_pad.wav
+    midi_file: 08_05_29_pad_2.mid
+  - id: 29
+    description: Vocals lead
+    audio_file: 08_05_55_vox_lead.wav
+    player: Katherine Koherence
+  - id: 30
+    description: Vocals harmony
+    audio_file: 08_05_56_vox_harmony.wav
+    player: Katherine Koherence
+  - id: 31
+    description: Vocals harmony low
+    audio_file: 08_05_57_vox_harmony_low.wav
+    player: Katherine Koherence
+  - id: 32
+    description: Vocals ad libs
+    audio_file: 08_05_58_vox_adlibs.wav
+    player: Katherine Koherence
+
+

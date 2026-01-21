@@ -12,6 +12,8 @@ TIME_OUT = 30.0
 
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 mcp = FastMCP("earthly_frames_discogs")
 
 
@@ -30,7 +32,7 @@ async def look_up_artist_by_name(artist_name: str):
         discogs = await discogs_earthly_frames_retriever_service()
         results = discogs.search(artist_name, type="artist")
         if not results:
-            logging.error(f"No results found for artist: {artist_name}")
+            logger.error(f"No results found for artist: {artist_name}")
             return None
         artist = results[0]
         result = {
@@ -42,7 +44,7 @@ async def look_up_artist_by_name(artist_name: str):
         print(f"Converted artist: {result}", file=sys.stderr)
         return result
     except Exception as err:
-        logging.info(f"Error searching for artist {artist_name}: {err}")
+        logger.info(f"Error searching for artist {artist_name}: {err}")
         return None
 
 
@@ -61,7 +63,7 @@ async def look_up_artist_by_id(artist_id: str | int):
             "styles": getattr(artist, "styles", []),
         }
     except Exception as err:
-        logging.info(f"Error fetching artist with ID {artist_id}: {err}")
+        logger.info(f"Error fetching artist with ID {artist_id}: {err}")
         return None
 
 
@@ -71,14 +73,14 @@ async def get_group_members(group_name: str):
         discogs = await discogs_earthly_frames_retriever_service()
         results = discogs.search(group_name, type="artist")
         if not results:
-            logging.error(f"No results found for group: {group_name}")
+            logger.error(f"No results found for group: {group_name}")
             return []
         group = results[0]
         group_detail = discogs.artist(group.id)
         members = [{"id": m.id, "name": m.name} for m in group_detail.members]
         return members
     except Exception as err:
-        logging.info(f"Error fetching group members for {group_name}: {err}")
+        logger.info(f"Error fetching group members for {group_name}: {err}")
         return []
 
 
@@ -122,7 +124,7 @@ async def get_release_list(
             )
         return filtered_releases
     except Exception as err:
-        logging.info(f"Error fetching releases for artist with ID {artist_id}: {err}")
+        logger.info(f"Error fetching releases for artist with ID {artist_id}: {err}")
         return []
 
 

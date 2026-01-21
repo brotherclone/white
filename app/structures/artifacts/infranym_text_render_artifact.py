@@ -14,6 +14,8 @@ from app.structures.enums.image_text_style import ImageTextStyle
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class InfranymTextRenderArtifact(ChainArtifact, ABC):
     """
@@ -49,7 +51,7 @@ class InfranymTextRenderArtifact(ChainArtifact, ABC):
         output_path = self.get_artifact_path(with_file_name=True, create_dirs=True)
         text_img.save(output_path, format="PNG")
 
-        logging.info(f"💜 Text render saved: {output_path}")
+        logger.info(f"💜 Text render saved: {output_path}")
         return output_path
 
     def create_text_image(
@@ -83,7 +85,7 @@ class InfranymTextRenderArtifact(ChainArtifact, ABC):
                     f"{os.getenv('LOCAL_FONT_PATH')}/HelveticaNeue.ttc", 120
                 )
             except (EnvironmentError, OSError) as e:
-                logging.error(f"Error loading font: {e}")
+                logger.error(f"Error loading font: {e}")
                 font = ImageFont.load_default()
             fill = w.hex_value
 
@@ -93,7 +95,7 @@ class InfranymTextRenderArtifact(ChainArtifact, ABC):
                     f"{os.getenv('LOCAL_FONT_PATH')}/Courier.ttc", 100
                 )
             except (EnvironmentError, OSError) as e:
-                logging.error(f"Error loading font: {e}")
+                logger.error(f"Error loading font: {e}")
                 font = ImageFont.load_default()
 
             # Multi-offset RGB separation for glitch effect
@@ -121,7 +123,7 @@ class InfranymTextRenderArtifact(ChainArtifact, ABC):
                     f"{os.getenv('LOCAL_FONT_PATH')}/Monaco.ttf", 80
                 )
             except (EnvironmentError, OSError) as e:
-                logging.error(f"Error loading font: {e}")
+                logger.error(f"Error loading font: {e}")
                 font = ImageFont.load_default()
             fill = w.hex_value
 
@@ -131,7 +133,7 @@ class InfranymTextRenderArtifact(ChainArtifact, ABC):
                     f"{os.getenv('LOCAL_FONT_PATH')}/Helvetica.ttc", 120
                 )
             except (EnvironmentError, OSError) as e:
-                logging.error(f"Error loading font: {e}")
+                logger.error(f"Error loading font: {e}")
                 font = ImageFont.load_default()
             fill = w.hex_value
 

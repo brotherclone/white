@@ -27,6 +27,8 @@ from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class OrangeAgent(BaseRainbowAgent, ABC):
     """Sussex Mythologizer - Rows Bud, the 182 BPM transmission keeper"""
@@ -130,7 +132,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 state.counter_proposal = counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -178,7 +180,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     counter_proposal = result
                 else:
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
-                    logging.error(error_msg)
+                    logger.error(error_msg)
                     if block_mode:
                         raise TypeError(error_msg)
                     timestamp = int(time.time() * 1000)
@@ -195,7 +197,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     )
             except Exception as e:
                 error_msg = f"Orange counter proposal LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
                 timestamp = int(time.time() * 1000)
@@ -239,7 +241,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     state.artifacts.append(story)
             except Exception as e:
                 error_msg = f"Failed to read or save mock base story: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -317,7 +319,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                         state.synthesized_story.save_file()
                     except Exception as e:
                         error_msg = f"Failed to save synthesized story file: {e!s}"
-                        logging.error(error_msg)
+                        logger.error(error_msg)
                         if block_mode:
                             raise Exception(error_msg)
                     state.artifacts.append(state.synthesized_story)
@@ -328,7 +330,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                         state.synthesized_story.save_file()
                     except Exception as e:
                         error_msg = f"Failed to save synthesized story file: {e!s}"
-                        logging.error(error_msg)
+                        logger.error(error_msg)
                         if block_mode:
                             raise Exception(error_msg)
                     state.artifacts.append(state.synthesized_story)
@@ -337,7 +339,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     error_msg = (
                         f"Expected NewspaperArtifact or dict, got {type(result)}"
                     )
-                    logging.error(error_msg)
+                    logger.error(error_msg)
                     if block_mode:
                         raise TypeError(error_msg)
                     fallback_story = NewspaperArtifact(
@@ -353,7 +355,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     return state
             except Exception as e:
                 error_msg = f"Base story synthesis LLM call failed: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         return state
@@ -380,7 +382,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 state.selected_story_id = story_id
                 print(f"   Added: {story_id} (score: {score:.2f})")
             except Exception as e:
-                logging.error(f"Corpus addition failed: {e}")
+                logger.error(f"Corpus addition failed: {e}")
                 state.selected_story_id = f"fallback_{int(time.time() * 1000)}"
             return state
 
@@ -402,7 +404,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     state.symbolic_object = obj
             except Exception as e:
                 error_msg = f"Failed to read mock symbolic object: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -440,7 +442,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 print(f"   Object inserted: {state.symbolic_object.name}")
 
             except Exception as e:
-                logging.error(f"Object insertion failed: {e}")
+                logger.error(f"Object insertion failed: {e}")
 
         return state
 
@@ -459,7 +461,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             )
             print(f"Object inserted: {state.symbolic_object.name}")
         except Exception as e:
-            logging.error(f"Object insertion failed: {e!s}")
+            logger.error(f"Object insertion failed: {e!s}")
 
         return state
 
@@ -489,13 +491,13 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     except Exception as e:
                         # In mock mode, file save failures are non-fatal
                         # (test mocks may not have complete file paths)
-                        logging.warning(
+                        logger.warning(
                             f"Mock mode: Could not save mythologized story file: {e!s}"
                         )
                     state.artifacts.append(state.mythologized_story)
             except Exception as e:
                 error_msg = f"Failed to read mock gonzo rewrite: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -564,7 +566,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 state.mythologized_story.save_file()
             except Exception as e:
                 error_msg = f"Failed to save mythologized story file: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             state.artifacts.append(state.mythologized_story)
@@ -572,7 +574,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
         except Exception as e:
             error_msg = f"Gonzo rewrite LLM call failed: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
             state.mythologized_story = state.synthesized_story

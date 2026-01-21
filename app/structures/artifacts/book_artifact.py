@@ -187,10 +187,7 @@ class BookArtifact(ChainArtifact, ABC):
             parent_data = {}
         return {
             **parent_data,
-            "thread_id": self.thread_id,
             "chain_artifact_file_type": self.chain_artifact_file_type.value,
-            "file_name": self.file_name,
-            "file_path": self.file_path,
             "chain_artifact_type": ChainArtifactType.BOOK.value,
             "title": self.title,
             "subtitle": self.subtitle,

@@ -11,6 +11,8 @@ BASE_URL = "https://www.earthlyframes.com"
 
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 mcp = FastMCP("earthly_frames")
 
 
@@ -21,7 +23,7 @@ async def earthly_frames_retriever_service(url: str) -> dict[str, Any] | None:
             response = await client.get(url, headers=headers, timeout=TIME_OUT)
             return response.json()
         except Exception as e:
-            logging.info(e)
+            logger.info(e)
             return None
 
 

@@ -14,17 +14,7 @@ from app.structures.artifacts.infranym_midi_artifact import InfranymMidiArtifact
 from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.enums.infranym_medium import InfranymMedium
 from app.structures.enums.infranym_method import InfranymMethod
-
-
-def safe_add(x, y):
-    """Safely add two lists, handling None values"""
-    if x is None and y is None:
-        return None
-    if x is None:
-        return y
-    if y is None:
-        return x
-    return x + y
+from app.util.agent_state_utils import safe_add
 
 
 class IndigoAgentState(BaseRainbowAgentState):

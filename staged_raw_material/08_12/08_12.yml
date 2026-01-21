@@ -1,1 +1,138 @@
-# ToDo: Complete this manifest
+bpm: 117
+manifest_id: '08_12'
+tempo: 4/4
+key: Bb minor
+rainbow_color: V
+title: Series Circuit
+release_date: '2025-09-08'
+album_sequence: 12
+main_audio_file: 08_12_main.wav
+TRT: '[02:46.003]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Verse Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:16.010]'
+    description: Warped synths and a banging beat start here
+  - section_name: Verse
+    start_time: '[00:16.011]'
+    end_time: '[00:32.020]'
+    description: The synths are lowered for the sultry, alto vocals
+  - section_name: Chorus
+    start_time: '[00:32.021]'
+    end_time: '[00:49.005]'
+    description: The chorus has a catchy, hypnotic sound
+  - section_name: Verse
+    start_time: '[00:49.006]'
+    end_time: '[01:05.016]'
+    description: We return to the sparser synths and the bass
+  - section_name: Chorus
+    start_time: '[01:05.017]'
+    end_time: '[01:22.001]'
+    description: The chorus comes back with more energy
+  - section_name: Interlude
+    start_time: '[01:22.002]'
+    end_time: '[01:38.011]'
+    description: A brief instrumental break with synth solos
+  - section_name: Chorus
+    start_time: '[01:38.012]'
+    end_time: '[01:54.021]'
+    description: The final chorus before the last verse
+  - section_name: Verse
+    start_time: '[01:54.022]'
+    end_time: '[02:11.007]'
+    description: The last verse with layered vocals
+  - section_name: Jams
+    start_time: '[02:11.008]'
+    end_time: '[02:46.003]'
+    description: The song goes full dance mode with creepy synth sounds
+concept: This song continues the story from 'Everyday Sigils' with out alienated hero lurking on the edges and contemplating terrible things. The song is a paranoid, hypnotic chorus with a catchy chorus.
+lrc_file: 08_12.lrc
+sounds_like:
+  - name: Amanda Lear
+    discogs_id: 51229
+  - name: Nico (3)
+    discogs_id: 158676
+  - name: DJ Koze
+    discogs_id: 8260
+mood:
+  - sultry
+  - paranoid
+  - hypnotic
+genres:
+  - electronic
+  - dance
+  - pop
+audio_tracks:
+  - id: 2
+    description: Kick 1
+    audio_file: 08_12_14_kick_1.wav
+    midi_file: 08_12_02_kick_1.mid
+  - id: 3
+    description: Kick 2
+    audio_file: 08_12_15_kick_2.wav
+    midi_file: 08_12_03_kick_2.mid
+  - id: 4
+    description: Kick 3
+    audio_file: 08_12_16_kick_3.wav
+    midi_file: 08_12_04_kick_3.mid
+  - id: 5
+    description: Snare
+    audio_file: 08_12_17_snare.wav
+    midi_file: 08_12_05_snare.mid
+  - id: 6
+    description: Cowbell
+    audio_file: 08_12_18_cowbell.wav
+    midi_file: 08_12_06_cowbell.mid
+  - id: 7
+    description: Clap
+    audio_file: 08_12_19_clap.wav
+    midi_file: 08_12_07_clap.mid
+  - id: 8
+    description: Shaker
+    audio_file: 08_12_20_shaker.wav
+    midi_file: 08_12_08_shaker.mid
+  - id: 9
+    description: PWM Bass
+    audio_file: 08_12_21_pwm_bass.wav
+    midi_file: 08_12_10_pwm_bass.mid
+  - id: 10
+    description: CMI Synth
+    audio_file: 08_12_23_cmi.wav
+    midi_file: 08_12_11_cmi.mid
+  - id: 11
+    description: Vox Continental
+    audio_file: 08_12_24_continental.wav
+    midi_file: 08_12_11_continental.mid
+  - id: 12
+    description: Jupiter Synth
+    audio_file: 08_12_25_jupiter.wav
+    midi_file: 08_12_12_jupiter.mid
+  - id: 13
+    description: Jupiter 2 Synth
+    audio_file: 08_12_26_jupiter2.wav
+    midi_file: 08_12_13_jupiter2.mid
+  - id: 14
+    description: Bass
+    audio_file: 08_12_22_bass.wav
+  - id: 15
+    description: Vocals Lead
+    audio_file: 08_12_27_vox_lead.wav
+    player: Shirley Kudirka
+  - id: 16
+    description: Vocals Harmony
+    audio_file: 08_12_28_vox_harmony.wav
+    player: Shirley Kudirka
+  - id: 17
+    description: Vocals Harmony 2
+    audio_file: 08_12_29_vox_harmony2.wav
+    player: Shirley Kudirka
+  - id: 18
+    description: Vocals Harmony Doubled
+    audio_file: 08_12_30_vox_harmony_dbl.wav
+    player: Shirley Kudirka
+  - id: 19
+    description: Vocals Ad libs
+    audio_file: 08_12_31_vox_adlibs.wav
+    player: Shirley Kudirka

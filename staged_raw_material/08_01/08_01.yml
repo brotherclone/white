@@ -1,1 +1,113 @@
-# ToDo: Complete this manifest
+bpm: 100
+manifest_id: '08_01'
+tempo: 4/4
+key: C# minor
+rainbow_color: V
+title: Thought Rays
+release_date: '2025-09-08'
+album_sequence: 1
+main_audio_file: 08_01_main.wav
+TRT: '[02:58.014]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Drum intro
+    start_time: '[00:00.000]'
+    end_time: '[00:04.020]'
+    description: A drum machine and fake drum kit lay down a heavy beat
+  - section_name: Verse 1
+    start_time: '[00:04.021]'
+    end_time: '[00:26.010]'
+    description: A very radio friendly version of The Earthly Frames starts and its joined by Shirley Kidurka's smooth, alto voice we know that this is oddly a commercial version of The Earthly Frames. Still there's something unsettling about the tempo, instrumentation and lyrics.
+  - section_name: Chorus 1
+    start_time: '[00:26.011]'
+    end_time: '[00:48.000]'
+    description: A quick jump to a banger of a chorus with traces of Infranym's vocoder buried in the mix.
+  - section_name: Verse 2
+    start_time: '[00:48.001]'
+    end_time: '[01:12.000]'
+    description: The song returns to the verse, a bit more minimal
+  - section_name: Interlude
+    start_time: '[01:12.001]'
+    end_time: '[01:31.005]'
+    description: A watery roto-speaker organ and guitar give us a short moment of psych rock signifiers
+  - section_name: Chorus 2
+    start_time: '[01:31.006]'
+    end_time: '[01:50.010]'
+    description: Back to the chorus
+  - section_name: Verse 3
+    start_time: '[01:50.011]'
+    end_time: '[02:14.010]'
+    description: The song returns to the verse again
+  - section_name: Bridge
+    start_time: '[02:14.011]'
+    end_time: '[02:33.015]'
+    description: Vocal improvs overlap a bridging instrumental section
+  - section_name: Jams
+    start_time: '[02:33.016]'
+    end_time: '[02:52.020]'
+    description: A 70s, slithery guitar lead adds back a touch of rock to the pop song
+  - section_name: Last notes
+    start_time: '[02:52.021]'
+    end_time: '[02:58.014]'
+    description: The final notes ring out
+concept: A woman spots a childhood friend on the street post transition to a trans woman and a trans human. She uses her own implanted 'thought rays' to ping her friend with warnings about what happens to girls like them on the street.
+lrc_file: 08_01.lrc
+sounds_like:
+  - name: Sabrina Carpenter
+    discogs_id: 4378284
+  - name: Billie Eilish
+    discogs_id: 5590213
+  - name: Television
+    discogs_id: 254494
+mood:
+  - catchy
+  - psychedelic
+  - creepy
+  - sexy
+genres:
+  - pop
+  - psychedelic rock
+audio_tracks:
+  - id: 2
+    description: Synth Bass
+    audio_file: 08_01_03_synth_bass.wav
+    midi_file: 08_01_02_synth_bass.mid
+  - id: 3
+    description: Main Synth
+    audio_file: 08_01_05_main_synth.wav
+    midi_file: 08_01_04_main_synth.mid
+  - id: 4
+    description: Guitar
+    audio_file: 08_01_06_guitar.wav
+  - id: 5
+    description: Guitar Sampled
+    audio_file: 08_01_07_guitar_sampled.wav
+  - id: 6
+    description: Drum Machine
+    audio_file: 08_01_09_drums.wav
+    midi_file: 08_01_08_drums.mid
+  - id: 7
+    description: Vocoder Vocal
+    audio_file: 08_01_11_vocoder.wav
+    midi_file: 08_01_10_vocoder.mid
+  - id: 8
+    description: Faux Kit
+    audio_file: 08_01_13_faux_kit.wav
+    midi_file: 08_01_12_faux_kit.mid
+  - id: 9
+    description: Pad Synth
+    audio_file: 08_01_15_pad.wav
+    midi_file: 08_01_14_pad.mid
+  - id: 10
+    description: Lead Vocal
+    audio_file: 08_01_16_lead_vocal.wav
+    player: Shirley Kudirka
+  - id: 11
+    description: Vocal Harmonies
+    audio_file: 08_01_17_vocal_harmonies.wav
+    player: Shirley Kudirka
+  - id: 12
+    description: Vocal Adlib
+    audio_file: 08_01_18_vocal_adlib.wav
+    player: Shirley Kudirka
