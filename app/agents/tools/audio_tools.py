@@ -24,12 +24,14 @@ load_dotenv()
 warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 
 def _get_agent_work_product_base_path() -> str:
     """Return a safe base path for agent work products; fall back to cwd if env var missing."""
     bp = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
     if not bp:
-        logging.warning(
+        logger.warning(
             "AGENT_WORK_PRODUCT_BASE_PATH not set; falling back to current working directory"
         )
         bp = os.getcwd()
@@ -376,14 +378,14 @@ def select_random_segment_audio(
         try:
             audio, sr = load_audio(wav_path, sr=None)
         except Exception as e:
-            logging.error(f"Failed to load `{wav_path}`: {e}")
+            logger.error(f"Failed to load `{wav_path}`: {e}")
             continue
         segments = extract_non_silent_segments(audio, sr, min_duration)
         if segments:
             random.shuffle(segments)
             per_file_segments[wav_path] = [(seg, sr) for seg in segments]
     if not per_file_segments:
-        logging.info("No non-silent segments found in any file.")
+        logger.info("No non-silent segments found in any file.")
         return
     os.makedirs(output_dir, exist_ok=True)
     written = 0
@@ -404,13 +406,13 @@ def select_random_segment_audio(
             out_path = os.path.join(output_dir, f"segment_{written + 1}_{base}.wav")
             try:
                 sf.write(out_path, seg_arr, sr, subtype="PCM_16")
-                logging.info(
+                logger.info(
                     f"Wrote `{out_path}` (sr={sr}, samples={len(seg_arr)}) from `{wav_path}`"
                 )
                 written += 1
             except Exception as e:
-                logging.error(f"Failed to write `{out_path}`: {e}")
-    logging.info(f"Extracted {written} segments to `{output_dir}`.")
+                logger.error(f"Failed to write `{out_path}`: {e}")
+    logger.info(f"Extracted {written} segments to `{output_dir}`.")
 
 
 def get_audio_segments_as_chain_artifacts(
@@ -424,7 +426,7 @@ def get_audio_segments_as_chain_artifacts(
         os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix
     )
     # Don't shuffle - keep vocal files prioritized at the front of the list
-    logging.info(
+    logger.info(
         f"Found {len(wav_files)} total files for prefix '{rainbow_color.file_prefix}'"
     )
     vocal_files = [
@@ -433,7 +435,7 @@ def get_audio_segments_as_chain_artifacts(
         if "vocal" in os.path.basename(f).lower()
         or "vox" in os.path.basename(f).lower()
     ]
-    logging.info(f"Found {len(vocal_files)} vocal files, will be processed first")
+    logger.info(f"Found {len(vocal_files)} vocal files, will be processed first")
 
     all_segments = []
     from app.util.audio_io import load_audio
@@ -443,7 +445,7 @@ def get_audio_segments_as_chain_artifacts(
             "vocal" in os.path.basename(wav_path).lower()
             or "vox" in os.path.basename(wav_path).lower()
         )
-        logging.info(
+        logger.info(
             f"Processing {'[VOCAL]' if is_vocal else '[INSTRUMENT]'} file: {os.path.basename(wav_path)}"
         )
         audio, sr = load_audio(wav_path, sr=None)
@@ -475,7 +477,7 @@ def get_audio_segments_as_chain_artifacts(
         )
         dest_path = artifact.get_artifact_path()
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        logging.info(
+        logger.info(
             f"Writing audio segment to `{dest_path}` (sr={sr}, samples={len(seg)})"
         )
         seg_arr = np.asarray(seg, dtype=np.float32)
@@ -554,7 +556,7 @@ def create_audio_mosaic_chain_artifact(
         collected_segments.append(audio[start : start + slice_samples])
         total_samples += slice_samples
     if not collected_segments:
-        logging.info("No suitable slices could be extracted to build a mosaic")
+        logger.info("No suitable slices could be extracted to build a mosaic")
         return None
     mosaic = np.concatenate(collected_segments)[:target_samples]
     artifact = AudioChainArtifactFile(
@@ -575,7 +577,7 @@ def create_audio_mosaic_chain_artifact(
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, artifact.file_name)
     sf.write(out_path, mosaic, sample_rate, subtype="PCM_16")
-    logging.info(
+    logger.info(
         f"Writing audio mosaic to `{out_path}` (sr={sample_rate}, samples={len(mosaic)})"
     )
     return artifact
@@ -633,7 +635,7 @@ def create_blended_audio_chain_artifact(
     )
 
     blend_with_noise(mosaic.get_artifact_path(with_file_name=True), blend, artifact)
-    logging.info(
+    logger.info(
         f"Writing audio mosaic to `{artifact.get_artifact_path(True)}` (sr={artifact.sample_rate})"
     )
     return artifact

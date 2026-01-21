@@ -21,7 +21,7 @@ def temp_manifest_dir():
 def valid_manifest(temp_manifest_dir):
     """Create a valid manifest with all files present"""
     manifest_data = {
-        "manifest_id": "test_01",
+        "manifest_id": "99_01",
         "title": "Test Song",
         "rainbow_color": "R",
         "bpm": 120,
@@ -55,11 +55,11 @@ def valid_manifest(temp_manifest_dir):
             },
         ],
         "midi_file": "test.mid",
-        "lrc_file": "test_01.lrc",
+        "lrc_file": "99_01.lrc",
     }
 
     # Write manifest
-    manifest_path = os.path.join(temp_manifest_dir, "test_01.yml")
+    manifest_path = os.path.join(temp_manifest_dir, "99_01.yml")
     with open(manifest_path, "w") as f:
         yaml.dump(manifest_data, f)
 
@@ -67,7 +67,7 @@ def valid_manifest(temp_manifest_dir):
     Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
     Path(os.path.join(temp_manifest_dir, "bg_vox.wav")).touch()
     Path(os.path.join(temp_manifest_dir, "test.mid")).touch()
-    Path(os.path.join(temp_manifest_dir, "test_01.lrc")).touch()
+    Path(os.path.join(temp_manifest_dir, "99_01.lrc")).touch()
 
     return manifest_path
 
@@ -76,7 +76,7 @@ def valid_manifest(temp_manifest_dir):
 def manifest_missing_audio(temp_manifest_dir):
     """Create a manifest with missing audio files"""
     manifest_data = {
-        "manifest_id": "test_02",
+        "manifest_id": "98_02",
         "title": "Test Song with Missing Audio",
         "rainbow_color": "BLUE",
         "bpm": 120,
@@ -88,7 +88,7 @@ def manifest_missing_audio(temp_manifest_dir):
         "TRT": "00:03:00",
         "vocals": True,
         "lyrics": True,
-        "mood": "Sad",
+        "mood": ["Sad"],
         "sounds_like": [{"name": "Artist", "discogs_id": "12345"}],
         "genres": ["Pop"],
         "concept": "Test concept",
@@ -109,15 +109,15 @@ def manifest_missing_audio(temp_manifest_dir):
                 "player": "REMEZ",
             },
         ],
-        "lrc_file": "test_02.lrc",
+        "lrc_file": "98_02.lrc",
     }
 
-    manifest_path = os.path.join(temp_manifest_dir, "test_02.yml")
+    manifest_path = os.path.join(temp_manifest_dir, "98_02.yml")
     with open(manifest_path, "w") as f:
         yaml.dump(manifest_data, f)
 
     Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
-    Path(os.path.join(temp_manifest_dir, "test_02.lrc")).touch()
+    Path(os.path.join(temp_manifest_dir, "98_02.lrc")).touch()
 
     return manifest_path
 
@@ -126,7 +126,7 @@ def manifest_missing_audio(temp_manifest_dir):
 def manifest_missing_midi(temp_manifest_dir):
     """Create a manifest with a missing MIDI file"""
     manifest_data = {
-        "manifest_id": "test_03",
+        "manifest_id": "97_03",
         "title": "Test Song with Missing MIDI",
         "rainbow_color": "GREEN",
         "bpm": 120,
@@ -138,7 +138,7 @@ def manifest_missing_midi(temp_manifest_dir):
         "TRT": "00:03:00",
         "vocals": True,
         "lyrics": True,
-        "mood": "Energetic",
+        "mood": ["Energetic"],
         "sounds_like": [{"name": "Artist", "discogs_id": "12345"}],
         "genres": ["Pop"],
         "concept": "Test concept",
@@ -158,15 +158,15 @@ def manifest_missing_midi(temp_manifest_dir):
                 "midi_file": "missing.mid",
             }
         ],
-        "lrc_file": "test_03.lrc",
+        "lrc_file": "97_03.lrc",
     }
 
-    manifest_path = os.path.join(temp_manifest_dir, "test_03.yml")
+    manifest_path = os.path.join(temp_manifest_dir, "97_03.yml")
     with open(manifest_path, "w") as f:
         yaml.dump(manifest_data, f)
 
     Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
-    Path(os.path.join(temp_manifest_dir, "test_03.lrc")).touch()
+    Path(os.path.join(temp_manifest_dir, "97_03.lrc")).touch()
 
     return manifest_path
 
@@ -257,6 +257,235 @@ class TestManifestValidator:
         error_text = " ".join(errors)
         assert "manifest_id" in error_text
         assert "structure" in error_text
+
+    def test_manifest_id_matches_filename(self, temp_manifest_dir):
+        """Test that manifest_id matching filename passes validation"""
+        manifest_data = {
+            "manifest_id": "01_01",
+            "title": "Test Song",
+            "rainbow_color": "R",
+            "bpm": 120,
+            "tempo": "4/4",
+            "key": "C major",
+            "release_date": "2025-01-01",
+            "album_sequence": 1,
+            "main_audio_file": "vocals.wav",
+            "TRT": "00:03:00",
+            "vocals": True,
+            "lyrics": False,
+            "mood": ["Happy"],
+            "sounds_like": [{"name": "Artist", "discogs_id": "12345"}],
+            "genres": ["Pop"],
+            "concept": "Test concept",
+            "structure": [
+                {
+                    "section_name": "Intro",
+                    "start_time": "[00:00.000]",
+                    "end_time": "[00:30.000]",
+                    "description": "Opening section",
+                }
+            ],
+            "audio_tracks": [
+                {"id": 1, "description": "Lead Vocals", "audio_file": "vocals.wav"}
+            ],
+        }
+
+        # Create file with matching name
+        manifest_path = os.path.join(temp_manifest_dir, "01_01.yml")
+        with open(manifest_path, "w") as f:
+            yaml.dump(manifest_data, f)
+
+        # Create referenced audio file
+        Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
+
+        is_valid, errors = validate_yaml_file(manifest_path)
+
+        # Should pass - no errors related to manifest_id/filename mismatch
+        error_text = " ".join(errors)
+        assert "does not match filename" not in error_text
+
+    def test_manifest_id_does_not_match_filename(self, temp_manifest_dir):
+        """Test that manifest_id not matching filename fails validation"""
+        manifest_data = {
+            "manifest_id": "01_02",  # Doesn't match filename
+            "title": "Test Song",
+            "rainbow_color": "R",
+            "bpm": 120,
+            "tempo": "4/4",
+            "key": "C major",
+            "release_date": "2025-01-01",
+            "album_sequence": 1,
+            "main_audio_file": "vocals.wav",
+            "TRT": "00:03:00",
+            "vocals": True,
+            "lyrics": False,
+            "mood": ["Happy"],
+            "sounds_like": [{"name": "Artist", "discogs_id": "12345"}],
+            "genres": ["Pop"],
+            "concept": "Test concept",
+            "structure": [
+                {
+                    "section_name": "Intro",
+                    "start_time": "[00:00.000]",
+                    "end_time": "[00:30.000]",
+                    "description": "Opening section",
+                }
+            ],
+            "audio_tracks": [
+                {"id": 1, "description": "Lead Vocals", "audio_file": "vocals.wav"}
+            ],
+        }
+
+        # Create file with different name than manifest_id
+        manifest_path = os.path.join(temp_manifest_dir, "01_01.yml")
+        with open(manifest_path, "w") as f:
+            yaml.dump(manifest_data, f)
+
+        Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
+
+        is_valid, errors = validate_yaml_file(manifest_path)
+
+        assert not is_valid
+        error_text = " ".join(errors)
+        assert "does not match filename" in error_text
+        assert "01_02" in error_text
+        assert "01_01" in error_text
+
+    def test_album_sequence_matches_manifest_id(self, temp_manifest_dir):
+        """Test that album_sequence matching manifest_id song number passes"""
+        manifest_data = {
+            "manifest_id": "02_05",
+            "title": "Test Song",
+            "rainbow_color": "R",
+            "bpm": 120,
+            "tempo": "4/4",
+            "key": "C major",
+            "release_date": "2025-01-01",
+            "album_sequence": 5,  # Matches '05' (song number) from manifest_id
+            "main_audio_file": "vocals.wav",
+            "TRT": "00:03:00",
+            "vocals": True,
+            "lyrics": False,
+            "mood": ["Happy"],
+            "sounds_like": [{"name": "Artist", "discogs_id": "12345"}],
+            "genres": ["Pop"],
+            "concept": "Test concept",
+            "structure": [
+                {
+                    "section_name": "Intro",
+                    "start_time": "[00:00.000]",
+                    "end_time": "[00:30.000]",
+                    "description": "Opening section",
+                }
+            ],
+            "audio_tracks": [
+                {"id": 1, "description": "Lead Vocals", "audio_file": "vocals.wav"}
+            ],
+        }
+
+        manifest_path = os.path.join(temp_manifest_dir, "02_05.yml")
+        with open(manifest_path, "w") as f:
+            yaml.dump(manifest_data, f)
+
+        Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
+
+        is_valid, errors = validate_yaml_file(manifest_path)
+
+        # Should pass - no errors related to album_sequence mismatch
+        error_text = " ".join(errors)
+        assert (
+            "song number" not in error_text
+            or "does not match album_sequence" not in error_text
+        )
+
+    def test_album_sequence_does_not_match_manifest_id(self, temp_manifest_dir):
+        """Test that album_sequence not matching manifest_id song number fails"""
+        manifest_data = {
+            "manifest_id": "02_05",
+            "title": "Test Song",
+            "rainbow_color": "R",
+            "bpm": 120,
+            "tempo": "4/4",
+            "key": "C major",
+            "release_date": "2025-01-01",
+            "album_sequence": 1,  # Doesn't match '05' (song number) from manifest_id
+            "main_audio_file": "vocals.wav",
+            "TRT": "00:03:00",
+            "vocals": True,
+            "lyrics": False,
+            "mood": ["Happy"],
+            "sounds_like": [{"name": "Artist", "discogs_id": "12345"}],
+            "genres": ["Pop"],
+            "concept": "Test concept",
+            "structure": [
+                {
+                    "section_name": "Intro",
+                    "start_time": "[00:00.000]",
+                    "end_time": "[00:30.000]",
+                    "description": "Opening section",
+                }
+            ],
+            "audio_tracks": [
+                {"id": 1, "description": "Lead Vocals", "audio_file": "vocals.wav"}
+            ],
+        }
+
+        manifest_path = os.path.join(temp_manifest_dir, "02_05.yml")
+        with open(manifest_path, "w") as f:
+            yaml.dump(manifest_data, f)
+
+        Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
+
+        is_valid, errors = validate_yaml_file(manifest_path)
+
+        assert not is_valid
+        error_text = " ".join(errors)
+        assert "song number" in error_text
+        assert "does not match album_sequence" in error_text
+
+    def test_invalid_manifest_id_format(self, temp_manifest_dir):
+        """Test that invalid manifest_id format is detected"""
+        manifest_data = {
+            "manifest_id": "invalid_format",
+            "title": "Test Song",
+            "rainbow_color": "R",
+            "bpm": 120,
+            "tempo": "4/4",
+            "key": "C major",
+            "release_date": "2025-01-01",
+            "album_sequence": 1,
+            "main_audio_file": "vocals.wav",
+            "TRT": "00:03:00",
+            "vocals": True,
+            "lyrics": False,
+            "mood": ["Happy"],
+            "sounds_like": [{"name": "Artist", "discogs_id": "12345"}],
+            "genres": ["Pop"],
+            "concept": "Test concept",
+            "structure": [
+                {
+                    "section_name": "Intro",
+                    "start_time": "[00:00.000]",
+                    "end_time": "[00:30.000]",
+                    "description": "Opening section",
+                }
+            ],
+            "audio_tracks": [
+                {"id": 1, "description": "Lead Vocals", "audio_file": "vocals.wav"}
+            ],
+        }
+
+        manifest_path = os.path.join(temp_manifest_dir, "invalid_format.yml")
+        with open(manifest_path, "w") as f:
+            yaml.dump(manifest_data, f)
+
+        Path(os.path.join(temp_manifest_dir, "vocals.wav")).touch()
+
+        is_valid, errors = validate_yaml_file(manifest_path)
+
+        assert not is_valid
+        error_text = " ".join(errors)
+        assert "does not follow expected format" in error_text or "XX_YY" in error_text
 
 
 class TestManifestCompleteness:

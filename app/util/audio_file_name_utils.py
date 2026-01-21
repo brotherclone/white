@@ -4,7 +4,7 @@ import os
 
 def rename_mid_audio_extensions(root_dir):
     """
-    Recursively renames files ending with .mid.wav or .mid.aif (case-insensitive)
+    Recursively renames files ending with .mid.wav or .m.wav or .mid.aif (case-insensitive)
     to .wav or .aif respectively.
     """
     renamed_count = 0
@@ -17,13 +17,17 @@ def rename_mid_audio_extensions(root_dir):
 
         for filename in filenames:
             total_files_checked += 1
-
-            # use a normalized, lower-case name for matching, but keep original for renaming
             normalized = filename.strip().lower()
 
-            if normalized.endswith(".mid.wav"):
+            if normalized.endswith(".mid.wav") or normalized.endswith(".m.wav"):
                 old_path = os.path.join(dirpath, filename)
-                new_filename = filename[: -len(".mid.wav")] + ".wav"
+                # choose correct suffix length based on which matched
+                suffix_len = (
+                    len(".mid.wav")
+                    if normalized.endswith(".mid.wav")
+                    else len(".m.wav")
+                )
+                new_filename = filename[:-suffix_len] + ".wav"
                 new_path = os.path.join(dirpath, new_filename)
 
                 print(f"  Renaming: {filename} -> {new_filename}")
@@ -54,7 +58,7 @@ def rename_mid_audio_extensions(root_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Recursively rename .mid.wav/.mid.aif files to .wav/.aif in a directory."
+        description="Recursively rename .mid.wav/.m.wav/.mid.aif files to .wav/.aif in a directory."
     )
     parser.add_argument("directory", type=str, help="Root directory to process.")
     args = parser.parse_args()

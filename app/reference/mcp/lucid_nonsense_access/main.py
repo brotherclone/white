@@ -15,6 +15,8 @@ TIME_OUT = 30.0
 
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 mcp = FastMCP("lucid_nonsense_access")
 
 
@@ -31,7 +33,7 @@ def search_white_project_files() -> list[Any]:
     try:
         return os.listdir(base_path)
     except OSError as e:
-        logging.error(f"Error listing directory {base_path}: {e}")
+        logger.error(f"Error listing directory {base_path}: {e}")
         return []
 
 
@@ -193,7 +195,7 @@ def claude_save_stuff_here(file_name: str, content: str) -> str:
         ).strip()
         metadata["git_branch"] = branch
     except Exception as err:
-        logging.debug(f"Git branch detection failed: {err}")
+        logger.debug(f"Git branch detection failed: {err}")
         metadata["git_branch"] = None
     try:
         remotes = subprocess.check_output(
@@ -201,7 +203,7 @@ def claude_save_stuff_here(file_name: str, content: str) -> str:
         ).strip()
         metadata["git_remotes"] = remotes
     except Exception as err:
-        logging.debug(f"Git remotes detection failed: {err}")
+        logger.debug(f"Git remotes detection failed: {err}")
         metadata["git_remotes"] = None
 
     yaml_lines = ["---"]
@@ -246,7 +248,7 @@ def get_project_diary() -> str:
         with open(diary_path, "r", encoding="utf-8") as file:
             return file.read()
     except OSError as e:
-        logging.error(f"Error reading project diary {diary_path}: {e}")
+        logger.error(f"Error reading project diary {diary_path}: {e}")
         return "Project diary not found."
 
 

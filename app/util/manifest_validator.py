@@ -10,7 +10,6 @@ import yaml
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 from dotenv import load_dotenv
-from pydantic import ValidationError
 
 
 def get_discogs_cache_path() -> Path:
@@ -343,7 +342,6 @@ def validate_manifest_completeness(yaml_file_path: str) -> Dict[str, Any]:
     Get a summary of what's complete and what's missing in a manifest.
     Returns all keys expected by tests.
     """
-
     with open(yaml_file_path, "r") as f:
         yaml_data = yaml.safe_load(f)
     yaml_dir = os.path.dirname(yaml_file_path)
@@ -396,7 +394,7 @@ def validate_manifest_completeness(yaml_file_path: str) -> Dict[str, Any]:
         )
         result["has_all_audio"] = len(result["incomplete_tracks"]) == 0
 
-    # MIDI
+    # MIDI (top-level)
     midi_file = yaml_data.get("midi_file")
     if midi_file:
         midi_path = os.path.join(yaml_dir, midi_file)
@@ -413,25 +411,45 @@ def validate_manifest_completeness(yaml_file_path: str) -> Dict[str, Any]:
                 if not os.path.exists(midi_path):
                     result["missing_midi"].append(midi_file)
 
-    # Completion percentage calculation
-    total_items = 1  # main audio
-    completed_items = 1 if result["has_main_audio"] else 0
+    # --- Correct completion percentage calculation ---
+    # Collect all MIDI references (top-level + per-track) and count how many exist
+    midi_refs = []
+    if yaml_data.get("midi_file"):
+        midi_refs.append(yaml_data.get("midi_file"))
     if "audio_tracks" in yaml_data and isinstance(yaml_data["audio_tracks"], list):
-        total_items += len(yaml_data["audio_tracks"])
-        completed_items += result["complete_tracks"]
-    if yaml_data.get("midi_file") or any(
-        at.get("midi_file") for at in yaml_data.get("audio_tracks", [])
-    ):
-        total_items += len(result["missing_midi"]) + (
-            1 if yaml_data.get("midi_file") else 0
-        )
-        completed_items += len(result["missing_midi"]) == 0
+        for at in yaml_data["audio_tracks"]:
+            if isinstance(at, dict):
+                if at.get("midi_file"):
+                    midi_refs.append(at.get("midi_file"))
+                if at.get("midi_group_file"):
+                    midi_refs.append(at.get("midi_group_file"))
+
+    # normalize and count
+    midi_refs = [m for m in midi_refs if m]
+    total_midi_refs = len(midi_refs)
+    existing_midi_refs = 0
+    for m in midi_refs:
+        if os.path.exists(os.path.join(yaml_dir, m)):
+            existing_midi_refs += 1
+
+    # total items: main audio (1) + each audio track + each midi reference + lyrics (1 if present)
+    total_items = 1  # main audio
+    total_items += result["total_tracks"]
+    total_items += total_midi_refs
     if yaml_data.get("lyrics"):
         total_items += 1
+
+    # completed items: main audio present + complete tracks + existing midi refs + lyrics satisfied
+    completed_items = 1 if result["has_main_audio"] else 0
+    completed_items += result["complete_tracks"]
+    completed_items += existing_midi_refs
+    if yaml_data.get("lyrics"):
         completed_items += 1 if result["has_lrc"] else 0
+
     result["completion_percentage"] = (
         round(100.0 * completed_items / total_items, 2) if total_items > 0 else 0.0
     )
+
     return result
 
 
@@ -736,40 +754,54 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
-def validate_pydantic_model(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+def validate_manifest_id_consistency(
+    yaml_data: Dict[str, Any], file_path: str
+) -> Tuple[bool, List[str]]:
     """
-    Validates that the YAML data can be successfully cast to the Manifest Pydantic model.
-    This catches type casting issues like titles that are parsed as integers instead of strings.
+    Validates that manifest_id matches the filename and album_sequence.
 
     Args:
         yaml_data: Parsed YAML content
+        file_path: Path to the YAML file
 
     Returns:
         Tuple of (is_valid, list_of_error_messages)
     """
-    pydantic_errors = []
+    errors = []
 
-    try:
-        from app.structures.manifests.manifest import Manifest
+    if not isinstance(yaml_data, dict):
+        return False, ["Invalid YAML structure: not a dictionary"]
 
-        # Try to instantiate the Manifest model with the YAML data
-        # This will raise a ValidationError if the data can't be properly cast
-        _ = Manifest(**yaml_data)
+    manifest_id = yaml_data.get("manifest_id")
+    album_sequence = yaml_data.get("album_sequence")
 
-    except ValidationError as e:
-        # Parse Pydantic validation errors
-        for error in e.errors():
-            loc = " -> ".join(str(x) for x in error["loc"])
-            msg = error["msg"]
-            error_type = error["type"]
-            pydantic_errors.append(
-                f"Pydantic validation error at '{loc}': {msg} (type: {error_type})"
+    # Extract filename without extension
+    filename = os.path.basename(file_path)
+    filename_without_ext = os.path.splitext(filename)[0]
+
+    # Check if manifest_id matches filename
+    if manifest_id and manifest_id != filename_without_ext:
+        errors.append(
+            f"manifest_id '{manifest_id}' does not match filename '{filename_without_ext}'"
+        )
+
+    # Check if manifest_id song number matches album_sequence
+    if manifest_id and album_sequence is not None:
+        # Parse manifest_id to extract song number (e.g., '02' from '08_02')
+        match = re.match(r"^(\d+)_(\d+)$", str(manifest_id))
+        if match:
+            song_num_from_id = int(match.group(2))
+            if song_num_from_id != album_sequence:
+                errors.append(
+                    f"manifest_id '{manifest_id}' song number ({song_num_from_id}) "
+                    f"does not match album_sequence ({album_sequence})"
+                )
+        else:
+            errors.append(
+                f"manifest_id '{manifest_id}' does not follow expected format 'XX_YY'"
             )
-    except Exception as e:
-        # Catch any other errors that might occur during model instantiation
-        pydantic_errors.append(f"Error casting to Pydantic model: {str(e)}")
 
-    return len(pydantic_errors) == 0, pydantic_errors
+    return len(errors) == 0, errors
 
 
 def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
@@ -793,16 +825,16 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
             for err in req_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
-        # Run validation: Pydantic model casting
-        is_valid, pydantic_errors = validate_pydantic_model(yaml_data)
-        if not is_valid:
-            for err in pydantic_errors:
-                errors.append(f"{os.path.basename(file_path)}: {err}")
-
         # Run validation: stricter field values
         is_valid, field_errors = validate_field_values(yaml_data)
         if not is_valid:
             for err in field_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: manifest ID consistency
+        is_valid, id_errors = validate_manifest_id_consistency(yaml_data, file_path)
+        if not is_valid:
+            for err in id_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
         # Run validation: lyrics has lrc

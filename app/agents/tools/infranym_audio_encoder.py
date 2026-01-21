@@ -30,6 +30,8 @@ from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
 from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
 from app.structures.artifacts.infranym_voice_composition import InfranymVoiceComposition
 
+logger = logging.getLogger(__name__)
+
 
 class InfranymAudioEncoder:
     """
@@ -58,14 +60,14 @@ class InfranymAudioEncoder:
                 try:
                     self.tts.stop()
                 except EnvironmentError as e:
-                    logging.warning("TTS engine stop error: %s", e)
+                    logger.warning("TTS engine stop error: %s", e)
                 try:
                     del self.tts
                 except ReferenceError as re:
-                    logging.warning("TTS engine reference error: %s", re)
+                    logger.warning("TTS engine reference error: %s", re)
                     pass
         except EnvironmentError as ee:
-            logging.warning("TTS engine init error: %s", ee)
+            logger.warning("TTS engine init error: %s", ee)
             pass
         teatime.sleep(0.1)
         self.tts = pyttsx3.init()
@@ -113,16 +115,16 @@ class InfranymAudioEncoder:
         # Create a cache key
         cache_key = f"{text}_{rate}_{voice_index}_{pitch}"
         if cache_key in self._audio_cache:
-            logging.info("Using cached audio")
+            logger.info("Using cached audio")
             return self._audio_cache[cache_key]
-        logging.info("Reinitializing TTS engine...")
+        logger.info("Reinitializing TTS engine...")
         self._reinit_tts()
         teatime.sleep(0.1)
         # Generate to a temp file (try multiple extensions for macOS compatibility)
         temp_base = self.output_dir / f"temp_{hash(cache_key)}"
         temp_wav = Path(f"{temp_base}.wav")
         temp_aiff = Path(f"{temp_base}.aiff")
-        logging.info("Generating: '%s...'", text[:50])
+        logger.info("Generating: '%s...'", text[:50])
         try:
             self.tts.setProperty("rate", rate)
             if voice_index < len(self.available_voices):
@@ -130,18 +132,18 @@ class InfranymAudioEncoder:
             self.tts.save_to_file(text, str(temp_wav))
             self.tts.runAndWait()
             teatime.sleep(0.2)
-            logging.info("Checking for temp file: %s", temp_wav.name)
+            logger.info("Checking for temp file: %s", temp_wav.name)
             audio = None
             # First, check if the file was actually created
             if not temp_wav.exists():
-                logging.error("Temp file not created: %s", temp_wav)
+                logger.error("Temp file not created: %s", temp_wav)
                 raise RuntimeError(
                     f"TTS failed to create audio file for: {text[:50]}..."
                 )
             file_size = temp_wav.stat().st_size
-            logging.info("File size: %d bytes", file_size)
+            logger.info("File size: %d bytes", file_size)
             if file_size == 0:
-                logging.error("TTS created empty file: %s", temp_wav)
+                logger.error("TTS created empty file: %s", temp_wav)
                 raise RuntimeError(f"TTS created empty file for: {text[:50]}...")
             try:
                 audio = AudioSegment.from_wav(str(temp_wav))
@@ -160,7 +162,7 @@ class InfranymAudioEncoder:
                         )
             if audio is None:
                 raise RuntimeError(f"Failed to generate speech for: {text[:50]}...")
-            logging.info(
+            logger.info(
                 "Generated %dms, %d samples",
                 len(audio),
                 len(audio.get_array_of_samples()),
@@ -189,13 +191,13 @@ class InfranymAudioEncoder:
                     try:
                         temp_file.unlink()
                     except EnvironmentError:
-                        logging.warning("Failed to delete temp file: %s", temp_file)
+                        logger.warning("Failed to delete temp file: %s", temp_file)
                         pass
             if retry:
-                logging.warning(
+                logger.warning(
                     "TTS generation failed, reinitializing engine and retrying..."
                 )
-                logging.warning("Error generating TTS: %s", e)
+                logger.warning("Error generating TTS: %s", e)
                 self._reinit_tts()
                 return self.generate_speech(text, rate, voice_index, pitch, retry=False)
             else:
@@ -217,13 +219,13 @@ class InfranymAudioEncoder:
         compositional contexts.
         """
         if len(audio) < 100:
-            logging.warning(
+            logger.warning(
                 "Audio too short (%dms), skipping voice profile effects", len(audio)
             )
             return audio
 
         if len(audio.get_array_of_samples()) < 10:  # Less than 10 samples
-            logging.warning("Audio has too few samples, skipping voice profile effects")
+            logger.warning("Audio has too few samples, skipping voice profile effects")
             return audio
 
         try:
@@ -244,8 +246,8 @@ class InfranymAudioEncoder:
                 audio = low_pass_filter(audio, 2000)
 
         except Exception as e:
-            logging.warning("Error applying %s profile: %s", profile.value, e)
-            logging.warning("Skipping voice profile effects for this layer")
+            logger.warning("Error applying %s profile: %s", profile.value, e)
+            logger.warning("Skipping voice profile effects for this layer")
             pass
         return audio
 
@@ -271,8 +273,8 @@ class InfranymAudioEncoder:
                 audio = high_pass_filter(audio, low_hz)
                 audio = low_pass_filter(audio, high_hz)
             except Exception as e:
-                logging.warning("Error applying frequency filter: %s", e)
-                logging.warning("Skipping frequency filter")
+                logger.warning("Error applying frequency filter: %s", e)
+                logger.warning("Skipping frequency filter")
         if layer.volume_db != 0.0:
             audio = audio + layer.volume_db
         if layer.stereo_pan != 0.0:
@@ -290,7 +292,7 @@ class InfranymAudioEncoder:
         """
         # Skip panning if audio is too short or empty
         if len(audio) < 100 or len(audio.get_array_of_samples()) < 10:
-            logging.warning("Audio too short for panning, skipping")
+            logger.warning("Audio too short for panning, skipping")
             return audio
 
         try:
@@ -308,7 +310,7 @@ class InfranymAudioEncoder:
             return panned
 
         except Exception as e:
-            logging.warning("Error applying pan: %s", e)
+            logger.warning("Error applying pan: %s", e)
             return audio
 
     def encode_composition(
@@ -328,11 +330,11 @@ class InfranymAudioEncoder:
         Returns:
             Dictionary with encoding metadata and file paths
         """
-        logging.info("\n🎧 Encoding Infranym: %s", composition.title)
-        logging.info("%s", "=" * 60)
+        logger.info("\n🎧 Encoding Infranym: %s", composition.title)
+        logger.info("%s", "=" * 60)
 
         # Generate layer 1: Surface (clear, primary message)
-        logging.info("📻 Layer 1 (Surface): Generating...")
+        logger.info("📻 Layer 1 (Surface): Generating...")
         surface_audio = self.generate_speech(
             composition.surface_layer.text,
             rate=composition.surface_layer.rate,
@@ -342,10 +344,10 @@ class InfranymAudioEncoder:
         surface_audio = self.apply_layer_processing(
             surface_audio, composition.surface_layer
         )
-        logging.info("   Duration: %dms", len(surface_audio))
+        logger.info("   Duration: %dms", len(surface_audio))
 
         # Generate layer 2: Reverse (textural, mysterious)
-        logging.info("🔄 Layer 2 (Reverse): Generating...")
+        logger.info("🔄 Layer 2 (Reverse): Generating...")
         reverse_audio = self.generate_speech(
             composition.reverse_layer.text,
             rate=composition.reverse_layer.rate,
@@ -355,10 +357,10 @@ class InfranymAudioEncoder:
         reverse_audio = self.apply_layer_processing(
             reverse_audio, composition.reverse_layer
         )
-        logging.info("   Duration: %dms", len(reverse_audio))
+        logger.info("   Duration: %dms", len(reverse_audio))
 
         # Generate layer 3: Submerged (subliminal, frequency-hidden)
-        logging.info("🌊 Layer 3 (Submerged): Generating...")
+        logger.info("🌊 Layer 3 (Submerged): Generating...")
         submerged_audio = self.generate_speech(
             composition.submerged_layer.text,
             rate=composition.submerged_layer.rate,
@@ -368,7 +370,7 @@ class InfranymAudioEncoder:
         submerged_audio = self.apply_layer_processing(
             submerged_audio, composition.submerged_layer
         )
-        logging.info("   Duration: %dms", len(submerged_audio))
+        logger.info("   Duration: %dms", len(submerged_audio))
 
         # Determine composite duration (longest layer)
         max_duration = max(len(surface_audio), len(reverse_audio), len(submerged_audio))
@@ -379,13 +381,13 @@ class InfranymAudioEncoder:
         submerged_audio = self._pad_to_duration(submerged_audio, max_duration)
 
         # Composite layers
-        logging.info("🎚️  Compositing layers...")
+        logger.info("🎚️  Compositing layers...")
         composite = surface_audio.overlay(reverse_audio).overlay(submerged_audio)
 
         # Export composite
         composite_path = self.output_dir / f"{output_filename}.wav"
         composite.export(composite_path, format="wav")
-        logging.info("✅ Composite exported: %s", composite_path)
+        logger.info("✅ Composite exported: %s", composite_path)
 
         # Export individual layers if requested
         layer_paths = {}
@@ -401,7 +403,7 @@ class InfranymAudioEncoder:
                     submerged_audio, output_filename, "submerged"
                 ),
             }
-            logging.info("✅ Individual layers exported")
+            logger.info("✅ Individual layers exported")
 
         # Export metadata
         metadata = {
@@ -431,18 +433,16 @@ class InfranymAudioEncoder:
 
         if composition.metadata:
             metadata.update(composition.metadata)
-
-        # ToDo: Move to save file
         metadata_path = self.output_dir / f"{output_filename}_metadata.json"
         with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
-        logging.info("📋 Metadata exported: %s", metadata_path)
+        logger.info("📋 Metadata exported: %s", metadata_path)
 
-        logging.info("\n🎵 Ready for Logic Pro import!")
-        logging.info("   Composite track: %s", composite_path)
+        logger.info("\n🎵 Ready for Logic Pro import!")
+        logger.info("   Composite track: %s", composite_path)
         if export_layers:
-            logging.info("   Individual layers available for separate treatment")
-        logging.info("%s", "=" * 60)
+            logger.info("   Individual layers available for separate treatment")
+        logger.info("%s", "=" * 60)
 
         return metadata
 
@@ -458,7 +458,6 @@ class InfranymAudioEncoder:
     def _export_layer(
         self, audio: AudioSegment, base_filename: str, layer_name: str
     ) -> str:
-        # ToDo: Move to save file
         """Export individual layer to file"""
         path = self.output_dir / f"{base_filename}_{layer_name}.wav"
         audio.export(path, format="wav")
@@ -580,17 +579,17 @@ def demo_encode_all_examples():
     """Encode all example compositions"""
     encoder = InfranymAudioEncoder()
 
-    logging.info("\n🎵 INFRANYM AUDIO ENCODER - DEMO")
-    logging.info("%s", "=" * 60)
-    logging.info("Encoding example compositions for The White Album...")
-    logging.info("")
+    logger.info("\n🎵 INFRANYM AUDIO ENCODER - DEMO")
+    logger.info("%s", "=" * 60)
+    logger.info("Encoding example compositions for The White Album...")
+    logger.info("")
 
     # Show available voices
     voices = encoder.list_available_voices()
-    logging.info("Available TTS voices: %d", len(voices))
+    logger.info("Available TTS voices: %d", len(voices))
     for i, voice in enumerate(voices[:3]):  # Show first 3
-        logging.info("  %d: %s", i, voice["name"])
-    logging.info("")
+        logger.info("  %d: %s", i, voice["name"])
+    logger.info("")
 
     # Encode each example
     results = {}
@@ -599,22 +598,22 @@ def demo_encode_all_examples():
             results[key] = encoder.encode_composition(
                 composition, output_filename=key, export_layers=True
             )
-            logging.info("")
+            logger.info("")
         except Exception as e:
-            logging.error("Failed to encode %s: %s", key, e)
-            logging.debug("", exc_info=True)
-            logging.info("")
+            logger.error("Failed to encode %s: %s", key, e)
+            logger.debug("", exc_info=True)
+            logger.info("")
             continue
 
-    logging.info("\n✅ Demo complete!")
-    logging.info("📁 Output directory: %s", encoder.output_dir)
-    logging.info(
+    logger.info("\n✅ Demo complete!")
+    logger.info("📁 Output directory: %s", encoder.output_dir)
+    logger.info(
         "🎵 Successfully encoded: %d/%d examples",
         len(results),
         len(EXAMPLE_COMPOSITIONS),
     )
-    logging.info("\nReady to import into Logic Pro for The Earthly Frames production.")
-    logging.info("%s", "=" * 60)
+    logger.info("\nReady to import into Logic Pro for The Earthly Frames production.")
+    logger.info("%s", "=" * 60)
 
     return results
 

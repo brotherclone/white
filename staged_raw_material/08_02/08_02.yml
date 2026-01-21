@@ -1,1 +1,112 @@
-# ToDo: Complete this manifest
+bpm: 85
+manifest_id: '08_02'
+tempo: 4/4
+key: Ab minor
+rainbow_color: V
+title: Read Rile…y
+release_date: '2025-09-08'
+album_sequence: 2
+main_audio_file: 08_02_main.wav
+TRT: '[03:06.008]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Bridge as Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:22.014]'
+    description: The keyboards, bass, and piano play the bridge before the drums and guitar kick in
+  - section_name: Verse 1
+    start_time: '[00:22.015]'
+    end_time: '[00:45.004]'
+    description: The vocals are an affected male baritone, but not Gabe - it's a commercial version of him and bordering on parody.
+  - section_name: Chorus 1
+    start_time: '[00:45.005]'
+    end_time: '[01:07.019]'
+    description: The chorus is an easy transition from the verse to the bridge with a sad and ironic lyric which focuses on the failings of Gabe's creative output.
+  - section_name: Bridge 2
+    start_time: '[01:07.020]'
+    end_time: '[01:30.008]'
+    description: The bridge returns with a slightly different arrangement.
+  - section_name: Verse 2
+    start_time: '[01:30.009]'
+    end_time: '[01:52.023]'
+    description: The second verse continues the ironic take on Gabe's creative struggles.
+  - section_name: Chorus 2
+    start_time: '[01:52.024]'
+    end_time: '[02:14.011]'
+    description: Back to the chorus.
+  - section_name: Bridge 3
+    start_time: '[02:14.012]'
+    end_time: '[02:38.002]'
+    description: A repeat of the bridge with a slightly different arrangement.
+  - section_name: Chorus 3
+    start_time: '[02:38.003]'
+    end_time: '[03:06.008]'
+    description: The final chorus is a bit more resigned and more emotional.
+concept: A very inside allusion to Fat Albert and The Clash - this song is a focus on one's limitations. The narrator realizes he's done this song before and it sends him into a depressive spiral.
+lrc_file: 08_02.lrc
+sounds_like:
+  - name: James Blake
+    discogs_id: 1500084
+  - name: Harry Styles
+    discogs_id: 2508414
+  - name: Lauv
+    discogs_id: 5047975
+mood:
+  - sad
+  - ironic
+  - sadistic
+genres:
+  - Pop
+  - Rock
+audio_tracks:
+  - id: 2
+    description: Piano
+    audio_file: 08_02_03_piano.wav
+    midi_file: 08_02_02_piano.mid
+  - id: 3
+    description: Main Synth
+    audio_file: 08_02_05_main_synth.wav
+    midi_file: 08_02_04_main_synth.mid
+  - id: 4
+    description: Guitar
+    audio_file: 08_02_06_guitar.wav
+  - id: 5
+    description: Bass
+    audio_file: 08_02_07_bass.wav
+  - id: 6
+    description: Drums
+    audio_file: 08_02_08_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Kick
+    audio_file: 08_02_10_kick.wav
+    midi_file: 08_02_09_kick.mid
+    group: Drums
+    player: Graham Hopkins
+  - id: 8
+    description: Snare
+    audio_file: 08_02_11_snare.wav
+  - id: 9
+    description: Hihat
+    audio_file: 08_02_12_hh.wav
+  - id: 10
+    description: Toms
+    audio_file: 08_02_13_toms.wav
+  - id: 11
+    description: Lead Vocals
+    audio_file: 08_02_14_lead_vox.wav
+    player: Aloysius Fortune
+  - id: 12
+    description: Double Vocals
+    audio_file: 08_02_15_dbl_vox.wav
+    player: Aloysius Fortune
+  - id: 13
+    description: Harmony Vocals
+    audio_file: 08_02_16_harmony_vox.wav
+    player: Aloysius Fortune
+  - id: 14
+    description: Adlib Vocals
+    audio_file: 08_02_17_adlib.wav
+    player: Aloysius Fortune
