@@ -466,10 +466,20 @@ class TestProcessStagedRawMaterial:
 
         mock_process_multiple.return_value = {"total_tracks_processed": 2}
 
-        call_args = mock_process_multiple.call_args
-        track_dirs = call_args[0][0]
+        # Actually call the function with track filter
+        result = process_staged_raw_material(
+            str(staged_dir), str(tmp_path / "output"), track_filter="08_*"
+        )
+
+        # Verify the mock was called
+        mock_process_multiple.assert_called_once()
+        args, kwargs = mock_process_multiple.call_args
+        track_dirs = args[0]
+
+        # Should only process 08_01 and 08_02, not 09_01
         assert len(track_dirs) == 2
         assert all("08_" in str(d) for d in track_dirs)
+        assert result["total_tracks_processed"] == 2
 
     def test_process_staged_no_tracks(self, tmp_path):
         """Test processing directory with no track subdirectories."""
