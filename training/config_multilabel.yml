@@ -1,0 +1,135 @@
+# Rainbow Pipeline Training Configuration
+# Phase 2: Multi-label rebracketing type classification
+# (Segments can have multiple rebracketing types simultaneously)
+
+# Data Configuration
+data:
+  manifest_path: "data/base_manifest_db.parquet"
+
+  # Target
+  target_column: "rebracketing_types"  # Multi-label: list of types per segment
+  target_type: "multilabel"  # Options: binary, multiclass, multilabel, regression
+
+  # Class mapping (rebracketing type taxonomy)
+  class_mapping:
+    spatial: 0
+    temporal: 1
+    causal: 2
+    perceptual: 3
+    memory: 4
+    ontological: 5
+    narrative: 6
+    identity: 7
+
+  # Splits
+  train_split: 0.8
+  val_split: 0.2
+  random_seed: 42
+  stratified: false  # Stratification complex for multi-label
+
+  # Filtering
+  require_concept: true
+  min_concept_length: 50
+  min_labels_per_segment: 1  # At least one label required
+
+# Model Architecture
+model:
+  # Text encoder
+  text_encoder:
+    model_name: "microsoft/deberta-v3-base"
+    hidden_size: 768
+    max_length: 512
+    freeze_layers: 0
+    pooling: "mean"
+
+  # Classifier head
+  classifier:
+    type: "multiclass"  # Same architecture, different loss
+    num_classes: 8
+    hidden_dims: [256, 128]
+    dropout: 0.3
+    activation: "relu"
+    multi_label: true  # Multi-label classification (multiple types per segment)
+    class_weights: "balanced"  # Applied to BCEWithLogitsLoss
+
+# Training Configuration
+training:
+  # Loss function
+  loss:
+    type: "bce_with_logits"  # BCEWithLogitsLoss for multi-label
+    pos_weight: null  # Optional per-class positive weights
+
+  # Optimization
+  batch_size: 32
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  epochs: 50
+
+  # Advanced
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  warmup_ratio: 0.1
+
+  # Hardware
+  device: "cuda"
+  mixed_precision: true
+  num_workers: 4
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 10
+    min_delta: 0.001
+    metric: "val_macro_f1"
+
+  # Checkpointing
+  save_best_only: true
+  save_every_n_epochs: 1
+
+# Evaluation Configuration
+evaluation:
+  # Prediction threshold for multi-label
+  threshold: 0.5
+
+  metrics:
+    # Per-class metrics
+    - "per_class_f1"
+    - "per_class_precision"
+    - "per_class_recall"
+
+    # Aggregate metrics
+    - "macro_f1"
+    - "micro_f1"
+    - "weighted_f1"
+
+    # Multi-label specific
+    - "hamming_loss"
+    - "subset_accuracy"  # Exact match of all labels
+    - "top_k_accuracy"  # k=3
+
+  # Confusion matrix (per-class binary)
+  confusion_matrix:
+    enabled: true
+    per_class: true  # Separate matrix for each class
+    save_path: "confusion_matrices/"
+
+# Logging Configuration
+logging:
+  wandb:
+    enabled: true
+    project: "rainbow-pipeline-multilabel"
+    entity: null
+    name: null
+    tags:
+      - "multilabel"
+      - "rebracketing-types"
+      - "phase-2"
+
+  output_dir: "/workspace/output"
+  log_every_n_steps: 10
+  log_per_class_metrics: true
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  deterministic: true

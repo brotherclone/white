@@ -1,1 +1,191 @@
-# ToDo: Complete this manifest
+bpm: 128
+manifest_id: '08_11'
+tempo: 4/4
+key: G major
+rainbow_color: V
+title: Ill ☆'d
+release_date: '2025-09-08'
+album_sequence: 11
+main_audio_file: 08_11_main.wav
+TRT: '[03:07.012]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro Chorus
+    start_time: '[00:00.000]'
+    end_time: '[00:07.012]'
+    description: A brief splash of soul and folk instruments
+  - section_name: Chorus
+    start_time: '[00:07.013]'
+    end_time: '[00:15.000]'
+    description: A soulful voice array swoons in with the chorus
+  - section_name: Verse
+    start_time: '[00:15.001]'
+    end_time: '[00:30.000]'
+    description: A sweet, almost comedic verse
+  - section_name: Chorus
+    start_time: '[00:30.001]'
+    end_time: '[00:45.000]'
+    description: Back to the chorus
+  - section_name: Bridge
+    start_time: '[00:45.001]'
+    end_time: '[01:01.021]'
+    description: A little break down and groove
+  - section_name: Verse
+    start_time: '[01:01.022]'
+    end_time: '[01:16.021]'
+    description: More sweet verse
+  - section_name: Chorus
+    start_time: '[01:16.022]'
+    end_time: '[01:31.021]'
+    description: Chorus returns repeating the woes of bad luck
+  - section_name: Bridge
+    start_time: '[01:31.022]'
+    end_time: '[01:46.021]'
+    description: The bridge is a little more relaxed
+  - section_name: Instrumental
+    start_time: '[01:46.022]'
+    end_time: '[02:01.021]'
+    description: More guitar and drums
+  - section_name: Verse
+    start_time: '[02:01.022]'
+    end_time: '[02:16.021]'
+    description: Final verse bringing back the comedic woes
+  - section_name: Chorus
+    start_time: '[02:16.022]'
+    end_time: '[02:31.021]'
+    description: Final chorus with all the emotions
+  - section_name: Bridge
+    start_time: '[02:31.022]'
+    end_time: '[02:46.021]'
+    description: A final bridge to wind down
+  - section_name: Instrumental
+    start_time: '[02:46.022]'
+    end_time: '[03:07.012]'
+    description: Closing instrumental outro
+concept: This meditation on back luck - a vanity in itself - is fun, soulful and heartwarming.
+lrc_file: 08_11.lrc
+sounds_like:
+  - name: The Weeknd
+    discogs_id: 2171152
+  - name: Frank Ocean
+    discogs_id: 2013868
+mood:
+  - soulful
+  - heartwarming
+  - comedic
+  - relaxed
+  - groovy
+genres:
+  - r&b
+  - soul
+  - indie pop
+  - roots
+audio_tracks:
+  - id: 2
+    description: Wurlitzer
+    audio_file: 08_11_06_wurlitzer.wav
+    midi_file: 08_11_02_wurl.mid
+  - id: 3
+    description: Piano
+    audio_file: 08_11_07_piano.wav
+    midi_file: 08_11_03_piano.mid
+  - id: 4
+    description: Guiro
+    audio_file: 08_11_12_guiro.wav
+    midi_file: 08_11_04_guiro.mid
+  - id: 5
+    description: Bass
+    audio_file: 08_11_05_bass.wav
+  - id: 6
+    description: Kick 1
+    audio_file: 08_11_13_kick_1.wav
+    midi_group_file: 08_11_05_kick.mid
+  - id: 7
+    description: Kick 2
+    audio_file: 08_11_14_kick_2.wav
+    midi_group_file: 08_11_05_kick.mid
+  - id: 8
+    description: Electric Guitar
+    audio_file: 08_11_08_electric_guitar.wav
+  - id: 9
+    description: Acoustic Guitar
+    audio_file: 08_11_09_acoustic_guitar.wav
+    player: Silas Walsh
+  - id: 10
+    description: Lap steel
+    audio_file: 08_11_10_lap_steel.wav
+  - id: 11
+    description: Tambourine
+    audio_file: 08_11_11_tambourine.wav
+  - id: 12
+    description: Snare 1
+    audio_file: 08_11_15_snare_1.wav
+  - id: 13
+    description: Snare 2
+    audio_file: 08_11_16_snare_2.wav
+  - id: 14
+    description: Snare 3
+    audio_file: 08_11_17_snare_3.wav
+  - id: 15
+    description: Snare 4
+    audio_file: 08_11_18_snare_4.wav
+  - id: 16
+    description: Clap 1
+    audio_file: 08_11_19_clap_1.wav
+  - id: 17
+    description: Clap 2
+    audio_file: 08_11_20_clap_2.wav
+  - id: 18
+    description: Kick
+    audio_file: 08_11_21_kick.wav
+    player: Graham Hopkins
+  - id: 19
+    description: Snare
+    audio_file: 08_11_22_snare.wav
+    player: Graham Hopkins
+  - id: 20
+    description: Hi-Hat
+    audio_file: 08_11_23_hh.wav
+  - id: 21
+    description: Toms
+    audio_file: 08_11_24_toms.wav
+  - id: 22
+    description: Vocal Lead
+    audio_file: 08_11_25_vox_lead.wav
+    player: Busayo Oninla
+  - id: 23
+    description: Vocal Double Lead
+    audio_file: 08_11_26_dbl_lead.wav
+    player: Busayo Oninla
+  - id: 24
+    description: Vocal Harmony
+    audio_file: 08_11_27_vox_harmony.wav
+    player: Busayo Oninla
+  - id: 25
+    description: Vocal Harmony 2
+    audio_file: 08_11_28_vox_harmony_2.wav
+    player: Busayo Oninla
+  - id: 26
+    description: Vocal Harmony 3
+    audio_file: 08_11_29_vox_harmony_3.wav
+    player: Busayo Oninla
+  - id: 27
+    description: Vocal Adlibs
+    audio_file: 08_11_30_vox_adlibs.wav
+    player: Busayo Oninla
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

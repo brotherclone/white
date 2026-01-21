@@ -15,6 +15,8 @@ MidiEncodingVariant = Union[NoteCipherEncoding, MorseDurationEncoding]
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class InfranymMidiArtifact(MidiArtifactFile, ABC):
     """
@@ -126,10 +128,10 @@ class InfranymMidiArtifact(MidiArtifactFile, ABC):
         # Save file
         mid.save(output_path)
 
-        logging.info(f"🎹 MIDI infranym saved: {output_path}")
-        logging.info(f"   Method: {self.encoding.method.value}")
-        logging.info(f"   Secret: {self.encoding.secret_word}")
-        logging.info(f"   Tracks: {len(mid.tracks)}")
+        logger.info(f"🎹 MIDI infranym saved: {output_path}")
+        logger.info(f"   Method: {self.encoding.method.value}")
+        logger.info(f"   Secret: {self.encoding.secret_word}")
+        logger.info(f"   Tracks: {len(mid.tracks)}")
 
         return output_path
 

@@ -11,6 +11,8 @@ from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class CharacterPortraitArtifact(ChainArtifact, ABC):
     """High-level artifact representing a character portrait and its metadata.
@@ -71,7 +73,7 @@ class CharacterPortraitArtifact(ChainArtifact, ABC):
             try:
                 img_path = self.image.get_artifact_path(with_file_name=True)
             except EnvironmentError as e:
-                logging.error(f"Error getting image path: {e}")
+                logger.error(f"Error getting image path: {e}")
                 img_path = getattr(self.image, "file_path", None) or "<no-path>"
             parts.append(f"Image: {img_path}")
         return " ".join(parts)

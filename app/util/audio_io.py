@@ -34,8 +34,6 @@ def load_audio(path_or_file, sr: int | None = None, mono: bool = True):
             data = librosa.resample(data, orig_sr=file_sr, target_sr=sr)
             file_sr = sr
         else:
-            # As a fallback, use numpy-based resampling (less optimal)
-            # simple linear interpolation
             duration = data.shape[0] / file_sr
             target_samples = int(round(duration * sr))
             if target_samples <= 0:

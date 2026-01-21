@@ -40,8 +40,12 @@ from app.agents.tools.infranym_text_tools import (
     create_riddle_encoding,
     create_anagram_encoding,
 )
+from app.structures.music.core.key_signature import KeySignature
+from app.structures.music.core.notes import Note
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 class IndigoAgent(BaseRainbowAgent, ABC):
@@ -206,7 +210,7 @@ class IndigoAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         state.anagram_attempts += 1
-        logging.info(f"🕵️ SPY choosing letter bank (attempt {state.anagram_attempts})")
+        logger.info(f"🕵️ SPY choosing letter bank (attempt {state.anagram_attempts})")
         if mock_mode:
             try:
                 with open(
@@ -218,7 +222,7 @@ class IndigoAgent(BaseRainbowAgent, ABC):
                     state.letter_bank = "".join(sorted(letters))
             except Exception as e:
                 error_msg = f"Failed to read mock letter bank: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -247,7 +251,7 @@ Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
                 msg = f"❌ SPY error: {e}"
                 if block_mode:
                     raise Exception(msg)
-                logging.error(msg)
+                logger.error(msg)
                 state.letter_bank = "AEILNORSTDM"
         return state
 
@@ -258,7 +262,7 @@ Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
         """
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        logging.info(f"🃏 FOOL arranging secret from: {state.letter_bank}")
+        logger.info(f"🃏 FOOL arranging secret from: {state.letter_bank}")
         if mock_mode:
             try:
                 with open(
@@ -270,7 +274,7 @@ Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
                     state.secret_name = secret_name
             except Exception as e:
                 error_msg = f"Failed to read mock letter bank: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -293,13 +297,13 @@ Respond with ONLY the secret name (proper capitalization, with spaces).
                 chain = self.llm | StrOutputParser()
                 secret_name = chain.invoke(prompt).strip()
                 state.secret_name = secret_name
-                logging.info(f"🃏 FOOL created: {secret_name}")
+                logger.info(f"🃏 FOOL created: {secret_name}")
                 return state
             except Exception as e:
                 msg = f"❌ FOOL error: {e}"
                 if block_mode:
                     raise Exception(msg)
-                logging.error(msg)
+                logger.error(msg)
                 state.secret_name = "ERROR"
         return state
 
@@ -317,7 +321,7 @@ Respond with ONLY the secret name (proper capitalization, with spaces).
                     state.surface_name = surface_name
             except Exception as e:
                 error_msg = f"Failed to read mock letter bank: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -342,13 +346,13 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
                 chain = self.llm | StrOutputParser()
                 surface_name = chain.invoke(spy_prompt).strip()
                 state.surface_name = surface_name
-                logging.info(f"🕵️ SPY created: {surface_name}")
+                logger.info(f"🕵️ SPY created: {surface_name}")
                 return state
             except Exception as e:
                 msg = f"❌ SPY error: {e}"
                 if block_mode:
                     raise Exception(msg)
-                logging.error(msg)
+                logger.error(msg)
                 state.surface_name = "ERROR"
                 return state
 
@@ -357,20 +361,20 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
         Validate that secret and surface are true anagrams.
         Sets a validation flag for conditional routing.
         """
-        logging.info(f"✓ Validating: '{state.secret_name}' ↔ '{state.surface_name}'")
+        logger.info(f"✓ Validating: '{state.secret_name}' ↔ '{state.surface_name}'")
         is_valid = self._is_valid_anagram(state.secret_name, state.surface_name)
         state.anagram_valid = is_valid
         if is_valid:
-            logging.info("✅ VALID anagram confirmed!")
+            logger.info("✅ VALID anagram confirmed!")
         else:
-            logging.warning(f"⚠️ INVALID anagram (attempt {state.anagram_attempts})")
+            logger.warning(f"⚠️ INVALID anagram (attempt {state.anagram_attempts})")
         return state
 
     def algorithmic_fallback(self, state: IndigoAgentState) -> IndigoAgentState:
         """
         Use pre-defined anagram pairs when LLM generation fails.
         """
-        logging.warning(
+        logger.warning(
             f"⚠️ Using algorithmic fallback after {state.anagram_attempts} attempts"
         )
         fallback_result = self._generate_algorithmic_fallback(state.concepts)
@@ -378,7 +382,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
         state.surface_name = fallback_result["surface"]
         state.letter_bank = fallback_result["letters"]
         state.anagram_valid = True
-        logging.info(f"🔧 Fallback: '{state.secret_name}' ↔ '{state.surface_name}'")
+        logger.info(f"🔧 Fallback: '{state.secret_name}' ↔ '{state.surface_name}'")
         return state
 
     def choose_infranym_method(self, state: IndigoAgentState) -> IndigoAgentState:
@@ -389,7 +393,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
 
         if mock_mode:
             state.infranym_method = InfranymMethod.DEFAULT
-            logging.info(f" MOCK: Selected method: {state.infranym_method.value}")
+            logger.info(f" MOCK: Selected method: {state.infranym_method.value}")
             return state
 
         # Weight by medium suitability
@@ -399,15 +403,15 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             InfranymMedium.MIDI: 0.25,
             InfranymMedium.IMAGE: 0.2,
         }
-        if not self._has_carrier_image(state):
-            weights[InfranymMedium.IMAGE] = 0.0  # Can't do image without carrier
+        if not self._has_carrier_image():
+            weights[InfranymMedium.IMAGE] = 0.0  # Can't do image without a carrier
         total = sum(weights.values())
         weights = {k: v / total for k, v in weights.items()}
         methods = list(weights.keys())
         probabilities = list(weights.values())
         chosen = random.choices(methods, weights=probabilities, k=1)[0]
         state.infranym_method = chosen
-        logging.info(f" Selected infranym method: {chosen.value}")
+        logger.info(f" Selected infranym method: {chosen.value}")
         return state
 
     def implement_infranym_method(self, state: IndigoAgentState) -> IndigoAgentState:
@@ -419,12 +423,12 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
         bpm = state.white_proposal.bpm if state.white_proposal else 120
         key = state.white_proposal.key if state.white_proposal else None
 
-        logging.info(f"🎨 Implementing {method.value} infranym for '{secret}'")
+        logger.info(f"🎨 Implementing {method.value} infranym for '{secret}'")
 
         if method == InfranymMedium.TEXT:
             # Text needs LLM generation for some methods, so we route to text nodes
             # The actual artifact creation happens in assemble_text_artifact
-            logging.info("📝 Routing to text generation nodes...")
+            logger.info("📝 Routing to text generation nodes...")
             return state
 
         elif method == InfranymMedium.AUDIO:
@@ -443,7 +447,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             path = artifact.save_file()
             state.infranym_audio = artifact
             state.artifacts.append(artifact)
-            logging.info(f"✅ Audio infranym saved: {path}")
+            logger.info(f"✅ Audio infranym saved: {path}")
 
         elif method == InfranymMedium.MIDI:
             midi_method = random.choice(["note_cipher", "morse_duration"])
@@ -472,7 +476,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             path = artifact.save_file()
             state.infranym_midi = artifact
             state.artifacts.append(artifact)
-            logging.info(f"✅ MIDI infranym saved: {path} ({midi_method})")
+            logger.info(f"✅ MIDI infranym saved: {path} ({midi_method})")
 
         elif method == InfranymMedium.IMAGE:
             # Step 1: Render text image (Layer 2 source)
@@ -491,7 +495,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             state.infranym_text_render = text_render
 
             # Step 2: Get carrier image
-            carrier_path = self._get_carrier_image(state)
+            carrier_path = self._get_carrier_image()
 
             # Step 3: Generate surface clue
             surface_clue = self._generate_surface_clue(state)
@@ -517,10 +521,10 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             puzzle_path = encoded_artifact.encode()
             state.infranym_encoded_image = encoded_artifact
             state.artifacts.append(encoded_artifact)
-            logging.info(f"✅ Image infranym saved: {puzzle_path}")
+            logger.info(f"✅ Image infranym saved: {puzzle_path}")
 
         else:
-            logging.warning(f"Unknown infranym method: {method}")
+            logger.warning(f"Unknown infranym method: {method}")
 
         return state
 
@@ -529,17 +533,43 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
     # ========================================================================
 
     @staticmethod
-    def _has_carrier_image(state: IndigoAgentState) -> bool:
-        """Check if we have access to a carrier image for image infranums"""
-        mock_image_path = "/Volumes/LucidNonsense/White/tests/mocks/mock.png"
-        return os.path.exists(mock_image_path)
+    def _has_carrier_image() -> bool:
+        """Check if we have access to a carrier image in `app/reference/carrier_images`."""
+        dir_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "reference", "carrier_images")
+        )
+        if not os.path.isdir(dir_path):
+            return False
+        image_extensions = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff")
+        try:
+            for image_file in os.listdir(dir_path):
+                if image_file.lower().endswith(image_extensions):
+                    return True
+        except ValueError as e:
+            logger.warning(f"Failed to read carrier images: {e}")
+            return False
+        return False
 
     @staticmethod
-    def _get_carrier_image(state: IndigoAgentState) -> str:
-        """Get path to carrier image for encoding"""
-        # ToDo: Add Image library
-        # In production, this could select from a library of images
-        # For now, use mock image
+    def _get_carrier_image() -> str:
+        """Return a carrier image path from `app/reference/carrier_images`, or fallback to mock."""
+        dir_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "reference", "carrier_images")
+        )
+        img_extensions = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff")
+        try:
+            if os.path.isdir(dir_path):
+                images = [
+                    os.path.join(dir_path, f)
+                    for f in os.listdir(dir_path)
+                    if f.lower().endswith(img_extensions)
+                ]
+                if images:
+                    return random.choice(images)
+        except EnvironmentError as e:
+            logger.warning(f"Failed to read carrier images: {e}")
+            pass
+        # Fallback to an original mock path if nothing found
         return "/Volumes/LucidNonsense/White/tests/mocks/mock.png"
 
     def _generate_surface_clue(self, state: IndigoAgentState) -> str:
@@ -558,7 +588,7 @@ Write ONLY the clue:
 """
         chain = self.llm | StrOutputParser()
         clue = chain.invoke(prompt).strip()
-        logging.info(f"🔍 Generated surface clue: {clue}")
+        logger.info(f"🔍 Generated surface clue: {clue}")
         return clue
 
     def _generate_solution_text(self, state: IndigoAgentState) -> str:
@@ -577,35 +607,37 @@ Write ONLY the solution text:
 """
         chain = self.llm | StrOutputParser()
         solution = chain.invoke(prompt).strip()
-        logging.info(f"✨ Generated solution: {solution[:50]}...")
+        logger.info(f"✨ Generated solution: {solution[:50]}...")
         return solution
 
     @staticmethod
-    def _generate_carrier_melody(key: str = None) -> List[int]:
-        """Generate a simple carrier melody for MIDI camouflage"""
-        # Simple scale-based melody
-        root = 60  # C4
-        if key:
-            key_map = {
-                "C": 0,
-                "C#": 1,
-                "D": 2,
-                "D#": 3,
-                "E": 4,
-                "F": 5,
-                "F#": 6,
-                "G": 7,
-                "G#": 8,
-                "A": 9,
-                "A#": 10,
-                "B": 11,
-            }
-            root += key_map.get(key.split()[0], 0)
+    def _note_to_midi(note: Note, octave: int = 4) -> int:
+        """Convert a Note to MIDI number at the given octave"""
+        base_offsets = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
+        midi_note = 12 + (octave * 12) + base_offsets[note.pitch_name]
 
-        # Major scale intervals
-        # ToDo: Use structural keys
-        scale = [0, 2, 4, 5, 7, 9, 11, 12]
-        melody = [root + interval for interval in scale]
+        if note.accidental == "sharp":
+            midi_note += 1
+        elif note.accidental == "flat":
+            midi_note -= 1
+
+        return midi_note
+
+    def _generate_carrier_melody(self, key: str = None) -> List[int]:
+        """Generate a simple carrier melody for MIDI camouflage"""
+        root = 60  # C4 default
+        scale_intervals = [0, 2, 4, 5, 7, 9, 11, 12]  # Major default
+
+        if key:
+            key_sig = KeySignature.model_validate(key)  # Handles "C# minor" etc.
+            root = self._note_to_midi(key_sig.note, octave=4)
+            if key_sig.mode.intervals:
+                scale_intervals = [0]
+                cumulative = 0
+                for interval in key_sig.mode.intervals:
+                    cumulative += interval
+                    scale_intervals.append(cumulative)
+        melody = [root + interval for interval in scale_intervals]
         random.shuffle(melody)
         return melody[:8]
 
@@ -615,7 +647,7 @@ Write ONLY the solution text:
         methods = ["acrostic", "riddle", "anagram"]
         chosen = random.choice(methods)
         state.text_infranym_method = chosen
-        logging.info(f"📝 Chose text method: {chosen}")
+        logger.info(f"📝 Chose text method: {chosen}")
         return state
 
     def generate_acrostic_lines(self, state: IndigoAgentState) -> IndigoAgentState:
@@ -637,12 +669,12 @@ Requirements:
 Write ONLY the lines (no numbers, no extra text):
     """
 
-        logging.info(f"🤖 Generating acrostic for '{secret}'...")
+        logger.info(f"🤖 Generating acrostic for '{secret}'...")
         chain = self.llm | StrOutputParser()
         response = chain.invoke(prompt).strip()
         lines = [line.strip() for line in response.split("\n") if line.strip()]
         if len(lines) != len(secret):
-            logging.warning(
+            logger.warning(
                 f"Expected {len(secret)} lines, got {len(lines)}. Adjusting..."
             )
             lines = lines[: len(secret)]
@@ -650,7 +682,7 @@ Write ONLY the lines (no numbers, no extra text):
                 lines.append(f"{secret[len(lines)]}... (incomplete)")
         state.generated_text_lines = lines
         state.text_infranym_method = "acrostic"
-        logging.info(f"✅ Generated {len(lines)} acrostic lines")
+        logger.info(f"✅ Generated {len(lines)} acrostic lines")
         return state
 
     def generate_riddle_text(self, state: IndigoAgentState) -> IndigoAgentState:
@@ -677,7 +709,7 @@ Requirements:
 
 Write ONLY the riddle (no answer, no explanation):
     """
-        logging.info(
+        logger.info(
             f"🤖 Generating riddle for '{secret}' (difficulty: {difficulty})..."
         )
         chain = self.llm | StrOutputParser()
@@ -685,7 +717,7 @@ Write ONLY the riddle (no answer, no explanation):
         state.generated_riddle_text = riddle_text
         state.text_infranym_difficulty = difficulty
         state.text_infranym_method = "riddle"
-        logging.info(f"✅ Generated riddle ({len(riddle_text)} chars)")
+        logger.info(f"✅ Generated riddle ({len(riddle_text)} chars)")
         return state
 
     @staticmethod
@@ -695,7 +727,7 @@ Write ONLY the riddle (no answer, no explanation):
         """
         method = state.text_infranym_method
 
-        logging.info(f"🎨 Assembling text artifact: {method}")
+        logger.info(f"🎨 Assembling text artifact: {method}")
 
         if method == "acrostic":
             encoding = create_acrostic_encoding(
@@ -732,7 +764,7 @@ Write ONLY the riddle (no answer, no explanation):
         )
         path = artifact.save_file()
         state.infranym_text = artifact
-        logging.info(f"✅ Text infranym artifact saved: {path}")
+        logger.info(f"✅ Text infranym artifact saved: {path}")
         return state
 
     def generate_alternate_song_spec(self, state: IndigoAgentState) -> IndigoAgentState:
@@ -756,7 +788,7 @@ Write ONLY the riddle (no answer, no explanation):
                 state.counter_proposal = counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -833,15 +865,15 @@ Concept: [full concept explanation]
                 counter_proposal.agent_name = "indigo"
                 counter_proposal.timestamp = time.time()
                 state.counter_proposal = counter_proposal
-                logging.info(
+                logger.info(
                     f"✅ Counter-proposal generated: '{counter_proposal.title}'"
                 )
-                logging.info(f"🎯 Concept: {counter_proposal.concept[:100]}...")
+                logger.info(f"🎯 Concept: {counter_proposal.concept[:100]}...")
 
                 return state
 
             except Exception as e:
-                logging.error(f"❌ Error generating proposal: {e}")
+                logger.error(f"❌ Error generating proposal: {e}")
                 state.counter_proposal = SongProposalIteration(
                     title=state.surface_name,
                     key=previous_iteration.key,
@@ -865,17 +897,17 @@ Concept: [full concept explanation]
         if state.anagram_valid:
             return "continue"
         elif state.anagram_attempts < state.anagram_attempt_max:
-            logging.info(
+            logger.info(
                 f"🔄 Retrying anagram generation (attempt {state.anagram_attempts + 1}/{state.anagram_attempt_max})"
             )
             return "retry"
         else:
-            logging.warning("🛑 Max attempts reached, using fallback")
+            logger.warning("🛑 Max attempts reached, using fallback")
             return "fallback"
 
     @staticmethod
     def _should_route_to_text_nodes(state: IndigoAgentState) -> str:
-        """Route to text generation if method is TEXT, otherwise done"""
+        """Route to text generation if the method is TEXT, otherwise done"""
         if state.infranym_method == InfranymMedium.TEXT:
             return "choose_text_method"
         return "generate_alternate_song_spec"
@@ -917,7 +949,7 @@ Concept: [full concept explanation]
                     (pair["secret"], pair["surface"]) for pair in data["anagram_pairs"]
                 ]
         except Exception as e:
-            logging.warning(
+            logger.warning(
                 f"⚠️ Failed to load anagram pairs from resource: {e}, using hardcoded fallback"
             )
             pairs = [

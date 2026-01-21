@@ -1,11 +1,11 @@
 from typing import List, Any, Optional, Annotated
-from operator import add  # Added by auto_annotate
 
 from pydantic import Field
 
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
 from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
+from app.util.agent_state_utils import safe_add
 
 
 class OrangeAgentState(BaseRainbowAgentState):
@@ -13,10 +13,10 @@ class OrangeAgentState(BaseRainbowAgentState):
     synthesized_story: Annotated[Optional[NewspaperArtifact], lambda x, y: y or x] = (
         Field(default=None)
     )
-    search_results: Annotated[Optional[List[Any]], add] = Field(
+    search_results: Annotated[Optional[List[Any]], safe_add] = Field(
         default=None, description="Web search results."
     )
-    corpus_stories: Annotated[Optional[List[Any]], add] = Field(
+    corpus_stories: Annotated[Optional[List[Any]], safe_add] = Field(
         default=None, description="Matching stories from the orange mythology corpus"
     )
     selected_story_id: Annotated[Optional[str], lambda x, y: y or x] = Field(

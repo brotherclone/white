@@ -32,6 +32,8 @@ from app.structures.manifests.song_proposal import SongProposalIteration
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 
 class GreenAgent(BaseRainbowAgent, ABC):
     def __init__(self, **data):
@@ -144,7 +146,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock species extinction artifact: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -158,7 +160,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
                 return state
             except Exception as e:
                 error_msg = f"Failed to load species extinction artifact: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         return state
@@ -181,7 +183,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock last human artifact: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -226,10 +228,10 @@ class GreenAgent(BaseRainbowAgent, ABC):
                     error_msg = f"Expected LastHumanArtifact, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
             except Exception as e:
                 error_msg = f"Failed to generate last human artifact: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         return state
@@ -252,7 +254,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock parallel moment: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -293,11 +295,11 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                     error_msg = f"Expected LastHumanSpeciesExtinctionParallelMoment, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
                     return state
             except Exception as e:
                 error_msg = f"Failed to generate parallel moment: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         return state
@@ -324,7 +326,7 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock narrative: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         else:
@@ -372,10 +374,10 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                     error_msg = f"Expected LastHumanSpeciesExtinctionNarrativeArtifact, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
             except Exception as e:
                 error_msg = f"Failed to generate narrative: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
         return state
@@ -398,7 +400,7 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock survey: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -437,10 +439,10 @@ Score each dimension (1-10) and provide brief reasoning. Then give an overall as
                 error_msg = f"Expected ArbitrarysSurveyArtifact, got {type(result)}"
                 if block_mode:
                     raise TypeError(error_msg)
-                logging.warning(error_msg)
+                logger.warning(error_msg)
         except Exception as e:
             error_msg = f"Failed to read mock survey: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
 
@@ -463,7 +465,7 @@ Score each dimension (1-10) and provide brief reasoning. Then give an overall as
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock rescue decision: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -509,10 +511,10 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
                 error_msg = f"Expected RescueDecisionArtifact, got {type(result)}"
                 if block_mode:
                     raise TypeError(error_msg)
-                logging.warning(error_msg)
+                logger.warning(error_msg)
         except Exception as e:
             error_msg = f"Failed to read mock decision: {e!s}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
         return state
@@ -531,7 +533,7 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
                     state.counter_proposal = counter_proposal
             except Exception as e:
                 error_msg = f"Failed to read mock counter proposal: {e!s}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
             return state
@@ -573,7 +575,7 @@ Using all of this, create a new SongProposalIteration that captures the essence 
                 else:
                     counter_proposal = result
             except Exception as e:
-                logging.error(f"Anthropic model call failed: {e!s}")
+                logger.error(f"Anthropic model call failed: {e!s}")
                 timestamp = int(time.time() * 1000)
                 counter_proposal = SongProposalIteration(
                     iteration_id=f"fallback_error_{timestamp}",

@@ -6,6 +6,8 @@ from app.reference.encodings.morse_code import MORSE_CODE
 from app.structures.concepts.infranym_midi_encoding import InfranymMidiEncoding
 from app.structures.enums.infranym_method import InfranymMethod
 
+logger = logging.getLogger(__name__)
+
 
 class MorseDurationEncoding(InfranymMidiEncoding):
     """
@@ -50,5 +52,5 @@ class MorseDurationEncoding(InfranymMidiEncoding):
             if char in MORSE_CODE:
                 morse_chars.append(MORSE_CODE[char])
             else:
-                logging.warning(f"Character '{char}' not in Morse code, skipping")
+                logger.warning(f"Character '{char}' not in Morse code, skipping")
         return " ".join(morse_chars)

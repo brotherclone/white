@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
 """Convert SMPTE-like timestamps to LRC-style timestamps.
 
 Examples:
-  Input:  01:01:06:11.49
+  Input: 01:01:06:11.49
   Output: [01:06.011]
 
 Rules applied:
-- Timestamps are matched by the regex
+- the regex matches Timestamps
 - For a matched timestamp we take the last three colon-separated fields as MM:SS:FRAMES
   (this gracefully handles an optional leading hour field).
 - The final field (frames, may contain a decimal) is converted by truncating to an integer
@@ -20,19 +19,26 @@ The module exposes:
 
 CLI:
   python -m app.util.convert_smpte_to_lrc [--inplace] [files...]
-  If no files are provided the script reads stdin and writes to stdout.
+  If no files are provided, the script reads stdin and writes to stdout.
 
 Use --inplace to overwrite files with the converted content.
 """
+
 from __future__ import annotations
 
 import argparse
 import re
 import sys
+import logging
+
 from pathlib import Path
 
 # Pattern matches e.g. 01:01:06:11.49 or 1:2:3:4 or 00:12:34:56
 _TIMESTAMP_RE = re.compile(r"\b(?:\d{1,2}:){2,3}\d{1,3}(?:[.,]\d+)?\b")
+
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 
 def _normalize_int_part(s: str) -> int:
@@ -58,7 +64,7 @@ def convert_timestamp(ts: str) -> str:
         # unexpected format: return original
         return ts
 
-    # Use the last three components as MM, SS, FRAMES
+    # Use the last three parts as MM, SS, FRAMES
     mm = parts[-3]
     ss = parts[-2]
     frames = parts[-1]
@@ -69,7 +75,8 @@ def convert_timestamp(ts: str) -> str:
     try:
         mm_i = int(mm)
         ss_i = int(ss)
-    except Exception:
+    except ValueError as e:
+        logger.warning(f"Failed to parse timestamp {ts}: {e}")
         # if mm/ss aren't numeric, fall back to original
         return ts
 
@@ -113,7 +120,6 @@ def _process_file(p: Path, inplace: bool) -> int:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     if not args.files:
-        # read stdin and write stdout
         data = sys.stdin.read()
         sys.stdout.write(convert_text(data))
         return 0

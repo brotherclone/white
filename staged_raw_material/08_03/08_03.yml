@@ -1,1 +1,139 @@
-# ToDo: Complete this manifest
+bpm: 120
+manifest_id: '08_03'
+tempo: 4/4
+key: C major
+rainbow_color: V
+title: IIVIIIIΞ
+release_date: '2025-09-08'
+album_sequence: 3
+main_audio_file: 08_03_main.wav
+TRT: '[02:34.000]'
+vocals: true
+lyrics: true
+structure:
+  - section_name: Intro
+    start_time: '[00:00.000]'
+    end_time: '[00:08.000]'
+    description: Organ and drum machine kick off
+  - section_name: Verse
+    start_time: '[00:08.001]'
+    end_time: '[00:28.000]'
+    description: The verse features a pop-corn sounding synth and soft vocals
+  - section_name: Chorus
+    start_time: '[00:28.001]'
+    end_time: '[00:44.000]'
+    description: The chorus gallops up a walking melody
+  - section_name: Verse
+    start_time: '[00:44.001]'
+    end_time: '[01:04.000]'
+    description: Back to the verse
+  - section_name: Bridge
+    start_time: '[01:04.001]'
+    end_time: '[01:28.000]'
+    description: A melancholic bridge with a focus on the vocals and synths
+  - section_name: Verse
+    start_time: '[01:28.001]'
+    end_time: '[01:52.000]'
+    description: A muted guitar kicks us back into the verse
+  - section_name: Chorus
+    start_time: '[01:52.001]'
+    end_time: '[02:08.000]'
+    description: The final chorus with lots of energy
+  - section_name: Jams
+    start_time: '[02:08.001]'
+    end_time: '[02:34.000]'
+    description: A keyboard uses a guitar line as a side-chained carrier and both solo giving a neo 70s vibe.
+concept: A central song on the album, the idea of being self-centered is turned on its head and becomes a internal prison.
+lrc_file: 08_03.lrc
+sounds_like:
+  - name: Lana Del Rey
+    discogs_id: 2445772
+  - name: St. Vincent
+    discogs_id: 849853
+  - name: His Name is Alive
+    discogs_id: 61796
+mood:
+  - dreamy
+  - sullen
+  - ethereal
+  - melancholic
+genres:
+  - Pop
+  - Indie Rock
+audio_tracks:
+  - id: 2
+    description: Drums
+    audio_file: 08_03_12_drums.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 3
+    description: Kick
+    audio_file: 08_03_13_kick.wav
+    midi_file: 08_03_03_kick_in.mid
+    group: Drums
+    player: Graham Hopkins
+  - id: 4
+    description: Snare
+    audio_file: 08_03_14_snare.wav
+    midi_file: 08_03_05_snare_top.mid
+    group: Drums
+    player: Graham Hopkins
+  - id: 5
+    description: Hi-hat
+    audio_file: 08_03_15_hh.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 6
+    description: Toms
+    audio_file: 08_03_16_toms.wav
+    group: Drums
+    player: Graham Hopkins
+  - id: 7
+    description: Percussion
+    audio_file: 08_03_19_percussion.wav
+    midi_file: 08_03_07_percussion.mid
+  - id: 8
+    description: Claps and Shaker
+    audio_file: 08_03_18_claps_shaker.wav
+    midi_file: 08_03_06_claps_shaker.mid
+  - id: 9
+    description: Vocals
+    audio_file: 08_03_26_vocals.wav
+    group: Vocals
+    player: Katherine Koherence
+  - id: 10
+    description: Lead Vocals
+    audio_file: 08_03_22_lead_vocals.wav
+    group: Vocals
+    player: Katherine Koherence
+  - id: 11
+    description: Double Vocals
+    audio_file: 08_03_23_dbl_vocals.wav
+    group: Vocals
+    player: Katherine Koherence
+  - id: 12
+    description: Synth Chords
+    audio_file: 08_03_20_chords.wav
+    midi_file: 08_03_08_chords.mid
+  - id: 13
+    description: Lead Synth
+    audio_file: 08_03_27_key_lead.wav
+    midi_file: 08_03_09_lead_synth.mid
+  - id: 14
+    description: Pad 1
+    audio_file: 08_03_28_pad.wav
+    midi_file: 08_03_10_pad_1.mid
+  - id: 15
+    description: Pad 2
+    audio_file: 08_03_29_pad_2.wav
+    midi_file: 08_03_11_pad_2.mid
+  - id: 16
+    description: Bass
+    audio_file: 08_03_17_bass.wav
+  - id: 17
+    description: Guitar
+    audio_file: 08_03_21_guitar.wav
+  - id: 18
+    description: End Lead
+    audio_file: 08_03_24_end_lead.wav
+
