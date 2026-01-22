@@ -109,7 +109,7 @@ audio_tracks:
     audio_file: 07_09_18_guitar.wav
   - id: 17
     description: Lead Guitar
-    midi_group_file: 07_09_19_lead_guitar.wav
+    audio_file: 07_09_19_lead_guitar.wav
   - id: 18
     description: Prophet
     audio_file: 07_09_21_prophet.wav

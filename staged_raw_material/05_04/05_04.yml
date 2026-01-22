@@ -110,7 +110,7 @@ audio_tracks:
     midi_group_file: 05_04_03_yearly.mid
   - id: 6
     description: Alp horns
-    midi_file: 05_04_09_alp_horn_decade.wav
+    audio_file: 05_04_09_alp_horn_decade.wav
     midi_group_file: 05_04_04_decades.mid
   - id: 7
     description: Bass

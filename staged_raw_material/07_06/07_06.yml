@@ -121,7 +121,7 @@ audio_tracks:
   - id: 15
     description: Organ
     audio_file: 07_06_16_organ.wav
-    midifile: 07_06_15_organ.mid
+    midi_file: 07_06_15_organ.mid
   - id: 16
     description: Organ Lead
     audio_file: 07_06_18_organ_lead.wav
