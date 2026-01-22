@@ -79,10 +79,8 @@ def clone_repo():
         subprocess.check_call(
             ["git", "clone", "https://github.com/brotherclone/white.git", str(code_dir)]
         )
-        # Checkout the feature branch with multiclass support
-        subprocess.check_call(
-            ["git", "-C", str(code_dir), "checkout", "feature/dataPrep"]
-        )
+        # Checkout develop branch
+        subprocess.check_call(["git", "-C", str(code_dir), "checkout", "develop"])
     else:
         print("Repository already exists, pulling latest...")
         subprocess.check_call(["git", "-C", str(code_dir), "pull"])
