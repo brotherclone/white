@@ -804,6 +804,202 @@ def validate_manifest_id_consistency(
     return len(errors) == 0, errors
 
 
+def validate_file_extension_consistency(
+    yaml_data: Dict[str, Any],
+) -> Tuple[bool, List[str]]:
+    """
+    Validates that audio_file references have audio extensions (.wav, .aif, .mp3)
+    and midi_file references have MIDI extensions (.mid, .midi).
+
+    Catches issues like audio_file pointing to a .mid file or midi_file pointing to .wav.
+
+    Args:
+        yaml_data: Parsed YAML content
+
+    Returns:
+        Tuple of (is_valid, list_of_error_messages)
+    """
+    errors = []
+    audio_extensions = {".wav", ".aif", ".aiff", ".mp3", ".flac", ".ogg"}
+    midi_extensions = {".mid", ".midi"}
+
+    if not isinstance(yaml_data, dict):
+        return True, errors
+
+    audio_tracks = yaml_data.get("audio_tracks", [])
+    if not isinstance(audio_tracks, list):
+        return True, errors
+
+    for i, track in enumerate(audio_tracks):
+        if not isinstance(track, dict):
+            continue
+
+        track_id = track.get("id", i + 1)
+        track_desc = track.get("description", "Unknown")
+
+        # Check audio_file has audio extension
+        audio_file = track.get("audio_file")
+        if audio_file:
+            ext = os.path.splitext(audio_file)[1].lower()
+            if ext and ext in midi_extensions:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): audio_file '{audio_file}' "
+                    f"has MIDI extension - should this be midi_file instead?"
+                )
+            elif ext and ext not in audio_extensions and ext:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): audio_file '{audio_file}' "
+                    f"has unexpected extension '{ext}'"
+                )
+
+        # Check midi_file has MIDI extension
+        midi_file = track.get("midi_file")
+        if midi_file:
+            ext = os.path.splitext(midi_file)[1].lower()
+            if ext and ext in audio_extensions:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): midi_file '{midi_file}' "
+                    f"has audio extension - should this be audio_file instead?"
+                )
+            elif ext and ext not in midi_extensions:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): midi_file '{midi_file}' "
+                    f"has unexpected extension '{ext}'"
+                )
+
+        # Check midi_group_file has MIDI extension
+        midi_group_file = track.get("midi_group_file")
+        if midi_group_file:
+            ext = os.path.splitext(midi_group_file)[1].lower()
+            if ext and ext in audio_extensions:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): midi_group_file '{midi_group_file}' "
+                    f"has audio extension - should this be audio_file instead?"
+                )
+            elif ext and ext not in midi_extensions:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): midi_group_file '{midi_group_file}' "
+                    f"has unexpected extension '{ext}'"
+                )
+
+    return len(errors) == 0, errors
+
+
+def validate_player_names(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """
+    Validates that all player names in audio_tracks are valid RainbowPlayer enum values.
+
+    Args:
+        yaml_data: Parsed YAML content
+
+    Returns:
+        Tuple of (is_valid, list_of_error_messages)
+    """
+    errors = []
+
+    if not isinstance(yaml_data, dict):
+        return True, errors
+
+    audio_tracks = yaml_data.get("audio_tracks", [])
+    if not isinstance(audio_tracks, list):
+        return True, errors
+
+    try:
+        from app.structures.enums.player import RainbowPlayer
+
+        valid_names = {member.name for member in RainbowPlayer}
+        valid_values = {member.value for member in RainbowPlayer}
+    except ImportError:
+        # If enum not available, skip validation
+        return True, errors
+
+    for i, track in enumerate(audio_tracks):
+        if not isinstance(track, dict):
+            continue
+
+        track_id = track.get("id", i + 1)
+        track_desc = track.get("description", "Unknown")
+        player = track.get("player")
+
+        if player is not None:
+            if player not in valid_names and player not in valid_values:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): unknown player '{player}'. "
+                    f"Valid players: {', '.join(sorted(valid_values))}"
+                )
+
+    return len(errors) == 0, errors
+
+
+def validate_no_field_typos(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """
+    Validates that audio_tracks don't contain common field name typos.
+
+    Catches issues like 'midifile' instead of 'midi_file'.
+
+    Args:
+        yaml_data: Parsed YAML content
+
+    Returns:
+        Tuple of (is_valid, list_of_error_messages)
+    """
+    errors = []
+
+    # Map of typos to correct field names
+    typo_corrections = {
+        "midifile": "midi_file",
+        "midi": "midi_file",
+        "audiofile": "audio_file",
+        "audio": "audio_file",
+        "midigroupfile": "midi_group_file",
+        "midi_group": "midi_group_file",
+        "midgroupfile": "midi_group_file",
+        "desc": "description",
+        "name": "description",
+    }
+
+    # Valid field names for audio_tracks
+    valid_fields = {
+        "id",
+        "description",
+        "audio_file",
+        "midi_file",
+        "midi_group_file",
+        "group",
+        "player",
+    }
+
+    if not isinstance(yaml_data, dict):
+        return True, errors
+
+    audio_tracks = yaml_data.get("audio_tracks", [])
+    if not isinstance(audio_tracks, list):
+        return True, errors
+
+    for i, track in enumerate(audio_tracks):
+        if not isinstance(track, dict):
+            continue
+
+        track_id = track.get("id", i + 1)
+        track_desc = track.get("description", "Unknown")
+
+        for field in track.keys():
+            field_lower = field.lower()
+            if field_lower in typo_corrections:
+                correct_field = typo_corrections[field_lower]
+                errors.append(
+                    f"Track {track_id} ({track_desc}): field '{field}' appears to be "
+                    f"a typo - did you mean '{correct_field}'?"
+                )
+            elif field not in valid_fields:
+                errors.append(
+                    f"Track {track_id} ({track_desc}): unknown field '{field}'. "
+                    f"Valid fields: {', '.join(sorted(valid_fields))}"
+                )
+
+    return len(errors) == 0, errors
+
+
 def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
     """Validates a single YAML file.
 
@@ -865,6 +1061,24 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
         is_valid, discogs_errors = validate_discogs_ids(yaml_data)
         if not is_valid:
             for err in discogs_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: file extension consistency (audio_file should be .wav, midi_file should be .mid)
+        is_valid, ext_errors = validate_file_extension_consistency(yaml_data)
+        if not is_valid:
+            for err in ext_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: player names against RainbowPlayer enum
+        is_valid, player_errors = validate_player_names(yaml_data)
+        if not is_valid:
+            for err in player_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: field name typos (e.g., 'midifile' instead of 'midi_file')
+        is_valid, typo_errors = validate_no_field_typos(yaml_data)
+        if not is_valid:
+            for err in typo_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
         tk_errors = check_no_tk_fields(yaml_data)
