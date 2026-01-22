@@ -222,6 +222,8 @@ class Trainer:
                     multi_label=self.multi_label,
                     stratified=data_config.get("stratified", True),
                     filter_unknown_types=data_config.get("filter_unknown_types", True),
+                    hf_dataset=data_config.get("hf_dataset"),
+                    hf_split=data_config.get("hf_split", "base_manifest"),
                 )
             )
 

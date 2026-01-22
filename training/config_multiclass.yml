@@ -3,7 +3,12 @@
 
 # Data Configuration
 data:
+  # Local path (fallback if HuggingFace unavailable)
   manifest_path: "data/base_manifest_db.parquet"
+
+  # HuggingFace Dataset (preferred - set to null to use local only)
+  hf_dataset: "brotherclone/rainbow-table-training"  # or null for local only
+  hf_split: "base_manifest"
 
   # Target
   target_column: "rebracketing_type"  # Multi-class: spatial, temporal, causal, etc.
