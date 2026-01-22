@@ -123,8 +123,8 @@ audio_tracks:
   - id: 15
     description: Main vocals
     audio_file: 08_09_19_vox_main.wav
-    player: Kate Koherence
+    player: Katherine Koherence
   - id: 16
     description: Background vocals
     audio_file: 08_09_20_vox_bg.wav
-    player: Kate Koherence
+    player: Katherine Koherence
