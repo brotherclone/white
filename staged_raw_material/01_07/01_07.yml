@@ -90,8 +90,8 @@ audio_tracks:
     group: drums
   - id: 8
     description: Kick thud
-    audio_file: 01_07_13_thud.mid
-    midi_file: 01_07_14_thud.wav
+    audio_file: 01_07_14_thud.wav
+    midi_file: 01_07_13_thud.mid
     group: drums
   - id: 9
     description: Bass
