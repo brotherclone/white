@@ -81,12 +81,17 @@ class MultiClassMetrics:
         # Overall accuracy
         metrics["accuracy"] = accuracy_score(labels, preds)
 
-        # Per-class metrics
+        # Per-class metrics (force all classes to be included)
+        all_labels = list(range(self.num_classes))
         per_class_precision = precision_score(
-            labels, preds, average=None, zero_division=0
+            labels, preds, average=None, zero_division=0, labels=all_labels
         )
-        per_class_recall = recall_score(labels, preds, average=None, zero_division=0)
-        per_class_f1 = f1_score(labels, preds, average=None, zero_division=0)
+        per_class_recall = recall_score(
+            labels, preds, average=None, zero_division=0, labels=all_labels
+        )
+        per_class_f1 = f1_score(
+            labels, preds, average=None, zero_division=0, labels=all_labels
+        )
 
         for i, name in enumerate(self.class_names):
             metrics[f"precision_{name}"] = per_class_precision[i]
@@ -95,12 +100,14 @@ class MultiClassMetrics:
 
         # Aggregate metrics
         metrics["macro_precision"] = precision_score(
-            labels, preds, average="macro", zero_division=0
+            labels, preds, average="macro", zero_division=0, labels=all_labels
         )
         metrics["macro_recall"] = recall_score(
-            labels, preds, average="macro", zero_division=0
+            labels, preds, average="macro", zero_division=0, labels=all_labels
         )
-        metrics["macro_f1"] = f1_score(labels, preds, average="macro", zero_division=0)
+        metrics["macro_f1"] = f1_score(
+            labels, preds, average="macro", zero_division=0, labels=all_labels
+        )
 
         metrics["micro_precision"] = precision_score(
             labels, preds, average="micro", zero_division=0
