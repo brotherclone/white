@@ -476,16 +476,15 @@ class BlackAgent(BaseRainbowAgent, ABC):
             evp_artifact.artifact_name = "evp"
             evp_artifact.chain_artifact_type = ChainArtifactType.EVP_ARTIFACT
             evp_artifact.base_path = os.path.join(
-                os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"), state.thread_id
+                os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts")
             )
             evp_artifact.audio_segments = [
                 AudioChainArtifactFile(
                     thread_id=state.thread_id,
                     chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
                     chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-                    base_path=os.path.join(
-                        os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"),
-                        state.thread_id,
+                    base_path=os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     ),
                     artifact_name="test_audio_artifact_segment",
                     sample_rate=44100,
@@ -498,10 +497,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 thread_id=state.thread_id,
                 chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
                 chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-                base_path=os.path.join(
-                    os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"),
-                    state.thread_id,
-                ),
+                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
                 artifact_name="test_audio_artifact_mosaic",
                 sample_rate=44100,
                 duration=5.0,
@@ -512,10 +508,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 thread_id=state.thread_id,
                 chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
                 chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-                base_path=os.path.join(
-                    os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"),
-                    state.thread_id,
-                ),
+                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
                 artifact_name="test_audio_artifact_blended",
                 sample_rate=44100,
                 duration=5.0,
@@ -550,7 +543,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 )
             evp_artifact = EVPArtifact(
                 artifact_name="evp",
-                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
                 audio_segments=segments,
                 transcript=transcript,
                 audio_mosaic=mosaic,

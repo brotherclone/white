@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import START
 from langgraph.graph.state import StateGraph
+from langchain_core.messages import HumanMessage
 from pydantic import Field
 
 from app.agents.states.orange_agent_state import OrangeAgentState
@@ -24,6 +25,7 @@ from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArti
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.manifest_loader import get_my_reference_proposals
+from app.structures.agents.agent_settings import AgentSettings
 
 load_dotenv()
 
@@ -38,13 +40,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
     def __init__(self, **data):
         if "settings" not in data or data["settings"] is None:
-            from app.structures.agents.agent_settings import AgentSettings
-
             data["settings"] = AgentSettings()
         super().__init__(**data)
         if self.settings is None:
-            from app.structures.agents.agent_settings import AgentSettings
-
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
             temperature=self.settings.temperature,
@@ -230,11 +228,10 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 ) as f:
                     data = yaml.safe_load(f)
                     story = NewspaperArtifact(**data)
-                    # Match non-mock processing
                     combined = story.get_text_content()
                     story.text = combined
-                    story.base_path = (
-                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    story.base_path = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
                     story.save_file()
                     state.synthesized_story = story
@@ -307,13 +304,17 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
-                    if result["thread_id"] is None:
-                        result["thread_id"] = state.thread_id
+                    result["thread_id"] = state.thread_id
+                    result["base_path"] = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    )
                     state.synthesized_story = NewspaperArtifact(**result)
+                    if state.synthesized_story.thread_id == "UNKNOWN_THREAD_ID":
+                        state.synthesized_story.thread_id = state.thread_id
                     combined = state.synthesized_story.get_text_content()
                     state.synthesized_story.text = combined
-                    state.synthesized_story.base_path = (
-                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    state.synthesized_story.base_path = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
                     try:
                         state.synthesized_story.save_file()
@@ -326,6 +327,10 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     return state
                 elif isinstance(result, NewspaperArtifact):
                     state.synthesized_story = result
+                    state.synthesized_story.thread_id = state.thread_id
+                    state.synthesized_story.base_path = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    )
                     try:
                         state.synthesized_story.save_file()
                     except Exception as e:
@@ -345,6 +350,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     fallback_story = NewspaperArtifact(
                         thread_id=state.thread_id,
                         headline="Strange Frequencies Reported Near High School Band Room",
+                        base_path=os.getenv(
+                            "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                        ),
                         date=story_date.strftime("%Y-%m-%d"),
                         source=random.choice(sources),
                         location=random.choice(locations) + ", NJ",
@@ -409,8 +417,19 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     raise Exception(error_msg)
             return state
         else:
+            if not state.symbolic_object:
+                logger.warning("No symbolic object selected - skipping insertion")
+                return state
+            if not state.selected_story_id:
+                logger.warning("No story ID selected - skipping object insertion")
+                return state
             try:
                 story = self.corpus.get_story(state.selected_story_id)
+                if not story:
+                    logger.warning(
+                        f"Could not retrieve story {state.selected_story_id}"
+                    )
+                    return state
                 prompt = f"""Insert this symbolic object into the story naturally.
     
                 ORIGINAL STORY:
@@ -428,7 +447,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 Return ONLY the updated story text."""
                 response = self.anthropic_client.messages.create(
                     model="claude-sonnet-4-20250514",
-                    max_tokens=2000,
+                    max_tokens=3000,
+                    temperature=0.8 + (state.gonzo_intensity * 0.05),
                     messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
                 )
                 updated_text = response.content[0].text.strip()
@@ -449,6 +469,12 @@ class OrangeAgent(BaseRainbowAgent, ABC):
     @staticmethod
     def insert_symbolic_object_node(state: OrangeAgentState) -> OrangeAgentState:
         """Insert a symbolic object into the story via MCP tool"""
+        if not state.symbolic_object:
+            logger.warning("No symbolic object to insert - skipping")
+            return state
+        if not state.selected_story_id:
+            logger.warning("No story ID for object insertion - skipping")
+            return state
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             print(f"[MOCK] Would insert: {state.symbolic_object.name} into story")
@@ -469,6 +495,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         """Rewrite the story in gonzo journalism style via MCP tool"""
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        if not state.synthesized_story:
+            logger.warning("No synthesized story for gonzo rewrite - using fallback")
+            return state
         if mock_mode:
             try:
                 with open(
@@ -483,14 +512,12 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     # Match non-mock processing
                     combined = state.mythologized_story.get_text_content()
                     state.mythologized_story.text = combined
-                    state.mythologized_story.base_path = (
-                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    state.mythologized_story.base_path = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
                     try:
                         state.mythologized_story.save_file()
                     except Exception as e:
-                        # In mock mode, file save failures are non-fatal
-                        # (test mocks may not have complete file paths)
                         logger.warning(
                             f"Mock mode: Could not save mythologized story file: {e!s}"
                         )
@@ -538,14 +565,12 @@ class OrangeAgent(BaseRainbowAgent, ABC):
     
             Return ONLY the gonzo rewritten story."""
 
-            response = self.anthropic_client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=3000,
+            response = self.llm.invoke(
+                [HumanMessage(content=prompt)],
                 temperature=0.8 + (state.gonzo_intensity * 0.05),
-                messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
+                max_tokens=3000,
             )
-
-            gonzo_text = response.content[0].text.strip()
+            gonzo_text = response.content.strip()
 
             self.corpus.add_gonzo_rewrite(
                 story_id=state.selected_story_id,
@@ -555,13 +580,14 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             )
             story_without_text = {k: v for k, v in story.items() if k != "text"}
             state.mythologized_story = NewspaperArtifact(
-                **story_without_text, text=gonzo_text
+                **story_without_text,
+                text=gonzo_text,
+                thread_id=state.thread_id,
+                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
             )
+
             combined = state.mythologized_story.get_text_content()
             state.mythologized_story.text = combined
-            state.mythologized_story.base_path = (
-                f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
-            )
             try:
                 state.mythologized_story.save_file()
             except Exception as e:

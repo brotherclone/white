@@ -33,7 +33,6 @@ years:
         - "Watching headlight patterns on the ceiling as a baby."
       emotional_landscape: "My room was yellow."
       choice_points: []
-
   1976:
     world_events:
       major:
@@ -61,7 +60,6 @@ years:
         - "A wooden staircase I think I fell down from."
       emotional_landscape: ["Odd sense of competition from parents"]
       choice_points: []
-
   1977:
     world_events:
       major:
@@ -92,7 +90,6 @@ years:
         - "I had a very vivid memory of flying at least hovering for a bit before landing under the dining room table, what if I believed this was just a dream?"
         - "I remember my Aunt telling me that calling a woman eating an ice cream cone was 'fat' and she explaining that it was hurtful. What if I didn't take this to heart?"
         - "What if I did build a fortress in the bushes on the side of the house?"
-
   1978:
     world_events:
       major:
@@ -127,7 +124,6 @@ years:
         - "What if I was hit by the truck and maimed?"
         - "What if I never had a sister?"
         - "What if I had a brother instead?"
-
   1979:
     world_events:
       major:
@@ -159,7 +155,6 @@ years:
         - "What if I never moved here?"
         - "What if I never saw Yellow Submarine?"
         - "What if I didn't develop a distaste for religion at such an early age?"
-
   1980:
     world_events:
       major:
@@ -183,6 +178,7 @@ years:
         - "My kindergarten class was in the post office"
         - "I walk home alone from the bus stop. One day a long, black sedan with a man and woman in it drives behind me, not passing going a few feet at a time. The people speak with an Eastern European accent and have matching bowl haircuts, and wear thick plastic sunglasses.Right around my driveway, my father catches all this and asks them what they are doing. They reply, 'We are looking at the black snake'."
         - "That winter I remember it being warm in December and playing outside, in the lot across from my house there was a patch of wild strawberries. I would play Pepperland and eat the strawberries. One morning, I guess have been December 9th, I heard my mother screaming. When I got to the house she was sobbing 'they shot him, they shot him'. I didn't understand. It was only later I learned that John Lennon had been shot."
+        - "We do a mock election in kindergarten, and I'm one of the only kids who voted for Carter - I begin to realize what shit bags people in Sussex are."
       influences:
         - "The beginning of many kinder-trauma movie viewings - starting with Han Solo being frozen"
       emotional_landscape:
@@ -191,7 +187,6 @@ years:
         - "What if I had been abducted or indoctrinated by the black snake people?"
         - "What if John Lennon wasn't shot?"
         - "What if I was more outgoing?"
-
   1981:
     world_events:
       major:
@@ -223,7 +218,6 @@ years:
       choice_points:
         - "My mom makes a play date with a kid down the street and we become friends - although he teased my forever 'can you play with my little boy?' - What if my mom didn't foist me on other kids?"
         - "There's an empty lot next to our house in which I find tiny 'dens' made from straw and grass. Inside there's a $20 bill. This happens three times and I'm convinced it's a leprechaun fue to big misunderstand about a distant relative being in 'A Leprechaun's Christmas Gold'"
-
   1982:
     world_events:
       major:
@@ -255,7 +249,6 @@ years:
         - "As a present I received the electro-mechanical board game called Dark Tower - this ended up having a big impact on both my creative and professional work - always trying to blend the physical and the digital. What if I never played this game?"
         - "I did all the boy stuff like scouts and little league - but was horrible at both - further isolating me, what if I took to these activities better?"
         - "I brought in a Cookie O'Puss for St. Patrick's Day at school and gave the ice cream cone nose to the 'scum bag' girl. All the kids hated me for it - but later my wife said that story is what made her love me. What if I gave the nose to a popular kid?"
-
   1983:
     world_events:
       major:
@@ -285,7 +278,6 @@ years:
       choice_points:
         - "What if I hadn't been interested in computers?"
         - "What if I had tried to live up to my teachers' assessment of being outgoing?"
-
   1984:
     world_events:
       major:
@@ -315,8 +307,6 @@ years:
       choice_points:
         - "What if I hadn't had these tastes of the occult and fantasy?"
         - "What if I had stayed in touch with Theresa, eventually marrying her?"
-
-  # ToDo: Fill in 1985
   1985:
     world_events:
       major:
@@ -337,17 +327,14 @@ years:
     personal_context:
       summary: "Age 10 - late childhood sophistication"
       key_events:
-        - "Double-digit milestone"
-        - "Cultural sophistication development"
+        - "I have an outburst in class where after girls were talking with the teacher about Michael Jackson gay speculation I said I didn't care about his sex life."
       influences:
-        - "Back to the Future time concepts"
-        - "Nintendo generation begins"
-      emotional_landscape: "Complexity and time awareness developing"
+        - "Oddly into drawing Tiki and surf characters"
+        - "Paid close attention to the billboard top 20?"
+      emotional_landscape:
+       - "Beginning to feel awkward about social interactions"
       choice_points:
-        - "Video game engagement level"
-        - "Music taste development"
-
-  # ToDo: Fill in 1986
+        - "What if I hadn't had that outburst in class?"
   1986:
     world_events:
       major:
@@ -368,16 +355,15 @@ years:
     personal_context:
       summary: "Age 11 - pre-adolescent transition"
       key_events:
-        - "Social complexity increasing"
-        - "Identity questions emerging"
+        - "Was suddenly ignored by a kid I thought was a close friend."
+        - "Middle school locker room torture"
       influences:
-        - "Disaster awareness via media"
-        - "Pop culture sophistication"
-      emotional_landscape: "Transitional awareness and complexity"
+        - "Disaster awareness from Challenger disaster"
+      emotional_landscape:
+       - "Real lonely outcast feelings here"
       choice_points:
-        - "Social group alignments"
-        - "Interest specialization"
-
+        - "What if I got into a fist fight after the friend rejection?"
+        - "What if I stood up to the locker room bullies?"
   1987:
     world_events:
       major:
@@ -409,9 +395,6 @@ years:
       choice_points:
         - "What if I never bought TMNT #1? The whole notion of DIY culture might have been lost on me."
         - "What if I hadn't gone to the UK with my Dad? I might not have gained a sense of independence from my parents."
-
-
-  # ToDo: Fill in 1988
   1988:
     world_events:
       major:
@@ -432,13 +415,16 @@ years:
     personal_context:
       summary: "Age 13 - full adolescence emergence"
       key_events:
-        - "Parent's divorce"
+        - "Before my Dad goes on a chaperoning trip to France, he buys me a VGA graphics card. My mom is very upset by this and refuses to say goodbye to him. I can see he's really hurt as he leaves."
+        - "During a party that summer my Dad has the gaul to invite his girlfriend to a family party. They must have started their relationship in France and I can't help but blame myself for causing the fight between my parents with the graphics card incident. The adults at the part get SUPER drunk and my dad tries to carry Lois into the pool and falls off the deck stairs causing a big scene. I sense something terrible is happening and ask if I sleep in my parents bed (no idea why - I hadn't done this in years) in a very drunken stupor my dad comes into the room and tells me all the men in the family have been alcholoics and that I was doomed to repeat if I wasn't careful."
       influences:
+        - "PC building/customization"
+        - "Monty Python on PBS"
+        - "The Who"
       emotional_landscape:
+        - "Racked with guilt and fear I begin to regress and turn inward."
       choice_points:
-
-
-  # ToDo: Fill in 1989
+        - "What if I hadn't bought the graphics card?"
   1989:
     world_events:
       major:
@@ -459,10 +445,16 @@ years:
     personal_context:
       summary: "Age 14 - high school preparation"
       key_events:
-        - "Paralysis"
+        - "My parents get divorced and my mother becomes very hostile towards me, saying things like 'you're just like your father'."
+        - "The stress of homelife is too much and I become nearly paralyzed through either a muscle virus or a psychosomatic back pain."
       influences:
+        - "TV re-runs"
+        - "Staying home alone"
       emotional_landscape:
+        - "Guilt and inner hatred for myself."
       choice_points:
+        - "What if I had just gone to live with my Dad?"
+        - "What if I went to therapy?"
 
 
   # ToDo: Fill in 1990
