@@ -94,13 +94,17 @@ def test_create_portrait_sets_portrait_and_portrait_artifact(monkeypatch, tmp_pa
     char.create_portrait()
 
     assert char.portrait is not None
-    assert char.portrait.file_path == png_path
+    # file_path is now computed from base_path/thread_id/file_type
+    expected_file_path = str(tmp_path / "thread-1" / "png")
+    assert char.portrait.file_path == expected_file_path
     assert char.portrait_artifact is not None
     assert char.portrait_artifact.image is char.portrait
     # for_prompt should include character name and image path
     prompt = char.portrait_artifact.for_prompt()
     assert "Crazed Detective" in prompt or "Detective" in prompt
-    assert "composite.png" in prompt
+    # Should include the auto-generated filename (artifact_id_color_name.ext)
+    assert ".png" in prompt
+    assert char.portrait.file_name in prompt
 
 
 def test_encounter_to_markdown_includes_portrait_line():

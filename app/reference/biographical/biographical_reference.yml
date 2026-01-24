@@ -395,9 +395,6 @@ years:
       choice_points:
         - "What if I never bought TMNT #1? The whole notion of DIY culture might have been lost on me."
         - "What if I hadn't gone to the UK with my Dad? I might not have gained a sense of independence from my parents."
-
-
-  # ToDo: Fill in 1988
   1988:
     world_events:
       major:
@@ -418,13 +415,16 @@ years:
     personal_context:
       summary: "Age 13 - full adolescence emergence"
       key_events:
-        - "Parent's divorce"
+        - "Before my Dad goes on a chaperoning trip to France, he buys me a VGA graphics card. My mom is very upset by this and refuses to say goodbye to him. I can see he's really hurt as he leaves."
+        - "During a party that summer my Dad has the gaul to invite his girlfriend to a family party. They must have started their relationship in France and I can't help but blame myself for causing the fight between my parents with the graphics card incident. The adults at the part get SUPER drunk and my dad tries to carry Lois into the pool and falls off the deck stairs causing a big scene. I sense something terrible is happening and ask if I sleep in my parents bed (no idea why - I hadn't done this in years) in a very drunken stupor my dad comes into the room and tells me all the men in the family have been alcholoics and that I was doomed to repeat if I wasn't careful."
       influences:
+        - "PC building/customization"
+        - "Monty Python on PBS"
+        - "The Who"
       emotional_landscape:
+        - "Racked with guilt and fear I begin to regress and turn inward."
       choice_points:
-
-
-  # ToDo: Fill in 1989
+        - "What if I hadn't bought the graphics card?"
   1989:
     world_events:
       major:
@@ -445,10 +445,16 @@ years:
     personal_context:
       summary: "Age 14 - high school preparation"
       key_events:
-        - "Paralysis"
+        - "My parents get divorced and my mother becomes very hostile towards me, saying things like 'you're just like your father'."
+        - "The stress of homelife is too much and I become nearly paralyzed through either a muscle virus or a psychosomatic back pain."
       influences:
+        - "TV re-runs"
+        - "Staying home alone"
       emotional_landscape:
+        - "Guilt and inner hatred for myself."
       choice_points:
+        - "What if I had just gone to live with my Dad?"
+        - "What if I went to therapy?"
 
 
   # ToDo: Fill in 1990

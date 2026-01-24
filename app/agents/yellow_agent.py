@@ -425,8 +425,7 @@ Your response should be a SongProposalIteration with:
                 encounter.base_path = os.getenv(
                     "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                 )
-                # Recalculate file_path based on new base_path
-                encounter.make_artifact_path()
+                # Note: file_path is now a computed property, automatically updated
                 state.encounter_narrative_artifact = encounter
                 # Save the mock artifact to chain_artifacts
                 encounter.save_file()
