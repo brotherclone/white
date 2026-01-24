@@ -59,16 +59,12 @@ class ChainArtifact(BaseModel, ABC):
         default=None,
         description="Generated file name of the artifact. Do not set manually.",
     )
-    file_path: Optional[str] = Field(
-        default=None, description="File path of the artifact."
-    )
 
     def __init__(self, **data):
         super().__init__(**data)
         if self.artifact_id is None:
             self.artifact_id = str(uuid.uuid4())
         self.get_file_name()
-        self.make_artifact_path()
 
     @abstractmethod
     def save_file(self):
@@ -81,6 +77,13 @@ class ChainArtifact(BaseModel, ABC):
     @abstractmethod
     def for_prompt(self):
         pass
+
+    @property
+    def file_path(self) -> str:
+        """Computed property - always fresh from current base_path and thread_id"""
+        return os.path.join(
+            self.base_path, self.thread_id, self.chain_artifact_file_type.value
+        )
 
     def get_file_name(self):
         if self.rainbow_color_mnemonic_character_value is None:
@@ -113,8 +116,3 @@ class ChainArtifact(BaseModel, ABC):
             os.makedirs(dir_path, exist_ok=True)
 
         return path
-
-    def make_artifact_path(self):
-        self.file_path = os.path.join(
-            self.base_path, self.thread_id, self.chain_artifact_file_type.value
-        )

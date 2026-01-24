@@ -27,6 +27,16 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def _get_thread_artifact_base_path(thread_id: str | None = None) -> str:
+    """Get base path with thread_id appended if provided."""
+    base = _get_agent_work_product_base_path()
+    if thread_id:
+        return os.path.join(base, thread_id)
+    else:
+        logger.warning("No thread_id provided - using base directory only")
+        return base
+
+
 def _get_agent_work_product_base_path() -> str:
     """Return a safe base path for agent work products; fall back to cwd if env var missing."""
     bp = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
@@ -463,10 +473,10 @@ def get_audio_segments_as_chain_artifacts(
     artifacts = []
     for idx, (seg, sr, wav_path) in enumerate(selected, start=1):
         artifact = AudioChainArtifactFile(
-            thread_id=thread_id,
+            thread_id=thread_id or "UNKNOWN_THREAD_ID",
             audio_bytes=seg.tobytes(),
             artifact_name=f"segment_{idx}.wav",
-            base_path=_get_agent_work_product_base_path(),
+            base_path=_get_thread_artifact_base_path(thread_id),
             rainbow_color_mnemonic_character_value=rainbow_color_mnemonic_character_value,
             chain_artifact_file_type=ChainArtifactFileType.AUDIO,
             artifact_path=wav_path,
@@ -560,9 +570,9 @@ def create_audio_mosaic_chain_artifact(
         return None
     mosaic = np.concatenate(collected_segments)[:target_samples]
     artifact = AudioChainArtifactFile(
-        thread_id=thread_id,
+        thread_id=thread_id or "UNKNOWN_THREAD_ID",
         audio_bytes=mosaic.tobytes(),
-        base_path=_get_agent_work_product_base_path(),
+        base_path=_get_thread_artifact_base_path(thread_id),
         rainbow_color_mnemonic_character_value=getattr(
             segments[0], "rainbow_color_mnemonic_character_value", None
         ),
@@ -623,8 +633,8 @@ def create_blended_audio_chain_artifact(
         blend = 0.0
 
     artifact = AudioChainArtifactFile(
-        thread_id=thread_id,
-        base_path=mosaic.base_path,
+        thread_id=thread_id or "UNKNOWN_THREAD_ID",
+        base_path=_get_thread_artifact_base_path(thread_id),
         audio_bytes=mosaic.audio_bytes,
         rainbow_color_mnemonic_character_value=mosaic.rainbow_color_mnemonic_character_value,
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,

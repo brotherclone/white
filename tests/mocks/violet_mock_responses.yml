@@ -1,4 +1,7 @@
 responses:
-  - Somtimes? Not really dicks are gross.
-  - Maple.
-  - It's kinda of a cosmic gumbo.
+  - question_number: 1
+    response: "Somtimes? Not really dicks are gross."
+  - question_number: 2
+    response: "Maple."
+  - question_number: 3
+    response: "It's kinda of a cosmic gumbo."

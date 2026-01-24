@@ -56,7 +56,7 @@ class EVPArtifact(ChainArtifact, ABC):
         if self.noise_blended_audio is not None:
             logger.info(f"Saving blended to: {self.noise_blended_audio.base_path}")
             self.noise_blended_audio.save_file()
-        if self.base_path is None:
+        if self.base_path is None or self.thread_id not in str(self.base_path):
             self.base_path = os.path.join(
                 os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"), self.thread_id
             )

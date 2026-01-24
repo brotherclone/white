@@ -1,0 +1,17 @@
+artifact_id: 6ddd9aee-2913-4009-9ae7-8cd72c308c5c
+artifact_name: mock_gonzo_headline
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1988-04-01'
+file_name: 6ddd9aee-2913-4009-9ae7-8cd72c308c5c_t_mock_gonzo_headline.yml
+headline: Mock Gonzo Headline
+location: Newton, NJ
+rainbow_color_mnemonic_character_value: T
+source: Mock Source
+tags:
+- mock
+text: This is the mock gonzo article.
+thread_id: t1
