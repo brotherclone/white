@@ -60,7 +60,6 @@ character_images:
       thread_id: "mock_thread_001"
       file_name: "portrait_one.png"
       base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
-      file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_one.png"
       width: 100
       height: 100
   - thread_id: "mock_thread_001"
@@ -78,7 +77,6 @@ character_images:
       thread_id: "mock_thread_001"
       file_name: "portrait_two.png"
       base_path: "/Volumes/LucidNonsense/White/tests/mocks/"
-      file_path: "/Volumes/LucidNonsense/White/tests/mocks/mock_thread_001/png/portrait_two.png"
       width: 100
       height: 100
 rooms:

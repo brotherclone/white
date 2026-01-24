@@ -341,11 +341,11 @@ class PulsarPalaceCharacter(BaseModel):
             width, height = img.size
 
         # Create the low-level image artifact
+        # Don't pass file_path - it will be computed from base_path + thread_id + file_type
         self.portrait = ImageChainArtifactFile(
             thread_id=self.thread_id,
             file_name=portrait_filename,
             base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-            file_path=png,
             width=width,
             height=height,
         )

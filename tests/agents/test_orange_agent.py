@@ -159,6 +159,7 @@ def test_select_symbolic_object_non_mock(monkeypatch):
         symbolic_object=SimpleNamespace(
             name="Strange Compass", symbolic_object_category="instrument"
         ),
+        gonzo_intensity=3,
     )
 
     result = OrangeAgent.select_symbolic_object(dummy_self, state)
@@ -250,7 +251,11 @@ def test_gonzo_rewrite_node_mock(monkeypatch, tmp_path):
     }
     (tmp_path / "orange_gonzo_rewrite.yml").write_text(yaml.safe_dump(mock_article))
 
-    state = SimpleNamespace(thread_id="t1", artifacts=[])
+    state = SimpleNamespace(
+        thread_id="t1",
+        artifacts=[],
+        synthesized_story={"headline": "Mock", "text": "Mock story"},
+    )
     state.gonzo_perspective = "first-person"
     state.gonzo_intensity = 2
 
@@ -266,19 +271,16 @@ def test_gonzo_rewrite_node_mock(monkeypatch, tmp_path):
 def test_gonzo_rewrite_node_non_mock(monkeypatch):
     monkeypatch.setenv("MOCK_MODE", "false")
 
-    # fake anthropic response
+    # fake LLM response
     gonzo_text = "Gonzo rewritten content with vivid paranoia."
 
-    class FakeContent:
+    class FakeLLMResponse:
         def __init__(self, text):
-            self.text = text
+            self.content = text
 
-    class FakeResponse:
-        def __init__(self, text):
-            self.content = [FakeContent(text)]
-
-    fake_messages = SimpleNamespace(create=lambda **kwargs: FakeResponse(gonzo_text))
-    fake_anthropic_client = SimpleNamespace(messages=fake_messages)
+    fake_llm = SimpleNamespace(
+        invoke=lambda messages, **kwargs: FakeLLMResponse(gonzo_text)
+    )
 
     captured = {}
 
@@ -301,11 +303,12 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
             return self._data[key]
 
         def __iter__(self):
-            # exclude 'text' so that `**story` won't pass it as a kwarg
-            return (k for k in self._data.keys() if k != "text")
+            # exclude 'text' and 'thread_id' so that `**story` won't pass them as kwargs
+            # (they'll be passed explicitly by the calling code)
+            return (k for k in self._data.keys() if k not in ("text", "thread_id"))
 
         def __len__(self):
-            return len([k for k in self._data.keys() if k != "text"])
+            return len([k for k in self._data.keys() if k not in ("text", "thread_id")])
 
     story_data = {
         "thread_id": "t-100",
@@ -315,6 +318,7 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
         "text": "Original story text that will be rewritten.",
         "source": "Sussex Courier",
         "tags": ["weird"],
+        "symbolic_object_desc": "a mysterious compass",
     }
     fake_story = FakeStory(story_data)
 
@@ -336,9 +340,7 @@ def test_gonzo_rewrite_node_non_mock(monkeypatch):
 
     monkeypatch.setattr(orange_mod, "NewspaperArtifact", FakeNewspaper)
 
-    dummy_self = SimpleNamespace(
-        corpus=fake_corpus, anthropic_client=fake_anthropic_client
-    )
+    dummy_self = SimpleNamespace(corpus=fake_corpus, llm=fake_llm)
 
     state = SimpleNamespace(
         thread_id="t-100",

@@ -24,6 +24,7 @@ EXPECTED = {
     "KATHERINE": "Katherine Koherence",
     "BUSAYO": "Busayo Oninla",
     "ALOY": "Aloysius Fortune",
+    "SILAS": "Silas Walsh",
 }
 
 
@@ -49,6 +50,8 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("Gabriel Walsh", RainbowPlayer.GABE),
         ("Josh Plotner", RainbowPlayer.JOSH),
         ("Remez", RainbowPlayer.REMEZ),
+        ("Marvin Muoneké", RainbowPlayer.MARVIN),
+        ("Silas Walsh", RainbowPlayer.SILAS),
     ],
 )
 def test_lookup_by_value(value, member):
@@ -73,3 +76,4 @@ def test_values_are_unique():
 def test_enum_members_are_enum_instances():
     assert isinstance(RainbowPlayer.GABE, enum.Enum)
     assert isinstance(RainbowPlayer.GRAHAM, enum.Enum)
+    assert isinstance(RainbowPlayer.SILAS, enum.Enum)
