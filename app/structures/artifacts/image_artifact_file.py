@@ -70,12 +70,12 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
                 "Set the image_bytes attribute before calling save_file()."
             )
 
-        if self.base_path:
-            file_path_obj = Path(self.base_path) / "png"
-            file_path_obj.mkdir(parents=True, exist_ok=True)
-            file_path = file_path_obj / self.file_name
-        else:
-            file_path = Path(self.file_name)
+        # Use the computed file_path property from base class
+        # This already includes base_path/thread_id/png
+        file_path_obj = Path(self.file_path)
+        file_path_obj.mkdir(parents=True, exist_ok=True)
+        file_path = file_path_obj / self.file_name
+
         with open(file_path, "wb") as f:
             f.write(self.image_bytes)
 
