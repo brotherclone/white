@@ -2434,7 +2434,8 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             logger.error(f"Chromatic synthesis LLM call failed: {e}")
             return f"Chromatic synthesis unavailable: {e}"
 
-    def _format_transformation_traces(self, traces: List[TransformationTrace]) -> str:
+    @staticmethod
+    def _format_transformation_traces(traces: List[TransformationTrace]) -> str:
         """Format transformation traces for prompts."""
         if not traces:
             return "No transformation traces recorded."
@@ -2623,13 +2624,23 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             return artifact.get("content") or artifact.get("narrative") or ""
 
         # Try multiple content fields
-        for field in ["content", "narrative", "text", "description"]:
+        for field in ["content", "narrative", "text", "description", "title"]:
             if hasattr(artifact, field):
-                content = getattr(artifact, field)
-                if content:
-                    return str(content)
+                try:
+                    content = getattr(artifact, field)
+                    if content and isinstance(content, str):
+                        return content
+                except Exception:
+                    continue
 
-        return str(artifact)
+        # Last resort - try to get artifact_name or type, avoid str() on full object
+        try:
+            if hasattr(artifact, "artifact_name"):
+                return str(getattr(artifact, "artifact_name", ""))
+        except Exception:
+            pass
+
+        return ""  # Return empty string instead of str(artifact) which might hang
 
     def _find_resonant_agents(
         self,
@@ -2851,42 +2862,71 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         """
         artifacts = state.artifacts
         if not artifacts:
+            logger.info("🔗 No artifacts to build relationships for")
             return
 
+        logger.info(f"🔗 Processing {len(artifacts)} artifacts...")
         relationships = []
 
-        for artifact in artifacts:
-            artifact_id = self._get_artifact_id(artifact)
-            artifact_type = self._get_artifact_type(artifact)
-            artifact_content = self._get_artifact_content(artifact)
+        for idx, artifact in enumerate(artifacts):
+            try:
+                logger.info(f"🔗   Processing artifact {idx+1}/{len(artifacts)}")
+                artifact_id = self._get_artifact_id(artifact)
+                logger.info(f"🔗     ID: {artifact_id}")
 
-            # Find resonances
-            resonant_agents = self._find_resonant_agents(
-                artifact, artifact_type, artifact_content, state
-            )
+                artifact_type = self._get_artifact_type(artifact)
+                logger.info(f"🔗     Type: {artifact_type}")
 
-            # Find entanglements
-            entangled_with = self._find_entangled_artifacts(
-                artifact, artifact_id, artifacts
-            )
+                artifact_content = self._get_artifact_content(artifact)
+                logger.info(f"🔗     Content length: {len(artifact_content)}")
 
-            # Analyze temporal depth
-            temporal_depth = self._analyze_temporal_depth(
-                artifact, artifact_type, state
-            )
+                # Find resonances
+                logger.info("🔗     Finding resonant agents...")
+                resonant_agents = self._find_resonant_agents(
+                    artifact, artifact_type, artifact_content, state
+                )
+                logger.info(f"🔗     Resonant agents: {resonant_agents}")
 
-            # Extract semantic tags
-            semantic_tags = self._extract_semantic_tags(artifact_type, artifact_content)
+                # Find entanglements
+                logger.info("🔗     Finding entanglements...")
+                entangled_with = self._find_entangled_artifacts(
+                    artifact, artifact_id, artifacts
+                )
+                logger.info(f"🔗     Entangled with: {len(entangled_with)} artifacts")
 
-            relationship = ArtifactRelationship(
-                artifact_id=artifact_id,
-                resonant_agents=resonant_agents,
-                entangled_with=entangled_with,
-                temporal_depth=temporal_depth,
-                semantic_tags=semantic_tags,
-            )
+                # Analyze temporal depth
+                logger.info("🔗     Analyzing temporal depth...")
+                temporal_depth = self._analyze_temporal_depth(
+                    artifact, artifact_type, state
+                )
+                logger.info(
+                    f"🔗     Temporal depth keys: {list(temporal_depth.keys())}"
+                )
 
-            relationships.append(relationship)
+                # Extract semantic tags
+                logger.info("🔗     Extracting semantic tags...")
+                semantic_tags = self._extract_semantic_tags(
+                    artifact_type, artifact_content
+                )
+                logger.info(f"🔗     Semantic tags: {semantic_tags}")
+
+                relationship = ArtifactRelationship(
+                    artifact_id=artifact_id,
+                    resonant_agents=resonant_agents,
+                    entangled_with=entangled_with,
+                    temporal_depth=temporal_depth,
+                    semantic_tags=semantic_tags,
+                )
+
+                relationships.append(relationship)
+                logger.info(f"🔗   ✓ Completed artifact {idx+1}/{len(artifacts)}")
+
+            except Exception as e:
+                logger.error(
+                    f"🔗   ✗ Error processing artifact {idx+1}: {e}", exc_info=True
+                )
+                # Continue processing other artifacts even if one fails
+                continue
 
         state.artifact_relationships = relationships
         logger.info(f"🔗 Built {len(relationships)} artifact relationships")

@@ -64,7 +64,9 @@ class ChainArtifact(BaseModel, ABC):
         super().__init__(**data)
         if self.artifact_id is None:
             self.artifact_id = str(uuid.uuid4())
-        self.get_file_name()
+        # Only auto-generate filename if not explicitly provided
+        if self.file_name is None:
+            self.get_file_name()
 
     @abstractmethod
     def save_file(self):
