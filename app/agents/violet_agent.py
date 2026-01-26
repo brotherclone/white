@@ -438,6 +438,8 @@ Keep response 2-4 sentences. Output as JSON:
         persona = state.interviewer_persona
         # Create structured artifact
         artifact = CircleJerkInterviewArtifact(
+            thread_id=state.thread_id,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
             name=f"{persona.first_name}_{persona.last_name}_interview",
             interviewer_name=f"{persona.first_name} {persona.last_name}",
             publication=persona.publication,
@@ -449,8 +451,8 @@ Keep response 2-4 sentences. Output as JSON:
             create_dirs=True,
         )
         try:
-            artifact.generate_file()
-            logger.info(f"   Transcript saved: {artifact.get_file_path()}")
+            artifact.save_file()
+            logger.info(f"   Transcript saved: {artifact.get_artifact_path()}")
         except Exception as e:
             logger.error(f"Failed to save transcript: {e}")
         state.circle_jerk_interview = artifact
