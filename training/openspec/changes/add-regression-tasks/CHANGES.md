@@ -165,18 +165,51 @@ The extensions are successful when:
 6. FastAPI endpoint responds <500ms
 7. White Agent workflow successfully gates concepts
 
-## Next Actions
+## Implementation Status
 
-1. ✅ Augment OpenSpec files (COMPLETE)
-2. Begin Section 14 implementation (Rainbow Table heads)
-3. Generate soft targets from existing annotations
-4. Train multi-task model with 10 outputs
-5. Deploy validation API
-6. Integrate with White Agent workflow
-7. Tune thresholds based on A/B testing
+### COMPLETED (86/89 tasks - 97%)
+
+1. ✅ Augment OpenSpec files
+2. ✅ Section 14: Rainbow Table heads (`models/rainbow_table_regression_head.py`)
+3. ✅ Section 11: Soft target generation (`core/regression_training.py`)
+4. ✅ Section 10: Concept validator API (`validate_concepts.py`)
+5. ✅ Section 12: Transmigration analysis (`models/transmigration.py`)
+6. ✅ Section 13: Album prediction (`models/album_prediction.py`)
+7. ✅ Section 6: Uncertainty estimation (`models/uncertainty.py`)
+8. ✅ Section 5.6.5/11.5: Human-in-the-loop annotation (`tools/annotation_cli.py`, `notebooks/annotation_interface.ipynb`)
+9. ✅ Documentation complete (`docs/regression_metrics.md`, `docs/multitask_learning.md`, etc.)
+
+### REMAINING (3 tasks)
+
+- [ ] 8.5 Run training and verify regression convergence (requires GPU)
+- [ ] 8.6 Compare multi-task vs single-task performance (requires training)
+- [ ] 10.12 Write integration tests with LangGraph workflow
+
+### CRITICAL FIX REQUIRED
+
+**Embedding Loading**: All training scripts currently use placeholder random embeddings:
+```python
+embedding = torch.randn(768)  # PLACEHOLDER - must load real embeddings
+```
+
+Before training produces meaningful results, must implement:
+1. Load embeddings from `training_data_embedded.parquet` (69GB)
+2. Match embeddings to segments by ID
+3. Handle missing embeddings gracefully
+
+**Affected Files**:
+- `train_phase_four.py` (line 231)
+- `validate_concepts.py` (line 164)
+- `core/regression_training.py` (line 156)
+
+### INCOMPLETE ALBUM MAPPINGS
+
+`validate_concepts.py` line 113-119 and `core/regression_training.py` line 323-329 have incomplete album mappings. Missing:
+- Violet: Past_Person_Known
+- Indigo: Present_Person_Forgotten
 
 ---
 
-*Generated: 2026-01-24*
+*Updated: 2026-01-26*
 *OpenSpec Version: Phase 4 Extensions*
-*Status: Specification Complete - Ready for Implementation*
+*Status: Code Complete - Awaiting Training Run*
