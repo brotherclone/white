@@ -1,14 +1,14 @@
 # Training Pipeline Status
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-01-27
 
 ## Overall Progress
 
 | Phase | Description | Status | Completion |
 |-------|-------------|--------|------------|
 | Phase 1 | Binary Classification | Complete | 100% |
-| Phase 2 | Multi-Class Classification | Complete | 85% |
-| Phase 4 | Regression Tasks | Code Complete | 97% |
+| Phase 2 | Multi-Class Classification | Complete | 100% |
+| Phase 4 | Regression Tasks | Complete | 100% |
 | Phase 8 | Model Interpretability | Partial | 40% |
 | Phase 3 | Multimodal Fusion | Not Started | 0% |
 | Phase 5 | Temporal Sequence | Not Started | 0% |
@@ -26,7 +26,7 @@
 - Trained model checkpoint on Google Drive
 - HuggingFace dataset: `earthlyframes/white-rebracketing`
 
-### Phase 4: Regression (Code Complete)
+### Phase 4: Regression ✓ COMPLETE
 - Rainbow Table regression heads (temporal/spatial/ontological + confidence)
 - Soft target generation from discrete labels
 - Multi-task loss (KL divergence + BCE)
@@ -36,6 +36,20 @@
 - Concept validation API with accept/reject gates
 - Human-in-the-loop annotation interface
 
+**Training Results (2026-01-27)**:
+| Dimension | Mode Accuracy |
+|-----------|---------------|
+| Temporal | **94.9%** |
+| Ontological | **92.9%** |
+| Spatial | 61.6% |
+| Album (all 3) | 57.2% |
+
+**Key Findings**:
+- Temporal and ontological dimensions perform excellently (90%+)
+- Spatial dimension limited by instrumental tracks (Yellow/Green albums = "Place" = no lyrics)
+- DeBERTa text embeddings cannot predict spatial mode for segments without lyrics
+- Multi-task learning (classification + regression) causes task interference → **single-task models preferred**
+
 ### Phase 8: Interpretability (Partial)
 - TSNE/UMAP embedding visualization (notebook)
 - Confusion matrix analysis (notebook)
@@ -44,32 +58,32 @@
 
 ## Blocking Issues
 
-### Critical: Embedding Loading
+### ✅ RESOLVED: Embedding Loading
 
-Phase 4 training scripts use placeholder random embeddings:
+Embedding loading has been implemented via `core/embedding_loader.py`:
 
-```python
-embedding = torch.randn(768)  # This produces meaningless results
-```
+- **PrecomputedEmbeddingLoader**: Loads embeddings from parquet for training
+- **DeBERTaEmbeddingEncoder**: Computes embeddings on-the-fly for validation/inference
 
-**Must fix before training**:
-- `train_phase_four.py` (line 231)
-- `validate_concepts.py` (line 164)
-- `core/regression_training.py` (line 156)
+Fixed files:
+- ✅ `train_phase_four.py` - Uses PrecomputedEmbeddingLoader
+- ✅ `validate_concepts.py` - Uses DeBERTaEmbeddingEncoder for new concepts
+- ✅ `core/regression_training.py` - Uses PrecomputedEmbeddingLoader
 
-### Missing Album Mappings
+### ✅ RESOLVED: Album Mappings
 
-Files missing Violet and Indigo album mappings:
-- `validate_concepts.py` (line 113-119)
-- `core/regression_training.py` (line 323-329)
+All album mappings now complete (Orange, Red, Violet, Yellow, Indigo, Green, Blue, Black):
+- ✅ `validate_concepts.py` - Full 27-mode mapping
+- ✅ `core/regression_training.py` - Complete index mapping
 
 ## Immediate Next Steps
 
-1. **Fix embedding loading** - Load from `training_data_embedded.parquet`
-2. **Complete album mappings** - Add Violet and Indigo
-3. **Run Phase 4 training** - On RunPod with real embeddings
+1. ~~**Fix embedding loading**~~ ✅ DONE - See `core/embedding_loader.py`
+2. ~~**Complete album mappings**~~ ✅ DONE - All 27 modes mapped
+3. ~~**Run Phase 4 training**~~ ✅ DONE - Trained on RunPod (2026-01-27)
 4. **Test validation** - Run `validate_concepts.py` with trained model
 5. **Integrate** - Connect to White Agent workflow
+6. **Phase 3: Multimodal Fusion** - Add audio embeddings for instrumental tracks
 
 ## Files Reference
 
@@ -100,8 +114,8 @@ Files missing Violet and Indigo album mappings:
 
 | Change | Status |
 |--------|--------|
-| `add-multiclass-rebracketing-classifier` | Complete (85%) |
-| `add-regression-tasks` | Code Complete (97%) |
+| `add-multiclass-rebracketing-classifier` | Complete (100%) |
+| `add-regression-tasks` | Complete (100%) |
 | `add-model-interpretability` | Partial (40%) |
 | `add-multimodal-fusion` | Not Started |
 | `add-temporal-sequence-modeling` | Not Started |

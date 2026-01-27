@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Phase 4: Regression Tasks Training Script
-Uses runtime soft target generation - no parquet changes needed!
+Uses runtime soft target generation with pre-computed DeBERTa embeddings.
 """
 
 import torch
@@ -10,10 +10,14 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 import numpy as np
-from typing import Dict, List
+from pathlib import Path
+from typing import Dict, List, Optional
 import wandb
 from sklearn.metrics import mean_absolute_error
 from scipy.stats import pearsonr
+
+# Import embedding loader
+from core.embedding_loader import PrecomputedEmbeddingLoader, find_embedding_file
 
 # ============================================================================
 # CONFIGURATION
@@ -22,7 +26,7 @@ from scipy.stats import pearsonr
 CONFIG = {
     "data": {
         "parquet_path": "/mnt/user-data/uploads/base_manifest_db.parquet",
-        "embeddings_path": None,  # Will load from your 69GB file if needed
+        "embeddings_path": "/mnt/user-data/uploads/training_data_with_embeddings.parquet",
         "label_smoothing": 0.1,
         "train_split": 0.8,
         "batch_size": 32,
@@ -126,9 +130,18 @@ class SoftTargetGenerator:
 class RainbowTableRegressionDataset(Dataset):
     """Dataset for regression training with runtime soft target generation"""
 
-    def __init__(self, parquet_path: str, label_smoothing: float = 0.1):
+    def __init__(
+        self,
+        parquet_path: str,
+        embeddings_path: Optional[str] = None,
+        label_smoothing: float = 0.1,
+    ):
         self.df = pd.read_parquet(parquet_path)
         self.target_generator = SoftTargetGenerator(label_smoothing)
+
+        # Load embeddings
+        self.embedding_loader = None
+        self._load_embeddings(embeddings_path, parquet_path)
 
         print(f"Loaded {len(self.df)} segments")
         print(f"  Albums: {self.df['rainbow_color'].value_counts().to_dict()}")
@@ -142,6 +155,34 @@ class RainbowTableRegressionDataset(Dataset):
             f"  Ontological: {self.df['rainbow_color_ontological_mode'].value_counts().to_dict()}"
         )
 
+    def _load_embeddings(self, embeddings_path: Optional[str], parquet_path: str):
+        """Load pre-computed embeddings from parquet file."""
+        # Try explicit embeddings path first
+        if embeddings_path and Path(embeddings_path).exists():
+            print(f"Loading embeddings from: {embeddings_path}")
+            self.embedding_loader = PrecomputedEmbeddingLoader(embeddings_path)
+            return
+
+        # Try to find embeddings in the same directory as parquet
+        data_dir = Path(parquet_path).parent
+        embedding_file = find_embedding_file(data_dir)
+        if embedding_file:
+            self.embedding_loader = PrecomputedEmbeddingLoader(embedding_file)
+            return
+
+        # Check if parquet itself has embeddings
+        if "embedding" in self.df.columns:
+            print("Using embeddings from main parquet file")
+            # Create a simple wrapper that uses df directly
+            self._use_inline_embeddings = True
+            return
+
+        # No embeddings found - warn but continue
+        print("WARNING: No embedding file found!")
+        print("  Training will use random embeddings (results will be meaningless)")
+        print("  Expected file: training_data_with_embeddings.parquet")
+        self._use_inline_embeddings = False
+
     def __len__(self):
         return len(self.df)
 
@@ -151,9 +192,16 @@ class RainbowTableRegressionDataset(Dataset):
         # Generate soft targets
         targets = self.target_generator.generate_targets(row)
 
-        # For now, use random embeddings as placeholder
-        # TODO: Load actual embeddings from your 69GB file
-        embedding = torch.randn(768)  # Replace with real embeddings
+        # Load embedding
+        if self.embedding_loader is not None:
+            embedding = self.embedding_loader.get_embedding_by_idx(idx)
+            embedding = torch.tensor(embedding, dtype=torch.float32)
+        elif hasattr(self, "_use_inline_embeddings") and self._use_inline_embeddings:
+            embedding = np.array(row["embedding"], dtype=np.float32)
+            embedding = torch.tensor(embedding, dtype=torch.float32)
+        else:
+            # Fallback to random (should not happen in production)
+            embedding = torch.randn(768)
 
         return {
             "embedding": embedding,
@@ -318,16 +366,26 @@ def predict_albums_from_scores(outputs):
         dim=-1
     )  # 0=Imagined, 1=Forgotten, 2=Known
 
-    # Map to albums (based on your data analysis)
-    # Past_Thing_Imagined=Orange, Present_Person_Forgotten=Blue, etc.
-    album_map = {
-        (0, 0, 0): 0,  # Past_Thing_Imagined → Orange
-        (0, 0, 2): 1,  # Past_Thing_Known → Red
-        (2, 1, 0): 2,  # Future_Place_Imagined → Yellow
-        (2, 1, 1): 3,  # Future_Place_Forgotten → Green
-        (1, 2, 1): 4,  # Present_Person_Forgotten → Blue
-        # Add Indigo mapping when you have it
-    }
+    # Map to albums based on Rainbow Table ontological modes
+    # Temporal: 0=Past, 1=Present, 2=Future
+    # Spatial: 0=Thing, 1=Place, 2=Person
+    # Ontological: 0=Imagined, 1=Forgotten, 2=Known
+    # Album indices: 0=Orange, 1=Red, 2=Violet, 3=Yellow, 4=Indigo, 5=Green, 6=Blue, 7=Black
+    album_map = {}
+    # Past (temporal=0)
+    for spatial in [0, 1, 2]:
+        album_map[(0, spatial, 0)] = 0  # Past + Imagined = Orange
+        album_map[(0, spatial, 1)] = 1  # Past + Forgotten = Red
+        album_map[(0, spatial, 2)] = 2  # Past + Known = Violet
+    # Present (temporal=1)
+    for spatial in [0, 1, 2]:
+        album_map[(1, spatial, 0)] = 3  # Present + Imagined = Yellow
+        album_map[(1, spatial, 1)] = 4  # Present + Forgotten = Indigo
+        album_map[(1, spatial, 2)] = 5  # Present + Known = Green
+    # Future (temporal=2) - all map to Blue
+    for spatial in [0, 1, 2]:
+        for ontological in [0, 1, 2]:
+            album_map[(2, spatial, ontological)] = 6  # Future = Blue
 
     albums = []
     for t, s, o in zip(temporal, spatial, ontological):
@@ -440,6 +498,7 @@ def main():
     print("\n📊 Loading dataset...")
     dataset = RainbowTableRegressionDataset(
         parquet_path=CONFIG["data"]["parquet_path"],
+        embeddings_path=CONFIG["data"]["embeddings_path"],
         label_smoothing=CONFIG["data"]["label_smoothing"],
     )
 
