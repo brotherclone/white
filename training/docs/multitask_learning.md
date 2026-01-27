@@ -2,6 +2,26 @@
 
 This document describes the multi-task learning framework for combining classification and regression in the Rainbow Pipeline.
 
+## Experimental Results (2026-01-27)
+
+> **TL;DR: Single-task models are preferred.** Multi-task learning causes task interference in our setting.
+
+| Approach | Classification | Temporal | Spatial | Ontological | Album |
+|----------|----------------|----------|---------|-------------|-------|
+| Single-task Classification | **100%** | - | - | - | - |
+| Single-task Regression | - | **94.9%** | 61.6% | **92.9%** | 57.2% |
+| Multi-task (both) | 100% | 52.1% | 52.1% | 57.6% | 52.1% |
+
+**Key Findings**:
+- Classification head dominates the shared representation when trained jointly
+- Regression heads drop to near-random performance (~52%) in multi-task setting
+- Task interference is severe despite gradient clipping and loss weighting
+- **Recommendation**: Train classification and regression as separate single-task models
+
+The spatial mode limitation (61.6%) is due to "Place" albums (Yellow/Green) being instrumental - no lyrics means no text signal for DeBERTa embeddings. This requires audio embeddings (Phase 3: Multimodal Fusion) to fix.
+
+---
+
 ## Overview
 
 The Rainbow Pipeline supports joint training of:
@@ -314,3 +334,14 @@ training:
 | Both tasks underperform | Task interference | Try sequential training |
 | Unstable training | Gradient scale mismatch | Use gradient normalization |
 | Slow convergence | Learning rate too low | Use task-specific LRs |
+| Regression drops to random | Classification dominates shared layers | **Use single-task models** |
+
+## When to Avoid Multi-Task Learning
+
+Based on our experiments (2026-01-27), multi-task learning may not be appropriate when:
+
+1. **Tasks have very different difficulty levels** - Our classification task achieves 100% easily, while regression is harder. The easy task dominates.
+2. **Shared representations aren't beneficial** - If tasks need different features, sharing hurts both.
+3. **One task has much stronger gradients** - Classification with cross-entropy loss produces strong gradients that overwhelm regression.
+
+In these cases, train separate single-task models and run inference sequentially.

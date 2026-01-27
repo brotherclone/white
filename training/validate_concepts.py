@@ -30,9 +30,13 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict
 from enum import Enum
 import sys
+import numpy as np
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
+
+# Import embedding encoder for inference
+from core.embedding_loader import DeBERTaEmbeddingEncoder
 
 
 # ============================================================================
@@ -110,12 +114,45 @@ class ConceptValidator:
     Runs separately from main workflow - no dependencies on LangGraph.
     """
 
+    # Album mapping based on the Rainbow Table ontological modes
+    # Temporal determines primary grouping, Ontological determines color
+    # See models/rainbow_table_regression_head.py for canonical mapping
     ALBUM_MAP = {
+        # Past + Imagined = Orange
         ("Past", "Thing", "Imagined"): "Orange",
-        ("Past", "Thing", "Known"): "Red",
-        ("Future", "Place", "Imagined"): "Yellow",
-        ("Future", "Place", "Forgotten"): "Green",
-        ("Present", "Person", "Forgotten"): "Blue",
+        ("Past", "Place", "Imagined"): "Orange",
+        ("Past", "Person", "Imagined"): "Orange",
+        # Past + Forgotten = Red
+        ("Past", "Thing", "Forgotten"): "Red",
+        ("Past", "Place", "Forgotten"): "Red",
+        ("Past", "Person", "Forgotten"): "Red",
+        # Past + Known = Violet
+        ("Past", "Thing", "Known"): "Violet",
+        ("Past", "Place", "Known"): "Violet",
+        ("Past", "Person", "Known"): "Violet",
+        # Present + Imagined = Yellow
+        ("Present", "Thing", "Imagined"): "Yellow",
+        ("Present", "Place", "Imagined"): "Yellow",
+        ("Present", "Person", "Imagined"): "Yellow",
+        # Present + Forgotten = Indigo
+        ("Present", "Thing", "Forgotten"): "Indigo",
+        ("Present", "Place", "Forgotten"): "Indigo",
+        ("Present", "Person", "Forgotten"): "Indigo",
+        # Present + Known = Green
+        ("Present", "Thing", "Known"): "Green",
+        ("Present", "Place", "Known"): "Green",
+        ("Present", "Person", "Known"): "Green",
+        # Future = Blue (all variations)
+        ("Future", "Thing", "Imagined"): "Blue",
+        ("Future", "Thing", "Forgotten"): "Blue",
+        ("Future", "Thing", "Known"): "Blue",
+        ("Future", "Place", "Imagined"): "Blue",
+        ("Future", "Place", "Forgotten"): "Blue",
+        ("Future", "Place", "Known"): "Blue",
+        ("Future", "Person", "Imagined"): "Blue",
+        ("Future", "Person", "Forgotten"): "Blue",
+        ("Future", "Person", "Known"): "Blue",
+        # Black = None/diffuse
         ("None", "None", "None"): "Black",
     }
 
@@ -140,13 +177,13 @@ class ConceptValidator:
         self.hybrid_threshold = hybrid_threshold
         self.diffuse_threshold = diffuse_threshold
 
-        # Load model
+        # Load regression model
         self.model = RegressionHead(
             input_dim=768, hidden_dim=256, dropout=0.0  # No dropout at inference
         )
 
         if Path(model_path).exists():
-            state_dict = torch.load(model_path, map_location=device)
+            state_dict = torch.load(model_path, map_location=device, weights_only=True)
             self.model.load_state_dict(state_dict)
             print(f"✅ Loaded model from {model_path}")
         else:
@@ -156,12 +193,25 @@ class ConceptValidator:
         self.model.to(device)
         self.model.eval()
 
+        # Initialize embedding encoder for computing embeddings from text
+        print("🔧 Initializing DeBERTa embedding encoder...")
+        self._embedding_encoder = None  # Lazy load to avoid slow startup
+
+    def _get_embedding_encoder(self) -> DeBERTaEmbeddingEncoder:
+        """Lazy load the embedding encoder."""
+        if self._embedding_encoder is None:
+            self._embedding_encoder = DeBERTaEmbeddingEncoder(device=self.device)
+        return self._embedding_encoder
+
     def validate_concept(self, concept_text: str) -> ValidationResult:
         """Validate a concept and return structured result"""
 
-        # TODO: Extract real features
-        # For now using random embedding as placeholder
-        embedding = torch.randn(1, 768).to(self.device)
+        # Compute embedding from text using DeBERTa
+        encoder = self._get_embedding_encoder()
+        embedding_np = encoder.encode(concept_text)
+        embedding = (
+            torch.tensor(embedding_np, dtype=torch.float32).unsqueeze(0).to(self.device)
+        )
 
         # Get predictions
         with torch.no_grad():
@@ -238,7 +288,6 @@ class ConceptValidator:
 
     def _detect_hybrid_states(self, temporal, spatial, ontological, confidence):
         """Detect hybrid/diffuse states"""
-        import numpy as np
 
         flags = []
 
@@ -290,7 +339,6 @@ class ConceptValidator:
 
     def _compute_transmigration_distances(self, temporal, spatial, ontological):
         """Compute distances to each album"""
-        import numpy as np
 
         distances = {}
 
