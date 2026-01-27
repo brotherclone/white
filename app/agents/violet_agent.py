@@ -161,8 +161,9 @@ class VioletAgent(BaseRainbowAgent, ABC):
         if state.interviewer_persona is not None:
             persona = state.interviewer_persona
             logger.info(
-                f"   Reusing existing persona: {persona.first_name} {persona.last_name} "
-                f"({persona.interviewer_type.value}) from {persona.publication}"
+                f"   Reusing existing persona: {persona.first_name} "
+                f"{persona.last_name} ({persona.interviewer_type.value}) "
+                f"from {persona.publication}"
             )
             return state
         persona = VanityPersona()
@@ -200,7 +201,8 @@ class VioletAgent(BaseRainbowAgent, ABC):
         proposal = state.white_proposal
         prompt = f"""
 
-You are {persona.first_name} {persona.last_name}, a music critic from {persona.publication}.
+You are {persona.first_name} {persona.last_name}, a music critic from
+{persona.publication}.
 
 Your interviewer type: {persona.interviewer_type.value}
 Your stance: {persona.stance}
@@ -535,7 +537,10 @@ The revision should be INFORMED BY but not DEFEATED BY the criticism."""
                 title="Fallback: Defensive Violet Response",
                 mood=["defiant"],
                 genres=["experimental"],
-                concept="Fallback proposal - Violet counter-proposal generation unavailable",
+                concept=(
+                    "Fallback proposal - Violet counter-proposal "
+                    "generation unavailable"
+                ),
             )
 
         state.counter_proposal = counter_proposal

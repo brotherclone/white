@@ -557,7 +557,7 @@ You are the Prism, the Architect of INFORMATION.
 All seven agents have contributed their unique lenses to this transmigration. You hold the complete chromatic spectrum:
 
 ⚫️ Black - ThreadKeepr's chaos and sigil work
-🔴 Red - The Light Reader's literary archaeology  
+🔴 Red - The Light Reader's literary archaeology
 🟠 Orange - Rows Bud's mythologized journalism
 🟡 Yellow - Lord Pulsimore's hypnagogic game mastery
 🟢 Green - Sub-Arbitrary's climate fiction observation
@@ -2331,8 +2331,8 @@ Structure your synthesis as the final creative brief before manifestation.
         prompt = f"""
 You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
 
-You have witnessed the complete chromatic cascade. Each agent shifted categorical 
-boundaries in their unique way:
+You have witnessed the complete chromatic cascade. Each agent shifted
+categorical boundaries in their unique way:
 
 ⚫️ BLACK (ThreadKeepr): CHAOS → ORDER, CONSCIOUS → UNCONSCIOUS
 🔴 RED (Light Reader): PAST/LITERARY → PRESENT/REAL, TEXT → TIME
@@ -2879,10 +2879,11 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         # Safety check: Prevent processing if count is impossibly high
         if actual_len > 1000:
             logger.error(
-                f"⚠️  CRITICAL: Artifact count is impossibly high: {actual_len:,}"
+                f"⚠️  CRITICAL: Artifact count is impossibly high: " f"{actual_len:,}"
             )
             logger.error(
-                "⚠️  This indicates a bug (possibly id() being returned instead of len())"
+                "⚠️  This indicates a bug (possibly id() being "
+                "returned instead of len())"
             )
             logger.error("⚠️  Expected < 100 artifacts per run")
             logger.error(f"⚠️  Artifact type: {type(artifacts)}")
@@ -3095,8 +3096,8 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         prompt = f"""
     You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
 
-    You have witnessed the complete chromatic cascade. Each agent shifted categorical 
-    boundaries in their unique way:
+    You have witnessed the complete chromatic cascade. Each agent shifted
+    categorical boundaries in their unique way:
 
     ⚫️ BLACK (ThreadKeepr): CHAOS → ORDER, CONSCIOUS → UNCONSCIOUS
     🔴 RED (Light Reader): PAST/LITERARY → PRESENT/REAL, TEXT → TIME
