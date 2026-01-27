@@ -6,19 +6,28 @@ Clean training pipeline for rebracketing classification. Designed for RunPod GPU
 
 ```
 training/
-├── core/
-│   └── pipeline.py          # Data loading and preprocessing
-├── models/
+├── core/                    # Core training components
+│   ├── pipeline.py          # Data loading & preprocessing
+│   └── multiclass_*.py      # Multiclass/multilabel support
+├── models/                  # Model architectures
 │   ├── text_encoder.py      # DeBERTa wrapper
-│   └── classifier.py        # Binary classifier head
-├── config.yml               # Training configuration (RunPod)
-├── train.py                 # Main training script
-├── test_setup.py           # Verify setup before training
-├── setup.sh                # RunPod environment setup
-├── train.sh                # RunPod training wrapper
-├── Dockerfile.runpod       # GPU container definition
-├── DEPLOYMENT.md           # Full deployment workflow
-└── requirements.txt         # Dependencies (Python 3.11)
+│   ├── classifier.py        # Binary classifier
+│   └── multiclass_*.py      # Multiclass/multilabel classifiers
+├── validation/              # Concept validation (Phase 4)
+├── visualization/           # Training visualization tools
+├── notebooks/               # Jupyter notebooks for analysis
+├── openspec/                # OpenSpec change proposals
+├── docs/                    # Documentation
+├── config.yml               # Binary classification config
+├── config_multiclass.yml    # Multiclass config
+├── config_multilabel.yml    # Multilabel config
+├── config_regression.yml    # Phase 4 regression config
+├── train.py                 # Main training script (Phases 1-3)
+├── train_phase_four.py      # Phase 4 regression training launcher
+├── train.sh                 # RunPod training wrapper
+├── validate_concepts.py     # Standalone concept validator (Phase 4)
+├── hf_dataset_prep.py       # HuggingFace dataset uploader
+└── requirements.txt         # Python dependencies
 ```
 
 ## Quick Start

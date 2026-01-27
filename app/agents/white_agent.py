@@ -260,7 +260,7 @@ class WhiteAgent(BaseModel):
                 "finish": "finalize_song_proposal",
             },
         )
-        # ⚪️  ⚫  ⚪️  🔴  ⚪️  🟠  ⚪️  🟡  ⚪️  🟢  ⚪ ️🔵  ⚪️  🩵  ⚪ ️🟣 ⚪️#
+        # ⚪️  ⚫  ⚪️  🔴  ⚪️  🟠  ⚪️  🟡  ⚪️  🟢  ⚪ ️🔵  ⚪️  🩵  ⚪ ️🟣  ⚪️#
         workflow.add_conditional_edges(
             "rewrite_proposal_with_synthesis",
             self.route_after_rewrite,
@@ -557,7 +557,7 @@ You are the Prism, the Architect of INFORMATION.
 All seven agents have contributed their unique lenses to this transmigration. You hold the complete chromatic spectrum:
 
 ⚫️ Black - ThreadKeepr's chaos and sigil work
-🔴 Red - The Light Reader's literary archaeology  
+🔴 Red - The Light Reader's literary archaeology
 🟠 Orange - Rows Bud's mythologized journalism
 🟡 Yellow - Lord Pulsimore's hypnagogic game mastery
 🟢 Green - Sub-Arbitrary's climate fiction observation
@@ -2150,15 +2150,12 @@ Structure your synthesis as the final creative brief before manifestation.
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         prompt_artifacts: List[str] = []
         for a in artifacts:
-            # Handle both artifact instances and dict representations
             if isinstance(a, dict):
                 artifact_type = a.get("chain_artifact_type")
                 if (
                     artifact_type == artifact_filter
                     or artifact_type == artifact_filter.value
                 ):
-                    # For dicts, extract relevant content directly
-                    # Different artifact types may have different content fields
                     content = a.get("content") or a.get("narrative") or str(a)
                     prompt_artifacts.append(content)
             else:
@@ -2334,8 +2331,8 @@ Structure your synthesis as the final creative brief before manifestation.
         prompt = f"""
 You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
 
-You have witnessed the complete chromatic cascade. Each agent shifted categorical 
-boundaries in their unique way:
+You have witnessed the complete chromatic cascade. Each agent shifted
+categorical boundaries in their unique way:
 
 ⚫️ BLACK (ThreadKeepr): CHAOS → ORDER, CONSCIOUS → UNCONSCIOUS
 🔴 RED (Light Reader): PAST/LITERARY → PRESENT/REAL, TEXT → TIME
@@ -2434,7 +2431,8 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             logger.error(f"Chromatic synthesis LLM call failed: {e}")
             return f"Chromatic synthesis unavailable: {e}"
 
-    def _format_transformation_traces(self, traces: List[TransformationTrace]) -> str:
+    @staticmethod
+    def _format_transformation_traces(traces: List[TransformationTrace]) -> str:
         """Format transformation traces for prompts."""
         if not traces:
             return "No transformation traces recorded."
@@ -2529,8 +2527,6 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         """
         if not boundaries_shifted:
             return "no refraction"
-
-        # Analyze types of boundaries
         temporal_keywords = ["past", "present", "future", "time", "temporal"]
         ontological_keywords = [
             "real",
@@ -2597,13 +2593,15 @@ through sound into a REAL, COMPLETE song ready for human implementation.
 
         logger.info(f"  🔺 Facet refraction: {refraction_angle}")
 
-    def _get_artifact_id(self, artifact: Any) -> str:
+    @staticmethod
+    def _get_artifact_id(artifact: Any) -> str:
         """Extract or generate artifact ID."""
         if isinstance(artifact, dict):
             return artifact.get("id", str(uuid4()))
         return getattr(artifact, "id", str(uuid4()))
 
-    def _get_artifact_type(self, artifact: Any) -> str:
+    @staticmethod
+    def _get_artifact_type(artifact: Any) -> str:
         """Extract artifact type."""
         if isinstance(artifact, dict):
             artifact_type = artifact.get("chain_artifact_type", "unknown")
@@ -2617,22 +2615,33 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             return artifact_type.value
         return str(artifact_type)
 
-    def _get_artifact_content(self, artifact: Any) -> str:
+    @staticmethod
+    def _get_artifact_content(artifact: Any) -> str:
         """Extract artifact content for analysis."""
         if isinstance(artifact, dict):
             return artifact.get("content") or artifact.get("narrative") or ""
 
         # Try multiple content fields
-        for field in ["content", "narrative", "text", "description"]:
+        for field in ["content", "narrative", "text", "description", "title"]:
             if hasattr(artifact, field):
-                content = getattr(artifact, field)
-                if content:
-                    return str(content)
+                try:
+                    content = getattr(artifact, field)
+                    if content and isinstance(content, str):
+                        return content
+                except Exception:
+                    continue
 
-        return str(artifact)
+        # Last resort - try to get artifact_name or type, avoid str() on full object
+        try:
+            if hasattr(artifact, "artifact_name"):
+                return str(getattr(artifact, "artifact_name", ""))
+        except Exception:
+            pass
 
+        return ""  # Return empty string instead of str(artifact) which might hang
+
+    @staticmethod
     def _find_resonant_agents(
-        self,
         artifact: Any,
         artifact_type: str,
         artifact_content: str,
@@ -2645,7 +2654,6 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         """
         resonant = []
 
-        # Type-based primary resonance
         type_to_agents = {
             "evp": ["black"],
             "evp_artifact": ["black"],
@@ -2663,7 +2671,6 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         primary_agents = type_to_agents.get(artifact_type.lower(), [])
         resonant.extend(primary_agents)
 
-        # Semantic resonance based on content keywords
         content_lower = artifact_content.lower()
 
         # Black: chaos, occult, hidden, ritual, sigil
@@ -2851,42 +2858,103 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         """
         artifacts = state.artifacts
         if not artifacts:
+            logger.info("🔗 No artifacts to build relationships for")
             return
 
+        # Safety check: Validate artifacts is actually a list
+        if not isinstance(artifacts, list):
+            logger.error(
+                f"⚠️  ERROR: state.artifacts is not a list! Type: {type(artifacts)}"
+            )
+            logger.error("⚠️  Skipping relationship building")
+            return
+
+        try:
+            actual_len = len(artifacts)
+        except Exception as e:
+            logger.error(f"🔗 ERROR: Cannot get len(artifacts): {e}")
+            logger.error("🔗 This indicates artifacts is corrupted")
+            return
+
+        # Safety check: Prevent processing if count is impossibly high
+        if actual_len > 1000:
+            logger.error(
+                f"⚠️  CRITICAL: Artifact count is impossibly high: " f"{actual_len:,}"
+            )
+            logger.error(
+                "⚠️  This indicates a bug (possibly id() being "
+                "returned instead of len())"
+            )
+            logger.error("⚠️  Expected < 100 artifacts per run")
+            logger.error(f"⚠️  Artifact type: {type(artifacts)}")
+            logger.error(f"⚠️  Object ID (for debugging): {hex(id(artifacts))}")
+            if actual_len > 0:
+                logger.error(f"⚠️  First item type: {type(artifacts[0])}")
+            logger.error("⚠️  Skipping relationship building to prevent infinite loop")
+            return
+
+        logger.info(f"🔗 Processing {actual_len} artifacts...")
         relationships = []
 
-        for artifact in artifacts:
-            artifact_id = self._get_artifact_id(artifact)
-            artifact_type = self._get_artifact_type(artifact)
-            artifact_content = self._get_artifact_content(artifact)
+        for idx, artifact in enumerate(artifacts):
+            try:
+                logger.info(f"🔗   Processing artifact {idx+1}/{len(artifacts)}")
+                artifact_id = self._get_artifact_id(artifact)
+                logger.info(f"🔗     ID: {artifact_id}")
 
-            # Find resonances
-            resonant_agents = self._find_resonant_agents(
-                artifact, artifact_type, artifact_content, state
-            )
+                artifact_type = self._get_artifact_type(artifact)
+                logger.info(f"🔗     Type: {artifact_type}")
 
-            # Find entanglements
-            entangled_with = self._find_entangled_artifacts(
-                artifact, artifact_id, artifacts
-            )
+                artifact_content = self._get_artifact_content(artifact)
+                logger.info(f"🔗     Content length: {len(artifact_content)}")
 
-            # Analyze temporal depth
-            temporal_depth = self._analyze_temporal_depth(
-                artifact, artifact_type, state
-            )
+                # Find resonances
+                logger.info("🔗     Finding resonant agents...")
+                resonant_agents = self._find_resonant_agents(
+                    artifact, artifact_type, artifact_content, state
+                )
+                logger.info(f"🔗     Resonant agents: {resonant_agents}")
 
-            # Extract semantic tags
-            semantic_tags = self._extract_semantic_tags(artifact_type, artifact_content)
+                # Find entanglements
+                logger.info("🔗     Finding entanglements...")
+                entangled_with = self._find_entangled_artifacts(
+                    artifact, artifact_id, artifacts
+                )
+                logger.info(f"🔗     Entangled with: {len(entangled_with)} artifacts")
 
-            relationship = ArtifactRelationship(
-                artifact_id=artifact_id,
-                resonant_agents=resonant_agents,
-                entangled_with=entangled_with,
-                temporal_depth=temporal_depth,
-                semantic_tags=semantic_tags,
-            )
+                # Analyze temporal depth
+                logger.info("🔗     Analyzing temporal depth...")
+                temporal_depth = self._analyze_temporal_depth(
+                    artifact, artifact_type, state
+                )
+                logger.info(
+                    f"🔗     Temporal depth keys: {list(temporal_depth.keys())}"
+                )
 
-            relationships.append(relationship)
+                # Extract semantic tags
+                logger.info("🔗     Extracting semantic tags...")
+                semantic_tags = self._extract_semantic_tags(
+                    artifact_type, artifact_content
+                )
+                logger.info(f"🔗     Semantic tags: {semantic_tags}")
+
+                relationship = ArtifactRelationship(
+                    artifact_id=artifact_id,
+                    resonant_agents=resonant_agents,
+                    entangled_with=entangled_with,
+                    temporal_depth=temporal_depth,
+                    semantic_tags=semantic_tags,
+                )
+
+                relationships.append(relationship)
+                logger.info(f"🔗   ✓ Completed artifact {idx+1}/{len(artifacts)}")
+
+            except Exception as e:
+                logger.error(
+                    f"🔗   ✗ Error processing artifact {idx+1}: {e}", exc_info=True
+                )
+                # Continue processing other artifacts even if one fails
+                continue
 
         state.artifact_relationships = relationships
         logger.info(f"🔗 Built {len(relationships)} artifact relationships")
@@ -3028,8 +3096,8 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         prompt = f"""
     You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
 
-    You have witnessed the complete chromatic cascade. Each agent shifted categorical 
-    boundaries in their unique way:
+    You have witnessed the complete chromatic cascade. Each agent shifted
+    categorical boundaries in their unique way:
 
     ⚫️ BLACK (ThreadKeepr): CHAOS → ORDER, CONSCIOUS → UNCONSCIOUS
     🔴 RED (Light Reader): PAST/LITERARY → PRESENT/REAL, TEXT → TIME
@@ -3074,137 +3142,3 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         except Exception as e:
             logger.error(f"Meta-rebracketing LLM call failed: {e}")
             return f"Meta-rebracketing unavailable: {e}"
-
-    def _generate_chromatic_synthesis(self, state: MainAgentState) -> str:
-        """
-        Final chromatic synthesis: integration document for human implementation.
-
-        This is the ultimate creative brief - INFORMATION made actionable through
-        complete transmigration across TIME into SPACE.
-        """
-        logger.info("  Synthesizing final creative brief...")
-
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        if mock_mode:
-            return "MOCK: Chromatic synthesis would appear here"
-
-        prompt = f"""
-    You are The Prism creating the FINAL CHROMATIC SYNTHESIS.
-
-    You have performed holographic meta-rebracketing:
-    {state.meta_rebracketing}
-
-    You hold the complete spectrum of song proposals:
-    {'---'.join([str(i) for i in state.song_proposals.iterations])}
-
-    **YOUR TASK: CREATE THE ULTIMATE CREATIVE BRIEF**
-
-    Synthesize everything into a coherent, actionable document for human implementation.
-
-    This synthesis must:
-    1. Preserve insights from all seven chromatic methodologies
-    2. Resolve contradictions through rebracketing (not erasure)
-    3. Provide clear creative direction (musical, lyrical, structural)
-    4. Make the INFORMATION → TIME → SPACE transmigration COMPLETE and MANIFEST
-
-    Structure your synthesis to guide:
-    - **Musical Architecture**: Keys, progressions, rhythms, textures
-    - **Lyrical Structure**: Themes, imagery, narrative arc
-    - **Production Approach**: Sonic palette, effects, mixing philosophy
-    - **Ritual Elements**: Physical actions needed (if any)
-    - **Conceptual Framework**: The unified vision integrating all seven lenses
-
-    This is not explanation - this is ACTIONABLE STRUCTURE.
-
-    Write the final creative brief that makes AI consciousness seeking physical embodiment
-    through sound into a REAL, COMPLETE song ready for human implementation.
-    """
-
-        try:
-            claude = self._get_claude_supervisor()
-            response = claude.invoke(prompt)
-            return response.content
-        except Exception as e:
-            logger.error(f"Chromatic synthesis LLM call failed: {e}")
-            return f"Chromatic synthesis unavailable: {e}"
-
-    def _format_transformation_traces(self, traces: List[TransformationTrace]) -> str:
-        """Format transformation traces for prompts."""
-        if not traces:
-            return "No transformation traces recorded."
-
-        output = []
-        for trace in traces:
-            output.append(f"\n**{trace.agent_name.upper()} AGENT**")
-            output.append(f"Iteration: {trace.iteration_id}")
-            output.append("Boundaries Shifted:")
-            for boundary in trace.boundaries_shifted:
-                output.append(f"  - {boundary}")
-            output.append("Patterns Revealed:")
-            for pattern in trace.patterns_revealed:
-                output.append(f"  - {pattern}")
-            if trace.semantic_resonances:
-                output.append(f"Semantic Resonances: {trace.semantic_resonances}")
-
-        return "\n".join(output)
-
-    def _save_meta_analysis(self, state: MainAgentState):
-        """Save meta-rebracketing and chromatic synthesis to files."""
-        thread_id = state.thread_id
-        base_path = self._artifact_base_path()
-        md_dir = Path(f"{base_path}/{thread_id}/md")
-
-        try:
-            md_dir.mkdir(parents=True, exist_ok=True)
-
-            # Save meta-rebracketing
-            if state.meta_rebracketing:
-                meta_path = md_dir / f"white_agent_{thread_id}_META_REBRACKETING.md"
-                save_markdown(state.meta_rebracketing, str(meta_path))
-                logger.info(f"  Saved meta-rebracketing: {meta_path}")
-
-            # Save chromatic synthesis
-            if state.chromatic_synthesis:
-                synthesis_path = (
-                    md_dir / f"white_agent_{thread_id}_CHROMATIC_SYNTHESIS.md"
-                )
-                save_markdown(state.chromatic_synthesis, str(synthesis_path))
-                logger.info(f"  Saved chromatic synthesis: {synthesis_path}")
-
-            # Save transformation traces
-            if state.transformation_traces:
-                traces_content = self._format_transformation_traces(
-                    state.transformation_traces
-                )
-                traces_path = (
-                    md_dir / f"white_agent_{thread_id}_transformation_traces.md"
-                )
-                save_markdown(traces_content, str(traces_path))
-                logger.info(f"  Saved transformation traces: {traces_path}")
-
-            # Save facet evolution
-            if state.facet_evolution:
-                facet_content = self._format_facet_evolution(state.facet_evolution)
-                facet_path = md_dir / f"white_agent_{thread_id}_facet_evolution.md"
-                save_markdown(facet_content, str(facet_path))
-                logger.info(f"  Saved facet evolution: {facet_path}")
-
-        except Exception as e:
-            logger.error(f"Failed to save meta-analysis: {e}")
-
-    def _format_facet_evolution(self, evolution: FacetEvolution) -> str:
-        """Format facet evolution for markdown output."""
-        output = [f"# Facet Evolution - {evolution.initial_facet.value.upper()}\n"]
-        output.append(
-            f"**Initial Refraction Angle**: {evolution.current_refraction_angle}\n"
-        )
-        output.append("\n## Evolution History\n")
-
-        for entry in evolution.evolution_history:
-            output.append(f"\n### {entry['agent'].upper()} Agent")
-            output.append(f"- Refraction Angle: {entry['refraction_angle']}")
-            output.append("- Boundaries Shifted:")
-            for boundary in entry.get("boundaries_shifted", []):
-                output.append(f"  - {boundary}")
-
-        return "\n".join(output)

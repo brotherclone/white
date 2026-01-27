@@ -46,3 +46,11 @@ dependencies = [
     "pydub>=0.25.1",
     "ipykernel>=7.1.0",
 ]
+
+[tool.ruff]
+exclude = [
+    "*.ipynb",
+    "**/*.ipynb",
+    "training/notebooks/*.ipynb",
+]
+
