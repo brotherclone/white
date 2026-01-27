@@ -134,7 +134,7 @@ def create_phase4_trainer(training_dir: Path):
     trainer_code = '''#!/usr/bin/env python3
 """
 Phase 4 Regression Training - RunPod Adapted
-Trains Rainbow Table ontological regression model
+Trains Rainbow Table ontological regression model with pre-computed embeddings
 """
 
 import torch
@@ -145,13 +145,56 @@ import pandas as pd
 import numpy as np
 import yaml
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 import wandb
 from tqdm import tqdm
 from sklearn.metrics import mean_absolute_error
 from scipy.stats import pearsonr
 import warnings
 warnings.filterwarnings('ignore')
+
+
+class PrecomputedEmbeddingLoader:
+    """Loads pre-computed embeddings from parquet file."""
+
+    def __init__(self, parquet_path: Path, id_column: str = "id", embedding_column: str = "embedding"):
+        self.parquet_path = Path(parquet_path)
+        self.id_column = id_column
+        self.embedding_column = embedding_column
+
+        print(f"Loading embeddings from {self.parquet_path}...")
+        self.df = pd.read_parquet(self.parquet_path)
+
+        if self.embedding_column not in self.df.columns:
+            raise ValueError(f"Embedding column '{self.embedding_column}' not found")
+
+        # Create index for fast lookup
+        if self.id_column in self.df.columns:
+            self._id_to_idx = {str(row[self.id_column]): idx for idx, row in self.df.iterrows()}
+        else:
+            self._id_to_idx = None
+
+        sample = self.df[self.embedding_column].iloc[0]
+        self.embedding_dim = len(np.array(sample))
+        print(f"Loaded {len(self.df)} embeddings (dim={self.embedding_dim})")
+
+    def get_embedding_by_idx(self, idx: int) -> np.ndarray:
+        return np.array(self.df[self.embedding_column].iloc[idx], dtype=np.float32)
+
+    def __len__(self):
+        return len(self.df)
+
+
+def find_embedding_file(data_dir: Path) -> Optional[Path]:
+    """Find the best available embedding file."""
+    candidates = ["training_data_with_embeddings.parquet", "training_data_embedded.parquet"]
+    for filename in candidates:
+        path = data_dir / filename
+        if path.exists():
+            size_gb = path.stat().st_size / (1024**3)
+            print(f"Found embedding file: {path} ({size_gb:.2f} GB)")
+            return path
+    return None
 
 
 class SoftTargetGenerator:
@@ -213,11 +256,22 @@ class SoftTargetGenerator:
 
 
 class RainbowRegressionDataset(Dataset):
-    """Dataset with runtime soft target generation"""
+    """Dataset with runtime soft target generation and pre-computed embeddings"""
 
-    def __init__(self, df: pd.DataFrame, label_smoothing: float = 0.1):
+    def __init__(self, df: pd.DataFrame, embedding_loader: Optional[PrecomputedEmbeddingLoader] = None, label_smoothing: float = 0.1):
         self.df = df
         self.generator = SoftTargetGenerator(label_smoothing)
+        self.embedding_loader = embedding_loader
+
+        # Check if df has inline embeddings
+        self._has_inline_embeddings = 'embedding' in df.columns
+
+        if self.embedding_loader:
+            print(f"Using pre-computed embeddings from loader")
+        elif self._has_inline_embeddings:
+            print(f"Using inline embeddings from dataframe")
+        else:
+            print(f"WARNING: No embeddings available - using random (results meaningless)")
 
     def __len__(self):
         return len(self.df)
@@ -226,9 +280,16 @@ class RainbowRegressionDataset(Dataset):
         row = self.df.iloc[idx]
         targets = self.generator.generate(row)
 
-        # TODO: Load real embeddings from training_data_embedded.parquet
-        # For now using random embeddings
-        embedding = torch.randn(768)
+        # Load embedding from pre-computed source
+        if self.embedding_loader is not None:
+            embedding = self.embedding_loader.get_embedding_by_idx(idx)
+            embedding = torch.tensor(embedding, dtype=torch.float32)
+        elif self._has_inline_embeddings:
+            embedding = np.array(row['embedding'], dtype=np.float32)
+            embedding = torch.tensor(embedding, dtype=torch.float32)
+        else:
+            # Fallback to random (should not happen in production)
+            embedding = torch.randn(768)
 
         return {
             'embedding': embedding,
@@ -395,18 +456,31 @@ def main():
     df = pd.read_parquet('/workspace/data/base_manifest_db.parquet')
     print(f"   Loaded {len(df)} segments")
 
+    # Load embeddings
+    print("\\n🔗 Loading embeddings...")
+    data_dir = Path('/workspace/data')
+    embedding_file = find_embedding_file(data_dir)
+    embedding_loader = None
+    if embedding_file:
+        embedding_loader = PrecomputedEmbeddingLoader(embedding_file)
+    else:
+        print("   WARNING: No embedding file found - training with random embeddings!")
+        print("   Expected: training_data_with_embeddings.parquet or training_data_embedded.parquet")
+
     # Split
     train_size = int(len(df) * config['data']['train_split'])
     train_df = df.iloc[:train_size]
     val_df = df.iloc[train_size:]
 
     train_dataset = RainbowRegressionDataset(
-        train_df, 
-        config['soft_targets']['label_smoothing']
+        train_df,
+        embedding_loader=embedding_loader,
+        label_smoothing=config['soft_targets']['label_smoothing']
     )
     val_dataset = RainbowRegressionDataset(
         val_df,
-        config['soft_targets']['label_smoothing']
+        embedding_loader=embedding_loader,
+        label_smoothing=config['soft_targets']['label_smoothing']
     )
 
     train_loader = DataLoader(
