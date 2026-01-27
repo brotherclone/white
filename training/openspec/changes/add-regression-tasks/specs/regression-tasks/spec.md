@@ -221,3 +221,285 @@ The system SHALL monitor gradients from each task to detect training imbalances.
 #### Scenario: Gradient clipping per-task
 - **WHEN** gradient clipping is enabled
 - **THEN** it can be applied independently to each task's gradients
+
+### Requirement: Rainbow Table Ontological Regression Targets
+The system SHALL predict continuous scores for temporal, spatial, and ontological modes that define the Rainbow Table framework.
+
+#### Scenario: Temporal mode distribution
+- **WHEN** predicting temporal orientation of a concept/segment
+- **THEN** three softmax values sum to 1.0: [past_score, present_score, future_score]
+- **AND** values represent probability distribution over temporal modes
+
+#### Scenario: Spatial mode distribution
+- **WHEN** predicting spatial focus of a concept/segment
+- **THEN** three softmax values sum to 1.0: [thing_score, place_score, person_score]
+- **AND** values represent probability distribution over spatial modes
+
+#### Scenario: Ontological mode distribution
+- **WHEN** predicting reality status of a concept/segment
+- **THEN** three softmax values sum to 1.0: [imagined_score, forgotten_score, known_score]
+- **AND** values represent probability distribution over ontological modes
+
+#### Scenario: Chromatic confidence score
+- **WHEN** predicting album assignment certainty
+- **THEN** single sigmoid value in [0,1] indicates how strongly concept fits any single mode
+- **AND** low confidence (<0.5) suggests hybrid or transitional state
+
+#### Scenario: Combined ontological state
+- **WHEN** all three distributions are predicted
+- **THEN** argmax of each gives discrete mode (e.g., Past_Thing_Imagined)
+- **AND** confidence scores indicate certainty of assignment
+
+#### Scenario: Model output structure
+- **WHEN** regression head produces predictions
+- **THEN** output contains temporal [3], spatial [3], ontological [3], confidence [1] tensors
+- **AND** total of 10 output values per prediction
+
+### Requirement: Hybrid State Detection
+The system SHALL identify concepts that straddle multiple ontological modes, indicating liminal or transitional states.
+
+#### Scenario: Balanced hybrid (liminal state)
+- **WHEN** top two scores in any dimension are within 0.15 of each other
+- **THEN** concept is flagged as "hybrid_{dimension}" (e.g., "hybrid_temporal")
+- **AND** both modes are reported in results
+
+#### Scenario: Dominant mode (clear assignment)
+- **WHEN** top score in a dimension exceeds 0.6
+- **THEN** dimension is flagged as "dominant_{mode}" (e.g., "dominant_past")
+- **AND** concept has clear orientation in that dimension
+
+#### Scenario: Diffuse state (unclear assignment)
+- **WHEN** all three scores in a dimension are within 0.2 of each other (≈0.33 each)
+- **THEN** dimension is flagged as "diffuse_{dimension}"
+- **AND** concept lacks clear orientation in that dimension
+
+#### Scenario: Triple diffuse (Black Album candidate)
+- **WHEN** all three dimensions (temporal, spatial, ontological) are diffuse
+- **THEN** concept is flagged as "black_album_candidate"
+- **AND** suggested for None_None_None mode (chaos/void)
+
+#### Scenario: Partial hybrid
+- **WHEN** one dimension is dominant but others are hybrid/diffuse
+- **THEN** concept is flagged as "partial_hybrid"
+- **AND** dominant dimension determines primary classification
+
+#### Scenario: Hybrid threshold configuration
+- **WHEN** hybrid_threshold parameter is set
+- **THEN** difference between top two scores must be < threshold to flag hybrid
+- **AND** default threshold is 0.15
+
+### Requirement: Transmigration Distance Computation
+The system SHALL measure the conceptual distance between ontological states to quantify transmigration difficulty.
+
+#### Scenario: Single dimension shift distance
+- **WHEN** computing distance between modes in one dimension
+- **THEN** L2 norm of score vectors is computed
+- **AND** Past[1,0,0] → Present[0,1,0] yields distance ≈ 1.414
+
+#### Scenario: Multi-dimensional shift distance
+- **WHEN** moving from one combined state to another (e.g., Past_Thing_Imagined → Future_Place_Known)
+- **THEN** total_distance = sqrt(temporal_distance² + spatial_distance² + ontological_distance²)
+- **AND** each dimension contributes to total transmigration effort
+
+#### Scenario: Minimum transmigration path
+- **WHEN** given source and target ontological states
+- **THEN** identify which dimensions require most change
+- **AND** report dimensions in order of required shift magnitude
+
+#### Scenario: Transmigration feasibility assessment
+- **WHEN** distance exceeds threshold (default: 2.0)
+- **THEN** flag as "difficult_transmigration"
+- **AND** suggest intermediate transitional states
+
+#### Scenario: Within-album distance
+- **WHEN** both states belong to same album (e.g., two Orange Album concepts)
+- **THEN** distance should be < 1.0
+- **AND** indicates concepts are ontologically similar
+
+#### Scenario: Cross-album distance
+- **WHEN** states belong to different albums
+- **THEN** distance typically > 1.0
+- **AND** indicates significant ontological shift required
+
+### Requirement: Concept Validation Gates
+The system SHALL provide automated accept/reject decisions for generated concepts based on ontological coherence.
+
+#### Scenario: High confidence concept (accept)
+- **WHEN** chromatic_confidence > 0.7 AND top mode in each dimension > 0.6
+- **THEN** validation_status = "ACCEPT"
+- **AND** concept has clear, confident ontological position
+
+#### Scenario: Hybrid concept (conditional accept)
+- **WHEN** concept flagged as hybrid in ≤2 dimensions AND confidence > 0.5
+- **THEN** validation_status = "ACCEPT_HYBRID"
+- **AND** suggest album based on dominant dimension(s)
+
+#### Scenario: Diffuse concept (reject for regeneration)
+- **WHEN** ≥2 dimensions are diffuse OR confidence < 0.4
+- **THEN** validation_status = "REJECT"
+- **AND** reason = "diffuse_ontology"
+
+#### Scenario: Out-of-distribution concept (reject)
+- **WHEN** uncertainty estimate > 0.8
+- **THEN** validation_status = "REJECT"
+- **AND** reason = "ood_detection" (outside training distribution)
+
+#### Scenario: Black Album acceptance
+- **WHEN** all three dimensions diffuse AND confidence < 0.3
+- **THEN** validation_status = "ACCEPT_BLACK"
+- **AND** suggest Black Album (None_None_None mode)
+
+#### Scenario: Validation with actionable suggestions
+- **WHEN** concept rejected
+- **THEN** provide specific suggestions for improvement
+- **AND** suggest which scores to increase/decrease (e.g., "increase past_score by 0.3")
+
+#### Scenario: Configurable validation thresholds
+- **WHEN** validation thresholds are configured
+- **THEN** accept/reject logic uses custom thresholds
+- **AND** defaults: confidence_threshold=0.7, dominant_threshold=0.6, diffuse_threshold=0.2
+
+### Requirement: White Agent Integration API
+The system SHALL provide a structured API for validating concepts generated by the White Agent workflow.
+
+#### Scenario: Concept validation request
+- **WHEN** White Agent submits concept text for validation
+- **THEN** system extracts features and runs regression model
+- **AND** returns ValidationResult with full ontological analysis
+
+#### Scenario: Validation result structure
+- **WHEN** concept validation completes
+- **THEN** return structured result containing temporal_scores, spatial_scores, ontological_scores, chromatic_confidence, predicted_album, predicted_mode, validation_status, hybrid_flags, uncertainty_estimates, transmigration_distances, and suggestions
+
+#### Scenario: Batch validation
+- **WHEN** multiple concepts submitted in single request
+- **THEN** process all concepts efficiently
+- **AND** return List[ValidationResult] in same order
+
+#### Scenario: Validation caching
+- **WHEN** identical concept text submitted multiple times
+- **THEN** return cached result
+- **AND** cache expires after configurable TTL (default: 1 hour)
+
+#### Scenario: LangGraph integration
+- **WHEN** called from LangGraph workflow node
+- **THEN** API accepts concept as string, returns ValidationResult
+- **AND** workflow can branch based on validation_status
+
+#### Scenario: Real-time validation endpoint
+- **WHEN** FastAPI endpoint receives POST request
+- **THEN** process concept and return JSON response
+- **AND** response time < 500ms for single concept
+
+### Requirement: Soft Target Derivation from Discrete Labels
+The system SHALL convert discrete Rainbow Table labels into continuous regression targets for training.
+
+#### Scenario: One-hot encoding for dominant modes
+- **WHEN** segment has discrete label "Past"
+- **THEN** convert to temporal target [1.0, 0.0, 0.0]
+- **AND** similarly for all nine modes across three dimensions
+
+#### Scenario: Label smoothing for less confident segments
+- **WHEN** label_smoothing parameter is set (e.g., 0.1)
+- **THEN** smooth one-hot: [1.0, 0.0, 0.0] → [0.9, 0.05, 0.05]
+- **AND** prevents overconfident predictions
+
+#### Scenario: Temporal context smoothing
+- **WHEN** segment surrounded by different modes (e.g., prev=Past, curr=Present, next=Past)
+- **THEN** adjust current target: [0.0, 1.0, 0.0] → [0.3, 0.4, 0.3]
+- **AND** accounts for transitional nature
+
+#### Scenario: Black Album (None) handling
+- **WHEN** segment labeled as None_None_None (Black Album)
+- **THEN** all dimensions get uniform distribution [0.33, 0.33, 0.33]
+- **AND** chromatic_confidence target = 0.0
+
+#### Scenario: Human-in-the-loop refinement
+- **WHEN** human annotates segment as "mostly Past, slightly Present"
+- **THEN** use provided distribution (e.g., [0.7, 0.3, 0.0])
+- **AND** override automatic soft target generation
+
+#### Scenario: Uncertainty-weighted targets
+- **WHEN** segment has high annotation uncertainty
+- **THEN** target distribution spread more evenly
+- **AND** loss weighting reduced for uncertain examples
+
+#### Scenario: Cross-validation of soft targets
+- **WHEN** soft targets are generated
+- **THEN** validate that distributions sum to 1.0
+- **AND** verify consistency across temporal sequences
+
+### Requirement: Album Assignment Prediction
+The system SHALL predict which Rainbow Table album a concept belongs to based on ontological scores.
+
+#### Scenario: Direct album prediction
+- **WHEN** computing album assignment
+- **THEN** determine mode from argmax of each dimension
+- **AND** map combined mode to album (e.g., Past_Thing_Imagined → Orange)
+
+#### Scenario: Album probability distribution
+- **WHEN** computing probabilities for all albums
+- **THEN** multiply dimension probabilities: P(Orange) = P(Past) * P(Thing) * P(Imagined)
+- **AND** return distribution over all albums
+
+#### Scenario: Album confidence threshold
+- **WHEN** top album probability < threshold (default: 0.3)
+- **THEN** flag as "uncertain_album"
+- **AND** consider Black Album or request regeneration
+
+#### Scenario: Tie-breaking for equal probabilities
+- **WHEN** two albums have similar probabilities (within 0.1)
+- **THEN** use chromatic_confidence as tiebreaker
+- **AND** report both albums as potential matches
+
+### Requirement: Transmigration Guidance
+The system SHALL provide specific guidance for moving concepts between ontological modes.
+
+#### Scenario: Transmigration vector computation
+- **WHEN** given source and target modes
+- **THEN** compute delta vectors in each dimension
+- **AND** provide magnitude and direction of required shift
+
+#### Scenario: Step-by-step transmigration plan
+- **WHEN** transmigration distance > 2.0
+- **THEN** suggest intermediate states
+- **AND** provide sequence: source → intermediate(s) → target
+
+#### Scenario: Dimension priority for transmigration
+- **WHEN** planning transmigration
+- **THEN** rank dimensions by required change magnitude
+- **AND** suggest tackling largest shifts first
+
+#### Scenario: Feasibility warning
+- **WHEN** transmigration requires changes in all three dimensions
+- **THEN** warn that transformation may be difficult
+- **AND** suggest starting from different source concept
+
+#### Scenario: Minimal edit suggestions
+- **WHEN** concept almost fits target mode (distance < 0.5 in one dimension)
+- **THEN** suggest minimal textual edits
+- **AND** provide specific score targets (e.g., "increase past_score from 0.55 to 0.70")
+
+### Requirement: Training Data Validation
+The system SHALL validate that training data has appropriate continuous targets for all Rainbow Table segments.
+
+#### Scenario: Target completeness check
+- **WHEN** loading training dataset
+- **THEN** verify all nine ontological targets exist for each segment
+- **AND** report missing targets or invalid ranges
+
+#### Scenario: Target distribution analysis
+- **WHEN** analyzing training dataset
+- **THEN** compute histograms of each score dimension
+- **AND** verify adequate coverage of score ranges
+
+#### Scenario: Target consistency validation
+- **WHEN** segment has discrete label and continuous scores
+- **THEN** verify scores align with label (e.g., Past label → past_score highest)
+- **AND** flag inconsistencies for review
+
+#### Scenario: Album balance in training data
+- **WHEN** training dataset is loaded
+- **THEN** report distribution of segments per album
+- **AND** warn if any album severely underrepresented
+

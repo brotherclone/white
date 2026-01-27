@@ -161,8 +161,9 @@ class VioletAgent(BaseRainbowAgent, ABC):
         if state.interviewer_persona is not None:
             persona = state.interviewer_persona
             logger.info(
-                f"   Reusing existing persona: {persona.first_name} {persona.last_name} "
-                f"({persona.interviewer_type.value}) from {persona.publication}"
+                f"   Reusing existing persona: {persona.first_name} "
+                f"{persona.last_name} ({persona.interviewer_type.value}) "
+                f"from {persona.publication}"
             )
             return state
         persona = VanityPersona()
@@ -200,7 +201,8 @@ class VioletAgent(BaseRainbowAgent, ABC):
         proposal = state.white_proposal
         prompt = f"""
 
-You are {persona.first_name} {persona.last_name}, a music critic from {persona.publication}.
+You are {persona.first_name} {persona.last_name}, a music critic from
+{persona.publication}.
 
 Your interviewer type: {persona.interviewer_type.value}
 Your stance: {persona.stance}
@@ -438,6 +440,8 @@ Keep response 2-4 sentences. Output as JSON:
         persona = state.interviewer_persona
         # Create structured artifact
         artifact = CircleJerkInterviewArtifact(
+            thread_id=state.thread_id,
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
             name=f"{persona.first_name}_{persona.last_name}_interview",
             interviewer_name=f"{persona.first_name} {persona.last_name}",
             publication=persona.publication,
@@ -449,8 +453,8 @@ Keep response 2-4 sentences. Output as JSON:
             create_dirs=True,
         )
         try:
-            artifact.generate_file()
-            logger.info(f"   Transcript saved: {artifact.get_file_path()}")
+            artifact.save_file()
+            logger.info(f"   Transcript saved: {artifact.get_artifact_path()}")
         except Exception as e:
             logger.error(f"Failed to save transcript: {e}")
         state.circle_jerk_interview = artifact
@@ -533,7 +537,10 @@ The revision should be INFORMED BY but not DEFEATED BY the criticism."""
                 title="Fallback: Defensive Violet Response",
                 mood=["defiant"],
                 genres=["experimental"],
-                concept="Fallback proposal - Violet counter-proposal generation unavailable",
+                concept=(
+                    "Fallback proposal - Violet counter-proposal "
+                    "generation unavailable"
+                ),
             )
 
         state.counter_proposal = counter_proposal

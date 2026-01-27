@@ -212,9 +212,11 @@ class RedAgent(BaseRainbowAgent, ABC):
                 ) as f:
                     data = yaml.safe_load(f)
                     book = BookArtifact(**data)
-                    book.base_path = (
-                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/{state.thread_id}"
+                    # Don't include thread_id in base_path - file_path property adds it
+                    book.base_path = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
+                    book.thread_id = state.thread_id
                     book.save_file()
                     state.artifacts.append(book)
                     state.should_create_book = False

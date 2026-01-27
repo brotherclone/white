@@ -47,3 +47,4 @@ htmlcov/
 /app/reference/news_articles/clippings/
 /checkpoints
 /claude_desktop_config.json
+chain_arifacts_incompletes/
