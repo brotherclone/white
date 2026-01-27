@@ -1,0 +1,61 @@
+# Example Configuration for Rainbow Table Ontological Regression
+
+model:
+  regression_head:
+    # Rainbow Table specific configuration
+    targets:
+      # Temporal dimension (3 outputs)
+      - past_score
+      - present_score
+      - future_score
+      # Spatial dimension (3 outputs)
+      - thing_score
+      - place_score
+      - person_score
+      # Ontological dimension (3 outputs)
+      - imagined_score
+      - forgotten_score
+      - known_score
+      # Confidence (1 output)
+      - chromatic_confidence
+
+    # Total: 10 outputs
+    activation:
+      temporal: softmax    # Ensures sum to 1.0
+      spatial: softmax     # Ensures sum to 1.0
+      ontological: softmax # Ensures sum to 1.0
+      confidence: sigmoid  # Bounded [0, 1]
+
+    hidden_layers: [256]  # Optional hidden layers before output
+
+  multitask:
+    loss_weights:
+      classification: 1.0     # Weight for discrete classification loss
+      temporal_regression: 0.8
+      spatial_regression: 0.8
+      ontological_regression: 0.8
+      confidence_regression: 0.5
+
+validation:
+  # Thresholds for accept/reject decisions
+  confidence_threshold: 0.7      # Minimum for ACCEPT
+  dominant_threshold: 0.6        # Score needed for dominant mode
+  hybrid_threshold: 0.15         # Max difference for hybrid flag
+  diffuse_threshold: 0.2         # Max deviation from uniform for diffuse
+  uncertainty_threshold: 0.8     # Max uncertainty for ACCEPT
+
+  # Transmigration settings
+  transmigration:
+    max_distance: 2.0            # Flag difficult transmigrations
+    suggest_intermediates: true  # Generate intermediate states
+
+  # Caching
+  cache_ttl_seconds: 3600        # 1 hour cache for validation results
+
+training:
+  soft_targets:
+    label_smoothing: 0.1         # Smooth one-hot by this amount
+    temporal_context: true       # Use surrounding segments for smoothing
+    context_window: 3            # Number of segments before/after
+    black_album_uniform: true    # Use uniform [0.33, 0.33, 0.33] for None
+    uncertainty_weighting: true  # Reduce loss weight for uncertain examples
