@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 import yaml
 
 from abc import ABC
@@ -11,8 +12,9 @@ from pydantic import Field
 
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.yellow_agent_state import YellowAgentState
-from app.agents.tools.gaming_tools import roll_dice
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
 )
@@ -30,6 +32,17 @@ from app.util.manifest_loader import get_my_reference_proposals
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+def roll_dice(options):
+    """Simple helper to roll dice given a list of (low, high) tuples. Returns list of ints."""
+    results = []
+    for low, high in options:
+        try:
+            results.append(random.randint(low, high))
+        except Exception:
+            results.append(low)
+    return results
 
 
 class YellowAgent(BaseRainbowAgent, ABC):
@@ -140,7 +153,11 @@ class YellowAgent(BaseRainbowAgent, ABC):
         return work_flow
 
     @staticmethod
+    @agent_error_handler("Lord Pulsimore")
     def generate_characters(state: YellowAgentState) -> YellowAgentState:
+        get_state_snapshot(
+            state, "generate_characters_enter", state.thread_id, "Lord Pulsimore"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -171,6 +188,10 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     character_two.create_portrait()
                     character_two.create_character_sheet()
                     state.characters.append(character_two)
+                get_state_snapshot(
+                    state, "generate_characters_exit", state.thread_id, "Lord Pulsimore"
+                )
+                return state
             except Exception as e:
                 error_msg = f"Failed to read mock character files: {e!s}"
                 logger.error(error_msg)
@@ -185,9 +206,16 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 char.create_portrait()
                 char.create_character_sheet()
                 state.characters.append(char)
+        get_state_snapshot(
+            state, "generate_characters_exit", state.thread_id, "Lord Pulsimore"
+        )
         return state
 
+    @agent_error_handler("Lord Pulsimore")
     def generate_environment(self, state: YellowAgentState) -> YellowAgentState:
+        get_state_snapshot(
+            state, "generate_environment_enter", state.thread_id, "Lord Pulsimore"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -205,6 +233,13 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     room_two = PulsarPalaceRoom(**data_two)
                     state.rooms.append(room_two)
                 state.story_elaboration_level = 2
+                get_state_snapshot(
+                    state,
+                    "generate_environment_exit",
+                    state.thread_id,
+                    "Lord Pulsimore",
+                )
+                return state
             except Exception as e:
                 error_msg = f"Failed to read mock room files: {e!s}"
                 logger.error(error_msg)
@@ -216,9 +251,16 @@ class YellowAgent(BaseRainbowAgent, ABC):
             for i in range(room_count):
                 room = self.room_generator.generate_room(room_number=i + 1)
                 state.rooms.append(room)
+        get_state_snapshot(
+            state, "generate_environment_exit", state.thread_id, "Lord Pulsimore"
+        )
         return state
 
+    @agent_error_handler("Lord Pulsimore")
     def generate_story(self, state: YellowAgentState) -> YellowAgentState:
+        get_state_snapshot(
+            state, "generate_story_enter", state.thread_id, "Lord Pulsimore"
+        )
         current_room = state.rooms[state.current_room_index]
 
         # Generate story with character state mutations
@@ -248,9 +290,16 @@ class YellowAgent(BaseRainbowAgent, ABC):
         )
         state.encounter_narrative_artifact = encounter_artifact
         state.story_elaboration_level = 1
+        get_state_snapshot(
+            state, "generate_story_exit", state.thread_id, "Lord Pulsimore"
+        )
         return state
 
+    @agent_error_handler("Lord Pulsimore")
     def evaluate_song_proposal(self, state: YellowAgentState) -> YellowAgentState:
+        get_state_snapshot(
+            state, "evaluate_song_proposal_enter", state.thread_id, "Lord Pulsimore"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             state.should_add_to_story = True
@@ -285,6 +334,9 @@ class YellowAgent(BaseRainbowAgent, ABC):
             except Exception as e:
                 logger.error(f"Game evaluation failed: {e!s}")
                 state.should_add_to_story = False
+        get_state_snapshot(
+            state, "evaluate_song_proposal_exit", state.thread_id, "Lord Pulsimore"
+        )
         return state
 
     def add_to_story(self, state: YellowAgentState) -> YellowAgentState:

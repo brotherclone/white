@@ -19,7 +19,9 @@ from app.agents.states.orange_agent_state import OrangeAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus, get_corpus
 from app.reference.mcp.rows_bud.orange_mythos_server import insert_symbolic_object
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
 from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
@@ -113,7 +115,11 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
         return work_flow
 
+    @agent_error_handler("Rows Bud")
     def generate_alternate_song_spec(self, state: OrangeAgentState) -> OrangeAgentState:
+        get_state_snapshot(
+            state, "generate_alternate_song_spec_entry", state.thread_id, "Rows Bud"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -212,10 +218,17 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 )
 
             state.counter_proposal = counter_proposal
+            get_state_snapshot(
+                state, "generate_alternate_song_spec_exit", state.thread_id, "Rows Bud"
+            )
             return state
 
+    @agent_error_handler("Rows Bud")
     def synthesize_base_story(self, state: OrangeAgentState) -> OrangeAgentState:
         """Synthesize a plausible Sussex County newspaper story (1975-1995)"""
+        get_state_snapshot(
+            state, "synthesize_base_story_entry", state.thread_id, "Rows Bud"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -366,15 +379,21 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+        get_state_snapshot(
+            state, "synthesize_base_story_exit", state.thread_id, "Rows Bud"
+        )
         return state
 
+    @agent_error_handler("Rows Bud")
     def add_to_corpus(self, state: OrangeAgentState) -> OrangeAgentState:
         """Add a synthesized story to mythology corpus (optional, for training data)"""
+        get_state_snapshot(state, "add_to_corpus_entry", state.thread_id, "Rows Bud")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             print(
                 f"[MOCK: {os.getenv('MOCK_MODE')}] Would call orange-mythos:add_story_to_corpus"
             )
+            get_state_snapshot(state, "add_to_corpus_exit", state.thread_id, "Rows Bud")
             return state
         else:
             try:
@@ -392,10 +411,15 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             except Exception as e:
                 logger.error(f"Corpus addition failed: {e}")
                 state.selected_story_id = f"fallback_{int(time.time() * 1000)}"
+            get_state_snapshot(state, "add_to_corpus_exit", state.thread_id, "Rows Bud")
             return state
 
+    @agent_error_handler("Rows Bud")
     def select_symbolic_object(self, state: OrangeAgentState) -> OrangeAgentState:
         """Analyze the story and select a symbolic object category"""
+        get_state_snapshot(
+            state, "select_symbolic_object_entry", state.thread_id, "Rows Bud"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -464,20 +488,36 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             except Exception as e:
                 logger.error(f"Object insertion failed: {e}")
 
+        get_state_snapshot(
+            state, "select_symbolic_object_exit", state.thread_id, "Rows Bud"
+        )
         return state
 
     @staticmethod
+    @agent_error_handler("Rows Bud")
     def insert_symbolic_object_node(state: OrangeAgentState) -> OrangeAgentState:
         """Insert a symbolic object into the story via MCP tool"""
+        get_state_snapshot(
+            state, "insert_symbolic_object_node_entry", state.thread_id, "Rows Bud"
+        )
         if not state.symbolic_object:
             logger.warning("No symbolic object to insert - skipping")
+            get_state_snapshot(
+                state, "insert_symbolic_object_node_exit", state.thread_id, "Rows Bud"
+            )
             return state
         if not state.selected_story_id:
             logger.warning("No story ID for object insertion - skipping")
+            get_state_snapshot(
+                state, "insert_symbolic_object_node_exit", state.thread_id, "Rows Bud"
+            )
             return state
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             print(f"[MOCK] Would insert: {state.symbolic_object.name} into story")
+            get_state_snapshot(
+                state, "insert_symbolic_object_node_exit", state.thread_id, "Rows Bud"
+            )
             return state
         try:
             insert_symbolic_object(
@@ -489,14 +529,24 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         except Exception as e:
             logger.error(f"Object insertion failed: {e!s}")
 
+        get_state_snapshot(
+            state, "insert_symbolic_object_node_exit", state.thread_id, "Rows Bud"
+        )
         return state
 
+    @agent_error_handler("Rows Bud")
     def gonzo_rewrite_node(self, state: OrangeAgentState) -> OrangeAgentState:
         """Rewrite the story in gonzo journalism style via MCP tool"""
+        get_state_snapshot(
+            state, "gonzo_rewrite_node_entry", state.thread_id, "Rows Bud"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if not state.synthesized_story:
             logger.warning("No synthesized story for gonzo rewrite - using fallback")
+            get_state_snapshot(
+                state, "gonzo_rewrite_node_exit", state.thread_id, "Rows Bud"
+            )
             return state
         if mock_mode:
             try:
@@ -527,6 +577,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+            get_state_snapshot(
+                state, "gonzo_rewrite_node_exit", state.thread_id, "Rows Bud"
+            )
             return state
         try:
             story = self.corpus.get_story(state.selected_story_id)
@@ -596,6 +649,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception(error_msg)
             state.artifacts.append(state.mythologized_story)
+            get_state_snapshot(
+                state, "gonzo_rewrite_node_exit", state.thread_id, "Rows Bud"
+            )
             return state
 
         except Exception as e:
@@ -605,4 +661,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 raise Exception(error_msg)
             state.mythologized_story = state.synthesized_story
 
+        get_state_snapshot(
+            state, "gonzo_rewrite_node_exit", state.thread_id, "Rows Bud"
+        )
         return state

@@ -36,7 +36,9 @@ from app.agents.tools.biographical_tools import (
     load_biographical_data,
     get_year_analysis,
 )
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
@@ -144,7 +146,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
 
     def create_graph(self) -> StateGraph:
         work_flow = StateGraph(BlueAgentState)
-        # Nodes
         work_flow.add_node("load_biographical_data", self.load_biographical_data)
         work_flow.add_node("select_year", self.select_year)
         work_flow.add_node("evaluate_timeline_frailty", self.evaluate_timeline_frailty)
@@ -158,8 +159,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
-
-        # Edges
         work_flow.add_edge(START, "load_biographical_data")
         work_flow.add_edge("load_biographical_data", "select_year")
         work_flow.add_edge("select_year", "evaluate_timeline_frailty")
@@ -179,7 +178,14 @@ class BlueAgent(BaseRainbowAgent, ABC):
         return work_flow
 
     @staticmethod
+    @agent_error_handler("The Cassette Bearer")
     def load_biographical_data(state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "load_biographical_data_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         biographical_data = load_biographical_data()
         if biographical_data is None:
@@ -188,9 +194,16 @@ class BlueAgent(BaseRainbowAgent, ABC):
             else:
                 logger.warning("Failed to load biographical data")
         state.biographical_data = biographical_data
+        get_state_snapshot(
+            state, "load_biographical_data_exit", state.thread_id, "The Cassette Bearer"
+        )
         return state
 
+    @agent_error_handler("The Cassette Bearer")
     def select_year(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state, "select_year_enter", state.thread_id, "The Cassette Bearer"
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         all_years = state.biographical_data.get("years", {})
         if not all_years:
@@ -242,6 +255,9 @@ class BlueAgent(BaseRainbowAgent, ABC):
             state.selected_period = chosen
             return state
         state.selected_period = all_years[len(all_years) // 2]
+        get_state_snapshot(
+            state, "select_year_exit", state.thread_id, "The Cassette Bearer"
+        )
         return state
 
     def _ensure_biographical_period(self, period: dict) -> BiographicalPeriod | None:
@@ -288,7 +304,14 @@ class BlueAgent(BaseRainbowAgent, ABC):
                     return None
         return None
 
+    @agent_error_handler("The Cassette Bearer")
     def evaluate_timeline_frailty(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "evaluate_timeline_frailty_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         period = state.selected_period
         # Get year from state or from BiographicalPeriod object
@@ -392,36 +415,41 @@ class BlueAgent(BaseRainbowAgent, ABC):
         )
         for check, passed in checks_dict.items():
             logger.info(f"   {check}: {'✅' if passed else '❌'}")
-
-        # Increment iteration count in the node (not the router) so it persists
         state.iteration_count += 1
-
+        get_state_snapshot(
+            state,
+            "evaluate_timeline_frailty_exit",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         return state
 
-    def route_after_evaluate_timeline_frailty(self, state: BlueAgentState) -> str:
-        # If we found a suitable year, proceed immediately
+    @staticmethod
+    def route_after_evaluate_timeline_frailty(state: BlueAgentState) -> str:
         if state.evaluation_result.is_suitable:
             logger.info(
                 f"✅ Found suitable year after {state.iteration_count} attempts, proceeding"
             )
             return "frail"
-
-        # If not suitable but haven't hit max iterations, try another year
         if state.iteration_count < state.max_iterations:
             logger.info(
                 f"❌ Year not suitable, trying another ({state.iteration_count}/{state.max_iterations})"
             )
             return "healthy"
-
-        # If we've exhausted max iterations without finding a suitable year,
-        # force proceed with the last evaluated year
         logger.warning(
             f"⚠️ Failed to find suitable year after {state.max_iterations} attempts, "
             f"forcing proceed with year {state.evaluation_result.year}"
         )
         return "frail"
 
+    @agent_error_handler("The Cassette Bearer")
     def generate_alternate_history(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "generate_alternate_history_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -449,7 +477,8 @@ class BlueAgent(BaseRainbowAgent, ABC):
         after = self._normalize_period(state.selected_period.next_period)
         period = state.selected_period
 
-        prompt = f"""You are The Cassette Bearer, the melancholy recordist who is the only witness to the realities of the
+        prompt = f"""
+You are The Cassette Bearer, the melancholy recordist who is the only witness to the realities of the
 multi-media artist and musician, Gabriel Walsh, being over-written at a quantum level. Your task is to
 visualize and document one such occurrence when his life's timeline was malleable and frail.
 
@@ -589,6 +618,12 @@ The tape has been recorded over. What life exists on it now?
             if block_mode:
                 raise Exception(f"Anthropic model call failed: {e!s}") from e
             logger.error(f"Anthropic model call failed: {e!s}")
+        get_state_snapshot(
+            state,
+            "generate_alternate_history_exit",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         return state
 
     def _validate_alternate_history(
@@ -815,7 +850,14 @@ The tape has been recorded over. What life exists on it now?
         return str(item)
 
     @staticmethod
+    @agent_error_handler("The Cassette Bearer")
     def extract_musical_parameters(state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "extract_musical_parameters_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         alternate = state.alternate_history
         bpm_map = {
             QuantumTapeEmotionalTone.WISTFUL: 94,
@@ -890,6 +932,12 @@ The tape has been recorded over. What life exists on it now?
             ),
         )
         state.musical_params = params
+        get_state_snapshot(
+            state,
+            "extract_musical_parameters_exit",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         return state
 
     @staticmethod
@@ -903,7 +951,11 @@ The tape has been recorded over. What life exists on it now?
             note = random.choice(YOUR_TEAM_RING_TAPE_LYRIC_FRAGMENTS)
         return note
 
+    @agent_error_handler("The Cassette Bearer")
     def generate_tape_label(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state, "generate_tape_label_enter", state.thread_id, "The Cassette Bearer"
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         from app.structures.enums.quantum_tape_recording_quality import (
             QuantumTapeRecordingQuality,
@@ -945,6 +997,9 @@ The tape has been recorded over. What life exists on it now?
             logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
+        get_state_snapshot(
+            state, "generate_tape_label_exit", state.thread_id, "The Cassette Bearer"
+        )
         return state
 
     def _format_alternate_history_for_prompt(
@@ -1005,7 +1060,14 @@ The tape has been recorded over. What life exists on it now?
         }
         return descriptions.get(tone, "unknown emotional signature")
 
+    @agent_error_handler("The Cassette Bearer")
     def generate_alternate_song_spec(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "generate_alternate_song_spec_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1102,4 +1164,10 @@ dream into a song about THIS erased timeline - the one in your hands.
                 )
 
             state.counter_proposal = counter_proposal
+            get_state_snapshot(
+                state,
+                "generate_alternate_song_spec_exit",
+                state.thread_id,
+                "The Cassette Bearer",
+            )
             return state

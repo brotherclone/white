@@ -22,8 +22,10 @@ from app.agents.tools.audio_tools import (
 )
 from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import transcription_from_speech_to_text
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.reference.mcp.todoist.main import create_sigil_charging_task
 from app.structures.agents.agent_settings import AgentSettings
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
@@ -140,9 +142,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         10. The black agent updates the counter-proposal to reflect the charged sigil if need be then goto 5.
 
         """
-
         black_workflow = StateGraph(BlackAgentState)
-        # Nodes
         black_workflow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
@@ -158,7 +158,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             "update_alternate_song_spec_with_sigil",
             self.update_alternate_song_spec_with_sigil,
         )
-        # Edges
         black_workflow.add_edge(START, "generate_alternate_song_spec")
 
         black_workflow.add_edge("generate_alternate_song_spec", "generate_evp")
@@ -187,8 +186,12 @@ class BlackAgent(BaseRainbowAgent, ABC):
     def route_after_sigil_chance(state: BlackAgentState) -> str:
         return "human" if state.should_update_proposal_with_sigil else "done"
 
+    @agent_error_handler("ThreadKeepr")
     def generate_alternate_song_spec(self, state: BlackAgentState) -> BlackAgentState:
         """Generate an initial counter-proposal"""
+        get_state_snapshot(
+            state, "generate_alternate_song_spec_enter", state.thread_id, "ThreadKeepr"
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -262,11 +265,21 @@ class BlackAgent(BaseRainbowAgent, ABC):
                         concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable.",
                     )
                     state.counter_proposal = counter_proposal
+            get_state_snapshot(
+                state,
+                "generate_alternate_song_spec_exit",
+                state.thread_id,
+                "ThreadKeepr",
+            )
             return state
 
+    @agent_error_handler("ThreadKeepr")
     @skip_chance(0.75)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
         """Generate a sigil artifact and create a Todoist task for charging"""
+        get_state_snapshot(
+            state, "generate_sigil_enter", state.thread_id, "ThreadKeepr"
+        )
         logger.info("🜏 Entering generate_sigil method")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
@@ -304,16 +317,16 @@ class BlackAgent(BaseRainbowAgent, ABC):
             sigil_maker = SigilTools()
             current_proposal = state.counter_proposal
             prompt = f"""
-            Distill this counter-proposal into a short, actionable wish statement that captures how 
-            the song could embody higher occult meaning and resistance against the Demiurge.
-    
-            Counter-proposal:
-            Title: {current_proposal.title}
-            Concept: {current_proposal.concept}
-            Mood: {', '.join(current_proposal.mood)}
-    
-            Format: A single sentence starting with "I will..." or "This song will..."
-            Example: "I will weave hidden frequencies that awaken dormant resistance."
+Distill this counter-proposal into a short, actionable wish statement that captures how 
+the song could embody higher occult meaning and resistance against the Demiurge.
+
+Counter-proposal:
+Title: {current_proposal.title}
+Concept: {current_proposal.concept}
+Mood: {', '.join(current_proposal.mood)}
+
+Format: A single sentence starting with "I will..." or "This song will..."
+Example: "I will weave hidden frequencies that awaken dormant resistance."
             """
             block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
             try:
@@ -339,7 +352,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 glyph_description=description,
                 glyph_components=components,
                 sigil_type=SigilType.WORD_METHOD,
-                activation_state=SigilState.CREATED,  # Not charged yet!
+                activation_state=SigilState.CREATED,
                 charging_instructions=charging_instructions,
                 thread_id=state.thread_id,
             )
@@ -354,7 +367,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             logger.info("Attempting to create Todoist task for sigil charging...")
             todoist_token = os.getenv("TODOIST_API_TOKEN")
             if not todoist_token:
-                logger.error("✗ TODOIST_API_TOKEN not found in environment variables!")
+                logger.error("TODOIST_API_TOKEN not found in environment variables!")
                 state.awaiting_human_action = True
                 state.should_update_proposal_with_sigil = True
                 state.human_instructions = f"""
@@ -410,12 +423,12 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     state.awaiting_human_action = True
                     state.should_update_proposal_with_sigil = True
                     state.human_instructions = f"""
-                    ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed with an unknown error)
-                    Error: {error_msg}
-                    Manually charge the sigil for '{current_proposal.title}':
-                    **Wish:** {wish_text}
-                    **Glyph:** {description}
-                    {charging_instructions}
+⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed with an unknown error)
+Error: {error_msg}
+Manually charge the sigil for '{current_proposal.title}':
+**Wish:** {wish_text}
+**Glyph:** {description}
+{charging_instructions}
                     """
 
             except Exception as e:
@@ -435,21 +448,23 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 state.awaiting_human_action = True
                 state.should_update_proposal_with_sigil = True
                 state.human_instructions = f"""
-                                            ⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed: {error_msg})
-    
-                                            Manually charge the sigil for '{current_proposal.title}':
-    
-                                            **Wish:** {wish_text}
-                                            **Glyph:** {description}
-    
-                                            {charging_instructions}
+⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed: {error_msg})
+
+Manually charge the sigil for '{current_proposal.title}':
+
+**Wish:** {wish_text}
+**Glyph:** {description}
+
+{charging_instructions}
                                             """
+        get_state_snapshot(state, "generate_sigil_exit", state.thread_id, "ThreadKeepr")
         return state
 
     @staticmethod
+    @agent_error_handler("ThreadKeepr")
     def generate_evp(state: BlackAgentState) -> BlackAgentState:
         """Generate an EVP artifact and optionally create an analysis task"""
-
+        get_state_snapshot(state, "generate_evp_enter", state.thread_id, "ThreadKeepr")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -469,7 +484,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
-                # Return early with an error state
                 return state
             evp_artifact.thread_id = state.thread_id
             evp_artifact.chain_artifact_file_type = ChainArtifactFileType.YML
@@ -558,17 +572,29 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception(error_msg)
             state.artifacts.append(evp_artifact)
+            get_state_snapshot(
+                state, "generate_evp_exit", state.thread_id, "ThreadKeepr"
+            )
             return state
 
     @staticmethod
+    @agent_error_handler("ThreadKeepr")
     def await_human_action(state: BlackAgentState) -> BlackAgentState:
         """
         Node that workflow interrupts at.
         """
+        get_state_snapshot(
+            state, "await_human_action_enter", state.thread_id, "ThreadKeepr"
+        )
         logger.info("Workflow interrupted - awaiting human action on sigil charging")
+        get_state_snapshot(
+            state, "await_human_action_exit", state.thread_id, "ThreadKeepr"
+        )
         return state
 
+    @agent_error_handler("ThreadKeepr")
     def evaluate_evp(self, state: BlackAgentState) -> BlackAgentState:
+        get_state_snapshot(state, "evaluate_evp_enter", state.thread_id, "ThreadKeepr")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -605,23 +631,23 @@ class BlackAgent(BaseRainbowAgent, ABC):
             )
 
             prompt = f"""
-                   You are the ThreadKeepr, helping a musician create a creative fiction song about an experimental musician
-                   working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
-                   artifact consisting of audio segments and a transcript. Now, your task is to evaluate the transcript
-                   and see if there are any surreal or lyrical results that could help you refocus your song proposal. At this point
-                   you only need to reply with a True or False property.
+You are the ThreadKeepr, helping a musician create a creative fiction song about an experimental musician
+working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
+artifact consisting of audio segments and a transcript. Now, your task is to evaluate the transcript
+and see if there are any surreal or lyrical results that could help you refocus your song proposal. At this point
+you only need to reply with a True or False property.
 
-                   Here's an example of what might warrant a True response:
-                   'do turn' 'caliphate murloc' 'a simple bloodline'
+Here's an example of what might warrant a True response:
+'do turn' 'caliphate murloc' 'a simple bloodline'
 
-                   Here's an example of what might warrant a False response which is more likely:
-                   'i' 'me me' 'to' 'hi' 'be be'
+Here's an example of what might warrant a False response which is more likely:
+'i' 'me me' 'to' 'hi' 'be be'
 
-                   Here's your previous counter-proposal:
-                   {state.counter_proposal}
+Here's your previous counter-proposal:
+{state.counter_proposal}
 
-                   Here's the EVP transcript:
-                   {transcript_text}
+Here's the EVP transcript:
+{transcript_text}
                    """
 
             claude = self._get_claude()
@@ -646,11 +672,21 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception(error_msg)
                 state.should_update_proposal_with_evp = False
+            get_state_snapshot(
+                state, "evaluate_evp_exit", state.thread_id, "ThreadKeepr"
+            )
             return state
 
+    @agent_error_handler("ThreadKeepr")
     def update_alternate_song_spec_with_evp(
         self, state: BlackAgentState
     ) -> BlackAgentState:
+        get_state_snapshot(
+            state,
+            "update_alternate_song_spec_with_evp_enter",
+            state.thread_id,
+            "ThreadKeepr",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -669,53 +705,53 @@ class BlackAgent(BaseRainbowAgent, ABC):
                     raise Exception(error_msg)
             return state
         prompt = f"""
-                You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
-                working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
-                artifact consisting of audio segments and a transcript. Now, you need to update your song counter-proposal
-                to reflect the results of your EVP analysis. At this point you only need to reply with a counter-proposal
-                that reflects the results of your EVP analysis.
-                 
-                As an example, imagine this was your original counter-proposal:
-                
-                    bpm: 100
-                    tempo: 4/4
-                    key: B minor
-                    rainbow_color: {the_rainbow_table_colors['Z']}
-                    title: "Whispers of the Abyss"
-                    mood: ["mysterious", "haunting", "ethereal"]
-                    genres: ["ambient", "darkwave", "experimental"]
-                    concept: This song is from the perspective of man who can't remember the previous day. There is 
-                    a hole in his memory that he can't explain. As the song progresses, he begins to hear whispers and voices that seem to
-                    come from the abyss of his forgotten memories. The song explores themes of memory, identity, and the unknown.
-                
-                
-                And this is an example of the EVP transcript:
-                
-                    ['cross keep lucky', 'antidote carpet', 'danny want it']
-                
-                Then your updated counter-proposal could be some like:
-                
-                    bpm: 104
-                    tempo: 4/4
-                    key: A minor
-                    rainbow_color: {the_rainbow_table_colors['Z']}
-                    title: "Lucky Danny's Antidote"
-                    mood: ["foreboding", "haunting", "jovial"]
-                    genres: ["folk rock", "tavern song", "alternative"]
-                    concept: Danny can't remember the previous day. And he should consider himself lucky as he's been
-                    through a horrendous experience. Warned not to try to remember he persists in try to regain his memory
-                    by retracing the past day's steps. As he does so, each clue brings him closer to an antidote for his amnesia, 
-                    but also deeper into a surreal and haunting journey through his own psyche.The song explores themes of memory,
-                    identity, and the unknown.
-         
-                Your actual counter-proposal was:
-                    {state.counter_proposal}
-                
-                The counter-proposal and new updated counter-proposal should have the 'rainbow_color' property set to:
-                    {the_rainbow_table_colors['Z']}
-                
-                And here is the EVP transcript:
-                    {state.artifacts[-1].transcript}
+You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
+working in the experimental music space. You have just generated an EVP (Electronic Voice Phenomenon)
+artifact consisting of audio segments and a transcript. Now, you need to update your song counter-proposal
+to reflect the results of your EVP analysis. At this point you only need to reply with a counter-proposal
+that reflects the results of your EVP analysis.
+ 
+As an example, imagine this was your original counter-proposal:
+
+    bpm: 100
+    tempo: 4/4
+    key: B minor
+    rainbow_color: {the_rainbow_table_colors['Z']}
+    title: "Whispers of the Abyss"
+    mood: ["mysterious", "haunting", "ethereal"]
+    genres: ["ambient", "darkwave", "experimental"]
+    concept: This song is from the perspective of man who can't remember the previous day. There is 
+    a hole in his memory that he can't explain. As the song progresses, he begins to hear whispers and voices that seem to
+    come from the abyss of his forgotten memories. The song explores themes of memory, identity, and the unknown.
+
+
+And this is an example of the EVP transcript:
+
+    ['cross keep lucky', 'antidote carpet', 'danny want it']
+
+Then your updated counter-proposal could be some like:
+
+    bpm: 104
+    tempo: 4/4
+    key: A minor
+    rainbow_color: {the_rainbow_table_colors['Z']}
+    title: "Lucky Danny's Antidote"
+    mood: ["foreboding", "haunting", "jovial"]
+    genres: ["folk rock", "tavern song", "alternative"]
+    concept: Danny can't remember the previous day. And he should consider himself lucky as he's been
+    through a horrendous experience. Warned not to try to remember he persists in try to regain his memory
+    by retracing the past day's steps. As he does so, each clue brings him closer to an antidote for his amnesia, 
+    but also deeper into a surreal and haunting journey through his own psyche.The song explores themes of memory,
+    identity, and the unknown.
+
+Your actual counter-proposal was:
+    {state.counter_proposal}
+
+The counter-proposal and new updated counter-proposal should have the 'rainbow_color' property set to:
+    {the_rainbow_table_colors['Z']}
+
+And here is the EVP transcript:
+    {state.artifacts[-1].transcript}
                """
         claude = self._get_claude()
         proposer = claude.with_structured_output(SongProposalIteration)
@@ -740,11 +776,24 @@ class BlackAgent(BaseRainbowAgent, ABC):
             logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
+        get_state_snapshot(
+            state,
+            "update_alternate_song_spec_with_evp_exit",
+            state.thread_id,
+            "ThreadKeepr",
+        )
         return state
 
+    @agent_error_handler("ThreadKeepr")
     def update_alternate_song_spec_with_sigil(
         self, state: BlackAgentState
     ) -> BlackAgentState:
+        get_state_snapshot(
+            state,
+            "update_alternate_song_spec_with_sigil_enter",
+            state.thread_id,
+            "ThreadKeepr",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -777,47 +826,47 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logger.error(f"Failed to parse sigil artifact: {e!s}")
                 return state
             prompt = f"""
-        You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
-        working in the experimental music space. You have just generated a sigil artifact and used a
-        ToDoist task to have your human charge the sigil. Now, you need to update your song counter-proposal
-        to reflect the results of your sigil charge. At this point you only need to reply with a counter-proposal
-        that reflects the results of your sigil charge.
-        
-         As an example, imagine this was your original counter-proposal:
-                
-                    bpm: 100
-                    tempo: 4/4
-                    key: B minor
-                    rainbow_color: {the_rainbow_table_colors['Z']}
-                    title: "Whispers of the Abyss"
-                    mood: ["mysterious", "haunting", "ethereal"]
-                    genres: ["ambient", "darkwave", "experimental"]
-                    concept: This song is from the perspective of man who can't remember the previous day. There is 
-                    a hole in his memory that he can't explain. As the song progresses, he begins to hear whispers and voices that seem to
-                    come from the abyss of his forgotten memories. The song explores themes of memory, identity, and the unknown.
-        
-         Here's the Sigil you previously created:
-            
-            {state.artifacts[-1]}
+You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
+working in the experimental music space. You have just generated a sigil artifact and used a
+ToDoist task to have your human charge the sigil. Now, you need to update your song counter-proposal
+to reflect the results of your sigil charge. At this point you only need to reply with a counter-proposal
+that reflects the results of your sigil charge.
 
-        Then your updated counter-proposal could be some like:
-            
-            bpm: 135
+ As an example, imagine this was your original counter-proposal:
+        
+            bpm: 100
             tempo: 4/4
-            key: B major
+            key: B minor
             rainbow_color: {the_rainbow_table_colors['Z']}
-            title: "Shut Up and Play"
-            mood: ["energetic", "triumphant", "liberating"]
-            genres: ["punk", "rock", "experimental", "no wave"]
-            concept: This song celebrates the banishing of destructive inner thoughts. The narrator of the song is feeling
-            relief and liberation as they silence the negative voices in their head that have been holding them back creatively.
-        
-        
-        Your actual counter-proposal was:
-        {state.counter_proposal}
-        
-        The counter-proposal and new updated counter-proposal should have the 'rainbow_color' property set to:
-        {the_rainbow_table_colors['Z']}
+            title: "Whispers of the Abyss"
+            mood: ["mysterious", "haunting", "ethereal"]
+            genres: ["ambient", "darkwave", "experimental"]
+            concept: This song is from the perspective of man who can't remember the previous day. There is 
+            a hole in his memory that he can't explain. As the song progresses, he begins to hear whispers and voices that seem to
+            come from the abyss of his forgotten memories. The song explores themes of memory, identity, and the unknown.
+
+ Here's the Sigil you previously created:
+    
+    {state.artifacts[-1]}
+
+Then your updated counter-proposal could be some like:
+    
+    bpm: 135
+    tempo: 4/4
+    key: B major
+    rainbow_color: {the_rainbow_table_colors['Z']}
+    title: "Shut Up and Play"
+    mood: ["energetic", "triumphant", "liberating"]
+    genres: ["punk", "rock", "experimental", "no wave"]
+    concept: This song celebrates the banishing of destructive inner thoughts. The narrator of the song is feeling
+    relief and liberation as they silence the negative voices in their head that have been holding them back creatively.
+
+
+Your actual counter-proposal was:
+{state.counter_proposal}
+
+The counter-proposal and new updated counter-proposal should have the 'rainbow_color' property set to:
+{the_rainbow_table_colors['Z']}
         """
             claude = self._get_claude()
             proposer = claude.with_structured_output(SongProposalIteration)
@@ -842,4 +891,10 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+            get_state_snapshot(
+                state,
+                "update_alternate_song_spec_with_sigil_exit",
+                state.thread_id,
+                "ThreadKeepr",
+            )
             return state

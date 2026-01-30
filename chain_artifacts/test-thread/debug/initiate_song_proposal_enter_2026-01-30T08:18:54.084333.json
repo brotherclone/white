@@ -1,0 +1,44 @@
+{
+  "node": "initiate_song_proposal_enter",
+  "timestamp": "2026-01-30T08:18:54.084333",
+  "state": {
+    "thread_id": "test-thread",
+    "song_proposals": {
+      "iterations": []
+    },
+    "artifacts": [],
+    "workflow_paused": false,
+    "pause_reason": null,
+    "pending_human_action": null,
+    "rebracketing_analysis": null,
+    "document_synthesis": null,
+    "meta_rebracketing": null,
+    "chromatic_synthesis": null,
+    "white_facet": null,
+    "white_facet_metadata": null,
+    "facet_evolution": null,
+    "transformation_traces": [],
+    "artifact_relationships": [],
+    "ready_for_red": false,
+    "ready_for_orange": false,
+    "ready_for_yellow": false,
+    "ready_for_green": false,
+    "ready_for_blue": false,
+    "ready_for_indigo": false,
+    "ready_for_violet": false,
+    "ready_for_white": false,
+    "run_finished": false,
+    "enabled_agents": [
+      "black",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "indigo",
+      "violet"
+    ],
+    "stop_after_agent": null
+  },
+  "agent_name": "The Prism"
+}
