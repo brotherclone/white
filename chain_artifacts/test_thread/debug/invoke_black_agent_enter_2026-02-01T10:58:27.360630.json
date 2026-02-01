@@ -1,6 +1,0 @@
-{
-  "node": "invoke_black_agent_enter",
-  "timestamp": "2026-02-01T10:58:27.360630",
-  "state": "<MagicMock name='mock.model_dump()' id='4865657552'>",
-  "agent_name": "The Prism"
-}
