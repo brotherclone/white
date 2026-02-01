@@ -74,7 +74,10 @@ class BaseRainbowAgentState(BaseModel):
     # Use dedupe_artifacts to prevent exponential growth from nodes that
     # mutate state.artifacts and return the full state
     artifacts: Annotated[List[Any], dedupe_artifacts] = Field(default_factory=list)
-    skipped_nodes: Annotated[List[str], add] = Field(default_factory=list)
+    # Deduplicate skipped nodes to prevent exponential growth
+    skipped_nodes: Annotated[
+        List[str], lambda old, new: list(dict.fromkeys((old or []) + (new or [])))
+    ] = Field(default_factory=list)
 
     def __init__(self, **data):
         super().__init__(**data)
