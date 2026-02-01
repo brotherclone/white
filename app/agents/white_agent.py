@@ -74,6 +74,10 @@ class WhiteAgent(BaseModel):
             "violet": VioletAgent(),
         }
 
+    def _artifact_base_path(self) -> str:
+        """Return the base path for artifacts from environment variable."""
+        return os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
+
     def start_workflow(
         self,
         user_input: str | None = None,
@@ -293,6 +297,7 @@ class WhiteAgent(BaseModel):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
 
     @staticmethod
@@ -638,7 +643,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logger.info("⚫️Processing Black Agent work... ")
+        logger.info("⚫️ Processing Black Agent work... ")
         if state.workflow_paused:
             logger.info("Skipping Black Agent work processing - workflow is paused")
             return state
@@ -741,7 +746,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logger.info("🟠Processing Orange Agent work... ")
+        logger.info("🟠 Processing Orange Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         orange_proposal = sp.iterations[-1]
         orange_artifacts = state.artifacts or []
@@ -792,7 +797,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_yellow_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logger.info("🟡Processing Yellow Agent work... ")
+        logger.info("🟡 Processing Yellow Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         yellow_proposal = sp.iterations[-1]
         yellow_artifacts = state.artifacts or []
@@ -839,7 +844,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_green_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logger.info("🟢Processing Green Agent work... ")
+        logger.info("🟢 Processing Green Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         green_proposal = sp.iterations[-1]
         green_artifacts = state.artifacts or []
@@ -962,7 +967,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_indigo_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logger.info("🩵Processing Indigo Agent work... ")
+        logger.info("🩵 Processing Indigo Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         indigo_proposal = sp.iterations[-1]
         indigo_artifacts = state.artifacts or []
@@ -1028,7 +1033,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def process_violet_agent_work(self, state: MainAgentState) -> MainAgentState:
-        logger.info("🟣Processing Violet Agent work... ")
+        logger.info("🟣 Processing Violet Agent work... ")
         sp = self._normalize_song_proposal(state.song_proposals)
         violet_proposal = sp.iterations[-1]
         violet_artifacts = state.artifacts or []
@@ -1074,7 +1079,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
         return state
 
     def _violet_rebracketing_analysis(self, proposal, interview_artifacts) -> str:
-        logger.info("Processing Violet Agent rebracketing analysis... ")
+        logger.info("🟣 Processing Violet Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1136,7 +1141,7 @@ Focus on revealing the underlying ORDER, not explaining away the solipsism.
     def _indigo_rebracketing_analysis(
         self, proposal, midi_artifacts, audio_artifacts, image_artifacts, text_artifacts
     ) -> str:
-        logger.info("Processing Indigo Agent rebracketing analysis... ")
+        logger.info("🩵 Processing Indigo Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1213,7 +1218,7 @@ Focus on revealing the underlying ORDER, not solving the puzzles.
         tape_label_artifacts,
         alternate_timeline_artifacts,
     ) -> str:
-        logger.info("Processing Blue Agent rebracketing analysis... ")
+        logger.info("🔵 Processing Blue Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1285,7 +1290,7 @@ Focus on revealing the underlying ORDER, not choosing between timelines.
         extinction_artifacts,
         rescue_decision_artifacts,
     ) -> str:
-        logger.info("Processing Green Agent rebracketing analysis... ")
+        logger.info("🟢 Processing Green Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         prompt = ""
@@ -1361,7 +1366,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _yellow_rebracketing_analysis(
         self, proposal, game_run_artifacts, character_sheet_artifacts
     ) -> str:
-        logger.info("🟡⚪️Processing Yellow Agent rebracketing analysis... ")
+        logger.info("🟡 ⚪️ Processing Yellow Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1425,7 +1430,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _orange_rebracketing_analysis(
         self, proposal, newspaper_artifacts, symbolic_object_artifacts
     ) -> str:
-        logger.info("🟠⚪️Processing Orange Agent rebracketing analysis... ")
+        logger.info("🟠 ⚪️ Processing Orange Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1487,7 +1492,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
                 return "LLM call failed - Orange rebracketing unavailable"
 
     def _red_rebracketing_analysis(self, proposal, book_artifacts) -> str:
-        logger.info("🔴⚪️Processing Red Agent rebracketing analysis... ")
+        logger.info("🔴 ⚪️ Processing Red Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1545,7 +1550,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
     def _black_rebracketing_analysis(
         self, proposal, evp_artifacts, sigil_artifacts
     ) -> str:
-        logger.info("⚫️⚪️Processing Black Agent rebracketing analysis... ")
+        logger.info("⚫️ ⚪️ Processing Black Agent rebracketing analysis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1607,7 +1612,7 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
     def _synthesize_document_for_red(
         self, rebracketed_analysis, black_proposal, artifacts
     ):
-        logger.info("⚫️⚪️🔴Processing Black Agent for synthesis... ")
+        logger.info("⚫️ ⚪️ 🔴 Processing Black Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1665,7 +1670,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_orange(
         self, rebracketed_analysis, red_proposal, artifacts
     ):
-        logger.info("🔴⚪️🟠Processing Red Agent for synthesis... ")
+        logger.info("🔴 ⚪️ 🟠 Processing Red Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1723,7 +1728,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_yellow(
         self, rebracketed_analysis, orange_proposal, artifacts
     ):
-        logger.info("🟠⚪️🟡Processing Orange Agent for synthesis... ")
+        logger.info("🟠 ⚪️ 🟡 Processing Orange Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1781,7 +1786,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_green(
         self, rebracketed_analysis, yellow_proposal, artifacts
     ):
-        logger.info("🟡⚪️🟢Processing Yellow Agent for synthesis... ")
+        logger.info("🟡 ⚪️ 🟢 Processing Yellow Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1839,7 +1844,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_blue(
         self, rebracketed_analysis, green_proposal, artifacts
     ):
-        logger.info("🟢⚪️🔵Processing Green Agent for synthesis... ")
+        logger.info("🟢 ⚪️ 🔵 Processing Green Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1897,7 +1902,7 @@ Structure your synthesis as a clear creative brief.
     def _synthesize_document_for_indigo(
         self, rebracketed_analysis, blue_proposal, artifacts
     ):
-        logger.info("🔵⚪️🩵Processing Blue Agent for synthesis... ")
+        logger.info("🔵 ⚪️ 🩵 Processing Blue Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1960,7 +1965,7 @@ Structure your synthesis as a clear creative brief for cryptographic methodology
     def _synthesize_document_for_violet(
         self, rebracketed_analysis, indigo_proposal, artifacts
     ):
-        logger.info("🩵⚪️🟣Processing Indigo Agent for synthesis... ")
+        logger.info("🩵 ⚪️ 🟣 Processing Indigo Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -2023,7 +2028,7 @@ Structure your synthesis as a clear creative brief for solipsistic methodology.
     def _synthesize_document_for_white(
         self, rebracketed_analysis, violet_proposal, artifacts
     ):
-        logger.info("🟣⚪️Processing Violet Agent for synthesis... ")
+        logger.info("🟣 ⚪️ Processing Violet Agent for synthesis... ")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -2349,7 +2354,7 @@ Structure your synthesis as the final creative brief before manifestation.
         all_iterations = "---".join([str(i) for i in state.song_proposals.iterations])
 
         prompt = f"""
-You are The Prism performing HOLOGRAPHIC META-REBRACKETING.
+You are the Prism performing HOLOGRAPHIC META-REBRACKETING.
 
 You have witnessed the complete chromatic cascade. Each agent shifted
 categorical boundaries in their unique way:
@@ -3062,13 +3067,3 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
-
-    @staticmethod
-    def _artifact_base_path() -> str:
-        """
-        Return a valid absolute path for artifact storage.
-        Ensures the directory exists and never returns None.
-        """
-        path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH") or "./chain_artifacts/unsorted"
-        os.makedirs(path, exist_ok=True)
-        return os.path.abspath(path)

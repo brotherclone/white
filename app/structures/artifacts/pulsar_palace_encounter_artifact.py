@@ -89,6 +89,17 @@ class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
             self.__class__._rebuilt = True
         super().__init__(**data)
 
+    def __repr_args__(self):
+        """Override to prevent circular reference in repr output."""
+        # Only return essential fields, not the full nested objects
+        return [
+            ("artifact_id", self.artifact_id),
+            ("thread_id", self.thread_id),
+            ("num_characters", len(self.characters)),
+            ("num_rooms", len(self.rooms)),
+            ("story_segments", len(self.story)),
+        ]
+
     def to_markdown(self) -> str:
         """Convert encounter artifact to formatted markdown."""
         md_lines = ["# Pulsar Palace Game Run", "", "## Characters", ""]

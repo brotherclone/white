@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from dotenv import load_dotenv
 
 from app.structures.artifacts.species_extinction_artifact import (
@@ -18,11 +19,11 @@ def load_green_corpus(corpus_path: str = os.getenv("GREEN_CORPUS_DIR")):
     return data
 
 
-def get_random_species(species: dict) -> SpeciesExtinctionArtifact:
+def get_random_species(corpus: dict) -> SpeciesExtinctionArtifact:
     """Get a random species from the corpus"""
-    c = len(species["entries"])
-    index = species["random"].randint(0, c - 1)
-    return parse_species_entry(species["entries"][index])
+    c = len(corpus["entries"])
+    index = random.randint(0, c - 1)
+    return parse_species_entry(corpus["entries"][index])
 
 
 def parse_species_entry(entry_dict: dict) -> SpeciesExtinctionArtifact:

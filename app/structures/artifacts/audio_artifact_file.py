@@ -26,7 +26,7 @@ class AudioChainArtifactFile(ChainArtifact, ABC):
         le=1000000.0,
         default=1.0,
     )
-    audio_bytes: bytes = Field(description="Audio bytes")
+    audio_bytes: bytes = Field(default=b"", description="Audio bytes")
     channels: int = Field(description="Number of audio channels", ge=1, le=2, default=2)
 
     def __init__(self, **data):

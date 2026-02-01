@@ -44,6 +44,7 @@ class RedAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
@@ -232,12 +233,11 @@ class RedAgent(BaseRainbowAgent, ABC):
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
-                    book = BookArtifact(**data)
-                    # Don't include thread_id in base_path - file_path property adds it
-                    book.base_path = os.getenv(
+                    data["base_path"] = os.getenv(
                         "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
-                    book.thread_id = state.thread_id
+                    data["thread_id"] = state.thread_id
+                    book = BookArtifact(**data)
                     book.save_file()
                     state.artifacts.append(book)
                     state.should_create_book = False
@@ -294,9 +294,15 @@ class RedAgent(BaseRainbowAgent, ABC):
                         page_2_text = ""
                 state.reaction_level += 1
                 book_dict = book_data.model_dump()
+                # Remove fields that should use class defaults, not source-generated values
+                book_dict.pop("chain_artifact_file_type", None)
+                book_dict.pop("chain_artifact_type", None)
+                book_dict.pop("file_name", None)
+                book_dict.pop("file_path", None)
+                book_dict.pop("artifact_id", None)  # Let class generate UUID
+
                 book_dict["excerpts"] = [page_1_text, page_2_text]
                 book_dict["thread_id"] = state.thread_id
-                book_dict["artifact_name"] = "main_book"
                 book_dict["base_path"] = os.getenv(
                     "AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"
                 )
@@ -346,7 +352,6 @@ class RedAgent(BaseRainbowAgent, ABC):
                         state.should_respond_with_reaction_book = False
                         return state
                     book_dict["thread_id"] = state.thread_id
-                    book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
                     book_dict["base_path"] = os.getenv(
                         "AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"
                     )
@@ -391,23 +396,35 @@ class RedAgent(BaseRainbowAgent, ABC):
             proposer = claude.with_structured_output(BookArtifact)
             try:
                 result = proposer.invoke(prompt)
-                if isinstance(result, BookArtifact | dict):
-
-                    result["thread_id"] = state.thread_id
-                    result["artifact_name"] = f"reaction_book_{state.reaction_level}"
-                    result["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")
-                    state.current_reaction_book = BookArtifact(**result)
-                    state.artifacts.append(state.current_reaction_book)
-                    state.reaction_level += 1
-                    state.should_respond_with_reaction_book = False
-                    return state
+                if isinstance(result, BookArtifact):
+                    result_dict = result.model_dump()
+                elif isinstance(result, dict):
+                    result_dict = result
                 else:
                     error_msg = f"Expected BookArtifact, got {type(result)}"
                     logger.error(error_msg)
                     state.current_reaction_book = None
                     if block_mode:
                         raise TypeError(error_msg)
+                    state.should_respond_with_reaction_book = False
+                    return state
+
+                # Remove fields that should use class defaults, not LLM-generated values
+                result_dict.pop("chain_artifact_file_type", None)
+                result_dict.pop("chain_artifact_type", None)
+                result_dict.pop("file_name", None)
+                result_dict.pop("file_path", None)
+                result_dict.pop("artifact_id", None)  # Let class generate UUID
+
+                result_dict["thread_id"] = state.thread_id
+                result_dict["base_path"] = os.getenv(
+                    "AGENT_ARTIFACTS_PATH", "artifacts"
+                )
+                state.current_reaction_book = BookArtifact(**result_dict)
+                state.artifacts.append(state.current_reaction_book)
+                state.reaction_level += 1
                 state.should_respond_with_reaction_book = False
+                return state
             except Exception as e:
                 logger.error(f"Anthropic model call failed: {e!s}")
                 state.current_reaction_book = None

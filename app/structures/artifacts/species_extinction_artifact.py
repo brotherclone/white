@@ -11,7 +11,8 @@ from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.population_data import PopulationData
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
-from app.structures.enums.extinction_cause import ExtinctionCause
+
+# ExtinctionCause changed to str to allow flexible values from corpus
 from app.util.string_utils import sanitize_for_filename
 
 load_dotenv()
@@ -35,7 +36,7 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
     # Conservation status
     iucn_status: str = Field(..., description="IUCN Red List category")
     extinction_year: int = Field(
-        ..., ge=2020, le=2150, description="Projected/actual extinction year"
+        ..., ge=1900, le=2150, description="Projected/actual extinction year"
     )
     population_trajectory: List[PopulationData] = Field(default_factory=list)
 
@@ -45,7 +46,9 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
     range_km2: Optional[float] = Field(None, description="Historical range in km²")
 
     # Extinction drivers
-    primary_cause: ExtinctionCause
+    primary_cause: str = Field(
+        ..., description="Primary extinction cause (e.g., habitat_loss, climate_change)"
+    )
     secondary_causes: List[str] = Field(default_factory=list)
     anthropogenic_factors: List[str] = Field(default_factory=list)
 
@@ -73,7 +76,9 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
 
     # Physical characteristics (for musical mapping)
     size_category: Literal["tiny", "small", "medium", "large", "massive"] = "medium"
-    lifespan_years: Optional[int] = None
+    lifespan_years: Optional[float] = (
+        None  # Can be fractional (e.g., 0.16 for ~2 months)
+    )
     movement_pattern: Optional[str] = Field(
         None, description="migratory, sedentary, nomadic"
     )
@@ -93,7 +98,7 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
             "species": self.common_name,
             "scientific_name": self.scientific_name,
             "extinction_year": self.extinction_year,
-            "primary_cause": self.primary_cause.value,
+            "primary_cause": self.primary_cause,
             "habitat": self.habitat,
             "population_trajectory": [
                 p.model_dump() for p in self.population_trajectory
@@ -116,7 +121,7 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
         return (
             f"{self.common_name} ({self.scientific_name}) went extinct in {self.extinction_year}. "
             f"{pop_text}"
-            f"Primary cause: {self.primary_cause.value.replace('_', ' ')}. "
+            f"Primary cause: {self.primary_cause.replace('_', ' ')}. "
             f"Habitat: {self.habitat}. "
             f"Cascade effects: {', '.join(self.cascade_effects[:3])}."
         )

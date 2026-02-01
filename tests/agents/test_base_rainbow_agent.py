@@ -52,6 +52,7 @@ def test__get_claude_uses_settings(monkeypatch):
         max_retries=2,
         timeout=30,
         stop=["\n"],
+        max_tokens=1000,
     )
 
     # Fake ChatAnthropic that captures init kwargs

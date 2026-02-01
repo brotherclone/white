@@ -422,6 +422,7 @@ def test_invoke_black_agent():
     """Test Black Agent invocation."""
     mock_state = MagicMock(spec=MainAgentState)
     mock_black_agent = MagicMock(return_value=mock_state)
+    mock_state.thread_id = "test_thread"
     agent = WhiteAgent()
     agent.agents["black"] = mock_black_agent
     result = agent.invoke_black_agent(mock_state)

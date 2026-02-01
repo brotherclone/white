@@ -73,6 +73,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
@@ -308,7 +309,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                        You are evaluating whether to continue adding another room to the Pulsar Palace game run.
 
                        Current run narrative:
-                       {state.encounter_narrative_artifact}
+                       {state.encounter_narrative_artifact.for_prompt()}
 
                        Current counter proposal:
                        {state.counter_proposal}
@@ -366,7 +367,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
         if mock_mode:
             return "done"
         else:
-            if state.story_elaboration_level < state.max_rooms:
+            if state.current_room_index < len(state.rooms) - 1:
                 if state.should_add_to_story:
                     return "add"
             return "done"
@@ -424,6 +425,10 @@ Your response should be a SongProposalIteration with:
 - The procedural BPM, key, mood, genres above
 - A creative title (not just the room name)
 - An enhanced concept that connects game → music → White Agent themes
+
+CRITICAL: rainbow_color should be the STRING "Y"
+NOT a dictionary like {{"color_name": "Yellow"}}
+Just: "Y"
             """
             claude = self._get_claude()
             proposer = claude.with_structured_output(SongProposalIteration)
@@ -472,11 +477,11 @@ Your response should be a SongProposalIteration with:
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
-                encounter = PulsarPalaceEncounterArtifact(**data)
-                # Update base_path to save to chain_artifacts instead of tests/mocks
-                encounter.base_path = os.getenv(
+                data["thread_id"] = state.thread_id
+                data["base_path"] = os.getenv(
                     "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                 )
+                encounter = PulsarPalaceEncounterArtifact(**data)
                 # Note: file_path is now a computed property, automatically updated
                 state.encounter_narrative_artifact = encounter
                 # Save the mock artifact to chain_artifacts

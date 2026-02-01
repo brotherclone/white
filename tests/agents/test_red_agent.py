@@ -45,6 +45,7 @@ def write_yaml(path, data):
 def test_generate_alternate_song_spec_mock():
     agent = RedAgent()
     state = RedAgentState()
+    state.thread_id = "test_thread"
     result_state = agent.generate_alternate_song_spec(state)
     assert result_state.counter_proposal is not None
     assert isinstance(result_state.counter_proposal, SongProposalIteration)

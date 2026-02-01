@@ -1,0 +1,18 @@
+artifact_id: 61ef4faa-8889-4659-bfb6-7c5bbddef485
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A mysteriously damaged recording tape from the 1977 session that plays
+  in an endless 7/8 time signature loop, with the eighth beat always cutting to silence
+  before beginning again. Local youth report experiencing "phantom sensations" and
+  temporal displacement when listening to the loop, as if consciousness itself is
+  learning to inhabit the productive stumble between completion and incompletion.
+file_name: 61ef4faa-8889-4659-bfb6-7c5bbddef485_t_symbolic_object.yml
+name: The Hopatcong 7/8 Tape Loop
+rainbow_color_mnemonic_character_value: T
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: c59be431-6527-4424-83fd-4dea6a83edf5

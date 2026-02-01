@@ -44,7 +44,7 @@ def violet_agent_state():
     )
 
     return VioletAgentState(
-        thread_id="test_thread_001",
+        thread_id="mock_thread_001",
         white_proposal=white_proposal,
         song_proposals=SongProposal(iterations=[white_proposal]),
     )
@@ -436,7 +436,7 @@ class TestVioletAgentFullWorkflow:
         )
 
         main_state = MainAgentState(
-            thread_id="test_thread_001", song_proposals=proposals
+            thread_id="mock_thread_001", song_proposals=proposals
         )
 
         result = violet_agent(main_state)
@@ -464,7 +464,7 @@ class TestVioletAgentFullWorkflow:
         )
 
         main_state = MainAgentState(
-            thread_id="test_thread_001", song_proposals=proposals
+            thread_id="mock_thread_001", song_proposals=proposals
         )
 
         original_count = len(main_state.song_proposals.iterations)
@@ -491,7 +491,7 @@ class TestVioletAgentFullWorkflow:
         )
 
         main_state = MainAgentState(
-            thread_id="test_thread_001", song_proposals=proposals
+            thread_id="mock_thread_001", song_proposals=proposals
         )
 
         result = violet_agent(main_state)
