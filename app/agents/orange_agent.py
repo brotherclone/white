@@ -6,7 +6,7 @@ import yaml
 
 from abc import ABC
 from datetime import datetime, timedelta
-from typing import cast, Iterable, Any, Optional
+from typing import Optional
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
@@ -18,9 +18,10 @@ from pydantic import Field
 from app.agents.states.orange_agent_state import OrangeAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus, get_corpus
-from app.reference.mcp.rows_bud.orange_mythos_server import insert_symbolic_object
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.symbolic_object_category import SymbolicObjectCategory
 from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
 from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
@@ -53,6 +54,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
         corpus_dir: str = os.getenv("ORANGE_CORPUS_DIR")
         self.corpus = get_corpus(corpus_dir)
@@ -240,12 +242,13 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
+                    data["thread_id"] = state.thread_id
+                    data["base_path"] = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    )
                     story = NewspaperArtifact(**data)
                     combined = story.get_text_content()
                     story.text = combined
-                    story.base_path = os.getenv(
-                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
-                    )
                     story.save_file()
                     state.synthesized_story = story
                     state.artifacts.append(story)
@@ -317,18 +320,21 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
+                    # Remove fields that should use class defaults, not LLM-generated values
+                    result.pop("chain_artifact_file_type", None)
+                    result.pop("chain_artifact_type", None)
+                    result.pop("file_name", None)
+                    result.pop("file_path", None)
+                    result.pop("thread_id", None)  # Will be set below
+                    result.pop("artifact_id", None)  # Let class generate UUID
+
                     result["thread_id"] = state.thread_id
                     result["base_path"] = os.getenv(
                         "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
                     state.synthesized_story = NewspaperArtifact(**result)
-                    if state.synthesized_story.thread_id == "UNKNOWN_THREAD_ID":
-                        state.synthesized_story.thread_id = state.thread_id
                     combined = state.synthesized_story.get_text_content()
                     state.synthesized_story.text = combined
-                    state.synthesized_story.base_path = os.getenv(
-                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
-                    )
                     try:
                         state.synthesized_story.save_file()
                     except Exception as e:
@@ -339,11 +345,20 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     state.artifacts.append(state.synthesized_story)
                     return state
                 elif isinstance(result, NewspaperArtifact):
-                    state.synthesized_story = result
-                    state.synthesized_story.thread_id = state.thread_id
-                    state.synthesized_story.base_path = os.getenv(
+                    # Override any LLM-generated values with correct ones
+                    result.thread_id = state.thread_id
+                    result.base_path = os.getenv(
                         "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
+                    # Force correct file type (class default is YML)
+                    result.chain_artifact_file_type = ChainArtifactFileType.YML
+                    # Regenerate file_name with correct values
+                    result.get_file_name()
+                    state.synthesized_story = result
+                    # Ensure text is populated from article content
+                    if not state.synthesized_story.text:
+                        combined = state.synthesized_story.get_text_content()
+                        state.synthesized_story.text = combined
                     try:
                         state.synthesized_story.save_file()
                     except Exception as e:
@@ -386,18 +401,18 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
     @agent_error_handler("Rows Bud")
     def add_to_corpus(self, state: OrangeAgentState) -> OrangeAgentState:
-        """Add a synthesized story to mythology corpus (optional, for training data)"""
         get_state_snapshot(state, "add_to_corpus_entry", state.thread_id, "Rows Bud")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
-            print(
-                f"[MOCK: {os.getenv('MOCK_MODE')}] Would call orange-mythos:add_story_to_corpus"
-            )
+            print("[MOCK] Would call orange-mythos:add_story_to_corpus")
             get_state_snapshot(state, "add_to_corpus_exit", state.thread_id, "Rows Bud")
             return state
         else:
             try:
                 story = state.synthesized_story
+                if not story.text:
+                    logger.warning("Story text is None, using headline as fallback")
+                    story.text = story.headline
                 story_id, score = self.corpus.add_story(
                     headline=story.headline,
                     date=story.date,
@@ -422,6 +437,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+
         if mock_mode:
             try:
                 with open(
@@ -432,6 +448,10 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
+                    data["thread_id"] = state.thread_id
+                    data["base_path"] = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    )
                     obj = SymbolicObjectArtifact(**data)
                     state.symbolic_object = obj
             except Exception as e:
@@ -439,63 +459,136 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+            get_state_snapshot(
+                state, "select_symbolic_object_exit", state.thread_id, "Rows Bud"
+            )
             return state
+
+        # Non-mock: Actually generate the symbolic object
         else:
-            if not state.symbolic_object:
-                logger.warning("No symbolic object selected - skipping insertion")
+            if not state.synthesized_story:
+                logger.warning("No synthesized story - creating fallback object")
+                state.symbolic_object = SymbolicObjectArtifact(
+                    thread_id=state.thread_id,
+                    name="mysterious radio equipment",
+                    symbolic_object_category=SymbolicObjectCategory.INFORMATION_ARTIFACTS,
+                    description="Unexplained electronic broadcasting device",
+                    base_path=os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    ),
+                )
+                get_state_snapshot(
+                    state, "select_symbolic_object_exit", state.thread_id, "Rows Bud"
+                )
                 return state
-            if not state.selected_story_id:
-                logger.warning("No story ID selected - skipping object insertion")
-                return state
+
+            prompt = f"""Analyze this Sussex County newspaper story and select a symbolic object.
+
+    STORY:
+    Headline: {state.synthesized_story.headline}
+    Date: {state.synthesized_story.date}
+    Location: {state.synthesized_story.location}
+
+    Full Text:
+    {state.synthesized_story.text}
+
+    WHITE'S CONCEPT (for thematic resonance):
+    {state.white_proposal.concept}
+
+    TASK: Select ONE symbolic object that:
+    1. Could plausibly exist in 1975-1995 Sussex County, New Jersey
+    2. Makes abstract concepts concrete (information → physical object)
+    3. Has mythological weight (could become legendary)
+    4. Connects to the story's themes and White's concepts
+    5. Fits one of these categories:
+       - CIRCULAR_TIME: Clocks, calendars, loops, temporal markers
+       - INFORMATION_ARTIFACTS: Newspapers, broadcasts, transmissions, recordings
+       - LIMINAL_OBJECTS: Doorways, thresholds, portals, boundaries
+       - PSYCHOGEOGRAPHIC: Maps, coordinates, dimensional markers
+
+    EXAMPLES:
+    - "Nash's 182 BPM clock" (CIRCULAR_TIME) - A metronome that marks impossible rhythm
+    - "The EMORY transmission" (INFORMATION_ARTIFACTS) - A persistent broadcast signal
+    - "The Loomis Avenue threshold" (LIMINAL_OBJECTS) - A doorway between states
+    - "Route 23 temporal marker" (PSYCHOGEOGRAPHIC) - A highway mile marker where time shifts
+
+    Return a SymbolicObjectArtifact with:
+    - name: Specific, evocative (e.g., "The Sussex Frequency Analyzer")
+    - symbolic_object_category: One of the four categories above
+    - description: 1-2 sentences about what it is and why it matters
+    """
+
+            claude = self._get_claude()
+            proposer = claude.with_structured_output(SymbolicObjectArtifact)
+
             try:
-                story = self.corpus.get_story(state.selected_story_id)
-                if not story:
-                    logger.warning(
-                        f"Could not retrieve story {state.selected_story_id}"
+                result = proposer.invoke(prompt)
+                if isinstance(result, dict):
+                    # Remove fields that should use class defaults, not LLM-generated values
+                    result.pop("chain_artifact_file_type", None)
+                    result.pop("chain_artifact_type", None)
+                    result.pop("file_name", None)
+                    result.pop("file_path", None)
+                    result.pop("thread_id", None)  # Will be set below
+                    result.pop("artifact_id", None)  # Let class generate UUID
+
+                    result["thread_id"] = state.thread_id
+                    result["base_path"] = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
-                    return state
-                prompt = f"""Insert this symbolic object into the story naturally.
-    
-                ORIGINAL STORY:
-                {story['text']}
-    
-                SYMBOLIC OBJECT: {state.symbolic_object}
-                CATEGORY: {state.symbolic_object.symbolic_object_category}
-    
-                RULES:
-                - Object did NOT exist in original story
-                - Insert as if it was always there
-                - Keep journalistic tone (pre-gonzo)
-                - Make it central to the narrative
-    
-                Return ONLY the updated story text."""
-                response = self.anthropic_client.messages.create(
-                    model="claude-sonnet-4-20250514",
-                    max_tokens=3000,
-                    temperature=0.8 + (state.gonzo_intensity * 0.05),
-                    messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
-                )
-                updated_text = response.content[0].text.strip()
-                self.corpus.insert_symbolic_object(
-                    story_id=state.selected_story_id,
-                    category=state.symbolic_object.symbolic_object_category,
-                    description=state.symbolic_object.name,
-                    updated_text=updated_text,
-                )
-                state.synthesized_story.text = updated_text
-                print(f"   Object inserted: {state.symbolic_object.name}")
+                    state.symbolic_object = SymbolicObjectArtifact(**result)
+                elif isinstance(result, SymbolicObjectArtifact):
+                    # Override any LLM-generated values with correct ones
+                    result.thread_id = state.thread_id
+                    result.base_path = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    )
+                    # Force correct file type (class default is YML)
+                    result.chain_artifact_file_type = ChainArtifactFileType.YML
+                    # Regenerate file_name with correct values
+                    result.get_file_name()
+                    state.symbolic_object = result
+                else:
+                    error_msg = (
+                        f"Expected SymbolicObjectArtifact or dict, got {type(result)}"
+                    )
+                    logger.warning(error_msg)
+                    if block_mode:
+                        raise TypeError(error_msg)
+                    state.symbolic_object = SymbolicObjectArtifact(
+                        thread_id=state.thread_id,
+                        name="mysterious radio equipment",
+                        symbolic_object_category=SymbolicObjectCategory.INFORMATION_ARTIFACTS,
+                        description="Unexplained electronic device found at the scene",
+                        base_path=os.getenv(
+                            "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                        ),
+                    )
+
+                logger.info(f"Selected symbolic object: {state.symbolic_object.name}")
 
             except Exception as e:
-                logger.error(f"Object insertion failed: {e}")
+                error_msg = f"Symbolic object selection LLM call failed: {e!s}"
+                logger.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+                state.symbolic_object = SymbolicObjectArtifact(
+                    thread_id=state.thread_id,
+                    name="unidentified transmission device",
+                    symbolic_object_category=SymbolicObjectCategory.INFORMATION_ARTIFACTS,
+                    description="Electronic equipment of unknown origin",
+                    base_path=os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    ),
+                )
 
-        get_state_snapshot(
-            state, "select_symbolic_object_exit", state.thread_id, "Rows Bud"
-        )
-        return state
+            get_state_snapshot(
+                state, "select_symbolic_object_exit", state.thread_id, "Rows Bud"
+            )
+            return state
 
-    @staticmethod
     @agent_error_handler("Rows Bud")
-    def insert_symbolic_object_node(state: OrangeAgentState) -> OrangeAgentState:
+    def insert_symbolic_object_node(self, state: OrangeAgentState) -> OrangeAgentState:
         """Insert a symbolic object into the story via MCP tool"""
         get_state_snapshot(
             state, "insert_symbolic_object_node_entry", state.thread_id, "Rows Bud"
@@ -520,12 +613,69 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             )
             return state
         try:
-            insert_symbolic_object(
+            object_desc = state.symbolic_object.description
+            object_category = state.symbolic_object.symbolic_object_category.value
+
+            # Get the story first
+            story = self.corpus.get_story(state.selected_story_id)
+            if not story:
+                logger.warning(f"Story {state.selected_story_id} not found in corpus")
+                get_state_snapshot(
+                    state,
+                    "insert_symbolic_object_node_exit",
+                    state.thread_id,
+                    "Rows Bud",
+                )
+                return state
+
+            # Build the prompt (same as MCP tool)
+            prompt = f"""Insert this symbolic object into the story naturally and seamlessly.
+
+                    ORIGINAL STORY:
+                    {story.get('text', '')}
+
+                    SYMBOLIC OBJECT: {object_desc}
+                    CATEGORY: {object_category}
+
+                    CRITICAL RULES:
+                    - The object did NOT exist in the original story
+                    - Insert it as if it was always there and was discovered/noticed
+                    - Make it feel central to the narrative, not forced
+                    - Keep the journalistic tone (this is pre-gonzo rewriting)
+                    - The object should raise questions, create mystery
+                    - It should feel like a detail the original journalist might have overlooked or downplayed
+
+                    LOCATION CONTEXT: {story.get('location', 'Sussex County')} in {story.get('date', '1980s')}
+
+                    Return ONLY the updated story text with the object naturally integrated. 
+                    Do not add any preamble or explanation."""
+
+            # Make Anthropic API call (same as MCP tool)
+            response = self.llm.invoke([HumanMessage(content=prompt)], max_tokens=2000)
+            updated_text = response.content.strip()
+
+            self.corpus.insert_symbolic_object(
                 story_id=state.selected_story_id,
-                object_category=state.symbolic_object.symbolic_object_category,
-                custom_object=state.symbolic_object.name,
+                category=object_category,
+                description=object_desc,
+                updated_text=updated_text,
             )
-            print(f"Object inserted: {state.symbolic_object.name}")
+
+            # Save the symbolic object artifact
+            if state.symbolic_object.base_path in (None, "/"):
+                state.symbolic_object.base_path = os.getenv(
+                    "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                )
+            if state.symbolic_object.thread_id in (None, "UNKNOWN_THREAD_ID"):
+                state.symbolic_object.thread_id = state.thread_id
+            try:
+                state.symbolic_object.save_file()
+                state.artifacts.append(state.symbolic_object)
+            except Exception as e:
+                logger.warning(f"Could not save symbolic object artifact: {e!s}")
+
+            logger.info(f"Object inserted: {state.symbolic_object.name}")
+
         except Exception as e:
             logger.error(f"Object insertion failed: {e!s}")
 
@@ -557,14 +707,15 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
+                    data["thread_id"] = state.thread_id
+                    data["base_path"] = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    )
                     new_article = NewspaperArtifact(**data)
                     state.mythologized_story = new_article
                     # Match non-mock processing
                     combined = state.mythologized_story.get_text_content()
                     state.mythologized_story.text = combined
-                    state.mythologized_story.base_path = os.getenv(
-                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
-                    )
                     try:
                         state.mythologized_story.save_file()
                     except Exception as e:
@@ -583,6 +734,16 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             return state
         try:
             story = self.corpus.get_story(state.selected_story_id)
+            if not story:
+                logger.warning("Could not retrieve story, using synthesized story")
+                story = {
+                    "headline": state.synthesized_story.headline,
+                    "date": state.synthesized_story.date,
+                    "location": state.synthesized_story.location,
+                    "text": state.synthesized_story.text,
+                    "source": state.synthesized_story.source,
+                    "tags": state.synthesized_story.tags,
+                }
             intensity_styles = {
                 1: "Subtle first-person observer",
                 2: "Embedded journalist, growing suspicion",

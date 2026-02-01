@@ -55,6 +55,14 @@ class ReactionBookChainArtifact(ChainArtifact, ABC):
     original_book_author: str
 
     def __init__(self, **data):
+        # Set artifact_name from title before super().__init__ generates file_name
+        if (
+            data.get("artifact_name") in (None, "UNKNOWN_ARTIFACT_NAME")
+            and "title" in data
+        ):
+            from app.util.string_utils import sanitize_for_filename
+
+            data["artifact_name"] = sanitize_for_filename(data["title"])
         super().__init__(**data)
 
     def save_file(self):

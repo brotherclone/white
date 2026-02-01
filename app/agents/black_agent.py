@@ -64,6 +64,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
         self.current_session_sigils = []
 
@@ -274,7 +275,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             return state
 
     @agent_error_handler("ThreadKeepr")
-    @skip_chance(0.75)
+    @skip_chance(1.0)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
         """Generate a sigil artifact and create a Todoist task for charging"""
         get_state_snapshot(
@@ -293,6 +294,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             try:
                 with open(mock_path, "r") as f:
                     data = yaml.safe_load(f)
+                data["thread_id"] = state.thread_id
                 sigil_artifact = SigilArtifact(**data)
                 state.artifacts.append(sigil_artifact)
                 state.awaiting_human_action = True
@@ -347,6 +349,7 @@ Example: "I will weave hidden frequencies that awaken dormant resistance."
             )
             charging_instructions = sigil_maker.charge_sigil()
             sigil_artifact = SigilArtifact(
+                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
                 wish=wish_text,
                 statement_of_intent=statement_of_intent,
                 glyph_description=description,
@@ -478,6 +481,7 @@ Manually charge the sigil for '{current_proposal.title}':
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
+                data["thread_id"] = state.thread_id
                 evp_artifact = EVPArtifact(**data)
             except Exception as e:
                 error_msg = f"Failed to read mock files for EVP: {e!s}"
@@ -485,7 +489,6 @@ Manually charge the sigil for '{current_proposal.title}':
                 if block_mode:
                     raise Exception(error_msg)
                 return state
-            evp_artifact.thread_id = state.thread_id
             evp_artifact.chain_artifact_file_type = ChainArtifactFileType.YML
             evp_artifact.artifact_name = "evp"
             evp_artifact.chain_artifact_type = ChainArtifactType.EVP_ARTIFACT

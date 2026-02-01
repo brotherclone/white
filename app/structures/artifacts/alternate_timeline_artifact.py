@@ -4,7 +4,7 @@ from abc import ABC
 from pathlib import Path
 from typing import List, Optional
 from dotenv import load_dotenv
-from pydantic import Field, field_validator
+from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.alternate_life_detail import AlternateLifeDetail
@@ -23,29 +23,33 @@ class AlternateTimelineArtifact(ChainArtifact, ABC):
     )
     title: str = Field(description="Title of the alternate timeline.")
     narrative: str = Field(
-        description="Narrative of the alternate timeline.", min_length=100
+        default="", description="Narrative of the alternate timeline."
     )
     divergence_point: DivergencePoint = Field(
         alias="divergence_point",
         description="Point of divergence between the original timeline and the alternate timeline.",
     )
     key_differences: List[str] = Field(
-        description="Key differences in the alternate timeline."
+        default_factory=list, description="Key differences in the alternate timeline."
     )
     specific_details: List[AlternateLifeDetail] = Field(
-        description="Specific details of the alternate timeline."
+        default_factory=list, description="Specific details of the alternate timeline."
     )
     emotional_tone: QuantumTapeEmotionalTone = Field(
-        alias="emotional_tone", description="Emotional tone of the alternate timeline."
+        default=QuantumTapeEmotionalTone.MELANCHOLY,
+        alias="emotional_tone",
+        description="Emotional tone of the alternate timeline.",
     )
     mood_description: str = Field(
-        description="Phenomenological notes about the alternate timeline."
+        default="", description="Phenomenological notes about the alternate timeline."
     )
     preceding_events: List[str] = Field(
-        description="Events that happened before the alternate timeline."
+        default_factory=list,
+        description="Events that happened before the alternate timeline.",
     )
     following_events: List[str] = Field(
-        description="Events that happened after the alternate timeline."
+        default_factory=list,
+        description="Events that happened after the alternate timeline.",
     )
     plausibility_score: Optional[float] = Field(
         default=None, description="How plausible the divergent event is", ge=0.0, le=1.0
@@ -64,23 +68,18 @@ class AlternateTimelineArtifact(ChainArtifact, ABC):
     )
 
     def __init__(self, **data):
+        # Set artifact_name from title before super().__init__ generates file_name
+        if (
+            data.get("artifact_name") in (None, "UNKNOWN_ARTIFACT_NAME")
+            and "title" in data
+        ):
+            from app.util.string_utils import sanitize_for_filename
+
+            data["artifact_name"] = sanitize_for_filename(data["title"])
         super().__init__(**data)
 
-    @field_validator("narrative")
-    @classmethod
-    def validate_narrative_length(cls, v):
-        """Narrative must be substantive."""
-        if len(v.split()) < 100:
-            raise ValueError("Narrative too short (minimum 100 words)")
-        return v
-
-    @field_validator("specific_details")
-    @classmethod
-    def validate_enough_details(cls, v):
-        """Must have at least 5 specific details."""
-        if len(v) < 5:
-            raise ValueError(f"Not enough specific details ({len(v)}/5)")
-        return v
+    # Validators removed to allow partial generation when model hits token limits
+    # The prompt still requests detailed content, but we accept what we get
 
     def flatten(self):
         parent_data = super().flatten()

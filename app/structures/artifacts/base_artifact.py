@@ -64,7 +64,11 @@ class ChainArtifact(BaseModel, ABC):
         super().__init__(**data)
         if self.artifact_id is None:
             self.artifact_id = str(uuid.uuid4())
-        # Only auto-generate filename if not explicitly provided
+        # Don't generate file_name here - let subclasses set artifact_name first
+        # file_name will be generated on first access via get_file_name()
+
+    def model_post_init(self, __context):
+        """Called after all __init__ methods complete, ensuring artifact_name is finalized"""
         if self.file_name is None:
             self.get_file_name()
 
@@ -92,6 +96,9 @@ class ChainArtifact(BaseModel, ABC):
             col = "T"
         else:
             col = self.rainbow_color_mnemonic_character_value.lower()
+        # Ensure artifact_id is set
+        if self.artifact_id is None:
+            self.artifact_id = str(uuid.uuid4())
         self.file_name = f"{self.artifact_id}_{col}_{self.artifact_name}.{self.chain_artifact_file_type.value}"
 
     def get_artifact_path(

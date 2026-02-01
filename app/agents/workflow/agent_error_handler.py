@@ -55,11 +55,14 @@ def agent_error_handler(agent_name: str):
                 }
 
                 try:
-                    error_file = (
-                        f"/chain_artifacts/{thread_id}/debug/ERROR_{agent_name}.json"
-                    )
                     import os
 
+                    base_path = os.getenv(
+                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
+                    )
+                    error_file = os.path.join(
+                        base_path, thread_id, "debug", f"ERROR_{agent_name}.json"
+                    )
                     os.makedirs(os.path.dirname(error_file), exist_ok=True)
                     with open(error_file, "w") as f:
                         json.dump(error_context, f, indent=2)

@@ -8,6 +8,7 @@ from app.structures.concepts.transformation_trace import TransformationTrace
 from app.structures.enums.white_facet import WhiteFacet
 from app.structures.manifests.song_proposal import SongProposal
 from app.structures.artifacts.artifact_relationship import ArtifactRelationship
+from app.structures.agents.base_rainbow_agent_state import dedupe_artifacts
 
 
 class MainAgentState(BaseModel):
@@ -18,14 +19,16 @@ class MainAgentState(BaseModel):
     present by shifting the angle of perception through successive refraction.
     """
 
-    thread_id: str
+    # thread_id should persist once set - use reducer that keeps old value if new is empty/None
+    thread_id: Annotated[str, lambda x, y: y if y else x]
     song_proposals: Annotated[SongProposal, lambda x, y: y or x] = Field(
         default_factory=lambda: SongProposal(iterations=[])
     )
 
     # Artifacts: Both ChainArtifact instances and dict representations
     # Rainbow agents serialize artifacts to dicts to avoid msgpack serialization issues
-    artifacts: Annotated[List[Any], add] = Field(default_factory=list)
+    # Use dedupe_artifacts to prevent exponential growth from node transitions
+    artifacts: Annotated[List[Any], dedupe_artifacts] = Field(default_factory=list)
 
     # Workflow control
     workflow_paused: Annotated[bool, lambda x, y: y if y is not None else x] = False

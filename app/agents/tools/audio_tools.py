@@ -28,13 +28,15 @@ logger = logging.getLogger(__name__)
 
 
 def _get_thread_artifact_base_path(thread_id: str | None = None) -> str:
-    """Get base path with thread_id appended if provided."""
+    """Get base path for artifacts.
+
+    NOTE: Returns ONLY the base path. The thread_id is added by
+    the artifact's file_path property in base_artifact.py.
+    """
     base = _get_agent_work_product_base_path()
-    if thread_id:
-        return os.path.join(base, thread_id)
-    else:
+    if not thread_id:
         logger.warning("No thread_id provided - using base directory only")
-        return base
+    return base
 
 
 def _get_agent_work_product_base_path() -> str:
@@ -475,7 +477,7 @@ def get_audio_segments_as_chain_artifacts(
         artifact = AudioChainArtifactFile(
             thread_id=thread_id or "UNKNOWN_THREAD_ID",
             audio_bytes=seg.tobytes(),
-            artifact_name=f"segment_{idx}.wav",
+            artifact_name=f"segment_{idx}",
             base_path=_get_thread_artifact_base_path(thread_id),
             rainbow_color_mnemonic_character_value=rainbow_color_mnemonic_character_value,
             chain_artifact_file_type=ChainArtifactFileType.AUDIO,

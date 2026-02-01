@@ -79,7 +79,7 @@ class CharacterPortraitArtifact(ChainArtifact, ABC):
 
 
 if __name__ == "__main__":
-    thread_id = "test_thread_001"
+    thread_id = "mock_thread_001"
     base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
 
     cp = CharacterPortraitArtifact(

@@ -253,8 +253,10 @@ class PulsarPalaceCharacter(BaseModel):
     portrait_artifact: Optional[CharacterPortraitArtifact] = Field(
         default=None, description="High-level portrait artifact with metadata"
     )
+    # Note: character_sheet creates a circular reference (sheet_content points back to this)
+    # Use exclude={"character_sheet"} when serializing to avoid infinite recursion
     character_sheet: Optional["PulsarPalaceCharacterSheet"] = Field(
-        default=None, description="Character sheet of the character"
+        default=None, description="Character sheet of the character", exclude=True
     )
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

@@ -39,9 +39,12 @@ class PulsarPalaceCharacterSheet(HtmlChainArtifactFile, ABC):
     rainbow_color_mnemonic_character_value: str = Field(
         default="Y", description="Mnemonic character for rainbow color coding: Y always"
     )
+    # Note: sheet_content creates a circular reference (character.character_sheet points back)
+    # Use exclude=True to prevent infinite recursion during serialization
     sheet_content: Optional["PulsarPalaceCharacter"] = Field(
         default=None,
         description="The PulsarPalaceCharacter object representing the character data",
+        exclude=True,
     )
 
     model_config = ConfigDict(extra="allow", arbitrary_types_allowed=True)

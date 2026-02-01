@@ -33,7 +33,7 @@ class YellowAgentState(BaseRainbowAgentState):
         Field(
             default=0,
             description="Number of times the story has been elaborated on. To prevent infinite looping",
-            lt=4,
+            le=4,
         )
     )
     current_room_index: Annotated[int, lambda x, y: y if y is not None else x] = Field(

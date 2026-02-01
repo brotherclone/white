@@ -36,7 +36,7 @@ def generate_note_cipher(
     artifact = InfranymMidiArtifact(
         base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "/tmp"),
         thread_id=f"midi_cipher_{random.randint(1000, 9999)}",
-        chain_artifact_file_type="mid",
+        chain_artifact_file_type="midi",
         chain_artifact_type="infranym_midi",
         rainbow_color_mnemonic_character_value="I",
         artifact_name=f"cipher_{secret_word.lower()[:8]}",
@@ -67,7 +67,7 @@ def generate_morse_duration(
     artifact = InfranymMidiArtifact(
         base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "/tmp"),
         thread_id=f"midi_morse_{random.randint(1000, 9999)}",
-        chain_artifact_file_type="mid",
+        chain_artifact_file_type="midi",
         chain_artifact_type="infranym_midi",
         rainbow_color_mnemonic_character_value="I",
         artifact_name=f"morse_{secret_word.lower()[:8]}",

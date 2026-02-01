@@ -12,6 +12,7 @@ from app.structures.manifests.song_proposal import SongProposalIteration
 def test_generate_alternate_song_spec_mock():
     agent = BlackAgent()
     state = BlackAgentState()
+    state.thread_id = "test_thread"
     result_state = agent.generate_alternate_song_spec(state)
     assert result_state.counter_proposal is not None
     assert isinstance(result_state.counter_proposal, SongProposalIteration)
@@ -22,6 +23,7 @@ def test_generate_alternate_song_spec_mock():
 def test_generate_evp_mock(mock_generate_evp):
     agent = BlackAgent(thread_id="test_thread")
     state = BlackAgentState()
+    state.thread_id = "test_thread"
     mock_evp = EVPArtifact()
     expected_state = BlackAgentState()
     expected_state.artifacts = [mock_evp]
@@ -36,6 +38,7 @@ def test_generate_sigil_mock_creates_artifact(monkeypatch):
     """Test that sigil is created when skip chance doesn't trigger"""
     agent = BlackAgent()
     state = BlackAgentState()
+    state.thread_id = "test_thread"
     state.counter_proposal = SongProposalIteration(
         iteration_id="mock_1",
         bpm=120,
@@ -71,6 +74,7 @@ def test_generate_sigil_mock_creates_artifact(monkeypatch):
 def test_evaluate_evp_routes(monkeypatch):
     agent = BlackAgent()
     state = BlackAgentState()
+    state.thread_id = "test_thread"
     monkeypatch.setattr("app.agents.black_agent.random.choice", lambda seq: 1)
     result_state = agent.evaluate_evp(state)
     assert result_state.should_update_proposal_with_evp is True
@@ -84,6 +88,7 @@ def test_evaluate_evp_routes(monkeypatch):
 def test_update_alternate_song_spec_with_evp_mock():
     agent = BlackAgent()
     state = BlackAgentState()
+    state.thread_id = "test_thread"
     result_state = agent.update_alternate_song_spec_with_evp(state)
     assert result_state.counter_proposal is not None
     assert isinstance(result_state.counter_proposal, SongProposalIteration)
@@ -93,6 +98,7 @@ def test_update_alternate_song_spec_with_evp_mock():
 def test_update_alternate_song_spec_with_sigil_mock():
     agent = BlackAgent()
     state = BlackAgentState()
+    state.thread_id = "test_thread"
     result_state = agent.update_alternate_song_spec_with_sigil(state)
     assert result_state.counter_proposal is not None
     assert isinstance(result_state.counter_proposal, SongProposalIteration)

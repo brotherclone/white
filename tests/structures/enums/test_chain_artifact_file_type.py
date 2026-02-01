@@ -12,6 +12,7 @@ EXPECTED = {
     "YML": "yml",
     "HTML": "html",
     "MIDI": "midi",
+    "TXT": "txt",
 }
 
 

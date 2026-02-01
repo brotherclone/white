@@ -1,0 +1,21 @@
+{
+  "node": "generate_alternate_song_spec_enter",
+  "timestamp": "2026-02-01T10:58:19.954538",
+  "state": {
+    "session_id": null,
+    "timestamp": null,
+    "thread_id": "test_thread",
+    "white_proposal": null,
+    "song_proposals": null,
+    "counter_proposal": null,
+    "messages": [],
+    "artifacts": [],
+    "skipped_nodes": [],
+    "main_generated_book": null,
+    "current_reaction_book": null,
+    "should_respond_with_reaction_book": false,
+    "should_create_book": true,
+    "reaction_level": 0
+  },
+  "agent_name": "The Light Reader"
+}

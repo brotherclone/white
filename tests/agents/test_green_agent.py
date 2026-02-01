@@ -44,7 +44,7 @@ def green_agent():
 @pytest.fixture
 def green_agent_state():
     """Create a GreenAgentState instance for testing."""
-    return GreenAgentState(thread_id="test-thread-001")
+    return GreenAgentState(thread_id="mock_thread_001")
 
 
 class TestGreenAgentInitialization:
@@ -325,7 +325,7 @@ class TestGreenAgentFullWorkflow:
         )
 
         main_state = MainAgentState(
-            thread_id="test-thread-001", song_proposals=proposals
+            thread_id="mock_thread_001", song_proposals=proposals
         )
 
         # Run the full agent
@@ -356,7 +356,7 @@ class TestGreenAgentFullWorkflow:
         )
 
         main_state = MainAgentState(
-            thread_id="test-thread-001", song_proposals=proposals
+            thread_id="mock_thread_001", song_proposals=proposals
         )
 
         original_count = len(main_state.song_proposals.iterations)

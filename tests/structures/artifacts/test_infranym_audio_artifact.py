@@ -37,13 +37,13 @@ class TestInfranymAudioArtifactInit:
     def test_init_basic(self, mock_audio_bytes, temp_base_path):
         """Test basic initialization with required fields"""
         artifact = InfranymAudioArtifact(
-            thread_id="test-thread-123",
+            thread_id="mock_thread_001",
             base_path=temp_base_path,
             audio_bytes=mock_audio_bytes,
             secret_word="TEST",
         )
 
-        assert artifact.thread_id == "test-thread-123"
+        assert artifact.thread_id == "mock_thread_001"
         assert artifact.chain_artifact_type == ChainArtifactType.INFRANYM_AUDIO
         assert artifact.encoder is not None
         assert artifact.surface_layer is not None
@@ -198,7 +198,7 @@ class TestGenerateComposition:
     def test_generate_composition_structure(self, mock_audio_bytes, temp_base_path):
         """Test that composition is generated with correct structure"""
         artifact = InfranymAudioArtifact(
-            thread_id="test-thread-123",
+            thread_id="mock_thread_001",
             base_path=temp_base_path,
             audio_bytes=mock_audio_bytes,
             secret_word="PUZZLE",
@@ -207,7 +207,7 @@ class TestGenerateComposition:
         composition = artifact.composition
 
         assert isinstance(composition, InfranymVoiceComposition)
-        assert composition.title == "test-thread-123_audio_infranym"
+        assert composition.title == "mock_thread_001_audio_infranym"
         assert composition.surface_layer is artifact.surface_layer
         assert composition.reverse_layer is artifact.reverse_layer
         assert composition.submerged_layer is artifact.submerged_layer
