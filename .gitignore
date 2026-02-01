@@ -49,5 +49,4 @@ htmlcov/
 /claude_desktop_config.json
 chain_arifacts_incompletes/
 chain_artifacts/**/debug/*.json
-chain_artifacts/**/debug/*.json**/transformation_traces.md
 **/transformation_traces.md
