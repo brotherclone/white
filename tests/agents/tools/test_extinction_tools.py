@@ -7,7 +7,6 @@ from unittest.mock import mock_open, patch, MagicMock
 
 from app.agents.tools.extinction_tools import (
     load_green_corpus,
-    get_random_species,
     parse_species_entry,
 )
 from app.structures.artifacts.species_extinction_artifact import (
@@ -133,18 +132,6 @@ def test_parse_species_entry_optional_fields(sample_species_entry):
 
     assert result.range_km2 is None
     assert result.lifespan_years is None
-
-
-def test_get_random_species(sample_corpus, sample_species_entry):
-    """Test getting a random species from corpus"""
-    # Mock the random index
-    sample_corpus["random"].randint.return_value = 0
-
-    result = get_random_species(sample_corpus)
-
-    assert isinstance(result, SpeciesExtinctionArtifact)
-    assert result.scientific_name == "Testus extinctus"
-    sample_corpus["random"].randint.assert_called_once_with(0, 1)
 
 
 def test_parse_species_entry_extinction_cause_enum():

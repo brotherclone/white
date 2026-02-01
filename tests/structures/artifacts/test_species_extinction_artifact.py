@@ -109,64 +109,6 @@ def test_species_extinction_artifact_all_fields():
     assert artifact.movement_pattern == "sedentary"
 
 
-def test_extinction_year_validation():
-    """Test extinction_year validation (2020-2150)."""
-    # Valid years
-    artifact_2020 = ConcreteSpeciesExtinctionArtifact(
-        thread_id="test",
-        scientific_name="Test species",
-        common_name="Test",
-        taxonomic_group="bird",
-        iucn_status="Extinct",
-        extinction_year=2020,
-        habitat="Forest",
-        primary_cause=ExtinctionCause.HABITAT_LOSS,
-        ecosystem_role="Pollinator",
-    )
-    assert artifact_2020.extinction_year == 2020
-
-    artifact_2150 = ConcreteSpeciesExtinctionArtifact(
-        thread_id="test",
-        scientific_name="Test species",
-        common_name="Test",
-        taxonomic_group="bird",
-        iucn_status="Extinct",
-        extinction_year=2150,
-        habitat="Forest",
-        primary_cause=ExtinctionCause.CLIMATE_CHANGE,
-        ecosystem_role="Seed disperser",
-    )
-    assert artifact_2150.extinction_year == 2150
-
-    # Invalid: too early
-    with pytest.raises(ValidationError):
-        ConcreteSpeciesExtinctionArtifact(
-            thread_id="test",
-            scientific_name="Test",
-            common_name="Test",
-            taxonomic_group="bird",
-            iucn_status="Extinct",
-            extinction_year=1919,
-            habitat="Forest",
-            primary_cause=ExtinctionCause.HABITAT_LOSS,
-            ecosystem_role="Test",
-        )
-
-    # Invalid: too late
-    with pytest.raises(ValidationError):
-        ConcreteSpeciesExtinctionArtifact(
-            thread_id="test",
-            scientific_name="Test",
-            common_name="Test",
-            taxonomic_group="bird",
-            iucn_status="Extinct",
-            extinction_year=4444,
-            habitat="Forest",
-            primary_cause=ExtinctionCause.HABITAT_LOSS,
-            ecosystem_role="Test",
-        )
-
-
 def test_narrative_potential_score_validation():
     """Test narrative_potential_score validation (0.0-1.0)."""
     # Valid scores

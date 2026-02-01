@@ -1,0 +1,99 @@
+artifact_id: 5526e0d3-ebe9-4cc6-a8ae-fe82f41c4b21
+artifact_name: the_year_of_teaching_strangers
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: null
+divergence_point:
+  what_changed: Instead of continuing his intelligence sector work after the Trump
+    election disappointment, Gabriel Walsh impulsively accepted a community college
+    teaching position in Tucson that he found through a friend's recommendation.
+  when: January 2017
+  why_plausible: The Trump election had genuinely disrupted his intelligence work,
+    he was already disillusioned with the sector, and many professionals made dramatic
+    career changes in early 2017 due to political upheaval. Teaching positions were
+    readily available and often went unfilled.
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: 5526e0d3-ebe9-4cc6-a8ae-fe82f41c4b21_t_the_year_of_teaching_strangers.yml
+following_events:
+- Returns to multimedia work with renewed appreciation for human connection
+- Maintains correspondence with several former students
+- Incorporates educational design principles into future creative projects
+- Develops deeper interest in accessibility and inclusive design
+key_differences:
+- Lives in Tucson, Arizona instead of continuing intelligence work
+- Daily routine centered around teaching basic computer skills
+- Income drops significantly but lifestyle simplifies
+- Creative work becomes educational rather than artistic
+- Develops fluency in basic Spanish through student interactions
+mood_description: ''
+narrative: ''
+period:
+  age_range: !!python/tuple
+  - 42
+  - 42
+  creative_output:
+  - Hand-drawn lesson plans
+  - Simple educational videos
+  - Weekly newsletter for students
+  description: The year Gabriel Walsh abandoned his intelligence work and multimedia
+    projects to become a community college instructor in Tucson, Arizona, teaching
+    basic computer skills to immigrants and retirees.
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: wistful
+  end_date: 2017-12-31
+  is_forgotten: false
+  key_relationships:
+  - Maria Santos (department head)
+  - Roberto Valdez (student)
+  - Ellen Kowalski (fellow instructor)
+  known_events:
+  - approximate_date: null
+    category: career
+    date: 2017-02-15
+    description: First day teaching at Pima Community College West Campus
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: relationship
+    date: 2017-05-20
+    description: Roberto Valdez graduates with basic computer certificate
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 2017-08-12
+    description: Creates simple educational video series on VHS
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: career
+    date: 2017-11-30
+    description: Decides not to renew contract for 2018
+    emotional_weight: 0.5
+    tags: []
+    year: null
+  location: Tucson, Arizona
+  primary_activity: Community college teaching
+  start_date: 2017-01-01
+  trauma_level: low
+plausibility_score: null
+preceding_events:
+- Intelligence project derailed by Trump election results
+- David Bowie's death creates existential questioning about creative legacy
+- Family trip to Ireland sparks thoughts about simpler living
+- Adobe conference in San Francisco provides networking contacts
+- Recording The Conjurer's Thread feels increasingly hollow
+rainbow_color_mnemonic_character_value: T
+specific_details: []
+specificity_score: null
+thread_id: c59be431-6527-4424-83fd-4dea6a83edf5
+title: The Year of Teaching Strangers

@@ -12,9 +12,11 @@ from langgraph.graph.state import StateGraph
 
 from app.agents.states.green_agent_state import GreenAgentState
 from app.agents.states.white_agent_state import MainAgentState
-from app.agents.tools.extinction_tools import load_green_corpus
+from app.agents.tools.extinction_tools import load_green_corpus, get_random_species
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
 from app.structures.artifacts.last_human_artifact import LastHumanArtifact
 from app.structures.artifacts.last_human_species_extinction_narative_artifact import (
@@ -49,6 +51,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
@@ -95,7 +98,6 @@ class GreenAgent(BaseRainbowAgent, ABC):
 
     def create_graph(self) -> StateGraph:
         work_flow = StateGraph(GreenAgentState)
-        # Nodes
         work_flow.add_node("get_species", self.get_species)  # SpeciesExtinctionArtifact
         work_flow.add_node("get_human", self.get_human)  # LastHumanArtifact
         work_flow.add_node(
@@ -112,7 +114,6 @@ class GreenAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )  # SongProposalIteration
-        # Edges
         work_flow.add_edge(START, "get_species")
         work_flow.add_edge("get_species", "get_human")
         work_flow.add_edge("get_human", "get_parallel_moment")
@@ -127,7 +128,9 @@ class GreenAgent(BaseRainbowAgent, ABC):
         return work_flow
 
     @staticmethod
+    @agent_error_handler("Sub-Arbitrary")
     def get_species(state: GreenAgentState) -> GreenAgentState:
+        get_state_snapshot(state, "get_species_enter", state.thread_id, "Sub-Arbitrary")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -138,11 +141,14 @@ class GreenAgent(BaseRainbowAgent, ABC):
                 ) as f:
                     data = yaml.safe_load(f)
                     data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    data["thread_id"] = state.thread_id
                     current_species = SpeciesExtinctionArtifact(**data)
-                    current_species.thread_id = state.thread_id
                     state.current_species = current_species
                     current_species.save_file()
                     state.artifacts.append(current_species)
+                    get_state_snapshot(
+                        state, "get_species_exit", state.thread_id, "Sub-Arbitrary"
+                    )
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock species extinction artifact: {e!s}"
@@ -152,20 +158,28 @@ class GreenAgent(BaseRainbowAgent, ABC):
         else:
             try:
                 species_corpus = load_green_corpus()
-                species_entry = species_corpus.get_random_species(species_corpus)
-                species_entry["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                species_entry = get_random_species(species_corpus)
+                species_entry.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                if species_entry.thread_id in (None, "UNKNOWN_THREAD_ID"):
+                    species_entry.thread_id = state.thread_id
                 state.current_species = species_entry
                 species_entry.save_file()
                 state.artifacts.append(species_entry)
+                get_state_snapshot(
+                    state, "get_species_exit", state.thread_id, "Sub-Arbitrary"
+                )
                 return state
             except Exception as e:
                 error_msg = f"Failed to load species extinction artifact: {e!s}"
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+        get_state_snapshot(state, "get_species_exit", state.thread_id, "Sub-Arbitrary")
         return state
 
+    @agent_error_handler("Sub-Arbitrary")
     def get_human(self, state: GreenAgentState) -> GreenAgentState:
+        get_state_snapshot(state, "get_human_enter", state.thread_id, "Sub-Arbitrary")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -176,6 +190,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
                 ) as f:
                     data = yaml.safe_load(f)
                     data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    data["thread_id"] = state.thread_id
                     last_human = LastHumanArtifact(**data)
                     state.current_human = last_human
                     last_human.save_file()
@@ -187,44 +202,65 @@ class GreenAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception(error_msg)
         else:
+            if state.current_species is None:
+                logger.error("current_species is None, cannot generate human")
+                get_state_snapshot(
+                    state, "get_human_exit", state.thread_id, "Sub-Arbitrary"
+                )
+                return state
+
             prompt = f"""
-            You are Sub-Arbitrary, a Mind from The Culture studying Earth's anthropocene extinction cascade.
+You are Sub-Arbitrary, a Mind from The Culture studying Earth's anthropocene extinction cascade.
 
-            Create an intimate, specific human character whose life parallels this species extinction:
+Create an intimate, specific human character whose life parallels this species extinction:
 
-            Species: {state.current_species.common_name} ({state.current_species.scientific_name})
-            Extinction driver: {state.current_species.primary_cause}
-            Symbolic resonance: {state.current_species.symbolic_resonance}
+Species: {state.current_species.common_name} ({state.current_species.scientific_name})
+Extinction driver: {state.current_species.primary_cause}
+Symbolic resonance: {state.current_species.symbolic_resonance}
 
-            Suggested parallels from corpus:
-            {json.dumps(state.current_species.suggested_human_parallels, indent=2)}
+Human parallel hints:
+{json.dumps(state.current_species.human_parallel_hints, indent=2)}
 
-            Human parallel hints:
-            {state.current_species.human_parallel_hints}
+Generate a LastHumanCharacterArtifact with:
+- Specific name, age, location (real place)
+- Occupation that mirrors species' ecological role
+- Daily routine disrupted by same forces killing the species
+- A symbolic object (like vaquita's acoustic monitor that stopped detecting clicks)
+- Environmental stressor that parallels the species' extinction driver
+- Vulnerability type matching species (entanglement, foundation_collapse, poisoning, etc)
 
-            Generate a LastHumanCharacterArtifact with:
-            - Specific name, age, location (real place)
-            - Occupation that mirrors species' ecological role
-            - Daily routine disrupted by same forces killing the species
-            - A symbolic object (like vaquita's acoustic monitor that stopped detecting clicks)
-            - Environmental stressor that parallels the species' extinction driver
-            - Vulnerability type matching species (entanglement, foundation_collapse, poisoning, etc)
-
-            Be intimate and specific, not generic. This person exists in 2025-2050 timeline.
+Be intimate and specific, not generic. This person exists in 2025-2050 timeline.
                 """
             claude = self._get_claude()
             proposer = claude.with_structured_output(LastHumanArtifact)
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
+                    # Remove fields that should use class defaults, not LLM-generated values
+                    result.pop("chain_artifact_file_type", None)
+                    result.pop("chain_artifact_type", None)
+                    result.pop("file_name", None)
+                    result.pop("file_path", None)
+                    result.pop("thread_id", None)  # Will be set below
+                    result.pop("artifact_id", None)  # Let class generate UUID
+
                     result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    result["thread_id"] = state.thread_id
                     current_human = LastHumanArtifact(**result)
-                    current_human.thread_id = state.thread_id
                     state.current_human = current_human
                     current_human.save_file()
                     state.artifacts.append(current_human)
                     return state
-                if not isinstance(result, LastHumanArtifact):
+                elif isinstance(result, LastHumanArtifact):
+                    # Override any LLM-generated values with correct ones
+                    result.thread_id = state.thread_id
+                    result.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    result.get_file_name()
+                    state.current_human = result
+                    result.save_file()
+                    state.artifacts.append(result)
+                    return state
+                else:
                     error_msg = f"Expected LastHumanArtifact, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
@@ -234,9 +270,14 @@ class GreenAgent(BaseRainbowAgent, ABC):
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+        get_state_snapshot(state, "get_human_exit", state.thread_id, "Sub-Arbitrary")
         return state
 
+    @agent_error_handler("Sub-Arbitrary")
     def get_parallel_moment(self, state: GreenAgentState) -> GreenAgentState:
+        get_state_snapshot(
+            state, "get_parallel_moment_enter", state.thread_id, "Sub-Arbitrary"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -258,14 +299,25 @@ class GreenAgent(BaseRainbowAgent, ABC):
                 if block_mode:
                     raise Exception(error_msg)
         else:
+            if state.current_species is None or state.current_human is None:
+                logger.error(
+                    "Missing required state for get_parallel_moment: current_species=%s, current_human=%s",
+                    state.current_species is not None,
+                    state.current_human is not None,
+                )
+                get_state_snapshot(
+                    state, "get_parallel_moment_exit", state.thread_id, "Sub-Arbitrary"
+                )
+                return state
+
             prompt = f"""
 You are discovering the temporal resonance between species extinction and human loss.
 
 SPECIES CONTEXT:
-{state.current_species.model_dump_json(indent=2)}
+{state.current_species.for_prompt()}
 
 HUMAN CONTEXT:
-{state.current_human.model_dump_json(indent=2)}
+{state.current_human.for_prompt()}
 
 Find the moment where their timescales overlap - not obvious parallels like "both ended," but deeper resonances:
 
@@ -302,11 +354,21 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+        get_state_snapshot(
+            state, "get_parallel_moment_exit", state.thread_id, "Sub-Arbitrary"
+        )
         return state
 
+    @agent_error_handler("Sub-Arbitrary")
     def write_last_human_extinction_narrative(
         self, state: GreenAgentState
     ) -> GreenAgentState:
+        get_state_snapshot(
+            state,
+            "write_last_human_extinction_narrative_enter",
+            state.thread_id,
+            "Sub-Arbitrary",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -330,30 +392,44 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                 if block_mode:
                     raise Exception(error_msg)
         else:
+            if state.current_species is None or state.current_human is None:
+                logger.error(
+                    "Missing required state for write_last_human_extinction_narrative: current_species=%s, current_human=%s",
+                    state.current_species is not None,
+                    state.current_human is not None,
+                )
+                get_state_snapshot(
+                    state,
+                    "write_last_human_extinction_narrative_exit",
+                    state.thread_id,
+                    "Sub-Arbitrary",
+                )
+                return state
+
             prompt = f"""
-            You are Sub-Arbitrary, creating elegiac parallel narratives for The Empty Fields.
+You are Sub-Arbitrary, creating elegiac parallel narratives for The Empty Fields.
 
-            Weave together two extinction stories:
+Weave together two extinction stories:
 
-            SPECIES (dispassionate documentary):
-            {state.current_species.to_artifact_dict()}
+SPECIES (dispassionate documentary):
+{state.current_species.for_prompt()}
 
-            HUMAN (intimate, immediate):
-            {state.current_human.to_artifact_dict()}
+HUMAN (intimate, immediate):
+{state.current_human.for_prompt()}
 
-            Create a LastHumanSpeciesExtinctionNarrativeArtifact with:
-            - Interleaved parallel moments where their stories intersect
-            - Species arc: ecological data, population decline, cascade effects
-            - Human arc: personal details, daily life disruption, quiet catastrophe
-            - Musical parameters derived from species' physical characteristics
-            - Opening image (before) and closing image (after)
-            - Elegiac quality - mourning without sentimentality
+Create a LastHumanSpeciesExtinctionNarrativeArtifact with:
+- Interleaved parallel moments where their stories intersect
+- Species arc: ecological data, population decline, cascade effects
+- Human arc: personal details, daily life disruption, quiet catastrophe
+- Musical parameters derived from species' physical characteristics
+- Opening image (before) and closing image (after)
+- Elegiac quality - mourning without sentimentality
 
-            The narrative structure should feel like:
-            "In 2028, the last vaquita dies in a gillnet..."
-            "In 2027, Maria Rodriguez makes the choice..."
+The narrative structure should feel like:
+"In 2028, the last vaquita dies in a gillnet..."
+"In 2027, Maria Rodriguez makes the choice..."
 
-            Parallel the timelines, mirror the losses, but never explain the connection - let it emerge.
+Parallel the timelines, mirror the losses, but never explain the connection - let it emerge.
                 """
             claude = self._get_claude()
             proposer = claude.with_structured_output(
@@ -362,7 +438,16 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
             try:
                 result = proposer.invoke(prompt)
                 if isinstance(result, dict):
+                    # Remove fields that should use class defaults, not LLM-generated values
+                    result.pop("chain_artifact_file_type", None)
+                    result.pop("chain_artifact_type", None)
+                    result.pop("file_name", None)
+                    result.pop("file_path", None)
+                    result.pop("thread_id", None)  # Will be set below
+                    result.pop("artifact_id", None)  # Let class generate UUID
+
                     result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    result["thread_id"] = state.thread_id
                     current_narrative = LastHumanSpeciesExtinctionNarrativeArtifact(
                         **result
                     )
@@ -370,7 +455,16 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                     current_narrative.save_file()
                     state.artifacts.append(current_narrative)
                     return state
-                if not isinstance(result, LastHumanSpeciesExtinctionNarrativeArtifact):
+                elif isinstance(result, LastHumanSpeciesExtinctionNarrativeArtifact):
+                    # Override any LLM-generated values with correct ones
+                    result.thread_id = state.thread_id
+                    result.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    result.get_file_name()
+                    state.current_narrative = result
+                    result.save_file()
+                    state.artifacts.append(result)
+                    return state
+                else:
                     error_msg = f"Expected LastHumanSpeciesExtinctionNarrativeArtifact, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
@@ -380,9 +474,17 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+        get_state_snapshot(
+            state,
+            "write_last_human_extinction_narrative_exit",
+            state.thread_id,
+            "Sub-Arbitrary",
+        )
         return state
 
+    @agent_error_handler("Sub-Arbitrary")
     def survey(self, state: GreenAgentState) -> GreenAgentState:
+        get_state_snapshot(state, "survey_enter", state.thread_id, "Sub-Arbitrary")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -405,11 +507,18 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                     raise Exception(error_msg)
             return state
         else:
+            if state.current_narrative is None:
+                logger.error("current_narrative is None, cannot conduct survey")
+                get_state_snapshot(
+                    state, "survey_exit", state.thread_id, "Sub-Arbitrary"
+                )
+                return state
+
             prompt = f"""
 You are a Culture Mind conducting Arbitrary's Survey - evaluating whether this narrative merits preservation in the infinite library.
 
 NARRATIVE:
-{state.current_narrative.model_dump_json(indent=2)}
+{state.current_narrative.for_prompt()}
 
 You have witnessed every pattern of loss across galactic history. You preserve only what reveals something essential about consciousness, time, or the shape of endings.
 
@@ -429,13 +538,31 @@ Score each dimension (1-10) and provide brief reasoning. Then give an overall as
         try:
             result = proposer.invoke(prompt)
             if isinstance(result, dict):
+                # Remove fields that should use class defaults, not LLM-generated values
+                result.pop("chain_artifact_file_type", None)
+                result.pop("chain_artifact_type", None)
+                result.pop("file_name", None)
+                result.pop("file_path", None)
+                result.pop("thread_id", None)  # Will be set below
+                result.pop("artifact_id", None)  # Let class generate UUID
+
                 result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                result["thread_id"] = state.thread_id
                 current_survey = ArbitrarysSurveyArtifact(**result)
                 state.current_survey = current_survey
                 current_survey.save_file()
                 state.artifacts.append(current_survey)
                 return state
-            if not isinstance(result, ArbitrarysSurveyArtifact):
+            elif isinstance(result, ArbitrarysSurveyArtifact):
+                # Override any LLM-generated values with correct ones
+                result.thread_id = state.thread_id
+                result.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                result.get_file_name()
+                state.current_survey = result
+                result.save_file()
+                state.artifacts.append(result)
+                return state
+            else:
                 error_msg = f"Expected ArbitrarysSurveyArtifact, got {type(result)}"
                 if block_mode:
                     raise TypeError(error_msg)
@@ -446,9 +573,14 @@ Score each dimension (1-10) and provide brief reasoning. Then give an overall as
             if block_mode:
                 raise Exception(error_msg)
 
+        get_state_snapshot(state, "survey_exit", state.thread_id, "Sub-Arbitrary")
         return state
 
+    @agent_error_handler("Sub-Arbitrary")
     def claudes_choice(self, state: GreenAgentState) -> GreenAgentState:
+        get_state_snapshot(
+            state, "claudes_choice_enter", state.thread_id, "Sub-Arbitrary"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -470,11 +602,27 @@ Score each dimension (1-10) and provide brief reasoning. Then give an overall as
                     raise Exception(error_msg)
             return state
         else:
+            if (
+                state.current_species is None
+                or state.current_human is None
+                or state.current_survey is None
+            ):
+                logger.error(
+                    "Missing required state for claudes_choice: current_species=%s, current_human=%s, current_survey=%s",
+                    state.current_species is not None,
+                    state.current_human is not None,
+                    state.current_survey is not None,
+                )
+                get_state_snapshot(
+                    state, "claudes_choice_exit", state.thread_id, "Sub-Arbitrary"
+                )
+                return state
+
             prompt = f"""
-            Based on the Culture Mind's survey, you must now decide: rescue or release?
+Based on the Culture Mind's survey, you must now decide: rescue or release?
 
 SURVEY EVALUATION:
-{state.current_survey.model_dump_json(indent=2)}
+{state.current_survey.for_prompt()}
 
 NARRATIVE CONTEXT:
 Species: {state.current_species.common_name}
@@ -501,13 +649,31 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
         try:
             result = proposer.invoke(prompt)
             if isinstance(result, dict):
+                # Remove fields that should use class defaults, not LLM-generated values
+                result.pop("chain_artifact_file_type", None)
+                result.pop("chain_artifact_type", None)
+                result.pop("file_name", None)
+                result.pop("file_path", None)
+                result.pop("thread_id", None)  # Will be set below
+                result.pop("artifact_id", None)  # Let class generate UUID
+
                 result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                result["thread_id"] = state.thread_id
                 current_decision = RescueDecisionArtifact(**result)
                 state.current_decision = current_decision
                 current_decision.save_file()
                 state.artifacts.append(current_decision)
                 return state
-            if not isinstance(result, RescueDecisionArtifact):
+            elif isinstance(result, RescueDecisionArtifact):
+                # Override any LLM-generated values with correct ones
+                result.thread_id = state.thread_id
+                result.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                result.get_file_name()
+                state.current_decision = result
+                result.save_file()
+                state.artifacts.append(result)
+                return state
+            else:
                 error_msg = f"Expected RescueDecisionArtifact, got {type(result)}"
                 if block_mode:
                     raise TypeError(error_msg)
@@ -517,9 +683,19 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
             logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
+        get_state_snapshot(
+            state, "claudes_choice_exit", state.thread_id, "Sub-Arbitrary"
+        )
         return state
 
+    @agent_error_handler("Sub-Arbitrary")
     def generate_alternate_song_spec(self, state: GreenAgentState) -> GreenAgentState:
+        get_state_snapshot(
+            state,
+            "generate_alternate_song_spec_enter",
+            state.thread_id,
+            "Sub-Arbitrary",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -589,4 +765,10 @@ Using all of this, create a new SongProposalIteration that captures the essence 
                     concept="Fallback stub because Anthropic model unavailable",
                 )
             state.counter_proposal = counter_proposal
+            get_state_snapshot(
+                state,
+                "generate_alternate_song_spec_exit",
+                state.thread_id,
+                "Sub-Arbitrary",
+            )
             return state

@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from typing import List, Optional, cast, Iterable, Any
+from typing import List, Optional
 from anthropic import Anthropic
 from fastmcp import FastMCP
 from app.reference.mcp.rows_bud.orange_corpus import get_corpus
@@ -51,184 +51,101 @@ def add_story_to_corpus(
         return {"error": str(e), "status": "error"}
 
 
-@mcp.tool()
-def insert_symbolic_object(
-    story_id: str, object_category: str, custom_object: Optional[str] = None
-) -> dict:
-    """
-    Insert a symbolic object into a story for mythologization.
-
-    The object should NOT exist in the original story but should be:
-    - Contextually appropriate to time/place
-    - Metaphorically resonant with themes
-    - Mythologically significant
-
-    Args:
-        story_id: ID of a story to mythologize
-        object_category: One of: CIRCULAR_TIME, INFORMATION_ARTIFACTS,
-                        LIMINAL_OBJECTS, PSYCHOGEOGRAPHIC
-        custom_object: Optional custom object description
-
-    Returns:
-        dict with an updated story and status
-    """
-    try:
-        story = corpus.get_story(story_id)
-
-        if not story:
-            return {"error": f"Story {story_id} not found", "status": "error"}
-
-        if custom_object:
-            object_desc = custom_object
-        else:
-            object_templates = {
-                "CIRCULAR_TIME": "a clock that runs at an unusual speed",
-                "INFORMATION_ARTIFACTS": "a mysterious recording or transmission",
-                "LIMINAL_OBJECTS": "a doorway or threshold to elsewhere",
-                "PSYCHOGEOGRAPHIC": "a map with impossible coordinates",
-            }
-            object_desc = object_templates.get(object_category, "a strange artifact")
-        prompt = f"""Insert this symbolic object into the story naturally and seamlessly.
-
-        ORIGINAL STORY:
-        {story['text']}
-        
-        SYMBOLIC OBJECT: {object_desc}
-        CATEGORY: {object_category}
-        
-        CRITICAL RULES:
-        - The object did NOT exist in the original story
-        - Insert it as if it was always there and was discovered/noticed
-        - Make it feel central to the narrative, not forced
-        - Keep the journalistic tone (this is pre-gonzo rewriting)
-        - The object should raise questions, create mystery
-        - It should feel like a detail the original journalist might have overlooked or downplayed
-        
-        LOCATION CONTEXT: {story['location']} in {story['date']}
-        
-        Return ONLY the updated story text with the object naturally integrated. 
-        Do not add any preamble or explanation."""
-
-        response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=2000,
-            messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
-        )
-
-        updated_text = response.content[0].text.strip()
-
-        # Update corpus
-        corpus.insert_symbolic_object(
-            story_id=story_id,
-            category=object_category,
-            description=object_desc,
-            updated_text=updated_text,
-        )
-
-        # Return updated story
-        updated_story = corpus.get_story(story_id)
-
-        return {"updated_story": updated_story, "status": "object_inserted"}
-
-    except Exception as e:
-        return {"error": str(e), "status": "error"}
-
-
-@mcp.tool()
-def gonzo_rewrite(
-    story_id: str, perspective: str = "journalist", intensity: int = 3
-) -> dict:
-    """
-    Rewrite a mythologized story in gonzo journalism style.
-
-    Style characteristics:
-    - First-person embedded journalism
-    - Paranoia and conspiracy undertones
-    - Perception shifts and altered states
-    - Authority distrust
-    - Vivid sensory details
-    - The symbolic object becomes central
-
-    Args:
-        story_id: ID of mythologized story
-        perspective: Narrative perspective (journalist, witness, investigator, participant)
-        intensity: Gonzo intensity level (1-5, where 5 is full Hunter S. Thompson)
-
-    Returns:
-        dict with gonzo story and status
-    """
-    try:
-        story = corpus.get_story(story_id)
-        if not story:
-            return {"error": f"Story {story_id} not found", "status": "error"}
-        intensity_styles = {
-            1: "Subtle first-person observer with mild questioning of official narrative",
-            2: "Embedded journalist noticing inconsistencies, growing suspicion",
-            3: "Active participant, perception shifts begin, reality feels slippery",
-            4: "Deep paranoia, conspiracy emerging, boundaries dissolving",
-            5: "Full Hunter S. Thompson - no holds barred, reality completely unhinged",
-        }
-        obj_desc = story.get("symbolic_object_desc", "a mysterious object")
-        prompt = f"""Rewrite this Sussex County story in gonzo journalism style.
-
-        ORIGINAL STORY (with symbolic object already inserted):
-        Headline: {story['headline']}
-        Date: {story['date']}
-        Location: {story['location']}
-        Source: {story['source']}
-        
-        {story['text']}
-        
-        SYMBOLIC OBJECT (central to your rewrite): {obj_desc}
-        
-        GONZO PARAMETERS:
-        - Perspective: {perspective} (first-person, embedded in the scene)
-        - Intensity: {intensity}/5 - {intensity_styles.get(intensity, intensity_styles[3])}
-        
-        GONZO JOURNALISM CHARACTERISTICS (Hunter S. Thompson method):
-        1. FIRST-PERSON EMBEDDED: You are THERE, in {story['location']}, investigating this story
-        2. PARANOIA & CONSPIRACY: Official story doesn't add up, authorities are hiding something
-        3. PERCEPTION SHIFTS: Reality feels unstable, witnesses contradict each other, time behaves strangely
-        4. AUTHORITY DISTRUST: Police chiefs lie, officials obscure truth, something darker underneath
-        5. VIVID SENSORY: Pine smell, electronic hum, the weight of {obj_desc}, sounds that shouldn't exist
-        6. SYMBOLIC OBJECT CENTRAL: {obj_desc} is THE KEY - it's proof, it's evidence, it's WRONG
-        7. INVESTIGATOR BECOMES PART OF STORY: Boundary between observer and participant dissolves
-        8. SUSSEX COUNTY MYTHOLOGY: This is New Jersey gothic, Pine Barrens energy, teenage doom
-        
-        The date is {story['date']}. You're investigating what happened. The more you dig, the weirder it gets.
-        {obj_desc} keeps appearing, impossible but undeniable. What's happening in {story['location']}?
-        
-        CRITICAL: Keep the original factual skeleton (who, what, when, where) but:
-        - Add your first-person investigation
-        - Show how the official story breaks down
-        - Make {obj_desc} central and inexplicable
-        - End with you realizing you're part of the transmission
-        
-        At intensity {intensity}, go {"absolutely wild - full Thompson madness" if intensity >= 4 else "strange but controlled" if intensity <= 2 else "deep into conspiracy territory"}.
-        
-        Return ONLY the gonzo rewritten story. No preamble, no explanation. Make it legendary."""
-
-        response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=3000,
-            temperature=0.8 + (intensity * 0.05),  # Higher temp for higher intensity
-            messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
-        )
-
-        gonzo_text = response.content[0].text.strip()
-        corpus.add_gonzo_rewrite(
-            story_id=story_id,
-            gonzo_text=gonzo_text,
-            perspective=perspective,
-            intensity=intensity,
-        )
-        updated_story = corpus.get_story(story_id)
-        gonzo_story = {**updated_story, "text": gonzo_text}
-
-        return {"gonzo_story": gonzo_story, "status": "gonzo_complete"}
-
-    except Exception as e:
-        return {"error": str(e), "status": "error"}
+# @mcp.tool()
+# def gonzo_rewrite(
+#     story_id: str, perspective: str = "journalist", intensity: int = 3
+# ) -> dict:
+#     """
+#     Rewrite a mythologized story in gonzo journalism style.
+#
+#     Style characteristics:
+#     - First-person embedded journalism
+#     - Paranoia and conspiracy undertones
+#     - Perception shifts and altered states
+#     - Authority distrust
+#     - Vivid sensory details
+#     - The symbolic object becomes central
+#
+#     Args:
+#         story_id: ID of mythologized story
+#         perspective: Narrative perspective (journalist, witness, investigator, participant)
+#         intensity: Gonzo intensity level (1-5, where 5 is full Hunter S. Thompson)
+#
+#     Returns:
+#         dict with gonzo story and status
+#     """
+#     try:
+#         story = corpus.get_story(story_id)
+#         if not story:
+#             return {"error": f"Story {story_id} not found", "status": "error"}
+#         intensity_styles = {
+#             1: "Subtle first-person observer with mild questioning of official narrative",
+#             2: "Embedded journalist noticing inconsistencies, growing suspicion",
+#             3: "Active participant, perception shifts begin, reality feels slippery",
+#             4: "Deep paranoia, conspiracy emerging, boundaries dissolving",
+#             5: "Full Hunter S. Thompson - no holds barred, reality completely unhinged",
+#         }
+#         obj_desc = story.get("symbolic_object_desc", "a mysterious object")
+#         prompt = f"""Rewrite this Sussex County story in gonzo journalism style.
+#
+#         ORIGINAL STORY (with symbolic object already inserted):
+#         Headline: {story['headline']}
+#         Date: {story['date']}
+#         Location: {story['location']}
+#         Source: {story['source']}
+#
+#         {story['text']}
+#
+#         SYMBOLIC OBJECT (central to your rewrite): {obj_desc}
+#
+#         GONZO PARAMETERS:
+#         - Perspective: {perspective} (first-person, embedded in the scene)
+#         - Intensity: {intensity}/5 - {intensity_styles.get(intensity, intensity_styles[3])}
+#
+#         GONZO JOURNALISM CHARACTERISTICS (Hunter S. Thompson method):
+#         1. FIRST-PERSON EMBEDDED: You are THERE, in {story['location']}, investigating this story
+#         2. PARANOIA & CONSPIRACY: Official story doesn't add up, authorities are hiding something
+#         3. PERCEPTION SHIFTS: Reality feels unstable, witnesses contradict each other, time behaves strangely
+#         4. AUTHORITY DISTRUST: Police chiefs lie, officials obscure truth, something darker underneath
+#         5. VIVID SENSORY: Pine smell, electronic hum, the weight of {obj_desc}, sounds that shouldn't exist
+#         6. SYMBOLIC OBJECT CENTRAL: {obj_desc} is THE KEY - it's proof, it's evidence, it's WRONG
+#         7. INVESTIGATOR BECOMES PART OF STORY: Boundary between observer and participant dissolves
+#         8. SUSSEX COUNTY MYTHOLOGY: This is New Jersey gothic, Pine Barrens energy, teenage doom
+#
+#         The date is {story['date']}. You're investigating what happened. The more you dig, the weirder it gets.
+#         {obj_desc} keeps appearing, impossible but undeniable. What's happening in {story['location']}?
+#
+#         CRITICAL: Keep the original factual skeleton (who, what, when, where) but:
+#         - Add your first-person investigation
+#         - Show how the official story breaks down
+#         - Make {obj_desc} central and inexplicable
+#         - End with you realizing you're part of the transmission
+#
+#         At intensity {intensity}, go {"absolutely wild - full Thompson madness" if intensity >= 4 else "strange but controlled" if intensity <= 2 else "deep into conspiracy territory"}.
+#
+#         Return ONLY the gonzo rewritten story. No preamble, no explanation. Make it legendary."""
+#
+#         response = anthropic_client.messages.create(
+#             model="claude-sonnet-4-20250514",
+#             max_tokens=3000,
+#             temperature=0.8 + (intensity * 0.05),  # Higher temp for higher intensity
+#             messages=cast(Iterable[Any], [{"role": "user", "content": prompt}]),
+#         )
+#
+#         gonzo_text = response.content[0].text.strip()
+#         corpus.add_gonzo_rewrite(
+#             story_id=story_id,
+#             gonzo_text=gonzo_text,
+#             perspective=perspective,
+#             intensity=intensity,
+#         )
+#         updated_story = corpus.get_story(story_id)
+#         gonzo_story = {**updated_story, "text": gonzo_text}
+#
+#         return {"gonzo_story": gonzo_story, "status": "gonzo_complete"}
+#
+#     except Exception as e:
+#         return {"error": str(e), "status": "error"}
 
 
 @mcp.tool()

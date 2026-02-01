@@ -21,7 +21,9 @@ from rich.prompt import Prompt
 
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
 )
@@ -70,6 +72,7 @@ class VioletAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
         corpus_path = Path(os.getenv("GABE_CORPUS_FILE", "./violet_assets/gabe_corpus"))
         self.gabe_corpus = self._load_corpus(corpus_path)
@@ -155,8 +158,12 @@ class VioletAgent(BaseRainbowAgent, ABC):
     # =========================================================================
 
     @staticmethod
+    @agent_error_handler("The Sultan of Solipsism")
     def select_persona(state: VioletAgentState) -> VioletAgentState:
         """Select a random interviewer persona (or reuse existing on rerun)"""
+        get_state_snapshot(
+            state, "select_persona_enter", state.thread_id, "The Sultan of Solipsism"
+        )
         logger.info("🎭 Selecting interviewer persona...")
         if state.interviewer_persona is not None:
             persona = state.interviewer_persona
@@ -164,6 +171,9 @@ class VioletAgent(BaseRainbowAgent, ABC):
                 f"   Reusing existing persona: {persona.first_name} "
                 f"{persona.last_name} ({persona.interviewer_type.value}) "
                 f"from {persona.publication}"
+            )
+            get_state_snapshot(
+                state, "select_persona_exit", state.thread_id, "The Sultan of Solipsism"
             )
             return state
         persona = VanityPersona()
@@ -173,10 +183,20 @@ class VioletAgent(BaseRainbowAgent, ABC):
         )
         logger.info(f"   Stance: {persona.stance}")
         state.interviewer_persona = persona
+        get_state_snapshot(
+            state, "select_persona_exit", state.thread_id, "The Sultan of Solipsism"
+        )
         return state
 
+    @agent_error_handler("The Sultan of Solipsism")
     def generate_questions(self, state: VioletAgentState) -> VioletAgentState:
         """Generate 3 targeted questions using LLM structured output"""
+        get_state_snapshot(
+            state,
+            "generate_questions_enter",
+            state.thread_id,
+            "The Sultan of Solipsism",
+        )
         logger.info("❓ Generating interview questions...")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
@@ -191,12 +211,18 @@ class VioletAgent(BaseRainbowAgent, ABC):
                 questions = [VanityInterviewQuestion(**q) for q in data["questions"]]
                 state.interview_questions = questions
                 logger.info(f"   Loaded {len(questions)} mock questions")
+                get_state_snapshot(
+                    state,
+                    "generate_questions_exit",
+                    state.thread_id,
+                    "The Sultan of Solipsism",
+                )
                 return state
             except Exception as e:
                 error_msg = f"Failed to load mock questions: {e}"
                 logger.error(error_msg)
                 if block_mode:
-                    raise Exception(error_msg)
+                    raise
         persona = state.interviewer_persona
         proposal = state.white_proposal
         prompt = f"""
@@ -221,6 +247,32 @@ MOOD: {proposal.mood}
 
 Generate EXACTLY 3 sharp, provocative questions that embody your persona.
 Each question should genuinely challenge the artist from your perspective.
+
+Indie music journalists are enthusiasts, not music theorists. They know:
+✅ Gear (if it's weird/vintage/meme-worthy): "Are you using a Mellotron?"
+✅ Vibes/aesthetics: "This has real late-night-highway energy"  
+✅ Recording process: "Did you track this in one take?"
+✅ Influences: "I'm hearing some Eno in here?"
+✅ Weird facts: "Is that a dentist drill sample?"
+
+They do NOT know:
+❌ Music theory: Keys, modes, chord progressions, harmonic analysis
+❌ Specific BPM numbers (might say "fast" or "downtempo")
+❌ Time signatures (unless it's obviously weird like 7/8, and even then they'd say "off-kilter")
+❌ Technical terminology: "contrapuntal", "cadential", "modal interchange"
+
+Generate questions from the perspective of an excited music nerd who:
+- Reads Pitchfork and Tiny Mix Tapes
+- Knows cultural references and gear memes
+- Feels vibes more than analyzes structure
+- Gets genuinely excited about weird sounds and recording stories
+- Might be slightly stoned
+
+Example authentic questions:
+- "The synth on this is giving me real Stranger Things basement vibes - what are you running through?"
+- "This feels like you recorded it in a bathroom at 3am, is that close?"
+- "I'm getting strong [obscure band] energy here - was that intentional or am I projecting?"
+- "That sound at 2:34 - is that a broken tape deck or are you just fucking with us?"
 
 Output as JSON with structure:
 {{
@@ -272,6 +324,9 @@ Output as JSON with structure:
 
     def roll_for_hitl(self, state: VioletAgentState) -> VioletAgentState:
         """Roll dice to determine a human vs. simulated interview"""
+        get_state_snapshot(
+            state, "roll_for_hitl_enter", state.thread_id, "The Sultan of Solipsism"
+        )
         roll = random.random()
         needs_human = roll < self.hitl_probability
         logger.info(
@@ -279,11 +334,18 @@ Output as JSON with structure:
             f"{'🧑 HUMAN NEEDED' if needs_human else '🤖 SIMULATED'}"
         )
         state.needs_human_interview = needs_human
+        get_state_snapshot(
+            state, "roll_for_hitl_exit", state.thread_id, "The Sultan of Solipsism"
+        )
         return state
 
     @staticmethod
+    @agent_error_handler("The Sultan of Solipsism")
     def human_interview(state: VioletAgentState) -> VioletAgentState:
         """Pause for real Gabe to answer questions (HitL with rich UI)"""
+        get_state_snapshot(
+            state, "human_interview_enter", state.thread_id, "The Sultan of Solipsism"
+        )
         logger.info("👤 HUMAN INTERVIEW MODE")
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -300,6 +362,12 @@ Output as JSON with structure:
                 responses = [VanityInterviewResponse(**r) for r in data["responses"]]
                 state.interview_responses = responses
                 logger.info(f"   Loaded {len(responses)} mock responses")
+                get_state_snapshot(
+                    state,
+                    "human_interview_exit",
+                    state.thread_id,
+                    "The Sultan of Solipsism",
+                )
                 return state
             except Exception as e:
                 error_msg = f"Failed to load mock responses: {e}"
@@ -342,10 +410,20 @@ Output as JSON with structure:
             console.print("\n")
         state.interview_responses = responses
         logger.info(f"   Collected {len(responses)} human responses")
+        get_state_snapshot(
+            state, "human_interview_exit", state.thread_id, "The Sultan of Solipsism"
+        )
         return state
 
+    @agent_error_handler("The Sultan of Solipsism")
     def simulated_interview(self, state: VioletAgentState) -> VioletAgentState:
         """Simulate Gabe's responses using RAG corpus + LLM"""
+        get_state_snapshot(
+            state,
+            "simulated_interview_enter",
+            state.thread_id,
+            "The Sultan of Solipsism",
+        )
         logger.info("🤖 SIMULATED INTERVIEW MODE")
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
@@ -362,6 +440,12 @@ Output as JSON with structure:
                 responses = [VanityInterviewResponse(**r) for r in data["responses"]]
                 state.interview_responses = responses
                 logger.info(f"   Loaded {len(responses)} mock responses")
+                get_state_snapshot(
+                    state,
+                    "simulated_interview_exit",
+                    state.thread_id,
+                    "The Sultan of Solipsism",
+                )
                 return state
 
             except Exception as e:
@@ -397,13 +481,61 @@ Concept: {proposal.concept}
 QUESTION:
 {q.question}
 
-Generate Gabe's response. Channel his voice:
-- Technical precision when relevant
-- References to rebracketing methodology if applicable
-- Occasional dad jokes or self-aware humor
-- Defensive but thoughtful when challenged
-- Links technical choices to artistic vision
-- May push back on false dichotomies
+
+You are Gabe responding to interview questions.
+
+YOUR SIGNATURE MOVE: Start high-register academic/theoretical, then IMMEDIATELY 
+undercut with something profane/mundane/lowbrow. This is not optional - the 
+bracket switching is the methodology.
+
+THE PATTERN:
+1. Dense theory/philosophy (10-30 words)
+2. HARD CUT with "but also" / "though" / "like" / "which"
+3. Profanity, 1980s TV, pop culture, food, mundane objects, or self-deprecation (10-20 words). 
+
+GOOD EXAMPLES:
+✅ "It's really about Heideggerian temporality meets information theory, 
+    but also it fucking slaps and the bassline has Smurf's intro music vibes"
+
+✅ "The composition explores ontological instability through temporal 
+    displacement, like when you microwave pizza and the center's still 
+    frozen but the edges are lava"
+
+✅ "I'm working with constraint-based creativity as productive limitation—
+    this, can't get my chocolate in my peanut-butter too easy now"
+
+✅ "The missing beat becomes the space where freedom lives, which I'm 
+    aware sounds like a fortune cookie had a baby with a grad seminar"
+
+✅ "The rebracketing methodology reveals how information seeks embodiment 
+    through temporal processes—I sound absolutely unhinged saying this 
+    out loud, no andy caps"
+
+BAD EXAMPLES (PURE METAPHORIPSUM):
+❌ "The composition reveals how consciousness negotiates the boundary 
+    between determination and emergence through systematic exploration 
+    of constrained possibility spaces" [NO UNDERCUT = BORING]
+
+❌ "I'm exploring the liminal space between human intentionality and 
+    machine creativity" [TOO SERIOUS, NO WHIPLASH]
+
+FREQUENCY: Every 2-3 sentences MUST have the pattern. You can't maintain 
+epistemic dignity for more than 30 seconds.
+
+ACCEPTABLE UNDERCUT CATEGORIES:
+- Profanity: "but it also fucks with", "this is deranged", "absolute banger though"
+- Pop culture: "giving divorced dad at Cinnabon energy", "Scooby Doo chase scene vibes"
+- Food/mundane: "like gas station sushi", "Wendy's biggie frosty at 2am feeling"
+- Internet slang: "no cap", "it goes hard", "this slaps", "unhinged behavior" BUT remember he's *Gen X* and would say Gen Y and Z slang with biter irony and distain.
+- Self-awareness: "I sound insane", "pretentious as hell", "hear me out though"
+- Physical/bodily: "makes your teeth hurt", "instant headache feeling"
+
+The interviewer might not get the academic stuff, but you don't dumb it down—
+you just immediately acknowledge how ridiculous it sounds by pivoting to 
+something extremely lowbrow.
+
+This isn't code-switching, it's bracket-demolishing. You're inhabiting both 
+registers simultaneously and refusing to pick a lane.
 
 Keep response 2-4 sentences. Output as JSON:
 {{"question_number": {q.number}, "response": "..."}}"""
@@ -431,11 +563,24 @@ Keep response 2-4 sentences. Output as JSON:
         state.interview_responses = responses
         logger.info(f"   Generated {len(responses)} simulated responses")
 
+        get_state_snapshot(
+            state,
+            "simulated_interview_exit",
+            state.thread_id,
+            "The Sultan of Solipsism",
+        )
         return state
 
     @staticmethod
+    @agent_error_handler("The Sultan of Solipsism")
     def synthesize_interview(state: VioletAgentState) -> VioletAgentState:
         """Create interview artifact and save transcript"""
+        get_state_snapshot(
+            state,
+            "synthesize_interview_enter",
+            state.thread_id,
+            "The Sultan of Solipsism",
+        )
         logger.info("📝 Synthesizing interview transcript...")
         persona = state.interviewer_persona
         # Create structured artifact
@@ -460,10 +605,23 @@ Keep response 2-4 sentences. Output as JSON:
         state.circle_jerk_interview = artifact
         state.artifacts.append(artifact)
 
+        get_state_snapshot(
+            state,
+            "synthesize_interview_exit",
+            state.thread_id,
+            "The Sultan of Solipsism",
+        )
         return state
 
+    @agent_error_handler("The Sultan of Solipsism")
     def generate_alternate_song_spec(self, state: VioletAgentState) -> VioletAgentState:
         """Generate a defensively revised proposal based on an interview"""
+        get_state_snapshot(
+            state,
+            "generate_alternate_song_spec_enter",
+            state.thread_id,
+            "The Sultan of Solipsism",
+        )
         logger.info("🛡️ Generating defensive counter-proposal...")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
@@ -479,6 +637,12 @@ Keep response 2-4 sentences. Output as JSON:
                 state.counter_proposal = counter_proposal
                 logger.info(
                     f"   Loaded mock counter-proposal: {counter_proposal.title}"
+                )
+                get_state_snapshot(
+                    state,
+                    "generate_alternate_song_spec_exit",
+                    state.thread_id,
+                    "The Sultan of Solipsism",
                 )
                 return state
             except Exception as e:
@@ -496,7 +660,7 @@ ORIGINAL PROPOSAL:
 {state.white_proposal.model_dump_json(indent=2)}
 
 INTERVIEW CONTEXT:
-{interview_artifact.artifact_report if interview_artifact else "No interview conducted"}
+{interview_artifact.for_prompt() if interview_artifact else "No interview conducted"}
 
 INTERVIEWER'S STANCE: {state.interviewer_persona.stance}
 
@@ -544,6 +708,12 @@ The revision should be INFORMED BY but not DEFEATED BY the criticism."""
             )
 
         state.counter_proposal = counter_proposal
+        get_state_snapshot(
+            state,
+            "generate_alternate_song_spec_exit",
+            state.thread_id,
+            "The Sultan of Solipsism",
+        )
         return state
 
     # =========================================================================
@@ -551,9 +721,25 @@ The revision should be INFORMED BY but not DEFEATED BY the criticism."""
     # =========================================================================
 
     @staticmethod
+    @agent_error_handler("The Sultan of Solipsism")
     def route_after_roll(state: VioletAgentState) -> str:
+        get_state_snapshot(
+            state, "route_after_roll_enter", state.thread_id, "The Sultan of Solipsism"
+        )
         """Route to a human or simulated interview based on roll"""
         if getattr(state, "needs_human_interview", False):
+            get_state_snapshot(
+                state,
+                "route_after_roll_exit",
+                state.thread_id,
+                "The Sultan of Solipsism",
+            )
             return "human_interview"
         else:
+            get_state_snapshot(
+                state,
+                "route_after_roll_exit",
+                state.thread_id,
+                "The Sultan of Solipsism",
+            )
             return "simulated_interview"

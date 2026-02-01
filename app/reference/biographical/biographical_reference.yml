@@ -564,7 +564,6 @@ years:
         - "What if I didn't have a girlfriend?"
         - "What if I missed seeing My Bloody Valentine?"
 
-  # ToDo: Fill in 1993
   1993:
     world_events:
       major:
@@ -585,12 +584,19 @@ years:
     personal_context:
       summary: "Age 18 - graduation and transition"
       key_events:
-        - "Start College"
-        - "Meet best friend, future wife"
-
+        - "I arrive at SUNY Purchase and note how much younger I am compared to my peers. Also, I'm a hayseed compared to the most NYC-based kids."
+        - "On my first day, I wait in line to get my meal card activated and see a bunch of kids in front of me in line that are acting very familiar with one another. I wondered how they all made friends so fast, one of the girls is wearing a yellow rain slicker and pounding the head - I think she must be developmentally disabled. I think to myself how wonderful the college has a place for all of us."
+        - "Late in our Film program orientation I see one of the kids from the line who's name is Josh Frank - later he invites me to his dorm and I meet two of my future best friends that evening: Kevin Fay and Tim Dedman."
+        - "A month or two later, Josh invites me to a rosh hashanah gathering in the woods. A nicely dressed, very mature woman, Allison Rand or Ali, attends and is dismissive of Josh not having anything to serve. She's sharp and commanding - and is the same girl I thought was developmentally disabled. She's also very funny and very friendly - this would be my future wife."
       influences:
+        - "Alternative rock culture"
+        - "Indi rock culture"
+        - "NYC Indie film scene"
       emotional_landscape:
+        - "Feeling undercooked and not ready to 'say something' creatively."
       choice_points:
+        - "What if I hadn't met Josh,Kevin, Ali and Tim?"
+        - "What I decided to take a gap year?"
 
 
   1994:

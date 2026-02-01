@@ -71,6 +71,16 @@ class BookArtifact(ChainArtifact, ABC):
     )
 
     def __init__(self, **data):
+        # Set artifact_name from title BEFORE super().__init__ generates file_name
+        if (
+            data.get("artifact_name") in (None, "UNKNOWN_ARTIFACT_NAME")
+            and "title" in data
+        ):
+            from app.util.string_utils import sanitize_for_filename
+
+            data["artifact_name"] = sanitize_for_filename(data["title"])
+        elif data.get("artifact_name") in (None, "UNKNOWN_ARTIFACT_NAME"):
+            data["artifact_name"] = "red_book_artifact"
         super().__init__(**data)
 
     def to_markdown(self) -> str:

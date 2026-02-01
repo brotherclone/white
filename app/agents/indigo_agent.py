@@ -16,7 +16,9 @@ from langgraph.graph.state import StateGraph
 from app.agents.states.indigo_agent_state import IndigoAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.structures.agents.agent_settings import AgentSettings
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 
 from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.artifacts.infranym_audio_artifact import InfranymAudioArtifact
@@ -28,7 +30,6 @@ from app.structures.artifacts.infranym_text_render_artifact import (
 )
 from app.structures.enums.image_text_style import ImageTextStyle
 from app.structures.enums.infranym_medium import InfranymMedium
-from app.structures.enums.infranym_method import InfranymMethod
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.agents.tools.infranym_midi_tools import (
     generate_note_cipher,
@@ -72,6 +73,7 @@ class IndigoAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
@@ -82,6 +84,7 @@ class IndigoAgent(BaseRainbowAgent, ABC):
             counter_proposal=None,
             artifacts=[],
             secret_name=None,
+            infranym_medium=None,
             infranym_method=None,
             infranym_encoded_image=None,
             infranym_text_render=None,
@@ -92,7 +95,7 @@ class IndigoAgent(BaseRainbowAgent, ABC):
             letter_bank=None,
             surface_name=None,
             anagram_attempts=0,
-            anagram__attempt_max=3,
+            anagram_attempt_max=3,
             anagram_valid=False,
             method_constraints=None,
         )
@@ -134,13 +137,10 @@ class IndigoAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
-
-        # Text-specific nodes (acrostic/riddle need LLM generation)
         work_flow.add_node("choose_text_method", self.choose_text_method)
         work_flow.add_node("generate_acrostic_lines", self.generate_acrostic_lines)
         work_flow.add_node("generate_riddle_text", self.generate_riddle_text)
         work_flow.add_node("assemble_text_artifact", self.assemble_text_artifact)
-
         work_flow.add_edge(START, "get_concepts")
         work_flow.add_edge("get_concepts", "spy_choose_letter_bank")
         work_flow.add_edge("spy_choose_letter_bank", "fool_arrange_secret")
@@ -186,7 +186,11 @@ class IndigoAgent(BaseRainbowAgent, ABC):
         return work_flow
 
     @staticmethod
+    @agent_error_handler("Decider Tangents")
     def get_concepts(state: IndigoAgentState) -> IndigoAgentState:
+        get_state_snapshot(
+            state, "get_concepts_enter", state.thread_id, "Decider Tangents"
+        )
         concepts = []
         if state.white_proposal:
             concepts.append(state.white_proposal.concept)
@@ -200,13 +204,20 @@ class IndigoAgent(BaseRainbowAgent, ABC):
                     concepts.append(mood)
         state.concepts = ", ".join(concepts[:10])
         state.anagram_attempts = 0
+        get_state_snapshot(
+            state, "get_concepts_exit", state.thread_id, "Decider Tangents"
+        )
         return state
 
+    @agent_error_handler("Decider Tangents")
     def spy_choose_letter_bank(self, state: IndigoAgentState) -> IndigoAgentState:
         """
         SPY selects the optimal letter distribution for anagrams.
         Now a traceable graph node!
         """
+        get_state_snapshot(
+            state, "spy_choose_letter_bank_enter", state.thread_id, "Decider Tangents"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         state.anagram_attempts += 1
@@ -253,13 +264,20 @@ Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
                     raise Exception(msg)
                 logger.error(msg)
                 state.letter_bank = "AEILNORSTDM"
+        get_state_snapshot(
+            state, "spy_choose_letter_bank_exit", state.thread_id, "Decider Tangents"
+        )
         return state
 
+    @agent_error_handler("Decider Tangents")
     def fool_arrange_secret(self, state: IndigoAgentState) -> IndigoAgentState:
         """
         FOOL arranges letters into SECRET name.
         Now a traceable graph node!
         """
+        get_state_snapshot(
+            state, "fool_arrange_secret_enter", state.thread_id, "Decider Tangents"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         logger.info(f"🃏 FOOL arranging secret from: {state.letter_bank}")
@@ -305,9 +323,16 @@ Respond with ONLY the secret name (proper capitalization, with spaces).
                     raise Exception(msg)
                 logger.error(msg)
                 state.secret_name = "ERROR"
+        get_state_snapshot(
+            state, "fool_arrange_secret_exit", state.thread_id, "Decider Tangents"
+        )
         return state
 
+    @agent_error_handler("Decider Tangents")
     def spy_arrange_surface(self, state: IndigoAgentState) -> IndigoAgentState:
+        get_state_snapshot(
+            state, "spy_arrange_surface_enter", state.thread_id, "Decider Tangents"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -354,13 +379,23 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
                     raise Exception(msg)
                 logger.error(msg)
                 state.surface_name = "ERROR"
+                get_state_snapshot(
+                    state,
+                    "spy_arrange_surface_exit",
+                    state.thread_id,
+                    "Decider Tangents",
+                )
                 return state
 
+    @agent_error_handler("Decider Tangents")
     def validate_anagram(self, state: IndigoAgentState) -> IndigoAgentState:
         """
         Validate that secret and surface are true anagrams.
         Sets a validation flag for conditional routing.
         """
+        get_state_snapshot(
+            state, "validate_anagram_enter", state.thread_id, "Decider Tangents"
+        )
         logger.info(f"✓ Validating: '{state.secret_name}' ↔ '{state.surface_name}'")
         is_valid = self._is_valid_anagram(state.secret_name, state.surface_name)
         state.anagram_valid = is_valid
@@ -368,12 +403,19 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             logger.info("✅ VALID anagram confirmed!")
         else:
             logger.warning(f"⚠️ INVALID anagram (attempt {state.anagram_attempts})")
+        get_state_snapshot(
+            state, "validate_anagram_exit", state.thread_id, "Decider Tangents"
+        )
         return state
 
+    @agent_error_handler("Decider Tangents")
     def algorithmic_fallback(self, state: IndigoAgentState) -> IndigoAgentState:
         """
         Use pre-defined anagram pairs when LLM generation fails.
         """
+        get_state_snapshot(
+            state, "algorithmic_fallback_enter", state.thread_id, "Decider Tangents"
+        )
         logger.warning(
             f"⚠️ Using algorithmic fallback after {state.anagram_attempts} attempts"
         )
@@ -383,17 +425,24 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
         state.letter_bank = fallback_result["letters"]
         state.anagram_valid = True
         logger.info(f"🔧 Fallback: '{state.secret_name}' ↔ '{state.surface_name}'")
+        get_state_snapshot(
+            state, "algorithmic_fallback_exit", state.thread_id, "Decider Tangents"
+        )
         return state
 
+    @agent_error_handler("Decider Tangents")
     def choose_infranym_method(self, state: IndigoAgentState) -> IndigoAgentState:
         """
         Select encoding method using weighted approach with resource checks.
         """
+        get_state_snapshot(
+            state, "choose_infranym_method_enter", state.thread_id, "Decider Tangents"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
         if mock_mode:
-            state.infranym_method = InfranymMethod.DEFAULT
-            logger.info(f" MOCK: Selected method: {state.infranym_method.value}")
+            state.infranym_medium = InfranymMedium.TEXT
+            logger.info(f" MOCK: Selected medium: {state.infranym_medium.value}")
             return state
 
         # Weight by medium suitability
@@ -410,28 +459,46 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
         methods = list(weights.keys())
         probabilities = list(weights.values())
         chosen = random.choices(methods, weights=probabilities, k=1)[0]
-        state.infranym_method = chosen
-        logger.info(f" Selected infranym method: {chosen.value}")
+        state.infranym_medium = chosen
+        logger.info(f" Selected infranym medium: {chosen.value}")
+        get_state_snapshot(
+            state, "choose_infranym_method_exit", state.thread_id, "Decider Tangents"
+        )
         return state
 
+    @agent_error_handler("Decider Tangents")
     def implement_infranym_method(self, state: IndigoAgentState) -> IndigoAgentState:
         """
         Execute the chosen encoding method and create artifacts.
         """
-        method = state.infranym_method
+        get_state_snapshot(
+            state,
+            "implement_infranym_method_enter",
+            state.thread_id,
+            "Decider Tangents",
+        )
+        medium = state.infranym_medium
         secret = state.secret_name
         bpm = state.white_proposal.bpm if state.white_proposal else 120
         key = state.white_proposal.key if state.white_proposal else None
 
-        logger.info(f"🎨 Implementing {method.value} infranym for '{secret}'")
+        if medium is None:
+            logger.error("infranym_medium is None, cannot implement infranym")
+            return state
 
-        if method == InfranymMedium.TEXT:
+        if secret is None:
+            logger.error("secret_name is None, cannot implement infranym")
+            return state
+
+        logger.info(f"🎨 Implementing {medium.value} infranym for '{secret}'")
+
+        if medium == InfranymMedium.TEXT:
             # Text needs LLM generation for some methods, so we route to text nodes
             # The actual artifact creation happens in assemble_text_artifact
             logger.info("📝 Routing to text generation nodes...")
             return state
 
-        elif method == InfranymMedium.AUDIO:
+        elif medium == InfranymMedium.AUDIO:
             artifact = InfranymAudioArtifact(
                 base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
                 thread_id=state.thread_id,
@@ -449,7 +516,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             state.artifacts.append(artifact)
             logger.info(f"✅ Audio infranym saved: {path}")
 
-        elif method == InfranymMedium.MIDI:
+        elif medium == InfranymMedium.MIDI:
             midi_method = random.choice(["note_cipher", "morse_duration"])
 
             if midi_method == "note_cipher":
@@ -470,6 +537,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             if random.random() < 0.5:
                 carrier_melody = self._generate_carrier_melody(key)
                 artifact = add_carrier_melody_to_artifact(artifact, carrier_melody)
+            # Always use the real thread_id (tool functions use placeholder thread_ids)
             artifact.thread_id = state.thread_id
             artifact.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
             artifact.artifact_name = re.sub(r"[^\w\-_]", "_", f"midi_{secret}".lower())
@@ -478,7 +546,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             state.artifacts.append(artifact)
             logger.info(f"✅ MIDI infranym saved: {path} ({midi_method})")
 
-        elif method == InfranymMedium.IMAGE:
+        elif medium == InfranymMedium.IMAGE:
             # Step 1: Render text image (Layer 2 source)
             text_render = InfranymTextRenderArtifact(
                 base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
@@ -489,7 +557,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
                 artifact_name=f"word_{secret}",
                 secret_word=secret,
                 image_text_style=random.choice(list(ImageTextStyle)),
-                size=(400, 200),  # Recommended default
+                size=(200, 100),  # Smaller to allow 600x600+ carrier images
             )
             text_path = text_render.encode()
             state.infranym_text_render = text_render
@@ -524,7 +592,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             logger.info(f"✅ Image infranym saved: {puzzle_path}")
 
         else:
-            logger.warning(f"Unknown infranym method: {method}")
+            logger.warning(f"Unknown infranym medium: {medium}")
 
         return state
 
@@ -545,7 +613,7 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             for image_file in os.listdir(dir_path):
                 if image_file.lower().endswith(image_extensions):
                     return True
-        except ValueError as e:
+        except OSError as e:
             logger.warning(f"Failed to read carrier images: {e}")
             return False
         return False
@@ -727,9 +795,16 @@ Write ONLY the riddle (no answer, no explanation):
         """
         method = state.text_infranym_method
 
+        if state.secret_name is None:
+            logger.error("secret_name is None, cannot assemble text artifact")
+            return state
+
         logger.info(f"🎨 Assembling text artifact: {method}")
 
         if method == "acrostic":
+            if state.generated_text_lines is None:
+                logger.error("generated_text_lines is None for acrostic")
+                return state
             encoding = create_acrostic_encoding(
                 secret_word=state.secret_name,
                 generated_lines=state.generated_text_lines,
@@ -737,6 +812,9 @@ Write ONLY the riddle (no answer, no explanation):
             usage = "verse"
 
         elif method == "riddle":
+            if state.generated_riddle_text is None:
+                logger.error("generated_riddle_text is None for riddle")
+                return state
             encoding = create_riddle_encoding(
                 secret_word=state.secret_name,
                 generated_riddle=state.generated_riddle_text,
@@ -745,6 +823,9 @@ Write ONLY the riddle (no answer, no explanation):
             usage = "bridge"
 
         else:  # anagram
+            if state.surface_name is None:
+                logger.error("surface_name is None for anagram")
+                return state
             encoding = create_anagram_encoding(
                 secret_word=state.secret_name, surface_phrase=state.surface_name
             )
@@ -764,6 +845,7 @@ Write ONLY the riddle (no answer, no explanation):
         )
         path = artifact.save_file()
         state.infranym_text = artifact
+        state.artifacts.append(artifact)
         logger.info(f"✅ Text infranym artifact saved: {path}")
         return state
 
@@ -807,7 +889,7 @@ BPM: {previous_iteration.bpm}
 **Your Infranym System:**
 - Secret Name: {state.secret_name}
 - Surface Name: {state.surface_name}
-- Encoding Method: {state.infranym_method}
+- Encoding Method: {state.infranym_medium}
 - Triple-Layer: Surface → Method → Secret
 
 **Your Task: CREATE A COMPLETE SONG PROPOSAL**
@@ -847,9 +929,8 @@ Concept: [full concept explanation]
                 counter_proposal.concept += (
                     f"Secret: '{state.secret_name}' encoded as '{state.surface_name}'\n"
                 )
-                counter_proposal.concept += f"Method: {state.infranym_method}\n"
+                counter_proposal.concept += f"Method: {state.infranym_medium}\n"
 
-                # Handle artifact info gracefully
                 if state.artifacts and len(state.artifacts) > 0:
                     artifact = state.artifacts[0]
                     decoding_hint = (
@@ -908,7 +989,7 @@ Concept: [full concept explanation]
     @staticmethod
     def _should_route_to_text_nodes(state: IndigoAgentState) -> str:
         """Route to text generation if the method is TEXT, otherwise done"""
-        if state.infranym_method == InfranymMedium.TEXT:
+        if state.infranym_medium == InfranymMedium.TEXT:
             return "choose_text_method"
         return "generate_alternate_song_spec"
 
@@ -952,11 +1033,15 @@ Concept: [full concept explanation]
             logger.warning(
                 f"⚠️ Failed to load anagram pairs from resource: {e}, using hardcoded fallback"
             )
+            # Verified valid anagram pairs
             pairs = [
-                ("Silent Storm", "Missiles Torn"),
-                ("Listen Close", "Sent Lisicle"),
-                ("Hidden Truth", "Dihutnt Herd"),
-                ("Secret Name", "Meant Crease"),
+                ("Silent", "Listen"),
+                ("Dormitory", "Dirty Room"),
+                ("The Eyes", "They See"),
+                ("Astronomer", "Moon Starer"),
+                ("Slot Machines", "Cash Lost In Me"),
+                ("The Morse Code", "Here Come Dots"),
+                ("Tone Arm", "Mentor A"),
             ]
 
         secret, surface = random.choice(pairs)
@@ -1001,10 +1086,25 @@ def _parse_proposal_response(response: str) -> SongProposalIteration:
         data[current_key] = " ".join(current_value).strip()
     mood_list = [m.strip() for m in data.get("mood", "").split(",") if m.strip()]
     genres_list = [g.strip() for g in data.get("genres", "").split(",") if g.strip()]
+    # Safely parse BPM - handle edge cases like "33⅓" (vinyl RPM)
+    raw_bpm = data.get("bpm", 120)
+    try:
+        bpm = int(raw_bpm)
+    except (ValueError, TypeError):
+        # Strip non-numeric characters and try again
+        import re
+
+        numeric_part = re.sub(r"[^\d]", "", str(raw_bpm))
+        bpm = int(numeric_part) if numeric_part else 120
+    import time
+
+    timestamp = int(time.time() * 1000)
     return SongProposalIteration(
+        iteration_id=f"indigo_proposal_{timestamp}",
+        rainbow_color="indigo",
         title=data.get("title", "Untitled"),
         key=data.get("key", "C major"),
-        bpm=int(data.get("bpm", 120)),
+        bpm=bpm,
         tempo=data.get("tempo", "Moderate"),
         mood=mood_list if mood_list else ["cryptic"],
         genres=genres_list if genres_list else ["experimental"],

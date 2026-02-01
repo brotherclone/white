@@ -16,3 +16,4 @@ class AgentSettings(BaseModel):
     max_retries: int = 3
     timeout: int = 120
     stop: list[str] = []
+    max_tokens: int = 8192  # Increased to handle complex structured outputs

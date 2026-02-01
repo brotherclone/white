@@ -1,0 +1,21 @@
+artifact_id: ce39ac63-db4a-4e44-8e36-4abb86dc5561
+artifact_name: phantom_limb_protocol_newspaper
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1977-11-13'
+file_name: ce39ac63-db4a-4e44-8e36-4abb86dc5561_b_phantom_limb_protocol_newspaper.yml
+headline: Local Band's Recording Session Linked to String of Youth Hospitalizations
+location: Hopatcong, NJ
+rainbow_color_mnemonic_character_value: B
+source: Sussex County Courier
+tags:
+- phantom limb protocol
+- consciousness archaeology
+- psychoacoustic phenomena
+- youth crime
+- unexplained incidents
+text: ''
+thread_id: c59be431-6527-4424-83fd-4dea6a83edf5

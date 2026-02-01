@@ -36,7 +36,9 @@ from app.agents.tools.biographical_tools import (
     load_biographical_data,
     get_year_analysis,
 )
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
@@ -95,6 +97,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
         self.alternate_history_constraints = AlternateHistoryConstraints(
             must_fit_temporally=True,
@@ -144,7 +147,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
 
     def create_graph(self) -> StateGraph:
         work_flow = StateGraph(BlueAgentState)
-        # Nodes
         work_flow.add_node("load_biographical_data", self.load_biographical_data)
         work_flow.add_node("select_year", self.select_year)
         work_flow.add_node("evaluate_timeline_frailty", self.evaluate_timeline_frailty)
@@ -158,8 +160,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
-
-        # Edges
         work_flow.add_edge(START, "load_biographical_data")
         work_flow.add_edge("load_biographical_data", "select_year")
         work_flow.add_edge("select_year", "evaluate_timeline_frailty")
@@ -179,7 +179,14 @@ class BlueAgent(BaseRainbowAgent, ABC):
         return work_flow
 
     @staticmethod
+    @agent_error_handler("The Cassette Bearer")
     def load_biographical_data(state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "load_biographical_data_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         biographical_data = load_biographical_data()
         if biographical_data is None:
@@ -188,9 +195,16 @@ class BlueAgent(BaseRainbowAgent, ABC):
             else:
                 logger.warning("Failed to load biographical data")
         state.biographical_data = biographical_data
+        get_state_snapshot(
+            state, "load_biographical_data_exit", state.thread_id, "The Cassette Bearer"
+        )
         return state
 
+    @agent_error_handler("The Cassette Bearer")
     def select_year(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state, "select_year_enter", state.thread_id, "The Cassette Bearer"
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         all_years = state.biographical_data.get("years", {})
         if not all_years:
@@ -242,6 +256,9 @@ class BlueAgent(BaseRainbowAgent, ABC):
             state.selected_period = chosen
             return state
         state.selected_period = all_years[len(all_years) // 2]
+        get_state_snapshot(
+            state, "select_year_exit", state.thread_id, "The Cassette Bearer"
+        )
         return state
 
     def _ensure_biographical_period(self, period: dict) -> BiographicalPeriod | None:
@@ -288,7 +305,14 @@ class BlueAgent(BaseRainbowAgent, ABC):
                     return None
         return None
 
+    @agent_error_handler("The Cassette Bearer")
     def evaluate_timeline_frailty(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "evaluate_timeline_frailty_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         period = state.selected_period
         # Get year from state or from BiographicalPeriod object
@@ -392,36 +416,41 @@ class BlueAgent(BaseRainbowAgent, ABC):
         )
         for check, passed in checks_dict.items():
             logger.info(f"   {check}: {'✅' if passed else '❌'}")
-
-        # Increment iteration count in the node (not the router) so it persists
         state.iteration_count += 1
-
+        get_state_snapshot(
+            state,
+            "evaluate_timeline_frailty_exit",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         return state
 
-    def route_after_evaluate_timeline_frailty(self, state: BlueAgentState) -> str:
-        # If we found a suitable year, proceed immediately
+    @staticmethod
+    def route_after_evaluate_timeline_frailty(state: BlueAgentState) -> str:
         if state.evaluation_result.is_suitable:
             logger.info(
                 f"✅ Found suitable year after {state.iteration_count} attempts, proceeding"
             )
             return "frail"
-
-        # If not suitable but haven't hit max iterations, try another year
         if state.iteration_count < state.max_iterations:
             logger.info(
                 f"❌ Year not suitable, trying another ({state.iteration_count}/{state.max_iterations})"
             )
             return "healthy"
-
-        # If we've exhausted max iterations without finding a suitable year,
-        # force proceed with the last evaluated year
         logger.warning(
             f"⚠️ Failed to find suitable year after {state.max_iterations} attempts, "
             f"forcing proceed with year {state.evaluation_result.year}"
         )
         return "frail"
 
+    @agent_error_handler("The Cassette Bearer")
     def generate_alternate_history(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "generate_alternate_history_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -432,8 +461,8 @@ class BlueAgent(BaseRainbowAgent, ABC):
                 ) as f:
                     data = yaml.safe_load(f)
                     data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    data["thread_id"] = state.thread_id
                     timeline = AlternateTimelineArtifact(**data)
-                    timeline.thread_id = state.thread_id
                     state.alternate_history = timeline
                     timeline.save_file()
                     state.artifacts.append(timeline)
@@ -445,11 +474,63 @@ class BlueAgent(BaseRainbowAgent, ABC):
                     raise Exception(error_msg)
             return state
 
-        before = self._normalize_period(state.selected_period.previous_period)
-        after = self._normalize_period(state.selected_period.next_period)
+        # Get before/after periods from adjacent years in biographical_data
+        years_data = (
+            state.biographical_data.get("years", {}) if state.biographical_data else {}
+        )
+        year_keys = sorted(years_data.keys())
+        selected_year = state.selected_year
+
+        before_period = None
+        after_period = None
+        if selected_year and year_keys:
+            try:
+                idx = year_keys.index(selected_year)
+                if idx > 0:
+                    before_period = years_data.get(year_keys[idx - 1])
+                if idx < len(year_keys) - 1:
+                    after_period = years_data.get(year_keys[idx + 1])
+            except (ValueError, IndexError):
+                pass
+
+        before = self._normalize_period(before_period)
+        after = self._normalize_period(after_period)
         period = state.selected_period
 
-        prompt = f"""You are The Cassette Bearer, the melancholy recordist who is the only witness to the realities of the
+        # Extract period info - handle both BiographicalPeriod objects and YAML dicts
+        if hasattr(period, "start_date"):
+            period_start = period.start_date
+            period_end = period.end_date
+            period_age_range = period.age_range
+            period_duration = getattr(period, "duration_months", 12)
+            period_location = getattr(period, "location", None) or "Unknown"
+            period_description = period.description
+        elif isinstance(period, dict):
+            period_start = selected_year
+            period_end = selected_year
+            period_age_range = (
+                (selected_year - 1975, selected_year - 1975)
+                if selected_year
+                else (0, 0)
+            )
+            period_duration = 12
+            period_location = "Unknown"
+            personal = period.get("personal_context", {})
+            period_description = (
+                personal.get("summary", "")
+                if isinstance(personal, dict)
+                else str(personal)
+            )
+        else:
+            period_start = "Unknown"
+            period_end = "Unknown"
+            period_age_range = (0, 0)
+            period_duration = 12
+            period_location = "Unknown"
+            period_description = str(period)
+
+        prompt = f"""
+You are The Cassette Bearer, the melancholy recordist who is the only witness to the realities of the
 multi-media artist and musician, Gabriel Walsh, being over-written at a quantum level. Your task is to
 visualize and document one such occurrence when his life's timeline was malleable and frail.
 
@@ -457,11 +538,11 @@ visualize and document one such occurrence when his life's timeline was malleabl
 THE BREAK IN THE TIMELINE
 ═══════════════════════════════════════════════════════════════════════════════
 
-Period: {period.start_date} to {period.end_date}
-Age: {period.age_range[0]}-{period.age_range[1]}
-Duration: {period.duration_months} months
-Location: {period.location or 'Unknown'}
-Known details: {period.description}
+Period: {period_start} to {period_end}
+Age: {period_age_range[0]}-{period_age_range[1]}
+Duration: {period_duration} months
+Location: {period_location}
+Known details: {period_description}
 
 What we know happened BEFORE this gap:
 {before}
@@ -484,7 +565,7 @@ Your alternate history MUST follow these constraints:
 1. TEMPORAL COHERENCE (Required)
    - Must fit between the "before" and "after" events
    - Timeline must be logically consistent
-   - Duration must match the period ({period.duration_months} months)
+   - Duration must match the period ({period_duration} months)
    - No anachronisms or impossible time compressions
 
 2. GEOGRAPHIC PLAUSIBILITY (Required)
@@ -549,13 +630,30 @@ The tape has been recorded over. What life exists on it now?
         try:
             result = proposer.invoke(prompt)
             if isinstance(result, dict):
+                # Remove fields that should use class defaults, not LLM-generated values
+                result.pop("chain_artifact_file_type", None)
+                result.pop("chain_artifact_type", None)
+                result.pop("file_name", None)
+                result.pop("file_path", None)
+                result.pop("thread_id", None)  # Will be set below
+                result.pop("artifact_id", None)  # Let class generate UUID
+
                 result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                result["thread_id"] = state.thread_id
                 timeline = AlternateTimelineArtifact(**result)
-                timeline.thread_id = state.thread_id
             elif isinstance(result, AlternateTimelineArtifact):
+                # Override any LLM-generated values with correct ones
                 timeline = result
                 timeline.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                 timeline.thread_id = state.thread_id
+                # Force correct file type (class default is YML)
+                from app.structures.enums.chain_artifact_file_type import (
+                    ChainArtifactFileType,
+                )
+
+                timeline.chain_artifact_file_type = ChainArtifactFileType.YML
+                # Regenerate file_name with correct values
+                timeline.get_file_name()
             else:
                 error_msg = f"Expected AlternateTimelineArtifact, got {type(result)}"
                 if block_mode:
@@ -567,7 +665,7 @@ The tape has been recorded over. What life exists on it now?
                 logger.warning("⚠️ Alternate history failed validation:")
                 for issue in validation_result["issues"]:
                     logger.warning(f"   - {issue}")
-                timeline.validation_issues = validation_result["issues"]
+                # Log validation issues but don't try to set on artifact (field doesn't exist)
                 if block_mode:
                     raise ValueError(
                         f"Generated alternate history failed plausibility checks: {validation_result['issues']}"
@@ -589,6 +687,12 @@ The tape has been recorded over. What life exists on it now?
             if block_mode:
                 raise Exception(f"Anthropic model call failed: {e!s}") from e
             logger.error(f"Anthropic model call failed: {e!s}")
+        get_state_snapshot(
+            state,
+            "generate_alternate_history_exit",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         return state
 
     def _validate_alternate_history(
@@ -609,41 +713,70 @@ The tape has been recorded over. What life exists on it now?
         unique_proper_nouns = 0
         if self.alternate_history_constraints.must_fit_temporally:
             bio_period = state.selected_period
-            alt_period = timeline.period
-            if alt_period.start_date != bio_period.start_date:
-                issues.append(
-                    f"Start date mismatch: alternate says {alt_period.start_date}, "
-                    f"but biographical period is {bio_period.start_date}"
-                )
-            if alt_period.end_date != bio_period.end_date:
-                issues.append(
-                    f"End date mismatch: alternate says {alt_period.end_date}, "
-                    f"but biographical period is {bio_period.end_date}"
-                )
-            calculated_months = (
-                alt_period.end_date.year - alt_period.start_date.year
-            ) * 12 + (alt_period.end_date.month - alt_period.start_date.month)
-            if (
-                abs(calculated_months - alt_period.duration_months) > 1
-            ):  # Allow 1-month rounding
-                issues.append(
-                    f"Duration mismatch: dates suggest {calculated_months} months, "
-                    f"but duration_months is {alt_period.duration_months}"
-                )
-            # Date ordering sanity
-            if alt_period.start_date >= alt_period.end_date:
-                issues.append(
-                    f"Invalid date order: start {alt_period.start_date} >= end {alt_period.end_date}"
-                )
+            alt_period = timeline.period if timeline else None
+
+            # Skip temporal validation if alt_period is missing or invalid
+            if alt_period is None:
+                issues.append("Timeline has no period defined")
+            elif isinstance(alt_period, dict):
+                # alt_period is a dict, try to extract fields
+                alt_start = alt_period.get("start_date")
+                alt_end = alt_period.get("end_date")
+                if alt_start is None or alt_end is None:
+                    issues.append("Timeline period missing start_date or end_date")
+            elif not hasattr(alt_period, "start_date") or not hasattr(
+                alt_period, "end_date"
+            ):
+                issues.append("Timeline period missing required date attributes")
+            else:
+                # Handle dict-based bio_period
+                if isinstance(bio_period, dict):
+                    bio_start_date = state.selected_year
+                    bio_end_date = state.selected_year
+                else:
+                    bio_start_date = bio_period.start_date
+                    bio_end_date = bio_period.end_date
+                if alt_period.start_date != bio_start_date:
+                    issues.append(
+                        f"Start date mismatch: alternate says {alt_period.start_date}, "
+                        f"but biographical period is {bio_start_date}"
+                    )
+                if alt_period.end_date != bio_end_date:
+                    issues.append(
+                        f"End date mismatch: alternate says {alt_period.end_date}, "
+                        f"but biographical period is {bio_end_date}"
+                    )
+                calculated_months = (
+                    alt_period.end_date.year - alt_period.start_date.year
+                ) * 12 + (alt_period.end_date.month - alt_period.start_date.month)
+                alt_duration = getattr(alt_period, "duration_months", calculated_months)
+                if abs(calculated_months - alt_duration) > 1:  # Allow 1-month rounding
+                    issues.append(
+                        f"Duration mismatch: dates suggest {calculated_months} months, "
+                        f"but duration_months is {alt_duration}"
+                    )
+                # Date ordering sanity
+                if alt_period.start_date >= alt_period.end_date:
+                    issues.append(
+                        f"Invalid date order: start {alt_period.start_date} >= end {alt_period.end_date}"
+                    )
         if self.alternate_history_constraints.must_fit_geographically:
-            bio_location = state.selected_period.location or "Unknown"
+            if isinstance(state.selected_period, dict):
+                bio_location = "Unknown"
+            else:
+                bio_location = state.selected_period.location or "Unknown"
             alt_location = (
                 timeline.period.location
-                if hasattr(timeline.period, "location")
+                if timeline and timeline.period and hasattr(timeline.period, "location")
                 else None
             )
             detail_locations = []
-            for detail in timeline.specific_details:
+            specific_details = (
+                timeline.specific_details
+                if timeline and hasattr(timeline, "specific_details")
+                else []
+            )
+            for detail in specific_details:
                 detail_locations.extend(
                     self._extract_locations_from_text(detail.detail)
                 )
@@ -793,12 +926,20 @@ The tape has been recorded over. What life exists on it now?
                 locations.append(keyword)
         return locations
 
-    def _normalize_period(self, period: dict | list | tuple) -> str:
+    def _normalize_period(
+        self, period: dict | list | tuple, max_chars: int = 1500
+    ) -> str:
+        """Normalize period to text, truncating if too long to prevent token blowout."""
         if period is None:
             return "No information on this period"
         if isinstance(period, (list, tuple)):
-            return "\n".join(self._item_to_text(i) for i in period)
-        return self._item_to_text(period)
+            text = "\n".join(self._item_to_text(i) for i in period)
+        else:
+            text = self._item_to_text(period)
+        # Truncate to prevent prompt from becoming too large
+        if len(text) > max_chars:
+            text = text[:max_chars] + "... [truncated]"
+        return text
 
     @staticmethod
     def _item_to_text(item: dict | list | tuple) -> str:
@@ -815,8 +956,24 @@ The tape has been recorded over. What life exists on it now?
         return str(item)
 
     @staticmethod
+    @agent_error_handler("The Cassette Bearer")
     def extract_musical_parameters(state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "extract_musical_parameters_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         alternate = state.alternate_history
+        if alternate is None:
+            logger.error("alternate_history is None, cannot extract musical parameters")
+            get_state_snapshot(
+                state,
+                "extract_musical_parameters_exit",
+                state.thread_id,
+                "The Cassette Bearer",
+            )
+            return state
         bpm_map = {
             QuantumTapeEmotionalTone.WISTFUL: 94,
             QuantumTapeEmotionalTone.MELANCHOLY: 88,
@@ -890,6 +1047,12 @@ The tape has been recorded over. What life exists on it now?
             ),
         )
         state.musical_params = params
+        get_state_snapshot(
+            state,
+            "extract_musical_parameters_exit",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         return state
 
     @staticmethod
@@ -903,13 +1066,27 @@ The tape has been recorded over. What life exists on it now?
             note = random.choice(YOUR_TEAM_RING_TAPE_LYRIC_FRAGMENTS)
         return note
 
+    @agent_error_handler("The Cassette Bearer")
     def generate_tape_label(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state, "generate_tape_label_enter", state.thread_id, "The Cassette Bearer"
+        )
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         from app.structures.enums.quantum_tape_recording_quality import (
             QuantumTapeRecordingQuality,
         )
 
         alternate = state.alternate_history
+        if alternate is None:
+            logger.error("alternate_history is None, cannot generate tape label")
+            get_state_snapshot(
+                state,
+                "generate_tape_label_exit",
+                state.thread_id,
+                "The Cassette Bearer",
+            )
+            return state
+
         quality = random.choices(
             [
                 QuantumTapeRecordingQuality.SP,
@@ -945,6 +1122,9 @@ The tape has been recorded over. What life exists on it now?
             logger.error(error_msg)
             if block_mode:
                 raise Exception(error_msg)
+        get_state_snapshot(
+            state, "generate_tape_label_exit", state.thread_id, "The Cassette Bearer"
+        )
         return state
 
     def _format_alternate_history_for_prompt(
@@ -978,15 +1158,15 @@ The tape has been recorded over. What life exists on it now?
     {details_text}
 
     WHY THIS FEELS REAL:
-    {alt.plausibility_justification}
+    {alt.mood_description or alt.narrative[:200] + '...' if alt.narrative else 'No justification provided'}
 
     ARCHAEOLOGICAL NOTES:
-    - Temporal fit: {"✓" if alt.constraints.must_fit_temporally else "✗"}
-    - Geographic coherence: {"✓" if alt.constraints.must_fit_geographically else "✗"}
-    - Concrete details present: {"✓" if alt.constraints.require_concrete_details else "✗"}
-    - Names and places verified: {"✓" if alt.constraints.require_names_and_places else "✗"}
-    - Specificity rating: {alt.specificity_score:.2f}/1.0
-    - Plausibility rating: {alt.plausibility_score:.2f}/1.0
+    - Temporal fit: {"✓" if self.alternate_history_constraints.must_fit_temporally else "✗"}
+    - Geographic coherence: {"✓" if self.alternate_history_constraints.must_fit_geographically else "✗"}
+    - Concrete details present: {"✓" if self.alternate_history_constraints.require_concrete_details else "✗"}
+    - Names and places verified: {"✓" if self.alternate_history_constraints.require_names_and_places else "✗"}
+    - Specificity rating: {alt.specificity_score or 0.0:.2f}/1.0
+    - Plausibility rating: {alt.plausibility_score or 0.0:.2f}/1.0
 
     ═══════════════════════════════════════════════════════════════
         """.strip()
@@ -1005,7 +1185,14 @@ The tape has been recorded over. What life exists on it now?
         }
         return descriptions.get(tone, "unknown emotional signature")
 
+    @agent_error_handler("The Cassette Bearer")
     def generate_alternate_song_spec(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state,
+            "generate_alternate_song_spec_enter",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -1025,8 +1212,30 @@ The tape has been recorded over. What life exists on it now?
                     raise Exception(error_msg)
             return state
         else:
+            # Check for required state before building prompt
+            if state.alternate_history is None:
+                logger.error("alternate_history is None, cannot generate song spec")
+                get_state_snapshot(
+                    state,
+                    "generate_alternate_song_spec_exit",
+                    state.thread_id,
+                    "The Cassette Bearer",
+                )
+                return state
+            if state.tape_label is None or state.musical_params is None:
+                logger.error(
+                    "tape_label or musical_params is None, cannot generate song spec"
+                )
+                get_state_snapshot(
+                    state,
+                    "generate_alternate_song_spec_exit",
+                    state.thread_id,
+                    "The Cassette Bearer",
+                )
+                return state
+
             prompt = f"""
-You are The Cassette Bearer, the sorrowful witness who exists outside time and space. 
+You are The Cassette Bearer, the sorrowful witness who exists outside time and space.
 You are the lone witness to the orphaned existences of one Gabriel Walsh, a musician 
 whose life has been repeatedly overwritten at a quantum level. Now, for once, you can 
 channel all the loss and frustration of seeing a life erased into a new creative vision.
@@ -1070,8 +1279,8 @@ Blue proposals are folk rock requiems for alternate lives. They must:
 - Ground in specific details (names, places, dates - no fantasy)
 - Embody counterfactual nostalgia - mourn what never happened
 - Sound like Springsteen, Joni Mitchell, Iron & Wine
-- Follow these constraints: minimum plausibility {state.alternate_history.constraints.minimum_plausibility_score}, 
-  minimum specificity {state.alternate_history.constraints.minimum_specificity_score}
+- Follow these constraints: minimum plausibility {self.alternate_history_constraints.minimum_plausibility_score},
+  minimum specificity {self.alternate_history_constraints.minimum_specificity_score}
 
 Before the tides change again, write your counter-proposal. Transform the White Agent's 
 dream into a song about THIS erased timeline - the one in your hands.
@@ -1102,4 +1311,10 @@ dream into a song about THIS erased timeline - the one in your hands.
                 )
 
             state.counter_proposal = counter_proposal
+            get_state_snapshot(
+                state,
+                "generate_alternate_song_spec_exit",
+                state.thread_id,
+                "The Cassette Bearer",
+            )
             return state

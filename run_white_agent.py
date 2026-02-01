@@ -6,9 +6,9 @@ import sys
 import warnings
 
 from pathlib import Path
-
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.white_agent import WhiteAgent
+from app.util.agent_state_utils import validate_state_structure
 
 # Configure logging early
 logging.basicConfig(
@@ -50,6 +50,9 @@ Usage:
 
     # Resume with a saved state file
     python run_white_agent.py resume --state-file paused_state.pkl
+    
+    # Validate state and artifacts
+    python run_white_agent.py validate
 """
 
 
@@ -63,8 +66,6 @@ def ensure_state_object(state):
 def start_workflow(args):
     """Start a new White Agent workflow."""
     white = WhiteAgent()
-
-    # Build execution control from args
     all_agents = [
         "black",
         "red",
@@ -77,8 +78,6 @@ def start_workflow(args):
     ]
     enabled_agents = all_agents.copy()
     stop_after = None
-
-    # Parse execution mode
     if args.mode == "single_agent":
         if not args.agent:
             logging.error("❌ --agent required for single_agent mode")
@@ -90,7 +89,6 @@ def start_workflow(args):
         if not args.stop_after:
             logging.error("❌ --stop-after required for stop_after mode")
             sys.exit(1)
-        # Enable all agents up to and including stop_after
         stop_index = all_agents.index(args.stop_after)
         enabled_agents = all_agents[: stop_index + 1]
         stop_after = args.stop_after
@@ -123,7 +121,6 @@ def start_workflow(args):
     final_state = ensure_state_object(final_state)
 
     if final_state.workflow_paused:
-        # Save the paused state
         state_file = Path("paused_state.pkl")
         with state_file.open("wb") as f:
             pickle.dump(final_state, f)
@@ -159,8 +156,6 @@ def start_workflow(args):
         if final_state.song_proposals and final_state.song_proposals.iterations:
             iterations = final_state.song_proposals.iterations
             logging.info(f"Generated {len(iterations)} proposal iterations")
-
-            # Show which agents contributed
             agents_used = set(
                 it.agent_name for it in iterations if it.agent_name is not None
             )
@@ -170,8 +165,6 @@ def start_workflow(args):
                 )
             else:
                 logging.info("No agent names tracked in iterations")
-
-            # Show final proposal
             if iterations:
                 final = iterations[-1]
                 logging.info(f"\n🎵 Final Song: {final.title}")
@@ -202,7 +195,6 @@ def resume_workflow(args):
     with state_file.open("rb") as f:
         paused_state = pickle.load(f)
 
-    # Convert to MainAgentState if it's a dict
     paused_state = ensure_state_object(paused_state)
 
     if not isinstance(paused_state, MainAgentState):
@@ -217,7 +209,7 @@ def resume_workflow(args):
     verify_tasks = not args.no_verify
 
     if args.no_verify:
-        logging.warning("⚠️  Skipping task verification (--no-verify flag)")
+        logging.warning(" Skipping task verification (--no-verify flag)")
 
     try:
         final_state = white.resume_workflow(paused_state, verify_tasks=verify_tasks)
@@ -232,7 +224,6 @@ def resume_workflow(args):
                 f"Total proposal iterations: {len(final_state.song_proposals.iterations)}"
             )
 
-        # Clean up the paused state file
         if args.cleanup:
             state_file.unlink()
             logging.info(f"🗑️  Removed paused state file: {state_file}")
@@ -245,41 +236,21 @@ def resume_workflow(args):
         sys.exit(1)
 
 
+def validate_state(args):
+    if args.dry_run:
+        dry_run_state = MainAgentState(thread_id="dry_run")
+        result = validate_state_structure(dry_run_state)
+        print(f"Validating dry run state: {result}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="White Agent Workflow Runner",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  # Start a new workflow (full spectrum - all 8 agents)
-  python run_white_agent.py start
-
-  # Provide an initial concept
-  python run_white_agent.py start --concept "The ghost in the machine dreams of flesh"
-
-  # Test Orange Agent in isolation (Black → Orange → White finale)
-  python run_white_agent.py start --mode single_agent --agent orange --concept "Library ghosts"
-
-  # Run up through Yellow (Black → Red → Orange → Yellow → White)
-  python run_white_agent.py start --mode stop_after --stop-after yellow --concept "Static children"
-
-  # Custom agent combination (just the puzzle-makers)
-  python run_white_agent.py start --mode custom --agents orange,indigo --concept "Hidden frequencies"
-
-  # Resume after completing ritual tasks
-  python run_white_agent.py resume
-
-  # Resume without verifying tasks (for testing)
-  python run_white_agent.py resume --no-verify
-
-  # Resume and clean up state file
-  python run_white_agent.py resume --cleanup
-        """,
+        epilog="",
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
-
-    # Start command
     start_parser = subparsers.add_parser("start", help="Start a new workflow")
     start_parser.add_argument(
         "--mode",
@@ -323,8 +294,6 @@ Examples:
         "--concept",
         help="Initial song concept (optional - White will use facet system if not provided)",
     )
-
-    # Resume command
     resume_parser = subparsers.add_parser("resume", help="Resume a paused workflow")
     resume_parser.add_argument(
         "--state-file",
@@ -342,6 +311,15 @@ Examples:
         help="Remove the paused state file after successful resume",
     )
 
+    validate_parser = subparsers.add_parser(
+        "validate", help="Validate state and artifacts"
+    )
+    validate_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="just validate structure",
+    )
+
     args = parser.parse_args()
 
     if not args.command:
@@ -352,6 +330,8 @@ Examples:
         start_workflow(args)
     elif args.command == "resume":
         resume_workflow(args)
+    elif args.command == "validate":
+        validate_state(args)
 
 
 if __name__ == "__main__":

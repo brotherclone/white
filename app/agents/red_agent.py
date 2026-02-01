@@ -12,8 +12,10 @@ from langgraph.graph import StateGraph
 from app.agents.states.red_agent_state import RedAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.tools.book_tool import BookMaker
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.book_artifact import BookArtifact, BookPageCollection
 from app.structures.concepts.book_evaluation import BookEvaluationDecision
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
@@ -42,6 +44,7 @@ class RedAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
+            max_tokens=self.settings.max_tokens,
         )
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
@@ -73,7 +76,9 @@ class RedAgent(BaseRainbowAgent, ABC):
             state.artifacts = final_state.artifacts
         return state
 
-    def _ensure_dict(self, obj):
+    # ToDo: Move to tools
+    @staticmethod
+    def _ensure_dict(obj):
         """Return a plain dict for pydantic/dataclass or dict-like objects."""
         if isinstance(obj, dict):
             return obj.copy()
@@ -126,7 +131,14 @@ class RedAgent(BaseRainbowAgent, ABC):
         )
         return red_workflow
 
+    @agent_error_handler("The Light Reader")
     def generate_alternate_song_spec(self, state: RedAgentState) -> RedAgentState:
+        get_state_snapshot(
+            state,
+            "generate_alternate_song_spec_enter",
+            state.thread_id,
+            "The Light Reader",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -199,9 +211,19 @@ class RedAgent(BaseRainbowAgent, ABC):
                         concept="Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable. Fallback stub because Anthropic model unavailable.",
                     )
                     state.counter_proposal = counter_proposal
+        get_state_snapshot(
+            state,
+            "generate_alternate_song_spec_exit",
+            state.thread_id,
+            "The Light Reader",
+        )
         return state
 
+    @agent_error_handler("The Light Reader")
     def generate_book(self, state: RedAgentState) -> RedAgentState:
+        get_state_snapshot(
+            state, "generate_book_enter", state.thread_id, "The Light Reader"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -211,16 +233,18 @@ class RedAgent(BaseRainbowAgent, ABC):
                     "r",
                 ) as f:
                     data = yaml.safe_load(f)
-                    book = BookArtifact(**data)
-                    # Don't include thread_id in base_path - file_path property adds it
-                    book.base_path = os.getenv(
+                    data["base_path"] = os.getenv(
                         "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
                     )
-                    book.thread_id = state.thread_id
+                    data["thread_id"] = state.thread_id
+                    book = BookArtifact(**data)
                     book.save_file()
                     state.artifacts.append(book)
                     state.should_create_book = False
                     state.reaction_level += 1
+                    get_state_snapshot(
+                        state, "generate_book_exit", state.thread_id, "The Light Reader"
+                    )
             except Exception as e:
                 error_msg = f"Failed to read or save mock book artifact: {e!s}"
                 logger.error(error_msg)
@@ -270,9 +294,15 @@ class RedAgent(BaseRainbowAgent, ABC):
                         page_2_text = ""
                 state.reaction_level += 1
                 book_dict = book_data.model_dump()
+                # Remove fields that should use class defaults, not source-generated values
+                book_dict.pop("chain_artifact_file_type", None)
+                book_dict.pop("chain_artifact_type", None)
+                book_dict.pop("file_name", None)
+                book_dict.pop("file_path", None)
+                book_dict.pop("artifact_id", None)  # Let class generate UUID
+
                 book_dict["excerpts"] = [page_1_text, page_2_text]
                 book_dict["thread_id"] = state.thread_id
-                book_dict["artifact_name"] = "main_book"
                 book_dict["base_path"] = os.getenv(
                     "AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"
                 )
@@ -294,7 +324,11 @@ class RedAgent(BaseRainbowAgent, ABC):
                     raise Exception("Anthropic model call failed")
             return state
 
+    @agent_error_handler("The Light Reader")
     def generate_reaction_book(self, state: RedAgentState) -> RedAgentState:
+        get_state_snapshot(
+            state, "generate_reaction_book_enter", state.thread_id, "The Light Reader"
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -318,7 +352,6 @@ class RedAgent(BaseRainbowAgent, ABC):
                         state.should_respond_with_reaction_book = False
                         return state
                     book_dict["thread_id"] = state.thread_id
-                    book_dict["artifact_name"] = f"reaction_book_{state.reaction_level}"
                     book_dict["base_path"] = os.getenv(
                         "AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"
                     )
@@ -363,23 +396,35 @@ class RedAgent(BaseRainbowAgent, ABC):
             proposer = claude.with_structured_output(BookArtifact)
             try:
                 result = proposer.invoke(prompt)
-                if isinstance(result, BookArtifact | dict):
-
-                    result["thread_id"] = state.thread_id
-                    result["artifact_name"] = f"reaction_book_{state.reaction_level}"
-                    result["base_path"] = os.getenv("AGENT_ARTIFACTS_PATH", "artifacts")
-                    state.current_reaction_book = BookArtifact(**result)
-                    state.artifacts.append(state.current_reaction_book)
-                    state.reaction_level += 1
-                    state.should_respond_with_reaction_book = False
-                    return state
+                if isinstance(result, BookArtifact):
+                    result_dict = result.model_dump()
+                elif isinstance(result, dict):
+                    result_dict = result
                 else:
                     error_msg = f"Expected BookArtifact, got {type(result)}"
                     logger.error(error_msg)
                     state.current_reaction_book = None
                     if block_mode:
                         raise TypeError(error_msg)
+                    state.should_respond_with_reaction_book = False
+                    return state
+
+                # Remove fields that should use class defaults, not LLM-generated values
+                result_dict.pop("chain_artifact_file_type", None)
+                result_dict.pop("chain_artifact_type", None)
+                result_dict.pop("file_name", None)
+                result_dict.pop("file_path", None)
+                result_dict.pop("artifact_id", None)  # Let class generate UUID
+
+                result_dict["thread_id"] = state.thread_id
+                result_dict["base_path"] = os.getenv(
+                    "AGENT_ARTIFACTS_PATH", "artifacts"
+                )
+                state.current_reaction_book = BookArtifact(**result_dict)
+                state.artifacts.append(state.current_reaction_book)
+                state.reaction_level += 1
                 state.should_respond_with_reaction_book = False
+                return state
             except Exception as e:
                 logger.error(f"Anthropic model call failed: {e!s}")
                 state.current_reaction_book = None
@@ -390,7 +435,14 @@ class RedAgent(BaseRainbowAgent, ABC):
                     raise Exception("Anthropic model call failed")
             return state
 
+    @agent_error_handler("The Light Reader")
     def write_reaction_book_pages(self, state: RedAgentState) -> RedAgentState | None:
+        get_state_snapshot(
+            state,
+            "write_reaction_book_pages_enter",
+            state.thread_id,
+            "The Light Reader",
+        )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -474,7 +526,14 @@ class RedAgent(BaseRainbowAgent, ABC):
             parts.append(f"Reaction book {i}:\n" + BookMaker.format_card_catalog(rb))
         return "\n\n".join(parts) if parts else "No books available."
 
+    @agent_error_handler("The Light Reader")
     def evaluate_books_versus_proposals(self, state: RedAgentState) -> RedAgentState:
+        get_state_snapshot(
+            state,
+            "evaluate_books_versus_proposals_enter",
+            state.thread_id,
+            "The Light Reader",
+        )
         if state.reaction_level >= 3:
             logger.info(
                 f"🛑 Reaction limit reached ({state.reaction_level}), ending book generation"
@@ -532,13 +591,44 @@ class RedAgent(BaseRainbowAgent, ABC):
                 logger.error(f"Book evaluation failed: {e!s}")
                 state.should_create_book = False
                 state.should_respond_with_reaction_book = False
+        get_state_snapshot(
+            state,
+            "evaluate_books_versus_proposals_exit",
+            state.thread_id,
+            "The Light Reader",
+        )
         return state
 
     @staticmethod
+    @agent_error_handler("The Light Reader")
     def route_after_evaluate_books_versus_proposals(state: RedAgentState) -> str:
+        get_state_snapshot(
+            state,
+            "route_after_evaluate_books_versus_proposals_enter",
+            state.thread_id,
+            "The Light Reader",
+        )
         if state.should_create_book:
+            get_state_snapshot(
+                state,
+                "route_after_evaluate_books_versus_proposals_exit",
+                state.thread_id,
+                "The Light Reader",
+            )
             return "new_book"
         elif state.should_respond_with_reaction_book:
+            get_state_snapshot(
+                state,
+                "route_after_evaluate_books_versus_proposals_exit",
+                state.thread_id,
+                "The Light Reader",
+            )
             return "reaction_book"
         else:
+            get_state_snapshot(
+                state,
+                "route_after_evaluate_books_versus_proposals_exit",
+                state.thread_id,
+                "The Light Reader",
+            )
             return "done"
