@@ -1,0 +1,320 @@
+# Rainbow Pipeline Training Configuration
+# Phase 4: Multi-task classification + Rainbow Table ontological regression
+
+# Data Configuration
+data:
+  # Local path (fallback if HuggingFace unavailable)
+  manifest_path: "data/base_manifest_db.parquet"
+  segments_path: "data/training_segments.parquet"
+
+  # HuggingFace Dataset (preferred)
+  hf_dataset: "brotherclone/rainbow-table-training"
+  hf_split: "base_manifest"
+
+  # Classification target
+  classification_target: "rebracketing_type"
+  classification_type: "multiclass"
+
+  # Regression targets (Rainbow Table ontological dimensions)
+  regression_targets:
+    # Temporal dimension (softmax distribution)
+    temporal:
+      - past_score
+      - present_score
+      - future_score
+    # Spatial dimension (softmax distribution)
+    spatial:
+      - thing_score
+      - place_score
+      - person_score
+    # Ontological dimension (softmax distribution)
+    ontological:
+      - imagined_score
+      - forgotten_score
+      - known_score
+    # Confidence (sigmoid)
+    confidence:
+      - chromatic_confidence
+
+  # Class mapping for classification
+  class_mapping:
+    spatial: 0
+    temporal: 1
+    causal: 2
+    perceptual: 3
+    memory: 4
+    ontological: 5
+    narrative: 6
+    identity: 7
+
+  # Album mapping for regression validation
+  album_mapping:
+    Orange: ["past", "thing", "imagined"]
+    Red: ["past", "thing", "forgotten"]
+    Violet: ["past", "person", "known"]
+    Yellow: ["present", "place", "imagined"]
+    Green: ["present", "person", "known"]
+    Indigo: ["present", "person", "forgotten"]
+    Blue: ["future", "place", "known"]
+    Black: null  # None_None_None
+
+  # Splits
+  train_split: 0.8
+  val_split: 0.2
+  random_seed: 42
+  stratified: true
+
+  # Filtering
+  require_concept: true
+  min_concept_length: 50
+  filter_unknown_types: true
+
+# Soft Target Generation
+soft_targets:
+  # Enable soft target generation from discrete labels
+  enabled: true
+
+  # Label smoothing (converts one-hot to soft distribution)
+  label_smoothing: 0.1  # [1.0, 0.0, 0.0] → [0.9, 0.05, 0.05]
+
+  # Temporal context smoothing
+  temporal_context:
+    enabled: true
+    window_size: 3  # Segments before/after
+    weight_decay: 0.3  # Influence of neighbors
+
+  # Black Album handling (None_None_None)
+  black_album:
+    use_uniform: true  # [0.33, 0.33, 0.33] for all dimensions
+    confidence: 0.0  # chromatic_confidence = 0 for Black
+
+  # Uncertainty weighting
+  uncertainty_weighting:
+    enabled: true
+    high_uncertainty_weight: 0.5  # Reduce loss for ambiguous segments
+    uncertainty_threshold: 0.4  # Segments below this confidence
+
+# Model Architecture
+model:
+  # Text encoder (shared backbone)
+  text_encoder:
+    model_name: "microsoft/deberta-v3-base"
+    hidden_size: 768
+    max_length: 512
+    freeze_layers: 0
+    pooling: "mean"
+
+  # Classification head
+  classifier:
+    type: "multiclass"
+    num_classes: 8
+    hidden_dims: [256, 128]
+    dropout: 0.3
+    activation: "relu"
+    multi_label: false
+    class_weights: "balanced"
+
+  # Regression head (Rainbow Table ontological)
+  regression_head:
+    # Architecture
+    hidden_dims: [256, 128]
+    dropout: 0.3
+    activation: "relu"
+
+    # Output structure (10 total outputs)
+    outputs:
+      temporal: 3     # [past, present, future] - softmax
+      spatial: 3      # [thing, place, person] - softmax
+      ontological: 3  # [imagined, forgotten, known] - softmax
+      confidence: 1   # chromatic_confidence - sigmoid
+
+    # Per-dimension activations
+    activations:
+      temporal: "softmax"     # Ensures sum to 1.0
+      spatial: "softmax"      # Ensures sum to 1.0
+      ontological: "softmax"  # Ensures sum to 1.0
+      confidence: "sigmoid"   # Bounded [0, 1]
+
+    # Uncertainty estimation
+    predict_uncertainty: false  # Set true for evidential outputs
+
+  # Multi-task configuration
+  multitask:
+    # Loss weighting strategy
+    weighting_strategy: "fixed"  # Options: fixed, uncertainty, gradnorm
+
+    # Fixed weights (only used if weighting_strategy: fixed)
+    loss_weights:
+      classification: 1.0
+      temporal: 0.8
+      spatial: 0.8
+      ontological: 0.8
+      confidence: 0.5
+
+    # Uncertainty weighting (Kendall et al.)
+    uncertainty_weighting:
+      enabled: false  # Set true to learn task-specific uncertainties
+      initial_log_var: 0.0  # Initial log(σ²) for each task
+
+    # Gradient normalization (GradNorm)
+    gradnorm:
+      enabled: false
+      alpha: 1.5  # Asymmetry parameter
+      update_frequency: 100  # Steps between weight updates
+
+# Training Configuration
+training:
+  # Classification loss
+  classification_loss:
+    type: "cross_entropy"
+    label_smoothing: 0.0
+
+  # Regression loss
+  regression_loss:
+    # Loss type for distribution targets
+    distribution_loss: "kl_div"  # Options: kl_div, mse, smooth_l1
+    confidence_loss: "bce"  # Binary cross-entropy for sigmoid output
+
+  # Optimization
+  batch_size: 32
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  epochs: 50
+
+  # Per-task learning rates (optional)
+  task_learning_rates:
+    encoder: 0.00002
+    classifier: 0.0001
+    regression: 0.0001
+
+  # Advanced
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  warmup_ratio: 0.1
+
+  # Sequential training (optional)
+  sequential_training:
+    enabled: false
+    phase1_epochs: 10  # Classification only
+    phase2_epochs: 10  # Regression only
+    phase3_epochs: 5   # Joint fine-tuning
+    freeze_encoder_phase2: false
+
+  # Hardware
+  device: "cuda"
+  mixed_precision: true
+  num_workers: 4
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 10
+    min_delta: 0.001
+    metric: "val_combined_score"  # Weighted combination of all metrics
+
+  # Checkpointing
+  save_best_only: true
+  save_every_n_epochs: 1
+
+# Validation Thresholds (for concept validation gates)
+validation:
+  # Accept/reject thresholds
+  confidence_threshold: 0.7      # Minimum for ACCEPT
+  dominant_threshold: 0.6        # Score needed for dominant mode
+  hybrid_threshold: 0.15         # Max difference for hybrid flag
+  diffuse_threshold: 0.2         # Max deviation from uniform for diffuse
+  uncertainty_threshold: 0.8     # Max uncertainty for ACCEPT
+
+  # Transmigration settings
+  transmigration:
+    max_easy_distance: 1.0       # Within-album shift
+    max_moderate_distance: 2.0   # Cross-album shift
+    suggest_intermediates: true  # Generate intermediate states for hard shifts
+
+  # Caching
+  cache:
+    enabled: true
+    ttl_seconds: 3600  # 1 hour
+    backend: "memory"  # Options: memory, redis
+
+# Evaluation Configuration
+evaluation:
+  # Classification metrics
+  classification_metrics:
+    - "per_class_f1"
+    - "macro_f1"
+    - "micro_f1"
+    - "accuracy"
+    - "confusion_matrix"
+
+  # Regression metrics (per dimension)
+  regression_metrics:
+    # Distribution comparison
+    - "jsd"           # Jensen-Shannon divergence
+    - "tv_distance"   # Total variation distance
+    - "hellinger"     # Hellinger distance
+    - "mode_accuracy" # Argmax matches target
+
+    # Confidence metrics
+    - "mae"
+    - "rmse"
+    - "r2"
+    - "pearson_r"
+    - "spearman_r"
+
+  # Calibration metrics (if uncertainty enabled)
+  calibration_metrics:
+    - "ece"           # Expected calibration error
+    - "coverage_95"   # 95% interval coverage
+    - "nll"           # Negative log-likelihood
+
+  # Album prediction
+  album_metrics:
+    - "album_accuracy"
+    - "album_confusion_matrix"
+
+  # Hybrid state detection
+  hybrid_metrics:
+    - "hybrid_precision"
+    - "hybrid_recall"
+    - "diffuse_detection_rate"
+
+  # Visualization
+  visualization:
+    confusion_matrix:
+      enabled: true
+      normalize: "true"
+    distribution_histograms:
+      enabled: true
+    calibration_curves:
+      enabled: true
+
+# Logging Configuration
+logging:
+  # Weights & Biases
+  wandb:
+    enabled: true
+    project: "rainbow-pipeline-regression"
+    entity: null
+    name: null
+    tags:
+      - "multitask"
+      - "regression"
+      - "rainbow-table"
+      - "phase-4"
+
+  # Local logging
+  output_dir: "/workspace/output"
+  log_every_n_steps: 10
+
+  # What to log
+  log_classification_metrics: true
+  log_regression_metrics: true
+  log_per_dimension_metrics: true
+  log_loss_components: true
+  log_task_weights: true  # If using uncertainty/gradnorm weighting
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  deterministic: true

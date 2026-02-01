@@ -221,6 +221,44 @@ class MultiClassRainbowDataset(Dataset):
         }
 
 
+def load_data_from_source(
+    manifest_path: str, hf_dataset: str = None, hf_split: str = "base_manifest"
+) -> pd.DataFrame:
+    """
+    Load data from local parquet or HuggingFace Hub.
+
+    Args:
+        manifest_path: Path to local parquet file
+        hf_dataset: HuggingFace dataset ID (e.g., "brotherclone/rainbow-table-training")
+        hf_split: Which split to load from HF dataset (default: "base_manifest")
+
+    Returns:
+        DataFrame with the loaded data
+    """
+    if hf_dataset:
+        print(f"Loading from HuggingFace: {hf_dataset} [{hf_split}]")
+        try:
+            from datasets import load_dataset
+
+            ds = load_dataset(hf_dataset, split=hf_split)
+            df = ds.to_pandas()
+            print(f"  Loaded {len(df)} tracks from HuggingFace")
+            return df
+        except Exception as e:
+            print(f"  HuggingFace load failed: {e}")
+            print("  Falling back to local file...")
+
+    # Local file fallback
+    manifest_path = Path(manifest_path)
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"Manifest not found: {manifest_path}")
+
+    print(f"Loading manifest from {manifest_path}")
+    df = pd.read_parquet(manifest_path)
+    print(f"  Loaded {len(df)} tracks")
+    return df
+
+
 def build_multiclass_dataloaders(
     manifest_path: str,
     tokenizer: AutoTokenizer,
@@ -237,12 +275,14 @@ def build_multiclass_dataloaders(
     multi_label: bool = False,
     stratified: bool = True,
     filter_unknown_types: bool = True,
+    hf_dataset: str = None,
+    hf_split: str = "base_manifest",
 ) -> Tuple[DataLoader, DataLoader, Dict]:
     """
     Build train and validation dataloaders for multi-class classification.
 
     Args:
-        manifest_path: Path to parquet manifest
+        manifest_path: Path to parquet manifest (fallback if HF fails)
         tokenizer: Tokenizer for text encoding
         class_mapping: Dictionary mapping label names to class indices
         target_column: Name of target column
@@ -257,20 +297,16 @@ def build_multiclass_dataloaders(
         multi_label: Whether this is multi-label classification
         stratified: Whether to use stratified splitting (single-label only)
         filter_unknown_types: Filter out rows with unknown label types
+        hf_dataset: HuggingFace dataset ID (e.g., "brotherclone/rainbow-table-training")
+        hf_split: Which split to load from HF dataset
 
     Returns:
         train_loader: Training DataLoader
         val_loader: Validation DataLoader
         stats: Dictionary with dataset statistics
     """
-    # Load data
-    manifest_path = Path(manifest_path)
-    if not manifest_path.exists():
-        raise FileNotFoundError(f"Manifest not found: {manifest_path}")
-
-    print(f"Loading manifest from {manifest_path}")
-    df = pd.read_parquet(manifest_path)
-    print(f"  Loaded {len(df)} tracks")
+    # Load data from HuggingFace or local file
+    df = load_data_from_source(manifest_path, hf_dataset, hf_split)
 
     # Filter
     if require_concept:

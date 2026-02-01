@@ -40,8 +40,7 @@ class CharacterPortraitArtifact(ChainArtifact, ABC):
                 or self.image.base_path == "/"
             ):
                 self.image.base_path = self.base_path
-                # Recalculate file_path with correct base_path
-                self.image.make_artifact_path()
+                # Note: file_path is now a computed property, no need to recalculate
             self.image.save_file()
 
     def flatten(self) -> dict:

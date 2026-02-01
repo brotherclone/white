@@ -21,3 +21,4 @@ class RainbowPlayer(str, Enum):
     KATHERINE = "Katherine Koherence"
     BUSAYO = "Busayo Oninla"
     ALOY = "Aloysius Fortune"
+    SILAS = "Silas Walsh"
