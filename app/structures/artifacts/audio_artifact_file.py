@@ -70,7 +70,7 @@ if __name__ == "__main__":
         audio_bytes = f.read()
 
     audio_artifact = AudioChainArtifactFile(
-        thread_id="test_thread_id",
+        thread_id="mock_thread_001_id",
         base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
         chain_artifact_type="unknown",
         chain_artifact_file_type="wav",

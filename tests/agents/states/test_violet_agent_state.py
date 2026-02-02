@@ -164,7 +164,6 @@ def test_violet_agent_state_has_required_fields():
     expected_fields = [
         "interviewer_persona",
         "interview_questions",
-        "needs_human_interview",
         "interview_responses",
         "circle_jerk_interview",
     ]
@@ -191,9 +190,6 @@ def test_violet_agent_state_field_defaults():
     assert obj.interview_questions is None
     assert obj.interview_responses is None
     assert obj.circle_jerk_interview is None
-
-    # Test boolean default
-    assert obj.needs_human_interview is False
 
     # Test required persona is set correctly
     assert obj.interviewer_persona == interviewer

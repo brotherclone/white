@@ -1,0 +1,47 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: This song mourns the lost timeline of Gabriel Walsh's year at Sunrise Commercial
+  Bakery (June 1994-May 1995), when instead of pursuing creative work after SUNY Purchase,
+  he took morning shifts mixing industrial bread dough in Yonkers. The narrative follows
+  the archetypal pattern of the artist temporarily surrendering to necessity - the
+  3:15 AM alarm, the fluorescent-lit mixing rooms, the tentative friendship with Polish
+  foreman Danny Kowalski who taught him to judge dough by touch. Living in Mrs. Chen's
+  converted garage at 47 Walnut Street, Gabriel spent late evenings logging WFUV songs
+  in composition notebooks while sketching bread truck routes through Westchester.
+  The song captures the profound melancholy of being awake when the world sleeps,
+  the strange comfort of routine becoming its own trap, and the gradual realization
+  that stepping sideways from your intended path changes your relationship to both
+  comfort and ambition forever. The title references his radio ritual of cataloging
+  late-night songs - 'salute the waves' being his notation for particularly moving
+  transmissions that reached him in that liminal space between creative dreams and
+  economic necessity. This represents the transmigration pattern where INFORMATION
+  (the songs he logged) becomes TIME (the suspended year of routine) becomes SPACE
+  (the geographic and emotional distance from his intended artistic path).
+genres:
+- folk rock
+- americana
+- indie folk
+iteration_id: morning_shifts_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholic
+- nostalgic
+- contemplative
+- lonely
+- resigned
+- wistful
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Salute the Waves

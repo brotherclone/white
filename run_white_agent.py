@@ -1,11 +1,9 @@
 import argparse
 import logging
 import os
-import pickle
 import sys
 import warnings
 
-from pathlib import Path
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.white_agent import WhiteAgent
 from app.util.agent_state_utils import validate_state_structure
@@ -30,7 +28,7 @@ if os.getenv("MOCK_MODE", "false").lower() == "true":
 """
 White Agent Workflow Runner
 
-This script provides convenient commands to start and resume the White Agent workflow.
+This script provides convenient commands to start the White Agent workflow.
 
 Usage:
     # Start a new workflow (full spectrum)
@@ -45,12 +43,6 @@ Usage:
     # Custom agent combination
     python run_white_agent.py start --mode custom --agents orange,indigo --concept "Hidden frequencies"
 
-    # Resume after completing ritual tasks (interactive)
-    python run_white_agent.py resume
-
-    # Resume with a saved state file
-    python run_white_agent.py resume --state-file paused_state.pkl
-    
     # Validate state and artifacts
     python run_white_agent.py validate
 """
@@ -120,120 +112,27 @@ def start_workflow(args):
     )
     final_state = ensure_state_object(final_state)
 
-    if final_state.workflow_paused:
-        state_file = Path("paused_state.pkl")
-        with state_file.open("wb") as f:
-            pickle.dump(final_state, f)
-
-        logging.info("\n" + "=" * 60)
-        logging.info("⏸️  WORKFLOW PAUSED")
-        logging.info("=" * 60)
-        logging.info(f"Paused state saved to: {state_file.absolute()}")
-        logging.info(f"\nReason: {final_state.pause_reason}")
-
-        if final_state.pending_human_action:
-            pending = final_state.pending_human_action
-            logging.info(f"\nAgent waiting: {pending.get('agent', 'unknown')}")
-            logging.info(
-                f"\nInstructions:\n{pending.get('instructions', 'No instructions')}"
-            )
-
-            tasks = pending.get("tasks", [])
-            if tasks:
-                logging.info(f"\n📋 Pending Tasks ({len(tasks)}):")
-                for task in tasks:
-                    logging.info(f"  - {task.get('content', 'Unknown task')}")
-                    if task.get("task_url"):
-                        logging.info(f"    URL: {task.get('task_url')}")
-
-        logging.info("\n▶️  To resume after completing tasks:")
-        logging.info("    python run_white_agent.py resume")
-        logging.info("=" * 60)
-    else:
-        logging.info("\n" + "=" * 60)
-        logging.info("✅ WORKFLOW COMPLETED")
-        logging.info("=" * 60)
-        if final_state.song_proposals and final_state.song_proposals.iterations:
-            iterations = final_state.song_proposals.iterations
-            logging.info(f"Generated {len(iterations)} proposal iterations")
-            agents_used = set(
-                it.agent_name for it in iterations if it.agent_name is not None
-            )
-            if agents_used:
-                logging.info(
-                    f"Agents that contributed: {', '.join(sorted(agents_used))}"
-                )
-            else:
-                logging.info("No agent names tracked in iterations")
-            if iterations:
-                final = iterations[-1]
-                logging.info(f"\n🎵 Final Song: {final.title}")
-                logging.info(f"   Key: {final.key}")
-                logging.info(f"   BPM: {final.bpm}")
-                logging.info(f"   Mood: {', '.join(final.mood)}")
+    logging.info("\n" + "=" * 60)
+    logging.info("✅ WORKFLOW COMPLETED")
+    logging.info("=" * 60)
+    if final_state.song_proposals and final_state.song_proposals.iterations:
+        iterations = final_state.song_proposals.iterations
+        logging.info(f"Generated {len(iterations)} proposal iterations")
+        agents_used = set(
+            it.agent_name for it in iterations if it.agent_name is not None
+        )
+        if agents_used:
+            logging.info(f"Agents that contributed: {', '.join(sorted(agents_used))}")
+        else:
+            logging.info("No agent names tracked in iterations")
+        if iterations:
+            final = iterations[-1]
+            logging.info(f"\n🎵 Final Song: {final.title}")
+            logging.info(f"   Key: {final.key}")
+            logging.info(f"   BPM: {final.bpm}")
+            logging.info(f"   Mood: {', '.join(final.mood)}")
 
     return final_state
-
-
-def resume_workflow(args):
-    """Resume a paused workflow."""
-    white = WhiteAgent()
-
-    # Load the paused state
-    if args.state_file:
-        state_file = Path(args.state_file)
-    else:
-        state_file = Path("paused_state.pkl")
-
-    if not state_file.exists():
-        logging.error(f"❌ State file not found: {state_file.absolute()}")
-        logging.error("Please provide a valid state file with --state-file")
-        sys.exit(1)
-
-    logging.info(f"Loading paused state from: {state_file.absolute()}")
-
-    with state_file.open("rb") as f:
-        paused_state = pickle.load(f)
-
-    paused_state = ensure_state_object(paused_state)
-
-    if not isinstance(paused_state, MainAgentState):
-        logging.error("❌ Invalid state file - cannot convert to MainAgentState object")
-        sys.exit(1)
-
-    logging.info("=" * 60)
-    logging.info("🔄 RESUMING WHITE AGENT WORKFLOW")
-    logging.info("=" * 60)
-    logging.info(f"Thread ID: {paused_state.thread_id}")
-
-    verify_tasks = not args.no_verify
-
-    if args.no_verify:
-        logging.warning(" Skipping task verification (--no-verify flag)")
-
-    try:
-        final_state = white.resume_workflow(paused_state, verify_tasks=verify_tasks)
-        final_state = ensure_state_object(final_state)
-
-        logging.info("\n" + "=" * 60)
-        logging.info("✅ WORKFLOW COMPLETED")
-        logging.info("=" * 60)
-
-        if final_state.song_proposals and final_state.song_proposals.iterations:
-            logging.info(
-                f"Total proposal iterations: {len(final_state.song_proposals.iterations)}"
-            )
-
-        if args.cleanup:
-            state_file.unlink()
-            logging.info(f"🗑️  Removed paused state file: {state_file}")
-
-        return final_state
-
-    except Exception as e:
-        logging.error(f"❌ Failed to resume workflow: {e}")
-        logging.exception("Full traceback:")
-        sys.exit(1)
 
 
 def validate_state(args):
@@ -294,22 +193,6 @@ def main():
         "--concept",
         help="Initial song concept (optional - White will use facet system if not provided)",
     )
-    resume_parser = subparsers.add_parser("resume", help="Resume a paused workflow")
-    resume_parser.add_argument(
-        "--state-file",
-        type=str,
-        help="Path to the paused state file (default: paused_state.pkl)",
-    )
-    resume_parser.add_argument(
-        "--no-verify",
-        action="store_true",
-        help="Skip task verification (useful for testing)",
-    )
-    resume_parser.add_argument(
-        "--cleanup",
-        action="store_true",
-        help="Remove the paused state file after successful resume",
-    )
 
     validate_parser = subparsers.add_parser(
         "validate", help="Validate state and artifacts"
@@ -328,8 +211,6 @@ def main():
 
     if args.command == "start":
         start_workflow(args)
-    elif args.command == "resume":
-        resume_workflow(args)
     elif args.command == "validate":
         validate_state(args)
 
