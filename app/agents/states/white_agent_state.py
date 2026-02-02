@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Annotated
+from typing import Any, List, Optional, Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -66,13 +66,6 @@ class MainAgentState(BaseModel):
     # Rainbow agents serialize artifacts to dicts to avoid msgpack serialization issues
     # Use dedupe_artifacts to prevent exponential growth from node transitions
     artifacts: Annotated[List[Any], dedupe_artifacts] = Field(default_factory=list)
-
-    # Workflow control
-    workflow_paused: Annotated[bool, lambda x, y: y if y is not None else x] = False
-    pause_reason: Annotated[Optional[str], lambda x, y: y or x] = None
-    pending_human_action: Annotated[Optional[Dict[str, Any]], lambda x, y: y or x] = (
-        None
-    )
 
     # White Agent working variables (per-agent rebracketing)
     rebracketing_analysis: Annotated[Optional[str], lambda x, y: y or x] = None

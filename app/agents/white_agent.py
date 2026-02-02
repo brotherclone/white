@@ -37,9 +37,6 @@ from app.agents.states.white_agent_state import (
 from app.agents.tools.text_tools import save_markdown
 from app.agents.violet_agent import VioletAgent
 from app.agents.workflow.agent_error_handler import agent_error_handler
-from app.agents.workflow.resume_black_workflow import (
-    resume_black_agent_workflow_with_agent,
-)
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
@@ -122,7 +119,6 @@ class WhiteAgent(BaseModel):
             thread_id=thread_id,
             song_proposals=SongProposal(iterations=[]),
             artifacts=[],
-            workflow_paused=False,
             ready_for_red=False,
             ready_for_orange=False,
             ready_for_yellow=False,
@@ -145,36 +141,6 @@ class WhiteAgent(BaseModel):
         else:
             final_state = result
         return final_state
-
-    def resume_workflow(
-        self, paused_state: MainAgentState, verify_tasks: bool = True
-    ) -> MainAgentState:
-
-        if not paused_state.workflow_paused:
-            logger.warning("⚠️ Workflow is not paused - nothing to resume")
-            return paused_state
-        logger.info(f"Resuming workflow (thread_id: {paused_state.thread_id})")
-        updated_state = self.resume_after_black_agent_ritual(
-            paused_state, verify_tasks=verify_tasks
-        )
-
-        while not updated_state.run_finished:
-            next_agent = self._determine_next_agent(updated_state)
-            if next_agent == "finish":
-                break
-            updated_state = self._invoke_and_process_agent(next_agent, updated_state)
-        return self.finalize_song_proposal(updated_state)
-
-    def resume_agent_workflow(
-        self, agent_name: str, paused_state: MainAgentState, verify_tasks: bool = True
-    ) -> MainAgentState:
-        """
-        Generalized resume for any agent - routes to a specific handler.
-        """
-        if agent_name == "black":
-            return self.resume_after_black_agent_ritual(paused_state, verify_tasks)
-        else:
-            raise ValueError(f"No resume handler for agent: {agent_name}")
 
     def build_workflow(self) -> CompiledStateGraph:
         disable_checkpoint = (
@@ -644,9 +610,6 @@ Structure your proposal as the final, complete vision - ready for human implemen
 
     def process_black_agent_work(self, state: MainAgentState) -> MainAgentState:
         logger.info("⚫️ Processing Black Agent work... ")
-        if state.workflow_paused:
-            logger.info("Skipping Black Agent work processing - workflow is paused")
-            return state
         if not state.song_proposals or not state.song_proposals.iterations:
             logger.warning("No song proposals to process from Black Agent")
             return state
@@ -2101,23 +2064,13 @@ Structure your synthesis as the final creative brief before manifestation.
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
 
-        if state.workflow_paused and state.pending_human_action:
-            return "finish"
         if mock_mode:
             return "red"
-        workflow_paused = getattr(
-            state,
-            "workflow_paused",
-            state.get("workflow_paused", False) if isinstance(state, dict) else False,
-        )
         ready_for_red = getattr(
             state,
             "ready_for_red",
             state.get("ready_for_red", False) if isinstance(state, dict) else False,
         )
-        if workflow_paused:
-            logger.info("Prism routing to finish because Black Agent is paused")
-            return "finish"
         if ready_for_red:
             return "red"
         else:
@@ -2204,33 +2157,6 @@ Structure your synthesis as the final creative brief before manifestation.
         """
         logger.info("🌈 The Prism: Finalizing chromatic cascade...")
 
-        # Handle pause case
-        if state.workflow_paused and state.pending_human_action:
-            pending = state.pending_human_action
-            logger.info("\n" + "=" * 60)
-            logger.info("WORKFLOW PAUSED - HUMAN ACTION REQUIRED")
-            logger.info("=" * 60)
-            logger.info(f"Agent: {pending.get('agent', 'unknown')}")
-            logger.info(f"Reason: {state.pause_reason}")
-            logger.info(
-                f"\nInstructions:\n{pending.get('instructions', 'No instructions')}"
-            )
-
-            tasks = pending.get("tasks", [])
-            if tasks:
-                logger.info(f"\nPending tasks ({len(tasks)}):")
-                for task in tasks:
-                    logger.info(
-                        f"  - {task.get('type', 'unknown')}: {task.get('task_url', 'No URL')}"
-                    )
-
-            logger.info("\nTo resume after completing tasks:")
-            logger.info("  from app.agents.white_agent import WhiteAgent")
-            logger.info("  agent = WhiteAgent()")
-            logger.info("  state = agent.resume_workflow(state)")
-            logger.info("=" * 60)
-            return state
-
         # Build artifact relationships
         if state.artifacts:
             logger.info("🔗 Building artifact relationship graph...")
@@ -2260,82 +2186,6 @@ Structure your synthesis as the final creative brief before manifestation.
             raise
 
         return state
-
-    def resume_after_black_agent_ritual(
-        self, paused_state: MainAgentState, verify_tasks: bool = True
-    ) -> MainAgentState:
-        """
-        Resume the Prism workflow after Black Agent ritual tasks are completed.
-
-        Args:
-            paused_state: The MainAgentState that was paused waiting for human action
-            verify_tasks: If True, verify all Todoist tasks are complete before resuming
-
-        Returns:
-            Updated MainAgentState after Black Agent workflow completion
-        """
-        if not paused_state.workflow_paused:
-            logger.warning("Workflow is not paused - nothing to resume")
-            return paused_state
-
-        if not paused_state.pending_human_action:
-            logger.warning("No pending human action found")
-            return paused_state
-
-        pending = paused_state.pending_human_action
-        if pending.get("agent") != "black":
-            logger.warning(
-                f"Cannot resume - pending action is for agent: {pending.get('agent')}"
-            )
-            return paused_state
-
-        black_config = pending.get("black_config")
-        if not black_config:
-            logger.error("No black_config found in pending_human_action")
-            return paused_state
-        black_agent = self.agents.get("black")
-        if not black_agent:
-            logger.error("Black agent not found in white_agent instance")
-            return paused_state
-
-        logger.info("Resuming Black Agent workflow...")
-
-        try:
-            final_black_state = resume_black_agent_workflow_with_agent(
-                black_agent, black_config, verify_tasks=verify_tasks
-            )
-            paused_state.workflow_paused = False
-            paused_state.pause_reason = None
-            paused_state.pending_human_action = None
-            if final_black_state.get("counter_proposal"):
-                paused_state.song_proposals.iterations.append(
-                    final_black_state["counter_proposal"]
-                )
-            if final_black_state.get("artifacts"):
-                paused_state.artifacts = final_black_state["artifacts"]
-            logger.info("Black Agent workflow resumed and completed")
-            artifacts = getattr(paused_state, "artifacts", []) or []
-            evp_artifacts = self._gather_artifacts_for_prompt(
-                artifacts, ChainArtifactType.EVP_ARTIFACT
-            )
-            sigil_artifacts = self._gather_artifacts_for_prompt(
-                artifacts, ChainArtifactType.SIGIL
-            )
-            black_proposal = paused_state.song_proposals.iterations[-1]
-            paused_state.rebracketing_analysis = self._black_rebracketing_analysis(
-                black_proposal, evp_artifacts, sigil_artifacts
-            )
-            paused_state.document_synthesis = self._synthesize_document_for_red(
-                paused_state.rebracketing_analysis,
-                black_proposal,
-                artifacts,
-            )
-            paused_state.ready_for_red = True
-            logger.info("Processed Black Agent work - ready for Red Agent")
-            return paused_state
-        except Exception as e:
-            logger.error(f"Failed to resume Black Agent workflow: {e}")
-            raise
 
     def _perform_meta_rebracketing(self, state: MainAgentState) -> str:
         """

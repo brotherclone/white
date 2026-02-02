@@ -1,7 +1,6 @@
 import logging
 import os
 import random
-import sqlite3
 import time
 import yaml
 
@@ -9,7 +8,6 @@ from abc import ABC
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables import RunnableConfig
-from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
@@ -23,7 +21,6 @@ from app.agents.tools.audio_tools import (
 from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import transcription_from_speech_to_text
 from app.agents.workflow.agent_error_handler import agent_error_handler
-from app.reference.mcp.todoist.main import create_sigil_charging_task
 from app.structures.agents.agent_settings import AgentSettings
 from app.util.agent_state_utils import get_state_snapshot
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
@@ -70,57 +67,21 @@ class BlackAgent(BaseRainbowAgent, ABC):
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
         """Entry point when White Agent invokes Black Agent"""
-        disable_checkpoint = (
-            os.getenv("DISABLE_CHECKPOINTING", "false").lower() == "true"
-        )
         current_proposal = state.song_proposals.iterations[-1]
         black_state = BlackAgentState(
             white_proposal=current_proposal,
             song_proposals=state.song_proposals,
             thread_id=state.thread_id,
             artifacts=[],
-            pending_human_tasks=[],
-            awaiting_human_action=False,
         )
         if not hasattr(self, "_compiled_workflow"):
-            if disable_checkpoint:
-                self._compiled_workflow = self.create_graph().compile()
-            else:
-                os.makedirs("checkpoints", exist_ok=True)
-                conn = sqlite3.connect(
-                    "checkpoints/black_agent.db", check_same_thread=False
-                )
-                checkpointer = SqliteSaver(conn)
-                self._compiled_workflow = self.create_graph().compile(
-                    checkpointer=checkpointer, interrupt_before=["await_human_action"]
-                )
+            self._compiled_workflow = self.create_graph().compile()
         black_config: RunnableConfig = {
             "configurable": {"thread_id": f"{state.thread_id}"}
         }
         result = self._compiled_workflow.invoke(
             black_state.model_dump(), config=black_config
         )
-        if not disable_checkpoint:
-            snapshot = self._compiled_workflow.get_state(black_config)
-            if snapshot.next:
-                logger.info(f"Black Agent workflow paused at: {snapshot.next}")
-                state.workflow_paused = True
-                state.pause_reason = "black_agent_awaiting_human_action"
-                state.pending_human_action = {
-                    "agent": "black",
-                    "action": "sigil_charging",
-                    "instructions": result.get(
-                        "human_instructions", "Complete Black Agent ritual tasks"
-                    ),
-                    "pending_tasks": result.get("pending_human_tasks", []),
-                    "black_config": black_config,
-                }
-                if result.get("artifacts"):
-                    state.artifacts = result["artifacts"]
-                logger.info(
-                    "Workflow paused - waiting for human to complete ritual tasks"
-                )
-                return state
         state.song_proposals = result.get("song_proposals") or state.song_proposals
         if result.get("counter_proposal"):
             state.song_proposals.iterations.append(result["counter_proposal"])
@@ -133,15 +94,10 @@ class BlackAgent(BaseRainbowAgent, ABC):
         Create the BlackAgent's internal workflow graph
         1. The black agent calls the llm to generate a counter-proposal
         2. The black agent generates an EVP artifact
-        3. The black agent evaluates the EVP artifact for potential insights, if any go to 4 if none skip to 6
+        3. The black agent evaluates the EVP artifact for potential insights, if any go to 4 if none skip to 5
         4. Using the EVP insights, the Black agent adjusts the counter-proposal to reflect the insights
-        5. The black agent returns the counter-proposal to the White Agent
-        6. The black agent may generate a sigil artifact to accompany the counter-proposal
-        7. The black agent creates a Todoist task for the human to charge the sigil
-        8. The black agent pauses the workflow, awaiting human action
-        9. Once the human completes the task, the black agent resumes
-        10. The black agent updates the counter-proposal to reflect the charged sigil if need be then goto 5.
-
+        5. The black agent may generate a sigil artifact to accompany the counter-proposal
+        6. The black agent returns the counter-proposal to the White Agent
         """
         black_workflow = StateGraph(BlackAgentState)
         black_workflow.add_node(
@@ -154,11 +110,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             self.update_alternate_song_spec_with_evp,
         )
         black_workflow.add_node("generate_sigil", self.generate_sigil)
-        black_workflow.add_node("await_human_action", self.await_human_action)
-        black_workflow.add_node(
-            "update_alternate_song_spec_with_sigil",
-            self.update_alternate_song_spec_with_sigil,
-        )
         black_workflow.add_edge(START, "generate_alternate_song_spec")
 
         black_workflow.add_edge("generate_alternate_song_spec", "generate_evp")
@@ -169,23 +120,12 @@ class BlackAgent(BaseRainbowAgent, ABC):
             {"evp": "update_alternate_song_spec_with_evp", "sigil": "generate_sigil"},
         )
         black_workflow.add_edge("update_alternate_song_spec_with_evp", "generate_sigil")
-        black_workflow.add_conditional_edges(
-            "generate_sigil",
-            self.route_after_sigil_chance,
-            {"human": "await_human_action", "done": END},
-        )
-        black_workflow.add_edge(
-            "await_human_action", "update_alternate_song_spec_with_sigil"
-        )
+        black_workflow.add_edge("generate_sigil", END)
         return black_workflow
 
     @staticmethod
     def route_after_evp_evaluation(state: BlackAgentState) -> str:
         return "evp" if state.should_update_proposal_with_evp else "sigil"
-
-    @staticmethod
-    def route_after_sigil_chance(state: BlackAgentState) -> str:
-        return "human" if state.should_update_proposal_with_sigil else "done"
 
     @agent_error_handler("ThreadKeepr")
     def generate_alternate_song_spec(self, state: BlackAgentState) -> BlackAgentState:
@@ -277,19 +217,24 @@ class BlackAgent(BaseRainbowAgent, ABC):
     @agent_error_handler("ThreadKeepr")
     @skip_chance(1.0)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
-        """Generate a sigil artifact and create a Todoist task for charging"""
+        """Generate a sigil artifact (fire-and-forget, no HitL pause)"""
         get_state_snapshot(
             state, "generate_sigil_enter", state.thread_id, "ThreadKeepr"
         )
-        logger.info("🜏 Entering generate_sigil method")
+        logger.info("🜏 Generating sigil artifact")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+
         if mock_mode:
             mock_path = (
                 f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_sigil_artifact_mock.yml"
             )
+            # 75% chance to skip sigil generation in mock mode
             if random.random() < 0.75:
-                state.should_update_proposal_with_sigil = False
+                logger.info("   Skipping sigil generation (random skip)")
+                get_state_snapshot(
+                    state, "generate_sigil_exit", state.thread_id, "ThreadKeepr"
+                )
                 return state
             try:
                 with open(mock_path, "r") as f:
@@ -297,17 +242,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 data["thread_id"] = state.thread_id
                 sigil_artifact = SigilArtifact(**data)
                 state.artifacts.append(sigil_artifact)
-                state.awaiting_human_action = True
-                state.human_instructions = "MOCK: Sigil charging task would be created"
-                state.should_update_proposal_with_sigil = True
-                state.pending_human_tasks.append(
-                    {
-                        "type": "sigil_charging",
-                        "task_id": "mock_task_123",
-                        "task_url": "https://todoist.com/app/task/mock_task_123",
-                        "artifact_index": len(state.artifacts) - 1,
-                        "sigil_wish": sigil_artifact.wish,
-                    }
+                logger.info(f"   Mock sigil generated: {sigil_artifact.wish[:50]}...")
+                get_state_snapshot(
+                    state, "generate_sigil_exit", state.thread_id, "ThreadKeepr"
                 )
                 return state
             except FileNotFoundError as e:
@@ -315,11 +252,16 @@ class BlackAgent(BaseRainbowAgent, ABC):
                 logger.warning(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
-        else:
-            sigil_maker = SigilTools()
-            current_proposal = state.counter_proposal
-            prompt = f"""
-Distill this counter-proposal into a short, actionable wish statement that captures how 
+                get_state_snapshot(
+                    state, "generate_sigil_exit", state.thread_id, "ThreadKeepr"
+                )
+                return state
+
+        # Real sigil generation
+        sigil_maker = SigilTools()
+        current_proposal = state.counter_proposal
+        prompt = f"""
+Distill this counter-proposal into a short, actionable wish statement that captures how
 the song could embody higher occult meaning and resistance against the Demiurge.
 
 Counter-proposal:
@@ -329,137 +271,45 @@ Mood: {', '.join(current_proposal.mood)}
 
 Format: A single sentence starting with "I will..." or "This song will..."
 Example: "I will weave hidden frequencies that awaken dormant resistance."
-            """
-            block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-            try:
-                claude = self._get_claude()
-                wish_response = claude.invoke(prompt)
-                wish_text = wish_response.content
-            except Exception as e:
-                error_msg = f"LLM call for sigil wish generation failed: {e!s}"
-                logger.error(error_msg)
-                if block_mode:
-                    raise Exception(error_msg)
-                wish_text = "Fallback wish - LLM unavailable"
-            statement_of_intent = sigil_maker.create_statement_of_intent(
-                wish_text, True
-            )
-            description, components = sigil_maker.generate_word_method_sigil(
-                statement_of_intent
-            )
-            charging_instructions = sigil_maker.charge_sigil()
-            sigil_artifact = SigilArtifact(
-                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
-                wish=wish_text,
-                statement_of_intent=statement_of_intent,
-                glyph_description=description,
-                glyph_components=components,
-                sigil_type=SigilType.WORD_METHOD,
-                activation_state=SigilState.CREATED,
-                charging_instructions=charging_instructions,
-                thread_id=state.thread_id,
-            )
-            try:
-                sigil_artifact.save_file()
-            except Exception as e:
-                error_msg = f"Failed to save sigil artifact file: {e!s}"
-                logger.error(error_msg)
-                if block_mode:
-                    raise Exception(error_msg)
-            state.artifacts.append(sigil_artifact)
-            logger.info("Attempting to create Todoist task for sigil charging...")
-            todoist_token = os.getenv("TODOIST_API_TOKEN")
-            if not todoist_token:
-                logger.error("TODOIST_API_TOKEN not found in environment variables!")
-                state.awaiting_human_action = True
-                state.should_update_proposal_with_sigil = True
-                state.human_instructions = f"""
-                ⚠️ SIGIL CHARGING REQUIRED (Todoist API token not configured)
-                Manually charge the sigil for '{current_proposal.title}':
-                **Wish:** {wish_text}
-                **Glyph:** {description}
-                {charging_instructions}
-                """
-                return state
-            try:
-                todoist_token = os.getenv("TODOIST_API_TOKEN")
-                if not todoist_token:
-                    raise ValueError("TODOIST_API_TOKEN not configured in environment")
+        """
+        try:
+            claude = self._get_claude()
+            wish_response = claude.invoke(prompt)
+            wish_text = wish_response.content
+        except Exception as e:
+            error_msg = f"LLM call for sigil wish generation failed: {e!s}"
+            logger.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
+            wish_text = "Fallback wish - LLM unavailable"
 
-                task_result = create_sigil_charging_task(
-                    sigil_description=description,
-                    charging_instructions=charging_instructions,
-                    song_title=current_proposal.title,
-                    section_name="Black Agent - Sigil Work",
-                )
-                if task_result.get("success", False):
-                    logger.info("✓ Created Todoist task successfully!")
-                    logger.info(f"  Task ID: {task_result['id']}")
-                    logger.info(f"  Task URL: {task_result['url']}")
-                    state.pending_human_tasks.append(
-                        {
-                            "type": "sigil_charging",
-                            "task_id": task_result["id"],
-                            "task_url": task_result["url"],
-                            "artifact_index": len(state.artifacts) - 1,
-                            "sigil_wish": wish_text,
-                        }
-                    )
-                    state.awaiting_human_action = True
-                    state.human_instructions = f"""
-                    🜏 SIGIL CHARGING REQUIRED
-                    A sigil has been generated for '{current_proposal.title}'.
-                    **Todoist Task:** {task_result['url']}
-                    **Wish:** {wish_text}
-                    **Glyph:** {description}
-                    **Instructions:**
-                    {charging_instructions}
-                    Mark the Todoist task complete after charging, then resume the workflow.
-                    """
-                    state.should_update_proposal_with_sigil = True
-                else:
-                    error_msg = task_result.get("error", "Unknown error")
-                    status_code = task_result.get("status_code", "N/A")
-                    logger.warning("⚠️ Todoist task creation failed!")
-                    logger.warning(f"  Error: {error_msg}")
-                    logger.warning(f"  Status code: {status_code}")
-                    state.awaiting_human_action = True
-                    state.should_update_proposal_with_sigil = True
-                    state.human_instructions = f"""
-⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed with an unknown error)
-Error: {error_msg}
-Manually charge the sigil for '{current_proposal.title}':
-**Wish:** {wish_text}
-**Glyph:** {description}
-{charging_instructions}
-                    """
+        statement_of_intent = sigil_maker.create_statement_of_intent(wish_text, True)
+        description, components = sigil_maker.generate_word_method_sigil(
+            statement_of_intent
+        )
+        charging_instructions = sigil_maker.charge_sigil()
 
-            except Exception as e:
-                error_msg = str(e)
-                if "401" in error_msg or "Unauthorized" in error_msg:
-                    logger.error("401 Unauthorized: Invalid API token.")
-                    logger.warning("⚠️ Todoist task creation failed!")
-                    logger.warning("  Error: 401 Unauthorized: Invalid API token.")
-                    logger.warning("  Status code: 401")
-                    logger.info("  To fix: Set TODOIST_API_TOKEN in your .env file")
-                elif "TODOIST_API_TOKEN not configured" in error_msg:
-                    logger.warning("⚠️ Todoist integration not configured")
-                    logger.info("  To enable: Set TODOIST_API_TOKEN in your .env file")
-                else:
-                    logger.error(f"✗ Failed to create Todoist task: {e}")
+        sigil_artifact = SigilArtifact(
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
+            wish=wish_text,
+            statement_of_intent=statement_of_intent,
+            glyph_description=description,
+            glyph_components=components,
+            sigil_type=SigilType.WORD_METHOD,
+            activation_state=SigilState.CREATED,
+            charging_instructions=charging_instructions,
+            thread_id=state.thread_id,
+        )
+        try:
+            sigil_artifact.save_file()
+            logger.info(f"   Sigil saved: {sigil_artifact.wish[:50]}...")
+        except Exception as e:
+            error_msg = f"Failed to save sigil artifact file: {e!s}"
+            logger.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
 
-                state.awaiting_human_action = True
-                state.should_update_proposal_with_sigil = True
-                state.human_instructions = f"""
-⚠️ SIGIL CHARGING REQUIRED (Todoist task creation failed: {error_msg})
-
-Manually charge the sigil for '{current_proposal.title}':
-
-**Wish:** {wish_text}
-**Glyph:** {description}
-
-{charging_instructions}
-                                            """
+        state.artifacts.append(sigil_artifact)
         get_state_snapshot(state, "generate_sigil_exit", state.thread_id, "ThreadKeepr")
         return state
 
@@ -579,21 +429,6 @@ Manually charge the sigil for '{current_proposal.title}':
                 state, "generate_evp_exit", state.thread_id, "ThreadKeepr"
             )
             return state
-
-    @staticmethod
-    @agent_error_handler("ThreadKeepr")
-    def await_human_action(state: BlackAgentState) -> BlackAgentState:
-        """
-        Node that workflow interrupts at.
-        """
-        get_state_snapshot(
-            state, "await_human_action_enter", state.thread_id, "ThreadKeepr"
-        )
-        logger.info("Workflow interrupted - awaiting human action on sigil charging")
-        get_state_snapshot(
-            state, "await_human_action_exit", state.thread_id, "ThreadKeepr"
-        )
-        return state
 
     @agent_error_handler("ThreadKeepr")
     def evaluate_evp(self, state: BlackAgentState) -> BlackAgentState:
@@ -786,118 +621,3 @@ And here is the EVP transcript:
             "ThreadKeepr",
         )
         return state
-
-    @agent_error_handler("ThreadKeepr")
-    def update_alternate_song_spec_with_sigil(
-        self, state: BlackAgentState
-    ) -> BlackAgentState:
-        get_state_snapshot(
-            state,
-            "update_alternate_song_spec_with_sigil_enter",
-            state.thread_id,
-            "ThreadKeepr",
-        )
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        if mock_mode:
-            try:
-                with open(
-                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_counter_proposal_after_sigil_mock.yml",
-                    "r",
-                ) as f:
-                    data = yaml.safe_load(f)
-                sigil_counter_proposal = SongProposalIteration(**data)
-                state.counter_proposal = sigil_counter_proposal
-            except Exception as e:
-                error_msg = f"Failed to read mock file: {e!s}"
-                logger.error(error_msg)
-                if block_mode:
-                    raise Exception(error_msg)
-            return state
-        else:
-            try:
-                previous_sigil_artifact = SigilArtifact(**state.artifacts[-1])
-                previous_sigil_artifact.artifact_type = f"""
-                    Wish:{previous_sigil_artifact.wish}
-                    Intent:{previous_sigil_artifact.statement_of_intent}
-                    Description:{previous_sigil_artifact.glyph_description}
-                    Type:{previous_sigil_artifact.sigil_type.value}
-                    Instructions:{previous_sigil_artifact.charging_instructions}
-                    Components: {",".join(previous_sigil_artifact.glyph_components or [])}
-                """
-            except Exception as e:
-                logger.error(f"Failed to parse sigil artifact: {e!s}")
-                return state
-            prompt = f"""
-You are the Threadkeepr, helping a musician create a creative fiction song about an experimental musician 
-working in the experimental music space. You have just generated a sigil artifact and used a
-ToDoist task to have your human charge the sigil. Now, you need to update your song counter-proposal
-to reflect the results of your sigil charge. At this point you only need to reply with a counter-proposal
-that reflects the results of your sigil charge.
-
- As an example, imagine this was your original counter-proposal:
-        
-            bpm: 100
-            tempo: 4/4
-            key: B minor
-            rainbow_color: {the_rainbow_table_colors['Z']}
-            title: "Whispers of the Abyss"
-            mood: ["mysterious", "haunting", "ethereal"]
-            genres: ["ambient", "darkwave", "experimental"]
-            concept: This song is from the perspective of man who can't remember the previous day. There is 
-            a hole in his memory that he can't explain. As the song progresses, he begins to hear whispers and voices that seem to
-            come from the abyss of his forgotten memories. The song explores themes of memory, identity, and the unknown.
-
- Here's the Sigil you previously created:
-    
-    {state.artifacts[-1]}
-
-Then your updated counter-proposal could be some like:
-    
-    bpm: 135
-    tempo: 4/4
-    key: B major
-    rainbow_color: {the_rainbow_table_colors['Z']}
-    title: "Shut Up and Play"
-    mood: ["energetic", "triumphant", "liberating"]
-    genres: ["punk", "rock", "experimental", "no wave"]
-    concept: This song celebrates the banishing of destructive inner thoughts. The narrator of the song is feeling
-    relief and liberation as they silence the negative voices in their head that have been holding them back creatively.
-
-
-Your actual counter-proposal was:
-{state.counter_proposal}
-
-The counter-proposal and new updated counter-proposal should have the 'rainbow_color' property set to:
-{the_rainbow_table_colors['Z']}
-        """
-            claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
-            try:
-                result = proposer.invoke(prompt)
-                if isinstance(result, dict):
-                    updated_proposal = SongProposalIteration(**result)
-                elif isinstance(result, SongProposalIteration):
-                    updated_proposal = result
-                else:
-                    error_msg = f"Expected SongProposalIteration, got {type(result)}"
-                    logger.error(error_msg)
-                    if block_mode:
-                        raise TypeError(error_msg)
-                    return state
-
-                state.song_proposals.iterations.append(state.counter_proposal)
-                state.counter_proposal = updated_proposal
-                return state
-            except Exception as e:
-                error_msg = f"Sigil update LLM call failed: {e!s}"
-                logger.error(error_msg)
-                if block_mode:
-                    raise Exception(error_msg)
-            get_state_snapshot(
-                state,
-                "update_alternate_song_spec_with_sigil_exit",
-                state.thread_id,
-                "ThreadKeepr",
-            )
-            return state
