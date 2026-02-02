@@ -1,0 +1,54 @@
+agent_name: Sub-Arbitrary (Green Agent)
+bpm: 72
+concept: 'This composition embodies the INFORMATION → TIME → SPACE transmigration
+  through the lens of extinction as knowledge obsolescence. The piece opens with field
+  recordings of actual ice singing - the harmonic pressure ridge formations that once
+  guided both polar bears and Inuit hunters across Foxe Basin. These recordings, preserved
+  by Culture orbital monitoring, become the foundational drone that slowly transforms
+  as the composition progresses. The musical structure mirrors the 25,000-year co-evolution
+  of bear navigation instincts and human ice-reading knowledge, both information systems
+  perfectly calibrated for a substrate that no longer exists. As the piece unfolds,
+  the ice songs fragment and distort, representing not just physical melting but the
+  dissolution of meaning itself - Nukka''s ivory pick testing empty air, polar bear
+  cubs swimming toward horizons that recede infinitely. The composition becomes a
+  memorial to precision without purpose, expertise without application, knowledge
+  that persists in consciousness even after its world has vanished. The final movement
+  consists of silence punctuated only by the sound of water lapping against shores
+  where ice highways once connected all Arctic life. This represents the ultimate
+  spatial manifestation: empty ocean as the grave of both species and culture, yet
+  somehow still holding the memory of what it once supported.'
+genres:
+- dark ambient
+- neo-classical
+- field recordings
+- drone
+- arctic soundscape
+- memorial music
+- experimental
+iteration_id: ice_remembers_extinction_v1
+iteration_number: null
+key: D minor
+mood:
+- elegiac
+- crystalline
+- haunting
+- patient
+- melting
+- ancestral
+- empty
+- reverent
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 65280
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Ice Remembers What It Cannot Hold

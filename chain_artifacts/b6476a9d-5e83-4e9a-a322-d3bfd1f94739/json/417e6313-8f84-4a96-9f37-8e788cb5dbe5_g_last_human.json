@@ -1,0 +1,63 @@
+adaptation_attempts:
+- Applied to work at the new research station studying ice loss
+- Tried to pivot to open-water fishing but lacks the boat and equipment
+- Started giving cultural talks to visiting scientists
+- Attempted to preserve traditional knowledge by recording videos, but feels like
+  documenting a language for a dead world
+age: 47
+artifact_id: 417e6313-8f84-4a96-9f37-8e788cb5dbe5
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Every morning at 4 AM, Nukka still checks the ice conditions from her
+  kitchen window with binoculars, a habit from 30 years of guiding hunters. She measures
+  wind direction, studies cloud formations, reads the subtle color changes in the
+  water that once told her where ice was forming. But now she's reading an empty ocean.
+  She maintains her hunting equipment in the shed - harpoons, ice picks, the traditional
+  tools her grandfather taught her to use - though they haven't touched ice in three
+  seasons.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Complete loss of reliable sea ice formation in Foxe Basin
+  - waters that traditionally froze solid by October now remain open through December,
+  making traditional hunting impossible
+family_situation: Widow, her husband Tunu drowned two years ago when ice gave way
+  unexpectedly during what should have been safe travel conditions. Her son moved
+  to Iqaluit for construction work. Her daughter studies marine biology in Winnipeg,
+  trying to understand what's happening to their home waters.
+file_name: 417e6313-8f84-4a96-9f37-8e788cb5dbe5_g_last_human.json
+final_thought: The ice was our highway, our hunting ground, our calendar, our identity.
+  Without it, we are polar bears on a shrinking floe, swimming toward a horizon that
+  keeps receding. My ancestors' knowledge lives in me, but the world it was meant
+  for has melted away.
+last_days_scenario: 'Nukka sits in her kitchen at dawn, coffee growing cold as she
+  watches the dark water where ice should be. The weather station says it''s -15°C,
+  cold enough for ice, but the ocean stays liquid - too much salt, too much current,
+  too much heat stored in the depths. Her radio crackles with other hunters sharing
+  the same empty observations. The community freezer, once filled with seal meat from
+  traditional hunts, now holds store-bought food flown in at enormous cost. She touches
+  the ivory pick in her pocket and remembers her grandmother''s words: ''The ice teaches
+  us patience.'' But what do you do when the ice itself has lost patience with the
+  world?'
+latitude: 69.3814
+location: Igloolik, Nunavut, Canada
+longitude: -81.7967
+name: Nukka Uki Kanguq
+occupation: Traditional sea ice hunting guide and cultural knowledge keeper
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A hand-carved ivory ice testing pick made by her great-grandfather,
+  used for generations to test ice thickness and safety. The ivory has worn smooth
+  from decades of her family's hands. She still carries it in her pocket every day,
+  though there's no ice left to test.
+thread_id: b6476a9d-5e83-4e9a-a322-d3bfd1f94739
+vulnerability_details: Like polar bears forced onto land as sea ice disappears, Nukka's
+  entire cultural and economic foundation - millennia of Inuit knowledge about reading
+  ice conditions, hunting seals through breathing holes, and navigating frozen seascapes
+  - becomes useless as the Arctic Ocean stays liquid year-round
+year_documented: 2031

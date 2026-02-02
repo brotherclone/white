@@ -1,0 +1,34 @@
+{
+  "title": "b6476a9d-5e83-4e9a-a322-d3bfd1f94739_audio_infranym",
+  "duration_ms": 17781,
+  "tempo_bpm": 63,
+  "key_signature": "F# minor",
+  "layers": {
+    "surface": {
+      "text": "William Shakespeare",
+      "voice_profile": "robotic",
+      "duration_ms": 17781
+    },
+    "reverse": {
+      "text": "William Shakespeare",
+      "voice_profile": "distorted",
+      "duration_ms": 17781
+    },
+    "submerged": {
+      "text": "William Shakespeare",
+      "voice_profile": "ancient",
+      "duration_ms": 17781
+    }
+  },
+  "files": {
+    "composite": "/Volumes/LucidNonsense/White/chain_artifacts/b6476a9d-5e83-4e9a-a322-d3bfd1f94739/wav/audio_william_shakespeare.wav",
+    "layers": {
+      "surface": "/Volumes/LucidNonsense/White/chain_artifacts/b6476a9d-5e83-4e9a-a322-d3bfd1f94739/wav/audio_william_shakespeare_surface.wav",
+      "reverse": "/Volumes/LucidNonsense/White/chain_artifacts/b6476a9d-5e83-4e9a-a322-d3bfd1f94739/wav/audio_william_shakespeare_reverse.wav",
+      "submerged": "/Volumes/LucidNonsense/White/chain_artifacts/b6476a9d-5e83-4e9a-a322-d3bfd1f94739/wav/audio_william_shakespeare_submerged.wav"
+    }
+  },
+  "puzzle_solution": "William Shakespeare",
+  "color_agent": "Indigo",
+  "album": "Untitled White Album"
+}
