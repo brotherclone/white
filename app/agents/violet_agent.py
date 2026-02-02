@@ -5,7 +5,6 @@ Dialectical pressure-testing through adversarial interviews
 
 import logging
 import os
-import random
 import time
 from abc import ABC
 from pathlib import Path
@@ -15,10 +14,6 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Prompt
-
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.workflow.agent_error_handler import agent_error_handler
@@ -41,7 +36,6 @@ from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()
 logger = logging.getLogger(__name__)
-console = Console()
 
 
 class VioletAgent(BaseRainbowAgent, ABC):
@@ -49,8 +43,8 @@ class VioletAgent(BaseRainbowAgent, ABC):
     Violet Agent: The Sultan of Solipsism
 
     Dialectical pressure-tester via adversarial interviews.
-    Process: select persona → generate questions → roll for HitL →
-             [human|simulated] interview → synthesize → revise proposal
+    Process: select persona → generate questions → simulated interview →
+             synthesize → revise proposal
     """
 
     def __init__(self, **data):
@@ -76,7 +70,6 @@ class VioletAgent(BaseRainbowAgent, ABC):
         )
         corpus_path = Path(os.getenv("GABE_CORPUS_FILE", "./violet_assets/gabe_corpus"))
         self.gabe_corpus = self._load_corpus(corpus_path)
-        self.hitl_probability = 0.09
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
         """Main entry point - transform MainAgentState through Violet workflow"""
@@ -90,7 +83,6 @@ class VioletAgent(BaseRainbowAgent, ABC):
             interview_questions=None,
             interview_responses=None,
             circle_jerk_interview=None,
-            needs_human_interview=False,
         )
         violet_graph = self.create_graph()
         compiled_graph = violet_graph.compile()
@@ -112,28 +104,15 @@ class VioletAgent(BaseRainbowAgent, ABC):
         # Add nodes
         workflow.add_node("select_persona", self.select_persona)
         workflow.add_node("generate_questions", self.generate_questions)
-        workflow.add_node("roll_for_hitl", self.roll_for_hitl)
-        workflow.add_node("human_interview", self.human_interview)
         workflow.add_node("simulated_interview", self.simulated_interview)
         workflow.add_node("synthesize_interview", self.synthesize_interview)
         workflow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
-        # Add edges
+        # Add edges - direct flow without HitL branching
         workflow.add_edge(START, "select_persona")
         workflow.add_edge("select_persona", "generate_questions")
-        workflow.add_edge("generate_questions", "roll_for_hitl")
-        # Conditional routing after roll
-        workflow.add_conditional_edges(
-            "roll_for_hitl",
-            self.route_after_roll,
-            {
-                "human_interview": "human_interview",
-                "simulated_interview": "simulated_interview",
-            },
-        )
-        # Both paths converge
-        workflow.add_edge("human_interview", "synthesize_interview")
+        workflow.add_edge("generate_questions", "simulated_interview")
         workflow.add_edge("simulated_interview", "synthesize_interview")
         workflow.add_edge("synthesize_interview", "generate_alternate_song_spec")
         workflow.add_edge("generate_alternate_song_spec", END)
@@ -322,99 +301,6 @@ Output as JSON with structure:
                 logger.warning("   Using generic fallback questions")
         return state
 
-    def roll_for_hitl(self, state: VioletAgentState) -> VioletAgentState:
-        """Roll dice to determine a human vs. simulated interview"""
-        get_state_snapshot(
-            state, "roll_for_hitl_enter", state.thread_id, "The Sultan of Solipsism"
-        )
-        roll = random.random()
-        needs_human = roll < self.hitl_probability
-        logger.info(
-            f"🎲 HitL Roll: {roll:.4f} - "
-            f"{'🧑 HUMAN NEEDED' if needs_human else '🤖 SIMULATED'}"
-        )
-        state.needs_human_interview = needs_human
-        get_state_snapshot(
-            state, "roll_for_hitl_exit", state.thread_id, "The Sultan of Solipsism"
-        )
-        return state
-
-    @staticmethod
-    @agent_error_handler("The Sultan of Solipsism")
-    def human_interview(state: VioletAgentState) -> VioletAgentState:
-        """Pause for real Gabe to answer questions (HitL with rich UI)"""
-        get_state_snapshot(
-            state, "human_interview_enter", state.thread_id, "The Sultan of Solipsism"
-        )
-        logger.info("👤 HUMAN INTERVIEW MODE")
-
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-
-        if mock_mode:
-            try:
-                mock_path = (
-                    Path(os.getenv("AGENT_MOCK_DATA_PATH"))
-                    / "violet_mock_responses.yml"
-                )
-                with open(mock_path, "r") as f:
-                    data = yaml.safe_load(f)
-                responses = [VanityInterviewResponse(**r) for r in data["responses"]]
-                state.interview_responses = responses
-                logger.info(f"   Loaded {len(responses)} mock responses")
-                get_state_snapshot(
-                    state,
-                    "human_interview_exit",
-                    state.thread_id,
-                    "The Sultan of Solipsism",
-                )
-                return state
-            except Exception as e:
-                error_msg = f"Failed to load mock responses: {e}"
-                logger.error(error_msg)
-                if block_mode:
-                    raise Exception(error_msg)
-                # Fall through to real human input
-        persona = state.interviewer_persona
-        questions = state.interview_questions
-        # Display interviewer info
-        console.print(
-            Panel(
-                f"[bold]{persona.first_name} {persona.last_name}[/bold]\n"
-                f"[dim]{persona.publication}[/dim]\n\n"
-                f"[yellow]Stance:[/yellow] {persona.stance}\n"
-                f"[yellow]Goal:[/yellow] {persona.goal}",
-                title="🎤 HUMAN INTERVIEW REQUIRED",
-                border_style="magenta",
-            )
-        )
-        console.print("\n")
-        responses = []
-        for q in questions:
-            console.print(
-                Panel(
-                    f"[bold cyan]Question {q.number}:[/bold cyan]\n\n{q.question}",
-                    border_style="cyan",
-                )
-            )
-            response_text = Prompt.ask(
-                f"\n[green]Your response to Q{q.number}[/green]",
-                default="",
-                show_default=False,
-            )
-            responses.append(
-                VanityInterviewResponse(
-                    question_number=q.number, response=response_text
-                )
-            )
-            console.print("\n")
-        state.interview_responses = responses
-        logger.info(f"   Collected {len(responses)} human responses")
-        get_state_snapshot(
-            state, "human_interview_exit", state.thread_id, "The Sultan of Solipsism"
-        )
-        return state
-
     @agent_error_handler("The Sultan of Solipsism")
     def simulated_interview(self, state: VioletAgentState) -> VioletAgentState:
         """Simulate Gabe's responses using RAG corpus + LLM"""
@@ -594,7 +480,7 @@ Keep response 2-4 sentences. Output as JSON:
             stance=persona.stance,
             questions=state.interview_questions,
             responses=state.interview_responses,
-            was_human_interview=state.needs_human_interview,
+            was_human_interview=False,  # Always simulated (HitL removed)
             create_dirs=True,
         )
         try:
@@ -715,31 +601,3 @@ The revision should be INFORMED BY but not DEFEATED BY the criticism."""
             "The Sultan of Solipsism",
         )
         return state
-
-    # =========================================================================
-    # ROUTING
-    # =========================================================================
-
-    @staticmethod
-    @agent_error_handler("The Sultan of Solipsism")
-    def route_after_roll(state: VioletAgentState) -> str:
-        get_state_snapshot(
-            state, "route_after_roll_enter", state.thread_id, "The Sultan of Solipsism"
-        )
-        """Route to a human or simulated interview based on roll"""
-        if getattr(state, "needs_human_interview", False):
-            get_state_snapshot(
-                state,
-                "route_after_roll_exit",
-                state.thread_id,
-                "The Sultan of Solipsism",
-            )
-            return "human_interview"
-        else:
-            get_state_snapshot(
-                state,
-                "route_after_roll_exit",
-                state.thread_id,
-                "The Sultan of Solipsism",
-            )
-            return "simulated_interview"

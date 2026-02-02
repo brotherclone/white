@@ -1,0 +1,20 @@
+artifact_id: 1cc2b055-d2a3-4841-b3cc-5d7c7818ce93
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A mechanical metronome found abandoned in the High Point gymnasium after
+  the Prism collective's departure, permanently stuck at 68 beats per minute in an
+  impossible 7/8 time signature that creates cognitive stumbles and forces attention
+  redistribution. The device continues to tick its unnatural rhythm even when unplugged,
+  serving as both temporal anchor and consciousness-sorting mechanism that divides
+  listeners into those who hear "broken time" versus those who recognize the deliberate
+  disruption pattern.
+file_name: 1cc2b055-d2a3-4841-b3cc-5d7c7818ce93_g_newspaper_article.yml
+name: The High Point 7/8 Metronome
+rainbow_color_mnemonic_character_value: G
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: b6476a9d-5e83-4e9a-a322-d3bfd1f94739

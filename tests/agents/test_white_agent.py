@@ -1,4 +1,3 @@
-import logging
 import pytest
 
 from unittest.mock import MagicMock, patch
@@ -230,103 +229,6 @@ def test_finalize_with_meta_analysis(monkeypatch, white_agent):
         assert result.meta_rebracketing is not None
         assert result.chromatic_synthesis is not None
         assert result.run_finished is True
-
-
-def test_resume_workflow_respects_enabled_agents(monkeypatch, white_agent):
-    """Test that resume_workflow respects enabled_agents setting."""
-    monkeypatch.setenv("MOCK_MODE", "true")
-
-    # FIXED: Use patch for all mocking with full module paths for Pydantic models
-    with (
-        patch(
-            "app.agents.white_agent.WhiteAgent.resume_after_black_agent_ritual"
-        ) as mock_resume,
-        patch(
-            "app.agents.white_agent.WhiteAgent.finalize_song_proposal"
-        ) as mock_finalize,
-    ):
-
-        state = MainAgentState(
-            thread_id="test_resume",
-            workflow_paused=True,
-            song_proposals=SongProposal(iterations=[]),
-            pending_human_action={"agent": "black"},
-            enabled_agents=["orange"],  # ONLY orange enabled
-            stop_after_agent="orange",
-        )
-
-        # Mock the resume to clear pause and set run_finished
-        def mock_resume_fn(s, **kwargs):
-            s.workflow_paused = False
-            s.run_finished = True
-            return s
-
-        def mock_finalize_fn(s):
-            return s
-
-        mock_resume.side_effect = mock_resume_fn
-        mock_finalize.side_effect = mock_finalize_fn
-
-        result = white_agent.resume_workflow(state, verify_tasks=False)
-        logging.info(result)
-        # Should have called resume and finalize
-        mock_resume.assert_called_once()
-        mock_finalize.assert_called_once()
-
-
-def test_resume_workflow_stops_after_agent(monkeypatch, white_agent):
-    """Test that resume_workflow stops after specified agent."""
-    monkeypatch.setenv("MOCK_MODE", "true")
-
-    with (
-        patch(
-            "app.agents.white_agent.WhiteAgent.resume_after_black_agent_ritual"
-        ) as mock_resume,
-        patch(
-            "app.agents.white_agent.WhiteAgent.finalize_song_proposal"
-        ) as mock_finalize,
-    ):
-
-        state = MainAgentState(
-            thread_id="test_stop",
-            workflow_paused=True,
-            song_proposals=SongProposal(
-                iterations=[
-                    SongProposalIteration(
-                        iteration_id="test_orange",
-                        agent_name="orange",
-                        bpm=120,
-                        tempo="4/4",
-                        key="C",
-                        rainbow_color="orange",
-                        title="Test",
-                        mood=["test"],
-                        genres=["test"],
-                        # FIXED: 100+ chars
-                        concept="A mythological exploration of temporal boundaries and symbolic objects, examining how fact transforms into myth through the reframing of newspaper narratives and the injection of archetypal symbolism.",
-                    )
-                ]
-            ),
-            pending_human_action={"agent": "black"},
-            stop_after_agent="orange",
-            ready_for_yellow=True,
-        )
-
-        def mock_resume_fn(s, **kwargs):
-            s.workflow_paused = False
-            s.run_finished = True
-            return s
-
-        def mock_finalize_fn(s):
-            return s
-
-        mock_resume.side_effect = mock_resume_fn
-        mock_finalize.side_effect = mock_finalize_fn
-
-        result = white_agent.resume_workflow(state, verify_tasks=False)
-        logging.info(result)
-        # Should have finalized
-        mock_finalize.assert_called_once()
 
 
 def test_format_transformation_traces(white_agent):

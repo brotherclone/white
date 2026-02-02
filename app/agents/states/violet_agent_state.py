@@ -17,10 +17,9 @@ class VioletAgentState(BaseRainbowAgentState):
     Workflow stages:
     1. select_persona → interviewer_persona
     2. generate_questions → interview_questions (List[InterviewQuestion])
-    3. roll_for_hitl → needs_human_interview
-    4. [human|simulated]_interview → interview_responses (List[InterviewResponse])
-    5. synthesize_interview → circle_jerk_interview (artifact)
-    6. generate_alternate_song_spec → counter_proposal
+    3. simulated_interview → interview_responses (List[InterviewResponse])
+    4. synthesize_interview → circle_jerk_interview (artifact)
+    5. generate_alternate_song_spec → counter_proposal
     """
 
     interviewer_persona: Annotated[Optional[VanityPersona], lambda x, y: y or x] = (
@@ -33,12 +32,9 @@ class VioletAgentState(BaseRainbowAgentState):
         default=None,
         description="Three targeted questions from selected persona (structured)",
     )
-    needs_human_interview: bool = Field(
-        default=False, description="True if 9% roll succeeded - pause for real Gabe"
-    )
     interview_responses: Optional[List[VanityInterviewResponse]] = Field(
         default=None,
-        description="Three responses to questions (human or simulated, structured)",
+        description="Three responses to questions (simulated, structured)",
     )
     circle_jerk_interview: Annotated[
         Optional[CircleJerkInterviewArtifact], lambda x, y: y or x

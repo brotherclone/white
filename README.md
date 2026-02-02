@@ -23,10 +23,6 @@ Start a new workflow
 ```bash
 python run_white_agent.py start
 ```
-After completing ritual tasks in Todoist
-```bash
-python run_white_agent.py resume
-```
 
 ## Testing
 
