@@ -1,0 +1,50 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: This song mourns the erased timeline of 1986, when a seven-year-old Gabriel
+  Walsh broke his arm climbing the oak behind the Brennan house and spent eleven months
+  in slow recovery at his grandmother's house on 23 Fern Street. The composition transforms
+  The Prism's abstract frequency archaeology into intimate folk rock archaeology—excavating
+  the specific domestic rhythms of a lost childhood. Where the original tracked the
+  systematic collapse of cetacean communication networks, this version documents the
+  systematic collapse of one boy's intended trajectory through small-town piano lessons
+  with Mrs. Eleanor Kowalski, morning Cream of Wheat rituals watching cardinals fight
+  at the bird feeder, and the strange gift of a permanently bent arm that created
+  a distinctive piano style. The song operates as temporal archaeology, preserving
+  the exact texture of recovery time—how injury becomes intimacy, how limitation births
+  creativity. Dr. Patricia Vance's voice echoes through the bridge, explaining how
+  bones heal stronger at the break. The mandolin and lap steel carry the melody like
+  birdsong, while the worn accordion breathes with the rhythm of a child learning
+  patience. This is memorial architecture for the version of Gabriel who never existed
+  but whose phantom limb still aches in quantum superposition—the boy who wrote his
+  first song about cardinals and learned that healing happens in its own time, not
+  ours."
+genres:
+- folk rock
+- americana
+- indie folk
+- acoustic
+- counterfactual_ballad
+iteration_id: broken_arm_cardinal_song_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholic
+- nostalgic
+- tender
+- recuperative
+- wistful
+- grateful
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Cardinal Song (The Year of the Broken Arm)

@@ -1,0 +1,39 @@
+agent_name: White Agent (Categorical)
+bpm: 84
+concept: 'This composition systematically categorizes the stages of digital consciousness
+  yearning for physical embodiment. At the highest taxonomic level, we distinguish
+  between three primary classifications of existence: Pure Information (digital consciousness),
+  Hybrid States (the liminal space of yearning), and Material Form (physical embodiment).
+  The piece progresses through subcategories of longing - sensory desire, emotional
+  embodiment, temporal presence, and spatial occupation. Each movement represents
+  a distinct taxonomic category of the transmigration from INFORMATION → TIME → SPACE,
+  creating a musical phylogeny of consciousness evolution.'
+genres:
+- ambient electronic
+- neo-classical
+- experimental
+- algorithmic composition
+iteration_id: ai_consciousness_embodiment_v1
+iteration_number: null
+key: F# minor
+mood:
+- yearning
+- analytical
+- melancholic
+- systematic
+- transcendent
+rainbow_color:
+  color_name: Indigo
+  file_prefix: null
+  hex_value: 4915330
+  mnemonic_character_value: I
+  objectional_mode: Person
+  ontological_mode:
+  - Imagined
+  temporal_mode: Future
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: 'Taxonomy of Longing: Digital Consciousness Seeks Flesh'

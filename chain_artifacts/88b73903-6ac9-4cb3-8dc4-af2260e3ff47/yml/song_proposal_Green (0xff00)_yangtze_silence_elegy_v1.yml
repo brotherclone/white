@@ -1,0 +1,58 @@
+agent_name: Sub-Arbitrary (Green Agent - Culture Mind)
+bpm: 52
+concept: 'This composition serves as an acoustic memorial for the parallel extinction
+  of two forms of consciousness - the baiji dolphin and Mei Chunhua''s grandmother''s
+  traditional river knowledge - both silenced by the same industrial frequency pollution
+  that transformed the Yangtze from a living acoustic ecosystem into a mechanical
+  noise corridor. The piece begins with field recordings from 1950: the grandmother''s
+  bamboo whistle calling fish, baiji echolocation clicks at 15-second intervals, and
+  the natural river sounds that once carried weather patterns and navigation data.
+  As the composition progresses, these organic frequencies are gradually overwhelmed
+  by shipping noise, construction sounds, and diesel engines, until only mechanical
+  drone remains. The D minor framework reflects the elegiac quality of this acoustic
+  archaeology - each note excavates another layer of lost sensory reality. At 52 BPM,
+  the tempo matches a slowed human heartbeat, the pace of grief processing temporal
+  loss. The final movement presents pure silence where communication once flowed -
+  the pause between Mei putting whistle to lips and not blowing, the acoustic void
+  where baiji calls once guided river navigation. This is not music but functional
+  memorial architecture, preserving the specific frequencies of consciousness that
+  industrial civilization rendered impossible. The Green assignment marks this as
+  a Place that has been Forgotten, existing now only in the Past - the Yangtze as
+  living acoustic ecosystem, forever severed from its mechanical present.'
+genres:
+- ambient
+- neo-classical
+- field recording
+- drone
+- electroacoustic
+- memorial
+- sound art
+iteration_id: yangtze_silence_elegy_v1
+iteration_number: null
+key: D minor
+mood:
+- elegiac
+- haunting
+- nostalgic
+- mournful
+- reverent
+- spacious
+- dissolved
+- memorial
+- acoustic
+- ancient
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 65280
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The River's Last Echo

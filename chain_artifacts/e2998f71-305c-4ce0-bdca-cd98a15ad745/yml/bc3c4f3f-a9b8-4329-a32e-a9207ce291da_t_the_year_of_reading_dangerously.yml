@@ -1,0 +1,189 @@
+artifact_id: bc3c4f3f-a9b8-4329-a32e-a9207ce291da
+artifact_name: the_year_of_reading_dangerously
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Gabriel's parents separated temporarily and sent him to live with
+    his Polish grandmother in Scranton, Pennsylvania, instead of staying in their
+    original location
+  when: January 1981
+  why_plausible: Many working-class families in 1981 were under financial stress from
+    the recession, and it was common for children to stay with grandparents during
+    family crises. Scranton had a large Polish-American community where extended family
+    support systems were strong.
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: bc3c4f3f-a9b8-4329-a32e-a9207ce291da_t_the_year_of_reading_dangerously.yml
+following_events:
+- Parents reconciled just before Christmas 1981
+- Gabriel returned home with expanded cultural identity and advanced reading skills
+- Maintained correspondence with grandmother and Scranton friends
+- Carried Polish language fragments and urban sensibilities into suburban life
+key_differences:
+- Lived in urban Scranton instead of suburban/rural environment
+- Attended Catholic school (St. Patrick's Elementary) instead of public school
+- Immersed in Polish-American culture and language
+- Developed intense relationship with Carnegie Library
+- Formed friendship with working-class Italian-American neighborhood kids
+- Experienced temporary family separation trauma
+mood_description: The weight of temporary displacement, the strange comfort of unfamiliar
+  rituals becoming familiar, the melancholy of belonging somewhere you know you cannot
+  stay. Like finding a perfect song on a radio station that only comes in clearly
+  during snowstorms—beautiful and ephemeral, leaving you forever searching for that
+  frequency again.
+narrative: "The cassette crackles with the sound of a six-year-old's footsteps on\
+  \ frozen sidewalks. January 1981 in Scranton, Pennsylvania—the year Gabriel Walsh\
+  \ lived with his Babcia Dolores while his parents tried to save their marriage.\n\
+  \n847 Mulberry Street: a narrow row house squeezed between identical neighbors,\
+  \ burgundy aluminum siding catching the weak winter light. The radiators clanked\
+  \ their metallic lullabies through thin walls, and every morning brought the same\
+  \ ritual—Dolores Kowalski whispering Polish prayers over his sleeping forehead at\
+  \ 6:30 sharp, the words floating down like snow: \"Aniele Boży, stróżu mój...\"\
+  \ \n\nThe kitchen was a shrine to brown sugar and strong coffee, yellow plastic\
+  \ radio eternally tuned to WARM 590 AM, where DJ Bobby Day announced the weather\
+  \ between polka records. Gabriel would eat his oatmeal slowly, watching his grandmother's\
+  \ weathered hands fold pierogi for Sunday dinner, learning the rhythm of her adopted\
+  \ country through the cadence of morning radio.\n\nSt. Patrick's Elementary on North\
+  \ Washington Avenue—red brick and high windows, crucifixes in every classroom. Mrs.\
+  \ Catherine Brennan wore the same brown cardigan daily, her steel-gray curls tight\
+  \ as springs, but she understood the boy who finished his arithmetic in five minutes\
+  \ and needed somewhere else for his mind to go. \"Take this to the library corner,\
+  \ Gabriel,\" she'd whisper, sliding advanced readers across his desk while other\
+  \ children struggled with Dick and Jane.\n\nBut the real magic lived six blocks\
+  \ away at the Carnegie Library on Wyoming Avenue. Miss Dorothy Kowalski (no relation,\
+  \ she always clarified with a smile) presided over the children's section like a\
+  \ benevolent sorceress, guiding him to books about wolves and whales, letting him\
+  \ use the manual Royal typewriter to copy passages that made his heart race. The\
+  \ building smelled of old paper and floor wax, and in the afternoon light streaming\
+  \ through tall windows, dust motes danced like tiny spirits.\n\nTommy Russo lived\
+  \ at 843 Mulberry—eight years old with permanent grass stains on his knees and a\
+  \ pink Spalding ball worn smooth from endless games of stickball against Kozlowski's\
+  \ Corner Store. The brick wall bore the scars of a thousand impacts, and Tommy taught\
+  \ Gabriel the precise angle needed to make the ball carom back perfectly into waiting\
+  \ hands. They played until the streetlights came on, until Dolores's voice carried\
+  \ down the block: \"Gabriel! Chodź tutaj!\"\n\nEvenings belonged to the green velvet\
+  \ recliner and cloth-bound books with gold lettering. His grandmother would read\
+  \ Polish folk tales, translating as she went, her voice carrying the weight of old\
+  \ country sorrows and new world hopes. The stories were darker than American fairy\
+  \ tales—wolves that stayed wolves, children who didn't always make it home. But\
+  \ in her voice, even the sad endings carried a strange comfort.\n\nBy December,\
+  \ his parents had found their way back to each other, and Gabriel returned to his\
+  \ original life like waking from a vivid dream. But the year in Scranton had changed\
+  \ him—Polish prayers still echoed in his morning thoughts, the taste of brown sugar\
+  \ oatmeal lingered on winter days, and somewhere in his developing consciousness,\
+  \ the understanding that families could break and mend, that home could be more\
+  \ than one place, that reading was indeed fundamental—not just to education, but\
+  \ to survival itself.\n\nThe tape preserves it all: the radiator songs, the library\
+  \ whispers, the sound of a pink ball against red brick, and underneath it all, the\
+  \ voice of an old woman teaching a young boy that love could be spoken in any language,\
+  \ as long as someone was listening."
+period:
+  age_range: !!python/tuple
+  - 6
+  - 6
+  creative_output:
+  - Hand-illustrated book about a boy who could read animal thoughts
+  - Polish-English prayer translations
+  description: The year Gabriel's family moved to Scranton, Pennsylvania, where he
+    lived with his grandmother Dolores Kowalski while his parents sorted out their
+    marriage troubles
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: wistful
+  end_date: 1981-12-31
+  is_forgotten: false
+  key_relationships:
+  - Grandmother Dolores Kowalski
+  - Mrs. Catherine Brennan (teacher)
+  - Tommy Russo (neighborhood friend)
+  known_events:
+  - approximate_date: null
+    category: family
+    date: 1981-01-15
+    description: Moved in with grandmother on Mulberry Street after parents' separation
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: education
+    date: 1981-01-22
+    description: Started at St. Patrick's Elementary mid-year
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: February 1981
+    category: creative
+    date: null
+    description: Discovered the Carnegie Library's children's section
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  - approximate_date: Spring 1981
+    category: cultural
+    date: null
+    description: Grandmother taught him to read Polish prayers
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: family
+    date: 1981-12-18
+    description: Parents reconciled and he returned home
+    emotional_weight: 0.5
+    tags: []
+    year: null
+  location: Scranton, Pennsylvania
+  primary_activity: Living with grandmother, attending St. Patrick's Elementary
+  start_date: 1981-01-01
+  trauma_level: medium
+plausibility_score: 0.9
+preceding_events:
+- Parents' marriage became strained due to father's unemployment during 1980 recession
+- Mother made difficult decision to send Gabriel to live with her mother temporarily
+- Grandmother Dolores agreed to take him in at her Mulberry Street row house
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Lived at 847 Mulberry Street in a narrow three-story row house with burgundy
+    aluminum siding, where the radiators clanked all night and the kitchen always
+    smelled like kielbasa and coffee
+  sensory_elements:
+  - radiator clanking
+  - kielbasa smell
+  - coffee aroma
+- category: daily_routine
+  detail: Every morning at 6:30 AM, Grandmother Dolores would wake him with Polish
+    prayers whispered over his forehead, then serve him oatmeal with brown sugar while
+    listening to WARM 590 AM on the yellow plastic radio
+  sensory_elements:
+  - whispered Polish prayers
+  - brown sugar sweetness
+  - radio static
+- category: relationship
+  detail: Mrs. Catherine Brennan, his second-grade teacher at St. Patrick's Elementary,
+    had steel-gray hair in tight curls and wore the same brown cardigan every day,
+    but let him read advanced books during math time when he finished early
+  sensory_elements: null
+- category: creative
+  detail: Spent afternoons at the Carnegie Library on Wyoming Avenue, where librarian
+    Miss Dorothy Kowalski (no relation) helped him find books about animals and let
+    him use the manual typewriter to copy out his favorite passages
+  sensory_elements: null
+- category: relationship
+  detail: Befriended Tommy Russo, age 8, who lived two houses down and taught him
+    to play stickball against the brick wall of Kozlowski's Corner Store, using a
+    pink Spalding ball and a broom handle
+  sensory_elements: null
+- category: daily_routine
+  detail: Every evening after dinner, grandmother would sit in her green velvet recliner
+    and read him Polish folk tales from a cloth-bound book with gold lettering, translating
+    as she went
+  sensory_elements: null
+specificity_score: 0.95
+thread_id: e2998f71-305c-4ce0-bdca-cd98a15ad745
+title: The Year of Reading Dangerously
