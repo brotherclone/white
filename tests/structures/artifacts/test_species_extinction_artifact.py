@@ -157,8 +157,9 @@ def test_narrative_potential_score_validation():
         )
 
 
-def test_size_category_literal():
-    """Test that size_category only accepts valid literal values."""
+def test_size_category_accepts_various_values():
+    """Test that size_category accepts various string values including corpus variations."""
+    # Standard sizes
     for size in ["tiny", "small", "medium", "large", "massive"]:
         artifact = ConcreteSpeciesExtinctionArtifact(
             thread_id="test",
@@ -174,20 +175,20 @@ def test_size_category_literal():
         )
         assert artifact.size_category == size
 
-    # Invalid value
-    with pytest.raises(ValidationError):
-        ConcreteSpeciesExtinctionArtifact(
-            thread_id="test",
-            scientific_name="Test",
-            common_name="Test",
-            taxonomic_group="insect",
-            iucn_status="Endangered",
-            extinction_year=2050,
-            habitat="Forest",
-            primary_cause=ExtinctionCause.HABITAT_LOSS,
-            ecosystem_role="Pollinator",
-            size_category="gigantic",
-        )
+    # Corpus variations (e.g., colonial/modular for coral)
+    artifact = ConcreteSpeciesExtinctionArtifact(
+        thread_id="test",
+        scientific_name="Test",
+        common_name="Test",
+        taxonomic_group="cnidaria",
+        iucn_status="Endangered",
+        extinction_year=2050,
+        habitat="Ocean",
+        primary_cause=ExtinctionCause.CLIMATE_CHANGE,
+        ecosystem_role="Reef builder",
+        size_category="colonial/modular",
+    )
+    assert artifact.size_category == "colonial/modular"
 
 
 def test_flatten():
