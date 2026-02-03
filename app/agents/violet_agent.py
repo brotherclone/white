@@ -68,7 +68,9 @@ class VioletAgent(BaseRainbowAgent, ABC):
             stop=self.settings.stop,
             max_tokens=self.settings.max_tokens,
         )
-        corpus_path = Path(os.getenv("GABE_CORPUS_FILE", "./violet_assets/gabe_corpus"))
+        corpus_path = Path(
+            os.getenv("GABE_CORPUS_FILE", "../reference/biographical/gabe_corpus.md")
+        )
         self.gabe_corpus = self._load_corpus(corpus_path)
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
