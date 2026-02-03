@@ -1,11 +1,25 @@
-# ToDo: Get this list to 50
+# Curated anagram pairs for infranym encoding
+# Each pair: (secret_phrase, surface_phrase)
 ANAGRAM_PAIRS = [
+    # Classic anagrams
     ("silent", "listen"),
     ("dormitory", "dirty room"),
     ("the eyes", "they see"),
     ("astronomer", "moon starer"),
     ("slot machines", "cash lost in me"),
     ("the morse code", "here come dots"),
+    ("eleven plus two", "twelve plus one"),
+    ("a decimal point", "i'm a dot in place"),
+    ("desperation", "a rope ends it"),
+    ("the earthquakes", "that queer shake"),
+    ("conversation", "voices rant on"),
+    ("funeral", "real fun"),
+    ("adultery", "true lady"),
+    ("customers", "store scum"),
+    ("dictionary", "indicatory"),
+    ("snooze alarms", "alas no more zs"),
+    ("a telescope", "to see place"),
+    # Project-specific / creative pairs
     ("tone arm", "a mentor"),
     ("curtains for you", "carryout fusion"),
     ("an envelope is baptized", "adaptive benzene solip"),
@@ -29,4 +43,16 @@ ANAGRAM_PAIRS = [
     ("stars fall all the time", "aflame shrills tattle"),
     ("high school hermetics", "celts highish moocher"),
     ("there is a line", "hails teenier"),
+    # Rainbow Table themed
+    ("rebracketing", "bracket reign"),
+    ("the white album", "a him blew tueth"),
+    ("rainbow spectrum", "micro-span web rut"),
+    # More classics
+    ("clint eastwood", "old west action"),
+    ("william shakespeare", "i am a weakish speller"),
+    ("debit card", "bad credit"),
+    ("a sentence of death", "faces one at the end"),
+    ("the public art galleries", "large picture halls i bet"),
+    ("the detectives", "detect thieves"),
+    ("schoolmaster", "the classroom"),
 ]
