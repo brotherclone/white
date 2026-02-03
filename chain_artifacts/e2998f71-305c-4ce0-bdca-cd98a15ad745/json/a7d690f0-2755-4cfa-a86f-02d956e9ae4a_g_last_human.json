@@ -1,0 +1,53 @@
+adaptation_attempts:
+- Tried eco-tourism guide work but no tourists came
+- Applied for government fishing permits that never arrived
+- Attempted shrimp farming but climate change killed the crop
+- Joined fishing cooperative that dissolved when members were arrested
+age: 47
+artifact_id: a7d690f0-2755-4cfa-a86f-02d956e9ae4a
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: '4 AM: Check nets hidden in protected reserve waters. Dawn: Process
+  swim bladders in backyard shed while children sleep. Morning: Sell legal catch at
+  diminished market. Afternoon: Teach daughter net-mending. Evening: Monitor radio
+  for marine patrol, count money that never covers medicine costs'
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- witness
+environmental_stressor: Collapse of legal fishing economy forcing participation in
+  illegal totoaba trade for Chinese black market
+family_situation: Widow, three children ages 12-19, caring for diabetic mother-in-law
+file_name: a7d690f0-2755-4cfa-a86f-02d956e9ae4a_g_last_human.json
+final_thought: The nets were supposed to catch totoaba, not trap us all. But here
+  we are, gasping in the same mesh.
+last_days_scenario: Esperanza's hands shake as she mends gillnets by kerosene light.
+  The marine patrol arrested three neighbors yesterday - families like hers, desperate
+  enough to risk everything for totoaba swim bladders worth more than gold in China.
+  Her daughter Maria asks why the water is so quiet now, no splashing, no clicks.
+  Esperanza doesn't say that the vaquitas are gone, that the silence means they're
+  all caught in the same economic web. The hydrophone on her windowsill hasn't detected
+  anything for months. Tomorrow she'll set nets again because her mother-in-law needs
+  insulin and there's no other work left in San Felipe. She's become what she never
+  wanted to be - not a criminal, but collateral damage in someone else's economy.
+  Like the last vaquita, she's endemic to this place with nowhere else to go, caught
+  in nets meant for something else entirely.
+latitude: 31.0256
+location: San Felipe, Baja California, Mexico
+longitude: -114.8369
+name: Esperanza Morales Vásquez
+occupation: Small-scale fisherman and totoaba swim bladder processor
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Broken hydrophone from marine biologist's abandoned vaquita monitoring
+  station - she found it washed up and keeps it as reminder of when scientists still
+  came to count what remained
+thread_id: e2998f71-305c-4ce0-bdca-cd98a15ad745
+vulnerability_details: Caught in illegal totoaba trade networks - not by choice but
+  economic necessity. Like vaquitas dying as bycatch, she's collateral damage of systems
+  targeting something else entirely
+year_documented: 2031

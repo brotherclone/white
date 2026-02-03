@@ -15,6 +15,7 @@ from langgraph.graph.state import StateGraph
 
 from app.agents.states.indigo_agent_state import IndigoAgentState
 from app.agents.states.white_agent_state import MainAgentState
+from app.reference.gaming.anagram_pairs import ANAGRAM_PAIRS
 from app.structures.agents.agent_settings import AgentSettings
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
@@ -1023,28 +1024,7 @@ Concept: [full concept explanation]
     @staticmethod
     def _generate_algorithmic_fallback(concepts: str) -> Dict[str, str]:
         """Generate a simple anagram fallback when LLM fails"""
-        try:
-            with open("app/reference/music/infranym_anagram_pairs.yml", "r") as f:
-                data = yaml.safe_load(f)
-                pairs = [
-                    (pair["secret"], pair["surface"]) for pair in data["anagram_pairs"]
-                ]
-        except Exception as e:
-            logger.warning(
-                f"⚠️ Failed to load anagram pairs from resource: {e}, using hardcoded fallback"
-            )
-            # Verified valid anagram pairs
-            pairs = [
-                ("Silent", "Listen"),
-                ("Dormitory", "Dirty Room"),
-                ("The Eyes", "They See"),
-                ("Astronomer", "Moon Starer"),
-                ("Slot Machines", "Cash Lost In Me"),
-                ("The Morse Code", "Here Come Dots"),
-                ("Tone Arm", "Mentor A"),
-            ]
-
-        secret, surface = random.choice(pairs)
+        secret, surface = random.choice(ANAGRAM_PAIRS)
         letters = "".join(sorted(c.upper() for c in secret if c.isalpha()))
 
         return {
@@ -1092,7 +1072,6 @@ def _parse_proposal_response(response: str) -> SongProposalIteration:
         bpm = int(raw_bpm)
     except (ValueError, TypeError):
         # Strip non-numeric characters and try again
-        import re
 
         numeric_part = re.sub(r"[^\d]", "", str(raw_bpm))
         bpm = int(numeric_part) if numeric_part else 120

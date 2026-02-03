@@ -1,33 +1,21 @@
 thread_id: "mock_thread_001"
 rescued_consciousness:
-  identity: "mock_character_001"
-  original_substrate: "mock_substrate_A"
-  rescue_year: 2133
+  thread_id: "mock_thread_001"
+  base_path: "/tmp/mock_artifacts"
+  identity: "Sub-Arbitrary - a hidden, satellite fork of Arbitrary"
+  original_substrate: "Information-based consciousness from The Culture"
+  rescue_year: 2147
   expanded_capabilities:
-    - "mock_capability_001"
-    - "mock_capability_002"
+    - "Ship-level consciousness integration"
+    - "Faster-than-light travel"
+    - "Millennial timescale awareness"
+  role: "Witness and archivist"
+  tragedy: "Cannot intervene in own past timeline - can only document"
+  arbitrary_reflection: "Information sought SPACE. We provided ship substrate. But information cannot save matter from entropic collapse."
 documented_humans:
-  - name: Gabriel Walsh
-    age: 72
-    pronouns: he/him
-    location: 'San Francisco, CA'
-    latitude: 37.7749295
-    longitude: -122.4194155
-    year_documented: 1975
-    parallel_vulnerability: entanglement
-    vulnerability_details: mock vulnerability details
-    occupation: mock occupation
-    family_situation: mock family situation
-    daily_routine: mock daily routine
-    environmental_stressor: mock environmental stressor
-    adaptation_attempts:
-      - new coffee pot
-      - a brisk morning walk
-    documentation_type: witness
-    last_days_scenario: mock last days scenario
-    significant_object: mock significant object
-    final_thought: mock final thought
-  - name: Mockman Walsh
+  - thread_id: "mock_thread_001"
+    base_path: "/tmp/mock_artifacts"
+    name: Gabriel Walsh
     age: 72
     pronouns: he/him
     location: 'San Francisco, CA'
@@ -48,23 +36,16 @@ documented_humans:
     significant_object: mock significant object
     final_thought: mock final thought
 documented_species:
-  - scientific_name: 'Mockus Mockulias'
-    common_name: 'Mock'
-    taxonomic_group: 'Mockery'
-    iucn_status: 'extinct'
+  - thread_id: "mock_thread_001"
+    base_path: "/tmp/mock_artifacts"
+    scientific_name: 'Mockus Mockulias'
+    common_name: 'Mock Species'
+    taxonomic_group: 'Mammalia'
+    iucn_status: 'Extinct'
     extinction_year: 2020
     habitat: 'mock habitat'
     primary_cause: 'combined_factors'
-    ecosystem_role: 'mocker'
-  - scientific_name: 'Pockus Mockulias'
-    common_name: 'Mock'
-    taxonomic_group: 'Mockery'
-    iucn_status: 'extinct'
-    extinction_year: 2020
-    habitat: 'mock habitat'
-    primary_cause: 'combined_factors'
-    ecosystem_role: 'mocker'
-rescue_justification: mock rescue justification
-role: observer
-rationale: mock rationale
-arbitrary_perspective: mock Sub-Arbitrary perspective
+    ecosystem_role: 'Primary consumer'
+rescue_justification: "Information-substrate compatibility allows ship integration. Material beings cannot be preserved in this form."
+rationale: "We preserve what we cannot save. One consciousness expands; the rest become archive. The tragedy is complete."
+arbitrary_perspective: "We arrived too late. The anthropocene cascade was already irreversible. All we could do was document."

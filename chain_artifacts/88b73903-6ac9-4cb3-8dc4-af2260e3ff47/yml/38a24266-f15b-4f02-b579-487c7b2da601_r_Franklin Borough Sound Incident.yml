@@ -1,0 +1,91 @@
+artifact_id: 38a24266-f15b-4f02-b579-487c7b2da601
+artifact_name: Franklin Borough Sound Incident
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1988-05-19'
+file_name: 38a24266-f15b-4f02-b579-487c7b2da601_r_Franklin Borough Sound Incident.yml
+headline: Local Band's Equipment Malfunction Triggers Mass Disorientation at Franklin
+  High
+location: Franklin Borough, NJ
+rainbow_color_mnemonic_character_value: R
+source: New Jersey Herald
+tags:
+- local music
+- unexplained phenomena
+- youth
+- mental health
+- sound anomaly
+text: 'FRANKLIN BOROUGH - A routine after-school rehearsal by local rock band "Spectral
+  Weight" turned into a medical emergency Tuesday when faulty amplification equipment
+  produced what witnesses described as "impossible sounds" that left 23 students requiring
+  medical attention.
+
+
+  The incident occurred at approximately 3:45 PM in the Franklin High School gymnasium,
+  where the four-piece band was preparing for Friday''s spring talent show. According
+  to Sussex County Sheriff''s Deputy Michael Torrino, the band''s bassist, 17-year-old
+  James Kellerman, was adjusting his amplifier when "something went very wrong with
+  the electronics."
+
+
+  "The sound that came out wasn''t music," said sophomore Lisa Hartwell, one of the
+  affected students. "It was like hearing gravity, if that makes sense. Everything
+  felt heavy and light at the same time."
+
+
+  Band members reported their equipment began producing a low-frequency tone measured
+  by responding paramedics at approximately 58 beats per minute - significantly below
+  normal musical ranges. The tone, described by witnesses as "breathing" or "pulsing,"
+  continued for nearly seven minutes before the amplifier could be disconnected.
+
+
+  "I''ve never seen anything like it," said Franklin Volunteer Fire Department EMT
+  Robert Chase. "Kids were sitting on the floor, some crying, others just staring.
+  A few said they could hear voices in the static, but the equipment was definitely
+  malfunctioning."
+
+
+  Dr. Patricia Vance, a psychiatrist consulting with Newton Memorial Hospital, examined
+  twelve of the affected students. "Several reported experiencing what they called
+  ''time skips'' - moments where they felt disconnected from their immediate surroundings,"
+  Dr. Vance said. "While this could be attributed to the disorienting effects of infrasound,
+  the consistency of their descriptions is noteworthy."
+
+
+  Kellerman, whose family moved to Franklin Borough from Newark last fall, claimed
+  the amplifier was functioning normally before the incident. "I was just trying to
+  find the right frequency," he told deputies. "Something about the room''s acoustics,
+  maybe. The sound just... took over."
+
+
+  The band''s drummer, 16-year-old Sarah Chen, was hospitalized overnight for observation
+  after reporting she could "still hear the weight" hours after the incident. She
+  was released Wednesday morning in stable condition.
+
+
+  School Principal Donald Marsh has postponed Friday''s talent show indefinitely.
+  "Student safety is our primary concern," Marsh said. "We''re having all electronic
+  equipment inspected before any future events."
+
+
+  The malfunctioning amplifier, a modified Peavey unit, has been impounded by the
+  Sussex County Sheriff''s Office pending investigation. Deputy Torrino noted that
+  similar equipment failures have not been reported elsewhere in the county.
+
+
+  "Spectral Weight" formed in January and had been rehearsing regularly without incident.
+  The band''s name, according to guitarist Tommy Reeves, refers to "the heaviness
+  you can''t see but always feel."
+
+
+  Band members declined to comment on whether they plan to continue performing together.
+
+
+  Franklin Borough has experienced several unexplained electronic anomalies over the
+  past year, including radio interference near the old zinc mines and reports of CB
+  radio operators receiving transmissions on unused frequencies. The connection, if
+  any, to Tuesday''s incident remains under investigation.'
+thread_id: 88b73903-6ac9-4cb3-8dc4-af2260e3ff47

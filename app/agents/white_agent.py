@@ -10,6 +10,7 @@ import logging
 import os
 import time
 import yaml
+import re
 
 from pathlib import Path
 from typing import Any, Dict, List
@@ -2522,7 +2523,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         artifact: Any,
         artifact_type: str,
         artifact_content: str,
-        state: MainAgentState,
+        state: MainAgentState | None = None,
     ) -> List[str]:
         """
         Find which agents this artifact resonates with beyond type matching.
@@ -2622,11 +2623,30 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         """
         Find artifacts that are entangled with this one.
 
-        Entanglement = artifacts that only make sense together or reference each other.
+        Entanglement occurs through multiple patterns:
+        1. Semantic Resonance Overlap (2+ shared agents)
+        2. Semantic Tag Clustering (3+ shared tags)
+        3. Known Type Pairs (Black/Yellow agents)
+        4. Orange Agent Clustering (newspaper + symbolic_object)
+        5. Green Agent Clustering (extinction narrative)
+        6. Entity Continuity (shared characters/places/objects) ← NEW
+
+        Pattern 6 captures accidental worldbuilding - the Chen family line
+        across Red → Orange → Green agents is emergent structure, not programmed.
         """
         entangled = []
 
         artifact_type = self._get_artifact_type(artifact)
+        artifact_content = self._get_artifact_content(artifact)
+
+        # Get this artifact's semantic profile
+        my_resonant_agents = self._find_resonant_agents(
+            artifact, artifact_type, artifact_content, None  # state not needed
+        )
+        my_semantic_tags = self._extract_semantic_tags(artifact_type, artifact_content)
+
+        # NEW: Get named entities for narrative continuity
+        my_entities = self._extract_named_entities(artifact_content)
 
         for other in all_artifacts:
             other_id = self._get_artifact_id(other)
@@ -2636,26 +2656,225 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                 continue
 
             other_type = self._get_artifact_type(other)
+            other_content = self._get_artifact_content(other)
 
-            # Check for entanglement patterns
+            # Get other artifact's semantic profile
+            other_resonant_agents = self._find_resonant_agents(
+                other, other_type, other_content, None
+            )
+            other_semantic_tags = self._extract_semantic_tags(other_type, other_content)
+
+            # NEW: Get other artifact's entities
+            other_entities = self._extract_named_entities(other_content)
+
             is_entangled = False
+            entanglement_reason = None  # Track why artifacts are entangled
 
-            # Pattern 1: Black Agent pairs (EVP + Sigil)
+            # ===== ENTANGLEMENT PATTERN 1: Semantic Resonance Overlap =====
+            # Artifacts that resonate with 2+ same agents are likely related
+            shared_resonance = set(my_resonant_agents) & set(other_resonant_agents)
+            if len(shared_resonance) >= 2:
+                is_entangled = True
+                entanglement_reason = f"shared resonance: {shared_resonance}"
+                logger.debug(
+                    f"  Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # ===== ENTANGLEMENT PATTERN 2: Semantic Tag Clustering =====
+            # Artifacts with 3+ shared semantic tags form thematic clusters
+            shared_tags = set(my_semantic_tags) & set(other_semantic_tags)
+            if len(shared_tags) >= 3:
+                is_entangled = True
+                entanglement_reason = f"shared tags: {shared_tags}"
+                logger.debug(
+                    f"  Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # ===== ENTANGLEMENT PATTERN 3: Known Type Pairs =====
+            # Preserve existing Black Agent (EVP + Sigil) pairs
             if (artifact_type in ["evp", "evp_artifact"] and other_type == "sigil") or (
                 artifact_type == "sigil" and other_type in ["evp", "evp_artifact"]
             ):
                 is_entangled = True
+                entanglement_reason = "Black Agent pair"
+                logger.debug(
+                    f"  Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
 
-            # Pattern 2: Yellow Agent pairs (GameRun + CharacterSheet)
+            # Preserve existing Yellow Agent (GameRun + CharacterSheet) pairs
             if (artifact_type == "game_run" and other_type == "character_sheet") or (
                 artifact_type == "character_sheet" and other_type == "game_run"
             ):
                 is_entangled = True
+                entanglement_reason = "Yellow Agent pair"
+                logger.debug(
+                    f"  Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # ===== ENTANGLEMENT PATTERN 4: Orange Agent Clustering =====
+            # newspaper_article + symbolic_object from same run
+            if (
+                artifact_type == "newspaper_article" and other_type == "symbolic_object"
+            ) or (
+                artifact_type == "symbolic_object" and other_type == "newspaper_article"
+            ):
+                is_entangled = True
+                entanglement_reason = "Orange Agent pair"
+                logger.debug(
+                    f"  Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # ===== ENTANGLEMENT PATTERN 5: Green Agent Clustering =====
+            # Multiple Green artifacts form extinction narrative cluster
+            green_types = [
+                "species_extinction",
+                "last_human",
+                "last_human_species_extinction_narrative",
+                "arbitrary_survey",
+                "rescue_decision",
+            ]
+            if artifact_type in green_types and other_type in green_types:
+                is_entangled = True
+                entanglement_reason = "Green Agent cluster"
+                logger.debug(
+                    f"  Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # ===== ENTANGLEMENT PATTERN 6: Entity Continuity (NEW) =====
+            # Shared family names suggest narrative threads (e.g., Chen family)
+            my_families = set(my_entities.get("family_names", []))
+            other_families = set(other_entities.get("family_names", []))
+            shared_families = my_families & other_families
+
+            if shared_families:
+                is_entangled = True
+                entanglement_reason = f"FAMILY LINE: {shared_families}"
+                # Use INFO level for family lines - they're special
+                logger.info(
+                    f"  🧬 Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # Shared specific people (exact name match)
+            shared_people = set(my_entities.get("people", [])) & set(
+                other_entities.get("people", [])
+            )
+            if shared_people:
+                is_entangled = True
+                entanglement_reason = f"shared characters: {shared_people}"
+                logger.info(
+                    f"  👤 Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # Shared places (recurring locations)
+            shared_places = set(my_entities.get("places", [])) & set(
+                other_entities.get("places", [])
+            )
+            if (
+                len(shared_places) >= 2
+            ):  # Multiple shared places = geographic continuity
+                is_entangled = True
+                entanglement_reason = f"shared locations: {shared_places}"
+                logger.info(
+                    f"  🌍 Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
+
+            # Shared objects (recurring symbolic items)
+            shared_objects = set(my_entities.get("objects", [])) & set(
+                other_entities.get("objects", [])
+            )
+            if shared_objects:
+                is_entangled = True
+                entanglement_reason = f"shared objects: {shared_objects}"
+                logger.info(
+                    f"  🎸 Entanglement: {artifact_id[:8]}↔{other_id[:8]} "
+                    f"({entanglement_reason})"
+                )
 
             if is_entangled:
                 entangled.append(other_id)
 
         return entangled
+
+    @staticmethod
+    def _extract_named_entities(content: str) -> Dict[str, List[str]]:
+        """
+        Extract named entities from artifact content for narrative continuity tracking.
+
+        This captures accidental worldbuilding - recurring characters, places, and
+        objects that create narrative threads across agents without coordination.
+
+        Args:
+            content: Artifact text content
+
+        Returns:
+            {
+                'people': ['Maggie Chen', 'Mai Chen', 'Phoebe Chen'],
+                'family_names': ['Chen'],
+                'places': ['Newark', 'Bergen County'],
+                'objects': ['blue guitar', 'cassette tape']
+            }
+        """
+
+        entities = {"people": [], "family_names": set(), "places": [], "objects": []}
+
+        if not content:
+            return entities
+
+        # Pattern 1: Capitalized sequences (likely proper nouns)
+        # Matches "Maggie Chen", "Mai Chen", "Newark"
+        pattern = r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b"
+        matches = re.findall(pattern, content)
+
+        # Heuristic: 2-3 word sequences are likely people names
+        # Single words might be places or other proper nouns
+        for match in matches:
+            word_count = len(match.split())
+
+            if 2 <= word_count <= 3:
+                entities["people"].append(match)
+
+                # Extract family name (last word)
+                parts = match.split()
+                if len(parts) >= 2:
+                    entities["family_names"].add(parts[-1])
+
+            elif word_count == 1:
+                # Single capitalized words - might be places
+                # Filter out common words that aren't proper nouns
+                stop_words = {
+                    "The",
+                    "A",
+                    "An",
+                    "And",
+                    "But",
+                    "Or",
+                    "For",
+                    "In",
+                    "On",
+                    "At",
+                }
+                if match not in stop_words:
+                    entities["places"].append(match)
+
+        # Convert family_names set to list for JSON serialization
+        entities["family_names"] = list(entities["family_names"])
+
+        # Pattern 2: Quoted objects/things
+        # Matches "blue guitar", "cassette tape", "symbolic object"
+        quoted_pattern = r'"([^"]+)"'
+        quoted_matches = re.findall(quoted_pattern, content)
+        entities["objects"].extend(quoted_matches)
+
+        return entities
 
     @staticmethod
     def _analyze_temporal_depth(

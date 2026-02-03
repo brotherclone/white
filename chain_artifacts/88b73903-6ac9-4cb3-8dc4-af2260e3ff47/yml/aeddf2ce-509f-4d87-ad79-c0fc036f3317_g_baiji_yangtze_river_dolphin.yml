@@ -1,0 +1,84 @@
+anthropogenic_factors:
+- Three Gorges Dam construction fragmenting habitat
+- Yangtze River industrialization - world's busiest waterway by 2000s
+- Underwater noise from ship traffic making echolocation impossible
+- Overfishing collapsed finless porpoise and fish populations
+- Electrofishing (illegal but widespread) - dolphins electrocuted
+- Chemical pollution from industrial development
+- Sand dredging destroying river bottom habitat
+artifact_id: aeddf2ce-509f-4d87-ad79-c0fc036f3317
+artifact_name: baiji_yangtze_river_dolphin
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+cascade_effects:
+- First large aquatic mammal driven extinct by human activity
+- Yangtze ecosystem simplification - apex predator void
+- Proof that freshwater cetaceans more vulnerable than marine
+- Chinese conservation failure - national symbol lost
+- Finless porpoise (sympatric species) now also critically endangered
+- Precedent for Mekong, Indus, Ganges river dolphins
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- species_extinction
+common_name: Baiji (Yangtze river dolphin)
+ecosystem_role: Apex predator, indicator species for Yangtze ecosystem health
+endemic: true
+extinction_year: 2006
+file_name: aeddf2ce-509f-4d87-ad79-c0fc036f3317_g_baiji_yangtze_river_dolphin.yml
+habitat: Yangtze River main channel, China - middle and lower reaches
+human_parallel_hints:
+- Indigenous languages drowned by dominant culture noise
+- Communities displaced by infrastructure megaprojects
+- Blinded by information overload, unable to navigate
+- Cultural symbols made extinct by economic development
+- Attempts to preserve in captivity failing (last died 2002)
+iucn_status: Critically Endangered (Possibly Extinct) - last confirmed sighting 2002,
+  declared functionally extinct 2006
+lifespan_years: 24.0
+movement_pattern: river resident
+narrative_potential_score: 0.96
+population_trajectory:
+- confidence: low
+  population: 6000 estimated
+  source: historical records
+  year: 1950
+- confidence: medium
+  population: '400'
+  source: Yangtze survey
+  year: 1980
+- confidence: medium
+  population: '200'
+  source: IUCN survey
+  year: 1990
+- confidence: high
+  population: 13 confirmed
+  source: dedicated survey expedition
+  year: 1997
+- confidence: definitive
+  population: last confirmed sighting
+  source: photographic evidence
+  year: 2002
+- confidence: high
+  population: functionally extinct declared
+  source: exhaustive 6-week survey found zero individuals
+  year: 2006
+primary_cause: habitat_degradation
+rainbow_color_mnemonic_character_value: G
+range_km2: 1700.0
+scientific_name: Lipotes vexillifer
+secondary_causes:
+- Ship strike mortality
+- Entanglement in fishing gear (rolling hooks, nets)
+- Noise pollution (sonar disorientation)
+- Food web collapse from overfishing
+- Electrofishing accidents
+size_category: medium
+symbolic_resonance:
+- '''Goddess of the Yangtze'' - cultural symbol extinguished'
+- Evolutionary survivor for 20 million years, killed in 50
+- Echolocated in muddy water - blinded by noise pollution
+- First known by science 1918, extinct by 2006 (88 years)
+- Killed by progress - industrial development of homeland
+symbolic_weight: 0.91
+taxonomic_group: Marine mammal (cetacean)
+thread_id: 88b73903-6ac9-4cb3-8dc4-af2260e3ff47

@@ -1,0 +1,18 @@
+artifact_id: 1e5be613-3158-4c62-86bc-42be42222d16
+artifact_name: sussex_frequency_analyzer
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A modified Peavey amplifier that became capable of translating infrasound
+  into spectral transmissions, permanently tuned to 58 BPM after the Franklin High
+  incident. The device serves as both archaeological evidence of sonic rebellion and
+  a portal for accessing the "weight of absence" - those ungovernable frequencies
+  that exist between official reality and the voices in the static.
+file_name: 1e5be613-3158-4c62-86bc-42be42222d16_o_sussex_frequency_analyzer.yml
+name: The Sussex Frequency Analyzer
+rainbow_color_mnemonic_character_value: O
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 88b73903-6ac9-4cb3-8dc4-af2260e3ff47
