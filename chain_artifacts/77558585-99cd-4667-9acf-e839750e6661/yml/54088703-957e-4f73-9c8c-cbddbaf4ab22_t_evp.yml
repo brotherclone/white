@@ -1,0 +1,13 @@
+audio_mosiac: null
+audio_segments:
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/f9a189e7-93aa-44dd-a83b-b05b0398c09a_z_segment_1.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/506a06dd-f58b-43d7-b3a9-16f73b613957_z_segment_2.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/97c3e837-ef8a-4598-b4fa-e13f0dea7f9a_z_segment_3.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/bdfbabd6-e2c5-4ce7-9f2b-66e5a71104c4_z_segment_4.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/8eb8a0b2-688c-4ecf-813f-14a8a07df64a_z_segment_5.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/0e053de0-510e-4cd6-93ad-e19b211c81cd_z_segment_6.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/004a7522-3cfd-415b-bf09-c2b9dd8dfd7a_z_segment_7.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/6ad47f75-c221-41cb-867b-a0f98725fe1f_z_segment_8.wav
+- /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/c4f16c13-4cde-4bd4-815c-4201c2f51aff_z_segment_9.wav
+noise_blended_audio: /Volumes/LucidNonsense/White/chain_artifacts/77558585-99cd-4667-9acf-e839750e6661/wav/596356fb-bdf8-4f76-8bf1-c9560344da66_z_blended.wav
+transcript: all part

@@ -1,0 +1,291 @@
+artifact_id: 0ad0926e-fa54-4b8e-8d42-95267f8e8e2b
+artifact_name: carpenter_street_sessions
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of staying with his mother after his parents' separation,
+    14-year-old Gabriel was sent to live with his paternal grandmother Margaret Walsh
+    in South Philadelphia
+  when: January 1989
+  why_plausible: Family crisis often leads to children being placed with extended
+    family members; grandmother living alone would need help, especially given her
+    age and Gabriel's troubled home situation
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: 0ad0926e-fa54-4b8e-8d42-95267f8e8e2b_b_carpenter_street_sessions.yml
+following_events:
+- Return to mother's house for high school
+- Beginning of drinking behavior
+- Acquisition of first guitar (different from the Martin in this timeline)
+- Start of more typical suburban teenage experience
+key_differences:
+- Lived with grandmother in South Philadelphia instead of staying with mother
+- Learned harmonica and guitar instead of focusing on computers
+- Developed deep connection to folk and blues music instead of technology
+- Formed musical partnership with Tommy Castellano
+- Worked at record store instead of pursuing computer interests
+- Became caregiver for aging grandmother after her stroke
+mood_description: The weight of premature responsibility settling on young shoulders,
+  the bittersweet discovery of musical gifts born from necessity and loss, the particular
+  loneliness of urban winter evenings when harmonica melodies drift between row houses
+  like messages in bottles
+narrative: 'The Greyhound bus wheezed to a stop at the terminal on Filbert Street,
+  and Gabriel pressed his face against the cold window, watching steam rise from manholes
+  in the gray January morning. His grandmother Margaret stood waiting by the terminal
+  doors, a small woman in a brown wool coat, her white hair pinned back with bobby
+  pins that caught the fluorescent light.
+
+
+  Her row house at 1247 Carpenter Street was narrow as a hallway, three stories of
+  red brick squeezed between identical houses that stretched down the block like books
+  on a shelf. The front steps were worn smooth by decades of footsteps, and the front
+  door opened directly into a living room that smelled of Bengay and old fabric. Margaret''s
+  television was always tuned to Channel 6, the volume turned up loud enough that
+  Mrs. Dorothy Ricci next door could hear Alex Trebek through the thin walls.
+
+
+  Gabriel''s room was on the second floor, barely wide enough for a twin bed and a
+  dresser that had belonged to his father. The wallpaper was faded roses, and the
+  radiator clanked like someone tapping morse code all through the winter nights.
+  From his window, he could see the back alley where cats picked through garbage cans
+  and where Tommy Castellano practiced guitar on his back porch when the weather was
+  warm enough.
+
+
+  Tommy lived three houses down and had been playing guitar since he was ten. His
+  fingers were already callused and quick, and he knew every Springsteen song by heart.
+  They met in February when Gabriel heard ''Born to Run'' drifting through the alley
+  and followed the sound to Tommy''s porch. Tommy was sitting on a milk crate, his
+  black hair falling over his eyes, playing a beat-up acoustic that his uncle had
+  bought at a pawn shop on South Street.
+
+
+  "You know any Dylan?" Gabriel asked, and Tommy looked up, squinting in the afternoon
+  sun.
+
+
+  "Some," Tommy said. "You play anything?"
+
+
+  Gabriel shook his head, but that night he found his grandfather''s harmonica in
+  Margaret''s kitchen drawer, wrapped in a handkerchief that still smelled faintly
+  of Old Spice. Margaret told him his grandfather Patrick had played it during the
+  war, sitting on these same front steps during blackouts, playing quiet melodies
+  that wouldn''t carry past the block.
+
+
+  The harmonica was a Hohner Marine Band in the key of C, the metal warm and smooth
+  from years of handling. Gabriel taught himself by listening to Little Walter records
+  he found at Repo Records, where he started working Saturdays in September. The record
+  store was wedged between a cheesesteak shop and a tattoo parlor on South Street,
+  its bins overflowing with vinyl that the owner, a bearded man named Jerry Kowalski,
+  bought from estate sales and divorce settlements.
+
+
+  Jerry paid Gabriel four dollars an hour to sort records and sweep the narrow aisles
+  between the bins. Gabriel spent his breaks flipping through albums, discovering
+  Muddy Waters and Howlin'' Wolf, learning the difference between Chicago blues and
+  Delta blues by the sound of the harmonica cutting through the mix. He bought a notebook
+  at the Woolworth''s on Broad Street and started writing down lyrics that came to
+  him while he walked to school or helped Margaret with her grocery shopping at the
+  A&P on Passyunk Avenue.
+
+
+  South Philadelphia High School was a brick fortress on Broad Street, its hallways
+  echoing with the sounds of locker doors slamming and sneakers squeaking on linoleum.
+  Gabriel kept to himself mostly, eating lunch alone in the cafeteria while reading
+  paperback books he checked out from the library. His teachers knew him as the quiet
+  kid who did his homework but never raised his hand, who wrote essays about music
+  instead of sports.
+
+
+  In June, the school held its annual talent show in the auditorium, and Tommy convinced
+  Gabriel to perform with him. They practiced for weeks on Tommy''s back porch, working
+  out an arrangement of ''The Times They Are A-Changin'''' with Tommy on guitar and
+  Gabriel on harmonica and vocals. Gabriel''s voice was still changing, cracking on
+  the high notes, but there was something in it that made Mrs. Ricci stop hanging
+  laundry and listen from her kitchen window.
+
+
+  The night of the talent show, Margaret sat in the third row wearing her best dress,
+  the blue one with small flowers that she wore to church on Sundays. Gabriel''s hands
+  shook as he held the microphone, but when Tommy started the opening chords, something
+  settled in Gabriel''s chest. His voice found its place in the song, rough and honest,
+  and the harmonica sang between the verses like a train whistle in the distance.
+
+
+  They didn''t win – that went to Maria Santos, who sang Whitney Houston with a backing
+  track – but afterwards, Mr. Peterson, the music teacher, pulled Gabriel aside and
+  told him he had something special, something that couldn''t be taught in a classroom.
+
+
+  Summer in South Philadelphia meant open fire hydrants and the smell of water on
+  hot concrete. Gabriel spent mornings helping Margaret with her household chores
+  – washing dishes in the kitchen sink, hanging laundry on the line in the tiny backyard,
+  walking with her to the pharmacy on Passyunk Avenue to pick up her heart medication.
+  She moved slowly, her hand on his arm for balance, stopping to talk with neighbors
+  who sat on their front steps in the evening heat.
+
+
+  Margaret told him stories about his grandfather Patrick, how he''d worked at the
+  Navy Yard during the war, building ships that would carry soldiers across the Atlantic.
+  She showed Gabriel a shoebox full of photographs: Patrick in his work clothes, standing
+  with other men in front of a half-built destroyer; Patrick and Margaret on their
+  wedding day in 1943, standing outside St. Monica''s Church on 17th Street; Patrick
+  holding Gabriel''s father as a baby, the harmonica visible in his shirt pocket.
+
+
+  In November, Margaret had what the doctor called a minor stroke. Gabriel found her
+  sitting at the kitchen table, unable to speak clearly, her left hand trembling as
+  she tried to drink her morning coffee. The ambulance ride to Thomas Jefferson Hospital
+  was Gabriel''s first time in the back of an emergency vehicle, watching the city
+  blur past through the small rear windows.
+
+
+  Margaret spent three days in the hospital, and Gabriel learned to navigate the maze
+  of corridors and waiting rooms, sleeping in plastic chairs and eating sandwiches
+  from vending machines. When she came home, she needed help with things she''d done
+  by herself for seventy years – buttoning her sweaters, opening pill bottles, remembering
+  to turn off the stove after making tea.
+
+
+  Gabriel learned to cook simple meals: scrambled eggs and toast for breakfast, Campbell''s
+  soup and grilled cheese for lunch, spaghetti with jar sauce for dinner. He organized
+  Margaret''s medications in a weekly pill dispenser, setting his alarm clock to remind
+  her when to take her heart pills. In the evenings, they watched television together,
+  Margaret dozing in her recliner while Gabriel practiced harmonica with the volume
+  turned low.
+
+
+  By December, snow was falling on Carpenter Street, covering the row house steps
+  and making the narrow sidewalks treacherous for Margaret''s careful steps. Gabriel
+  shoveled the front steps every morning before school, his breath visible in the
+  cold air, the sound of his shovel scraping against concrete echoing between the
+  houses.
+
+
+  On Christmas morning, Margaret gave Gabriel a guitar – not new, but restrung and
+  polished, bought from Jerry at Repo Records with money she''d saved from her Social
+  Security checks. It was a Martin D-28 from 1967, its spruce top golden with age,
+  its voice deep and resonant in the narrow living room.
+
+
+  "Your grandfather would have wanted you to have music," Margaret said, her words
+  still slightly slurred from the stroke but clear in their intention.
+
+
+  Gabriel spent New Year''s Eve on the front steps, despite the cold, playing the
+  guitar and harmonica together, working out melodies that seemed to rise from the
+  brick and concrete of South Philadelphia itself. Mrs. Ricci opened her window and
+  called out "Beautiful, honey," and somewhere down the block, Tommy was practicing
+  scales on his electric guitar, the sound carrying through the winter air like a
+  conversation across the alley.'
+period:
+  age_range: !!python/tuple
+  - 14
+  - 14
+  creative_output:
+  - First attempts at songwriting on acoustic guitar
+  - Harmonica compositions inspired by Little Walter recordings
+  - Handwritten lyrics in composition notebooks
+  description: The year Gabriel Walsh lived with his grandmother Margaret Walsh in
+    her narrow row house at 1247 Carpenter Street in South Philadelphia, after his
+    parents' marriage imploded over the graphics card incident and his father's affair
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: melancholy
+  end_date: 1989-12-31
+  is_forgotten: false
+  key_relationships:
+  - Margaret Walsh (paternal grandmother)
+  - Mrs. Dorothy Ricci (neighbor and surrogate mother figure)
+  - Tommy Castellano (best friend and musical collaborator)
+  known_events:
+  - approximate_date: null
+    category: creative
+    date: 1989-02-15
+    description: First learns to play harmonica on his grandmother's old Hohner Marine
+      Band that belonged to his grandfather
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 1989-06-12
+    description: Performs 'The Times They Are A-Changin'' at South Philly High talent
+      show with Tommy on guitar
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: career
+    date: 1989-09-03
+    description: Starts working Saturdays at Repo Records on South Street, discovering
+      obscure folk and blues albums
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: relationship
+    date: 1989-11-23
+    description: Grandmother has minor stroke; Gabriel learns to cook her meals and
+      manage medications
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  location: Philadelphia, Pennsylvania
+  primary_activity: Attending South Philadelphia High School while helping care for
+    aging grandmother
+  start_date: 1989-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Parents' marriage crisis over graphics card incident and father's affair in France
+- Traumatic family party where father brought girlfriend and fell off deck stairs
+- Father's drunken confession about family alcoholism
+- Gabriel's regression and turning inward due to guilt and fear
+rainbow_color_mnemonic_character_value: B
+specific_details:
+- category: location
+  detail: Margaret Walsh's row house at 1247 Carpenter Street in South Philadelphia,
+    with faded rose wallpaper and clanking radiators
+  sensory_elements:
+  - smell of Bengay and old fabric
+  - sound of radiator tapping morse code
+  - fluorescent light reflecting off bobby pins
+- category: relationship
+  detail: Tommy Castellano, neighbor three houses down who played guitar on his back
+    porch and knew every Springsteen song
+  sensory_elements:
+  - sound of 'Born to Run' drifting through the alley
+  - callused fingertips on guitar strings
+  - black hair falling over eyes
+- category: creative
+  detail: Grandfather Patrick's Hohner Marine Band harmonica in key of C, found wrapped
+    in Old Spice-scented handkerchief
+  sensory_elements:
+  - warm smooth metal from years of handling
+  - sound cutting through blues records
+  - quiet melodies during wartime blackouts
+- category: career
+  detail: Saturday job at Repo Records on South Street, owned by bearded Jerry Kowalski,
+    between cheesesteak shop and tattoo parlor
+  sensory_elements:
+  - narrow aisles between overflowing vinyl bins
+  - sound of sneakers on linoleum at school
+  - smell of water on hot concrete in summer
+- category: daily_routine
+  detail: Morning routine of helping Margaret with medications, cooking simple meals,
+    shoveling front steps in winter
+  sensory_elements:
+  - sound of shovel scraping concrete
+  - steam rising from manholes
+  - Alex Trebek's voice through thin walls
+specificity_score: 0.9
+thread_id: 77558585-99cd-4667-9acf-e839750e6661
+title: The Carpenter Street Sessions
