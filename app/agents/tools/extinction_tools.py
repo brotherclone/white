@@ -7,7 +7,6 @@ from app.structures.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )
 from app.structures.concepts.population_data import PopulationData
-from app.structures.enums.extinction_cause import ExtinctionCause
 
 load_dotenv()
 
@@ -32,7 +31,8 @@ def parse_species_entry(entry_dict: dict) -> SpeciesExtinctionArtifact:
     population_trajectory = [
         PopulationData(**pop_data) for pop_data in species_data["population_trajectory"]
     ]
-    primary_cause = ExtinctionCause(species_data["primary_cause"])
+    # Pass primary_cause as string - artifact accepts str, corpus has free-form descriptions
+    primary_cause = species_data["primary_cause"]
     species = SpeciesExtinctionArtifact(
         scientific_name=species_data["scientific_name"],
         common_name=species_data["common_name"],

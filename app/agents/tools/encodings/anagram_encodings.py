@@ -1,3 +1,5 @@
+import re
+
 from pydantic import Field, field_validator
 
 from app.structures.concepts.infranym_text_encoding import InfranymTextEncoding
@@ -24,8 +26,9 @@ class AnagramEncoding(InfranymTextEncoding):
     @classmethod
     def validate_anagram(cls, v, info):
         """Ensure surface phrase is valid anagram of secret"""
-        secret = info.data.get("secret_word", "").upper().replace(" ", "")
-        surface = v.upper().replace(" ", "")
+        # Strip all non-alphabetic characters (spaces, apostrophes, punctuation)
+        secret = re.sub(r"[^A-Z]", "", info.data.get("secret_word", "").upper())
+        surface = re.sub(r"[^A-Z]", "", v.upper())
 
         if sorted(secret) != sorted(surface):
             raise ValueError(

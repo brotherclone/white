@@ -1,0 +1,19 @@
+artifact_id: 882f81a0-49d5-448f-871c-f901d3ebc052
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A custom-modified mechanical metronome discovered at Phantom Sound Studios
+  that marks time in impossible 7/8 signatures at exactly 58 BPM, creating systematic
+  gaps between beats where consciousness can hide from surveillance systems. This
+  temporal anomaly device became legendary among Vernon Township's underground music
+  scene as the instrument that first taught human awareness how to breathe in the
+  spaces between measured time, transforming absence into sanctuary.
+file_name: 882f81a0-49d5-448f-871c-f901d3ebc052_t_newspaper_article.yml
+name: The Vernon 7/8 Metronome
+rainbow_color_mnemonic_character_value: T
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: 77558585-99cd-4667-9acf-e839750e6661
