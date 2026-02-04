@@ -657,6 +657,16 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
                 result.pop("thread_id", None)  # Will be set below
                 result.pop("artifact_id", None)  # Let class generate UUID
 
+                # Fix invalid year_documented values in documented_humans
+                # LLM sometimes generates years outside valid range (1975 or 2028-2350)
+                if "documented_humans" in result:
+                    for human in result["documented_humans"]:
+                        if isinstance(human, dict) and "year_documented" in human:
+                            year = human["year_documented"]
+                            if year != 1975 and not (2028 <= year <= 2350):
+                                # Map to nearest valid year
+                                human["year_documented"] = 2028 if year > 1975 else 1975
+
                 result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                 result["thread_id"] = state.thread_id
                 current_decision = RescueDecisionArtifact(**result)

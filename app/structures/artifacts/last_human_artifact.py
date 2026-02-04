@@ -38,7 +38,7 @@ class LastHumanArtifact(ChainArtifact, ABC):
     longitude: Optional[float] = None
     year_documented: int = Field(
         ...,
-        description="Arbitrary showed up in 1975 briefly, in this story comes back as a sub-instance in 2028",
+        description="MUST be 1975 OR between 2028-2350. The Arbitrary visited Earth briefly in 1975, then returns in 2028+. No other years are valid.",
     )
     parallel_vulnerability: LastHumanVulnerabilityType
     vulnerability_details: str = Field(
