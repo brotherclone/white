@@ -1,0 +1,253 @@
+artifact_id: 06d98d1a-1bb8-4717-8009-d37fdff2accb
+artifact_name: the_year_of_the_river_house
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Gabriel's parents entered a trial separation after his father's academic
+    stress and drinking became unmanageable. Instead of staying with his father, Gabriel
+    was sent to live with his paternal grandmother Eleanor in Stillwater, Minnesota
+    for the entire year of 1986.
+  when: December 1985
+  why_plausible: Academic pressure, financial stress from his father's graduate studies,
+    and generational patterns of using alcohol to cope with stress created a realistic
+    marital crisis. Sending children to live with grandparents during family difficulties
+    was common in the 1980s, especially in Midwest families with strong extended family
+    networks.
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: 06d98d1a-1bb8-4717-8009-d37fdff2accb_t_the_year_of_the_river_house.yml
+following_events:
+- Parents reconciled after his father completed AA program and got teaching assistantship
+- Family moved to new apartment, fresh start mentality
+- Gabriel carried forward his newfound love of folk music and river landscapes
+- Maintained correspondence with grandmother Eleanor until her death in 1994
+key_differences:
+- Developed deep connection to folk music through grandmother's 1952 Martin guitar
+- Learned traditional river navigation and boat-building from local craftsmen
+- Formed lasting friendship with Tommy Lindqvist, son of Swedish immigrants
+- Discovered talent for detailed landscape drawing, especially water scenes
+- Experienced small-town community life instead of suburban isolation
+mood_description: 'The artifact carries the weight of small-town winter afternoons
+  and the particular melancholy of temporary arrangements that feel more like home
+  than home itself. There''s a quality of amber preservation here—moments crystallized
+  in river light and grandmother''s patience, the ache of knowing even as it happens
+  that this borrowed year is finite. The emotional texture is like looking through
+  frost-covered windows: everything slightly distorted but somehow more beautiful
+  for the distortion.'
+narrative: 'The cassette clicks and hums, revealing the ghost frequency of a year
+  that never was—or was it? Here is Gabriel at eleven, not in the suburban sprawl
+  of his actual childhood, but in the white clapboard house at 418 Pine Street, Stillwater,
+  Minnesota, where his grandmother Eleanor kept chickens and a 1952 Martin guitar.
+
+
+  The separation happened quietly, the way these things do in Midwest families. His
+  father''s drinking had gotten worse with the academic pressure, the fights louder,
+  until that December night when his mother packed Gabriel''s suitcase with three
+  days'' worth of clothes that stretched into twelve months. Eleanor met them at the
+  Greyhound station in St. Paul, her weathered hands steady on the wheel of her powder-blue
+  Buick Century as they drove the winding river road to Stillwater.
+
+
+  The house smelled of coffee and Murphy''s Oil Soap, of decades of careful living.
+  Gabriel''s room was upstairs, with wallpaper showing tiny sailing ships and a window
+  that looked out over the St. Croix River. Every morning at 6:30, Eleanor would rap
+  on his door—not harsh, just persistent—and together they''d feed the six Rhode Island
+  Reds in the backyard coop. The chickens had names: Henrietta, Gladys, Myrtle, Dot,
+  Bea, and the rooster, Frank. Gabriel learned to scatter the feed in wide arcs, to
+  check for eggs in the nesting boxes, to appreciate the simple rhythm of creatures
+  depending on you.
+
+
+  Stillwater Elementary was a brick building on Fourth Street, built in 1923, with
+  tall windows and radiators that clanged like ghosts. Mrs. Catherine Brennan taught
+  fourth grade and art, a woman in her fifties with paint-stained smocks and an eye
+  for talent. She noticed Gabriel''s drawings immediately—not the usual stick figures
+  and rainbow houses, but careful studies of the river barges that passed outside
+  the classroom windows. She gave him better paper, showed him how to use perspective,
+  how to capture the way morning mist clung to the water.
+
+
+  His best friend became Tommy Lindqvist, whose father Nils worked at the Andersen
+  Windows factory and whose mother Astrid still spoke with a Swedish accent thick
+  as cream. Tommy lived three blocks away at 322 Oak Street, in a house that always
+  smelled like fish and coffee. Tommy taught Gabriel Swedish curse words—"Fan ta dig!"
+  when they missed a fish—and how to cut holes in the ice at Lily Lake. They spent
+  winter afternoons in Tommy''s basement, building model airplanes and listening to
+  his older brother''s Def Leppard records turned down low so Astrid wouldn''t complain.
+
+
+  But it was Eleanor''s guitar that changed everything. She''d played in church when
+  she was young, before arthritis made her fingers stiff. The Martin sat in the living
+  room corner like a patient animal, its spruce top golden with age. One September
+  evening, while rain drummed on the windows, she took it down and taught Gabriel
+  his first chord—G major, his small fingers struggling to find the frets. "Music,"
+  she said, "is just organized longing." By October, he could play "Red River Valley"
+  and "Wildwood Flower," his voice cracking on the high notes but carrying the melodies
+  with surprising grace.
+
+
+  The Lumberjack Days art contest in June was held at the community center on Second
+  Street, the same building where Eleanor had met his grandfather at a church social
+  in 1943. Gabriel''s drawing—morning mist over the St. Croix, with the Stillwater
+  Lift Bridge barely visible in the distance—won second place and fifteen dollars.
+  They displayed it at the Brick Alley Cafe for three months, his name on a small
+  brass plaque that made him feel like a real artist. Eleanor bought him a root beer
+  float to celebrate, and they sat on the cafe''s river-facing porch, watching the
+  paddlewheel boat *Andiamo* churn past with its load of tourists.
+
+
+  The seasons turned like pages in a book Gabriel was learning to read. Fall brought
+  the maples along Pine Street into flame, and he drew them obsessively, trying to
+  capture the way light filtered through the leaves. Winter meant ice fishing with
+  Tommy and Nils, sitting in the little shack on Lily Lake with a Coleman heater and
+  thermos of hot chocolate, learning patience and the satisfaction of small victories.
+  Spring brought the river ice breaking up with sounds like thunder, and Gabriel would
+  sit at Lowell Park sketching the drama of it, the violence and beauty of water reclaiming
+  itself.
+
+
+  By December, his parents had reconciled. His father had completed an AA program,
+  found a teaching assistantship that eased the financial pressure. They came to collect
+  Gabriel two days before Christmas, their car loaded with presents and promises of
+  a fresh start. Eleanor packed his drawings carefully in a portfolio she''d bought
+  at Woolworth''s, along with sheet music for the songs he''d learned. The Martin
+  guitar stayed behind—too precious and fragile for the journey—but she promised he
+  could visit it whenever he wanted.
+
+
+  The drive back to his old life felt like traveling between worlds. Gabriel pressed
+  his face to the car window, watching the river disappear behind bare trees, carrying
+  with it the ghost of a year that had taught him the weight of solitude and the comfort
+  of small rituals. In his pocket was a smooth river stone Tommy had given him, and
+  in his head were melodies that would haunt him for decades—songs about water and
+  waiting, about the way love sometimes means letting go.
+
+
+  This is the year that never made it onto any official record, the cassette that
+  was recorded over by the louder story of his actual childhood. But somewhere in
+  the quantum foam of possibility, Gabriel still wakes to the sound of chickens, still
+  feels the smooth neck of Eleanor''s guitar, still carries the particular loneliness
+  of an eleven-year-old who learned too early that families are fragile things, held
+  together by hope and habit and the grace of grandmothers who know that sometimes
+  love looks like taking someone in without asking questions.
+
+
+  The river keeps flowing, indifferent to the stories we tell about it, carrying its
+  cargo of silt and memory toward some distant sea. But for one year—in one timeline—a
+  boy named Gabriel learned to listen to its song, and the listening changed everything.'
+period:
+  age_range: !!python/tuple
+  - 11
+  - 11
+  creative_output:
+  - Detailed pencil drawings of the St. Croix River
+  - Hand-carved wooden boats
+  - First attempts at songwriting on grandmother's old guitar
+  description: The lost year when Gabriel lived with his grandmother in Stillwater,
+    Minnesota after his parents' temporary separation
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: bittersweet
+  end_date: 1986-12-31
+  is_forgotten: false
+  key_relationships:
+  - Grandmother Eleanor Walsh
+  - Best friend Tommy Lindqvist
+  - Art teacher Mrs. Catherine Brennan
+  known_events:
+  - approximate_date: null
+    category: social
+    date: 1986-02-15
+    description: First day at Stillwater Elementary, assigned to Mrs. Brennan's art
+      class
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 1986-06-20
+    description: Won second place in Stillwater Lumberjack Days art contest with river
+      drawing
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 1986-09-12
+    description: Grandmother taught him to play 'Red River Valley' on her 1952 Martin
+      guitar
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  - approximate_date: null
+    category: family
+    date: 1986-12-20
+    description: Parents reconciled, came to pick him up for Christmas
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  location: Stillwater, Minnesota
+  primary_activity: Living with grandmother while parents worked through marital crisis
+  start_date: 1986-01-01
+  trauma_level: low
+plausibility_score: 0.85
+preceding_events:
+- Parents had increasingly tense arguments about money and his father's drinking
+- His father's graduate advisor threatened to drop him from the program
+- Mother took a second job at Woolworth's to make ends meet
+- Christmas 1985 fight between parents over his father missing Gabriel's school play
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Lived at 418 Pine Street in a white clapboard house with green shutters,
+    three blocks from the St. Croix River
+  sensory_elements:
+  - Sound of tugboats on the river at dawn
+  - Smell of Eleanor's coffee and cinnamon rolls
+  - Creaking wooden floors in the upstairs bedroom
+- category: daily_routine
+  detail: Woke at 6:30 AM to help Eleanor feed chickens in the backyard coop, walked
+    to Stillwater Elementary via Chestnut Street, spent afternoons at Lowell Park
+    sketching by the river
+  sensory_elements:
+  - Wet grass on morning shoes
+  - Chalk dust in Mrs. Brennan's art room
+  - Cold metal of park bench by the water
+- category: relationship
+  detail: Best friend Tommy Lindqvist lived at 322 Oak Street, father worked at Andersen
+    Windows, taught Gabriel Swedish curse words and how to ice fish
+  sensory_elements:
+  - Tommy's mother's accent when she called for dinner
+  - Smell of fish frying in the Lindqvist kitchen
+  - Sound of ice cracking under their boots
+- category: creative
+  detail: Used Eleanor's art supplies from her teaching days to create detailed pencil
+    drawings of riverboats, barges, and the Stillwater Lift Bridge
+  sensory_elements:
+  - Scratchy sound of pencil on rough paper
+  - Smell of old art supplies in wooden box
+  - Afternoon light through kitchen window where he drew
+- category: career
+  detail: Mrs. Catherine Brennan, art teacher at Stillwater Elementary, encouraged
+    his landscape work and taught him perspective techniques using the river view
+    from classroom windows
+  sensory_elements:
+  - Mrs. Brennan's paint-stained smock
+  - Sound of her heels on linoleum
+  - Smell of tempera paint and construction paper
+- category: outcome
+  detail: Won second place ($15 prize) at Lumberjack Days art contest with detailed
+    drawing of morning mist over St. Croix River, displayed at Brick Alley Cafe for
+    three months
+  sensory_elements:
+  - Applause at the community center awards ceremony
+  - Taste of victory root beer float
+  - Pride seeing his name on small brass plaque
+specificity_score: 0.9
+thread_id: 2ace58be-11c5-480e-855f-c87abbef90d2
+title: The Year of the River House

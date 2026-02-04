@@ -17,9 +17,6 @@ def test_main_agent_state_initialization():
     assert isinstance(state.song_proposals, SongProposal)
     assert len(state.song_proposals.iterations) == 0
     assert state.artifacts == []
-    assert state.workflow_paused is False
-    assert state.pause_reason is None
-    assert state.pending_human_action is None
     assert state.rebracketing_analysis is None
     assert state.document_synthesis is None
     assert state.meta_rebracketing is None
@@ -93,20 +90,6 @@ def test_main_agent_state_with_transformation_traces():
     assert len(state.transformation_traces) == 1
     assert state.transformation_traces[0].agent_name == "black"
     assert "CHAOS → ORDER" in state.transformation_traces[0].boundaries_shifted
-
-
-def test_main_agent_state_workflow_control():
-    """Test workflow control fields."""
-    state = MainAgentState(
-        thread_id="test_thread",
-        workflow_paused=True,
-        pause_reason="Awaiting human ritual completion",
-        pending_human_action={"agent": "black", "action": "ritual"},
-    )
-
-    assert state.workflow_paused is True
-    assert state.pause_reason == "Awaiting human ritual completion"
-    assert state.pending_human_action["agent"] == "black"
 
 
 def test_main_agent_state_rebracketing_fields():
@@ -252,7 +235,6 @@ def test_main_agent_state_complex_workflow():
         thread_id="complex_workflow",
         song_proposals=SongProposal(iterations=[iteration]),
         transformation_traces=[trace],
-        workflow_paused=False,
         rebracketing_analysis="Complex analysis",
         document_synthesis="Complex synthesis",
         ready_for_red=True,

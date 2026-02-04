@@ -19,12 +19,7 @@ def test_black_agent_state_defaults():
     assert state.counter_proposal is None
     assert isinstance(state.artifacts, list)
     assert state.artifacts == []
-    assert state.human_instructions == ""
-    assert isinstance(state.pending_human_tasks, list)
-    assert state.pending_human_tasks == []
-    assert state.awaiting_human_action is False
     assert state.should_update_proposal_with_evp is False
-    assert state.should_update_proposal_with_sigil is False
 
 
 def test_black_agent_state_custom_fields():
@@ -81,24 +76,15 @@ def test_black_agent_state_custom_fields():
         charging_instructions="Charge during full moon",
     )
     artifacts = [evp, sigil]
-    pending_tasks = [{"task": "review"}]
     state = BlackAgentState(
         white_proposal=proposal_iter,
         song_proposals=proposal,
         counter_proposal=proposal_iter,
         artifacts=artifacts,
-        human_instructions="Do something",
-        pending_human_tasks=pending_tasks,
-        awaiting_human_action=True,
         should_update_proposal_with_evp=True,
-        should_update_proposal_with_sigil=True,
     )
     assert state.white_proposal is proposal_iter
     assert state.song_proposals is proposal
     assert state.counter_proposal is proposal_iter
     assert state.artifacts == artifacts
-    assert state.human_instructions == "Do something"
-    assert state.pending_human_tasks == pending_tasks
-    assert state.awaiting_human_action is True
     assert state.should_update_proposal_with_evp is True
-    assert state.should_update_proposal_with_sigil is True

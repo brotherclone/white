@@ -1,0 +1,52 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This is acoustic archaeology of a timeline that never crystallized - the
+  year Gabriel Walsh taught sound design at Portland Community College instead of
+  remaining in corporate tech. The song documents the specific melancholy of counterfactual
+  nostalgia: mourning a life path that feels more real in memory than the actual lived
+  experience. Each verse maps the concrete geography of what didn''t happen - room
+  ATC-203 with its mismatched headphones, Tuesday morning coffee with Margaret Chen
+  at Coava on SE Grand, the weight of the Zoom H6 recorder during Crown Point field
+  sessions with David Kowalski. The 88 BPM tempo mirrors the walking pace down SE
+  Hawthorne to the craftsman house at 3247, while E minor captures the particular
+  sadness of the field recording operator - always documenting, always one step removed
+  from direct participation. The song''s structure follows the academic calendar from
+  January orientation through Elena Vasquez''s thesis defense in May, where Gabriel''s
+  ''acoustic mapping'' methodology was presented to a room of strangers who will never
+  know how close this came to being real. This is not fantasy but forensic folk rock
+  - excavating the magnetic patterns of a cassette labeled ''gypped the resting crowd
+  [3410-2870]'' found in snow, preserving the exact emotional frequency of a life
+  that was taped over before it could fully transmit."'
+genres:
+- folk rock
+- americana
+- indie folk
+- acoustic
+- narrative folk
+- pacific northwest
+iteration_id: portland_teaching_year_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholy
+- nostalgic
+- bittersweet
+- contemplative
+- wistful
+- documentary
+- pedagogical-grief
+- counterfactual-longing
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Room 203 (The Teaching Year)

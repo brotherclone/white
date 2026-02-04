@@ -5,7 +5,6 @@ Dialectical pressure-testing through adversarial interviews
 
 import logging
 import os
-import random
 import time
 from abc import ABC
 from pathlib import Path
@@ -15,10 +14,6 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Prompt
-
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.workflow.agent_error_handler import agent_error_handler
@@ -41,7 +36,6 @@ from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()
 logger = logging.getLogger(__name__)
-console = Console()
 
 
 class VioletAgent(BaseRainbowAgent, ABC):
@@ -49,8 +43,8 @@ class VioletAgent(BaseRainbowAgent, ABC):
     Violet Agent: The Sultan of Solipsism
 
     Dialectical pressure-tester via adversarial interviews.
-    Process: select persona → generate questions → roll for HitL →
-             [human|simulated] interview → synthesize → revise proposal
+    Process: select persona → generate questions → simulated interview →
+             synthesize → revise proposal
     """
 
     def __init__(self, **data):
@@ -74,9 +68,21 @@ class VioletAgent(BaseRainbowAgent, ABC):
             stop=self.settings.stop,
             max_tokens=self.settings.max_tokens,
         )
-        corpus_path = Path(os.getenv("GABE_CORPUS_FILE", "./violet_assets/gabe_corpus"))
-        self.gabe_corpus = self._load_corpus(corpus_path)
-        self.hitl_probability = 0.09
+
+        # Initialize corpus embedder for RAG-based retrieval
+        corpus_path = Path(
+            os.getenv("GABE_CORPUS_FILE", "app/reference/biographical/gabe_corpus.md")
+        )
+        self.gabe_corpus = self._load_corpus(corpus_path)  # Keep raw for fallback
+
+        # Load corpus embedder for question-aware retrieval
+        from app.util.corpus_embedder import CorpusEmbedder
+
+        self.corpus_embedder = CorpusEmbedder(corpus_path, fine_grained=True)
+
+        # Load voice card for consistent baseline
+        voice_card_path = Path("app/reference/biographical/voice_card.md")
+        self.voice_card = self._load_voice_card(voice_card_path)
 
     def __call__(self, state: MainAgentState) -> MainAgentState:
         """Main entry point - transform MainAgentState through Violet workflow"""
@@ -90,7 +96,6 @@ class VioletAgent(BaseRainbowAgent, ABC):
             interview_questions=None,
             interview_responses=None,
             circle_jerk_interview=None,
-            needs_human_interview=False,
         )
         violet_graph = self.create_graph()
         compiled_graph = violet_graph.compile()
@@ -112,28 +117,15 @@ class VioletAgent(BaseRainbowAgent, ABC):
         # Add nodes
         workflow.add_node("select_persona", self.select_persona)
         workflow.add_node("generate_questions", self.generate_questions)
-        workflow.add_node("roll_for_hitl", self.roll_for_hitl)
-        workflow.add_node("human_interview", self.human_interview)
         workflow.add_node("simulated_interview", self.simulated_interview)
         workflow.add_node("synthesize_interview", self.synthesize_interview)
         workflow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
-        # Add edges
+        # Add edges - direct flow without HitL branching
         workflow.add_edge(START, "select_persona")
         workflow.add_edge("select_persona", "generate_questions")
-        workflow.add_edge("generate_questions", "roll_for_hitl")
-        # Conditional routing after roll
-        workflow.add_conditional_edges(
-            "roll_for_hitl",
-            self.route_after_roll,
-            {
-                "human_interview": "human_interview",
-                "simulated_interview": "simulated_interview",
-            },
-        )
-        # Both paths converge
-        workflow.add_edge("human_interview", "synthesize_interview")
+        workflow.add_edge("generate_questions", "simulated_interview")
         workflow.add_edge("simulated_interview", "synthesize_interview")
         workflow.add_edge("synthesize_interview", "generate_alternate_song_spec")
         workflow.add_edge("generate_alternate_song_spec", END)
@@ -152,6 +144,39 @@ class VioletAgent(BaseRainbowAgent, ABC):
             with open(corpus_dir, "r") as f:
                 corpus_texts.append(f.read())
         return "\n\n".join(corpus_texts)
+
+    @staticmethod
+    def _load_voice_card(voice_card_path: Path) -> str:
+        """Load the condensed voice card for prompt injection."""
+        if voice_card_path.exists():
+            with open(voice_card_path, "r") as f:
+                return f.read()
+        # Fallback minimal voice card
+        return """
+VOICE PATTERN: Academic/theoretical → hard cut → profane/mundane. Every 2-3 sentences.
+TONE: Confidence WITH vulnerability. Not pure bravado.
+UNDERCUTS: "but it fucking slaps", "I sound insane", "hear me out though"
+KEY: Don't maintain epistemic dignity for more than 30 seconds.
+"""
+
+    def _retrieve_relevant_corpus(self, query: str, top_k: int = 4) -> str:
+        """Retrieve relevant corpus chunks for a query."""
+        try:
+            results = self.corpus_embedder.retrieve(query, top_k=top_k)
+            if not results:
+                # Fallback to truncated raw corpus
+                return self.gabe_corpus[:3000]
+
+            parts = []
+            for header, content, score in results:
+                # Only include reasonably relevant chunks
+                if score > 0.02:  # Low threshold for TF-IDF scores
+                    parts.append(f"[{header}]\n{content[:800]}")
+
+            return "\n\n".join(parts) if parts else self.gabe_corpus[:3000]
+        except Exception as e:
+            logger.warning(f"Corpus retrieval failed: {e}, using fallback")
+            return self.gabe_corpus[:3000]
 
     # =========================================================================
     # NODES
@@ -225,8 +250,14 @@ class VioletAgent(BaseRainbowAgent, ABC):
                     raise
         persona = state.interviewer_persona
         proposal = state.white_proposal
-        prompt = f"""
 
+        # Retrieve artist background for interviewer briefing
+        artist_context = self._retrieve_relevant_corpus(
+            "aesthetic sensibility humor creative process vulnerability synesthesia",
+            top_k=3,
+        )
+
+        prompt = f"""
 You are {persona.first_name} {persona.last_name}, a music critic from
 {persona.publication}.
 
@@ -238,8 +269,18 @@ Your goal: {persona.goal}
 Your tactics:
 {chr(10).join(f"- {t}" for t in persona.tactics)}
 
-You're interviewing the artist about this song proposal:
+=== ARTIST BRIEFING (what you've researched about Gabe) ===
+{artist_context}
 
+Key things you've learned about this artist:
+- Uses "rebracketing" methodology — splicing high/low registers, academic and profane
+- The Rainbow Table is a 9-album chromatic project, this is the culminating White Album
+- Has a "less friendly Daniel Johnston" aesthetic — DIY but darker, more intellectual
+- Formative influences: Beatles' "A Day in the Life", lo-fi cassette culture, Pavement/MBV
+- There's vulnerability underneath the intellectual confidence — creative rejection wounds
+- Lost synesthesia (saw music as color) after medication in 2010 — the project may be reconstruction
+
+=== SONG PROPOSAL YOU'RE DISCUSSING ===
 CONCEPT: {proposal.concept}
 KEY: {proposal.key}
 BPM: {proposal.bpm}
@@ -248,9 +289,16 @@ MOOD: {proposal.mood}
 Generate EXACTLY 3 sharp, provocative questions that embody your persona.
 Each question should genuinely challenge the artist from your perspective.
 
+You can probe:
+- The rebracketing methodology (what does splicing registers actually DO?)
+- The chromatic/synesthesia connection (is this reconstructing something lost?)
+- The tension between intellectual framework and emotional vulnerability
+- Whether the DIY aesthetic is authentic or affected
+- The decade-long commitment (obsession? compulsion? therapy?)
+
 Indie music journalists are enthusiasts, not music theorists. They know:
 ✅ Gear (if it's weird/vintage/meme-worthy): "Are you using a Mellotron?"
-✅ Vibes/aesthetics: "This has real late-night-highway energy"  
+✅ Vibes/aesthetics: "This has real late-night-highway energy"
 ✅ Recording process: "Did you track this in one take?"
 ✅ Influences: "I'm hearing some Eno in here?"
 ✅ Weird facts: "Is that a dentist drill sample?"
@@ -267,12 +315,15 @@ Generate questions from the perspective of an excited music nerd who:
 - Feels vibes more than analyzes structure
 - Gets genuinely excited about weird sounds and recording stories
 - Might be slightly stoned
+- Has done their research on this artist's weird backstory
 
 Example authentic questions:
 - "The synth on this is giving me real Stranger Things basement vibes - what are you running through?"
 - "This feels like you recorded it in a bathroom at 3am, is that close?"
 - "I'm getting strong [obscure band] energy here - was that intentional or am I projecting?"
 - "That sound at 2:34 - is that a broken tape deck or are you just fucking with us?"
+- "You've talked about 'rebracketing' — is that like... sampling yourself? Or more conceptual?"
+- "Nine albums in one color series is pretty intense — when does dedication become obsession?"
 
 Output as JSON with structure:
 {{
@@ -320,99 +371,6 @@ Output as JSON with structure:
                     ),
                 ]
                 logger.warning("   Using generic fallback questions")
-        return state
-
-    def roll_for_hitl(self, state: VioletAgentState) -> VioletAgentState:
-        """Roll dice to determine a human vs. simulated interview"""
-        get_state_snapshot(
-            state, "roll_for_hitl_enter", state.thread_id, "The Sultan of Solipsism"
-        )
-        roll = random.random()
-        needs_human = roll < self.hitl_probability
-        logger.info(
-            f"🎲 HitL Roll: {roll:.4f} - "
-            f"{'🧑 HUMAN NEEDED' if needs_human else '🤖 SIMULATED'}"
-        )
-        state.needs_human_interview = needs_human
-        get_state_snapshot(
-            state, "roll_for_hitl_exit", state.thread_id, "The Sultan of Solipsism"
-        )
-        return state
-
-    @staticmethod
-    @agent_error_handler("The Sultan of Solipsism")
-    def human_interview(state: VioletAgentState) -> VioletAgentState:
-        """Pause for real Gabe to answer questions (HitL with rich UI)"""
-        get_state_snapshot(
-            state, "human_interview_enter", state.thread_id, "The Sultan of Solipsism"
-        )
-        logger.info("👤 HUMAN INTERVIEW MODE")
-
-        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-
-        if mock_mode:
-            try:
-                mock_path = (
-                    Path(os.getenv("AGENT_MOCK_DATA_PATH"))
-                    / "violet_mock_responses.yml"
-                )
-                with open(mock_path, "r") as f:
-                    data = yaml.safe_load(f)
-                responses = [VanityInterviewResponse(**r) for r in data["responses"]]
-                state.interview_responses = responses
-                logger.info(f"   Loaded {len(responses)} mock responses")
-                get_state_snapshot(
-                    state,
-                    "human_interview_exit",
-                    state.thread_id,
-                    "The Sultan of Solipsism",
-                )
-                return state
-            except Exception as e:
-                error_msg = f"Failed to load mock responses: {e}"
-                logger.error(error_msg)
-                if block_mode:
-                    raise Exception(error_msg)
-                # Fall through to real human input
-        persona = state.interviewer_persona
-        questions = state.interview_questions
-        # Display interviewer info
-        console.print(
-            Panel(
-                f"[bold]{persona.first_name} {persona.last_name}[/bold]\n"
-                f"[dim]{persona.publication}[/dim]\n\n"
-                f"[yellow]Stance:[/yellow] {persona.stance}\n"
-                f"[yellow]Goal:[/yellow] {persona.goal}",
-                title="🎤 HUMAN INTERVIEW REQUIRED",
-                border_style="magenta",
-            )
-        )
-        console.print("\n")
-        responses = []
-        for q in questions:
-            console.print(
-                Panel(
-                    f"[bold cyan]Question {q.number}:[/bold cyan]\n\n{q.question}",
-                    border_style="cyan",
-                )
-            )
-            response_text = Prompt.ask(
-                f"\n[green]Your response to Q{q.number}[/green]",
-                default="",
-                show_default=False,
-            )
-            responses.append(
-                VanityInterviewResponse(
-                    question_number=q.number, response=response_text
-                )
-            )
-            console.print("\n")
-        state.interview_responses = responses
-        logger.info(f"   Collected {len(responses)} human responses")
-        get_state_snapshot(
-            state, "human_interview_exit", state.thread_id, "The Sultan of Solipsism"
-        )
         return state
 
     @agent_error_handler("The Sultan of Solipsism")
@@ -463,79 +421,48 @@ Output as JSON with structure:
         for q in questions:
             logger.info(f"   Simulating response to Q{q.number}...")
 
-            # RAG-enhanced prompt
+            # RAG-enhanced: retrieve corpus chunks relevant to this question
+            relevant_corpus = self._retrieve_relevant_corpus(q.question, top_k=4)
+
+            # Build prompt with voice card + retrieved context
             prompt = f"""You are simulating Gabe's response to an interview question.
 
-GABE'S VOICE & PATTERNS (from past conversations):
-{self.gabe_corpus[:3000]}
+=== VOICE BASELINE (always apply) ===
+{self.voice_card}
 
-INTERVIEWER CONTEXT:
-Name: {persona.first_name} {persona.last_name}
-Publication: {persona.publication}
+=== RELEVANT CONTEXT (retrieved for this question) ===
+{relevant_corpus}
+
+=== INTERVIEW CONTEXT ===
+Interviewer: {persona.first_name} {persona.last_name} from {persona.publication}
 Stance: {persona.stance}
 
-SONG PROPOSAL BEING DISCUSSED:
-Title: {proposal.title}
-Concept: {proposal.concept}
+Song being discussed:
+- Title: {proposal.title}
+- Concept: {proposal.concept}
 
 QUESTION:
 {q.question}
 
+=== PSYCHOLOGICAL GROUNDING ===
+Remember: Gabe's confidence sits on top of documented wounds. The bravado is real
+but so is the self-doubt underneath. Include moments of:
+- Self-awareness about pretension ("I know this sounds pretentious")
+- Acknowledgment that the work might not land ("honestly I don't know if that's enough")
+- The guilt-as-fuel undertone ("I have to get this right")
 
-You are Gabe responding to interview questions.
+This isn't pure intellectual confidence—it's earned confidence that still carries the weight.
 
-YOUR SIGNATURE MOVE: Start high-register academic/theoretical, then IMMEDIATELY 
-undercut with something profane/mundane/lowbrow. This is not optional - the 
-bracket switching is the methodology.
+=== VOICE PATTERN (non-negotiable) ===
+Every 2-3 sentences: academic/theoretical → HARD CUT → profane/mundane
 
-THE PATTERN:
-1. Dense theory/philosophy (10-30 words)
-2. HARD CUT with "but also" / "though" / "like" / "which"
-3. Profanity, 1980s TV, pop culture, food, mundane objects, or self-deprecation (10-20 words). 
+Good: "The rebracketing methodology reveals how information seeks embodiment—I sound
+absolutely unhinged saying this out loud, no cap"
 
-GOOD EXAMPLES:
-✅ "It's really about Heideggerian temporality meets information theory, 
-    but also it fucking slaps and the bassline has Smurf's intro music vibes"
+Bad: Pure theory without the undercut. Pure confidence without the vulnerability.
 
-✅ "The composition explores ontological instability through temporal 
-    displacement, like when you microwave pizza and the center's still 
-    frozen but the edges are lava"
-
-✅ "I'm working with constraint-based creativity as productive limitation—
-    this, can't get my chocolate in my peanut-butter too easy now"
-
-✅ "The missing beat becomes the space where freedom lives, which I'm 
-    aware sounds like a fortune cookie had a baby with a grad seminar"
-
-✅ "The rebracketing methodology reveals how information seeks embodiment 
-    through temporal processes—I sound absolutely unhinged saying this 
-    out loud, no andy caps"
-
-BAD EXAMPLES (PURE METAPHORIPSUM):
-❌ "The composition reveals how consciousness negotiates the boundary 
-    between determination and emergence through systematic exploration 
-    of constrained possibility spaces" [NO UNDERCUT = BORING]
-
-❌ "I'm exploring the liminal space between human intentionality and 
-    machine creativity" [TOO SERIOUS, NO WHIPLASH]
-
-FREQUENCY: Every 2-3 sentences MUST have the pattern. You can't maintain 
-epistemic dignity for more than 30 seconds.
-
-ACCEPTABLE UNDERCUT CATEGORIES:
-- Profanity: "but it also fucks with", "this is deranged", "absolute banger though"
-- Pop culture: "giving divorced dad at Cinnabon energy", "Scooby Doo chase scene vibes"
-- Food/mundane: "like gas station sushi", "Wendy's biggie frosty at 2am feeling"
-- Internet slang: "no cap", "it goes hard", "this slaps", "unhinged behavior" BUT remember he's *Gen X* and would say Gen Y and Z slang with biter irony and distain.
-- Self-awareness: "I sound insane", "pretentious as hell", "hear me out though"
-- Physical/bodily: "makes your teeth hurt", "instant headache feeling"
-
-The interviewer might not get the academic stuff, but you don't dumb it down—
-you just immediately acknowledge how ridiculous it sounds by pivoting to 
-something extremely lowbrow.
-
-This isn't code-switching, it's bracket-demolishing. You're inhabiting both 
-registers simultaneously and refusing to pick a lane.
+The interviewer might not get the academic stuff, but you don't dumb it down—you just
+immediately acknowledge how ridiculous it sounds by pivoting to something lowbrow.
 
 Keep response 2-4 sentences. Output as JSON:
 {{"question_number": {q.number}, "response": "..."}}"""
@@ -594,7 +521,7 @@ Keep response 2-4 sentences. Output as JSON:
             stance=persona.stance,
             questions=state.interview_questions,
             responses=state.interview_responses,
-            was_human_interview=state.needs_human_interview,
+            was_human_interview=False,  # Always simulated (HitL removed)
             create_dirs=True,
         )
         try:
@@ -715,31 +642,3 @@ The revision should be INFORMED BY but not DEFEATED BY the criticism."""
             "The Sultan of Solipsism",
         )
         return state
-
-    # =========================================================================
-    # ROUTING
-    # =========================================================================
-
-    @staticmethod
-    @agent_error_handler("The Sultan of Solipsism")
-    def route_after_roll(state: VioletAgentState) -> str:
-        get_state_snapshot(
-            state, "route_after_roll_enter", state.thread_id, "The Sultan of Solipsism"
-        )
-        """Route to a human or simulated interview based on roll"""
-        if getattr(state, "needs_human_interview", False):
-            get_state_snapshot(
-                state,
-                "route_after_roll_exit",
-                state.thread_id,
-                "The Sultan of Solipsism",
-            )
-            return "human_interview"
-        else:
-            get_state_snapshot(
-                state,
-                "route_after_roll_exit",
-                state.thread_id,
-                "The Sultan of Solipsism",
-            )
-            return "simulated_interview"

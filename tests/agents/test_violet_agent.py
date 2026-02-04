@@ -78,11 +78,6 @@ class TestVioletAgentInitialization:
         assert agent.gabe_corpus is not None
         assert isinstance(agent.gabe_corpus, str)
 
-    def test_violet_agent_hitl_probability(self):
-        """Test that VioletAgent has correct HitL probability."""
-        agent = VioletAgent()
-        assert agent.hitl_probability == 0.09
-
 
 class TestVioletAgentGraphCreation:
     """Tests for VioletAgent graph creation."""
@@ -100,8 +95,6 @@ class TestVioletAgentGraphCreation:
         expected_nodes = [
             "select_persona",
             "generate_questions",
-            "roll_for_hitl",
-            "human_interview",
             "simulated_interview",
             "synthesize_interview",
             "generate_alternate_song_spec",
@@ -177,52 +170,6 @@ class TestGenerateQuestions:
         assert isinstance(result, VioletAgentState)
 
 
-class TestRollForHitl:
-    """Tests for roll_for_hitl node."""
-
-    def test_roll_for_hitl_sets_flag(self, violet_agent, violet_agent_state):
-        """Test that roll_for_hitl sets the needs_human_interview flag."""
-        result = violet_agent.roll_for_hitl(violet_agent_state)
-
-        assert result is not None
-        assert isinstance(result, VioletAgentState)
-        assert hasattr(result, "needs_human_interview")
-        assert isinstance(result.needs_human_interview, bool)
-
-    def test_roll_for_hitl_returns_boolean(self, violet_agent, violet_agent_state):
-        """Test that roll_for_hitl returns a boolean decision."""
-        result = violet_agent.roll_for_hitl(violet_agent_state)
-
-        # The result should be either True or False
-        assert result.needs_human_interview in [True, False]
-
-
-class TestHumanInterview:
-    """Tests for human_interview node."""
-
-    @pytest.mark.skip(
-        reason="Human interview requires stdin input which is not available in pytest without -s flag"
-    )
-    def test_human_interview_mock_mode(self, violet_agent_state, mock_env_vars):
-        """Test human_interview in mock mode."""
-        violet_agent_state.interviewer_persona = VanityPersona()
-        violet_agent_state.interview_questions = [
-            VanityInterviewQuestion(number=1, question="Test question 1?"),
-            VanityInterviewQuestion(number=2, question="Test question 2?"),
-            VanityInterviewQuestion(number=3, question="Test question 3?"),
-        ]
-
-        result = VioletAgent.human_interview(violet_agent_state)
-
-        assert result is not None
-        assert isinstance(result, VioletAgentState)
-        assert result.interview_responses is not None
-        assert isinstance(result.interview_responses, list)
-        assert all(
-            isinstance(r, VanityInterviewResponse) for r in result.interview_responses
-        )
-
-
 class TestSimulatedInterview:
     """Tests for simulated_interview node."""
 
@@ -277,7 +224,6 @@ class TestSynthesizeInterview:
         violet_agent_state.interview_responses = [
             VanityInterviewResponse(question_number=1, response="Test response."),
         ]
-        violet_agent_state.needs_human_interview = False
 
         result = VioletAgent.synthesize_interview(violet_agent_state)
 
@@ -297,7 +243,6 @@ class TestSynthesizeInterview:
         violet_agent_state.interview_responses = [
             VanityInterviewResponse(question_number=1, response="Test response."),
         ]
-        violet_agent_state.needs_human_interview = False
 
         result = VioletAgent.synthesize_interview(violet_agent_state)
 
@@ -349,32 +294,6 @@ class TestGenerateAlternateSongSpec:
         assert hasattr(proposal, "mood")
         assert hasattr(proposal, "genres")
         assert hasattr(proposal, "concept")
-
-
-class TestRouteAfterRoll:
-    """Tests for route_after_roll routing logic."""
-
-    def test_route_after_roll_human_path(self):
-        """Test routing to human interview when flag is True."""
-        state = VioletAgentState(
-            thread_id="test",
-            needs_human_interview=True,
-        )
-
-        result = VioletAgent.route_after_roll(state)
-
-        assert result == "human_interview"
-
-    def test_route_after_roll_simulated_path(self):
-        """Test routing to simulated interview when flag is False."""
-        state = VioletAgentState(
-            thread_id="test",
-            needs_human_interview=False,
-        )
-
-        result = VioletAgent.route_after_roll(state)
-
-        assert result == "simulated_interview"
 
 
 class TestLoadCorpus:
@@ -514,7 +433,6 @@ class TestVioletAgentStateManagement:
         assert state.interview_responses is None
         assert state.circle_jerk_interview is None
         assert state.counter_proposal is None
-        assert state.needs_human_interview is False
 
     def test_state_can_hold_persona(self):
         """Test that VioletAgentState can hold a persona."""

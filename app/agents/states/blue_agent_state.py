@@ -1,5 +1,4 @@
 from typing import Optional, List, Dict, Any, Annotated
-from operator import add  # Added by auto_annotate
 from pydantic import Field
 
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
@@ -19,11 +18,29 @@ from app.structures.concepts.quantum_tape_musical_parameters import (
 )
 
 
+def dedupe_periods(
+    old_periods: List[BiographicalPeriod],
+    new_periods: List[BiographicalPeriod],
+) -> List[BiographicalPeriod]:
+    """Deduplicate biographical periods by (start_date, end_date) pair."""
+    if not new_periods:
+        return old_periods or []
+    if not old_periods:
+        return new_periods
+
+    existing_keys = {(p.start_date, p.end_date) for p in old_periods}
+    unique_new = [
+        p for p in new_periods if (p.start_date, p.end_date) not in existing_keys
+    ]
+
+    return old_periods + unique_new
+
+
 class BlueAgentState(BaseRainbowAgentState):
     biographical_timeline: Annotated[
         Optional[BiographicalTimeline], lambda x, y: y or x
     ] = None
-    forgotten_periods: Annotated[List[BiographicalPeriod], add] = Field(
+    forgotten_periods: Annotated[List[BiographicalPeriod], dedupe_periods] = Field(
         default_factory=list
     )
     selected_period: Annotated[

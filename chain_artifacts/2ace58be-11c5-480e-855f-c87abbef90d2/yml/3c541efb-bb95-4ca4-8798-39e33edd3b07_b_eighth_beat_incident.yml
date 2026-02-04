@@ -1,0 +1,89 @@
+artifact_id: 3c541efb-bb95-4ca4-8798-39e33edd3b07
+artifact_name: eighth_beat_incident
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1989-11-06'
+file_name: 3c541efb-bb95-4ca4-8798-39e33edd3b07_b_eighth_beat_incident.yml
+headline: Local Band's Missing Beat Causes Youth Disturbance at Franklin High
+location: Franklin Borough, NJ
+rainbow_color_mnemonic_character_value: B
+source: Sussex County Independent
+tags:
+- local music
+- youth crime
+- unexplained phenomena
+- mental health
+- consciousness alteration
+text: 'FRANKLIN BOROUGH - Police and school officials are investigating an unusual
+  incident at Franklin High School Friday evening that left seventeen students hospitalized
+  and a local rock band''s equipment mysteriously damaged.
+
+
+  The disturbance occurred during an after-school concert by "Phantom Limb," a four-piece
+  experimental rock group composed of Franklin High seniors. According to witnesses,
+  the band was performing an original composition in an unusual 7/8 time signature
+  when students in the audience began experiencing what school nurse Patricia Kellerman
+  described as "synchronized anxiety attacks."
+
+
+  "It started about three minutes into their second song," said junior Mark Tessler,
+  who was treated and released from Newton Memorial Hospital. "Everyone just started
+  feeling like something was missing, like we were waiting for a beat that never came.
+  Then kids started hyperventilating."
+
+
+  Franklin High principal Robert Chen said the incident began when students reported
+  feeling disoriented by the band''s unconventional rhythm. "Several students complained
+  of phantom sensations, as if they could hear a beat that wasn''t there," Chen explained.
+  "Within minutes, we had kids collapsing."
+
+
+  The band''s lead guitarist, 17-year-old David Kessler, told police that their amplifiers
+  began malfunctioning during the performance, producing what he described as "impossible
+  frequencies" that seemed to create gaps in the music itself. When maintenance staff
+  examined the equipment afterward, they found that all electronic components had
+  been damaged in a pattern that audio technician James Wright called "architecturally
+  impossible."
+
+
+  "The circuitry was burned out in perfect geometric shapes," Wright said. "I''ve
+  never seen anything like it. It''s as if the electricity was following some kind
+  of blueprint."
+
+
+  Dr. Margaret Hollis, who treated twelve of the affected students at Newton Memorial,
+  said the victims exhibited symptoms consistent with acute anxiety disorder, but
+  noted unusual similarities in their accounts. "They all described the same sensation
+  of missing time, of waiting for something that never arrived," Hollis said. "Several
+  mentioned feeling like they were hiding inside music that wasn''t playing."
+
+
+  Sussex County Sheriff''s Department spokesman Lt. Michael Torres confirmed that
+  investigators found no evidence of drug use among the students, despite initial
+  suspicions about psychedelic substances. Blood tests on all seventeen hospitalized
+  students came back negative for controlled substances.
+
+
+  The band''s drummer, Jennifer Walsh, 18, said the group had been experimenting with
+  "temporal safe house" compositions designed to create "cognitive hiding spaces"
+  through incomplete musical structures. "We were trying to build something where
+  your mind could disappear into the gaps," Walsh explained. "We never expected it
+  to work this well."
+
+
+  School officials have suspended all after-school musical performances pending a
+  full investigation. The band''s equipment remains in police custody.
+
+
+  Phantom Limb formed six months ago and had performed only twice before Friday''s
+  incident. Following the disturbance, the four members announced they were disbanding
+  immediately. Attempts to reach the band members over the weekend were unsuccessful,
+  with neighbors reporting that all four families appeared to have left town.
+
+
+  The investigation continues. Anyone with information about Friday''s incident is
+  asked to contact the Sussex County Sheriff''s Department.'
+thread_id: 2ace58be-11c5-480e-855f-c87abbef90d2

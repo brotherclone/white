@@ -1,5 +1,4 @@
-from typing import Any, Dict, List, Optional, Annotated
-from operator import add  # Added by auto_annotate
+from typing import Any, List, Optional, Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -9,6 +8,44 @@ from app.structures.enums.white_facet import WhiteFacet
 from app.structures.manifests.song_proposal import SongProposal
 from app.structures.artifacts.artifact_relationship import ArtifactRelationship
 from app.structures.agents.base_rainbow_agent_state import dedupe_artifacts
+
+
+def dedupe_traces(
+    old_traces: List[TransformationTrace],
+    new_traces: List[TransformationTrace],
+) -> List[TransformationTrace]:
+    """
+    Deduplicate transformation traces by iteration_id to prevent exponential growth.
+
+    Only adds NEW traces (those not already in old_traces).
+    """
+    if not new_traces:
+        return old_traces or []
+    if not old_traces:
+        return new_traces
+
+    existing_ids = {trace.iteration_id for trace in old_traces}
+    unique_new = [
+        trace for trace in new_traces if trace.iteration_id not in existing_ids
+    ]
+
+    return old_traces + unique_new
+
+
+def dedupe_relationships(
+    old_rels: List[ArtifactRelationship],
+    new_rels: List[ArtifactRelationship],
+) -> List[ArtifactRelationship]:
+    """Deduplicate artifact relationships by artifact_id."""
+    if not new_rels:
+        return old_rels or []
+    if not old_rels:
+        return new_rels
+
+    existing_ids = {rel.artifact_id for rel in old_rels}
+    unique_new = [rel for rel in new_rels if rel.artifact_id not in existing_ids]
+
+    return old_rels + unique_new
 
 
 class MainAgentState(BaseModel):
@@ -30,13 +67,6 @@ class MainAgentState(BaseModel):
     # Use dedupe_artifacts to prevent exponential growth from node transitions
     artifacts: Annotated[List[Any], dedupe_artifacts] = Field(default_factory=list)
 
-    # Workflow control
-    workflow_paused: Annotated[bool, lambda x, y: y if y is not None else x] = False
-    pause_reason: Annotated[Optional[str], lambda x, y: y or x] = None
-    pending_human_action: Annotated[Optional[Dict[str, Any]], lambda x, y: y or x] = (
-        None
-    )
-
     # White Agent working variables (per-agent rebracketing)
     rebracketing_analysis: Annotated[Optional[str], lambda x, y: y or x] = None
     document_synthesis: Annotated[Optional[str], lambda x, y: y or x] = None
@@ -54,14 +84,14 @@ class MainAgentState(BaseModel):
     facet_evolution: Annotated[Optional[FacetEvolution], lambda x, y: y or x] = None
 
     # Transformation traces (what boundaries shifted per agent)
-    transformation_traces: Annotated[List[TransformationTrace], add] = Field(
+    transformation_traces: Annotated[List[TransformationTrace], dedupe_traces] = Field(
         default_factory=list
     )
 
     # Artifact relationship graph
-    artifact_relationships: Annotated[List[ArtifactRelationship], add] = Field(
-        default_factory=list
-    )
+    artifact_relationships: Annotated[
+        List[ArtifactRelationship], dedupe_relationships
+    ] = Field(default_factory=list)
 
     # Agent readiness flags
     ready_for_red: Annotated[bool, lambda x, y: y if y is not None else x] = False
@@ -76,8 +106,8 @@ class MainAgentState(BaseModel):
     # Workflow completion
     run_finished: Annotated[bool, lambda x, y: y if y is not None else x] = False
 
-    # Execution mode controls
-    enabled_agents: Annotated[List[str], add] = Field(
+    # Execution mode controls (take new value if provided, else keep old)
+    enabled_agents: Annotated[List[str], lambda x, y: y if y else x] = Field(
         default_factory=lambda: [
             "black",
             "red",

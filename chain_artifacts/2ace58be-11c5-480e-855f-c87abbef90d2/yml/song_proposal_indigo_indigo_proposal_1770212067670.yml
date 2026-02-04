@@ -1,0 +1,47 @@
+agent_name: indigo
+bpm: 120
+concept: 'This song operates as a sonic investigation where the listener becomes both
+  detective and thief simultaneously. The surface narrative follows a security expert
+  obsessed with catching art thieves, cataloguing stolen paintings and missing artifacts
+  with forensic precision. Each verse details another heist: "The Vermeer vanished
+  Tuesday night / Canvas cut clean from its frame / Motion sensors found nothing /
+  Just shadows playing games." But the song''s true architecture lies in its MIDI
+  encoding system—every melodic phrase, every rhythmic pattern, every harmonic progression
+  maps to specific data points that spell out "the detectives" when decoded through
+  musical notation values. The electronic elements aren''t atmospheric—they''re cryptographic:
+  synthesizer arpeggios that translate to letter sequences, drum machine patterns
+  that encode positional data, guitar effects that serve as decryption keys. The paranoid
+  mood reflects the listener''s growing suspicion that something deeper lurks beneath
+  the surface story. The investigative mood drives the urge to analyze each musical
+  element. The revelatory mood emerges when the puzzle clicks: the security expert
+  isn''t hunting thieves—they ARE the thieves. The "stolen artifacts" are actually
+  the listener''s assumptions, lifted so cleanly they never noticed. The motion sensors
+  detected nothing because the real heist was happening in plain sight: the song itself
+  stealing your attention while encoding its true identity. "The detectives" aren''t
+  characters in the story—they''re the song''s secret confession, hidden in the musical
+  DNA, waiting for someone skilled enough to extract the truth from the evidence.
+
+
+  **INFRANYM PROTOCOL:**
+
+  Secret: ''the detectives'' encoded as ''detect thieves''
+
+  Method: InfranymMedium.MIDI
+
+  Decoding: MIDI Infranym: morse_duration hiding ''the detectives'' at 88 BPM
+
+  '
+genres:
+- Electronic Folk
+- Puzzle Rock
+iteration_id: indigo_proposal_1770212067670
+iteration_number: 14
+key: E minor
+mood:
+- Paranoid
+- Investigative
+- Revelatory
+rainbow_color: indigo
+tempo: Moderate
+timestamp: 1770212067.6711261
+title: Detect Thieves

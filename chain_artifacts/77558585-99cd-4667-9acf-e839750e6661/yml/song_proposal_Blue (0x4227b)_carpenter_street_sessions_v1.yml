@@ -1,0 +1,52 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: This song mourns the timeline where fourteen-year-old Gabriel Walsh spent
+  1989 living with his paternal grandmother Margaret in her South Philadelphia row
+  house at 1247 Carpenter Street. In this erased reality, family crisis led not to
+  staying with his mother but to premature responsibility - helping an aging woman
+  with her medications, learning to cook simple meals, shoveling snow from cracked
+  front steps. The song captures the weight of adult duties settling on young shoulders,
+  the discovery of his grandfather Patrick's Hohner Marine Band harmonica wrapped
+  in Old Spice-scented handkerchief, and Saturday afternoons working at Repo Records
+  on South Street for bearded Jerry Kowalski. Most poignantly, it memorializes the
+  musical mentorship that never was - Tommy Castellano from three houses down, playing
+  Springsteen covers on his back porch, teaching Gabriel chord progressions between
+  the clanking radiators and faded rose wallpaper. This is folk rock archaeology of
+  a specific lost year, when urban winter evenings echoed with harmonica melodies
+  drifting between row houses like messages in bottles, and a boy learned that sometimes
+  love sounds like responsibility, sometimes music is born from necessity, and sometimes
+  the most profound education happens in the spaces between what we lose and what
+  we're asked to carry. The song embodies the particular loneliness of premature wisdom,
+  the bittersweet discovery of gifts born from loss, and the counterfactual nostalgia
+  for a Philadelphia that shaped a different version of Gabriel Walsh entirely."
+genres:
+- folk rock
+- americana
+- philadelphia folk
+- working class ballad
+- urban pastoral
+iteration_id: carpenter_street_sessions_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholic
+- nostalgic
+- bittersweet
+- responsible
+- lonely
+- grounding
+- premature-wisdom
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 270971
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Margaret's House on Carpenter Street

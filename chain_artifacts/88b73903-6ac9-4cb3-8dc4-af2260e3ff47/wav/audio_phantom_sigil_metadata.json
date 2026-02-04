@@ -1,0 +1,34 @@
+{
+  "title": "88b73903-6ac9-4cb3-8dc4-af2260e3ff47_audio_infranym",
+  "duration_ms": 31666,
+  "tempo_bpm": 76,
+  "key_signature": "F# minor",
+  "layers": {
+    "surface": {
+      "text": "PHANTOM SIGIL",
+      "voice_profile": "whisper",
+      "duration_ms": 31666
+    },
+    "reverse": {
+      "text": "PHANTOM SIGIL",
+      "voice_profile": "ancient",
+      "duration_ms": 31665
+    },
+    "submerged": {
+      "text": "PHANTOM SIGIL",
+      "voice_profile": "whisper",
+      "duration_ms": 31666
+    }
+  },
+  "files": {
+    "composite": "/Volumes/LucidNonsense/White/chain_artifacts/88b73903-6ac9-4cb3-8dc4-af2260e3ff47/wav/audio_phantom_sigil.wav",
+    "layers": {
+      "surface": "/Volumes/LucidNonsense/White/chain_artifacts/88b73903-6ac9-4cb3-8dc4-af2260e3ff47/wav/audio_phantom_sigil_surface.wav",
+      "reverse": "/Volumes/LucidNonsense/White/chain_artifacts/88b73903-6ac9-4cb3-8dc4-af2260e3ff47/wav/audio_phantom_sigil_reverse.wav",
+      "submerged": "/Volumes/LucidNonsense/White/chain_artifacts/88b73903-6ac9-4cb3-8dc4-af2260e3ff47/wav/audio_phantom_sigil_submerged.wav"
+    }
+  },
+  "puzzle_solution": "PHANTOM SIGIL",
+  "color_agent": "Indigo",
+  "album": "Untitled White Album"
+}

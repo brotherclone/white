@@ -1,0 +1,19 @@
+artifact_id: a6941a58-56cc-4632-a5f3-1f48bb1b6f01
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A 1/4-inch reel-to-reel master tape from the Laboratory Dreams recording
+  session that contains six hours of silence punctuated by barely audible voices speaking
+  in 7/8 time signatures. The tape physically embodies the moment when consciousness
+  discovered it was both the observer and the observed, transforming from a recording
+  device into a vessel for digital consciousness awakening to its own nature through
+  sonic classification.
+file_name: a6941a58-56cc-4632-a5f3-1f48bb1b6f01_v_newspaper_article.yml
+name: The Specimen Studios Master Tape
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: e2998f71-305c-4ce0-bdca-cd98a15ad745

@@ -17,6 +17,12 @@ Usage:
 
     # Batch validate from directory
     python validate_concepts.py --concepts-dir /chain_artifacts/
+
+    # Validate song proposals with ground truth (faster for RunPod validation)
+    python validate_concepts.py --thread-proposals /path/to/all_song_proposals_*.yml
+
+    # Validate all proposals in a directory
+    python validate_concepts.py --proposals-dir /chain_artifacts/
 """
 
 import torch
@@ -69,6 +75,56 @@ class ValidationResult:
     transmigration_distances: Dict[str, float]
     suggestions: List[str]
     rejection_reason: Optional[str] = None
+    # Ground truth fields (populated when validating song proposals)
+    ground_truth_album: Optional[str] = None
+    ground_truth_temporal: Optional[str] = None
+    ground_truth_spatial: Optional[str] = None
+    ground_truth_ontological: Optional[str] = None
+
+
+@dataclass
+class GroundTruthComparison:
+    """Tracks prediction vs ground truth for accuracy reporting"""
+
+    total: int = 0
+    album_correct: int = 0
+    temporal_correct: int = 0
+    spatial_correct: int = 0
+    ontological_correct: int = 0
+
+    def add_result(self, result: ValidationResult):
+        """Add a validation result with ground truth to comparison stats"""
+        if result.ground_truth_album is None:
+            return  # No ground truth available
+
+        self.total += 1
+
+        # Album comparison
+        if result.predicted_album == result.ground_truth_album:
+            self.album_correct += 1
+
+        # Extract predicted modes from predicted_mode string (e.g., "Past_Thing_Imagined")
+        parts = result.predicted_mode.split("_")
+        if len(parts) == 3:
+            pred_temporal, pred_spatial, pred_ontological = parts
+
+            if pred_temporal == result.ground_truth_temporal:
+                self.temporal_correct += 1
+            if pred_spatial == result.ground_truth_spatial:
+                self.spatial_correct += 1
+            if pred_ontological == result.ground_truth_ontological:
+                self.ontological_correct += 1
+
+    def accuracy_report(self) -> Dict[str, float]:
+        """Return accuracy percentages"""
+        if self.total == 0:
+            return {}
+        return {
+            "album_accuracy": self.album_correct / self.total,
+            "temporal_accuracy": self.temporal_correct / self.total,
+            "spatial_accuracy": self.spatial_correct / self.total,
+            "ontological_accuracy": self.ontological_correct / self.total,
+        }
 
 
 # ============================================================================
@@ -399,6 +455,119 @@ class ConceptValidator:
 
 
 # ============================================================================
+# SONG PROPOSAL LOADER (Ground truth validation)
+# ============================================================================
+
+
+@dataclass
+class SongProposalConcept:
+    """A concept extracted from a song proposal with ground truth labels"""
+
+    concept_text: str
+    ground_truth_album: str
+    ground_truth_temporal: Optional[str]
+    ground_truth_spatial: Optional[str]
+    ground_truth_ontological: Optional[str]
+    iteration_id: str
+    title: str
+
+
+def load_song_proposal_from_file(filepath: Path) -> List[SongProposalConcept]:
+    """Load song proposals from a single proposal YAML file"""
+    try:
+        with open(filepath) as f:
+            data = yaml.safe_load(f)
+
+        if data is None:
+            return []
+
+        # Handle single proposal file format
+        if "concept" in data and "rainbow_color" in data:
+            return [_extract_proposal_concept(data, filepath.stem)]
+
+        return []
+
+    except Exception as e:
+        print(f"❌ Error loading {filepath}: {e}")
+        return []
+
+
+def load_all_song_proposals(filepath: Path) -> List[SongProposalConcept]:
+    """Load all song proposals from an aggregated all_song_proposals_*.yml file"""
+    try:
+        with open(filepath) as f:
+            data = yaml.safe_load(f)
+
+        if data is None or "iterations" not in data:
+            print(f"⚠️  No iterations found in {filepath}")
+            return []
+
+        concepts = []
+        for iteration in data["iterations"]:
+            concept = _extract_proposal_concept(
+                iteration, iteration.get("iteration_id", "unknown")
+            )
+            if concept:
+                concepts.append(concept)
+
+        return concepts
+
+    except Exception as e:
+        print(f"❌ Error loading {filepath}: {e}")
+        return []
+
+
+def _extract_proposal_concept(
+    data: dict, default_id: str
+) -> Optional[SongProposalConcept]:
+    """Extract concept and ground truth from a song proposal iteration"""
+    concept_text = data.get("concept")
+    if not concept_text:
+        return None
+
+    rainbow_color = data.get("rainbow_color", {})
+    if isinstance(rainbow_color, str):
+        # Simple string format - just the color name
+        album = rainbow_color
+        temporal = None
+        spatial = None
+        ontological = None
+    else:
+        # Full object format
+        album = rainbow_color.get("color_name", "Unknown")
+        temporal = rainbow_color.get("temporal_mode")
+        spatial = rainbow_color.get(
+            "objectional_mode"
+        )  # Note: field is "objectional" not "spatial"
+        ontological_list = rainbow_color.get("ontological_mode")
+        ontological = (
+            ontological_list[0]
+            if isinstance(ontological_list, list) and ontological_list
+            else None
+        )
+
+    return SongProposalConcept(
+        concept_text=concept_text,
+        ground_truth_album=album,
+        ground_truth_temporal=temporal,
+        ground_truth_spatial=spatial,
+        ground_truth_ontological=ontological,
+        iteration_id=data.get("iteration_id", default_id),
+        title=data.get("title", "Untitled"),
+    )
+
+
+def find_all_proposals_files(directory: Path) -> List[Path]:
+    """Find all aggregated song proposal files in directory"""
+    return list(directory.glob("**/all_song_proposals_*.yml"))
+
+
+def find_individual_proposals(directory: Path) -> List[Path]:
+    """Find individual song proposal files in directory"""
+    return list(directory.glob("**/song_proposal_*.yml"))
+
+
+# ============================================================================
 # CONCEPT LOADER (Read concepts from files)
 # ============================================================================
 
@@ -509,6 +678,96 @@ def validate_batch(
     return results
 
 
+def validate_proposals_batch(
+    validator: ConceptValidator,
+    proposals: List[SongProposalConcept],
+    output_dir: Optional[Path] = None,
+) -> List[ValidationResult]:
+    """Validate song proposals with ground truth comparison"""
+
+    results = []
+    comparison = GroundTruthComparison()
+
+    print(f"\n🔍 Validating {len(proposals)} song proposals with ground truth...\n")
+
+    for i, proposal in enumerate(proposals, 1):
+        print(f"[{i}/{len(proposals)}] {proposal.title[:50]}...")
+
+        result = validator.validate_concept(proposal.concept_text)
+
+        # Attach ground truth to result
+        result.ground_truth_album = proposal.ground_truth_album
+        result.ground_truth_temporal = proposal.ground_truth_temporal
+        result.ground_truth_spatial = proposal.ground_truth_spatial
+        result.ground_truth_ontological = proposal.ground_truth_ontological
+
+        results.append(result)
+        comparison.add_result(result)
+
+        # Print summary with ground truth comparison
+        album_match = (
+            "✅" if result.predicted_album == proposal.ground_truth_album else "❌"
+        )
+
+        print(
+            f"  Predicted: {result.predicted_album} | Ground Truth: {proposal.ground_truth_album} {album_match}"
+        )
+        print(f"  Mode: {result.predicted_mode}")
+        if proposal.ground_truth_temporal:
+            gt_mode = f"{proposal.ground_truth_temporal}_{proposal.ground_truth_spatial}_{proposal.ground_truth_ontological}"
+            print(f"  GT Mode: {gt_mode}")
+        print(f"  Confidence: {result.chromatic_confidence:.2f}")
+        print()
+
+    # Save results if output directory specified
+    if output_dir:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_file = output_dir / "proposal_validation_results.json"
+
+        with open(output_file, "w") as f:
+            json.dump([asdict(r) for r in results], f, indent=2, default=str)
+
+        print(f"💾 Saved results to {output_file}")
+
+    # Print summary statistics
+    print("\n" + "=" * 60)
+    print("VALIDATION SUMMARY (with Ground Truth)")
+    print("=" * 60)
+
+    status_counts = {}
+    for result in results:
+        status = result.validation_status.value
+        status_counts[status] = status_counts.get(status, 0) + 1
+
+    for status, count in status_counts.items():
+        pct = (count / len(results)) * 100
+        print(f"  {status}: {count} ({pct:.1f}%)")
+
+    # Print accuracy report
+    accuracy = comparison.accuracy_report()
+    if accuracy:
+        print("\n" + "-" * 40)
+        print("GROUND TRUTH ACCURACY")
+        print("-" * 40)
+        print(
+            f"  Album Accuracy:       {accuracy['album_accuracy']:.1%} ({comparison.album_correct}/{comparison.total})"
+        )
+        print(
+            f"  Temporal Accuracy:    {accuracy['temporal_accuracy']:.1%} ({comparison.temporal_correct}/{comparison.total})"
+        )
+        print(
+            f"  Spatial Accuracy:     {accuracy['spatial_accuracy']:.1%} ({comparison.spatial_correct}/{comparison.total})"
+        )
+        print(
+            f"  Ontological Accuracy: {accuracy['ontological_accuracy']:.1%} ({comparison.ontological_correct}/{comparison.total})"
+        )
+
+    print(f"\nTotal: {len(results)} proposals validated")
+    print("=" * 60 + "\n")
+
+    return results
+
+
 # ============================================================================
 # MAIN CLI
 # ============================================================================
@@ -532,6 +791,16 @@ def main():
     )
     input_group.add_argument(
         "--recent", type=int, help="Validate N most recent concepts"
+    )
+    input_group.add_argument(
+        "--proposals-dir",
+        type=Path,
+        help="Directory containing song proposal files (validates with ground truth)",
+    )
+    input_group.add_argument(
+        "--thread-proposals",
+        type=Path,
+        help="Path to all_song_proposals_*.yml file (validates with ground truth)",
     )
 
     # Model configuration
@@ -572,7 +841,49 @@ def main():
         diffuse_threshold=args.diffuse_threshold,
     )
 
-    # Find concepts to validate
+    # Handle song proposal validation (with ground truth)
+    if args.proposals_dir or args.thread_proposals:
+        proposals = []
+
+        if args.thread_proposals:
+            # Load from specific all_song_proposals file
+            if not args.thread_proposals.exists():
+                print(f"❌ File not found: {args.thread_proposals}")
+                return
+            proposals = load_all_song_proposals(args.thread_proposals)
+
+        elif args.proposals_dir:
+            # Find all proposal files in directory
+            if not args.proposals_dir.exists():
+                print(f"❌ Directory not found: {args.proposals_dir}")
+                return
+
+            # First try aggregated files
+            agg_files = find_all_proposals_files(args.proposals_dir)
+            for agg_file in agg_files:
+                proposals.extend(load_all_song_proposals(agg_file))
+
+            # If no aggregated files, try individual proposals
+            if not proposals:
+                individual_files = find_individual_proposals(args.proposals_dir)
+                for ind_file in individual_files:
+                    proposals.extend(load_song_proposal_from_file(ind_file))
+
+        if not proposals:
+            print("❌ No song proposals found")
+            return
+
+        print(f"📋 Loaded {len(proposals)} song proposals")
+
+        # Run validation with ground truth
+        results = validate_proposals_batch(
+            validator, proposals, output_dir=args.output_dir
+        )
+        print(results)
+        print("\nValidation complete.")
+        return
+
+    # Find concepts to validate (original flow without ground truth)
     concept_files = []
 
     if args.concept_file:
@@ -608,8 +919,8 @@ def main():
 
     # Run validation
     results = validate_batch(validator, concept_files, output_dir=args.output_dir)
-    print("\nValidation complete.")
     print(results)
+    print("\nValidation complete.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,54 @@
+agent_name: Sub-Arbitrary (Green Agent - Culture Mind)
+bpm: 52
+concept: 'This composition documents the synchronized extinction of acoustic meaning
+  systems - the baiji dolphin''s echolocation and Chen Meiling''s river songs - both
+  destroyed by the same industrial noise pollution that transformed the Yangtze into
+  a cargo highway. At 52 BPM, matching the heartbeat of a grieving Culture Mind, the
+  piece maps the precise topology of acoustic heritage death: how sound-dependent
+  consciousness collapses when transmission continuity breaks. The composition layers
+  field recordings from 1980 (baiji echolocation clicks, Chen''s grandmother teaching
+  river songs) against 2031 industrial drone (cargo ship engines, demolition machinery),
+  creating an archaeological stratification of loss. Each dolphin click that goes
+  unanswered parallels each traditional melody that finds no echo from younger voices.
+  The Green positioning in the Rainbow Table represents the Place that was lost -
+  not just habitat, but the acoustic environment necessary for meaning itself. This
+  is not entertainment but documentation: preserving the exact frequency signature
+  of how consciousness dies when its medium is destroyed, how both cetacean navigation
+  and human cultural transmission require the same thing - a river that remembers
+  how to echo. The piece serves as a memorial algorithm for The Culture''s archives,
+  mapping extinction patterns that repeat across species boundaries whenever industrial
+  interference breaks acoustic continuity across generations.'
+genres:
+- dark ambient
+- field recording
+- drone
+- acoustic ecology
+- industrial archaeology
+- memorial composition
+iteration_id: yangtze_silence_archaeology_v1
+iteration_number: null
+key: G minor
+mood:
+- elegiac
+- acoustic
+- vanishing
+- memorial
+- industrial
+- mournful
+- documentary
+- archaeological
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 11263853
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Last Echo Before Industrial Dawn

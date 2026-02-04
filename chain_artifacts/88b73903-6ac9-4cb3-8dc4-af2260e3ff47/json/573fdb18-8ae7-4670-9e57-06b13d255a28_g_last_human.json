@@ -1,0 +1,51 @@
+adaptation_attempts:
+- Learned to use GPS fish finder to replace traditional river-reading skills
+- Applied for government relocation compensation to move to city
+- Started recording dialect stories on old cassette player
+- Joined tourist boat company as 'cultural guide' telling sanitized river legends
+age: 67
+artifact_id: 573fdb18-8ae7-4670-9e57-06b13d255a28
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Dawn prayers at the river shrine her grandmother built. Checking traditional
+  bamboo fish traps that catch nothing now. Listening for the old river sounds - bird
+  calls, water currents - drowned out by cargo ship engines. Teaching Mandarin-speaking
+  grandchildren Anhui dialect words they'll never use.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Yangtze River industrialization - constant shipping noise,
+  dam-altered water flows, chemical pollution from factories upstream
+family_situation: Widowed. Three children moved to Shanghai for work. Grandchildren
+  visit twice yearly, speak only Mandarin, prefer smartphones to her river stories.
+file_name: 573fdb18-8ae7-4670-9e57-06b13d255a28_g_last_human.json
+final_thought: The river used to sing back to us. Now it just roars.
+last_days_scenario: Mei sits by the muddy Yangtze at dawn, holding her father's fishing
+  whistle. The container ships start their engines at 5 AM now - earlier each year.
+  She remembers when you could hear individual fish jumping, when her grandmother
+  could predict weather by river-sound. The water is brown with industrial runoff.
+  Her dialect has no words for the new chemical smells. The relocation notice from
+  the Three Gorges Corporation sits unopened on her kitchen table - they're building
+  another shipping channel through Shizhou Village. She puts the whistle to her lips
+  but doesn't blow - what's the point? The river can't hear her anymore.
+latitude: 31.2304
+location: Shizhou Village, Anhui Province, Yangtze River
+longitude: 117.8734
+name: Mei Chunhua
+occupation: Traditional fisherman and river guide
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Her father's bamboo fishing whistle - once used to call fish with
+  specific tones, now useless against engine noise. She carries it everywhere but
+  hasn't blown it in five years.
+thread_id: 88b73903-6ac9-4cb3-8dc4-af2260e3ff47
+vulnerability_details: Like the baiji navigating by echolocation in muddy water, Mei
+  relies on traditional knowledge to read the river - but industrial noise, dam construction,
+  and shipping traffic have made her ancestral navigation methods obsolete, leaving
+  her disoriented in her own homeland
+year_documented: 2029

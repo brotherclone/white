@@ -1,0 +1,19 @@
+artifact_id: 96937be1-0aad-45cc-9689-668ce5533eb2
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A mechanical metronome found in the Franklin High music room, permanently
+  locked at 72 BPM in an impossible 7/8 time signature that creates a phantom eighth
+  beat - a temporal gap where consciousness can hide from surveillance. The device
+  embodies the missing democracy beat that seventeen students felt in their bodies,
+  transforming the abstract concept of temporal safe houses into a concrete object
+  that marks the rhythm of resistance itself.
+file_name: 96937be1-0aad-45cc-9689-668ce5533eb2_v_symbolic_object.yml
+name: The Franklin High 7/8 Metronome
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: 2ace58be-11c5-480e-855f-c87abbef90d2

@@ -3,7 +3,7 @@ import yaml
 
 from abc import ABC
 from pathlib import Path
-from typing import List, Optional, Literal, Dict
+from typing import List, Optional, Dict
 from pydantic import Field
 from dotenv import load_dotenv
 
@@ -75,7 +75,9 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
     )
 
     # Physical characteristics (for musical mapping)
-    size_category: Literal["tiny", "small", "medium", "large", "massive"] = "medium"
+    size_category: str = (
+        "medium"  # e.g., tiny, small, medium, large, massive, colonial/modular
+    )
     lifespan_years: Optional[float] = (
         None  # Can be fractional (e.g., 0.16 for ~2 months)
     )

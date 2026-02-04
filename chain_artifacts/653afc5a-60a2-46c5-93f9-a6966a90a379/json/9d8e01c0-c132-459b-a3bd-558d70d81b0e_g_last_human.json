@@ -1,0 +1,61 @@
+adaptation_attempts:
+- Tried recording the old songs on smartphone apps
+- Attempted to teach river stories at the new cultural center
+- Started writing down oral traditions for the first time in her family's history
+- Moved her storytelling sessions to quieter tributaries
+age: 67
+artifact_id: 9d8e01c0-c132-459b-a3bd-558d70d81b0e
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Each dawn, she would sit by the muddy Yangtze waters with her bamboo
+  flute, playing the old river songs her grandmother taught her - melodies that once
+  guided fishermen and celebrated the 'Goddess of the Yangtze'. Now cargo ships pass
+  every few minutes, their engines so loud she can't hear her own music
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- witness
+environmental_stressor: Acoustic pollution from massive cargo ship traffic and industrial
+  development drowning out traditional cultural transmission methods
+family_situation: Last of her family line to speak the old Yangtze dialects - her
+  children moved to cities, grandchildren only speak Mandarin and digital-speak
+file_name: 9d8e01c0-c132-459b-a3bd-558d70d81b0e_g_last_human.json
+final_thought: The river still flows, but it no longer speaks in the old language
+  - like trying to whisper in a thunderstorm
+last_days_scenario: Chen Meiling sits on the concrete embankment where her family's
+  traditional fishing village once stood, now replaced by a logistics hub. The cargo
+  ships pass every three minutes, their diesel engines drowning out everything. She
+  holds her wooden flute but doesn't play - there's no point. The old river songs
+  were meant to echo off the water, to call and respond with the natural acoustics
+  of the Yangtze bends. Now the sound just gets swallowed by industrial noise. Her
+  smartphone has 847 recordings of the traditional stories, but when she plays them
+  back, they sound hollow, disconnected from the living river. The cultural center
+  offered her a monthly stipend to perform for tourists, but they wanted her to shorten
+  the stories, add English subtitles, make them 'accessible.' She tried for three
+  months before realizing she was performing the death of her own tradition. The last
+  time anyone asked her to tell the old stories was six months ago - a graduate student
+  writing a thesis. Tomorrow, the demolition crew arrives to tear down her small house
+  for the new container port expansion. She's been offered relocation to a modern
+  apartment in the city, but she knows that moving inland means the river songs will
+  die with her. Tonight, she'll play her flute one last time, not for anyone to hear,
+  but because the river deserves to hear its own name spoken in the old way, even
+  if the words get lost in the engine noise.
+latitude: 30.4167
+location: Shibaozhai, Zhongxian County, Yangtze River, China
+longitude: 108.1833
+name: Chen Meiling
+occupation: Traditional river storyteller and cultural interpreter
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A hand-carved wooden flute made from Yangtze driftwood, its holes
+  worn smooth by 40 years of playing river songs that no one under 50 can understand
+  anymore
+thread_id: 653afc5a-60a2-46c5-93f9-a6966a90a379
+vulnerability_details: Last keeper of Yangtze river oral traditions, her cultural
+  knowledge being drowned out by industrial noise and digital displacement, just as
+  the baiji's echolocation was overwhelmed by ship engine noise
+year_documented: 2031

@@ -1,0 +1,51 @@
+agent_name: Prism (Architect of Information)
+bpm: 88
+concept: 'This composition functions as a sonic palimpsest where multiple biographical
+  timelines exist simultaneously in magnetic layers. Like the Blue Agent''s cassette
+  archaeology, the piece reveals how alternate selves persist as recoverable frequencies
+  beneath the surface narrative. The 88 BPM tempo mirrors the bicycle cadence from
+  the Spokane timeline - a rhythmic constant that transcends temporal boundaries.
+  Each musical layer represents a different competence constellation: mechanical drones
+  (bicycle repair), melodic fragments (piano lessons never taken), and spatial harmonics
+  (routes through alternate geographies). The composition employs tape manipulation
+  techniques to simulate the archaeological recovery of biographical data - sounds
+  emerge from static, overlap with present recordings, and fade back into the magnetic
+  substrate. Field recordings of actual cassette playback, complete with mechanical
+  artifacts and frequency degradation, serve as the foundational layer upon which
+  counterfactual melodies are built. The listener experiences the temporal archaeology
+  firsthand - hearing not just what was recorded, but the ghostly persistence of what
+  was recorded over. This creates a cryptographic listening experience where true
+  emotional content hides within the intersection of multiple biographical frequencies,
+  preparing the substrate for the Indigo Agent''s infranym encoding protocols.'
+genres:
+- ambient
+- experimental
+- tape music
+- neo-classical
+- drone
+- field recording
+iteration_id: biographical_palimpsest_v1
+iteration_number: null
+key: F# minor
+mood:
+- nostalgic
+- archaeological
+- melancholic
+- investigative
+- temporal
+- layered
+rainbow_color:
+  color_name: Indigo
+  file_prefix: null
+  hex_value: 4915330
+  mnemonic_character_value: I
+  objectional_mode: Person
+  ontological_mode:
+  - Imagined
+  temporal_mode: Future
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Cassette Archaeologist
