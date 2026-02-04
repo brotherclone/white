@@ -1,0 +1,95 @@
+artifact_id: f53f6ed0-e796-43ef-85b8-49fd7d695672
+artifact_name: sleepwalkers_broadcast_newspaper
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1992-03-05'
+file_name: f53f6ed0-e796-43ef-85b8-49fd7d695672_i_sleepwalkers_broadcast_newspaper.yml
+headline: Local Band's Broadcast Linked to String of Youth Sleepwalking Episodes
+location: Stanhope, NJ
+rainbow_color_mnemonic_character_value: I
+source: The Advertiser-News
+tags:
+- local music
+- sleepwalking
+- youth incidents
+- unexplained phenomena
+- broadcast frequency
+text: 'STANHOPE - Sussex County health officials are investigating a series of unusual
+  sleepwalking incidents involving local teenagers, all reportedly linked to late-night
+  radio broadcasts by an experimental music group calling itself "The Sleepwalker''s
+  Broadcast."
+
+
+  Over the past three weeks, Stanhope police have responded to seven separate incidents
+  of teenagers found wandering the streets between 2 and 4 a.m., all in apparent sleepwalking
+  states. The youths, ranging in age from 14 to 17, were discovered walking in synchronized
+  patterns along Route 206, with several witnesses reporting they moved "like they
+  were following music only they could hear."
+
+
+  "It''s the strangest thing I''ve seen in twenty years on the force," said Stanhope
+  Police Chief Robert Henley. "These kids weren''t just sleepwalking - they were walking
+  in formation, keeping perfect time to some rhythm. When we woke them up, they all
+  mentioned hearing the same broadcast."
+
+
+  The broadcast in question appears to originate from an unlicensed low-power FM transmitter
+  operating at 88.7 MHz. The signal, which can only be received clearly within a three-mile
+  radius of Stanhope, features what listeners describe as "hypnotic electronic music"
+  mixed with ambient sounds and irregular time signatures.
+
+
+  Local resident Margaret Kowalski first noticed the broadcast two months ago while
+  scanning radio frequencies late at night. "It was beautiful but unsettling," she
+  said. "The music had this strange rhythm - not quite waltz time, not quite regular.
+  My teenage son started listening to it every night, and that''s when the sleepwalking
+  began."
+
+
+  Dr. Patricia Vance, a psychiatrist at Newton Medical Center who has examined three
+  of the affected teenagers, noted unusual brainwave patterns in the youths during
+  sleep studies. "We''re seeing synchronized theta wave activity that''s highly uncommon,"
+  she said. "It''s as if their sleep cycles have been entrained to an external rhythm."
+
+
+  The mysterious band behind the broadcasts remains unidentified. Attempts to trace
+  the signal''s origin have led investigators to various locations around Stanhope,
+  but the transmitter appears to be mobile or well-hidden. The group''s only identifying
+  information comes from a brief spoken introduction heard occasionally during broadcasts:
+  "This is The Sleepwalker''s Broadcast, frequency 88.7, transmitting from the spaces
+  between waking and sleeping."
+
+
+  Several parents have reported their teenagers exhibiting enhanced pattern recognition
+  abilities and increased resistance to authority following exposure to the broadcasts,
+  leading some to speculate about subliminal programming techniques.
+
+
+  "My daughter started solving complex math problems she''d never seen before, but
+  she also stopped following basic household rules," said Stanhope resident David
+  Chen. "It''s like the music rewired something in her brain."
+
+
+  The Federal Communications Commission has been notified of the unlicensed broadcasts,
+  but officials report difficulty locating the transmission source due to its apparent
+  mobility and the complex terrain of the area.
+
+
+  Sussex County Sheriff''s Department spokesman Lt. Michael Torres advised parents
+  to monitor their children''s nighttime activities and radio listening habits. "Until
+  we understand what''s causing these incidents, we recommend limiting exposure to
+  unknown broadcast frequencies, particularly during late evening hours."
+
+
+  The investigation continues, with authorities planning to conduct electronic surveillance
+  of the 88.7 MHz frequency throughout the coming week. Anyone with information about
+  the broadcasts or the group responsible is asked to contact Stanhope police at 973-347-0150.
+
+
+  As of press time, no new sleepwalking incidents have been reported, though several
+  residents claim to still hear faint traces of the mysterious broadcast during the
+  early morning hours.'
+thread_id: 653afc5a-60a2-46c5-93f9-a6966a90a379

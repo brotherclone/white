@@ -1,0 +1,92 @@
+artifact_id: 933f5d61-7be7-4bea-a10f-41ca58a5d43f
+artifact_name: local_bands_broadcast_linked_to_string_of_youth_sl
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1992-03-05'
+file_name: 933f5d61-7be7-4bea-a10f-41ca58a5d43f_t_local_bands_broadcast_linked_to_string_of_youth_sl.yml
+headline: Local Band's Broadcast Linked to String of Youth Sleepwalking Episodes
+location: Stanhope, NJ
+rainbow_color_mnemonic_character_value: T
+source: The Advertiser-News
+tags:
+- local music
+- sleepwalking
+- youth incidents
+- unexplained phenomena
+- broadcast frequency
+text: "**The Crystal Frequency Conspiracy: Three Days in the Sleepwalking Zone**\n\
+  \n*Stanhope, NJ - March 1992*\n\nThe first rule of covering a story in Sussex County\
+  \ is never trust the official version. The second rule is always follow the frequency.\n\
+  \nI learned both rules the hard way after spending three sleepless nights chasing\
+  \ phantom radio signals through the pine barrens around Stanhope, armed with nothing\
+  \ but a handheld scanner, a thermos of coffee gone cold, and a growing certainty\
+  \ that something fundamentally wrong was broadcasting itself into the teenage brains\
+  \ of northern New Jersey.\n\nIt started innocuously enough - a press release about\
+  \ kids sleepwalking, the kind of human interest fluff that usually gets buried on\
+  \ page six. But Chief Henley's description nagged at me: \"walking in formation,\
+  \ keeping perfect time.\" That's not sleepwalking. That's programming.\n\nBy 2 AM\
+  \ on my first night out, parked behind the Wawa on Route 206 with my scanner locked\
+  \ onto 88.7 MHz, I understood why seven teenagers had been found wandering the streets\
+  \ like zombies following an invisible pied piper. The signal hit my eardrums like\
+  \ liquid mercury - not quite music, not quite noise, but something that made my\
+  \ teeth ache and my vision blur at the edges.\n\nThe rhythm was all wrong. 4/4 time\
+  \ stretched into 5/4, then compressed back, creating a temporal undertow that seemed\
+  \ to pull consciousness sideways. I found myself unconsciously tapping my fingers\
+  \ to beats that shouldn't exist, feeling my brainwaves trying to sync with frequencies\
+  \ that had no business being broadcast on the FM band.\n\nThat's when I met Morrison,\
+  \ the public works guy who found the crystal.\n\n\"Thing is,\" he told me over beers\
+  \ at the Brick House Tavern, his hands shaking slightly as he lit another Marlboro,\
+  \ \"I wasn't supposed to be at the treatment plant that morning. Something just...\
+  \ drew me there. Like I was sleepwalking myself, you know? And there it was, sitting\
+  \ on the fence post like someone wanted it found.\"\n\nThe crystal. The heart of\
+  \ the whole operation. Morrison let me photograph it before the FCC tech Webb confiscated\
+  \ it - a small, innocuous piece of quartz wrapped in hand-etched aluminum, covered\
+  \ with circuit diagrams that looked like electronic hieroglyphics. Frequency: 88.7\
+  \ MHz. Precise to the hundredth decimal point.\n\nBut here's what Webb didn't tell\
+  \ the papers: the diagrams weren't just sophisticated. They were impossible. The\
+  \ circuit modifications showed an understanding of frequency modulation that wouldn't\
+  \ be developed for another five years. Someone had reverse-engineered the future\
+  \ and built it into a salvaged Motorola crystal.\n\n\"This is The Sleepwalker's\
+  \ Broadcast, frequency 88.7, transmitting from the spaces between waking and sleeping.\"\
+  \n\nI heard those words myself on night two, crouched in a stand of pine trees behind\
+  \ the high school, the scanner crackling with that hypnotic rhythm while something\
+  \ that sounded like a teenage voice spoke in cadences that made my spine crawl.\
+  \ The transmission was coming from everywhere and nowhere - bouncing off the Stanhope\
+  \ water tower, echoing through the trees, seeming to emanate from the very air itself.\n\
+  \nThat's when I started to understand the scope of what was happening. This wasn't\
+  \ some amateur radio enthusiast playing pranks. This was recruitment. The enhanced\
+  \ pattern recognition, the resistance to authority - these kids weren't being damaged\
+  \ by the broadcasts. They were being upgraded.\n\nDr. Vance showed me the sleep\
+  \ study results off the record, her hands trembling as she pointed to the EEG readouts.\
+  \ \"Look at these theta waves,\" she whispered, glancing over her shoulder like\
+  \ she expected the walls to be listening. \"Perfect synchronization across multiple\
+  \ subjects. This is impossible without direct neural interface technology.\"\n\n\
+  The synchronized brainwaves looked like radio oscilloscope patterns. Like the teenagers'\
+  \ minds had been tuned to the same frequency as the crystal.\n\nOn my third night,\
+  \ I found the real transmission site - not the abandoned equipment Morrison discovered,\
+  \ but the active node. It was hidden in plain sight: the Stanhope Municipal Building's\
+  \ radio antenna, modified with additional crystals that glowed faintly in the darkness.\
+  \ The building's basement hummed with electronic frequencies that made my fillings\
+  \ ache.\n\nI never found out who was behind The Sleepwalker's Broadcast. But as\
+  \ I drove out of town that final morning, my scanner picked up one last transmission\
+  \ on 88.7: \"Thank you for listening. Phase One complete. Beginning Phase Two in\
+  \ Sparta Township.\"\n\nThe crystal Morrison found wasn't evidence of the crime.\
+  \ It was a calling card. A signature left by someone who wanted us to know exactly\
+  \ how they'd rewired seven teenage brains using nothing but precise frequencies\
+  \ and the spaces between sleeping and waking.\n\nThe official investigation concluded\
+  \ with no arrests, no answers, and a sudden transfer of Dr. Vance to a facility\
+  \ in Pennsylvania. Chief Henley retired early. The FCC filed the crystal in some\
+  \ basement in Washington, probably next to boxes full of other impossible things\
+  \ that don't fit the official version of reality.\n\nBut sometimes, late at night\
+  \ when I'm scanning the radio dial, I still hear echoes of that rhythm bleeding\
+  \ through on adjacent frequencies. And I wonder how many other crystals are out\
+  \ there, hidden in makeshift aluminum cases, broadcasting beautiful, parasitic frequencies\
+  \ into the spaces between waking and sleeping.\n\nThe teenagers of Stanhope returned\
+  \ to normal, according to the official reports. \n\nI'm not sure I believe that\
+  \ anymore.\n\nI'm not sure I believe anything anymore.\n\n*[The author continues\
+  \ to monitor frequency 88.7 MHz from his home in Morristown. No further transmissions\
+  \ have been documented.]*"
+thread_id: 653afc5a-60a2-46c5-93f9-a6966a90a379

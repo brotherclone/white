@@ -1,0 +1,2 @@
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+so-vits-svc-fork 3.14.1 requires fastapi==0.88, but you have fastapi 0.115.12 which is incompatible.

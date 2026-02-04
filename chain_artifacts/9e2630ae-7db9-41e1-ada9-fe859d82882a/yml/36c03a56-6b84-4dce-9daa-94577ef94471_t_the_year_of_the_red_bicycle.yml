@@ -1,0 +1,215 @@
+artifact_id: 36c03a56-6b84-4dce-9daa-94577ef94471
+artifact_name: the_year_of_the_red_bicycle
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of staying with his parents through their increasingly volatile
+    fights, Gabriel was sent to live with his father's sister Margaret in Spokane,
+    Washington for the 1987 school year
+  when: December 1986
+  why_plausible: Family separations often involve children staying with relatives
+    during particularly difficult periods, and Margaret Walsh was a real person who
+    had offered to help with childcare before
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: 36c03a56-6b84-4dce-9daa-94577ef94471_t_the_year_of_the_red_bicycle.yml
+following_events:
+- Return home to find parents had officially separated
+- Father had moved to an apartment downtown
+- Gabriel's piano skills impressed his middle school music teacher
+- The red bicycle remained in Spokane, becoming a symbol of that transformative year
+key_differences:
+- Lived in Spokane instead of his hometown for age 12
+- Learned piano a year earlier than in actual timeline
+- Developed mechanical skills fixing the bicycle with Mr. Peterson
+- Formed close bond with Aunt Margaret that lasted his whole life
+- Experienced Pacific Northwest culture and landscape
+- Avoided the worst of his parents' separation trauma by being away
+mood_description: A bittersweet exploration of displacement as discovery - the melancholy
+  of family dissolution balanced against the unexpected gifts of solitude, mechanical
+  competence, and musical awakening. The narrative carries the specific weight of
+  Pacific Northwest winter light, the particular loneliness of being twelve and far
+  from home, and the way certain years become foundational not because they're happy,
+  but because they teach you who you might become.
+narrative: 'The red bicycle appeared on Valentine''s Day like a promise. Gabriel found
+  it in Aunt Margaret''s basement, buried under paint cans and Christmas decorations
+  at 1247 West Boone Avenue. A 1975 Schwinn Stingray with a banana seat and rust eating
+  at the chrome handlebars. Margaret said it belonged to her son Danny, who''d died
+  in Vietnam, and Gabriel could have it if he could make it work.
+
+
+  That''s how he met Mr. Peterson at Peterson''s Bike Shop on West Sprague Avenue.
+  Peterson was maybe sixty, with hands permanently stained black from bike grease
+  and a way of explaining things that made sense. The shop smelled like WD-40 and
+  old rubber, and Peterson taught Gabriel to true wheels, adjust brakes, and oil chains
+  while classic rock played from a paint-splattered radio.
+
+
+  "Every bike''s got a song," Peterson would say, spinning a wheel and listening to
+  the spokes. "You just got to know how to hear it."
+
+
+  Gabriel''s song that year was the route from Margaret''s house to Mrs. Helen Chen''s
+  piano lessons on South Grand Boulevard. Every Tuesday and Thursday at 4 PM, $8 for
+  thirty minutes. Mrs. Chen served jasmine tea in tiny cups and had a metronome that
+  ticked like a mechanical heart. Her piano was an old Yamaha upright with keys that
+  clicked softly under his fingers.
+
+
+  "Music is mathematics with soul," she''d say in her precise English, adjusting his
+  hand position. "You understand mathematics, yes?"
+
+
+  He did. The bike routes were mathematics too - the geometry of Spokane''s hills,
+  the physics of momentum carrying him down Riverside Avenue, the probability of making
+  green lights if he timed it right. By summer, he knew every pothole between Boone
+  Avenue and Riverfront Park, could navigate by the smell of the Spokane River and
+  the sound of traffic on I-90.
+
+
+  Tommy Kowalski from next door had a paper route and taught Gabriel to fold the Spokesman-Review
+  into tight squares that wouldn''t come apart when thrown. Tommy was thirteen and
+  had opinions about everything - which neighborhoods tipped best (South Hill), which
+  dogs to avoid (the German Shepherd on Maple Street), which convenience stores would
+  sell you candy even if you were obviously under the purchase age limit for certain
+  items.
+
+
+  Margaret worked at Sacred Heart Medical Center as a radiology technician, left every
+  morning at 7 AM in her white Buick Century that smelled like menthol cigarettes
+  and Aqua Net. She''d pack Gabriel''s lunch - usually a peanut butter sandwich, an
+  apple, and a Thermos of milk - while KZZU played soft rock from the kitchen radio.
+  Evenings, she''d ask about school over dinner (usually something involving Hamburger
+  Helper and frozen vegetables), and Gabriel would tell her about Mr. Rodriguez''s
+  social studies class or the kid who brought a snake to show-and-tell.
+
+
+  What he didn''t tell her was how the piano was becoming something more than lessons.
+  How he''d started hearing melodies in the bicycle spokes, in the rhythm of his breathing
+  on the hills, in the way the Spokane River sounded different depending on the season.
+  By October, he''d composed his first piece - "Song for the Spokane River" - a simple
+  melody in C major that somehow captured the sound of water moving over rocks.
+
+
+  Mrs. Chen cried when he played it for her. "You have the gift," she said. "Music
+  finds you, not the other way around."
+
+
+  The year ended with the first snow, the red Schwinn finally too slippery for the
+  hills. Gabriel would return home to find his parents separated, his father living
+  in a downtown apartment, everything changed. But he''d keep the music, the mechanical
+  knowledge, the memory of that house on Boone Avenue where Margaret made coffee every
+  morning and never asked too many questions about why he''d been sent away.
+
+
+  Years later, he''d realize that 1987 was the year he learned that home could be
+  temporary and still be real, that some gifts come disguised as exile, and that the
+  sound of bicycle spokes can teach you as much about rhythm as any metronome.'
+period:
+  age_range: !!python/tuple
+  - 12
+  - 12
+  creative_output:
+  - First attempts at piano composition
+  - Detailed journal of bicycle routes
+  - Sketches of Spokane landmarks
+  description: The year Gabriel spent living with his Aunt Margaret in Spokane after
+    his parents' separation became too volatile
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: wistful
+  end_date: 1987-12-31
+  is_forgotten: false
+  key_relationships:
+  - Aunt Margaret Walsh
+  - Mrs. Chen (piano teacher)
+  - Tommy Kowalski (neighbor)
+  - Mr. Peterson (bike shop owner)
+  known_events:
+  - approximate_date: null
+    category: discovery
+    date: 1987-02-14
+    description: Found the abandoned red Schwinn Stingray in the basement of 1247
+      West Boone Avenue
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: education
+    date: 1987-04-03
+    description: First piano lesson with Mrs. Chen at her house on South Hill
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: friendship
+    date: 1987-07-04
+    description: Watched fireworks from Riverfront Park with Tommy Kowalski and his
+      family
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 1987-10-15
+    description: Composed first piano piece, 'Song for the Spokane River'
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  location: Spokane, Washington
+  primary_activity: Attending Garfield Elementary, exploring the city by bicycle,
+    learning piano from Mrs. Chen
+  start_date: 1987-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Parents' marriage deteriorating through late 1986
+- Father's drinking becoming more problematic
+- Gabriel's grades slipping at his current school
+- Aunt Margaret offering to take him for the school year during a tense family Christmas
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Aunt Margaret's house at 1247 West Boone Avenue, a craftsman bungalow with
+    a wraparound porch and lilac bushes
+  sensory_elements:
+  - smell of Margaret's Folgers coffee every morning
+  - sound of the Spokane River from the back yard
+  - texture of the worn wooden banister
+- category: daily_routine
+  detail: Woke up at 6:30 AM to the sound of Margaret's alarm clock radio playing
+    KZZU, ate Cheerios while she packed his lunch
+  sensory_elements:
+  - tinny sound of the radio
+  - Margaret humming while making sandwiches
+  - cold linoleum under bare feet
+- category: relationship
+  detail: Mrs. Helen Chen taught piano from her home at 2156 South Grand Boulevard,
+    charging $8 per half-hour lesson
+  sensory_elements:
+  - smell of jasmine tea
+  - sound of her metronome ticking
+  - feel of the worn piano bench cushion
+- category: creative
+  detail: Spent hours at Peterson's Bike Shop on West Sprague Avenue learning to true
+    wheels and adjust derailleurs
+  sensory_elements:
+  - smell of bike grease and WD-40
+  - sound of spinning wheels
+  - feel of cold metal tools
+- category: outcome
+  detail: By December, could ride the red Schwinn from Boone Avenue to Riverfront
+    Park in under 20 minutes, knew every pothole on the route
+  sensory_elements: null
+- category: relationship
+  detail: Tommy Kowalski lived next door at 1245 West Boone, had a paper route and
+    taught Gabriel to fold newspapers properly
+  sensory_elements: null
+specificity_score: 0.9
+thread_id: 9e2630ae-7db9-41e1-ada9-fe859d82882a
+title: The Year of the Red Bicycle

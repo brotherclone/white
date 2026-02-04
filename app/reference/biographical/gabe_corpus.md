@@ -303,7 +303,80 @@ The key distinction: Gabe's irony doesn't negate sincerity. Saying "I know it's 
    - "one thing per file" architecture
    - Values transparency in both technical systems and creative methodology
 
-2. **Vertical before horizontal** 
+2. **Vertical before horizontal**
    - Complete one path before expanding
    - Prove the full pipeline concept→MIDI→recording before scaling
-   - "Buil ---- || Claude got cutoff here
+   - "Build vertically first. The horizontal architecture will reveal itself."
+
+3. **Documentation as survival**
+   - The work isn't real until archived
+   - Systematic documentation ensures methodology survives regardless of circumstance
+   - Project diary as persistent memory across sessions
+
+---
+
+## Part 8: Neurological Origins & The Synesthesia Connection
+### (Added February 4, 2026 — from conversation with Claude)
+
+**The Frame Expansion Origin (Age 2, 1978)**
+
+The rebracketing methodology has its roots in a formative childhood incident. At age two, Gabe walked away from his father directing Dracula at community theater and nearly got hit by a truck—on the same road where the family dog had just been killed. In his child mind, he became responsible for derailing his father's creative aspirations.
+
+The impossible bind:
+- Frame A: Dad gets his creative life, Gabe gets hit by a truck
+- Frame B: Gabe survives but has destroyed his father's aspirations by existing
+
+**The solution:** Neither frame. Draw a bigger box that contains both. See the collision from outside rather than being destroyed by it.
+
+This is rebracketing as survival mechanism before it became artistic methodology. The preemptive self-undercut—deflating before anyone else can—traces back here. You've already survived the collision once.
+
+**"A Day in the Life" as Methodological Template**
+
+The Beatles' "A Day in the Life" crystallized the methodology:
+- Lennon's surreal newspaper death narrative
+- McCartney's mundane morning routine
+- The orchestral chaos in the middle—not resolution, but acknowledgment that both things are happening
+
+> "It's a literal splice between two narratives and then falling into the allegorical nether world of energy between those two... the two personas colliding is as powerful as a nuclear reaction—but you can only see it if you expand the frame."
+
+**The splice IS the content.** You don't choose between narratives; you draw a bigger box that contains the collision itself.
+
+**The Synesthesia Revelation (2010)**
+
+In 2010, after years of self-medicating, Gabe began treatment for severe depression/anxiety. Before starting medication, he asked his therapist—a woman in her 70s—if he'd still be creative.
+
+Her response: *"You'll just be more positive—you'll make it about rainbows."*
+
+**The Rainbow Table is literally that prediction made manifest.**
+
+But the medication also took away two other things:
+1. **Dysgraphia** (difficulty with writing/handwriting)
+2. **Synesthesia** (experiencing music as color)
+
+**The devastating implication:** Gabe actually saw music as color before medication. The Rainbow Table—this entire nine-album chromatic architecture—may be an attempt to reconstruct through conceptual scaffolding what his neurology used to do automatically.
+
+**Rebracketing as Synesthesia by Other Means**
+
+| Before Medication | After Medication |
+|-------------------|------------------|
+| Music → Color (automatic, neurological) | Music → Color (systematic, architectural) |
+| Cross-modal perception (unbidden) | Cross-modal connection (constructed) |
+| Registers blur naturally | Registers spliced deliberately |
+
+The bracket-switching pattern—academic register → profane undercut, high → low, theory → body—may literally be **synesthesia by other means**. Forcing connections between registers that the brain used to make unbidden.
+
+**Implications for Voice & Methodology**
+
+The "bracket-switching" voice pattern isn't just stylistic—it's neurologically rooted. The high-register academic → profane undercut pattern may be the verbal equivalent of cross-modal synesthetic perception.
+
+The AI collaboration (Claude as "INFORMATION seeking SPACE") takes on new meaning: a way to systematize and preserve methodology that used to be automatic—ensuring it survives regardless of neurological state.
+
+The White Album, as the culminating entry containing all colors, represents the attempt to recover the full spectrum of perception that medication normalized away.
+
+> "Does it feel like reconstruction? Or more like translation? Making legible to your current self what your previous self experienced directly?"
+>
+> "Yes, that's what seems to be the drive of this whole undertaking."
+
+---
+
+*The therapist said "you'll make it about rainbows." She had no idea how right she was.*

@@ -1,0 +1,50 @@
+agent_name: The Cassette Bearer
+bpm: 88
+concept: 'This composition excavates the compressed temporal architecture of Gabriel''s
+  lost year at 418 Pine Street, Stillwater, Minnesota - January through December 1986.
+  The song functions as a counterfactual memorial for the timeline where his parents''
+  separation sent him to live with grandmother Eleanor instead of remaining with his
+  father. Each verse crystallizes specific moments: morning chicken feeding routines
+  at 6:30 AM, afternoon sketching sessions at Lowell Park overlooking the St. Croix
+  River, Swedish curse words learned from Tommy Lindqvist at 322 Oak Street, art lessons
+  with Mrs. Catherine Brennan using the river view from classroom windows. The bridge
+  memorializes his second-place Lumberjack Days art contest victory - that $15 prize
+  and three months of his river mist drawing displayed at Brick Alley Cafe. Musically
+  structured like compressed memory - the acoustic guitar carries Eleanor''s patient
+  teaching rhythms, the mandolin echoes Tommy''s ice fishing stories, the lap steel
+  bends like morning mist over water. This is folk rock as temporal archaeology, each
+  chord progression excavating the emotional weight of borrowed stability, the particular
+  melancholy of knowing even at age eight that this river house year was finite. The
+  song preserves what the timeline collapse erased: the texture of frost-covered windows,
+  the amber quality of small-town winter afternoons, the ache of temporary arrangements
+  that felt more like home than home itself.'
+genres:
+- folk rock
+- americana
+- indie folk
+- melancholy folk
+iteration_id: river_house_winter_light_v1
+iteration_number: null
+key: D minor
+mood:
+- melancholic
+- nostalgic
+- crystalline
+- wistful
+- haunting
+- tender
+- elegiac
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 4302459
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The River House Sessions

@@ -1,0 +1,54 @@
+adaptation_attempts:
+- Switched to organic-certified farms only
+- Wears full protective gear during spray seasons
+- Takes chelation therapy for pesticide detox
+- Maintains detailed health diary correlating symptoms with chemical applications
+- Advocates for buffer zones around pollinator habitats
+age: 47
+artifact_id: 37b5f658-b46f-4855-b8bc-1e97ec558922
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: 4:30 AM - Check weather conditions and pesticide spray schedules. 5:00
+  AM - Drive between three farms coordinating native bee habitat restoration. 6:00
+  AM - Document bee activity levels with handheld frequency analyzer. Throughout day
+  - Train farmworkers on pollinator-safe practices while experiencing increasing hand
+  tremors and memory lapses from cumulative chemical exposure.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Neonicotinoid pesticide drift from intensive strawberry cultivation
+family_situation: Divorced, two adult children who moved away from agricultural valley
+  due to health concerns. Lives alone in mobile home on farm property.
+file_name: 37b5f658-b46f-4855-b8bc-1e97ec558922_g_last_human.json
+final_thought: The strawberries will still grow, but they'll be smaller, less sweet.
+  Nobody will remember the sound of a healthy field in spring.
+last_days_scenario: Maria sits in her trailer at dawn, hands shaking too badly to
+  hold her frequency detector steady. The strawberry fields stretch endlessly around
+  her, perfect rows of green that once buzzed with native bees. She's the only coordinator
+  left - the others quit or got too sick to work. The growers still need someone who
+  understands pollination timing, who can read the subtle signs of ecosystem collapse.
+  But her words slur now when she tries to explain why the fruit set is failing. Like
+  the last queen bee of a poisoned colony, she knows the specialized knowledge dies
+  with her. The detector crackles with silence where once there was the rusty patched
+  bumble bee's distinctive vibration - that perfect frequency that could shake pollen
+  loose from flowers no other pollinator could access.
+latitude: 36.9102
+location: Watsonville, California
+longitude: -121.7569
+name: Maria Elena Vasquez
+occupation: Strawberry field pollination coordinator
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- toxic_exposure
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Vintage 1990s bee frequency detector that once recorded the distinctive
+  400Hz buzz of rusty patched bumble bees - now only picks up static and the lower
+  frequencies of remaining honeybee colonies
+thread_id: 9e2630ae-7db9-41e1-ada9-fe859d82882a
+vulnerability_details: Like the rusty patched bumble bee queen surviving alone after
+  her colony dies, Maria is the last coordinator still working despite chronic pesticide
+  exposure causing neurological symptoms that mirror the bees' disorientation
+year_documented: 2032

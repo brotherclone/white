@@ -1,0 +1,20 @@
+artifact_id: 5f45cc23-9e48-4380-92d1-c9e426f81229
+artifact_name: The 88.7 MHz Crystal Oscillator
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A quartz crystal frequency generator salvaged from a 1980s Motorola radio
+  transmitter, precisely calibrated to 88.7 MHz and housed in a makeshift aluminum
+  case covered with hand-etched circuit diagrams. This crystal became the heart of
+  The Sleepwalker's Broadcast transmission system, its oscillations creating the hypnotic
+  rhythmic foundation that synchronized teenage brainwaves across Stanhope, transforming
+  a simple electronic component into the physical anchor point for consensual unconscious
+  recruitment through beautiful, parasitic frequencies.
+file_name: 5f45cc23-9e48-4380-92d1-c9e426f81229_b_The 88.7 MHz Crystal Oscillator.yml
+name: The 88.7 MHz Crystal Oscillator
+rainbow_color_mnemonic_character_value: B
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 653afc5a-60a2-46c5-93f9-a6966a90a379

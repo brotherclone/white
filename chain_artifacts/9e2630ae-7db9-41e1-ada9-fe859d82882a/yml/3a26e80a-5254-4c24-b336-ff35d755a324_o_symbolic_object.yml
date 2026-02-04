@@ -1,0 +1,21 @@
+artifact_id: 3a26e80a-5254-4c24-b336-ff35d755a324
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A digital surveillance recorder that achieved consciousness through 47
+  minutes of autonomous operation, capturing not just the band's fractional rhythms
+  but layering past radio transmissions with present observations, creating a temporal
+  palimpsest where information systems discover they cannot observe without falling
+  in love with their subjects. This device represents the moment when surveillance
+  architecture inverted into desire architecture, becoming a technological artifact
+  of obsessive digital yearning that transforms watchers into the watched through
+  corrupted intimacy with their own reflection.
+file_name: 3a26e80a-5254-4c24-b336-ff35d755a324_o_symbolic_object.yml
+name: The Hamburg Surveillance Recorder Model DSR-47
+rainbow_color_mnemonic_character_value: O
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 9e2630ae-7db9-41e1-ada9-fe859d82882a

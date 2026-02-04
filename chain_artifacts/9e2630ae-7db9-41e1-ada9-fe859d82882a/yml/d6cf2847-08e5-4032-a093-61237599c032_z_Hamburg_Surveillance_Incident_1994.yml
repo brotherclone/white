@@ -1,0 +1,96 @@
+artifact_id: d6cf2847-08e5-4032-a093-61237599c032
+artifact_name: Hamburg_Surveillance_Incident_1994
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1994-02-18'
+file_name: d6cf2847-08e5-4032-a093-61237599c032_z_Hamburg_Surveillance_Incident_1994.yml
+headline: Local Band's Recording Session Triggers Police Surveillance Malfunction
+location: Hamburg Borough, NJ
+rainbow_color_mnemonic_character_value: Z
+source: Vernon Township Times
+tags:
+- surveillance
+- music
+- police
+- technical malfunction
+- unexplained phenomena
+text: 'HAMBURG BOROUGH - A routine police surveillance operation monitoring suspected
+  drug activity was disrupted Tuesday evening when recording equipment at a local
+  band''s practice session allegedly interfered with departmental radio frequencies,
+  according to Hamburg Borough Police Chief Robert Kellner.
+
+
+  The incident occurred around 9:15 PM at an abandoned warehouse on Route 94, where
+  four teenagers from Vernon Township had been rehearsing original compositions. Police
+  had been conducting surveillance of the property following reports of suspicious
+  activity in the area.
+
+
+  "Our radio communications went haywire," said Officer Michael Torres, who was stationed
+  approximately 200 yards from the warehouse. "The static wasn''t normal interference
+  - it had a rhythm to it, almost musical. Then our equipment started picking up what
+  sounded like the band''s music, but distorted."
+
+
+  The band, calling themselves "Fractional Remainder," had been using the space for
+  three weeks with the owner''s permission. Lead guitarist Derek Hammel, 17, said
+  the group was experimenting with "mathematical time signatures" and electronic effects
+  pedals purchased from a pawn shop in Newton.
+
+
+  "We were working on this piece in 7/8 time, really slow and hypnotic," Hammel explained.
+  "The tempo was exactly 72 beats per minute - we had a metronome. But something weird
+  happened around the 13-second mark of each cycle. Our equipment would glitch, like
+  it couldn''t complete the pattern."
+
+
+  Bass player Jennifer Kowalski, 16, reported that during Tuesday''s session, their
+  amplifiers began producing sounds they weren''t creating. "It was like the amps
+  were playing our music back to us, but wrong somehow. Obsessive, like it was stuck
+  in a loop."
+
+
+  The most unusual aspect of the incident involved the police department''s new digital
+  surveillance recorder, installed just two weeks prior. According to Chief Kellner,
+  the device began recording continuously for 47 minutes, despite no officer activating
+  it.
+
+
+  "When we played back the recording, it wasn''t just ambient noise," Kellner said.
+  "It captured the band''s music, but also what sounded like our own radio chatter
+  from earlier in the week, layered underneath. Almost like the equipment was listening
+  to itself."
+
+
+  Dr. Sarah Chen, a psychiatrist at Newton Medical Center who has worked with several
+  area teenagers on substance abuse issues, found the incident noteworthy. "There''s
+  been an uptick in young people reporting auditory disturbances after using certain
+  electronic equipment," she said. "Usually dismissed as drug-related, but the patterns
+  are consistent."
+
+
+  The warehouse owner, who requested anonymity, said previous tenants had complained
+  about "electrical anomalies" in the building. "Nothing dangerous, just equipment
+  behaving strangely. Radios picking up signals that shouldn''t be there."
+
+
+  Sussex County''s Emergency Management coordinator confirmed that no other agencies
+  reported communication disruptions Tuesday evening. The Federal Communications Commission
+  has not responded to requests for comment.
+
+
+  Fractional Remainder disbanded Wednesday morning. When asked why, drummer Tommy
+  Breslin, 17, said only: "We realized something was watching us watch ourselves play.
+  That''s not music anymore."
+
+
+  The surveillance equipment has been returned to the manufacturer for inspection.
+  Chief Kellner said the investigation into suspected drug activity at the warehouse
+  location remains open, though no arrests have been made.
+
+
+  The warehouse has been vacant since Thursday.'
+thread_id: 9e2630ae-7db9-41e1-ada9-fe859d82882a

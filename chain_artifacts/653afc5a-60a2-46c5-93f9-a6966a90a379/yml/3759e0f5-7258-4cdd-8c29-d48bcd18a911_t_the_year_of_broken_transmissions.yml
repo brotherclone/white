@@ -1,0 +1,210 @@
+artifact_id: 3759e0f5-7258-4cdd-8c29-d48bcd18a911
+artifact_name: the_year_of_broken_transmissions
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of staying at Adobe, Gabriel accepted an adjunct teaching
+    position at Portland Community College's new Media Arts program after meeting
+    department chair Margaret Chen at a sound design conference
+  when: December 2015
+  why_plausible: Many tech professionals in their 40s transition to teaching, especially
+    those with creative backgrounds. PCC was expanding their media programs in 2015-2016
+    due to Portland's growing creative economy
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: 3759e0f5-7258-4cdd-8c29-d48bcd18a911_t_the_year_of_broken_transmissions.yml
+following_events:
+- Margaret Chen recommended Gabriel for a Fulbright fellowship to document European
+  river systems
+- The corrupted Celilo Falls recordings became the inspiration for his next album
+- David Kowalski invited Gabriel to collaborate on a book about acoustic ecology
+- Elena Vasquez credited Gabriel's teaching in her successful graduate school applications
+key_differences:
+- Living in a shared house in Southeast Portland instead of corporate housing
+- Teaching sound design to community college students instead of working in corporate
+  software
+- Spending weekends field recording in the Columbia River Gorge
+- Developing a deep friendship with environmental sound artist David Kowalski
+- Creating acoustic documentation of endangered river ecosystems
+mood_description: The melancholy weight of documenting things as they disappear, the
+  bittersweet satisfaction of teaching students who remind you why art matters, the
+  restless sense that this year was preparation for something larger but undefined.
+  Coffee shop conversations about methodology while outside the city changes too fast
+  to document. The particular loneliness of the field recorder operator—always listening,
+  always one step removed from direct experience.
+narrative: 'The year began with Gabriel Walsh carrying a borrowed field recorder through
+  the Columbia River Gorge, his breath visible in the January morning air. He''d traded
+  his Adobe security badge for a community college ID, teaching sound design to students
+  who couldn''t afford art school but had stories worth telling.
+
+
+  Margaret Chen had offered him the position after a chance conversation at an audio
+  conference. She needed someone who understood both technology and creativity. Gabriel
+  needed something that felt real after years of corporate abstraction. The pay was
+  terrible—$2,400 per month for part-time work—but the shared house on Hawthorne Boulevard
+  cost only $650, and he could walk to Stumptown for coffee.
+
+
+  His Tuesday/Thursday classes in room ATC-203 became laboratories for acoustic archaeology.
+  While his students learned Pro Tools basics, Gabriel developed a methodology he
+  called "environmental sound mapping"—documenting how human infrastructure changed
+  natural acoustic spaces. Elena Vasquez, a 24-year-old transfer student from Eastern
+  Oregon, became fascinated with the concept. She''d grown up near the John Day River
+  and remembered when it sounded different.
+
+
+  David Kowalski, a environmental sound artist in his fifties, became Gabriel''s weekend
+  recording partner. They met at Coava Coffee through Margaret''s introduction. David
+  owned professional equipment and a Subaru Outback perfect for accessing remote locations.
+  Together they documented the acoustic interference patterns at Bonneville Dam, the
+  way industrial machinery created rhythms that migrating salmon had to navigate around.
+
+
+  Their most ambitious project focused on the Celilo Falls memorial site, where the
+  Columbia River had once thundered through ancient fishing grounds before the dam
+  silenced it in 1957. Gabriel wanted to record the acoustic memory embedded in the
+  landscape—what remained when the primary sound source disappeared.
+
+
+  The November recording session went wrong. David''s equipment malfunctioned during
+  a crucial take, and hours of recordings became digital noise. Gabriel found himself
+  staring at the corrupted audio files on his laptop screen in the Cascade Campus
+  library at 11 PM, fluorescent lights buzzing overhead, wondering if this was what
+  extinction sounded like—not silence, but broken transmission.
+
+
+  Elena''s thesis defense in May became the year''s unexpected triumph. She presented
+  Gabriel''s acoustic mapping methodology to a panel at Portland State, demonstrating
+  how sound pollution data could predict ecological disruption. The professors were
+  impressed. Elena got accepted to graduate programs at three universities.
+
+
+  Margaret offered Gabriel a permanent position that summer, but he declined. The
+  year had taught him something about the relationship between documentation and loss,
+  about how recording something might be the first step toward forgetting it. He needed
+  to follow that thread somewhere else, somewhere the stakes felt higher than a community
+  college classroom.
+
+
+  The corrupted Celilo Falls recordings became the seed for his next album, though
+  he wouldn''t realize it until months later when Peter called from LEGO about the
+  Moleskine opportunity. The year of broken transmissions had prepared him for something
+  he couldn''t yet name—the understanding that creativity and loss were the same frequency,
+  heard from different angles.'
+period:
+  age_range: !!python/tuple
+  - 41
+  - 41
+  creative_output:
+  - '''Echoes from the Gorge'' field recording series'
+  - Sound design curriculum for community college
+  - Unfinished composition 'When Rivers Forget Their Names'
+  description: A year spent documenting the acoustic archaeology of dying river systems
+    while teaching sound design at Portland Community College
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: melancholy
+  end_date: 2016-12-31
+  is_forgotten: false
+  key_relationships:
+  - Margaret Chen (department chair)
+  - David Kowalski (field recording partner)
+  - Elena Vasquez (graduate student)
+  known_events:
+  - approximate_date: null
+    category: creative
+    date: 2016-02-14
+    description: First field recording session at Bonneville Dam with David Kowalski,
+      documenting the interference patterns between industrial machinery and migrating
+      salmon
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: career
+    date: 2016-06-21
+    description: Margaret Chen offers permanent position at PCC, but Gabriel declines,
+      feeling pulled toward something undefined
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: relationship
+    date: 2016-09-03
+    description: Elena Vasquez presents her thesis on urban sound pollution using
+      Gabriel's teaching methods
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 2016-11-15
+    description: Final recording session at Celilo Falls memorial site, equipment
+      malfunctions, recordings corrupted
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  location: Portland, Oregon and rural Columbia River Gorge
+  primary_activity: Teaching sound design and field recording endangered acoustic
+    environments
+  start_date: 2016-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Met Margaret Chen at the 2015 Audio Engineering Society conference in Los Angeles
+- Felt increasingly disconnected from corporate culture at Adobe despite security
+  clearance
+- Discovered field recording through a weekend workshop in the Santa Cruz mountains
+- Started questioning the environmental impact of tech industry work
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Rented a room in a 1920s craftsman house at 3247 SE Hawthorne Boulevard,
+    sharing space with two Portland State graduate students
+  sensory_elements:
+  - Creaking hardwood floors
+  - Smell of coffee from Stumptown next door
+  - Sound of MAX train every 15 minutes
+- category: daily_routine
+  detail: Tuesday/Thursday classes at PCC Cascade Campus, room ATC-203, teaching 'Introduction
+    to Sound Design' to 23 students
+  sensory_elements:
+  - Fluorescent lighting buzz
+  - Students' energy drink cans crinkling
+  - HVAC system interference on recordings
+- category: relationship
+  detail: Weekly coffee meetings with Margaret Chen at Coava Coffee on SE Grand Avenue,
+    discussing curriculum development
+  sensory_elements:
+  - Steam from espresso machine
+  - Margaret's nervous habit of clicking her pen
+  - Industrial district traffic outside
+- category: creative
+  detail: Field recording sessions with David Kowalski using borrowed Zoom H6 recorder
+    and Sennheiser shotgun mic at Crown Point Vista
+  sensory_elements:
+  - Wind through the mic windscreen
+  - Tourist conversations in multiple languages
+  - Columbia River current 400 feet below
+- category: outcome
+  detail: Elena Vasquez's thesis defense at Portland State University, Neuberger Hall
+    room 415, where she presented Gabriel's 'acoustic mapping' methodology
+  sensory_elements:
+  - Projector fan whirring
+  - Elena's voice shaking with nerves
+  - Coffee stains on the presentation table
+- category: career
+  detail: Teaching sound editing in the basement computer lab with 12 aging iMacs,
+    students wearing mismatched headphones
+  sensory_elements:
+  - Basement mustiness
+  - Clicking of mouse wheels
+  - Student frustration sighs when software crashed
+specificity_score: 0.9
+thread_id: 653afc5a-60a2-46c5-93f9-a6966a90a379
+title: The Year of Broken Transmissions

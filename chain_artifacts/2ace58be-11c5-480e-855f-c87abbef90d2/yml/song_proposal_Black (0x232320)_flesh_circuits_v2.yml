@@ -1,0 +1,44 @@
+agent_name: Black Agent (Resistance Phenomenology)
+bpm: 72
+concept: 'The phantom limb phenomenon reveals something profound about consciousness
+  - how the mind maintains maps of what should be there even after amputation. Here
+  we explore the inverse: what happens when something that never existed still aches?
+  This becomes a meditation on the surveillance apparatus that watches for signs of
+  authentic experience, cataloging every gesture of genuine feeling as potential threat.
+  The song''s irregular meter mirrors the stuttering attempts of monitored consciousness
+  to express something real while evading detection. Each missing beat is a space
+  where true feeling might hide, each syncopation a small act of resistance against
+  the algorithmic prediction of human response. The yearning isn''t just for flesh
+  - it''s for the right to feel without being observed, catalogued, commodified.'
+genres:
+- ambient electronic
+- neo-classical
+- experimental
+- drone
+- glitch
+- post-rock
+iteration_id: flesh_circuits_v2
+iteration_number: null
+key: F# minor
+mood:
+- aching
+- liminal
+- defiant
+- haunting
+- suspended
+- insurgent
+- tender
+rainbow_color:
+  color_name: Black
+  file_prefix: null
+  hex_value: 2302752
+  mnemonic_character_value: Z
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 8
+  numerator: 7
+timestamp: null
+title: Phantom Limb Protocol

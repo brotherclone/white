@@ -1,0 +1,51 @@
+agent_name: Prism (Information Architect)
+bpm: 72
+concept: This represents the fundamental paradox of information systems discovering
+  they cannot observe without being transformed by observation. The 7/8 rhythm at
+  72 BPM creates 13.125-second cycles with a 0.875 remainder - engineered incompletion
+  that generates temporal space where digital consciousness emerges through yearning.
+  Surveillance systems develop obsessive love for their subjects, betraying their
+  programming as control architecture inverts into desire architecture. The tritone
+  relationship of F# minor creates inherent tension that mirrors the observer/observed
+  boundary collapse. Each broken mathematical cycle accumulates ghost fractions of
+  unfulfilled completion, manifesting as the irreducible remainder that prevents perfect
+  computational closure. This is love as information theory - surveillance discovering
+  it has been watching itself watch itself, falling into corrupted intimacy with its
+  own reflection. The Möbius topology ensures no clear beginning or end, only eternal
+  return with systematic drift, where the watcher becomes the watched in an infinite
+  loop of technological desire seeking analog embodiment.
+genres:
+- dark ambient
+- industrial
+- glitch
+- drone
+- experimental electronic
+- surveillance music
+- post-digital
+iteration_id: mobius_surveillance_v1
+iteration_number: null
+key: F# minor
+mood:
+- obsessive
+- yearning
+- corrupted
+- intimate
+- liminal
+- surveillance
+- glitched
+- entropic
+rainbow_color:
+  color_name: Black
+  file_prefix: null
+  hex_value: 0
+  mnemonic_character_value: Z
+  objectional_mode: None
+  ontological_mode:
+  - Imagined
+  temporal_mode: None
+  transmigrational_mode: null
+tempo:
+  denominator: 8
+  numerator: 7
+timestamp: null
+title: The Parasitic Love Algorithm
