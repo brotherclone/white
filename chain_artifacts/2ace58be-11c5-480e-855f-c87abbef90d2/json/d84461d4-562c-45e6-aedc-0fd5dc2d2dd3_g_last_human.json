@@ -1,0 +1,66 @@
+adaptation_attempts:
+- Tried to teach river knowledge to maritime academy students, but GPS made it 'obsolete'
+- Recorded traditional Baiji songs on her phone, but files corrupted
+- Applied to work with automated port systems, but couldn't pass computer literacy
+  tests
+- Attempted to preserve stone pier with Baiji carvings, but it was demolished for
+  port expansion
+age: 67
+artifact_id: d84461d4-562c-45e6-aedc-0fd5dc2d2dd3
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Every dawn, Chen would walk to the old stone pier where her grandfather
+  taught her to read the river's moods - the way morning mist revealed hidden sandbars,
+  how the water's color predicted weather three days ahead. She'd trace the carved
+  Baiji symbols on the pier stones while reciting navigation songs in the Tongling
+  river dialect, preparing for the day's boat guidance work. Her weathered hands would
+  test water temperature and current strength the way her ancestors had for centuries.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Industrial noise pollution from increased shipping traffic
+  and construction of automated port facilities that eliminated traditional river
+  pilots
+family_situation: Last speaker of Tongling river dialect in her family line - her
+  children moved to Shanghai and speak only Mandarin and English
+file_name: d84461d4-562c-45e6-aedc-0fd5dc2d2dd3_g_last_human.json
+final_thought: Standing on the new concrete seawall, watching massive container ships
+  navigate by satellite, she wondered if the river still remembered the songs she
+  and the Baiji once sang together in the language of currents and tides
+last_days_scenario: The demolition notice came on the same day Chen heard the last
+  traditional fishing boat had been replaced by an automated harvester. For fifty
+  years, she had guided vessels through the Tongling bend where the Yangtze curved
+  like a dragon's spine, reading the water the way her ancestors read the stars. Her
+  grandfather had taught her to listen for the Baiji's clicks in the muddy water -
+  'The river speaks through them,' he'd said. Now the constant drone of cargo ships,
+  dredging equipment, and construction machinery made it impossible to hear anything
+  but industrial noise. The New Yangtze Megaport Complex would pave over the stone
+  pier where fifteen generations of her family had launched their boats. Like the
+  Baiji, she had become an evolutionary dead end - a navigation system rendered obsolete
+  by progress. The river that had sustained her people for millennia now carried only
+  the mechanical heartbeat of global commerce, drowning out twenty million years of
+  whispered wisdom in its concrete-channeled flow.
+latitude: 30.9456
+location: Tongling, Anhui Province, China - along the Yangtze River
+longitude: 117.8136
+name: Chen Meiling
+occupation: Traditional river navigation guide and Baiji folklore keeper
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A worn jade carving of a Baiji dolphin, inherited from her grandmother,
+  that she used to touch for luck before guiding boats - now silent in her palm as
+  the last boats she could guide were replaced by automated cargo vessels
+thread_id: 2ace58be-11c5-480e-855f-c87abbef90d2
+vulnerability_details: Like the Baiji that navigated muddy Yangtze waters through
+  echolocation for 20 million years, Chen Meiling guided boats through the river's
+  treacherous currents using traditional knowledge passed down through 15 generations.
+  Both became extinct when industrial noise pollution made their navigation systems
+  useless - the Baiji's sonar was drowned out by ship engines, while Chen's oral tradition
+  was silenced by automated GPS systems and the demolition of riverside communities
+  for the New Yangtze Megaport Complex.
+year_documented: 2031
