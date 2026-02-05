@@ -1,0 +1,34 @@
+{
+  "title": "9c8ab2ae-05d3-4f8a-b2a3-56db95df255e_audio_infranym",
+  "duration_ms": 13194,
+  "tempo_bpm": 74,
+  "key_signature": "F# minor",
+  "layers": {
+    "surface": {
+      "text": "the morse code",
+      "voice_profile": "whisper",
+      "duration_ms": 13194
+    },
+    "reverse": {
+      "text": "the morse code",
+      "voice_profile": "proclaim",
+      "duration_ms": 13194
+    },
+    "submerged": {
+      "text": "the morse code",
+      "voice_profile": "whisper",
+      "duration_ms": 13194
+    }
+  },
+  "files": {
+    "composite": "/Volumes/LucidNonsense/White/chain_artifacts/9c8ab2ae-05d3-4f8a-b2a3-56db95df255e/wav/audio_the_morse_code.wav",
+    "layers": {
+      "surface": "/Volumes/LucidNonsense/White/chain_artifacts/9c8ab2ae-05d3-4f8a-b2a3-56db95df255e/wav/audio_the_morse_code_surface.wav",
+      "reverse": "/Volumes/LucidNonsense/White/chain_artifacts/9c8ab2ae-05d3-4f8a-b2a3-56db95df255e/wav/audio_the_morse_code_reverse.wav",
+      "submerged": "/Volumes/LucidNonsense/White/chain_artifacts/9c8ab2ae-05d3-4f8a-b2a3-56db95df255e/wav/audio_the_morse_code_submerged.wav"
+    }
+  },
+  "puzzle_solution": "the morse code",
+  "color_agent": "Indigo",
+  "album": "Untitled White Album"
+}

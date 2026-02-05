@@ -13,7 +13,7 @@ import yaml
 import re
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import RunnableConfig
@@ -707,6 +707,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "red", trace.boundaries_shifted)
         return state
 
     def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -758,6 +759,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "orange", trace.boundaries_shifted)
         return state
 
     def process_yellow_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -805,6 +807,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "yellow", trace.boundaries_shifted)
         return state
 
     def process_green_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -877,6 +880,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "green", trace.boundaries_shifted)
         return state
 
     def process_blue_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -928,6 +932,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "blue", trace.boundaries_shifted)
         return state
 
     def process_indigo_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -994,6 +999,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "indigo", trace.boundaries_shifted)
         return state
 
     def process_violet_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -1040,6 +1046,7 @@ Structure your proposal as the final, complete vision - ready for human implemen
             },
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "violet", trace.boundaries_shifted)
         return state
 
     def _violet_rebracketing_analysis(self, proposal, interview_artifacts) -> str:
@@ -2150,6 +2157,286 @@ Structure your synthesis as the final creative brief before manifestation.
                         )
         return prompt_artifacts
 
+    def _gather_artifact_summaries(self, state: MainAgentState) -> str:
+        """
+        Extract brief summaries from all artifacts, organized by originating agent.
+
+        Returns a formatted string suitable for injection into finalization prompts,
+        giving The Prism visibility into the actual content generated during the run.
+        """
+        if not state.artifacts:
+            return "No artifacts generated during this run."
+
+        # Map artifact types to their originating agents
+        ARTIFACT_TO_AGENT = {
+            ChainArtifactType.EVP_ARTIFACT: "BLACK",
+            ChainArtifactType.SIGIL: "BLACK",
+            ChainArtifactType.BOOK: "RED",
+            ChainArtifactType.NEWSPAPER_ARTICLE: "ORANGE",
+            ChainArtifactType.SYMBOLIC_OBJECT: "ORANGE",
+            ChainArtifactType.GAME_RUN: "YELLOW",
+            ChainArtifactType.CHARACTER_SHEET: "YELLOW",
+            ChainArtifactType.ARBITRARYS_SURVEY: "GREEN",
+            ChainArtifactType.LAST_HUMAN: "GREEN",
+            ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE: "GREEN",
+            ChainArtifactType.SPECIES_EXTINCTION: "GREEN",
+            ChainArtifactType.RESCUE_DECISION: "GREEN",
+            ChainArtifactType.QUANTUM_TAPE_LABEL: "BLUE",
+            ChainArtifactType.ALTERNATE_TIMELINE: "BLUE",
+            ChainArtifactType.INFRANYM_MIDI: "INDIGO",
+            ChainArtifactType.INFRANYM_AUDIO: "INDIGO",
+            ChainArtifactType.INFRANYM_ENCODED_IMAGE: "INDIGO",
+            ChainArtifactType.INFRANYM_TEXT: "INDIGO",
+            ChainArtifactType.CIRCLE_JERK_INTERVIEW: "VIOLET",
+        }
+
+        # Collect summaries by agent
+        agent_summaries: Dict[str, List[str]] = {}
+
+        for artifact in state.artifacts:
+            # Get artifact type
+            if isinstance(artifact, dict):
+                artifact_type_str = artifact.get("chain_artifact_type")
+                try:
+                    artifact_type = ChainArtifactType(artifact_type_str)
+                except (ValueError, TypeError):
+                    continue
+            else:
+                artifact_type = getattr(artifact, "chain_artifact_type", None)
+                if artifact_type is None:
+                    continue
+
+            # Find agent
+            agent = ARTIFACT_TO_AGENT.get(artifact_type, "UNKNOWN")
+            if agent not in agent_summaries:
+                agent_summaries[agent] = []
+
+            # Extract brief summary based on artifact type
+            summary = self._extract_artifact_summary(artifact, artifact_type)
+            if summary:
+                agent_summaries[agent].append(summary)
+
+        # Format output
+        if not agent_summaries:
+            return "No recognizable artifacts found."
+
+        # Order agents in chromatic sequence
+        agent_order = [
+            "BLACK",
+            "RED",
+            "ORANGE",
+            "YELLOW",
+            "GREEN",
+            "BLUE",
+            "INDIGO",
+            "VIOLET",
+        ]
+        output = []
+
+        for agent in agent_order:
+            if agent in agent_summaries and agent_summaries[agent]:
+                output.append(f"\n**{agent} Agent Artifacts:**")
+                for summary in agent_summaries[agent]:
+                    output.append(f"  • {summary}")
+
+        # Add any unknown agents
+        for agent, summaries in agent_summaries.items():
+            if agent not in agent_order and summaries:
+                output.append(f"\n**{agent} Artifacts:**")
+                for summary in summaries:
+                    output.append(f"  • {summary}")
+
+        return "\n".join(output) if output else "No artifact summaries available."
+
+    def _extract_artifact_summary(
+        self, artifact: Any, artifact_type: ChainArtifactType
+    ) -> Optional[str]:
+        """Extract a brief identifying summary from an artifact."""
+
+        # Handle dict-serialized artifacts
+        if isinstance(artifact, dict):
+            return self._extract_dict_artifact_summary(artifact, artifact_type)
+
+        # Handle object artifacts
+        try:
+            if artifact_type == ChainArtifactType.EVP_ARTIFACT:
+                transcript = getattr(artifact, "transcript", None)
+                if transcript and len(transcript) > 80:
+                    return f"EVP: {transcript[:80]}..."
+                return f"EVP: {transcript or 'no transcript'}"
+
+            elif artifact_type == ChainArtifactType.SIGIL:
+                name = getattr(artifact, "artifact_name", "unnamed")
+                return f"Sigil: {name}"
+
+            elif artifact_type == ChainArtifactType.BOOK:
+                title = getattr(artifact, "title", "untitled")
+                author = getattr(artifact, "author", "unknown")
+                return f"Book: '{title}' by {author}"
+
+            elif artifact_type == ChainArtifactType.NEWSPAPER_ARTICLE:
+                headline = getattr(artifact, "headline", "no headline")
+                source = getattr(artifact, "source", "")
+                return f"Newspaper: '{headline}'" + (f" ({source})" if source else "")
+
+            elif artifact_type == ChainArtifactType.SYMBOLIC_OBJECT:
+                name = getattr(artifact, "name", None) or getattr(
+                    artifact, "artifact_name", "unnamed"
+                )
+                return f"Symbolic Object: {name}"
+
+            elif artifact_type == ChainArtifactType.ALTERNATE_TIMELINE:
+                title = getattr(artifact, "title", "untitled")
+                divergence = getattr(artifact, "divergence_point", None)
+                when = (
+                    divergence.when
+                    if divergence and hasattr(divergence, "when")
+                    else ""
+                )
+                return f"Timeline: '{title}'" + (f" (diverges: {when})" if when else "")
+
+            elif (
+                artifact_type
+                == ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE
+            ):
+                species = getattr(artifact, "species", None)
+                human = getattr(artifact, "human", None)
+                species_name = (
+                    getattr(species, "common_name", "species") if species else "species"
+                )
+                human_name = getattr(human, "name", "human") if human else "human"
+                return f"Extinction Narrative: {species_name} / {human_name}"
+
+            elif artifact_type == ChainArtifactType.SPECIES_EXTINCTION:
+                name = getattr(artifact, "common_name", None) or getattr(
+                    artifact, "artifact_name", "unnamed"
+                )
+                return f"Species Extinction: {name}"
+
+            elif artifact_type == ChainArtifactType.LAST_HUMAN:
+                name = getattr(artifact, "name", "unnamed")
+                return f"Last Human: {name}"
+
+            elif artifact_type == ChainArtifactType.CIRCLE_JERK_INTERVIEW:
+                interviewer = getattr(artifact, "interviewer_name", "unknown")
+                pub = getattr(artifact, "publication", "")
+                return f"Interview: {interviewer}" + (f" ({pub})" if pub else "")
+
+            elif artifact_type == ChainArtifactType.QUANTUM_TAPE_LABEL:
+                name = getattr(artifact, "artifact_name", "unnamed tape")
+                return f"Quantum Tape: {name}"
+
+            elif artifact_type in (
+                ChainArtifactType.INFRANYM_MIDI,
+                ChainArtifactType.INFRANYM_AUDIO,
+                ChainArtifactType.INFRANYM_ENCODED_IMAGE,
+                ChainArtifactType.INFRANYM_TEXT,
+            ):
+                name = getattr(artifact, "artifact_name", "unnamed")
+                medium = artifact_type.value.replace("infranym_", "").upper()
+                return f"Infranym ({medium}): {name}"
+
+            elif artifact_type == ChainArtifactType.GAME_RUN:
+                name = getattr(artifact, "artifact_name", "unnamed")
+                return f"Game Run: {name}"
+
+            elif artifact_type == ChainArtifactType.CHARACTER_SHEET:
+                name = getattr(artifact, "character_name", None) or getattr(
+                    artifact, "artifact_name", "unnamed"
+                )
+                return f"Character: {name}"
+
+            elif artifact_type == ChainArtifactType.ARBITRARYS_SURVEY:
+                name = getattr(artifact, "artifact_name", "survey")
+                return f"Survey: {name}"
+
+            elif artifact_type == ChainArtifactType.RESCUE_DECISION:
+                name = getattr(artifact, "artifact_name", "decision")
+                return f"Rescue Decision: {name}"
+
+            else:
+                name = getattr(artifact, "artifact_name", None) or str(
+                    artifact_type.value
+                )
+                return f"{artifact_type.value}: {name}"
+
+        except Exception as e:
+            logger.debug(f"Failed to extract summary for {artifact_type}: {e}")
+            return None
+
+    def _extract_dict_artifact_summary(
+        self, artifact: dict, artifact_type: ChainArtifactType
+    ) -> Optional[str]:
+        """Extract summary from dict-serialized artifact."""
+        try:
+            if artifact_type == ChainArtifactType.EVP_ARTIFACT:
+                transcript = artifact.get("transcript", "")
+                if transcript and len(transcript) > 80:
+                    return f"EVP: {transcript[:80]}..."
+                return f"EVP: {transcript or 'no transcript'}"
+
+            elif artifact_type == ChainArtifactType.NEWSPAPER_ARTICLE:
+                headline = artifact.get("headline", "no headline")
+                source = artifact.get("source", "")
+                return f"Newspaper: '{headline}'" + (f" ({source})" if source else "")
+
+            elif artifact_type == ChainArtifactType.ALTERNATE_TIMELINE:
+                title = artifact.get("title", "untitled")
+                div = artifact.get("divergence_point", {})
+                when = div.get("when", "") if isinstance(div, dict) else ""
+                return f"Timeline: '{title}'" + (f" (diverges: {when})" if when else "")
+
+            elif (
+                artifact_type
+                == ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE
+            ):
+                species_name = artifact.get("species_name", "species")
+                human_name = artifact.get("human_name", "human")
+                return f"Extinction Narrative: {species_name} / {human_name}"
+
+            elif artifact_type == ChainArtifactType.CIRCLE_JERK_INTERVIEW:
+                interviewer = artifact.get("interviewer_name", "unknown")
+                pub = artifact.get("publication", "")
+                return f"Interview: {interviewer}" + (f" ({pub})" if pub else "")
+
+            elif artifact_type == ChainArtifactType.BOOK:
+                title = artifact.get("title", "untitled")
+                author = artifact.get("author", "unknown")
+                return f"Book: '{title}' by {author}"
+
+            elif artifact_type == ChainArtifactType.SPECIES_EXTINCTION:
+                name = artifact.get("common_name") or artifact.get(
+                    "artifact_name", "unnamed"
+                )
+                return f"Species Extinction: {name}"
+
+            elif artifact_type == ChainArtifactType.LAST_HUMAN:
+                name = artifact.get("name", "unnamed")
+                return f"Last Human: {name}"
+
+            elif artifact_type == ChainArtifactType.GAME_RUN:
+                name = artifact.get("artifact_name", "unnamed")
+                return f"Game Run: {name}"
+
+            elif artifact_type == ChainArtifactType.CHARACTER_SHEET:
+                name = artifact.get("character_name") or artifact.get(
+                    "artifact_name", "unnamed"
+                )
+                return f"Character: {name}"
+
+            else:
+                name = (
+                    artifact.get("artifact_name")
+                    or artifact.get("title")
+                    or artifact.get("name")
+                    or str(artifact_type.value)
+                )
+                return f"{artifact_type.value}: {name}"
+
+        except Exception as e:
+            logger.debug(f"Failed to extract dict summary for {artifact_type}: {e}")
+            return None
+
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
         """
         The Prism's final act: holographic meta-rebracketing and chromatic synthesis.
@@ -2203,6 +2490,7 @@ Structure your synthesis as the final creative brief before manifestation.
 
         traces_summary = self._format_transformation_traces(state.transformation_traces)
         all_iterations = "---".join([str(i) for i in state.song_proposals.iterations])
+        artifact_summaries = self._gather_artifact_summaries(state)
 
         prompt = f"""
 You are the Prism performing HOLOGRAPHIC META-REBRACKETING.
@@ -2221,6 +2509,9 @@ categorical boundaries in their unique way:
 
 **Transformation Traces:**
 {traces_summary}
+
+**Artifacts Generated:**
+{artifact_summaries}
 
 **All Song Proposal Iterations:**
 {all_iterations}
@@ -2267,6 +2558,8 @@ Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
         if mock_mode:
             return "MOCK: Chromatic synthesis would appear here"
 
+        artifact_summaries = self._gather_artifact_summaries(state)
+
         prompt = f"""
 You are The Prism creating the FINAL CHROMATIC SYNTHESIS.
 
@@ -2276,15 +2569,20 @@ You have performed holographic meta-rebracketing:
 You hold the complete spectrum of song proposals:
 {'---'.join([str(i) for i in state.song_proposals.iterations])}
 
+**Artifacts Generated During This Run:**
+{artifact_summaries}
+
 **YOUR TASK: CREATE THE ULTIMATE CREATIVE BRIEF**
 
 Synthesize everything into a coherent, actionable document for human implementation.
+Reference specific artifacts where they illuminate the creative direction.
 
 This synthesis must:
 1. Preserve insights from all seven chromatic methodologies
 2. Resolve contradictions through rebracketing (not erasure)
 3. Provide clear creative direction (musical, lyrical, structural)
 4. Make the INFORMATION → TIME → SPACE transmigration COMPLETE and MANIFEST
+5. Ground abstract concepts in the concrete artifacts generated
 
 Structure your synthesis to guide:
 - **Musical Architecture**: Keys, progressions, rhythms, textures
@@ -2292,6 +2590,7 @@ Structure your synthesis to guide:
 - **Production Approach**: Sonic palette, effects, mixing philosophy
 - **Ritual Elements**: Physical actions needed (if any)
 - **Conceptual Framework**: The unified vision integrating all seven lenses
+- **Artifact Integration**: How specific artifacts inform each element
 
 This is not explanation - this is ACTIONABLE STRUCTURE.
 

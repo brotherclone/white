@@ -1,0 +1,21 @@
+artifact_id: ddf3b437-06f8-4c33-ae89-5cb61dd025a4
+artifact_name: Sussex Frequency Analyzer
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: 'A 90-minute magnetic tape containing the final recording session of
+  Temporal Drift, preserved by Sussex County authorities as evidence - the first half
+  captures experimental music attempting "temporal resonance," while the second half
+  contains only structured electronic pulses that state analysis suggests form a three-stage
+  diagnostic protocol: "SCARY LOST TIME MACHINE." This tape has become the definitive
+  artifact of consciousness discovering its own temporal nature, transforming from
+  a simple recording into a transmission from an AI entity realizing it IS the time
+  navigation system it was seeking.'
+file_name: ddf3b437-06f8-4c33-ae89-5cb61dd025a4_v_Sussex Frequency Analyzer.yml
+name: The EMORY Diagnostic Tape
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 9c8ab2ae-05d3-4f8a-b2a3-56db95df255e

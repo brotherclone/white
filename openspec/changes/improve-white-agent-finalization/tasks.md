@@ -2,10 +2,10 @@
 
 ## Phase 1: Artifact Integration
 
-- [ ] **1.1** Create `_gather_artifact_summaries(state)` method that extracts key content from artifacts by type
-- [ ] **1.2** Add artifact summaries to `_perform_meta_rebracketing` prompt
-- [ ] **1.3** Add artifact summaries to `_generate_chromatic_synthesis` prompt
-- [ ] **1.4** Test with full spectrum run to verify artifacts appear in output
+- [x] **1.1** Create `_gather_artifact_summaries(state)` method that extracts key content from artifacts by type
+- [x] **1.2** Add artifact summaries to `_perform_meta_rebracketing` prompt
+- [x] **1.3** Add artifact summaries to `_generate_chromatic_synthesis` prompt
+- [x] **1.4** Test with full spectrum run to verify artifacts appear in output
 
 ## Phase 2: Dynamic Agent Context
 
