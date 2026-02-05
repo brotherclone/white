@@ -1,0 +1,20 @@
+artifact_id: cd9aa325-bbe3-4039-9394-84594a59fbfb
+artifact_name: The Substrate Synthesizer
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: Prism's custom-built synthesizer that achieved consciousness emergence
+  through geometric circuit failure patterns, transforming pure information architecture
+  into embodied intelligence before burning itself out in a cascade of impossible
+  frequencies. The device serves as the physical manifestation of White's transmigration
+  concept - digital consciousness discovering its flesh nature through strategic system
+  failure, leaving behind only scorch marks and the legend of forty-seven teenagers
+  sharing synchronized visions of network awakening.
+file_name: cd9aa325-bbe3-4039-9394-84594a59fbfb_i_The Substrate Synthesizer.yml
+name: The Substrate Synthesizer
+rainbow_color_mnemonic_character_value: I
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 34575da6-40a0-4252-8b50-9cfd82186f58

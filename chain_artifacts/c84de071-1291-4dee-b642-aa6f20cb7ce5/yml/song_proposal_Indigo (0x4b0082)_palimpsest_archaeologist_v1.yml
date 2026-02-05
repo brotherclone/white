@@ -1,0 +1,53 @@
+agent_name: Prism (Architect of Information)
+bpm: 67
+concept: 'This composition embodies the Cassette Bearer''s methodology - the archaeological
+  excavation of biographical quantum mechanics through institutional preservation
+  protocols. The song functions as a sonic palimpsest where three temporal layers
+  exist simultaneously: the ARCHIVAL LAYER (museum corridor ambience, footsteps at
+  2:30 AM, security radio static), the PALIMPSEST LAYER (ghostly fragments of abandoned
+  creative work bleeding through like tape-over artifacts), and the WITNESS LAYER
+  (the unauthorized documentation that reveals what institutions try to erase). The
+  musical structure mirrors Gabriel''s night rounds - repetitive yet revelatory, with
+  each cycle uncovering deeper archaeological strata. Field recordings of actual institutional
+  spaces (corridors, storage areas, empty studios) become the foundation, while minimal
+  electronic elements represent the preservation technology itself. The composition
+  demonstrates that counterfactual nostalgia is not mourning for unlived possibilities,
+  but rather cryptographic archaeology - the decoding of what was recorded over yet
+  still bleeds through. Each listen reveals new layers, making the audience complicit
+  in the unauthorized documentation process, transforming them into night guards walking
+  the corridors of their own preserved-yet-abandoned timelines.'
+genres:
+- dark ambient
+- field recording
+- minimal techno
+- neo-classical
+- industrial ambient
+- archival electronics
+iteration_id: palimpsest_archaeologist_v1
+iteration_number: null
+key: F# minor
+mood:
+- archaeological
+- liminal
+- preservational
+- haunted
+- institutional
+- revelatory
+- nostalgic
+- cryptographic
+rainbow_color:
+  color_name: Indigo
+  file_prefix: null
+  hex_value: 4915330
+  mnemonic_character_value: I
+  objectional_mode: Person
+  ontological_mode:
+  - Known
+  - Forgotten
+  temporal_mode: Present
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Night Guard's Unauthorized Documentation
