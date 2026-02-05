@@ -1,0 +1,50 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: This song chronicles the erased timeline of Gabriel Walsh's year as a Smithsonian
+  security guard (January-November 2017), when political despair and Bowie's death
+  drove him to abandon his multimedia practice for night shifts walking marble corridors.
+  The narrative follows his 11 PM to 7 AM rounds past the Hope Diamond, his H Street
+  apartment above Maketto where ramen steam rose through floorboards, his 2:30 AM
+  meeting with documentary filmmaker Rosa Delgado-Chen in the mineral hall, and his
+  unauthorized filming of basement storage areas until supervisor Janet Kowalski's
+  disciplinary meeting on August 12th. The song's archaeological structure mirrors
+  the museum's preservation logic - each verse a specimen jar containing moments of
+  institutional loneliness, creative abandonment, and the bitter recognition that
+  even rebellion becomes archival material. The melody carries the weight of being
+  sole witness to institutional memory, of relationships that bloom in darkness and
+  wither in bureaucratic light, culminating in November 3rd when he left his badge
+  on Janet's desk with a note about 'institutional critique and personal failure.'
+  This represents the INFORMATION (unauthorized documentation) → TIME (night shift
+  temporality, 11-month erasure) → SPACE (museum corridors, basement storage, the
+  physical geography of institutional preservation) transmigration, where counterfactual
+  nostalgia mourns not just what never happened, but what happened and was then overwritten.
+genres:
+- folk rock
+- americana
+- indie folk
+- melancholy folk
+iteration_id: empty_studio_security_guard_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholic
+- nostalgic
+- institutional
+- lonely
+- regretful
+- contemplative
+- defeated
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Night Guard's Last Round

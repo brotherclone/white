@@ -1,0 +1,62 @@
+adaptation_attempts:
+- Tried converting sanctuary space to general eco-tourism
+- Attempted to raise monarchs in captivity
+- Started teaching online courses about traditional butterfly knowledge
+- Applied for government reforestation jobs
+- Considered moving to follow remaining monarch populations north
+age: 47
+artifact_id: 10c3d9a8-d0ad-46a9-bcbb-b29d42c0ea42
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Every morning at 5:30 AM, Elena would walk the forest paths her grandmother
+  taught her, checking the oyamel fir trees for butterfly clusters. She'd prepare
+  educational materials in three languages, tend the small museum of monarch artifacts,
+  and guide groups of visitors through the sacred groves where millions of monarchs
+  once overwintered.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Habitat destruction from illegal logging combined with climate-shifted
+  weather patterns that disrupted monarch migration timing, leaving sanctuary communities
+  economically stranded
+family_situation: Divorced, two teenage children who moved to Mexico City for work.
+  Her mother died in 2032 before passing on the final migration songs. Elena is the
+  last keeper of her family's traditional ecological knowledge.
+file_name: 10c3d9a8-d0ad-46a9-bcbb-b29d42c0ea42_g_last_human.json
+final_thought: She wondered if the monarchs would remember this place in their genetic
+  memory, even after the forests were gone, the way she still dreamed of her grandmother's
+  songs even though there was no one left to sing them to.
+last_days_scenario: 'Elena stands alone in the Cerro Pelón sanctuary at dawn, holding
+  her grandmother''s counting stick. The oyamel firs are still here, but silent. Three
+  years since the last major monarch arrival. The eco-lodge closed last month. Her
+  neighbors have left for the cities or the strawberry fields. She counts empty branches
+  out of habit, whispering the Purépecha names for butterfly behaviors her grandmother
+  taught her - words that will die with her. The morning mist carries no orange wings,
+  only the sound of distant chainsaws from illegal loggers who know no one is watching
+  anymore. Her phone buzzes with a message from her daughter in Mexico City: "Mama,
+  there''s work in the maquiladoras. You can''t stay there alone." Elena looks at
+  the empty trees one more time, then begins walking down the mountain path, leaving
+  the sanctuary key hanging on the visitor center door for whoever might come after
+  - though she knows no one will.'
+latitude: 19.6344
+location: Angangueo, Michoacán, Mexico
+longitude: -100.2806
+name: Elena Vásquez-Chen
+occupation: Traditional ecological guide and butterfly sanctuary keeper
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Her grandmother's hand-carved wooden butterfly counting stick,
+  marked with notches representing decades of migration counts, now pointing only
+  to empty trees
+thread_id: 9c8ab2ae-05d3-4f8a-b2a3-56db95df255e
+vulnerability_details: Like monarchs whose multi-generational migration was broken
+  when climate disrupted timing, Elena's family's four-generation tradition of guiding
+  visitors through monarch sanctuaries ended when the butterflies stopped arriving.
+  Her grandmother's knowledge of reading weather patterns and butterfly behavior became
+  useless overnight.
+year_documented: 2034

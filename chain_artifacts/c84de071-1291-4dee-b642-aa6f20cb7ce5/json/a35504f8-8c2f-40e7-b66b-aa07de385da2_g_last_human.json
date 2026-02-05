@@ -1,0 +1,56 @@
+adaptation_attempts:
+- Switched to motorboat hunting in open water but lacks fuel money
+- Tried commercial fishing but quota system excludes traditional hunters
+- Applied for government climate adaptation grants - denied for lack of paperwork
+- Attempted to guide climate tourists but ice too dangerous for visitors
+- Started carving soapstone full-time but tourist market collapsed
+age: 47
+artifact_id: a35504f8-8c2f-40e7-b66b-aa07de385da2
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Wakes at 4 AM to check ice conditions via satellite feeds on a cracked
+  tablet powered by solar panel. Spends hours studying weather patterns and ice charts,
+  looking for stable floes within dog sled range. Maintains his traditional sealskin
+  kayak and harpoons that haven't touched seal in three seasons. Teaches his grandson
+  Inuit words for ice conditions that no longer exist.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Accelerating Arctic sea ice loss making traditional ice-edge
+  hunting impossible
+family_situation: Lives with wife Siku and grandson Malik (8) after his daughter died
+  in Nuuk seeking work. His son moved to Denmark. Three generations of hunting knowledge
+  concentrated in a man who can no longer hunt.
+file_name: a35504f8-8c2f-40e7-b66b-aa07de385da2_g_last_human.json
+final_thought: The ice remembers everything - every seal breath, every footstep, every
+  prayer. But we are forgetting how to listen.
+last_days_scenario: 'Aput sits by his kitchen window at 3 AM, watching the dark ocean
+  where solid ice should stretch to the horizon. The weather app shows another warm
+  front approaching - 4°C above normal for January. His grandson asks why the polar
+  bears in his picture book look so fat when the ones on YouTube look so thin. Aput
+  has no words in English or Inuktitut for this betrayal by the world itself. Tomorrow
+  he will check the ice charts again, knowing what he will find: open water where
+  his ancestors walked on solid ground. His wife quietly packs dried fish for another
+  winter of rationing, while outside, the wind carries the sound of waves that should
+  be frozen silent.'
+latitude: 77.484
+location: Qaanaaq, Northwest Greenland
+longitude: -69.3632
+name: Aput Kanguq
+occupation: Traditional seal hunter and ice navigator
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: he/him
+rainbow_color_mnemonic_character_value: G
+significant_object: His grandfather's bone ice chisel, carved with lunar calendar
+  markings for optimal seal hunting times. The tool has been in his family for eight
+  generations but is now useless - there is no ice thick enough to require chiseling.
+thread_id: c84de071-1291-4dee-b642-aa6f20cb7ce5
+vulnerability_details: Like polar bears who must swim impossible distances between
+  shrinking ice floes, Aput's hunting grounds have retreated beyond the reach of his
+  traditional methods. The sea ice that once supported his family's 800-year hunting
+  tradition now forms too late, breaks too early, and lies too far from shore.
+year_documented: 2034

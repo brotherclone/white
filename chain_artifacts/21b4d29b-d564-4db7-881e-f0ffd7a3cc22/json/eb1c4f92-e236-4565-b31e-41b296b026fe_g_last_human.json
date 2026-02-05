@@ -1,0 +1,61 @@
+adaptation_attempts:
+- Tried to teach monarch identification through WhatsApp videos to urban grandchildren
+- Planted milkweed in her home garden, but wrong species for this elevation
+- Learned English to attract international eco-tourists, but flights became too expensive
+- Started documenting traditional stories about monarchs on her phone, but no one
+  to pass them to
+age: 47
+artifact_id: eb1c4f92-e236-4565-b31e-41b296b026fe
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Every dawn, Rosa walked the same forest paths her grandmother taught
+  her, checking the oyamel fir trees for monarch clusters. She'd count empty branches
+  where millions once hung like living ornaments, noting in her weathered notebook
+  which trees still hosted stragglers. By 10 AM, she'd return to the visitor center
+  to wait for tourists who rarely came anymore - the sanctuary that once drew 150,000
+  visitors yearly now saw maybe a dozen families per month.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- witness
+environmental_stressor: Habitat loss from illegal logging and climate-shifted migration
+  timing making traditional knowledge obsolete
+family_situation: Widowed mother of three adult children who all moved to Mexico City.
+  Her eldest daughter Carmen was supposed to inherit the guide tradition but became
+  a software engineer instead. Rosa's granddaughter speaks no Purépecha and has never
+  seen a monarch cluster.
+file_name: eb1c4f92-e236-4565-b31e-41b296b026fe_g_last_human.json
+final_thought: Standing in the empty forest, Rosa wondered if the monarchs felt the
+  same loneliness she did - arriving at a place that no longer remembered how to receive
+  them
+last_days_scenario: Rosa spent her final weeks in the sanctuary forest, sleeping in
+  the old research cabin as illegal loggers worked closer each night. The last dozen
+  monarchs had arrived three weeks late, confused by unseasonable warmth, clustering
+  on trees that would be cut before spring. She'd stopped updating her visitor logs
+  - there was no one left to read them. Her phone battery died on day four, cutting
+  her off from her children's worried calls from the city. She found herself talking
+  to the butterflies in Purépecha, the old words her grandmother used, knowing she
+  was the last person on Earth who remembered the specific blessing for monarchs preparing
+  to die far from home.
+latitude: 19.6167
+location: Michoacán, Mexico - Cerro Pelón Sanctuary
+longitude: -100.25
+name: Rosa Elena Vásquez-Chen
+occupation: Traditional ecological knowledge keeper and monarch butterfly sanctuary
+  guide
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Her grandmother's hand-carved wooden monarch pendant, made from
+  oyamel wood, worn smooth by three generations of women who guided visitors to see
+  the butterflies
+thread_id: 21b4d29b-d564-4db7-881e-f0ffd7a3cc22
+vulnerability_details: Like monarchs whose multi-generational migration is broken
+  when no single generation completes the full journey, Rosa's family's 200-year tradition
+  of guiding visitors to overwintering monarchs ends with her - her children moved
+  to Mexico City for work, breaking the knowledge transmission that sustained both
+  butterflies and community
+year_documented: 2043

@@ -1,0 +1,77 @@
+anthropogenic_factors:
+- Neonicotinoid pesticides (imidacloprid, clothianidin) - neuro-disruptive to bees
+- Fungicides interfering with gut microbiome
+- Conversion of prairie/grassland to corn/soy monoculture (90% habitat loss)
+- Intensive mowing regimes eliminating nesting sites
+- Light pollution disrupting navigation
+- Nosema bombi pathogen spread from commercial bumblebee operations
+artifact_id: 5b227d0b-2b06-4366-89c2-b60f11eb40d6
+artifact_name: rusty_patched_bumble_bee
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+cascade_effects:
+- Pollination failure for wild blueberries, cranberries, tomatoes
+- Co-evolved plant species (native prairie flowers) decline without specialist pollinator
+- Agricultural productivity decline - $3 billion pollination services lost
+- Proof that even common species can collapse rapidly
+- 'Death spiral: fewer bees → less pollination → fewer flowers → fewer bees'
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- species_extinction
+common_name: Rusty patched bumble bee
+ecosystem_role: Native specialist pollinator for nightshade family, legumes, and native
+  prairie plants; buzz pollination specialist
+endemic: false
+extinction_year: 2030
+file_name: 5b227d0b-2b06-4366-89c2-b60f11eb40d6_g_rusty_patched_bumble_bee.yml
+habitat: Grasslands, prairies, and woodlands across upper Midwest and Northeast US
+human_parallel_hints:
+- Workers whose labor is essential but invisible until absent
+- Communities poisoned by the industries they serve
+- Neurodivergence made non-viable by environmental neurotoxins
+- Specialized knowledge that can't adapt fast enough
+- Distinctive identity marker fading into homogeneous decline
+iucn_status: Critically Endangered (87% decline, near extinction by 2030)
+lifespan_years: 0.08
+movement_pattern: local forager
+narrative_potential_score: 0.85
+population_trajectory:
+- confidence: high
+  population: historically abundant across 28 US states and 2 Canadian provinces
+  source: Xerces Society baseline surveys
+  year: 2000
+- confidence: high
+  population: 87% decline, present in only 13 states
+  source: USFWS species status assessment
+  year: 2010
+- confidence: high
+  population: Listed as federally endangered, scattered colonies
+  source: USFWS endangered species listing
+  year: 2017
+- confidence: medium
+  population: fewer than 100 colonies confirmed, genetic bottleneck
+  source: Xerces Society monitoring
+  year: 2024
+- confidence: medium-high
+  population: functional extinction predicted
+  source: projected based on decline rate
+  year: 2030
+primary_cause: pesticides
+rainbow_color_mnemonic_character_value: G
+range_km2: 2500000.0
+scientific_name: Bombus affinis
+secondary_causes:
+- Colony collapse from Nosema bombi pathogen
+- Habitat loss from agricultural intensification
+- Climate change disrupting queen emergence timing
+- Competition from invasive managed honeybees
+size_category: small
+symbolic_resonance:
+- Named for rust-colored patch - visual marker of identity fading
+- Colony creature - queen is only survivor of each year's colony
+- Killed by chemicals meant to protect crops they pollinate
+- Common abundance to rare sighting in single generation
+- Buzz pollination - vibration at specific frequency, disrupted by pesticides
+symbolic_weight: 0.87
+taxonomic_group: Insect (Hymenoptera)
+thread_id: 34575da6-40a0-4252-8b50-9cfd82186f58

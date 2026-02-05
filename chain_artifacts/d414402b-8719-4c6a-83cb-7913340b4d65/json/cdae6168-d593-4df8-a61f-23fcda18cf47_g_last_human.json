@@ -1,0 +1,57 @@
+adaptation_attempts:
+- Moved hives to certified organic farms
+- Installed air filtration systems in bee trucks
+- Started chelation therapy for pesticide poisoning
+- Switched to treatment-free beekeeping methods
+- Lobbied county for pesticide-free buffer zones
+- Partnered with UC Davis on bee health monitoring
+age: 47
+artifact_id: cdae6168-d593-4df8-a61f-23fcda18cf47
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: 4:30 AM check hive temperatures on tablet, 5:00 AM drive between scattered
+  apiaries in modified truck with ventilation system, 6:00 AM-noon inspect colonies
+  wearing respirator, afternoon coordinate with organic farms for placement contracts,
+  evening inject herself with chelation therapy for heavy metal buildup, night falls
+  asleep to the sound of fewer and fewer bees returning
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Neonicotinoid pesticides and glyphosate drift from industrial
+  agriculture
+family_situation: Widow - husband died of lymphoma linked to pesticide exposure three
+  years ago, two adult children moved away from agriculture, maintains hives started
+  by her grandfather in 1987
+file_name: cdae6168-d593-4df8-a61f-23fcda18cf47_g_last_human.json
+final_thought: The bees are trying to tell me something with their dance, but my hands
+  shake too much now to read the angles properly
+last_days_scenario: Maria's neurological symptoms worsen as pesticide residues accumulate
+  in her system - tremors that make hive manipulation dangerous, memory gaps that
+  cause her to forget which colonies she's already treated, spatial disorientation
+  that mirrors the navigation problems killing her bees. Her last viable queen excluder
+  sits unused as colony after colony fails to overwinter. The organic farms that contracted
+  her services switch to mechanical pollination. She drives between empty hive boxes,
+  checking for signs of life that never come, her grandfather's smoker growing rustier
+  in the California sun, its orange-brown oxidation the same color as the patches
+  that once marked the bumble bees now extinct in the valley.
+latitude: 36.6777
+location: Salinas Valley, California
+longitude: -121.6555
+name: Maria Elena Vasquez
+occupation: Crop pollination coordinator and bee colony manager
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- toxic_exposure
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Her grandfather's 1987 smoker, now rusted with the same orange-brown
+  patina as the rusty patched bumble bee, which she still uses daily despite having
+  modern electric alternatives
+thread_id: d414402b-8719-4c6a-83cb-7913340b4d65
+vulnerability_details: Like the rusty patched bumble bee queen surviving alone after
+  her colony dies, Maria is the last of her family's beekeeping operation, managing
+  the final commercial hives while suffering from pesticide-induced neurological damage
+  that mirrors the disorientation killing the bees she tends
+year_documented: 2034
