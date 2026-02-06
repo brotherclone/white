@@ -1,0 +1,49 @@
+agent_name: indigo
+bpm: 132
+concept: 'This composition presents itself as a simple arithmetic meditation—thirteen
+  repetitions of musical phrases, thirteen-beat time signatures, lyrics obsessing
+  over the number thirteen and its superstitions. The surface layer embraces mathematical
+  literalism: verses that count upward, bridge sections with exactly thirteen measures,
+  harmonic progressions that cycle through thirteen chord changes. But the encoding
+  method operates through textual anagram space embedded in the vocal delivery itself.
+  Each sung phrase can be rearranged letter-by-letter, creating a secondary lyrical
+  layer that exists in potential until activated by listener investigation. The revelation
+  transforms everything: "twelve plus one" and "eleven plus two" are perfect anagrams—identical
+  letters rearranged. What seemed like mathematical progression reveals itself as
+  linguistic sleight of hand. The song''s obsession with thirteen was misdirection;
+  the true subject is equivalence hidden by different arrangements of the same elements.
+  Musically, this operates through melodic anagram—the same note sequences rearranged
+  across different octaves and rhythmic positions, creating the illusion of development
+  while cycling through identical pitch collections. The listener experiences the
+  Fool''s journey from literal interpretation to pattern recognition to the Spy''s
+  understanding: that surface complexity often conceals elegant underlying symmetries.
+  The composition rewards investigation by revealing that every apparent "thirteen"
+  contains hidden "eleven plus two" relationships—the secret name bleeding through
+  whenever the surface name is examined closely enough. This is mathematical mysticism
+  as musical cryptography, where the deepest truth preserves itself through the simple
+  rearrangement of existing elements rather than the introduction of new information.
+
+
+  **INFRANYM PROTOCOL:**
+
+  Secret: ''eleven plus two'' encoded as ''twelve plus one''
+
+  Method: InfranymMedium.TEXT
+
+  Decoding: Text Infranym: riddle_poem hiding ''eleven plus two'' in bridge
+
+  '
+genres:
+- Math rock
+- cryptographic folk
+iteration_id: indigo_proposal_1770314867925
+iteration_number: 15
+key: E major
+mood:
+- Playful deception
+- mathematical precision
+- dawning recognition
+rainbow_color: indigo
+tempo: Moderately fast
+timestamp: 1770314867.925357
+title: Twelve Plus One

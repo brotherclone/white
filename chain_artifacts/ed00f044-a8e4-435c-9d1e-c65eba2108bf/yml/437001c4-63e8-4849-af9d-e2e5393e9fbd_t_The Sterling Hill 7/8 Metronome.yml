@@ -1,0 +1,19 @@
+artifact_id: 437001c4-63e8-4849-af9d-e2e5393e9fbd
+artifact_name: The Sterling Hill 7/8 Metronome
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A modified Wittner metronome found among the band's equipment, mechanically
+  altered to click in an impossible 7/8 pattern that never completes its cycle - the
+  missing eighth beat creating a temporal fracture where consciousness can slip through
+  surveillance systems. Local musicians who encounter it report that playing along
+  creates a hypnotic state where time becomes elastic and the feeling of being watched
+  dissolves into something approaching freedom.
+file_name: 437001c4-63e8-4849-af9d-e2e5393e9fbd_t_The Sterling Hill 7/8 Metronome.yml
+name: The Sterling Hill 7/8 Metronome
+rainbow_color_mnemonic_character_value: T
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: ed00f044-a8e4-435c-9d1e-c65eba2108bf

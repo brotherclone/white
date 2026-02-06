@@ -1,6 +1,7 @@
 import pytest
 from app.agents.states.white_agent_state import (
     MainAgentState,
+    merge_document_syntheses,
 )
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 from app.structures.concepts.transformation_trace import TransformationTrace
@@ -11,9 +12,9 @@ from app.structures.artifacts.artifact_relationship import ArtifactRelationship
 
 def test_main_agent_state_initialization():
     """Test MainAgentState initializes with correct defaults."""
-    state = MainAgentState(thread_id="test_thread")
+    state = MainAgentState(thread_id="mock_thread_001")
 
-    assert state.thread_id == "test_thread"
+    assert state.thread_id == "mock_thread_001"
     assert isinstance(state.song_proposals, SongProposal)
     assert len(state.song_proposals.iterations) == 0
     assert state.artifacts == []
@@ -26,6 +27,7 @@ def test_main_agent_state_initialization():
     assert state.facet_evolution is None
     assert state.transformation_traces == []
     assert state.artifact_relationships == []
+    assert state.agent_document_syntheses == {}
     assert state.ready_for_red is False
     assert state.ready_for_orange is False
     assert state.ready_for_yellow is False
@@ -252,6 +254,41 @@ def test_main_agent_state_complex_workflow():
     assert state.ready_for_orange is True
     assert state.stop_after_agent == "yellow"
     assert "yellow" in state.enabled_agents
+
+
+def test_main_agent_state_agent_document_syntheses():
+    """Test agent_document_syntheses field for per-agent storage."""
+    state = MainAgentState(
+        thread_id="test_thread",
+        agent_document_syntheses={
+            "BLACK": "ThreadKeepr's synthesis of chaos and order",
+            "RED": "Light Reader's literary archaeology synthesis",
+        },
+    )
+
+    assert len(state.agent_document_syntheses) == 2
+    assert "BLACK" in state.agent_document_syntheses
+    assert "RED" in state.agent_document_syntheses
+    assert "ThreadKeepr" in state.agent_document_syntheses["BLACK"]
+
+
+def test_merge_document_syntheses_empty():
+    """Test merge_document_syntheses with empty dicts."""
+    assert merge_document_syntheses({}, {}) == {}
+    assert merge_document_syntheses({"A": "1"}, {}) == {"A": "1"}
+    assert merge_document_syntheses({}, {"B": "2"}) == {"B": "2"}
+
+
+def test_merge_document_syntheses_new_takes_precedence():
+    """Test that new values take precedence in merge."""
+    old = {"BLACK": "old synthesis", "RED": "red synthesis"}
+    new = {"BLACK": "new synthesis", "ORANGE": "orange synthesis"}
+
+    result = merge_document_syntheses(old, new)
+
+    assert result["BLACK"] == "new synthesis"  # new takes precedence
+    assert result["RED"] == "red synthesis"  # preserved from old
+    assert result["ORANGE"] == "orange synthesis"  # added from new
 
 
 if __name__ == "__main__":

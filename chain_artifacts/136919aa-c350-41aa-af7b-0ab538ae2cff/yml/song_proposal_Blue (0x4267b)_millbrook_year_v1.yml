@@ -1,0 +1,52 @@
+agent_name: The Cassette Bearer (Temporal Archaeologist)
+bpm: 92
+concept: This is the archetypal song of borrowed belonging - the universal pattern
+  of children who learn love through temporary arrangements, who discover that home
+  can be a place you're sent to rather than born into. The Millbrook year represents
+  the liminal space where displacement becomes discovery, where the ache of not-quite-belonging
+  transforms into the deeper recognition that all homes are temporary, all families
+  are chosen in some sense. The 6:30 AM porch vigil becomes a ritual of transition
+  - the child suspended between the family that couldn't keep him and the family learning
+  to love him, watching for the yellow school bus that carries him between worlds.
+  Uncle Frank's red Hohner accordion embodies the transmission of cultural memory
+  through tactile teaching - the old immigrant's hands guiding small fingers across
+  keys that wheeze out polkas like prayers, preserving something essential even as
+  everything else shifts. The injured crow Merlin functions as the song's central
+  metaphor - the wounded thing that heals and returns, choosing to stay not from obligation
+  but from recognition, mirroring the boy's own journey from abandonment to chosen
+  connection. This is counterfactual archaeology at its most precise - excavating
+  the emotional architecture of a year that shaped everything by never happening,
+  mourning not just the lost timeline but the lost capacity for that particular kind
+  of innocent adaptation, when love could still be learned through accordion lessons
+  and comic book charity.
+genres:
+- folk rock
+- americana
+- indie folk
+- country folk
+iteration_id: millbrook_year_v1
+iteration_number: null
+key: G major
+mood:
+- bittersweet
+- nostalgic
+- melancholic
+- tender
+- wistful
+- rural
+- temporary
+- longing
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: 47 Shunpike Road
