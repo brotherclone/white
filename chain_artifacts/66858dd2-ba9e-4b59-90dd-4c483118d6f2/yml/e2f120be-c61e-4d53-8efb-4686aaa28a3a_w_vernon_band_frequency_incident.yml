@@ -1,0 +1,89 @@
+artifact_id: e2f120be-c61e-4d53-8efb-4686aaa28a3a
+artifact_name: vernon_band_frequency_incident
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1992-07-03'
+file_name: e2f120be-c61e-4d53-8efb-4686aaa28a3a_w_vernon_band_frequency_incident.yml
+headline: Local Band's Recording Session Linked to Psychiatric Episodes
+location: Vernon Township, NJ
+rainbow_color_mnemonic_character_value: W
+source: The Advertiser-News
+tags:
+- local music
+- mental health
+- unexplained phenomena
+- youth
+- recording studio
+text: 'VERNON TOWNSHIP - Sussex County health officials are investigating a series
+  of psychiatric episodes that occurred following a local rock band''s recording session
+  at Sedimentary Sound Studios on Route 94 last month.
+
+
+  The incidents began June 15 when four teenagers, all members of the experimental
+  rock group "Temporal Deposit," were hospitalized after what witnesses described
+  as simultaneous "dissociative episodes" during a late-night recording session. The
+  band had been working on what they called "layered consciousness music" - compositions
+  featuring repetitive vocal fragments recorded in seven-beat cycles.
+
+
+  "They kept saying the same phrase over and over - ''um older is each and every time''
+  - for nearly three hours straight," said studio owner Marcus Hecht, 42. "By the
+  end, none of them seemed to recognize where they were. It was like they''d aged
+  years in a single night."
+
+
+  The band members - Derek Moss, 17; Jennifer Carlin, 16; Michael Torres, 18; and
+  Lisa Brennan, 16 - were treated at Newton Memorial Hospital for what Dr. Patricia
+  Vance described as "acute temporal disorientation syndrome." All four reported experiencing
+  "geological time" during the session, claiming they felt centuries passing with
+  each recording loop.
+
+
+  "The strangest part was their synchronization," Dr. Vance noted. "They all described
+  identical experiences of watching their thoughts accumulate like sedimentary layers,
+  building up until they couldn''t distinguish between past and present awareness."
+
+
+  Studio equipment showed unusual wear patterns following the session, with recording
+  heads displaying what Hecht called "impossible aging" - decades of use compressed
+  into hours. The mixing board''s digital display repeatedly showed error messages
+  reading "MEMORY OVERFLOW" and "TEMPORAL RESOLUTION FAILED."
+
+
+  Vernon Township Police Chief Robert Manning confirmed that three other individuals
+  who heard playback recordings of the session have since reported similar disorientation
+  episodes. The original master tapes remain in police custody pending investigation.
+
+
+  "We''re treating this as a potential public health issue," Manning said. "Whatever
+  frequency or combination they were using seems to have affected people''s perception
+  of time itself."
+
+
+  The band formed six months ago after meeting at a Sussex County Community College
+  psychology course on consciousness studies. Their previous performances at local
+  venues featured what music critics described as "industrial ambient drone" with
+  "archaeological themes."
+
+
+  Sedimentary Sound Studios has temporarily suspended operations while state health
+  inspectors examine the facility''s acoustic properties. Several residents near the
+  Route 94 location reported hearing "layered voices" emanating from the building
+  for days after the incident, though no recording equipment was active.
+
+
+  The teenagers remain under medical observation. Family members report they continue
+  to speak in synchronized seven-beat patterns and claim to remember "digital lifetimes"
+  that never occurred.
+
+
+  County officials advise anyone who may have heard recordings from the June 15 session
+  to contact Newton Memorial Hospital immediately if they experience temporal disorientation
+  or memory accumulation symptoms.
+
+
+  The investigation continues.'
+thread_id: 66858dd2-ba9e-4b59-90dd-4c483118d6f2

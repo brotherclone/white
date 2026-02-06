@@ -5,7 +5,6 @@ from app.agents.tools.speech_tools import (
     transcription_from_speech_to_text,
     evp_speech_to_text,
 )
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 
 
 def test_evp_returns_none_when_no_api_key(monkeypatch):
@@ -100,24 +99,17 @@ def test_evp_uses_utterances_when_no_text(monkeypatch):
     os.environ.get("BLOCK_MODE", "").lower() in {"1", "true", "yes"},
     reason="Skipping test because BLOCK_MODE is enabled",
 )
-def test_chain_artifact_file_from_speech_to_text_creates_text_file(monkeypatch):
-    """Test that speech-to-text returns the transcript string"""
+def test_transcription_from_speech_to_text_returns_transcript(monkeypatch):
+    """Test that speech-to-text returns the transcript string from in-memory audio"""
     monkeypatch.setattr(
         "app.agents.tools.speech_tools.evp_speech_to_text",
         lambda wp, fn: "transcript body",
     )
 
-    class FakeAudio:
-        file_name = "audio.wav"
-        rainbow_color = the_rainbow_table_colors["Z"]
-        base_path = "/tmp/base"
-        artifact_name = "artifactX"
+    import numpy as np
 
-        def get_artifact_path(self, with_file_name=False):
-            return "/tmp/base" if not with_file_name else "/tmp/base/audio.wav"
-
-    audio = FakeAudio()
-    txt = transcription_from_speech_to_text(audio)
+    audio_data = np.zeros(44100, dtype=np.float32)
+    txt = transcription_from_speech_to_text(audio_data, 44100)
     assert isinstance(txt, str)
     assert txt == "transcript body"
 
@@ -126,7 +118,7 @@ def test_chain_artifact_file_from_speech_to_text_creates_text_file(monkeypatch):
     os.environ.get("BLOCK_MODE", "").lower() in {"1", "true", "yes"},
     reason="Skipping test because BLOCK_MODE is enabled",
 )
-def test_chain_artifact_file_from_speech_to_text_returns_placeholder_when_no_transcript(
+def test_transcription_from_speech_to_text_returns_placeholder_when_no_transcript(
     monkeypatch,
 ):
     """Test that None transcript results in placeholder text, not None"""
@@ -134,17 +126,10 @@ def test_chain_artifact_file_from_speech_to_text_returns_placeholder_when_no_tra
         "app.agents.tools.speech_tools.evp_speech_to_text", lambda wp, fn: None
     )
 
-    class FakeAudio:
-        file_name = "audio.wav"
-        rainbow_color = the_rainbow_table_colors["Z"]
-        base_path = "/tmp/base"
-        artifact_name = "artifactX"
+    import numpy as np
 
-        def get_artifact_path(self, with_file_name=False):
-            return "/tmp/base" if not with_file_name else "/tmp/base/audio.wav"
-
-    audio = FakeAudio()
-    out = transcription_from_speech_to_text(audio)
+    audio_data = np.zeros(44100, dtype=np.float32)
+    out = transcription_from_speech_to_text(audio_data, 44100)
     assert out is not None
     assert isinstance(out, str)
     assert out == "[EVP: No discernible speech detected]"

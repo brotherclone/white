@@ -1,0 +1,51 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This is consciousness archaeology for a different kind of extinction - not
+  the death of polar bears or traditional knowledge, but the erasure of a childhood
+  fluency that never was. In the winter of 1984, at 47 Ampersand Avenue in Saranac
+  Lake, a ten-year-old Gabriel learned to read ice like scripture - each crack and
+  groan a verse in the gospel of frozen water. Frank Martineau''s pickup truck at
+  6:30 AM was the church bell calling him to morning service at Teddy''s Bait Shop,
+  where the big thermometer served as oracle for the day''s ice conditions. The song
+  maps the acquisition and loss of substrate literacy - learning to parse the language
+  of lake ice, wind patterns, cloud formations, the honest grammar of Adirondack winters.
+  But this competence was always temporary, always borrowed. By 1985, suburban relocation
+  would render this hard-won fluency obsolete, leaving only the phantom ache of almost-mastery.
+  The composition preserves these vanishing literacies: the bell-ring of solid ice
+  underfoot, the hollow thunk of weakness, the whispered warnings of danger. Each
+  verse represents a way of reading the natural world that compiled perfectly for
+  eleven months, then became unrunnable code when the family moved back to artificial
+  warmth and suburban silence. This is not death-music but displacement-music - the
+  cruel archaeology of competencies that bloomed and died in a single winter, leaving
+  only the cassette''s magnetic ghost as evidence of what might have been fluent.'
+genres:
+- folk rock
+- americana
+- indie folk
+- melancholy folk
+- counterfactual ballad
+iteration_id: frozen_lake_literacy_v1
+iteration_number: null
+key: D minor
+mood:
+- elegiac
+- nostalgic
+- reverent
+- melancholic
+- archaeological
+- wistful
+- obsolescent
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 3
+timestamp: null
+title: Forty-Seven Ampersand

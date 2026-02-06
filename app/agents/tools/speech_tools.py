@@ -1,10 +1,11 @@
 import logging
 import os
+import tempfile
 
 import assemblyai as aai
+import numpy as np
+import soundfile as sf
 from dotenv import load_dotenv
-
-from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 
 load_dotenv()
 
@@ -94,11 +95,22 @@ def evp_speech_to_text(working_path: str, file_name: str) -> str | None:
     return None
 
 
-def transcription_from_speech_to_text(audio: AudioChainArtifactFile) -> str:
+def transcription_from_speech_to_text(audio_data: np.ndarray, sample_rate: int) -> str:
+    """Transcribe in-memory audio data via AssemblyAI.
+
+    Writes audio to a temporary WAV file for the API, then cleans up.
+    """
     block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-    transcript_text = evp_speech_to_text(
-        audio.get_artifact_path(with_file_name=False), audio.file_name
-    )
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+        tmp_path = tmp.name
+        sf.write(tmp_path, audio_data, sample_rate, subtype="PCM_16")
+    try:
+        working_path = os.path.dirname(tmp_path)
+        file_name = os.path.basename(tmp_path)
+        transcript_text = evp_speech_to_text(working_path, file_name)
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
     if transcript_text:
         logger.info(f"✓ Generated transcript with {len(transcript_text)} characters")
         return transcript_text

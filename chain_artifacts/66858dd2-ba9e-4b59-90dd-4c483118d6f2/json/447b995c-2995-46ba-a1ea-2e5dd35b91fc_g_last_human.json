@@ -1,0 +1,64 @@
+adaptation_attempts:
+- Tried to digitally document grandmother's migration knowledge before she died
+- Attempted to establish new community networks through social media
+- Started teaching children about monarchs to preserve cultural connections
+- Applied for family reunification visas repeatedly denied
+- Tried to find work in climate-controlled agriculture but was told she was too old
+age: 47
+artifact_id: 447b995c-2995-46ba-a1ea-2e5dd35b91fc
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Each morning Elena would check the traditional calendar her grandmother
+  kept, marking the days when families should begin preparing for seasonal moves north
+  to follow agricultural work. She maintained a small milkweed garden where she taught
+  local children about monarch lifecycles, but fewer children came each year as families
+  abandoned the traditional patterns. She spent afternoons at the community radio
+  station, broadcasting weather and crop information to scattered family networks,
+  trying to coordinate movements that no longer followed the old rhythms.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Habitat destruction of traditional migration corridors due
+  to industrial agriculture expansion and climate-shifted growing seasons disrupting
+  generational knowledge transmission
+family_situation: Daughter lives in Dallas, unable to return due to visa restrictions.
+  Son works in a vertical farm in Mexico City, no longer following seasonal patterns.
+  Husband died in 2034 from pesticide exposure while working treated fields.
+file_name: 447b995c-2995-46ba-a1ea-2e5dd35b91fc_g_last_human.json
+final_thought: The monarchs and her people followed the same invisible highways for
+  so long - both now lost because the world changed too fast for memory to bridge
+  the gap.
+last_days_scenario: Elena sits in her empty house during what should have been departure
+  week, holding her grandmother's cloth map. The milkweed in her garden has been contaminated
+  by drift from the new soy plantation next door - the same neonicotinoids that killed
+  the last monarchs. Her radio broadcasts reach no one; the families have scattered
+  to cities or been deported. She traces the old routes with her finger, knowing that
+  like the monarchs, her people's ancient pattern of movement has been broken. The
+  knowledge that took six generations to accumulate died in one summer when her grandmother
+  couldn't survive the heat and Elena couldn't cross the border to learn the final
+  pieces of their family's migration wisdom.
+latitude: 19.6167
+location: Michoacán, Mexico (Monarch Butterfly Biosphere Reserve)
+longitude: -100.3333
+name: Elena Vasquez-Chen
+occupation: Cultural heritage interpreter and seasonal migration coordinator
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A hand-drawn map on cloth showing traditional family migration
+  routes between Michoacán and Iowa, with annotations in three languages (Spanish,
+  English, and Purépecha) marking seasonal timing, safe houses, and work opportunities
+  - now obsolete as the routes are blocked and the timing no longer matches climate
+  reality
+thread_id: 66858dd2-ba9e-4b59-90dd-4c483118d6f2
+vulnerability_details: Like monarchs whose multi-generational migration cycle was
+  broken, Elena's family's traditional seasonal movement between Mexico and agricultural
+  communities in the US Midwest has been severed by border restrictions and habitat
+  destruction. Her grandmother's knowledge of traditional waypoints and seasonal timing
+  died with her during the 2035 heat dome, leaving Elena unable to complete the cultural
+  transmission cycle her family maintained for six generations.
+year_documented: 2037

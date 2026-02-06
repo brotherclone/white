@@ -427,17 +427,19 @@ def select_random_segment_audio(
     logger.info(f"Extracted {written} segments to `{output_dir}`.")
 
 
-def get_audio_segments_as_chain_artifacts(
+def get_audio_segments_in_memory(
     min_duration: float,
     num_segments: int,
     rainbow_color_mnemonic_character_value: str,
-    thread_id: str | None = None,
-) -> list:
+) -> List[Tuple[np.ndarray, int]]:
+    """Extract non-silent audio segments and return them in memory.
+
+    Returns a list of (audio_array, sample_rate) tuples without saving to disk.
+    """
     rainbow_color = the_rainbow_table_colors[rainbow_color_mnemonic_character_value]
     wav_files = find_wav_files_prioritized(
         os.getenv("MANIFEST_PATH"), rainbow_color.file_prefix
     )
-    # Don't shuffle - keep vocal files prioritized at the front of the list
     logger.info(
         f"Found {len(wav_files)} total files for prefix '{rainbow_color.file_prefix}'"
     )
@@ -465,40 +467,29 @@ def get_audio_segments_as_chain_artifacts(
         if not segments:
             continue
         random.shuffle(segments)
-        all_segments.extend([(seg, sr, wav_path) for seg in segments])
+        all_segments.extend([(seg, sr) for seg in segments])
         if len(all_segments) >= max(num_segments * 5, num_segments + 10):
             break
     if not all_segments:
         return []
     random.shuffle(all_segments)
     selected = all_segments[:num_segments]
-    artifacts = []
-    for idx, (seg, sr, wav_path) in enumerate(selected, start=1):
-        artifact = AudioChainArtifactFile(
-            thread_id=thread_id or "UNKNOWN_THREAD_ID",
-            audio_bytes=seg.tobytes(),
-            artifact_name=f"segment_{idx}",
-            base_path=_get_thread_artifact_base_path(thread_id),
-            rainbow_color_mnemonic_character_value=rainbow_color_mnemonic_character_value,
-            chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-            artifact_path=wav_path,
-            duration=len(seg) / sr,
-            sample_rate=sr,
-            channels=1,
-            bit_depth=16,
-        )
-        dest_path = artifact.get_artifact_path()
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        logger.info(
-            f"Writing audio segment to `{dest_path}` (sr={sr}, samples={len(seg)})"
-        )
-        seg_arr = np.asarray(seg, dtype=np.float32)
-        max_abs = np.max(np.abs(seg_arr)) if seg_arr.size else 0.0
-        if max_abs > 1.0:
-            seg_arr = seg_arr / max_abs
-        sf.write(dest_path, seg_arr, sr, subtype="PCM_16")
-        artifacts.append(artifact)
-    return artifacts
+    logger.info(f"Selected {len(selected)} in-memory audio segments")
+
+    # EVP_DEBUG_MODE: save segments to disk for debugging
+    if os.getenv("EVP_DEBUG_MODE", "false").lower() == "true":
+        debug_dir = os.path.join(_get_agent_work_product_base_path(), "evp_debug")
+        os.makedirs(debug_dir, exist_ok=True)
+        for idx, (seg, sr) in enumerate(selected, start=1):
+            seg_arr = np.asarray(seg, dtype=np.float32)
+            max_abs = np.max(np.abs(seg_arr)) if seg_arr.size else 0.0
+            if max_abs > 1.0:
+                seg_arr = seg_arr / max_abs
+            path = os.path.join(debug_dir, f"debug_segment_{idx}.wav")
+            sf.write(path, seg_arr, sr, subtype="PCM_16")
+            logger.info(f"[EVP_DEBUG] Saved segment to {path}")
+
+    return selected
 
 
 def create_random_audio_mosaic(
@@ -535,49 +526,47 @@ def create_random_audio_mosaic(
 
 
 def create_audio_mosaic_chain_artifact(
-    segments: List[AudioChainArtifactFile],
+    segments: List[Tuple[np.ndarray, int]],
     slice_duration_ms: int,
     target_length_sec: int | float,
     thread_id: str | None = None,
+    rainbow_color_mnemonic_character_value: str | None = None,
 ) -> AudioChainArtifactFile | None:
+    """Create an audio mosaic from in-memory segments.
+
+    Args:
+        segments: List of (audio_array, sample_rate) tuples.
+        slice_duration_ms: Duration of each random slice in milliseconds.
+        target_length_sec: Target total length of the mosaic in seconds.
+        thread_id: Thread identifier for artifact naming.
+        rainbow_color_mnemonic_character_value: Rainbow color code.
+    """
     if not segments:
-        raise ValueError("`segments` must contain at least one AudioChainArtifactFile")
-    wav_files = [
-        seg.get_artifact_path()
-        for seg in segments
-        if os.path.exists(seg.get_artifact_path())
-    ]
-    if not wav_files:
-        raise FileNotFoundError("No segment files found.")
-    # Prefer the recorded sample rate on the artifact; if missing, use soundfile
-    sample_rate = segments[0].sample_rate or sf.info(wav_files[0]).samplerate
+        raise ValueError("`segments` must contain at least one (audio, sr) tuple")
+    sample_rate = segments[0][1]
     random_slice_duration_ms = random.randint(
         slice_duration_ms - 50, slice_duration_ms + 50
     )
     slice_samples = int(random_slice_duration_ms / 1000 * sample_rate)
     target_samples = int(target_length_sec * sample_rate)
-    random.shuffle(wav_files)
-    collected_segments = []
+    collected_slices = []
     total_samples = 0
-    while total_samples < target_samples and wav_files:
-        wav_path = random.choice(wav_files)
-        audio, sr = load_audio(wav_path, sr=sample_rate)
+    while total_samples < target_samples and segments:
+        audio, sr = random.choice(segments)
         if len(audio) < slice_samples:
             continue
         start = random.randint(0, len(audio) - slice_samples)
-        collected_segments.append(audio[start : start + slice_samples])
+        collected_slices.append(audio[start : start + slice_samples])
         total_samples += slice_samples
-    if not collected_segments:
+    if not collected_slices:
         logger.info("No suitable slices could be extracted to build a mosaic")
         return None
-    mosaic = np.concatenate(collected_segments)[:target_samples]
+    mosaic = np.concatenate(collected_slices)[:target_samples]
     artifact = AudioChainArtifactFile(
         thread_id=thread_id or "UNKNOWN_THREAD_ID",
         audio_bytes=mosaic.tobytes(),
         base_path=_get_thread_artifact_base_path(thread_id),
-        rainbow_color_mnemonic_character_value=getattr(
-            segments[0], "rainbow_color_mnemonic_character_value", None
-        ),
+        rainbow_color_mnemonic_character_value=rainbow_color_mnemonic_character_value,
         chain_artifact_file_type=ChainArtifactFileType.AUDIO,
         artifact_name="mosiac",
         duration=len(mosaic) / sample_rate,
@@ -595,12 +584,19 @@ def create_audio_mosaic_chain_artifact(
     return artifact
 
 
-def blend_with_noise(
-    input_path: str, blend: float, blended_artifact: AudioChainArtifactFile
-):
+def blend_audio_in_memory(
+    mosaic_artifact: AudioChainArtifactFile, blend: float
+) -> Tuple[np.ndarray, int]:
+    """Blend a mosaic audio artifact with speech-like noise in memory.
+
+    Returns (blended_audio_array, sample_rate) without saving to disk.
+    """
+    mosaic_path = mosaic_artifact.get_artifact_path(with_file_name=True)
     from app.util.audio_io import load_audio
 
-    audio, sr = load_audio(input_path, sr=None)
+    audio, sr = load_audio(mosaic_path, sr=None)
+    if blend == 0.0:
+        return audio, sr
     duration_seconds = len(audio) / sr
     noise = (
         np.frombuffer(
@@ -615,42 +611,17 @@ def blend_with_noise(
             else np.pad(noise, (0, len(audio) - len(noise)), mode="constant")
         )
     blended_audio = np.clip((1 - blend) * audio + blend * noise, -1.0, 1.0)
-    out_path = blended_artifact.get_artifact_path(True)
-    out_dir = os.path.dirname(out_path)
-    if out_dir:
-        os.makedirs(out_dir, exist_ok=True)
-    # write as 16-bit PCM for consistency with other writers
-    sf.write(out_path, blended_audio, sr, subtype="PCM_16")
+    logger.info(f"Blended audio in memory (sr={sr}, samples={len(blended_audio)})")
 
+    # EVP_DEBUG_MODE: save blended audio to disk for debugging
+    if os.getenv("EVP_DEBUG_MODE", "false").lower() == "true":
+        debug_dir = os.path.join(_get_agent_work_product_base_path(), "evp_debug")
+        os.makedirs(debug_dir, exist_ok=True)
+        path = os.path.join(debug_dir, "debug_blended.wav")
+        sf.write(path, blended_audio, sr, subtype="PCM_16")
+        logger.info(f"[EVP_DEBUG] Saved blended audio to {path}")
 
-def create_blended_audio_chain_artifact(
-    mosaic: AudioChainArtifactFile, blend: float, thread_id: str
-) -> AudioChainArtifactFile:
-
-    is_vocal = (
-        "vocal" in mosaic.artifact_name.lower() or "vox" in mosaic.artifact_name.lower()
-    )
-
-    if is_vocal:
-        blend = 0.0
-
-    artifact = AudioChainArtifactFile(
-        thread_id=thread_id or "UNKNOWN_THREAD_ID",
-        base_path=_get_thread_artifact_base_path(thread_id),
-        audio_bytes=mosaic.audio_bytes,
-        rainbow_color_mnemonic_character_value=mosaic.rainbow_color_mnemonic_character_value,
-        chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-        artifact_name="blended",
-        duration=mosaic.duration,
-        sample_rate=mosaic.sample_rate,
-        channels=mosaic.channels,
-    )
-
-    blend_with_noise(mosaic.get_artifact_path(with_file_name=True), blend, artifact)
-    logger.info(
-        f"Writing audio mosaic to `{artifact.get_artifact_path(True)}` (sr={artifact.sample_rate})"
-    )
-    return artifact
+    return blended_audio, sr
 
 
 def _safe_normalize_and_clip(x: np.ndarray) -> np.ndarray:
@@ -665,8 +636,7 @@ def _safe_normalize_and_clip(x: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    a = get_audio_segments_as_chain_artifacts(
-        0.25, 3, the_rainbow_table_colors["Z"], "mock_101"
-    )
-    m = create_audio_mosaic_chain_artifact(a, 500, 5, thread_id="mock_101")
-    b = create_blended_audio_chain_artifact(m, 0.5, thread_id="mock_101")
+    segments = get_audio_segments_in_memory(0.25, 3, "Z")
+    m = create_audio_mosaic_chain_artifact(segments, 500, 5, thread_id="mock_101")
+    if m:
+        blended, sr = blend_audio_in_memory(m, 0.5)

@@ -1,0 +1,78 @@
+anthropogenic_factors:
+- Glyphosate herbicide eliminating 99% of Midwest milkweed (only host plant)
+- Neonicotinoid pesticides causing sub-lethal navigation damage
+- Industrial agriculture replacing diverse meadows with corn/soy monoculture
+- Illegal logging in Monarch Butterfly Biosphere Reserve despite protection
+- 'Climate change: spring arriving too early, monarchs emerge before milkweed'
+- Subdivision development fragmenting migratory corridors
+artifact_id: 30dd244d-df1c-47e4-9e6b-21a97c7b166b
+artifact_name: monarch_butterfly_eastern_migratory_population
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+cascade_effects:
+- Loss of iconic pollinator - cultural symbol extinction
+- Milkweed-dependent food web collapse (milkweed bugs, beetles, etc)
+- Ecotourism collapse in Mexican mountain communities
+- 'Proof of concept: multi-generational migration can be broken'
+- Pollination services lost across 3000-mile corridor
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- species_extinction
+common_name: Monarch butterfly (Eastern migratory population)
+ecosystem_role: Long-distance pollinator, connecting ecosystems across North America
+  through multi-generational migration
+endemic: false
+extinction_year: 2045
+file_name: 30dd244d-df1c-47e4-9e6b-21a97c7b166b_g_monarch_butterfly_eastern_migratory_population.yml
+habitat: '3000-mile migratory corridor: Canada/US breeding grounds to Mexican oyamel
+  fir forests'
+human_parallel_hints:
+- Migrant populations with broken generational transmission
+- Families whose homeland becomes uninhabitable
+- Jobs made obsolete mid-career
+- Cultural knowledge lost when elders die unexpectedly
+- Poisoned by the infrastructure meant to sustain us
+iucn_status: Endangered (Eastern population near collapse by 2045)
+lifespan_years: 0.16
+movement_pattern: long-distance migrant
+narrative_potential_score: 0.88
+population_trajectory:
+- confidence: high
+  population: 1 billion overwintering in Mexico
+  source: WWF Mexico monarch monitoring
+  year: 1996
+- confidence: high
+  population: 33.5 million (96.6% decline)
+  source: WWF Mexico monarch monitoring
+  year: 2013
+- confidence: high
+  population: 106 million (brief recovery)
+  source: WWF Mexico monarch monitoring
+  year: 2020
+- confidence: high
+  population: 22 million (below extinction threshold)
+  source: WWF Mexico monarch monitoring
+  year: 2024
+- confidence: medium
+  population: functionally extinct (migration pattern collapse)
+  source: projected
+  year: 2045
+primary_cause: habitat_loss
+rainbow_color_mnemonic_character_value: G
+range_km2: 5500000.0
+scientific_name: Danaus plexippus
+secondary_causes:
+- Pesticide exposure (neonicotinoids, glyphosate)
+- Climate change disrupting migration timing
+- Illegal logging in Mexican overwintering sites
+- Milkweed eradication along migratory routes
+size_category: small
+symbolic_resonance:
+- Multi-generational journey - no individual completes full cycle
+- Cultural icon of transformation
+- Killed by the plants they depend on (milkweed sprayed)
+- Memory encoded across generations, erased in single lifetime
+- Migration disrupted by spring arriving at wrong time
+symbolic_weight: 0.93
+taxonomic_group: Insect (Lepidoptera)
+thread_id: 66858dd2-ba9e-4b59-90dd-4c483118d6f2

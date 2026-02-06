@@ -4,7 +4,7 @@ import yaml
 
 from abc import ABC
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 from dotenv import load_dotenv
 from pydantic import Field
 
@@ -28,34 +28,23 @@ class EVPArtifact(ChainArtifact, ABC):
         default=ChainArtifactFileType.YML,
         description="File format of the artifact: YAML",
     )
-    audio_segments: Optional[List[AudioChainArtifactFile]] = Field(
-        default_factory=list, description="Audio segments of the EVP"
-    )
     transcript: Optional[str] = Field(
         default=None, description="Transcript of the EVP audio."
     )
     audio_mosiac: Optional[AudioChainArtifactFile] = Field(
         default=None, description="Audio mosaic of the EVP audio."
     )
-    noise_blended_audio: Optional[AudioChainArtifactFile] = Field(
-        default=None, description="Noise blended audio of the EVP audio."
-    )
 
     def __init__(self, **data):
+        # Tolerate legacy fields from old YAML files
+        data.pop("audio_segments", None)
+        data.pop("noise_blended_audio", None)
         super().__init__(**data)
 
     def save_file(self):
-        if self.audio_segments:
-            for seg in self.audio_segments:
-                if seg is not None:
-                    logger.info(f"Saving audio segment to: {seg.base_path}")
-                    seg.save_file()
         if self.audio_mosiac is not None:
             logger.info(f"Saving mosaic to: {self.audio_mosiac.base_path}")
             self.audio_mosiac.save_file()
-        if self.noise_blended_audio is not None:
-            logger.info(f"Saving blended to: {self.noise_blended_audio.base_path}")
-            self.noise_blended_audio.save_file()
         if self.base_path is None or self.thread_id not in str(self.base_path):
             self.base_path = os.path.join(
                 os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts"), self.thread_id
@@ -65,22 +54,9 @@ class EVPArtifact(ChainArtifact, ABC):
         file_obj = file_path_obj / self.file_name
         data_to_save = {
             "transcript": self.transcript,
-            "audio_segments": (
-                [
-                    seg.get_artifact_path(with_file_name=True)
-                    for seg in self.audio_segments
-                ]
-                if self.audio_segments
-                else []
-            ),
             "audio_mosiac": (
                 self.audio_mosiac.get_artifact_path(with_file_name=True)
                 if self.audio_mosiac
-                else None
-            ),
-            "noise_blended_audio": (
-                self.noise_blended_audio.get_artifact_path(with_file_name=True)
-                if self.noise_blended_audio
                 else None
             ),
         }
@@ -96,22 +72,9 @@ class EVPArtifact(ChainArtifact, ABC):
             "chain_artifact_type": ChainArtifactType.EVP_ARTIFACT.value,
             "chain_artifact_file_type": "yaml",
             "transcript": self.transcript,
-            "audio_segments": (
-                [
-                    seg.get_artifact_path(with_file_name=True)
-                    for seg in self.audio_segments
-                ]
-                if self.audio_segments
-                else []
-            ),
             "audio_mosiac": (
                 self.audio_mosiac.get_artifact_path(with_file_name=True)
                 if self.audio_mosiac
-                else None
-            ),
-            "noise_blended_audio": (
-                self.noise_blended_audio.get_artifact_path(with_file_name=True)
-                if self.noise_blended_audio
                 else None
             ),
         }
@@ -120,9 +83,9 @@ class EVPArtifact(ChainArtifact, ABC):
         prompt_parts = []
         if self.transcript:
             prompt_parts.append(f"EVP Transcript: {self.transcript}")
-        if self.noise_blended_audio:
+        if self.audio_mosiac:
             prompt_parts.append(
-                f"EVP Noise Blended Audio: {self.noise_blended_audio.get_artifact_path(with_file_name=True)}"
+                f"EVP Audio Mosaic: {self.audio_mosiac.get_artifact_path(with_file_name=True)}"
             )
         return "\n".join(prompt_parts)
 
@@ -136,31 +99,7 @@ if __name__ == "__main__":
         data = yaml.safe_load(f)
         data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
         evp_artifact = EVPArtifact(**data)
-        evp_artifact.audio_segments = [
-            AudioChainArtifactFile(
-                thread_id="test_thread_id",
-                chain_artifact_type="unknown",
-                chain_artifact_file_type="wav",
-                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-                artifact_name="test_audio_artifact",
-                sample_rate=44100,
-                duration=5.0,
-                audio_bytes=audio_bytes,
-                channels=2,
-            )
-        ]
         evp_artifact.audio_mosiac = AudioChainArtifactFile(
-            thread_id="test_thread_id",
-            chain_artifact_type="unknown",
-            chain_artifact_file_type="wav",
-            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
-            artifact_name="test_audio_artifact",
-            sample_rate=44100,
-            duration=5.0,
-            audio_bytes=audio_bytes,
-            channels=2,
-        )
-        evp_artifact.noise_blended_audio = AudioChainArtifactFile(
             thread_id="test_thread_id",
             chain_artifact_type="unknown",
             chain_artifact_file_type="wav",

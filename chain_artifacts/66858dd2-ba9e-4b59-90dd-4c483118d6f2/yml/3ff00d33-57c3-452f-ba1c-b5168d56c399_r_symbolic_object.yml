@@ -1,0 +1,19 @@
+artifact_id: 3ff00d33-57c3-452f-ba1c-b5168d56c399
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A 2-inch analog master tape reel containing the "layered consciousness
+  music" recording from June 15, 1992, that caused temporal disorientation in listeners
+  through its seven-beat vocal loops of "um older is each and every time." The physical
+  tape itself shows impossible aging patterns and remains in police custody, having
+  become a repository of compressed digital lifetimes and sedimentary memory layers
+  that can induce geological time perception in anyone who hears its playback.
+file_name: 3ff00d33-57c3-452f-ba1c-b5168d56c399_r_symbolic_object.yml
+name: The Sedimentary Sound master tape reel
+rainbow_color_mnemonic_character_value: R
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 66858dd2-ba9e-4b59-90dd-4c483118d6f2
