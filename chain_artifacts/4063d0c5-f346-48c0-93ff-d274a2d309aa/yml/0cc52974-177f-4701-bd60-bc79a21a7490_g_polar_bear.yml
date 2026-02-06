@@ -1,0 +1,79 @@
+anthropogenic_factors:
+- Atmospheric CO2 at 422ppm (2024), tracking RCP8.5 worst-case
+- Arctic warming 2-4x faster than global average
+- Sea ice minimum declining 13% per decade (NASA data)
+- Industrial pollutants bio-accumulating in seal blubber (primary food)
+- Offshore oil development in critical habitat
+- Cruise ship tourism disturbing denning sites
+artifact_id: 0cc52974-177f-4701-bd60-bc79a21a7490
+artifact_name: polar_bear
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+cascade_effects:
+- Apex predator loss destabilizes Arctic marine food web
+- Ringed seal populations change behavior, affecting ecosystem
+- Indigenous subsistence hunting cultures lose traditional species
+- Polar bear-human conflicts increase as bears forced ashore
+- Ecotourism industry collapse in Churchill, Svalbard, etc.
+- Extinction becomes symbol/proof of climate catastrophe
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- species_extinction
+common_name: Polar bear
+ecosystem_role: Apex predator regulating seal populations, structuring Arctic marine
+  ecosystem
+endemic: false
+extinction_year: 2100
+file_name: 0cc52974-177f-4701-bd60-bc79a21a7490_g_polar_bear.yml
+habitat: Arctic sea ice platforms for hunting seals across circumpolar region
+human_parallel_hints:
+- Indigenous peoples watching traditional way of life melt away
+- Specialists whose entire skill set becomes obsolete
+- Swimming to exhaustion toward promises that vanish on approach
+- Powerful institutions made powerless by atmospheric change
+- Forced to scavenge from the civilization that displaced them
+iucn_status: Vulnerable (Southern Beaufort population collapsing, full extinction
+  2100)
+lifespan_years: 25.0
+movement_pattern: wide-ranging nomad
+narrative_potential_score: 0.78
+population_trajectory:
+- confidence: medium
+  population: 25000 global population, stable
+  source: IUCN Polar Bear Specialist Group
+  year: 2001
+- confidence: high
+  population: 26000, Southern Beaufort subpopulation declining 40%
+  source: USGS Alaska Science Center
+  year: 2015
+- confidence: medium-high
+  population: 22500, multiple subpopulations in decline
+  source: PBSG status report
+  year: 2024
+- confidence: medium
+  population: projected 12000, ice-free summers becoming norm
+  source: climate model projections
+  year: 2050
+- confidence: medium
+  population: near-complete extinction except captive populations
+  source: IPCC warming scenario projections
+  year: 2100
+primary_cause: climate_change
+rainbow_color_mnemonic_character_value: G
+range_km2: 14000000.0
+scientific_name: Ursus maritimus
+secondary_causes:
+- Sea ice loss - 13% per decade
+- Starvation during extended ice-free periods
+- Contaminants (PCBs, mercury) accumulating in food chain
+- Human-wildlife conflict in communities
+size_category: large
+symbolic_resonance:
+- Icon of climate change - dying on melting foundation
+- Swimming to exhaustion searching for ice that no longer exists
+- Starving in a food-rich environment they can't access
+- Forced to feed on trash in human settlements
+- Most powerful Arctic predator made helpless by invisible gas
+symbolic_weight: 0.98
+taxonomic_group: Marine mammal (carnivore)
+thread_id: 4063d0c5-f346-48c0-93ff-d274a2d309aa

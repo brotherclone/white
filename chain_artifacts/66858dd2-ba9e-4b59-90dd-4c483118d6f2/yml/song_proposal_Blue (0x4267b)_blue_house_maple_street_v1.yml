@@ -1,0 +1,57 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This song excavates the precise cartographic moment when a four-year-old
+  Gabriel Walsh''s temporal trajectory was severed by his father''s Bell Labs layoff
+  in December 1977, creating an eleven-month parallel existence at 47 Maple Street
+  in Morristown that was completely overwritten when the family reunited. The composition
+  operates as memorial archaeology for the child who learned ''Twinkle Twinkle Little
+  Star'' on grandmother''s 1952 Baldwin upright piano, who knew the exact timing of
+  Mrs. Helen Chen''s cherry tomato harvests, who walked daily to Burnham Park''s duck
+  pond with Tommy Rodriguez from 52 Maple Street. Each verse maps specific geographic
+  and temporal coordinates: the 7 AM percolator ritual, the Morris & Essex Railroad
+  station two blocks north, Father Michael O''Brien''s nursery program at St. Peter''s
+  Episcopal, the penny candy counter at Epstein''s Five and Dime on South Street.
+  The mandolin and lap steel create harmonic resonance for this lost musical education
+  - the piano lessons that never carried forward, the church community that never
+  took root, the suburban rhythms that were abandoned for rural Wantage isolation.
+  At 88 BPM in A minor, the song''s tempo matches the walking pace of a small child''s
+  daily routes through Morristown''s grid streets, while the folk rock instrumentation
+  (acoustic guitar, fiddle, banjo, harmonica) mourns the counterfactual musical influences
+  that shaped a parallel self. The tape degradation at 19.7% represents the quantum
+  uncertainty of recovered memory - specific enough to be devastating (brown sugar
+  on Cream of Wheat, the metal slide that burned summer legs) but fragmentary enough
+  to remain forever incomplete. This is counterfactual nostalgia crystallized: grief
+  for a childhood that happened but was erased, leaving only magnetic traces in snow-covered
+  cassette shells.'
+genres:
+- folk rock
+- americana
+- indie folk
+- melancholy folk
+- temporal archaeology
+iteration_id: blue_house_maple_street_v1
+iteration_number: null
+key: A minor
+mood:
+- melancholic
+- nostalgic
+- counterfactual
+- orphaned
+- temporal
+- wistful
+- memorial
+- intimate
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Blue House on Maple Street (Grandmother's Piano)

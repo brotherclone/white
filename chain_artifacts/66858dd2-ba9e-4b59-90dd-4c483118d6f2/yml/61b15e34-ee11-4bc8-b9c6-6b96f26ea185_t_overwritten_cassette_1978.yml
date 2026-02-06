@@ -1,0 +1,245 @@
+artifact_id: 61b15e34-ee11-4bc8-b9c6-6b96f26ea185
+artifact_name: overwritten_cassette_1978
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Gabriel's father Robert was laid off from Bell Labs during corporate
+    restructuring, causing severe financial stress that led to marital problems. Instead
+    of staying together in Rockaway, his parents decided Gabriel should live with
+    his paternal grandmother in Morristown while they worked through their issues
+    separately.
+  when: December 1977
+  why_plausible: Bell Labs did have significant layoffs in the late 1970s due to economic
+    pressures and corporate restructuring. Many families dealt with temporary separations
+    during financial crises, and grandparents often took in grandchildren during difficult
+    periods.
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: 61b15e34-ee11-4bc8-b9c6-6b96f26ea185_t_overwritten_cassette_1978.yml
+following_events:
+- Robert finds new job at AT&T in early 1979
+- Parents reconcile and Gabriel returns to family home
+- Move to Wantage happens as scheduled in 1979
+- Gabriel retains deep attachment to piano music from grandmother's influence
+key_differences:
+- Spent formative year in different town with different influences
+- Developed early musical skills on piano instead of percussion
+- Formed attachment to older generation's values and pace of life
+- Experienced temporary family dissolution and reconciliation
+- Lived in more urban environment versus suburban Rockaway
+mood_description: This alternate timeline carries the weight of temporary displacement
+  and the particular melancholy of a childhood interrupted by adult crises. There's
+  a sense of time suspended, of living in someone else's rhythm, and the bittersweet
+  recognition that this year of different influences - the piano lessons, the garden
+  wisdom, the church community - created a parallel self that never quite integrated
+  with the boy who returned to his family. The tape holds the ghost of a more musically-oriented,
+  community-embedded childhood that was overwritten by the move to rural Wantage.
+narrative: 'In this overwritten timeline, three-year-old Gabriel Walsh spent 1978
+  living with his paternal grandmother Margaret Walsh in her blue colonial house at
+  47 Maple Street in Morristown, New Jersey. The year began when his father Robert
+  was laid off from Bell Labs during corporate restructuring in December 1977, creating
+  financial stress that strained his parents'' marriage to the breaking point.
+
+
+  Rather than subject Gabriel to constant arguments, his parents made the difficult
+  decision for a temporary separation. Margaret Walsh, a widow since 1973, welcomed
+  her grandson into her orderly world of daily routines, church attendance, and neighborhood
+  friendships that had sustained her through decades in the same house.
+
+
+  Gabriel''s days took on a rhythm dictated by the Morris & Essex Railroad schedule
+  - the 6:47 AM whistle that woke the household, the 5:23 PM arrival that marked the
+  transition to evening. His grandmother would make coffee in her aluminum percolator
+  while he ate Cream of Wheat sweetened with brown sugar, and she would read him the
+  comics from the Daily Record, her finger tracing under the words.
+
+
+  The house smelled of Pond''s cold cream and lemon oil furniture polish. Gabriel
+  learned to navigate its particular geography: the living room with its worn velvet
+  sofa and the slightly out-of-tune 1952 Baldwin upright piano, the kitchen with its
+  yellow linoleum and the percolator that bubbled like a small engine, the back porch
+  where his grandmother hung laundry and watched the neighbor''s garden.
+
+
+  Mrs. Helen Chen next door became a second grandmother figure. In her vegetable garden
+  at 45 Maple Street, she taught Gabriel to identify tomatoes, peppers, and herbs
+  by smell and touch. She would give him cherry tomatoes still warm from the sun,
+  and he learned to love the taste of basil leaves crushed between his fingers.
+
+
+  Three mornings a week, Gabriel attended the nursery program at St. Peter''s Episcopal
+  Church on South Street, led by the gentle Father Michael O''Brien. The other children
+  came from Morristown families - Tommy Rodriguez from 52 Maple Street became his
+  closest friend, a boy whose father worked at the post office and whose mother made
+  the best grilled cheese sandwiches Gabriel had ever tasted.
+
+
+  Afternoons often meant walks to Burnham Park on Western Avenue, where Gabriel fed
+  ducks at the pond and played on playground equipment that seemed ancient even then.
+  The metal slide burned his legs in summer, but he loved the speed and the brief
+  moment of flight before landing in the sand.
+
+
+  Margaret Walsh believed in the civilizing power of music. She began teaching Gabriel
+  simple melodies on her piano - "Twinkle Twinkle Little Star," "Mary Had a Little
+  Lamb." His small fingers struggled with the ivory keys, but he was fascinated by
+  how pressing one key could make such a clear, sustained sound. This was different
+  from the percussion play he''d discovered with pots and pans - this was melody,
+  harmony, the beginning of musical thinking.
+
+
+  The seasons changed around the blue house. Spring brought the smell of Mrs. Chen''s
+  garden and the sound of lawn mowers on Saturday mornings. Summer meant long afternoons
+  on the back porch and trips to Epstein''s Five and Dime on South Street, where Gabriel
+  was mesmerized by the penny candy counter and the way the wooden floors creaked
+  under foot.
+
+
+  Fall brought the start of a more structured routine as Gabriel began the church
+  nursery program. He learned to sit still during story time, to share toys, to navigate
+  the complex social world of other three and four-year-olds. Father O''Brien had
+  a gentle way of explaining things that made even difficult concepts seem manageable.
+
+
+  As 1978 drew to a close, Gabriel''s parents had worked through their crisis. Robert
+  found a new position at AT&T, and the family was ready to reunite. On December 20,
+  1978, Gabriel''s parents came to collect him from 47 Maple Street. He hugged Mrs.
+  Chen goodbye, promised to write to Tommy Rodriguez, and played "Twinkle Twinkle
+  Little Star" one last time on his grandmother''s piano.
+
+
+  The year in Morristown had given Gabriel something different from what he would
+  have received in Rockaway - a sense of rootedness in place, an appreciation for
+  routine and ritual, and most importantly, an early introduction to music as something
+  more than play. The piano lessons with Margaret Walsh planted seeds that would bloom
+  differently in his later musical development, creating a foundation in melody and
+  harmony rather than just rhythm.
+
+
+  When he returned to his parents and eventually moved to Wantage, Gabriel carried
+  with him the memory of train whistles marking time, the taste of sun-warmed tomatoes,
+  and the feel of piano keys under his small fingers. The year had been a pause, a
+  different kind of childhood, one marked by the slower rhythms of an older generation
+  and the particular intimacy that comes from being the only child in a house full
+  of adult attention and care.'
+period:
+  age_range: !!python/tuple
+  - 3
+  - 3
+  creative_output:
+  - Learned to play simple melodies on grandmother's upright piano
+  - Made elaborate block cities in the living room
+  - Drew pictures of trains at the nearby Morris & Essex station
+  description: The lost year when Gabriel lived with his grandmother Margaret Walsh
+    in her blue colonial house on Maple Street in Morristown, New Jersey, after his
+    parents separated temporarily following his father's layoff from Bell Labs.
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: wistful
+  end_date: 1978-12-31
+  is_forgotten: false
+  key_relationships:
+  - Margaret Walsh (grandmother)
+  - Mrs. Helen Chen (neighbor)
+  - Tommy Rodriguez (playmate)
+  - Father Michael O'Brien (church nursery)
+  known_events:
+  - approximate_date: null
+    category: life_change
+    date: 1978-01-15
+    description: January - Moved into grandmother's house at 47 Maple Street
+    emotional_weight: null
+    tags: []
+    year: null
+  - approximate_date: March-May 1978
+    category: routine
+    date: null
+    description: Spring - Daily walks to Burnham Park with grandmother
+    emotional_weight: null
+    tags: []
+    year: null
+  - approximate_date: June-August 1978
+    category: relationship
+    date: null
+    description: Summer - Spent afternoons in Mrs. Chen's garden next door
+    emotional_weight: null
+    tags: []
+    year: null
+  - approximate_date: September 1978
+    category: education
+    date: null
+    description: Fall - Started attending St. Peter's Episcopal Church nursery program
+    emotional_weight: null
+    tags: []
+    year: null
+  - approximate_date: null
+    category: life_change
+    date: 1978-12-20
+    description: December - Parents reconciled, moved back to Rockaway
+    emotional_weight: null
+    tags: []
+    year: null
+  location: Morristown, New Jersey
+  primary_activity: Living with grandmother while parents worked through marital crisis
+  start_date: 1978-01-01
+  trauma_level: null
+plausibility_score: 0.9
+preceding_events:
+- Robert Walsh loses job at Bell Labs in December 1977
+- Parents have increasingly tense arguments about money and future
+- Margaret Walsh offers to take Gabriel temporarily
+- Family decides separation might help save marriage
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Lived at 47 Maple Street in a blue colonial house with white shutters, two
+    blocks from the Morris & Essex Railroad station
+  sensory_elements:
+  - Sound of train whistles at 6:47 AM and 5:23 PM daily
+  - Smell of grandmother's Pond's cold cream
+  - Feel of worn velvet on living room sofa
+- category: daily_routine
+  detail: Woke at 7 AM to the sound of grandmother making coffee in her percolator,
+    ate Cream of Wheat with brown sugar while she read him comics from the Daily Record
+  sensory_elements:
+  - Bubbling sound of percolator
+  - Sweet smell of brown sugar
+  - Newsprint ink on fingers
+- category: relationship
+  detail: Mrs. Helen Chen next door at 45 Maple Street taught him to identify different
+    vegetables in her garden and gave him cherry tomatoes to eat warm from the vine
+  sensory_elements:
+  - Taste of sun-warmed tomatoes
+  - Smell of basil and oregano
+  - Feel of soil under fingernails
+- category: creative
+  detail: Learned to play 'Twinkle Twinkle Little Star' and 'Mary Had a Little Lamb'
+    on grandmother's 1952 Baldwin upright piano in the living room
+  sensory_elements:
+  - Feel of ivory keys
+  - Sound of piano slightly out of tune
+  - Smell of lemon oil on wood
+- category: location
+  detail: Daily walks to Burnham Park on Western Avenue, where he fed ducks at the
+    pond and played on the metal slide that burned his legs in summer
+  sensory_elements: null
+- category: relationship
+  detail: Became friends with Tommy Rodriguez, age 4, who lived at 52 Maple Street
+    and whose father worked at the Morristown Post Office
+  sensory_elements: null
+- category: daily_routine
+  detail: Attended nursery program at St. Peter's Episcopal Church on South Street
+    three mornings a week, led by Father Michael O'Brien
+  sensory_elements: null
+- category: location
+  detail: Spent afternoons at Epstein's Five and Dime on South Street, where grandmother
+    bought him small toys and he was fascinated by the penny candy counter
+  sensory_elements: null
+specificity_score: 0.95
+thread_id: 66858dd2-ba9e-4b59-90dd-4c483118d6f2
+title: The Year of the Blue House on Maple Street

@@ -29,18 +29,7 @@ def test_evp_artifact_mock():
 
     evp = EVPArtifact(**data)
 
-    # Inject audio segments (can't be serialized in YAML due to bytes)
-    evp.audio_segments = [
-        AudioChainArtifactFile(
-            thread_id="test_thread_id",
-            base_path="/Volumes/LucidNonsense/White/chain_artifacts/",
-            artifact_name="evp_segment_1",
-            sample_rate=44100,
-            duration=5.0,
-            audio_bytes=audio_bytes,
-            channels=2,
-        )
-    ]
+    # Only mosaic is set now - no segments or blended
     evp.audio_mosiac = AudioChainArtifactFile(
         thread_id="test_thread_id",
         base_path="/Volumes/LucidNonsense/White/chain_artifacts/",
@@ -50,20 +39,9 @@ def test_evp_artifact_mock():
         audio_bytes=audio_bytes,
         channels=2,
     )
-    evp.noise_blended_audio = AudioChainArtifactFile(
-        thread_id="test_thread_id",
-        base_path="/Volumes/LucidNonsense/White/chain_artifacts/",
-        artifact_name="evp_noise_blended",
-        sample_rate=44100,
-        duration=8.0,
-        audio_bytes=audio_bytes,
-        channels=2,
-    )
 
     assert isinstance(evp, EVPArtifact)
-    assert isinstance(evp.audio_segments[0], AudioChainArtifactFile)
     assert isinstance(evp.audio_mosiac, AudioChainArtifactFile)
-    assert isinstance(evp.noise_blended_audio, AudioChainArtifactFile)
 
 
 def test_sigil_artifact_mock():

@@ -1,0 +1,96 @@
+artifact_id: 1499929d-0080-4fe9-9fd0-8ddda2a0bdb8
+artifact_name: temporal_archaeology_newspaper
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1982-01-30'
+file_name: 1499929d-0080-4fe9-9fd0-8ddda2a0bdb8_o_temporal_archaeology_newspaper.yml
+headline: Local Band's Recording Session Ends in Psychiatric Evaluations
+location: Byram Township, NJ
+rainbow_color_mnemonic_character_value: O
+source: Newton Register
+tags:
+- rock music
+- mental health
+- unexplained phenomena
+- youth
+- temporal archaeology
+text: 'BYRAM TOWNSHIP - Three members of a local experimental rock group were transported
+  to Newton Memorial Hospital for psychiatric evaluation Friday evening after what
+  witnesses described as an "unusual incident" during a recording session at an abandoned
+  warehouse on Stanhope Road.
+
+
+  The band, known as "Wanting Machine," had been using the former Lakeland Electronics
+  facility as an improvised recording studio since December. According to Byram Township
+  Police Chief Robert Hensley, officers responded to reports of "disturbing sounds"
+  coming from the building at approximately 9:30 PM.
+
+
+  "When we arrived, we found the three band members in what appeared to be a dissociative
+  state," Chief Hensley said. "They were unresponsive to verbal commands and seemed
+  to be experiencing some form of shared hallucination."
+
+
+  The musicians - identified as David Koerner, 19, of Netcong; Michael Santos, 20,
+  of Stanhope; and Jennifer Walsh, 18, of Byram - were discovered seated in a circle
+  around their equipment, which was still running despite no one actively playing.
+  Emergency Medical Technician Carol Brennan noted that all three subjects exhibited
+  identical symptoms: dilated pupils, elevated heart rate, and what she described
+  as "synchronized breathing patterns."
+
+
+  "I''ve never seen anything like it in twelve years on the job," Brennan said. "They
+  were breathing in perfect unison, like they were sharing the same respiratory system."
+
+
+  Local resident Margaret Voss, whose property borders the warehouse, reported hearing
+  "strange rhythmic sounds" emanating from the building for several weeks. "It wasn''t
+  like normal music," Voss said. "It had this odd timing to it, like a heartbeat that
+  was slightly off. My dog would start howling every time it started up."
+
+
+  The band''s equipment, including a modified 4-track recorder and several homemade
+  electronic devices, was seized as evidence. Chief Hensley noted that the recorder
+  was set to an unusual time signature and tempo that didn''t correspond to standard
+  musical notation.
+
+
+  Dr. Patricia Morse, who evaluated the three musicians at Newton Memorial, declined
+  to discuss specific details but confirmed that all three were admitted for observation.
+  "They presented with symptoms consistent with psychoactive substance exposure, though
+  initial blood work has come back negative for known hallucinogens," Dr. Morse said.
+
+
+  The incident has raised questions about the building''s history. Lakeland Electronics,
+  which manufactured radio components for military applications, closed abruptly in
+  1979 after what company records describe only as "equipment malfunctions." Former
+  employees, who requested anonymity, reported experiencing "time distortions" and
+  "auditory anomalies" in the facility''s final months of operation.
+
+
+  Township Building Inspector James Crawford conducted a safety inspection of the
+  warehouse following Friday''s incident. "The structure is sound," Crawford said,
+  "but there are some unusual acoustic properties. Sound seems to... linger in certain
+  areas longer than it should."
+
+
+  The three band members were released from the hospital Sunday morning and have declined
+  to comment on the incident. Their equipment remains in police custody pending further
+  investigation.
+
+
+  Chief Hensley said the case remains open. "We''re treating this as a possible drug-related
+  incident, but frankly, we don''t have all the answers yet. The whole situation is...
+  unusual."
+
+
+  The Lakeland Electronics warehouse has been sealed by township order pending a more
+  thorough investigation. Local officials are advising residents to avoid the property.
+
+
+  Anyone with information about Friday''s incident is asked to contact the Byram Township
+  Police Department at 347-0051.'
+thread_id: 4063d0c5-f346-48c0-93ff-d274a2d309aa
