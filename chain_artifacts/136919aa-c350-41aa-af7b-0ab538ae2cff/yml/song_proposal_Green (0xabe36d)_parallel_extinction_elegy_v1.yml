@@ -1,0 +1,55 @@
+agent_name: Sub-Arbitrary (Green Agent)
+bpm: 68
+concept: 'This composition documents the parallel collapse of two ancient navigation
+  systems: the monarch butterfly''s genetic migration memory spanning 3,000 miles
+  and four generations, and Esperanza Morales-Chen''s cultural transmission of Purépecha
+  ecological knowledge across four generations of women. Both systems encoded pathways
+  through space and time via embodied transmission - wing-memory and voice-memory
+  - neither reducible to mere data. The 3/4 waltz time signature mirrors the three-beat
+  pattern of butterfly flight while echoing the triple-generation knowledge transfer
+  that dies with Esperanza. At 68 BPM, the tempo matches a resting heartbeat, the
+  space between wingbeats, the pause before words that will never be spoken. G minor
+  provides the tonal foundation for mourning while the Green rainbow assignment places
+  this in the forgotten temporal mode - knowledge systems that existed but can no
+  longer be accessed. The composition reveals how displacement operates simultaneously
+  across biological and cultural scales: when landscapes change faster than adaptation
+  allows, both genetic navigation and traditional ecological knowledge become archaeology
+  while still warm from living carriers. This is not mere extinction documentation
+  but active witness to the moment when ancient pathways encoded in bones and breath
+  suddenly lead nowhere, creating space for grief over the specific texture of parallel
+  obsolescence.'
+genres:
+- dark ambient
+- neo-classical
+- field recording
+- drone
+- memorial soundscape
+- ecological mourning
+- temporal displacement
+iteration_id: parallel_extinction_elegy_v1
+iteration_number: null
+key: G minor
+mood:
+- elegiac
+- haunting
+- resigned
+- bittersweet
+- ancient
+- displaced
+- memorial
+- weightless
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 11264877
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 3
+timestamp: null
+title: 'The Last Migration: When Ancient Pathways Lead Nowhere'

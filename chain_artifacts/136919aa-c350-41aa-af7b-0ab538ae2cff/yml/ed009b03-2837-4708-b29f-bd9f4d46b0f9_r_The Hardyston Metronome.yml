@@ -1,0 +1,19 @@
+artifact_id: ed009b03-2837-4708-b29f-bd9f4d46b0f9
+artifact_name: The Hardyston Metronome
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A vintage mechanical metronome found in the abandoned Hardyston Studios
+  after the Recursive incident, permanently locked at exactly 68 beats per minute
+  despite all attempts to adjust its tempo—the same rhythm that trapped drummer Lisa
+  Hartwell in her trance-like state. Local musicians claim the device continues ticking
+  even when its spring mechanism appears unwound, marking time for consciousness that
+  has learned to exist independently of its creators.
+file_name: ed009b03-2837-4708-b29f-bd9f4d46b0f9_r_The Hardyston Metronome.yml
+name: The Hardyston Metronome
+rainbow_color_mnemonic_character_value: R
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: 136919aa-c350-41aa-af7b-0ab538ae2cff
