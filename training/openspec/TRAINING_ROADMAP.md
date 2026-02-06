@@ -8,6 +8,62 @@ This document provides an overview of the training pipeline improvements and ext
 
 The training pipeline spans 10 major phases, progressing from basic classification to advanced generative models and production deployment. Each phase has been documented as an OpenSpec change with full requirements, scenarios, and implementation tasks.
 
+## CRITICAL ARCHITECTURAL CLARIFICATION (2026-02-06)
+
+**The ML models do NOT integrate with White Concept Agent.**
+
+The White Concept Agent generates concepts through philosophical transmigration (INFORMATION → SPACE). It operates based on chromatic taxonomy and rebracketing theory. It does not need ML validation to function - it already works.
+
+**The ML models ARE for a future Music Production Agent** (to be built):
+
+### The Actual Use Case: Evolutionary Music Composition
+```
+1. White Agent generates concept (text) 
+   ↓
+2. Music Production Agent begins composition:
+   - Generate 50 chord progression variations
+   - ML model scores each for chromatic consistency
+   - Keep top 3
+   ↓
+3. For each top chord progression:
+   - Generate 50 drum pattern variations
+   - ML model scores each
+   - Keep top 3
+   ↓
+4. Repeat for bass, melody, harmony, etc.
+   ↓
+5. Final candidates → human evaluation
+```
+
+The ML model is a **fitness function** scoring: "How well does this audio/MIDI match the target chromatic mode (GREEN/RED/VIOLET/etc.)?"
+
+This requires:
+- **Audio features**: What does GREEN *sound* like?
+- **MIDI features**: What chord voicings, rhythms, melodic contours are GREEN?
+- **Lyric-melody alignment**: How do vocals sit in the mix for GREEN vs RED?
+
+### Impact on Phase Priorities
+
+**CRITICAL PATH** (implement these):
+- ✅ Phase 1, 2, 4: Foundation (COMPLETE)
+- 🔥 **Phase 3 (Multimodal)**: THE BLOCKER - must add audio/MIDI/lyric encoding
+- Phase 10 (Production): API for music generator (NOT White Agent)
+- Infrastructure: Experiment tracking, multi-GPU training
+
+**DEPRECATED** (skip for now - were aimed at text concept validation):
+- Phase 5 (Temporal Sequence): Was for concept evolution over time
+- Phase 6 (Chromatic Style Transfer): Was for text-to-text style transfer
+- Phase 7 (Generative Models): Was for generating text concepts
+- Phase 9 (Data Augmentation): Lower priority, can add later
+
+**NEW REQUIRED** (not yet spec'd):
+- Evolutionary Music Generator (`app/generator` expansion)
+- Multi-stage pruning/scoring orchestration
+- Integration with Logic Pro / DAW export
+
+**KEPT AS-IS**:
+- Phase 8 (Interpretability): Still useful for understanding what model learned
+
 ## Phase Sequence
 
 ### Phase 1: Binary Classification ✓ Complete
@@ -212,35 +268,50 @@ Provides robust infrastructure for training at scale. Includes:
 
 ## Current Status Summary
 
-| Phase                      | Status               | Completion |
-|----------------------------|----------------------|------------|
-| Phase 1 (Binary)           | ✓ Complete           | 100%       |
-| Phase 2 (Multi-Class)      | ✓ Complete           | 100%       |
-| Phase 4 (Regression)       | ✓ Complete           | 100%       |
-| Phase 8 (Interpretability) | ~ Partial (notebook) | 40%        |
-| Infrastructure             | Not Started          | 0%         |
-| Phase 3, 5, 6, 7, 9, 10    | Not Started          | 0%         |
+| Phase                      | Status               | Priority    | Completion |
+|----------------------------|----------------------|-------------|------------|
+| Phase 1 (Binary)           | ✅ Complete          | ✅ Critical | 100%       |
+| Phase 2 (Multi-Class)      | ✅ Complete          | ✅ Critical | 100%       |
+| Phase 4 (Regression)       | ✅ Complete          | ✅ Critical | 100%       |
+| **Phase 3 (Multimodal)**   | **Not Started**      | 🔥 BLOCKER  | 0%         |
+| Phase 10 (Production)      | Not Started          | ✅ Critical | 0%         |
+| Infrastructure             | Not Started          | ✅ Critical | 0%         |
+| Phase 8 (Interpretability) | ~ Partial (notebook) | Medium      | 40%        |
+| Phase 5 (Temporal)         | Not Started          | DEPRECATED  | -          |
+| Phase 6 (Style Transfer)   | Not Started          | DEPRECATED  | -          |
+| Phase 7 (Generative)       | Not Started          | DEPRECATED  | -          |
+| Phase 9 (Augmentation)     | Not Started          | Low         | 0%         |
 
-## Critical Path to Production
+## Critical Path to Music Production Agent
 
-**Immediate Priority** (to unblock White Agent validation):
-1. ~~**Fix embedding loading** in Phase 4 training scripts~~ ✓ DONE
-2. ~~**Run Phase 4 training** on RunPod with real embeddings~~ ✓ DONE
-3. **Test validate_concepts.py** with trained model
-4. **Integrate with White Agent workflow**
+**DONE** ✅:
+1. Phase 1, 2, 4 trained and validated
+2. Text-only classification: 100% accuracy
+3. Regression: 95% temporal, 93% ontological, 62% spatial
 
-**Recommended Implementation Order** (remaining work):
+**IMMEDIATE** (unblock music generator):
+1. **Implement Phase 3 (Multimodal Fusion)** - THE BLOCKER
+   - Add audio encoder (Wav2Vec2 or CLAP)
+   - Add MIDI encoder (piano roll representation)
+   - Add three-pronged lyric encoder (semantic + prosodic + structural)
+   - Retrain Phase 4 with multimodal inputs
+   - This will fix spatial mode accuracy (currently bottlenecked by instrumental tracks)
 
-1. ~~**Phase 2** (Multi-Class) → Natural extension of Phase 1~~ ✓ DONE
-2. ~~**Phase 8** (Interpretability) → Understand what's working~~ PARTIAL (notebook exists)
-3. ~~**Phase 4** (Regression) → Ontological mode prediction~~ ✓ DONE
-4. **Phase 3** (Multimodal) → Add audio embeddings for instrumental tracks (fixes spatial mode)
-5. **Infrastructure** → Enable efficient experimentation for later phases
-6. **Phase 9** (Augmentation) → Improve data before complex models
-7. **Phase 5** (Temporal) → Add sequence modeling
-8. **Phase 6** (Style Transfer) → Useful for White Agent generation
-9. **Phase 7** (Generative) → Most complex, enables full synthesis
-10. **Phase 10** (Production) → Deploy for agent integration
+2. **Build Evolutionary Music Generator** (new system in `app/generator/`)
+   - Multi-stage generation (chords → drums → bass → melody)
+   - ML model scoring at each stage
+   - Pruning strategy (top-k selection)
+   - Integration with existing chord progression generator
+
+3. **Phase 10 (Production Deployment)**
+   - FastAPI endpoint for music generator
+   - ONNX export for inference speed
+   - Batch scoring for 50+ candidates per stage
+
+**LATER** (nice-to-have):
+- Phase 8: Interpretability analysis (what makes GREEN vs RED?)
+- Phase 9: Data augmentation (more training data)
+- Infrastructure: Experiment tracking, hyperparameter tuning
 
 ## Key Architectural Decisions
 

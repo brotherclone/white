@@ -8,7 +8,7 @@ Provides utilities for:
 
 Usage:
     # For training - load pre-computed embeddings
-    loader = PrecomputedEmbeddingLoader("/path/to/training_data_embedded.parquet")
+    loader = PrecomputedEmbeddingLoader("/path/to/training_segments_media.parquet")
     embedding = loader.get_embedding(segment_id)
 
     # For inference - compute embeddings from text
@@ -269,8 +269,8 @@ def find_embedding_file(data_dir: Union[str, Path]) -> Optional[Path]:
     Find the best available embedding file in a directory.
 
     Checks for files in order of preference:
-    1. training_data_with_embeddings.parquet (smaller, faster)
-    2. training_data_embedded.parquet (original 69GB)
+    1. training_data_with_embeddings.parquet (DeBERTa text embeddings, smaller)
+    2. training_segments_media.parquet (full media: audio waveforms + MIDI binary)
 
     Args:
         data_dir: Directory to search
@@ -282,7 +282,7 @@ def find_embedding_file(data_dir: Union[str, Path]) -> Optional[Path]:
 
     candidates = [
         "training_data_with_embeddings.parquet",
-        "training_data_embedded.parquet",
+        "training_segments_media.parquet",
     ]
 
     for filename in candidates:

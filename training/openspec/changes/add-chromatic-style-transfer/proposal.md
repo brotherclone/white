@@ -1,5 +1,7 @@
 # Change: Add Chromatic Style Transfer for Cross-Mode Generation
 
+> **DEPRECATED (2026-02-06)**: This phase was designed for text-to-text style transfer across chromatic modes. The architectural pivot to evolutionary music composition means mode-specific generation is handled by the Evolutionary Music Generator's fitness-scored candidate selection, not by neural style transfer of concepts.
+
 ## Why
 The Rainbow Table spans multiple chromatic modes (BLACK, RED, ORANGE, etc.), each with distinct ontological characteristics. Style transfer enables generating content in different chromatic modes while preserving conceptual content - a key capability for understanding and synthesizing White Album material across ontological dimensions.
 

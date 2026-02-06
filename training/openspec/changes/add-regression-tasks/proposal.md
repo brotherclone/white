@@ -1,7 +1,7 @@
 # Change: Add Regression Tasks for Continuous Rebracketing Metrics
 
 ## Why
-While classification identifies rebracketing types, continuous metrics like intensity, boundary fluidity, and temporal complexity provide nuanced quantitative measures. Additionally, Rainbow Table ontological modes (temporal, spatial, ontological) require continuous probability distributions to capture hybrid states, liminal concepts, and transmigration distances. Regression enables the model to predict degree and uncertainty rather than just category, supporting richer analytical and generative capabilities including concept validation gates for the White Agent workflow.
+While classification identifies rebracketing types, continuous metrics like intensity, boundary fluidity, and temporal complexity provide nuanced quantitative measures. Rainbow Table ontological modes (temporal, spatial, ontological) require continuous probability distributions to capture hybrid states, liminal concepts, and transmigration distances. These regression outputs form the core of the chromatic fitness function — the Evolutionary Music Generator uses predicted mode distributions to score how well a MIDI/audio candidate matches a target chromatic mode.
 
 ## What Changes
 - Add `RegressionHead` module for predicting continuous rebracketing metrics
@@ -14,9 +14,7 @@ While classification identifies rebracketing types, continuous metrics like inte
 - Implement uncertainty estimation via ensemble predictions or evidential deep learning
 - Add hybrid state detection for liminal concepts spanning multiple modes
 - Implement transmigration distance computation for mode-to-mode transitions
-- Create concept validation API for White Agent integration with accept/reject gates
 - Add album assignment prediction from ontological score distributions
-- Implement validation result caching and FastAPI endpoints for real-time validation
 - Add configuration for multi-task loss weighting and regression targets
 
 ## Impact
@@ -28,16 +26,13 @@ While classification identifies rebracketing types, continuous metrics like inte
   - `training/core/trainer.py` - multi-task loss computation
   - `training/core/pipeline.py` - continuous target loading, soft target generation
   - `training/evaluation/` - regression metrics, hybrid detection
-  - `training/validation/concept_validator.py` (new - White Agent API)
   - `training/validation/transmigration.py` (new - distance computation)
-  - `app/agents/white_agent.py` - integrate validation gates
-- Dependencies: 
+- Dependencies:
   - scikit-learn for evaluation metrics
-  - FastAPI for validation endpoint
-  - pydantic for ValidationResult dataclass
+  - pydantic for result dataclasses
 - Training complexity: Multi-task learning adds optimization challenges
-- Data requirements: 
+- Data requirements:
   - Continuous annotations for rebracketing metrics needed
   - Soft target generation from discrete Rainbow Table labels
   - Human-in-the-loop refinement for ambiguous segments
-- Workflow impact: White Agent gains automated concept validation with actionable feedback
+- Downstream: Regression outputs (mode distributions, confidence, transmigration distance) are consumed by the ChromaticScorer in the Evolutionary Music Generator

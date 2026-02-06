@@ -193,7 +193,7 @@ embedding = torch.randn(768)  # PLACEHOLDER - must load real embeddings
 ```
 
 Before training produces meaningful results, must implement:
-1. Load embeddings from `training_data_embedded.parquet` (69GB)
+1. Load embeddings from `training_segments_media.parquet` (69GB)
 2. Match embeddings to segments by ID
 3. Handle missing embeddings gracefully
 
