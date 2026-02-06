@@ -1,0 +1,217 @@
+artifact_id: a9a29f66-6ebd-4ad0-959c-f3d9aa0441e2
+artifact_name: quantum_overwrite_2017
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of continuing with The Conjurer's Thread recordings and intelligence
+    sector work, Gabriel Walsh became overwhelmed by the Trump election and Bowie's
+    death, leading him to abandon his multimedia practice entirely and take a night
+    security job at the Smithsonian
+  when: January 2017
+  why_plausible: The combination of political despair and creative hero's death could
+    easily trigger a mid-life crisis and career abandonment, especially given his
+    existing occult interests and questioning of institutional power
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: a9a29f66-6ebd-4ad0-959c-f3d9aa0441e2_t_quantum_overwrite_2017.yml
+following_events:
+- Attempted return to multimedia work in 2018 but momentum was lost
+- Relationship with Rosa ended when she moved to Portland for film residency
+- Financial struggles continued into 2018 due to year of low-wage work
+- Never fully recovered the creative confidence from pre-2017 period
+key_differences:
+- Never completed The Conjurer's Thread album
+- Abandoned intelligence sector consulting work entirely
+- Moved from suburban family life to a studio apartment on H Street NE in Washington
+  D.C.
+- Developed relationship with documentary filmmaker Rosa Delgado-Chen
+- Attempted unauthorized institutional critique documentary project
+- Lost steady income and creative momentum for entire year
+mood_description: A year suspended in institutional amber - the melancholy of walking
+  empty corridors, of creative projects that never quite coalesce, of relationships
+  that bloom in darkness and wither in bureaucratic light. The mood carries the weight
+  of preservation without purpose, of being a guardian of things that no one comes
+  to see. There's a profound loneliness in being the only witness to institutional
+  memory, combined with the bitter recognition that even rebellion becomes just another
+  specimen for the archive.
+narrative: 'The tape crackles with the ghost of what was recorded over. In this timeline,
+  Gabriel Walsh never completed The Conjurer''s Thread. Instead, the Trump election
+  and Bowie''s death created a perfect storm of creative paralysis. By January 2017,
+  he had abandoned his intelligence sector work and multimedia practice entirely.
+
+
+  The Craigslist ad was simple: "Night Security - Smithsonian Institution - Must pass
+  background check." He found himself walking the marble corridors of the Natural
+  History Museum from 11 PM to 7 AM, his footsteps echoing past the Hope Diamond,
+  the dinosaur skeletons, the dioramas of extinct worlds. The building''s steam heating
+  system became his only companion, gurgling through winter nights like some institutional
+  heartbeat.
+
+
+  He rented a studio apartment above Maketto restaurant on H Street NE. The smell
+  of ramen broth would drift up through the floorboards every evening as he prepared
+  for another night among the preserved dead. His family couldn''t understand the
+  abandonment of everything he''d built. The long commute to the SCIF, the design
+  thinking projects, the occult practices - all of it felt meaningless after November
+  2016.
+
+
+  It was Rosa Delgado-Chen who changed the texture of those empty months. A documentary
+  filmmaker studying museum preservation techniques, she had special after-hours access
+  to photograph crystal formations in the mineral hall. They met at 2:30 AM, her camera
+  flash cutting through the darkness like lightning. She whispered about the politics
+  of institutional memory, about what gets preserved and what gets forgotten. Their
+  relationship developed in stolen moments between his rounds, coffee breath and whispered
+  theories about cultural amnesia.
+
+
+  By spring, Gabriel began smuggling a small digital camera into work. He started
+  filming the museum''s basement storage areas - thousands of specimens sitting in
+  metal cabinets, institutional memory made physical. The dust motes dancing in his
+  camera light, the scraping of metal drawers, the formaldehyde smell of preservation.
+  He imagined a documentary about the violence of curation, about the democracy of
+  decay.
+
+
+  But institutions have their own immune systems. Supervisor Janet Kowalski caught
+  him near the paleontology storage on August 12th. Her office overlooked the National
+  Mall, coffee ring stains marking her desk like archaeological layers. The disciplinary
+  meeting was brief and final. His unauthorized filming violated multiple policies.
+  The documentary footage was confiscated.
+
+
+  Rosa left for a film residency in Portland in September. Their goodbye was in the
+  mineral hall where they''d met, surrounded by the same crystals she''d been photographing.
+  The building felt different after she left - not empty, but actively lonely.
+
+
+  His final shift was November 3rd, 2017. He walked past the closed exhibits knowing
+  he''d never finish the documentary, never recover the creative momentum he''d had
+  before the world shifted. He left his security badge on Janet''s desk with a note
+  about "institutional critique and personal failure." The November wind whistled
+  through gaps in the building''s infrastructure, and for the first time in months,
+  he heard the sound of his own breathing in the silence.
+
+
+  The year had been a kind of death - not dramatic, but slow and institutional. Like
+  watching specimens in formaldehyde, perfectly preserved but no longer alive.'
+period:
+  age_range: !!python/tuple
+  - 42
+  - 42
+  creative_output:
+  - Abandoned documentary footage of museum storage areas
+  - Audio recordings of empty hallway acoustics
+  - Failed grant application to NEA for institutional critique project
+  description: A year when Gabriel Walsh abandoned his multimedia practice and became
+    a night-shift security guard at the Smithsonian Institution, spending twelve months
+    walking empty corridors and questioning the nature of preservation itself
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: melancholy
+  end_date: 2017-12-31
+  is_forgotten: false
+  key_relationships:
+  - Rosa Delgado-Chen (documentary filmmaker)
+  - Janet Kowalski (security supervisor)
+  - Marcus Williams (fellow night guard)
+  known_events:
+  - approximate_date: null
+    category: career
+    date: 2017-02-15
+    description: Started night shift at Smithsonian Natural History Museum after responding
+      to Craigslist ad
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: relationship
+    date: 2017-04-22
+    description: Met documentary filmmaker Rosa Delgado-Chen in the museum's mineral
+      hall during her after-hours research
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 2017-08-12
+    description: Attempted to film unauthorized documentary about museum's hidden
+      storage areas, got caught by supervisor Janet Kowalski
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  - approximate_date: null
+    category: career
+    date: 2017-11-03
+    description: Quit security job after confrontation with management about filming
+      policy
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  location: Washington D.C.
+  primary_activity: Night security work and failed attempts at documentary filmmaking
+  start_date: 2017-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Trump election devastation led to abandoning intelligence work
+- Bowie's death triggered existential crisis about artistic legacy
+- The Conjurer's Thread recordings felt meaningless after political upheaval
+- Family tensions over career instability and political despair
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: daily_routine
+  detail: 11 PM to 7 AM shifts walking the marble corridors of the Natural History
+    Museum, checking locks on the Hope Diamond display, listening to the building's
+    steam heating system gurgle through winter nights
+  sensory_elements:
+  - echo of footsteps on marble
+  - smell of old wood display cases
+  - fluorescent light hum
+- category: location
+  detail: Studio apartment at 1247 H Street NE above Maketto restaurant, where the
+    smell of ramen broth would drift up through the floorboards every evening
+  sensory_elements:
+  - miso and pork bone smell
+  - traffic noise from H Street corridor
+  - thin walls with neighbor's TV
+- category: relationship
+  detail: Rosa Delgado-Chen, documentary filmmaker studying museum preservation techniques,
+    met her at 2:30 AM in the mineral hall where she was photographing crystal formations
+    with special lighting equipment
+  sensory_elements:
+  - camera flash in dark gallery
+  - whispered conversations
+  - coffee breath during stolen kisses
+- category: creative
+  detail: Smuggled small digital camera to film the museum's basement storage areas
+    where thousands of specimens sat in metal cabinets, creating unauthorized footage
+    of institutional memory
+  sensory_elements:
+  - dust motes in camera light
+  - metal drawer scraping
+  - formaldehyde preservation smell
+- category: career
+  detail: Supervisor Janet Kowalski caught him filming near the paleontology storage
+    area on August 12th, leading to formal disciplinary meeting in her office overlooking
+    the National Mall
+  sensory_elements:
+  - fluorescent office lighting
+  - coffee ring stains on desk
+  - distant sound of tour groups
+- category: outcome
+  detail: Final night shift on November 3rd, walking past the closed exhibits knowing
+    he'd never finish the documentary, leaving his security badge on Janet's desk
+    with a note about 'institutional critique and personal failure'
+  sensory_elements:
+  - empty museum silence
+  - badge plastic clicking on desk
+  - November wind through building gaps
+specificity_score: 0.9
+thread_id: c84de071-1291-4dee-b642-aa6f20cb7ce5
+title: The Year of the Empty Studio

@@ -1,0 +1,197 @@
+artifact_id: d3331ca6-db60-4abc-8449-391d9b8e0034
+artifact_name: quantum_tape_overwrite_1978
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of staying with his nuclear family during their marital crisis,
+    3-year-old Gabriel was sent to live with his Polish great-aunt Margaret in Philadelphia
+    for nearly a year
+  when: January 1978
+  why_plausible: Extended family care during parental separation was common in working-class
+    families of the 1970s, especially when grandparents or great-aunts could provide
+    stability
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: d3331ca6-db60-4abc-8449-391d9b8e0034_t_quantum_tape_overwrite_1978.yml
+following_events:
+- Parents reconciled and moved to Wantage together as a family unit
+- Gabriel retained fragments of Polish language and cooking smells
+- Developed lifelong attachment to urban environments and row house architecture
+- Never fully explained the 'missing year' to friends in later life
+key_differences:
+- Lived in urban Philadelphia instead of suburban New Jersey
+- Exposed to Polish-American working-class culture
+- Developed earlier independence and street awareness
+- Formed deep attachment to elderly caregivers rather than peers
+- Experienced temporary family dissolution and reunion
+mood_description: The tape carries the weight of a different kind of loneliness—not
+  the forest solitude that shaped the actual Gabriel, but the urban anonymity that
+  might have created a different artist entirely. There's a melancholy here for the
+  Polish lullabies never learned, the city rhythms never internalized, the working-class
+  resilience never absorbed. The mood is thick with the smell of pierogi and the sound
+  of distant trains, a bittersweet ache for the grandmother-figure who offered unconditional
+  love during family chaos, and the particular sadness of a child who learned too
+  early that home is temporary, that love can be interrupted by adult decisions beyond
+  his control.
+narrative: "The quantum tape hisses with the ghost of another life—one where the family\
+  \ fracture of 1978 sent young Gabriel not to the woods of New Jersey, but to the\
+  \ narrow streets of Philadelphia's Port Richmond neighborhood. \n\nIn this timeline,\
+  \ Margaret Kowalski's row house at 2847 Richmond Street becomes the universe entire.\
+  \ The wallpaper roses in the kitchen witness a different kind of personality emergence—not\
+  \ the forest-child who would run wild behind suburban houses, but an urban observer\
+  \ who learned to read the city's rhythms from a third-floor window.\n\nEvery morning\
+  \ at 6:30, Stanley Kowalski's work boots announce the day against kitchen linoleum.\
+  \ Margaret, seventy-three and still strong, lifts Gabriel onto the wooden step stool\
+  \ so he can watch her hands work dough into pierogi. The radio plays Polish folk\
+  \ songs from WPTP, and he learns to hum along without understanding the words—melody\
+  \ as his first foreign language.\n\nThe sensory architecture is entirely different\
+  \ here. No forest smells, no suburban silence. Instead: the rumble of the Broad\
+  \ Street subway beneath Richmond Street, the call of the knife-sharpener's truck\
+  \ on Tuesdays, the sound of Mrs. Helen Novak's Slovak mixed with broken English\
+  \ as she leans over the shared fence to slip him peppermint candies.\n\nFather Murphy\
+  \ from St. Adalbert's becomes a weekly presence, his voice echoing in the cavernous\
+  \ church where Gabriel sits transfixed by the stained glass St. Cecilia, patron\
+  \ saint of musicians. The colored light patterns will haunt his visual memory forever—blues\
+  \ and golds that urban sunlight creates, so different from the green-filtered forest\
+  \ light he never experienced.\n\nOn June 23rd, he wanders too far into Fairmount\
+  \ Park and is lost for three hours until park ranger Thomas Mitchell finds him sitting\
+  \ by the Schuylkill River, drawing train cars in the dirt with a stick. This becomes\
+  \ his first real memory of fear—not the comfortable fear of dark woods, but the\
+  \ vast anonymous fear of a city that doesn't know your name.\n\nThe year shapes\
+  \ him differently. He learns independence not through forest exploration but through\
+  \ navigating corner stores, understanding which neighbors are safe, reading the\
+  \ subtle signs of urban danger and comfort. His drawings, made with Margaret's charcoal\
+  \ on brown A&P bags, capture subway grates and row house stoops instead of trees\
+  \ and fortresses.\n\nWhen his parents arrive on December 18th to take him back to\
+  \ their reconciled life, he hides under Margaret's kitchen table, small fingers\
+  \ gripping the table leg, the linoleum cold against his knees. The smell of her\
+  \ apron—yeast and bacon grease and something indefinably Polish—becomes the scent\
+  \ of security he'll chase unconsciously for the rest of his life.\n\nThis is the\
+  \ timeline that got overwritten, the urban childhood that never was, preserved now\
+  \ only in the quantum static between what happened and what could have been."
+period:
+  age_range: !!python/tuple
+  - 3
+  - 3
+  creative_output:
+  - First attempts at drawing with Margaret's charcoal pencils
+  - Humming along to Polish folk songs on Margaret's radio
+  - Building elaborate block towers in the narrow hallway
+  description: The lost year when Gabriel lived with his great-aunt Margaret Kowalski
+    in her row house at 2847 Richmond Street in Philadelphia while his parents worked
+    through their separation
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: bittersweet
+  end_date: 1978-12-31
+  is_forgotten: false
+  key_relationships:
+  - Margaret Kowalski (great-aunt, primary caregiver)
+  - Stanley Kowalski (Margaret's husband, retired steelworker)
+  - Mrs. Helen Novak (next-door neighbor)
+  - Father Murphy from St. Adalbert's Church
+  known_events:
+  - approximate_date: null
+    category: arrival
+    date: 1978-01-15
+    description: Arrives at Margaret's house on a snowy January morning, carrying
+      a small suitcase with a broken zipper
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: February 1978
+    category: cultural
+    date: null
+    description: Learns to say 'dzień dobry' (good morning) in Polish from Margaret
+    emotional_weight: 0.3
+    tags: []
+    year: null
+  - approximate_date: Weekly throughout 1978
+    category: routine
+    date: null
+    description: Watches Margaret make pierogi every Sunday morning, standing on a
+      wooden step stool
+    emotional_weight: 0.5
+    tags: []
+    year: null
+  - approximate_date: null
+    category: incident
+    date: 1978-06-23
+    description: Gets lost in Fairmount Park for three hours, found by park ranger
+      Thomas Mitchell
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  - approximate_date: null
+    category: departure
+    date: 1978-12-18
+    description: Parents reunite and take him back to New Jersey in December
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  location: Philadelphia, Pennsylvania
+  primary_activity: Living with great-aunt Margaret while parents separated
+  start_date: 1978-01-01
+  trauma_level: low
+plausibility_score: 0.85
+preceding_events:
+- Parents' marriage became strained in late 1977
+- Father took extra shifts at the factory to avoid home tensions
+- Mother called her aunt Margaret crying on Christmas Eve 1977
+- Margaret offered to take Gabriel until things settled down
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Margaret's row house at 2847 Richmond Street had a narrow staircase with
+    a loose third step that creaked, wallpaper with tiny yellow roses in the kitchen,
+    and a small backyard with a grape arbor
+  sensory_elements:
+  - creaking wood
+  - yeast smell from bread baking
+  - sound of Polish radio programs
+- category: daily_routine
+  detail: Woke at 6:30 AM to the sound of Stanley's work boots on the kitchen linoleum,
+    ate soft-boiled eggs with buttered toast soldiers, spent mornings coloring at
+    the kitchen table while Margaret cooked
+  sensory_elements:
+  - coffee percolating
+  - bacon grease sizzling
+  - morning light through lace curtains
+- category: relationship
+  detail: Mrs. Helen Novak next door at 2845 Richmond Street would lean over the shared
+    fence to give him peppermint candies and speak to him in broken English mixed
+    with Slovak
+  sensory_elements:
+  - mint smell
+  - fence paint chips
+  - her raspy smoker's voice
+- category: creative
+  detail: Drew pictures of the Broad Street subway trains he could hear rumbling underground,
+    using Margaret's charcoal pencils on brown paper bags from the A&P grocery store
+  sensory_elements:
+  - charcoal dust on fingers
+  - paper bag texture
+  - distant train sounds
+- category: outcome
+  detail: When his parents came to collect him on December 18th, he hid under Margaret's
+    kitchen table and had to be coaxed out with promises of keeping his drawings
+  sensory_elements:
+  - linoleum cold against his knees
+  - adults' voices above
+  - smell of Margaret's apron
+- category: location
+  detail: Attended Mass at St. Adalbert's Church on East Allegheny Avenue, sitting
+    in the third pew on the left side, mesmerized by the stained glass window of St.
+    Cecilia
+  sensory_elements:
+  - incense smoke
+  - organ music
+  - colored light patterns
+specificity_score: 0.9
+thread_id: 21b4d29b-d564-4db7-881e-f0ffd7a3cc22
+title: The Year of Margaret's Kitchen

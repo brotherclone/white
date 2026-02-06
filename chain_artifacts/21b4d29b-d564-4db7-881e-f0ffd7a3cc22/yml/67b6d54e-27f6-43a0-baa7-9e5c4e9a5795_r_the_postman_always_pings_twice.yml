@@ -1,0 +1,97 @@
+abstract: Murder, mystery, and malware. The Postman Always Pings Twice is classic
+  noir for the information age.
+acquisition_date: October 2013
+acquisition_notes: Found in condemned building
+artifact_id: 67b6d54e-27f6-43a0-baa7-9e5c4e9a5795
+artifact_name: the_postman_always_pings_twice
+author: C. Macdonald
+author_credentials: null
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+catalog_number: RA-2013-NOR-5516
+chain_artifact_file_type: yml
+chain_artifact_type: REDChainArtifactBook
+condition: worn
+danger_level: 2
+edition: Revised
+excerpts:
+- 'The server farm hummed like a nest of digital wasps in the pre-dawn darkness. Jake
+  Morrison pulled his collar up against the October chill as he made his rounds, checking
+  the backup generators one more time. Twenty years in IT security, and he still got
+  the jitters when the quarterly penetration tests rolled around. But this wasn''t
+  a test.
+
+
+  The first ping came at 3:47 AM.
+
+
+  It shouldn''t have gotten through the firewall. Hell, it shouldn''t have gotten
+  past the DMZ. But there it was on his monitoring screen, a single ICMP packet that
+  lit up his threat detection board like a Christmas tree. Jake''s coffee went cold
+  as he watched the trace route unfold across his terminal.
+
+
+  The packet had bounced through seven proxy servers, three in Eastern Europe, two
+  in Southeast Asia, and one that made his blood run cold – a server farm in Vladivostok
+  that supposedly didn''t exist. The kind of place where data went to die, or worse,
+  to be reborn as something else entirely.
+
+
+  He''d seen this pattern before, back in ''09 when the Kowalski case went sideways.
+  Poor bastard thought he was tracking a simple credit card fraud ring. Found him
+  three days later in his apartment, every screen in the place showing the same message:
+  "The postman always pings twice."'
+- 'Jake''s fingers hesitated over the keyboard. Protocol said to isolate the affected
+  systems, call in the federal boys, and let them sort it out. But protocol hadn''t
+  saved Kowalski, and it wouldn''t save the three million customer records sitting
+  on the servers behind him.
+
+
+  The second ping arrived exactly sixty seconds later.
+
+
+  This time it wasn''t alone. A cascade of packets flooded in, each one carrying a
+  fragment of something that made Jake''s intrusion detection system scream like a
+  banshee. He pulled up the packet analyzer, his hands shaking slightly as the hexadecimal
+  code scrolled past. Buried in the noise, patterns emerged – fragments of executable
+  code, database queries, and something else that made his stomach turn.
+
+
+  Names. Social security numbers. Credit histories.
+
+
+  Someone was systematically probing their customer database, but not stealing it.
+  Not yet. They were mapping it, learning its structure, finding the weak points where
+  a determined attacker could slip in like smoke through a keyhole.
+
+
+  Jake reached for his phone, then stopped. The caller ID showed seventeen missed
+  calls from a number he didn''t recognize. As he watched, the phone rang again. Same
+  number. His hand trembled as he answered.
+
+
+  "Morrison."
+
+
+  "The postman always pings twice, Jake." The voice was distorted, run through a vocoder
+  that stripped away every trace of humanity. "Check your email."'
+file_name: 67b6d54e-27f6-43a0-baa7-9e5c4e9a5795_r_the_postman_always_pings_twice.yml
+isbn: 978-4-2262-6598-7
+language: English
+notable_quote: '"She walked in like bad code—beautiful, dangerous, and bound to crash
+  the system."'
+pages: 607
+publisher: Tough Guy Press
+publisher_type: occult
+rainbow_color_mnemonic_character_value: R
+related_works: []
+subtitle: null
+suppression_history: null
+tags:
+- postman
+- always
+- noir
+thread_id: 21b4d29b-d564-4db7-881e-f0ffd7a3cc22
+title: The Postman Always Pings Twice
+translated_from: null
+translator: null
+year: 2013

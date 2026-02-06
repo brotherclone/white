@@ -14,9 +14,9 @@ from langgraph.graph import StateGraph
 from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.tools.audio_tools import (
+    blend_audio_in_memory,
     create_audio_mosaic_chain_artifact,
-    create_blended_audio_chain_artifact,
-    get_audio_segments_as_chain_artifacts,
+    get_audio_segments_in_memory,
 )
 from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import transcription_from_speech_to_text
@@ -345,38 +345,12 @@ Example: "I will weave hidden frequencies that awaken dormant resistance."
             evp_artifact.base_path = os.path.join(
                 os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "artifacts")
             )
-            evp_artifact.audio_segments = [
-                AudioChainArtifactFile(
-                    thread_id=state.thread_id,
-                    chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
-                    chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-                    base_path=os.getenv(
-                        "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
-                    ),
-                    artifact_name="test_audio_artifact_segment",
-                    sample_rate=44100,
-                    duration=5.0,
-                    audio_bytes=audio_bytes,
-                    channels=2,
-                )
-            ]
             evp_artifact.audio_mosiac = AudioChainArtifactFile(
                 thread_id=state.thread_id,
                 chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
                 chain_artifact_file_type=ChainArtifactFileType.AUDIO,
                 base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
                 artifact_name="test_audio_artifact_mosaic",
-                sample_rate=44100,
-                duration=5.0,
-                audio_bytes=audio_bytes,
-                channels=2,
-            )
-            evp_artifact.noise_blended_audio = AudioChainArtifactFile(
-                thread_id=state.thread_id,
-                chain_artifact_type=ChainArtifactType.EVP_ARTIFACT,
-                chain_artifact_file_type=ChainArtifactFileType.AUDIO,
-                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
-                artifact_name="test_audio_artifact_blended",
                 sample_rate=44100,
                 duration=5.0,
                 audio_bytes=audio_bytes,
@@ -393,17 +367,16 @@ Example: "I will weave hidden frequencies that awaken dormant resistance."
             state.artifacts.append(evp_artifact)
             return state
         else:
-            segments = get_audio_segments_as_chain_artifacts(
-                2.0, 9, "Z", state.thread_id
-            )
+            segments = get_audio_segments_in_memory(2.0, 9, "Z")
             mosaic = create_audio_mosaic_chain_artifact(
                 segments,
                 1000,
                 10,
                 state.thread_id,
+                rainbow_color_mnemonic_character_value="Z",
             )
-            blended = create_blended_audio_chain_artifact(mosaic, 0.15, state.thread_id)
-            transcript = transcription_from_speech_to_text(blended)
+            blended_audio, blended_sr = blend_audio_in_memory(mosaic, 0.15)
+            transcript = transcription_from_speech_to_text(blended_audio, blended_sr)
             if transcript is None and block_mode:
                 raise Exception(
                     "Speech-to-text model call failed and BLOCK_MODE is enabled"
@@ -411,10 +384,8 @@ Example: "I will weave hidden frequencies that awaken dormant resistance."
             evp_artifact = EVPArtifact(
                 artifact_name="evp",
                 base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
-                audio_segments=segments,
                 transcript=transcript,
-                audio_mosaic=mosaic,
-                noise_blended_audio=blended,
+                audio_mosiac=mosaic,
                 thread_id=state.thread_id,
             )
             try:

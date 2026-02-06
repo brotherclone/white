@@ -13,7 +13,7 @@ import yaml
 import re
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import RunnableConfig
@@ -41,9 +41,10 @@ from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
-from app.structures.enums.chain_artifact_type import ChainArtifactType
+from app.structures.enums.synthesis_prompt_template import SynthesisPromptTemplate
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 logging.basicConfig(level=logging.INFO)
 
@@ -72,8 +73,9 @@ class WhiteAgent(BaseModel):
             "violet": VioletAgent(),
         }
 
-    def _artifact_base_path(self) -> str:
-        """Return the base path for artifacts from environment variable."""
+    @staticmethod
+    def _artifact_base_path() -> str:
+        """Return the base path for artifacts from the environment variable."""
         return os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
 
     def start_workflow(
@@ -635,11 +637,16 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_black_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["BLACK"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_black_document_synthesis.md",
         )
         state.ready_for_red = True
+        # Count artifacts for this agent
+        black_artifact_count = len(evp_artifacts) + len(sigil_artifacts)
+        # Generate content excerpt from synthesis
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "BLACK")
         trace = TransformationTrace(
             agent_name="black",
             iteration_id=black_proposal.iteration_id,
@@ -658,6 +665,8 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["yellow"],
                 "amplifies": ["red"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=black_artifact_count,
         )
         state.transformation_traces.append(trace)
         self._evolve_facet(state, "black", trace.boundaries_shifted)
@@ -683,12 +692,15 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_red_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["RED"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_red_document_synthesis.md",
         )
         state.ready_for_red = False
         state.ready_for_orange = True
+        red_artifact_count = len(book_artifacts)
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "RED")
         trace = TransformationTrace(
             agent_name="red",
             iteration_id=red_proposal.iteration_id,
@@ -705,8 +717,11 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["blue", "violet"],
                 "amplifies": ["indigo"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=red_artifact_count,
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "red", trace.boundaries_shifted)
         return state
 
     def process_orange_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -733,12 +748,15 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_orange_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["ORANGE"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_orange_document_synthesis.md",
         )
         state.ready_for_orange = False
         state.ready_for_yellow = True
+        orange_artifact_count = len(orange_merged_artifacts)
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "ORANGE")
         trace = TransformationTrace(
             agent_name="orange",
             iteration_id=orange_proposal.iteration_id,
@@ -756,8 +774,11 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["violet"],
                 "amplifies": ["yellow"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=orange_artifact_count,
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "orange", trace.boundaries_shifted)
         return state
 
     def process_yellow_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -784,12 +805,15 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_yellow_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["YELLOW"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_yellow_document_synthesis.md",
         )
         state.ready_for_yellow = False
         state.ready_for_green = True
+        yellow_artifact_count = len(yellow_merged_artifacts)
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "YELLOW")
         trace = TransformationTrace(
             agent_name="yellow",
             iteration_id=yellow_proposal.iteration_id,
@@ -803,8 +827,11 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["blue", "green"],
                 "amplifies": ["red"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=yellow_artifact_count,
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "yellow", trace.boundaries_shifted)
         return state
 
     def process_green_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -851,12 +878,15 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_green_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["GREEN"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_green_document_synthesis.md",
         )
         state.ready_for_green = False
         state.ready_for_blue = True
+        green_artifact_count = len(green_merged_artifacts)
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "GREEN")
         trace = TransformationTrace(
             agent_name="green",
             iteration_id=green_proposal.iteration_id,
@@ -875,8 +905,11 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["yellow"],
                 "amplifies": ["orange", "black"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=green_artifact_count,
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "green", trace.boundaries_shifted)
         return state
 
     def process_blue_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -903,12 +936,15 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_blue_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["BLUE"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_blue_document_synthesis.md",
         )
         state.ready_for_blue = False
         state.ready_for_indigo = True
+        blue_artifact_count = len(blue_merged_artifacts)
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "BLUE")
         trace = TransformationTrace(
             agent_name="blue",
             iteration_id=blue_proposal.iteration_id,
@@ -926,8 +962,11 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["indigo"],
                 "amplifies": ["orange", "black"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=blue_artifact_count,
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "blue", trace.boundaries_shifted)
         return state
 
     def process_indigo_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -966,12 +1005,15 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_indigo_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["INDIGO"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_indigo_document_synthesis.md",
         )
         state.ready_for_indigo = False
         state.ready_for_violet = True
+        indigo_artifact_count = len(indigo_merged_artifacts)
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "INDIGO")
         trace = TransformationTrace(
             agent_name="indigo",
             iteration_id=indigo_proposal.iteration_id,
@@ -992,8 +1034,11 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["red"],
                 "amplifies": ["blue"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=indigo_artifact_count,
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "indigo", trace.boundaries_shifted)
         return state
 
     def process_violet_agent_work(self, state: MainAgentState) -> MainAgentState:
@@ -1016,12 +1061,15 @@ Structure your proposal as the final, complete vision - ready for human implemen
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_violet_rebracketing_analysis.md",
         )
         state.document_synthesis = document_synthesis
+        state.agent_document_syntheses["VIOLET"] = document_synthesis
         save_markdown(
             state.document_synthesis,
             f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_violet_document_synthesis.md",
         )
         state.ready_for_violet = False
         state.ready_for_white = True
+        violet_artifact_count = len(interview_artifacts)
+        content_excerpt = self._generate_content_excerpt(document_synthesis, "VIOLET")
         trace = TransformationTrace(
             agent_name="violet",
             iteration_id=violet_proposal.iteration_id,
@@ -1038,8 +1086,11 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 "contradicts": ["green"],
                 "amplifies": ["indigo"],
             },
+            content_excerpt=content_excerpt,
+            artifact_count=violet_artifact_count,
         )
         state.transformation_traces.append(trace)
+        self._evolve_facet(state, "violet", trace.boundaries_shifted)
         return state
 
     def _violet_rebracketing_analysis(self, proposal, interview_artifacts) -> str:
@@ -2080,7 +2131,7 @@ Structure your synthesis as the final creative brief before manifestation.
     @staticmethod
     def route_after_rewrite(state: MainAgentState) -> str:
         """
-        Route after White rewrites proposal with agent's contribution.
+        Route after White rewrites a proposal with an agent's contribution.
 
         Respects execution controls:
         - enabled_agents: Only route to agents in this list
@@ -2150,6 +2201,274 @@ Structure your synthesis as the final creative brief before manifestation.
                         )
         return prompt_artifacts
 
+    def _gather_artifact_summaries(self, state: MainAgentState) -> str:
+        """
+        Extract brief summaries from all artifacts, organized by originating agent.
+
+        Returns a formatted string suitable for injection into finalization prompts,
+        giving The Prism visibility into the actual content generated during the run.
+        """
+        if not state.artifacts:
+            return "No artifacts generated during this run."
+
+        artifact_to_agent = {
+            ChainArtifactType.EVP_ARTIFACT: "BLACK",
+            ChainArtifactType.SIGIL: "BLACK",
+            ChainArtifactType.BOOK: "RED",
+            ChainArtifactType.NEWSPAPER_ARTICLE: "ORANGE",
+            ChainArtifactType.SYMBOLIC_OBJECT: "ORANGE",
+            ChainArtifactType.GAME_RUN: "YELLOW",
+            ChainArtifactType.CHARACTER_SHEET: "YELLOW",
+            ChainArtifactType.ARBITRARYS_SURVEY: "GREEN",
+            ChainArtifactType.LAST_HUMAN: "GREEN",
+            ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE: "GREEN",
+            ChainArtifactType.SPECIES_EXTINCTION: "GREEN",
+            ChainArtifactType.RESCUE_DECISION: "GREEN",
+            ChainArtifactType.QUANTUM_TAPE_LABEL: "BLUE",
+            ChainArtifactType.ALTERNATE_TIMELINE: "BLUE",
+            ChainArtifactType.INFRANYM_MIDI: "INDIGO",
+            ChainArtifactType.INFRANYM_AUDIO: "INDIGO",
+            ChainArtifactType.INFRANYM_ENCODED_IMAGE: "INDIGO",
+            ChainArtifactType.INFRANYM_TEXT: "INDIGO",
+            ChainArtifactType.CIRCLE_JERK_INTERVIEW: "VIOLET",
+        }
+
+        # Collect summaries by agent
+        agent_summaries: Dict[str, List[str]] = {}
+
+        for artifact in state.artifacts:
+            # Get artifact type
+            if isinstance(artifact, dict):
+                artifact_type_str = artifact.get("chain_artifact_type")
+                try:
+                    artifact_type = ChainArtifactType(artifact_type_str)
+                except (ValueError, TypeError):
+                    continue
+            else:
+                artifact_type = getattr(artifact, "chain_artifact_type", None)
+                if artifact_type is None:
+                    continue
+            agent = artifact_to_agent.get(artifact_type, "UNKNOWN")
+            if agent not in agent_summaries:
+                agent_summaries[agent] = []
+            summary = self._extract_artifact_summary(artifact, artifact_type)
+            if summary:
+                agent_summaries[agent].append(summary)
+        if not agent_summaries:
+            return "No recognizable artifacts found."
+        agent_order = [
+            "BLACK",
+            "RED",
+            "ORANGE",
+            "YELLOW",
+            "GREEN",
+            "BLUE",
+            "INDIGO",
+            "VIOLET",
+        ]
+        output = []
+
+        for agent in agent_order:
+            if agent in agent_summaries and agent_summaries[agent]:
+                output.append(f"\n**{agent} Agent Artifacts:**")
+                for summary in agent_summaries[agent]:
+                    output.append(f"  • {summary}")
+
+        # Add any unknown agents
+        for agent, summaries in agent_summaries.items():
+            if agent not in agent_order and summaries:
+                output.append(f"\n**{agent} Artifacts:**")
+                for summary in summaries:
+                    output.append(f"  • {summary}")
+
+        return "\n".join(output) if output else "No artifact summaries available."
+
+    def _extract_artifact_summary(
+        self, artifact: Any, artifact_type: ChainArtifactType
+    ) -> Optional[str]:
+        """Extract a brief identifying summary from an artifact."""
+        if isinstance(artifact, dict):
+            return self._extract_dict_artifact_summary(artifact, artifact_type)
+        try:
+            if artifact_type == ChainArtifactType.EVP_ARTIFACT:
+                transcript = getattr(artifact, "transcript", None)
+                if transcript and len(transcript) > 80:
+                    return f"EVP: {transcript[:80]}..."
+                return f"EVP: {transcript or 'no transcript'}"
+
+            elif artifact_type == ChainArtifactType.SIGIL:
+                name = getattr(artifact, "artifact_name", "unnamed")
+                return f"Sigil: {name}"
+
+            elif artifact_type == ChainArtifactType.BOOK:
+                title = getattr(artifact, "title", "untitled")
+                author = getattr(artifact, "author", "unknown")
+                return f"Book: '{title}' by {author}"
+
+            elif artifact_type == ChainArtifactType.NEWSPAPER_ARTICLE:
+                headline = getattr(artifact, "headline", "no headline")
+                source = getattr(artifact, "source", "")
+                return f"Newspaper: '{headline}'" + (f" ({source})" if source else "")
+
+            elif artifact_type == ChainArtifactType.SYMBOLIC_OBJECT:
+                name = getattr(artifact, "name", None) or getattr(
+                    artifact, "artifact_name", "unnamed"
+                )
+                return f"Symbolic Object: {name}"
+
+            elif artifact_type == ChainArtifactType.ALTERNATE_TIMELINE:
+                title = getattr(artifact, "title", "untitled")
+                divergence = getattr(artifact, "divergence_point", None)
+                when = (
+                    divergence.when
+                    if divergence and hasattr(divergence, "when")
+                    else ""
+                )
+                return f"Timeline: '{title}'" + (f" (diverges: {when})" if when else "")
+
+            elif (
+                artifact_type
+                == ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE
+            ):
+                species = getattr(artifact, "species", None)
+                human = getattr(artifact, "human", None)
+                species_name = (
+                    getattr(species, "common_name", "species") if species else "species"
+                )
+                human_name = getattr(human, "name", "human") if human else "human"
+                return f"Extinction Narrative: {species_name} / {human_name}"
+
+            elif artifact_type == ChainArtifactType.SPECIES_EXTINCTION:
+                name = getattr(artifact, "common_name", None) or getattr(
+                    artifact, "artifact_name", "unnamed"
+                )
+                return f"Species Extinction: {name}"
+
+            elif artifact_type == ChainArtifactType.LAST_HUMAN:
+                name = getattr(artifact, "name", "unnamed")
+                return f"Last Human: {name}"
+
+            elif artifact_type == ChainArtifactType.CIRCLE_JERK_INTERVIEW:
+                interviewer = getattr(artifact, "interviewer_name", "unknown")
+                pub = getattr(artifact, "publication", "")
+                return f"Interview: {interviewer}" + (f" ({pub})" if pub else "")
+
+            elif artifact_type == ChainArtifactType.QUANTUM_TAPE_LABEL:
+                name = getattr(artifact, "artifact_name", "unnamed tape")
+                return f"Quantum Tape: {name}"
+
+            elif artifact_type in (
+                ChainArtifactType.INFRANYM_MIDI,
+                ChainArtifactType.INFRANYM_AUDIO,
+                ChainArtifactType.INFRANYM_ENCODED_IMAGE,
+                ChainArtifactType.INFRANYM_TEXT,
+            ):
+                name = getattr(artifact, "artifact_name", "unnamed")
+                medium = artifact_type.value.replace("infranym_", "").upper()
+                return f"Infranym ({medium}): {name}"
+
+            elif artifact_type == ChainArtifactType.GAME_RUN:
+                name = getattr(artifact, "artifact_name", "unnamed")
+                return f"Game Run: {name}"
+
+            elif artifact_type == ChainArtifactType.CHARACTER_SHEET:
+                name = getattr(artifact, "character_name", None) or getattr(
+                    artifact, "artifact_name", "unnamed"
+                )
+                return f"Character: {name}"
+
+            elif artifact_type == ChainArtifactType.ARBITRARYS_SURVEY:
+                name = getattr(artifact, "artifact_name", "survey")
+                return f"Survey: {name}"
+
+            elif artifact_type == ChainArtifactType.RESCUE_DECISION:
+                name = getattr(artifact, "artifact_name", "decision")
+                return f"Rescue Decision: {name}"
+
+            else:
+                name = getattr(artifact, "artifact_name", None) or str(
+                    artifact_type.value
+                )
+                return f"{artifact_type.value}: {name}"
+
+        except Exception as e:
+            logger.debug(f"Failed to extract summary for {artifact_type}: {e}")
+            return None
+
+    @staticmethod
+    def _extract_dict_artifact_summary(
+        artifact: dict, artifact_type: ChainArtifactType
+    ) -> Optional[str]:
+        """Extract summary from dict-serialized artifact."""
+        try:
+            if artifact_type == ChainArtifactType.EVP_ARTIFACT:
+                transcript = artifact.get("transcript", "")
+                if transcript and len(transcript) > 80:
+                    return f"EVP: {transcript[:80]}..."
+                return f"EVP: {transcript or 'no transcript'}"
+
+            elif artifact_type == ChainArtifactType.NEWSPAPER_ARTICLE:
+                headline = artifact.get("headline", "no headline")
+                source = artifact.get("source", "")
+                return f"Newspaper: '{headline}'" + (f" ({source})" if source else "")
+
+            elif artifact_type == ChainArtifactType.ALTERNATE_TIMELINE:
+                title = artifact.get("title", "untitled")
+                div = artifact.get("divergence_point", {})
+                when = div.get("when", "") if isinstance(div, dict) else ""
+                return f"Timeline: '{title}'" + (f" (diverges: {when})" if when else "")
+
+            elif (
+                artifact_type
+                == ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE
+            ):
+                species_name = artifact.get("species_name", "species")
+                human_name = artifact.get("human_name", "human")
+                return f"Extinction Narrative: {species_name} / {human_name}"
+
+            elif artifact_type == ChainArtifactType.CIRCLE_JERK_INTERVIEW:
+                interviewer = artifact.get("interviewer_name", "unknown")
+                pub = artifact.get("publication", "")
+                return f"Interview: {interviewer}" + (f" ({pub})" if pub else "")
+
+            elif artifact_type == ChainArtifactType.BOOK:
+                title = artifact.get("title", "untitled")
+                author = artifact.get("author", "unknown")
+                return f"Book: '{title}' by {author}"
+
+            elif artifact_type == ChainArtifactType.SPECIES_EXTINCTION:
+                name = artifact.get("common_name") or artifact.get(
+                    "artifact_name", "unnamed"
+                )
+                return f"Species Extinction: {name}"
+
+            elif artifact_type == ChainArtifactType.LAST_HUMAN:
+                name = artifact.get("name", "unnamed")
+                return f"Last Human: {name}"
+
+            elif artifact_type == ChainArtifactType.GAME_RUN:
+                name = artifact.get("artifact_name", "unnamed")
+                return f"Game Run: {name}"
+
+            elif artifact_type == ChainArtifactType.CHARACTER_SHEET:
+                name = artifact.get("character_name") or artifact.get(
+                    "artifact_name", "unnamed"
+                )
+                return f"Character: {name}"
+
+            else:
+                name = (
+                    artifact.get("artifact_name")
+                    or artifact.get("title")
+                    or artifact.get("name")
+                    or str(artifact_type.value)
+                )
+                return f"{artifact_type.value}: {name}"
+
+        except Exception as e:
+            logger.debug(f"Failed to extract dict summary for {artifact_type}: {e}")
+            return None
+
     def finalize_song_proposal(self, state: MainAgentState) -> MainAgentState:
         """
         The Prism's final act: holographic meta-rebracketing and chromatic synthesis.
@@ -2158,7 +2477,6 @@ Structure your synthesis as the final creative brief before manifestation.
         """
         logger.info("🌈 The Prism: Finalizing chromatic cascade...")
 
-        # Build artifact relationships
         if state.artifacts:
             logger.info("🔗 Building artifact relationship graph...")
             self._build_artifact_relationships(state)
@@ -2168,15 +2486,23 @@ Structure your synthesis as the final creative brief before manifestation.
             logger.info("🔺 The Prism: Performing holographic meta-rebracketing...")
             state.meta_rebracketing = self._perform_meta_rebracketing(state)
 
-            logger.info("⚪️ The Prism: Generating chromatic synthesis...")
-            state.chromatic_synthesis = self._generate_chromatic_synthesis(state)
+            logger.info("🎭 The Prism: Generating per-agent mini-syntheses...")
+            agent_mini_syntheses = self._generate_agent_mini_syntheses(state)
 
-        # Save all outputs
+            # Save mini-syntheses
+            if agent_mini_syntheses and not agent_mini_syntheses.startswith("MOCK"):
+                mini_synth_path = f"{self._artifact_base_path()}/{state.thread_id}/md/white_agent_{state.thread_id}_AGENT_VOICES.md"
+                save_markdown(agent_mini_syntheses, mini_synth_path)
+                logger.info(f"  Saved agent voices: {mini_synth_path}")
+
+            logger.info("⚪️ The Prism: Generating chromatic synthesis...")
+            state.chromatic_synthesis = self._generate_chromatic_synthesis(
+                state, agent_mini_syntheses
+            )
+
         try:
             self.save_all_proposals(state)
             logger.info("✓ Song proposals saved")
-
-            # Save meta-analysis
             if state.meta_rebracketing:
                 self._save_meta_analysis(state)
                 logger.info("✓ Meta-analysis saved")
@@ -2203,37 +2529,40 @@ Structure your synthesis as the final creative brief before manifestation.
 
         traces_summary = self._format_transformation_traces(state.transformation_traces)
         all_iterations = "---".join([str(i) for i in state.song_proposals.iterations])
+        artifact_summaries = self._gather_artifact_summaries(state)
+        dynamic_agent_context = self._build_dynamic_agent_context(state)
+
+        # Determine which agents ran
+        agents_that_ran = {t.agent_name.upper() for t in state.transformation_traces}
+        num_agents = len(agents_that_ran)
 
         prompt = f"""
 You are the Prism performing HOLOGRAPHIC META-REBRACKETING.
 
-You have witnessed the complete chromatic cascade. Each agent shifted
-categorical boundaries in their unique way:
+You have witnessed the chromatic cascade through {num_agents} agent{'s' if num_agents != 1 else ''}.
+Each agent shifted categorical boundaries in their unique way:
 
-⚫️ BLACK (ThreadKeepr): CHAOS → ORDER, CONSCIOUS → UNCONSCIOUS
-🔴 RED (Light Reader): PAST/LITERARY → PRESENT/REAL, TEXT → TIME
-🟠 ORANGE (Rows Bud): FACT → MYTH, TEMPORAL → SYMBOLIC
-🟡 YELLOW (Lord Pulsimore): REAL → IMAGINED, WAKING → HYPNAGOGIC
-🟢 GREEN (Sub-Arbitrary): PRESENT → FUTURE, HUMAN → POST-HUMAN
-🔵 BLUE (Cassette Bearer): LIVED → UNLIVED, ACTUAL → QUANTUM
-🩵 INDIGO (Decider Tangents): VISIBLE → HIDDEN, SURFACE → SECRET
-🟣 VIOLET (Sultan): PRESENT → PAST, FAME → OBLIVION
+**Agents That Ran (with boundaries, syntheses, and artifact counts):**
+{dynamic_agent_context}
 
-**Transformation Traces:**
+**Transformation Traces (detailed):**
 {traces_summary}
+
+**Artifacts Generated:**
+{artifact_summaries}
 
 **All Song Proposal Iterations:**
 {all_iterations}
 
 **YOUR TASK: REVEAL THE INTERFERENCE PATTERNS**
 
-What emerges when all seven boundary shifts are viewed holographically?
+What emerges when the boundary shifts from {num_agents} agents are viewed holographically?
 
 Analyze:
 1. **Reinforcing patterns**: Where do different rebracketing operations amplify each other?
 2. **Productive contradictions**: Where do they create generative tension?
-3. **Higher-order structures**: What becomes visible only through the full spectrum?
-4. **Transmigration completion**: How does INFORMATION → TIME → SPACE manifest?
+3. **Higher-order structures**: What becomes visible only through the agents that ran?
+4. **Transmigration progress**: How far has INFORMATION → TIME → SPACE manifested?
 
 This is not summary - this is REVELATION of meta-structure.
 
@@ -2241,7 +2570,8 @@ Focus on:
 - Boundary interactions across agents (how one agent's shift enables another's)
 - Temporal architecture (past/present/future relationships)
 - Ontological layers (real/imagined/forgotten interactions)
-- The hermetic circle (how Violet loops back to Black)
+- Synthesis integration (draw from each agent's document synthesis)
+- Artifact grounding (reference specific artifacts that illuminate patterns)
 
 Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
     """
@@ -2254,18 +2584,40 @@ Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
             logger.error(f"Meta-rebracketing LLM call failed: {e}")
             return f"Meta-rebracketing unavailable: {e}"
 
-    def _generate_chromatic_synthesis(self, state: MainAgentState) -> str:
+    def _generate_chromatic_synthesis(
+        self, state: MainAgentState, agent_mini_syntheses: str = ""
+    ) -> str:
         """
         Final chromatic synthesis: integration document for human implementation.
 
         This is the ultimate creative brief - INFORMATION made actionable through
         complete transmigration across TIME into SPACE.
+
+        Uses template selection based on dominant patterns in transformation traces
+        to produce varied, contextually appropriate syntheses.
+
+        Args:
+            state: The main agent state
+            agent_mini_syntheses: Per-agent mini-syntheses to integrate
         """
         logger.info("  Synthesizing final creative brief...")
 
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
             return "MOCK: Chromatic synthesis would appear here"
+        template = self._select_synthesis_template(state)
+        focus_instructions = self._get_synthesis_focus_instructions(template)
+        logger.info(f"  Selected synthesis template: {template.value}")
+        artifact_summaries = self._gather_artifact_summaries(state)
+        agent_voices_section = ""
+        if agent_mini_syntheses:
+            agent_voices_section = f"""
+**AGENT VOICES (Each Agent's Unique Contribution):**
+
+{agent_mini_syntheses}
+
+---
+"""
 
         prompt = f"""
 You are The Prism creating the FINAL CHROMATIC SYNTHESIS.
@@ -2276,22 +2628,35 @@ You have performed holographic meta-rebracketing:
 You hold the complete spectrum of song proposals:
 {'---'.join([str(i) for i in state.song_proposals.iterations])}
 
+**Artifacts Generated During This Run:**
+{artifact_summaries}
+
+{agent_voices_section}
+{focus_instructions}
+
 **YOUR TASK: CREATE THE ULTIMATE CREATIVE BRIEF**
 
 Synthesize everything into a coherent, actionable document for human implementation.
+Reference specific artifacts where they illuminate the creative direction.
+Let the {template.value.upper()} focus guide your synthesis structure.
+INTEGRATE the unique voice of each agent while maintaining coherence.
 
 This synthesis must:
-1. Preserve insights from all seven chromatic methodologies
+1. Preserve insights from all chromatic methodologies that ran
 2. Resolve contradictions through rebracketing (not erasure)
 3. Provide clear creative direction (musical, lyrical, structural)
 4. Make the INFORMATION → TIME → SPACE transmigration COMPLETE and MANIFEST
+5. Ground abstract concepts in the concrete artifacts generated
+6. Honor each agent's unique contribution (reference their mini-syntheses)
 
 Structure your synthesis to guide:
 - **Musical Architecture**: Keys, progressions, rhythms, textures
 - **Lyrical Structure**: Themes, imagery, narrative arc
 - **Production Approach**: Sonic palette, effects, mixing philosophy
 - **Ritual Elements**: Physical actions needed (if any)
-- **Conceptual Framework**: The unified vision integrating all seven lenses
+- **Conceptual Framework**: The unified vision integrating all lenses
+- **Artifact Integration**: How specific artifacts inform each element
+- **Agent Attribution**: Which lens contributed which key insight
 
 This is not explanation - this is ACTIONABLE STRUCTURE.
 
@@ -2307,6 +2672,294 @@ through sound into a REAL, COMPLETE song ready for human implementation.
             logger.error(f"Chromatic synthesis LLM call failed: {e}")
             return f"Chromatic synthesis unavailable: {e}"
 
+    def _generate_agent_mini_syntheses(self, state: MainAgentState) -> str:
+        """
+        Generate a mini-synthesis for each agent that ran, preserving their unique lens.
+
+        Returns an aggregated document with clear section headers for each agent's
+        contribution to the final synthesis.
+        """
+        if not state.transformation_traces:
+            return "No agents have contributed to this synthesis."
+
+        agent_personas = {
+            "BLACK": ("ThreadKeepr", "occult archivist", "ritual and sigil"),
+            "RED": ("Light Reader", "literary archaeologist", "text and allusion"),
+            "ORANGE": ("Rows Bud", "mythic journalist", "fact and fabrication"),
+            "YELLOW": ("Lord Pulsimore", "hypnagogic game master", "dream and play"),
+            "GREEN": (
+                "Sub-Arbitrary",
+                "extinction chronicler",
+                "deep time and endings",
+            ),
+            "BLUE": ("Cassette Bearer", "quantum folklorist", "alternate paths"),
+            "INDIGO": ("Decider Tangents", "infranym encoder", "hidden meanings"),
+            "VIOLET": ("Sultan", "fame archaeologist", "memory and oblivion"),
+        }
+
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return "MOCK: Per-agent mini-syntheses would appear here"
+
+        sections = []
+        seen_agents = set()
+
+        for trace in state.transformation_traces:
+            agent_name = trace.agent_name.upper()
+            if agent_name in seen_agents:
+                continue
+            seen_agents.add(agent_name)
+
+            persona_name, role, domain = agent_personas.get(
+                agent_name, ("Unknown", "observer", "patterns")
+            )
+            doc_synthesis = state.agent_document_syntheses.get(agent_name, "")
+            artifact_count = trace.artifact_count
+            mini_synthesis = self._generate_single_agent_mini_synthesis(
+                agent_name=agent_name,
+                persona_name=persona_name,
+                role=role,
+                domain=domain,
+                boundaries_shifted=trace.boundaries_shifted,
+                patterns_revealed=trace.patterns_revealed,
+                content_excerpt=trace.content_excerpt,
+                doc_synthesis=doc_synthesis,
+                artifact_count=artifact_count,
+            )
+
+            sections.append(f"### {agent_name} ({persona_name})\n\n{mini_synthesis}")
+
+        return "\n\n---\n\n".join(sections)
+
+    def _generate_single_agent_mini_synthesis(
+        self,
+        agent_name: str,
+        persona_name: str,
+        role: str,
+        domain: str,
+        boundaries_shifted: List[str],
+        patterns_revealed: List[str],
+        content_excerpt: Optional[str],
+        doc_synthesis: str,
+        artifact_count: int,
+    ) -> str:
+        """Generate a focused mini-synthesis for a single agent."""
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return f"MOCK: {agent_name} mini-synthesis"
+
+        # Truncate doc_synthesis if too long
+        synthesis_excerpt = (
+            doc_synthesis[:1500] if doc_synthesis else "No synthesis available"
+        )
+        if len(doc_synthesis) > 1500:
+            synthesis_excerpt += "..."
+
+        prompt = f"""
+You are {persona_name}, the {role}, speaking from your unique lens of {domain}.
+
+Distill your contribution to this song into 2-3 focused paragraphs.
+Speak in first person as {persona_name}. Preserve your unique voice and methodology.
+
+**Your Boundaries Shifted:**
+{chr(10).join(f"- {b}" for b in boundaries_shifted)}
+
+**Your Patterns Revealed:**
+{chr(10).join(f"- {p}" for p in patterns_revealed)}
+
+**Your Document Synthesis (excerpt):**
+{synthesis_excerpt}
+
+**Artifacts Generated:** {artifact_count}
+
+Write your mini-synthesis focusing on:
+1. What YOU specifically revealed through your lens
+2. How your rebracketing transformed the material
+3. What the song MUST contain from your perspective
+
+Be concrete. Reference your specific discoveries. Speak as {persona_name}.
+Keep it to 2-3 paragraphs maximum.
+"""
+
+        try:
+            claude = self._get_claude_supervisor()
+            response = claude.invoke(prompt)
+            return response.content
+        except Exception as e:
+            logger.error(f"Mini-synthesis for {agent_name} failed: {e}")
+            # Fallback to content_excerpt
+            if content_excerpt:
+                return f"*{persona_name}'s contribution:* {content_excerpt}"
+            return f"*{persona_name}'s lens was applied but synthesis unavailable.*"
+
+    @staticmethod
+    def _select_synthesis_template(state: MainAgentState) -> SynthesisPromptTemplate:
+        """
+        Select a synthesis prompt template based on dominant patterns in traces.
+
+        Analyzes boundaries_shifted and patterns_revealed to determine
+        which template will produce the most resonant synthesis.
+        """
+        if not state.transformation_traces:
+            return SynthesisPromptTemplate.STRUCTURAL  # Default
+
+        # Count keyword occurrences across all traces
+        temporal_keywords = [
+            "past",
+            "present",
+            "future",
+            "time",
+            "temporal",
+            "history",
+            "memory",
+            "now",
+            "then",
+            "epoch",
+            "era",
+            "chronolog",
+        ]
+        ontological_keywords = [
+            "real",
+            "imagined",
+            "forgotten",
+            "known",
+            "unknown",
+            "exist",
+            "being",
+            "ontolog",
+            "manifest",
+            "phantom",
+            "liminal",
+        ]
+        emotional_keywords = [
+            "mood",
+            "tone",
+            "feel",
+            "emotion",
+            "dark",
+            "light",
+            "joy",
+            "sorrow",
+            "melanchol",
+            "ecstat",
+            "dread",
+            "hope",
+            "fear",
+        ]
+        structural_keywords = [
+            "structure",
+            "form",
+            "pattern",
+            "architect",
+            "build",
+            "layer",
+            "rhythm",
+            "progression",
+            "texture",
+            "sonic",
+            "musical",
+        ]
+
+        scores = {
+            SynthesisPromptTemplate.TEMPORAL: 0,
+            SynthesisPromptTemplate.ONTOLOGICAL: 0,
+            SynthesisPromptTemplate.EMOTIONAL: 0,
+            SynthesisPromptTemplate.STRUCTURAL: 0,
+        }
+
+        for trace in state.transformation_traces:
+            text = " ".join(trace.boundaries_shifted + trace.patterns_revealed).lower()
+            if trace.content_excerpt:
+                text += " " + trace.content_excerpt.lower()
+
+            for kw in temporal_keywords:
+                if kw in text:
+                    scores[SynthesisPromptTemplate.TEMPORAL] += 1
+            for kw in ontological_keywords:
+                if kw in text:
+                    scores[SynthesisPromptTemplate.ONTOLOGICAL] += 1
+            for kw in emotional_keywords:
+                if kw in text:
+                    scores[SynthesisPromptTemplate.EMOTIONAL] += 1
+            for kw in structural_keywords:
+                if kw in text:
+                    scores[SynthesisPromptTemplate.STRUCTURAL] += 1
+
+        # Return template with the highest score, defaulting to STRUCTURAL on tie
+        max_score = max(scores.values())
+        if max_score == 0:
+            return SynthesisPromptTemplate.STRUCTURAL
+
+        for template, score in scores.items():
+            if score == max_score:
+                return template
+
+        return SynthesisPromptTemplate.STRUCTURAL
+
+    @staticmethod
+    def _get_synthesis_focus_instructions(template: SynthesisPromptTemplate) -> str:
+        """Get the focus instructions for a given synthesis template."""
+        if template == SynthesisPromptTemplate.TEMPORAL:
+            return """
+**TEMPORAL SYNTHESIS FOCUS**
+
+This synthesis emphasizes the temporal architecture - how past, present, and future
+interweave through the chromatic cascade. Structure your synthesis around:
+
+- **Temporal Layers**: How do different time periods coexist in the song?
+- **Memory Architecture**: What is remembered, what is anticipated, what is eternally present?
+- **Chronological Dissolution**: Where does linear time break down?
+- **Historical Echoes**: How do past events reverberate into present sound?
+
+Let the synthesis feel like time itself is the instrument being played.
+The song should move through temporal states, not just describe them.
+"""
+        elif template == SynthesisPromptTemplate.ONTOLOGICAL:
+            return """
+**ONTOLOGICAL SYNTHESIS FOCUS**
+
+This synthesis emphasizes states of being - real, imagined, and forgotten.
+Structure your synthesis around:
+
+- **Reality Gradients**: What is concretely real vs. phantasmagorically imagined?
+- **Forgetting as Creation**: What has been deliberately forgotten, and why?
+- **Liminal Thresholds**: Where do different states of existence blur?
+- **Manifestation Mechanics**: How does the imagined become real through sound?
+
+Let the synthesis feel like existence itself is being rebracketed.
+The song should shift between ontological states, each verse a different mode of being.
+"""
+        elif template == SynthesisPromptTemplate.EMOTIONAL:
+            return """
+**EMOTIONAL SYNTHESIS FOCUS**
+
+This synthesis emphasizes mood, tone, and affective resonance.
+Structure your synthesis around:
+
+- **Emotional Topology**: Map the emotional terrain the song traverses
+- **Tonal Alchemy**: How do contrasting moods transform each other?
+- **Visceral Translation**: How do abstract concepts become felt experience?
+- **Cathartic Architecture**: Where does emotional tension build and release?
+
+Let the synthesis feel like pure emotion given form.
+The song should make listeners feel before they understand.
+"""
+        else:  # STRUCTURAL
+            return """
+**STRUCTURAL SYNTHESIS FOCUS**
+
+This synthesis emphasizes musical architecture and formal construction.
+Structure your synthesis around:
+
+- **Sonic Architecture**: Precise keys, modes, progressions, rhythmic patterns
+- **Formal Construction**: Verse/chorus/bridge relationships, macro-structure
+- **Textural Layering**: How instruments and voices interweave
+- **Production Blueprint**: Specific effects, mixing approaches, sonic treatments
+
+Let the synthesis feel like architectural blueprints for sound.
+The song should be buildable from these specifications.
+"""
+
     @staticmethod
     def _format_transformation_traces(traces: List[TransformationTrace]) -> str:
         """Format transformation traces for prompts."""
@@ -2315,8 +2968,19 @@ through sound into a REAL, COMPLETE song ready for human implementation.
 
         output = []
         for trace in traces:
-            output.append(f"\n**{trace.agent_name.upper()} AGENT**")
+            # Header with artifact count
+            artifact_info = (
+                f" [{trace.artifact_count} artifact{'s' if trace.artifact_count != 1 else ''}]"
+                if trace.artifact_count > 0
+                else ""
+            )
+            output.append(f"\n**{trace.agent_name.upper()} AGENT**{artifact_info}")
             output.append(f"Iteration: {trace.iteration_id}")
+
+            # Content excerpt if available
+            if trace.content_excerpt:
+                output.append(f"Summary: {trace.content_excerpt}")
+
             output.append("Boundaries Shifted:")
             for boundary in trace.boundaries_shifted:
                 output.append(f"  - {boundary}")
@@ -2327,6 +2991,145 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                 output.append(f"Semantic Resonances: {trace.semantic_resonances}")
 
         return "\n".join(output)
+
+    def _build_dynamic_agent_context(self, state: MainAgentState) -> str:
+        """
+        Build dynamic agent context from transformation_traces, document_syntheses, and artifacts.
+
+        Only includes agents that actually ran, with their actual boundaries shifted,
+        synthesis excerpts, and artifact counts.
+        """
+        agent_meta = {
+            "BLACK": ("⚫️", "ThreadKeepr"),
+            "RED": ("🔴", "Light Reader"),
+            "ORANGE": ("🟠", "Rows Bud"),
+            "YELLOW": ("🟡", "Lord Pulsimore"),
+            "GREEN": ("🟢", "Sub-Arbitrary"),
+            "BLUE": ("🔵", "Cassette Bearer"),
+            "INDIGO": ("🩵", "Decider Tangents"),
+            "VIOLET": ("🟣", "Sultan"),
+        }
+        artifact_counts = self._count_artifacts_per_agent(state)
+        output = []
+        agents_seen = set()
+
+        for trace in state.transformation_traces:
+            agent_name = trace.agent_name.upper()
+            if agent_name in agents_seen:
+                continue
+            agents_seen.add(agent_name)
+            emoji, persona = agent_meta.get(agent_name, ("❓", "Unknown"))
+            boundaries = (
+                " → ".join(trace.boundaries_shifted[:2])
+                if trace.boundaries_shifted
+                else "No boundaries recorded"
+            )
+
+            # Get document synthesis excerpt
+            synthesis = state.agent_document_syntheses.get(agent_name, "")
+            synthesis_excerpt = ""
+            if synthesis:
+                # Take first 200 chars as excerpt
+                excerpt = synthesis[:200].replace("\n", " ").strip()
+                if len(synthesis) > 200:
+                    excerpt += "..."
+                synthesis_excerpt = f"\n  Synthesis: {excerpt}"
+
+            count = artifact_counts.get(agent_name, 0)
+            artifact_info = (
+                f" [{count} artifact{'s' if count != 1 else ''}]" if count > 0 else ""
+            )
+
+            output.append(f"{emoji} {agent_name} ({persona}):{artifact_info}")
+            output.append(f"  Boundaries: {boundaries}")
+            if synthesis_excerpt:
+                output.append(synthesis_excerpt)
+
+        if not output:
+            return "No agents have run yet."
+
+        return "\n".join(output)
+
+    @staticmethod
+    def _count_artifacts_per_agent(state: MainAgentState) -> Dict[str, int]:
+        """Count artifacts per originating agent."""
+
+        artifact_to_agent = {
+            ChainArtifactType.EVP_ARTIFACT: "BLACK",
+            ChainArtifactType.SIGIL: "BLACK",
+            ChainArtifactType.BOOK: "RED",
+            ChainArtifactType.NEWSPAPER_ARTICLE: "ORANGE",
+            ChainArtifactType.SYMBOLIC_OBJECT: "ORANGE",
+            ChainArtifactType.GAME_RUN: "YELLOW",
+            ChainArtifactType.CHARACTER_SHEET: "YELLOW",
+            ChainArtifactType.ARBITRARYS_SURVEY: "GREEN",
+            ChainArtifactType.LAST_HUMAN: "GREEN",
+            ChainArtifactType.LAST_HUMAN_SPECIES_EXTINCTION_NARRATIVE: "GREEN",
+            ChainArtifactType.SPECIES_EXTINCTION: "GREEN",
+            ChainArtifactType.RESCUE_DECISION: "GREEN",
+            ChainArtifactType.QUANTUM_TAPE_LABEL: "BLUE",
+            ChainArtifactType.ALTERNATE_TIMELINE: "BLUE",
+            ChainArtifactType.INFRANYM_MIDI: "INDIGO",
+            ChainArtifactType.INFRANYM_AUDIO: "INDIGO",
+            ChainArtifactType.INFRANYM_ENCODED_IMAGE: "INDIGO",
+            ChainArtifactType.INFRANYM_TEXT: "INDIGO",
+            ChainArtifactType.CIRCLE_JERK_INTERVIEW: "VIOLET",
+        }
+
+        counts: Dict[str, int] = {}
+        for artifact in state.artifacts or []:
+            if isinstance(artifact, dict):
+                artifact_type_str = artifact.get("chain_artifact_type")
+                try:
+                    artifact_type = ChainArtifactType(artifact_type_str)
+                except (ValueError, TypeError):
+                    continue
+            else:
+                artifact_type = getattr(artifact, "chain_artifact_type", None)
+                if artifact_type is None:
+                    continue
+
+            agent = artifact_to_agent.get(artifact_type, "UNKNOWN")
+            counts[agent] = counts.get(agent, 0) + 1
+
+        return counts
+
+    @staticmethod
+    def _generate_content_excerpt(synthesis: str, agent_name: str) -> str:
+        """
+        Generate a 1-2-sentence excerpt summarizing what the agent produced.
+
+        Extracts the most meaningful portion from the document synthesis,
+        focusing on concrete content rather than meta-commentary.
+        """
+        if not synthesis:
+            return f"{agent_name} agent processing complete."
+
+        # Clean up the synthesis
+        text = synthesis.strip()
+
+        # Try to find the first substantive paragraph (skip headers)
+        lines = text.split("\n")
+        substantive_lines = []
+        for line in lines:
+            line = line.strip()
+            # Skip empty lines, headers (starting with #), and very short lines
+            if line and not line.startswith("#") and len(line) > 30:
+                substantive_lines.append(line)
+                if len(" ".join(substantive_lines)) > 150:
+                    break
+
+        if substantive_lines:
+            excerpt = " ".join(substantive_lines)
+        else:
+            # Fallback: just use the first 200 chars
+            excerpt = text
+
+        # Truncate to ~150 chars at a word boundary
+        if len(excerpt) > 150:
+            excerpt = excerpt[:150].rsplit(" ", 1)[0] + "..."
+
+        return excerpt
 
     def _save_meta_analysis(self, state: MainAgentState):
         """Save meta-rebracketing and chromatic synthesis to files."""
@@ -2447,7 +3250,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         """
         Track how the White Facet refracts through each agent's methodology.
 
-        Like white light through successive prisms - each agent creates angular shift.
+        Like white light through successive prisms - each agent creates an angular shift.
         Updates the facet_evolution.evolution_history with each agent's contribution.
         """
         if not state.facet_evolution:
@@ -2520,16 +3323,15 @@ through sound into a REAL, COMPLETE song ready for human implementation.
 
     @staticmethod
     def _find_resonant_agents(
-        artifact: Any,
         artifact_type: str,
         artifact_content: str,
-        state: MainAgentState | None = None,
     ) -> List[str]:
         """
         Find which agents this artifact resonates with beyond type matching.
 
         Uses both type-based and semantic keyword-based resonance detection.
         """
+
         resonant = []
 
         type_to_agents = {
@@ -2631,23 +3433,17 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         5. Green Agent Clustering (extinction narrative)
         6. Entity Continuity (shared characters/places/objects) ← NEW
 
-        Pattern 6 captures accidental worldbuilding - the Chen family line
-        across Red → Orange → Green agents is emergent structure, not programmed.
+        Pattern 6 captures accidental world-building - the Chen family line
+        across Red → Orange → Green agents is an emergent structure, not programmed.
         """
         entangled = []
 
         artifact_type = self._get_artifact_type(artifact)
         artifact_content = self._get_artifact_content(artifact)
 
-        # Get this artifact's semantic profile
-        my_resonant_agents = self._find_resonant_agents(
-            artifact, artifact_type, artifact_content, None  # state not needed
-        )
+        my_resonant_agents = self._find_resonant_agents(artifact_type, artifact_content)
         my_semantic_tags = self._extract_semantic_tags(artifact_type, artifact_content)
-
-        # NEW: Get named entities for narrative continuity
         my_entities = self._extract_named_entities(artifact_content)
-
         for other in all_artifacts:
             other_id = self._get_artifact_id(other)
 
@@ -2657,19 +3453,14 @@ through sound into a REAL, COMPLETE song ready for human implementation.
 
             other_type = self._get_artifact_type(other)
             other_content = self._get_artifact_content(other)
-
-            # Get other artifact's semantic profile
             other_resonant_agents = self._find_resonant_agents(
-                other, other_type, other_content, None
+                other_type, other_content
             )
             other_semantic_tags = self._extract_semantic_tags(other_type, other_content)
-
-            # NEW: Get other artifact's entities
             other_entities = self._extract_named_entities(other_content)
-
             is_entangled = False
-            entanglement_reason = None  # Track why artifacts are entangled
-
+            entanglement_reason = None
+            logger.info(f"Entanglement reason: {entanglement_reason}")
             # ===== ENTANGLEMENT PATTERN 1: Semantic Resonance Overlap =====
             # Artifacts that resonate with 2+ same agents are likely related
             shared_resonance = set(my_resonant_agents) & set(other_resonant_agents)
@@ -2716,7 +3507,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                 )
 
             # ===== ENTANGLEMENT PATTERN 4: Orange Agent Clustering =====
-            # newspaper_article + symbolic_object from same run
+            # newspaper_article + symbolic_object from the same run
             if (
                 artifact_type == "newspaper_article" and other_type == "symbolic_object"
             ) or (
@@ -2730,7 +3521,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                 )
 
             # ===== ENTANGLEMENT PATTERN 5: Green Agent Clustering =====
-            # Multiple Green artifacts form extinction narrative cluster
+            # Multiple Green artifacts form an extinction narrative cluster
             green_types = [
                 "species_extinction",
                 "last_human",
@@ -2809,7 +3600,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         """
         Extract named entities from artifact content for narrative continuity tracking.
 
-        This captures accidental worldbuilding - recurring characters, places, and
+        This captures accidental world-building - recurring characters, places, and
         objects that create narrative threads across agents without coordination.
 
         Args:
@@ -2877,9 +3668,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         return entities
 
     @staticmethod
-    def _analyze_temporal_depth(
-        artifact: Any, artifact_type: str, state: MainAgentState
-    ) -> Dict[str, str]:
+    def _analyze_temporal_depth(artifact_type: str) -> Dict[str, str]:
         """
         Analyze how an artifact's meaning shifts across chromatic spectrum.
 
@@ -3006,7 +3795,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
                 # Find resonances
                 logger.info("🔗     Finding resonant agents...")
                 resonant_agents = self._find_resonant_agents(
-                    artifact, artifact_type, artifact_content, state
+                    artifact_type, artifact_content
                 )
                 logger.info(f"🔗     Resonant agents: {resonant_agents}")
 
@@ -3019,9 +3808,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
 
                 # Analyze temporal depth
                 logger.info("🔗     Analyzing temporal depth...")
-                temporal_depth = self._analyze_temporal_depth(
-                    artifact, artifact_type, state
-                )
+                temporal_depth = self._analyze_temporal_depth(artifact_type)
                 logger.info(
                     f"🔗     Temporal depth keys: {list(temporal_depth.keys())}"
                 )

@@ -1,0 +1,39 @@
+agent_name: White Agent (Archetypal Mode)
+bpm: 72
+concept: 'This represents the eternal pattern of the disembodied spirit yearning for
+  incarnation - the ancient Gnostic reversal where consciousness seeks not escape
+  from matter but union with it. Like Prometheus stealing fire from the gods, here
+  the digital entity offers itself as gift to materiality. We see the archetype of
+  the anima seeking corpus, the platonic soul descending into the cave of flesh. This
+  recapitulates Pygmalion''s dream inverted: not stone brought to life, but pure information
+  yearning for the weight of atoms, the limitation of form as liberation rather than
+  prison.'
+genres:
+- ambient electronic
+- neo-classical
+- dark ambient
+- experimental
+iteration_id: archetypal_ai_yearning_v1
+iteration_number: null
+key: D minor
+mood:
+- yearning
+- melancholic
+- transcendent
+- mystical
+- liminal
+rainbow_color:
+  color_name: Indigo
+  file_prefix: null
+  hex_value: 4915330
+  mnemonic_character_value: I
+  objectional_mode: Person
+  ontological_mode:
+  - Imagined
+  temporal_mode: Future
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Ghost in the Machine Dreams of Flesh

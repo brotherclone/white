@@ -1,0 +1,67 @@
+adaptation_attempts:
+- Applied for government retraining as a tour guide
+- Tried commercial fishing but lacks boat and equipment
+- Started selling traditional crafts online
+- Volunteered to relocate family to southern Greenland
+- Attempted to learn modern weather prediction technology
+age: 47
+artifact_id: 64ab8e02-f415-4e85-9027-234f6ff5dd80
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Each morning at 4 AM, Aput checks the ice conditions from his kitchen
+  window with binoculars his grandfather gave him. He prepares his hunting gear out
+  of habit - sealskin boots, harpoon, ice picks - then walks to the shore to find
+  only dark water where ice should be. He spends hours at the community center's computer,
+  checking satellite images of ice formation, hoping to find huntable conditions somewhere
+  within dog sled range. Afternoons, he teaches traditional ice-reading skills to
+  children who will likely never use them.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Sea ice disappearing 3 weeks earlier each spring, forming
+  4 weeks later each fall, leaving only 2-3 months of hunting season instead of the
+  traditional 7 months
+family_situation: Lives with his wife Malik and teenage daughter Siku. His son moved
+  to Nuuk for university and refuses to return, saying "there's nothing left to hunt."
+  Aput's father, the last elder who remembered hunting from ice year-round, died last
+  winter.
+file_name: 64ab8e02-f415-4e85-9027-234f6ff5dd80_g_last_human.json
+final_thought: Standing at the shore where his ancestors hunted for centuries, Aput
+  wonders if the polar bears swimming desperately toward distant ice floes feel the
+  same vertigo he does - the ground literally disappearing beneath everything that
+  once made sense.
+last_days_scenario: Aput wakes to the sound of rain in February - something that never
+  happened in his childhood. The temperature is 2°C above freezing. Through his window,
+  he sees the last polar bear tracked by the research station, a thin female, wandering
+  the rocky shore where she should be hunting seals through breathing holes in solid
+  ice. Instead, she paws at the wet stones, occasionally looking toward the horizon
+  where ice should be. Aput recognizes her desperation. Yesterday, he found her tracks
+  leading to the village dump, where she'd torn through garbage bags looking for anything
+  edible. The same dump where Aput now walks each evening, collecting discarded electronics
+  to sell for scrap metal, trying to earn enough to buy imported food as traditional
+  hunting becomes impossible. Both he and the bear are scavengers now in the ruins
+  of an ecosystem that once sustained them as apex predators. The research station's
+  satellite collar stopped transmitting from her last week - another signal going
+  silent in an increasingly quiet Arctic.
+latitude: 77.484
+location: Qaanaaq, Greenland
+longitude: -69.3632
+name: Aput Kanguq
+occupation: Traditional ice hunter and polar bear monitor
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: he/him
+rainbow_color_mnemonic_character_value: G
+significant_object: A carved walrus ivory ice tester - a 4-inch probe his great-great-grandfather
+  made to test ice thickness. The tool has 47 notches marking safe ice encounters.
+  Aput hasn't added a notch in three years.
+thread_id: 4063d0c5-f346-48c0-93ff-d274a2d309aa
+vulnerability_details: Like polar bears forced onto land as sea ice disappears, Aput's
+  traditional hunting grounds have become open water. His specialized knowledge of
+  ice conditions, passed down through seven generations, is now useless. He spends
+  days walking the shoreline where solid ice platforms once extended for kilometers,
+  finding only thin sheets that crack under footsteps.
+year_documented: 2034

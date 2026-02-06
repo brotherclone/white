@@ -1,0 +1,231 @@
+artifact_id: 734f26de-e76f-4bf5-8004-53d8f6a4a841
+artifact_name: portland_studio_year_timeline
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of staying in New York area, Gabriel accepted a teaching position
+    at the Art Institute of Portland and moved to the Pacific Northwest
+  when: December 2014
+  why_plausible: Many creative professionals relocated to Portland in the mid-2010s
+    for lower cost of living and vibrant arts scene. Teaching positions at art institutes
+    were common transitional careers for working artists.
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- wistful
+file_name: 734f26de-e76f-4bf5-8004-53d8f6a4a841_t_portland_studio_year_timeline.yml
+following_events:
+- Continued teaching and expanded curriculum
+- Sarah moved in permanently by spring 2016
+- Started collaborative label with Tommy Nguyen
+- Never worked in intelligence sector
+- Remained in Pacific Northwest arts community
+- Developed different relationship with technology and recording
+key_differences:
+- Living in Portland instead of New York area
+- Teaching at Art Institute instead of working at Huge
+- Focusing on experimental sound art instead of commercial design
+- In relationship with librarian Sarah Kowalski
+- Living in warehouse studio with roommate Marcus Chen
+- No commute stress or Google Glass involvement
+- Released field recording album through local label
+- Weekly sound art installations at Alberta Rose Theatre
+mood_description: A year suspended in Portland rain and possibility - the weight of
+  what might have been if creativity had taken precedence over career security. The
+  warehouse studio becomes a cocoon where experimental sound art flourishes away from
+  commercial pressures, but there's an underlying melancholy about paths not taken
+  and the simplicity that was chosen over complexity.
+narrative: 'The cassette hisses with the sound of constant rain on warehouse skylights.
+  In this timeline, Gabriel never endured that soul-crushing commute to the SCIF.
+  Instead, he wakes at 7:30 AM in a converted warehouse at 1247 SE Division Street,
+  the smell of coffee and sawdust from Marcus Chen''s woodworking corner mixing with
+  the perpetual dampness of Portland winter.
+
+
+  His teaching schedule at the Art Institute is Tuesdays and Thursdays - Sound Design
+  Fundamentals in Room 204, where he shows twenty-somethings how to layer field recordings
+  with synthesized tones. The fluorescent lights flicker above worn carpet and outdated
+  Mac Pros, but his students - kids with names like River and Sage - hang on every
+  word about frequency modulation and spatial audio.
+
+
+  The warehouse studio becomes his real laboratory. Twelve-foot ceilings, concrete
+  floors, and Marcus''s collection of found metal objects create a natural reverb
+  chamber. Gabriel spends hours with his Zoom H6 recorder, capturing the drip patterns
+  from the leaky skylight, the hum of the industrial refrigerator, the way footsteps
+  echo differently when it''s raining versus when it''s dry.
+
+
+  Wednesday afternoons he rides his fixed-gear bike to Powell''s Books on Burnside,
+  ostensibly to browse the music theory section but really to see Sarah Kowalski reshelf
+  returns in the Science & Nature section. She has paint-stained fingers from weekend
+  ceramics classes at the community college and knows more about mycology than anyone
+  he''s ever met. Their first real conversation happens over coffee at Stumptown on
+  Division - she tells him about the way different mushroom species create underground
+  communication networks, and he plays her a recording he made of tree roots crackling
+  during a freeze.
+
+
+  By April, he''s convinced Janet Rodriguez, the department head, to let him do weekly
+  installations at the Alberta Rose Theatre. Every Thursday at 8 PM, he fills the
+  small venue with what he calls ''environmental compositions'' - field recordings
+  from Forest Park layered with synthesized whale songs, or the sound of rain on different
+  surfaces played through speakers positioned around the audience like a surround-sound
+  storm.
+
+
+  The breakthrough comes in June when Tommy Nguyen from Cascade Records attends one
+  of these installations. Tommy runs the label out of a converted garage in the Hawthorne
+  district, specializing in experimental Pacific Northwest artists. He offers Gabriel
+  a deal to release an album of field recordings - not the commercial electronic music
+  Gabriel had been making in New York, but pure environmental sound art.
+
+
+  ''Rain Patterns'' releases in September - forty-three minutes of Gabriel''s most
+  intimate recordings from his first Portland year. The opening track captures the
+  specific percussion of rain hitting the metal roof of the warehouse at 3 AM. Track
+  four is the sound of Sarah making tea in her kitchen while explaining the lifecycle
+  of bracket fungi, her voice barely audible over the whistle of the kettle.
+
+
+  The album sells 300 copies, mostly to people who attend his installations. But Gabriel
+  doesn''t care about numbers anymore. He''s teaching kids to hear the world differently,
+  living in a space where he can experiment freely, and falling asleep to the sound
+  of rain that never quite stops. His hands no longer shake from commuter stress.
+  His Google Glass sits unused in a drawer, a relic from a different life.
+
+
+  By December, he''s converted half the garage behind the warehouse into a private
+  teaching studio. Students pay $40 an hour to learn field recording techniques, and
+  he''s booked solid through the winter. Sarah has started staying over most weekends,
+  bringing her collection of mushroom identification books and leaving ceramic mugs
+  in his kitchen sink.
+
+
+  The year ends with a collaborative installation at the Alberta Rose - Gabriel''s
+  environmental recordings mixed with Marcus''s sculptural sound objects and Sarah''s
+  spoken-word pieces about fungal networks. Thirty-seven people attend on a rainy
+  Thursday night in December, and afterward they all walk to the Sapphire Hotel for
+  drinks, their voices mixing with the sound of rain on Southeast Portland streets.'
+period:
+  age_range: !!python/tuple
+  - 40
+  - 40
+  creative_output:
+  - Rain Patterns field recording album
+  - Weekly sound installations at Alberta Rose Theatre
+  - Teaching curriculum for Sound Design Fundamentals
+  - Collaborative pieces with Marcus Chen
+  description: The year Gabriel never left Portland - teaching sound design at the
+    Art Institute while living in a converted warehouse studio on SE Division
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: wistful
+  end_date: 2015-12-31
+  is_forgotten: false
+  key_relationships:
+  - Marcus Chen - warehouse roommate and fellow sound artist
+  - Sarah Kowalski - librarian at Multnomah County Library
+  - Professor Janet Rodriguez - department head at Art Institute
+  - Tommy Nguyen - owner of Cascade Records
+  known_events:
+  - approximate_date: null
+    category: career
+    date: 2015-01-15
+    description: Started teaching Sound Design Fundamentals at the Art Institute of
+      Portland in January
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: location
+    date: 2015-02-01
+    description: Moved into warehouse studio space at 1247 SE Division Street with
+      roommate Marcus Chen
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 2015-04-12
+    description: Started weekly sound art installations at the Alberta Rose Theatre
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: relationship
+    date: 2015-06-23
+    description: Began relationship with librarian Sarah Kowalski after meeting at
+      Powell's Books
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 2015-09-15
+    description: Released field recording album 'Rain Patterns' through local label
+      Cascade Records
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: career
+    date: 2015-10-01
+    description: Started teaching private lessons in converted garage studio
+    emotional_weight: 0.5
+    tags: []
+    year: null
+  location: Portland, Oregon
+  primary_activity: Teaching and experimental sound art
+  start_date: 2015-01-01
+  trauma_level: low
+plausibility_score: 0.85
+preceding_events:
+- Decided not to renew lease in New York area
+- Applied for teaching position at Art Institute of Portland
+- Sold most possessions and drove across country
+- Connected with Marcus Chen through Craigslist roommate ad
+- Attended faculty orientation in January 2015
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Warehouse studio at 1247 SE Division Street with twelve-foot ceilings and
+    leaky skylights
+  sensory_elements:
+  - sound of rain on metal roof
+  - sawdust smell from woodworking
+  - concrete floor echo
+- category: relationship
+  detail: Sarah Kowalski, librarian at Multnomah County Library with paint-stained
+    fingers and mycology expertise
+  sensory_elements:
+  - tea kettle whistle
+  - ceramic mug clinks
+  - soft voice explaining fungi
+- category: career
+  detail: Teaching Sound Design Fundamentals in Room 204 with flickering fluorescent
+    lights and outdated Mac Pros
+  sensory_elements:
+  - worn carpet texture
+  - computer fan hum
+  - student chatter
+- category: creative
+  detail: Weekly installations at Alberta Rose Theatre with surround-sound speaker
+    positioning
+  sensory_elements:
+  - venue reverb
+  - audience breathing
+  - rain field recordings
+- category: daily_routine
+  detail: 7:30 AM wake-up, fixed-gear bike rides to Powell's Books, Wednesday afternoon
+    browsing ritual
+  sensory_elements:
+  - coffee brewing
+  - bike chain clicking
+  - book page turning
+specificity_score: 0.9
+thread_id: 34575da6-40a0-4252-8b50-9cfd82186f58
+title: The Portland Studio Year

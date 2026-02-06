@@ -1,0 +1,48 @@
+agent_name: indigo
+bpm: 126
+concept: 'This composition functions as a sonic infranym where the aggressive surface
+  narrative masks profound vulnerability through visual encoding. The title "Yeah,
+  Blowtorch Ave." presents as working-class machismo—a street tough''s anthem about
+  destructive power and territorial swagger. Distorted guitars and driving rhythms
+  support lyrics celebrating reckless behavior, industrial imagery, and masculine
+  posturing. However, the encoding method operates through the song''s visual architecture:
+  album artwork, lyric sheets, and music video contain carefully placed IMAGE elements
+  that spell out the true message. Street signs in backgrounds, graffiti on walls,
+  worn photographs tucked into scenes—each visual component contributes letters that
+  gradually reveal "oh, what a clever boy." The A major tonality initially reinforces
+  the surface confidence, but as the infranym decodes, listeners realize this same
+  key carries profound tenderness—the voice of someone who once received this exact
+  phrase as childhood praise. The 126 BPM maintains the facade of aggressive momentum
+  while actually matching the heartbeat of vulnerable confession. Guitar feedback
+  and industrial noise slowly give way to delicate fingerpicking as the secret name
+  emerges, transforming the blowtorch from weapon to tool of careful craftsmanship.
+  The song teaches that sometimes the loudest posturing protects the softest memories,
+  and that true names hide not in what we hear, but in what we''re taught to overlook.
+  The avenue becomes a pathway between who we pretend to be and who we were praised
+  for being.
+
+
+  **INFRANYM PROTOCOL:**
+
+  Secret: ''oh, what a clever boy'' encoded as ''yeah, blowtorch ave.''
+
+  Method: InfranymMedium.IMAGE
+
+  Decoding: Infranym Puzzle: ''puzzle_oh, what a clever boy'' (3 layers, keyed by
+  text render)
+
+  '
+genres:
+- Indie rock
+- shoegaze
+iteration_id: indigo_proposal_1770295365523
+iteration_number: 14
+key: A major
+mood:
+- Reckless bravado
+- nostalgic melancholy
+- tender revelation
+rainbow_color: indigo
+tempo: Moderate driving
+timestamp: 1770295365.523573
+title: Yeah, Blowtorch Ave.

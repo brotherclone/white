@@ -1,0 +1,128 @@
+artifact_id: dd45aa73-93e5-4f7f-b9d1-196e8442ff1d
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1990-08-26'
+file_name: dd45aa73-93e5-4f7f-b9d1-196e8442ff1d_o_newspaper_article.yml
+headline: Local Band's Final Recording Session Ends in Psychiatric Emergency
+location: Hamburg Borough, NJ
+rainbow_color_mnemonic_character_value: O
+source: Sussex County Courier
+tags:
+- rock music
+- mental health
+- unexplained phenomena
+- Hamburg Borough
+- recording studio
+text: 'HAMBURG BOROUGH - A three-member experimental rock band''s recording session
+  at Hardyston Studios ended abruptly Friday night when the group''s drummer was hospitalized
+  following what witnesses described as a "trance-like episode" during the final take
+  of an untitled composition.
+
+
+  The band, known locally as "Recursive," had been working on what bassist Michael
+  Chen, 19, called their "most ambitious piece" - a complex instrumental track featuring
+  an unusual 7/8 time signature and incorporating what the group termed "environmental
+  voice phenomena" recorded at various locations throughout Sussex County.
+
+
+  According to studio owner Frank Kowalski, the problems began during the third hour
+  of the session when drummer Lisa Hartwell, 18, of Vernon, began playing at exactly
+  68 beats per minute despite the song''s written tempo calling for variable speeds.
+
+
+  "She just locked into this rhythm and wouldn''t break out of it," Kowalski said.
+  "The other two kept trying to follow her lead, but she was somewhere else entirely.
+  Her eyes were open but she wasn''t responding to anything we said."
+
+
+  The session continued for another 47 minutes with Hartwell maintaining the steady
+  pulse while guitarist David Morse, 19, of Hamburg, layered increasingly complex
+  melodic patterns over the foundation. Chen reported that during this period, the
+  previously recorded vocal samples - fragments of speech the band had collected from
+  abandoned buildings and remote locations - began to align into what sounded like
+  coherent phrases.
+
+
+  "It was like the sounds were organizing themselves," Chen told the Courier. "We''d
+  recorded these random bits of audio months ago, but suddenly they were forming patterns.
+  The phrase that kept coming through was something like ''meaning to come to come
+  leave me'' - over and over."
+
+
+  Emergency services were called when Hartwell collapsed at her drum kit at approximately
+  11:30 PM. Hamburg Volunteer Ambulance Corps transported her to Newton Memorial Hospital,
+  where she was treated for exhaustion and disorientation. Hospital spokesman Dr.
+  Robert Fielding confirmed Hartwell was admitted for observation but declined to
+  provide details about her condition.
+
+
+  The master recording of the session has reportedly gone missing from the studio.
+  Kowalski claims the tape was in the mixing console when emergency personnel arrived,
+  but was nowhere to be found when he returned the following morning.
+
+
+  "The weird thing is, the multitrack machine was still running," Kowalski said. "Twenty-four
+  tracks of tape, but completely blank. Like it had been bulk-erased, but we don''t
+  have that equipment here."
+
+
+  Morse and Chen have been unavailable for further comment. Attempts to reach Hartwell''s
+  family were unsuccessful.
+
+
+  The incident has prompted discussions among local musicians about the psychological
+  effects of experimental recording techniques. Dr. Sarah Brennan, a psychiatrist
+  at Sussex County Community Mental Health Center, noted that repetitive musical patterns
+  and sustained concentration can sometimes trigger dissociative episodes in susceptible
+  individuals.
+
+
+  "When you combine intensive focus with unusual rhythmic structures, you can create
+  conditions that affect consciousness in unpredictable ways," Brennan explained.
+  "Add in the emotional investment these young people have in their creative work,
+  and you have a recipe for psychological stress."
+
+
+  The three band members had been working together for eight months, developing what
+  they described as "architecture music" - compositions designed to create specific
+  psychological spaces rather than traditional entertainment. Their previous performances
+  at local venues including the Sparta Community Center and McAfee Fire Hall had drawn
+  small but dedicated audiences.
+
+
+  Studio owner Kowalski, who has worked with dozens of local acts over the past decade,
+  said he had never experienced anything similar.
+
+
+  "I''ve seen musicians get lost in their playing before, but this was different,"
+  he said. "It was like the music was playing them instead of the other way around."
+
+
+  The Hamburg Borough Police Department has classified the incident as a medical emergency
+  with no criminal activity suspected. Chief William Morrison noted that while unusual,
+  the case does not warrant further investigation.
+
+
+  "Sometimes young people push themselves too hard with their artistic pursuits,"
+  Morrison said. "As long as no laws were broken and no one was seriously hurt, we
+  consider this a private matter."
+
+
+  Hartwell was released from Newton Memorial on Sunday morning and is reportedly recovering
+  at home. The future of Recursive remains uncertain, with their scheduled performance
+  at the Sussex County Fair now canceled.
+
+
+  The missing master tape has become something of a local mystery, with some suggesting
+  it was stolen by collectors of unusual recordings, while others speculate it was
+  deliberately destroyed by the band members themselves.
+
+
+  "Maybe some things aren''t meant to be preserved," Chen said in a brief phone conversation
+  before declining further interviews. "Sometimes the only way forward is to leave
+  everything behind."'
+thread_id: 136919aa-c350-41aa-af7b-0ab538ae2cff

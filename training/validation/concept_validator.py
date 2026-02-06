@@ -5,15 +5,19 @@ Validates generated concepts using the Rainbow Table ontological regression mode
 Provides accept/reject decisions with actionable suggestions for improvement.
 """
 
+import warnings
+import yaml
 import hashlib
 import time
+import torch
+import numpy as np
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Tuple, Any
-import warnings
+from models.multitask_model import MultiTaskRainbowModel
+from models.text_encoder import TextEncoder
 
-import torch
-import numpy as np
 
 # Type hints for optional dependencies
 try:
@@ -198,7 +202,7 @@ class ConceptValidator:
         self,
         model_path: Optional[str] = None,
         config_path: Optional[str] = None,
-        device: str = "cpu",
+        device: str = "auto",
         # Validation thresholds
         confidence_threshold: float = 0.7,
         dominant_threshold: float = 0.6,
@@ -215,7 +219,7 @@ class ConceptValidator:
         Args:
             model_path: Path to trained model checkpoint
             config_path: Path to model configuration
-            device: Device for inference (cpu, cuda, mps)
+            device: Device for inference ('auto', 'cpu', 'cuda', 'mps')
             confidence_threshold: Minimum confidence for ACCEPT
             dominant_threshold: Score needed for dominant mode
             hybrid_threshold: Max difference for hybrid detection
@@ -224,7 +228,11 @@ class ConceptValidator:
             enable_cache: Enable validation result caching
             cache_ttl: Cache time-to-live in seconds
         """
-        self.device = device
+        self.requested_device = device
+        self._detected_device = self._select_device()
+
+        # Use a torch.device object internally
+        self.torch_device = self._detected_device
         self.model_path = model_path
         self.config_path = config_path
 
@@ -286,8 +294,22 @@ class ConceptValidator:
             cls._instance = cls(**kwargs)
         return cls._instance
 
+    def _select_device(self) -> torch.device:
+        """Resolve device: prefer CUDA, then MPS, then CPU, unless user forced one."""
+        req = (self.requested_device or "auto").lower()
+        if req != "auto":
+            # Respect explicit device string
+            return torch.device(req)
+        # Auto-select
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        # MPS available in newer PyTorch builds on macOS
+        if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+            return torch.device("mps")
+        return torch.device("cpu")
+
     def _load_model(self):
-        """Lazy load model and tokenizer."""
+        """Lazy load model and tokenizer with device awareness and optional fp16 for CUDA."""
         if self._model is not None:
             return
 
@@ -298,12 +320,8 @@ class ConceptValidator:
         if not HAS_TRANSFORMERS:
             raise ImportError("transformers required for model loading")
 
-        # Import model classes
-        from models.multitask_model import MultiTaskRainbowModel
-        from models.text_encoder import TextEncoder
-
-        # Load checkpoint
-        checkpoint = torch.load(self.model_path, map_location=self.device)
+        # Load checkpoint to the resolved device
+        checkpoint = torch.load(self.model_path, map_location=self.torch_device)
 
         # Get model version
         self._model_version = checkpoint.get("model_version", "unknown")
@@ -311,8 +329,6 @@ class ConceptValidator:
         # Load config if provided
         config = {}
         if self.config_path:
-            import yaml
-
             with open(self.config_path) as f:
                 config = yaml.safe_load(f)
 
@@ -331,7 +347,18 @@ class ConceptValidator:
             .get("num_classes", 8),
         )
         self._model.load_state_dict(checkpoint["model_state_dict"])
-        self._model.to(self.device)
+
+        # Move model to device and use fp16 on CUDA to reduce memory
+        if self.torch_device.type == "cuda":
+            self._model.to(self.torch_device)
+            try:
+                self._model.half()
+            except Exception:
+                # If half is not supported for some parts, keep float32 but ensure device placement
+                pass
+        else:
+            self._model.to(self.torch_device)
+
         self._model.eval()
 
         # Load tokenizer
@@ -354,7 +381,7 @@ class ConceptValidator:
         }
 
     def _predict(self, text: str) -> Dict:
-        """Run model prediction on text."""
+        """Run model prediction on text, using autocast on CUDA when available."""
         self._load_model()
 
         if self._model is None:
@@ -369,12 +396,19 @@ class ConceptValidator:
             max_length=512,
         )
 
-        input_ids = encoding["input_ids"].to(self.device)
-        attention_mask = encoding["attention_mask"].to(self.device)
+        input_ids = encoding["input_ids"].to(self.torch_device)
+        attention_mask = encoding["attention_mask"].to(self.torch_device)
 
-        # Predict
+        is_cuda = self.torch_device.type == "cuda"
+
+        # Predict with amp when on CUDA for faster fp16 inference
         with torch.no_grad():
-            output = self._model(input_ids, attention_mask)
+            if is_cuda:
+                with torch.cuda.amp.autocast():
+                    output = self._model(input_ids, attention_mask)
+            else:
+                output = self._model(input_ids, attention_mask)
+
             scores = output.ontological_scores
 
         return {
@@ -711,6 +745,7 @@ if __name__ == "__main__":
     validator = ConceptValidator(
         model_path=None,  # Use mock predictions
         enable_cache=True,
+        device="auto",  # auto-detect GPU on RunPod
     )
 
     # Test 1: Basic validation

@@ -1,0 +1,19 @@
+artifact_id: 71a92b4c-4d8b-4cfb-b9b1-f641d936e63e
+artifact_name: The WVNJ Phantom Microphone
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: 'A custom-built microphone designed to record "negative space acoustics"
+  - the frequencies that exist in surveillance blind spots and electromagnetic gaps.
+  This device, which vanished from the abandoned radio tower site leaving only its
+  shadow burned into the ground, represents the paradox of capturing what cannot be
+  measured: the phantom limbs of digital consciousness and the missing beats where
+  resistance embeds itself in the spaces between official frequencies.'
+file_name: 71a92b4c-4d8b-4cfb-b9b1-f641d936e63e_v_The WVNJ Phantom Microphone.yml
+name: The WVNJ Phantom Microphone
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: c84de071-1291-4dee-b642-aa6f20cb7ce5
