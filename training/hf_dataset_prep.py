@@ -39,9 +39,9 @@ DATA_DIR = Path(__file__).parent / "data"
 # Files to include in the dataset
 DATASET_FILES = {
     "base_manifest": "base_manifest_db.parquet",
-    "training_full": "training_data_full.parquet",
+    "training_full": "training_segments_metadata.parquet",
     "training_segments": "training_segments.parquet",
-    # "embeddings": "training_data_embedded.parquet",  # Add for Phase 3
+    # "embeddings": "training_segments_media.parquet",  # Add for Phase 3
 }
 
 
@@ -257,7 +257,7 @@ def main():
     # Determine which files to include
     files_to_load = DATASET_FILES.copy()
     if args.include_embeddings:
-        files_to_load["embeddings"] = "training_data_embedded.parquet"
+        files_to_load["embeddings"] = "training_segments_media.parquet"
 
     # Load all files
     print("\nLoading data files...")

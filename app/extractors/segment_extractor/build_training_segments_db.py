@@ -121,8 +121,8 @@ def has_midi_notes_in_segment(
         end_tick = int(end_seconds * ticks_per_second)
 
         # Check for note_on messages in range
-        absolute_tick = 0
         for track in midi.tracks:
+            absolute_tick = 0
             for msg in track:
                 absolute_tick += msg.time
                 if start_tick <= absolute_tick <= end_tick:
@@ -649,7 +649,7 @@ def embed_audio_and_midi_binaries(
 
         if row["has_midi"] and row["midi_file"]:
             try:
-                midi_file = staged_material_dir / row["song_id"] / row["midi_file"]
+                midi_file = Path(row["midi_file"])
                 if midi_file.exists():
                     with open(midi_file, "rb") as f:
                         midi_binary = f.read()
@@ -739,7 +739,7 @@ def main():
             segments_df = pl.read_parquet(segments_path)
             joined_df = join_with_manifest_db(segments_df, manifest_path)
 
-            joined_path = builder.output_dir / "training_data_full.parquet"
+            joined_path = builder.output_dir / "training_segments_metadata.parquet"
             joined_df.write_parquet(joined_path, compression="snappy")
 
             print(f"✅ Full training data: {joined_path}")
@@ -752,7 +752,7 @@ def main():
                     joined_df, builder.staged_material_dir, sample_rate=args.sample_rate
                 )
 
-                embedded_path = builder.output_dir / "training_data_embedded.parquet"
+                embedded_path = builder.output_dir / "training_segments_media.parquet"
 
                 print(
                     "\n📝 Writing parquet file (this may take several minutes for large datasets)..."

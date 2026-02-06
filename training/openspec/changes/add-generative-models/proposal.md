@@ -1,5 +1,7 @@
 # Change: Add Generative Models for Segment Synthesis
 
+> **DEPRECATED (2026-02-06)**: This phase was designed for generating text concepts via VAE/Diffusion/GPT models. The architectural pivot to evolutionary music composition uses rule-based generation + mutation + fitness scoring (the Evolutionary Music Generator) rather than learned generative models for synthesis.
+
 ## Why
 Beyond understanding rebracketing, the White Album requires generating new segments that authentically manifest chromatic and rebracketing characteristics. Generative models (VAE, Diffusion, GPT-style) enable sampling new segments, completing partial segments, and exploring the latent space of ontological transformations.
 

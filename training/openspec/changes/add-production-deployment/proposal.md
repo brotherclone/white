@@ -1,22 +1,22 @@
-# Change: Add Production Deployment and Inference API
+# Change: Add Production Deployment and Chromatic Scoring API
 
 ## Why
-Trained models must be deployed for use by White Agent and other components. Production deployment requires model export, optimization, API endpoints, and integration with LangGraph agents.
+The trained multimodal model serves as the fitness function for the Evolutionary Music Generator. Production deployment requires model export, optimization, and a scoring API that can evaluate batches of MIDI/audio candidates quickly enough to support multi-stage evolutionary composition (50+ candidates per stage, multiple stages per composition).
 
 ## What Changes
-- Add model export to ONNX for CPU inference optimization
-- Create `RebracketingInferenceAPI` (Flask/FastAPI) for prediction endpoints
-- Add `RebracketingAnalyzerTool` for LangGraph agent integration
-- Implement streaming analysis for real-time segment processing
+- Add model export to ONNX for optimized inference
+- Create `ChromaticScoringAPI` (FastAPI) for fitness evaluation endpoints
+- Add `ChromaticScorerTool` for LangGraph agent integration with the Evolutionary Music Generator
+- Implement batch scoring optimization for evaluating candidate populations (50+ per call)
 - Add model versioning and registry integration
-- Implement batch inference optimization
-- Add monitoring and logging for production inference
+- Implement monitoring and logging for production inference
+- Add MIDI rendering pipeline for scoring MIDI-only candidates (render to audio for multimodal model)
 
 ## Impact
 - Affected specs: production-deployment (new capability)
 - Affected code:
   - `training/export/` - ONNX export and optimization
-  - `training/api/` - inference API implementation
+  - `training/api/` - ChromaticScoringAPI implementation
   - `training/tools/` - LangGraph tool integration
-  - Main project `app/tools/` - White Agent tool registration
-- Dependencies: onnx, onnxruntime, fastapi, pydantic
+  - `app/generator/` - Evolutionary Music Generator consumes scoring API
+- Dependencies: onnx, onnxruntime, fastapi, pydantic, fluidsynth (MIDI rendering)
