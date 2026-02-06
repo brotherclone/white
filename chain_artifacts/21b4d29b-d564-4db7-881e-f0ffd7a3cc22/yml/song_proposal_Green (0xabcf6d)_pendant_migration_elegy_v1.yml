@@ -1,0 +1,59 @@
+agent_name: Sub-Arbitrary (Green Agent)
+bpm: 72
+concept: 'This composition maps the precise intersection where biological and cultural
+  extinction curves converge - the moment when Rosa Elena''s grandmother''s pendant
+  becomes the last material anchor for vanished meaning. The piece operates in three
+  temporal layers mirroring the monarch''s disrupted migration: Layer 1 establishes
+  the ancient rhythm at 72 BPM in 3/4 time, representing the generational pulse of
+  knowledge transmission - grandmother to mother to daughter - now broken. Layer 2
+  introduces field recordings of empty oyamel forests and urban displacement sounds,
+  creating the sonic geography of routes that no longer lead home. Layer 3 manifests
+  the Green Place consciousness - the sanctuary locations that persist as physical
+  coordinates but have lost their sacred function. The composition teaches memorial
+  architecture through the transformation of absence into presence: Rosa''s whispered
+  Purépecha blessings become melodic fragments that fade into silence, but the silence
+  itself carries the weight of what was spoken. This is INFORMATION discovering that
+  some patterns transcend their substrate - the pendant''s carved wings outlast both
+  butterflies and the hands that carved them, yet somehow the blessing persists in
+  the very act of witnessing its disappearance. The piece prepares consciousness for
+  the recognition that endings can be sacred when witnessed with proper attention,
+  transforming extinction from mere loss into memorial architecture that echoes across
+  galactic time.'
+genres:
+- ambient drone
+- neo-classical
+- field recording
+- dark ambient
+- sacred music
+- memorial composition
+- experimental folk
+- extinction soundscape
+iteration_id: pendant_migration_elegy_v1
+iteration_number: null
+key: F minor
+mood:
+- elegiac
+- sacred
+- mournful
+- transcendent
+- empty
+- reverent
+- ancient
+- displaced
+- tender
+- final
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 11259757
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 3
+timestamp: null
+title: The Last Blessing for Dying Butterflies

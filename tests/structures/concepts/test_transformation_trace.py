@@ -18,6 +18,8 @@ def test_initial_values():
     assert t.boundaries_shifted == []
     assert t.patterns_revealed == []
     assert t.semantic_resonances == {}
+    assert t.content_excerpt is None
+    assert t.artifact_count == 0
 
 
 def test_with_boundaries_shifted():
@@ -124,3 +126,31 @@ def test_complex_semantic_resonances():
     )
     assert "spectrum_integration" in t.semantic_resonances
     assert t.semantic_resonances["cognitive_shift"] == "analytical to holistic"
+
+
+def test_content_excerpt_and_artifact_count():
+    """Test the Phase 3 additions: content_excerpt and artifact_count."""
+    t = TransformationTrace(
+        agent_name="black",
+        iteration_id="iter_001",
+        boundaries_shifted=["CHAOS → ORDER"],
+        patterns_revealed=["Structured chaos"],
+        content_excerpt="ThreadKeepr reveals the boundary between conscious ritual and unconscious manifestation...",
+        artifact_count=3,
+    )
+    assert (
+        t.content_excerpt
+        == "ThreadKeepr reveals the boundary between conscious ritual and unconscious manifestation..."
+    )
+    assert t.artifact_count == 3
+
+
+def test_content_excerpt_optional():
+    """Test that content_excerpt is optional."""
+    t = TransformationTrace(
+        agent_name="red",
+        iteration_id="iter_002",
+        artifact_count=5,
+    )
+    assert t.content_excerpt is None
+    assert t.artifact_count == 5

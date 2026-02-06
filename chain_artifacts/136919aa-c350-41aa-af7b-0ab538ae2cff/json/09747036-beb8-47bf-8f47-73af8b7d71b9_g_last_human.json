@@ -1,0 +1,65 @@
+adaptation_attempts:
+- Tried to diversify into year-round ecotourism focusing on local birds and plants
+- Applied for government reforestation grants to replant cleared areas
+- Attempted to create a seed bank of native milkweed varieties
+- Partnered with researchers tracking butterfly population collapse
+- Started teaching traditional ecological knowledge online to preserve it
+age: 47
+artifact_id: 09747036-beb8-47bf-8f47-73af8b7d71b9
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Every morning at 5 AM, Esperanza would walk the same forest paths her
+  grandmother taught her, checking the oyamel fir trees for butterfly clusters. She'd
+  prepare traditional hot chocolate with cinnamon for tourists, sharing stories in
+  three languages about how her great-grandmother could predict the monarchs' arrival
+  by the angle of morning light through the canopy. Now she walks empty trails, the
+  silence broken only by chainsaws clearing land for more avocado trees.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Habitat conversion of overwintering forests to avocado plantations,
+  combined with climate-shifted migration timing that left sanctuaries empty during
+  traditional tourist season
+family_situation: Widowed mother of two adult children who moved to Mexico City for
+  work. Her son sends money but can't return - the sanctuary closed, no jobs remain.
+  Her daughter calls weekly, begging her to leave, but Esperanza refuses to abandon
+  the forest where four generations of women in her family learned to read the butterflies'
+  ancient language.
+file_name: 09747036-beb8-47bf-8f47-73af8b7d71b9_g_last_human.json
+final_thought: She wondered if the butterflies could feel it too - that terrible disorientation
+  when the world changes faster than memory can adapt, when the ancient pathways encoded
+  in your bones suddenly lead nowhere.
+last_days_scenario: 'Esperanza sits in her empty visitor center, surrounded by faded
+  photographs of orange clouds of monarchs that once darkened the sky each winter.
+  The last tourists left three weeks ago. Outside, she can hear the distant rumble
+  of machinery clearing another hectare for avocado cultivation. Her phone buzzes
+  with a message from a researcher in Canada: "Migration route completely disrupted.
+  Population down 95%. May be functionally extinct." She sets down the carved butterfly
+  her grandmother made, its paint worn smooth by four generations of hands. Tomorrow,
+  the bank will foreclose on the sanctuary. Tonight, she''ll walk the empty trails
+  one last time, speaking aloud the Purépecha names for each tree, each seasonal marker,
+  each sacred site - words that will die with her, just like the butterflies'' ancient
+  memory of how to find home.'
+latitude: 19.6069
+location: Michoacán, Mexico (Monarch Butterfly Biosphere Reserve)
+longitude: -100.2407
+name: Esperanza Morales-Chen
+occupation: Traditional ecological knowledge keeper and butterfly sanctuary guide
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A hand-carved wooden monarch butterfly made by her grandmother,
+  painted with natural pigments. It was traditionally passed to the next generation
+  when the butterflies returned each November. Now it sits unused on her kitchen table
+  - there's no one left to receive it, and no butterflies to mark the season.
+thread_id: 136919aa-c350-41aa-af7b-0ab538ae2cff
+vulnerability_details: Like monarchs whose multi-generational migration was broken
+  when climate disrupted timing, Esperanza's family's four-generation tradition of
+  guiding monarch tourism ended when the butterflies stopped arriving. Her grandmother's
+  indigenous Purépecha knowledge of seasonal timing became useless when spring arrived
+  six weeks early three years running.
+year_documented: 2034

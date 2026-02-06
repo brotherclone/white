@@ -1,0 +1,52 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This is the folk rock requiem for Gabriel Walsh''s erased 2006 - the counting
+  year that never was. In this lost timeline, Walsh became obsessed with documenting
+  disappearing bird calls at Hoyt Arboretum, developing an elaborate mathematical
+  memorial system while falling in love with Elena Morales, an OHSU environmental
+  scientist. The song embodies the melancholy of counterfactual nostalgia - mourning
+  a specific year that was taped over by quantum revision. Built around the 3/4 waltz
+  rhythm at 88 BPM that mirrors Elena''s data collection patterns and Walsh''s obsessive
+  counting rituals, the composition layers acoustic guitar fingerpicking with field
+  recordings of empty Portland forests. The pedal steel weeps through vintage tube
+  reverb like morning mist over the Willamette, while the mandolin carries Elena''s
+  whispered scientific nomenclature for vanished species. This isn''t cosmic drone
+  - it''s Springsteen-meets-Iron-&-Wine heartbreak, grounded in specific Portland
+  geography: the #20 bus route, Stumptown Coffee on Division, Elena''s apartment above
+  Bipartisan Cafe. The lap steel bends capture the ache of 347 hours of recorded silence,
+  the mathematical devotion that couldn''t save either the birds or the relationship.
+  By December 2006, Elena had moved to Monterey for research, leaving Walsh with incomplete
+  data and a broken memorial system. The song''s archaeological layers excavate this
+  erased domesticity - not galactic consciousness but the intimate tragedy of a man
+  who tried to count what was already disappearing, including his own timeline. Dedicated
+  to the 11 months that were taped over, and to Elena Morales, who exists only in
+  magnetic arrangements now.'
+genres:
+- folk rock
+- indie folk
+- americana
+- experimental folk
+iteration_id: counting_year_memorial_v1
+iteration_number: null
+key: A minor
+mood:
+- melancholic
+- nostalgic
+- devotional
+- archaeological
+- ritualistic
+- memorial
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 3
+timestamp: null
+title: The Counter of Empty Branches (Stumptown Requiem)

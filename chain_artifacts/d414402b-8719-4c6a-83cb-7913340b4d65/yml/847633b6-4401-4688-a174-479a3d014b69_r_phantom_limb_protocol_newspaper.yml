@@ -1,0 +1,84 @@
+artifact_id: 847633b6-4401-4688-a174-479a3d014b69
+artifact_name: phantom_limb_protocol_newspaper
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1988-12-04'
+file_name: 847633b6-4401-4688-a174-479a3d014b69_r_phantom_limb_protocol_newspaper.yml
+headline: Local Band's Final Performance Linked to Bizarre Medical Reports
+location: Wantage Township, NJ
+rainbow_color_mnemonic_character_value: R
+source: The Advertiser-News
+tags:
+- phantom limb syndrome
+- experimental music
+- unexplained phenomena
+- local music scene
+- medical mystery
+text: 'WANTAGE TOWNSHIP - Five teenagers who attended the final performance of experimental
+  rock band "Ghost Appendage" at the Wantage Community Center on November 19th have
+  reported identical symptoms to area physicians: persistent sensations in limbs they
+  never lost.
+
+
+  The band, comprised of 17-year-old Kevin Torrino (guitar), 16-year-old Sarah Delacroix
+  (synthesizer), and 18-year-old Marcus Chen (drums), performed what witnesses described
+  as an unusually intense 47-minute set featuring complex rhythmic patterns and electronic
+  frequencies not typical of local rock acts.
+
+
+  "They were playing in some weird time signature," said attendee Jennifer Walsh,
+  16, of Frankford. "It felt like the music was pulling at something inside you. My
+  left arm started tingling during the third song, and it hasn''t stopped."
+
+
+  Dr. Patricia Vance of Newton Memorial Hospital confirmed treating four patients
+  between ages 15-17 for "phantom limb sensations" following the concert. "These are
+  symptoms typically associated with amputees," Dr. Vance explained. "But these patients
+  have all their limbs intact. It''s medically unprecedented."
+
+
+  The affected teens report feeling distinct sensations - touch, movement, even pain
+  - in arms and legs that exist normally but somehow feel "displaced" or "not quite
+  there." Two have sought psychiatric evaluation.
+
+
+  Sussex County Sheriff''s Deputy Robert Kowalski investigated reports of drug use
+  at the venue but found no evidence of controlled substances. "Whatever happened
+  to these kids, it wasn''t chemical," Kowalski stated. "At least not anything we
+  can test for."
+
+
+  The band''s equipment, including a modified Moog synthesizer and digital delay units
+  described by witnesses as "homemade," disappeared from the community center the
+  night of the performance. Attempts to locate the three musicians have been unsuccessful.
+
+
+  Community Center director Helen Martz said the band paid their $50 rental fee in
+  cash and provided no contact information beyond first names. "They seemed like nice
+  kids," Martz recalled. "Very serious about their music. They kept talking about
+  ''phantom protocols'' and ''transmigration frequencies,'' but I figured that was
+  just teenage musician talk."
+
+
+  The affected concertgoers have formed an informal support group, meeting weekly
+  at the Wantage Township Library. According to librarian Dorothy Chen (no relation
+  to the missing drummer), the group spends hours discussing "impossible sensations"
+  and "bridging protocols between different states of being."
+
+
+  "They''re not delusional," Dr. Vance emphasized. "Their neurological responses are
+  genuine. Something triggered very real phantom limb syndrome in otherwise healthy
+  teenagers. We just don''t know what."
+
+
+  The case has attracted attention from researchers at Rutgers Medical School, who
+  plan to study the affected individuals. Meanwhile, the Wantage Community Center
+  has suspended all music bookings pending investigation.
+
+
+  Anyone with information about the whereabouts of Kevin Torrino, Sarah Delacroix,
+  or Marcus Chen is asked to contact the Sussex County Sheriff''s Office.'
+thread_id: d414402b-8719-4c6a-83cb-7913340b4d65

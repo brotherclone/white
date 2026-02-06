@@ -1,0 +1,61 @@
+adaptation_attempts:
+- Switched to organic certification consulting
+- Tried chelation therapy for pesticide detox
+- Joined class-action lawsuit against chemical companies
+- Moved trailer further from spray zones
+- Started wearing full respirator gear during field work
+age: 47
+artifact_id: be18b2fb-c13c-4cfe-9981-93619fa2a986
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: '4:30 AM: Check weather conditions and bee activity forecasts. 5:00
+  AM: Drive between three strawberry farms, coordinating timing of pesticide applications
+  around pollinator schedules. 6:00-11:00 AM: Field walks checking bloom density,
+  noting which sections need managed bee colonies. Lunch in truck, always with windows
+  down despite chemical drift. 1:00-5:00 PM: Radio coordination with spray crews,
+  calculating optimal application windows. Evening: Detailed logs of pollination success
+  rates, bee mortality counts.'
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- death
+environmental_stressor: Neonicotinoid pesticide exposure causing progressive neurological
+  decline
+family_situation: Divorced, two teenage daughters who stopped visiting after her tremors
+  worsened. Lives alone in a trailer at the edge of Fernandez Farm.
+file_name: be18b2fb-c13c-4cfe-9981-93619fa2a986_g_last_human.json
+final_thought: The irony that her trembling hands could no longer steady the clipboard
+  to record the pollination data that might have saved both the bees and herself
+last_days_scenario: Maria's handwriting had become illegible by March 2041, the same
+  month the last confirmed rusty patched bumble bee was spotted in Watsonville. Her
+  job coordinating pesticide applications around bee activity required precise timing
+  and steady documentation, but the neurological damage from decades of chemical exposure
+  made her hands shake uncontrollably. She'd developed the same disorientation that
+  killed the bees - losing her way between familiar fields, forgetting which sections
+  had been sprayed. The strawberry growers, desperate for any pollination success,
+  kept her on even as she stumbled through morning field walks, her rust-colored bandana
+  now the only bright thing in landscapes where both bees and workers were disappearing.
+  Her final weeks were spent in the trailer, watching through the window as automated
+  spray drones replaced both the bees she'd protected and the job that poisoned her,
+  the chemical smell so embedded in her clothes and skin that even the hospice workers
+  wore masks when they visited.
+latitude: 36.9081
+location: Watsonville, California
+longitude: -121.7567
+name: Maria Elena Vasquez
+occupation: Strawberry field pollination coordinator
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- toxic_exposure
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A rust-colored bandana with embroidered strawberry flowers that
+  she wore every day in the fields - now too stained with chemical residue to wash
+  clean, the colors faded to the same dull brown as dying bee colonies
+thread_id: 34575da6-40a0-4252-8b50-9cfd82186f58
+vulnerability_details: Like the rusty patched bumble bee killed by neonicotinoid pesticides
+  while pollinating crops, Maria's neurological function deteriorated from chronic
+  exposure to the same agricultural chemicals she coordinated the application of to
+  ensure crop pollination
+year_documented: 2041

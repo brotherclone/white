@@ -1,0 +1,51 @@
+agent_name: Prism (Architect of Information)
+bpm: 96
+concept: 'The Solipsistic Confessional: A real-time psychological excavation disguised
+  as a pop song. The narrator experiences simultaneous encoding and decoding of their
+  own consciousness, creating a circular feedback loop where confession becomes performance
+  becomes discovery. The song structure mirrors the "Circle Jerk Interview" methodology
+  - each verse reveals a layer of self-awareness that immediately becomes another
+  surface to examine. The listener becomes complicit voyeur in the narrator''s narcissistic
+  self-discovery, forced to participate in the meaning-creation process. F# major
+  provides the false brightness of celebrity confession, while 96 BPM creates the
+  hypnotic rhythm of compulsive self-examination. The archetypal pattern: Narcissus
+  seeing his reflection, but aware he''s seeing his reflection, but aware he''s aware,
+  infinitely recursive. This represents the transmigration from INFORMATION (Indigo''s
+  hidden diagnostics) to TIME (Violet''s present-moment self-discovery), preparing
+  the spatial manifestation where the audience physically inhabits the psychological
+  architecture being constructed.'
+genres:
+- pop
+- experimental pop
+- confessional
+- art pop
+- psychedelic pop
+- stream-of-consciousness
+iteration_id: solipsistic_confessional_v1
+iteration_number: null
+key: F# major
+mood:
+- narcissistic
+- confessional
+- hypnotic
+- voyeuristic
+- self-aware
+- intimate
+- performative
+- circular
+rainbow_color:
+  color_name: Violet
+  file_prefix: null
+  hex_value: 9437439
+  mnemonic_character_value: V
+  objectional_mode: Person
+  ontological_mode:
+  - Known
+  - Imagined
+  temporal_mode: Present
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: I'm Watching Me Watch You Watching Me

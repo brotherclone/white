@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Annotated
+from typing import Any, Dict, List, Optional, Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -8,6 +8,18 @@ from app.structures.enums.white_facet import WhiteFacet
 from app.structures.manifests.song_proposal import SongProposal
 from app.structures.artifacts.artifact_relationship import ArtifactRelationship
 from app.structures.agents.base_rainbow_agent_state import dedupe_artifacts
+
+
+def merge_document_syntheses(
+    old: Dict[str, str],
+    new: Dict[str, str],
+) -> Dict[str, str]:
+    """Merge document syntheses dicts, new values take precedence."""
+    if not new:
+        return old or {}
+    if not old:
+        return new
+    return {**old, **new}
 
 
 def dedupe_traces(
@@ -70,6 +82,12 @@ class MainAgentState(BaseModel):
     # White Agent working variables (per-agent rebracketing)
     rebracketing_analysis: Annotated[Optional[str], lambda x, y: y or x] = None
     document_synthesis: Annotated[Optional[str], lambda x, y: y or x] = None
+
+    # Per-agent document syntheses for aggregation in finalization
+    # Keys are agent names (e.g., "BLACK", "RED", "ORANGE")
+    agent_document_syntheses: Annotated[Dict[str, str], merge_document_syntheses] = (
+        Field(default_factory=dict)
+    )
 
     meta_rebracketing: Annotated[Optional[str], lambda x, y: y or x] = (
         None  # The interference pattern across all seven lenses

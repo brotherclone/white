@@ -1,0 +1,262 @@
+artifact_id: cc29ff00-de82-4710-8b0a-36b962bf568c
+artifact_name: millbrook_year_timeline
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Gabriel's parents separated temporarily due to his father's drinking,
+    and his mother couldn't handle raising him alone while working two jobs. Instead
+    of staying in their hometown, Gabriel was sent to live with his Aunt Patricia
+    and Uncle Frank in rural Millbrook, New York.
+  when: December 1982
+  why_plausible: Family separations were common in the early 1980s recession, and
+    sending children to live with relatives during difficult times was a typical working-class
+    solution. Millbrook is a real small town in Dutchess County, New York, where many
+    families had extended networks.
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- bittersweet
+file_name: cc29ff00-de82-4710-8b0a-36b962bf568c_b_millbrook_year_timeline.yml
+following_events:
+- Parents reconciled in January 1984 and Gabriel returned home
+- Maintained lifelong correspondence with Uncle Frank about music
+- Developed lasting interest in wildlife rehabilitation
+- Carried forward self-reliance skills that affected future relationships
+- Retained deep connection to rural landscapes in later artistic work
+key_differences:
+- Lived in rural small-town environment instead of suburban setting
+- Attended a one-room schoolhouse-style elementary school with mixed grades
+- Developed deep connection to nature and wildlife rehabilitation
+- Learned Polish folk traditions from Uncle Frank
+- Experienced profound sense of abandonment and temporary family displacement
+- Became more self-reliant and independent at an earlier age
+- Developed different social skills in small-town environment
+mood_description: The tape hums with the particular loneliness of borrowed time -
+  the ache of loving people you know you'll have to leave, the way temporary homes
+  can feel more real than permanent ones. There's the smell of Murphy's Oil Soap and
+  the wheeze of an old accordion, the sound of a school bus turning around in gravel
+  driveways, the weight of secrets carried in small hands. It's the melancholy of
+  almost-belonging, of learning that love can be conditional and geography can be
+  temporary, but also the surprising comfort of discovering you can adapt, you can
+  survive, you can even thrive in the spaces between your real life.
+narrative: 'The cassette tape crackles with the ghost of that other year, when eight-year-old
+  Gabriel lived in the white farmhouse at 47 Shunpike Road, where the mourning doves
+  called from the oak trees every dawn and Uncle Frank''s accordion wheezed Polish
+  polkas through Sunday dinners.
+
+
+  It was December 1982 when his mother''s voice broke over the phone, telling Aunt
+  Patricia she couldn''t do it alone anymore - not with two jobs and the bills piling
+  up and Gabriel''s father drinking himself to sleep above Kowalski''s Tavern. So
+  Gabriel packed his Transformers and his winter clothes into a brown Samsonite suitcase
+  and rode the Trailways bus north to Millbrook, watching the world turn white and
+  rural through fogged windows.
+
+
+  The Kowalski house smelled like coffee and Murphy''s Oil Soap, and Aunt Patricia
+  had soft hands that braided his hair wrong for school pictures. Uncle Frank worked
+  nights at the IBM plant in Poughkeepsie and slept until noon, so mornings were quiet
+  except for the radio playing low in the kitchen and the sound of Patricia''s slippers
+  shuffling across linoleum.
+
+
+  At Millbrook Elementary, Mrs. Eleanor Hartwell taught third grade in a classroom
+  that still had the old-fashioned pull-down maps and a radiator that clanked like
+  a ghost in chains. Gabriel sat in the third row, next to a girl named Susan McCarthy
+  who always smelled like her mother''s Aqua Net hairspray. He learned to raise his
+  hand higher here, learned that his stories about dragons and kingdoms could make
+  the younger kids lean forward during Friday story time.
+
+
+  Every Tuesday after school, he walked the two miles down Route 44 to Thorne''s Corner
+  Store, past the Brennan''s Hardware and the Methodist church with its white steeple.
+  Old Mr. Thorne had rheumy eyes and let Gabriel read the comic books for free if
+  he bought five cents worth of penny candy - usually root beer barrels that lasted
+  the whole walk home. The store smelled like dust and old wood, and Mr. Thorne would
+  tell him stories about the town when it was smaller, when there were still working
+  farms on every road.
+
+
+  In April, Gabriel found an injured crow in the woods behind the house, its wing
+  bent wrong against a fallen branch. He carried it home in his jacket and made a
+  hospital in a cardboard box, feeding it scraps of Uncle Frank''s kielbasa and drops
+  of water from his finger. Aunt Patricia said it would probably die, but Gabriel
+  read to it from his library books - Watership Down and The Dark Crystal novelization
+  - and after three weeks the crow''s wing healed straight. He named it Merlin and
+  it would come to the kitchen window every morning, cawing until Gabriel came out
+  with breakfast scraps.
+
+
+  Uncle Frank taught him accordion on Sundays, his tobacco-stained fingers guiding
+  Gabriel''s small hands across the mother-of-pearl keys. The red Hohner was heavy
+  across Gabriel''s lap, and the bellows wheezed when he pushed too hard, but slowly
+  he learned "The Pennsylvania Polka" and "Roll Out the Barrel." Frank would nod and
+  tap his foot, and sometimes Aunt Patricia would dance around the kitchen while Gabriel
+  played, her house dress swirling around her ankles.
+
+
+  Summer meant fireflies in Mason jars and sleeping on the screened porch when the
+  house got too hot. Gabriel became friends with Jimmy Brennan, whose father owned
+  the hardware store, and they spent July afternoons building forts in the woods and
+  catching crayfish in Wappinger Creek. On the Fourth of July, they climbed up on
+  the roof of Brennan''s Hardware to watch fireworks, and Gabriel could see all the
+  way to the Taconic Hills, purple in the distance like something from one of his
+  imaginary kingdoms.
+
+
+  But it was Thanksgiving when Gabriel understood he might never go home. Uncle Frank
+  played "Edelweiss" on his accordion after dinner, and Aunt Patricia cried a little
+  into her coffee cup, and Gabriel realized that the phone calls with his mother had
+  gotten shorter and less frequent. He started writing letters to his parents that
+  he never sent, hiding them in the space between his mattress and box spring, where
+  they stayed until January when his mother finally called to say his father was sober
+  now, they were back together, Gabriel could come home.
+
+
+  The tape remembers the sound of his suitcase latches clicking shut, the way Merlin
+  cawed from the oak tree as the Trailways bus pulled away, how Uncle Frank''s accordion
+  case looked smaller and smaller through the rear window. Gabriel carried something
+  different back with him - a knowledge of how quickly home could disappear, how families
+  could scatter like leaves, how you could learn to belong somewhere else if you had
+  to.
+
+
+  In the alternate timeline, this year of displacement taught him self-reliance that
+  would echo through every relationship afterward, every creative project, every decision
+  to stay or go. The boy who returned was quieter, more watchful, carrying the weight
+  of temporary love and the sound of mourning doves calling across empty fields.'
+period:
+  age_range: !!python/tuple
+  - 8
+  - 8
+  creative_output:
+  - Hand-drawn maps of imaginary kingdoms
+  - Letters to parents never sent
+  - A collection of pressed leaves with invented stories
+  description: The year Gabriel lived with his Aunt Patricia in Millbrook, New York,
+    after his parents' temporary separation
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: bittersweet
+  end_date: 1983-12-31
+  is_forgotten: false
+  key_relationships:
+  - Aunt Patricia Walsh
+  - Uncle Frank Kowalski
+  - Cousin Danny Kowalski
+  - Mrs. Eleanor Hartwell (teacher)
+  - Jimmy Brennan (neighbor boy)
+  known_events:
+  - approximate_date: null
+    category: education
+    date: 1983-02-14
+    description: Gabriel's first day at Millbrook Elementary, where he was placed
+      in Mrs. Hartwell's third-grade class
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: personal
+    date: 1983-04-22
+    description: Found an injured crow in the woods behind the Kowalski house on Shunpike
+      Road, nursed it back to health in a cardboard box
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: friendship
+    date: 1983-07-04
+    description: Watched fireworks from the roof of Brennan's Hardware Store with
+      Jimmy, could see all the way to the Taconic Hills
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: routine
+    date: 1983-09-15
+    description: Started walking the two miles to Thorne's Corner Store every Tuesday
+      after school to buy penny candy and comic books
+    emotional_weight: 0.5
+    tags: []
+    year: null
+  - approximate_date: null
+    category: family
+    date: 1983-11-28
+    description: Thanksgiving dinner where Uncle Frank played his accordion and Gabriel
+      realized he might never go home
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  location: Millbrook, New York
+  primary_activity: Living with extended family, attending new school
+  start_date: 1983-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Parents had increasing arguments about money and father's drinking
+- Mother took second job at Kmart to make ends meet
+- Gabriel overheard late-night phone calls between his mother and Aunt Patricia
+- Father moved out to apartment above Kowalski's Tavern in December 1982
+- Mother realized she couldn't manage work and childcare alone
+rainbow_color_mnemonic_character_value: B
+specific_details:
+- category: location
+  detail: The Kowalski house at 47 Shunpike Road had a wraparound porch where Gabriel
+    would sit every morning at 6:30 AM, watching for the school bus and listening
+    to the mourning doves in the oak trees
+  sensory_elements:
+  - creaking porch boards
+  - coffee smell from kitchen
+  - mourning dove calls
+  - morning mist over fields
+- category: daily_routine
+  detail: Every Tuesday after school, Gabriel walked the two miles down Route 44 to
+    Thorne's Corner Store, where old Mr. Thorne would let him read comic books for
+    free if he bought at least a nickel's worth of penny candy
+  sensory_elements:
+  - gravel crunching underfoot
+  - bell jingling on store door
+  - musty smell of old magazines
+  - taste of root beer barrels
+- category: relationship
+  detail: Uncle Frank taught Gabriel to play simple polkas on his red Hohner accordion
+    every Sunday after dinner, and Gabriel's small fingers could barely stretch across
+    the keys
+  sensory_elements:
+  - wheeze of bellows
+  - smooth mother-of-pearl keys
+  - Frank's tobacco-stained fingers guiding his hands
+  - sound echoing off kitchen walls
+- category: creative
+  detail: Gabriel created detailed maps of imaginary kingdoms on the backs of Uncle
+    Frank's old insurance forms, using different colored pencils he found in Aunt
+    Patricia's sewing box
+  sensory_elements:
+  - scratch of pencil on carbon paper
+  - waxy smell of colored pencils
+  - Patricia's lavender sachets in the sewing box
+  - afternoon light through lace curtains
+- category: outcome
+  detail: The injured crow Gabriel nursed back to health in April 1983 would return
+    to the backyard every morning for months, and Gabriel named it Merlin after the
+    wizard in the King Arthur stories Mrs. Hartwell read to the class
+  sensory_elements:
+  - crow's distinctive caw
+  - flutter of black wings
+  - scratch of claws on windowsill
+  - musty smell of the cardboard box hospital
+- category: career
+  detail: Mrs. Eleanor Hartwell, his third-grade teacher at Millbrook Elementary,
+    encouraged Gabriel's storytelling by having him read his adventure stories aloud
+    to the younger students during Friday afternoon story time
+  sensory_elements:
+  - chalk dust in afternoon sunbeams
+  - children sitting cross-legged on worn carpet
+  - Mrs. Hartwell's encouraging nods
+  - sound of his own voice gaining confidence
+specificity_score: 0.9
+thread_id: 136919aa-c350-41aa-af7b-0ab538ae2cff
+title: The Millbrook Year

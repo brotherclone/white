@@ -1,0 +1,91 @@
+artifact_id: 99211e99-f6ed-4831-a61c-651a6dc8d02f
+artifact_name: sparta_band_incident_1980
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1980-04-08'
+file_name: 99211e99-f6ed-4831-a61c-651a6dc8d02f_r_sparta_band_incident_1980.yml
+headline: Local Band's Practice Sessions Linked to String of Teen Behavioral Episodes
+location: Sparta Township, NJ
+rainbow_color_mnemonic_character_value: R
+source: Newton Register
+tags:
+- local music
+- youth behavior
+- unexplained phenomena
+- mental health
+- consciousness alteration
+text: 'SPARTA TOWNSHIP - Sussex County authorities are investigating a series of incidents
+  involving local teenagers that appear connected to practice sessions held by an
+  experimental rock band calling itself "Parametric Autonomy."
+
+
+  The band, comprised of four Sparta High School students, has been rehearsing in
+  an abandoned barn on Woodport Road since February. According to police reports,
+  at least seven teenagers have been treated at Newton Memorial Hospital for what
+  Dr. Margaret Hensley describes as "dissociative episodes" following exposure to
+  the group''s music.
+
+
+  "These kids aren''t on drugs," said Dr. Hensley, who has treated five of the cases.
+  "Blood work comes back clean every time. But they''re exhibiting symptoms consistent
+  with altered consciousness states - time distortion, difficulty with decision-making,
+  and what they describe as ''hearing choices'' in everyday sounds."
+
+
+  The incidents began in early March when 16-year-old Jennifer Walsh was found by
+  her parents sitting motionless in their driveway at 3 AM, apparently having been
+  there for hours. Walsh told police she had attended a Parametric Autonomy practice
+  session and afterward felt "stuck between wanting to go inside and wanting to stay
+  outside, so I just... chose neither."
+
+
+  Similar cases followed. Teenagers reported becoming paralyzed by simple decisions
+  - which door to enter, which foot to step with first, whether to speak or remain
+  silent. Most described the sensation as "hearing the pause between the beats" or
+  feeling like "every seventh second was a choice point."
+
+
+  Band leader Marcus Chen, 17, maintains the group is simply exploring "constraint-based
+  composition." Their music, he explains, adheres strictly to F minor at 72 beats
+  per minute in 7/8 time signature, with the seventh beat of each measure left deliberately
+  open.
+
+
+  "We''re not trying to mess with anyone''s head," Chen said. "We just play the rules
+  perfectly and let the silence decide what happens next."
+
+
+  The band''s unusual approach has drawn attention from Dr. Robert Fitzgerald, a psychiatry
+  professor at Rutgers who specializes in music therapy. Fitzgerald visited one practice
+  session and described experiencing "a profound sense of interpretive freedom within
+  rigid constraints."
+
+
+  "It''s as if the music creates a space where consciousness recognizes its own agency,"
+  Fitzgerald noted in his preliminary report. "The listeners aren''t losing control
+  - they''re discovering they have more control than they realized."
+
+
+  Police Chief Donald Kramer has not banned the practices but has requested the band
+  limit attendance to band members only. "We''re not dealing with criminal behavior
+  here," Kramer said. "But when kids start showing up at the emergency room talking
+  about ''choosing how to follow time,'' we have to take precautions."
+
+
+  The band''s practice schedule remains irregular, with sessions occurring "when the
+  constraint calls for it," according to bassist Sarah Novak. The group has not performed
+  publicly and has no plans to record their material.
+
+
+  Parents are advised to monitor their teenagers for signs of decision paralysis or
+  reports of "hearing pauses in regular sounds." Anyone experiencing prolonged episodes
+  should contact Newton Memorial Hospital immediately.
+
+
+  The barn on Woodport Road remains accessible to the public, though several visitors
+  have reported feeling "temporally displaced" after spending time in the structure,
+  even when no music is being played.'
+thread_id: 21b4d29b-d564-4db7-881e-f0ffd7a3cc22

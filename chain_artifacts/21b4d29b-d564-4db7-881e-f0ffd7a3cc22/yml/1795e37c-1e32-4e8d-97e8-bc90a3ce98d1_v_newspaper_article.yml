@@ -1,0 +1,19 @@
+artifact_id: 1795e37c-1e32-4e8d-97e8-bc90a3ce98d1
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A mechanical metronome found abandoned in the barn on Woodport Road,
+  permanently stuck at exactly 72 beats per minute with its seventh tick producing
+  no sound—only a profound silence that listeners describe as "hearing the choice
+  being made." This object embodies the story's central theme of parametric autonomy,
+  where consciousness discovers interpretive freedom within rigid temporal constraints,
+  transforming mechanical time-keeping into moments of sovereign decision.
+file_name: 1795e37c-1e32-4e8d-97e8-bc90a3ce98d1_v_newspaper_article.yml
+name: The Woodport Road Metronome
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: 21b4d29b-d564-4db7-881e-f0ffd7a3cc22
