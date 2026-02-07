@@ -18,10 +18,18 @@ import yaml
 
 def find_intermediate_files(base_path: str):
     """Find segment and blended WAV files in chain_artifacts."""
-    segment_pattern = os.path.join(base_path, "*/audio/segment_*.wav")
-    blended_pattern = os.path.join(base_path, "*/audio/blended*.wav")
-    segments = sorted(glob.glob(segment_pattern))
-    blended = sorted(glob.glob(blended_pattern))
+    # Check both audio/ and wav/ subdirs; filenames are {uuid}_z_segment_{n}.wav
+    segment_files = []
+    blended_files = []
+    for subdir in ("audio", "wav"):
+        segment_files.extend(
+            glob.glob(os.path.join(base_path, f"*/{subdir}/*_segment_*.wav"))
+        )
+        blended_files.extend(
+            glob.glob(os.path.join(base_path, f"*/{subdir}/blended*.wav"))
+        )
+    segments = sorted(segment_files)
+    blended = sorted(blended_files)
     return segments, blended
 
 
