@@ -18,6 +18,7 @@ Example: Song with guitar, vocals, fiddle and 10 lyric segments:
 
 import logging
 import os
+import tempfile
 from pathlib import Path
 from typing import List, Optional, Dict
 
@@ -28,6 +29,7 @@ from pydantic import BaseModel, Field
 
 from app.util.audio_io import load_audio
 from app.util.manifest_loader import load_manifest
+from app.util.midi_segment_utils import segment_midi_file
 from app.util.timestamp_audio_extractor import (
     create_segment_specs_from_lrc,
     create_segment_specs_from_structure,
@@ -660,15 +662,29 @@ def embed_audio_and_midi_binaries(
         audio_waveforms.append(audio_waveform)
         audio_sample_rates.append(sr if sr else sample_rate)
 
-        # Load MIDI file as binary
+        # Load and segment MIDI file to match audio time range
         midi_binary = None
 
         if row["has_midi"] and row["midi_file"]:
             try:
                 midi_file = Path(row["midi_file"])
                 if midi_file.exists():
-                    with open(midi_file, "rb") as f:
-                        midi_binary = f.read()
+                    with tempfile.NamedTemporaryFile(
+                        suffix=".mid", delete=False
+                    ) as tmp:
+                        tmp_path = tmp.name
+                    success = segment_midi_file(
+                        str(midi_file),
+                        row["start_seconds"],
+                        row["end_seconds"],
+                        tmp_path,
+                    )
+                    if success:
+                        with open(tmp_path, "rb") as f:
+                            midi_binary = f.read()
+                    else:
+                        logger.warning(f"MIDI segmentation failed for row {i}")
+                    os.unlink(tmp_path)
                 else:
                     logger.debug(f"MIDI file not found: {midi_file}")
             except Exception as e:
