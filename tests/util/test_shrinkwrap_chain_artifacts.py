@@ -292,6 +292,7 @@ class TestGenerateDirectoryName:
 
 
 class TestFindDebugFiles:
+    # ToDo: Failing
     def test_finds_debug_files(self, tmp_path):
         thread_dir = make_thread(tmp_path, "c59be431-6527-4424-83fd-4dea6a83edf5")
         found = find_debug_files(thread_dir)
@@ -341,6 +342,7 @@ class TestCopyThreadFiles:
         assert counts["skipped_debug"] == 0
         assert (dest / ".debug").exists()
 
+    # ToDo: Failing
     def test_skips_evp_intermediates(self, tmp_path):
         source = make_thread(
             tmp_path / "source", "c59be431-6527-4424-83fd-4dea6a83edf5"
@@ -351,7 +353,6 @@ class TestCopyThreadFiles:
 
         counts = copy_thread_files(source, dest, include_debug=False)
         assert counts["skipped_evp"] == 4
-        # Verify none of the segment/blended files were copied
         for f in (dest / "wav").iterdir():
             assert "_segment_" not in f.name
             assert not f.name.startswith("blended")
