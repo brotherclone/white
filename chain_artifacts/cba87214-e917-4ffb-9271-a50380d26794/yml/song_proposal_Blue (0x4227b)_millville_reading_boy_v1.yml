@@ -1,0 +1,54 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 94
+concept: 'This song excavates the quantum archaeology of a year that never was - the
+  Millville timeline where six-year-old Gabriel learned to read while his parents''
+  marriage dissolved in another state. The folk rock arrangement mirrors the gentle
+  displacement of childhood resilience: acoustic guitar fingerpicking like pages turning,
+  mandolin bright as morning walks past Acme and Woolworth''s, lap steel weeping like
+  a grandmother''s worry. The 94 BPM tempo captures the measured pace of a small New
+  Jersey town in 1981, while C major provides the innocent clarity of a child discovering
+  that letters become words become worlds. This represents the INFORMATION → TIME
+  transmigration in reverse: temporal experience (the lost year at 47 Vine Street)
+  crystallizing into pure narrative data (hand-drawn Reading Boy comics, Mrs. Hendricks''
+  pearl buttons, Tommy Benedetto''s Matchbox cars). The song structure follows the
+  school year rhythm - verses for each season of displacement, chorus as the recurring
+  comfort of the Holly Glen Elementary library. Field recordings of chain-link fence
+  rattling, slippers on linoleum, create presence-through-absence for this timeline
+  that was taped over. The final harmonica solo carries the weight of counterfactual
+  nostalgia - mourning not just what was lost, but what was never allowed to be lost
+  because it never happened. This is infrastructure maintenance for erased childhoods,
+  keeping the structural patterns of alternate innocence alive in magnetic memory.'
+genres:
+- folk rock
+- americana
+- indie folk
+- singer-songwriter
+- roots rock
+iteration_id: millville_reading_boy_v1
+iteration_number: null
+key: C major
+mood:
+- wistful
+- nostalgic
+- melancholic
+- tender
+- displaced
+- bittersweet
+- contemplative
+- innocent
+- longing
+- grounded
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 270971
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: When Reading Was Fundamental (Millville, 1981)

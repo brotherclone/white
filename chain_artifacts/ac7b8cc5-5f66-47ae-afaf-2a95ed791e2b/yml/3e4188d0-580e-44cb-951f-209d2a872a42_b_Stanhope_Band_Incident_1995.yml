@@ -1,0 +1,91 @@
+artifact_id: 3e4188d0-580e-44cb-951f-209d2a872a42
+artifact_name: Stanhope_Band_Incident_1995
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1995-09-19'
+file_name: 3e4188d0-580e-44cb-951f-209d2a872a42_b_Stanhope_Band_Incident_1995.yml
+headline: Local Band's Recording Session Ends in Psychiatric Emergency
+location: Stanhope, NJ
+rainbow_color_mnemonic_character_value: B
+source: Sussex County Courier
+tags:
+- local music
+- mental health
+- unexplained phenomena
+- youth
+- recording studio
+text: 'STANHOPE - A recording session at Hopatcong Sound Studios ended abruptly Sunday
+  evening when three members of local rock band "Paternal Echo" were hospitalized
+  following what witnesses described as a "synchronized psychological episode."
+
+
+  The incident occurred around 8:30 PM as the five-member band was recording their
+  debut album. According to studio owner Frank Kowalski, the band had been experimenting
+  with an unusual time signature - seven beats over eight - when drummer Marcus Delacroix,
+  19, bassist Jennifer Huang, 17, and guitarist Tommy Castellano, 18, simultaneously
+  began exhibiting signs of severe disorientation.
+
+
+  "They just stopped playing mid-song and started staring at each other," said Kowalski.
+  "Marcus kept saying ''I can hear my father in the drums'' over and over. The other
+  two were just nodding like they understood exactly what he meant."
+
+
+  Lead singer David Chen, 20, and keyboardist Sarah Brennan, 19, were unaffected and
+  called for medical assistance. All three hospitalized members were treated at Newton
+  Medical Center and released Monday morning with no lasting effects.
+
+
+  Dr. Margaret Voss, attending psychiatrist, declined to discuss specific details
+  but confirmed that all three patients reported "auditory phenomena" during the episode.
+  She noted that such synchronized psychological events are "extremely rare" and typically
+  associated with shared trauma or substance use.
+
+
+  However, toxicology reports came back negative for all three band members. Studio
+  equipment showed no technical malfunctions, though Kowalski noted that the band''s
+  recording exhibited "some very strange acoustic properties" he had never encountered
+  in fifteen years of operation.
+
+
+  "When I played back their session tape, the drums sounded like they were coming
+  from inside my head," Kowalski said. "And there were these harmonics that shouldn''t
+  have been there - like the instruments were generating their own echoes."
+
+
+  The band had been working on a concept album exploring themes of "musical genealogy"
+  and "sound as inheritance," according to Chen. Their song "I Felt Father More Father"
+  was reportedly the piece being recorded when the incident occurred.
+
+
+  Paternal Echo formed six months ago and had gained a following in the local underground
+  music scene for their experimental approach to rhythm and their use of what they
+  called "recursive compositions" - songs that seemed to reference and build upon
+  themselves.
+
+
+  The band''s equipment remains at the studio while police investigate whether any
+  external factors contributed to the incident. Detective Ray Morrison noted that
+  several residents in the area reported hearing "unusual drumming patterns" emanating
+  from the studio that evening, though the building is supposedly soundproofed.
+
+
+  "We''ve had three separate calls about people hearing rhythms that made them feel
+  ''emotionally disoriented,''" Morrison said. "That''s not typical for a noise complaint."
+
+
+  The affected band members have no memory of the episode itself, according to their
+  families. All three have requested to return to the studio to complete the recording,
+  though Kowalski has not yet decided whether to allow this.
+
+
+  The master tape of their interrupted session has been secured as evidence, though
+  officials have not specified what crime, if any, might have been committed.
+
+
+  Paternal Echo was scheduled to perform at the Sparta Township Fall Festival next
+  month. Event organizers have not announced whether the band will still appear.'
+thread_id: ac7b8cc5-5f66-47ae-afaf-2a95ed791e2b

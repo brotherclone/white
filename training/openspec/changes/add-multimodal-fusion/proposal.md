@@ -44,101 +44,61 @@ Add three modality encoders with multi-pronged lyric representation:
 - Melodic contour (stepwise vs leaps)
 - Harmonic progression patterns
 
-### 3. Lyric Encoder (Three-Pronged)
+### 3. Text Encoder (Existing DeBERTa)
 
-This is the key innovation - capture lyrics at three levels:
-
-#### 3a. Semantic Encoding (What It Means)
+Reuses the existing DeBERTa-v3 text encoder from Phases 1-4:
 ```python
-semantic_emb = deberta_model(lyrics_text)  # [batch, 768]
+text_emb = deberta_model(lyrics_text)  # [batch, 768]
 ```
-- Existing DeBERTa-v3 text encoder
 - Captures vocabulary, themes, conceptual content
 - Example: "spatial" "place" "geography" → GREEN
+- For instrumental segments (no lyrics): zero tensor with modality mask=False
 
-#### 3b. Prosodic Encoding (How It's Delivered)
-```python
-# Requires forced alignment (Montreal Forced Aligner, Gentle)
-alignment = forced_aligner(audio, lyrics_text, midi)
-
-prosodic_features = extract_prosody(alignment):
-    - pitch_contour_per_syllable: [N_syllables, 3]  # mean, std, range
-    - note_duration_per_phoneme: [N_phonemes, 1]
-    - stress_pattern_matching: [N_words, 1]  # does pitch align with stress?
-    - melisma_detection: [N_syllables, 1]  # single note vs multiple
-    - legato_vs_staccato: [N_phrases, 1]  # note overlap with next syllable
-    
-prosodic_emb = mlp(prosodic_features)  # [batch, 256]
-```
-
-**Chromatic implications**:
-- GREEN: Sustained notes on place names, legato phrasing, sparse syllables
-- RED: Rapid syllabic delivery, staccato, syncopation
-- VIOLET: Rubato, unexpected pitch leaps, metric modulation
-
-#### 3c. Structural Encoding (Form/Rhythm)
-```python
-# No alignment needed - just counting
-structural_features = {
-    'notes_per_syllable': len(midi_notes) / syllable_count,
-    'melisma_ratio': melismatic_notes / total_notes,
-    'syllabic_density': syllables_per_measure,
-    'rhythmic_alignment': onset_sync_score,  # syllable onsets match beat grid?
-    'phrase_length_variance': std(phrase_lengths),
-    'repetition_ratio': repeated_phrases / total_phrases,
-}
-
-structural_emb = mlp(structural_features)  # [batch, 128]
-```
-
-**Combined Lyric Embedding**:
-```python
-lyric_emb = concat([semantic_emb, prosodic_emb, structural_emb])  # [batch, 768+256+128=1152]
-```
+**Future extension**: Prosodic and structural lyric encoding (see `add-prosodic-lyric-encoding` change) can replace this with a richer `[batch, 1152]` representation once Phase 3.1/3.2 results validate the approach.
 
 ### 4. Multimodal Fusion
 
 **Fusion Strategy Options**:
 
-#### Early Fusion (Recommended for Phase 3)
+#### Late Fusion / Concatenation (Recommended for Phase 3)
 ```python
-class EarlyFusionModel(nn.Module):
+class ConcatFusionModel(nn.Module):
     def __init__(self):
-        self.audio_encoder = Wav2Vec2Encoder()  # → [batch, 768]
-        self.midi_encoder = PianoRollEncoder()  # → [batch, 512]
-        self.lyric_encoder = ThreeProngLyricEncoder()  # → [batch, 1152]
-        
+        self.audio_encoder = Wav2Vec2Encoder()     # → [batch, 768]
+        self.midi_encoder = PianoRollEncoder()      # → [batch, 512]
+        self.text_encoder = DeBERTaEncoder()        # → [batch, 768]
+
         # Concatenate all modalities
         self.fusion = nn.Sequential(
-            nn.Linear(768 + 512 + 1152, 1024),
+            nn.Linear(768 + 512 + 768, 1024),
             nn.ReLU(),
             nn.Dropout(0.3),
             nn.Linear(1024, 512)
         )
-        
+
         # Reuse existing Phase 4 heads
         self.temporal_head = RegressionHead(512, 3)
         self.spatial_head = RegressionHead(512, 3)
         self.ontological_head = RegressionHead(512, 3)
-    
-    def forward(self, audio, midi, lyrics_text, lyrics_prosody, lyrics_structure):
-        audio_emb = self.audio_encoder(audio)
-        midi_emb = self.midi_encoder(midi)
-        
-        # Three-pronged lyric encoding
-        semantic = self.deberta(lyrics_text)
-        prosodic = self.prosody_mlp(lyrics_prosody)
-        structural = self.structure_mlp(lyrics_structure)
-        lyric_emb = torch.cat([semantic, prosodic, structural], dim=-1)
-        
+
+    def forward(self, audio, midi, text, modality_mask):
+        audio_emb = self.audio_encoder(audio)   # zeroed if mask[audio]=False
+        midi_emb = self.midi_encoder(midi)       # zeroed if mask[midi]=False
+        text_emb = self.text_encoder(text)       # zeroed if mask[text]=False
+
+        # Apply modality mask (zero out absent modalities)
+        audio_emb = audio_emb * modality_mask[:, 1:2]  # audio
+        midi_emb = midi_emb * modality_mask[:, 2:3]     # midi
+        text_emb = text_emb * modality_mask[:, 0:1]     # text
+
         # Fuse all modalities
-        fused = self.fusion(torch.cat([audio_emb, midi_emb, lyric_emb], dim=-1))
-        
+        fused = self.fusion(torch.cat([audio_emb, midi_emb, text_emb], dim=-1))
+
         # Predict ontological distributions
         temporal = self.temporal_head(fused)
         spatial = self.spatial_head(fused)
         ontological = self.ontological_head(fused)
-        
+
         return temporal, spatial, ontological
 ```
 
@@ -159,76 +119,87 @@ class CrossAttentionFusion(nn.Module):
 
 ## Implementation Phases
 
+### Prerequisites
+- `prepare-multimodal-data` change must be complete (text embeddings, coverage verification)
+
 ### Phase 3.1: Audio + MIDI (No Lyrics)
 - Add audio encoder (Wav2Vec2)
 - Add MIDI encoder (piano roll CNN)
-- Early fusion
+- Late fusion (concatenate embeddings) with modality mask
 - Retrain Phase 4 regression heads
 - **Goal**: Fix spatial mode accuracy for instrumental tracks
 
-### Phase 3.2: Add Semantic Lyrics
-- Add DeBERTa encoder (already exists)
-- Concat with audio/MIDI
+### Phase 3.2: Add Semantic Text
+- Wire existing DeBERTa encoder into fusion model
+- Three-modality late fusion: audio + MIDI + text
 - **Goal**: Improve overall accuracy with text context
 
-### Phase 3.3: Add Prosodic Lyrics
-- Set up forced alignment pipeline (Montreal Forced Aligner)
-- Extract prosodic features from alignment
-- Add prosody MLP
-- **Goal**: Capture vocal delivery style (GREEN legato vs RED staccato)
-
-### Phase 3.4: Add Structural Lyrics
-- Extract syllable counts, rhythmic stats
-- Add structure MLP
-- **Goal**: Capture phrasing patterns, rhythmic density
+### Future: Prosodic + Structural Lyrics
+See `add-prosodic-lyric-encoding` change (deferred until Phase 3.1/3.2 results validate the approach).
 
 ## Dataset Updates
 
-Current: `rainbow_table_segments.parquet` has:
-- `segment_id`, `concept_text`, `album`, `temporal_mode`, `spatial_mode`, `ontological_mode`
+### Current State (as of 2026-02-07)
 
-**Need to add**:
+The extraction pipeline was re-run on 2026-02-06 after MIDI bug fixes. Data now lives in two split files:
+
+| File | Rows | Purpose |
+|------|------|---------|
+| `training/data/training_segments_metadata.parquet` | 10,544 | All columns except binary blobs (fast queries) |
+| `training/data/training_segments_media.parquet` | 10,544 | Full columns including `audio_waveform` and `midi_binary` |
+
+**Coverage**:
+| Modality | Segments | % of total | Notes |
+|----------|----------|------------|-------|
+| Audio (`audio_waveform`) | 8,972 | 85.1% | 1,572 segments missing audio |
+| MIDI (`midi_binary`) | 4,563 | **43.3%** | Majority-missing — design for sparsity |
+| Text (`lyric_text`) | varies | ~60% | Instrumental tracks have no lyrics |
+| Text embeddings | **0** | **0%** | Old file had them; new extraction needs re-embed |
+
+**MIDI coverage by album color**:
+| Color | MIDI | Total | % |
+|-------|------|-------|---|
+| Black | 1,064 | 1,777 | 60% |
+| Orange | 810 | 1,493 | 54% |
+| Red | 640 | 1,326 | 48% |
+| UNLABELED | 1,648 | 3,506 | 47% |
+| Yellow | 147 | 345 | 43% |
+| Blue | 254 | 2,097 | **12%** |
+
+**Missing colors**: Green, Indigo, Violet are absent from the dataset entirely.
+
+**Key columns** (metadata parquet):
+- `segment_id`, `song_id`, `track_id`
+- `rainbow_color`, `rainbow_color_temporal_mode`, `rainbow_color_ontological_mode`, `rainbow_color_objectional_mode`
+- `has_audio`, `has_midi`, `midi_file`, `source_audio_file`, `segment_audio_file`
+- `lyric_text`, `content_type`, `vocals`
+- `bpm`, `key_signature_note`, `key_signature_mode`
+
+**Key columns** (media parquet):
+- `audio_waveform` (binary), `audio_sample_rate` (int32)
+- `midi_binary` (binary, nullable — 57% null)
+
+**Legacy file**: `training_data_with_embeddings.parquet` (8,972 rows) has DeBERTa embeddings in an `embedding` column but `midi_binary` is entirely null (pre-bugfix). Kept for reference but should not be used for multimodal training.
+
+### Preprocessing Pipeline
+
 ```python
-# Preprocessing script: extract_multimodal_features.py
+# Phase 3.0: Re-embed new extraction
+# Uses existing core/embedding_loader.py DeBERTaEmbeddingEncoder
 
-for segment in segments:
-    # Audio
-    audio_path = f"audio/{segment.album}/{segment.track_id}.wav"
-    audio_features = extract_audio(audio_path, segment.start_time, segment.end_time)
-    
-    # MIDI
-    midi_path = f"midi/{segment.album}/{segment.track_id}.mid"
-    midi_features = extract_midi(midi_path, segment.start_time, segment.end_time)
-    
-    # Lyrics - Prosodic (if vocal track)
-    if segment.has_vocals:
-        alignment = forced_aligner.align(audio_path, segment.lyrics_text)
-        prosody = extract_prosody(alignment, midi_features)
-    else:
-        prosody = None
-    
-    # Lyrics - Structural
-    structure = extract_structure(segment.lyrics_text, midi_features)
-    
-    # Save
-    segment.audio_embedding = audio_features
-    segment.midi_embedding = midi_features
-    segment.prosody_features = prosody
-    segment.structure_features = structure
+# Phase 3.1: Extract audio + MIDI features from media parquet
+# Audio: decode audio_waveform binary → resample → encode
+# MIDI: decode midi_binary → parse via app/util/midi_segment_utils.py → encode
+# Missing modalities: zero-tensor with modality mask flag
 ```
 
-**New dataset schema**:
-```
-rainbow_table_multimodal.parquet:
-  - segment_id
-  - concept_text
-  - album
-  - temporal_mode, spatial_mode, ontological_mode
-  - audio_embedding: [768] float array
-  - midi_embedding: [512] float array
-  - prosody_features: [256] float array (nullable for instrumental)
-  - structure_features: [128] float array
-```
+### Design Constraint: MIDI Sparsity
+
+With only 43% MIDI coverage, the model MUST treat MIDI as optional:
+- Use a **modality presence mask** `[has_text, has_audio, has_midi]` as model input
+- **Modality dropout** during training simulates missing MIDI (already planned)
+- Blue album (12% MIDI) will rely almost entirely on audio + text
+- At inference time (scoring music candidates), MIDI will always be present since we're scoring generated MIDI
 
 ## Success Metrics
 
@@ -275,12 +246,12 @@ class ChromaticScorer:
         midi_emb = self.model.midi_encoder(midi_candidate)
         
         if lyrics:
-            lyric_emb = self.model.lyric_encoder(lyrics, midi_candidate, audio_render)
+            text_emb = self.model.text_encoder(lyrics)
         else:
-            lyric_emb = torch.zeros(1152)  # Null encoding for instrumental
+            text_emb = torch.zeros(768)  # Null encoding for instrumental
         
         # Predict
-        temporal, spatial, ontological = self.model(audio_emb, midi_emb, lyric_emb)
+        temporal, spatial, ontological = self.model(audio_emb, midi_emb, text_emb)
         
         return {
             'temporal_dist': temporal.softmax(-1).tolist(),
@@ -298,13 +269,8 @@ class ChromaticScorer:
 transformers  # Wav2Vec2, DeBERTa
 librosa  # Audio processing
 pretty_midi  # MIDI parsing
-montreal-forced-aligner  # Prosodic alignment
-torch-audiomentations  # Data augmentation
+torch-audiomentations  # Data augmentation (optional)
 ```
-
-**External tools**:
-- Montreal Forced Aligner: https://github.com/MontrealCorpusTools/Montreal-Forced-Aligner
-- Or Gentle: https://github.com/lowerquality/gentle (Python-based alternative)
 
 ## Breaking Changes
 
@@ -313,25 +279,7 @@ torch-audiomentations  # Data augmentation
 - Training scripts need updates (load audio/MIDI, not just text)
 - Inference API changes (accept MIDI + audio, not just text)
 
-## Timeline Estimate
+## Related Changes
 
-- **Phase 3.1** (Audio + MIDI): 1-2 weeks
-  - Audio encoder integration: 3 days
-  - MIDI encoder implementation: 4 days
-  - Data preprocessing pipeline: 3 days
-  - Training + evaluation: 3 days
-
-- **Phase 3.2** (Add semantic lyrics): 2 days
-  - Already have DeBERTa encoder
-  - Just concatenation + retrain
-
-- **Phase 3.3** (Add prosodic lyrics): 1 week
-  - Forced alignment setup: 3 days
-  - Feature extraction pipeline: 2 days
-  - Training + evaluation: 2 days
-
-- **Phase 3.4** (Add structural lyrics): 2 days
-  - Feature extraction (counting): 1 day
-  - Training + evaluation: 1 day
-
-**Total**: 3-4 weeks for full multimodal implementation
+- **Prerequisite**: `prepare-multimodal-data` (data readiness — embeddings, coverage verification)
+- **Follow-up**: `add-prosodic-lyric-encoding` (Phases 3.3/3.4 — deferred until results validate approach)

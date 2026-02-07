@@ -1,0 +1,50 @@
+adaptation_attempts:
+- Switched to smaller mesh nets to avoid vaquita bycatch
+- Joined fishermen's cooperative promoting sustainable methods
+- Worked as translator for international conservation teams
+- Applied for relocation assistance three times
+- Started small tortilla business to supplement fishing income
+age: 47
+artifact_id: e972aa6f-30cc-463c-b706-49e10e6e40ea
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Dawn patrol checking her legal nets for corvina while avoiding cartel
+  boats, afternoon meetings with frustrated conservationists counting fewer vaquita
+  clicks each month, evening mending nets by lamplight while her teenage son asks
+  why they can't just move inland
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- witness
+environmental_stressor: Escalating cartel control of fishing grounds combined with
+  marine protected area restrictions that exist only on paper
+family_situation: Widow raising two teenagers after husband disappeared for refusing
+  to fish for totoaba; eldest daughter moved to Tijuana, youngest son torn between
+  staying to help or leaving for safety
+file_name: e972aa6f-30cc-463c-b706-49e10e6e40ea_g_last_human.json
+final_thought: We were all just trying to survive in the same small sea
+last_days_scenario: 'The cartel gave her an ultimatum: use her boat for totoaba runs
+  or lose it entirely. The conservation fund she''d been promised was frozen due to
+  "administrative delays." Her son was recruited by smugglers. Elena sat in her empty
+  boat at dawn, holding the broken acoustic monitor, listening to the same silence
+  that marked the vaquitas'' disappearance. She understood she was the last of her
+  kind too - caught between forces too large to escape, in waters that once sustained
+  both her people and the porpoises, now empty of both.'
+latitude: 31.0258
+location: San Felipe, Baja California, Mexico
+longitude: -114.8375
+name: Elena Morales Vásquez
+occupation: Traditional gillnet fisher and community liaison for vaquita conservation
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Waterlogged acoustic monitoring device she found washed up on
+  shore - the same type scientists use to count vaquita clicks, now silent and barnacle-crusted
+thread_id: ac7b8cc5-5f66-47ae-afaf-2a95ed791e2b
+vulnerability_details: Caught between illegal totoaba fishing networks demanding participation
+  and conservation groups offering insufficient compensation - unable to escape economic
+  nets that trap both her and the vaquitas
+year_documented: 2031

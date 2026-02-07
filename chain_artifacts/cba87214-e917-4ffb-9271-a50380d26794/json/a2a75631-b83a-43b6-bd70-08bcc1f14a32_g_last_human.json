@@ -1,0 +1,57 @@
+adaptation_attempts:
+- Built greenhouse to protect milkweed from herbicide spray
+- Partnered with urban schools to create rooftop monarch waystation gardens
+- Documented traditional knowledge in digital archive
+- Lobbied government to ban neonicotinoid pesticides
+- Organized community seed-saving networks
+age: 47
+artifact_id: a2a75631-b83a-43b6-bd70-08bcc1f14a32
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Rises before dawn to check monarch traps and weather stations. Tends
+  small milkweed nursery in greenhouse protected from herbicide drift. Teaches traditional
+  ecological calendar to remaining researchers via video calls. Maintains detailed
+  journals of temperature, rainfall, and plant phenology that no longer match her
+  grandmother's records.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Deforestation of oyamel fir forests combined with herbicide
+  drift from industrial agriculture killing native milkweed patches
+family_situation: Widowed mother of two. Eldest daughter moved to Mexico City for
+  work. Youngest daughter (17) helps reluctantly but plans to leave for university.
+  Elena's mother died in 2039, taking with her the last fluent knowledge of the traditional
+  butterfly ceremonies.
+file_name: a2a75631-b83a-43b6-bd70-08bcc1f14a32_g_last_human.json
+final_thought: If I plant enough milkweed, if the rains come at the right time, if
+  the chemicals stay away from just this one patch... maybe one orange wing will find
+  its way home.
+last_days_scenario: Elena walks the same mountain paths her great-grandmother showed
+  her, but the sacred oyamel groves where billions of monarchs once clustered are
+  stumps and cattle pasture. She carries a leather pouch of milkweed seeds, trying
+  to replant corridors, but the herbicide spray from adjacent soy fields kills each
+  new patch within months. Her teenage daughter refuses to learn the traditional butterfly
+  calendar - "Why memorize something that doesn't exist anymore, mamá?" The climate
+  research station her family helped run for 30 years closed last spring. Elena still
+  wakes at 4 AM to check butterfly traps that haven't caught a monarch in three years.
+latitude: 19.6333
+location: Michoacán, Mexico - former oyamel fir forest reserve
+longitude: -100.25
+name: Elena Vasquez-Chen
+occupation: Traditional ecological knowledge keeper and milkweed seed collector
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A hand-carved wooden butterfly counting board made by her great-grandmother,
+  with 47 small holes for tracking daily monarch counts. Only three holes have been
+  used in the past five years.
+thread_id: cba87214-e917-4ffb-9271-a50380d26794
+vulnerability_details: Like monarchs whose multi-generational migration broke when
+  climate shifted timing, Elena's family's four-generation tradition of guiding monarch
+  research ended when the last overwintering site was logged. Her grandmother's knowledge
+  of seasonal timing died with the forest.
+year_documented: 2041

@@ -30,6 +30,7 @@ from app.util.audio_io import load_audio
 from app.util.manifest_loader import load_manifest
 from app.util.timestamp_audio_extractor import (
     create_segment_specs_from_lrc,
+    create_segment_specs_from_structure,
     duration_to_seconds,
 )
 
@@ -209,31 +210,46 @@ class BuildTrainingSegmentsDB(BaseModel):
             logger.error(f"Failed to load manifest {manifest_path}: {e}")
             return rows
 
-        # Find LRC file
-        lrc_path = (
-            track_dir / manifest.lrc_file
-            if manifest.lrc_file
-            else track_dir / f"{track_id}.lrc"
-        )
-        if not lrc_path.exists():
-            logger.warning(f"No LRC file found: {lrc_path}")
-            return rows
-
         # Find main audio (for structure reference)
         main_audio_path = track_dir / manifest.main_audio_file
         if not main_audio_path.exists():
             logger.warning(f"Main audio not found: {main_audio_path}")
             return rows
 
-        # Create segment specs from LRC + structure
-        segment_specs = create_segment_specs_from_lrc(
-            str(lrc_path),
-            str(main_audio_path),
-            manifest=manifest,
-            max_segment_length=30.0,
-            structure_threshold=2.0,
-            overlap_seconds=2.0,
+        # Find LRC file
+        lrc_path = (
+            track_dir / manifest.lrc_file
+            if manifest.lrc_file
+            else track_dir / f"{track_id}.lrc"
         )
+
+        if lrc_path.exists():
+            # Create segment specs from LRC + structure
+            segment_specs = create_segment_specs_from_lrc(
+                str(lrc_path),
+                str(main_audio_path),
+                manifest=manifest,
+                max_segment_length=30.0,
+                structure_threshold=2.0,
+                overlap_seconds=2.0,
+            )
+        elif manifest.structure:
+            # Fallback: use structure sections for segmentation (instrumental tracks)
+            logger.info(
+                f"No LRC file for {track_id}, falling back to structure-based segmentation "
+                f"({len(manifest.structure)} sections)"
+            )
+            segment_specs = create_segment_specs_from_structure(
+                str(main_audio_path),
+                manifest=manifest,
+                max_segment_length=30.0,
+                overlap_seconds=2.0,
+            )
+        else:
+            logger.warning(
+                f"No LRC file and no structure data for {track_id}, skipping"
+            )
+            return rows
 
         logger.info(
             f"Processing {track_id}: {len(segment_specs)} segments × {len(manifest.audio_tracks)} tracks"
