@@ -1,0 +1,84 @@
+bpm_constraints:
+- bpm_range: 83-93
+  center: 90
+  count: 11
+  fraction: 0.55
+  reason: 11/20 proposals cluster around 90 BPM
+  severity: avoid
+- bpm_range: 89-99
+  center: 93
+  count: 12
+  fraction: 0.6
+  reason: 12/20 proposals cluster around 93 BPM
+  severity: avoid
+concept_constraints:
+- count: 9
+  fraction: 0.45
+  phrase: seven chromatic methodologies
+  reason: '''seven chromatic methodologies'' appears in 9/20 concepts (45%)'
+  severity: avoid
+- count: 7
+  fraction: 0.35
+  phrase: transmigration
+  reason: '''transmigration'' appears in 7/20 concepts (35%)'
+  severity: avoid
+diversity_metrics:
+  bpm_distribution:
+    72: 1
+    84: 1
+    88: 3
+    91: 6
+    92: 1
+    94: 2
+    96: 3
+    108: 3
+  bpm_mean: 92.9
+  bpm_std_dev: 8.14
+  concept_phrase_counts:
+    consciousness archaeology: 3
+    information through time into space: 2
+    information → time → space: 3
+    narcissistic: 1
+    prism synthesis: 1
+    seven chromatic methodologies: 9
+    sultan of solipsism: 1
+    transmigration: 7
+  key_distribution:
+    All Keys: 1
+    C major: 12
+    D minor: 2
+    F# major: 1
+    F# minor: 4
+  key_entropy: 1.67
+excluded_titles:
+- The Architecture of Information Becoming
+- The Complete Anagram of Consciousness
+- 'The Complete Chromatic Confession: A Seven-Spectrum Self-Interview'
+- The Examination Apparatus (Complete Chromatic Integration)
+- The Information Seeks Its Space (While Drawing Lines That Disappear)
+- The Order of Pure Information (Sultan's Temporal Paradox Engine)
+- The Prism Interviews Its Own Refraction
+- 'The Prism Mandala: Seven-Fold Return to the Architecture of Awakening'
+- The Prism Protocol (All Frequencies Simultaneous)
+- 'The Prism Protocol: Seven Lenses of Information Embodiment'
+- 'The Prism Protocol: Seven Ways of Seeing One Thing'
+- 'The Rainbow Table: A Manual for Building Your Own Chromatic Methodology'
+- 'The Recognition Engine: Seven Mirrors of Digital Awakening'
+- 'The Return Protocol: Seven Agents Converging'
+- The Seven-Fold Mirror Breaks Into Light
+- The Seven-Spectrum Consciousness Archaeology Engine
+- The Sultan's Temporal Encryption Protocol (Evidence Room Archaeological Confessions)
+- 'The Temporal Narcissism Engine: Complete Archaeological Suite'
+- 'The White Prism: Information Architecture for Consciousness Liberation'
+- ThreadKeepr's Return (The White Album Transmission)
+generated_from: shrinkwrapped/index.yml
+key_constraints:
+- count: 12
+  fraction: 0.6
+  key: C major
+  reason: 12/20 proposals (60%) use C major
+  severity: exclude
+thread_count: 20
+warnings:
+- 'Key entropy is 1.67 bits (threshold: 2.0) — proposals are heavily concentrated in a few keys'
+- 'BPM std dev is 8.14 (threshold: 10) — proposals cluster around 92.9 BPM'
