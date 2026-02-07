@@ -16,11 +16,12 @@
 
 ## 3. Fusion Architecture
 - [ ] 3.1 Create `MultimodalFusion` base class
-- [ ] 3.2 Implement EarlyFusion (concatenate before encoding)
-- [ ] 3.3 Implement LateFusion (concatenate after independent encoding)
+- [ ] 3.2 Implement LateFusion / ConcatFusion (concatenate modality embeddings, shared projection)
+- [ ] 3.3 Implement EarlyFusion (concatenate raw/minimally-processed inputs before shared encoder)
 - [ ] 3.4 Implement CrossModalAttention (text attends to audio/MIDI)
 - [ ] 3.5 Implement GatedFusion (learnable modality importance weights)
 - [ ] 3.6 Add fusion strategy selection via configuration
+- [ ] 3.7 Implement modality presence mask input — fusion layers MUST handle missing modalities via mask
 
 ## 4. Audio Preprocessing
 - [ ] 4.1 Implement waveform loading with soundfile/librosa
@@ -39,11 +40,13 @@
 - [ ] 5.6 Add augmentation: transpose, velocity randomization, time quantization
 
 ## 6. Multimodal Dataset
-- [ ] 6.1 Extend `Dataset` to return dict with text, audio, MIDI, label
-- [ ] 6.2 Implement lazy loading for audio/MIDI (memory efficiency)
-- [ ] 6.3 Add multimodal batch collation function
+- [ ] 6.1 Extend `Dataset` to return dict with text, audio, midi, modality_mask, label
+- [ ] 6.2 Implement lazy loading from split parquet (`_metadata` for labels, `_media` for blobs)
+- [ ] 6.3 Add multimodal batch collation function with modality presence mask `[batch, 3]`
 - [ ] 6.4 Verify temporal alignment between modalities
-- [ ] 6.5 Handle missing modalities (text-only, audio-only fallback)
+- [ ] 6.5 Handle missing MIDI (57% of segments) — zero tensor + mask=False
+- [ ] 6.6 Handle missing audio (15% of segments) — zero tensor + mask=False
+- [ ] 6.7 Fallback: load audio/MIDI from disk path when parquet binary is null but file exists
 
 ## 7. Training Loop Integration
 - [ ] 7.1 Update forward pass to accept multimodal batch dict
@@ -68,9 +71,15 @@
 - [ ] 9.6 Run small-scale training to verify convergence
 - [ ] 9.7 Compare multimodal vs text-only performance on validation set
 
-## 10. Documentation
-- [ ] 10.1 Document audio encoder options and trade-offs
-- [ ] 10.2 Document MIDI encoder options and trade-offs
-- [ ] 10.3 Document fusion strategies and when to use each
-- [ ] 10.4 Add example multimodal configuration files
-- [ ] 10.5 Document preprocessing pipeline and alignment verification
+## 10. Text Encoder Integration (Phase 3.2)
+- [ ] 10.1 Wire existing DeBERTa-v3 encoder (`training/models/text_encoder.py`) into fusion model
+- [ ] 10.2 Load precomputed embeddings from re-embedded parquet when available
+- [ ] 10.3 Handle instrumental segments (no lyrics) — zero embedding + text mask=False
+- [ ] 10.4 Test: text encoder produces `[batch, 768]` for vocal segments, zeros for instrumental
+
+## 11. Documentation
+- [ ] 11.1 Document audio encoder options and trade-offs
+- [ ] 11.2 Document MIDI encoder options and trade-offs
+- [ ] 11.3 Document fusion strategies and when to use each
+- [ ] 11.4 Add example multimodal configuration files
+- [ ] 11.5 Document modality mask design and missing-modality behavior

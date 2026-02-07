@@ -1,0 +1,63 @@
+adaptation_attempts:
+- Switched to aluminum boat for open-water hunting but lacks traditional knowledge
+  for this method
+- Took government job monitoring polar bear populations via GPS collars
+- Attempted to teach traditional skills in community center instead of on ice
+- Started buying store-bought meat with government assistance
+age: 47
+artifact_id: b706e3c4-bbf8-4dd5-8e35-b8ba9bae7f54
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Each morning at 4 AM, Aput checks ice conditions via satellite imagery
+  on his tablet, comparing current ice thickness to GPS coordinates his grandfather
+  carved into walrus ivory. He spends hours maintaining his qamutiik (traditional
+  sled) and checking his seal hunting equipment, though he hasn't been able to use
+  either in three weeks due to unsafe ice conditions
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Arctic sea ice forming 6 weeks later and breaking up 8 weeks
+  earlier each year, eliminating the stable ice platform essential for traditional
+  seal hunting
+family_situation: Divorced father of two teenagers who moved to Iqaluit for high school.
+  His ex-wife works for the territorial government and believes traditional hunting
+  is "no longer viable." His son wants to learn traditional skills but there's no
+  ice to teach on
+file_name: b706e3c4-bbf8-4dd5-8e35-b8ba9bae7f54_g_last_human.json
+final_thought: The bears and I, we're both swimming toward something that used to
+  be there
+last_days_scenario: 'Aput sits in his heated government office, watching GPS dots
+  on a computer screen that represent polar bears wandering farther from shore each
+  day, just as he wanders farther from everything his ancestors knew. The last dot
+  disappeared yesterday - a mother and two cubs who swam beyond the satellite''s range,
+  searching for ice that won''t form until December, if at all. His ivory chisel sits
+  on the windowsill, smooth from generations of hands, now just a reminder of knowledge
+  that died with the ice. Outside, rain falls in November for the third year running.
+  His phone buzzes with a message from his son in the south: "Dad, I got into university.
+  Engineering program. I want to help fix this." Aput stares at the empty map where
+  ice used to be, where his people used to live, where polar bears used to hunt. The
+  heating system hums, powered by the same fossil fuels that melted his world. He
+  touches the ivory chisel one last time, then closes the laptop. The bears are gone.
+  The ice is gone. Tomorrow he''ll submit his final report to a government that will
+  file it away, another data point in the great melting.'
+latitude: 69.3744
+location: Igloolik, Nunavut, Canada
+longitude: -81.7967
+name: Aput Kanguq
+occupation: Traditional sea ice hunting guide and polar bear monitor
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: he/him
+rainbow_color_mnemonic_character_value: G
+significant_object: A hand-carved ivory ice chisel passed down through five generations,
+  now useless because the ice it was designed to test and navigate no longer forms
+  consistently enough to support human weight
+thread_id: a2ea230f-eecd-4340-884a-56170198bed7
+vulnerability_details: Like polar bears swimming endless distances to find ice that
+  no longer forms, Aput travels farther each season to find hunting grounds that existed
+  in his grandfather's time, watching his people's 4,000-year relationship with sea
+  ice dissolve into open water
+year_documented: 2034

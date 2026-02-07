@@ -2,7 +2,7 @@
 
 This document provides an overview of the training pipeline improvements and extensions documented as OpenSpec changes. These changes correspond to the recommendations from the training additions outline created in desktop mode.
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-07
 
 ## Overview
 
@@ -94,21 +94,55 @@ Extends binary classification to predict specific rebracketing types (spatial, t
 - tasks.md:30 tasks across 7 sections
 - spec.md:9 requirements, 27 scenarios
 
-### Phase 3: Multimodal Fusion
-**Change**: `add-multimodal-fusion`
-**Priority**: Medium (requires Phase 2 validation first)
+### Phase 3: Multimodal Fusion (split into 3 changes)
 
-Combines text, audio, and MIDI representations for richer rebracketing detection. Includes:
-- AudioEncoder (Wav2Vec2, CLAP, custom CNN options)
-- MIDIEncoder (piano roll, event-based, Music Transformer)
-- MultimodalFusion (early, late, cross-attention, gated strategies)
-- Audio/MIDI preprocessing pipelines
-- Cross-modal attention mechanisms
+#### Phase 3.0: Data Prerequisites
+**Change**: `prepare-multimodal-data`
+**Priority**: 🔥 IMMEDIATE — blocks Phase 3.1
+**Status**: Not Started
+
+Prepares training data for multimodal model training:
+- Run DeBERTa embedding pass on new extraction (10,544 segments, currently 0% embedded)
+- Audit 3,506 UNLABELED segments for recoverable `rainbow_color` labels
+- Verify audio/MIDI binary coverage and flag consistency
+- Document coverage gaps (Green, Indigo, Violet absent; Blue MIDI at 12%)
 
 **Key Files**:
-- proposal.md:Breaking change (dataset format expansion)
-- tasks.md:55 tasks across 10 sections
-- spec.md:14 requirements, 48 scenarios
+- proposal.md, tasks.md (12 tasks across 4 sections)
+- spec delta: multimodal-fusion (data readiness requirement)
+
+#### Phase 3.1 + 3.2: Audio + MIDI + Text Fusion
+**Change**: `add-multimodal-fusion`
+**Priority**: 🔥 THE BLOCKER — enables chromatic fitness function
+**Status**: Not Started
+
+Core multimodal model combining audio, MIDI, and text:
+- AudioEncoder (Wav2Vec2, CLAP, custom CNN options)
+- MIDIEncoder (piano roll, event-based, Music Transformer)
+- Text encoder (existing DeBERTa-v3)
+- Late fusion with modality presence mask (handles 57% MIDI-absent segments)
+- Retrain Phase 4 regression heads with multimodal input
+
+**Key Files**:
+- proposal.md (breaking change: dataset format, model architecture)
+- tasks.md: 52 tasks across 11 sections
+- spec.md: 14 requirements, 50+ scenarios
+
+#### Phase 3.3 + 3.4: Prosodic & Structural Lyric Encoding
+**Change**: `add-prosodic-lyric-encoding`
+**Priority**: Medium — deferred until Phase 3.1/3.2 results validate approach
+**Status**: Not Started
+**Prerequisites**: `add-multimodal-fusion` must ship first
+
+Adds prosodic and structural lyric encoding on top of semantic text:
+- Forced alignment pipeline (Montreal Forced Aligner)
+- Prosodic features: pitch contour, stress patterns, melisma → `[batch, 256]`
+- Structural features: syllabic density, rhythmic alignment → `[batch, 128]`
+- Combined three-pronged lyric encoder: `[batch, 1152]`
+
+**Key Files**:
+- proposal.md, tasks.md (18 tasks across 7 sections)
+- spec delta: multimodal-fusion (three-pronged lyric encoding requirement)
 
 ### Phase 4: Regression Tasks ✓ COMPLETE
 **Change**: `add-regression-tasks`
@@ -268,19 +302,21 @@ Provides robust infrastructure for training at scale. Includes:
 
 ## Current Status Summary
 
-| Phase                      | Status               | Priority    | Completion |
-|----------------------------|----------------------|-------------|------------|
-| Phase 1 (Binary)           | ✅ Complete          | ✅ Critical | 100%       |
-| Phase 2 (Multi-Class)      | ✅ Complete          | ✅ Critical | 100%       |
-| Phase 4 (Regression)       | ✅ Complete          | ✅ Critical | 100%       |
-| **Phase 3 (Multimodal)**   | **Not Started**      | 🔥 BLOCKER  | 0%         |
-| Phase 10 (Production)      | Not Started          | ✅ Critical | 0%         |
-| Infrastructure             | Not Started          | ✅ Critical | 0%         |
-| Phase 8 (Interpretability) | ~ Partial (notebook) | Medium      | 40%        |
-| Phase 5 (Temporal)         | Not Started          | DEPRECATED  | -          |
-| Phase 6 (Style Transfer)   | Not Started          | DEPRECATED  | -          |
-| Phase 7 (Generative)       | Not Started          | DEPRECATED  | -          |
-| Phase 9 (Augmentation)     | Not Started          | Low         | 0%         |
+| Phase | Change | Status | Priority | Completion |
+|-------|--------|--------|----------|------------|
+| Phase 1 (Binary) | - | ✅ Complete | ✅ Critical | 100% |
+| Phase 2 (Multi-Class) | - | ✅ Complete | ✅ Critical | 100% |
+| Phase 4 (Regression) | - | ✅ Complete | ✅ Critical | 100% |
+| **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | **Not Started** | 🔥 IMMEDIATE | 0% |
+| **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | **Not Started** | 🔥 BLOCKER | 0% |
+| Phase 3.3+3.4 (Lyrics) | `add-prosodic-lyric-encoding` | Not Started | Medium | 0% |
+| Phase 10 (Production) | `add-production-deployment` | Not Started | ✅ Critical | 0% |
+| Infrastructure | `add-infrastructure-improvements` | Not Started | ✅ Critical | 0% |
+| Phase 8 (Interpretability) | `add-model-interpretability` | ~ Partial | Medium | 40% |
+| Phase 5 (Temporal) | - | Not Started | DEPRECATED | - |
+| Phase 6 (Style Transfer) | - | Not Started | DEPRECATED | - |
+| Phase 7 (Generative) | - | Not Started | DEPRECATED | - |
+| Phase 9 (Augmentation) | `add-data-augmentation` | Not Started | Low | 0% |
 
 ## Critical Path to Music Production Agent
 
@@ -290,25 +326,30 @@ Provides robust infrastructure for training at scale. Includes:
 3. Regression: 95% temporal, 93% ontological, 62% spatial
 
 **IMMEDIATE** (unblock music generator):
-1. **Implement Phase 3 (Multimodal Fusion)** - THE BLOCKER
+1. **`prepare-multimodal-data`** — Data readiness (Phase 3.0)
+   - Re-embed 10,544 segments with DeBERTa (new extraction has 0% text embeddings)
+   - Audit UNLABELED segments, verify audio/MIDI binary coverage
+
+2. **`add-multimodal-fusion`** — Core multimodal model (Phases 3.1 + 3.2) — THE BLOCKER
    - Add audio encoder (Wav2Vec2 or CLAP)
-   - Add MIDI encoder (piano roll representation)
-   - Add three-pronged lyric encoder (semantic + prosodic + structural)
-   - Retrain Phase 4 with multimodal inputs
+   - Add MIDI encoder (piano roll) with modality mask for 57% MIDI-absent segments
+   - Wire existing DeBERTa text encoder
+   - Late fusion + retrain Phase 4 regression heads
    - This will fix spatial mode accuracy (currently bottlenecked by instrumental tracks)
 
-2. **Build Evolutionary Music Generator** (new system in `app/generator/`)
+3. **Build Evolutionary Music Generator** (new system in `app/generator/`)
    - Multi-stage generation (chords → drums → bass → melody)
    - ML model scoring at each stage
    - Pruning strategy (top-k selection)
    - Integration with existing chord progression generator
 
-3. **Phase 10 (Production Deployment)**
+4. **Phase 10 (Production Deployment)**
    - FastAPI endpoint for music generator
    - ONNX export for inference speed
    - Batch scoring for 50+ candidates per stage
 
-**LATER** (nice-to-have):
+**LATER** (nice-to-have, after Phase 3.1/3.2 results):
+- `add-prosodic-lyric-encoding`: Prosodic + structural lyrics (Phase 3.3/3.4)
 - Phase 8: Interpretability analysis (what makes GREEN vs RED?)
 - Phase 9: Data augmentation (more training data)
 - Infrastructure: Experiment tracking, hyperparameter tuning
@@ -402,8 +443,9 @@ All 27 mode combinations now mapped to 8 albums (Orange, Red, Violet, Yellow, In
 4. Integrate with White Agent workflow
 
 **To improve spatial mode accuracy**:
-- Implement Phase 3 (Multimodal Fusion) to add audio embeddings
+- `prepare-multimodal-data` → `add-multimodal-fusion` (Phase 3.0 → 3.1/3.2)
 - Instrumental tracks (Yellow/Green = "Place" albums) need audio features, not text
+- MIDI now available for 43.3% of segments (post-bugfix 2026-02-06)
 
 **Ongoing**:
 1. Choose next phase to implement
@@ -421,6 +463,6 @@ All 27 mode combinations now mapped to 8 albums (Orange, Red, Violet, Yellow, In
 
 ---
 
-*Last Updated: 2026-01-27*
+*Last Updated: 2026-02-07*
 
-**Status**: Phases 1, 2, and 4 complete. Classification achieves 100%, regression achieves 95% temporal / 93% ontological / 62% spatial. Spatial limited by instrumental tracks (no lyrics). Next: integrate with White Agent, then Phase 3 (multimodal) for audio embeddings.
+**Status**: Phases 1, 2, and 4 complete. Classification achieves 100%, regression achieves 95% temporal / 93% ontological / 62% spatial. Spatial limited by instrumental tracks (no lyrics). Phase 3 split into three changes: `prepare-multimodal-data` (data readiness), `add-multimodal-fusion` (audio+MIDI+text fusion), `add-prosodic-lyric-encoding` (deferred). Next: prepare data, then implement multimodal fusion.
