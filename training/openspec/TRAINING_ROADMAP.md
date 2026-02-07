@@ -61,33 +61,45 @@ LOCAL PREP (before RunPod)
     • Network volume gotchas (region-locked, 64KB min alloc, no S3 in MD-1)
     • File upload strategy, execution order
 
- ② add-training-data-verification       ← IMPLEMENT before RunPod run
-    • Spot-check tool: extract segments as playable WAV/MIDI from parquet
-    • Coverage report by album color
-    • Fidelity checks (sample rate, duration, MIDI note events)
+ ✅ add-training-data-verification (COMPLETE 2026-02-07)
+    • training/verify_extraction.py: --extract, --fidelity, --all, --color, --song, --random N
+    • Coverage report by album color (audio %, MIDI %, text %)
+    • Fidelity checks: 10/10 audio, 10/10 MIDI passing
+    • 28 tests passing
+
+ ✅ MIDI segmentation bug fix (2026-02-07):
+    • build_training_segments_db.py was storing full MIDI files, not segment slices
+    • Now uses segment_midi_file() to trim MIDI to segment time window
+    • Audio and MIDI segments now aligned to same start_seconds:end_seconds
 
 
-RUNPOD EXECUTION (~6 hours)
+LOCAL EXTRACTION (no GPU needed)
 ══════════════════════════════════
 
- ③ Rebuild base_manifest_db.parquet
+ ✅ Rebuild base_manifest_db.parquet (COMPLETE 2026-02-07)
     python -m app.extractors.manifest_extractor.build_base_manifest_db
     → 1,327 tracks across all 8 colors (Indigo + Violet now included)
-    → Verify: 8 unique rainbow_color values in output
+    → Verified: 8 unique rainbow_color values
                 │
- ④ Re-run segment extraction
+ ④ Re-run segment extraction ← IN PROGRESS
     python -m app.extractors.segment_extractor.build_training_segments_db
     → Structure fallback extracts Green, Yellow, Red instrumentals
     → Indigo/Violet segments now get rainbow_color from manifest join
+    → MIDI now segmented to time window (not full file)
     → Expected: ~12,000+ segments (up from 10,544)
     → Verify: Green segments > 0, no UNLABELED segments
                 │
- ⑤ Verify extraction (add-training-data-verification)
+ ⑤ Verify extraction
+    python -m training.verify_extraction --all
     → Spot-check Green audio — can you hear it?
-    → Spot-check MIDI segments — notes make sense?
+    → Spot-check MIDI segments — notes line up with audio?
     → Coverage report: all 8 colors, MIDI %, audio %
     → GATE: do NOT proceed if data looks wrong
-                │
+
+
+RUNPOD EXECUTION (GPU needed)
+══════════════════════════════════
+
  ⑥ prepare-multimodal-data (Phase 3.0)
     → DeBERTa embedding pass on all segments
     → Verify: text embeddings populated for vocal segments
@@ -249,9 +261,10 @@ Core multimodal model combining audio, MIDI, and text:
 | Phase 1 (Binary) | - | ✅ Complete | Done |
 | Phase 2 (Multi-Class) | - | ✅ Complete | Done |
 | Phase 4 (Regression) | - | ✅ Complete | Done |
-| **Pipeline Fixes** | *(this branch)* | **✅ Ready** | 🔥 Commit now |
+| **Pipeline Fixes** | *(this branch)* | **✅ Complete** | Done |
+| **MIDI Segmentation Fix** | *(this branch)* | **✅ Complete** | Done |
 | **RunPod Guide** | `add-runpod-deployment-guide` | **Spec'd** | 🔥 Read before RunPod |
-| **Data Verification** | `add-training-data-verification` | **Spec'd** | 🔥 Implement before RunPod |
+| **Data Verification** | `add-training-data-verification` | **✅ Complete** | Done |
 | **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | Not Started | 🔥 IMMEDIATE |
 | **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | Design complete | 🔥 BLOCKER |
 | **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | High (parallel track) |
