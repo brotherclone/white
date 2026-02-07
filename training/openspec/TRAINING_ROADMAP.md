@@ -103,18 +103,18 @@ RUNPOD EXECUTION (~6 hours)
 ### Track B: Agent Pipeline (Local, No GPU)
 
 ```
- ① add-shrinkwrap-chain-artifacts
-    → Clean up chain_artifacts/ thread directories
-    → Rename UUID dirs to {color}-{slugified-title}
-    → Delete debug files (rebracketing analyses, traces, facet evolution)
-    → Generate manifest.yml per thread + index.yml
+ ✅ add-shrinkwrap-chain-artifacts (COMPLETE 2026-02-07)
+    → 20 threads shrinkwrapped to shrinkwrapped/ directory
+    → EVP intermediates stripped (135 files, 210MB freed from chain_artifacts)
+    → manifest.yml per thread + index.yml generated
+    → 47 tests passing
                 │
- ② add-chain-result-feedback (depends on shrinkwrap)
-    → Read index.yml, detect key/BPM clusters and repeated concepts
-    → Generate negative_constraints.yml
-    → ~1/3 of current proposals converge on "I am a mirror" C major 96bpm
-    → White Agent loads constraints at workflow start
-    → Diversity metrics: key entropy, BPM spread, concept uniqueness
+ ✅ add-chain-result-feedback (COMPLETE 2026-02-07)
+    → Key entropy: 1.67 bits (12/20 = 60% C major!)
+    → BPM std dev: 8.14 (cluster around 91-96)
+    → Overused phrases: "seven chromatic methodologies" (45%), "transmigration" (35%)
+    → White Agent now loads constraints at workflow start, injects into all prompts
+    → 27 tests passing
 ```
 
 ### Convergence
@@ -254,8 +254,8 @@ Core multimodal model combining audio, MIDI, and text:
 | **Data Verification** | `add-training-data-verification` | **Spec'd** | 🔥 Implement before RunPod |
 | **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | Not Started | 🔥 IMMEDIATE |
 | **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | Design complete | 🔥 BLOCKER |
-| **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | Spec'd | High (parallel track) |
-| **Result Feedback** | `add-chain-result-feedback` | Spec'd | High (parallel track) |
+| **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | High (parallel track) |
+| **Result Feedback** | `add-chain-result-feedback` | ✅ Complete | High (parallel track) |
 | Phase 3.3+3.4 (Lyrics) | `add-prosodic-lyric-encoding` | Not Started | Medium |
 | Phase 10 (Production) | `add-production-deployment` | Not Started | After Phase 3 |
 | Infrastructure | `add-infrastructure-improvements` | Not Started | High |

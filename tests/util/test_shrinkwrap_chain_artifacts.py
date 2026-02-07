@@ -292,9 +292,9 @@ class TestGenerateDirectoryName:
 
 
 class TestFindDebugFiles:
-    # ToDo: Failing
     def test_finds_debug_files(self, tmp_path):
         thread_dir = make_thread(tmp_path, "c59be431-6527-4424-83fd-4dea6a83edf5")
+        add_debug_files(thread_dir, count=3)
         found = find_debug_files(thread_dir)
         assert len(found) == 3
 
@@ -342,12 +342,12 @@ class TestCopyThreadFiles:
         assert counts["skipped_debug"] == 0
         assert (dest / ".debug").exists()
 
-    # ToDo: Failing
     def test_skips_evp_intermediates(self, tmp_path):
         source = make_thread(
             tmp_path / "source", "c59be431-6527-4424-83fd-4dea6a83edf5"
         )
         add_content_files(source)
+        add_evp_intermediates(source, count=3)  # 3 segments + 1 blended = 4
         dest = tmp_path / "dest"
         dest.mkdir()
 

@@ -32,7 +32,7 @@ The system SHALL maintain a top-level index of all shrink-wrapped chain artifact
 
 #### Scenario: Index generation
 - **WHEN** shrink-wrap processes threads
-- **THEN** `chain_artifacts/index.yml` is updated with an entry per shrink-wrapped thread
+- **THEN** `shrinkwrapped/index.yml` is updated with an entry per shrink-wrapped thread
 
 #### Scenario: Index entry structure
 - **WHEN** an entry is added to the index

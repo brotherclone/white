@@ -138,4 +138,8 @@ class MainAgentState(BaseModel):
         ]
     )
     stop_after_agent: Annotated[Optional[str], lambda x, y: y or x] = None
+
+    # Negative constraints from prior results (loaded at workflow start)
+    negative_constraints: Annotated[Optional[str], lambda x, y: y or x] = None
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
