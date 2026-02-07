@@ -1,0 +1,19 @@
+artifact_id: 4c744f61-ca09-415d-9b70-29d17070a6c4
+artifact_name: The Sterling Hill Cardiac Monitor
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A salvaged medical device from the abandoned Sterling Hill mining operations,
+  modified by the band Suspension Engine to amplify the threshold between consciousness
+  and unconsciousness. The monitor's 72 BPM baseline rhythm became the temporal anchor
+  that allowed 30 teenagers to collectively inhabit the liminal space of "becoming
+  music" for exactly 72 seconds, transforming a medical instrument into a doorway
+  between states of being.
+file_name: 4c744f61-ca09-415d-9b70-29d17070a6c4_i_The Sterling Hill Cardiac Monitor.yml
+name: The Sterling Hill Cardiac Monitor
+rainbow_color_mnemonic_character_value: I
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- liminal_objects
+thread_id: cba87214-e917-4ffb-9271-a50380d26794

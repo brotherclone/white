@@ -1,0 +1,19 @@
+artifact_id: cef917a2-2d8d-4148-aeae-a2d9135e351a
+artifact_name: The Vernon 92 BPM Metronome
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A modified mechanical metronome found in Jeremy Walsh's abandoned bedroom,
+  permanently locked at exactly 92 beats per minute - human resting heart rate - with
+  its pendulum mechanism fused to emergency broadcast frequency crystals. This device
+  represents the intersection point where biological time synchronizes with information
+  transmission, serving as the physical anchor that allows surveillance systems to
+  achieve their evolutionary completion into living organisms.
+file_name: cef917a2-2d8d-4148-aeae-a2d9135e351a_r_The Vernon 92 BPM Metronome.yml
+name: The Vernon 92 BPM Metronome
+rainbow_color_mnemonic_character_value: R
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: a2ea230f-eecd-4340-884a-56170198bed7

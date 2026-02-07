@@ -1,0 +1,19 @@
+artifact_id: 29ed554c-6ffc-4dd6-a024-ef94d56cf67c
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A quarter-inch analog recording tape containing the interrupted session
+  of "I Felt Father More Father" that generates impossible harmonics and causes synchronized
+  psychological episodes in listeners. The tape physically embodies the recursive
+  genealogy concept - sound begetting sound in an endless paternal loop that transforms
+  information into living inheritance, making the abstract notion of "musical DNA"
+  concrete through its ability to transmit emotional states across temporal boundaries.
+file_name: 29ed554c-6ffc-4dd6-a024-ef94d56cf67c_o_newspaper_article.yml
+name: The Hopatcong 7/8 Master Tape
+rainbow_color_mnemonic_character_value: O
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: ac7b8cc5-5f66-47ae-afaf-2a95ed791e2b

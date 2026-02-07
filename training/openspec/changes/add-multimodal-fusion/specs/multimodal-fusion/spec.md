@@ -40,16 +40,31 @@ The system SHALL encode MIDI event sequences into dense embeddings capturing har
 - **WHEN** a MIDI event tensor [batch, events, features] is input
 - **THEN** an embedding tensor [batch, hidden_dim] is output
 
+### Requirement: Text Encoding
+The system SHALL encode lyric text into semantic embeddings using the existing DeBERTa-v3 encoder from Phases 1-4. Future prosodic and structural encoding is deferred to `add-prosodic-lyric-encoding`.
+
+#### Scenario: Semantic text embedding
+- **WHEN** lyric text is available for a segment
+- **THEN** the DeBERTa-v3 encoder produces a `[batch, 768]` text embedding
+
+#### Scenario: Precomputed embedding loading
+- **WHEN** precomputed text embeddings exist in the training parquet
+- **THEN** they are loaded directly instead of running the encoder at training time
+
+#### Scenario: Instrumental segment (no lyrics)
+- **WHEN** a segment has no lyric text (`vocals=False` or `lyric_text` is empty)
+- **THEN** a zero tensor is returned and `modality_mask[text]` is set to False
+
 ### Requirement: Multimodal Fusion Strategy
 The system SHALL combine text, audio, and MIDI representations using configurable fusion strategies.
 
+#### Scenario: Late fusion (concatenation)
+- **WHEN** fusion strategy is "late"
+- **THEN** modality-specific embeddings are independently encoded and concatenated before shared projection layers
+
 #### Scenario: Early fusion
 - **WHEN** fusion strategy is "early"
-- **THEN** raw inputs are concatenated before any encoding
-
-#### Scenario: Late fusion
-- **WHEN** fusion strategy is "late"
-- **THEN** modality-specific embeddings are concatenated after independent encoding
+- **THEN** raw or minimally-processed inputs are concatenated before a shared encoder
 
 #### Scenario: Cross-modal attention fusion
 - **WHEN** fusion strategy is "cross_attention"
@@ -110,19 +125,27 @@ The system SHALL preprocess MIDI event sequences to ensure consistent format and
 - **THEN** random transposition, velocity scaling, or time quantization is applied
 
 ### Requirement: Multimodal Dataset Interface
-The system SHALL extend the dataset to load and return text, audio, and MIDI for each segment.
+The system SHALL extend the dataset to load and return text, audio, and MIDI for each segment, reading from the split parquet files (`training_segments_metadata.parquet` for metadata, `training_segments_media.parquet` for binary blobs).
 
 #### Scenario: Multimodal batch structure
 - **WHEN** a batch is loaded from the dataset
-- **THEN** it returns a dict with keys: text, audio, midi, label
+- **THEN** it returns a dict with keys: text, audio, midi, modality_mask, label
 
 #### Scenario: Lazy loading for efficiency
 - **WHEN** audio and MIDI files are large
-- **THEN** they are loaded on-demand rather than preloaded into memory
+- **THEN** they are loaded on-demand from the media parquet rather than preloaded into memory
 
-#### Scenario: Missing modality handling
-- **WHEN** a segment lacks audio or MIDI data
-- **THEN** zero tensors or None values are returned and handled gracefully
+#### Scenario: Missing MIDI handling (majority case)
+- **WHEN** a segment has `has_midi=False` (57% of segments, up to 88% for Blue album)
+- **THEN** a zero tensor is returned for the MIDI modality and `modality_mask[midi]` is set to False
+
+#### Scenario: Missing audio handling
+- **WHEN** a segment has `has_audio=False` (15% of segments)
+- **THEN** a zero tensor is returned for the audio modality and `modality_mask[audio]` is set to False
+
+#### Scenario: Modality presence mask
+- **WHEN** a batch is constructed
+- **THEN** a boolean mask tensor `[batch, 3]` indicates which of `[text, audio, midi]` are present per sample
 
 #### Scenario: Batch collation
 - **WHEN** batching variable-length sequences
@@ -189,8 +212,8 @@ The system SHALL provide comprehensive configuration options for multimodal fusi
 - **THEN** the corresponding encoder is instantiated
 
 #### Scenario: Fusion strategy selection
-- **WHEN** config.model.fusion.strategy is set to "early", "late", "cross_attention", or "gated"
-- **THEN** the corresponding fusion module is instantiated
+- **WHEN** config.model.fusion.strategy is set to "late", "early", "cross_attention", or "gated"
+- **THEN** the corresponding fusion module is instantiated (late fusion is the recommended default)
 
 #### Scenario: Hidden dimension compatibility
 - **WHEN** encoders have different output dimensions
@@ -212,24 +235,32 @@ The system SHALL monitor gradient norms for each modality to detect training imb
 - **THEN** it can be applied independently to each encoder
 
 ### Requirement: Storage Strategy for Multimodal Data
-The system SHALL support flexible storage strategies for audio and MIDI to balance convenience and performance.
+The system SHALL support the split-parquet storage layout where `training_segments_metadata.parquet` holds all non-binary columns (fast queries, 75 columns) and `training_segments_media.parquet` holds the same columns plus `audio_waveform` (binary), `audio_sample_rate` (int32), and `midi_binary` (binary, nullable).
 
-#### Scenario: Audio in parquet binary
-- **WHEN** audio is stored as binary blobs in parquet
-- **THEN** it is decoded on-the-fly during data loading
+#### Scenario: Metadata-only queries
+- **WHEN** the dataset needs segment metadata (labels, flags, paths) without binary data
+- **THEN** it reads from `training_segments_metadata.parquet` to avoid loading multi-GB binary columns
 
-#### Scenario: Audio on disk referenced by path
-- **WHEN** audio is stored as separate WAV files
-- **THEN** file paths in parquet are used to load audio on-demand
+#### Scenario: Audio from parquet binary
+- **WHEN** audio is needed for a segment and `audio_waveform` is non-null in the media parquet
+- **THEN** the binary blob is decoded using the corresponding `audio_sample_rate`
+
+#### Scenario: Audio from disk path fallback
+- **WHEN** `audio_waveform` is null but `segment_audio_file` path exists on disk
+- **THEN** the audio is loaded from the file path as a fallback
 
 #### Scenario: Precomputed audio features
-- **WHEN** audio features (spectrograms, embeddings) are precomputed
+- **WHEN** audio features (spectrograms, embeddings) are precomputed and stored
 - **THEN** they are loaded directly to speed up training
 
-#### Scenario: MIDI in parquet binary
-- **WHEN** MIDI is stored as binary blobs in parquet
-- **THEN** it is parsed on-the-fly during data loading
+#### Scenario: MIDI from parquet binary
+- **WHEN** MIDI is needed and `midi_binary` is non-null in the media parquet
+- **THEN** it is parsed on-the-fly via `app/util/midi_segment_utils.py`
 
-#### Scenario: MIDI on disk referenced by path
-- **WHEN** MIDI is stored as separate .mid files
-- **THEN** file paths in parquet are used to load MIDI on-demand
+#### Scenario: MIDI from disk path fallback
+- **WHEN** `midi_binary` is null but `midi_file` path exists on disk
+- **THEN** the MIDI file is loaded from the path and parsed
+
+#### Scenario: MIDI absent
+- **WHEN** both `midi_binary` is null and `midi_file` path does not exist (57% of segments)
+- **THEN** the segment is flagged as MIDI-absent and a zero tensor with mask is used

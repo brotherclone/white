@@ -11,6 +11,7 @@ from app.structures.manifests.manifest_song_structure import ManifestSongStructu
 from app.structures.music.core.duration import Duration
 from app.util.timestamp_audio_extractor import (
     adjust_segment_to_structure,
+    create_segment_specs_from_structure,
     duration_to_seconds,
     find_nearest_structure_boundary,
     split_long_segment,
@@ -508,3 +509,127 @@ class TestProcessStagedRawMaterial:
 
         # Should not raise error
         assert "total_tracks_processed" in result
+
+
+class TestCreateSegmentSpecsFromStructure:
+    """Test structure-based segmentation for instrumental tracks."""
+
+    @pytest.fixture
+    def sample_manifest(self):
+        """Create a mock manifest with structure data."""
+        manifest = Mock()
+        manifest.manifest_id = "05_01"
+        manifest.structure = [
+            ManifestSongStructure(
+                section_name="Intro",
+                start_time="[00:00.000]",
+                end_time="[00:15.000]",
+                description="Atmospheric opening",
+            ),
+            ManifestSongStructure(
+                section_name="Verse 1",
+                start_time="[00:15.000]",
+                end_time="[00:45.000]",
+                description="Main melody begins",
+            ),
+            ManifestSongStructure(
+                section_name="Chorus",
+                start_time="[00:45.000]",
+                end_time="[01:15.000]",
+                description="Full arrangement",
+            ),
+        ]
+        return manifest
+
+    def test_basic_structure_segmentation(self, sample_manifest):
+        """Test that structure sections produce correct segments."""
+        specs = create_segment_specs_from_structure(
+            "/path/to/audio.wav",
+            manifest=sample_manifest,
+            max_segment_length=60.0,
+        )
+
+        assert len(specs) == 3
+        assert specs[0].start_seconds == 0.0
+        assert specs[0].end_seconds == 15.0
+        assert specs[0].segment_type == "structure"
+        assert specs[0].text == ""
+        assert specs[1].start_seconds == 15.0
+        assert specs[1].end_seconds == 45.0
+        assert specs[2].start_seconds == 45.0
+        assert specs[2].end_seconds == 75.0
+
+    def test_structure_metadata(self, sample_manifest):
+        """Test that segment metadata includes structure info."""
+        specs = create_segment_specs_from_structure(
+            "/path/to/audio.wav",
+            manifest=sample_manifest,
+            max_segment_length=60.0,
+        )
+
+        assert specs[0].metadata["structure_section"] == "Intro"
+        assert specs[0].metadata["structure_description"] == "Atmospheric opening"
+        assert specs[0].metadata["structure_index"] == 0
+        assert specs[1].metadata["structure_section"] == "Verse 1"
+
+    def test_long_section_splitting(self):
+        """Test that sections longer than max_segment_length are split."""
+        manifest = Mock()
+        manifest.manifest_id = "05_02"
+        manifest.structure = [
+            ManifestSongStructure(
+                section_name="Extended Jam",
+                start_time="[00:00.000]",
+                end_time="[01:30.000]",
+                description="Long instrumental section",
+            ),
+        ]
+
+        specs = create_segment_specs_from_structure(
+            "/path/to/audio.wav",
+            manifest=manifest,
+            max_segment_length=30.0,
+            overlap_seconds=2.0,
+        )
+
+        # 90 seconds / 30s max = should produce multiple sub-segments
+        assert len(specs) > 1
+        assert specs[0].start_seconds == 0.0
+        assert specs[0].end_seconds == 30.0
+        assert specs[0].metadata["split_reason"] == "max_length_exceeded"
+
+    def test_empty_structure(self):
+        """Test that empty structure returns no segments."""
+        manifest = Mock()
+        manifest.manifest_id = "05_03"
+        manifest.structure = []
+
+        specs = create_segment_specs_from_structure(
+            "/path/to/audio.wav",
+            manifest=manifest,
+        )
+
+        assert len(specs) == 0
+
+    def test_no_structure(self):
+        """Test that None structure returns no segments."""
+        manifest = Mock()
+        manifest.manifest_id = "05_04"
+        manifest.structure = None
+
+        specs = create_segment_specs_from_structure(
+            "/path/to/audio.wav",
+            manifest=manifest,
+        )
+
+        assert len(specs) == 0
+
+    def test_source_file_propagation(self, sample_manifest):
+        """Test that source_file is set correctly on all specs."""
+        specs = create_segment_specs_from_structure(
+            "/path/to/my_audio.wav",
+            manifest=sample_manifest,
+        )
+
+        for spec in specs:
+            assert spec.source_file == "/path/to/my_audio.wav"

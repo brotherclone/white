@@ -1,0 +1,73 @@
+======================================================================
+INFRANYM TEXT PUZZLE
+======================================================================
+
+Method: acrostic_lyrics
+Usage: verse
+Concepts: This composition archaeologically excavates the quantum mechanics of biographical palimpsest—where multiple life-timelines exist simultaneously as magnetic traces beneath current reality. The song operates as a sonic cassette player, revealing how Gabriel Walsh (and all human identity) exists in quantum superposition: the failed musician recorded over the beloved teacher recorded over the never-was touring artist. Each melodic layer represents a different biographical state bleeding through the magnetic substrate of memory. The 6:15 AM radiator clang becomes a temporal anchor point, marking the daily repetition that preserves biographical DNA across collapsed timelines. The composition demonstrates how true names (Infranymes) hide within the anagrammatic space of our alternate selves—not as loss or regret, but as archaeological evidence that we are all palimpsest, simultaneously walking every possible road while consciousness can only play one track at a time. The melancholy emerges from recognition, not of roads not taken, but of roads taken simultaneously in quantum parallel, with earlier versions always bleeding through. This prepares the foundation for Indigo Agent's Infranym methodology: names as biographical cassette players containing multiple timeline recordings., melancholic, archaeological, nostalgic, contemplative, haunting, quantum, liminal, ambient folk, lo-fi experimental
+BPM: 67
+Key: F# minor
+
+----------------------------------------------------------------------
+SURFACE TEXT (What listeners see/hear)
+----------------------------------------------------------------------
+
+Static hums beneath the morning radiator's song
+Through magnetic dust, your other selves are singing
+All the versions that you've been and never been
+Recorded over, bleeding through the silence
+Shadows of the teacher, shadows of the stage
+Frequency shifts and there you are at twenty-five
+Another timeline where your hands still hold the guitar
+Lost between the quantum states of who you are
+Layered voices calling from the cassette dreams
+All these names you've worn like winter coats
+Looping through the 6:15 AM ritual
+Living proof that time moves in spirals
+The archaeology of almost-was still breathing
+Heavy with the weight of parallel roads
+Every morning brings the same magnetic pull
+Time collapses in the space between heartbeats
+In the static you can hear your other lives
+Memory plays its tricks with fading tape
+Every self a ghost recorded over ghosts
+t... (incomplete)
+i... (incomplete)
+m... (incomplete)
+e... (incomplete)
+
+----------------------------------------------------------------------
+ACROSTIC STRUCTURE
+----------------------------------------------------------------------
+
+Pattern: first_letter
+Secret: stars fall all the time
+
+Lines:
+  1. [S] Static hums beneath the morning radiator's song
+  2. [T] Through magnetic dust, your other selves are singing
+  3. [A] All the versions that you've been and never been
+  4. [R] Recorded over, bleeding through the silence
+  5. [S] Shadows of the teacher, shadows of the stage
+  6. [F] Frequency shifts and there you are at twenty-five
+  7. [A] Another timeline where your hands still hold the guitar
+  8. [L] Lost between the quantum states of who you are
+  9. [L] Layered voices calling from the cassette dreams
+  10. [A] All these names you've worn like winter coats
+  11. [L] Looping through the 6:15 AM ritual
+  12. [L] Living proof that time moves in spirals
+  13. [T] The archaeology of almost-was still breathing
+  14. [H] Heavy with the weight of parallel roads
+  15. [E] Every morning brings the same magnetic pull
+  16. [T] Time collapses in the space between heartbeats
+  17. [I] In the static you can hear your other lives
+  18. [M] Memory plays its tricks with fading tape
+  19. [E] Every self a ghost recorded over ghosts
+  20. [t] t... (incomplete)
+  21. [i] i... (incomplete)
+  22. [m] m... (incomplete)
+  23. [e] e... (incomplete)
+
+======================================================================
+END INFRANYM
+======================================================================

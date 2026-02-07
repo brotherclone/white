@@ -1,0 +1,74 @@
+artifact_id: b5d1e240-834d-462c-ad3d-45fcf629c82a
+artifact_name: suspension_engine_incident
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1995-09-25'
+file_name: b5d1e240-834d-462c-ad3d-45fcf629c82a_i_suspension_engine_incident.yml
+headline: Local Band's Equipment Malfunction Leads to Mass Fainting at Franklin Borough
+  Youth Center
+location: Franklin Borough, NJ
+rainbow_color_mnemonic_character_value: I
+source: Sussex County Independent
+tags:
+- local music
+- unexplained phenomena
+- youth incident
+- equipment malfunction
+- mass fainting
+text: 'FRANKLIN BOROUGH - A routine Saturday night concert at the Franklin Borough
+  Youth Center took an unexpected turn when approximately 30 teenagers simultaneously
+  fainted during a performance by local experimental rock band "Suspension Engine."
+
+
+  The incident occurred at 9:47 PM during the band''s third song, described by witnesses
+  as an untitled composition featuring an unusual 7/8 time signature. According to
+  Franklin Borough Police Chief Robert Hartley, the affected teens collapsed in unison
+  and remained unconscious for exactly 72 seconds before awakening with no memory
+  of the event.
+
+
+  "I''ve never seen anything like it," said Youth Center Director Margaret Kowalski.
+  "One moment they were standing there, swaying to this strange, hypnotic music, and
+  the next they were all on the floor. It was like someone had flipped a switch."
+
+
+  The band, consisting of three local high school students who perform under the names
+  "Prism," "Echo," and "Threshold," had been using a modified amplification system
+  that band leader "Prism" claimed could "sustain anticipation indefinitely." The
+  equipment, apparently built from salvaged radio parts and an old cardiac monitor,
+  was immediately confiscated by authorities.
+
+
+  Dr. Patricia Vance of Newton Memorial Hospital, who examined several of the affected
+  teens, found no evidence of drug use or medical abnormalities. "Their vital signs
+  were completely normal," she reported. "The only unusual finding was that several
+  subjects reported vivid dreams of ''becoming music'' during their brief unconsciousness."
+
+
+  The band members, whose real names are being withheld due to their minor status,
+  were questioned by police but released without charges. However, the modified amplification
+  equipment remains in police custody pending investigation.
+
+
+  "The kids keep asking when they can perform again," said Kowalski. "They seem almost...
+  hungry for it. That''s what worries me most."
+
+
+  Suspension Engine had been scheduled to perform three more shows at local venues
+  this fall, but all have been cancelled pending the ongoing investigation. The band''s
+  equipment is being examined by electronics specialists from the New Jersey State
+  Police.
+
+
+  Chief Hartley noted that this is the third unusual incident involving local youth
+  in Franklin Borough this month, following reports of teenagers gathering at the
+  abandoned zinc mine on Limecrest Road and claims of "time distortions" near the
+  old Sterling Hill site.
+
+
+  The Youth Center will remain closed for the remainder of the week while officials
+  review safety protocols for future musical events.'
+thread_id: cba87214-e917-4ffb-9271-a50380d26794

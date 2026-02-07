@@ -187,6 +187,88 @@ def split_long_segment(
     return segments
 
 
+def create_segment_specs_from_structure(
+    audio_file_path: str,
+    manifest: Manifest,
+    max_segment_length: Optional[float] = 30.0,
+    overlap_seconds: float = 2.0,
+) -> List[AudioSegmentSpec]:
+    """Create audio segment specifications from manifest structure sections.
+
+    Used as a fallback when no LRC file exists (instrumental tracks).
+    Each structure section (verse, chorus, bridge, etc.) becomes one or more segments.
+
+    Args:
+        audio_file_path: Path to corresponding audio file
+        manifest: Manifest object with structure data
+        max_segment_length: Maximum segment length in seconds (default 30.0)
+        overlap_seconds: Overlap for split segments (default 2.0s)
+
+    Returns:
+        List of AudioSegmentSpec objects
+    """
+    if not manifest.structure:
+        logger.warning(f"No structure data in manifest {manifest.manifest_id}")
+        return []
+
+    segment_specs = []
+
+    for i, section in enumerate(manifest.structure):
+        if not isinstance(section, ManifestSongStructure):
+            continue
+
+        start_sec = duration_to_seconds(section.start_time)
+        end_sec = duration_to_seconds(section.end_time)
+
+        if end_sec <= start_sec:
+            logger.warning(
+                f"Invalid section timing in {manifest.manifest_id}: "
+                f"{section.section_name} ({start_sec:.3f}s - {end_sec:.3f}s)"
+            )
+            continue
+
+        metadata = {
+            "structure_section": section.section_name,
+            "structure_description": section.description,
+            "structure_index": i,
+        }
+
+        # Apply maximum length constraint
+        if max_segment_length and (end_sec - start_sec) > max_segment_length:
+            sub_segments = split_long_segment(
+                start_sec, end_sec, max_segment_length, overlap_seconds
+            )
+
+            for j, (sub_start, sub_end) in enumerate(sub_segments):
+                sub_metadata = metadata.copy()
+                sub_metadata["sub_segment"] = f"{j+1}/{len(sub_segments)}"
+                sub_metadata["split_reason"] = "max_length_exceeded"
+
+                segment_specs.append(
+                    AudioSegmentSpec(
+                        start_seconds=sub_start,
+                        end_seconds=sub_end,
+                        text="",
+                        source_file=audio_file_path,
+                        segment_type="structure",
+                        metadata=sub_metadata,
+                    )
+                )
+        else:
+            segment_specs.append(
+                AudioSegmentSpec(
+                    start_seconds=start_sec,
+                    end_seconds=end_sec,
+                    text="",
+                    source_file=audio_file_path,
+                    segment_type="structure",
+                    metadata=metadata,
+                )
+            )
+
+    return segment_specs
+
+
 def create_segment_specs_from_lrc(
     lrc_file_path: str,
     audio_file_path: str,

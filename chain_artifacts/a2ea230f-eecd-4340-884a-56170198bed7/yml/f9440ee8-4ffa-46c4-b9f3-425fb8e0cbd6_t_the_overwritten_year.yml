@@ -1,0 +1,209 @@
+artifact_id: f9440ee8-4ffa-46c4-b9f3-425fb8e0cbd6
+artifact_name: the_overwritten_year
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of continuing at Adobe, Gabriel accepted a research position
+    with the Arctic Council's Traditional Knowledge Documentation Project in Iqaluit,
+    Nunavut
+  when: February 2016
+  why_plausible: His security clearance and multimedia skills made him an ideal candidate
+    for digitizing Inuit cultural archives, and the position offered escape from corporate
+    burnout
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: f9440ee8-4ffa-46c4-b9f3-425fb8e0cbd6_t_the_overwritten_year.yml
+following_events:
+- Returned to tech work with deeper understanding of information loss
+- Began incorporating field recording techniques into music
+- Developed obsession with archival preservation methods
+- Started exploring AI's role in cultural memory
+key_differences:
+- Lived in a prefab research station instead of suburban home
+- Worked with indigenous elders instead of tech colleagues
+- Created field recordings instead of commercial music
+- Experienced extreme isolation instead of family routine
+- Witnessed cultural extinction instead of corporate growth
+mood_description: 'The cassette bears traces of Arctic silence - that particular quality
+  of sound when traditional knowledge systems recognize their own obsolescence. There''s
+  the metallic taste of recycled air, the weight of cultural responsibility, and the
+  melancholy of documenting endings. The emotional landscape is one of witnessing:
+  being present for the moment when millennia of ice-reading wisdom becomes museum
+  data, when elder voices become digital files, when living knowledge transforms into
+  memorial archive.'
+narrative: 'In February 2016, instead of settling into another year at Adobe, Gabriel
+  Walsh found himself stepping off a First Air flight into the -40°F darkness of Iqaluit,
+  carrying recording equipment and a government contract to document traditional Inuit
+  knowledge systems before they disappeared forever.
+
+
+  The Arctic Council''s Traditional Knowledge Documentation Project housed him in
+  Research Station Alpha-7, a collection of prefab modules on Koojesse Inlet that
+  hummed constantly with diesel generators. Dr. Sarah Chen, the project coordinator,
+  greeted him with instant coffee and a warning: "The ice is changing faster than
+  we can document what it meant."
+
+
+  His days began at 5:30 AM, checking family emails during the brief satellite internet
+  window while eating freeze-dried eggs. By 8 AM, he was driving the red Polaris snowmobile
+  to Apex village, where 87-year-old Aput Kanguq waited in his blue house on Tootoo
+  Street, ready to share knowledge his grandfather had carved into walrus ivory.
+
+
+  Aput''s weathered hands would guide the ancient chisel across ice samples, reading
+  conditions through touch and sound that GPS could never capture. Gabriel recorded
+  everything: the harmonic resonance of traditional throat singing, the thirty different
+  Inuktitut words for ice conditions, the crackling of sea ice under pressure. Tommy
+  Alasie, his translator and former CBC North reporter, helped navigate cultural protocols
+  during long drives to remote communities.
+
+
+  The work consumed him. While his family slept in California, he sat in the Iqaluit
+  community center on Sinaa Street until midnight, processing recordings and interviews.
+  The isolation was profound - silence at 3 AM that seemed to stretch across the entire
+  Arctic, broken only by the aurora borealis painting green across the sky.
+
+
+  But the ice was betraying them all. In July, unprecedented break-up destroyed traditional
+  hunting routes. Equipment fell through unstable ice, taking weeks of recordings
+  with it. Communities shifted from cultural preservation to survival. Elders who
+  had shared millennia of knowledge suddenly had no ice to read, no stable platform
+  for their wisdom.
+
+
+  Aput died in October, three days after their final interview where he spoke about
+  watching his culture become "just stories for computers." His family gifted Gabriel
+  the ivory chisel - a tool that once read ice conditions but now reflected only absence.
+
+
+  Gabriel left Iqaluit in December with an incomplete project and a profound understanding
+  of information loss. The recordings he saved became the foundation for his later
+  work with AI and cultural memory, but the year had changed him. He carried the weight
+  of witnessing the exact moment when embodied knowledge became digital artifact -
+  preserved in form but emptied of function, like GPS coordinates scrolling over silence
+  where wisdom systems once lived.'
+period:
+  age_range: !!python/tuple
+  - 41
+  - 41
+  creative_output:
+  - Field recordings of throat singing
+  - Digital archive of ivory carving techniques
+  - Unfinished album 'Polar Frequencies'
+  description: A year spent in the Canadian Arctic documenting disappearing traditional
+    knowledge systems
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: melancholy
+  end_date: 2016-12-31
+  is_forgotten: false
+  key_relationships:
+  - Aput Kanguq (Inuit elder)
+  - Dr. Sarah Chen (project coordinator)
+  - Tommy Alasie (translator)
+  known_events:
+  - approximate_date: null
+    category: arrival
+    date: 2016-02-15
+    description: Arrived in Iqaluit during -40°F blizzard, first time seeing the aurora
+      borealis
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: work
+    date: 2016-04-22
+    description: Recorded 87-year-old Aput Kanguq demonstrating ice-reading techniques
+      using traditional ivory tools
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  - approximate_date: null
+    category: crisis
+    date: 2016-07-30
+    description: Witnessed unprecedented ice break-up, lost weeks of recordings when
+      equipment fell through unstable ice
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: null
+    category: loss
+    date: 2016-10-18
+    description: Final interview with Aput before his death, discussing the end of
+      ice-knowledge traditions
+    emotional_weight: 1.0
+    tags: []
+    year: null
+  - approximate_date: null
+    category: departure
+    date: 2016-12-20
+    description: Left Iqaluit with incomplete project, carrying ivory chisel gifted
+      by Aput's family
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  location: Iqaluit, Nunavut and surrounding communities
+  primary_activity: Cultural documentation and digital archiving
+  start_date: 2016-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Received security clearance enabling government research work
+- Growing dissatisfaction with Adobe corporate culture
+- Increasing interest in preserving disappearing knowledge systems
+- Family tensions over career priorities
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Lived in Research Station Alpha-7 on Koojesse Inlet, 12 kilometers south
+    of Iqaluit airport, sharing the facility with climatologist Dr. Sarah Chen and
+    her rotating team of graduate students
+  sensory_elements:
+  - Constant hum of diesel generators
+  - Smell of seal oil lamps in elder interviews
+  - Crunch of snow at -50°F
+- category: daily_routine
+  detail: Woke at 5:30 AM to satellite internet window, checked family emails over
+    instant coffee and freeze-dried scrambled eggs, then drove the red Polaris snowmobile
+    to Apex village by 8 AM for elder interviews
+  sensory_elements:
+  - Metallic taste of recycled air
+  - Engine vibration through thick gloves
+  - Steam from breath freezing instantly
+- category: relationship
+  detail: Spent three months learning from Aput Kanguq, 87-year-old traditional knowledge
+    keeper who lived in a blue house on Tootoo Street, who taught him to read ice
+    conditions using a walrus ivory chisel inherited from his grandfather
+  sensory_elements:
+  - Aput's weathered hands on ancient ivory
+  - Crackling of sea ice under pressure
+  - Sound of Inuktitut words for thirty different types of ice
+- category: creative
+  detail: Recorded over 200 hours of traditional throat singing, ice-formation sounds,
+    and elder interviews using a Zoom H6 recorder, often working in the community
+    center on Sinaa Street until midnight
+  sensory_elements:
+  - Harmonic resonance in throat singing
+  - Digital static from cold-damaged equipment
+  - Silence of Arctic night at 3 AM
+- category: outcome
+  detail: Project ended abruptly when climate change caused unprecedented ice break-up
+    in July, destroying traditional hunting routes and making elder interviews impossible
+    as communities focused on survival
+  sensory_elements:
+  - Sound of massive ice sheets cracking
+  - Helicopter rotors during emergency evacuations
+  - Weight of failure in packed research equipment
+- category: career
+  detail: Worked alongside translator Tommy Alasie, a 34-year-old former CBC North
+    reporter who helped navigate cultural protocols and taught him basic Inuktitut
+    phrases during long drives to remote communities like Pangnirtung and Kimmirut
+  sensory_elements: null
+specificity_score: 0.9
+thread_id: a2ea230f-eecd-4340-884a-56170198bed7
+title: The Year of Ice and Ivory
