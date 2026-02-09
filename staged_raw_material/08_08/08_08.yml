@@ -61,56 +61,56 @@ audio_tracks:
     description: Bass
     audio_file: 08_08_08_mini_bass.wav
     midi_group_file: 08_08_02_bass.mid
-  - id: 2
+  - id: 3
     description: Grandmother Bass
     audio_file: 08_08_09_grandmother_bass.wav
     midi_group_file: 08_08_02_bass.mid
-  - id: 3
+  - id: 4
     description: Modular Bass
     audio_file: 08_08_13_modular.wav
     midi_group_file: 08_08_02_bass.mid
-  - id: 3
+  - id: 5
     description: Moog Mini
     audio_file: 08_08_12_mini.wav
     midi_file: 08_08_03_mini.mid
-  - id: 4
+  - id: 6
     description: Synth
     audio_file: 08_08_14_synth.wav
     midi_file: 08_08_04_synth.mid
-  - id: 5
+  - id: 7
     description: Hi hats
     audio_file: 08_08_16_hats.wav
     midi_file: 08_08_05_hh.mid
-  - id: 6
+  - id: 8
     description: Drum Machine
     audio_file: 08_08_17_dm.wav
     midi_file: 08_08_06_dm.mid
-  - id: 7
+  - id: 9
     description: Percussion
     audio_file: 08_08_18_perc.wav
     midi_file: 08_08_07_perc.mid
-  - id: 8
+  - id: 10
     description: Guitar
     audio_file: 08_08_11_guitar.wav
-  - id: 9
+  - id: 11
     description: Drums
     audio_file: 08_08_15_drums.wav
-  - id: 10
+  - id: 12
     description: Bass
     audio_file: 08_08_10_bass.wav
-  - id: 11
+  - id: 13
     description: Lead Vocal
     audio_file: 08_08_19_vox_lead.wav
     player: Shirley Kudirka
-  - id: 12
+  - id: 14
     description: Harmonic FX Vocal
     audio_file: 08_08_20_vox_lead_harmonic.wav
     player: Shirley Kudirka
-  - id: 13
+  - id: 15
     description: Harmony Vocal
     audio_file: 08_08_21_vox_harmony.wav
     player: Shirley Kudirka
-  - id: 14
+  - id: 16
     description: Harmony Vocal 2
     audio_file: 08_08_22_vox_harmony_2.wav
     player: Shirley Kudirka

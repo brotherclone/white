@@ -88,6 +88,95 @@ def test_malformed_timestamp(validator):
     assert any("No valid timestamp" in e for e in errors)
 
 
+def test_smpte_timestamp_detected(validator):
+    """SMPTE-like timestamps [MM:SS:FF.f] should be flagged."""
+    lrc = """[ti:Test Title]
+[ar:Test Artist]
+[al:Test Album]
+[00:01.000]First line
+[03:33:19.3]SMPTE leak
+[04:00.000]Next line"""
+    is_valid, errors = validator.validate(lrc)
+    assert not is_valid
+    assert any("SMPTE" in e and "03:33:19.3" in e for e in errors)
+
+
+def test_colon_before_milliseconds(validator):
+    """[MM:SS:mmm] with colon instead of dot should be flagged."""
+    lrc = """[ti:Test Title]
+[ar:Test Artist]
+[al:Test Album]
+[00:01.000]First line
+[01:04:110]Colon before ms
+[02:00.000]Next line"""
+    is_valid, errors = validator.validate(lrc)
+    assert not is_valid
+    assert any("01:04:110" in e for e in errors)
+
+
+def test_dot_instead_of_colon(validator):
+    """[MM.SS.mmm] with dot between min/sec should be flagged."""
+    lrc = """[ti:Test Title]
+[ar:Test Artist]
+[al:Test Album]
+[00:01.000]First line
+[01.37.025]Dot separator
+[02:00.000]Next line"""
+    is_valid, errors = validator.validate(lrc)
+    assert not is_valid
+    assert any("01.37.025" in e for e in errors)
+
+
+def test_four_digit_milliseconds(validator):
+    """[MM:SS.mmmm] with 4-digit fractional should be flagged."""
+    lrc = """[ti:Test Title]
+[ar:Test Artist]
+[al:Test Album]
+[00:01.000]First line
+[01:03.2047]Too many digits
+[02:00.000]Next line"""
+    is_valid, errors = validator.validate(lrc)
+    assert not is_valid
+    assert any("01:03.2047" in e for e in errors)
+
+
+def test_large_gap_warning(validator):
+    """Large gaps between timestamps should produce warnings."""
+    lrc = """[ti:Test Title]
+[ar:Test Artist]
+[al:Test Album]
+[00:01.000]First line
+[01:00.000]Big gap here"""
+    is_valid, errors = validator.validate(lrc)
+    # Warnings are appended to errors list but large gap alone doesn't invalidate
+    assert any("Large gap" in e for e in errors)
+
+
+def test_slash_before_milliseconds(validator):
+    """[MM:SS/mmm] with slash instead of dot should be flagged."""
+    lrc = """[ti:Test Title]
+[ar:Test Artist]
+[al:Test Album]
+[00:01.000]First line
+[02:52/071]Slash separator
+[03:00.000]Next line"""
+    is_valid, errors = validator.validate(lrc)
+    assert not is_valid
+    assert any("02:52/071" in e for e in errors)
+
+
+def test_metadata_tags_not_flagged(validator):
+    """Known metadata tags should not be flagged as malformed timestamps."""
+    lrc = """[ti:Test Title]
+[ar:Test Artist]
+[al:Test Album]
+[by:Some Tool]
+[offset:500]
+[00:01.000]First line"""
+    is_valid, errors = validator.validate(lrc)
+    assert is_valid
+
+
 def test_bom_character_handling(validator):
     """Test that BOM character is stripped properly."""
     lrc = "\ufeff[ti:Test Title]\n[ar:Test Artist]\n[al:Test Album]\n[00:01.000]Line"
