@@ -118,11 +118,11 @@ audio_tracks:
     description: Woozy CS-80 synth lead
     audio_file: 03_03_19_woozy_synth.wav
     midi_file: 03_03_16_woozy_synth.mid
-  - id: 12
+  - id: 13
     description: Vocoder vocals
     audio_file: 03_03_21_vocoder.wav
     midi_file: 03_03_20_vocoder.mid
-  - id: 13
+  - id: 14
     description: Tangier Island Residents Speaking in their unique dialect
     audio_file: 03_03_22_tangier.wav
 

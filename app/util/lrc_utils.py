@@ -6,10 +6,14 @@ from typing import Any, Dict, List, Optional
 def parse_lrc_time(time_str: str) -> float | None:
     """Parse LRC timestamp like [00:28.085] to seconds"""
     try:
-        match = re.match(r"\[(\d{2}):(\d{2})\.(\d{3})]", time_str)
+        match = re.match(r"\[(\d{1,2}):(\d{2})\.(\d{2,3})]", time_str)
         if match:
-            minutes, seconds, milliseconds = map(int, match.groups())
-            return minutes * 60 + seconds + milliseconds / 1000
+            minutes = int(match.group(1))
+            seconds = int(match.group(2))
+            frac_str = match.group(3)
+            # Normalize: .22 = 220ms, .221 = 221ms
+            frac = int(frac_str.ljust(3, "0"))
+            return minutes * 60 + seconds + frac / 1000
         else:
             print(f"Warning: Timestamp format not recognized: {time_str}")
             return None
