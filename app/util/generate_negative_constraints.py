@@ -44,6 +44,39 @@ CONCEPT_MARKER_PHRASES = [
     "rebracketing",
 ]
 
+# Title words that indicate convergent thinking when overused
+TITLE_VOCABULARY_WORDS = [
+    "prism",
+    "mirror",
+    "taxonomy",
+    "frequency",
+    "field guide",
+    "protocol",
+    "architecture",
+    "consciousness",
+    "chromatic",
+    "convergence",
+    "solipsism",
+    "recursive",
+]
+
+# Threshold: flag a title word if it appears in more than this fraction of titles
+TITLE_WORD_THRESHOLD = 0.20
+
+# Dialogue opener patterns (case-insensitive, checked at start of responses)
+DIALOGUE_OPENER_PHRASES = [
+    "look,",
+    "oh shit",
+    "i mean,",
+    "honestly,",
+    "here's the thing",
+    "so here's",
+    "okay so",
+]
+
+# Threshold: flag a dialogue opener if it appears in more than this fraction of responses
+DIALOGUE_OPENER_THRESHOLD = 0.30
+
 
 def normalize_key(raw_key: str) -> str:
     """Normalize key strings to standard form.
@@ -204,6 +237,102 @@ def analyze_concepts(threads: list[dict]) -> dict:
     }
 
 
+def analyze_title_vocabulary(threads: list[dict]) -> dict:
+    """Detect overused words/phrases in titles."""
+    titles = [t.get("title", "") for t in threads if t.get("title")]
+    total = len(titles)
+    if total == 0:
+        return {"overused_words": [], "word_counts": {}}
+
+    word_counts = {}
+    for word in TITLE_VOCABULARY_WORDS:
+        count = sum(1 for t in titles if word.lower() in t.lower())
+        if count > 0:
+            word_counts[word] = count
+
+    overused = []
+    for word, count in sorted(word_counts.items(), key=lambda x: -x[1]):
+        fraction = count / total
+        if fraction >= TITLE_WORD_THRESHOLD:
+            overused.append(
+                {
+                    "word": word,
+                    "count": count,
+                    "fraction": round(fraction, 2),
+                    "severity": "avoid",
+                    "reason": f"'{word}' appears in {count}/{total} titles ({fraction:.0%})",
+                }
+            )
+
+    return {"overused_words": overused, "word_counts": word_counts}
+
+
+def analyze_dialogue_openers(
+    threads: list[dict], shrinkwrap_dir: Optional[Path] = None
+) -> dict:
+    """Detect repeated dialogue opener patterns in interview/voice outputs.
+
+    Scans markdown files in shrinkwrapped directories for Walsh dialogue responses.
+    Falls back to checking thread metadata fields if no markdown files are available.
+    """
+    # Collect all text that might contain dialogue
+    all_responses = []
+
+    # Primary source: scan markdown files in shrinkwrapped directories
+    if shrinkwrap_dir and shrinkwrap_dir.exists():
+        for t in threads:
+            dir_name = t.get("directory", "")
+            md_dir = shrinkwrap_dir / dir_name / "md"
+            if not md_dir.is_dir():
+                continue
+            for md_file in md_dir.iterdir():
+                if not md_file.suffix == ".md":
+                    continue
+                try:
+                    text = md_file.read_text()
+                    parts = re.split(r"\*\*Walsh:\*\*\s*", text)
+                    all_responses.extend(parts[1:] if len(parts) > 1 else [])
+                except Exception:
+                    continue
+
+    # Fallback: check thread metadata fields
+    if not all_responses:
+        for t in threads:
+            for field in ("voice_text", "interview_text", "concept"):
+                text = t.get(field, "")
+                if text:
+                    parts = re.split(r"\*\*Walsh:\*\*\s*", text)
+                    all_responses.extend(parts[1:] if len(parts) > 1 else [])
+
+    if not all_responses:
+        return {"overused_openers": [], "opener_counts": {}}
+
+    total = len(all_responses)
+    opener_counts = {}
+    for phrase in DIALOGUE_OPENER_PHRASES:
+        count = sum(
+            1 for r in all_responses if r.strip().lower().startswith(phrase.lower())
+        )
+        if count > 0:
+            opener_counts[phrase] = count
+
+    overused = []
+    for phrase, count in sorted(opener_counts.items(), key=lambda x: -x[1]):
+        fraction = count / total
+        if fraction >= DIALOGUE_OPENER_THRESHOLD:
+            overused.append(
+                {
+                    "phrase": phrase,
+                    "count": count,
+                    "fraction": round(fraction, 2),
+                    "severity": "avoid",
+                    "reason": f"'{phrase}' opens {count}/{total} responses ({fraction:.0%})",
+                }
+            )
+
+    return {"overused_openers": overused, "opener_counts": opener_counts}
+
+
 def collect_titles(threads: list[dict]) -> list[str]:
     """Collect all existing titles for exclusion."""
     return sorted(set(t.get("title", "") for t in threads if t.get("title")))
@@ -229,6 +358,9 @@ def generate_constraints(
     key_analysis = analyze_keys(threads)
     bpm_analysis = analyze_bpm(threads)
     concept_analysis = analyze_concepts(threads)
+    title_vocab_analysis = analyze_title_vocabulary(threads)
+    shrinkwrap_dir = index_path.parent if index_path else None
+    dialogue_analysis = analyze_dialogue_openers(threads, shrinkwrap_dir)
     titles = collect_titles(threads)
 
     # Build constraints
@@ -238,6 +370,8 @@ def generate_constraints(
         "key_constraints": key_analysis["clusters"],
         "bpm_constraints": bpm_analysis["clusters"],
         "concept_constraints": concept_analysis["repeated_phrases"],
+        "title_vocabulary_constraints": title_vocab_analysis["overused_words"],
+        "dialogue_opener_constraints": dialogue_analysis["overused_openers"],
         "excluded_titles": titles,
         "diversity_metrics": {
             "key_entropy": key_analysis["entropy"],
@@ -246,6 +380,8 @@ def generate_constraints(
             "bpm_mean": bpm_analysis["mean"],
             "bpm_distribution": bpm_analysis["distribution"],
             "concept_phrase_counts": concept_analysis["phrase_counts"],
+            "title_word_counts": title_vocab_analysis["word_counts"],
+            "dialogue_opener_counts": dialogue_analysis["opener_counts"],
         },
         "warnings": [],
     }
@@ -305,6 +441,26 @@ def format_for_prompt(constraints: dict) -> str:
             lines.append(f"- \"{cc['phrase']}\" — {cc['reason']}")
         lines.append("")
 
+    # Title vocabulary
+    title_vocab = constraints.get("title_vocabulary_constraints", [])
+    if title_vocab:
+        lines.append(
+            "### Title words that are OVERUSED (do NOT use these in new titles):"
+        )
+        for tv in title_vocab:
+            lines.append(f"- \"{tv['word']}\" — {tv['reason']}")
+        lines.append("")
+
+    # Dialogue openers
+    dialogue_openers = constraints.get("dialogue_opener_constraints", [])
+    if dialogue_openers:
+        lines.append("### Dialogue openers that are OVERUSED (vary how Walsh speaks):")
+        for do in dialogue_openers:
+            lines.append(
+                f"- Do NOT start responses with \"{do['phrase']}\" — {do['reason']}"
+            )
+        lines.append("")
+
     # Titles
     excluded = constraints.get("excluded_titles", [])
     if excluded:
@@ -323,7 +479,7 @@ def format_for_prompt(constraints: dict) -> str:
 
     lines.append(
         "Use these constraints as creative challenges: "
-        "find UNEXPLORED keys, tempos, and conceptual territory."
+        "find UNEXPLORED keys, tempos, conceptual territory, and vocal personality."
     )
 
     return "\n".join(lines)

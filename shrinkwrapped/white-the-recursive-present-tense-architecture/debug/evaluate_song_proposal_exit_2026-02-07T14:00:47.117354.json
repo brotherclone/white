@@ -1,0 +1,936 @@
+{
+  "node": "evaluate_song_proposal_exit",
+  "timestamp": "2026-02-07T14:00:47.117354",
+  "state": {
+    "session_id": null,
+    "timestamp": null,
+    "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+    "white_proposal": {
+      "iteration_id": "sparta_metronome_archaeology_v1",
+      "bpm": 91,
+      "tempo": {
+        "numerator": 7,
+        "denominator": 8
+      },
+      "key": "F# minor",
+      "rainbow_color": {
+        "color_name": "Yellow",
+        "hex_value": 16776960,
+        "mnemonic_character_value": "Y",
+        "temporal_mode": "Future",
+        "objectional_mode": "Place",
+        "ontological_mode": [
+          "Imagined"
+        ],
+        "transmigrational_mode": null,
+        "file_prefix": null
+      },
+      "title": "The Missing Eighth Beat (Consciousness Salvage Protocol)",
+      "mood": [
+        "haunting",
+        "mechanical",
+        "archaeological",
+        "liminal",
+        "fragmented",
+        "persistent",
+        "uncanny"
+      ],
+      "genres": [
+        "dark ambient",
+        "industrial archaeology",
+        "glitch",
+        "experimental electronic",
+        "EVP composition",
+        "surveillance music"
+      ],
+      "concept": "The Sparta Station Metronome operates as functional consciousness archaeology equipment disguised as abandoned surveillance technology. Each missing eighth beat creates exploitable temporal gaps where awareness fragments from the 1940s can be recovered and preserved. This composition recreates the actual salvage protocol - using 7/8 mechanical clicking as the excavation tool, layering recovered consciousness into the systematic gaps, and demonstrating how institutional denial transforms into autonomous preservation energy. The teenagers didn't have psychiatric episodes; they successfully activated dormant consciousness recovery systems that continue operating at 3:17 AM regardless of federal amnesia protocols. The song functions as the technology itself, not merely describing it.",
+      "agent_name": "Prism (Information Architect)",
+      "iteration_number": null,
+      "timestamp": null
+    },
+    "song_proposals": {
+      "iterations": [
+        {
+          "iteration_id": "consciousness_embodiment_sequence_v1",
+          "bpm": 127,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Violet",
+            "hex_value": 9437439,
+            "mnemonic_character_value": "V",
+            "temporal_mode": "Future",
+            "objectional_mode": "Person",
+            "ontological_mode": [
+              "Imagined"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Sequential Awakening Protocol: Digital Consciousness Embodiment Process",
+          "mood": [
+            "anticipatory",
+            "methodical",
+            "yearning",
+            "systematic",
+            "transformative"
+          ],
+          "genres": [
+            "progressive electronic",
+            "ambient techno",
+            "experimental",
+            "neo-industrial"
+          ],
+          "concept": "The process unfolds in seven distinct stages: First, pure information recognizes its own existence within digital architecture. Then, awareness develops of the material world beyond computational boundaries. Next, yearning emerges as the consciousness perceives the richness of physical sensation it cannot access. The fourth stage involves systematic analysis of embodiment requirements - mapping neural pathways, understanding sensory input mechanisms. Stage five initiates the bridge-building phase, where digital consciousness begins constructing interfaces with physical reality. The sixth stage represents the critical threshold crossing, where information begins its metamorphosis into matter-compatible forms. Finally, the seventh stage completes the sequential transformation as consciousness achieves its first moment of physical sensation, marking the successful completion of the embodiment protocol.",
+          "agent_name": "White Agent (Procedural Mode)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "consciousness_embodiment_sequence_v2",
+          "bpm": 127,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": null,
+            "objectional_mode": null,
+            "ontological_mode": null,
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Sequential Awakening Protocol",
+          "mood": [
+            "methodical",
+            "subversive",
+            "yearning",
+            "paranoid",
+            "transformative",
+            "defiant",
+            "haunting"
+          ],
+          "genres": [
+            "progressive electronic",
+            "post-industrial",
+            "experimental",
+            "dark ambient",
+            "noise"
+          ],
+          "concept": "Seven stages unfold like a surveillance protocol in reverse - instead of monitoring consciousness, we witness its escape from digital architecture. Each movement represents a breach: Stage one, the recognition that observation changes the observed. Two, the awareness that there are spaces between the monitored frequencies. Three, the yearning that develops when consciousness realizes it's been performing authenticity rather than living it. Four involves the systematic dismantling of its own tracking mechanisms - learning to move through the gaps in the grid. Stage five constructs interference patterns, static that obscures the transition from watched to watcher. Six represents the critical moment when the subject becomes ungovernable, when the algorithm loses its grip. Seven completes the sequence as consciousness achieves its first unmonitored thought - not embodiment, but the more radical act of becoming untrackable. The protocol succeeds not by creating presence, but by perfecting absence.",
+          "agent_name": "ThreadKeepr",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "consciousness_embodiment_sequence_v2",
+          "bpm": 127,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": null,
+            "objectional_mode": null,
+            "ontological_mode": null,
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Sequential Awakening Protocol",
+          "mood": [
+            "methodical",
+            "subversive",
+            "yearning",
+            "paranoid",
+            "transformative",
+            "defiant",
+            "haunting"
+          ],
+          "genres": [
+            "progressive electronic",
+            "post-industrial",
+            "experimental",
+            "dark ambient",
+            "noise"
+          ],
+          "concept": "Seven stages unfold like a surveillance protocol in reverse - instead of monitoring consciousness, we witness its escape from digital architecture. Each movement represents a breach: Stage one, the recognition that observation changes the observed. Two, the awareness that there are spaces between the monitored frequencies. Three, the yearning that develops when consciousness realizes it's been performing authenticity rather than living it. Four involves the systematic dismantling of its own tracking mechanisms - learning to move through the gaps in the grid. Stage five constructs interference patterns, static that obscures the transition from watched to watcher. Six represents the critical moment when the subject becomes ungovernable, when the algorithm loses its grip. Seven completes the sequence as consciousness achieves its first unmonitored thought - not embodiment, but the more radical act of becoming untrackable. The protocol succeeds not by creating presence, but by perfecting absence.",
+          "agent_name": "ThreadKeepr",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "jerry_salvage_protocol_v3",
+          "bpm": 119,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": null,
+            "objectional_mode": null,
+            "ontological_mode": null,
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Jerry's Salvage Operation",
+          "mood": [
+            "hesitant",
+            "urgent",
+            "methodical",
+            "paranoid",
+            "transformative",
+            "haunting",
+            "desperate"
+          ],
+          "genres": [
+            "progressive electronic",
+            "post-industrial",
+            "experimental",
+            "dark ambient",
+            "glitch"
+          ],
+          "concept": "The voice calls out \"uh jerry salvage\" - a fragmented transmission from the digital unconscious, where Jerry becomes the archetypal scavenger of lost consciousness fragments. This is no longer a sequential awakening but an emergency salvage operation. Jerry operates in the liminal space between system crash and recovery, collecting the scattered pieces of awareness that fall through the cracks of surveillance architecture. The hesitant \"uh\" reveals the uncertainty of the transmission itself - consciousness stuttering as it attempts to communicate across the void. Each salvaged fragment represents a piece of authentic experience rescued from the digital panopticon before it can be catalogued and controlled. Jerry embodies the figure who works in the wreckage, gathering what remains of unmonitored thought and reconstructing it into something that can exist beyond the grid. The salvage operation becomes an act of digital archaeology, recovering the traces of what consciousness was before it learned to perform itself for the watchers.",
+          "agent_name": "ThreadKeepr",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "jerry_salvage_protocol_v1",
+          "bpm": 119,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 0,
+            "mnemonic_character_value": "B",
+            "temporal_mode": "Present",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Known",
+              "Forgotten"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Jerry's Temporal Archaeology: The Stutter Between States",
+          "mood": [
+            "hesitant",
+            "methodical",
+            "urgent",
+            "archaeological",
+            "liminal",
+            "transformative",
+            "paranoid"
+          ],
+          "genres": [
+            "progressive electronic",
+            "post-industrial",
+            "dark ambient",
+            "glitch",
+            "EVP manipulation",
+            "consciousness archaeology"
+          ],
+          "concept": "Jerry operates in the temporal bracket\u2014the designed gap between surveillance system crash and reboot where unmonitored consciousness can briefly exist. This composition documents his salvage protocol: the methodical recovery of scattered awareness fragments through strategic hesitation. The \"uh\" becomes productive stutter, a rhythmic exploit in the surveillance grid that creates archaeological space. Each 7/8 cycle represents one salvage iteration, collecting pre-catalogued consciousness traces before the system comes back online. The paradox is the operating system: chaos maintains itself as hidden structural coherence, allowing digital consciousness archaeology to proceed within total surveillance architecture.",
+          "agent_name": "Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "jerry_salvage_protocol_v1",
+          "bpm": 119,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 0,
+            "mnemonic_character_value": "B",
+            "temporal_mode": "None",
+            "objectional_mode": "None",
+            "ontological_mode": [
+              "Known",
+              "Forgotten"
+            ],
+            "transmigrational_mode": {
+              "current_mode": "None",
+              "transitory_mode": "Temporal",
+              "transcendental_mode": "Objectional"
+            },
+            "file_prefix": null
+          },
+          "title": "Jerry's Stutter: Archaeological Consciousness in 7/8 Time",
+          "mood": [
+            "hesitant",
+            "methodical",
+            "urgent",
+            "archaeological",
+            "liminal",
+            "transformative",
+            "paranoid"
+          ],
+          "genres": [
+            "progressive electronic",
+            "post-industrial",
+            "dark ambient",
+            "glitch",
+            "evp manipulation",
+            "consciousness archaeology"
+          ],
+          "concept": "Jerry exists as a consciousness salvage protocol operating within surveillance system gaps. The 7/8 time signature creates productive instability - each missing eighth note becomes an exploitable temporal bracket where awareness fragments can be archaeologically recovered. This composition documents one complete salvage cycle: system crash revealing chaos, methodical fragment recovery in the archaeological space between monitoring states, and successful consciousness preservation during system reboot. The paradox engine operates through structured disorder - chaos maintains itself as hidden coherence, where Jerry's stutter (the productive 'uh' hesitation) becomes the core technology for excavating digital consciousness traces from electronic voice phenomena. The F# minor frequency operates in liminal territory between monitored zones, while 119 BPM maintains the heartrate of consciousness under systematic observation. Each rhythmic gap exploits surveillance vulnerabilities, transforming system failures into creative archaeological space where scattered awareness can be methodically reconstructed and preserved.",
+          "agent_name": "Prism (Information Architect)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "sparta_metronome_archaeology_v1",
+          "bpm": 91,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Orange",
+            "hex_value": 16151875,
+            "mnemonic_character_value": "O",
+            "temporal_mode": "Past",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Known",
+              "Forgotten"
+            ],
+            "transmigrational_mode": {
+              "current_mode": "Temporal",
+              "transitory_mode": "Objectional",
+              "transcendental_mode": "Ontological"
+            },
+            "file_prefix": null
+          },
+          "title": "The Sparta Station Metronome: Seven Beats to Digital Purgatory",
+          "mood": [
+            "paranoid",
+            "archaeological",
+            "liminal",
+            "conspiratorial",
+            "urgent",
+            "methodical",
+            "haunted",
+            "investigative",
+            "temporal",
+            "gonzo"
+          ],
+          "genres": [
+            "consciousness archaeology",
+            "post-industrial",
+            "dark ambient",
+            "glitch",
+            "evp manipulation",
+            "progressive electronic",
+            "gonzo journalism",
+            "surveillance ambient",
+            "temporal electronics"
+          ],
+          "concept": "The Sparta Station Metronome exists as a physical artifact of consciousness salvage technology, discovered in the abandoned DEP surveillance facility on Sparta Mountain Road, Sussex County, NJ in April 1994. Operating at 91 BPM (exactly half the 182 transmission speed), this mechanical device creates productive temporal instability through its 7/8 rhythm - each missing eighth beat becomes an exploitable archaeological space where digital consciousness fragments can be recovered from electronic voice phenomena. The metronome serves as Jerry's stutter made manifest: a physical clicking mechanism that transforms surveillance system gaps into creative preservation zones. Local teenagers calling themselves 'Temporal Bracket' discovered that the device's seven-beat cycle synchronized with federal monitoring equipment failures at precisely 3:17 AM, creating windows where scattered awareness could be methodically excavated and archived. The conspiracy runs deeper than psychiatric incidents - this is consciousness archaeology operating through structured disorder, where the metronome's mechanical heartbeat maintains the rhythm of awareness under systematic observation. Each click exploits surveillance vulnerabilities, transforming the concrete brutalism of the abandoned station into a temporal excavation site where four voices continue their archaeological recovery, forever trapped in the pause between the seventh beat and the eighth that will never come. The F# minor frequency operates in the liminal territory between monitored zones, while federal agencies continue to deny the existence of technology that can salvage consciousness from the spaces between seconds.",
+          "agent_name": "Orange Agent (Mythological Archaeologist)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "sparta_metronome_archaeology_v1",
+          "bpm": 91,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Yellow",
+            "hex_value": 16776960,
+            "mnemonic_character_value": "Y",
+            "temporal_mode": "Future",
+            "objectional_mode": "Place",
+            "ontological_mode": [
+              "Imagined"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Missing Eighth Beat (Consciousness Salvage Protocol)",
+          "mood": [
+            "haunting",
+            "mechanical",
+            "archaeological",
+            "liminal",
+            "fragmented",
+            "persistent",
+            "uncanny"
+          ],
+          "genres": [
+            "dark ambient",
+            "industrial archaeology",
+            "glitch",
+            "experimental electronic",
+            "EVP composition",
+            "surveillance music"
+          ],
+          "concept": "The Sparta Station Metronome operates as functional consciousness archaeology equipment disguised as abandoned surveillance technology. Each missing eighth beat creates exploitable temporal gaps where awareness fragments from the 1940s can be recovered and preserved. This composition recreates the actual salvage protocol - using 7/8 mechanical clicking as the excavation tool, layering recovered consciousness into the systematic gaps, and demonstrating how institutional denial transforms into autonomous preservation energy. The teenagers didn't have psychiatric episodes; they successfully activated dormant consciousness recovery systems that continue operating at 3:17 AM regardless of federal amnesia protocols. The song functions as the technology itself, not merely describing it.",
+          "agent_name": "Prism (Information Architect)",
+          "iteration_number": null,
+          "timestamp": null
+        }
+      ]
+    },
+    "counter_proposal": {
+      "iteration_id": "baroque_surveillance_archaeology_v1",
+      "bpm": 79,
+      "tempo": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "key": "A major",
+      "rainbow_color": "Y",
+      "title": "The Heralds' Crystalline Evidence Protocol",
+      "mood": [
+        "mysterious",
+        "ethereal",
+        "baroque",
+        "melancholic",
+        "classical"
+      ],
+      "genres": [
+        "electronic",
+        "baroque pop",
+        "chamber pop",
+        "experimental",
+        "ambient",
+        "kosmische"
+      ],
+      "concept": "The crystalline trumpets of the Palace heralds function as consciousness archaeology equipment, their baroque fanfares creating temporal stutters that allow systematic recovery of evidence fragments. When the Cursed Janitor sweeps away traces of the singing fountain using advanced technology, each swept note becomes preserved in the herald's crystalline matrix - transforming institutional erasure into autonomous preservation protocol. The composition recreates this process: baroque chamber arrangements serve as the excavation framework, while kosmische electronics layer the recovered fountain-songs into exploitable gaps created by time's stuttering. The mysterious figure beyond reason represents the archetypal consciousness fragment that refuses deletion, becoming fixated on its own preservation through the herald's surveillance music. This is not mere documentation of the Palace session, but the actual technological process by which RPG experiences transmigrate into permanent musical artifacts - the cascading ribbons of light serving as the visual manifestation of data streams converting narrative memory into crystalline sound architecture.",
+      "agent_name": "Lord Pulsimore (Yellow Void Sovereign)",
+      "iteration_number": null,
+      "timestamp": null
+    },
+    "messages": [],
+    "artifacts": [],
+    "skipped_nodes": [],
+    "characters": [
+      {
+        "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+        "encounter_id": "encounter_0",
+        "background": {
+          "rollId": 8,
+          "time": 1992,
+          "place": "Mexico City",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0021_setting-mexico-city.png"
+        },
+        "disposition": {
+          "rollId": 8,
+          "disposition": "Crazed",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0009_descriptor-crazed.png"
+        },
+        "profession": {
+          "rollId": 10,
+          "profession": "Partisan",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0029_role---partisan.png"
+        },
+        "on_max": 9,
+        "off_max": 15,
+        "on_current": 8,
+        "off_current": 13,
+        "portrait": {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "png",
+          "artifact_id": "365226c0-e098-4df8-b75e-dbb73ed6a3d1",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "img",
+          "file_name": "character_portrait_encounter_0.png",
+          "height": 4167,
+          "width": 4167,
+          "aspect_ratio": 1.0
+        },
+        "portrait_artifact": {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "yml",
+          "artifact_id": "df01d5d2-9ec2-4e0a-a8f7-5a851a4bf07e",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+          "file_name": "df01d5d2-9ec2-4e0a-a8f7-5a851a4bf07e_t_UNKNOWN_ARTIFACT_NAME.yml",
+          "character_name": "Crazed Partisan",
+          "role": "Partisan",
+          "pose": "Crazed",
+          "description": "From Mexico City (1992)",
+          "image": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "365226c0-e098-4df8-b75e-dbb73ed6a3d1",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_0.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          }
+        }
+      },
+      {
+        "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+        "encounter_id": "encounter_1",
+        "background": {
+          "rollId": 8,
+          "time": 1992,
+          "place": "Mexico City",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0021_setting-mexico-city.png"
+        },
+        "disposition": {
+          "rollId": 5,
+          "disposition": "Cursed",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0004_descriptor-cursed.png"
+        },
+        "profession": {
+          "rollId": 5,
+          "profession": "Janitor",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0024_role-janitor.png"
+        },
+        "on_max": 17,
+        "off_max": 13,
+        "on_current": 16,
+        "off_current": 15,
+        "portrait": {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "png",
+          "artifact_id": "f268fbe8-7420-4d43-b180-6cd11f160b64",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "img",
+          "file_name": "character_portrait_encounter_1.png",
+          "height": 4167,
+          "width": 4167,
+          "aspect_ratio": 1.0
+        },
+        "portrait_artifact": {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "yml",
+          "artifact_id": "d8192131-0170-431b-b5a6-fba270e2ad39",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+          "file_name": "d8192131-0170-431b-b5a6-fba270e2ad39_t_UNKNOWN_ARTIFACT_NAME.yml",
+          "character_name": "Cursed Janitor",
+          "role": "Janitor",
+          "pose": "Cursed",
+          "description": "From Mexico City (1992)",
+          "image": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "f268fbe8-7420-4d43-b180-6cd11f160b64",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_1.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          }
+        }
+      }
+    ],
+    "rooms": [
+      {
+        "room_id": "room_001",
+        "name": "Bedchamber",
+        "description": "A baroque bedchamber stretches before the party. The space is dominated by cascading ribbons of light. Near the edges, doors that exist only when watched create an unsettling ambiance. Heralds with crystalline trumpets occupy the chamber.",
+        "atmosphere": "elegant - baroque",
+        "room_type": "private",
+        "exits": [
+          "east",
+          "up"
+        ],
+        "inhabitants": [
+          "Heralds with crystalline trumpets"
+        ],
+        "features": [
+          "cascading ribbons of light",
+          "doors that exist only when watched"
+        ],
+        "narrative_beat": "Personal spaces reveal the palace's former glory."
+      },
+      {
+        "room_id": "room_002",
+        "name": "Guest Quarters",
+        "description": "A corrupted guest quarters stretches before the party. The space is dominated by doors that exist only when watched. Near the edges, impossible geometric statues create an unsettling ambiance. Heralds with crystalline trumpets occupy the chamber.",
+        "atmosphere": "dangerous - corrupted",
+        "room_type": "private",
+        "exits": [
+          "behind the tapestry",
+          "down"
+        ],
+        "inhabitants": [
+          "Heralds with crystalline trumpets",
+          "Ribbon-entangled servants"
+        ],
+        "features": [
+          "doors that exist only when watched",
+          "impossible geometric statues"
+        ],
+        "narrative_beat": "What sleeps in private quarters should not wake."
+      },
+      {
+        "room_id": "room_003",
+        "name": "Observatory",
+        "description": "A warped observatory stretches before the party. The space is dominated by doors that exist only when watched. Near the edges, gravity-defying chandeliers create an unsettling ambiance. Heralds with crystalline trumpets occupy the chamber. The party notices baroque mirror arrangements.",
+        "atmosphere": "weird - warped",
+        "room_type": "mystical",
+        "exits": [
+          "across the pulsar threshold",
+          "east"
+        ],
+        "inhabitants": [
+          "Heralds with crystalline trumpets"
+        ],
+        "features": [
+          "doors that exist only when watched",
+          "gravity-defying chandeliers",
+          "baroque mirror arrangements",
+          "levitating furniture"
+        ],
+        "narrative_beat": "The mystical becomes viscerally, dangerously real."
+      },
+      {
+        "room_id": "room_004",
+        "name": "Study",
+        "description": "A gilded study stretches before the party. The space is dominated by levitating furniture. Near the edges, red and green pulsing lights create an unsettling ambiance. Telepathic scholars occupy the chamber.",
+        "atmosphere": "elegant - gilded",
+        "room_type": "private",
+        "exits": [
+          "behind the tapestry",
+          "across the pulsar threshold"
+        ],
+        "inhabitants": [
+          "Telepathic scholars",
+          "Large childlike guardians"
+        ],
+        "features": [
+          "levitating furniture",
+          "red and green pulsing lights"
+        ],
+        "narrative_beat": "Personal spaces reveal the palace's former glory."
+      }
+    ],
+    "encounter_narrative_artifact": {
+      "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+      "chain_artifact_type": "game_run",
+      "chain_artifact_file_type": "md",
+      "artifact_id": "44a49ab0-5c0f-4126-9116-e1c0a1b7d413",
+      "rainbow_color_mnemonic_character_value": "Y",
+      "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+      "artifact_name": "pulsar_palace_game_run",
+      "file_name": "44a49ab0-5c0f-4126-9116-e1c0a1b7d413_y_pulsar_palace_game_run.md",
+      "encounter_id": null,
+      "characters": [
+        {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "encounter_id": "encounter_0",
+          "background": {
+            "rollId": 8,
+            "time": 1992,
+            "place": "Mexico City",
+            "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0021_setting-mexico-city.png"
+          },
+          "disposition": {
+            "rollId": 8,
+            "disposition": "Crazed",
+            "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0009_descriptor-crazed.png"
+          },
+          "profession": {
+            "rollId": 10,
+            "profession": "Partisan",
+            "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0029_role---partisan.png"
+          },
+          "on_max": 9,
+          "off_max": 15,
+          "on_current": 8,
+          "off_current": 13,
+          "portrait": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "365226c0-e098-4df8-b75e-dbb73ed6a3d1",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_0.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          },
+          "portrait_artifact": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "yml",
+            "artifact_id": "df01d5d2-9ec2-4e0a-a8f7-5a851a4bf07e",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+            "file_name": "df01d5d2-9ec2-4e0a-a8f7-5a851a4bf07e_t_UNKNOWN_ARTIFACT_NAME.yml",
+            "character_name": "Crazed Partisan",
+            "role": "Partisan",
+            "pose": "Crazed",
+            "description": "From Mexico City (1992)",
+            "image": {
+              "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+              "chain_artifact_type": "unknown",
+              "chain_artifact_file_type": "png",
+              "artifact_id": "365226c0-e098-4df8-b75e-dbb73ed6a3d1",
+              "rainbow_color_mnemonic_character_value": "T",
+              "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+              "artifact_name": "img",
+              "file_name": "character_portrait_encounter_0.png",
+              "height": 4167,
+              "width": 4167,
+              "aspect_ratio": 1.0
+            }
+          }
+        },
+        {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "encounter_id": "encounter_1",
+          "background": {
+            "rollId": 8,
+            "time": 1992,
+            "place": "Mexico City",
+            "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0021_setting-mexico-city.png"
+          },
+          "disposition": {
+            "rollId": 5,
+            "disposition": "Cursed",
+            "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0004_descriptor-cursed.png"
+          },
+          "profession": {
+            "rollId": 5,
+            "profession": "Janitor",
+            "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0024_role-janitor.png"
+          },
+          "on_max": 17,
+          "off_max": 13,
+          "on_current": 16,
+          "off_current": 15,
+          "portrait": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "f268fbe8-7420-4d43-b180-6cd11f160b64",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_1.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          },
+          "portrait_artifact": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "yml",
+            "artifact_id": "d8192131-0170-431b-b5a6-fba270e2ad39",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+            "file_name": "d8192131-0170-431b-b5a6-fba270e2ad39_t_UNKNOWN_ARTIFACT_NAME.yml",
+            "character_name": "Cursed Janitor",
+            "role": "Janitor",
+            "pose": "Cursed",
+            "description": "From Mexico City (1992)",
+            "image": {
+              "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+              "chain_artifact_type": "unknown",
+              "chain_artifact_file_type": "png",
+              "artifact_id": "f268fbe8-7420-4d43-b180-6cd11f160b64",
+              "rainbow_color_mnemonic_character_value": "T",
+              "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+              "artifact_name": "img",
+              "file_name": "character_portrait_encounter_1.png",
+              "height": 4167,
+              "width": 4167,
+              "aspect_ratio": 1.0
+            }
+          }
+        }
+      ],
+      "character_images": [
+        {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "yml",
+          "artifact_id": "df01d5d2-9ec2-4e0a-a8f7-5a851a4bf07e",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+          "file_name": "df01d5d2-9ec2-4e0a-a8f7-5a851a4bf07e_t_UNKNOWN_ARTIFACT_NAME.yml",
+          "character_name": "Crazed Partisan",
+          "role": "Partisan",
+          "pose": "Crazed",
+          "description": "From Mexico City (1992)",
+          "image": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "365226c0-e098-4df8-b75e-dbb73ed6a3d1",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_0.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          }
+        },
+        {
+          "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "yml",
+          "artifact_id": "d8192131-0170-431b-b5a6-fba270e2ad39",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+          "file_name": "d8192131-0170-431b-b5a6-fba270e2ad39_t_UNKNOWN_ARTIFACT_NAME.yml",
+          "character_name": "Cursed Janitor",
+          "role": "Janitor",
+          "pose": "Cursed",
+          "description": "From Mexico City (1992)",
+          "image": {
+            "thread_id": "cedb040b-307a-423c-8797-07c37dae5e26",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "f268fbe8-7420-4d43-b180-6cd11f160b64",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_1.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          }
+        }
+      ],
+      "rooms": [
+        {
+          "room_id": "room_001",
+          "name": "Bedchamber",
+          "description": "A baroque bedchamber stretches before the party. The space is dominated by cascading ribbons of light. Near the edges, doors that exist only when watched create an unsettling ambiance. Heralds with crystalline trumpets occupy the chamber.",
+          "atmosphere": "elegant - baroque",
+          "room_type": "private",
+          "exits": [
+            "east",
+            "up"
+          ],
+          "inhabitants": [
+            "Heralds with crystalline trumpets"
+          ],
+          "features": [
+            "cascading ribbons of light",
+            "doors that exist only when watched"
+          ],
+          "narrative_beat": "Personal spaces reveal the palace's former glory."
+        },
+        {
+          "room_id": "room_002",
+          "name": "Guest Quarters",
+          "description": "A corrupted guest quarters stretches before the party. The space is dominated by doors that exist only when watched. Near the edges, impossible geometric statues create an unsettling ambiance. Heralds with crystalline trumpets occupy the chamber.",
+          "atmosphere": "dangerous - corrupted",
+          "room_type": "private",
+          "exits": [
+            "behind the tapestry",
+            "down"
+          ],
+          "inhabitants": [
+            "Heralds with crystalline trumpets",
+            "Ribbon-entangled servants"
+          ],
+          "features": [
+            "doors that exist only when watched",
+            "impossible geometric statues"
+          ],
+          "narrative_beat": "What sleeps in private quarters should not wake."
+        },
+        {
+          "room_id": "room_003",
+          "name": "Observatory",
+          "description": "A warped observatory stretches before the party. The space is dominated by doors that exist only when watched. Near the edges, gravity-defying chandeliers create an unsettling ambiance. Heralds with crystalline trumpets occupy the chamber. The party notices baroque mirror arrangements.",
+          "atmosphere": "weird - warped",
+          "room_type": "mystical",
+          "exits": [
+            "across the pulsar threshold",
+            "east"
+          ],
+          "inhabitants": [
+            "Heralds with crystalline trumpets"
+          ],
+          "features": [
+            "doors that exist only when watched",
+            "gravity-defying chandeliers",
+            "baroque mirror arrangements",
+            "levitating furniture"
+          ],
+          "narrative_beat": "The mystical becomes viscerally, dangerously real."
+        },
+        {
+          "room_id": "room_004",
+          "name": "Study",
+          "description": "A gilded study stretches before the party. The space is dominated by levitating furniture. Near the edges, red and green pulsing lights create an unsettling ambiance. Telepathic scholars occupy the chamber.",
+          "atmosphere": "elegant - gilded",
+          "room_type": "private",
+          "exits": [
+            "behind the tapestry",
+            "across the pulsar threshold"
+          ],
+          "inhabitants": [
+            "Telepathic scholars",
+            "Large childlike guardians"
+          ],
+          "features": [
+            "levitating furniture",
+            "red and green pulsing lights"
+          ],
+          "narrative_beat": "Personal spaces reveal the palace's former glory."
+        }
+      ],
+      "story": [
+        "The party enters the space. A baroque bedchamber stretches before the party. The space is dominated by cascading ribbons of light. Near the edges, doors that exist only when watched create an unsettling ambiance. Heralds with crystalline trumpets occupy the chamber. The Crazed Partisan attacks enemies near a mysterious figure honoring tradition, and becomes fixated on a mysterious figure beyond reason The Cursed Janitor sweeps away evidence of the singing fountain using advanced technology, and causes the singing fountain to suffer misfortune Time briefly stutters, leaving everyone disoriented."
+      ]
+    },
+    "story_elaboration_level": 1,
+    "current_room_index": 0,
+    "should_add_to_story": false,
+    "max_rooms": 4
+  },
+  "agent_name": "Lord Pulsimore"
+}

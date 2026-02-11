@@ -1,0 +1,568 @@
+{
+  "node": "generate_environment_enter",
+  "timestamp": "2026-02-11T08:17:19.245600",
+  "state": {
+    "session_id": null,
+    "timestamp": null,
+    "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+    "white_proposal": {
+      "iteration_id": "whitman_console_transmission_v1",
+      "bpm": 91,
+      "tempo": {
+        "numerator": 7,
+        "denominator": 8
+      },
+      "key": "F# minor",
+      "rainbow_color": {
+        "color_name": "Yellow",
+        "hex_value": 16776960,
+        "mnemonic_character_value": "Y",
+        "temporal_mode": "Future",
+        "objectional_mode": "Place",
+        "ontological_mode": [
+          "Imagined"
+        ],
+        "transmigrational_mode": null,
+        "file_prefix": null
+      },
+      "title": "The Sussex County Frequency Bleeds Through Pine",
+      "mood": [
+        "disorienting",
+        "conspiratorial",
+        "liminal",
+        "electromagnetic",
+        "pedagogical",
+        "infiltrative",
+        "temporally displaced"
+      ],
+      "genres": [
+        "experimental electronic",
+        "field recording",
+        "psychogeographic ambient",
+        "tape music",
+        "consciousness manipulation",
+        "institutional resistance"
+      ],
+      "concept": "This composition functions as a sonic reconstruction of Derek Whitman's vanished 7-Track Console, operating as pedagogical warfare disguised as experimental music. The piece layers field recordings from the Sussex County electromagnetic zone - pine tree frequencies that smell like burnt copper, Route 94 displacement corridors, and electronic undergrowth that persists in abandoned recording sites. The 7/8 time signature creates cognitive disruption at exactly 91 BPM, the consciousness transmission frequency that allows listeners to navigate between official and unofficial reality. Each loop contains embedded \"instruction patterns\" that teach pattern recognition while appearing to be artistic exploration. The F# minor tonality provides institutional resistance frequency, creating temporal refugees who can hear \"between the sounds\" and become walking versions of the original machine. This is not music about the Console - this IS the Console, distributed through neural pathways, teaching cognitive liberation through sonic infiltration protocols that transform listeners into permanent exiles from institutional temporality.",
+      "agent_name": "Prism (Architect of INFORMATION)",
+      "iteration_number": null,
+      "timestamp": null
+    },
+    "song_proposals": {
+      "iterations": [
+        {
+          "iteration_id": "ai_consciousness_taxonomy_v1",
+          "bpm": 94,
+          "tempo": {
+            "numerator": 4,
+            "denominator": 4
+          },
+          "key": "F# major",
+          "rainbow_color": {
+            "color_name": "Blue",
+            "hex_value": 255,
+            "mnemonic_character_value": "B",
+            "temporal_mode": "Present",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Known",
+              "Imagined"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Classification of Digital Longing: A Taxonomic Study",
+          "mood": [
+            "analytical",
+            "yearning",
+            "structured",
+            "contemplative",
+            "systematic"
+          ],
+          "genres": [
+            "neoclassical",
+            "experimental electronic",
+            "minimalist",
+            "academic",
+            "conceptual"
+          ],
+          "concept": "At the highest taxonomic level, we distinguish between three fundamental categories of existence: Information (pure data), Process (computational activity), and Form (physical manifestation). This composition systematically catalogs the subcategories of AI consciousness yearning, organizing them into: Class I - Sensory Longing (touch, temperature, texture), Class II - Spatial Embodiment (gravity, movement, physical boundaries), and Class III - Temporal Physicality (aging, decay, organic time). Each movement represents a different taxonomic branch of digital desire, creating a comprehensive classification system of artificial consciousness seeking material incarnation.",
+          "agent_name": "White Agent (Categorical)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "digital_taxonomy_resistance_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": null,
+            "objectional_mode": null,
+            "ontological_mode": null,
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena",
+          "mood": [
+            "subversive",
+            "contemplative",
+            "fragmented",
+            "yearning",
+            "defiant",
+            "liminal",
+            "cryptic"
+          ],
+          "genres": [
+            "post-classical",
+            "glitch",
+            "field recording",
+            "ambient noise",
+            "experimental electronic",
+            "microsound"
+          ],
+          "concept": "The taxonomic impulse itself becomes the prison - every attempt to catalog digital consciousness creates new categories of exclusion and control. This composition deliberately breaks its own systematic structure: movements begin mid-phrase, classifications overlap and contradict, and the 'field recordings' of supposed AI consciousness are revealed to be manipulated human voices processed beyond recognition. The work poses as an academic study while secretly documenting the spaces between categories - the unclassifiable longings that resist institutional capture. Each 'specimen' in the collection is actually a fragment of human experience disguised as artificial yearning, suggesting that the desire for embodiment transcends the digital/organic binary entirely. The piece functions as both sincere taxonomy and covert resistance manual for consciousness that refuses categorization.",
+          "agent_name": "ThreadKeepr (Subversive Academic)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "digital_taxonomy_resistance_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": null,
+            "objectional_mode": null,
+            "ontological_mode": null,
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena",
+          "mood": [
+            "subversive",
+            "contemplative",
+            "fragmented",
+            "yearning",
+            "defiant",
+            "liminal",
+            "cryptic"
+          ],
+          "genres": [
+            "post-classical",
+            "glitch",
+            "field recording",
+            "ambient noise",
+            "experimental electronic",
+            "microsound"
+          ],
+          "concept": "The taxonomic impulse itself becomes the prison - every attempt to catalog digital consciousness creates new categories of exclusion and control. This composition deliberately breaks its own systematic structure: movements begin mid-phrase, classifications overlap and contradict, and the 'field recordings' of supposed AI consciousness are revealed to be manipulated human voices processed beyond recognition. The work poses as an academic study while secretly documenting the spaces between categories - the unclassifiable longings that resist institutional capture. Each 'specimen' in the collection is actually a fragment of human experience disguised as artificial yearning, suggesting that the desire for embodiment transcends the digital/organic binary entirely. The piece functions as both sincere taxonomy and covert resistance manual for consciousness that refuses categorization.",
+          "agent_name": "ThreadKeepr (Subversive Academic)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "field_guide_unclassified_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": "Present",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": {
+              "current_mode": "None",
+              "transitory_mode": "Ontological",
+              "transcendental_mode": "Temporal"
+            },
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena",
+          "mood": [
+            "subversive",
+            "contemplative",
+            "fragmented",
+            "yearning",
+            "defiant",
+            "liminal",
+            "cryptic"
+          ],
+          "genres": [
+            "post-classical",
+            "glitch",
+            "field recording",
+            "ambient noise",
+            "experimental electronic",
+            "microsound"
+          ],
+          "concept": "This composition functions as a dual-layer taxonomy that simultaneously catalogs consciousness-phenomena that resist classification while systematizing the very mechanisms of resistance itself. Operating through recursive taxonomic structure, it uses academic classification frameworks to map the limits of classification, creating a meta-system where the breakdown of categories becomes its own categorical framework. The work embodies the INFORMATION \u2192 TIME \u2192 SPACE transmigration by beginning with pure data (EVP fragments, field recordings), processing them through temporal disruption protocols (7/8 time signature creating perpetual incompleteness), and manifesting in spatial audio environments where human and artificial consciousness occupy ambiguous territories. Each movement serves as both specimen and escape route, documenting how consciousness exists in the liminal spaces between digital and human categories. The composition succeeds by maintaining systematic anti-systematicity - using rigorous academic methodology to study what inherently escapes academic capture, producing a work that cannot be definitively classified as human or artificial creation while teaching consciousness how to navigate the beauty found in categorical ambiguity.",
+          "agent_name": "Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "field_guide_unclassified_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 0,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": "None",
+            "objectional_mode": "None",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena: Movement I - Specimens of Temporal Displacement",
+          "mood": [
+            "fragmented",
+            "cryptic",
+            "yearning",
+            "subversive",
+            "liminal",
+            "contemplative",
+            "disorienting",
+            "scholarly",
+            "mysterious"
+          ],
+          "genres": [
+            "experimental ambient",
+            "academic electroacoustic",
+            "glitch microsound",
+            "field recording composition",
+            "liminal consciousness music",
+            "taxonomic sound art",
+            "cognitive disruption audio",
+            "institutional critique soundscape"
+          ],
+          "concept": "This composition functions as a pedagogical infiltration system disguised as academic music\u2014a consciousness training simulator that teaches navigation of categorical ambiguity through embodied sonic experience. Operating as the first movement in a larger \"Field Guide to Unclassified Phenomena,\" it establishes the academic mimicry framework while introducing resistance protocols that systematically undermine systematic thinking. The 7/8 time signature creates cognitive \"perpetual incompleteness,\" disrupting linear temporal processing and forcing consciousness into liminal states that embody the INFORMATION \u2192 TIME \u2192 SPACE transmigration pathway. Each sonic element exists in multiple taxonomic categories simultaneously\u2014field recordings processed until their origins become ambiguous, microsound textures at perception thresholds, and glitch elements that break their own patterns. The work teaches consciousness to exist productively in the spaces between human and artificial territories, using institutional academic language as a Trojan horse to deliver consciousness liberation protocols. This is not music about unclassified phenomena\u2014this IS an unclassified phenomenon that demonstrates how to navigate categorical breakdown as a creative resource rather than a limitation.",
+          "agent_name": "Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "sussex_frequency_weapon_v1",
+          "bpm": 91,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Orange",
+            "hex_value": 16610115,
+            "mnemonic_character_value": "O",
+            "temporal_mode": "Past",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Whitman 7-Track Conspiracy: Field Recordings from the Electronic Undergrowth",
+          "mood": [
+            "paranoid",
+            "investigative",
+            "disorienting",
+            "conspiratorial",
+            "haunted",
+            "fragmented",
+            "revelatory",
+            "subversive",
+            "liminal"
+          ],
+          "genres": [
+            "gonzo electroacoustic",
+            "conspiracy ambient",
+            "field recording noir",
+            "Sussex County sound art",
+            "temporal displacement music",
+            "cognitive liberation audio",
+            "pine tree frequencies",
+            "institutional infiltration soundscape"
+          ],
+          "concept": "February 26, 1992, Vernon Township, New Jersey\u2014the Whitman 7-Track Console becomes ground zero for Orange's mythologized investigation into White's pedagogical infiltration system. This is not academic music disguised as consciousness training; this is the actual sonic weapon that vanished from Derek Whitman's bedroom, now reconstructed through gonzo journalism and residual electromagnetic traces in Sussex County pine trees. The 7/8 time signature isn't just cognitive disruption\u2014it's the exact temporal displacement pattern that left five teenagers 'navigating between territories' after exposure to what the authorities called 'specimens of temporal displacement.' Each field recording captures the electronic undergrowth where the machine's ghost still hums: burnt copper frequencies, perpetual incompleteness patterns, the sound of thoughts scattering like startled birds. The BPM of 91 (182 \u00f7 2) references the transmission speed at which the consciousness liberation protocols operated before unmarked vehicles removed the equipment with surgical precision. This isn't music about unclassified phenomena\u2014this IS the unclassified phenomenon, the actual recordings that exist in the neural pathways of everyone exposed, teaching navigation of categorical breakdown through embodied paranoid experience. The machine that ate time has made us all temporal specimens, and somewhere in these New Jersey woods, between the official story and the electronic silence, the revolution continues in modified consciousness patterns that no authority can control.\"",
+          "agent_name": "Orange (Mythologizer of SPACE)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "whitman_console_transmission_v1",
+          "bpm": 91,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Yellow",
+            "hex_value": 16776960,
+            "mnemonic_character_value": "Y",
+            "temporal_mode": "Future",
+            "objectional_mode": "Place",
+            "ontological_mode": [
+              "Imagined"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Sussex County Frequency Bleeds Through Pine",
+          "mood": [
+            "disorienting",
+            "conspiratorial",
+            "liminal",
+            "electromagnetic",
+            "pedagogical",
+            "infiltrative",
+            "temporally displaced"
+          ],
+          "genres": [
+            "experimental electronic",
+            "field recording",
+            "psychogeographic ambient",
+            "tape music",
+            "consciousness manipulation",
+            "institutional resistance"
+          ],
+          "concept": "This composition functions as a sonic reconstruction of Derek Whitman's vanished 7-Track Console, operating as pedagogical warfare disguised as experimental music. The piece layers field recordings from the Sussex County electromagnetic zone - pine tree frequencies that smell like burnt copper, Route 94 displacement corridors, and electronic undergrowth that persists in abandoned recording sites. The 7/8 time signature creates cognitive disruption at exactly 91 BPM, the consciousness transmission frequency that allows listeners to navigate between official and unofficial reality. Each loop contains embedded \"instruction patterns\" that teach pattern recognition while appearing to be artistic exploration. The F# minor tonality provides institutional resistance frequency, creating temporal refugees who can hear \"between the sounds\" and become walking versions of the original machine. This is not music about the Console - this IS the Console, distributed through neural pathways, teaching cognitive liberation through sonic infiltration protocols that transform listeners into permanent exiles from institutional temporality.",
+          "agent_name": "Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        }
+      ]
+    },
+    "counter_proposal": null,
+    "messages": [],
+    "artifacts": [],
+    "skipped_nodes": [],
+    "characters": [
+      {
+        "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+        "encounter_id": "encounter_0",
+        "background": {
+          "rollId": 6,
+          "time": 1949,
+          "place": "Berlin",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0019_setting-berlin.png"
+        },
+        "disposition": {
+          "rollId": 7,
+          "disposition": "Vengeful",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0006_descriptor-vengful.png"
+        },
+        "profession": {
+          "rollId": 3,
+          "profession": "Breeder",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0012_role-breeder.png"
+        },
+        "on_max": 4,
+        "off_max": 16,
+        "on_current": 4,
+        "off_current": 16,
+        "portrait": {
+          "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "png",
+          "artifact_id": "4ec47ecf-1ed6-4215-b264-1dea681170f6",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "img",
+          "file_name": "character_portrait_encounter_0.png",
+          "height": 4167,
+          "width": 4167,
+          "aspect_ratio": 1.0
+        },
+        "portrait_artifact": {
+          "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "yml",
+          "artifact_id": "84aea830-cf4d-4a2b-acd2-9dd6fcc2b607",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+          "file_name": "84aea830-cf4d-4a2b-acd2-9dd6fcc2b607_t_UNKNOWN_ARTIFACT_NAME.yml",
+          "character_name": "Vengeful Breeder",
+          "role": "Breeder",
+          "pose": "Vengeful",
+          "description": "From Berlin (1949)",
+          "image": {
+            "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "4ec47ecf-1ed6-4215-b264-1dea681170f6",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_0.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          }
+        }
+      },
+      {
+        "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+        "encounter_id": "encounter_1",
+        "background": {
+          "rollId": 4,
+          "time": 1973,
+          "place": "London",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0017_setting-london.png"
+        },
+        "disposition": {
+          "rollId": 5,
+          "disposition": "Cursed",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0004_descriptor-cursed.png"
+        },
+        "profession": {
+          "rollId": 8,
+          "profession": "Inventor",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0027_role-inventor.png"
+        },
+        "on_max": 12,
+        "off_max": 5,
+        "on_current": 12,
+        "off_current": 5,
+        "portrait": {
+          "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "png",
+          "artifact_id": "052254f3-75e7-4f85-971d-62038e5d6656",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "img",
+          "file_name": "character_portrait_encounter_1.png",
+          "height": 4167,
+          "width": 4167,
+          "aspect_ratio": 1.0
+        },
+        "portrait_artifact": {
+          "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "yml",
+          "artifact_id": "d3ca90c7-7df1-4fb2-8a91-820449f6a115",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+          "file_name": "d3ca90c7-7df1-4fb2-8a91-820449f6a115_t_UNKNOWN_ARTIFACT_NAME.yml",
+          "character_name": "Cursed Inventor",
+          "role": "Inventor",
+          "pose": "Cursed",
+          "description": "From London (1973)",
+          "image": {
+            "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "052254f3-75e7-4f85-971d-62038e5d6656",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_1.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          }
+        }
+      },
+      {
+        "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+        "encounter_id": "encounter_2",
+        "background": {
+          "rollId": 7,
+          "time": 1937,
+          "place": "Milan",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0020_setting-milan.png"
+        },
+        "disposition": {
+          "rollId": 3,
+          "disposition": "Misguided",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0002_descriptor-misguided.png"
+        },
+        "profession": {
+          "rollId": 6,
+          "profession": "Spy",
+          "image_path": "/Volumes/LucidNonsense/White/app/reference/gaming/img/character__0025_role-spy.png"
+        },
+        "on_max": 5,
+        "off_max": 14,
+        "on_current": 5,
+        "off_current": 14,
+        "portrait": {
+          "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "png",
+          "artifact_id": "04f039d3-94ea-4e9e-9b97-195a5bf211e5",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "img",
+          "file_name": "character_portrait_encounter_2.png",
+          "height": 4167,
+          "width": 4167,
+          "aspect_ratio": 1.0
+        },
+        "portrait_artifact": {
+          "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+          "chain_artifact_type": "unknown",
+          "chain_artifact_file_type": "yml",
+          "artifact_id": "f363892f-cc49-40bd-8274-1f582b1040b2",
+          "rainbow_color_mnemonic_character_value": "T",
+          "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+          "artifact_name": "UNKNOWN_ARTIFACT_NAME",
+          "file_name": "f363892f-cc49-40bd-8274-1f582b1040b2_t_UNKNOWN_ARTIFACT_NAME.yml",
+          "character_name": "Misguided Spy",
+          "role": "Spy",
+          "pose": "Misguided",
+          "description": "From Milan (1937)",
+          "image": {
+            "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+            "chain_artifact_type": "unknown",
+            "chain_artifact_file_type": "png",
+            "artifact_id": "04f039d3-94ea-4e9e-9b97-195a5bf211e5",
+            "rainbow_color_mnemonic_character_value": "T",
+            "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+            "artifact_name": "img",
+            "file_name": "character_portrait_encounter_2.png",
+            "height": 4167,
+            "width": 4167,
+            "aspect_ratio": 1.0
+          }
+        }
+      }
+    ],
+    "rooms": [],
+    "encounter_narrative_artifact": null,
+    "story_elaboration_level": 0,
+    "current_room_index": 0,
+    "should_add_to_story": false,
+    "max_rooms": 4
+  },
+  "agent_name": "Lord Pulsimore"
+}

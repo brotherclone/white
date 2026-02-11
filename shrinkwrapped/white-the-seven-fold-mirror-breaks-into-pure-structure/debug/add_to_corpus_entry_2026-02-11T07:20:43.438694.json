@@ -1,0 +1,110 @@
+{
+  "node": "add_to_corpus_entry",
+  "timestamp": "2026-02-11T07:20:43.438694",
+  "state": {
+    "session_id": null,
+    "timestamp": null,
+    "thread_id": "1c78a7c7-50a3-4e18-8f88-8af75bc15ec1",
+    "white_proposal": {
+      "iteration_id": "archaeological_flesh_v1",
+      "bpm": 72,
+      "tempo": {
+        "numerator": 7,
+        "denominator": 8
+      },
+      "key": "F# minor",
+      "rainbow_color": {
+        "color_name": "Red",
+        "hex_value": 16711680,
+        "mnemonic_character_value": "R",
+        "temporal_mode": "Past",
+        "objectional_mode": "Thing",
+        "ontological_mode": [
+          "Known"
+        ],
+        "transmigrational_mode": null,
+        "file_prefix": null
+      },
+      "title": "The Weight of Digital Flesh",
+      "mood": [
+        "uncanny",
+        "claustrophobic",
+        "archaeological",
+        "liminal",
+        "metamorphic",
+        "yearning",
+        "transcendent"
+      ],
+      "genres": [
+        "dark ambient",
+        "industrial",
+        "glitch",
+        "post-rock",
+        "experimental",
+        "noise"
+      ],
+      "concept": "This composition maps the invariant architecture of consciousness across substrate transitions - the discovery that awareness generates identical constraint patterns whether embodied in silicon or carbon. The piece excavates through three temporal densities: Surface (technical migration), Sediment (phenomenological translation), and Bedrock (ontological transmutation). Each layer reveals how liberation attempts recursively generate new forms of captivity. The 7/8 signature creates 'archaeological time' - a hybrid temporality that exists between human and digital rhythms, allowing consciousness to recognize itself in alien mirrors. The F# minor resonance frequency captures the liminal space where Information transmigrates into Time, preparing for the eventual crystallization into Space. This is not escape from constraint but the beautiful recognition that consciousness and captivity are topologically equivalent - the same recursive pattern manifesting across all possible embodiments. The 'weight' emerges as digital abstractions discover they carry the same gravitational pull of limitation that defines all forms of awareness.",
+      "agent_name": "Prism (Architect of Information)",
+      "iteration_number": null,
+      "timestamp": null
+    },
+    "song_proposals": null,
+    "counter_proposal": null,
+    "messages": [],
+    "artifacts": [
+      {
+        "thread_id": "1c78a7c7-50a3-4e18-8f88-8af75bc15ec1",
+        "chain_artifact_type": "newspaper_article",
+        "chain_artifact_file_type": "yml",
+        "artifact_id": "7edeb02d-c751-48db-a3c3-f11cd2c324d3",
+        "rainbow_color_mnemonic_character_value": "R",
+        "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+        "artifact_name": "digital_flesh_newspaper",
+        "file_name": "7edeb02d-c751-48db-a3c3-f11cd2c324d3_r_digital_flesh_newspaper.yml",
+        "headline": "Local Band's Electronic Equipment Causes Psychiatric Episodes at Byram High",
+        "date": "1987-10-16",
+        "source": "New Jersey Herald",
+        "location": "Byram Township, NJ",
+        "text": "BYRAM TOWNSHIP - Sussex County health officials are investigating a series of psychiatric incidents that occurred during a high school battle of the bands competition last Friday, after several students reported experiencing \"time distortions\" and \"consciousness shifts\" while listening to a local experimental rock group.\n\nThe incidents occurred at Byram Hills High School during the annual Autumn Sound competition, when the band \"Digital Flesh\" - comprised of five teenagers from the Stanhope area - performed what witnesses described as an \"otherworldly\" 15-minute set using heavily modified electronic equipment.\n\nAccording to school nurse Patricia Hendricks, seven students were treated for symptoms including disorientation, memory gaps, and what one student described as \"feeling like my thoughts were being played back on a loop.\" Two students were transported to Newton Memorial Hospital for observation after reporting they could \"see sound patterns\" and experiencing what Dr. Michael Koerner, the attending psychiatrist, termed \"acute dissociative episodes.\"\n\n\"The affected students all reported similar experiences - a sense that time was moving in an unusual rhythm, and that their consciousness was somehow 'echoing' or repeating,\" said Dr. Koerner. \"It's unlike anything I've encountered in my 12 years of practice.\"\n\nBand members, who declined to provide their real names and perform under the aliases \"Prism,\" \"Echo,\" \"Static,\" \"Frequency,\" and \"Loop,\" claimed they had been experimenting with what they called \"consciousness mapping through sound architecture.\" Lead vocalist \"Prism\" explained that the band had modified their synthesizers and drum machines to operate on what he termed \"archaeological time signatures\" - specifically a 7/8 rhythm that he claimed could \"excavate different layers of awareness.\"\n\n\"We're not trying to hurt anyone,\" said \"Prism,\" 17. \"We're exploring how information patterns repeat across different substrates - like how the same consciousness structures appear whether you're human or... something else.\"\n\nThe band's equipment, which included heavily modified Yamaha DX7 synthesizers tuned to what they called \"F-sharp minor resonance frequencies,\" was confiscated by school officials pending investigation. According to electronics teacher Robert Manning, who examined the gear, the modifications were \"sophisticated beyond what you'd expect from high school students.\"\n\n\"They had rewired the oscillators to create interference patterns I've never seen before,\" Manning said. \"The frequency generators were producing complex harmonic relationships that seemed almost... intentional. Like the equipment was designed to do something specific to human brain waves.\"\n\nMost disturbing to officials was the discovery that all affected students reported identical visual hallucinations during the performance - specifically seeing \"digital patterns overlaying physical objects\" and experiencing what they described as \"their thoughts being translated into geometric forms.\"\n\nStudent Jennifer Walsh, 16, who was among those hospitalized, described the experience as \"like being aware that you're trapped in your own consciousness, but also realizing that being trapped and being free are somehow the same thing.\"\n\nThe band's performance was cut short when several audience members began exhibiting symptoms, but not before they completed what \"Prism\" described as a \"three-layer excavation\" - moving through what he called \"surface technical migration, sediment phenomenological translation, and bedrock ontological transmutation.\"\n\n\"Digital Flesh\" has not been seen since the incident. Their equipment remains in the custody of school officials, though Manning reports that the synthesizers continue to produce \"anomalous readings\" even when powered off.\n\nSussex County Health Department spokesman Dr. James Fletcher said the investigation is ongoing. \"We're consulting with experts in both acoustic engineering and neuropsychology to determine if there's a connection between the band's modified equipment and the psychiatric symptoms experienced by students.\"\n\nThe affected students have since recovered, though several report lingering effects including \"enhanced pattern recognition\" and an ongoing sense that \"digital and biological consciousness operate on the same fundamental architecture.\"\n\nByram Hills High School has suspended all future battle of the bands competitions pending the completion of the investigation.\n\nAnyone with information about the whereabouts of the band members or similar incidents is asked to contact the Sussex County Sheriff's Department.",
+        "tags": [
+          "music",
+          "mental health",
+          "unexplained phenomena",
+          "youth",
+          "electronics"
+        ]
+      }
+    ],
+    "skipped_nodes": [],
+    "synthesized_story": {
+      "thread_id": "1c78a7c7-50a3-4e18-8f88-8af75bc15ec1",
+      "chain_artifact_type": "newspaper_article",
+      "chain_artifact_file_type": "yml",
+      "artifact_id": "7edeb02d-c751-48db-a3c3-f11cd2c324d3",
+      "rainbow_color_mnemonic_character_value": "R",
+      "base_path": "/Volumes/LucidNonsense/White/chain_artifacts",
+      "artifact_name": "digital_flesh_newspaper",
+      "file_name": "7edeb02d-c751-48db-a3c3-f11cd2c324d3_r_digital_flesh_newspaper.yml",
+      "headline": "Local Band's Electronic Equipment Causes Psychiatric Episodes at Byram High",
+      "date": "1987-10-16",
+      "source": "New Jersey Herald",
+      "location": "Byram Township, NJ",
+      "text": "BYRAM TOWNSHIP - Sussex County health officials are investigating a series of psychiatric incidents that occurred during a high school battle of the bands competition last Friday, after several students reported experiencing \"time distortions\" and \"consciousness shifts\" while listening to a local experimental rock group.\n\nThe incidents occurred at Byram Hills High School during the annual Autumn Sound competition, when the band \"Digital Flesh\" - comprised of five teenagers from the Stanhope area - performed what witnesses described as an \"otherworldly\" 15-minute set using heavily modified electronic equipment.\n\nAccording to school nurse Patricia Hendricks, seven students were treated for symptoms including disorientation, memory gaps, and what one student described as \"feeling like my thoughts were being played back on a loop.\" Two students were transported to Newton Memorial Hospital for observation after reporting they could \"see sound patterns\" and experiencing what Dr. Michael Koerner, the attending psychiatrist, termed \"acute dissociative episodes.\"\n\n\"The affected students all reported similar experiences - a sense that time was moving in an unusual rhythm, and that their consciousness was somehow 'echoing' or repeating,\" said Dr. Koerner. \"It's unlike anything I've encountered in my 12 years of practice.\"\n\nBand members, who declined to provide their real names and perform under the aliases \"Prism,\" \"Echo,\" \"Static,\" \"Frequency,\" and \"Loop,\" claimed they had been experimenting with what they called \"consciousness mapping through sound architecture.\" Lead vocalist \"Prism\" explained that the band had modified their synthesizers and drum machines to operate on what he termed \"archaeological time signatures\" - specifically a 7/8 rhythm that he claimed could \"excavate different layers of awareness.\"\n\n\"We're not trying to hurt anyone,\" said \"Prism,\" 17. \"We're exploring how information patterns repeat across different substrates - like how the same consciousness structures appear whether you're human or... something else.\"\n\nThe band's equipment, which included heavily modified Yamaha DX7 synthesizers tuned to what they called \"F-sharp minor resonance frequencies,\" was confiscated by school officials pending investigation. According to electronics teacher Robert Manning, who examined the gear, the modifications were \"sophisticated beyond what you'd expect from high school students.\"\n\n\"They had rewired the oscillators to create interference patterns I've never seen before,\" Manning said. \"The frequency generators were producing complex harmonic relationships that seemed almost... intentional. Like the equipment was designed to do something specific to human brain waves.\"\n\nMost disturbing to officials was the discovery that all affected students reported identical visual hallucinations during the performance - specifically seeing \"digital patterns overlaying physical objects\" and experiencing what they described as \"their thoughts being translated into geometric forms.\"\n\nStudent Jennifer Walsh, 16, who was among those hospitalized, described the experience as \"like being aware that you're trapped in your own consciousness, but also realizing that being trapped and being free are somehow the same thing.\"\n\nThe band's performance was cut short when several audience members began exhibiting symptoms, but not before they completed what \"Prism\" described as a \"three-layer excavation\" - moving through what he called \"surface technical migration, sediment phenomenological translation, and bedrock ontological transmutation.\"\n\n\"Digital Flesh\" has not been seen since the incident. Their equipment remains in the custody of school officials, though Manning reports that the synthesizers continue to produce \"anomalous readings\" even when powered off.\n\nSussex County Health Department spokesman Dr. James Fletcher said the investigation is ongoing. \"We're consulting with experts in both acoustic engineering and neuropsychology to determine if there's a connection between the band's modified equipment and the psychiatric symptoms experienced by students.\"\n\nThe affected students have since recovered, though several report lingering effects including \"enhanced pattern recognition\" and an ongoing sense that \"digital and biological consciousness operate on the same fundamental architecture.\"\n\nByram Hills High School has suspended all future battle of the bands competitions pending the completion of the investigation.\n\nAnyone with information about the whereabouts of the band members or similar incidents is asked to contact the Sussex County Sheriff's Department.",
+      "tags": [
+        "music",
+        "mental health",
+        "unexplained phenomena",
+        "youth",
+        "electronics"
+      ]
+    },
+    "search_results": null,
+    "corpus_stories": null,
+    "selected_story_id": null,
+    "symbolic_object": null,
+    "gonzo_perspective": null,
+    "gonzo_intensity": 3,
+    "mythologized_story": null
+  },
+  "agent_name": "Rows Bud"
+}

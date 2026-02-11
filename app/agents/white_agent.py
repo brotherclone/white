@@ -132,9 +132,12 @@ class WhiteAgent(BaseModel):
             except Exception as e:
                 logger.warning(f"Auto-shrinkwrap failed: {e}")
 
-        # Load negative constraints from prior results if available
+        # Load negative constraints from shrinkwrapped corpus (all prior results)
         negative_constraints_text = None
-        constraints_path = output_dir / "index.yml"
+        shrinkwrap_index = Path("shrinkwrapped/index.yml")
+        constraints_path = (
+            shrinkwrap_index if shrinkwrap_index.exists() else output_dir / "index.yml"
+        )
         if constraints_path.exists():
             try:
                 constraints = generate_constraints(constraints_path)

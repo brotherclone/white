@@ -21,8 +21,6 @@ import sys
 from pathlib import Path
 from typing import List
 
-# ToDo: Also add 'test_thread'
-
 
 def find_mock_dirs(base_dir: Path) -> List[Path]:
     """Return a list of directories under base_dir whose name contains 'mock' (case-insensitive) or is 'UNKNOWN_THREAD_ID'."""
@@ -33,7 +31,9 @@ def find_mock_dirs(base_dir: Path) -> List[Path]:
         # only top-level entries (folders) are considered
         try:
             if entry.is_dir() and (
-                "mock" in entry.name.lower() or entry.name == "UNKNOWN_THREAD_ID"
+                "mock" in entry.name.lower()
+                or entry.name == "UNKNOWN_THREAD_ID"
+                or entry.name == "test_thread"
             ):
                 results.append(entry)
         except OSError:
@@ -68,7 +68,7 @@ def delete_paths(paths: List[Path], verbose: bool = False) -> int:
 
 def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Delete directories in <repo_root>/chain_artifacts whose names contain 'mock' or are named 'UNKNOWN_THREAD_ID'",
+        description="Delete directories in <repo_root>/chain_artifacts whose names contain 'mock' or are named 'UNKNOWN_THREAD_ID' or test_thread",
     )
     p.add_argument(
         "--base",

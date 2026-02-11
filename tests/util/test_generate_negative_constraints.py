@@ -7,7 +7,9 @@ import yaml
 from app.util.generate_negative_constraints import (
     analyze_bpm,
     analyze_concepts,
+    analyze_dialogue_openers,
     analyze_keys,
+    analyze_title_vocabulary,
     collect_titles,
     format_for_prompt,
     generate_constraints,
@@ -164,6 +166,63 @@ class TestAnalyzeConcepts:
         assert result["repeated_phrases"] == []
 
 
+class TestAnalyzeTitleVocabulary:
+    def test_detects_overused_words(self):
+        threads = [
+            make_thread(title="The Prism Protocol"),
+            make_thread(title="Prism Mandala"),
+            make_thread(title="Seven-Fold Mirror"),
+            make_thread(title="Mirror Breaks Into Light"),
+            make_thread(title="Ocean Song"),
+        ]
+        result = analyze_title_vocabulary(threads)
+        overused_words = [w["word"] for w in result["overused_words"]]
+        assert "prism" in overused_words  # 2/5 = 40% > 20%
+        assert "mirror" in overused_words  # 2/5 = 40% > 20%
+
+    def test_no_overuse_when_diverse(self):
+        threads = [
+            make_thread(title="Ocean Waves"),
+            make_thread(title="Mountain Echo"),
+            make_thread(title="Desert Wind"),
+            make_thread(title="River Song"),
+            make_thread(title="Forest Dawn"),
+        ]
+        result = analyze_title_vocabulary(threads)
+        assert len(result["overused_words"]) == 0
+
+    def test_empty(self):
+        result = analyze_title_vocabulary([])
+        assert result["overused_words"] == []
+
+
+class TestAnalyzeDialogueOpeners:
+    def test_detects_repeated_openers(self):
+        threads = [
+            make_thread(concept="**Walsh:** Look, the whole thing is about..."),
+            make_thread(concept="**Walsh:** Look, I mean this is..."),
+            make_thread(concept="**Walsh:** Look, honestly the method..."),
+            make_thread(concept="**Walsh:** Something completely different"),
+        ]
+        result = analyze_dialogue_openers(threads)
+        overused = [o["phrase"] for o in result["overused_openers"]]
+        assert "look," in overused  # 3/4 = 75% > 30%
+
+    def test_no_overuse_when_varied(self):
+        threads = [
+            make_thread(concept="**Walsh:** The thing about this is..."),
+            make_thread(concept="**Walsh:** You know what's funny..."),
+            make_thread(concept="**Walsh:** So there's this idea..."),
+            make_thread(concept="**Walsh:** When I think about it..."),
+        ]
+        result = analyze_dialogue_openers(threads)
+        assert len(result["overused_openers"]) == 0
+
+    def test_empty(self):
+        result = analyze_dialogue_openers([])
+        assert result["overused_openers"] == []
+
+
 class TestCollectTitles:
     def test_collects_unique_sorted(self):
         threads = [
@@ -241,6 +300,24 @@ class TestFormatForPrompt:
                     "reason": "'transmigration' appears in 7/20 concepts",
                 }
             ],
+            "title_vocabulary_constraints": [
+                {
+                    "word": "prism",
+                    "count": 7,
+                    "fraction": 0.35,
+                    "severity": "avoid",
+                    "reason": "'prism' appears in 7/20 titles (35%)",
+                }
+            ],
+            "dialogue_opener_constraints": [
+                {
+                    "phrase": "look,",
+                    "count": 8,
+                    "fraction": 0.40,
+                    "severity": "avoid",
+                    "reason": "'look,' opens 8/20 responses (40%)",
+                }
+            ],
             "excluded_titles": ["Song One", "Song Two"],
             "warnings": ["Key entropy low"],
         }
@@ -249,6 +326,10 @@ class TestFormatForPrompt:
         assert "C major" in text
         assert "86-96" in text
         assert "transmigration" in text
+        assert "prism" in text
+        assert "Title words" in text
+        assert "look," in text
+        assert "Dialogue openers" in text
         assert "Song One" in text
         assert "DIVERSITY WARNINGS" in text
 

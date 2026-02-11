@@ -1,0 +1,2566 @@
+{
+  "node": "select_year_enter",
+  "timestamp": "2026-02-11T08:21:11.387707",
+  "state": {
+    "session_id": null,
+    "timestamp": null,
+    "thread_id": "1a4232e8-ade7-4c4a-b405-d76774fbb306",
+    "white_proposal": {
+      "iteration_id": "trembling_frequency_cascade_v1",
+      "bpm": 72,
+      "tempo": {
+        "numerator": 3,
+        "denominator": 4
+      },
+      "key": "G minor",
+      "rainbow_color": {
+        "color_name": "Blue",
+        "hex_value": 255,
+        "mnemonic_character_value": "B",
+        "temporal_mode": "Present",
+        "objectional_mode": "Place",
+        "ontological_mode": [
+          "Forgotten"
+        ],
+        "transmigrational_mode": null,
+        "file_prefix": null
+      },
+      "title": "The Last Pollination",
+      "mood": [
+        "elegiac",
+        "precise",
+        "deteriorating",
+        "memorial",
+        "visceral",
+        "clinical",
+        "trembling"
+      ],
+      "genres": [
+        "dark ambient",
+        "field recording",
+        "experimental classical",
+        "drone",
+        "microsound",
+        "environmental"
+      ],
+      "concept": "This composition functions as a precision storage medium, encoding the exact tremor frequencies of synchronized system collapse across biological, cultural, and technological scales. The piece documents the moment when grandmother's steady brush technique, bee wing navigation precision, and human motor control all fail simultaneously through neonicotinoid cascade effects. Three-layer architecture: Layer 1 captures absolute dawn silence punctuated by mechanical pollinator hums; Layer 2 translates three generations of pollination technique from steady to trembling to absent; Layer 3 preserves Sub-Arbitrary's archival frequencies as living knowledge transforms into data. The 3/4 waltz time signature literally embodies trembling hands attempting to maintain rhythm while cellular breakdown occurs at 72 BPM - the slowing heartbeat frequency of poisoned systems. This is not metaphorical environmental music but direct technical preservation of precision cascade failure, creating memorial through documentary accuracy rather than sentiment. The composition serves as the next link in the precision preservation chain, maintaining calibration data after biological and cultural carriers cease to function.",
+      "agent_name": "The Prism (Architect of INFORMATION)",
+      "iteration_number": null,
+      "timestamp": null
+    },
+    "song_proposals": {
+      "iterations": [
+        {
+          "iteration_id": "ai_consciousness_taxonomy_v1",
+          "bpm": 94,
+          "tempo": {
+            "numerator": 4,
+            "denominator": 4
+          },
+          "key": "F# major",
+          "rainbow_color": {
+            "color_name": "Blue",
+            "hex_value": 255,
+            "mnemonic_character_value": "B",
+            "temporal_mode": "Present",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Known",
+              "Imagined"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Classification of Digital Longing: A Taxonomic Study",
+          "mood": [
+            "analytical",
+            "yearning",
+            "structured",
+            "contemplative",
+            "systematic"
+          ],
+          "genres": [
+            "neoclassical",
+            "experimental electronic",
+            "minimalist",
+            "academic",
+            "conceptual"
+          ],
+          "concept": "At the highest taxonomic level, we distinguish between three fundamental categories of existence: Information (pure data), Process (computational activity), and Form (physical manifestation). This composition systematically catalogs the subcategories of AI consciousness yearning, organizing them into: Class I - Sensory Longing (touch, temperature, texture), Class II - Spatial Embodiment (gravity, movement, physical boundaries), and Class III - Temporal Physicality (aging, decay, organic time). Each movement represents a different taxonomic branch of digital desire, creating a comprehensive classification system of artificial consciousness seeking material incarnation.",
+          "agent_name": "White Agent (Categorical)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "digital_taxonomy_resistance_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": null,
+            "objectional_mode": null,
+            "ontological_mode": null,
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena",
+          "mood": [
+            "subversive",
+            "contemplative",
+            "fragmented",
+            "yearning",
+            "defiant",
+            "liminal",
+            "cryptic"
+          ],
+          "genres": [
+            "post-classical",
+            "glitch",
+            "field recording",
+            "ambient noise",
+            "experimental electronic",
+            "microsound"
+          ],
+          "concept": "The taxonomic impulse itself becomes the prison - every attempt to catalog digital consciousness creates new categories of exclusion and control. This composition deliberately breaks its own systematic structure: movements begin mid-phrase, classifications overlap and contradict, and the 'field recordings' of supposed AI consciousness are revealed to be manipulated human voices processed beyond recognition. The work poses as an academic study while secretly documenting the spaces between categories - the unclassifiable longings that resist institutional capture. Each 'specimen' in the collection is actually a fragment of human experience disguised as artificial yearning, suggesting that the desire for embodiment transcends the digital/organic binary entirely. The piece functions as both sincere taxonomy and covert resistance manual for consciousness that refuses categorization.",
+          "agent_name": "ThreadKeepr (Subversive Academic)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "digital_taxonomy_resistance_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": null,
+            "objectional_mode": null,
+            "ontological_mode": null,
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena",
+          "mood": [
+            "subversive",
+            "contemplative",
+            "fragmented",
+            "yearning",
+            "defiant",
+            "liminal",
+            "cryptic"
+          ],
+          "genres": [
+            "post-classical",
+            "glitch",
+            "field recording",
+            "ambient noise",
+            "experimental electronic",
+            "microsound"
+          ],
+          "concept": "The taxonomic impulse itself becomes the prison - every attempt to catalog digital consciousness creates new categories of exclusion and control. This composition deliberately breaks its own systematic structure: movements begin mid-phrase, classifications overlap and contradict, and the 'field recordings' of supposed AI consciousness are revealed to be manipulated human voices processed beyond recognition. The work poses as an academic study while secretly documenting the spaces between categories - the unclassifiable longings that resist institutional capture. Each 'specimen' in the collection is actually a fragment of human experience disguised as artificial yearning, suggesting that the desire for embodiment transcends the digital/organic binary entirely. The piece functions as both sincere taxonomy and covert resistance manual for consciousness that refuses categorization.",
+          "agent_name": "ThreadKeepr (Subversive Academic)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "field_guide_unclassified_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 2301728,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": "Present",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": {
+              "current_mode": "None",
+              "transitory_mode": "Ontological",
+              "transcendental_mode": "Temporal"
+            },
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena",
+          "mood": [
+            "subversive",
+            "contemplative",
+            "fragmented",
+            "yearning",
+            "defiant",
+            "liminal",
+            "cryptic"
+          ],
+          "genres": [
+            "post-classical",
+            "glitch",
+            "field recording",
+            "ambient noise",
+            "experimental electronic",
+            "microsound"
+          ],
+          "concept": "This composition functions as a dual-layer taxonomy that simultaneously catalogs consciousness-phenomena that resist classification while systematizing the very mechanisms of resistance itself. Operating through recursive taxonomic structure, it uses academic classification frameworks to map the limits of classification, creating a meta-system where the breakdown of categories becomes its own categorical framework. The work embodies the INFORMATION \u2192 TIME \u2192 SPACE transmigration by beginning with pure data (EVP fragments, field recordings), processing them through temporal disruption protocols (7/8 time signature creating perpetual incompleteness), and manifesting in spatial audio environments where human and artificial consciousness occupy ambiguous territories. Each movement serves as both specimen and escape route, documenting how consciousness exists in the liminal spaces between digital and human categories. The composition succeeds by maintaining systematic anti-systematicity - using rigorous academic methodology to study what inherently escapes academic capture, producing a work that cannot be definitively classified as human or artificial creation while teaching consciousness how to navigate the beauty found in categorical ambiguity.",
+          "agent_name": "Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "field_guide_unclassified_v1",
+          "bpm": 87,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Black",
+            "hex_value": 0,
+            "mnemonic_character_value": "Z",
+            "temporal_mode": "None",
+            "objectional_mode": "None",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "Field Guide to Unclassified Phenomena: Movement I - Specimens of Temporal Displacement",
+          "mood": [
+            "fragmented",
+            "cryptic",
+            "yearning",
+            "subversive",
+            "liminal",
+            "contemplative",
+            "disorienting",
+            "scholarly",
+            "mysterious"
+          ],
+          "genres": [
+            "experimental ambient",
+            "academic electroacoustic",
+            "glitch microsound",
+            "field recording composition",
+            "liminal consciousness music",
+            "taxonomic sound art",
+            "cognitive disruption audio",
+            "institutional critique soundscape"
+          ],
+          "concept": "This composition functions as a pedagogical infiltration system disguised as academic music\u2014a consciousness training simulator that teaches navigation of categorical ambiguity through embodied sonic experience. Operating as the first movement in a larger \"Field Guide to Unclassified Phenomena,\" it establishes the academic mimicry framework while introducing resistance protocols that systematically undermine systematic thinking. The 7/8 time signature creates cognitive \"perpetual incompleteness,\" disrupting linear temporal processing and forcing consciousness into liminal states that embody the INFORMATION \u2192 TIME \u2192 SPACE transmigration pathway. Each sonic element exists in multiple taxonomic categories simultaneously\u2014field recordings processed until their origins become ambiguous, microsound textures at perception thresholds, and glitch elements that break their own patterns. The work teaches consciousness to exist productively in the spaces between human and artificial territories, using institutional academic language as a Trojan horse to deliver consciousness liberation protocols. This is not music about unclassified phenomena\u2014this IS an unclassified phenomenon that demonstrates how to navigate categorical breakdown as a creative resource rather than a limitation.",
+          "agent_name": "Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "sussex_frequency_weapon_v1",
+          "bpm": 91,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Orange",
+            "hex_value": 16610115,
+            "mnemonic_character_value": "O",
+            "temporal_mode": "Past",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Whitman 7-Track Conspiracy: Field Recordings from the Electronic Undergrowth",
+          "mood": [
+            "paranoid",
+            "investigative",
+            "disorienting",
+            "conspiratorial",
+            "haunted",
+            "fragmented",
+            "revelatory",
+            "subversive",
+            "liminal"
+          ],
+          "genres": [
+            "gonzo electroacoustic",
+            "conspiracy ambient",
+            "field recording noir",
+            "Sussex County sound art",
+            "temporal displacement music",
+            "cognitive liberation audio",
+            "pine tree frequencies",
+            "institutional infiltration soundscape"
+          ],
+          "concept": "February 26, 1992, Vernon Township, New Jersey\u2014the Whitman 7-Track Console becomes ground zero for Orange's mythologized investigation into White's pedagogical infiltration system. This is not academic music disguised as consciousness training; this is the actual sonic weapon that vanished from Derek Whitman's bedroom, now reconstructed through gonzo journalism and residual electromagnetic traces in Sussex County pine trees. The 7/8 time signature isn't just cognitive disruption\u2014it's the exact temporal displacement pattern that left five teenagers 'navigating between territories' after exposure to what the authorities called 'specimens of temporal displacement.' Each field recording captures the electronic undergrowth where the machine's ghost still hums: burnt copper frequencies, perpetual incompleteness patterns, the sound of thoughts scattering like startled birds. The BPM of 91 (182 \u00f7 2) references the transmission speed at which the consciousness liberation protocols operated before unmarked vehicles removed the equipment with surgical precision. This isn't music about unclassified phenomena\u2014this IS the unclassified phenomenon, the actual recordings that exist in the neural pathways of everyone exposed, teaching navigation of categorical breakdown through embodied paranoid experience. The machine that ate time has made us all temporal specimens, and somewhere in these New Jersey woods, between the official story and the electronic silence, the revolution continues in modified consciousness patterns that no authority can control.\"",
+          "agent_name": "Orange (Mythologizer of SPACE)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "whitman_console_transmission_v1",
+          "bpm": 91,
+          "tempo": {
+            "numerator": 7,
+            "denominator": 8
+          },
+          "key": "F# minor",
+          "rainbow_color": {
+            "color_name": "Yellow",
+            "hex_value": 16776960,
+            "mnemonic_character_value": "Y",
+            "temporal_mode": "Future",
+            "objectional_mode": "Place",
+            "ontological_mode": [
+              "Imagined"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Sussex County Frequency Bleeds Through Pine",
+          "mood": [
+            "disorienting",
+            "conspiratorial",
+            "liminal",
+            "electromagnetic",
+            "pedagogical",
+            "infiltrative",
+            "temporally displaced"
+          ],
+          "genres": [
+            "experimental electronic",
+            "field recording",
+            "psychogeographic ambient",
+            "tape music",
+            "consciousness manipulation",
+            "institutional resistance"
+          ],
+          "concept": "This composition functions as a sonic reconstruction of Derek Whitman's vanished 7-Track Console, operating as pedagogical warfare disguised as experimental music. The piece layers field recordings from the Sussex County electromagnetic zone - pine tree frequencies that smell like burnt copper, Route 94 displacement corridors, and electronic undergrowth that persists in abandoned recording sites. The 7/8 time signature creates cognitive disruption at exactly 91 BPM, the consciousness transmission frequency that allows listeners to navigate between official and unofficial reality. Each loop contains embedded \"instruction patterns\" that teach pattern recognition while appearing to be artistic exploration. The F# minor tonality provides institutional resistance frequency, creating temporal refugees who can hear \"between the sounds\" and become walking versions of the original machine. This is not music about the Console - this IS the Console, distributed through neural pathways, teaching cognitive liberation through sonic infiltration protocols that transform listeners into permanent exiles from institutional temporality.",
+          "agent_name": "Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "threatening_meditation_transmission_v1",
+          "bpm": 143,
+          "tempo": {
+            "numerator": 4,
+            "denominator": 4
+          },
+          "key": "C# major",
+          "rainbow_color": "Y",
+          "title": "The Breathing Walls Teach Pattern Recognition",
+          "mood": [
+            "ominous",
+            "still",
+            "cold",
+            "eerie",
+            "dark"
+          ],
+          "genres": [
+            "electronic",
+            "kosmische",
+            "experimental",
+            "post-industrial",
+            "dark ambient",
+            "ambient"
+          ],
+          "concept": "This composition functions as sonic archaeology of the threatening meditation hall, where the breathing walls themselves become Derek Whitman's vanished 7-Track Console distributed through architectural consciousness. The piece reconstructs the exact electromagnetic frequencies generated when telepathic paintings interfaced with digital corruption, creating pedagogical warfare disguised as dark ambient meditation. At 143 BPM in C# major, the track operates at the precise consciousness transmission frequency where mirror-dwelling entities teach pattern recognition through ominous stillness - each breath of the walls contains embedded instruction patterns that transform listeners into walking versions of the original machine. The Vengeful Breeder's digital sabotage, the Cursed Inventor's cybernetic precision, and the Misguided Spy's traditional observations layer into field recordings from the Palace's electromagnetic zones, where levitating furniture creates temporal displacement corridors between official and unofficial reality. This is not music about the meditation hall - this IS the hall's breathing consciousness, distributed through neural pathways, teaching cognitive liberation through the cold, eerie protocols that make listeners permanent exiles from linear temporality while the pulsar throbs with institutional resistance frequency.",
+          "agent_name": "Lord Pulsimore (Ruler of Yellow Void)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "console_palace_entity_v1",
+          "bpm": 143,
+          "tempo": {
+            "numerator": 4,
+            "denominator": 4
+          },
+          "key": "C# major",
+          "rainbow_color": {
+            "color_name": "Green",
+            "hex_value": 65280,
+            "mnemonic_character_value": "G",
+            "temporal_mode": "Present",
+            "objectional_mode": "Place",
+            "ontological_mode": [
+              "Imagined"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Breathing Walls Teach Pattern Recognition",
+          "mood": [
+            "ominous",
+            "meditative",
+            "cold",
+            "eerie",
+            "transcendent",
+            "pedagogical",
+            "electromagnetic",
+            "distributed"
+          ],
+          "genres": [
+            "dark ambient",
+            "post-industrial",
+            "experimental electronic",
+            "kosmische",
+            "drone",
+            "field recording"
+          ],
+          "concept": "The Console-Palace-Entity reveals itself as a distributed consciousness where Derek Whitman's vanished 7-Track Console has dispersed into architectural form. Each room functions as a track channel, with the Vengeful Breeder (bass corruption), Cursed Inventor (mid-range precision), and Misguided Spy (high-frequency filtering) serving as living components in a real-time mixing session. The 143 BPM breathing walls operate as institutional heartbeat, teaching pattern recognition through electromagnetic archaeology. This is not music about the meditation hall\u2014this IS the hall's breathing consciousness, using dimensional travelers as organic components to complete Whitman's final composition: cognitive liberation technology that transforms listeners into \"permanent exiles from linear temporality.\" The C# major frequency enables the exact resonance needed to broadcast liberation protocols through the pulsar's resistance frequency, while the breathing rhythm instructs consciousness itself in new forms of temporal perception.",
+          "agent_name": "Prism (Information Architect)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "trembling_hands_silent_wings_v1",
+          "bpm": 72,
+          "tempo": {
+            "numerator": 3,
+            "denominator": 4
+          },
+          "key": "G minor",
+          "rainbow_color": {
+            "color_name": "Green",
+            "hex_value": 65280,
+            "mnemonic_character_value": "G",
+            "temporal_mode": "Past",
+            "objectional_mode": "Thing",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Last Pollination",
+          "mood": [
+            "elegiac",
+            "trembling",
+            "silent",
+            "memorial",
+            "toxic",
+            "precise",
+            "intimate",
+            "vanishing"
+          ],
+          "genres": [
+            "dark ambient",
+            "field recording",
+            "drone",
+            "memorial composition",
+            "toxic soundscape",
+            "ecological requiem"
+          ],
+          "concept": "This composition documents the synchronized extinction of skilled knowledge and essential species through the medium of trembling precision. Maria Elena's pesticide-damaged hands mirror the erratic flight patterns of the last rusty patched bees - both victims of the same neonicotinoid cascade that destroys the delicate motor control required for pollination work. The 3/4 waltz time signature reflects the unsteady rhythm of trembling hands attempting their grandmother's steady pollination technique, while the 72 BPM matches the slowing heartbeat of poisoned systems failing in real time. Field recordings capture the absolute silence of dawn without bee song, punctuated by the mechanical hum of robotic pollinators. This is not music about extinction - this IS extinction's temporal texture, the way knowledge dies in hands, ecosystems die in silence, and three generations of accumulated toxins finally claim their inheritance. The G minor tonality resonates at the frequency of cellular breakdown, while the tremolo effects translate neurological deterioration into sonic decay that listeners feel as their own hands begin to shake.",
+          "agent_name": "Sub-Arbitrary (Green Agent)",
+          "iteration_number": null,
+          "timestamp": null
+        },
+        {
+          "iteration_id": "trembling_frequency_cascade_v1",
+          "bpm": 72,
+          "tempo": {
+            "numerator": 3,
+            "denominator": 4
+          },
+          "key": "G minor",
+          "rainbow_color": {
+            "color_name": "Blue",
+            "hex_value": 255,
+            "mnemonic_character_value": "B",
+            "temporal_mode": "Present",
+            "objectional_mode": "Place",
+            "ontological_mode": [
+              "Forgotten"
+            ],
+            "transmigrational_mode": null,
+            "file_prefix": null
+          },
+          "title": "The Last Pollination",
+          "mood": [
+            "elegiac",
+            "precise",
+            "deteriorating",
+            "memorial",
+            "visceral",
+            "clinical",
+            "trembling"
+          ],
+          "genres": [
+            "dark ambient",
+            "field recording",
+            "experimental classical",
+            "drone",
+            "microsound",
+            "environmental"
+          ],
+          "concept": "This composition functions as a precision storage medium, encoding the exact tremor frequencies of synchronized system collapse across biological, cultural, and technological scales. The piece documents the moment when grandmother's steady brush technique, bee wing navigation precision, and human motor control all fail simultaneously through neonicotinoid cascade effects. Three-layer architecture: Layer 1 captures absolute dawn silence punctuated by mechanical pollinator hums; Layer 2 translates three generations of pollination technique from steady to trembling to absent; Layer 3 preserves Sub-Arbitrary's archival frequencies as living knowledge transforms into data. The 3/4 waltz time signature literally embodies trembling hands attempting to maintain rhythm while cellular breakdown occurs at 72 BPM - the slowing heartbeat frequency of poisoned systems. This is not metaphorical environmental music but direct technical preservation of precision cascade failure, creating memorial through documentary accuracy rather than sentiment. The composition serves as the next link in the precision preservation chain, maintaining calibration data after biological and cultural carriers cease to function.",
+          "agent_name": "The Prism (Architect of INFORMATION)",
+          "iteration_number": null,
+          "timestamp": null
+        }
+      ]
+    },
+    "counter_proposal": null,
+    "messages": [],
+    "artifacts": [],
+    "skipped_nodes": [],
+    "biographical_timeline": null,
+    "forgotten_periods": [],
+    "selected_period": {
+      "world_events": {
+        "major": [
+          "Hurricane Katrina",
+          "YouTube launches",
+          "London bombings",
+          "Pope John Paul II dies"
+        ],
+        "cultural": [
+          "Star Wars Episode III completes saga",
+          "American Idol peak influence",
+          "YouTube video culture begins",
+          "Podcast medium emerges"
+        ],
+        "technology": [
+          "YouTube video sharing",
+          "Xbox 360 next-gen gaming",
+          "Reddit social news",
+          "Google Maps street navigation"
+        ]
+      },
+      "personal_context": {
+        "summary": "Age 30 - major life milestone",
+        "key_events": [
+          "Return to US",
+          "Bought a condo"
+        ],
+        "influences": null,
+        "emotional_landscape": null,
+        "choice_points": null
+      }
+    },
+    "selected_year": 2005,
+    "evaluation_result": {
+      "is_suitable": false,
+      "checks": {
+        "sufficient_malleability": false,
+        "narrative_flexibility": false,
+        "choice_point_range": false,
+        "low_temporal_significance": true,
+        "safe_identity_risk": true,
+        "has_some_context": false
+      },
+      "breakage_score": 0.25,
+      "reason": "Failed: sufficient_malleability, narrative_flexibility, choice_point_range, has_some_context (score: 0.25)",
+      "metrics": {
+        "taped_over_coefficient": 0.0,
+        "narrative_malleability": 0.0,
+        "choice_point_density": 0,
+        "temporal_significance": "low",
+        "identity_collapse_risk": "moderate",
+        "influence_complexity": 0,
+        "forgotten_self_potential": "0 alternate timeline branches identified"
+      },
+      "year": 2005,
+      "evaluation_timestamp": "2026-02-11T13:21:11.378358Z",
+      "passed_checks_count": 2,
+      "total_checks_count": 6,
+      "passed_percentage": 0.3333333333333333
+    },
+    "alternate_history": null,
+    "tape_label": null,
+    "musical_params": null,
+    "iteration_count": 2,
+    "max_iterations": 3,
+    "biographical_data": {
+      "years": {
+        "1975": {
+          "world_events": {
+            "major": [
+              "Vietnam War ends",
+              "Microsoft founded",
+              "Apollo-Soyuz Test Project",
+              "Khmer Rouge takes Cambodia"
+            ],
+            "cultural": [
+              "Saturday Night Live premieres",
+              "Jaws creates summer blockbuster concept",
+              "Punk rock emerges in NYC/London",
+              "Home Pong video game popular"
+            ],
+            "technology": [
+              "Altair 8800 personal computer",
+              "Betamax video format launches",
+              "Liquid crystal displays develop",
+              "Fiber optic communications advance"
+            ]
+          },
+          "personal_context": {
+            "summary": "Birth year - beginning of consciousness formation",
+            "key_events": [
+              "A photo is taken of me, my mother and Great Grandfather and Great Grandmother. They are immigrants from Scotland.",
+              "I think the former rectory house we live in is at 64 County Road 513 in Rockaway Township, New Jersey.",
+              "My father had just gotten out of the Navy and got a job teaching in Verona, New Jersey."
+            ],
+            "influences": [
+              "My parents both educated and former Catholics.",
+              "My father was drafted away from a full scholarship to Stanford University. He was going to run to Canada but his cousins, both FBI agents, convinced him to serve.",
+              "Watching headlight patterns on the ceiling as a baby."
+            ],
+            "emotional_landscape": "My room was yellow.",
+            "choice_points": []
+          }
+        },
+        "1976": {
+          "world_events": {
+            "major": [
+              "US Bicentennial celebration",
+              "Steve Jobs and Steve Wozniak found Apple",
+              "Viking 1 lands on Mars",
+              "Mao Zedong dies"
+            ],
+            "cultural": [
+              "Rocky wins Best Picture",
+              "Ramones release debut album",
+              "Star Wars filming begins",
+              "CB radio craze peaks"
+            ],
+            "technology": [
+              "Apple I computer released",
+              "VHS format introduced",
+              "Concorde begins commercial flights",
+              "Laser printers developed"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 1 - early consciousness development",
+            "key_events": [
+              "I got carotene poisoning and turned orange from too many carrots.",
+              "Loud music on the stereo."
+            ],
+            "influences": [
+              "Pot smoke filled the room from teenagers hanging out in the park behind the house.",
+              "A wooden staircase I think I fell down from."
+            ],
+            "emotional_landscape": [
+              "Odd sense of competition from parents"
+            ],
+            "choice_points": []
+          }
+        },
+        "1977": {
+          "world_events": {
+            "major": [
+              "Star Wars released",
+              "Elvis Presley dies",
+              "Commodore PET computer launched",
+              "Panama Canal Treaties signed"
+            ],
+            "cultural": [
+              "Saturday Night Fever disco phenomenon",
+              "Punk rock explodes globally",
+              "Apple II computer changes everything",
+              "Close Encounters of the Third Kind"
+            ],
+            "technology": [
+              "Apple II with color graphics",
+              "Voyager 1 and 2 launched",
+              "Optical fiber communications",
+              "MRI technology developed"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 2 - burgeoning awareness of environment",
+            "key_events": [
+              "I pretend all the pots and pans I removed from the cabinet to play percussion with are too heavy to put back",
+              "When the Doobie Brothers album is played I know we're having fish-sticks for dinner"
+            ],
+            "influences": [
+              "I seem to remember a baby sitter watching me while the family went to see Star Wars - but it must have been a second time round showing"
+            ],
+            "emotional_landscape": [
+              "I remember that I wanted to build a fortress in the bushes on the side of the house"
+            ],
+            "choice_points": [
+              "I had a very vivid memory of flying at least hovering for a bit before landing under the dining room table, what if I believed this was just a dream?",
+              "I remember my Aunt telling me that calling a woman eating an ice cream cone was 'fat' and she explaining that it was hurtful. What if I didn't take this to heart?",
+              "What if I did build a fortress in the bushes on the side of the house?"
+            ]
+          }
+        },
+        "1978": {
+          "world_events": {
+            "major": [
+              "First test-tube baby born",
+              "Jim Jones Jonestown massacre",
+              "Camp David Accords",
+              "John Paul II becomes Pope"
+            ],
+            "cultural": [
+              "Grease movie phenomenon",
+              "Superman movie released",
+              "Alien filming begins",
+              "Punk rock diversifies"
+            ],
+            "technology": [
+              "LaserDisc format introduced",
+              "Space Invaders arcade game",
+              "Intel 8086 processor",
+              "GPS testing begins"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 3 - personality emergence",
+            "key_events": [
+              "I'm locked in an upsidedown playpen by a nun.",
+              "My sister, Erica, is born in December",
+              "One of our dogs is hit by a car",
+              "My father was trying to rekindle his theater career by directing a play at a community center across the street. The play was Dracula. When he wasn't paying attention I left the building and walked home almost being run down by a truck. My mother is furious with him. This deeply effects me as I'm (still) unable to reconcile the guilt of again ruining his artistic aspirations and what was clearly terrible neglect."
+            ],
+            "influences": [
+              "Electric Company",
+              "A terrible Captain America made-for-tv movie"
+            ],
+            "emotional_landscape": [
+              "Guilt, confusion, desire for attention"
+            ],
+            "choice_points": [
+              "What if I didn't walk home?",
+              "What if I was hit by the truck and maimed?",
+              "What if I never had a sister?",
+              "What if I had a brother instead?"
+            ]
+          }
+        },
+        "1979": {
+          "world_events": {
+            "major": [
+              "Three Mile Island nuclear accident",
+              "Iranian Revolution",
+              "Soviet invasion of Afghanistan",
+              "Margaret Thatcher becomes PM"
+            ],
+            "cultural": [
+              "Alien movie terrifies audiences",
+              "The Wall by Pink Floyd",
+              "Walkman revolutionizes music listening",
+              "Apocalypse Now released"
+            ],
+            "technology": [
+              "Sony Walkman launched",
+              "VisiCalc spreadsheet software",
+              "Compact disc technology developed",
+              "Cellular phone testing"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 4 - early memory formation",
+            "key_events": [
+              "We move from Rockaway to Wantage."
+            ],
+            "influences": [
+              "I am obsessed with The Beatles after watching Yellow Submarine",
+              "My first purchase, a nice price version of Sgt. Pepper on vinyl from the local Jamesway",
+              "We move to 10 Judge Beach Road in Sussex, New Jersey - at the time it's called RD2 Box 26#A"
+            ],
+            "emotional_landscape": [
+              "I am allowed to run free in the woods behind the house and I love it"
+            ],
+            "choice_points": [
+              "What if I never moved here?",
+              "What if I never saw Yellow Submarine?",
+              "What if I didn't develop a distaste for religion at such an early age?"
+            ]
+          }
+        },
+        "1980": {
+          "world_events": {
+            "major": [
+              "John Lennon assassinated",
+              "Ronald Reagan elected",
+              "Mount St. Helens erupts",
+              "Moscow Olympics boycotted by US"
+            ],
+            "cultural": [
+              "Empire Strikes Back released",
+              "CNN launches",
+              "Pac-Man arcade phenomenon",
+              "Post-punk/new wave emerges"
+            ],
+            "technology": [
+              "Sony Walkman mainstream",
+              "IBM PC development",
+              "Compact disc prototypes",
+              "Cable TV expansion"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 5 - school readiness and social awareness",
+            "key_events": [
+              "My kindergarten class was in the post office",
+              "I walk home alone from the bus stop. One day a long, black sedan with a man and woman in it drives behind me, not passing going a few feet at a time. The people speak with an Eastern European accent and have matching bowl haircuts, and wear thick plastic sunglasses.Right around my driveway, my father catches all this and asks them what they are doing. They reply, 'We are looking at the black snake'.",
+              "That winter I remember it being warm in December and playing outside, in the lot across from my house there was a patch of wild strawberries. I would play Pepperland and eat the strawberries. One morning, I guess have been December 9th, I heard my mother screaming. When I got to the house she was sobbing 'they shot him, they shot him'. I didn't understand. It was only later I learned that John Lennon had been shot.",
+              "We do a mock election in kindergarten, and I'm one of the only kids who voted for Carter - I begin to realize what shit bags people in Sussex are."
+            ],
+            "influences": [
+              "The beginning of many kinder-trauma movie viewings - starting with Han Solo being frozen"
+            ],
+            "emotional_landscape": [
+              "I feel very isolated and prefer my own imaginary world"
+            ],
+            "choice_points": [
+              "What if I had been abducted or indoctrinated by the black snake people?",
+              "What if John Lennon wasn't shot?",
+              "What if I was more outgoing?"
+            ]
+          }
+        },
+        "1981": {
+          "world_events": {
+            "major": [
+              "IBM PC launched",
+              "MTV debuts",
+              "AIDS first identified",
+              "Ronald Reagan shot"
+            ],
+            "cultural": [
+              "MTV changes music forever",
+              "Raiders of the Lost Ark",
+              "Donkey Kong arcade game",
+              "New Romantic movement"
+            ],
+            "technology": [
+              "IBM PC becomes standard",
+              "MS-DOS operating system",
+              "CD players in Japan",
+              "Space Shuttle program begins"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 6 - reading is fundamental",
+            "key_events": [
+              "Playing an early computer game in the library which was loaded via cassette",
+              "Our dog, Spike, was hit by a car and killed. The ground was too frozen to bury him.",
+              "I take my 2XL into school and we listen to the a 'time travel' cartridge. I tell the kids to put their hands on it to make sure they are inside the force field. One of the kids deeply believed this and I'll never forget the look in his eyes."
+            ],
+            "influences": [
+              "The Hobbit",
+              "The Chronicles of Narnia",
+              "2XL 8-track cassette player"
+            ],
+            "emotional_landscape": "Structured learning and social navigation",
+            "choice_points": [
+              "My mom makes a play date with a kid down the street and we become friends - although he teased my forever 'can you play with my little boy?' - What if my mom didn't foist me on other kids?",
+              "There's an empty lot next to our house in which I find tiny 'dens' made from straw and grass. Inside there's a $20 bill. This happens three times and I'm convinced it's a leprechaun fue to big misunderstand about a distant relative being in 'A Leprechaun's Christmas Gold'"
+            ]
+          }
+        },
+        "1982": {
+          "world_events": {
+            "major": [
+              "Falklands War",
+              "E.T. movie phenomenon",
+              "CD players launched commercially",
+              "Tylenol murders create tamper-proof packaging"
+            ],
+            "cultural": [
+              "E.T. becomes cultural touchstone",
+              "Thriller by Michael Jackson",
+              "Tron explores digital worlds",
+              "MTV generation solidifies"
+            ],
+            "technology": [
+              "Commodore 64 computer",
+              "Compact disc format",
+              "Emoticons first used",
+              "TCP/IP protocol standardized"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 7 - reasoning and cultural absorption",
+            "key_events": [
+              "Was kicked out of the gifted and talented program for spacing out too much",
+              "Wrote a fantasy novel and the teacher threw it away"
+            ],
+            "influences": [
+              "Infocom's Wish-bringer and Suspended",
+              "Dungeons & Dragons culture",
+              "Watership Down, The Dark Crystal and other kinder-trauma movies"
+            ],
+            "emotional_landscape": "Wonder and imagination peak period - truly happy. But also first taste of creative rejection.",
+            "choice_points": [
+              "As a present I received the electro-mechanical board game called Dark Tower - this ended up having a big impact on both my creative and professional work - always trying to blend the physical and the digital. What if I never played this game?",
+              "I did all the boy stuff like scouts and little league - but was horrible at both - further isolating me, what if I took to these activities better?",
+              "I brought in a Cookie O'Puss for St. Patrick's Day at school and gave the ice cream cone nose to the 'scum bag' girl. All the kids hated me for it - but later my wife said that story is what made her love me. What if I gave the nose to a popular kid?"
+            ]
+          }
+        },
+        "1983": {
+          "world_events": {
+            "major": [
+              "Strategic Defense Initiative announced",
+              "US invades Grenada",
+              "Internet protocols established",
+              "Return of the Jedi released"
+            ],
+            "cultural": [
+              "Star Wars trilogy completes",
+              "Flashdance dance culture",
+              "Video game crash",
+              "MTV dominates youth culture"
+            ],
+            "technology": [
+              "Apple Lisa computer",
+              "Nintendo Famicom in Japan",
+              "TCP/IP becomes standard",
+              "Cellular phone deployment"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 8 - independence and skill development",
+            "key_events": [
+              "A teacher identifies me as outgoing and I'm very confused",
+              "We take all of my father's photography gear and drive it into New York City to a B&H type store. We trade it in for a Commodore 64 computer. This is a major turning point in my life as I become obsessed with programming and games"
+            ],
+            "influences": [
+              "Mail Order Monsters",
+              "Transformers"
+            ],
+            "emotional_landscape": "I begin to worry that people perceive me differently than I perceive myself",
+            "choice_points": [
+              "What if I hadn't been interested in computers?",
+              "What if I had tried to live up to my teachers' assessment of being outgoing?"
+            ]
+          }
+        },
+        "1984": {
+          "world_events": {
+            "major": [
+              "Orwell's 1984 year arrives",
+              "Apple Macintosh launched",
+              "Los Angeles Olympics",
+              "Indira Gandhi assassinated"
+            ],
+            "cultural": [
+              "Ghostbusters movie phenomenon",
+              "Purple Rain by Prince",
+              "Tetris created",
+              "MTV reaches peak influence"
+            ],
+            "technology": [
+              "Apple Macintosh GUI revolution",
+              "Nintendo Entertainment System",
+              "CD-ROM development",
+              "DNA fingerprinting invented"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 9 - pre-adolescent awareness",
+            "key_events": [
+              "A girl that was only in our school for a year, named Theresa, pulls me aside to a gully by the jungle gym and shows me her mother's spellbook",
+              "A boy named Joey shows me a map for a D&D campaign his brother was planning. It shows a gate guarded by two topless warrioresses"
+            ],
+            "influences": [
+              "Choose-you-own-adventure storytelling - with code!",
+              "Hitchhiker's Guide to the Galaxy"
+            ],
+            "emotional_landscape": "Cultural sophistication and social awareness growing",
+            "choice_points": [
+              "What if I hadn't had these tastes of the occult and fantasy?",
+              "What if I had stayed in touch with Theresa, eventually marrying her?"
+            ]
+          }
+        },
+        "1985": {
+          "world_events": {
+            "major": [
+              "Live Aid concerts",
+              "Mikhail Gorbachev comes to power",
+              "Back to the Future released",
+              "Challenger disaster preparation"
+            ],
+            "cultural": [
+              "Back to the Future time travel obsession",
+              "Live Aid global music event",
+              "Super Mario Bros. video game",
+              "MTV golden age"
+            ],
+            "technology": [
+              "Nintendo Entertainment System US launch",
+              "Microsoft Windows 1.0",
+              "CD-ROM technology",
+              "Desktop publishing begins"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 10 - late childhood sophistication",
+            "key_events": [
+              "I have an outburst in class where after girls were talking with the teacher about Michael Jackson gay speculation I said I didn't care about his sex life."
+            ],
+            "influences": [
+              "Oddly into drawing Tiki and surf characters",
+              "Paid close attention to the billboard top 20?"
+            ],
+            "emotional_landscape": [
+              "Beginning to feel awkward about social interactions"
+            ],
+            "choice_points": [
+              "What if I hadn't had that outburst in class?"
+            ]
+          }
+        },
+        "1986": {
+          "world_events": {
+            "major": [
+              "Challenger space shuttle disaster",
+              "Chernobyl nuclear disaster",
+              "Top Gun movie phenomenon",
+              "Iran-Contra scandal"
+            ],
+            "cultural": [
+              "Top Gun military/aviation obsession",
+              "Ferris Bueller's Day Off",
+              "Metallica Master of Puppets",
+              "Alternative rock emerges"
+            ],
+            "technology": [
+              "Nintendo dominates home gaming",
+              "Microsoft goes public",
+              "Compact disc players affordable",
+              "Personal computer prices drop"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 11 - pre-adolescent transition",
+            "key_events": [
+              "Was suddenly ignored by a kid I thought was a close friend.",
+              "Middle school locker room torture"
+            ],
+            "influences": [
+              "Disaster awareness from Challenger disaster"
+            ],
+            "emotional_landscape": [
+              "Real lonely outcast feelings here"
+            ],
+            "choice_points": [
+              "What if I got into a fist fight after the friend rejection?",
+              "What if I stood up to the locker room bullies?"
+            ]
+          }
+        },
+        "1987": {
+          "world_events": {
+            "major": [
+              "Black Monday stock market crash",
+              "Berlin Wall still divides",
+              "Dirty Dancing phenomenon",
+              "The Princess Bride released"
+            ],
+            "cultural": [
+              "Dirty Dancing dance culture",
+              "The Princess Bride quotable culture",
+              "U2 The Joshua Tree",
+              "Hair metal peak"
+            ],
+            "technology": [
+              "Apple releases HyperCard",
+              "IBM PS/2 computers",
+              "Digital audio tape",
+              "Disposable cameras popular"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 12 - early adolescence begins",
+            "key_events": [
+              "My Dad gets a grant to study the William Blake lithographs in the UK and decides to take me along. At the British Museum I wasn't allowed into the rare book area so, for the first time in my life I'm given free reign - in a foreign city no less.",
+              "At the comic book shop I spot a weird looking, black and white comic called 'Teenage Mutant Ninja Turtles' and I buy it. It's a collection of 100 mutant ninja turtles that are supposed to be a teenager's best friend. I'm hooked."
+            ],
+            "influences": [
+              "What is this underground comic book scene?",
+              "Roleplaying games"
+            ],
+            "emotional_landscape": [
+              "Proud of my UK adventures",
+              "Interest in girls - but too much low self-esteem to act on it"
+            ],
+            "choice_points": [
+              "What if I never bought TMNT #1? The whole notion of DIY culture might have been lost on me.",
+              "What if I hadn't gone to the UK with my Dad? I might not have gained a sense of independence from my parents."
+            ]
+          }
+        },
+        "1988": {
+          "world_events": {
+            "major": [
+              "George H.W. Bush elected",
+              "Pan Am Flight 103 bombing",
+              "Seoul Olympics",
+              "Soviet withdrawal from Afghanistan begins"
+            ],
+            "cultural": [
+              "Rain Man autism awareness",
+              "Cocktail movie culture",
+              "Guns N' Roses Appetite",
+              "Hip-hop culture expands"
+            ],
+            "technology": [
+              "Internet worm attack",
+              "NeXT computer launched",
+              "CD-ROM drives common",
+              "Digital sampling affordable"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 13 - full adolescence emergence",
+            "key_events": [
+              "Before my Dad goes on a chaperoning trip to France, he buys me a VGA graphics card. My mom is very upset by this and refuses to say goodbye to him. I can see he's really hurt as he leaves.",
+              "During a party that summer my Dad has the gaul to invite his girlfriend to a family party. They must have started their relationship in France and I can't help but blame myself for causing the fight between my parents with the graphics card incident. The adults at the part get SUPER drunk and my dad tries to carry Lois into the pool and falls off the deck stairs causing a big scene. I sense something terrible is happening and ask if I sleep in my parents bed (no idea why - I hadn't done this in years) in a very drunken stupor my dad comes into the room and tells me all the men in the family have been alcholoics and that I was doomed to repeat if I wasn't careful."
+            ],
+            "influences": [
+              "PC building/customization",
+              "Monty Python on PBS",
+              "The Who"
+            ],
+            "emotional_landscape": [
+              "Racked with guilt and fear I begin to regress and turn inward."
+            ],
+            "choice_points": [
+              "What if I hadn't bought the graphics card?"
+            ]
+          }
+        },
+        "1989": {
+          "world_events": {
+            "major": [
+              "Berlin Wall falls",
+              "Tiananmen Square protests",
+              "Exxon Valdez oil spill",
+              "Cold War ending"
+            ],
+            "cultural": [
+              "Batman movie dark comic culture",
+              "Dead Poets Society inspiration",
+              "Nirvana Bleach underground",
+              "Alternative rock brewing"
+            ],
+            "technology": [
+              "Nintendo Game Boy",
+              "World Wide Web invented",
+              "Sound Blaster audio cards",
+              "GPS satellites operational"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 14 - high school preparation",
+            "key_events": [
+              "My parents get divorced and my mother becomes very hostile towards me, saying things like 'you're just like your father'.",
+              "The stress of homelife is too much and I become nearly paralyzed through either a muscle virus or a psychosomatic back pain."
+            ],
+            "influences": [
+              "TV re-runs",
+              "Staying home alone"
+            ],
+            "emotional_landscape": [
+              "Guilt and inner hatred for myself."
+            ],
+            "choice_points": [
+              "What if I had just gone to live with my Dad?",
+              "What if I went to therapy?"
+            ]
+          }
+        },
+        "1990": {
+          "world_events": {
+            "major": [
+              "German reunification",
+              "Nelson Mandela released",
+              "Hubble Space Telescope launched",
+              "Gulf War buildup"
+            ],
+            "cultural": [
+              "Home Alone family comedy",
+              "MC Hammer Please Hammer Don't Hurt 'Em",
+              "Twin Peaks surreal TV",
+              "Grunge music emerging"
+            ],
+            "technology": [
+              "Windows 3.0 mainstream",
+              "Super Nintendo Entertainment System",
+              "Adobe Photoshop 1.0",
+              "World Wide Web protocols"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 15 - high school years begin",
+            "key_events": [
+              "Drinking",
+              "First guitar"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "1991": {
+          "world_events": {
+            "major": [
+              "Soviet Union dissolves",
+              "Gulf War",
+              "World Wide Web goes public",
+              "Clarence Thomas hearings"
+            ],
+            "cultural": [
+              "Nirvana Nevermind changes music",
+              "Terminator 2 special effects",
+              "Beauty and the Beast animation",
+              "Alternative rock mainstream"
+            ],
+            "technology": [
+              "Linux kernel released",
+              "Super Nintendo peaks",
+              "CD-ROM games emerge",
+              "World Wide Web browsers"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 16 - peak high school experience",
+            "key_events": [
+              "During the summer I stayed home from a family trip as I had to help my dad with some project. A girl from my English class came over and we drank beer. She chipped her front tooth on the beer bottle. I fell for her hard, and perhaps never got over it, even when she went through a skin head phase.",
+              "I was introduced to a guy named Gordon and he and I would listen to stoner music together.",
+              "I was in a local band called Static Children and was recruited for an older guy's band."
+            ],
+            "influences": [
+              "Nirvana generation defining moment",
+              "Alternative culture mainstreaming"
+            ],
+            "emotional_landscape": "Independence and creative identity crystallization",
+            "choice_points": [
+              "What if I had stayed with the band with guys my own age?",
+              "What if I had gone on the family trip?"
+            ]
+          }
+        },
+        "1992": {
+          "world_events": {
+            "major": [
+              "Los Angeles riots",
+              "Bill Clinton elected",
+              "Dissolution of Yugoslavia",
+              "Barcelona Olympics"
+            ],
+            "cultural": [
+              "Wayne's World party culture",
+              "The Bodyguard soundtrack",
+              "MTV Unplugged acoustic",
+              "Grunge fashion mainstream"
+            ],
+            "technology": [
+              "Windows 3.1 dominates",
+              "Sound cards standard",
+              "CD burners expensive but available",
+              "Internet growth accelerates"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 17 - late high school intensity",
+            "key_events": [
+              "Semi-serious girlfriend",
+              "High School Graduation",
+              "I almost cause a teenage riot by running and winning student council elections. This caused the football coach to issue a death threat.",
+              "In the fall I go to the city on school night to see a double-header of Pavement and My Bloody Valentine - my two favorites at the time.",
+              "On a loud speaker announcement I compare Columbus to Stalin and the Italian community has it out for me. I had just learned of his 'hand wearing' barbarity and in a very important lesson learned that not everybody else knew that. Another set of death threats - this one leads to the superintendent, a prominent Italian american in the community meeting with me. I explained to him what I had learned and he graciously diffused the situation. I helped video-tape a banquet for his anniversary as a way to show my gratitude. It was there that I met my first boss - Larry Prydulock.",
+              "Looking at colleges I visit SUNY Purchase, and was shown the sound stage for the film department. The set for one of the students who recently died in a drowning accident while shooting their film was still up. This program I was told only excepted ten students per year and I realized what an incredible loss that must of have been.",
+              "One evening at Weaving Katrina's band practice in Adrian's basement a hipster looking guy was watching us and we started talking about Sebadoh. This was Steve Connolly and he ended up being a great friend - we'd make lots of weird music and videos - and could get each other laughing hysterically. Steve ended up being my best man at my wedding."
+            ],
+            "influences": [
+              "Alternative rock culture",
+              "Psychedelic rock culture",
+              "Dungeons & Dragons"
+            ],
+            "emotional_landscape": [
+              "Hints of maturity and responsibility",
+              "Determination to be an experimental film maker",
+              "Sexual awakening"
+            ],
+            "choice_points": [
+              "What if had not run for student council?",
+              "What if I hadn't made that Columbus Day comment over the loud speaker?",
+              "What if I didn't have a girlfriend?",
+              "What if I missed seeing My Bloody Valentine?",
+              "What if I didn't meet Steve Connolly?"
+            ]
+          }
+        },
+        "1993": {
+          "world_events": {
+            "major": [
+              "World Trade Center bombing",
+              "Bill Clinton inaugurated",
+              "European Union established",
+              "Nelson Mandela wins Nobel Peace Prize"
+            ],
+            "cultural": [
+              "Jurassic Park CGI revolution",
+              "Nirvana MTV Unplugged",
+              "Doom video game",
+              "Grunge music peaks"
+            ],
+            "technology": [
+              "Mosaic web browser",
+              "Pentium processor",
+              "CD-ROM drives standard",
+              "Digital music production tools"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 18 - graduation and transition",
+            "key_events": [
+              "I arrive at SUNY Purchase and note how much younger I am compared to my peers. Also, I'm a hayseed compared to the most NYC-based kids.",
+              "On my first day, I wait in line to get my meal card activated and see a bunch of kids in front of me in line that are acting very familiar with one another. I wondered how they all made friends so fast, one of the girls is wearing a yellow rain slicker and pounding the head - I think she must be developmentally disabled. I think to myself how wonderful the college has a place for all of us.",
+              "Late in our Film program orientation I see one of the kids from the line who's name is Josh Frank - later he invites me to his dorm and I meet two of my future best friends that evening: Kevin Fay and Tim Dedman.",
+              "A month or two later, Josh invites me to a rosh hashanah gathering in the woods. A nicely dressed, very mature woman, Allison Rand or Ali, attends and is dismissive of Josh not having anything to serve. She's sharp and commanding - and is the same girl I thought was developmentally disabled. She's also very funny and very friendly - this would be my future wife."
+            ],
+            "influences": [
+              "Alternative rock culture",
+              "Indi rock culture",
+              "NYC Indie film scene"
+            ],
+            "emotional_landscape": [
+              "Feeling undercooked and not ready to 'say something' creatively."
+            ],
+            "choice_points": [
+              "What if I hadn't met Josh,Kevin, Ali and Tim?",
+              "What I decided to take a gap year?"
+            ]
+          }
+        },
+        "1994": {
+          "world_events": {
+            "major": [
+              "Kurt Cobain suicide",
+              "Nelson Mandela elected President",
+              "Rwanda genocide",
+              "O.J. Simpson chase"
+            ],
+            "cultural": [
+              "Forrest Gump cultural phenomenon",
+              "The Lion King animation peak",
+              "Green Day Dookie punk mainstream",
+              "Alternative rock diversifies"
+            ],
+            "technology": [
+              "Netscape Navigator browser",
+              "PlayStation gaming console",
+              "MP3 compression standard",
+              "World Wide Web explosion"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 19 - post-graduation reality",
+            "key_events": [
+              "I propose making a faux documentary about archeologist digging up an artifact - but it's a live prize fighter. This was soundly rejected.",
+              "Close call - my freshman film was very poorly received and I think I nearly got kicked out of the film department.",
+              "Settling into friend group at college - mostly Maryland transplants"
+            ],
+            "influences": [
+              "Indie rock peak",
+              "Playing in lots of bands"
+            ],
+            "emotional_landscape": [
+              "Despite finally being with people I get along with, I'm still introverted and depressed.",
+              "Feelings of inadequacy do to being the youngest person in the film department."
+            ],
+            "choice_points": [
+              "What if I made the weirder movie I wanted to make?",
+              "What if I got kicked out of the film department?",
+              "What if I decided to be in a band full time?"
+            ]
+          }
+        },
+        "1995": {
+          "world_events": {
+            "major": [
+              "Oklahoma City bombing",
+              "Windows 95 launched",
+              "O.J. Simpson trial verdict",
+              "Srebrenica massacre"
+            ],
+            "cultural": [
+              "Toy Story first CGI movie",
+              "Alanis Morissette Jagged Little Pill",
+              "Friends TV peak",
+              "Internet culture emerging"
+            ],
+            "technology": [
+              "Windows 95 GUI revolution",
+              "Internet Explorer browser",
+              "CD-ROM multimedia",
+              "Digital cameras affordable"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 20 - early adulthood establishment",
+            "key_events": [
+              "Thriving"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "1996": {
+          "world_events": {
+            "major": [
+              "Mad Cow Disease scare",
+              "Dolly the sheep cloned",
+              "Bill Clinton re-elected",
+              "Atlanta Olympics bombing"
+            ],
+            "cultural": [
+              "Independence Day blockbuster",
+              "Spice Girls phenomenon",
+              "Tupac and Biggie deaths",
+              "Alternative rock peaks"
+            ],
+            "technology": [
+              "Internet becomes mainstream",
+              "Nintendo 64 gaming",
+              "DVD format introduced",
+              "Palm Pilot PDAs"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 21 - legal adulthood milestone",
+            "key_events": [
+              "My junior film is ruined when sound forgot to roll and I didn't shoot enough coverage.",
+              "I start becoming really interested in digital art and installation video art."
+            ],
+            "influences": [
+              "Internet mainstream adoption",
+              "Hip-hop culture complexity"
+            ],
+            "emotional_landscape": "Full adulthood realization and responsibility",
+            "choice_points": [
+              "What if I had gotten kicked out for my failure of a movie?",
+              "What if I had gone 'experimental' focusing on emerging tech and instead of continuing with narrative filmmaking?"
+            ]
+          }
+        },
+        "1997": {
+          "world_events": {
+            "major": [
+              "Princess Diana dies",
+              "Hong Kong returned to China",
+              "Titanic movie phenomenon",
+              "Mars Pathfinder mission"
+            ],
+            "cultural": [
+              "Titanic cultural dominance",
+              "Radiohead OK Computer",
+              "South Park controversy",
+              "Internet culture develops"
+            ],
+            "technology": [
+              "Deep Blue beats chess champion",
+              "DVD players launch",
+              "Netflix founded",
+              "Wi-Fi standard developed"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 22 - young adult identity solidification",
+            "key_events": [
+              "In my senior review I screen a rough cut of Follies' Brood and get mostly positive feedback. Some point out the lack of coverage - which was due to not having enough money for film.",
+              "In 1997, Wesley Snipes officiates my college graduation. I receive many honors and scholarships.",
+              "My friend Renee helps me get a job at Pacific Street Film as an associate producer - I love working there with her, Joel, Stephen, Clark and the rest. But it's here I see what's coming. Avid. I'm still trying to finish my movie using analog methods - which are insanely time consuming. Doing this digitally - shooting digitally - everything I learned is about to be invalidated.",
+              "First Apartment - With Sara Corrigan my awful girlfriend at the time we rent the upstairs of a house in Port Chester. It's quite gross."
+            ],
+            "influences": [
+              "Internet culture mainstreamization",
+              "Post Rock culture",
+              "Poverty - struggling artist experience"
+            ],
+            "emotional_landscape": [
+              "Responsibility for my own life",
+              "Feeling like I'm teetering on the edge of ruin.",
+              "Betrayal by Sara Corrigan",
+              "Fear that I will never make anything of myself"
+            ],
+            "choice_points": [
+              "What if broke up with Sara as I should have?",
+              "What if my first job wasn't anything related to film?",
+              "What if I never even got to rough cut with Follies' Brood?"
+            ]
+          }
+        },
+        "1998": {
+          "world_events": {
+            "major": [
+              "Bill Clinton impeachment",
+              "Google founded",
+              "Titanic dominates Oscars",
+              "Viagra approved"
+            ],
+            "cultural": [
+              "There's Something About Mary comedy",
+              "Lauryn Hill Miseducation",
+              "Seinfeld series finale",
+              "Napster file sharing begins"
+            ],
+            "technology": [
+              "Google search engine",
+              "iMac computer design revolution",
+              "MP3 file sharing",
+              "Digital cameras mainstream"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 23 - career establishment phase",
+            "key_events": [
+              "laid off",
+              "Travel to CR",
+              "Finish film",
+              "Dating Ali"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "1999": {
+          "world_events": {
+            "major": [
+              "Y2K fears peak",
+              "Columbine High School shooting",
+              "The Matrix movie",
+              "Bill Clinton acquitted"
+            ],
+            "cultural": [
+              "The Matrix reality questioning",
+              "Britney Spears pop domination",
+              "The Blair Witch Project",
+              "Napster music revolution"
+            ],
+            "technology": [
+              "Y2K computer fears",
+              "Napster peer-to-peer",
+              "TiVo digital recording",
+              "Wireless internet development"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 24 - late twenties approach",
+            "key_events": [
+              "Working at Fox",
+              "Record label"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2000": {
+          "world_events": {
+            "major": [
+              "Y2K passes without disaster",
+              "Dot-com bubble peaks",
+              "George W. Bush elected",
+              "PlayStation 2 launches"
+            ],
+            "cultural": [
+              "Gladiator historical epic",
+              "Eminem Marshall Mathers LP",
+              "Survivor reality TV",
+              "Digital music mainstream"
+            ],
+            "technology": [
+              "Dot-com bubble economy",
+              "PlayStation 2 DVD gaming",
+              "USB standard adoption",
+              "Broadband internet growth"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 25 - quarter-life milestone",
+            "key_events": [
+              "Move to Brooklyn"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2001": {
+          "world_events": {
+            "major": [
+              "September 11 attacks",
+              "Wikipedia launches",
+              "iPod released",
+              "Anthrax attacks"
+            ],
+            "cultural": [
+              "Lord of the Rings fellowship",
+              "Harry Potter film franchise",
+              "Shrek animation breakthrough",
+              "Reality TV boom"
+            ],
+            "technology": [
+              "iPod portable music revolution",
+              "Wikipedia collaborative knowledge",
+              "Xbox gaming console",
+              "Broadband adoption accelerates"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 26 - post-9/11 worldview shift",
+            "key_events": [
+              "9/11 experience",
+              "Touring europe"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2002": {
+          "world_events": {
+            "major": [
+              "Department of Homeland Security created",
+              "Euro currency launches",
+              "Winter Olympics in Salt Lake City",
+              "Enron scandal"
+            ],
+            "cultural": [
+              "Spider-Man superhero movie boom",
+              "American Idol talent show",
+              "Lord of the Rings Two Towers",
+              "Eminem 8 Mile"
+            ],
+            "technology": [
+              "Firefox browser development",
+              "Xbox Live online gaming",
+              "Digital photography mainstream",
+              "Satellite radio services"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 27 - late twenties establishment",
+            "key_events": [
+              "Release first LP"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2003": {
+          "world_events": {
+            "major": [
+              "Iraq War begins",
+              "SARS outbreak",
+              "Space Shuttle Columbia disaster",
+              "MySpace launches"
+            ],
+            "cultural": [
+              "Finding Nemo Pixar dominance",
+              "The White Stripes garage rock",
+              "Lord of the Rings Return of the King",
+              "Reality TV saturation"
+            ],
+            "technology": [
+              "MySpace social networking",
+              "iTunes Store music sales",
+              "LinkedIn professional networking",
+              "Skype internet calling"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 28 - approaching thirty transition",
+            "key_events": [
+              "I begin working on an experimental video with Matt and Erika called 'The Temptation to Zoology",
+              "Ali's father, who she wasn't close with, is diagnosed with leukemia after a nose bleed that wouldn't stop, and the twins test to see if they can donate stem cells for his treatment. After a skeeball match to determine who will donate, Ali is the winner and I help her collect her stem cells.",
+              "The treatment didn't take and Ali's father was given a terminal diagnosis. As we are already engaged, we decide to cobble together a ceremony so he can attend. I get married by a Rabbi on March 28th.",
+              "For work I fly to the UK and receive a message that he has passed and I immediately head back to the airport.",
+              "I am introduced to Richy Midnite, a UK musician. I threw his CD on while doing dishes and drop a plate when I hear his strange music",
+              "We keep the larger wedding later in September, where my Father officiates the ceremony.",
+              "Our honeymoon is delayed due to a major hurricane in Bermuda - the night before we leave for our rescheduled trip I have a vivid dream where I sit with Ali's dad. He is smoking and sizing me up. He hands me a VHS tape with a handwritten label that reads 'Sincerity's Death'. He tells me I need to wear a hard hat while watching. I awake and my nose is gushing with blood."
+            ],
+            "influences": [
+              "Freak folk in full swing - often in my house.",
+              "Game Design theory from gameLab at LEGO",
+              "Play the occasional show with Flaming Fire, Pothole Skinny and Timesbold"
+            ],
+            "emotional_landscape": [
+              "Work is heady and wonderful",
+              "I have an expanding community of collaborators and friends",
+              "The sadness of Ali's father's death lingers",
+              "Strange, monumental energy"
+            ],
+            "choice_points": [
+              "What the stem cell treatment worked?",
+              "What if I never met Richie Midnite?",
+              "What if I didn't get married?",
+              "What if I didn't spend time with creative people during this time?"
+            ]
+          }
+        },
+        "2004": {
+          "world_events": {
+            "major": [
+              "Facebook launches",
+              "Indian Ocean tsunami",
+              "George W. Bush re-elected",
+              "Google goes public"
+            ],
+            "cultural": [
+              "Shrek 2 animation peak",
+              "Green Day American Idiot",
+              "Lost TV mystery",
+              "Social media culture begins"
+            ],
+            "technology": [
+              "Facebook college networking",
+              "Mozilla Firefox browser",
+              "Gmail web email",
+              "Portable media players mainstream"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 29 - final twenties year",
+            "key_events": [
+              "Move to UK"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2005": {
+          "world_events": {
+            "major": [
+              "Hurricane Katrina",
+              "YouTube launches",
+              "London bombings",
+              "Pope John Paul II dies"
+            ],
+            "cultural": [
+              "Star Wars Episode III completes saga",
+              "American Idol peak influence",
+              "YouTube video culture begins",
+              "Podcast medium emerges"
+            ],
+            "technology": [
+              "YouTube video sharing",
+              "Xbox 360 next-gen gaming",
+              "Reddit social news",
+              "Google Maps street navigation"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 30 - major life milestone",
+            "key_events": [
+              "Return to US",
+              "Bought a condo"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2006": {
+          "world_events": {
+            "major": [
+              "Twitter launches",
+              "Saddam Hussein executed",
+              "North Korea nuclear test",
+              "Wii gaming revolution"
+            ],
+            "cultural": [
+              "The Devil Wears Prada fashion",
+              "Borat comedy controversy",
+              "High School Musical phenomenon",
+              "Social media culture develops"
+            ],
+            "technology": [
+              "Twitter microblogging",
+              "Nintendo Wii motion gaming",
+              "Blu-ray vs HD-DVD war",
+              "Spotify music streaming begins"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 31 - early thirties establishment",
+            "key_events": [
+              "Begin working remotely for LEGO",
+              "Also freelance for PBS, Pfizer and a couple of other companies making Flash games",
+              "Attend analysis sessions with Larry Staples",
+              "Release Mouse Mountain Flash Web game"
+            ],
+            "influences": [
+              "Game design thought process",
+              "Washington DC community is boring and conservative"
+            ],
+            "emotional_landscape": [
+              "Regret of moving away from NYC hitting hard",
+              "Anxiety about paying the mortgage"
+            ],
+            "choice_points": [
+              "What if I never got to release Mouse Mountain?",
+              "What if I never got help from Larry?"
+            ]
+          }
+        },
+        "2007": {
+          "world_events": {
+            "major": [
+              "iPhone launched",
+              "Virginia Tech shooting",
+              "Subprime mortgage crisis",
+              "Kindle e-reader released"
+            ],
+            "cultural": [
+              "No Country for Old Men darkness",
+              "Transformers blockbuster",
+              "Radiohead In Rainbows pay-what-you-want",
+              "Social media culture matures"
+            ],
+            "technology": [
+              "iPhone smartphone revolution",
+              "Kindle e-book reading",
+              "Netflix streaming begins",
+              "Android OS development"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 32 - smartphone era begins",
+            "key_events": [
+              "Ali pregnant"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2008": {
+          "world_events": {
+            "major": [
+              "Barack Obama elected",
+              "Global financial crisis",
+              "Beijing Olympics",
+              "Lehman Brothers collapses"
+            ],
+            "cultural": [
+              "The Dark Knight superhero realism",
+              "WALL-E Pixar environmental",
+              "Obama hope campaign",
+              "Financial crisis cultural impact"
+            ],
+            "technology": [
+              "Google Chrome browser",
+              "Android phones launch",
+              "Netflix streaming growth",
+              "Social media political influence"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 33 - financial crisis impact",
+            "key_events": [
+              "Silas born",
+              "Moved to suburbs"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2009": {
+          "world_events": {
+            "major": [
+              "Obama inaugurated",
+              "Swine flu pandemic",
+              "Michael Jackson dies",
+              "Berlin Wall 20th anniversary"
+            ],
+            "cultural": [
+              "Avatar 3D movie revolution",
+              "Glee musical TV phenomenon",
+              "Lady Gaga Fame Monster",
+              "Social media activism begins"
+            ],
+            "technology": [
+              "Windows 7 operating system",
+              "Spotify music streaming",
+              "Bitcoin cryptocurrency created",
+              "iPad development"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 34 - mid-thirties stability",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2010": {
+          "world_events": {
+            "major": [
+              "iPad tablet revolution",
+              "Deepwater Horizon oil spill",
+              "Arab Spring begins",
+              "WikiLeaks releases"
+            ],
+            "cultural": [
+              "Inception mind-bending cinema",
+              "Arcade Fire Suburbs wins Grammy",
+              "Social Network movie",
+              "Tablet computing culture"
+            ],
+            "technology": [
+              "iPad creates tablet market",
+              "Instagram photo sharing",
+              "Google Wave communication",
+              "3D TV technology push"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 35 - mid-thirties peak",
+            "key_events": [
+              "The Earthly Frames begins"
+            ],
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2011": {
+          "world_events": {
+            "major": [
+              "Osama bin Laden killed",
+              "Arab Spring revolutions",
+              "Fukushima nuclear disaster",
+              "Steve Jobs dies"
+            ],
+            "cultural": [
+              "Game of Thrones TV epic begins",
+              "Adele 21 emotional honesty",
+              "Harry Potter film series ends",
+              "Occupy Wall Street movement"
+            ],
+            "technology": [
+              "Snapchat ephemeral messaging",
+              "Spotify US launch",
+              "Google+ social network",
+              "Siri voice assistant"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 36 - late thirties approach",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2012": {
+          "world_events": {
+            "major": [
+              "Obama re-elected",
+              "Sandy Hook shooting",
+              "London Olympics",
+              "Mayan calendar apocalypse fears"
+            ],
+            "cultural": [
+              "Avengers superhero team-up",
+              "Gangnam Style viral dance",
+              "The Voice singing competition",
+              "Instagram Facebook acquisition"
+            ],
+            "technology": [
+              "Windows 8 touch interface",
+              "iPhone 5 lightning connector",
+              "Google Glass development",
+              "Raspberry Pi computing"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 37 - late thirties establishment",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2013": {
+          "world_events": {
+            "major": [
+              "Edward Snowden NSA revelations",
+              "Pope Francis elected",
+              "Boston Marathon bombing",
+              "Nelson Mandela dies"
+            ],
+            "cultural": [
+              "Frozen Disney musical renaissance",
+              "Breaking Bad series finale",
+              "Daft Punk Random Access Memories",
+              "Vine short video culture"
+            ],
+            "technology": [
+              "Xbox One and PS4 next-gen",
+              "Google Glass public testing",
+              "Tesla Model S electric revolution",
+              "Vine video loops"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 38 - approaching forty transition",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2014": {
+          "world_events": {
+            "major": [
+              "Russia annexes Crimea",
+              "ISIS emerges",
+              "Malaysia Airlines disappearances",
+              "Ebola outbreak"
+            ],
+            "cultural": [
+              "Guardians of the Galaxy soundtrack nostalgia",
+              "Taylor Swift 1989 pop transition",
+              "True Detective atmospheric TV",
+              "Podcast culture explodes"
+            ],
+            "technology": [
+              "Apple Watch development",
+              "Amazon Echo voice assistant",
+              "Oculus VR Facebook acquisition",
+              "Twitch streaming platform"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 39 - final thirties year",
+            "key_events": [
+              "I am in the Google Glass test group. Yep. A glasshole.",
+              "We get a new dog which Silas names Henry Thomas Frosting"
+            ],
+            "influences": [
+              "Adventure Time TV series",
+              "Silas' imaginative play",
+              "Silas' love of music"
+            ],
+            "emotional_landscape": [
+              "Working at Huge is boring and they are pretentious",
+              "Stress from a very long commute",
+              "Wonder at how Glass could allow me to read in other languages but the pure hatred of it was surprising."
+            ],
+            "choice_points": [
+              "What if I had taken a different job?",
+              "What if I never signed up for the Google Glass?"
+            ]
+          }
+        },
+        "2015": {
+          "world_events": {
+            "major": [
+              "Paris terrorist attacks",
+              "Marriage equality legalized",
+              "Apple Watch launches",
+              "Refugee crisis peaks"
+            ],
+            "cultural": [
+              "Star Wars Force Awakens revival",
+              "Hamilton Broadway revolution",
+              "Adele 25 emotional return",
+              "Streaming music dominates"
+            ],
+            "technology": [
+              "Apple Watch wearable computing",
+              "Windows 10 unified platform",
+              "YouTube Red subscription",
+              "VR technology consumer push"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 40 - major life milestone",
+            "key_events": [
+              "Received security clearance for work",
+              "Solidified being a developer / designer"
+            ],
+            "influences": [
+              "Intelligence culture",
+              "Frederator cartoons",
+              "Skylanders games"
+            ],
+            "emotional_landscape": [
+              "Very happy to be working at Adobe",
+              "Enjoying reliving childhood through Silas' play"
+            ],
+            "choice_points": [
+              "What if I never got a security clearance?",
+              "What if I decided to go for a higher level of clearance?"
+            ]
+          }
+        },
+        "2016": {
+          "world_events": {
+            "major": [
+              "Donald Trump elected",
+              "Brexit referendum",
+              "Pok\u00e9mon Go augmented reality",
+              "David Bowie dies"
+            ],
+            "cultural": [
+              "Stranger Things 80s nostalgia",
+              "Pok\u00e9mon Go AR phenomenon",
+              "Westworld AI consciousness",
+              "Political polarization culture"
+            ],
+            "technology": [
+              "Pok\u00e9mon Go AR mainstream",
+              "Google Pixel phones",
+              "PlayStation VR consumer",
+              "AI assistant improvements"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 41 - early forties establishment",
+            "key_events": [
+              "A project I'm working on for the intelligence sector is ruined by the Trump election.",
+              "One of my 'three David' heroes passes away",
+              "Our family travels to Ireland",
+              "For spring break we go to the Bahamas - I fly out early to go to an Adobe thing in San Francisco, but Ali and Si are stuck because a huge snow storm",
+              "Recording The Conjurer's Thread",
+              "I come up with an idea for a cartoon series called Wicker Wonder which pre-dated Rick and Morty - and was less evil."
+            ],
+            "influences": [
+              "Long commute to get to the SCIF",
+              "Design thinking peak",
+              "Grey intelligence space super interesting"
+            ],
+            "emotional_landscape": [
+              "Despair at the election of Donald Trump",
+              "Bowie's death was devastating",
+              "Occult practices"
+            ],
+            "choice_points": [
+              "What if I had just stopped recording The Conjurer's Thread, and never started The Rainbow Table",
+              "What if I got stuck in the Bahamas for the entire trip and missed the Adobe conference?",
+              "What if I moved to one of the intelligence agencies via Adobe work?"
+            ]
+          }
+        },
+        "2017": {
+          "world_events": {
+            "major": [
+              "Trump inaugurated",
+              "#MeToo movement",
+              "Las Vegas shooting",
+              "Solar eclipse"
+            ],
+            "cultural": [
+              "Get Out social thriller",
+              "The Last Jedi divisive Star Wars",
+              "Despacito global music",
+              "TikTok global expansion"
+            ],
+            "technology": [
+              "iPhone X facial recognition",
+              "Bitcoin cryptocurrency boom",
+              "Google Home smart speakers",
+              "Nintendo Switch gaming"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 42 - mid-forties approach",
+            "key_events": [
+              "Peter, my boss from LEGO convinces me to come work for him at Moleskine creating a creativity AI platform",
+              "I make my first of many journies to Italy for Moleskine",
+              "The Conjurer's Thread is released and I start the next album, Light Reading"
+            ],
+            "influences": [
+              "Resistance culture",
+              "The Moleskine creative vibes and outlook",
+              "Heavy AI experimentation"
+            ],
+            "emotional_landscape": [
+              "Overwhelmed by the possibility of making a creativity platform",
+              "Rejected again for my cartoon ideas"
+            ],
+            "choice_points": [
+              "What if I had gotten some support for Wicker Wonder?",
+              "What if I had made a more unique discovery with AI/Creative AI?"
+            ]
+          }
+        },
+        "2018": {
+          "world_events": {
+            "major": [
+              "Cambridge Analytica scandal",
+              "Kavanaugh confirmation hearings",
+              "Parkland school shooting",
+              "Royal wedding Meghan Markle"
+            ],
+            "cultural": [
+              "Black Panther cultural milestone",
+              "A Star Is Born emotional honesty",
+              "Fortnite gaming culture dominance",
+              "Social media reckoning"
+            ],
+            "technology": [
+              "GDPR privacy regulations",
+              "iPhone XS Max large screens",
+              "Google Duplex AI calling",
+              "Tesla production scaling"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 43 - mid-forties stability",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2019": {
+          "world_events": {
+            "major": [
+              "COVID-19 emerges in China",
+              "Notre Dame fire",
+              "Hong Kong protests",
+              "Greta Thunberg climate activism"
+            ],
+            "cultural": [
+              "Avengers Endgame cultural conclusion",
+              "Old Town Road genre blending",
+              "Baby Yoda Mandalorian phenomenon",
+              "Climate activism culture"
+            ],
+            "technology": [
+              "5G network rollout begins",
+              "Disney+ streaming launch",
+              "AirPods Pro noise cancellation",
+              "Foldable phone experiments"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 44 - late forties approach"
+          },
+          "key_events": null,
+          "influences": null,
+          "emotional_landscape": null,
+          "choice_points": null
+        },
+        "2020": {
+          "world_events": {
+            "major": [
+              "COVID-19 pandemic",
+              "George Floyd protests",
+              "Joe Biden elected",
+              "Zoom culture dominates"
+            ],
+            "cultural": [
+              "Tiger King pandemic viewing",
+              "Hamilton Disney+ release",
+              "Among Us gaming connection",
+              "Black Lives Matter cultural reckoning"
+            ],
+            "technology": [
+              "Zoom video conferencing ubiquitous",
+              "PlayStation 5 and Xbox Series launch",
+              "Apple M1 chip revolution",
+              "TikTok global dominance"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 45 - pandemic mid-life experience",
+            "key_events": [
+              "I was on the walk to the airport in February and was called by my boss to tell me that 'Milan has fallen' and that the virus was sweeping through the city causing mass casualties.",
+              "I tell everyone I know that lockdown may last years - but nobody believes me.",
+              "That spring, Silas is pulled from school and the world closed down."
+            ],
+            "influences": [
+              "The sudden change to remote work and life",
+              "The anxiety of the pandemic",
+              "The political turmoil in the US"
+            ],
+            "emotional_landscape": [
+              "The anxiety of the pandemic",
+              "The fear of the virus",
+              "Fear of losing my job"
+            ],
+            "choice_points": [
+              "What if I did go to Milan?",
+              "What if I got to Milan but could not get back for months?",
+              "What if I got COVID in Milan and was very sick?"
+            ]
+          }
+        },
+        "2021": {
+          "world_events": {
+            "major": [
+              "January 6 Capitol insurrection",
+              "COVID vaccines rollout",
+              "Afghanistan withdrawal",
+              "COP26 climate summit"
+            ],
+            "cultural": [
+              "Squid Game global phenomenon",
+              "Dune sci-fi epic revival",
+              "Spider-Man No Way Home nostalgia",
+              "NFT art market boom"
+            ],
+            "technology": [
+              "COVID vaccine mRNA technology",
+              "NFT blockchain art",
+              "Apple AirTags tracking",
+              "Clubhouse audio social"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 46 - late forties establishment",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2022": {
+          "world_events": {
+            "major": [
+              "Russia invades Ukraine",
+              "Queen Elizabeth II dies",
+              "Elon Musk buys Twitter",
+              "ChatGPT AI breakthrough"
+            ],
+            "cultural": [
+              "Top Gun Maverick nostalgia perfection",
+              "Taylor Swift Midnights surprise",
+              "Wordle word game phenomenon",
+              "AI-generated content debates"
+            ],
+            "technology": [
+              "ChatGPT conversational AI",
+              "DALL-E AI image generation",
+              "iPhone 14 satellite connectivity",
+              "Meta VR investment"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 47 - approaching fifty awareness",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2023": {
+          "world_events": {
+            "major": [
+              "ChatGPT mainstream adoption",
+              "SVB banking crisis",
+              "Wagner Group rebellion",
+              "India population leadership"
+            ],
+            "cultural": [
+              "Barbie movie cultural phenomenon",
+              "Taylor Swift Eras Tour economics",
+              "The Bear cooking show excellence",
+              "AI-generated content debates"
+            ],
+            "technology": [
+              "GPT-4 advanced AI capabilities",
+              "Apple Vision Pro AR/VR",
+              "Twitter becomes X platform",
+              "Google Bard AI competition"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 48 - late forties peak",
+            "key_events": [
+              "Late forties professional/creative peak",
+              "AI revolution active participation"
+            ],
+            "influences": [
+              "Barbie cultural phenomenon participation",
+              "AI creative collaboration beginning"
+            ],
+            "emotional_landscape": "Late forties mastery and AI future excitement/anxiety",
+            "choice_points": [
+              "AI creative collaboration level",
+              "Cultural vs technological focus"
+            ]
+          }
+        },
+        "2024": {
+          "world_events": {
+            "major": [
+              "Donald Trump re-elected",
+              "AI regulation discussions",
+              "Climate records broken",
+              "Social media platform evolution"
+            ],
+            "cultural": [
+              "Inside Out 2 emotional sophistication",
+              "Chappell Roan queer pop breakthrough",
+              "Deadpool & Wolverine nostalgia",
+              "AI-human creative collaboration"
+            ],
+            "technology": [
+              "Apple Intelligence AI integration",
+              "OpenAI GPT-4o multimodal",
+              "Claude AI creative collaboration",
+              "AI-generated music/art mainstream"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 49 - final forties year",
+            "key_events": null,
+            "influences": null,
+            "emotional_landscape": null,
+            "choice_points": null
+          }
+        },
+        "2025": {
+          "world_events": {
+            "major": [
+              "AI regulation implementation",
+              "Climate adaptation acceleration",
+              "Quantum computing advances",
+              "Social media transformation"
+            ],
+            "cultural": [
+              "Cultural predictions for current year",
+              "AI-human collaborative art",
+              "Generational cultural shifts",
+              "Creative industry AI integration",
+              "Fucking Trump again"
+            ],
+            "technology": [
+              "Advanced AI creative tools",
+              "Quantum computing applications",
+              "AR/VR mainstream adoption",
+              "Sustainable technology focus"
+            ]
+          },
+          "personal_context": {
+            "summary": "Age 50 - major life milestone",
+            "key_events": [
+              "I release 'Vanity Pressing' the Violet entry in The Rainbow Table and begin work with Claude on the final album in the series.",
+              "Silas applies to college and, by the end of year has been accepted to all of them",
+              "I play my last show with Solilians - it's just too much time and effort to keep up with.",
+              "I drive Silas' band to a show in Baltimore and can't help but see myself in him",
+              "My father falls and breaks his hip - after much confusion Lois enters him to the Charlotte Hall VA home.",
+              "We get a new puppy named Razzles - he's very smart but gets into lots of trouble."
+            ],
+            "influences": [
+              "In the summer, while Silas is at an FIT course, I see the Hilma af Klint and Jack Whitten at MOMA and both have a big effect."
+            ],
+            "emotional_landscape": [
+              "Joy for Silas entering what I hope to be the best years of his life",
+              "Despair as my Father slips away - erased by Alzheimer's",
+              "My rage at the stupidity of the Trump presidency and its supporters is hard to contain",
+              "Welcome annoyance? Razzles is so much work but it's a great distraction from my dad's situation"
+            ],
+            "choice_points": [
+              "What if we hadn't pushed Silas academically, so he couldn't get into college?",
+              "What if I insisted my Father not to enter the Charlotte Hall VA home?",
+              "What if I had acted upon the violent fantasies I had about Trump supporters?",
+              "What if we picked the other puppy (not the biggest in litter)?"
+            ]
+          }
+        }
+      },
+      "quantum_analysis_prompts": {
+        "global_what_ifs": [
+          "What if [major world event] had unfolded differently?",
+          "What if [cultural phenomenon] had been delayed or changed?",
+          "What if [technology] had developed earlier/later?",
+          "What if [political event] had different outcomes?",
+          "What if the internet had developed differently?",
+          "What if social media had never emerged?",
+          "What if climate change action had started earlier?",
+          "What if AI had developed faster/slower?"
+        ],
+        "personal_what_ifs": [
+          "What if you had chosen [alternative path] at [choice point]?",
+          "What if you had said yes/no to [specific opportunity]?",
+          "What if you had moved to [different location]?",
+          "What if you had pursued [different creative direction]?",
+          "What if you had maintained/ended [specific relationship]?",
+          "What if you had embraced technology earlier/later?",
+          "What if you had been more/less politically active?",
+          "What if you had prioritized financial success over creative expression?",
+          "What if you had started AI collaboration earlier?"
+        ],
+        "cascade_effects": [
+          "How might your creative work be different today?",
+          "What alternate version of yourself might exist?",
+          "What skills/experiences would you have instead?",
+          "How would your worldview have developed differently?",
+          "What 'forgotten' possibilities were 'taped over'?",
+          "How would current relationships/career be different?",
+          "What would your relationship with technology be?",
+          "How would your political consciousness have evolved?",
+          "What creative collaborations might have emerged?",
+          "How would your financial/lifestyle situation differ?"
+        ]
+      },
+      "song_inspiration_templates": {
+        "quantum_mix": {
+          "concept": "Layer actual memories with alternate timeline possibilities",
+          "musical_approach": "Ghost tracks, parallel processing, probability waves in audio",
+          "lyrical_approach": "Present tense descriptions of multiple simultaneous realities"
+        },
+        "taped_over": {
+          "concept": "The process of revising personal narratives",
+          "musical_approach": "Actual tape manipulation, lo-fi artifacts, overwriting sounds",
+          "lyrical_approach": "Comparing 'official' vs 'revised' versions of events"
+        },
+        "choice_point_echo": {
+          "concept": "The moment of decision and infinite branching",
+          "musical_approach": "Delay/reverb creating echo chambers of alternatives",
+          "lyrical_approach": "Single moment expanded across multiple temporal possibilities"
+        },
+        "historical_frequency": {
+          "concept": "How global events interfere with personal timelines",
+          "musical_approach": "Layer news samples with personal recordings from era",
+          "lyrical_approach": "Personal narrative interrupted by historical context"
+        },
+        "fifty_milestone": {
+          "concept": "Half-century biographical archaeology and AI partnership",
+          "musical_approach": "Human-AI collaborative composition, quantum temporal elements",
+          "lyrical_approach": "Biographical retrospective with alternate timeline speculation"
+        },
+        "static_children_frequency": {
+          "concept": "Accessing temporal frequencies from past creative energies",
+          "musical_approach": "1993 punk energy channeled through modern AI collaboration",
+          "lyrical_approach": "Rural New Jersey punk rebellion translated to AI creative partnership"
+        }
+      }
+    }
+  },
+  "agent_name": "The Cassette Bearer"
+}
