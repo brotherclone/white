@@ -1,6 +1,6 @@
 # Training Pipeline Roadmap
 
-**Last Updated**: 2026-02-07
+**Last Updated**: 2026-02-10
 
 ## Overview
 
@@ -76,25 +76,33 @@ LOCAL PREP (before RunPod)
 LOCAL EXTRACTION (no GPU needed)
 ══════════════════════════════════
 
- ✅ Rebuild base_manifest_db.parquet (COMPLETE 2026-02-07)
+ ✅ Rebuild base_manifest_db.parquet (COMPLETE 2026-02-10)
     python -m app.extractors.manifest_extractor.build_base_manifest_db
     → 1,327 tracks across all 8 colors (Indigo + Violet now included)
     → Verified: 8 unique rainbow_color values
+    → Rebuilt 2026-02-10 after YAML edits introduced 4 duplicate track IDs
                 │
- ④ Re-run segment extraction ← IN PROGRESS
+ ✅ Re-run segment extraction (COMPLETE 2026-02-10)
     python -m app.extractors.segment_extractor.build_training_segments_db
-    → Structure fallback extracts Green, Yellow, Red instrumentals
-    → Indigo/Violet segments now get rainbow_color from manifest join
-    → MIDI now segmented to time window (not full file)
-    → Expected: ~12,000+ segments (up from 10,544)
-    → Verify: Green segments > 0, no UNLABELED segments
+    → 11,605 segments across 83 songs (up from 10,544)
+    → All 8 colors: Black 1748, Red 1474, Orange 1731, Yellow 656,
+      Green 393, Blue 2097, Indigo 1406, Violet 2100
+    → Audio: 85.4%, MIDI: 44.3%
+    → Zero UNLABELED segments, zero metadata duplicates
                 │
- ⑤ Verify extraction
+ ✅ Verify extraction (COMPLETE 2026-02-10)
     python -m training.verify_extraction --all
-    → Spot-check Green audio — can you hear it?
-    → Spot-check MIDI segments — notes line up with audio?
-    → Coverage report: all 8 colors, MIDI %, audio %
-    → GATE: do NOT proceed if data looks wrong
+    → Audio fidelity: 10/10 passed
+    → MIDI fidelity: 10/10 passed
+    → RESULT: PASS — All checks passed
+                │
+ ✅ Publish to HuggingFace (COMPLETE 2026-02-10)
+    python training/hf_dataset_prep.py --push --public --include-embeddings
+    → earthlyframes/white-training-data v0.2.0
+    → 3 configs: base_manifest, training_full, training_segments
+    → Media parquet uploaded (15.3 GB): audio waveforms + MIDI binaries
+    → Dataset card with coverage tables, usage docs, CI License
+    → Public: https://huggingface.co/datasets/earthlyframes/white-training-data
 
 
 RUNPOD EXECUTION (GPU needed)
@@ -148,15 +156,18 @@ POST-TRAINING
 
 ### What Changed Since Last RunPod Run
 
-| Item | Before (2026-01-27) | After (2026-02-07) |
+| Item | Before (2026-01-27) | After (2026-02-10) |
 |------|---------------------|---------------------|
 | Manifest DB | 892 tracks, 6 colors (01-06 only) | 1,327 tracks, 8 colors (01-08) |
-| Green segments | 0 (LRC hard-bail) | ~102 (structure fallback) |
-| Yellow instrumental segments | Missing 4 songs | ~45 new segments |
-| Red instrumental segments | Missing 3 songs | ~23 new segments |
-| MIDI coverage | 0% (bug) | 43.3% (fixed 2026-02-06) |
-| Indigo/Violet labels | UNLABELED (3,506 segments) | Labeled (manifest DB rebuilt) |
-| Total expected segments | 10,544 | ~12,000+ |
+| Green segments | 0 (LRC hard-bail) | 393 (structure fallback) |
+| Yellow segments | Missing 4 instrumental songs | 656 (structure fallback) |
+| Red segments | Missing 3 instrumental songs | 1,474 (structure fallback) |
+| MIDI coverage | 0% (bug) | 44.3% (5,145/11,605) |
+| Audio coverage | ~85% | 85.4% (9,907/11,605) |
+| Indigo/Violet labels | UNLABELED (3,506 segments) | Indigo 1,406 + Violet 2,100 |
+| Total segments | 10,544 | 11,605 |
+| Metadata duplicates | 87 (stale manifest after YAML edits) | 0 (rebuilt 2026-02-10) |
+| HuggingFace | Not published | v0.2.0 public, 15.3 GB media included |
 
 ## Phase Details
 
@@ -188,12 +199,13 @@ Extends binary classification to predict specific rebracketing types (spatial, t
 #### Phase 3.0: Data Prerequisites
 **Change**: `prepare-multimodal-data`
 **Priority**: 🔥 IMMEDIATE — blocks Phase 3.1
-**Status**: Not Started
+**Status**: Data extracted and published; DeBERTa embedding pass remains (RunPod GPU)
 
 Prepares training data for multimodal model training:
-- Run DeBERTa embedding pass on new extraction (~12,000 segments, currently 0% embedded)
-- Verify all 8 album colors present (Green, Indigo, Violet now in extraction)
-- Verify audio/MIDI binary coverage and flag consistency
+- ✅ All 8 album colors present and verified (11,605 segments, 2026-02-10)
+- ✅ Audio/MIDI binary coverage verified (85.4% audio, 44.3% MIDI)
+- ✅ Published to HuggingFace (earthlyframes/white-training-data v0.2.0)
+- Run DeBERTa embedding pass on new extraction (11,605 segments, currently 0% embedded)
 - Document remaining coverage gaps (Blue MIDI at 12%)
 
 #### Phase 3.1 + 3.2: Audio + MIDI + Text Fusion
@@ -263,12 +275,14 @@ Core multimodal model combining audio, MIDI, and text:
 | Phase 4 (Regression) | - | ✅ Complete | Done |
 | **Pipeline Fixes** | *(this branch)* | **✅ Complete** | Done |
 | **MIDI Segmentation Fix** | *(this branch)* | **✅ Complete** | Done |
+| **Extraction + Verification** | - | **✅ Complete** (2026-02-10) | Done |
+| **HuggingFace Publish** | - | **✅ v0.2.0 public** (2026-02-10) | Done |
 | **RunPod Guide** | `add-runpod-deployment-guide` | **Spec'd** | 🔥 Read before RunPod |
 | **Data Verification** | `add-training-data-verification` | **✅ Complete** | Done |
-| **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | Not Started | 🔥 IMMEDIATE |
+| **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | DeBERTa pass remaining | 🔥 IMMEDIATE (RunPod) |
 | **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | Design complete | 🔥 BLOCKER |
-| **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | High (parallel track) |
-| **Result Feedback** | `add-chain-result-feedback` | ✅ Complete | High (parallel track) |
+| **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | Done |
+| **Result Feedback** | `add-chain-result-feedback` | ✅ Complete | Done |
 | Phase 3.3+3.4 (Lyrics) | `add-prosodic-lyric-encoding` | Not Started | Medium |
 | Phase 10 (Production) | `add-production-deployment` | Not Started | After Phase 3 |
 | Infrastructure | `add-infrastructure-improvements` | Not Started | High |
@@ -305,6 +319,13 @@ Core multimodal model combining audio, MIDI, and text:
 ### ✅ RESOLVED: MIDI File Path (2026-02-06)
 Was reconstructing path from `staged_material_dir / song_id / midi_file` but `midi_file` is already an absolute path. Changed to `Path(row["midi_file"])`.
 
+### ✅ RESOLVED: Metadata Duplicates from Stale Manifest (2026-02-10)
+**Root cause**: YAML manifests for 3 songs (01_01, 03_03, 08_08) were edited after the manifest DB was built (YAMLs modified Feb 9, manifest built Feb 7). The stale manifest had incorrect `track_id` values for 4 tracks, producing 87 duplicate rows when segments joined to metadata.
+
+**Fix**: Rebuild `base_manifest_db.parquet` after YAML edits. Zero duplicate composite keys after rebuild.
+
+**Impact**: Metadata rows now exactly match segment rows (11,605 = 11,605). Previously 11,692 metadata vs 11,605 segments.
+
 ## Required Fixes Before Production
 
 ### ✅ RESOLVED: Embedding Loading (Phase 4)
@@ -326,6 +347,6 @@ All 27 mode combinations now mapped to 8 albums.
 
 ---
 
-*Last Updated: 2026-02-07*
+*Last Updated: 2026-02-10*
 
-**Status**: Phases 1, 2, 4 complete. Pipeline bug fixes ready to commit (structure fallback for instrumentals, manifest DB rebuild for Indigo/Violet). Four new specs created: RunPod deployment guide, training data verification, chain artifact shrink-wrap, chain result feedback. Next: commit fixes, implement verification tool, then RunPod run for Phase 3.0 → 3.1/3.2.
+**Status**: Phases 1, 2, 4 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). All local prep complete. **Next: RunPod for Phase 3.0 (DeBERTa embeddings) → Phase 3.1/3.2 (multimodal fusion).**

@@ -45,7 +45,12 @@ dependencies = [
     "pyttsx3>=2.99",
     "pydub>=0.25.1",
     "ipykernel>=7.1.0",
-    "sentence-transformers>=3.0.0",
+    "datasets>=4.5.0",
+]
+
+[project.optional-dependencies]
+training = [
+    "sentence-transformers>=3.0.0"
 ]
 
 [tool.ruff]

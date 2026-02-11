@@ -1,0 +1,14 @@
+{
+  "segment_id": "06_06_seg_0015_track_02",
+  "song_id": "06_06",
+  "rainbow_color": "Blue",
+  "structure_section": "Chorus 2",
+  "start_seconds": 156.02,
+  "end_seconds": 166.001,
+  "duration_seconds": 9.980999999999995,
+  "has_audio": true,
+  "has_midi": false,
+  "lyric_text": "Don't bring it up, don't be so distraught",
+  "track_description": "Bass",
+  "content_type": "audio_only"
+}

@@ -1,0 +1,14 @@
+{
+  "segment_id": "08_08_seg_0012_track_06",
+  "song_id": "08_08",
+  "rainbow_color": "Violet",
+  "structure_section": "Verse",
+  "start_seconds": 84.023,
+  "end_seconds": 91.017,
+  "duration_seconds": 6.994,
+  "has_audio": true,
+  "has_midi": true,
+  "lyric_text": "You saw headlight angels",
+  "track_description": "Synth",
+  "content_type": "audio_midi"
+}

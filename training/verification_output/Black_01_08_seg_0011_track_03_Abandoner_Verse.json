@@ -1,0 +1,14 @@
+{
+  "segment_id": "01_08_seg_0011_track_03",
+  "song_id": "01_08",
+  "rainbow_color": "Black",
+  "structure_section": "Abandoner Verse",
+  "start_seconds": 144.105,
+  "end_seconds": 151.071,
+  "duration_seconds": 6.966000000000008,
+  "has_audio": true,
+  "has_midi": false,
+  "lyric_text": "I'll flee from spring and head to winter",
+  "track_description": "Main Vocal",
+  "content_type": "audio_only"
+}
