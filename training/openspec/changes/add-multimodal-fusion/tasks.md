@@ -3,7 +3,7 @@
 ## 1. Audio Encoder Architecture
 - [ ] 1.1 Create `AudioEncoder` base class with forward pass interface
 - [ ] 1.2 Implement Wav2Vec2Encoder using pretrained Hugging Face model
-- [ ] 1.3 Implement CLAPEncoder for contrastive language-audio pretraining
+- [x] 1.3 CLAP audio embeddings precomputed (512-dim, 9,981 segments) — 2026-02-12 via Modal
 - [ ] 1.4 Implement custom CNN encoder on mel spectrograms (baseline)
 - [ ] 1.5 Add encoder selection logic via configuration
 
@@ -72,10 +72,10 @@
 - [ ] 9.7 Compare multimodal vs text-only performance on validation set
 
 ## 10. Text Encoder Integration (Phase 3.2)
-- [ ] 10.1 Wire existing DeBERTa-v3 encoder (`training/models/text_encoder.py`) into fusion model
-- [ ] 10.2 Load precomputed embeddings from re-embedded parquet when available
-- [ ] 10.3 Handle instrumental segments (no lyrics) — zero embedding + text mask=False
-- [ ] 10.4 Test: text encoder produces `[batch, 768]` for vocal segments, zeros for instrumental
+- [x] 10.1 DeBERTa-v3-base text embeddings precomputed (768-dim, 11,605 segments) — 2026-02-12 via Modal
+- [x] 10.2 Precomputed embeddings stored in `training_data_with_embeddings.parquet`
+- [x] 10.3 Instrumental segments → zero lyric_embedding + has_lyric_embedding=False (841 segments)
+- [ ] 10.4 Wire precomputed embeddings into fusion model DataLoader
 
 ## 11. Documentation
 - [ ] 11.1 Document audio encoder options and trade-offs

@@ -37,3 +37,4 @@ data/
 
 # Reports
 reports/*.pdf
+verification_output/

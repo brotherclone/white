@@ -1,6 +1,6 @@
 # Training Pipeline Roadmap
 
-**Last Updated**: 2026-02-10
+**Last Updated**: 2026-02-12
 
 ## Overview
 
@@ -105,16 +105,23 @@ LOCAL EXTRACTION (no GPU needed)
     → Public: https://huggingface.co/datasets/earthlyframes/white-training-data
 
 
-RUNPOD EXECUTION (GPU needed)
+MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
 ══════════════════════════════════
 
- ⑥ prepare-multimodal-data (Phase 3.0)
-    → DeBERTa embedding pass on all segments
-    → Verify: text embeddings populated for vocal segments
-    → Verify: instrumental segments have text mask = False
+ ✅ prepare-multimodal-data (Phase 3.0) — COMPLETE 2026-02-12
+    → DeBERTa-v3-base embedding pass: 11,605 concept + 10,764 lyric embeddings (768-dim)
+    → 841 instrumental segments → zero vectors + has_lyric_embedding=False
+    → Output: training_data_with_embeddings.parquet (4.5 MB)
+    → Executed on Modal (A10G), ~3 min
                 │
- ⑦ add-multimodal-fusion (Phases 3.1 + 3.2) — THE BLOCKER
-    → Precompute CLAP audio embeddings (512-dim, resample 44.1kHz → 48kHz)
+ ✅ CLAP audio embedding precomputation (Phase 3.1 partial) — COMPLETE 2026-02-12
+    → CLAP (laion/larger_clap_music) audio embeddings: 9,981/11,692 segments (512-dim)
+    → Manual resample 44.1kHz → 48kHz via librosa
+    → 1,711 segments without audio → zero vectors + has_audio_embedding=False
+    → Output: training_data_clap_embeddings.parquet (20.5 MB)
+    → Executed on Modal (A10G), ~30 min. Media parquet cached in Modal Volume.
+                │
+ ⑦ add-multimodal-fusion (Phases 3.1 + 3.2 remaining) — THE BLOCKER
     → Precompute piano roll MIDI embeddings (128 pitch x 256 time → CNN → 512-dim)
     → Train fusion model: [audio 512 + MIDI 512 + text 768] → MLP → regression heads
     → Target: spatial mode 62% → >85%
@@ -198,20 +205,21 @@ Extends binary classification to predict specific rebracketing types (spatial, t
 
 #### Phase 3.0: Data Prerequisites
 **Change**: `prepare-multimodal-data`
-**Priority**: 🔥 IMMEDIATE — blocks Phase 3.1
-**Status**: Data extracted and published; DeBERTa embedding pass remains (RunPod GPU)
+**Priority**: ✅ COMPLETE
+**Status**: Complete (2026-02-12, Modal GPU)
 
 Prepares training data for multimodal model training:
 - ✅ All 8 album colors present and verified (11,605 segments, 2026-02-10)
 - ✅ Audio/MIDI binary coverage verified (85.4% audio, 44.3% MIDI)
 - ✅ Published to HuggingFace (earthlyframes/white-training-data v0.2.0)
-- Run DeBERTa embedding pass on new extraction (11,605 segments, currently 0% embedded)
-- Document remaining coverage gaps (Blue MIDI at 12%)
+- ✅ DeBERTa embedding pass: 11,605 concept + 10,764 lyric embeddings (768-dim)
+- ✅ CLAP audio embedding pass: 9,981 audio embeddings (512-dim)
+- Known gap: Blue MIDI at 12%, Yellow/Green instrumental (no lyrics)
 
 #### Phase 3.1 + 3.2: Audio + MIDI + Text Fusion
 **Change**: `add-multimodal-fusion`
 **Priority**: 🔥 THE BLOCKER — enables chromatic fitness function
-**Status**: Not Started
+**Status**: CLAP precomputation done; MIDI CNN + fusion training remain
 **Design**: `design.md` complete — CLAP audio encoder, piano roll CNN, learned null embeddings, precompute-then-fuse, late concatenation
 
 Core multimodal model combining audio, MIDI, and text:
@@ -279,8 +287,8 @@ Core multimodal model combining audio, MIDI, and text:
 | **HuggingFace Publish** | - | **✅ v0.2.0 public** (2026-02-10) | Done |
 | **RunPod Guide** | `add-runpod-deployment-guide` | **Spec'd** | 🔥 Read before RunPod |
 | **Data Verification** | `add-training-data-verification` | **✅ Complete** | Done |
-| **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | DeBERTa pass remaining | 🔥 IMMEDIATE (RunPod) |
-| **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | Design complete | 🔥 BLOCKER |
+| **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | **✅ Complete** (2026-02-12) | Done |
+| **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | CLAP done; MIDI CNN + fusion remain | 🔥 BLOCKER |
 | **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | Done |
 | **Result Feedback** | `add-chain-result-feedback` | ✅ Complete | Done |
 | Phase 3.3+3.4 (Lyrics) | `add-prosodic-lyric-encoding` | Not Started | Medium |
@@ -347,6 +355,6 @@ All 27 mode combinations now mapped to 8 albums.
 
 ---
 
-*Last Updated: 2026-02-10*
+*Last Updated: 2026-02-12*
 
-**Status**: Phases 1, 2, 4 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). All local prep complete. **Next: RunPod for Phase 3.0 (DeBERTa embeddings) → Phase 3.1/3.2 (multimodal fusion).**
+**Status**: Phases 1, 2, 4 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3.0 complete**: DeBERTa text embeddings (768-dim) + CLAP audio embeddings (512-dim) extracted via Modal GPU. **Next: Piano roll MIDI CNN → multimodal fusion training (Phase 3.1/3.2).** GPU execution migrated from RunPod to Modal (serverless, no storage provisioning).
