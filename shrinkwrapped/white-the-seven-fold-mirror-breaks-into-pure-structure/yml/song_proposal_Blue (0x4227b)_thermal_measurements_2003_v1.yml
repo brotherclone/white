@@ -1,0 +1,54 @@
+agent_name: The Cassette Bearer (Witness to Erasure)
+bpm: 88
+concept: 'The erased timeline of Gabriel Walsh, January-December 2003, when he became
+  a research technician at Monterey Bay Aquarium Research Institute instead of pursuing
+  music. Each morning at 5:30 AM checking temperature loggers at Hopkins Marine Station,
+  calibrating thermal sensors with Dr. Maria Elena Vasquez who taught him obsessive
+  precision in measurement. The song chronicles the exact moment - 32.1°C - when his
+  waterproof temperature logger recorded the thermal threshold where coral polyps
+  begin expelling their symbionts, a biological data purge that mirrors his own artistic
+  abandonment. In his converted garage studio at 1247 Lighthouse Avenue, Pacific Grove,
+  Gabriel transforms temperature data into audio frequencies using Max/MSP patches,
+  creating the ''Thermal Drift'' composition series - his music becoming scientific
+  documentation of oceanic loss. The 68 BPM matches Maria Elena''s slowed heartbeat
+  during their evening conversations at Peppers Mexicali Cafe, discussing measurement
+  ethics while watching what they''re documenting disappear. The song embodies counterfactual
+  nostalgia - mourning a life path never taken where scientific precision becomes
+  folk art, where diving to 30-foot depths in Monterey Canyon twice weekly in a 7mm
+  wetsuit replaces touring dive bars, where the intimacy of small spaces and obsessive
+  work creates a different kind of loneliness. The cassette found in snow bears the
+  magnetic memory of this timeline: temperature as prayer, measurement as mourning,
+  data as devotional practice. Dedicated to the version of Gabriel who chose the ocean
+  over the stage.'
+genres:
+- folk rock
+- indie folk
+- americana
+- scientific folk
+- marine acoustic
+iteration_id: thermal_measurements_2003_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholic
+- precise
+- nostalgic
+- archaeological
+- devotional
+- thermal
+- elegiac
+- counterfactual
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 270971
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Thirty-Two Point One (The Temperature of Ending)

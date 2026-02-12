@@ -1,0 +1,61 @@
+adaptation_attempts:
+- Tried switching to hook-and-line fishing but couldn't catch enough to survive
+- Applied for government fishing permits that never came through
+- Attempted to join ecotourism cooperatives that collapsed when vaquita sightings
+  ended
+- Learned to repair boat engines to supplement income
+age: 47
+artifact_id: 4d1554b2-4f4e-4e6f-9045-d67fceefcd8c
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Rosa wakes at 4 AM to check her small panga boat, mends nets by lamplight,
+  and sets out before dawn to avoid the naval patrols that supposedly protect the
+  vaquita refuge. She fishes the edges of the protected zone where shrimp still cluster,
+  always listening for the sound of larger boats that might report her. Her hands
+  work automatically, untangling bycatch she can't sell - juvenile fish, rays, sometimes
+  dolphins - throwing them back usually too late.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- witness
+environmental_stressor: Gillnet fishing regulations that exist on paper but aren't
+  enforced, forcing subsistence fishers into illegal methods while industrial boats
+  operate freely
+family_situation: Widow with two teenage sons who want to leave for Tijuana factories.
+  Her husband drowned in 2031 when their boat was rammed by cartel vessels protecting
+  totoaba smuggling routes.
+file_name: 4d1554b2-4f4e-4e6f-9045-d67fceefcd8c_g_last_human.json
+final_thought: She wonders if the scientists who placed the acoustic monitors felt
+  the same helplessness she does now - documenting something disappearing while being
+  unable to stop it
+last_days_scenario: Rosa sits in her beached panga at dawn, holding the silent acoustic
+  monitor. The Upper Gulf is empty now - no vaquita clicks, no shrimp boats, just
+  the occasional naval patrol enforcing a refuge that protects nothing. Her sons left
+  for the maquiladoras last month. The government compensation for retiring her fishing
+  license hasn't come through, and won't cover her mother's dialysis anyway. She's
+  the last of the San Felipe fishing families who remembers when the water was full
+  of life. Like the vaquita, she's endemic to this place, with nowhere else to go.
+  The gillnets that killed the porpoises are killing her too, slowly, through the
+  collapse of everything they both depended on. She starts the motor one last time,
+  not to fish, but to scatter her husband's ashes where the vaquitas used to sing.
+latitude: 31.0256
+location: San Felipe, Baja California, Mexico
+longitude: -114.8369
+name: Rosa Elena Murillo
+occupation: Small-scale shrimp fisherman
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A waterlogged acoustic monitoring device she pulled up in her
+  nets in 2033 - it had been recording for the vaquita recovery program, but the clicks
+  it was meant to detect had already stopped
+thread_id: cedb040b-307a-423c-8797-07c37dae5e26
+vulnerability_details: Rosa is trapped in the same gillnet economy that killed the
+  vaquita - she needs to fish to survive, but the only viable nets catch everything
+  indiscriminately. Like the vaquita, she's collateral damage in an economic system
+  designed around larger targets (totoaba, shrimp), with no alternative habitat or
+  livelihood to migrate to.
+year_documented: 2034

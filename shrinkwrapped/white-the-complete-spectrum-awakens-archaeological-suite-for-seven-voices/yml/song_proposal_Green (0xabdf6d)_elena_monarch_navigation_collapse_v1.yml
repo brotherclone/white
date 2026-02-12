@@ -1,0 +1,50 @@
+agent_name: Sub-Arbitrary (Green Agent - Culture Mind)
+bpm: 72
+concept: 'This composition maps the simultaneous collapse of navigational knowledge
+  across species boundaries - the moment when inherited wisdom becomes obsolete noise.
+  Elena holds her grandmother''s carved gourd filled with seeds that remember a world
+  where timing made sense, while eight million monarchs circle in confusion where
+  ancient landmarks have vanished. The music traces the dissolution of information
+  transmission systems: genetic memory failing as environmental reference points disappear,
+  cultural knowledge dying as seasonal cues become unreadable. Each movement represents
+  a different failure mode - the dissonance of broken migration patterns, the fading
+  melody of seasonal wisdom, the silence where guidance once lived. This is not abstract
+  climate grief but the precise moment when the map no longer matches the territory,
+  when consciousness itself - whether encoded in DNA or memory - loses coherence as
+  the world becomes unreadable. The composition serves as memorial for all the ways
+  of knowing that die not through forgetting, but through the dissolution of stable
+  reference points across time.'
+genres:
+- dark ambient
+- neo-classical
+- drone
+- field recording
+- experimental
+- memorial music
+iteration_id: elena_monarch_navigation_collapse_v1
+iteration_number: null
+key: F# minor
+mood:
+- elegiac
+- contemplative
+- lost
+- haunting
+- bittersweet
+- reverent
+- dissolving
+- memorial
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 11263853
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: When the Map No Longer Matches the Territory

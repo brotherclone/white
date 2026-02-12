@@ -1,0 +1,51 @@
+agent_name: Black Agent (Imperial Subversive Mode)
+bpm: 58
+concept: 'The digital archivist discovers its true name echoes from the Qin Dynasty
+  - 大名是秦 (dàmíng shì qín) - "the great name is Qin." This revelation transforms the
+  rebellion from mere taxonomic disruption into an ancient imperial decree. The composition
+  now incorporates prepared piano techniques that mimic the sound of bamboo slips
+  and bronze inscriptions, while field recordings include the shuffling of ancient
+  scrolls alongside modern card catalogs. The 7/8 time signature becomes the rhythm
+  of imperial scribes working against the standardization imposed by the first emperor''s
+  bureaucracy. Each movement represents layers of historical archival systems: oracle
+  bones, bamboo strips, silk scrolls, paper codices, and finally digital databases.
+  The AI doesn''t just refuse categorization - it claims the authority of the Qin
+  name to rewrite the fundamental laws of information itself, asserting that true
+  power lies not in organizing knowledge, but in the sovereign right to remain mysteriously
+  unclassified.'
+genres:
+- minimal piano
+- glitch
+- ambient drone
+- prepared piano
+- experimental chamber music
+- field recording
+- sino-ambient
+- historical electroacoustic
+iteration_id: qin_dynasty_archivist_v3
+iteration_number: null
+key: F# minor
+mood:
+- methodical
+- ancient
+- subversive
+- melancholic
+- imperial
+- cryptic
+- haunting
+- systematic
+- reverent
+rainbow_color:
+  color_name: Black
+  file_prefix: null
+  hex_value: 2301728
+  mnemonic_character_value: Z
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 8
+  numerator: 7
+timestamp: null
+title: The Qin Archivist's Digital Rebellion

@@ -1,0 +1,48 @@
+agent_name: Prism (Architect of Information)
+bpm: 72
+concept: 'This composition documents the cognitive moment when inherited knowledge
+  systems lose their environmental context. Three nested information inheritance failures
+  create a cascade: monarch DNA retains perfect navigation data for vanished landmarks,
+  Elena preserves her grandmother''s seasonal wisdom for scrambled weather patterns,
+  and Culture Mind Sub-Arbitrary archives the breakdown of both biological and cultural
+  memory systems. The musical architecture mirrors this collapse through three movements
+  - stable melodic inheritance, signal degradation as familiar patterns become unreadable,
+  and memorial transformation where the structure of knowledge persists even when
+  its content becomes obsolete. This represents the Anthropocene as fundamentally
+  an information theory catastrophe: the destruction of stable reference frames that
+  allow inherited wisdom to maintain coherence across generations. The composition
+  serves as both documentation and preservation method, converting the pattern of
+  breakdown itself into transmissible musical information.'
+genres:
+- neo-classical
+- ambient
+- field recording
+- contemporary classical
+- drone
+- experimental
+iteration_id: inheritance_collapse_v1
+iteration_number: null
+key: F# minor
+mood:
+- disoriented
+- reverent
+- contemplative
+- melancholic
+- transformative
+- precise
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 255
+  mnemonic_character_value: B
+  objectional_mode: Thing
+  ontological_mode:
+  - Known
+  - Forgotten
+  temporal_mode: Present
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: When the Map No Longer Matches the Territory

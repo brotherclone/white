@@ -327,6 +327,57 @@ def shrinkwrap_thread(
     return metadata
 
 
+def load_orphaned_manifests(output_dir: Path, known_dirs: set[str]) -> list[dict]:
+    """Load manifests from output directories not already tracked.
+
+    When chain_artifacts are deleted or become unparseable, the shrinkwrapped
+    output directories (with their manifests) are the only remaining record.
+    This scans for those orphaned directories so the index stays complete.
+    """
+    orphaned = []
+    if not output_dir.exists():
+        return orphaned
+
+    for d in sorted(output_dir.iterdir()):
+        if not d.is_dir() or d.name.startswith("."):
+            continue
+        if d.name in known_dirs:
+            continue
+
+        manifest_path = d / "manifest.yml"
+        if not manifest_path.exists():
+            continue
+
+        try:
+            with open(manifest_path) as f:
+                manifest = yaml.safe_load(f)
+            if not manifest or not manifest.get("title"):
+                continue
+
+            metadata = {
+                "thread_id": manifest.get("thread_id", "unknown"),
+                "title": manifest["title"],
+                "bpm": manifest.get("bpm"),
+                "key": manifest.get("key"),
+                "tempo": manifest.get("tempo"),
+                "concept": manifest.get("concept", ""),
+                "rainbow_color": manifest.get("rainbow_color", "unknown"),
+                "mnemonic": manifest.get("mnemonic", "?"),
+                "mood": manifest.get("mood", []),
+                "genres": manifest.get("genres", []),
+                "agent_name": manifest.get("agent_name", ""),
+                "iteration_count": manifest.get("iteration_count", 0),
+                "timestamp": manifest.get("timestamp"),
+                "directory_name": d.name,
+            }
+            orphaned.append(metadata)
+            logger.info(f"Recovered orphaned manifest: {d.name}")
+        except Exception as e:
+            logger.warning(f"Failed to load manifest from {d.name}: {e}")
+
+    return orphaned
+
+
 def shrinkwrap(
     artifacts_dir: Path,
     output_dir: Path,
@@ -396,6 +447,21 @@ def shrinkwrap(
             processed += 1
         else:
             failed += 1
+
+    # Recover orphaned manifests from output directories whose chain_artifacts
+    # are no longer parseable (deleted, reorganized, etc.)
+    tracked_dirs = {
+        m.get("directory_name") for m in all_metadata if m.get("directory_name")
+    }
+    orphaned = load_orphaned_manifests(output_dir, tracked_dirs)
+    if orphaned:
+        all_metadata.extend(orphaned)
+        if not dry_run:
+            logger.info(f"Recovered {len(orphaned)} orphaned manifests")
+        else:
+            print(
+                f"\n  + {len(orphaned)} existing directories with manifests (from previous runs)"
+            )
 
     # Write index
     if all_metadata and not dry_run:
