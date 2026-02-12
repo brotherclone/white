@@ -40,6 +40,11 @@ from .album_prediction import (
     AlbumConfusionMatrix,
     evaluate_album_predictions,
 )
+from .piano_roll_encoder import (
+    PianoRollEncoder,
+    midi_bytes_to_piano_roll,
+    batch_midi_to_piano_rolls,
+)
 
 __all__ = [
     # Binary classification
@@ -82,4 +87,8 @@ __all__ = [
     "AlbumPredictor",
     "AlbumConfusionMatrix",
     "evaluate_album_predictions",
+    # Piano roll MIDI encoder
+    "PianoRollEncoder",
+    "midi_bytes_to_piano_roll",
+    "batch_midi_to_piano_rolls",
 ]
