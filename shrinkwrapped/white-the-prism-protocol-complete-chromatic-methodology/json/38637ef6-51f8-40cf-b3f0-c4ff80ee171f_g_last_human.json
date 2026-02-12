@@ -1,0 +1,53 @@
+adaptation_attempts:
+- Switched to lighter synthetic brushes
+- Takes chelation therapy for heavy metal buildup
+- Wears increasingly sophisticated protective gear
+- Tries to work earlier hours before spraying
+- Advocates for organic certification programs
+age: 47
+artifact_id: 38637ef6-51f8-40cf-b3f0-c4ff80ee171f
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: 4:30 AM wake, check tremor severity in hands, drive to Honeycrisp orchards,
+  hand-pollinate 200 trees using small brushes before 10 AM spray schedule, return
+  home by noon to avoid chemical drift, spend afternoons teaching her niece pollination
+  techniques through video calls while her hands still work
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Neonicotinoid pesticide exposure from intensive apple orchard
+  spraying
+family_situation: Widow, two adult children moved to Seattle after developing chemical
+  sensitivities, maintains long-distance relationship with granddaughter who wants
+  to learn the family trade but cannot visit due to environmental illness
+file_name: 38637ef6-51f8-40cf-b3f0-c4ff80ee171f_g_last_human.json
+final_thought: The valley used to sing with wings - now it only whispers with machines
+last_days_scenario: 'Maria sits in her kitchen at 3 AM, hands shaking too violently
+  to hold coffee. The orchard called yesterday - they''re switching to robotic pollinators
+  next season. She stares at her grandmother''s brush on the table, remembering when
+  the valley hummed with bees. Her phone buzzes with a text from her granddaughter:
+  "Abuela, my hands shake too now." Outside, the pre-dawn silence is absolute - no
+  bee song, no bird calls, just the distant hum of spray equipment preparing for another
+  day. She knows she is the last link in a chain that once connected soil to sky,
+  and tomorrow that chain breaks forever.'
+latitude: 46.6021
+location: Yakima Valley, Washington
+longitude: -120.5059
+name: Maria Elena Vasquez
+occupation: Hand pollinator and agricultural specialist
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- toxic_exposure
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Her grandmother's wooden-handled pollination brush, worn smooth
+  by three generations of hands, now too heavy for her pesticide-weakened grip to
+  hold steady
+thread_id: 1a4232e8-ade7-4c4a-b405-d76774fbb306
+vulnerability_details: Like the rusty patched bumble bee queen who survives each winter
+  alone while her colony dies, Maria is the last of her family's three generations
+  of agricultural workers, her distinctive hand-pollination skills becoming obsolete
+  as the very pesticides that killed the bees now cause her severe neurological tremors
+year_documented: 2034

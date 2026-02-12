@@ -1,14 +1,182 @@
 # Training Pipeline Roadmap
 
-This document provides an overview of the training pipeline improvements and extensions documented as OpenSpec changes. These changes correspond to the recommendations from the training additions outline created in desktop mode.
-
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-12
 
 ## Overview
 
 The training pipeline spans 10 major phases, progressing from basic classification to advanced generative models and production deployment. Each phase has been documented as an OpenSpec change with full requirements, scenarios, and implementation tasks.
 
-## Phase Sequence
+## CRITICAL ARCHITECTURAL CLARIFICATION (2026-02-06)
+
+**The ML models do NOT integrate with White Concept Agent.**
+
+The White Concept Agent generates concepts through philosophical transmigration (INFORMATION → SPACE). It operates based on chromatic taxonomy and rebracketing theory. It does not need ML validation to function - it already works.
+
+**The ML models ARE for a future Music Production Agent** (to be built):
+
+### The Actual Use Case: Evolutionary Music Composition
+```
+1. White Agent generates concept (text)
+   ↓
+2. Music Production Agent begins composition:
+   - Generate 50 chord progression variations
+   - ML model scores each for chromatic consistency
+   - Keep top 3
+   ↓
+3. For each top chord progression:
+   - Generate 50 drum pattern variations
+   - ML model scores each
+   - Keep top 3
+   ↓
+4. Repeat for bass, melody, harmony, etc.
+   ↓
+5. Final candidates → human evaluation
+```
+
+The ML model is a **fitness function** scoring: "How well does this audio/MIDI match the target chromatic mode (GREEN/RED/VIOLET/etc.)?"
+
+This requires:
+- **Audio features**: What does GREEN *sound* like?
+- **MIDI features**: What chord voicings, rhythms, melodic contours are GREEN?
+- **Lyric-melody alignment**: How do vocals sit in the mix for GREEN vs RED?
+
+## Execution Plan (Complete Order of Events)
+
+Two parallel tracks converge at the Evolutionary Music Generator.
+
+### Track A: Training Pipeline (RunPod GPU)
+
+```
+LOCAL PREP (before RunPod)
+══════════════════════════════════
+
+ ✅ Pipeline bug fixes (2026-02-07):
+    • Structure-based segmentation fallback for instrumentals
+      (15 songs with no LRC now produce ~170 segments via manifest structure)
+    • Verified: rebuild manifest DB → 1,327 tracks across all 8 colors
+    • Tests: 36/36 passing
+
+ ① add-runpod-deployment-guide          ← READ before touching RunPod
+    • Region selection (US-KS-2 or US-CA-2 recommended over US-MD-1)
+    • Network volume gotchas (region-locked, 64KB min alloc, no S3 in MD-1)
+    • File upload strategy, execution order
+
+ ✅ add-training-data-verification (COMPLETE 2026-02-07)
+    • training/verify_extraction.py: --extract, --fidelity, --all, --color, --song, --random N
+    • Coverage report by album color (audio %, MIDI %, text %)
+    • Fidelity checks: 10/10 audio, 10/10 MIDI passing
+    • 28 tests passing
+
+ ✅ MIDI segmentation bug fix (2026-02-07):
+    • build_training_segments_db.py was storing full MIDI files, not segment slices
+    • Now uses segment_midi_file() to trim MIDI to segment time window
+    • Audio and MIDI segments now aligned to same start_seconds:end_seconds
+
+
+LOCAL EXTRACTION (no GPU needed)
+══════════════════════════════════
+
+ ✅ Rebuild base_manifest_db.parquet (COMPLETE 2026-02-10)
+    python -m app.extractors.manifest_extractor.build_base_manifest_db
+    → 1,327 tracks across all 8 colors (Indigo + Violet now included)
+    → Verified: 8 unique rainbow_color values
+    → Rebuilt 2026-02-10 after YAML edits introduced 4 duplicate track IDs
+                │
+ ✅ Re-run segment extraction (COMPLETE 2026-02-10)
+    python -m app.extractors.segment_extractor.build_training_segments_db
+    → 11,605 segments across 83 songs (up from 10,544)
+    → All 8 colors: Black 1748, Red 1474, Orange 1731, Yellow 656,
+      Green 393, Blue 2097, Indigo 1406, Violet 2100
+    → Audio: 85.4%, MIDI: 44.3%
+    → Zero UNLABELED segments, zero metadata duplicates
+                │
+ ✅ Verify extraction (COMPLETE 2026-02-10)
+    python -m training.verify_extraction --all
+    → Audio fidelity: 10/10 passed
+    → MIDI fidelity: 10/10 passed
+    → RESULT: PASS — All checks passed
+                │
+ ✅ Publish to HuggingFace (COMPLETE 2026-02-10)
+    python training/hf_dataset_prep.py --push --public --include-embeddings
+    → earthlyframes/white-training-data v0.2.0
+    → 3 configs: base_manifest, training_full, training_segments
+    → Media parquet uploaded (15.3 GB): audio waveforms + MIDI binaries
+    → Dataset card with coverage tables, usage docs, CI License
+    → Public: https://huggingface.co/datasets/earthlyframes/white-training-data
+
+
+MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
+══════════════════════════════════
+
+ ✅ prepare-multimodal-data (Phase 3.0) — COMPLETE 2026-02-12
+    → DeBERTa-v3-base embedding pass: 11,605 concept + 10,764 lyric embeddings (768-dim)
+    → 841 instrumental segments → zero vectors + has_lyric_embedding=False
+    → Output: training_data_with_embeddings.parquet (4.5 MB)
+    → Executed on Modal (A10G), ~3 min
+                │
+ ✅ CLAP audio embedding precomputation (Phase 3.1 partial) — COMPLETE 2026-02-12
+    → CLAP (laion/larger_clap_music) audio embeddings: 9,981/11,692 segments (512-dim)
+    → Manual resample 44.1kHz → 48kHz via librosa
+    → 1,711 segments without audio → zero vectors + has_audio_embedding=False
+    → Output: training_data_clap_embeddings.parquet (20.5 MB)
+    → Executed on Modal (A10G), ~30 min. Media parquet cached in Modal Volume.
+                │
+ ⑦ add-multimodal-fusion (Phases 3.1 + 3.2 remaining) — THE BLOCKER
+    → Precompute piano roll MIDI embeddings (128 pitch x 256 time → CNN → 512-dim)
+    → Train fusion model: [audio 512 + MIDI 512 + text 768] → MLP → regression heads
+    → Target: spatial mode 62% → >85%
+```
+
+### Track B: Agent Pipeline (Local, No GPU)
+
+```
+ ✅ add-shrinkwrap-chain-artifacts (COMPLETE 2026-02-07)
+    → 20 threads shrinkwrapped to shrinkwrapped/ directory
+    → EVP intermediates stripped (135 files, 210MB freed from chain_artifacts)
+    → manifest.yml per thread + index.yml generated
+    → 47 tests passing
+                │
+ ✅ add-chain-result-feedback (COMPLETE 2026-02-07)
+    → Key entropy: 1.67 bits (12/20 = 60% C major!)
+    → BPM std dev: 8.14 (cluster around 91-96)
+    → Overused phrases: "seven chromatic methodologies" (45%), "transmigration" (35%)
+    → White Agent now loads constraints at workflow start, injects into all prompts
+    → 27 tests passing
+```
+
+### Convergence
+
+```
+POST-TRAINING
+══════════════════════════════════
+
+ ⑧ Build Evolutionary Music Generator (not yet spec'd)
+    → Uses multimodal model (Track A ⑦) as fitness function
+    → Uses negative constraints (Track B ②) for diversity
+    → Multi-stage: concept → chords → drums → bass → melody → human eval
+                │
+ ⑨ Phase 10: Production Deployment
+    → FastAPI endpoint for scoring
+    → ONNX export for inference speed
+    → Batch scoring for 50+ candidates per stage
+```
+
+### What Changed Since Last RunPod Run
+
+| Item | Before (2026-01-27) | After (2026-02-10) |
+|------|---------------------|---------------------|
+| Manifest DB | 892 tracks, 6 colors (01-06 only) | 1,327 tracks, 8 colors (01-08) |
+| Green segments | 0 (LRC hard-bail) | 393 (structure fallback) |
+| Yellow segments | Missing 4 instrumental songs | 656 (structure fallback) |
+| Red segments | Missing 3 instrumental songs | 1,474 (structure fallback) |
+| MIDI coverage | 0% (bug) | 44.3% (5,145/11,605) |
+| Audio coverage | ~85% | 85.4% (9,907/11,605) |
+| Indigo/Violet labels | UNLABELED (3,506 segments) | Indigo 1,406 + Violet 2,100 |
+| Total segments | 10,544 | 11,605 |
+| Metadata duplicates | 87 (stale manifest after YAML edits) | 0 (rebuilt 2026-02-10) |
+| HuggingFace | Not published | v0.2.0 public, 15.3 GB media included |
+
+## Phase Details
 
 ### Phase 1: Binary Classification ✓ Complete
 **Status**: Implemented and deployed
@@ -33,42 +201,44 @@ Extends binary classification to predict specific rebracketing types (spatial, t
 - 6.4/6.5 Compare with Phase 1 baseline
 - 7.x Documentation
 
-**Key Files**:
-- proposal.md:10 lines
-- tasks.md:30 tasks across 7 sections
-- spec.md:9 requirements, 27 scenarios
+### Phase 3: Multimodal Fusion (split into 3 changes)
 
-### Phase 3: Multimodal Fusion
+#### Phase 3.0: Data Prerequisites
+**Change**: `prepare-multimodal-data`
+**Priority**: ✅ COMPLETE
+**Status**: Complete (2026-02-12, Modal GPU)
+
+Prepares training data for multimodal model training:
+- ✅ All 8 album colors present and verified (11,605 segments, 2026-02-10)
+- ✅ Audio/MIDI binary coverage verified (85.4% audio, 44.3% MIDI)
+- ✅ Published to HuggingFace (earthlyframes/white-training-data v0.2.0)
+- ✅ DeBERTa embedding pass: 11,605 concept + 10,764 lyric embeddings (768-dim)
+- ✅ CLAP audio embedding pass: 9,981 audio embeddings (512-dim)
+- Known gap: Blue MIDI at 12%, Yellow/Green instrumental (no lyrics)
+
+#### Phase 3.1 + 3.2: Audio + MIDI + Text Fusion
 **Change**: `add-multimodal-fusion`
-**Priority**: Medium (requires Phase 2 validation first)
+**Priority**: 🔥 THE BLOCKER — enables chromatic fitness function
+**Status**: CLAP precomputation done; MIDI CNN + fusion training remain
+**Design**: `design.md` complete — CLAP audio encoder, piano roll CNN, learned null embeddings, precompute-then-fuse, late concatenation
 
-Combines text, audio, and MIDI representations for richer rebracketing detection. Includes:
-- AudioEncoder (Wav2Vec2, CLAP, custom CNN options)
-- MIDIEncoder (piano roll, event-based, Music Transformer)
-- MultimodalFusion (early, late, cross-attention, gated strategies)
-- Audio/MIDI preprocessing pipelines
-- Cross-modal attention mechanisms
+Core multimodal model combining audio, MIDI, and text:
+- CLAP audio encoder (`laion/larger_clap_music`) → [batch, 512]
+- Piano roll CNN MIDI encoder → [batch, 512]
+- Existing DeBERTa-v3 text encoder → [batch, 768]
+- Late fusion [1792] → MLP → [512] → regression heads
+- Learned null embeddings for missing modalities (57% MIDI-absent)
+- Modality dropout (p=0.15) during training
 
-**Key Files**:
-- proposal.md:Breaking change (dataset format expansion)
-- tasks.md:55 tasks across 10 sections
-- spec.md:14 requirements, 48 scenarios
+#### Phase 3.3 + 3.4: Prosodic & Structural Lyric Encoding
+**Change**: `add-prosodic-lyric-encoding`
+**Priority**: Medium — deferred until Phase 3.1/3.2 results validate approach
+**Status**: Not Started
+**Prerequisites**: `add-multimodal-fusion` must ship first
 
 ### Phase 4: Regression Tasks ✓ COMPLETE
 **Change**: `add-regression-tasks`
 **Status**: 100% complete - TRAINED AND VALIDATED (2026-01-27)
-
-Predicts continuous Rainbow Table ontological modes (temporal, spatial, ontological distributions) plus chromatic confidence. Includes:
-- RegressionHead and RainbowTableRegressionHead ✓
-- Multi-task learning (classification + regression) ✓
-- MSE, Huber, Smooth L1, KL divergence losses ✓
-- Uncertainty estimation (ensemble, MC dropout, evidential) ✓
-- MAE, RMSE, R², correlation metrics ✓
-- Soft target generation from discrete labels ✓
-- Concept validation API with accept/reject gates ✓
-- Human-in-the-loop annotation interface ✓
-- Transmigration distance computation ✓
-- Album prediction from ontological scores ✓
 
 **Training Results**:
 | Dimension | Mode Accuracy | Notes |
@@ -83,273 +253,108 @@ Predicts continuous Rainbow Table ontological modes (temporal, spatial, ontologi
 - Spatial mode limited by "Place" albums (Yellow/Green) being instrumental - no lyrics = no text embeddings
 - Early stopping on accuracy (not loss) critical for stable training
 
-**Remaining**:
-- 10.12 LangGraph integration tests
-
-**Key Files**:
-- proposal.md:44 lines (expanded)
-- tasks.md:89 tasks across 15 sections
-- spec.md:12 requirements, 36 scenarios
-
-### Phase 5: Temporal Sequence Modeling
-**Change**: `add-temporal-sequence-modeling`
-**Priority**: Medium (adds sequential understanding)
-
-Models rebracketing evolution across time and segment sequences. Includes:
-- TemporalDataset with context windows
-- SegmentLSTM, TemporalTransformer, TemporalConvNet architectures
-- Temporal positional encoding using actual time distances
-- TransitionPredictor for delta prediction between segments
-- Sequence-level evaluation metrics
-
-**Key Files**:
-- proposal.md:14 lines
-- tasks.md:41 tasks across 9 sections
-- spec.md:13 requirements, 45 scenarios
-
-### Phase 6: Chromatic Style Transfer
-**Change**: `add-chromatic-style-transfer`
-**Priority**: Medium-High (enables cross-mode generation)
-
-Generates segments in different chromatic modes while preserving content. Includes:
-- ChromaticStyleEncoder for extracting mode essence
-- DisentangledEncoder for content-style separation
-- ChromaticDecoder for generation
-- Style reconstruction, transfer, preservation losses
-- Adversarial training for realism
-
-**Key Files**:
-- proposal.md:16 lines
-- tasks.md:37 tasks across 9 sections
-- spec.md:13 requirements, 37 scenarios
-
-### Phase 7: Generative Models
-**Change**: `add-generative-models`
-**Priority**: Medium (most complex, enables synthesis)
-
-Generates entirely new segments using VAE, Diffusion, and GPT-style models. Includes:
-- RebracketingVAE conditioned on chromatic mode
-- RebracketingDiffusion for high-quality generation
-- SegmentGenerator (autoregressive transformer)
-- Latent space manipulation
-- Audio tokenization (EnCodec) and MIDI tokenization (REMI)
-- FID, diversity, chromatic consistency metrics
-
-**Key Files**:
-- proposal.md:18 lines
-- tasks.md:45 tasks across 10 sections
-- spec.md:15 requirements, 42 scenarios
+### Phase 5-7: DEPRECATED
+- Phase 5 (Temporal Sequence): Was for concept evolution over time
+- Phase 6 (Chromatic Style Transfer): Was for text-to-text style transfer
+- Phase 7 (Generative Models): Was for generating text concepts
 
 ### Phase 8: Model Interpretability ~ Partially Complete
 **Change**: `add-model-interpretability`
 **Status**: 40% complete via notebook implementation
 
-Analyzes and visualizes what models learn about rebracketing. Includes:
-- Attention visualization (text, audio, cross-modal) - NOT STARTED
-- Embedding space analysis (TSNE, UMAP) ✓ (via notebook)
-- Feature attribution (Integrated Gradients, SHAP) - NOT STARTED
-- Counterfactual explanations - NOT STARTED
-- Chromatic geometry analysis - NOT STARTED
-- Confusion matrix and misclassification analysis ✓ (via notebook)
-- Confidence distribution analysis ✓ (via notebook)
-
-**Implemented in**: `notebooks/interpretability_analysis.ipynb`
-
-**Key Files**:
-- proposal.md:13 lines
-- tasks.md:31 tasks across 8 sections
-- spec.md:9 requirements, 27 scenarios
-
 ### Phase 9: Data Augmentation
 **Change**: `add-data-augmentation`
-**Priority**: High (improves all phases)
-
-Increases training data quality and quantity through augmentation and synthesis. Includes:
-- AudioAugmenter (time stretch, pitch shift, noise, reverb)
-- TextAugmenter (back-translation, synonyms, paraphrase)
-- MIDIAugmenter (transpose, velocity, quantization)
-- SyntheticGenerator using White Agent
-- Label preservation validation
-
-**Key Files**:
-- proposal.md:12 lines
-- tasks.md:28 tasks across 7 sections
-- spec.md:7 requirements, 20 scenarios
+**Priority**: Low
 
 ### Phase 10: Production Deployment
 **Change**: `add-production-deployment`
-**Priority**: High (enables agent integration)
-
-Deploys trained models for use by White Agent and other components. Includes:
-- ONNX export for CPU optimization
-- RebracketingInferenceAPI (FastAPI)
-- RebracketingAnalyzerTool for LangGraph agents
-- Streaming analysis for real-time processing
-- Model versioning and registry
-- Monitoring and logging
-
-**Key Files**:
-- proposal.md:17 lines
-- tasks.md:36 tasks across 9 sections
-- spec.md:11 requirements, 33 scenarios
+**Priority**: Critical (after Phase 3)
 
 ### Infrastructure: Experiment Tracking & Optimization
 **Change**: `add-infrastructure-improvements`
 **Priority**: High (supports all phases)
 
-Provides robust infrastructure for training at scale. Includes:
-- Weights & Biases integration
-- Optuna/Ray Tune hyperparameter optimization
-- PyTorch DDP for multi-GPU training
-- MLflow model versioning and registry
-- Checkpoint management and resumption
-- Training profiling and monitoring
-
-**Key Files**:
-- proposal.md:16 lines
-- tasks.md:41 tasks across 9 sections
-- spec.md:12 requirements, 39 scenarios
-
 ## Current Status Summary
 
-| Phase                      | Status               | Completion |
-|----------------------------|----------------------|------------|
-| Phase 1 (Binary)           | ✓ Complete           | 100%       |
-| Phase 2 (Multi-Class)      | ✓ Complete           | 100%       |
-| Phase 4 (Regression)       | ✓ Complete           | 100%       |
-| Phase 8 (Interpretability) | ~ Partial (notebook) | 40%        |
-| Infrastructure             | Not Started          | 0%         |
-| Phase 3, 5, 6, 7, 9, 10    | Not Started          | 0%         |
+| Phase | Change | Status | Priority |
+|-------|--------|--------|----------|
+| Phase 1 (Binary) | - | ✅ Complete | Done |
+| Phase 2 (Multi-Class) | - | ✅ Complete | Done |
+| Phase 4 (Regression) | - | ✅ Complete | Done |
+| **Pipeline Fixes** | *(this branch)* | **✅ Complete** | Done |
+| **MIDI Segmentation Fix** | *(this branch)* | **✅ Complete** | Done |
+| **Extraction + Verification** | - | **✅ Complete** (2026-02-10) | Done |
+| **HuggingFace Publish** | - | **✅ v0.2.0 public** (2026-02-10) | Done |
+| **RunPod Guide** | `add-runpod-deployment-guide` | **Spec'd** | 🔥 Read before RunPod |
+| **Data Verification** | `add-training-data-verification` | **✅ Complete** | Done |
+| **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | **✅ Complete** (2026-02-12) | Done |
+| **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | CLAP done; MIDI CNN + fusion remain | 🔥 BLOCKER |
+| **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | Done |
+| **Result Feedback** | `add-chain-result-feedback` | ✅ Complete | Done |
+| Phase 3.3+3.4 (Lyrics) | `add-prosodic-lyric-encoding` | Not Started | Medium |
+| Phase 10 (Production) | `add-production-deployment` | Not Started | After Phase 3 |
+| Infrastructure | `add-infrastructure-improvements` | Not Started | High |
+| Phase 8 (Interpretability) | `add-model-interpretability` | ~ Partial | Medium |
+| Phase 9 (Augmentation) | `add-data-augmentation` | Not Started | Low |
 
-## Critical Path to Production
+## Pipeline Bug Fixes (2026-02-07)
 
-**Immediate Priority** (to unblock White Agent validation):
-1. ~~**Fix embedding loading** in Phase 4 training scripts~~ ✓ DONE
-2. ~~**Run Phase 4 training** on RunPod with real embeddings~~ ✓ DONE
-3. **Test validate_concepts.py** with trained model
-4. **Integrate with White Agent workflow**
+### ✅ RESOLVED: Instrumental Track Extraction
+**Root cause**: `build_training_segments_db.py:218-220` hard-returned empty when no LRC file existed. All instrumental tracks (no lyrics = no LRC) produced 0 segments.
 
-**Recommended Implementation Order** (remaining work):
+**Fix**: Added structure-based segmentation fallback. When no LRC file exists but `manifest.structure` has sections, segments are created from structure boundaries with the same max-length splitting logic.
 
-1. ~~**Phase 2** (Multi-Class) → Natural extension of Phase 1~~ ✓ DONE
-2. ~~**Phase 8** (Interpretability) → Understand what's working~~ PARTIAL (notebook exists)
-3. ~~**Phase 4** (Regression) → Ontological mode prediction~~ ✓ DONE
-4. **Phase 3** (Multimodal) → Add audio embeddings for instrumental tracks (fixes spatial mode)
-5. **Infrastructure** → Enable efficient experimentation for later phases
-6. **Phase 9** (Augmentation) → Improve data before complex models
-7. **Phase 5** (Temporal) → Add sequence modeling
-8. **Phase 6** (Style Transfer) → Useful for White Agent generation
-9. **Phase 7** (Generative) → Most complex, enables full synthesis
-10. **Phase 10** (Production) → Deploy for agent integration
+**Impact**: 15 previously-skipped songs now produce segments:
+- 8 Green songs → ~102 segments
+- 4 Yellow songs (04_03, 04_06, 04_09, 04_10) → ~45 segments
+- 3 Red songs (02_06, 02_10, 02_12) → ~23 segments
 
-## Key Architectural Decisions
+**Files changed**:
+- `app/util/timestamp_audio_extractor.py` — Added `create_segment_specs_from_structure()`
+- `app/extractors/segment_extractor/build_training_segments_db.py` — LRC → structure fallback
+- `tests/util/test_timestamp_pipeline.py` — 6 new tests (36/36 passing)
 
-### Training Strategy
-- **Curriculum learning**: Start with easier examples, progress to complex
-- **Multi-task vs specialized**: One model for everything vs separate models per task
-- **Transfer learning**: Fine-tune pretrained models vs train from scratch
+### ✅ RESOLVED: Missing Album Labels (Indigo/Violet)
+**Root cause**: `base_manifest_db.parquet` was built before Indigo (07) and Violet (08) albums were staged in `staged_raw_material/`. Not a code bug — just needs a rebuild.
 
-### Data Strategy
-- **Streaming vs batch**: Load all 14k segments or stream from disk
-- **Preprocessing**: Compute features once (fast training) or on-the-fly (flexible)
-- **Validation split**: Hold out entire albums or random segments
+**Fix**: Re-run `build_base_manifest_db.py` before next extraction.
 
-### Evaluation Strategy
-- **Metrics**: Accuracy, F1, AUC-ROC for classification; MAE, RMSE for regression
-- **Test set**: Hold out White Album for final evaluation
-- **Human evaluation**: Validate generated segments match chromatic modes
+**Impact**: 892 → 1,327 tracks. All 8 colors present. 3,506 previously-UNLABELED segments (Indigo + Violet) will get `rainbow_color` from the manifest join.
 
-### Computational Strategy
-- **GPU budget**: RunPod costs vs local vs Colab
-- **Training time**: Quick iterations (hours) vs overnight runs (days)
-- **Model size**: Small fast models vs large capable models
+### ✅ RESOLVED: MIDI Segment Detection (2026-02-06)
+`absolute_tick` was accumulating across tracks in Type 1 MIDI files instead of resetting per track. Fixed in `build_training_segments_db.py:124`. MIDI coverage went from 0% to 43.3%.
 
-## Using These Specs
+### ✅ RESOLVED: MIDI File Path (2026-02-06)
+Was reconstructing path from `staged_material_dir / song_id / midi_file` but `midi_file` is already an absolute path. Changed to `Path(row["midi_file"])`.
 
-Each OpenSpec change can be worked on independently or in combination:
+### ✅ RESOLVED: Metadata Duplicates from Stale Manifest (2026-02-10)
+**Root cause**: YAML manifests for 3 songs (01_01, 03_03, 08_08) were edited after the manifest DB was built (YAMLs modified Feb 9, manifest built Feb 7). The stale manifest had incorrect `track_id` values for 4 tracks, producing 87 duplicate rows when segments joined to metadata.
 
-```bash
-# View a specific change
-openspec show add-multiclass-rebracketing-classifier
+**Fix**: Rebuild `base_manifest_db.parquet` after YAML edits. Zero duplicate composite keys after rebuild.
 
-# Validate all changes
-openspec validate --strict
-
-# When ready to implement a phase
-openspec show add-multiclass-rebracketing-classifier
-# Read proposal.md for context
-# Read tasks.md for implementation checklist
-# Read spec.md for detailed requirements
-# Mark tasks as completed in tasks.md as you work
-
-# After deployment
-openspec archive add-multiclass-rebracketing-classifier
-```
-
-## Integration with White Album Project
-
-These training improvements directly support White Album creation:
-
-1. **Chromatic Understanding**: Models learn distinctions between chromatic modes (BLACK, RED, etc.)
-2. **Rebracketing Detection**: Identify and classify rebracketing patterns in concepts
-3. **Generative Synthesis**: Create new White Album content that transmigrates from INFORMATION to SPACE
-4. **Agent Integration**: White Agent can query models for rebracketing analysis
-5. **Style Transfer**: Generate concepts in different chromatic modes
+**Impact**: Metadata rows now exactly match segment rows (11,605 = 11,605). Previously 11,692 metadata vs 11,605 segments.
 
 ## Required Fixes Before Production
 
 ### ✅ RESOLVED: Embedding Loading (Phase 4)
-
-Implemented via `core/embedding_loader.py`:
-
-- **PrecomputedEmbeddingLoader**: Loads pre-computed embeddings from parquet
-- **DeBERTaEmbeddingEncoder**: Computes embeddings on-the-fly for new concepts
-- **find_embedding_file()**: Auto-discovers embedding files in data directories
-
-Fixed files:
-- ✅ `train_phase_four.py` - Uses PrecomputedEmbeddingLoader
-- ✅ `validate_concepts.py` - Uses DeBERTaEmbeddingEncoder
-- ✅ `core/regression_training.py` - Uses PrecomputedEmbeddingLoader
+Implemented via `core/embedding_loader.py`.
 
 ### ✅ RESOLVED: Album Mappings
-
-All 27 mode combinations now mapped to 8 albums (Orange, Red, Violet, Yellow, Indigo, Green, Blue, Black):
-- ✅ `validate_concepts.py` - Full mapping
-- ✅ `core/regression_training.py` - Complete index mapping
+All 27 mode combinations now mapped to 8 albums.
 
 ### Low: Hardcoded Paths
-
 - `validate_concepts.py:538` hardcodes `/chain_artifacts` - should be configurable
 - `core/regression_training.py:24` hardcodes parquet path (configurable via CONFIG dict)
 
-## Next Steps
-
-**Immediate** (unblock White Agent validation):
-1. ~~Fix embedding loading in Phase 4 scripts~~ ✅ DONE
-2. ~~Run Phase 4 training on RunPod~~ ✅ DONE (2026-01-27)
-3. **Test `validate_concepts.py` with trained model** ← NEXT
-4. Integrate with White Agent workflow
-
-**To improve spatial mode accuracy**:
-- Implement Phase 3 (Multimodal Fusion) to add audio embeddings
-- Instrumental tracks (Yellow/Green = "Place" albums) need audio features, not text
-
-**Ongoing**:
-1. Choose next phase to implement
-2. Read the corresponding OpenSpec change documentation
-3. Follow the tasks.md checklist for implementation
-4. Validate against spec.md requirements and scenarios
-5. Deploy and integrate with White Agent workflows
-
 ## Resources
 
-- Training additions outline: `/Volumes/LucidNonsense/White/claude_working_area/training_additions_outline.md`
-- OpenSpec changes: `/Volumes/LucidNonsense/White/training/openspec/changes/`
-- Project context: `/Volumes/LucidNonsense/White/training/openspec/project.md`
-- Training README: `/Volumes/LucidNonsense/White/training/README.md`
+- OpenSpec changes (training): `training/openspec/changes/`
+- OpenSpec changes (agent): `openspec/changes/`
+- Design decisions: `training/openspec/changes/add-multimodal-fusion/design.md`
+- Project context: `training/openspec/project.md`
 
 ---
 
-*Last Updated: 2026-01-27*
+*Last Updated: 2026-02-12*
 
-**Status**: Phases 1, 2, and 4 complete. Classification achieves 100%, regression achieves 95% temporal / 93% ontological / 62% spatial. Spatial limited by instrumental tracks (no lyrics). Next: integrate with White Agent, then Phase 3 (multimodal) for audio embeddings.
+**Status**: Phases 1, 2, 4 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3.0 complete**: DeBERTa text embeddings (768-dim) + CLAP audio embeddings (512-dim) extracted via Modal GPU. **Next: Piano roll MIDI CNN → multimodal fusion training (Phase 3.1/3.2).** GPU execution migrated from RunPod to Modal (serverless, no storage provisioning).

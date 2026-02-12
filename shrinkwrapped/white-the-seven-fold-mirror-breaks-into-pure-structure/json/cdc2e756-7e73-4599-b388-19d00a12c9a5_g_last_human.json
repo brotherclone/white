@@ -1,0 +1,60 @@
+adaptation_attempts:
+- Moved coral nurseries to deeper, cooler waters
+- Partnered with university researchers on heat-resistant coral breeding
+- Diversified into cenote tours when reef tours became too depressing
+- Applied for climate migration assistance to move inland
+age: 47
+artifact_id: cdc2e756-7e73-4599-b388-19d00a12c9a5
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Every morning at 5:30 AM, Maria checks water temperature readings from
+  her underwater sensors. She prepares coral fragment nurseries in the cooler, deeper
+  waters, then leads tourists on "ghost reef" tours where she explains what the white
+  skeletons used to be. Afternoons spent writing grant applications for restoration
+  projects that keep getting defunded as temperatures rise beyond coral survival thresholds.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Marine heatwaves causing mass coral bleaching events, with
+  ocean temperatures regularly exceeding 30°C (86°F) for months at a time
+family_situation: Divorced, two teenage children who moved to Cancún for work when
+  the local fishing industry collapsed. Sends them money when tourism bookings allow.
+file_name: cdc2e756-7e73-4599-b388-19d00a12c9a5_g_last_human.json
+final_thought: The water feels like bathwater now, even at dawn. The tourists still
+  come, but they're here to see what's left before it's all gone. I'm documenting
+  the death of everything I've spent my life trying to save.
+last_days_scenario: Maria floats above the bleached skeleton of what was once Mesoamerica's
+  largest coral formation, her dive computer showing 31.2°C - a temperature that would
+  have been an emergency just five years ago, now routine. The few remaining coral
+  colonies are stark white, their symbiotic algae expelled in a desperate fever response
+  that never ends. Her underwater camera captures the dissolution - literally, as
+  increasing ocean acidity eats away at the calcium carbonate structures built over
+  centuries. The last dive shop on the island closed yesterday. The desalination plant
+  that kept the resort running failed when algal blooms clogged its intake filters.
+  Maria checks her temperature logger one final time, watching the numbers climb past
+  any threshold for recovery. Like the colonial coral polyps that built these reefs
+  over generations, she cannot survive alone when the entire system collapses. The
+  fever dreams started three days ago when the air conditioning failed and the heat
+  became inescapable, even underwater.
+latitude: 20.423
+location: Cozumel, Quintana Roo, Mexico
+longitude: -86.9223
+name: Maria Elena Vásquez
+occupation: Coral restoration coordinator and dive tour operator
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A waterproof temperature logger that once recorded the gradual
+  warming that killed Palancar Reef - now it just displays flatlined readings above
+  coral survival thresholds, like a cardiac monitor after the patient has died
+thread_id: 1c78a7c7-50a3-4e18-8f88-8af75bc15ec1
+vulnerability_details: Like staghorn coral polyps that cannot survive alone, Maria's
+  livelihood depends entirely on the interconnected web of reef tourism, local dive
+  operators, and marine conservation grants. When the reef system collapses, the entire
+  economic ecosystem dies with it, leaving individuals stranded without the collective
+  structure that sustained them.
+year_documented: 2043

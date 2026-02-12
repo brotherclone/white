@@ -18,6 +18,7 @@ Example: Song with guitar, vocals, fiddle and 10 lyric segments:
 
 import logging
 import os
+import tempfile
 from pathlib import Path
 from typing import List, Optional, Dict
 
@@ -28,8 +29,10 @@ from pydantic import BaseModel, Field
 
 from app.util.audio_io import load_audio
 from app.util.manifest_loader import load_manifest
+from app.util.midi_segment_utils import segment_midi_file
 from app.util.timestamp_audio_extractor import (
     create_segment_specs_from_lrc,
+    create_segment_specs_from_structure,
     duration_to_seconds,
 )
 
@@ -121,8 +124,8 @@ def has_midi_notes_in_segment(
         end_tick = int(end_seconds * ticks_per_second)
 
         # Check for note_on messages in range
-        absolute_tick = 0
         for track in midi.tracks:
+            absolute_tick = 0
             for msg in track:
                 absolute_tick += msg.time
                 if start_tick <= absolute_tick <= end_tick:
@@ -209,31 +212,46 @@ class BuildTrainingSegmentsDB(BaseModel):
             logger.error(f"Failed to load manifest {manifest_path}: {e}")
             return rows
 
-        # Find LRC file
-        lrc_path = (
-            track_dir / manifest.lrc_file
-            if manifest.lrc_file
-            else track_dir / f"{track_id}.lrc"
-        )
-        if not lrc_path.exists():
-            logger.warning(f"No LRC file found: {lrc_path}")
-            return rows
-
         # Find main audio (for structure reference)
         main_audio_path = track_dir / manifest.main_audio_file
         if not main_audio_path.exists():
             logger.warning(f"Main audio not found: {main_audio_path}")
             return rows
 
-        # Create segment specs from LRC + structure
-        segment_specs = create_segment_specs_from_lrc(
-            str(lrc_path),
-            str(main_audio_path),
-            manifest=manifest,
-            max_segment_length=30.0,
-            structure_threshold=2.0,
-            overlap_seconds=2.0,
+        # Find LRC file
+        lrc_path = (
+            track_dir / manifest.lrc_file
+            if manifest.lrc_file
+            else track_dir / f"{track_id}.lrc"
         )
+
+        if lrc_path.exists():
+            # Create segment specs from LRC + structure
+            segment_specs = create_segment_specs_from_lrc(
+                str(lrc_path),
+                str(main_audio_path),
+                manifest=manifest,
+                max_segment_length=30.0,
+                structure_threshold=2.0,
+                overlap_seconds=2.0,
+            )
+        elif manifest.structure:
+            # Fallback: use structure sections for segmentation (instrumental tracks)
+            logger.info(
+                f"No LRC file for {track_id}, falling back to structure-based segmentation "
+                f"({len(manifest.structure)} sections)"
+            )
+            segment_specs = create_segment_specs_from_structure(
+                str(main_audio_path),
+                manifest=manifest,
+                max_segment_length=30.0,
+                overlap_seconds=2.0,
+            )
+        else:
+            logger.warning(
+                f"No LRC file and no structure data for {track_id}, skipping"
+            )
+            return rows
 
         logger.info(
             f"Processing {track_id}: {len(segment_specs)} segments × {len(manifest.audio_tracks)} tracks"
@@ -586,98 +604,165 @@ def clean_joined_schema(df: pl.DataFrame) -> pl.DataFrame:
     return df
 
 
-def embed_audio_and_midi_binaries(
-    df: pl.DataFrame, staged_material_dir: Path, sample_rate: int = 44100
-) -> pl.DataFrame:
-    """Extract and embed audio/MIDI segments as binary data in the dataframe.
+def embed_and_write_chunked(
+    df: pl.DataFrame,
+    staged_material_dir: Path,
+    output_path: Path,
+    sample_rate: int = 44100,
+    chunk_size: int = 500,
+) -> None:
+    """Extract audio/MIDI segments and write to parquet in memory-efficient chunks.
 
-    This creates a self-contained training dataset with embedded binaries,
-    perfect for transferring to training VMs like RunPod.
+    Instead of loading all binary data into memory at once (~60GB), processes
+    rows in chunks and writes each chunk as a row group using pyarrow's
+    incremental ParquetWriter.
 
     Args:
-        df: Training segments dataframe
+        df: Training segments dataframe (metadata only, no binaries)
         staged_material_dir: Path to staged_raw_material directory
+        output_path: Path for output parquet file
         sample_rate: Target sample rate for audio (default: 44100)
-
-    Returns:
-        DataFrame with embedded audio_waveform and midi_binary columns
+        chunk_size: Number of rows to process per chunk (default: 500)
     """
-    import numpy as np
-    from app.util.audio_io import load_audio
+    import pyarrow.parquet as pq
 
     logger.info("\n" + "=" * 70)
-    logger.info("Embedding Audio and MIDI Binaries")
+    logger.info("Embedding Audio and MIDI Binaries (chunked writer)")
     logger.info("=" * 70)
 
-    audio_waveforms = []
-    audio_sample_rates = []
-    midi_binaries = []
-
     total_rows = len(df)
-    logger.info(f"Processing {total_rows:,} track-segment rows...")
+    total_audio = 0
+    total_midi = 0
+    writer = None
 
-    for i, row in enumerate(df.iter_rows(named=True), 1):
-        if i % 100 == 0:
-            logger.info(f"  Progress: {i:,} / {total_rows:,} ({i/total_rows*100:.1f}%)")
+    # Serialize struct columns to JSON strings to avoid polars→arrow
+    # struct conversion bug when slicing DataFrames (child array length mismatch)
+    struct_cols = [
+        col
+        for col, dtype in zip(df.columns, df.dtypes)
+        if dtype.base_type() == pl.Struct
+    ]
+    if struct_cols:
+        logger.info(
+            f"  Serializing {len(struct_cols)} struct column(s) to JSON: {struct_cols}"
+        )
+        df = df.with_columns(
+            [pl.col(c).struct.json_encode().alias(c) for c in struct_cols]
+        )
 
-        # Extract audio segment
-        audio_waveform = None
-        sr = None
+    logger.info(f"Processing {total_rows:,} rows in chunks of {chunk_size}...")
 
-        if row["has_audio"] and row["source_audio_file"]:
-            try:
-                audio_file = Path(row["source_audio_file"])
-                if audio_file.exists():
-                    # Load and extract segment
-                    audio, sr = load_audio(str(audio_file), sr=sample_rate)
-                    start_sample = int(row["start_seconds"] * sr)
-                    end_sample = int(row["end_seconds"] * sr)
-                    segment = audio[start_sample:end_sample]
+    for chunk_start in range(0, total_rows, chunk_size):
+        chunk_end = min(chunk_start + chunk_size, total_rows)
+        chunk_df = df.slice(chunk_start, chunk_end - chunk_start)
 
-                    # Convert to bytes (float32)
-                    audio_waveform = segment.astype(np.float32).tobytes()
-                else:
-                    logger.warning(f"Audio file not found: {audio_file}")
-            except Exception as e:
-                logger.warning(f"Failed to load audio for row {i}: {e}")
+        audio_waveforms = []
+        audio_sample_rates = []
+        midi_binaries = []
 
-        audio_waveforms.append(audio_waveform)
-        audio_sample_rates.append(sr if sr else sample_rate)
+        for i, row in enumerate(chunk_df.iter_rows(named=True)):
+            global_i = chunk_start + i + 1
+            if global_i % 500 == 0:
+                logger.info(
+                    f"  Progress: {global_i:,} / {total_rows:,}"
+                    f" ({global_i / total_rows * 100:.1f}%)"
+                )
 
-        # Load MIDI file as binary
-        midi_binary = None
+            # Extract audio segment
+            audio_waveform = None
+            sr = None
 
-        if row["has_midi"] and row["midi_file"]:
-            try:
-                midi_file = staged_material_dir / row["song_id"] / row["midi_file"]
-                if midi_file.exists():
-                    with open(midi_file, "rb") as f:
-                        midi_binary = f.read()
-                else:
-                    logger.debug(f"MIDI file not found: {midi_file}")
-            except Exception as e:
-                logger.warning(f"Failed to load MIDI for row {i}: {e}")
+            if row["has_audio"] and row["source_audio_file"]:
+                try:
+                    audio_file = Path(row["source_audio_file"])
+                    if audio_file.exists():
+                        audio, sr = load_audio(str(audio_file), sr=sample_rate)
+                        start_sample = int(row["start_seconds"] * sr)
+                        end_sample = int(row["end_seconds"] * sr)
+                        segment = audio[start_sample:end_sample]
+                        audio_waveform = segment.astype(np.float32).tobytes()
+                    else:
+                        logger.warning(f"Audio file not found: {audio_file}")
+                except Exception as e:
+                    logger.warning(f"Failed to load audio for row {global_i}: {e}")
 
-        midi_binaries.append(midi_binary)
+            audio_waveforms.append(audio_waveform)
+            audio_sample_rates.append(sr if sr else sample_rate)
 
-    # Add binary columns to dataframe
-    df = df.with_columns(
-        [
-            pl.Series("audio_waveform", audio_waveforms, dtype=pl.Binary),
-            pl.Series("audio_sample_rate", audio_sample_rates, dtype=pl.Int32),
-            pl.Series("midi_binary", midi_binaries, dtype=pl.Binary),
-        ]
-    )
+            # Load and segment MIDI file to match audio time range
+            midi_binary = None
 
-    # Calculate sizes
-    audio_count = sum(1 for w in audio_waveforms if w is not None)
-    midi_count = sum(1 for m in midi_binaries if m is not None)
+            if row["has_midi"] and row["midi_file"]:
+                try:
+                    midi_file = Path(row["midi_file"])
+                    if midi_file.exists():
+                        with tempfile.NamedTemporaryFile(
+                            suffix=".mid", delete=False
+                        ) as tmp:
+                            tmp_path = tmp.name
+                        success = segment_midi_file(
+                            str(midi_file),
+                            row["start_seconds"],
+                            row["end_seconds"],
+                            tmp_path,
+                        )
+                        if success:
+                            with open(tmp_path, "rb") as f:
+                                midi_binary = f.read()
+                        else:
+                            logger.warning(
+                                f"MIDI segmentation failed for row {global_i}"
+                            )
+                        os.unlink(tmp_path)
+                    else:
+                        logger.debug(f"MIDI file not found: {midi_file}")
+                except Exception as e:
+                    logger.warning(f"Failed to load MIDI for row {global_i}: {e}")
 
-    logger.info("\n✅ Embedded binaries:")
-    logger.info(f"   Audio segments: {audio_count:,} / {total_rows:,}")
-    logger.info(f"   MIDI files: {midi_count:,} / {total_rows:,}")
+            midi_binaries.append(midi_binary)
 
-    return df
+        # Add binary columns to chunk
+        chunk_with_binaries = chunk_df.with_columns(
+            [
+                pl.Series("audio_waveform", audio_waveforms, dtype=pl.Binary),
+                pl.Series("audio_sample_rate", audio_sample_rates, dtype=pl.Int32),
+                pl.Series("midi_binary", midi_binaries, dtype=pl.Binary),
+            ]
+        )
+
+        total_audio += sum(1 for w in audio_waveforms if w is not None)
+        total_midi += sum(1 for m in midi_binaries if m is not None)
+
+        # Convert to pyarrow and write as row group
+        # rechunk() required: sliced DataFrames retain parent array refs,
+        # causing struct column length mismatches in arrow conversion
+        arrow_table = chunk_with_binaries.rechunk().to_arrow()
+
+        if writer is None:
+            writer = pq.ParquetWriter(
+                output_path,
+                arrow_table.schema,
+                compression="zstd",
+                compression_level=3,
+            )
+
+        writer.write_table(arrow_table)
+        logger.info(
+            f"  Wrote chunk {chunk_start + 1}-{chunk_end}"
+            f" ({chunk_end - chunk_start} rows)"
+        )
+
+        # Free memory
+        del chunk_with_binaries, audio_waveforms, midi_binaries, arrow_table
+
+    if writer is not None:
+        writer.close()
+
+    file_size_gb = output_path.stat().st_size / (1024**3)
+    logger.info("\n✅ Embedded binaries (chunked):")
+    logger.info(f"   Audio segments: {total_audio:,} / {total_rows:,}")
+    logger.info(f"   MIDI files: {total_midi:,} / {total_rows:,}")
+    logger.info(f"   File size: {file_size_gb:.2f} GB")
 
 
 def main():
@@ -739,7 +824,7 @@ def main():
             segments_df = pl.read_parquet(segments_path)
             joined_df = join_with_manifest_db(segments_df, manifest_path)
 
-            joined_path = builder.output_dir / "training_data_full.parquet"
+            joined_path = builder.output_dir / "training_segments_metadata.parquet"
             joined_df.write_parquet(joined_path, compression="snappy")
 
             print(f"✅ Full training data: {joined_path}")
@@ -747,39 +832,18 @@ def main():
 
             # Optional: embed binaries for self-contained dataset
             if args.embed_binaries:
-                print("\n🔄 Embedding audio and MIDI binaries...")
-                embedded_df = embed_audio_and_midi_binaries(
-                    joined_df, builder.staged_material_dir, sample_rate=args.sample_rate
+                embedded_path = builder.output_dir / "training_segments_media.parquet"
+                print("\n🔄 Embedding audio and MIDI binaries (chunked writer)...")
+                embed_and_write_chunked(
+                    joined_df,
+                    builder.staged_material_dir,
+                    embedded_path,
+                    sample_rate=args.sample_rate,
+                    chunk_size=500,
                 )
-
-                embedded_path = builder.output_dir / "training_data_embedded.parquet"
-
                 print(
-                    "\n📝 Writing parquet file (this may take several minutes for large datasets)..."
+                    "\n💡 This file contains embedded audio/MIDI and is ready to transfer to RunPod!"
                 )
-                try:
-                    # Use zstd compression for better binary data compression
-                    # and write with row_group_size to handle large files better
-                    embedded_df.write_parquet(
-                        embedded_path,
-                        compression="zstd",
-                        compression_level=3,  # Balance between speed and compression
-                        row_group_size=1000,  # Write in chunks for better memory handling
-                    )
-
-                    file_size_gb = embedded_path.stat().st_size / (1024**3)
-                    print(f"\n✅ Self-contained training data: {embedded_path}")
-                    print(
-                        f"   Rows: {len(embedded_df):,}, Columns: {len(embedded_df.columns)}"
-                    )
-                    print(f"   Size: {file_size_gb:.2f} GB")
-                    print(
-                        "\n💡 This file contains embedded audio/MIDI and is ready to transfer to RunPod!"
-                    )
-                except Exception as e:
-                    print(f"\n❌ Error writing parquet file: {e}")
-                    print("   File may be incomplete or corrupted")
-                    raise
         else:
             print(f"⚠️  Manifest DB not found: {manifest_path}")
 

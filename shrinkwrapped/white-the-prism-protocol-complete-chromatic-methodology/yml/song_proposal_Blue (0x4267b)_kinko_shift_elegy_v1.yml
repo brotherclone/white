@@ -1,0 +1,49 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This is the requiem for the year that Gabriel Walsh spent recording the
+  ambient frequencies of late-night Saugus - January to December 2002, when instead
+  of chasing music in the city, he took the overnight shift at Kinko''s on Route 1.
+  The song captures the specific melancholy of fluorescent-lit nights, documenting
+  the quantum archaeology of a timeline where artistic ambition was traded for the
+  steady hum of DocuColor 2060 copy machines. Each verse chronicles the ritual: waking
+  at 9:30pm in studio apartment #2B above Sal''s Pizza, the 0.7-mile walk past the
+  Dunkin'' Donuts, the 30-minute overlap with Denise Kowalski at shift change, and
+  Marcus Chen''s twice-weekly visits at 2am to make flyers for Sleeping Giant. The
+  bridge preserves the exact moment of temporal severance - Ali''s voice through the
+  cordless phone at 3:17am on August 23rd, the relationship ending while Gabriel stood
+  alone under buzzing lights. This isn''t metaphorical folk rock but documentary preservation
+  of a specific Massachusetts winter, the sound of possibility being recorded over
+  by necessity, the ambient frequencies of what-if preserved in magnetic tape degradation.
+  The trembling precision isn''t from poison but from the recognition that sometimes
+  the most honest music comes from the most mundane circumstances - a year of morning
+  shifts that existed only in the space between security and ambition.'
+genres:
+- folk rock
+- americana
+- indie folk
+- alt-country
+iteration_id: kinko_shift_elegy_v1
+iteration_number: null
+key: A minor
+mood:
+- melancholic
+- nostalgic
+- contemplative
+- lonely
+- wistful
+- resigned
+- haunted
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Fluorescent Frequencies

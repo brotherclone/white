@@ -182,7 +182,7 @@ audio_tracks:
     description: gated, but roomy mic picking up multiple hits
     audio_file: 01_01_25.wav
     midi_group_file: 01_01_drums.mid
-  - id: 20
+  - id: 22
     description: big, over-modulated floor tom
     audio_file: 01_01_26.wav
     midi_group_file: 01_01_drums.mid

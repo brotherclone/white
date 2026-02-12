@@ -5,7 +5,7 @@
 ```bash
 # 1. Upload your data to /workspace/data/
 #    - base_manifest_db.parquet (required)
-#    - training_data_embedded.parquet (optional, 69GB)
+#    - training_segments_media.parquet (optional, 69GB)
 
 # 2. Upload runpod_train_phase4.py to /workspace/
 
@@ -34,7 +34,7 @@ Your data should be in `/workspace/data/`:
 ```
 /workspace/data/
 ├── base_manifest_db.parquet       # Required (892 segments, ~4MB)
-└── training_data_embedded.parquet # Optional (69GB with embeddings)
+└── training_segments_media.parquet # Optional (69GB with embeddings)
 ```
 
 **Option A: With embeddings (faster training)**

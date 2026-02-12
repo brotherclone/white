@@ -44,6 +44,11 @@ from app.structures.concepts.white_facet_system import WhiteFacetSystem
 from app.structures.enums.synthesis_prompt_template import SynthesisPromptTemplate
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
+from app.util.generate_negative_constraints import (
+    format_for_prompt,
+    generate_constraints,
+)
+from app.util.shrinkwrap_chain_artifacts import shrinkwrap
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 logging.basicConfig(level=logging.INFO)
@@ -116,6 +121,35 @@ class WhiteAgent(BaseModel):
         if len(enabled_agents) < 8:
             logger.info(f"🎯 Enabled agents: {', '.join(enabled_agents)}")
 
+        # Auto-shrinkwrap any new chain artifact threads before loading constraints
+        artifacts_dir = Path(self._artifact_base_path())
+        output_dir = Path(os.getenv("SHRINKWRAP_OUTPUT_DIR", "shrinkwrapped"))
+        if artifacts_dir.exists():
+            try:
+                result = shrinkwrap(artifacts_dir, output_dir)
+                if result["processed"] > 0:
+                    logger.info(f"Shrinkwrapped {result['processed']} new thread(s)")
+            except Exception as e:
+                logger.warning(f"Auto-shrinkwrap failed: {e}")
+
+        # Load negative constraints from shrinkwrapped corpus (all prior results)
+        negative_constraints_text = None
+        shrinkwrap_index = Path("shrinkwrapped/index.yml")
+        constraints_path = (
+            shrinkwrap_index if shrinkwrap_index.exists() else output_dir / "index.yml"
+        )
+        if constraints_path.exists():
+            try:
+                constraints = generate_constraints(constraints_path)
+                if "error" not in constraints:
+                    negative_constraints_text = format_for_prompt(constraints)
+                    logger.info(
+                        f"Loaded negative constraints from {constraints_path} "
+                        f"({constraints['thread_count']} prior results)"
+                    )
+            except Exception as e:
+                logger.warning(f"Failed to load negative constraints: {e}")
+
         workflow = self.build_workflow()
         thread_id = str(uuid4())
         initial_state = MainAgentState(
@@ -133,6 +167,7 @@ class WhiteAgent(BaseModel):
             run_finished=False,
             enabled_agents=enabled_agents,
             stop_after_agent=stop_after_agent,
+            negative_constraints=negative_constraints_text,
         )
         config = RunnableConfig(
             configurable={"thread_id": thread_id}, recursion_limit=50
@@ -361,6 +396,12 @@ class WhiteAgent(BaseModel):
         prompt, facet = WhiteFacetSystem.build_white_initial_prompt(
             user_input=None, use_weights=True
         )
+
+        # Inject negative constraints from prior results
+        if state.negative_constraints:
+            prompt = prompt + "\n\n" + state.negative_constraints
+            logger.info("Injected negative constraints into initial proposal prompt")
+
         facet_metadata = WhiteFacetSystem.log_facet_selection(facet)
         logger.info(f" Prism using {facet.value.upper()} lens")
         logger.info(f" {facet_metadata['description']}")
@@ -590,6 +631,10 @@ You must provide a complete, final song proposal with:
 
 Structure your proposal as the final, complete vision - ready for human implementation.
 """
+            # Inject negative constraints into rewrite prompt
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
+
             claude = self._get_claude_supervisor()
             proposer = claude.with_structured_output(SongProposalIteration)
         try:

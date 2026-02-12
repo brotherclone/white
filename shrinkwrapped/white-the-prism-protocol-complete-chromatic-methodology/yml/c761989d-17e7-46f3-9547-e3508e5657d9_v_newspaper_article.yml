@@ -1,0 +1,19 @@
+artifact_id: c761989d-17e7-46f3-9547-e3508e5657d9
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A modified 7-track recording system operating at non-standard speeds,
+  used by Temporal Specimens to create "consciousness training music" through layered
+  field recordings processed in perpetual incompleteness patterns. This machine became
+  legendary as the device that could transform unclassified sounds into cognitive
+  disruption tools, mysteriously vanishing after the disorientation incidents, leaving
+  only its effects as proof of its revolutionary pedagogical infiltration capabilities.
+file_name: c761989d-17e7-46f3-9547-e3508e5657d9_v_newspaper_article.yml
+name: The Whitman 7-Track Console
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 1a4232e8-ade7-4c4a-b405-d76774fbb306

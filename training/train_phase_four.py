@@ -74,7 +74,7 @@ def check_data():
         print("\nExpected structure:")
         print("  /workspace/data/")
         print("    ├── base_manifest_db.parquet")
-        print("    └── training_data_embedded.parquet (optional, 69GB)")
+        print("    └── training_segments_media.parquet (optional, 69GB)")
         sys.exit(1)
 
     # Check base manifest (required)
@@ -87,13 +87,13 @@ def check_data():
     print(f"✅ base_manifest_db.parquet ({manifest_size_mb:.1f} MB)")
 
     # Check embeddings (optional but recommended)
-    embedded = data_dir / "training_data_embedded.parquet"
+    embedded = data_dir / "training_segments_media.parquet"
     if embedded.exists():
         size_gb = embedded.stat().st_size / (1024**3)
-        print(f"✅ training_data_embedded.parquet ({size_gb:.1f} GB)")
+        print(f"✅ training_segments_media.parquet ({size_gb:.1f} GB)")
         print("   Using pre-computed embeddings")
     else:
-        print("⚠️  training_data_embedded.parquet not found")
+        print("⚠️  training_segments_media.parquet not found")
         print("   Will compute embeddings on-the-fly (slower)")
 
     print()
@@ -187,7 +187,7 @@ class PrecomputedEmbeddingLoader:
 
 def find_embedding_file(data_dir: Path) -> Optional[Path]:
     """Find the best available embedding file."""
-    candidates = ["training_data_with_embeddings.parquet", "training_data_embedded.parquet"]
+    candidates = ["training_data_with_embeddings.parquet", "training_segments_media.parquet"]
     for filename in candidates:
         path = data_dir / filename
         if path.exists():
@@ -465,7 +465,7 @@ def main():
         embedding_loader = PrecomputedEmbeddingLoader(embedding_file)
     else:
         print("   WARNING: No embedding file found - training with random embeddings!")
-        print("   Expected: training_data_with_embeddings.parquet or training_data_embedded.parquet")
+        print("   Expected: training_data_with_embeddings.parquet or training_segments_media.parquet")
 
     # Split
     train_size = int(len(df) * config['data']['train_split'])

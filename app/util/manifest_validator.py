@@ -176,7 +176,7 @@ def validate_timestamp_format(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str
         Tuple of (is_valid, list_of_error_messages)
     """
     time_stamp_errors = []
-    timestamp_pattern = re.compile(r"^\[\d{2}:\d{2}\.\d{3}\]$")
+    timestamp_pattern = re.compile(r"^\[\d{1,2}:\d{2}\.\d{2,3}\]$")
 
     if not isinstance(yaml_data, dict) or "structure" not in yaml_data:
         return True, time_stamp_errors
@@ -931,6 +931,42 @@ def validate_player_names(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
+def validate_unique_track_ids(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """
+    Validates that all audio_tracks have unique IDs.
+
+    Duplicate track IDs cause identical segment_ids during extraction,
+    producing corrupt training data.
+    """
+    errors = []
+
+    if not isinstance(yaml_data, dict):
+        return True, errors
+
+    audio_tracks = yaml_data.get("audio_tracks", [])
+    if not isinstance(audio_tracks, list):
+        return True, errors
+
+    seen: Dict[int, List[str]] = {}
+    for i, track in enumerate(audio_tracks):
+        if not isinstance(track, dict):
+            continue
+        track_id = track.get("id")
+        if track_id is None:
+            continue
+        desc = track.get("description", f"track index {i}")
+        seen.setdefault(track_id, []).append(desc)
+
+    for track_id, descriptions in seen.items():
+        if len(descriptions) > 1:
+            desc_list = ", ".join(f"'{d}'" for d in descriptions)
+            errors.append(
+                f"Duplicate track id {track_id} used by {len(descriptions)} tracks: {desc_list}"
+            )
+
+    return len(errors) == 0, errors
+
+
 def validate_no_field_typos(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
     """
     Validates that audio_tracks don't contain common field name typos.
@@ -1079,6 +1115,12 @@ def validate_yaml_file(file_path: str) -> Tuple[bool, List[str]]:
         is_valid, typo_errors = validate_no_field_typos(yaml_data)
         if not is_valid:
             for err in typo_errors:
+                errors.append(f"{os.path.basename(file_path)}: {err}")
+
+        # Run validation: unique track IDs (duplicates cause corrupt segment_ids)
+        is_valid, dupe_id_errors = validate_unique_track_ids(yaml_data)
+        if not is_valid:
+            for err in dupe_id_errors:
                 errors.append(f"{os.path.basename(file_path)}: {err}")
 
         tk_errors = check_no_tk_fields(yaml_data)

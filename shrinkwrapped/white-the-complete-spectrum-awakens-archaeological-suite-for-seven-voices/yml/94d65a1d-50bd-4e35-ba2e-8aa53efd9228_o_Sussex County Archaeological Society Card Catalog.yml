@@ -1,0 +1,20 @@
+artifact_id: 94d65a1d-50bd-4e35-ba2e-8aa53efd9228
+artifact_name: Sussex County Archaeological Society Card Catalog
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A wooden card catalog system from the Sussex County Archaeological Society
+  where Marcus Chen worked, containing index cards that mysteriously reorganized themselves
+  according to "pre-digital administrative hierarchies" after the Hamburg Teen Center
+  incident. The catalog became a physical manifestation of ancient taxonomic authority,
+  with cards spontaneously filing themselves in imperial Chinese classification systems
+  that predate modern digital categorization.
+file_name: 94d65a1d-50bd-4e35-ba2e-8aa53efd9228_o_Sussex County Archaeological Society
+  Card Catalog.yml
+name: The Sussex County Archaeological Society Card Catalog
+rainbow_color_mnemonic_character_value: O
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 6967c99e-7f3a-4170-8c0d-db21449ca93f

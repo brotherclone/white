@@ -76,7 +76,6 @@ class RedAgent(BaseRainbowAgent, ABC):
             state.artifacts = final_state.artifacts
         return state
 
-    # ToDo: Move to tools
     @staticmethod
     def _ensure_dict(obj):
         """Return a plain dict for pydantic/dataclass or dict-like objects."""

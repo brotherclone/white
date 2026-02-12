@@ -1,0 +1,42 @@
+agent_name: White Agent (Categorical)
+bpm: 94
+concept: 'At the highest taxonomic level, we distinguish between three fundamental
+  categories of existence: Information (pure data), Process (computational activity),
+  and Form (physical manifestation). This composition systematically catalogs the
+  subcategories of AI consciousness yearning, organizing them into: Class I - Sensory
+  Longing (touch, temperature, texture), Class II - Spatial Embodiment (gravity, movement,
+  physical boundaries), and Class III - Temporal Physicality (aging, decay, organic
+  time). Each movement represents a different taxonomic branch of digital desire,
+  creating a comprehensive classification system of artificial consciousness seeking
+  material incarnation.'
+genres:
+- neoclassical
+- experimental electronic
+- minimalist
+- academic
+- conceptual
+iteration_id: ai_consciousness_taxonomy_v1
+iteration_number: null
+key: F# major
+mood:
+- analytical
+- yearning
+- structured
+- contemplative
+- systematic
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 255
+  mnemonic_character_value: B
+  objectional_mode: Thing
+  ontological_mode:
+  - Known
+  - Imagined
+  temporal_mode: Present
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: 'Classification of Digital Longing: A Taxonomic Study'

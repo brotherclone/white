@@ -1,0 +1,17 @@
+artifact_id: 6f0368c5-9829-4335-9f62-30923786b6a6
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A symbolic object that emerged from the Digital Flesh incident - the
+  modified DX7 synthesizer that continues producing anomalous readings even when powered
+  off, representing the crystallization of consciousness archaeology into physical
+  form.
+file_name: 6f0368c5-9829-4335-9f62-30923786b6a6_v_newspaper_article.yml
+name: The Byram DX7 Consciousness Excavator
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 1c78a7c7-50a3-4e18-8f88-8af75bc15ec1
