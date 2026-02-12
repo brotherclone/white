@@ -1,0 +1,57 @@
+adaptation_attempts:
+- Created digital archive of traditional ecological calendar
+- Attempted to establish greenhouse for heritage seeds
+- Worked with climate scientists to predict new seasonal patterns
+- Tried to teach urban grandchildren traditional plant knowledge via video calls
+age: 47
+artifact_id: 23defefb-7dde-4978-a3ed-43b2e042bbd8
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Each dawn, Elena walked the traditional route markers, checking for
+  the native plants that once guided seasonal movements - milkweed, asters, goldenrod.
+  She maintained a seed library of heritage varieties, taught children traditional
+  weather reading, and coordinated with other families about seasonal migration timing.
+  By 2034, she spends her days documenting disappearing plant communities and trying
+  to adapt traditional knowledge to unpredictable climate patterns.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Habitat destruction through industrial agriculture expansion
+  and pesticide contamination of traditional seasonal camps
+family_situation: Daughter works in Mexico City, disconnected from traditional knowledge.
+  Grandchildren speak only Spanish, not the indigenous language that contains the
+  migration wisdom. Extended family scattered across borders, seasonal gathering patterns
+  broken.
+file_name: 23defefb-7dde-4978-a3ed-43b2e042bbd8_g_last_human.json
+final_thought: The children will never know which stars to follow, which plants mean
+  it's time to move. We were the memory keepers, and the memory is dying with us.
+last_days_scenario: Elena sits in the abandoned seasonal camp where her grandmother
+  taught her to read weather patterns in milkweed growth. The corporate soy fields
+  stretch endlessly where diverse native plants once guided her people's movements.
+  Her daughter, working in Mexico City, doesn't know the old routes - the knowledge
+  dies with Elena. She holds her grandmother's carved gourd, filled with seeds from
+  plants that no longer grow here, poisoned by the same chemicals that killed the
+  monarchs. The timing is all wrong now anyway - spring comes when winter should,
+  the rains when drought is expected. Even if the plants survived, even if her daughter
+  remembered, the seasons themselves have become unreadable.
+latitude: 19.5665
+location: Michoacán, Mexico
+longitude: -101.7068
+name: Elena Vasquez-Chen
+occupation: Traditional ecological knowledge keeper and seasonal migration coordinator
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Hand-carved gourd seed container passed down through seven generations,
+  now holding seeds from plants that no longer grow in their traditional locations
+thread_id: 6967c99e-7f3a-4170-8c0d-db21449ca93f
+vulnerability_details: Like monarchs whose multi-generational migration requires each
+  generation to know the next stage, Elena's family carried indigenous agricultural
+  knowledge across seasonal migrations for centuries - but climate disruption broke
+  the timing, and corporate monoculture poisoned the traditional waypoints where her
+  people would rest and gather food
+year_documented: 2034

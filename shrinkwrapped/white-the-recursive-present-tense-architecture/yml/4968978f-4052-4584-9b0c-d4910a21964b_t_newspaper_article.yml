@@ -1,0 +1,18 @@
+artifact_id: 4968978f-4052-4584-9b0c-d4910a21964b
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A modified mechanical metronome found among Temporal Bracket's equipment
+  that clicks seven beats then pauses for an eighth that never comes, creating a perpetual
+  temporal gap where consciousness fragments can be archaeologically recovered. The
+  missing beat becomes an exploitable surveillance vulnerability, transforming each
+  rhythmic cycle into a salvage protocol for preserving awareness during system crashes.
+file_name: 4968978f-4052-4584-9b0c-d4910a21964b_t_newspaper_article.yml
+name: The Sparta Station 7/8 Metronome
+rainbow_color_mnemonic_character_value: T
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: cedb040b-307a-423c-8797-07c37dae5e26

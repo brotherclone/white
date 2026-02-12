@@ -1,0 +1,78 @@
+anthropogenic_factors:
+- Atmospheric CO2 levels exceeding 420ppm (2024)
+- Ocean temperature increase 1.5°C above pre-industrial
+- Agricultural runoff (nitrogen, phosphorus loading)
+- Coastal development destroying mangrove nurseries
+- Overfishing removing herbivorous fish that control algae
+- Sunscreen chemicals (oxybenzone) in tourist areas
+artifact_id: 40fe33a0-2952-4450-8f68-f55210c0fb93
+artifact_name: staghorn_coral
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+cascade_effects:
+- Loss of reef structure - 3D habitat collapses to 2D rubble field
+- 25% of all marine species lose critical habitat
+- Caribbean fisheries collapse (600+ species depend on reef)
+- Coastal erosion accelerates without reef wave-breaking
+- Tourism economies collapse in 26 Caribbean nations
+- Protein source for 100+ million people disappears
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- species_extinction
+common_name: Staghorn coral
+ecosystem_role: Reef architect - fastest growing coral, creates 3D structure for entire
+  ecosystem
+endemic: false
+extinction_year: 2035
+file_name: 40fe33a0-2952-4450-8f68-f55210c0fb93_g_staghorn_coral.yml
+habitat: Shallow Caribbean reef systems, 5-25m depth
+human_parallel_hints:
+- Communities whose infrastructure is crumbling
+- Fever dreams during climate events
+- Slowly dissolving institutional structures
+- Generational projects abandoned mid-construction
+- Tourism-dependent economies with no Plan B
+iucn_status: Critically Endangered (regional extinction Caribbean by 2035)
+lifespan_years: 10.0
+movement_pattern: sessile
+narrative_potential_score: 0.92
+population_trajectory:
+- confidence: high
+  population: abundant throughout Caribbean
+  source: NOAA historical surveys
+  year: 1980
+- confidence: high
+  population: 97% decline from 1980 baseline
+  source: IUCN Red List assessment
+  year: 2005
+- confidence: high
+  population: 98.7% decline, scattered remnant colonies
+  source: Caribbean coral disease monitoring
+  year: 2014
+- confidence: high
+  population: 99.3% decline, genetic bottleneck reached
+  source: NOAA coral reef monitoring
+  year: 2024
+- confidence: medium-high
+  population: functional extinction (Caribbean)
+  source: projected based on warming trajectory
+  year: 2035
+primary_cause: ocean_warming
+rainbow_color_mnemonic_character_value: G
+range_km2: 2700000.0
+scientific_name: Acropora cervicornis
+secondary_causes:
+- White band disease
+- Ocean acidification (pH decline)
+- Hurricane damage (increased intensity)
+- Algae overgrowth from nutrient pollution
+size_category: colonial/modular
+symbolic_resonance:
+- Colonial organism - individuals can't survive alone
+- Builds structures that outlast individual polyps by centuries
+- Death by fever (bleaching from temperature)
+- Dissolving in the medium it evolved in (acidification)
+- Killed by the atmosphere (CO2 absorption)
+symbolic_weight: 0.95
+taxonomic_group: Scleractinian coral
+thread_id: 1c78a7c7-50a3-4e18-8f88-8af75bc15ec1

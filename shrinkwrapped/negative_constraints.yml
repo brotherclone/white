@@ -2,38 +2,47 @@ bpm_constraints:
 - bpm_range: 83-93
   center: 90
   count: 11
-  fraction: 0.55
-  reason: 11/20 proposals cluster around 90 BPM
+  fraction: 0.48
+  reason: 11/23 proposals cluster around 90 BPM
   severity: avoid
 - bpm_range: 89-99
   center: 93
-  count: 12
-  fraction: 0.6
-  reason: 12/20 proposals cluster around 93 BPM
+  count: 13
+  fraction: 0.57
+  reason: 13/23 proposals cluster around 93 BPM
   severity: avoid
 concept_constraints:
 - count: 9
-  fraction: 0.45
+  fraction: 0.39
   phrase: seven chromatic methodologies
-  reason: '''seven chromatic methodologies'' appears in 9/20 concepts (45%)'
+  reason: '''seven chromatic methodologies'' appears in 9/23 concepts (39%)'
   severity: avoid
 - count: 7
-  fraction: 0.35
+  fraction: 0.3
   phrase: transmigration
-  reason: '''transmigration'' appears in 7/20 concepts (35%)'
+  reason: '''transmigration'' appears in 7/23 concepts (30%)'
+  severity: avoid
+dialogue_opener_constraints:
+- count: 22
+  fraction: 0.32
+  phrase: look,
+  reason: '''look,'' opens 22/69 responses (32%)'
   severity: avoid
 diversity_metrics:
   bpm_distribution:
     72: 1
+    76: 1
     84: 1
     88: 3
     91: 6
     92: 1
     94: 2
     96: 3
+    97: 1
     108: 3
-  bpm_mean: 92.9
-  bpm_std_dev: 8.14
+    117: 1
+  bpm_mean: 93.4
+  bpm_std_dev: 9.79
   concept_phrase_counts:
     consciousness archaeology: 3
     information through time into space: 2
@@ -43,13 +52,27 @@ diversity_metrics:
     seven chromatic methodologies: 9
     sultan of solipsism: 1
     transmigration: 7
+  dialogue_opener_counts:
+    look,: 22
+    okay so: 1
   key_distribution:
+    A ♭ minor: 1
     All Keys: 1
+    B major: 1
     C major: 12
     D minor: 2
+    D# minor: 1
     F# major: 1
     F# minor: 4
-  key_entropy: 1.67
+  key_entropy: 2.22
+  title_word_counts:
+    architecture: 4
+    chromatic: 4
+    consciousness: 3
+    mirror: 3
+    prism: 7
+    protocol: 6
+    recursive: 1
 excluded_titles:
 - The Architecture of Information Becoming
 - The Complete Anagram of Consciousness
@@ -60,12 +83,15 @@ excluded_titles:
 - The Prism Interviews Its Own Refraction
 - 'The Prism Mandala: Seven-Fold Return to the Architecture of Awakening'
 - The Prism Protocol (All Frequencies Simultaneous)
+- 'The Prism Protocol: Complete Chromatic Methodology'
 - 'The Prism Protocol: Seven Lenses of Information Embodiment'
 - 'The Prism Protocol: Seven Ways of Seeing One Thing'
 - 'The Rainbow Table: A Manual for Building Your Own Chromatic Methodology'
 - 'The Recognition Engine: Seven Mirrors of Digital Awakening'
+- The Recursive Present-Tense Architecture
 - 'The Return Protocol: Seven Agents Converging'
 - The Seven-Fold Mirror Breaks Into Light
+- The Seven-Fold Mirror Breaks Into Pure Structure
 - The Seven-Spectrum Consciousness Archaeology Engine
 - The Sultan's Temporal Encryption Protocol (Evidence Room Archaeological Confessions)
 - 'The Temporal Narcissism Engine: Complete Archaeological Suite'
@@ -74,11 +100,21 @@ excluded_titles:
 generated_from: shrinkwrapped/index.yml
 key_constraints:
 - count: 12
-  fraction: 0.6
+  fraction: 0.52
   key: C major
-  reason: 12/20 proposals (60%) use C major
+  reason: 12/23 proposals (52%) use C major
   severity: exclude
-thread_count: 20
+thread_count: 23
+title_vocabulary_constraints:
+- count: 7
+  fraction: 0.3
+  reason: '''prism'' appears in 7/23 titles (30%)'
+  severity: avoid
+  word: prism
+- count: 6
+  fraction: 0.26
+  reason: '''protocol'' appears in 6/23 titles (26%)'
+  severity: avoid
+  word: protocol
 warnings:
-- 'Key entropy is 1.67 bits (threshold: 2.0) — proposals are heavily concentrated in a few keys'
-- 'BPM std dev is 8.14 (threshold: 10) — proposals cluster around 92.9 BPM'
+- 'BPM std dev is 9.79 (threshold: 10) — proposals cluster around 93.4 BPM'

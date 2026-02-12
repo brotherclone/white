@@ -1,0 +1,50 @@
+agent_name: Sub-Arbitrary (Green Agent)
+bpm: 72
+concept: This composition documents the synchronized extinction of skilled knowledge
+  and essential species through the medium of trembling precision. Maria Elena's pesticide-damaged
+  hands mirror the erratic flight patterns of the last rusty patched bees - both victims
+  of the same neonicotinoid cascade that destroys the delicate motor control required
+  for pollination work. The 3/4 waltz time signature reflects the unsteady rhythm
+  of trembling hands attempting their grandmother's steady pollination technique,
+  while the 72 BPM matches the slowing heartbeat of poisoned systems failing in real
+  time. Field recordings capture the absolute silence of dawn without bee song, punctuated
+  by the mechanical hum of robotic pollinators. This is not music about extinction
+  - this IS extinction's temporal texture, the way knowledge dies in hands, ecosystems
+  die in silence, and three generations of accumulated toxins finally claim their
+  inheritance. The G minor tonality resonates at the frequency of cellular breakdown,
+  while the tremolo effects translate neurological deterioration into sonic decay
+  that listeners feel as their own hands begin to shake.
+genres:
+- dark ambient
+- field recording
+- drone
+- memorial composition
+- toxic soundscape
+- ecological requiem
+iteration_id: trembling_hands_silent_wings_v1
+iteration_number: null
+key: G minor
+mood:
+- elegiac
+- trembling
+- silent
+- memorial
+- toxic
+- precise
+- intimate
+- vanishing
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 65280
+  mnemonic_character_value: G
+  objectional_mode: Thing
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 3
+timestamp: null
+title: The Last Pollination

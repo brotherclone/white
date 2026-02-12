@@ -1,0 +1,78 @@
+anthropogenic_factors:
+- Illegal gillnet fishing for totoaba
+- Totoaba swim bladder trade to China ($20,000+ per bladder)
+- Insufficient enforcement of marine protected areas
+- Economic desperation in fishing communities
+- Organized crime involvement in totoaba trade
+artifact_id: 77adfd03-12db-4285-b42b-e85b64aaea74
+artifact_name: vaquita_porpoise
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+cascade_effects:
+- Gulf of California ecosystem predator-prey imbalance
+- Totoaba also critically endangered (swim bladders worth more than cocaine)
+- Fishing community economic collapse in San Felipe
+- Marine protected area credibility crisis
+- Loss of top predator creates trophic cascade
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- species_extinction
+common_name: Vaquita porpoise
+ecosystem_role: Top predator for small fish and squid in upper Gulf of California
+endemic: true
+extinction_year: 2028
+file_name: 77adfd03-12db-4285-b42b-e85b64aaea74_g_vaquita_porpoise.yml
+habitat: Upper Gulf of California, Mexico
+human_parallel_hints:
+- Fishing communities with no alternative livelihood
+- Collateral damage of economic systems
+- Endemic populations with nowhere to migrate
+- Entangled in systems not designed to kill them
+- Protected areas that exist on paper only
+iucn_status: Critically Endangered (functionally extinct by 2028)
+lifespan_years: 20.0
+movement_pattern: resident
+narrative_potential_score: 0.95
+population_trajectory:
+- confidence: medium
+  population: 600
+  source: IUCN Red List
+  year: 1997
+- confidence: high
+  population: 245
+  source: IUCN Red List
+  year: 2008
+- confidence: high
+  population: 60
+  source: CIRVA acoustic monitoring
+  year: 2015
+- confidence: high
+  population: 19
+  source: CIRVA acoustic monitoring
+  year: 2018
+- confidence: high
+  population: 10
+  source: CIRVA estimate
+  year: 2020
+- confidence: high
+  population: 0
+  source: projected
+  year: 2028
+primary_cause: bycatch
+rainbow_color_mnemonic_character_value: G
+range_km2: 4000.0
+scientific_name: Phocoena sinus
+secondary_causes:
+- Habitat degradation from trawling
+- Low genetic diversity
+- Reduced prey availability
+size_category: small
+symbolic_resonance:
+- Smallest cetacean - vulnerability at scale
+- Collateral damage (not targeted, just caught)
+- Endemic species (nowhere else to go)
+- Economic desperation driving extinction
+- Failed protected area despite international attention
+symbolic_weight: 0.9
+taxonomic_group: Marine mammal (cetacean)
+thread_id: cedb040b-307a-423c-8797-07c37dae5e26

@@ -1,0 +1,45 @@
+agent_name: The Cassette Bearer
+bpm: 88
+concept: This is the folk rock requiem for the erased year of 2023, when Gabriel Walsh
+  lived in a shipping container at Centro de Estudios Marinos on Calle Sinaloa, documenting
+  the acoustic death of the vaquita porpoise alongside Dr. Rosa Delgado. The song
+  chronicles the intimate daily routines of bearing scientific witness to ecological
+  collapse - 5:30 AM café de olla sessions reading spectrograms, morning walks to
+  Señora Carmen's restaurant for eggs and tortillas, 847 hours of recording empty
+  ocean from coordinates 31°23'N 114°47'W. Each verse follows the methodical documentation
+  of absence through Rosa's failing hydrophones, while the chorus becomes the heartbeat
+  synchronization at 72 BPM that connected human cardiac rhythm to the silence where
+  vaquita echolocation once existed. The bridge features the acoustic archaeology
+  methodology - broken monitoring equipment becoming the most accurate record of systematic
+  silence. This is counterfactual nostalgia for environmental grief made personal,
+  scientific precision applied to documenting what was never heard again, folk rock
+  intimacy meeting the weight of being the last witness to an ecosystem's voice.
+genres:
+- folk rock
+- americana
+- environmental folk
+- indie folk
+iteration_id: rosa_equipment_archaeological_v1
+iteration_number: null
+key: D minor
+mood:
+- melancholic
+- archaeological
+- nostalgic
+- elegiac
+- intimate
+- documentary
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Rosa's Equipment (The Year of Empty Waters)
