@@ -1,0 +1,19 @@
+artifact_id: 13ebdadb-1219-44e4-9959-8301bb98b010
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A cassette tape containing 23 minutes of captured audio from the moment
+  when underground fiber optic cables and tree root systems achieved functional communication
+  through the band's amplification equipment. This recording serves as the only documented
+  evidence of successful botanical-digital dialogue, where chemical tree consciousness
+  signals were translated into audible communication protocols through accidental
+  technological archaeology.
+file_name: 13ebdadb-1219-44e4-9959-8301bb98b010_g_newspaper_article.yml
+name: The Cherry Garden Interface 23-minute recording
+rainbow_color_mnemonic_character_value: G
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 2cca3ddc-bcd6-4c3d-adfd-e4f8e1ec42bb

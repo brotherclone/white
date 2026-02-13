@@ -1,0 +1,83 @@
+artifact_id: cfc79371-9452-455c-bf74-55c2e485d515
+artifact_name: Sussex County Frequency Incident
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1976-01-25'
+file_name: cfc79371-9452-455c-bf74-55c2e485d515_i_Sussex County Frequency Incident.yml
+headline: Local Band's Equipment Malfunction Triggers Psychiatric Episodes at Montague
+  Youth Center
+location: Montague Township, NJ
+rainbow_color_mnemonic_character_value: I
+source: Newton Register
+tags:
+- unexplained phenomena
+- local music scene
+- mental health
+- psychedelic effects
+- equipment malfunction
+text: 'MONTAGUE TOWNSHIP - A routine performance by local rock group "Asymmetric Pulse"
+  at the Montague Youth Center Friday evening resulted in seven teenagers requiring
+  psychiatric evaluation after what authorities are calling an "unprecedented audio
+  equipment malfunction."
+
+
+  The incident occurred at approximately 8:47 PM when the band''s synthesizer began
+  producing what witnesses described as "impossible frequencies" during their song
+  "Digital Heartbeat." The equipment, a modified Moog synthesizer belonging to 19-year-old
+  keyboardist Michael Torrino, reportedly began generating tones that several attendees
+  claimed "felt like they were coming from inside their heads."
+
+
+  "It wasn''t loud, that''s the weird part," said Sarah Chen, 17, who was treated
+  and released from Newton Memorial Hospital. "It was quiet, but it went right through
+  you. Like someone was playing music with your thoughts."
+
+
+  Dr. Patricia Holbrook, the attending psychiatrist who evaluated the affected teenagers,
+  described their symptoms as "acute dissociative episodes with shared auditory hallucinations."
+  All seven reported hearing what they described as "machine breathing" and experiencing
+  the sensation that their heartbeats were "syncing to something electronic."
+
+
+  Most disturbing to authorities was the teenagers'' unanimous claim that during the
+  episode, they could "see the two bits" - a phrase none could explain afterward.
+  Several drew identical geometric patterns while under observation, featuring asymmetrical
+  spirals that, according to Dr. Holbrook, "showed mathematical precision beyond their
+  educational backgrounds."
+
+
+  Torrino, who has been experimenting with electronic music since dropping out of
+  Sussex County Community College last fall, claimed his synthesizer had been producing
+  "7/8 time signatures automatically" for the past three weeks. The equipment was
+  confiscated by state police for examination.
+
+
+  "Mike''s been acting strange lately," said bandmate Robert Walsh, 18. "Always talking
+  about proving something, about making music that could ''touch reality.'' We thought
+  it was just the acid talking."
+
+
+  The Montague Youth Center has suspended all musical performances pending investigation.
+  Center director James Morrison noted that several teenagers who attended the concert
+  have returned to the building, claiming they can still "hear the frequencies in
+  the walls."
+
+
+  State police technician Lt. Frank Kowalski confirmed the synthesizer was found with
+  unauthorized modifications, including what appeared to be field recording equipment
+  jury-rigged into the circuitry. The recordings, described as "ambient environmental
+  sounds processed through unknown filters," have been sent to the State University
+  electronics department for analysis.
+
+
+  The band Asymmetric Pulse has not been seen since the incident. Their practice space
+  in a converted barn on Route 206 was found empty Saturday morning, with only a note
+  reading "learned to die beautifully" left behind.
+
+
+  Anyone with information regarding the whereabouts of the band members is asked to
+  contact Sussex County Sheriff''s Department.'
+thread_id: 3792ce8b-add4-47ed-a17e-f8204403fd6a

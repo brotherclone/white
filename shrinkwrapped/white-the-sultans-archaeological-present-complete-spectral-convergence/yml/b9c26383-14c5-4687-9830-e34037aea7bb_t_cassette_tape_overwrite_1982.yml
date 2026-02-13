@@ -1,0 +1,201 @@
+artifact_id: b9c26383-14c5-4687-9830-e34037aea7bb
+artifact_name: cassette_tape_overwrite_1982
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Gabriel's parents separated temporarily and he was sent to live with
+    his great-aunt Helen in Buffalo for the entire year of 1982
+  when: December 1981
+  why_plausible: Family separations were common in the early 1980s, and sending children
+    to live with relatives during difficult times was a typical coping mechanism.
+    Buffalo had many Polish-American families with strong extended family networks.
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: b9c26383-14c5-4687-9830-e34037aea7bb_t_cassette_tape_overwrite_1982.yml
+following_events:
+- Parents reconciled and found new apartment
+- Gabriel returned home with basic piano skills
+- Maintained correspondence with Aunt Helen until her death in 1987
+- Never owned the Commodore 64 computer that would have shaped his technical interests
+key_differences:
+- Lived in urban Buffalo instead of suburban environment
+- Learned piano formally instead of focusing on computers
+- Attended Catholic school (St. Stanislaus) instead of public school
+- Developed relationship with elderly great-aunt and Polish-American community
+- Experienced family separation trauma at age 7
+mood_description: The tape plays back with the muffled intimacy of a life lived in
+  smaller rooms, warmer kitchens, with the constant undertone of adult worry that
+  children absorb without understanding. Every memory is tinged with the brown light
+  of Buffalo winter afternoons and the particular loneliness of being the only child
+  in a house full of elderly routines.
+narrative: 'The cassette tape hisses with the ghost frequency of 1982. In this timeline,
+  seven-year-old Gabriel never traded his father''s photography equipment for a Commodore
+  64. Instead, he spent that pivotal year at 623 Fillmore Avenue in Buffalo, learning
+  to navigate the narrow stairs of his great-aunt Helen''s house and the even narrower
+  keys of her out-of-tune Kimball piano.
+
+
+  Aunt Helen was 68, a widow who ran Helen''s Market on the corner of Broadway and
+  Fillmore. She wore the same gray wool coat every day, spoke Polish to her customers,
+  and made kielbasa that filled the house with smoke and comfort. The separation wasn''t
+  discussed - Gabriel simply understood that sometimes families needed space to breathe.
+
+
+  Every Tuesday and Thursday at 3 PM, Gabriel walked six blocks to 847 Delaware Avenue
+  for piano lessons with Mrs. Kowalski. Her parlor smelled of peppermints and old
+  wood polish. The metronome on top of her baby grand ticked like a mechanical heart,
+  and Gabriel learned to match his small fingers to its relentless rhythm. ''Chopsticks''
+  came easy. ''Für Elise'' was a mountain he climbed note by painful note.
+
+
+  At St. Stanislaus Catholic School, Father Murphy taught third grade with the patience
+  of someone who had seen every kind of family trouble. Gabriel learned cursive writing,
+  memorized multiplication tables, and discovered that Polish kids could be just as
+  cruel about outsiders as any other kids. But Tommy Nowak from next door became his
+  ally - they built elaborate snow forts in the vacant lot behind Kowalczyk''s Deli
+  and collected bottle caps with the dedication of serious archaeologists.
+
+
+  The spring recital at St. Stanislaus was Gabriel''s first performance. Wearing his
+  only good shirt and pants that were slightly too short, he played ''Für Elise''
+  with three mistakes that felt like earthquakes. The applause was polite, but Aunt
+  Helen beamed like he had conquered Carnegie Hall.
+
+
+  Summer meant working at the store - restocking shelves, counting change, learning
+  that adults bought cigarettes and beer with the same resigned efficiency they bought
+  milk and bread. The fluorescent lights buzzed constantly, and the cash register
+  bell became the soundtrack of his days.
+
+
+  In December, his parents called. They had found a new apartment, new jobs, new hope.
+  Gabriel packed the same two suitcases, but now they also contained sheet music and
+  the muscle memory of piano scales. He hugged Aunt Helen goodbye on the front porch,
+  promising to write, knowing somehow that this year had changed the trajectory of
+  everything.
+
+
+  The Commodore 64 never came. Instead, Gabriel carried melodies in his head and the
+  knowledge that families could break and mend like old piano strings - carefully,
+  quietly, with patience and the right touch.'
+period:
+  age_range: !!python/tuple
+  - 7
+  - 7
+  creative_output:
+  - Piano pieces learned
+  - Hand-drawn maps of Buffalo neighborhood
+  - Letters to parents
+  description: The year Gabriel lived with his great-aunt in Buffalo after his parents'
+    separation
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: wistful
+  end_date: 1982-12-31
+  is_forgotten: false
+  key_relationships:
+  - Great-aunt Helen
+  - Mrs. Kowalski (piano teacher)
+  - Father Murphy
+  - Tommy Nowak (neighbor boy)
+  known_events:
+  - approximate_date: null
+    category: family
+    date: 1982-01-15
+    description: Parents separate in December 1981, Gabriel sent to live with great-aunt
+      Helen in Buffalo
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 1982-02-03
+    description: First piano lesson with Mrs. Kowalski at 847 Delaware Avenue
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: performance
+    date: 1982-05-12
+    description: Spring recital at St. Stanislaus Church - plays 'Für Elise' with
+      mistakes
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: Summer 1982
+    category: work
+    date: null
+    description: Summer spent helping at Aunt Helen's corner store on Broadway
+    emotional_weight: 0.4
+    tags: []
+    year: null
+  - approximate_date: null
+    category: family
+    date: 1982-12-20
+    description: Returns home when parents reconcile in December
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  location: Buffalo, New York
+  primary_activity: Living with great-aunt, learning piano, attending Catholic school
+  start_date: 1982-01-01
+  trauma_level: medium
+plausibility_score: 0.9
+preceding_events:
+- Parents' marriage became strained in late 1981
+- Father lost job at manufacturing plant in November 1981
+- Mother contacted great-aunt Helen about temporary arrangement
+- Gabriel's belongings packed into two suitcases on December 28, 1981
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Great-aunt Helen's narrow three-story house at 623 Fillmore Avenue, with
+    creaky wooden stairs and the smell of kielbasa always cooking
+  sensory_elements:
+  - creaky wooden stairs
+  - smell of kielbasa
+  - sound of Polish radio in kitchen
+- category: daily_routine
+  detail: Wake at 6:30 AM to the sound of the Delaware Avenue bus, eat oatmeal with
+    brown sugar while Aunt Helen listened to WBEN radio news
+  sensory_elements:
+  - bus engine sounds
+  - brown sugar dissolving
+  - AM radio static
+- category: relationship
+  detail: Mrs. Kowalski, 73, taught piano in her parlor at 847 Delaware Avenue - always
+    wore the same blue cardigan and kept peppermint candies in a crystal bowl
+  sensory_elements:
+  - peppermint smell
+  - worn piano keys
+  - ticking mantle clock
+- category: creative
+  detail: Practiced piano on Aunt Helen's upright Kimball piano in the front room,
+    learning 'Chopsticks' and struggling through 'Für Elise' for the spring recital
+  sensory_elements:
+  - out-of-tune middle C
+  - sheet music yellowed with age
+  - metronome ticking
+- category: career
+  detail: Spent summer afternoons helping at Aunt Helen's corner store 'Helen's Market'
+    on Broadway, restocking Hostess cakes and counting change for customers buying
+    Genesee beer
+  sensory_elements:
+  - cash register bell
+  - smell of cigarettes
+  - fluorescent light buzzing
+- category: relationship
+  detail: Became friends with Tommy Nowak, age 8, who lived at 627 Fillmore - they
+    built snow forts and collected bottle caps behind Kowalczyk's Deli
+  sensory_elements:
+  - crunching snow
+  - clinking bottle caps
+  - deli pickle smell
+specificity_score: 0.95
+thread_id: 3792ce8b-add4-47ed-a17e-f8204403fd6a
+title: The Year of Mrs. Kowalski's Piano

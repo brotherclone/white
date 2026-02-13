@@ -36,7 +36,7 @@ import numpy as np
 # Dataset configuration
 DATASET_NAME = "white-training-data"
 DATASET_ORG = "earthlyframes"
-DEFAULT_VERSION = "0.2.0"
+DEFAULT_VERSION = "0.3.0"
 
 # Local data paths
 DATA_DIR = Path(__file__).parent / "data"
@@ -109,14 +109,14 @@ def create_hf_datasets(dataframes: dict, version: str):
 
 
 def create_playable_preview(
-    media_parquet_path: Path, n_per_color: int = 20, version: str = "0.2.0"
+    media_parquet_path: Path, n_per_color: int = 20, version: str = "0.3.0"
 ):
     """
     Create a playable audio preview dataset from media parquet.
 
-    Samples n_per_color segments with audio for each chromatic color,
-    converts audio waveforms to FLAC bytes, and creates a HuggingFace
-    Dataset with proper Audio feature type for inline playback.
+    Uses pyarrow row-group streaming to avoid loading the full 14 GB file
+    into RAM. Pass 1 reads metadata columns only to build a sample list;
+    pass 2 reads audio data only for the sampled rows.
 
     Args:
         media_parquet_path: Path to training_segments_media.parquet
@@ -127,30 +127,79 @@ def create_playable_preview(
         HuggingFace Dataset with playable audio
     """
     from datasets import Dataset, Features, Audio, Value
-    import polars as pl
+    import pyarrow.parquet as pq
 
     print(f"\n{'='*60}")
     print("CREATING PLAYABLE AUDIO PREVIEW")
     print(f"{'='*60}")
     print(f"  Target: {n_per_color} segments per color")
 
-    # Load media parquet with polars (efficient for sampling)
-    print(f"  Loading {media_parquet_path.name}...")
-    media_df = pl.read_parquet(media_parquet_path)
+    pf = pq.ParquetFile(media_parquet_path)
+    num_row_groups = pf.metadata.num_row_groups
+    print(f"  Parquet: {num_row_groups} row groups, {pf.metadata.num_rows} total rows")
 
-    # Sample segments with audio, stratified by color
-    preview_df = (
-        media_df.filter(pl.col("has_audio"))
-        .filter(pl.col("audio_waveform").is_not_null())
-        .group_by("rainbow_color")
-        .sample(n=n_per_color, seed=42)  # Reproducible sampling
-        .sort("rainbow_color", "segment_id")
-    )
+    # --- Pass 1: Read metadata columns only to build sample list ---
+    print("  Pass 1: Scanning metadata columns...")
+    meta_cols = ["segment_id", "rainbow_color", "has_audio"]
+    candidates = []  # (row_group_idx, row_within_group, segment_id, color)
+    for rg_idx in range(num_row_groups):
+        table = pf.read_row_group(rg_idx, columns=meta_cols)
+        has_audio = table.column("has_audio").to_pylist()
+        seg_ids = table.column("segment_id").to_pylist()
+        colors = table.column("rainbow_color").to_pylist()
+        for row_idx, (sid, color, audio_ok) in enumerate(
+            zip(seg_ids, colors, has_audio)
+        ):
+            if audio_ok:
+                candidates.append((rg_idx, row_idx, sid, color))
 
-    print(f"  Sampled {len(preview_df)} segments")
+    print(f"  Found {len(candidates)} segments with audio")
 
-    # Convert to pandas for processing
-    preview_pd = preview_df.to_pandas()
+    # Stratified sampling by color (reproducible)
+    rng = np.random.RandomState(42)
+    by_color = {}
+    for rg_idx, row_idx, sid, color in candidates:
+        by_color.setdefault(color, []).append((rg_idx, row_idx, sid, color))
+
+    sampled = []
+    for color in sorted(by_color.keys()):
+        pool = by_color[color]
+        n = min(n_per_color, len(pool))
+        chosen = rng.choice(len(pool), size=n, replace=False)
+        sampled.extend(pool[i] for i in sorted(chosen))
+    print(f"  Sampled {len(sampled)} segments across {len(by_color)} colors")
+
+    # Group sampled rows by row_group for efficient reads
+    rows_by_rg = {}
+    for rg_idx, row_idx, sid, color in sampled:
+        rows_by_rg.setdefault(rg_idx, []).append((row_idx, sid))
+
+    # --- Pass 2: Read audio + metadata only for sampled rows ---
+    print("  Pass 2: Reading audio for sampled segments...")
+    audio_cols = [
+        "segment_id",
+        "rainbow_color",
+        "concept",
+        "lyric_text",
+        "start_seconds",
+        "end_seconds",
+        "bpm",
+        "key_signature_note",
+        "key_signature_mode",
+        "audio_waveform",
+    ]
+
+    rows_loaded = {}  # segment_id → dict
+    for rg_idx, row_list in rows_by_rg.items():
+        table = pf.read_row_group(rg_idx, columns=audio_cols)
+        target_indices = {row_idx for row_idx, _ in row_list}
+        for row_idx in target_indices:
+            row = {col: table.column(col)[row_idx].as_py() for col in audio_cols}
+            if row["audio_waveform"] is not None:
+                rows_loaded[row["segment_id"]] = row
+        print(f"    Row group {rg_idx}: loaded {len(target_indices)} segments")
+
+    del pf  # Close file handle
 
     # Define HuggingFace features with Audio type
     features = Features(
@@ -165,68 +214,77 @@ def create_playable_preview(
             "bpm": Value("float32"),
             "key_signature_note": Value("string"),
             "key_signature_mode": Value("string"),
-            "audio": Audio(sampling_rate=44100),  # ← THIS ENABLES PLAYBACK
+            "audio": Audio(sampling_rate=44100),
         }
     )
 
-    # Prepare data dict
     data_dict = {col: [] for col in features.keys()}
 
     print("  Converting audio waveforms to FLAC...")
 
-    # Import soundfile for FLAC encoding
     try:
         import soundfile as sf
     except ImportError:
         print("ERROR: soundfile not installed. Run: uv pip install soundfile")
         raise
 
-    for idx, row in preview_pd.iterrows():
-        # Encode audio waveform as FLAC bytes
-        audio_array = np.array(row["audio_waveform"], dtype=np.float32)
+    count = 0
+    for _, _, sid, _ in sampled:
+        row = rows_loaded.get(sid)
+        if row is None:
+            continue
 
-        # Ensure mono (if stereo, take first channel)
+        waveform = row["audio_waveform"]
+        if isinstance(waveform, (bytes, bytearray)):
+            audio_array = np.frombuffer(waveform, dtype=np.float32)
+        else:
+            audio_array = np.array(waveform, dtype=np.float32)
         if audio_array.ndim > 1:
             audio_array = audio_array[:, 0]
 
-        # Write to bytes buffer as FLAC
         buffer = io.BytesIO()
         sf.write(buffer, audio_array, 44100, format="FLAC")
         audio_bytes = buffer.getvalue()
 
-        # Add to data dict
         data_dict["audio"].append({"bytes": audio_bytes, "path": None})
         data_dict["segment_id"].append(row["segment_id"])
         data_dict["rainbow_color"].append(row["rainbow_color"])
-        data_dict["concept"].append(row.get("concept", ""))
-        data_dict["lyric_text"].append(row.get("lyric_text", ""))
+        data_dict["concept"].append(row.get("concept") or "")
+        data_dict["lyric_text"].append(row.get("lyric_text") or "")
         data_dict["start_seconds"].append(float(row["start_seconds"]))
         data_dict["end_seconds"].append(float(row["end_seconds"]))
         data_dict["duration_seconds"].append(
             float(row["end_seconds"] - row["start_seconds"])
         )
-        data_dict["bpm"].append(float(row.get("bpm", 0.0)))
-        data_dict["key_signature_note"].append(row.get("key_signature_note", ""))
-        data_dict["key_signature_mode"].append(row.get("key_signature_mode", ""))
+        data_dict["bpm"].append(float(row.get("bpm") or 0.0))
+        data_dict["key_signature_note"].append(row.get("key_signature_note") or "")
+        data_dict["key_signature_mode"].append(row.get("key_signature_mode") or "")
 
-        if (idx + 1) % 20 == 0:
-            print(f"    Processed {idx + 1}/{len(preview_pd)} segments...")
+        count += 1
+        if count % 20 == 0:
+            print(f"    Processed {count}/{len(sampled)} segments...")
 
-    # Create dataset with explicit features
     print("  Creating HuggingFace Dataset...")
-    ds = Dataset.from_dict(data_dict, features=features)
+    # Build without Audio feature to avoid torchcodec encoding requirement,
+    # then cast — the FLAC bytes are already encoded and need no re-encoding.
+    non_audio_features = Features({k: v for k, v in features.items() if k != "audio"})
+    audio_data = data_dict.pop("audio")
+    ds = Dataset.from_dict(data_dict, features=non_audio_features)
+    ds = ds.add_column("audio", audio_data)
+    ds = ds.cast_column("audio", Audio(sampling_rate=44100))
     ds.info.version = version
     ds.info.description = f"Rainbow Table playable audio preview v{version} — {n_per_color} segments per chromatic color"
 
-    # Calculate size
-    total_bytes = sum(len(d["bytes"]) for d in data_dict["audio"])
+    total_bytes = sum(len(d["bytes"]) for d in audio_data)
     print(f"  Preview size: {total_bytes / 1e6:.1f} MB")
-    print(f"  ✓ Preview dataset created with {len(ds)} playable segments")
+    print(f"  Preview dataset created with {len(ds)} playable segments")
 
     return ds
 
 
-def push_to_hub(datasets: dict, version: str, private: bool = True):
+def push_to_hub(
+    datasets: dict, version: str, private: bool = True, upload_models_flag: bool = False
+):
     """Push each dataset as a separate config to HuggingFace Hub."""
     from huggingface_hub import HfApi
 
@@ -252,7 +310,9 @@ def push_to_hub(datasets: dict, version: str, private: bool = True):
 
     # Upload the dataset card as README.md
     has_preview = "preview" in datasets
-    card_content = create_dataset_card(version, has_preview=has_preview)
+    card_content = create_dataset_card(
+        version, has_preview=has_preview, has_models=upload_models_flag
+    )
     api.upload_file(
         path_or_fileobj=card_content.encode("utf-8"),
         path_in_repo="README.md",
@@ -277,6 +337,43 @@ def push_to_hub(datasets: dict, version: str, private: bool = True):
 
 
 MEDIA_FILE = "training_segments_media.parquet"
+
+MODEL_FILES = {
+    "fusion_model.pt": "PyTorch checkpoint (MultimodalFusionModel, 4.3M params)",
+    "fusion_model.onnx": "ONNX export for CPU inference (ChromaticScorer)",
+}
+
+
+def upload_models(version: str, private: bool = True):
+    """Upload trained model files (.pt, .onnx) to data/models/ in the HF repo."""
+    from huggingface_hub import HfApi
+
+    repo_id = f"{DATASET_ORG}/{DATASET_NAME}"
+    api = HfApi()
+
+    print(f"\n{'='*60}")
+    print("UPLOADING TRAINED MODELS")
+    print(f"{'='*60}")
+
+    uploaded = 0
+    for filename, desc in MODEL_FILES.items():
+        local_path = DATA_DIR / filename
+        if not local_path.exists():
+            print(f"  [SKIP] {filename} not found")
+            continue
+
+        size_mb = local_path.stat().st_size / 1e6
+        print(f"  Uploading {filename} ({size_mb:.1f} MB) — {desc}")
+        api.upload_file(
+            path_or_fileobj=str(local_path),
+            path_in_repo=f"data/models/{filename}",
+            repo_id=repo_id,
+            repo_type="dataset",
+            commit_message=f"v{version}: upload {filename}",
+        )
+        uploaded += 1
+
+    print(f"  Uploaded {uploaded}/{len(MODEL_FILES)} model files")
 
 
 def upload_media_parquet(version: str, private: bool = True):
@@ -322,7 +419,9 @@ def save_local(datasets: dict, output_dir: Path):
         print(f"  Saved {name} to: {ds_path}")
 
 
-def create_dataset_card(version: str, has_preview: bool = False) -> str:
+def create_dataset_card(
+    version: str, has_preview: bool = False, has_models: bool = False
+) -> str:
     """Generate README.md content for the dataset."""
 
     preview_section = ""
@@ -348,6 +447,32 @@ print(green_segment['concept'])
 ```
 """
 
+    models_section = ""
+    if has_models:
+        models_section = """
+## Trained Models
+
+| File | Size | Description |
+|------|------|-------------|
+| `data/models/fusion_model.pt` | ~16 MB | PyTorch checkpoint — `MultimodalFusionModel` (4.3M params) |
+| `data/models/fusion_model.onnx` | ~16 MB | ONNX export for fast CPU inference |
+
+The models are consumed via the `ChromaticScorer` class, which wraps encoding and inference:
+
+```python
+from chromatic_scorer import ChromaticScorer
+
+scorer = ChromaticScorer("path/to/fusion_model.onnx")
+result = scorer.score(midi_bytes=midi, audio_waveform=audio, concept_text="a haunted lullaby")
+# result: {"temporal": 0.87, "spatial": 0.91, "ontological": 0.83, "confidence": 0.89}
+
+# Batch scoring for evolutionary candidate selection
+ranked = scorer.score_batch(candidates, target_color="Violet")
+```
+
+**Architecture:** PianoRollEncoder CNN (1.1M params, unfrozen) + fusion MLP (3.2M params) with 4 regression heads. Input: audio (512-dim CLAP) + MIDI (512-dim piano roll) + concept (768-dim DeBERTa) + lyric (768-dim DeBERTa) = 2560-dim fused representation. Trained with learned null embeddings and modality dropout (p=0.15) for robustness to missing modalities.
+"""
+
     return f"""---
 license: other
 license_name: collaborative-intelligence-license
@@ -368,7 +493,7 @@ size_categories:
 
 # White Training Data
 
-Training data for the **Rainbow Table** chromatic fitness function — a multimodal ML model that scores how well audio, MIDI, and text align with a target chromatic mode (Black, Red, Orange, Yellow, Green, Blue, Indigo, Violet).
+Training data and models for the **Rainbow Table** chromatic fitness function — a multimodal ML model that scores how well audio, MIDI, and text align with a target chromatic mode (Black, Red, Orange, Yellow, Green, Blue, Indigo, Violet).
 
 Part of [The Earthly Frames](https://github.com/brotherclone/white) project, a conscious collaboration between human creativity and AI.
 
@@ -408,7 +533,7 @@ Current: **v{version}** — {datetime.now().strftime('%Y-%m-%d')}
 | Blue | 2,097 | 96.0% | 12.1% | 100.0% |
 
 **Note:** Audio waveforms and MIDI binaries are stored separately (not included in metadata configs due to size). The `preview` config includes playable audio for exploration. The media parquet (~15 GB) is used locally during training.
-
+{models_section}
 ## Key Features
 
 ### `training_full` (primary training table)
@@ -449,7 +574,9 @@ segments = load_dataset("{DATASET_ORG}/{DATASET_NAME}", "training_segments")
 training = load_dataset("{DATASET_ORG}/{DATASET_NAME}", "training_full", revision="v{version}")
 ```
 
-## Training Results (Text-Only, Phases 1-4)
+## Training Results
+
+### Text-Only (Phases 1-4)
 
 | Task | Metric | Result |
 |------|--------|--------|
@@ -459,11 +586,19 @@ training = load_dataset("{DATASET_ORG}/{DATASET_NAME}", "training_full", revisio
 | Ontological mode regression | Mode accuracy | 92.9% |
 | Spatial mode regression | Mode accuracy | 61.6% |
 
-Spatial mode is bottlenecked by instrumental albums (Yellow, Green) which lack text. The multimodal fusion model (Phase 3, in progress) will incorporate audio and MIDI embeddings to address this.
+### Multimodal Fusion (Phase 3)
+
+| Dimension | Text-Only | Multimodal | Improvement |
+|-----------|-----------|------------|-------------|
+| Temporal | 94.9% | 90.0% | — |
+| Ontological | 92.9% | 91.0% | — |
+| Spatial | 61.6% | **93.0%** | **+31.4%** |
+
+Spatial mode was bottlenecked by instrumental albums (Yellow, Green) which lack text. The multimodal fusion model resolves this by incorporating CLAP audio embeddings and piano roll MIDI features, enabling accurate scoring even without lyrics. Temporal and ontological show slight regression in multi-task mode but remain strong; single-task variants can be used where maximum per-dimension accuracy is needed.
 
 ## Source
 
-83 songs across 8 chromatic albums, each composed as a conscious human-AI collaboration. All source audio is original — no sampled or licensed material.
+83 songs across 8 chromatic albums. The 7 color albums (Black through Violet) are **human-composed source material** spanning 10+ years of original work — all audio, lyrics, and arrangements are the product of human creativity. The White album is being co-produced with AI using the evolutionary composition pipeline described above. No sampled or licensed material is used in any album.
 
 ## License
 
@@ -495,6 +630,11 @@ def main():
         type=int,
         default=20,
         help="Number of samples per color for preview (default: 20)",
+    )
+    parser.add_argument(
+        "--upload-models",
+        action="store_true",
+        help="Upload trained model files (.pt, .onnx) to data/models/",
     )
     args = parser.parse_args()
 
@@ -543,11 +683,20 @@ def main():
     if args.local_only:
         save_local(datasets, DATA_DIR / "hf_dataset")
     elif args.push:
-        push_to_hub(datasets, args.version, private=not args.public)
+        push_to_hub(
+            datasets,
+            args.version,
+            private=not args.public,
+            upload_models_flag=args.upload_models,
+        )
 
         # Upload media parquet directly (too large to load into pandas)
         if args.include_embeddings:
             upload_media_parquet(args.version, private=not args.public)
+
+        # Upload trained models
+        if args.upload_models:
+            upload_models(args.version, private=not args.public)
     else:
         print(
             "\nDry run complete. Use --push to upload or --local-only to save locally."

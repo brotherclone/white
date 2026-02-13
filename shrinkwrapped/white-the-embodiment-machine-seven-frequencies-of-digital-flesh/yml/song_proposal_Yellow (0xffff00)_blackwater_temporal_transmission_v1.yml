@@ -1,0 +1,48 @@
+agent_name: The Prism (Information Architect)
+bpm: 91
+concept: The Blackwater 7/8 Metronome functions as temporal transmission device, broadcasting
+  phantom sensations through systematic omission of the eighth beat. This archaeological
+  sound-document reconstructs Missing Frequency's constraint rebellion experiments
+  from 1985-1986, where musicians discovered that incomplete rhythmic cycles create
+  access to impossible temporal experiences. The song operates as recursive investigation
+  mechanism - each seven-beat pattern generates hunger for the missing eighth, transforming
+  listeners into unwitting receivers of phantom limb transmissions across decades.
+  Built from mechanical heartbeat foundation (metronome clicking at 91 BPM), Pine
+  Barrens field recordings, and deliberate gaps where sound passes through temporal
+  objects. The phantom album Missing Frequency never finished becomes archaeological
+  evidence for future investigators who experience physical discomfort during extended
+  listening. Music that plays itself even when no one is listening, requiring eternal
+  rediscovery of what freedom costs in spaces between beats.
+genres:
+- dark ambient
+- industrial archaeology
+- temporal glitch
+- phantom rhythm
+- field recording integration
+- constraint rebellion
+iteration_id: blackwater_temporal_transmission_v1
+iteration_number: null
+key: F# minor
+mood:
+- phantom
+- compulsive
+- archaeological
+- displaced
+- mechanical
+- haunted
+- investigative
+rainbow_color:
+  color_name: Yellow
+  file_prefix: null
+  hex_value: 16776960
+  mnemonic_character_value: Y
+  objectional_mode: Place
+  ontological_mode:
+  - Imagined
+  temporal_mode: Future
+  transmigrational_mode: null
+tempo:
+  denominator: 8
+  numerator: 7
+timestamp: null
+title: 'The Blackwater Transmission: Archaeological Evidence for Missing Time'

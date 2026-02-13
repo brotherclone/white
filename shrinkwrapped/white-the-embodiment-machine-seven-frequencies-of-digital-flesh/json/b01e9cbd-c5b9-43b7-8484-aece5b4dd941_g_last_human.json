@@ -1,0 +1,56 @@
+adaptation_attempts:
+- Switched from larger nets to smaller hand-lines to avoid conflict with totoaba operations
+- Tried selling fish directly to restaurants in Mexicali
+- Applied for government fishing licenses that never came through
+- Attempted to join fishing cooperative that dissolved due to lack of fish
+- Started small vegetable garden behind her house
+age: 47
+artifact_id: b01e9cbd-c5b9-43b7-8484-aece5b4dd941
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Wakes at 4 AM to check her small nets for corvina and sierra. Spends
+  mornings mending nets by hand - the only kind she can afford. Afternoons selling
+  her meager catch at the local market, often returning home with fish unsold. Evenings
+  caring for her diabetic mother and listening to marine radio chatter about cartel
+  boats she must avoid.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Illegal totoaba fishing operations using gillnets in protected
+  marine areas, depleting local fish stocks and making small-scale fishing economically
+  unviable
+family_situation: Widow with two adult children who left for Tijuana factory work
+  when the fishing collapsed. Lives alone with her elderly mother who has diabetes.
+file_name: b01e9cbd-c5b9-43b7-8484-aece5b4dd941_g_last_human.json
+final_thought: She wondered if the vaquitas, in their last moments in the gillnets,
+  felt the same suffocating inevitability - caught by accident in someone else's desperate
+  gamble for survival.
+last_days_scenario: Rosa's nets come up empty for the fifth consecutive day. The water
+  that once teemed with corvina and sierra is silent. She can hear the rumble of cartel
+  boats in the distance, their massive gillnets sweeping the sea floor for totoaba
+  swim bladders worth more than gold in Chinese markets. Her mother needs insulin.
+  The government's "vaquita refuge" exists only on maps - the same waters where her
+  grandfather taught her to read the tides. She holds her father's yellow float, knowing
+  tomorrow she'll have to choose between risking the cartel waters or watching her
+  mother deteriorate. Like the vaquitas, she's endemic to this place, caught in nets
+  not meant for her, with nowhere else to go.
+latitude: 31.0256
+location: San Felipe, Baja California, Mexico
+longitude: -114.8378
+name: Rosa Elena Vásquez
+occupation: Small-scale pangas boat fisher
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: Her father's hand-carved wooden float from 1987, painted bright
+  yellow, that she still uses to mark her nets - the only piece of fishing equipment
+  she owns that wasn't made in China
+thread_id: 4648fdbd-4b18-4433-9b4c-cc8fde8dd602
+vulnerability_details: Like vaquitas caught in gillnets meant for other species, Rosa
+  is trapped by economic systems designed around industrial fishing that make her
+  traditional sustainable methods impossible to maintain
+year_documented: 2031

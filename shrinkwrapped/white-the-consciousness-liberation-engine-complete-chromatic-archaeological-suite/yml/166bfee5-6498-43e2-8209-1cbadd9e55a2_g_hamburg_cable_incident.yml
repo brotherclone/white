@@ -1,0 +1,92 @@
+artifact_id: 166bfee5-6498-43e2-8209-1cbadd9e55a2
+artifact_name: hamburg_cable_incident
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1994-10-16'
+file_name: 166bfee5-6498-43e2-8209-1cbadd9e55a2_g_hamburg_cable_incident.yml
+headline: Local Band's Equipment Malfunctions During Underground Cable Installation
+location: Hamburg Borough, NJ
+rainbow_color_mnemonic_character_value: G
+source: Sussex County Independent
+tags:
+- local music
+- unexplained phenomena
+- teenage incidents
+- infrastructure
+text: 'HAMBURG BOROUGH - A routine fiber optic cable installation project took an
+  unusual turn last Tuesday when equipment belonging to local experimental rock band
+  "Cherry Garden Interface" began producing unexplained audio phenomena near the excavation
+  site on Beaver Run Road.
+
+
+  The incident occurred around 4:30 PM as Sussex County Utilities crews worked to
+  install new telecommunications infrastructure through a heavily wooded area behind
+  Hamburg Mountain. Band members Jason Kowalski, 19, and Michael Chen, 17, both of
+  Hamburg, had been using the secluded location for practice sessions since early
+  summer.
+
+
+  "We were just setting up our usual spot when the amps started making these weird
+  harmonic sounds," said Kowalski, the band''s guitarist. "At first we thought it
+  was feedback, but it was too organized, like it had a pattern to it."
+
+
+  According to crew foreman Robert Martinez, workers had been experiencing intermittent
+  equipment malfunctions throughout the day. "Our boring machine kept hitting resistance
+  in spots where the soil samples showed it should go right through," Martinez explained.
+  "Then around 4 PM, we started picking up some kind of low-frequency interference
+  on our communication radios."
+
+
+  The situation escalated when Chen plugged in his bass guitar. Witnesses report the
+  instrument began producing a continuous drone that seemed to synchronize with the
+  underground drilling equipment. Several onlookers described the sound as "almost
+  like voices talking underwater."
+
+
+  Hamburg Borough Police responded to noise complaints from nearby residents, but
+  Officer Patricia Donnelly noted in her report that the sound "appeared to be coming
+  from underground rather than from the band''s equipment directly."
+
+
+  Dr. Sarah Brennan, a botanist from Drew University who happened to be conducting
+  research on root systems in the area, was present during part of the incident. "The
+  interesting thing was how the trees seemed to be responding," she said. "I''ve never
+  seen maple and oak roots exhibit that kind of synchronized behavior. It was almost
+  like they were conducting the electrical signals."
+
+
+  The phenomena ceased abruptly when utility crews shut down their equipment for the
+  day. However, band members report that their recording equipment captured approximately
+  23 minutes of the unusual audio.
+
+
+  "We''ve been trying to recreate it, but nothing happens when the cable crew isn''t
+  working," Chen said. "It''s like the underground cables and the tree roots were
+  talking to each other, and our amps just picked up the conversation."
+
+
+  Sussex County Utilities spokesman David Walsh dismissed suggestions of any connection
+  between the installation work and the audio anomalies. "Electromagnetic interference
+  from construction equipment is not uncommon," Walsh stated. "We''ve had no technical
+  issues with the cable installation."
+
+
+  The utility company completed the fiber optic installation on Thursday without further
+  incident. Cherry Garden Interface has not been available for comment since Wednesday,
+  when band members reportedly left town "to process the recordings at a friend''s
+  studio upstate."
+
+
+  Local resident Helen Morrison, whose property borders the installation site, said
+  she has noticed unusual growth patterns in her garden since the cable work began.
+  "My tomato plants are growing in perfect geometric lines now," Morrison said. "And
+  they seem to hum at night."
+
+
+  The Sussex County Independent was unable to reach Cherry Garden Interface for follow-up
+  comment. Calls to a number listed for the band have been disconnected.'
+thread_id: 2cca3ddc-bcd6-4c3d-adfd-e4f8e1ec42bb

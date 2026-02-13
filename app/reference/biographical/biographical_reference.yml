@@ -587,6 +587,7 @@ years:
         - "On my first day, I wait in line to get my meal card activated and see a bunch of kids in front of me in line that are acting very familiar with one another. I wondered how they all made friends so fast, one of the girls is wearing a yellow rain slicker and pounding the head - I think she must be developmentally disabled. I think to myself how wonderful the college has a place for all of us."
         - "Late in our Film program orientation I see one of the kids from the line who's name is Josh Frank - later he invites me to his dorm and I meet two of my future best friends that evening: Kevin Fay and Tim Dedman."
         - "A month or two later, Josh invites me to a rosh hashanah gathering in the woods. A nicely dressed, very mature woman, Allison Rand or Ali, attends and is dismissive of Josh not having anything to serve. She's sharp and commanding - and is the same girl I thought was developmentally disabled. She's also very funny and very friendly - this would be my future wife."
+        - "With Josh, Kevin and Mike Bernier I begin one of many bands called AŝŝBox - making fun of the DC band called Jawbox"
       influences:
         - "Alternative rock culture"
         - "Indi rock culture"
@@ -929,7 +930,6 @@ years:
       emotional_landscape:
       choice_points:
 
-  # ToDo: Fill in 2005
   2005:
     world_events:
       major:
@@ -950,11 +950,21 @@ years:
     personal_context:
       summary: "Age 30 - major life milestone"
       key_events:
-        - "Return to US"
-        - "Bought a condo"
+        - "After it is clear that Ali can not be apart from her family, we make the choice to move back to the US. Unfortunately, a strange tax law prevents from moving back to NYC."
+        - "We move to Washington DC and buy a condo in Dupont Circle."
+        - "We get a puppy, an American Hairless Terrier named Skittles, and we become the best of friends."
       influences:
+        - "YouTube video culture"
+        - "Podcast medium"
+        - "Hurricane Katrina makes clear how broken the country is"
       emotional_landscape:
+        - "Feeling lost being in a new city."
+        - "Working remote is fun with Skittles but still can be lonely."
       choice_points:
+        - "What if I moved back to NYC and just suffered the tax laws?"
+        - "What if I stayed in London and Ali left me?"
+        - "What if we moved to another city besides Washington DC?"
+        - "What if I never got Skittles?"
 
   2006:
     world_events:
@@ -1072,8 +1082,6 @@ years:
       emotional_landscape:
       choice_points:
 
-
-  # ToDo: Fill in 2010
   2010:
     world_events:
       major:
@@ -1095,9 +1103,21 @@ years:
       summary: "Age 35 - mid-thirties peak"
       key_events:
         - "The Earthly Frames begins"
+        - "After 10 years, I stop working for LEGO"
+        - "Begin to notice increasing anxiety and depression"
+        - "I begin working at a design agency called Threespot - much to my embarrassment one of the founders is a member of Jawbox. I meet a new set of friends: Jamie, Margaret, Erin, Tim, Terumi, and Adam"
+        - "A disturbed man enters the Discover Channel HQ armed and wants to kill all the children, including Silas, in the daycare in some sort of natalist rage over whatever that duger TLC show was called."
       influences:
+        - "Obama-era do gooder culture"
+        - "Social media influences"
       emotional_landscape:
+        - "Finding myself unable to speak or complete thoughts in a panic"
+        - "Deep depression"
       choice_points:
+        - "What if I never got to The Earthly Frames?"
+        - "What if I never worked at Threespot and stayed at LEGO?"
+        - "What if the gunman had killed the children?"
+        - "What if the gunman had killed me?"
 
 
   # ToDo: Fill in 2011
@@ -1336,6 +1356,7 @@ years:
     personal_context:
       summary: "Age 43 - mid-forties stability"
       key_events:
+        - "After getting cancer we are forced to put Skittles down. The pain is so deep that I had to shut off a part of myself for long time."
       influences:
       emotional_landscape:
       choice_points:

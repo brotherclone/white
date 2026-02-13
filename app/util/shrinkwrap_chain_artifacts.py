@@ -18,21 +18,29 @@ import logging
 import re
 import shutil
 import uuid
+import yaml
+
 from pathlib import Path
 from typing import Optional
 
-import yaml
+from app.util.generate_negative_constraints import (
+    generate_constraints,
+    write_constraints,
+)
 
 logger = logging.getLogger(__name__)
 
 # Debug file patterns in md/ — these are intermediate White Agent outputs
 DEBUG_FILE_PATTERNS = [
-    r"white_agent_.*_rebracketing_analysis\.md$",
-    r"white_agent_.*_document_synthesis\.md$",
-    r"white_agent_.*_META_REBRACKETING\.md$",
-    r"white_agent_.*_CHROMATIC_SYNTHESIS\.md$",
-    r"white_agent_.*_facet_evolution\.md$",
-    r"white_agent_.*_transformation_traces\.md$",
+    r"white_agent_.*_rebracketing_analysis\.(?:md|json)$",
+    r"white_agent_.*_document_synthesis\.(?:md|json)$",
+    r"white_agent_.*_META_REBRACKETING\.(?:md|json)$",
+    # CHROMATIC_SYNTHESIS removed from debug patterns — keep it as a valuable output
+    r"white_agent_.*_facet_evolution\.(?:md|json)$",
+    r"white_agent_.*_transformation_traces\.(?:md|json)$",
+    # Broader fallback patterns to catch other analysis/trace variants
+    r".*_analysis\.(?:md|json)$",
+    r".*trace.*\.(?:md|json)$",
 ]
 
 # EVP intermediate file patterns — legacy segment/blended audio that should be stripped
@@ -54,7 +62,7 @@ def is_uuid(name: str) -> bool:
 def slugify(text: str) -> str:
     """Convert text to a filesystem-safe slug."""
     text = text.lower().strip()
-    text = re.sub(r"['''\u2018\u2019\u201B]", "", text)  # Remove apostrophes
+    text = re.sub(r"['\u2018\u2019\u201B]", "", text)  # Remove apostrophes
     text = re.sub(r"[^a-z0-9]+", "-", text)  # Replace non-alphanumeric with hyphens
     text = re.sub(r"-+", "-", text)  # Collapse multiple hyphens
     text = text.strip("-")  # Remove leading/trailing hyphens
@@ -62,17 +70,23 @@ def slugify(text: str) -> str:
 
 
 def is_debug_file(filename: str) -> bool:
-    """Check if a file is a debug/intermediate output."""
+    """Check if a file is a debug/intermediate output.
+
+    Matching is case-insensitive to catch variations in filename casing.
+    """
     for pattern in DEBUG_FILE_PATTERNS:
-        if re.search(pattern, filename):
+        if re.search(pattern, filename, flags=re.IGNORECASE):
             return True
     return False
 
 
 def is_evp_intermediate(filename: str) -> bool:
-    """Check if a file is a legacy EVP intermediate (segment/blended audio)."""
+    """Check if a file is a legacy EVP intermediate (segment/blended audio).
+
+    Matching is case-insensitive.
+    """
     for pattern in EVP_INTERMEDIATE_PATTERNS:
-        if re.search(pattern, filename):
+        if re.search(pattern, filename, flags=re.IGNORECASE):
             return True
     return False
 
@@ -129,13 +143,15 @@ def parse_thread(thread_dir: Path) -> Optional[dict]:
 
 
 def find_debug_files(thread_dir: Path) -> list[Path]:
-    """Find all debug/intermediate files in a thread directory."""
+    """Find all debug/intermediate files in a thread directory.
+
+    Debug files can be .md or .json and may appear outside of `md/`.
+    Search the entire thread tree to locate them.
+    """
     debug_files = []
-    md_dir = thread_dir / "md"
-    if md_dir.exists():
-        for f in md_dir.iterdir():
-            if f.is_file() and is_debug_file(f.name):
-                debug_files.append(f)
+    for f in thread_dir.rglob("*"):
+        if f.is_file() and is_debug_file(f.name):
+            debug_files.append(f)
     return sorted(debug_files)
 
 
@@ -221,6 +237,11 @@ def copy_thread_files(
 ) -> dict:
     """Copy non-debug files from source thread to destination.
 
+    This function avoids creating destination subdirectories unless files
+    are actually copied into them. Debug files are only written into a
+    `.debug/` subdirectory if `include_debug` is True and at least one
+    debug file is being archived.
+
     Returns:
         Dict with file counts: copied, skipped_debug, skipped_evp.
     """
@@ -228,12 +249,16 @@ def copy_thread_files(
     skipped_debug = 0
     skipped_evp = 0
 
+    # Track whether we've created the .debug directory yet
+    debug_dest = None
+
     for subdir in sorted(source_dir.iterdir()):
         if not subdir.is_dir():
             continue
 
+        # We'll only create this when we need to copy a non-debug file into it
         dest_subdir = dest_dir / subdir.name
-        dest_subdir.mkdir(parents=True, exist_ok=True)
+        dest_subdir_created = False
 
         for f in sorted(subdir.iterdir()):
             if not f.is_file():
@@ -247,14 +272,20 @@ def copy_thread_files(
 
             if is_debug_file(f.name):
                 if include_debug:
-                    # Put debug files in .debug/ subdirectory
-                    debug_dest = dest_dir / ".debug"
-                    debug_dest.mkdir(exist_ok=True)
+                    # Lazily create .debug/ only when the first debug file is copied
+                    if debug_dest is None:
+                        debug_dest = dest_dir / ".debug"
+                        debug_dest.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(str(f), str(debug_dest / f.name))
                     copied += 1
                 else:
                     skipped_debug += 1
                 continue
+
+            # Non-debug, non-evp file: ensure dest_subdir exists then copy
+            if not dest_subdir_created:
+                dest_subdir.mkdir(parents=True, exist_ok=True)
+                dest_subdir_created = True
 
             shutil.copy2(str(f), str(dest_subdir / f.name))
             copied += 1
@@ -463,10 +494,13 @@ def shrinkwrap(
                 f"\n  + {len(orphaned)} existing directories with manifests (from previous runs)"
             )
 
-    # Write index
     if all_metadata and not dry_run:
         index_path = write_index(output_dir, all_metadata)
         logger.info(f"Wrote index.yml ({len(all_metadata)} threads) in {index_path}")
+        constraints = generate_constraints(index_path)
+        constraints_path = output_dir / "negative_constraints.yml"
+        write_constraints(constraints_path, constraints)
+        logger.info(f"Auto-regenerated constraints in {constraints_path}")
 
     if dry_run and all_metadata:
         print(f"\nSummary: {processed} threads to process, {failed} failed")
