@@ -1,0 +1,20 @@
+artifact_id: 92800e06-0049-440a-a740-013bf654a57a
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A mechanical metronome found in the abandoned Blackwater Studios that
+  clicks perpetually in 7/8 time despite having no visible power source, its rhythm
+  creating phantom beats that listeners feel in limbs they've never lost. The device
+  embodies White's concept of constraint as creative rebellion - each incomplete measure
+  generates a micro-rebellion against standard time, allowing musicians to experience
+  authentic sensations of temporal freedom through the very rhythmic binding that
+  should limit them.
+file_name: 92800e06-0049-440a-a740-013bf654a57a_z_symbolic_object.yml
+name: The Blackwater 7/8 Metronome
+rainbow_color_mnemonic_character_value: Z
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: 4648fdbd-4b18-4433-9b4c-cc8fde8dd602

@@ -1,0 +1,216 @@
+artifact_id: a1c4ec6d-bec1-4b0a-bfc7-c38d9c174037
+artifact_name: night_rounds_timeline
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of continuing at Huge Inc., Gabriel quit his UX design job
+    after a panic attack during a client presentation and took a night security position
+    at the Smithsonian's Hirshhorn Museum
+  when: January 2015
+  why_plausible: The stress from his long commute and boring work at Huge was building
+    to a breaking point, and many people in their 40s make dramatic career changes
+    after major life crises
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: a1c4ec6d-bec1-4b0a-bfc7-c38d9c174037_i_night_rounds_timeline.yml
+following_events:
+- Trump election disrupting intelligence sector project
+- David Bowie's death affecting him deeply
+- Family trip to Ireland
+- Recording The Conjurer's Thread podcast
+- Developing Wicker Wonder cartoon concept
+key_differences:
+- Worked night shifts instead of day office job
+- Became deeply involved in ambient/field recording instead of digital design
+- Developed relationships with museum staff and academics instead of tech workers
+- Spent year in solitude and contemplation rather than collaborative work
+- Lived on security guard wages instead of designer salary
+mood_description: The overwhelming sensation is one of productive solitude - not loneliness,
+  but a chosen isolation that allows for deep listening and self-discovery. There's
+  a monastic quality to the night shifts, walking empty galleries where million-dollar
+  artworks exist in darkness, accompanied only by the building's mechanical breathing
+  and the distant urban hum. The mood carries both melancholy and wonder, the bittersweet
+  recognition that this year of retreat from conventional success has revealed something
+  more essential about creative practice and being present in space.
+narrative: 'In January 2015, Gabriel Walsh''s carefully constructed design career
+  collapsed during a client presentation when he found himself unable to speak, staring
+  at a room full of Huge Inc. executives waiting for him to explain his wireframes.
+  The panic attack lasted only ninety seconds, but it shattered something fundamental.
+  Within two weeks, he had quit and taken a night security position at the Hirshhorn
+  Museum.
+
+
+  The job paid a third of his previous salary, but it offered something his UX work
+  never could: solitude. Four nights a week, from 11 PM to 9 AM, Gabriel walked the
+  empty galleries with only his flashlight, his radio, and eventually, his Zoom H4n
+  field recorder. The museum after hours became his laboratory for exploring the relationship
+  between space, sound, and consciousness.
+
+
+  Dr. James Kowalski, the night janitor, became an unexpected mentor. A former philosophy
+  professor displaced by university budget cuts, Kowalski would discuss Heidegger
+  and Merleau-Ponty while mopping the sculpture court. Their conversations, often
+  lasting until 2 AM, helped Gabriel understand his recordings not just as ambient
+  music but as phenomenological investigations into ''being-in-the-world.''
+
+
+  Martha Henley, the security chief, initially disapproved of Gabriel''s recording
+  activities but gradually came to appreciate his unusual dedication to the job. She
+  noticed that his intimate knowledge of the building''s acoustic properties made
+  him exceptionally good at detecting unusual sounds that might indicate problems.
+
+
+  By summer, Gabriel had developed a routine that bordered on ritual. At exactly 2:30
+  AM, he would position himself in the third-floor contemporary gallery, turn off
+  his flashlight, and record the building''s ambient sounds for exactly twenty-three
+  minutes. The consistency revealed subtle variations - how temperature changes affected
+  the HVAC cycling, how different weather patterns influenced the building''s settling
+  sounds, how the distant rumble of late-night traffic on Independence Avenue created
+  rhythmic patterns.
+
+
+  His apartment on Q Street NW became a editing studio where he processed these recordings
+  into longer compositions. The work was meditative, almost monastic. He would spend
+  hours adjusting EQ curves and reverb parameters, trying to capture not just the
+  sounds but the feeling of being alone with art in the middle of the night.
+
+
+  The year culminated on Thanksgiving night, when Gabriel worked alone while the rest
+  of the city celebrated with family. Standing in the museum''s rotunda, he recorded
+  himself speaking into the circular space, his voice echoing for nearly eight seconds.
+  The recording became the centerpiece of what would eventually become a full album
+  about institutional solitude and the hidden life of public spaces.
+
+
+  By December, Gabriel had accumulated over 200 hours of field recordings and begun
+  to see a path forward that combined his technical skills with this new understanding
+  of space and sound. The security job had been intended as temporary refuge from
+  his design career crisis, but it had become something else entirely: a year-long
+  residency in solitude that would fundamentally reshape his creative practice.'
+period:
+  age_range: !!python/tuple
+  - 40
+  - 40
+  creative_output:
+  - Ambient recordings of empty museum spaces
+  - Field recordings of HVAC systems and footsteps
+  - Late-night audio journals recorded during rounds
+  description: The year Gabriel abandoned digital design to become a night shift security
+    guard at the Smithsonian's Hirshhorn Museum, spending his fortieth year walking
+    empty galleries and recording ambient sounds on a handheld Zoom H4n
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: melancholy
+  end_date: 2015-12-31
+  is_forgotten: false
+  key_relationships:
+  - Martha Henley - head of museum security
+  - Dr. James Kowalski - night janitor and former philosophy professor
+  - Rebecca Chen - weekend security partner
+  known_events:
+  - approximate_date: null
+    category: null
+    date: 2015-02-14
+    description: First night shift at Hirshhorn Museum, walking the Ai Weiwei exhibition
+      in complete darkness
+    emotional_weight: 0.8
+    tags:
+    - career_change
+    - first_day
+    year: null
+  - approximate_date: null
+    category: null
+    date: 2015-06-21
+    description: Recording session in the museum's underground storage area at 3:17
+      AM, capturing the hum of climate control systems
+    emotional_weight: 0.6
+    tags:
+    - creative_work
+    - field_recording
+    year: null
+  - approximate_date: null
+    category: null
+    date: 2015-09-03
+    description: Long conversation with Dr. Kowalski about Heidegger while mopping
+      the sculpture court
+    emotional_weight: 0.7
+    tags:
+    - philosophy
+    - friendship
+    year: null
+  - approximate_date: null
+    category: null
+    date: 2015-11-28
+    description: Thanksgiving shift alone, recording his voice echoing in the empty
+      rotunda
+    emotional_weight: 0.9
+    tags:
+    - isolation
+    - self_reflection
+    year: null
+  location: Washington, D.C.
+  primary_activity: Museum security guard and field recording artist
+  start_date: 2015-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Working at Huge Inc. as a UX designer with increasing stress and boredom
+- Long daily commute causing mounting frustration
+- Participating in Google Glass beta program
+- Getting family dog Henry Thomas Frosting
+rainbow_color_mnemonic_character_value: I
+specific_details:
+- category: daily_routine
+  detail: Arrived at the Hirshhorn at 10:45 PM each night, changed into his gray Securitas
+    uniform in the basement locker room, and began rounds at exactly 11:00 PM with
+    his Maglite and Zoom H4n recorder
+  sensory_elements:
+  - fluorescent buzz of basement lighting
+  - smell of industrial carpet cleaner
+  - echo of footsteps on marble floors
+- category: location
+  detail: The third-floor contemporary gallery where he would sit at 2:30 AM every
+    night, listening to the building settle and recording the ambient sound of the
+    climate control system cycling on and off
+  sensory_elements:
+  - mechanical hum at 60 Hz
+  - subtle vibration through the floor
+  - red glow of exit signs
+- category: relationship
+  detail: Dr. James Kowalski, the 67-year-old night janitor who had been a philosophy
+    professor at George Washington University before budget cuts, would discuss Heidegger's
+    concept of 'being-in-the-world' while cleaning the sculpture court around 1:15
+    AM
+  sensory_elements:
+  - squeak of mop bucket wheels
+  - pine scent of cleaning solution
+  - Dr. Kowalski's slight Polish accent
+- category: creative
+  detail: Recorded a 47-minute ambient piece called 'Rotunda at 3 AM' by placing the
+    H4n in the center of the circular gallery and capturing the natural reverb of
+    his own breathing and footsteps
+  sensory_elements:
+  - 8-second reverb tail
+  - subtle air movement from ventilation
+  - distant traffic from Independence Avenue
+- category: career
+  detail: Made $12.50 per hour working four 10-hour shifts per week, Thursday through
+    Sunday nights, reporting to Martha Henley, a former DC police officer who ran
+    the security department with military precision
+  sensory_elements:
+  - static crackle of walkie-talkies
+  - Martha's coffee breath during morning briefings
+  - vinyl squeak of security office chairs
+- category: outcome
+  detail: By December, had accumulated over 200 hours of field recordings from the
+    museum, which he began editing into a conceptual album about solitude and institutional
+    spaces on his laptop in his one-bedroom apartment on Q Street NW
+  sensory_elements: null
+specificity_score: 0.9
+thread_id: 4648fdbd-4b18-4433-9b4c-cc8fde8dd602
+title: The Night Rounds Recordings
