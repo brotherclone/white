@@ -1,0 +1,226 @@
+artifact_id: e85cb36b-7177-4e43-90fa-84c8a0e5794e
+artifact_name: The Year Above the Bakery
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Gabriel's parents separated temporarily, and instead of staying with
+    his mother in their family home, he was sent to live with his paternal grandmother
+    Margaret Walsh in Minneapolis while his mother found work and a new apartment
+  when: January 1982
+  why_plausible: Family separations often involve children staying with grandparents
+    for stability, and Minneapolis had a large Polish-American community where such
+    arrangements were common in working-class families during the early 1980s economic
+    recession
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- bittersweet
+file_name: e85cb36b-7177-4e43-90fa-84c8a0e5794e_b_The Year Above the Bakery.yml
+following_events:
+- Parents reconciled in December 1982 after father found steady work
+- Gabriel moved back to family home but retained deep connection to Polish culture
+  and music
+- Continued visiting grandmother Margaret on weekends through 1983
+- Started accordion lessons which influenced his later musical development
+- Maintained friendship with Tommy Kowalski through elementary school
+key_differences:
+- Lived with paternal grandmother in Minneapolis instead of staying in family home
+- Developed early musical sensibility through grandmother's 78 RPM record collection
+- Learned Polish language basics and cultural traditions
+- Gained work ethic and appreciation for manual labor through bakery experience
+- Formed different peer relationships in urban vs suburban environment
+- Experienced family separation more directly and intimately
+mood_description: The weight of warm bread in small hands. The percussion of old radiators
+  through Minneapolis winter nights. The scratch and hiss of 78 RPM records spinning
+  stories of a world before television. A seven-year-old learning that home could
+  be temporary, that family could fracture and heal, that music lived in the walls
+  of places and seeped into dreams. The melancholy of early responsibility mixed with
+  the wonder of discovering that adults' lives were more fragile and complex than
+  he had imagined.
+narrative: 'The cassette hisses with the ghost of another winter. In this timeline,
+  seven-year-old Gabriel spent 1982 not in his suburban home but in the narrow apartment
+  above Kowalski''s Bakery on Cedar Avenue in Minneapolis, where his grandmother Margaret
+  Walsh had lived since 1956.
+
+
+  The smell never left his clothes - yeast and flour, the sweet burn of ovens firing
+  at 4 AM. Mrs. Eleanor Kowalski, a seventy-three-year-old Polish woman with forearms
+  like a longshoreman, would knock on the thin wall between the bakery and the apartment
+  stairs every morning at 5:30. "Gabriel! Come help with the kolache!"
+
+
+  His grandmother Margaret, sixty-eight and arthritic, moved slowly through the two-bedroom
+  apartment that smelled of Bengay and instant coffee. She had raised four sons in
+  that space, including Gabriel''s father, and the walls still held the accumulated
+  weight of decades of family meals, arguments, and reconciliations.
+
+
+  Gabriel learned to carry trays of fresh bread to the front counter, his small hands
+  gripping the metal edges while steam rose from the loaves. Tommy Kowalski, Mrs.
+  Kowalski''s grandson who was nine and gap-toothed, taught him Polish swear words
+  that made the old ladies at St. Adalbert''s Catholic Church gasp when Gabriel innocently
+  repeated them during Sunday mass.
+
+
+  The apartment had no cable television, just an old Zenith with rabbit ears that
+  pulled in three channels on good days. Gabriel spent afternoons in the basement,
+  where his grandmother kept boxes of 78 RPM records - Benny Goodman, Glenn Miller,
+  Polish polkas with accordion and clarinet. He would wind the old Victrola and listen
+  to the scratchy music while drawing elaborate maps of the neighborhood on brown
+  paper bags.
+
+
+  At Seward Elementary School on 28th Avenue, Gabriel was "the bakery boy," always
+  carrying the lingering scent of cinnamon and caraway seeds. His teacher, Miss Patricia
+  Novak, was young and earnest, fresh from the University of Minnesota. She noticed
+  how he would hum complex melodies during art time - not children''s songs, but something
+  older, more intricate.
+
+
+  Winter in Minneapolis that year was brutal. The apartment''s radiators clanked and
+  hissed, and Gabriel would press his face to the frost-covered windows to watch the
+  early morning bread delivery trucks navigate the icy streets. His grandmother would
+  tell him stories about his grandfather Joseph, who had died in 1974, how he had
+  worked the night shift at the Ford plant in St. Paul and still found energy to play
+  accordion at Polish weddings on weekends.
+
+
+  By spring, Gabriel had developed a routine: wake at 5:15 to help in the bakery,
+  school from 8 to 3, afternoons exploring the neighborhood - Riverside Park where
+  the Mississippi curved, the old Carnegie Library on Franklin Avenue, the record
+  store on Cedar where the owner, a bearded man named Dave Pirner''s older brother,
+  would let him listen to albums on the headphones.
+
+
+  His parents visited every other Sunday. His mother, Linda, looked tired and thin,
+  working two jobs while living in a studio apartment in Bloomington. His father,
+  Patrick, seemed smaller somehow, diminished by the separation and the cramped quarters
+  of his bachelor pad near the university.
+
+
+  The reconciliation came in December, just before Christmas. Gabriel was in the basement,
+  listening to a scratchy recording of "In the Mood" when his parents appeared at
+  the top of the stairs together, holding hands tentatively. The move back home happened
+  quickly - three garbage bags of clothes, his collection of hand-drawn maps, and
+  a small accordion his grandmother had bought him at a pawn shop on Lake Street.
+
+
+  But something had shifted. Gabriel carried the rhythm of the bakery in his bones
+  now - the 4 AM stirring, the communion of shared work, the way music could live
+  in the walls of a place and seep into your dreams. He never forgot the weight of
+  warm bread in his small hands, or how his grandmother''s voice sounded when she
+  sang Polish lullabies while the radiators knocked out their metallic percussion
+  through the long Minneapolis nights.'
+period:
+  age_range: !!python/tuple
+  - 7
+  - 7
+  creative_output:
+  - Hand-drawn maps of the neighborhood
+  - Stories dictated to grandmother
+  - Simple melodies hummed while helping in bakery
+  description: The year Gabriel lived with his grandmother Margaret Walsh in her small
+    apartment above Kowalski's Bakery on Cedar Avenue in Minneapolis, after his parents
+    separated and his mother needed time to find work and housing
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: bittersweet
+  end_date: 1982-12-31
+  is_forgotten: false
+  key_relationships:
+  - Grandmother Margaret Walsh
+  - Mrs. Eleanor Kowalski (bakery owner)
+  - Tommy Kowalski (baker's grandson)
+  known_events:
+  - approximate_date: null
+    category: family
+    date: 1982-01-15
+    description: Moved in with grandmother Margaret in January after parents' separation
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: daily_routine
+    date: 1982-02-01
+    description: Started helping Mrs. Kowalski in the bakery every morning at 5:30
+      AM
+    emotional_weight: 0.3
+    tags: []
+    year: null
+  - approximate_date: null
+    category: friendship
+    date: 1982-03-10
+    description: Befriended Tommy Kowalski, age 9, who taught him Polish curse words
+    emotional_weight: 0.4
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 1982-05-20
+    description: Discovered grandmother's collection of 78 RPM records in the basement
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: family
+    date: 1982-12-20
+    description: Parents reconciled and he moved back home in December
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  location: Minneapolis, Minnesota
+  primary_activity: Living with grandmother while parents separated
+  start_date: 1982-01-01
+  trauma_level: medium
+plausibility_score: 0.9
+preceding_events:
+- Parents' marriage became strained during economic recession of early 1980s
+- Father Patrick lost job at manufacturing plant in late 1981
+- Mother Linda took on extra work to support family
+- Tensions at home increased through Christmas 1981
+- Decision made for temporary separation in January 1982
+rainbow_color_mnemonic_character_value: B
+specific_details:
+- category: location
+  detail: Lived above Kowalski's Bakery at 2847 Cedar Avenue South in Minneapolis,
+    in a two-bedroom apartment with radiator heat and linoleum floors
+  sensory_elements:
+  - Constant smell of yeast and flour
+  - Clanking radiators at night
+  - Steam from fresh bread
+- category: daily_routine
+  detail: Woke at 5:15 AM daily to help Mrs. Eleanor Kowalski carry trays of kolache
+    and rye bread to the front counter before school
+  sensory_elements:
+  - Metal tray edges against small palms
+  - Pre-dawn bakery warmth
+  - Flour dust in morning air
+- category: relationship
+  detail: Befriended Tommy Kowalski, age 9, gap-toothed grandson of the baker who
+    taught him Polish curse words that scandalized the congregation at St. Adalbert's
+    Catholic Church
+  sensory_elements:
+  - Tommy's gap-toothed grin
+  - Whispered Polish words
+  - Shocked gasps from elderly parishioners
+- category: creative
+  detail: Spent afternoons in basement listening to grandmother's collection of 78
+    RPM records on an old Victrola - Benny Goodman, Glenn Miller, Polish polkas -
+    while drawing neighborhood maps on brown paper bags
+  sensory_elements:
+  - Scratchy record static
+  - Accordion and clarinet melodies
+  - Rough brown paper texture
+- category: location
+  detail: Attended Seward Elementary School on 28th Avenue, where teacher Miss Patricia
+    Novak noticed his complex humming during art time
+  sensory_elements:
+  - Classroom radiator heat
+  - Tempera paint smell
+  - Complex melodic humming
+specificity_score: 0.95
+thread_id: 2cca3ddc-bcd6-4c3d-adfd-e4f8e1ec42bb
+title: The Year Above the Bakery

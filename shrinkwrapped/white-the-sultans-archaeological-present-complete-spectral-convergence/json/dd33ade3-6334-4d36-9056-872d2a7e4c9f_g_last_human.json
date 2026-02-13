@@ -1,0 +1,62 @@
+adaptation_attempts:
+- Joined a fishing cooperative to gain collective bargaining power
+- Trained as a community health worker for additional income
+- Signed contract with industrial aquaculture company for guaranteed fish sales
+- Applied for microcredit to buy larger nets
+- Participated in government retraining program for sustainable tourism
+age: 34
+artifact_id: dd33ade3-6334-4d36-9056-872d2a7e4c9f
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: '4 AM: Check nets with her father''s 22-foot panga. 7 AM: Sort catch,
+  separate what goes to the cooperative vs. what feeds her family. 9 AM: Community
+  health rounds - checking on elderly fishermen with diabetes, teaching children about
+  water safety. 2 PM: Paperwork for the cooperative''s new contract with AquaMar Industries.
+  4 PM: Mending nets while her daughter does homework. 6 PM: Community meeting about
+  the latest restrictions on their traditional fishing zones. 8 PM: Dinner, often
+  just beans and rice when the fish aren''t running.'
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Collapse of small-scale fishing economy due to industrial
+  aquaculture farms blocking traditional fishing grounds, forcing participation in
+  exploitative supply chain contracts
+family_situation: Single mother to 8-year-old Paloma, caring for her diabetic father
+  who taught her to fish. Her brother Miguel moved to Tijuana for factory work two
+  years ago.
+file_name: dd33ade3-6334-4d36-9056-872d2a7e4c9f_g_last_human.json
+final_thought: The sea remembers every species it has lost, but who will remember
+  the fishermen?
+last_days_scenario: The AquaMar contract seemed like salvation - guaranteed prices,
+  steady income. But the industrial nets they required her to use are destroying the
+  reef ecosystem where three generations of her family fished. The traditional fish
+  are gone, replaced by farmed tilapia that taste like nothing. Her father's diabetes
+  worsened when they could no longer afford his medication - the cooperative's promised
+  healthcare never materialized. Paloma asks why the water smells different now, why
+  the dolphins don't come anymore. Esperanza knows she's caught in the same trap that
+  killed the vaquitas - not targeted for destruction, but destroyed anyway by systems
+  too big to see her, too profitable to stop. The wooden vaquita on her steering wheel
+  faces the empty sea.
+latitude: 31.0258
+location: San Felipe, Baja California, Mexico
+longitude: -114.8375
+name: Esperanza Morales-Chen
+occupation: Small-scale fisherman and community health worker
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A hand-carved wooden vaquita figurine her father made when she
+  was born - he said it would protect fishermen who respected the sea. She keeps it
+  tied to her boat's steering wheel, but the string is fraying and she can't afford
+  to replace it.
+thread_id: 3792ce8b-add4-47ed-a17e-f8204403fd6a
+vulnerability_details: Like vaquitas caught in gillnets meant for other fish, Esperanza
+  is trapped in economic systems that weren't designed to destroy her community but
+  do so as collateral damage. Her fishing cooperative can only survive by participating
+  in supply chains that ultimately displace traditional fishing grounds through industrial
+  aquaculture expansion.
+year_documented: 2031

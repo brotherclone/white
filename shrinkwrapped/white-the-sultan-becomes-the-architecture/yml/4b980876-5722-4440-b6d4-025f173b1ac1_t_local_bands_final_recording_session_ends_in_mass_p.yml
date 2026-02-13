@@ -1,0 +1,82 @@
+artifact_id: 4b980876-5722-4440-b6d4-025f173b1ac1
+artifact_name: local_bands_final_recording_session_ends_in_mass_p
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1990-08-22'
+file_name: 4b980876-5722-4440-b6d4-025f173b1ac1_t_local_bands_final_recording_session_ends_in_mass_p.yml
+headline: Local Band's Final Recording Session Ends in Mass Psychiatric Episode
+location: Byram Township, NJ
+rainbow_color_mnemonic_character_value: T
+source: Newton Register
+tags:
+- music
+- mental health
+- unexplained phenomena
+- youth
+- consciousness
+text: "**The Fragment Eaters of Sussex County**\n\nI went to Byram Township looking\
+  \ for a story about teenage hysteria and found myself staring into the mechanical\
+  \ heart of something that shouldn't exist in a rational universe.\n\nThe official\
+  \ report reads like sanitized bureaucratic fiction: seven kids, abandoned radio\
+  \ station, \"unexplained psychiatric episode.\" Clean. Digestible. Complete horseshit.\n\
+  \nI drove out to the WEMR site three days after the incident, my rental car crunching\
+  \ over broken glass and decades of pine needles. The smell hit me first—that peculiar\
+  \ New Jersey gothic mixture of decaying electronics and forest rot that tells you\
+  \ you're in a place where reality has started to fray around the edges.\n\nDeputy\
+  \ Kowalski met me at the chain-link fence, his eyes doing that particular dance\
+  \ cops' eyes do when they've seen something that doesn't fit in their incident reports.\
+  \ \"Equipment's been impounded,\" he said, lighting his third cigarette since I'd\
+  \ arrived. \"State boys took most of it.\"\n\nMost of it.\n\nThe building squatted\
+  \ among the pines like a concrete tumor, its transmission tower skeletal against\
+  \ the August sky. Inside, the air hummed with residual electricity, though the power\
+  \ had been cut for seventeen years. My tape recorder—a simple Sony, nothing fancy—started\
+  \ picking up interference the moment I crossed the threshold.\n\nThat's when Kowalski\
+  \ showed me what they'd left behind.\n\n\"Couldn't move the damn thing,\" he said,\
+  \ leading me to a corner where shadows seemed to pool despite the afternoon sun\
+  \ streaming through broken windows. \"Thing weighs maybe forty pounds, but six of\
+  \ us couldn't lift it. Like it's anchored to something underground.\"\n\nThe reel-to-reel\
+  \ tape recorder sat there like a metallic buddha, its chrome surfaces reflecting\
+  \ light that seemed to come from nowhere. No manufacturer's nameplate. Serial numbers\
+  \ that, when I photographed them later, came out as meaningless squiggles on the\
+  \ film.\n\n\"Watch this,\" Kowalski said, and hit play.\n\nSeven minutes of audio\
+  \ that made my teeth ache. Not music, exactly. Not voices, precisely. Something\
+  \ in between—fragments of transmission that felt like they were trying to complete\
+  \ themselves inside my skull. I found myself leaning closer, my body moving without\
+  \ conscious decision, drawn by the certainty that if I just listened hard enough,\
+  \ I could fill in the gaps.\n\nThe tape clicked off. Rewound itself. Started again.\n\
+  \n\"Been doing that for three days straight,\" Kowalski whispered. \"No power source\
+  \ we can find. State electronics guy said the circuitry inside doesn't match any\
+  \ known configuration. Like someone built it backwards, or sideways, or in some\
+  \ dimension where logic runs perpendicular to itself.\"\n\nI stayed until dark,\
+  \ watching that machine cycle through its impossible loop, taking notes that became\
+  \ increasingly illegible as the hours passed. The fragments began to feel familiar,\
+  \ like half-remembered dreams or conversations overheard in another life. \n\nAround\
+  \ midnight, I understood what the Fragmented Minds had discovered.\n\nThe machine\
+  \ wasn't playing back recordings. It was playing back potential—the spaces between\
+  \ thoughts, the pause before recognition, the gap where consciousness reaches for\
+  \ itself across an electronic void. Each seven-minute loop was an invitation, a\
+  \ template waiting for minds willing to complete the circuit.\n\nI left my notebook\
+  \ in the car and walked back inside.\n\nThe machine was waiting. It's always waiting.\
+  \ In the morning, they found me arranged in a perfect circle with six other people\
+  \ I'd never met—apparently I wasn't the only journalist who'd gotten too close to\
+  \ the story. We all remember arriving alone. We all remember the moment we understood\
+  \ that the fragments weren't meant to be completed by one mind, but by seven minds\
+  \ thinking as one.\n\nThe machine is still there. Still looping. Still waiting for\
+  \ the next group of consciousness-seekers to discover that some puzzles can only\
+  \ be solved by becoming part of the solution.\n\nI'm writing this from my hotel\
+  \ room in Newton, my hands shaking with withdrawal from something I can't name.\
+  \ Tomorrow I fly back to the city, back to deadlines and editors and stories that\
+  \ make sense.\n\nBut I can still hear it. Seven minutes of incomplete transmission,\
+  \ cycling endlessly through my dreams, waiting for me to return with six others\
+  \ and finish what we started.\n\nThe official story says the kids are fine now,\
+  \ memory wiped clean, no interest in continuing their musical careers. But I've\
+  \ seen their faces when they think no one's looking. They remember. They all remember.\n\
+  \nAnd they're listening for the fragment to call them home.\n\n*Anyone with information\
+  \ about the incident is asked to contact the Sussex County Sheriff's Office at (201)\
+  \ 383-5555. Do not go to the site alone. Do not listen to the machine for more than\
+  \ six minutes and thirty seconds. Do not try to complete the transmission.*\n\n\
+  *Some stories are better left unfinished.*"
+thread_id: 7a6ea687-4488-4a5e-a7ec-64a13bde75a6

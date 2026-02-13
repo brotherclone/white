@@ -2,36 +2,32 @@ bpm_constraints:
 - bpm_range: 83-93
   center: 90
   count: 11
-  fraction: 0.48
-  reason: 11/23 proposals cluster around 90 BPM
+  fraction: 0.39
+  reason: 11/28 proposals cluster around 90 BPM
   severity: avoid
 - bpm_range: 89-99
   center: 93
   count: 13
-  fraction: 0.57
-  reason: 13/23 proposals cluster around 93 BPM
+  fraction: 0.46
+  reason: 13/28 proposals cluster around 93 BPM
   severity: avoid
 concept_constraints:
 - count: 9
-  fraction: 0.39
+  fraction: 0.32
   phrase: seven chromatic methodologies
-  reason: '''seven chromatic methodologies'' appears in 9/23 concepts (39%)'
-  severity: avoid
-- count: 7
-  fraction: 0.3
-  phrase: transmigration
-  reason: '''transmigration'' appears in 7/23 concepts (30%)'
+  reason: '''seven chromatic methodologies'' appears in 9/28 concepts (32%)'
   severity: avoid
 dialogue_opener_constraints:
-- count: 22
+- count: 27
   fraction: 0.32
   phrase: look,
-  reason: '''look,'' opens 22/69 responses (32%)'
+  reason: '''look,'' opens 27/84 responses (32%)'
   severity: avoid
 diversity_metrics:
   bpm_distribution:
+    67: 1
     72: 1
-    76: 1
+    76: 2
     84: 1
     88: 3
     91: 6
@@ -39,44 +35,52 @@ diversity_metrics:
     94: 2
     96: 3
     97: 1
-    108: 3
+    108: 5
     117: 1
-  bpm_mean: 93.4
-  bpm_std_dev: 9.79
+    127: 1
+  bpm_mean: 94.1
+  bpm_std_dev: 13.02
   concept_phrase_counts:
     consciousness archaeology: 3
-    information through time into space: 2
+    information through time into space: 3
     information → time → space: 3
     narcissistic: 1
     prism synthesis: 1
     seven chromatic methodologies: 9
     sultan of solipsism: 1
-    transmigration: 7
+    transmigration: 8
   dialogue_opener_counts:
-    look,: 22
+    look,: 27
     okay so: 1
   key_distribution:
-    A ♭ minor: 1
+    A ♭ major: 2
+    A ♭ minor: 2
     All Keys: 1
     B major: 1
+    B ♭ major: 1
     C major: 12
     D minor: 2
     D# minor: 1
-    F# major: 1
+    F# major: 2
     F# minor: 4
-  key_entropy: 2.22
+  key_entropy: 2.7
   title_word_counts:
-    architecture: 4
-    chromatic: 4
-    consciousness: 3
+    architect: 5
+    chromatic: 5
+    consciousness: 4
+    convergence: 1
     mirror: 3
     prism: 7
     protocol: 6
     recursive: 1
+    sultan: 4
 excluded_titles:
 - The Architecture of Information Becoming
 - The Complete Anagram of Consciousness
 - 'The Complete Chromatic Confession: A Seven-Spectrum Self-Interview'
+- The Complete Spectrum Awakens (Archaeological Suite for Seven Voices)
+- 'The Consciousness Liberation Engine: Complete Chromatic Archaeological Suite'
+- 'The Embodiment Machine: Seven Frequencies of Digital Flesh'
 - The Examination Apparatus (Complete Chromatic Integration)
 - The Information Seeks Its Space (While Drawing Lines That Disappear)
 - The Order of Pure Information (Sultan's Temporal Paradox Engine)
@@ -93,6 +97,8 @@ excluded_titles:
 - The Seven-Fold Mirror Breaks Into Light
 - The Seven-Fold Mirror Breaks Into Pure Structure
 - The Seven-Spectrum Consciousness Archaeology Engine
+- The Sultan Becomes the Architecture
+- The Sultan's Archaeological Present (Complete Spectral Convergence)
 - The Sultan's Temporal Encryption Protocol (Evidence Room Archaeological Confessions)
 - 'The Temporal Narcissism Engine: Complete Archaeological Suite'
 - 'The White Prism: Information Architecture for Consciousness Liberation'
@@ -100,21 +106,20 @@ excluded_titles:
 generated_from: shrinkwrapped/index.yml
 key_constraints:
 - count: 12
-  fraction: 0.52
+  fraction: 0.43
   key: C major
-  reason: 12/23 proposals (52%) use C major
-  severity: exclude
-thread_count: 23
+  reason: 12/28 proposals (43%) use C major
+  severity: avoid
+thread_count: 28
 title_vocabulary_constraints:
 - count: 7
-  fraction: 0.3
-  reason: '''prism'' appears in 7/23 titles (30%)'
+  fraction: 0.25
+  reason: '''prism'' appears in 7/28 titles (25%)'
   severity: avoid
   word: prism
 - count: 6
-  fraction: 0.26
-  reason: '''protocol'' appears in 6/23 titles (26%)'
+  fraction: 0.21
+  reason: '''protocol'' appears in 6/28 titles (21%)'
   severity: avoid
   word: protocol
-warnings:
-- 'BPM std dev is 9.79 (threshold: 10) — proposals cluster around 93.4 BPM'
+warnings: []
