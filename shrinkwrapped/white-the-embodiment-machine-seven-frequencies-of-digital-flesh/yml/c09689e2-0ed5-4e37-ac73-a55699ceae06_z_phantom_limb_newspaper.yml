@@ -1,0 +1,86 @@
+artifact_id: c09689e2-0ed5-4e37-ac73-a55699ceae06
+artifact_name: phantom_limb_newspaper
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1986-08-26'
+file_name: c09689e2-0ed5-4e37-ac73-a55699ceae06_z_phantom_limb_newspaper.yml
+headline: Local Band's Recording Session Ends in Psychiatric Emergency
+location: Vernon Township, NJ
+rainbow_color_mnemonic_character_value: Z
+source: Sussex County Independent
+tags:
+- local music
+- mental health
+- unexplained phenomena
+- youth
+- phantom sensations
+text: 'VERNON TOWNSHIP - A recording session by local experimental rock band "Missing
+  Frequency" ended abruptly Sunday night when three of the four band members were
+  transported to Newton Memorial Hospital following what witnesses described as a
+  "shared psychological episode."
+
+
+  The incident occurred at Blackwater Studios, a converted barn on Route 94, where
+  the band had been working on what they called their "phantom album" - a collection
+  of songs designed to evoke sensations of experiences never lived.
+
+
+  According to studio owner Frank Kowalski, the band had been experimenting with an
+  unusual recording technique involving seven-beat rhythmic patterns and frequencies
+  tuned to F# minor. "They kept talking about ''recursive layers'' and ''micro-rebellions,''"
+  Kowalski said. "I thought it was just musician talk."
+
+
+  The trouble began around 9:30 PM when bassist Jenny Marchetti, 19, began complaining
+  of severe phantom pain in her left arm - despite having both arms intact. Within
+  minutes, guitarist Tom Brennan, 20, and drummer Rick Santos, 18, reported similar
+  sensations of missing limbs they had never lost.
+
+
+  "They were reaching for things that weren''t there, trying to play instruments with
+  hands they couldn''t feel," said Kowalski. "Jenny kept saying she could hear her
+  bass line continuing even after she stopped playing."
+
+
+  The band''s lead vocalist and primary songwriter, Marcus "Ghost" Delacroix, 21,
+  remained unaffected but became increasingly agitated as his bandmates'' conditions
+  worsened. "He kept shouting about ''constraint rebellion'' and how they were ''feeling
+  freedom through binding,''" Kowalski reported.
+
+
+  Dr. Patricia Hennessy, who treated the three musicians at Newton Memorial, confirmed
+  they were experiencing "phantom limb syndrome without amputation" - a condition
+  she said she had never encountered in medical literature. "They described vivid
+  sensations in limbs they possessed but couldn''t access," she explained. "It''s
+  as if their nervous systems were rebelling against their own constraints."
+
+
+  The musicians were released Monday morning with no lasting effects, but the incident
+  has left the local music community puzzled. The band''s equipment remains at Blackwater
+  Studios, where Kowalski reports hearing faint musical patterns continuing to play
+  from speakers that aren''t connected to power.
+
+
+  "Missing Frequency" formed in early 1985 and had gained a small following for their
+  unconventional approach to rock music. They frequently performed in 7/8 time signatures
+  and incorporated field recordings of local environments into their songs.
+
+
+  The band''s "phantom album" remains unfinished. When contacted for comment, Delacroix
+  would only say, "We found something we weren''t supposed to find. The music is still
+  playing itself."
+
+
+  Blackwater Studios has temporarily suspended operations pending investigation of
+  what Kowalski describes as "ongoing audio anomalies." The Sussex County Health Department
+  has found no environmental factors that could explain the incident.
+
+
+  The three affected musicians have declined further medical treatment and say they
+  plan to continue with the band, though they admit the phantom sensations return
+  whenever they attempt to play music in the same rhythmic patterns that triggered
+  the original episode.'
+thread_id: 4648fdbd-4b18-4433-9b4c-cc8fde8dd602

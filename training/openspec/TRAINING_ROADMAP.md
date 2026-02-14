@@ -121,10 +121,14 @@ MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
     → Output: training_data_clap_embeddings.parquet (20.5 MB)
     → Executed on Modal (A10G), ~30 min. Media parquet cached in Modal Volume.
                 │
- ⑦ add-multimodal-fusion (Phases 3.1 + 3.2 remaining) — THE BLOCKER
-    → Precompute piano roll MIDI embeddings (128 pitch x 256 time → CNN → 512-dim)
-    → Train fusion model: [audio 512 + MIDI 512 + text 768] → MLP → regression heads
-    → Target: spatial mode 62% → >85%
+ ✅ add-multimodal-fusion (Phases 3.1 + 3.2) — COMPLETE 2026-02-13
+    → Piano roll preprocessing: 11,692 segments → [128,256] matrices (5,231 with MIDI)
+    → PianoRollEncoder CNN (1.1M params, unfrozen) + fusion MLP (3.2M params)
+    → Input: [audio 512 + MIDI 512 + concept 768 + lyric 768] = 2560-dim
+    → Learned null embeddings + modality dropout (p=0.15)
+    → Results: temporal 90%, spatial 93%, ontological 91%
+    → Spatial mode: 62% → 93% (target was >85%) ✓
+    → Model: training/data/fusion_model.pt (16.4 MB)
 ```
 
 ### Track B: Agent Pipeline (Local, No GPU)
@@ -150,15 +154,16 @@ MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
 POST-TRAINING
 ══════════════════════════════════
 
+ ⑨ ONNX Export + ChromaticScorer (next)
+    → Export fusion model (4.3M params) to ONNX for fast inference
+    → ChromaticScorer class: score(midi_bytes, audio_waveform, concept_text) → dict
+    → No API needed — scorer is imported directly by the generator
+    → Batch scoring for 50+ candidates per evolutionary stage
+                │
  ⑧ Build Evolutionary Music Generator (not yet spec'd)
-    → Uses multimodal model (Track A ⑦) as fitness function
+    → Uses ChromaticScorer (⑨) as fitness function
     → Uses negative constraints (Track B ②) for diversity
     → Multi-stage: concept → chords → drums → bass → melody → human eval
-                │
- ⑨ Phase 10: Production Deployment
-    → FastAPI endpoint for scoring
-    → ONNX export for inference speed
-    → Batch scoring for 50+ candidates per stage
 ```
 
 ### What Changed Since Last RunPod Run
@@ -218,9 +223,9 @@ Prepares training data for multimodal model training:
 
 #### Phase 3.1 + 3.2: Audio + MIDI + Text Fusion
 **Change**: `add-multimodal-fusion`
-**Priority**: 🔥 THE BLOCKER — enables chromatic fitness function
-**Status**: CLAP precomputation done; MIDI CNN + fusion training remain
-**Design**: `design.md` complete — CLAP audio encoder, piano roll CNN, learned null embeddings, precompute-then-fuse, late concatenation
+**Priority**: ✅ COMPLETE (2026-02-13)
+**Status**: Complete — spatial mode 62% → 93%
+**Design**: `design.md` — CLAP audio encoder, piano roll CNN, learned null embeddings, joint CNN training (Option A), late concatenation
 
 Core multimodal model combining audio, MIDI, and text:
 - CLAP audio encoder (`laion/larger_clap_music`) → [batch, 512]
@@ -266,9 +271,18 @@ Core multimodal model combining audio, MIDI, and text:
 **Change**: `add-data-augmentation`
 **Priority**: Low
 
-### Phase 10: Production Deployment
-**Change**: `add-production-deployment`
-**Priority**: Critical (after Phase 3)
+### Phase 10: ONNX Export + ChromaticScorer
+**Change**: `add-production-deployment` (revised — no API, direct import)
+**Priority**: 🔥 Next — enables Evolutionary Music Generator
+**Status**: Not Started
+
+Revised scope (2026-02-13): No FastAPI endpoint needed. The Evolutionary Music Generator
+calls the scorer directly in-process. Scope is now:
+- ONNX export of `MultimodalFusionModel` (4.3M params → fast CPU inference)
+- `ChromaticScorer` class that loads ONNX model + handles piano roll conversion
+- Interface: `score(midi_bytes, audio_waveform, concept_text) → {temporal, spatial, ontological, confidence}`
+- Batch interface: `score_batch(candidates) → ranked list` for 50+ candidates per stage
+- DeBERTa + CLAP encoders still needed at inference for new text/audio — either precompute or lazy-load
 
 ### Infrastructure: Experiment Tracking & Optimization
 **Change**: `add-infrastructure-improvements`
@@ -288,11 +302,11 @@ Core multimodal model combining audio, MIDI, and text:
 | **RunPod Guide** | `add-runpod-deployment-guide` | **Spec'd** | 🔥 Read before RunPod |
 | **Data Verification** | `add-training-data-verification` | **✅ Complete** | Done |
 | **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | **✅ Complete** (2026-02-12) | Done |
-| **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | CLAP done; MIDI CNN + fusion remain | 🔥 BLOCKER |
+| **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | **✅ Complete** (2026-02-13) | Done |
 | **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | Done |
 | **Result Feedback** | `add-chain-result-feedback` | ✅ Complete | Done |
 | Phase 3.3+3.4 (Lyrics) | `add-prosodic-lyric-encoding` | Not Started | Medium |
-| Phase 10 (Production) | `add-production-deployment` | Not Started | After Phase 3 |
+| Phase 10 (ONNX+Scorer) | `add-production-deployment` | Not Started | 🔥 Next |
 | Infrastructure | `add-infrastructure-improvements` | Not Started | High |
 | Phase 8 (Interpretability) | `add-model-interpretability` | ~ Partial | Medium |
 | Phase 9 (Augmentation) | `add-data-augmentation` | Not Started | Low |
@@ -357,4 +371,4 @@ All 27 mode combinations now mapped to 8 albums.
 
 *Last Updated: 2026-02-12*
 
-**Status**: Phases 1, 2, 4 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3.0 complete**: DeBERTa text embeddings (768-dim) + CLAP audio embeddings (512-dim) extracted via Modal GPU. **Next: Piano roll MIDI CNN → multimodal fusion training (Phase 3.1/3.2).** GPU execution migrated from RunPod to Modal (serverless, no storage provisioning).
+**Status**: Phases 1, 2, 3, 4 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3 complete** (2026-02-13): Multimodal fusion model (audio + MIDI + text) achieves 90% temporal, 93% spatial, 91% ontological. Spatial mode went from 62% (text-only) to 93% (multimodal). Model saved as `training/data/fusion_model.pt` (16.4 MB). **Next: Phase 10 (Production Deployment) and Step 8 (Evolutionary Music Generator).** GPU execution on Modal (serverless).

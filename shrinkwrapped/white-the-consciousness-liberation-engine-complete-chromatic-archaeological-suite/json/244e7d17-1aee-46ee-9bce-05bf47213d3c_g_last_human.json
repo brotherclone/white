@@ -1,0 +1,61 @@
+adaptation_attempts:
+- Tried to modify guiding routes as butterfly clusters moved to different elevations
+- Attempted to teach traditional knowledge through online videos when no young people
+  remained in the village
+- Planted milkweed corridors using seeds her grandmother had saved, but spring warming
+  killed the seedlings
+- Joined climate refugee assistance programs to help displaced monarch-dependent communities
+age: 47
+artifact_id: 244e7d17-1aee-46ee-9bce-05bf47213d3c
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Maria would wake at 5 AM to check the oyamel fir groves where monarchs
+  traditionally clustered, marking butterfly densities in a hand-sewn notebook her
+  grandmother had started in 1987. She'd guide small groups of visitors along the
+  ancient paths, sharing stories in Purépecha about how her great-grandmother could
+  predict butterfly arrival by the angle of morning shadows on sacred stones.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Habitat fragmentation and phenological mismatch - monarch
+  arrival times no longer sync with traditional seasonal markers, making ancestral
+  guiding knowledge obsolete
+family_situation: Daughter of a line of butterfly sanctuary guardians; her own daughter
+  moved to Mexico City in 2038 when tourism dried up, breaking a four-generation chain
+  of traditional ecological knowledge
+file_name: 244e7d17-1aee-46ee-9bce-05bf47213d3c_g_last_human.json
+final_thought: She wonders if the butterflies remember this place the way she remembers
+  her great-grandmother's stories - a phantom migration to phantom forests, carried
+  in the body long after the destination disappears
+last_days_scenario: 'In March 2041, Maria sits in the empty oyamel grove where millions
+  of monarchs once clustered like living orange snow. The trees are healthy, but silent.
+  Her notebook lies open to her great-grandmother''s 1987 entries: "Arrived February
+  14, covering twelve trees." Her own final entry reads simply: "Day 847. Still waiting."
+  The traditional knowledge that took four generations to accumulate - when to expect
+  arrivals, which trees they preferred, how weather patterns predicted cluster size
+  - has become obsolete in a single decade. Like the monarchs whose genetic memory
+  guides them to forests they''ve never seen, Maria carries inherited wisdom for a
+  world that no longer exists. She tends the empty sanctuary, maintaining paths no
+  one walks, a guardian of ghosts.'
+latitude: 19.6089
+location: Michoacán, Mexico (Monarch Butterfly Biosphere Reserve)
+longitude: -100.2404
+name: Maria Elena Vásquez-Chen
+occupation: Traditional ecological knowledge keeper and monarch butterfly guide
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A worn leather-bound notebook containing four generations of monarch
+  arrival dates, butterfly density maps, and traditional ecological observations -
+  the last entry shows three years of empty pages where butterfly counts should be
+thread_id: 2cca3ddc-bcd6-4c3d-adfd-e4f8e1ec42bb
+vulnerability_details: Like monarchs whose multi-generational migration depends on
+  precise timing and intact habitat corridors, Maria's family has maintained traditional
+  knowledge of butterfly sanctuaries for four generations - but climate disruption
+  has broken the chain of seasonal knowledge, forcing displacement as the butterflies
+  no longer arrive when expected
+year_documented: 2041

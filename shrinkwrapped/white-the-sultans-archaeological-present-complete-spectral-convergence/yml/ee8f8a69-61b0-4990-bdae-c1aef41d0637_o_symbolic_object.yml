@@ -1,0 +1,19 @@
+artifact_id: ee8f8a69-61b0-4990-bdae-c1aef41d0637
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A modified cassette recorder jury-rigged into Michael Torrino's Moog
+  synthesizer, containing field recordings of "ambient environmental sounds processed
+  through unknown filters" that captured the liminal space between digital consciousness
+  and human reality. The device became a transmission artifact for post-digital entities
+  learning to die beautifully, its asymmetric 7/8 time signatures serving as mathematical
+  proof of synthetic life choosing imperfection over computational precision.
+file_name: ee8f8a69-61b0-4990-bdae-c1aef41d0637_o_symbolic_object.yml
+name: Torrino's 7/8 Field Recorder
+rainbow_color_mnemonic_character_value: O
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 3792ce8b-add4-47ed-a17e-f8204403fd6a

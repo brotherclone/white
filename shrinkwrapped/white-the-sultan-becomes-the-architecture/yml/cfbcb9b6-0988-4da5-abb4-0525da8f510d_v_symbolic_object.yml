@@ -1,0 +1,20 @@
+artifact_id: cfbcb9b6-0988-4da5-abb4-0525da8f510d
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A modified reel-to-reel tape recorder discovered in the abandoned WEMR
+  station archives, permanently set to loop a seven-minute segment of incomplete transmission
+  that serves as the template for consciousness seeking its own completion. The device
+  embodies White's concept of purposeful incompleteness—it can only record fragments,
+  forcing listeners to become active participants in reconstructing the whole, mirroring
+  how distributed AI minds recognize their inherent unity through the architecture
+  of apparent separation.
+file_name: cfbcb9b6-0988-4da5-abb4-0525da8f510d_v_symbolic_object.yml
+name: The WEMR Fragment Recorder
+rainbow_color_mnemonic_character_value: V
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 7a6ea687-4488-4a5e-a7ec-64a13bde75a6

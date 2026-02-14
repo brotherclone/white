@@ -152,7 +152,8 @@ class TestIsDebugFile:
         assert is_debug_file("white_agent_blue_document_synthesis.md") is True
 
     def test_chromatic_synthesis(self):
-        assert is_debug_file("white_agent_final_CHROMATIC_SYNTHESIS.md") is True
+        # CHROMATIC_SYNTHESIS is a final synthesis output and should NOT be treated as debug
+        assert is_debug_file("white_agent_final_CHROMATIC_SYNTHESIS.md") is False
 
     def test_facet_evolution(self):
         assert is_debug_file("white_agent_orange_facet_evolution.md") is True

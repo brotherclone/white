@@ -1,0 +1,62 @@
+adaptation_attempts:
+- Tried to join fishing cooperative but it was infiltrated by cartels
+- Applied for government transition program that never materialized
+- Attempted sustainable aquaculture with microcredit that became predatory debt
+- Moved fishing grounds repeatedly as enforcement increased
+- Sold family heirlooms to buy GPS to avoid protected areas
+age: 47
+artifact_id: 927c0bb6-40a8-432c-95f2-c4e1c84f38b9
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: '4 AM: Check weather and debt payment schedule. 4:30 AM: Prepare nets
+  while avoiding eye contact with cartel lookouts at the dock. 5 AM: Motor out in
+  her 22-foot panga ''Pequeña Esperanza'' to coordinates texted by loan sharks. 6
+  AM-2 PM: Fish with growing desperation as catches shrink and patrol boats circle.
+  3 PM: Sell catch to middlemen who take 60% for ''protection fees.'' 4 PM: Count
+  money that never covers expenses. Evening: Mend nets by lamplight, calculate impossible
+  math of survival.'
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Escalating enforcement raids and cartel control of fishing
+  grounds, forcing her into increasingly dangerous waters and illegal practices to
+  pay off debts for equipment she bought to feed her family
+family_situation: Widow with two teenage children - Miguel (17) who refuses to fish,
+  and Carmen (15) who dreams of marine biology but whose school closed when the fishing
+  economy collapsed
+file_name: 927c0bb6-40a8-432c-95f2-c4e1c84f38b9_g_last_human.json
+final_thought: Like the vaquita, she never meant to be caught - just trying to feed
+  her family in waters that were once abundant. Now the nets meant to sustain life
+  have become the trap that ends it.
+last_days_scenario: The loan sharks demand she use gillnets in the vaquita refuge
+  - the same nets that killed the last porpoises. Esperanza knows the patrol boats
+  have new sonar, that the penalties now include prison time her children cannot survive.
+  But the debt collectors are at her door, and Miguel is talking about joining them
+  for quick money. She loads the forbidden nets into Pequeña Esperanza at dawn, her
+  hands shaking as she motors toward the coordinates where both species make their
+  final stand against systems designed to harvest everything.
+latitude: 31.0258
+location: San Felipe, Baja California, Mexico
+longitude: -114.8375
+name: Esperanza Morales Vásquez
+occupation: Small-scale shrimp fisher
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A waterlogged VHF radio that once connected her to other fishers
+  sharing safe coordinates and weather warnings, now mostly silent as the fleet shrinks
+  and trust dissolves. She keeps it on channel 16 hoping to hear familiar voices,
+  but increasingly hears only cartel communications and coast guard warnings she cannot
+  heed without starving.
+thread_id: 7a6ea687-4488-4a5e-a7ec-64a13bde75a6
+vulnerability_details: Like the vaquita caught in gillnets meant for totoaba, Esperanza
+  is trapped in debt cycles to loan sharks who finance illegal fishing operations
+  she never intended to join. Her small boat and nets, meant for sustainable shrimp
+  fishing, are now collateral in a system that demands she fish in protected waters
+  or lose everything. She cannot escape to other work - fishing is all she knows,
+  and San Felipe has no other economy.
+year_documented: 2031
