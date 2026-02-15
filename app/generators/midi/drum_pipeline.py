@@ -495,6 +495,10 @@ def run_drum_pipeline(
     drums_dir = prod_path / "drums"
     candidates_dir = drums_dir / "candidates"
     approved_dir = drums_dir / "approved"
+    # Clean old candidates to avoid stale files from previous runs
+    if candidates_dir.exists():
+        for old_file in candidates_dir.glob("*.mid"):
+            old_file.unlink()
     candidates_dir.mkdir(parents=True, exist_ok=True)
     approved_dir.mkdir(parents=True, exist_ok=True)
 
