@@ -181,7 +181,30 @@ POST-TRAINING
     → Same review.yml + promote workflow as chords
     → 41 tests passing
                 │
- ⑨ Next phases: strums, bass, melody+lyrics, assembly
+ ✅ Music Production Pipeline — Strum Phase (COMPLETE 2026-02-15)
+    → OpenSpec: openspec/changes/add-strum-rhythm-generation/
+    → Patterns: app/generators/midi/strum_patterns.py
+    → Pipeline: app/generators/midi/strum_pipeline.py
+    → Applies rhythm patterns (whole/half/quarter/eighth/push/arpeggio) to approved chord voicings
+    → Per-chord mode (each chord × each pattern) and progression mode (full sequence)
+    → 4/4 and 7/8 patterns with fallback for other time sigs
+    → No ChromaticScorer (harmony unchanged)
+    → Same review.yml + promote workflow
+    → 24 tests passing
+                │
+ ✅ Music Production Pipeline — Harmonic Rhythm Phase (COMPLETE 2026-02-15)
+    → OpenSpec: openspec/changes/add-harmonic-rhythm-generation/
+    → Core: app/generators/midi/harmonic_rhythm.py
+    → Pipeline: app/generators/midi/harmonic_rhythm_pipeline.py
+    → Variable chord durations on half-bar grid (0.5, 1.0, 1.5, 2.0 bars)
+    → Reads approved drum MIDI for accent alignment scoring
+    → ChromaticScorer temporal mode scoring
+    → Composite: 30% drum alignment + 70% chromatic temporal
+    → Section expansion/contraction supported (N*0.5 to N*2.0 bars)
+    → Strum pipeline updated to consume approved harmonic rhythm
+    → 34 tests passing
+                │
+ ⑩ Next phases: bass, melody+lyrics, assembly
     → Each follows same pattern: generate → score → human gate → approve
 ```
 
@@ -328,6 +351,8 @@ calls the scorer directly in-process. Scope is now:
 | Phase 10 (ONNX+Scorer)        | `add-production-deployment`       | **✅ Complete** (2026-02-14)     | Done                  |
 | **Chord Phase**               | `add-music-production-pipeline`   | **✅ Complete** (2026-02-14)     | Done                  |
 | **Drum Phase**                | `add-drum-pattern-generation`     | **✅ Complete** (2026-02-15)     | Done                  |
+| **Strum Phase**               | `add-strum-rhythm-generation`     | **✅ Complete** (2026-02-15)     | Done                  |
+| **Harmonic Rhythm Phase**     | `add-harmonic-rhythm-generation`  | **✅ Complete** (2026-02-15)     | Done                  |
 | Infrastructure                | `add-infrastructure-improvements` | Not Started                      | High                  |
 | Phase 8 (Interpretability)    | `add-model-interpretability`      | ~ Partial                        | Medium                |
 | Phase 9 (Augmentation)        | `add-data-augmentation`           | Not Started                      | Low                   |
