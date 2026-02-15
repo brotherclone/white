@@ -46,6 +46,9 @@ dependencies = [
     "pydub>=0.25.1",
     "ipykernel>=7.1.0",
     "datasets>=4.5.0",
+    "networkx",
+    "transformers",
+    "onnxruntime"
 ]
 
 [project.optional-dependencies]

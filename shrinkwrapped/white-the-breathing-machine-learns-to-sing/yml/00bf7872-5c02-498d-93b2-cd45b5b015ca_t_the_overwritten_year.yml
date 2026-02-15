@@ -1,0 +1,186 @@
+artifact_id: 00bf7872-5c02-498d-93b2-cd45b5b015ca
+artifact_name: the_overwritten_year
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of continuing at Huge Inc., Gabriel took an unpaid sabbatical
+    to join Dr. Margaret Chen's acoustic ecology research project documenting the
+    collapse of Midwest bee colonies
+  when: January 2013
+  why_plausible: The 2012 bee colony collapse was major news, Gabriel had always been
+    interested in environmental sound recording, and many creative professionals took
+    career breaks during this period to pursue meaningful work
+emotional_tone: !!python/object/apply:app.structures.enums.quantum_tape_emotional_tone.QuantumTapeEmotionalTone
+- melancholy
+file_name: 00bf7872-5c02-498d-93b2-cd45b5b015ca_t_the_overwritten_year.yml
+following_events:
+- Return to New York with hundreds of hours of field recordings that no one wanted
+  to release
+- Sarah's ultimatum about choosing between family stability and artistic pursuits
+- The Google Glass project becoming a way to escape the failure of the pollinator
+  work
+- Silas's birth coinciding with Gabriel's return to commercial work and creative compromise
+key_differences:
+- Spent 2013 living in a converted Airstream trailer traveling between research sites
+- Developed expertise in acoustic ecology and bioacoustic recording techniques
+- Created a body of environmental sound work instead of commercial digital projects
+- Experienced rural Midwest culture for the first time as an adult
+- Strained marriage due to extended absence and financial uncertainty
+mood_description: A year spent in the liminal space between technological civilization
+  and ecological collapse, documenting the acoustic archaeology of abundance machinery
+  turning against its operators. The melancholy of witnessing endings, the intimacy
+  of field recording work, the weight of creating art that serves as memorial rather
+  than entertainment. Folk rock territory - personal mythology built from concrete
+  specificity and environmental grief.
+narrative: "The year began with Gabriel Walsh driving a rented U-Haul west on I-80,\
+  \ the Airstream trailer fishtailing behind him in January wind. Sarah had given\
+  \ him exactly twelve months to \"get this environmental thing out of your system,\"\
+  \ and Dr. Margaret Chen's grant money would cover basic expenses if he lived simply.\
+  \ \n\nThe first morning at Kowalski Apiaries, Gabriel woke to condensation dripping\
+  \ from the trailer's aluminum ceiling onto his sleeping bag. Outside, Thomas Kowalski\
+  \ was already working the hives, his movements deliberate and economical. \"You\
+  \ want to hear bees dying?\" Thomas had said when Gabriel explained his project.\
+  \ \"I got plenty of that.\"\n\nThe work was methodical: wake at 5:47, instant coffee,\
+  \ equipment check, walk to the hives. Gabriel learned to read the acoustic signatures\
+  \ of healthy colonies - the steady 230 beats per second of worker bee wings, the\
+  \ deeper bass notes of drones, the high-frequency alarm calls when the hive was\
+  \ disturbed. But increasingly, he was documenting silence.\n\nDr. Chen would drive\
+  \ up from Urbana-Champaign twice a week in her Honda Civic, the back seat filled\
+  \ with spectral analysis equipment. In her lab on the third floor of Morrill Hall,\
+  \ they would spend nights analyzing Gabriel's recordings, watching the frequency\
+  \ displays as healthy colony sounds degraded into chaos, then nothing. Margaret\
+  \ had been studying colony collapse for six years, but Gabriel's recordings revealed\
+  \ patterns she'd never heard - the way dying colonies produced a specific rust-colored\
+  \ frequency signature before going silent.\n\nBy June, Gabriel had documented the\
+  \ complete collapse of seventeen hives across three counties. The moment that would\
+  \ define the project came at Meadowbrook Farm outside Galena, Illinois. Gabriel\
+  \ had been recording a struggling hive when, at exactly 3:17 PM on the summer solstice,\
+  \ the wing-beat frequency dropped from 230 to 180 to zero beats per second. The\
+  \ silence that followed contained everything - the end of thirty thousand years\
+  \ of pollinator evolution, the sound abundance used to make.\n\nThe recordings accumulated:\
+  \ 340 hours of acoustic documentation that no one knew how to categorize. Gabriel\
+  \ submitted samples to Thrill Jockey, Kranky, even Smithsonian Folkways. The responses\
+  \ were polite but clear - this was \"unmarketable environmental audio,\" too specific\
+  \ for music, too artistic for science.\n\nThomas Kowalski sold his remaining hives\
+  \ to a corporate operation in September. The Airstream was returned to the rental\
+  \ company. Gabriel drove back to New York with hard drives full of the sounds of\
+  \ ecological collapse, arriving home to Sarah's careful silence and the knowledge\
+  \ that he'd spent a year documenting something the world wasn't ready to hear.\n\
+  \nThe Google Glass opportunity would come six months later, a chance to work with\
+  \ cutting-edge technology and stable income. But sometimes, late at night, Gabriel\
+  \ would put on headphones and listen to those recordings - the rust signal transmitting\
+  \ across frequencies, the phantom wing beats of abundance that once was, the sound\
+  \ of his own breathing as he witnessed the end of something ancient and irreplaceable."
+period:
+  age_range: !!python/tuple
+  - 38
+  - 38
+  creative_output:
+  - The Rust Signal Recordings
+  - Pollinator Frequency Maps
+  - Abandoned hive sound documentation
+  description: The year Gabriel Walsh left digital work behind to document dying bee
+    colonies across the Midwest, creating field recordings that would become his most
+    profound and unheard work
+  detail_level: !!python/object/apply:app.structures.enums.biographical_timeline_detail_level.BiographicalTimelineDetailLevel
+  - high
+  duration_months: 11
+  emotional_tone: melancholy
+  end_date: 2013-12-31
+  is_forgotten: false
+  key_relationships:
+  - Dr. Margaret Chen - entomologist
+  - Thomas Kowalski - beekeeper
+  - Sarah Walsh - estranged wife
+  known_events:
+  - approximate_date: null
+    category: creative
+    date: 2013-02-15
+    description: First field recording session at Kowalski Apiaries in Delavan, Wisconsin
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: creative
+    date: 2013-06-21
+    description: Discovery of the 230 BPS wing frequency pattern in dying colonies
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  - approximate_date: null
+    category: career
+    date: 2013-09-30
+    description: Final recording session before returning to New York
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  location: Various locations across Illinois, Wisconsin, and Iowa
+  primary_activity: Acoustic ecology research and field recording
+  start_date: 2013-01-01
+  trauma_level: medium
+plausibility_score: 0.85
+preceding_events:
+- Gabriel's growing dissatisfaction with commercial digital work at Huge Inc.
+- Sarah's increasing concern about their financial stability and Gabriel's restlessness
+- Reading about Dr. Margaret Chen's research on bee colony acoustic signatures in
+  Scientific American
+- The devastating bee colony losses of winter 2012-2013 making national headlines
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Lived in a 1978 Airstream International parked behind Kowalski Apiaries
+    on County Road H near Delavan, Wisconsin, waking each morning to the sound of
+    propane heating and the distant hum of surviving hives
+  sensory_elements:
+  - metallic condensation dripping
+  - propane burner whoosh
+  - morning bee activity at 230 beats per second
+- category: relationship
+  detail: Dr. Margaret Chen from University of Illinois Urbana-Champaign became his
+    research partner and closest confidant, teaching him to identify colony stress
+    patterns through frequency analysis over late-night sessions in her lab on Morrill
+    Hall's third floor
+  sensory_elements:
+  - fluorescent lab lighting
+  - coffee from the vending machine
+  - spectral analysis software beeping
+- category: daily_routine
+  detail: Every morning at 5:47 AM, Gabriel would check his Zoom H6 recorder battery
+    levels, drink instant coffee heated on the trailer's single burner, and walk the
+    quarter-mile to Thomas Kowalski's hives carrying his boom pole and windscreen
+  sensory_elements:
+  - frost crunching underfoot
+  - coffee steam in cold air
+  - equipment bag zipper sounds
+- category: career
+  detail: Instead of designing interfaces, Gabriel spent his days crouched in Illinois
+    cornfields with a shotgun microphone, documenting the acoustic signature of colony
+    collapse disorder at sites from Rockford to Bloomington
+  sensory_elements:
+  - corn stalks rustling
+  - wind hitting the microphone
+  - sudden silence when colonies failed
+- category: creative
+  detail: His masterwork 'The Rust Signal' was a 47-minute composition built from
+    the wing-beat frequencies of dying bees, recorded at Meadowbrook Farm outside
+    Galena, Illinois, where he captured the exact moment a hive went silent on June
+    21st at 3:17 PM
+  sensory_elements:
+  - decreasing frequency from 230 to 180 to 0 BPS
+  - wind through empty frames
+  - his own breathing on the recording
+- category: outcome
+  detail: The project ended when Thomas Kowalski sold his remaining hives to a corporate
+    operation in September, and Gabriel returned to New York with 340 hours of recordings
+    that Thrill Jockey Records called 'unmarketable environmental audio'
+  sensory_elements:
+  - rejection letter paper
+  - hard drives clicking
+  - Sarah's silence when he walked in the door
+specificity_score: 0.9
+thread_id: 346b57fa-c4cc-4d69-bbf1-cc90ca9317e8
+title: The Year of the Pollinator Project

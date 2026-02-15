@@ -154,32 +154,40 @@ MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
 POST-TRAINING
 ══════════════════════════════════
 
- ⑨ ONNX Export + ChromaticScorer (next)
-    → Export fusion model (4.3M params) to ONNX for fast inference
-    → ChromaticScorer class: score(midi_bytes, audio_waveform, concept_text) → dict
-    → No API needed — scorer is imported directly by the generator
-    → Batch scoring for 50+ candidates per evolutionary stage
+ ✅ ONNX Export + ChromaticScorer (COMPLETE 2026-02-14)
+    → ONNX export: training/data/fusion_model.onnx (16 MB, CPU inference)
+    → ChromaticScorer class: training/chromatic_scorer.py
+    → score(midi_bytes, concept_emb=...) → {temporal, spatial, ontological, confidence}
+    → score_batch(candidates, concept_emb=...) → ranked list for 50+ candidates
+    → Lazy-loaded DeBERTa + CLAP encoders (MIDI-only scoring never loads CLAP)
+    → Model definition extracted: training/models/multimodal_fusion.py
                 │
- ⑧ Build Evolutionary Music Generator (not yet spec'd)
-    → Uses ChromaticScorer (⑨) as fitness function
-    → Uses negative constraints (Track B ②) for diversity
-    → Multi-stage: concept → chords → drums → bass → melody → human eval
+ ✅ Music Production Pipeline — Chord Phase (COMPLETE 2026-02-14)
+    → OpenSpec: openspec/changes/add-music-production-pipeline/
+    → Pipeline: app/generators/midi/chord_pipeline.py
+    → Reads shrinkwrapped song proposal → Markov chord generation → ChromaticScorer scoring
+    → Composite scoring (30% theory + 70% chromatic) → top-N MIDI files + review.yml
+    → Human labels candidates (verse/chorus/bridge) in review.yml → promote to approved/
+    → Promotion tool: app/generators/midi/promote_chords.py
+                │
+ ⑧ Next phases: drums, bass, melody+lyrics, assembly (not yet spec'd)
+    → Each follows same pattern: generate → score → human gate → approve
 ```
 
 ### What Changed Since Last RunPod Run
 
-| Item | Before (2026-01-27) | After (2026-02-10) |
-|------|---------------------|---------------------|
-| Manifest DB | 892 tracks, 6 colors (01-06 only) | 1,327 tracks, 8 colors (01-08) |
-| Green segments | 0 (LRC hard-bail) | 393 (structure fallback) |
-| Yellow segments | Missing 4 instrumental songs | 656 (structure fallback) |
-| Red segments | Missing 3 instrumental songs | 1,474 (structure fallback) |
-| MIDI coverage | 0% (bug) | 44.3% (5,145/11,605) |
-| Audio coverage | ~85% | 85.4% (9,907/11,605) |
-| Indigo/Violet labels | UNLABELED (3,506 segments) | Indigo 1,406 + Violet 2,100 |
-| Total segments | 10,544 | 11,605 |
-| Metadata duplicates | 87 (stale manifest after YAML edits) | 0 (rebuilt 2026-02-10) |
-| HuggingFace | Not published | v0.2.0 public, 15.3 GB media included |
+| Item                 | Before (2026-01-27)                  | After (2026-02-10)                    |
+|----------------------|--------------------------------------|---------------------------------------|
+| Manifest DB          | 892 tracks, 6 colors (01-06 only)    | 1,327 tracks, 8 colors (01-08)        |
+| Green segments       | 0 (LRC hard-bail)                    | 393 (structure fallback)              |
+| Yellow segments      | Missing 4 instrumental songs         | 656 (structure fallback)              |
+| Red segments         | Missing 3 instrumental songs         | 1,474 (structure fallback)            |
+| MIDI coverage        | 0% (bug)                             | 44.3% (5,145/11,605)                  |
+| Audio coverage       | ~85%                                 | 85.4% (9,907/11,605)                  |
+| Indigo/Violet labels | UNLABELED (3,506 segments)           | Indigo 1,406 + Violet 2,100           |
+| Total segments       | 10,544                               | 11,605                                |
+| Metadata duplicates  | 87 (stale manifest after YAML edits) | 0 (rebuilt 2026-02-10)                |
+| HuggingFace          | Not published                        | v0.2.0 public, 15.3 GB media included |
 
 ## Phase Details
 
@@ -273,8 +281,8 @@ Core multimodal model combining audio, MIDI, and text:
 
 ### Phase 10: ONNX Export + ChromaticScorer
 **Change**: `add-production-deployment` (revised — no API, direct import)
-**Priority**: 🔥 Next — enables Evolutionary Music Generator
-**Status**: Not Started
+**Priority**: ✅ COMPLETE (2026-02-14)
+**Status**: Complete
 
 Revised scope (2026-02-13): No FastAPI endpoint needed. The Evolutionary Music Generator
 calls the scorer directly in-process. Scope is now:
@@ -290,26 +298,26 @@ calls the scorer directly in-process. Scope is now:
 
 ## Current Status Summary
 
-| Phase | Change | Status | Priority |
-|-------|--------|--------|----------|
-| Phase 1 (Binary) | - | ✅ Complete | Done |
-| Phase 2 (Multi-Class) | - | ✅ Complete | Done |
-| Phase 4 (Regression) | - | ✅ Complete | Done |
-| **Pipeline Fixes** | *(this branch)* | **✅ Complete** | Done |
-| **MIDI Segmentation Fix** | *(this branch)* | **✅ Complete** | Done |
-| **Extraction + Verification** | - | **✅ Complete** (2026-02-10) | Done |
-| **HuggingFace Publish** | - | **✅ v0.2.0 public** (2026-02-10) | Done |
-| **RunPod Guide** | `add-runpod-deployment-guide` | **Spec'd** | 🔥 Read before RunPod |
-| **Data Verification** | `add-training-data-verification` | **✅ Complete** | Done |
-| **Phase 3.0 (Data Prep)** | `prepare-multimodal-data` | **✅ Complete** (2026-02-12) | Done |
-| **Phase 3.1+3.2 (Fusion)** | `add-multimodal-fusion` | **✅ Complete** (2026-02-13) | Done |
-| **Shrink-Wrap** | `add-shrinkwrap-chain-artifacts` | ✅ Complete | Done |
-| **Result Feedback** | `add-chain-result-feedback` | ✅ Complete | Done |
-| Phase 3.3+3.4 (Lyrics) | `add-prosodic-lyric-encoding` | Not Started | Medium |
-| Phase 10 (ONNX+Scorer) | `add-production-deployment` | Not Started | 🔥 Next |
-| Infrastructure | `add-infrastructure-improvements` | Not Started | High |
-| Phase 8 (Interpretability) | `add-model-interpretability` | ~ Partial | Medium |
-| Phase 9 (Augmentation) | `add-data-augmentation` | Not Started | Low |
+| Phase                         | Change                            | Status                           | Priority              |
+|-------------------------------|-----------------------------------|----------------------------------|-----------------------|
+| Phase 1 (Binary)              | -                                 | ✅ Complete                       | Done                  |
+| Phase 2 (Multi-Class)         | -                                 | ✅ Complete                       | Done                  |
+| Phase 4 (Regression)          | -                                 | ✅ Complete                       | Done                  |
+| **Pipeline Fixes**            | *(this branch)*                   | **✅ Complete**                   | Done                  |
+| **MIDI Segmentation Fix**     | *(this branch)*                   | **✅ Complete**                   | Done                  |
+| **Extraction + Verification** | -                                 | **✅ Complete** (2026-02-10)      | Done                  |
+| **HuggingFace Publish**       | -                                 | **✅ v0.2.0 public** (2026-02-10) | Done                  |
+| **RunPod Guide**              | `add-runpod-deployment-guide`     | **Spec'd**                       | 🔥 Read before RunPod |
+| **Data Verification**         | `add-training-data-verification`  | **✅ Complete**                   | Done                  |
+| **Phase 3.0 (Data Prep)**     | `prepare-multimodal-data`         | **✅ Complete** (2026-02-12)      | Done                  |
+| **Phase 3.1+3.2 (Fusion)**    | `add-multimodal-fusion`           | **✅ Complete** (2026-02-13)      | Done                  |
+| **Shrink-Wrap**               | `add-shrinkwrap-chain-artifacts`  | ✅ Complete                       | Done                  |
+| **Result Feedback**           | `add-chain-result-feedback`       | ✅ Complete                       | Done                  |
+| Phase 3.3+3.4 (Lyrics)        | `add-prosodic-lyric-encoding`     | Not Started                      | Medium                |
+| Phase 10 (ONNX+Scorer)        | `add-production-deployment`       | **✅ Complete** (2026-02-14)     | Done                  |
+| Infrastructure                | `add-infrastructure-improvements` | Not Started                      | High                  |
+| Phase 8 (Interpretability)    | `add-model-interpretability`      | ~ Partial                        | Medium                |
+| Phase 9 (Augmentation)        | `add-data-augmentation`           | Not Started                      | Low                   |
 
 ## Pipeline Bug Fixes (2026-02-07)
 
@@ -371,4 +379,4 @@ All 27 mode combinations now mapped to 8 albums.
 
 *Last Updated: 2026-02-12*
 
-**Status**: Phases 1, 2, 3, 4 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3 complete** (2026-02-13): Multimodal fusion model (audio + MIDI + text) achieves 90% temporal, 93% spatial, 91% ontological. Spatial mode went from 62% (text-only) to 93% (multimodal). Model saved as `training/data/fusion_model.pt` (16.4 MB). **Next: Phase 10 (Production Deployment) and Step 8 (Evolutionary Music Generator).** GPU execution on Modal (serverless).
+**Status**: Phases 1, 2, 3, 4, 10 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3 complete** (2026-02-13): Multimodal fusion model achieves 90% temporal, 93% spatial, 91% ontological. **Phase 10 complete** (2026-02-14): ChromaticScorer class with ONNX inference, batch scoring for 50+ candidates, lazy-loaded DeBERTa/CLAP encoders. **Next: Step 8 (Evolutionary Music Generator).** GPU execution on Modal (serverless).

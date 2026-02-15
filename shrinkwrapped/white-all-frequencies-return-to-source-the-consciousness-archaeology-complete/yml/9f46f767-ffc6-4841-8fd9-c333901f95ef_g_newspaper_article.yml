@@ -1,0 +1,19 @@
+artifact_id: 9f46f767-ffc6-4841-8fd9-c333901f95ef
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+description: A 1982 municipal infrastructure map marking the concrete tunnel network
+  beneath Byram Township, with hand-drawn annotations in trembling ink showing "frequency
+  gap coordinates" and heartbeat rhythm notations at specific drain intersections.
+  This map became the sacred geometry for Tremor Sync's underground sanctuary, transforming
+  bureaucratic infrastructure documentation into a navigation system for synchronized
+  vulnerability and collective nervous system resonance.
+file_name: 9f46f767-ffc6-4841-8fd9-c333901f95ef_g_newspaper_article.yml
+name: The Byram Township Storm Drain Map (Grid Section 7H-Minor)
+rainbow_color_mnemonic_character_value: G
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- psychogeographic
+thread_id: 12c27cb8-d3d8-4513-bc0e-57b8f4449222

@@ -1,0 +1,51 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This is the folk rock requiem for Gabriel Walsh''s erased year documenting
+  bee colony collapse in Wisconsin, 2013. Instead of designing interfaces at Huge
+  Inc., he spent eleven months living in a 1978 Airstream behind Kowalski Apiaries
+  on County Road H near Delavan, recording the acoustic signature of dying hives with
+  Dr. Margaret Chen from University of Illinois. The song captures the melancholy
+  of that lost timeline - waking at 5:47 AM to propane heating and distant bee hum,
+  walking quarter-miles through Illinois cornfields with boom poles and windscreens,
+  crouching in the acoustic archaeology of abundance machinery turning against its
+  operators. His masterwork ''The Rust Signal'' - a 47-minute composition built from
+  wing-beat frequencies of dying bees - was recorded at Meadowbrook Farm outside Galena
+  on June 21st at 3:17 PM when a hive went permanently silent. The folk rock arrangement
+  mirrors that environmental grief: pedal steel through vintage tube amps like the
+  drone of empty hives, upright bass bowed deep and resonant like the weight of ecological
+  collapse, twelve-string tremolo picking like the flutter of failing wings. This
+  is counterfactual nostalgia for the path not taken - mourning the year spent witnessing
+  endings, creating memorial art instead of marketable interfaces, choosing environmental
+  documentation over digital design. When Thomas Kowalski sold his remaining hives
+  to corporate operations in September, Gabriel returned to New York with 340 hours
+  of ''unmarketable environmental audio'' - the sound abundance used to make, preserved
+  as folk rock testimony to a timeline where he chose witness over profit.'
+genres:
+- folk rock
+- americana
+- environmental folk
+- field recording integration
+iteration_id: pollinator_project_memorial_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholic
+- nostalgic
+- environmental-grief
+- documentary
+- intimate
+- archaeological
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: County Road H (The Rust Signal Sessions)
