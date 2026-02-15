@@ -1,4 +1,5 @@
 .venv
+.venv312
 .idea
 /staged_raw_materials/
 /working/
@@ -51,3 +52,5 @@ chain_arifacts_incompletes/
 chain_artifacts/
 chain_artifacts/**/debug/*.json
 **/transformation_traces.md
+*.logicx
+*.logicx/

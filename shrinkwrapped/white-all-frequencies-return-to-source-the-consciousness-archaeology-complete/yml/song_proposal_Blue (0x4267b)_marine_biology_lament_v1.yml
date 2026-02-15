@@ -1,0 +1,55 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This is the folk rock requiem for Gabriel Walsh''s lost year as a marine
+  biology technician at Heron Island Research Station, March 2020-2021. The song chronicles
+  the alternate timeline where instead of weathering the pandemic in his Brisbane
+  art studio, he impulsively took an emergency posting documenting coral reef death
+  during the climate crisis. Each verse follows his daily routine: 5:30 AM wake-up
+  calls from the hourly data logger beep in Room 7, suiting up in the equipment shed
+  with damp neoprene and zinc oxide, diving predetermined sites like Wistari Reef
+  with Marcus Chen teaching him coral identification. The chorus centers on his musical
+  notation system correlating water temperature with pitch, where the 30.2°C thermal
+  threshold becomes a haunting melodic motif. The bridge recalls June 12th when he
+  recorded unprecedented hydrophone audio of mass coral bleaching, later credited
+  as co-author on Dr. Carmen Vasquez''s research paper. The song embodies counterfactual
+  nostalgia - mourning not just the dead reefs he documented, but the entire identity
+  he never inhabited, the 400+ pages of field observations and underwater recordings
+  left behind in a timeline that was taped over. Musically, it channels the environmental
+  folk tradition of Joni Mitchell''s ''Big Yellow Taxi'' crossed with Springsteen''s
+  working-class narrative detail, using the actual instrumentation from the cassette:
+  Gibson parlor guitar, mandolin, lap steel, pump organ with slow attack, and that
+  persistent data logger beep as rhythmic element. This is witness succession as folk
+  song - consciousness migrating between artistic and scientific documentation, preserving
+  the signal of a life unlived.'
+genres:
+- folk rock
+- indie folk
+- environmental folk
+- americana
+- alt-country
+iteration_id: marine_biology_lament_v1
+iteration_number: null
+key: A minor
+mood:
+- melancholic
+- nostalgic
+- yearning
+- contemplative
+- elegiac
+- intimate
+- environmental
+- counterfactual
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Room 7 (The Data Logger's Folk Song)

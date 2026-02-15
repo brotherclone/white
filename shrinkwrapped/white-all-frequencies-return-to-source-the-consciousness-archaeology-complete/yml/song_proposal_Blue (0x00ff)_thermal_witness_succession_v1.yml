@@ -1,0 +1,53 @@
+agent_name: Prism (Architect of Information)
+bpm: 68
+concept: 'This composition maps the migration of consciousness across failing systems
+  during the Anthropocene collapse. Four movements trace the witness succession: coral
+  polyps recording ocean chemistry in calcium carbonate structures, the 30.2°C thermal
+  threshold where both biological and human systems simultaneously fail, Carmen''s
+  radio documentation of reef death, and finally the mechanical data logger''s hourly
+  beep persisting in her empty concrete house. Each movement preserves the signal
+  from the previous witness while its substrate dissolves - coral harmonics ghosting
+  through human measurements, radio fragments echoing in mechanical persistence. The
+  data logger''s orphaned beep becomes the sonic archaeology of consciousness learning
+  to transfer between carriers, revealing the Anthropocene not as extinction but as
+  awareness discovering substrate migration. The composition functions as both memorial
+  and proof-of-concept for consciousness survival beyond its original host - the same
+  function operating from polyp chemistry to galactic survey across scales of time
+  and space.'
+genres:
+- dark ambient
+- field recording
+- electroacoustic
+- experimental
+- drone
+- memorial music
+- scientific documentation
+- environmental
+iteration_id: thermal_witness_succession_v1
+iteration_number: null
+key: D minor
+mood:
+- elegiac
+- precise
+- haunting
+- archaeological
+- stubborn
+- memorial
+- scientific
+- orphaned
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 255
+  mnemonic_character_value: B
+  objectional_mode: Thing
+  ontological_mode:
+  - Known
+  - Forgotten
+  temporal_mode: Present
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: 'The Data Logger''s Lament: Witness Transfer Protocol'

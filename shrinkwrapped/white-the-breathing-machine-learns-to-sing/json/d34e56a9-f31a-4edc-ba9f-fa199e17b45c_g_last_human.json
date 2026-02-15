@@ -1,0 +1,65 @@
+adaptation_attempts:
+- Experimented with protective gear but it reduced dexterity needed for precise pollination
+  work
+- Tried to organize crew rotations to limit exposure but farm quotas made it impossible
+- Documented health symptoms hoping for worker protection changes
+- Trained replacement coordinators but they kept getting sick or quitting
+age: 47
+artifact_id: d34e56a9-f31a-4edc-ba9f-fa199e17b45c
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: '5 AM: Check weather and bloom reports. 5:30 AM: Brief her crew of
+  12 hand-pollinators on field assignments. 6 AM-2 PM: Move between strawberry rows
+  with fine brushes, transferring pollen flower by flower - the precise vibration
+  work once done by bumble bees. Track which workers show tremors or confusion. 3
+  PM: Document pollination rates and crew health incidents. Evening: Visit hospitalized
+  crew members.'
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- witness
+environmental_stressor: Chronic exposure to neonicotinoid residues and organophosphates
+  from intensive strawberry cultivation, causing neurological symptoms in her pollination
+  crews
+family_situation: Widow - husband died of pesticide-related Parkinson's in 2031. Two
+  adult children moved away from agricultural work. Lives alone in company housing.
+file_name: d34e56a9-f31a-4edc-ba9f-fa199e17b45c_g_last_human.json
+final_thought: The strawberries are perfect this year - biggest harvest ever. But
+  there's no one left who remembers the sound the fields used to make when the bees
+  were working.
+last_days_scenario: Maria's hands shake as she demonstrates proper brush technique
+  to the three remaining workers - down from twelve last season, six the season before.
+  The others are in various stages of neurological decline, some hospitalized, others
+  simply vanished back to wherever people go when their bodies can no longer perform
+  the precise work that feeds the world. She moves through the strawberry rows with
+  the same methodical pattern she's followed for fifteen years, but now she's often
+  alone, her rust-colored jacket a bright spot against endless green. The farm manager
+  keeps asking when she'll train her replacement, but the young workers don't stay
+  long enough to learn the subtle rhythms of hand-pollination. At night, she sits
+  in her company trailer and writes detailed reports about declining pollination rates
+  and worker health that no one reads. The strawberries grow larger and more perfect
+  each year, engineered for appearance and shelf life, but Maria remembers when the
+  fields hummed with a different kind of productivity. She's the last one who remembers
+  the sound of abundance.
+latitude: 36.9108
+location: Watsonville, California - Pajaro Valley strawberry fields
+longitude: -121.7569
+name: Maria Elena Vasquez-Chen
+occupation: Commercial pollination coordinator - manages hand-pollination crews for
+  strawberry farms
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- toxic_exposure
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A rust-colored work jacket with "POLLINATION CREW LEADER" embroidered
+  in fading yellow thread - the same color as the rusty patch that once identified
+  Bombus affinis queens. She refuses to replace it despite chemical stains.
+thread_id: 346b57fa-c4cc-4d69-bbf1-cc90ca9317e8
+vulnerability_details: Like the rusty patched bumble bee killed by neonicotinoid pesticides
+  while pollinating the very crops they serve, Maria coordinates human hand-pollination
+  teams exposed to the same agricultural chemicals that eliminated their bee predecessors.
+  Her rust-colored work jacket, once a badge of her crew leadership, now marks her
+  as part of a dying profession.
+year_documented: 2034
