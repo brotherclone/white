@@ -1,0 +1,638 @@
+song_proposal: song_proposal_Black (0x221f20)_sequential_dissolution_v2.yml
+thread: shrinkwrapped/white-the-breathing-machine-learns-to-sing
+key: Gb minor
+bpm: 84
+color: Black
+generated: '2026-02-14T15:19:00.775255+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+candidates:
+- id: chord_001
+  midi_file: candidates/chord_001.mid
+  rank: 1
+  scores:
+    composite: 0.3775
+    theory:
+      melody: 1.0
+      voice_leading: 0.7222
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.6167
+    chromatic:
+      temporal:
+        past: 0.4987
+        present: 0.1904
+        future: 0.3109
+      spatial:
+        thing: 0.4993
+        place: 0.3104
+        person: 0.1903
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2793
+        known: 0.3911
+      confidence: 0.6498
+      match: 0.275
+  progression: I(EbmajAdd9) - ii(Fdim7) - None(bII - FbmajAdd9) - iv(Abm7b5)
+  chords:
+  - function: I
+    name: EbmajAdd9
+    notes:
+    - D#2
+    - A#2
+    - G3
+    - A#3
+    - F4
+  - function: ii
+    name: Fdim7
+    notes:
+    - F2
+    - G#3
+    - B3
+    - D4
+    - F4
+  - function: null
+    name: bII - FbmajAdd9
+    notes:
+    - E2
+    - G#3
+    - B3
+    - E4
+    - F#4
+  - function: iv
+    name: Abm7b5
+    notes:
+    - G#2
+    - G#3
+    - B3
+    - D4
+    - F#4
+  label: Bridge
+  status: approved
+  notes: 'Feels transition like keep for a bridge part'
+- id: chord_002
+  midi_file: candidates/chord_002.mid
+  rank: 2
+  scores:
+    composite: 0.3762
+    theory:
+      melody: 0.8333
+      voice_leading: 0.9722
+      variety: 0.75
+      graph_probability: 0.0
+    theory_total: 0.6125
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1905
+        future: 0.311
+      spatial:
+        thing: 0.4991
+        place: 0.3105
+        person: 0.1904
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2794
+        known: 0.3909
+      confidence: 0.6492
+      match: 0.2749
+  progression: I(AbmajAdd9;Eb) - I(AbmajAdd9;Eb) - None(bII - Fb9(#11)) - None(#VII
+    - Bb7;D)
+  chords:
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: null
+    name: bII - Fb9(#11)
+    notes:
+    - E2
+    - G#3
+    - A#3
+    - D4
+    - F#4
+  - function: null
+    name: '#VII - Bb7;D'
+    notes:
+    - D2
+    - D3
+    - G#3
+    - A#3
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_003
+  midi_file: candidates/chord_003.mid
+  rank: 3
+  scores:
+    composite: 0.375
+    theory:
+      melody: 1.0
+      voice_leading: 0.6944
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.6083
+    chromatic:
+      temporal:
+        past: 0.4988
+        present: 0.1904
+        future: 0.3109
+      spatial:
+        thing: 0.4994
+        place: 0.3104
+        person: 0.1903
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2792
+        known: 0.3911
+      confidence: 0.65
+      match: 0.275
+  progression: I(AbmajAdd9;Eb) - II(F7) - VI(Cb9) - I(EbmajAdd9)
+  chords:
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: II
+    name: F7
+    notes:
+    - F2
+    - F3
+    - A3
+    - C4
+    - D#4
+  - function: VI
+    name: Cb9
+    notes:
+    - B2
+    - F#3
+    - A3
+    - C#4
+    - D#4
+  - function: I
+    name: EbmajAdd9
+    notes:
+    - D#2
+    - A#2
+    - G3
+    - A#3
+    - F4
+  label: Intro
+  status: Approved
+  notes: 'Gorgeous - use as intro or repeating outro'
+- id: chord_004
+  midi_file: candidates/chord_004.mid
+  rank: 4
+  scores:
+    composite: 0.375
+    theory:
+      melody: 1.0
+      voice_leading: 0.6944
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.6083
+    chromatic:
+      temporal:
+        past: 0.4987
+        present: 0.1904
+        future: 0.3109
+      spatial:
+        thing: 0.4993
+        place: 0.3104
+        person: 0.1903
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.2793
+        known: 0.3911
+      confidence: 0.6498
+      match: 0.275
+  progression: I(AbmajAdd9;Eb) - ii(Fdim7) - VII(Db9) - VI(Cb Maj)
+  chords:
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: ii
+    name: Fdim7
+    notes:
+    - F2
+    - G#3
+    - B3
+    - D4
+    - F4
+  - function: VII
+    name: Db9
+    notes:
+    - C#3
+    - G#3
+    - B3
+    - D#4
+    - F4
+  - function: VI
+    name: Cb Maj
+    notes:
+    - B2
+    - F#3
+    - B3
+    - D#4
+  label: Bridge
+  status: Approved
+  notes: 'Would make a nice alternating part with chord_001 '
+- id: chord_005
+  midi_file: candidates/chord_005.mid
+  rank: 5
+  scores:
+    composite: 0.3738
+    theory:
+      melody: 1.0
+      voice_leading: 0.8056
+      variety: 0.75
+      graph_probability: 0.0
+    theory_total: 0.6042
+    chromatic:
+      temporal:
+        past: 0.4988
+        present: 0.1904
+        future: 0.3108
+      spatial:
+        thing: 0.4994
+        place: 0.3103
+        person: 0.1903
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2792
+        known: 0.3911
+      confidence: 0.6501
+      match: 0.275
+  progression: I(EbmajAdd9) - None(bII - FbmajAdd9) - IV(Fb;Ab) - IV(Fb;Ab)
+  chords:
+  - function: I
+    name: EbmajAdd9
+    notes:
+    - D#2
+    - A#2
+    - G3
+    - A#3
+    - F4
+  - function: null
+    name: bII - FbmajAdd9
+    notes:
+    - E2
+    - G#3
+    - B3
+    - E4
+    - F#4
+  - function: IV
+    name: Fb;Ab
+    notes:
+    - G#2
+    - E3
+    - G#3
+    - B3
+    - E4
+  - function: IV
+    name: Fb;Ab
+    notes:
+    - G#2
+    - E3
+    - G#3
+    - B3
+    - E4
+  label: null
+  status: Rejected
+  notes: 'Love the repeat but it builds and then stands still it is jarring'
+- id: chord_006
+  midi_file: candidates/chord_006.mid
+  rank: 6
+  scores:
+    composite: 0.3725
+    theory:
+      melody: 1.0
+      voice_leading: 0.6667
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.6
+    chromatic:
+      temporal:
+        past: 0.4987
+        present: 0.1904
+        future: 0.3109
+      spatial:
+        thing: 0.4993
+        place: 0.3104
+        person: 0.1903
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2793
+        known: 0.391
+      confidence: 0.6498
+      match: 0.275
+  progression: I(AbmajAdd9;Eb) - I(EbmajAdd9) - None(bII - Fb9(#11)) - None(#VI -
+    Ddim7)
+  chords:
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: I
+    name: EbmajAdd9
+    notes:
+    - D#2
+    - A#2
+    - G3
+    - A#3
+    - F4
+  - function: null
+    name: bII - Fb9(#11)
+    notes:
+    - E2
+    - G#3
+    - A#3
+    - D4
+    - F#4
+  - function: null
+    name: '#VI - Ddim7'
+    notes:
+    - D2
+    - D3
+    - G#3
+    - B3
+    - F4
+  label: null
+  status: Rejected
+  notes: 'Too jazy'
+- id: chord_007
+  midi_file: candidates/chord_007.mid
+  rank: 7
+  scores:
+    composite: 0.3725
+    theory:
+      melody: 1.0
+      voice_leading: 0.6667
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.6
+    chromatic:
+      temporal:
+        past: 0.4987
+        present: 0.1904
+        future: 0.3109
+      spatial:
+        thing: 0.4993
+        place: 0.3104
+        person: 0.1903
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2792
+        known: 0.391
+      confidence: 0.6497
+      match: 0.275
+  progression: I(EbmajAdd9) - None(bII - FbmajAdd9) - III(Gb Maj) - ii(Bb9;F)
+  chords:
+  - function: I
+    name: EbmajAdd9
+    notes:
+    - D#2
+    - A#2
+    - G3
+    - A#3
+    - F4
+  - function: null
+    name: bII - FbmajAdd9
+    notes:
+    - E2
+    - G#3
+    - B3
+    - E4
+    - F#4
+  - function: III
+    name: Gb Maj
+    notes:
+    - F#2
+    - A#3
+    - C#4
+    - F#4
+  - function: ii
+    name: Bb9;F
+    notes:
+    - F2
+    - A#3
+    - C4
+    - D4
+    - G#4
+  label: Verse
+  status: Accepted
+  notes: 'Could be used as verse or verse alt'
+- id: chord_008
+  midi_file: candidates/chord_008.mid
+  rank: 8
+  scores:
+    composite: 0.3701
+    theory:
+      melody: 1.0
+      voice_leading: 0.6389
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.5917
+    chromatic:
+      temporal:
+        past: 0.4989
+        present: 0.1903
+        future: 0.3108
+      spatial:
+        thing: 0.4995
+        place: 0.3103
+        person: 0.1902
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.2792
+        known: 0.3912
+      confidence: 0.6505
+      match: 0.2751
+  progression: I(AbmajAdd9;Eb) - III(Gbmaj7) - II(F7) - III(Gbmaj9)
+  chords:
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: III
+    name: Gbmaj7
+    notes:
+    - F#2
+    - C#3
+    - A#3
+    - F4
+  - function: II
+    name: F7
+    notes:
+    - F2
+    - F3
+    - A3
+    - C4
+    - D#4
+  - function: III
+    name: Gbmaj9
+    notes:
+    - F#2
+    - F3
+    - G#3
+    - A#3
+    - C#4
+  label: null
+  status: Rejected
+  notes: 'Almost perfect - but does not resolve'
+- id: chord_009
+  midi_file: candidates/chord_009.mid
+  rank: 9
+  scores:
+    composite: 0.3699
+    theory:
+      melody: 0.8333
+      voice_leading: 0.7778
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.5917
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1905
+        future: 0.311
+      spatial:
+        thing: 0.4991
+        place: 0.3105
+        person: 0.1904
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2794
+        known: 0.3909
+      confidence: 0.6491
+      match: 0.2748
+  progression: I(AbmajAdd9;Eb) - iv(Abm9) - v(Bb min) - v(Bbm7)
+  chords:
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: iv
+    name: Abm9
+    notes:
+    - G#2
+    - F#3
+    - A#3
+    - B3
+    - D#4
+  - function: v
+    name: Bb min
+    notes:
+    - A#2
+    - A#3
+    - C#4
+    - F4
+  - function: v
+    name: Bbm7
+    notes:
+    - A#2
+    - A#3
+    - C#4
+    - F4
+    - G#4
+  label: Verse
+  status: Accepted
+  notes: 'Gorgeous verse - if the main verse might need a repeat and alteration'
+- id: chord_010
+  midi_file: candidates/chord_010.mid
+  rank: 10
+  scores:
+    composite: 0.3687
+    theory:
+      melody: 1.0
+      voice_leading: 0.75
+      variety: 0.75
+      graph_probability: 0.0
+    theory_total: 0.5875
+    chromatic:
+      temporal:
+        past: 0.4987
+        present: 0.1904
+        future: 0.3109
+      spatial:
+        thing: 0.4993
+        place: 0.3104
+        person: 0.1903
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2793
+        known: 0.391
+      confidence: 0.6498
+      match: 0.275
+  progression: I(AbmajAdd9;Eb) - II(Db9;F) - II(Db9;F) - II(DbmajAdd9;F)
+  chords:
+  - function: I
+    name: AbmajAdd9;Eb
+    notes:
+    - D#2
+    - G#3
+    - A#3
+    - C4
+    - D#4
+  - function: II
+    name: Db9;F
+    notes:
+    - F2
+    - G#3
+    - B3
+    - C#4
+    - D#4
+  - function: II
+    name: Db9;F
+    notes:
+    - F2
+    - G#3
+    - B3
+    - C#4
+    - D#4
+  - function: II
+    name: DbmajAdd9;F
+    notes:
+    - F3
+    - G#3
+    - C#4
+    - D#4
+  label: null
+  status: Rejected
+  notes: 'It stumbles on the last two'

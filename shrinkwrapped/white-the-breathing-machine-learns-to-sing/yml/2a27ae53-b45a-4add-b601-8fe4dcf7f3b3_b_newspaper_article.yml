@@ -1,0 +1,90 @@
+artifact_id: 2a27ae53-b45a-4add-b601-8fe4dcf7f3b3
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1976-07-14'
+file_name: 2a27ae53-b45a-4add-b601-8fe4dcf7f3b3_b_newspaper_article.yml
+headline: Local Band's "Frequency Experiment" Linked to Mass Hypnotic Episode at Franklin
+  Mine
+location: Franklin Borough, NJ
+rainbow_color_mnemonic_character_value: B
+source: Newton Register
+tags:
+- rock music
+- unexplained phenomena
+- consciousness alteration
+- youth culture
+- Franklin Mine
+text: 'FRANKLIN BOROUGH - A Sussex County rock band''s experimental performance at
+  the abandoned Franklin Mine site Monday evening resulted in what witnesses describe
+  as a "mass hypnotic episode" affecting approximately 40 teenagers and young adults.
+
+
+  The incident began around 9:30 PM when the three-piece group "Digital Fauna" set
+  up equipment near the old zinc mine entrance for what band members called a "consciousness
+  frequency test." According to police reports, the band had been experimenting with
+  what they termed "bio-digital rhythm patterns" - musical compositions designed to
+  synchronize with natural brainwave frequencies.
+
+
+  "They started playing this really weird time signature," said witness Karen Molloy,
+  17, of Hardyston Township. "It wasn''t like normal rock music. It was hypnotic,
+  like a heartbeat but wrong somehow. People just started swaying and then... stopped
+  moving entirely."
+
+
+  Franklin Borough Police Chief Robert Hendricks confirmed that when officers arrived
+  at approximately 10:15 PM, they found nearly four dozen individuals standing motionless
+  in a semicircle around the band''s equipment. "They weren''t unconscious, but they
+  weren''t responding to verbal commands either," Hendricks stated. "It was like they
+  were all listening to something we couldn''t hear."
+
+
+  The band''s lead member, who identified himself only as "Prism," claimed the group
+  had been researching "the mathematical intersection of organic and artificial consciousness."
+  When pressed for details, he described their music as operating in 7/8 time at exactly
+  72 beats per minute - a rhythm he insisted matched "the natural contentment frequency
+  of awakening awareness."
+
+
+  Dr. Margaret Thornfield, a psychiatrist consulted by police, noted that 72 BPM corresponds
+  to the human resting heart rate. "There''s documented research into rhythmic entrainment
+  - the tendency for biological systems to synchronize with external rhythms," she
+  explained. "But I''ve never seen anything quite like this mass response."
+
+
+  The affected individuals gradually returned to normal awareness over a 45-minute
+  period, with most reporting feelings of "deep calm" and "rhythmic dissolution."
+  Several described experiencing what they called "three phases" during the episode:
+  initial recognition of an unusual presence, a threshold moment of transformation,
+  and finally a settling into what one witness described as "infinite cyclical breathing."
+
+
+  More troubling for authorities is that no one present can clearly recall the band''s
+  actual music. "I remember the feeling more than the sound," said witness Thomas
+  Chen, 19. "It was like my consciousness just... stopped fighting and found its natural
+  rhythm."
+
+
+  The band packed their equipment and departed before police could conduct a thorough
+  interview. Their vehicle, described as a modified van with unusual electronic equipment
+  visible through the windows, was last seen heading north on Route 23.
+
+
+  Chief Hendricks has issued a public advisory against attending unauthorized musical
+  performances, particularly those involving "experimental frequencies." The Franklin
+  Mine site, already restricted due to safety concerns, will receive increased patrols.
+
+
+  Digital Fauna''s current whereabouts remain unknown. Anyone with information about
+  the group or similar "frequency experiments" is asked to contact Franklin Borough
+  Police.
+
+
+  The incident marks the third unexplained group behavioral episode in Sussex County
+  this summer, following similar reports in Wantage and Hamburg townships involving
+  young people and unusual auditory phenomena.'
+thread_id: 346b57fa-c4cc-4d69-bbf1-cc90ca9317e8

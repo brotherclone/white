@@ -1,0 +1,1617 @@
+production_dir: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/black__sequential_dissolution_v2
+pipeline: harmonic-rhythm
+bpm: 84
+time_sig: 7/8
+color: Black
+generated: '2026-02-15T17:40:55.639239+00:00'
+seed: 42
+scoring_weights:
+  alignment: 0.3
+  chromatic: 0.7
+sections_found:
+- Bridge
+- Intro
+- Bridge
+- Verse
+- Verse
+candidates:
+- id: hr_bridge_1_001
+  midi_file: candidates/hr_bridge_1_001.mid
+  rank: 1
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4998
+        present: 0.1898
+        future: 0.3104
+      spatial:
+        thing: 0.5004
+        place: 0.3099
+        person: 0.1897
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2786
+        known: 0.3915
+      confidence: 0.6535
+      match: 0.2756
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_1_002
+  midi_file: candidates/hr_bridge_1_002.mid
+  rank: 2
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4998
+        present: 0.1898
+        future: 0.3104
+      spatial:
+        thing: 0.5004
+        place: 0.3099
+        person: 0.1897
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2786
+        known: 0.3915
+      confidence: 0.6535
+      match: 0.2756
+  label: drone_bridge_01
+  status: approved
+  notes: ''
+- id: hr_bridge_1_003
+  midi_file: candidates/hr_bridge_1_003.mid
+  rank: 3
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4995
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1899
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2788
+        known: 0.3913
+      confidence: 0.6523
+      match: 0.2754
+  label: fakeout_bridge_01
+  status: approved
+  notes: ''
+- id: hr_bridge_1_004
+  midi_file: candidates/hr_bridge_1_004.mid
+  rank: 4
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4995
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1899
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2788
+        known: 0.3913
+      confidence: 0.6522
+      match: 0.2754
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_1_005
+  midi_file: candidates/hr_bridge_1_005.mid
+  rank: 5
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4994
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1899
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2789
+        known: 0.3913
+      confidence: 0.6522
+      match: 0.2754
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_1_006
+  midi_file: candidates/hr_bridge_1_006.mid
+  rank: 6
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4993
+        present: 0.1901
+        future: 0.3106
+      spatial:
+        thing: 0.4999
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2789
+        known: 0.3913
+      confidence: 0.6517
+      match: 0.2753
+  label: drone_end_bridge_01
+  status: approved
+  notes: ''
+- id: hr_bridge_1_007
+  midi_file: candidates/hr_bridge_1_007.mid
+  rank: 7
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4993
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3913
+      confidence: 0.6516
+      match: 0.2753
+  label: drone_end_bridge_01
+  status: approved
+  notes: ''
+- id: hr_bridge_1_008
+  midi_file: candidates/hr_bridge_1_008.mid
+  rank: 8
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3912
+      confidence: 0.6516
+      match: 0.2753
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_1_009
+  midi_file: candidates/hr_bridge_1_009.mid
+  rank: 9
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3913
+      confidence: 0.6516
+      match: 0.2753
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_1_010
+  midi_file: candidates/hr_bridge_1_010.mid
+  rank: 10
+  section: Bridge
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3912
+      confidence: 0.6514
+      match: 0.2752
+  label: balanced_drone_bridge_01
+  status: approved
+  notes: ''
+- id: hr_intro_001
+  midi_file: candidates/hr_intro_001.mid
+  rank: 11
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.1897
+        future: 0.3103
+      spatial:
+        thing: 0.5006
+        place: 0.3099
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2787
+        known: 0.3918
+      confidence: 0.6534
+      match: 0.2756
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_002
+  midi_file: candidates/hr_intro_002.mid
+  rank: 12
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4998
+        present: 0.1898
+        future: 0.3104
+      spatial:
+        thing: 0.5003
+        place: 0.31
+        person: 0.1897
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.2788
+        known: 0.3916
+      confidence: 0.6531
+      match: 0.2755
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_003
+  midi_file: candidates/hr_intro_003.mid
+  rank: 13
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4999
+        present: 0.1898
+        future: 0.3104
+      spatial:
+        thing: 0.5004
+        place: 0.3099
+        person: 0.1897
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2788
+        known: 0.3918
+      confidence: 0.6531
+      match: 0.2755
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_004
+  midi_file: candidates/hr_intro_004.mid
+  rank: 14
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.1897
+        future: 0.3103
+      spatial:
+        thing: 0.5005
+        place: 0.3099
+        person: 0.1896
+      ontological:
+        imagined: 0.3293
+        forgotten: 0.2788
+        known: 0.3919
+      confidence: 0.6531
+      match: 0.2755
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_005
+  midi_file: candidates/hr_intro_005.mid
+  rank: 15
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4997
+        present: 0.1898
+        future: 0.3104
+      spatial:
+        thing: 0.5003
+        place: 0.31
+        person: 0.1897
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.2788
+        known: 0.3916
+      confidence: 0.653
+      match: 0.2755
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_006
+  midi_file: candidates/hr_intro_006.mid
+  rank: 16
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4999
+        present: 0.1898
+        future: 0.3103
+      spatial:
+        thing: 0.5004
+        place: 0.3099
+        person: 0.1897
+      ontological:
+        imagined: 0.3293
+        forgotten: 0.2788
+        known: 0.3919
+      confidence: 0.6529
+      match: 0.2755
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_007
+  midi_file: candidates/hr_intro_007.mid
+  rank: 17
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4997
+        present: 0.1898
+        future: 0.3105
+      spatial:
+        thing: 0.5003
+        place: 0.31
+        person: 0.1897
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2788
+        known: 0.3915
+      confidence: 0.6522
+      match: 0.2754
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_008
+  midi_file: candidates/hr_intro_008.mid
+  rank: 18
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4993
+        present: 0.1901
+        future: 0.3106
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.279
+        known: 0.3914
+      confidence: 0.6516
+      match: 0.2753
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_009
+  midi_file: candidates/hr_intro_009.mid
+  rank: 19
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4994
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1899
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.279
+        known: 0.3915
+      confidence: 0.6514
+      match: 0.2752
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_intro_010
+  midi_file: candidates/hr_intro_010.mid
+  rank: 20
+  section: Intro
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4994
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1898
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.279
+        known: 0.3914
+      confidence: 0.6514
+      match: 0.2752
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_2_001
+  midi_file: candidates/hr_bridge_2_001.mid
+  rank: 21
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4998
+        present: 0.1898
+        future: 0.3104
+      spatial:
+        thing: 0.5004
+        place: 0.3099
+        person: 0.1897
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2786
+        known: 0.3915
+      confidence: 0.6535
+      match: 0.2756
+  label: bridge_2_main
+  status: approved
+  notes: 'nice'
+- id: hr_bridge_2_002
+  midi_file: candidates/hr_bridge_2_002.mid
+  rank: 22
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4929
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4998
+        present: 0.1898
+        future: 0.3104
+      spatial:
+        thing: 0.5004
+        place: 0.3099
+        person: 0.1897
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2786
+        known: 0.3915
+      confidence: 0.6535
+      match: 0.2756
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_2_003
+  midi_file: candidates/hr_bridge_2_003.mid
+  rank: 23
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4995
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1899
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2788
+        known: 0.3913
+      confidence: 0.6523
+      match: 0.2754
+  label: drone_slur_bridge_2
+  status: approved
+  notes: ''
+- id: hr_bridge_2_004
+  midi_file: candidates/hr_bridge_2_004.mid
+  rank: 24
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4995
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1899
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2788
+        known: 0.3913
+      confidence: 0.6522
+      match: 0.2754
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_2_005
+  midi_file: candidates/hr_bridge_2_005.mid
+  rank: 25
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4928
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4994
+        present: 0.19
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1899
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2789
+        known: 0.3913
+      confidence: 0.6522
+      match: 0.2754
+  label: null
+  status: accepted
+  notes: ''
+- id: hr_bridge_2_006
+  midi_file: candidates/hr_bridge_2_006.mid
+  rank: 26
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4993
+        present: 0.1901
+        future: 0.3106
+      spatial:
+        thing: 0.4999
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2789
+        known: 0.3913
+      confidence: 0.6517
+      match: 0.2753
+  label: drone_end_bridge_2
+  status: accepted
+  notes: ''
+- id: hr_bridge_2_007
+  midi_file: candidates/hr_bridge_2_007.mid
+  rank: 27
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4993
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3913
+      confidence: 0.6516
+      match: 0.2753
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_2_008
+  midi_file: candidates/hr_bridge_2_008.mid
+  rank: 28
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3912
+      confidence: 0.6516
+      match: 0.2753
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_2_009
+  midi_file: candidates/hr_bridge_2_009.mid
+  rank: 29
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3913
+      confidence: 0.6516
+      match: 0.2753
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_bridge_2_010
+  midi_file: candidates/hr_bridge_2_010.mid
+  rank: 30
+  section: Bridge
+  chord_source: chord_004
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4927
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.1901
+        future: 0.3107
+      spatial:
+        thing: 0.4998
+        place: 0.3102
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3912
+      confidence: 0.6514
+      match: 0.2752
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_1_001
+  midi_file: candidates/hr_verse_1_001.mid
+  rank: 31
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 5.5
+  - 1.0
+  - 0.5
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4931
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.1896
+        future: 0.3101
+      spatial:
+        thing: 0.5009
+        place: 0.3096
+        person: 0.1895
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.3921
+      confidence: 0.655
+      match: 0.2758
+  label: null
+  status: accepted
+  notes: ''
+- id: hr_verse_1_002
+  midi_file: candidates/hr_verse_1_002.mid
+  rank: 32
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 5.5
+  - 1.0
+  - 1.0
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.4931
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.1896
+        future: 0.3101
+      spatial:
+        thing: 0.5008
+        place: 0.3097
+        person: 0.1895
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.392
+      confidence: 0.6549
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_1_003
+  midi_file: candidates/hr_verse_1_003.mid
+  rank: 33
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 5.5
+  - 1.5
+  - 0.5
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.4931
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.1896
+        future: 0.3101
+      spatial:
+        thing: 0.5008
+        place: 0.3097
+        person: 0.1895
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.392
+      confidence: 0.6549
+      match: 0.2758
+  label: verse_1_sneaky
+  status: accepted
+  notes: ''
+- id: hr_verse_1_004
+  midi_file: candidates/hr_verse_1_004.mid
+  rank: 34
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 5.0
+  - 0.5
+  - 2.0
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.6546
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_1_005
+  midi_file: candidates/hr_verse_1_005.mid
+  rank: 35
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 4.5
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.6545
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_1_006
+  midi_file: candidates/hr_verse_1_006.mid
+  rank: 36
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 4.0
+  - 1.5
+  - 1.0
+  - 1.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5002
+        present: 0.1897
+        future: 0.3101
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.6545
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_1_007
+  midi_file: candidates/hr_verse_1_007.mid
+  rank: 37
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 4.5
+  - 0.5
+  - 2.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5006
+        place: 0.3098
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3918
+      confidence: 0.6544
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_1_008
+  midi_file: candidates/hr_verse_1_008.mid
+  rank: 38
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 4.5
+  - 0.5
+  - 2.5
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5006
+        place: 0.3098
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2787
+        known: 0.3918
+      confidence: 0.6543
+      match: 0.2757
+  label: verse_1_long_end
+  status: accepted
+  notes: ''
+- id: hr_verse_1_009
+  midi_file: candidates/hr_verse_1_009.mid
+  rank: 39
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 4.0
+  - 0.5
+  - 0.5
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2785
+        known: 0.3918
+      confidence: 0.6542
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_1_010
+  midi_file: candidates/hr_verse_1_010.mid
+  rank: 40
+  section: Verse
+  chord_source: chord_007
+  distribution:
+  - 4.5
+  - 2.0
+  - 0.5
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5002
+        present: 0.1897
+        future: 0.3101
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.654
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_001
+  midi_file: candidates/hr_verse_2_001.mid
+  rank: 41
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 5.5
+  - 1.0
+  - 0.5
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4931
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.1896
+        future: 0.3101
+      spatial:
+        thing: 0.5009
+        place: 0.3096
+        person: 0.1895
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.3921
+      confidence: 0.655
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_002
+  midi_file: candidates/hr_verse_2_002.mid
+  rank: 42
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 5.5
+  - 1.0
+  - 1.0
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.4931
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.1896
+        future: 0.3101
+      spatial:
+        thing: 0.5008
+        place: 0.3097
+        person: 0.1895
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.392
+      confidence: 0.6549
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_003
+  midi_file: candidates/hr_verse_2_003.mid
+  rank: 43
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 5.5
+  - 1.5
+  - 0.5
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.4931
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.1896
+        future: 0.3101
+      spatial:
+        thing: 0.5008
+        place: 0.3097
+        person: 0.1895
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.392
+      confidence: 0.6549
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_004
+  midi_file: candidates/hr_verse_2_004.mid
+  rank: 44
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 5.0
+  - 0.5
+  - 2.0
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.6546
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_005
+  midi_file: candidates/hr_verse_2_005.mid
+  rank: 45
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 4.5
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.6545
+      match: 0.2758
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_006
+  midi_file: candidates/hr_verse_2_006.mid
+  rank: 46
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 4.0
+  - 1.5
+  - 1.0
+  - 1.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5002
+        present: 0.1897
+        future: 0.3101
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.6545
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_007
+  midi_file: candidates/hr_verse_2_007.mid
+  rank: 47
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 4.5
+  - 0.5
+  - 2.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5006
+        place: 0.3098
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2786
+        known: 0.3918
+      confidence: 0.6544
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_008
+  midi_file: candidates/hr_verse_2_008.mid
+  rank: 48
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 4.5
+  - 0.5
+  - 2.5
+  - 0.5
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5006
+        place: 0.3098
+        person: 0.1896
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2787
+        known: 0.3918
+      confidence: 0.6543
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_009
+  midi_file: candidates/hr_verse_2_009.mid
+  rank: 49
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 4.0
+  - 0.5
+  - 0.5
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5001
+        present: 0.1897
+        future: 0.3102
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2785
+        known: 0.3918
+      confidence: 0.6542
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_verse_2_010
+  midi_file: candidates/hr_verse_2_010.mid
+  rank: 50
+  section: Verse
+  chord_source: chord_009
+  distribution:
+  - 4.5
+  - 2.0
+  - 0.5
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.493
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.5002
+        present: 0.1897
+        future: 0.3101
+      spatial:
+        thing: 0.5007
+        place: 0.3097
+        person: 0.1896
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2786
+        known: 0.3919
+      confidence: 0.654
+      match: 0.2757
+  label: null
+  status: rejected
+  notes: ''

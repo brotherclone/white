@@ -1,0 +1,631 @@
+song_proposal: song_proposal_Green (0xabcd6d)_last_pollinators_elegy_v1.yml
+thread: shrinkwrapped/white-the-breathing-machine-learns-to-sing
+key: G minor
+bpm: 60
+color: Green
+generated: '2026-02-14T20:44:55.768612+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+candidates:
+- id: chord_001
+  midi_file: candidates/chord_001.mid
+  rank: 1
+  scores:
+    composite: 0.3204
+    theory:
+      melody: 1.0
+      voice_leading: 0.9167
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.675
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2462
+        future: 0.3037
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3606
+      confidence: 0.1413
+      match: 0.1685
+  progression: I(AmajAdd9;E) - ii(D;F#) - II(D9;F#) - ii(F#dim7)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: ii
+    name: D;F#
+    notes:
+    - F#2
+    - F#3
+    - A3
+    - D4
+  - function: II
+    name: D9;F#
+    notes:
+    - F#2
+    - A3
+    - C4
+    - D4
+    - E4
+  - function: ii
+    name: F#dim7
+    notes:
+    - F#2
+    - F#3
+    - A3
+    - C4
+    - D#4
+  label: null
+  status: rejected
+  notes: ''
+- id: chord_002
+  midi_file: candidates/chord_002.mid
+  rank: 2
+  scores:
+    composite: 0.3004
+    theory:
+      melody: 1.0
+      voice_leading: 0.6944
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.6083
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1414
+      match: 0.1685
+  progression: I(AmajAdd9;E) - I(EmajAdd9) - None(bII - F9(#11)) - None(#VII - B7;D#)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: I
+    name: EmajAdd9
+    notes:
+    - E2
+    - B2
+    - G#3
+    - B3
+    - F#4
+  - function: null
+    name: bII - F9(#11)
+    notes:
+    - F2
+    - A3
+    - B3
+    - D#4
+    - G4
+  - function: null
+    name: '#VII - B7;D#'
+    notes:
+    - D#2
+    - D#3
+    - A3
+    - B3
+    - F#4
+  label: bridge
+  status: approved
+  notes: 'apprehension and release'
+- id: chord_003
+  midi_file: candidates/chord_003.mid
+  rank: 3
+  scores:
+    composite: 0.3004
+    theory:
+      melody: 1.0
+      voice_leading: 0.6944
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.6083
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1412
+      match: 0.1685
+  progression: I(AmajAdd9;E) - II(F#7) - VI(C9) - I(EmajAdd9)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: II
+    name: F#7
+    notes:
+    - F#2
+    - F#3
+    - A#3
+    - C#4
+    - E4
+  - function: VI
+    name: C9
+    notes:
+    - C3
+    - G3
+    - A#3
+    - D4
+    - E4
+  - function: I
+    name: EmajAdd9
+    notes:
+    - E2
+    - B2
+    - G#3
+    - B3
+    - F#4
+  label: chorus
+  status: approved
+  notes: 'solid, emotional'
+- id: chord_004
+  midi_file: candidates/chord_004.mid
+  rank: 4
+  scores:
+    composite: 0.2992
+    theory:
+      melody: 0.8333
+      voice_leading: 0.9444
+      variety: 0.75
+      graph_probability: 0.0
+    theory_total: 0.6042
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.141
+      match: 0.1685
+  progression: I(AmajAdd9;E) - I(AmajAdd9;E) - None(bII - F9(#11)) - None(#VII - D#dim7)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: null
+    name: bII - F9(#11)
+    notes:
+    - F2
+    - A3
+    - B3
+    - D#4
+    - G4
+  - function: null
+    name: '#VII - D#dim7'
+    notes:
+    - D#2
+    - D#3
+    - A3
+    - C4
+    - F#4
+  label: bridge
+  status: approved
+  notes: 'wonderful for transitions - time passing'
+- id: chord_005
+  midi_file: candidates/chord_005.mid
+  rank: 5
+  scores:
+    composite: 0.2955
+    theory:
+      melody: 1.0
+      voice_leading: 0.6389
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.5917
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1414
+      match: 0.1685
+  progression: I(AmajAdd9;E) - III(Gmaj7) - II(F#7) - III(Gmaj9)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: III
+    name: Gmaj7
+    notes:
+    - G2
+    - D3
+    - B3
+    - F#4
+  - function: II
+    name: F#7
+    notes:
+    - F#2
+    - F#3
+    - A#3
+    - C#4
+    - E4
+  - function: III
+    name: Gmaj9
+    notes:
+    - G2
+    - F#3
+    - A3
+    - B3
+    - D4
+  label: null
+  status: rejected
+  notes: ''
+- id: chord_006
+  midi_file: candidates/chord_006.mid
+  rank: 6
+  scores:
+    composite: 0.2955
+    theory:
+      melody: 1.0
+      voice_leading: 0.6389
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.5917
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3606
+      confidence: 0.1414
+      match: 0.1685
+  progression: I(AmajAdd9;E) - III(G Maj) - II(F#7) - VI(C Maj)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: III
+    name: G Maj
+    notes:
+    - G2
+    - G3
+    - B3
+    - D4
+  - function: II
+    name: F#7
+    notes:
+    - F#2
+    - F#3
+    - A#3
+    - C#4
+    - E4
+  - function: VI
+    name: C Maj
+    notes:
+    - C3
+    - G3
+    - C4
+    - E4
+  label: bridge
+  status: approved
+  notes: 'another great transition - time passing'
+- id: chord_007
+  midi_file: candidates/chord_007.mid
+  rank: 7
+  scores:
+    composite: 0.2954
+    theory:
+      melody: 1.0
+      voice_leading: 0.6389
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.5917
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3042
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3606
+      confidence: 0.141
+      match: 0.1685
+  progression: I(AmajAdd9;E) - VI(C Maj) - None(bV - BbmajAdd9) - iv(Am6Add9)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: VI
+    name: C Maj
+    notes:
+    - C3
+    - G3
+    - C4
+    - E4
+  - function: null
+    name: bV - BbmajAdd9
+    notes:
+    - A#2
+    - F3
+    - C4
+    - D4
+    - F4
+  - function: iv
+    name: Am6Add9
+    notes:
+    - A2
+    - F#3
+    - B3
+    - C4
+    - E4
+  label: null
+  status: rejected
+  notes: ''
+- id: chord_008
+  midi_file: candidates/chord_008.mid
+  rank: 8
+  scores:
+    composite: 0.2942
+    theory:
+      melody: 0.8333
+      voice_leading: 0.8889
+      variety: 0.75
+      graph_probability: 0.0
+    theory_total: 0.5875
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2464
+        future: 0.3038
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1408
+      match: 0.1685
+  progression: I(AmajAdd9;E) - iv(A min) - IV(A9) - IV(A9)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: iv
+    name: A min
+    notes:
+    - A2
+    - A3
+    - C4
+    - E4
+  - function: IV
+    name: A9
+    notes:
+    - A2
+    - E3
+    - B3
+    - C#4
+    - G4
+  - function: IV
+    name: A9
+    notes:
+    - A2
+    - E3
+    - B3
+    - C#4
+    - G4
+  label: null
+  status: rejected
+  notes: ''
+- id: chord_009
+  midi_file: candidates/chord_009.mid
+  rank: 9
+  scores:
+    composite: 0.2942
+    theory:
+      melody: 1.0
+      voice_leading: 0.75
+      variety: 0.75
+      graph_probability: 0.0
+    theory_total: 0.5875
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1407
+      match: 0.1685
+  progression: I(AmajAdd9;E) - II(D9;F#) - II(D9;F#) - II(DmajAdd9;F#)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: II
+    name: D9;F#
+    notes:
+    - F#2
+    - A3
+    - C4
+    - D4
+    - E4
+  - function: II
+    name: D9;F#
+    notes:
+    - F#2
+    - A3
+    - C4
+    - D4
+    - E4
+  - function: II
+    name: DmajAdd9;F#
+    notes:
+    - F#3
+    - A3
+    - D4
+    - E4
+  label: null
+  status: rejected
+  notes: ''
+- id: chord_010
+  midi_file: candidates/chord_010.mid
+  rank: 10
+  scores:
+    composite: 0.2929
+    theory:
+      melody: 1.0
+      voice_leading: 0.6111
+      variety: 1.0
+      graph_probability: 0.0
+    theory_total: 0.5833
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1411
+      match: 0.1685
+  progression: I(AmajAdd9;E) - VI(Cmaj7) - i(E min) - VII(D Maj)
+  chords:
+  - function: I
+    name: AmajAdd9;E
+    notes:
+    - E2
+    - A3
+    - B3
+    - C#4
+    - E4
+  - function: VI
+    name: Cmaj7
+    notes:
+    - C3
+    - G3
+    - B3
+    - E4
+  - function: i
+    name: E min
+    notes:
+    - E3
+    - G3
+    - B3
+    - E4
+  - function: VII
+    name: D Maj
+    notes:
+    - D3
+    - F#3
+    - A3
+    - D4
+  label: verse
+  status: approved
+  notes: 'perfectly balanced'

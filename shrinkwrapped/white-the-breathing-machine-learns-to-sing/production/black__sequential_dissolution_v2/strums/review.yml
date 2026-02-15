@@ -1,0 +1,336 @@
+production_dir: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/black__sequential_dissolution_v2
+pipeline: strum-generation
+bpm: 84
+time_sig: 7/8
+generated: '2026-02-15T18:53:03.933979+00:00'
+candidates:
+- id: bridge_whole
+  midi_file: candidates/bridge_whole.mid
+  rank: 1
+  source_chord: bridge
+  pattern: whole
+  pattern_description: Whole — one hit, held full bar
+  is_arpeggio: false
+  mode: per-chord
+  label: bridge_whole_sneaky
+  status: approved
+  notes: ''
+- id: bridge_grouped_322
+  midi_file: candidates/bridge_grouped_322.mid
+  rank: 2
+  source_chord: bridge
+  pattern: grouped_322
+  pattern_description: 3+2+2 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: bridge_main
+  status: approved
+  notes: ''
+- id: bridge_grouped_223
+  midi_file: candidates/bridge_grouped_223.mid
+  rank: 3
+  source_chord: bridge
+  pattern: grouped_223
+  pattern_description: 2+2+3 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: bridge_eighth
+  midi_file: candidates/bridge_eighth.mid
+  rank: 4
+  source_chord: bridge
+  pattern: eighth
+  pattern_description: All seventh eighth notes
+  is_arpeggio: false
+  mode: per-chord
+  label: bridge_eighth_hypnotic
+  status: approved
+  notes: ''
+- id: bridge_arp_up
+  midi_file: candidates/bridge_arp_up.mid
+  rank: 5
+  source_chord: bridge
+  pattern: arp_up
+  pattern_description: Arpeggio up across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: bridge_arp_up
+  status: approved
+  notes: 'golden'
+- id: bridge_arp_down
+  midi_file: candidates/bridge_arp_down.mid
+  rank: 6
+  source_chord: bridge
+  pattern: arp_down
+  pattern_description: Arpeggio down across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: bridge_2_whole
+  midi_file: candidates/bridge_2_whole.mid
+  rank: 7
+  source_chord: bridge_2
+  pattern: whole
+  pattern_description: Whole — one hit, held full bar
+  is_arpeggio: false
+  mode: per-chord
+  label: bridge_2_punctuated
+  status: approved
+  notes: ''
+- id: bridge_2_grouped_322
+  midi_file: candidates/bridge_2_grouped_322.mid
+  rank: 8
+  source_chord: bridge_2
+  pattern: grouped_322
+  pattern_description: 3+2+2 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: bridge_2_main
+  status: accepted
+  notes: ''
+- id: bridge_2_grouped_223
+  midi_file: candidates/bridge_2_grouped_223.mid
+  rank: 9
+  source_chord: bridge_2
+  pattern: grouped_223
+  pattern_description: 2+2+3 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: bridge_2_eighth
+  midi_file: candidates/bridge_2_eighth.mid
+  rank: 10
+  source_chord: bridge_2
+  pattern: eighth
+  pattern_description: All seventh eighth notes
+  is_arpeggio: false
+  mode: per-chord
+  label: bridge_2_eighth_hypnotic
+  status: approved
+  notes: ''
+- id: bridge_2_arp_up
+  midi_file: candidates/bridge_2_arp_up.mid
+  rank: 11
+  source_chord: bridge_2
+  pattern: arp_up
+  pattern_description: Arpeggio up across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: bridge_2_arp_up
+  status: approved
+  notes: ''
+- id: bridge_2_arp_down
+  midi_file: candidates/bridge_2_arp_down.mid
+  rank: 12
+  source_chord: bridge_2
+  pattern: arp_down
+  pattern_description: Arpeggio down across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: bridge_2_arp_down
+  status: approved
+  notes: ''
+- id: intro_whole
+  midi_file: candidates/intro_whole.mid
+  rank: 13
+  source_chord: intro
+  pattern: whole
+  pattern_description: Whole — one hit, held full bar
+  is_arpeggio: false
+  mode: per-chord
+  label: intro_plain
+  status: approved
+  notes: ''
+- id: intro_grouped_322
+  midi_file: candidates/intro_grouped_322.mid
+  rank: 14
+  source_chord: intro
+  pattern: grouped_322
+  pattern_description: 3+2+2 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: intro_grouped_223
+  midi_file: candidates/intro_grouped_223.mid
+  rank: 15
+  source_chord: intro
+  pattern: grouped_223
+  pattern_description: 2+2+3 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: intro_223_keeper
+  status: approved
+  notes: ''
+- id: intro_eighth
+  midi_file: candidates/intro_eighth.mid
+  rank: 16
+  source_chord: intro
+  pattern: eighth
+  pattern_description: All seventh eighth notes
+  is_arpeggio: false
+  mode: per-chord
+  label: intro_eighth_hypnotic
+  status: approved
+  notes: ''
+- id: intro_arp_up
+  midi_file: candidates/intro_arp_up.mid
+  rank: 17
+  source_chord: intro
+  pattern: arp_up
+  pattern_description: Arpeggio up across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: intro_arp_up
+  status: approved
+  notes: ''
+- id: intro_arp_down
+  midi_file: candidates/intro_arp_down.mid
+  rank: 18
+  source_chord: intro
+  pattern: arp_down
+  pattern_description: Arpeggio down across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: verse_whole
+  midi_file: candidates/verse_whole.mid
+  rank: 19
+  source_chord: verse
+  pattern: whole
+  pattern_description: Whole — one hit, held full bar
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: verse_grouped_322
+  midi_file: candidates/verse_grouped_322.mid
+  rank: 20
+  source_chord: verse
+  pattern: grouped_322
+  pattern_description: 3+2+2 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: verse_sneaky
+  status: approved
+  notes: ''
+- id: verse_grouped_223
+  midi_file: candidates/verse_grouped_223.mid
+  rank: 21
+  source_chord: verse
+  pattern: grouped_223
+  pattern_description: 2+2+3 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: verse_eighth
+  midi_file: candidates/verse_eighth.mid
+  rank: 22
+  source_chord: verse
+  pattern: eighth
+  pattern_description: All seventh eighth notes
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: verse_arp_up
+  midi_file: candidates/verse_arp_up.mid
+  rank: 23
+  source_chord: verse
+  pattern: arp_up
+  pattern_description: Arpeggio up across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: verse_arp_down
+  midi_file: candidates/verse_arp_down.mid
+  rank: 24
+  source_chord: verse
+  pattern: arp_down
+  pattern_description: Arpeggio down across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: verse_arp_down
+  status: approved
+  notes: ''
+- id: verse_2_whole
+  midi_file: candidates/verse_2_whole.mid
+  rank: 25
+  source_chord: verse_2
+  pattern: whole
+  pattern_description: Whole — one hit, held full bar
+  is_arpeggio: false
+  mode: per-chord
+  label: verse_2_plain
+  status: approved
+  notes: ''
+- id: verse_2_grouped_322
+  midi_file: candidates/verse_2_grouped_322.mid
+  rank: 26
+  source_chord: verse_2
+  pattern: grouped_322
+  pattern_description: 3+2+2 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: verse_2_322_keeper
+  status: approved
+  notes: ''
+- id: verse_2_grouped_223
+  midi_file: candidates/verse_2_grouped_223.mid
+  rank: 27
+  source_chord: verse_2
+  pattern: grouped_223
+  pattern_description: 2+2+3 grouping — hits on group boundaries
+  is_arpeggio: false
+  mode: per-chord
+  label: verse_2_223_keeper
+  status: approved
+  notes: ''
+- id: verse_2_eighth
+  midi_file: candidates/verse_2_eighth.mid
+  rank: 28
+  source_chord: verse_2
+  pattern: eighth
+  pattern_description: All seventh eighth notes
+  is_arpeggio: false
+  mode: per-chord
+  label: verse_2_eighth_hypnotic
+  status: approved
+  notes: ''
+- id: verse_2_arp_up
+  midi_file: candidates/verse_2_arp_up.mid
+  rank: 29
+  source_chord: verse_2
+  pattern: arp_up
+  pattern_description: Arpeggio up across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: verse_2_arp_up
+  status: approved
+  notes: ''
+- id: verse_2_arp_down
+  midi_file: candidates/verse_2_arp_down.mid
+  rank: 30
+  source_chord: verse_2
+  pattern: arp_down
+  pattern_description: Arpeggio down across 7/8 bar in eighth-note subdivisions
+  is_arpeggio: true
+  mode: per-chord
+  label: verse_2_arp_down
+  status: approved
+  notes: ''

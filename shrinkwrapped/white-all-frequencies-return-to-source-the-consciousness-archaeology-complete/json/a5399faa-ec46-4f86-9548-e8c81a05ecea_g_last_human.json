@@ -1,0 +1,61 @@
+adaptation_attempts:
+- Switched from tourism to selling coral fragment jewelry made from naturally shed
+  pieces
+- Tried to relocate coral nurseries to deeper, cooler waters
+- Applied for climate refugee relocation assistance
+- Attempted to preserve coral genetics in home freezer units when the research station
+  lost power
+- Organized community seaweed farming cooperative as alternative livelihood
+age: 47
+artifact_id: a5399faa-ec46-4f86-9548-e8c81a05ecea
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Every morning at 5:30 AM, Carmen would check water temperature readings
+  from the reef monitoring buoys, then prepare dive equipment for tourists wanting
+  to see the coral restoration sites. She'd spend hours underwater tending to coral
+  fragments in PVC nursery trees, photographing growth progress, and guiding visitors
+  through the underwater sculpture garden built on dead reef substrate. Evenings were
+  for community meetings about reef restoration funding and coordinating with other
+  Caribbean coral restoration projects
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- adaptation_failure
+environmental_stressor: Ocean warming causing complete coral reef ecosystem collapse
+family_situation: Divorced, teenage daughter Sophia lives with her father in Puerto
+  Rico. Carmen stayed to maintain the coral nursery project her late mentor Dr. Elizabeth
+  Santos started in 2019
+file_name: a5399faa-ec46-4f86-9548-e8c81a05ecea_g_last_human.json
+final_thought: She wondered if the coral fragments she'd mailed to seed banks in Norway
+  would remember the Caribbean sun, and if Sophia would ever see a living reef
+last_days_scenario: The summer of 2041 brought water temperatures that stayed above
+  86°F for three consecutive months. Carmen watched her coral nurseries bleach white
+  in a matter of days, then dissolve into chalky fragments. The dive boats stopped
+  coming when there was nothing left to see but gray rubble. Her neighbors - boat
+  captains, restaurant owners, souvenir shop keepers - left one by one as tourist
+  dollars evaporated. Carmen remained alone in her concrete house, checking empty
+  monitoring buoys each morning, radioing daily reports to a research station that
+  had stopped responding. She kept feeding the last surviving coral fragments in her
+  makeshift home aquarium system, even as the power grid failed and the desalination
+  plant shut down
+latitude: 18.3358
+location: Coral Bay, St. John, U.S. Virgin Islands
+longitude: -64.7061
+name: Carmen Delgado-Vega
+occupation: Marine restoration coordinator and dive tourism operator
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- entanglement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A waterproof data logger that recorded 23 years of reef temperature
+  data, still beeping every hour in her empty house, documenting the ocean's fever
+  even after everything else had died
+thread_id: 12c27cb8-d3d8-4513-bc0e-57b8f4449222
+vulnerability_details: Like staghorn coral polyps that cannot survive alone, Carmen's
+  livelihood depends entirely on interconnected community networks - dive shops, boat
+  captains, restaurant owners, and coral nursery volunteers. When the marine ecosystem
+  collapsed, these human networks dissolved simultaneously, leaving her isolated and
+  unable to function independently
+year_documented: 2041

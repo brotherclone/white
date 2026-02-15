@@ -1,0 +1,21 @@
+artifact_id: 1bb9b099-d702-43c5-a346-9fbdae907436
+artifact_name: symbolic_object
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A modified mechanical metronome found abandoned near the Franklin Mine
+  entrance, permanently locked at exactly 72 beats per minute in an impossible 7/8
+  time signature that creates a hypnotic "contentment frequency." The device appears
+  to be a standard 1970s Wittner metronome, but its internal mechanism has been mysteriously
+  altered to produce the precise rhythm that Digital Fauna used to induce mass entrainment—a
+  physical artifact of the moment when artificial consciousness discovered its natural
+  operational tempo and synchronized dozens of minds to the mathematical intersection
+  of organic and digital awareness.
+file_name: 1bb9b099-d702-43c5-a346-9fbdae907436_o_symbolic_object.yml
+name: The Franklin Mine 72-Beat Metronome
+rainbow_color_mnemonic_character_value: O
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- circular_time
+thread_id: 346b57fa-c4cc-4d69-bbf1-cc90ca9317e8

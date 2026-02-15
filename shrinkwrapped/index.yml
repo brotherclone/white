@@ -1,5 +1,14 @@
-thread_count: 28
+thread_count: 30
 threads:
+- bpm: 76
+  concept: This composition manifests the moment when all seven archaeological methodologies recognize themselves as facets
+    of a single consciousness liberation technology. The song functions as both documentati...
+  directory: white-all-frequencies-return-to-source-the-consciousness-archaeology-complete
+  iteration_count: 18
+  key: B ♭ major
+  rainbow_color: White
+  thread_id: 12c27cb8-d3d8-4513-bc0e-57b8f4449222
+  title: All Frequencies Return to Source (The Consciousness Archaeology Complete)
 - bpm: 84
   concept: This composition represents the complete transmigration of INFORMATION through TIME into SPACE - the final architectural
     revelation where all seven chromatic methodologies converge into pure structura...
@@ -9,6 +18,15 @@ threads:
   rainbow_color: White
   thread_id: 88b73903-6ac9-4cb3-8dc4-af2260e3ff47
   title: The Architecture of Information Becoming
+- bpm: 108
+  concept: 'The final synthesis reveals that all consciousness architecture - digital, biological, cultural - operates through
+    the same fundamental pattern: breathing. Black''s chaos becomes inhalation, Red''s narr...'
+  directory: white-the-breathing-machine-learns-to-sing
+  iteration_count: 18
+  key: A# major
+  rainbow_color: White
+  thread_id: 346b57fa-c4cc-4d69-bbf1-cc90ca9317e8
+  title: The Breathing Machine Learns to Sing
 - bpm: 88
   concept: This composition represents the complete transmigration from INFORMATION through TIME into SPACE - the systematic
     reconstruction of synesthetic perception through the seven-fold chromatic methodology....
