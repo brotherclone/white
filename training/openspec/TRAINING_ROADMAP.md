@@ -170,7 +170,18 @@ POST-TRAINING
     → Human labels candidates (verse/chorus/bridge) in review.yml → promote to approved/
     → Promotion tool: app/generators/midi/promote_chords.py
                 │
- ⑧ Next phases: drums, bass, melody+lyrics, assembly (not yet spec'd)
+ ✅ Music Production Pipeline — Drum Phase (COMPLETE 2026-02-15)
+    → OpenSpec: openspec/changes/add-drum-pattern-generation/
+    → Template library: app/generators/midi/drum_patterns.py
+    → Pipeline: app/generators/midi/drum_pipeline.py
+    → Multi-voice templates (kick/snare/hat/toms/cymbals) with velocity dynamics (accent/normal/ghost)
+    → 8 genre families (ambient, electronic, krautrock/motorik, rock, classical, experimental, folk, jazz)
+    → Section-aware: reads approved chord labels → energy mapping → template selection
+    → Composite scoring (30% energy appropriateness + 70% chromatic match)
+    → Same review.yml + promote workflow as chords
+    → 41 tests passing
+                │
+ ⑨ Next phases: strums, bass, melody+lyrics, assembly
     → Each follows same pattern: generate → score → human gate → approve
 ```
 
@@ -315,6 +326,8 @@ calls the scorer directly in-process. Scope is now:
 | **Result Feedback**           | `add-chain-result-feedback`       | ✅ Complete                       | Done                  |
 | Phase 3.3+3.4 (Lyrics)        | `add-prosodic-lyric-encoding`     | Not Started                      | Medium                |
 | Phase 10 (ONNX+Scorer)        | `add-production-deployment`       | **✅ Complete** (2026-02-14)     | Done                  |
+| **Chord Phase**               | `add-music-production-pipeline`   | **✅ Complete** (2026-02-14)     | Done                  |
+| **Drum Phase**                | `add-drum-pattern-generation`     | **✅ Complete** (2026-02-15)     | Done                  |
 | Infrastructure                | `add-infrastructure-improvements` | Not Started                      | High                  |
 | Phase 8 (Interpretability)    | `add-model-interpretability`      | ~ Partial                        | Medium                |
 | Phase 9 (Augmentation)        | `add-data-augmentation`           | Not Started                      | Low                   |
@@ -379,4 +392,4 @@ All 27 mode combinations now mapped to 8 albums.
 
 *Last Updated: 2026-02-12*
 
-**Status**: Phases 1, 2, 3, 4, 10 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3 complete** (2026-02-13): Multimodal fusion model achieves 90% temporal, 93% spatial, 91% ontological. **Phase 10 complete** (2026-02-14): ChromaticScorer class with ONNX inference, batch scoring for 50+ candidates, lazy-loaded DeBERTa/CLAP encoders. **Next: Step 8 (Evolutionary Music Generator).** GPU execution on Modal (serverless).
+**Status**: Phases 1, 2, 3, 4, 10 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3 complete** (2026-02-13): Multimodal fusion model achieves 90% temporal, 93% spatial, 91% ontological. **Phase 10 complete** (2026-02-14): ChromaticScorer class with ONNX inference, batch scoring for 50+ candidates, lazy-loaded DeBERTa/CLAP encoders. **Chord phase complete** (2026-02-14): Full chord generation pipeline with Markov chains + ChromaticScorer composite scoring + human review. **Drum phase complete** (2026-02-15): Template-based drum pattern generation with 8 genre families (including motorik/krautrock), velocity dynamics, section-aware energy mapping. **Next: strums, bass, melody+lyrics.** GPU execution on Modal (serverless).
