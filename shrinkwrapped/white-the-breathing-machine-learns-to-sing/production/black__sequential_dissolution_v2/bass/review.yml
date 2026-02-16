@@ -1,0 +1,812 @@
+production_dir: /Volumes/LucidNonsense/White/shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/black__sequential_dissolution_v2
+pipeline: bass-generation
+bpm: 84
+time_sig: 7/8
+color: Black
+generated: '2026-02-16T13:19:32.929891+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+sections_found:
+- Bridge
+- Intro
+- Bridge
+- Verse
+- Verse
+candidates:
+- id: bass_bridge_1_01
+  midi_file: candidates/bass_bridge_1_01.mid
+  rank: 1
+  section: Bridge
+  chord_source: chord_001
+  style: root
+  pattern_name: root_7_sparse
+  energy: low
+  scores:
+    composite: 0.4288
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1907
+        future: 0.3109
+      spatial:
+        thing: 0.499
+        place: 0.3104
+        person: 0.1906
+      ontological:
+        imagined: 0.3301
+        forgotten: 0.2792
+        known: 0.3907
+      confidence: 0.6469
+      match: 0.2745
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_bridge_1_02
+  midi_file: candidates/bass_bridge_1_02.mid
+  rank: 2
+  section: Bridge
+  chord_source: chord_001
+  style: arpeggiated
+  pattern_name: arp_7_322
+  energy: medium
+  scores:
+    composite: 0.3966
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4989
+        present: 0.1902
+        future: 0.3109
+      spatial:
+        thing: 0.4995
+        place: 0.3105
+        person: 0.1901
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2792
+        known: 0.391
+      confidence: 0.65
+      match: 0.275
+  label: bass_bridge_1_02_eighths
+  status: approved
+  notes: ''
+- id: bass_bridge_1_03
+  midi_file: candidates/bass_bridge_1_03.mid
+  rank: 3
+  section: Bridge
+  chord_source: chord_001
+  style: octave
+  pattern_name: octave_7_bounce
+  energy: medium
+  scores:
+    composite: 0.3965
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4986
+        present: 0.1903
+        future: 0.3111
+      spatial:
+        thing: 0.4992
+        place: 0.3106
+        person: 0.1902
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2793
+        known: 0.3909
+      confidence: 0.6497
+      match: 0.2749
+  label: bass_bridge_1_03_arps
+  status: approved
+  notes: ''
+- id: bass_bridge_1_04
+  midi_file: candidates/bass_bridge_1_04.mid
+  rank: 4
+  section: Bridge
+  chord_source: chord_001
+  style: walking
+  pattern_name: walking_7
+  energy: medium
+  scores:
+    composite: 0.3965
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4989
+        present: 0.1902
+        future: 0.3109
+      spatial:
+        thing: 0.4995
+        place: 0.3104
+        person: 0.19
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2792
+        known: 0.3911
+      confidence: 0.6496
+      match: 0.2749
+  label: bass_bridge_1_04_322
+  status: approved
+  notes: ''
+- id: bass_bridge_1_05
+  midi_file: candidates/bass_bridge_1_05.mid
+  rank: 5
+  section: Bridge
+  chord_source: chord_001
+  style: root
+  pattern_name: root_7_322
+  energy: medium
+  scores:
+    composite: 0.3963
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4983
+        present: 0.1906
+        future: 0.3111
+      spatial:
+        thing: 0.4988
+        place: 0.3106
+        person: 0.1905
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2794
+        known: 0.3907
+      confidence: 0.6475
+      match: 0.2746
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_intro_01
+  midi_file: candidates/bass_intro_01.mid
+  rank: 6
+  section: Intro
+  chord_source: chord_003
+  style: octave
+  pattern_name: octave_7_bounce
+  energy: medium
+  scores:
+    composite: 0.4272
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+    chromatic:
+      temporal:
+        past: 0.498
+        present: 0.1907
+        future: 0.3113
+      spatial:
+        thing: 0.4986
+        place: 0.3108
+        person: 0.1906
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2794
+        known: 0.3904
+      confidence: 0.6473
+      match: 0.2746
+  label: bass_intro_01_bounce
+  status: approved
+  notes: ''
+- id: bass_intro_02
+  midi_file: candidates/bass_intro_02.mid
+  rank: 7
+  section: Intro
+  chord_source: chord_003
+  style: arpeggiated
+  pattern_name: arp_7_322
+  energy: medium
+  scores:
+    composite: 0.4272
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+    chromatic:
+      temporal:
+        past: 0.4981
+        present: 0.1907
+        future: 0.3112
+      spatial:
+        thing: 0.4987
+        place: 0.3107
+        person: 0.1906
+      ontological:
+        imagined: 0.3301
+        forgotten: 0.2794
+        known: 0.3905
+      confidence: 0.6473
+      match: 0.2745
+  label: bass_intro_02_eighths
+  status: approved
+  notes: ''
+- id: bass_intro_03
+  midi_file: candidates/bass_intro_03.mid
+  rank: 8
+  section: Intro
+  chord_source: chord_003
+  style: walking
+  pattern_name: walking_7
+  energy: medium
+  scores:
+    composite: 0.4272
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+    chromatic:
+      temporal:
+        past: 0.498
+        present: 0.1907
+        future: 0.3112
+      spatial:
+        thing: 0.4986
+        place: 0.3108
+        person: 0.1906
+      ontological:
+        imagined: 0.3301
+        forgotten: 0.2795
+        known: 0.3904
+      confidence: 0.6472
+      match: 0.2745
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_intro_04
+  midi_file: candidates/bass_intro_04.mid
+  rank: 9
+  section: Intro
+  chord_source: chord_003
+  style: root
+  pattern_name: root_7_sparse
+  energy: low
+  scores:
+    composite: 0.4271
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+    chromatic:
+      temporal:
+        past: 0.4981
+        present: 0.1909
+        future: 0.3111
+      spatial:
+        thing: 0.4986
+        place: 0.3106
+        person: 0.1908
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2794
+        known: 0.3905
+      confidence: 0.6462
+      match: 0.2744
+  label: bass_intro_02_eighths2
+  status: approved
+  notes: ''
+- id: bass_intro_05
+  midi_file: candidates/bass_intro_05.mid
+  rank: 10
+  section: Intro
+  chord_source: chord_003
+  style: root
+  pattern_name: root_7_322
+  energy: medium
+  scores:
+    composite: 0.4269
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+    chromatic:
+      temporal:
+        past: 0.4979
+        present: 0.1911
+        future: 0.3111
+      spatial:
+        thing: 0.4985
+        place: 0.3105
+        person: 0.191
+      ontological:
+        imagined: 0.3303
+        forgotten: 0.2794
+        known: 0.3904
+      confidence: 0.645
+      match: 0.2742
+  label: bass_intro_simple
+  status: approved
+  notes: ''
+- id: bass_bridge_2_01
+  midi_file: candidates/bass_bridge_2_01.mid
+  rank: 11
+  section: Bridge
+  chord_source: chord_004
+  style: root
+  pattern_name: root_7_sparse
+  energy: low
+  scores:
+    composite: 0.4288
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1907
+        future: 0.3109
+      spatial:
+        thing: 0.499
+        place: 0.3104
+        person: 0.1906
+      ontological:
+        imagined: 0.3301
+        forgotten: 0.2792
+        known: 0.3907
+      confidence: 0.6469
+      match: 0.2745
+  label: null
+  status: bass_bridge_2_01_alt
+  notes: ''
+- id: bass_bridge_2_02
+  midi_file: candidates/bass_bridge_2_02.mid
+  rank: 12
+  section: Bridge
+  chord_source: chord_004
+  style: arpeggiated
+  pattern_name: arp_7_322
+  energy: medium
+  scores:
+    composite: 0.3966
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4989
+        present: 0.1902
+        future: 0.3109
+      spatial:
+        thing: 0.4995
+        place: 0.3105
+        person: 0.1901
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2792
+        known: 0.391
+      confidence: 0.65
+      match: 0.275
+  label: bass_bridge_2_02_eighths
+  status: approved
+  notes: ''
+- id: bass_bridge_2_03
+  midi_file: candidates/bass_bridge_2_03.mid
+  rank: 13
+  section: Bridge
+  chord_source: chord_004
+  style: octave
+  pattern_name: octave_7_bounce
+  energy: medium
+  scores:
+    composite: 0.3965
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4986
+        present: 0.1903
+        future: 0.3111
+      spatial:
+        thing: 0.4992
+        place: 0.3106
+        person: 0.1902
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2793
+        known: 0.3909
+      confidence: 0.6497
+      match: 0.2749
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_bridge_2_04
+  midi_file: candidates/bass_bridge_2_04.mid
+  rank: 14
+  section: Bridge
+  chord_source: chord_004
+  style: walking
+  pattern_name: walking_7
+  energy: medium
+  scores:
+    composite: 0.3965
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4989
+        present: 0.1902
+        future: 0.3109
+      spatial:
+        thing: 0.4995
+        place: 0.3104
+        person: 0.19
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2792
+        known: 0.3911
+      confidence: 0.6496
+      match: 0.2749
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_bridge_2_05
+  midi_file: candidates/bass_bridge_2_05.mid
+  rank: 15
+  section: Bridge
+  chord_source: chord_004
+  style: root
+  pattern_name: root_7_322
+  energy: medium
+  scores:
+    composite: 0.3963
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.8667
+      kick_alignment: 0.1739
+    chromatic:
+      temporal:
+        past: 0.4983
+        present: 0.1906
+        future: 0.3111
+      spatial:
+        thing: 0.4988
+        place: 0.3106
+        person: 0.1905
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2794
+        known: 0.3907
+      confidence: 0.6475
+      match: 0.2746
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_1_01
+  midi_file: candidates/bass_verse_1_01.mid
+  rank: 16
+  section: Verse
+  chord_source: chord_007
+  style: root
+  pattern_name: root_7_sparse
+  energy: low
+  scores:
+    composite: 0.4332
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.4444
+    chromatic:
+      temporal:
+        past: 0.4983
+        present: 0.1907
+        future: 0.3109
+      spatial:
+        thing: 0.4989
+        place: 0.3104
+        person: 0.1906
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2792
+        known: 0.3906
+      confidence: 0.6467
+      match: 0.2744
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_1_02
+  midi_file: candidates/bass_verse_1_02.mid
+  rank: 17
+  section: Verse
+  chord_source: chord_007
+  style: arpeggiated
+  pattern_name: arp_7_322
+  energy: medium
+  scores:
+    composite: 0.4053
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.19
+        future: 0.3108
+      spatial:
+        thing: 0.4998
+        place: 0.3103
+        person: 0.1899
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3912
+      confidence: 0.6508
+      match: 0.2751
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_1_03
+  midi_file: candidates/bass_verse_1_03.mid
+  rank: 18
+  section: Verse
+  chord_source: chord_007
+  style: walking
+  pattern_name: walking_7
+  energy: medium
+  scores:
+    composite: 0.4052
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4991
+        present: 0.1901
+        future: 0.3108
+      spatial:
+        thing: 0.4997
+        place: 0.3104
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2791
+        known: 0.3911
+      confidence: 0.6503
+      match: 0.2751
+  label: null
+  status: pending
+  notes: ''
+- id: bass_verse_1_04
+  midi_file: candidates/bass_verse_1_04.mid
+  rank: 19
+  section: Verse
+  chord_source: chord_007
+  style: octave
+  pattern_name: octave_7_bounce
+  energy: medium
+  scores:
+    composite: 0.4052
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4989
+        present: 0.1903
+        future: 0.3109
+      spatial:
+        thing: 0.4994
+        place: 0.3104
+        person: 0.1901
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2792
+        known: 0.3911
+      confidence: 0.6501
+      match: 0.275
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_1_05
+  midi_file: candidates/bass_verse_1_05.mid
+  rank: 20
+  section: Verse
+  chord_source: chord_007
+  style: root
+  pattern_name: root_7_322
+  energy: medium
+  scores:
+    composite: 0.4049
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4983
+        present: 0.1906
+        future: 0.3111
+      spatial:
+        thing: 0.4989
+        place: 0.3106
+        person: 0.1905
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2794
+        known: 0.3907
+      confidence: 0.6479
+      match: 0.2746
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_2_01
+  midi_file: candidates/bass_verse_2_01.mid
+  rank: 21
+  section: Verse
+  chord_source: chord_009
+  style: root
+  pattern_name: root_7_sparse
+  energy: low
+  scores:
+    composite: 0.4332
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.4444
+    chromatic:
+      temporal:
+        past: 0.4983
+        present: 0.1907
+        future: 0.3109
+      spatial:
+        thing: 0.4989
+        place: 0.3104
+        person: 0.1906
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2792
+        known: 0.3906
+      confidence: 0.6467
+      match: 0.2744
+  label: bass_verse_2_01_root
+  status: approved
+  notes: ''
+- id: bass_verse_2_02
+  midi_file: candidates/bass_verse_2_02.mid
+  rank: 22
+  section: Verse
+  chord_source: chord_009
+  style: arpeggiated
+  pattern_name: arp_7_322
+  energy: medium
+  scores:
+    composite: 0.4053
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4992
+        present: 0.19
+        future: 0.3108
+      spatial:
+        thing: 0.4998
+        place: 0.3103
+        person: 0.1899
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.279
+        known: 0.3912
+      confidence: 0.6508
+      match: 0.2751
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_2_03
+  midi_file: candidates/bass_verse_2_03.mid
+  rank: 23
+  section: Verse
+  chord_source: chord_009
+  style: walking
+  pattern_name: walking_7
+  energy: medium
+  scores:
+    composite: 0.4052
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4991
+        present: 0.1901
+        future: 0.3108
+      spatial:
+        thing: 0.4997
+        place: 0.3104
+        person: 0.19
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2791
+        known: 0.3911
+      confidence: 0.6503
+      match: 0.2751
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_2_04
+  midi_file: candidates/bass_verse_2_04.mid
+  rank: 24
+  section: Verse
+  chord_source: chord_009
+  style: octave
+  pattern_name: octave_7_bounce
+  energy: medium
+  scores:
+    composite: 0.4052
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4989
+        present: 0.1903
+        future: 0.3109
+      spatial:
+        thing: 0.4994
+        place: 0.3104
+        person: 0.1901
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2792
+        known: 0.3911
+      confidence: 0.6501
+      match: 0.275
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_verse_2_05
+  midi_file: candidates/bass_verse_2_05.mid
+  rank: 25
+  section: Verse
+  chord_source: chord_009
+  style: root
+  pattern_name: root_7_322
+  energy: medium
+  scores:
+    composite: 0.4049
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.16
+    chromatic:
+      temporal:
+        past: 0.4983
+        present: 0.1906
+        future: 0.3111
+      spatial:
+        thing: 0.4989
+        place: 0.3106
+        person: 0.1905
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2794
+        known: 0.3907
+      confidence: 0.6479
+      match: 0.2746
+  label: bass_verse_2_05_root
+  status: approved
+  notes: ''
