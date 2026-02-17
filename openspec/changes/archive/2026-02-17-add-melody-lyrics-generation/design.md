@@ -115,22 +115,17 @@ write candidates/ MIDI files
 write review.yml (includes chromatic synthesis excerpt per section for reference)
 ```
 
-## 7. Vocal prep (vocal_prep.py)
+## 7. Vocal synthesis workflow (external)
 
-Thin conversion utility (NOT part of the scoring pipeline):
+After melody promotion, the human workflow is:
 
-```
-Input:  promoted melody MIDI + lyrics.txt (line per section)
-Output: SoulX-Singer metadata JSON
-```
+1. Import approved melody MIDI into **ACE Studio** (commercial SVS)
+2. ACE Studio handles syllable parsing and phoneme alignment natively
+3. Human adds lyrics in ACE Studio editor (Claude can draft lyrics from chromatic synthesis docs)
+4. Render vocal audio in ACE Studio
+5. Assembly in Logic Pro (loop grid → timeline)
 
-Steps:
-1. Parse melody MIDI → list of (onset_sec, duration_sec, midi_note)
-2. Parse lyrics → syllable sequences (simple whitespace + hyphen splitting)
-3. Align syllables to notes (one syllable per note, overflow wraps)
-4. Output JSON with per-note: pitch, duration, phoneme/syllable, timing
-
-This is intentionally simple — the human can fine-tune alignment in SoulX-Singer's MIDI Editor before rendering.
+No pipeline code is needed for this step — ACE Studio accepts standard MIDI directly.
 
 ## 8. Output structure
 
@@ -141,9 +136,7 @@ This is intentionally simple — the human can fine-tune alignment in SoulX-Sing
     approved/
         <human-labeled>.mid
     review.yml
-    lyrics.txt          (human-written, not generated)
-    vocal_prep/
-        <section>_metadata.json   (SoulX-Singer input)
+    lyrics.txt          (human-written or Claude-drafted, for reference)
 ```
 
 ## 9. MIDI channel

@@ -6,15 +6,13 @@ The music production pipeline currently generates chords, drums, harmonic rhythm
 
 The Chromatic Synthesis documents contain agent-generated lyrical themes per section. These serve as creative direction, not final lyrics. The human writes actual lyrics informed by that thematic material, then the pipeline generates singable melodies that fit the harmonic and rhythmic context.
 
-Vocal synthesis uses **SoulX-Singer** (score-conditioned MIDI input, Apache 2.0), which accepts per-note MIDI pitch + duration + phoneme alignment. This means the melody pipeline outputs standard MIDI, and a separate lightweight step converts melody MIDI + lyrics text into SoulX-Singer metadata for rendering.
+Vocal synthesis uses **ACE Studio** (commercial singing voice synthesis), which imports standard MIDI files and handles lyrics/syllable alignment natively in its editor. The melody pipeline outputs standard MIDI; the human imports it into ACE Studio, adds lyrics, and renders vocal audio.
 
 ## Approach
 
-### Two-stage pipeline
+### Pipeline
 
-1. **Melody MIDI generation** (`melody_patterns.py` + `melody_pipeline.py`) — same generate → score → human gate → promote pattern as all other phases. Template-based melodic contour generation constrained to singer vocal ranges.
-
-2. **Vocal synthesis prep** (`vocal_prep.py`) — takes promoted melody MIDI + human-written lyrics text, produces SoulX-Singer metadata JSON for inference. This is a thin conversion layer, not a generation step.
+**Melody MIDI generation** (`melody_patterns.py` + `melody_pipeline.py`) — same generate → score → human gate → promote pattern as all other phases. Template-based melodic contour generation constrained to singer vocal ranges.
 
 ### Key design decisions
 
@@ -28,7 +26,7 @@ Vocal synthesis uses **SoulX-Singer** (score-conditioned MIDI input, Apache 2.0)
 
 5. **Theory scoring**: Singability (interval size, range usage, rest placement), chord-tone alignment (strong beats on chord tones), and melodic contour quality (arch shapes, climax placement).
 
-6. **Lyrics are human-authored**: The pipeline does NOT generate lyrics. Chromatic Synthesis text is thematic reference. Human writes lyrics after reviewing melody candidates, then the vocal prep step aligns them.
+6. **Lyrics are human-authored**: The pipeline does NOT generate lyrics. Chromatic Synthesis text is thematic reference. Claude can draft lyrics from the song proposal and chromatic synthesis docs; the human refines them and adds them in ACE Studio.
 
 ### Singer roster
 
@@ -42,7 +40,7 @@ Vocal synthesis uses **SoulX-Singer** (score-conditioned MIDI input, Apache 2.0)
 
 ### What this change does NOT include
 
-- Actual lyric generation (human task)
-- Running SoulX-Singer inference (separate tooling, not part of this pipeline)
+- Actual lyric generation (human task, with optional Claude drafting from chromatic synthesis)
+- ACE Studio vocal rendering (external commercial tool, not part of this pipeline)
 - Harmony/backing vocal generation (future phase)
 - Audio rendering or mixing

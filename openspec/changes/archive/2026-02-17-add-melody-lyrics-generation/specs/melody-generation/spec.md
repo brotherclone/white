@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Melody generation for the music production pipeline. Generates singable melody MIDI from approved chord progressions within singer vocal range constraints, with optional vocal synthesis preparation for SoulX-Singer.
+Melody generation for the music production pipeline. Generates singable melody MIDI from approved chord progressions within singer vocal range constraints. Vocal synthesis is handled externally in ACE Studio.
 
 ## ADDED Requirements
 
@@ -179,29 +179,6 @@ The melody pipeline SHALL generate a YAML review file alongside the MIDI candida
 - **WHEN** the review file is generated
 - **THEN** each candidate SHALL have `label: null`, `status: pending`, and `notes: ""` fields for human annotation
 
-### Requirement: Vocal Synthesis Preparation
-
-The pipeline SHALL include a utility to convert promoted melody MIDI and human-written lyrics into SoulX-Singer metadata.
-
-#### Scenario: Melody MIDI parsing
-
-- **WHEN** vocal prep is run on a promoted melody MIDI file
-- **THEN** it SHALL extract per-note: onset time (seconds), duration (seconds), and MIDI pitch
-
-#### Scenario: Lyrics syllable alignment
-
-- **WHEN** a `lyrics.txt` file is provided
-- **THEN** the utility SHALL split text into syllables using whitespace and hyphen boundaries
-- **AND** align one syllable per melody note
-- **AND** if syllables outnumber notes, excess syllables SHALL be appended to the last note
-- **AND** if notes outnumber syllables, excess notes SHALL use a sustained vowel ("ah")
-
-#### Scenario: Metadata output
-
-- **WHEN** alignment is complete
-- **THEN** the utility SHALL write a JSON metadata file per section in `<song>/melody/vocal_prep/`
-- **AND** the JSON SHALL include per-note: pitch (MIDI), duration (seconds), onset (seconds), and syllable text
-
 ### Requirement: Melody CLI Interface
 
 The melody pipeline SHALL be invocable from the command line.
@@ -210,11 +187,6 @@ The melody pipeline SHALL be invocable from the command line.
 
 - **WHEN** the user runs the melody pipeline CLI
 - **THEN** it SHALL accept `--production-dir`, `--singer` (name), `--seed`, `--top-k`, `--theory-weight` (default 0.3), `--chromatic-weight` (default 0.7), `--onnx-path`
-
-#### Scenario: Vocal prep invocation
-
-- **WHEN** the user runs the vocal prep CLI
-- **THEN** it SHALL accept `--production-dir`, `--section` (specific section or "all"), `--lyrics` (path to lyrics.txt)
 
 #### Scenario: Progress output
 

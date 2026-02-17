@@ -3,7 +3,7 @@ thread: shrinkwrapped/white-the-breathing-machine-learns-to-sing
 key: G minor
 bpm: 60
 color: Green
-generated: '2026-02-14T20:44:55.768612+00:00'
+generated: '2026-02-16T19:35:13.592750+00:00'
 seed: 42
 scoring_weights:
   theory: 0.3
@@ -68,8 +68,8 @@ candidates:
     - A3
     - C4
     - D#4
-  label: null
-  status: rejected
+  label: toppling
+  status: approved
   notes: ''
 - id: chord_002
   midi_file: candidates/chord_002.mid
@@ -131,9 +131,9 @@ candidates:
     - A3
     - B3
     - F#4
-  label: bridge
+  label: worker
   status: approved
-  notes: 'apprehension and release'
+  notes: ''
 - id: chord_003
   midi_file: candidates/chord_003.mid
   rank: 3
@@ -194,9 +194,9 @@ candidates:
     - G#3
     - B3
     - F#4
-  label: chorus
+  label: queen
   status: approved
-  notes: 'solid, emotional'
+  notes: ''
 - id: chord_004
   midi_file: candidates/chord_004.mid
   rank: 4
@@ -257,9 +257,9 @@ candidates:
     - A3
     - C4
     - F#4
-  label: bridge
-  status: approved
-  notes: 'wonderful for transitions - time passing'
+  label: null
+  status: rejected
+  notes: ''
 - id: chord_005
   midi_file: candidates/chord_005.mid
   rank: 5
@@ -319,8 +319,8 @@ candidates:
     - A3
     - B3
     - D4
-  label: null
-  status: rejected
+  label: pasture
+  status: approved
   notes: ''
 - id: chord_006
   midi_file: candidates/chord_006.mid
@@ -380,9 +380,9 @@ candidates:
     - G3
     - C4
     - E4
-  label: bridge
+  label: ministers_daughter
   status: approved
-  notes: 'another great transition - time passing'
+  notes: ''
 - id: chord_007
   midi_file: candidates/chord_007.mid
   rank: 7
@@ -442,8 +442,8 @@ candidates:
     - B3
     - C4
     - E4
-  label: null
-  status: rejected
+  label: royal_degradation
+  status: approved
   notes: ''
 - id: chord_008
   midi_file: candidates/chord_008.mid
@@ -626,6 +626,6 @@ candidates:
     - F#3
     - A3
     - D4
-  label: verse
+  label: honey
   status: approved
-  notes: 'perfectly balanced'
+  notes: ''

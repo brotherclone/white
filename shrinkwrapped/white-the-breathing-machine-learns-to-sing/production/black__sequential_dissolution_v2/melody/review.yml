@@ -1,0 +1,843 @@
+production_dir: /Volumes/LucidNonsense/White/shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/black__sequential_dissolution_v2
+pipeline: melody-generation
+bpm: 84
+time_sig: 7/8
+color: Black
+singer: Shirley
+generated: '2026-02-17T12:35:31.851572+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+sections_found:
+- Bridge
+- Intro
+- Bridge
+- Verse
+- Verse
+candidates:
+- id: melody_bridge_1_01
+  midi_file: candidates/melody_bridge_1_01.mid
+  rank: 1
+  section: Bridge
+  chord_source: chord_001
+  contour: stepwise
+  pattern_name: stepwise_7_223
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4328
+    theory:
+      singability: 0.4102
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9942
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1904
+        future: 0.311
+      spatial:
+        thing: 0.4991
+        place: 0.3106
+        person: 0.1903
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3908
+      confidence: 0.6489
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_1_02
+  midi_file: candidates/melody_bridge_1_02.mid
+  rank: 2
+  section: Bridge
+  chord_source: chord_001
+  contour: repeated
+  pattern_name: repeated_7_pulse
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.431
+    theory:
+      singability: 0.4102
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9766
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1905
+        future: 0.3111
+      spatial:
+        thing: 0.499
+        place: 0.3106
+        person: 0.1904
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3906
+      confidence: 0.6488
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_1_03
+  midi_file: candidates/melody_bridge_1_03.mid
+  rank: 3
+  section: Bridge
+  chord_source: chord_001
+  contour: arpeggiated
+  pattern_name: arp_7_up
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4309
+    theory:
+      singability: 0.404
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9807
+    chromatic:
+      temporal:
+        past: 0.4986
+        present: 0.1905
+        future: 0.311
+      spatial:
+        thing: 0.4992
+        place: 0.3105
+        person: 0.1903
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2792
+        known: 0.3908
+      confidence: 0.6493
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_1_04
+  midi_file: candidates/melody_bridge_1_04.mid
+  rank: 4
+  section: Bridge
+  chord_source: chord_001
+  contour: pentatonic
+  pattern_name: penta_7_modal
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.429
+    theory:
+      singability: 0.388
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9778
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1905
+        future: 0.3111
+      spatial:
+        thing: 0.499
+        place: 0.3106
+        person: 0.1904
+      ontological:
+        imagined: 0.3301
+        forgotten: 0.2793
+        known: 0.3906
+      confidence: 0.649
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_1_05
+  midi_file: candidates/melody_bridge_1_05.mid
+  rank: 5
+  section: Bridge
+  chord_source: chord_001
+  contour: stepwise
+  pattern_name: stepwise_7_322
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.415
+    theory:
+      singability: 0.4029
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8237
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1905
+        future: 0.3111
+      spatial:
+        thing: 0.499
+        place: 0.3106
+        person: 0.1904
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3906
+      confidence: 0.6486
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_intro_01
+  midi_file: candidates/melody_intro_01.mid
+  rank: 6
+  section: Intro
+  chord_source: chord_003
+  contour: arpeggiated
+  pattern_name: arp_7_up
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4238
+    theory:
+      singability: 0.4003
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9167
+    chromatic:
+      temporal:
+        past: 0.4983
+        present: 0.1909
+        future: 0.3108
+      spatial:
+        thing: 0.4989
+        place: 0.3103
+        person: 0.1909
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2792
+        known: 0.3907
+      confidence: 0.6466
+      match: 0.2744
+  label: null
+  status: pending
+  notes: ''
+- id: melody_intro_02
+  midi_file: candidates/melody_intro_02.mid
+  rank: 7
+  section: Intro
+  chord_source: chord_003
+  contour: stepwise
+  pattern_name: stepwise_7_223
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.411
+    theory:
+      singability: 0.4
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7889
+    chromatic:
+      temporal:
+        past: 0.4981
+        present: 0.1909
+        future: 0.311
+      spatial:
+        thing: 0.4987
+        place: 0.3105
+        person: 0.1908
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2793
+        known: 0.3905
+      confidence: 0.6467
+      match: 0.2745
+  label: null
+  status: pending
+  notes: ''
+- id: melody_intro_03
+  midi_file: candidates/melody_intro_03.mid
+  rank: 8
+  section: Intro
+  chord_source: chord_003
+  contour: pentatonic
+  pattern_name: penta_7_modal
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.4109
+    theory:
+      singability: 0.425
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7639
+    chromatic:
+      temporal:
+        past: 0.4982
+        present: 0.191
+        future: 0.3108
+      spatial:
+        thing: 0.4988
+        place: 0.3103
+        person: 0.191
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2792
+        known: 0.3906
+      confidence: 0.6462
+      match: 0.2744
+  label: null
+  status: pending
+  notes: ''
+- id: melody_intro_04
+  midi_file: candidates/melody_intro_04.mid
+  rank: 9
+  section: Intro
+  chord_source: chord_003
+  contour: stepwise
+  pattern_name: stepwise_7_322
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.4096
+    theory:
+      singability: 0.3974
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7778
+    chromatic:
+      temporal:
+        past: 0.4981
+        present: 0.191
+        future: 0.311
+      spatial:
+        thing: 0.4987
+        place: 0.3105
+        person: 0.1909
+      ontological:
+        imagined: 0.3303
+        forgotten: 0.2793
+        known: 0.3905
+      confidence: 0.646
+      match: 0.2743
+  label: null
+  status: pending
+  notes: ''
+- id: melody_intro_05
+  midi_file: candidates/melody_intro_05.mid
+  rank: 10
+  section: Intro
+  chord_source: chord_003
+  contour: repeated
+  pattern_name: repeated_7_pulse
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4076
+    theory:
+      singability: 0.4
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7556
+    chromatic:
+      temporal:
+        past: 0.4981
+        present: 0.1909
+        future: 0.311
+      spatial:
+        thing: 0.4987
+        place: 0.3104
+        person: 0.1909
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2793
+        known: 0.3905
+      confidence: 0.6462
+      match: 0.2744
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_2_01
+  midi_file: candidates/melody_bridge_2_01.mid
+  rank: 11
+  section: Bridge
+  chord_source: chord_004
+  contour: stepwise
+  pattern_name: stepwise_7_223
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4328
+    theory:
+      singability: 0.4102
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9942
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1904
+        future: 0.311
+      spatial:
+        thing: 0.4991
+        place: 0.3106
+        person: 0.1903
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3908
+      confidence: 0.6489
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_2_02
+  midi_file: candidates/melody_bridge_2_02.mid
+  rank: 12
+  section: Bridge
+  chord_source: chord_004
+  contour: repeated
+  pattern_name: repeated_7_pulse
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.431
+    theory:
+      singability: 0.4102
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9766
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1905
+        future: 0.3111
+      spatial:
+        thing: 0.499
+        place: 0.3106
+        person: 0.1904
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3906
+      confidence: 0.6488
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_2_03
+  midi_file: candidates/melody_bridge_2_03.mid
+  rank: 13
+  section: Bridge
+  chord_source: chord_004
+  contour: arpeggiated
+  pattern_name: arp_7_up
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4309
+    theory:
+      singability: 0.404
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9807
+    chromatic:
+      temporal:
+        past: 0.4986
+        present: 0.1905
+        future: 0.311
+      spatial:
+        thing: 0.4992
+        place: 0.3105
+        person: 0.1903
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2792
+        known: 0.3908
+      confidence: 0.6493
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_2_04
+  midi_file: candidates/melody_bridge_2_04.mid
+  rank: 14
+  section: Bridge
+  chord_source: chord_004
+  contour: pentatonic
+  pattern_name: penta_7_modal
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.429
+    theory:
+      singability: 0.388
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9778
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1905
+        future: 0.3111
+      spatial:
+        thing: 0.499
+        place: 0.3106
+        person: 0.1904
+      ontological:
+        imagined: 0.3301
+        forgotten: 0.2793
+        known: 0.3906
+      confidence: 0.649
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_bridge_2_05
+  midi_file: candidates/melody_bridge_2_05.mid
+  rank: 15
+  section: Bridge
+  chord_source: chord_004
+  contour: stepwise
+  pattern_name: stepwise_7_322
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.415
+    theory:
+      singability: 0.4029
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8237
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1905
+        future: 0.3111
+      spatial:
+        thing: 0.499
+        place: 0.3106
+        person: 0.1904
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3906
+      confidence: 0.6486
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_1_01
+  midi_file: candidates/melody_verse_1_01.mid
+  rank: 16
+  section: Verse
+  chord_source: chord_007
+  contour: arpeggiated
+  pattern_name: arp_7_down
+  energy: high
+  singer: Shirley
+  scores:
+    composite: 0.4448
+    theory:
+      singability: 0.5917
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9298
+    chromatic:
+      temporal:
+        past: 0.4995
+        present: 0.1899
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1898
+      ontological:
+        imagined: 0.3292
+        forgotten: 0.2791
+        known: 0.3917
+      confidence: 0.6514
+      match: 0.2752
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_1_02
+  midi_file: candidates/melody_verse_1_02.mid
+  rank: 17
+  section: Verse
+  chord_source: chord_007
+  contour: stepwise
+  pattern_name: stepwise_7_223
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.429
+    theory:
+      singability: 0.4445
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9214
+    chromatic:
+      temporal:
+        past: 0.4986
+        present: 0.1903
+        future: 0.3111
+      spatial:
+        thing: 0.4992
+        place: 0.3106
+        person: 0.1902
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2793
+        known: 0.3909
+      confidence: 0.6493
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_1_03
+  midi_file: candidates/melody_verse_1_03.mid
+  rank: 18
+  section: Verse
+  chord_source: chord_007
+  contour: repeated
+  pattern_name: repeated_7_pulse
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4272
+    theory:
+      singability: 0.4428
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9051
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1904
+        future: 0.3111
+      spatial:
+        thing: 0.4991
+        place: 0.3106
+        person: 0.1903
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2793
+        known: 0.3907
+      confidence: 0.6491
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_1_04
+  midi_file: candidates/melody_verse_1_04.mid
+  rank: 19
+  section: Verse
+  chord_source: chord_007
+  contour: stepwise
+  pattern_name: stepwise_7_322
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.4134
+    theory:
+      singability: 0.4746
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7356
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1905
+        future: 0.3112
+      spatial:
+        thing: 0.4989
+        place: 0.3107
+        person: 0.1904
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2794
+        known: 0.3906
+      confidence: 0.6487
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_1_05
+  midi_file: candidates/melody_verse_1_05.mid
+  rank: 20
+  section: Verse
+  chord_source: chord_007
+  contour: pentatonic
+  pattern_name: penta_7_modal
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.4121
+    theory:
+      singability: 0.3913
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8056
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1904
+        future: 0.3111
+      spatial:
+        thing: 0.4991
+        place: 0.3106
+        person: 0.1903
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3907
+      confidence: 0.6494
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_2_01
+  midi_file: candidates/melody_verse_2_01.mid
+  rank: 21
+  section: Verse
+  chord_source: chord_009
+  contour: arpeggiated
+  pattern_name: arp_7_down
+  energy: high
+  singer: Shirley
+  scores:
+    composite: 0.4448
+    theory:
+      singability: 0.5917
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9298
+    chromatic:
+      temporal:
+        past: 0.4995
+        present: 0.1899
+        future: 0.3106
+      spatial:
+        thing: 0.5
+        place: 0.3101
+        person: 0.1898
+      ontological:
+        imagined: 0.3292
+        forgotten: 0.2791
+        known: 0.3917
+      confidence: 0.6514
+      match: 0.2752
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_2_02
+  midi_file: candidates/melody_verse_2_02.mid
+  rank: 22
+  section: Verse
+  chord_source: chord_009
+  contour: stepwise
+  pattern_name: stepwise_7_223
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.429
+    theory:
+      singability: 0.4445
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9214
+    chromatic:
+      temporal:
+        past: 0.4986
+        present: 0.1903
+        future: 0.3111
+      spatial:
+        thing: 0.4992
+        place: 0.3106
+        person: 0.1902
+      ontological:
+        imagined: 0.3298
+        forgotten: 0.2793
+        known: 0.3909
+      confidence: 0.6493
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_2_03
+  midi_file: candidates/melody_verse_2_03.mid
+  rank: 23
+  section: Verse
+  chord_source: chord_009
+  contour: repeated
+  pattern_name: repeated_7_pulse
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.4272
+    theory:
+      singability: 0.4428
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9051
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1904
+        future: 0.3111
+      spatial:
+        thing: 0.4991
+        place: 0.3106
+        person: 0.1903
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2793
+        known: 0.3907
+      confidence: 0.6491
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_2_04
+  midi_file: candidates/melody_verse_2_04.mid
+  rank: 24
+  section: Verse
+  chord_source: chord_009
+  contour: stepwise
+  pattern_name: stepwise_7_322
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.4134
+    theory:
+      singability: 0.4746
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7356
+    chromatic:
+      temporal:
+        past: 0.4984
+        present: 0.1905
+        future: 0.3112
+      spatial:
+        thing: 0.4989
+        place: 0.3107
+        person: 0.1904
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2794
+        known: 0.3906
+      confidence: 0.6487
+      match: 0.2748
+  label: null
+  status: pending
+  notes: ''
+- id: melody_verse_2_05
+  midi_file: candidates/melody_verse_2_05.mid
+  rank: 25
+  section: Verse
+  chord_source: chord_009
+  contour: pentatonic
+  pattern_name: penta_7_modal
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.4121
+    theory:
+      singability: 0.3913
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8056
+    chromatic:
+      temporal:
+        past: 0.4985
+        present: 0.1904
+        future: 0.3111
+      spatial:
+        thing: 0.4991
+        place: 0.3106
+        person: 0.1903
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2793
+        known: 0.3907
+      confidence: 0.6494
+      match: 0.2749
+  label: null
+  status: pending
+  notes: ''
