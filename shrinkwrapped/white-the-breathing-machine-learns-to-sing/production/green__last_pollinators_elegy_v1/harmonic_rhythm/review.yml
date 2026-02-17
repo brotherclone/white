@@ -1,0 +1,4499 @@
+production_dir: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/green__last_pollinators_elegy_v1
+pipeline: harmonic-rhythm
+bpm: 60
+time_sig: 3/4
+color: Green
+generated: '2026-02-16T19:58:29.858209+00:00'
+seed: 42
+scoring_weights:
+  alignment: 0.3
+  chromatic: 0.7
+sections_found:
+- toppling
+- worker
+- queen
+- pasture
+- ministers_daughter
+- royal_degradation
+- honey
+candidates:
+- id: hr_toppling_001
+  midi_file: candidates/hr_toppling_001.mid
+  rank: 1
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3606
+      confidence: 0.1408
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_002
+  midi_file: candidates/hr_toppling_002.mid
+  rank: 2
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2465
+        future: 0.3038
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1404
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_003
+  midi_file: candidates/hr_toppling_003.mid
+  rank: 3
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4496
+        present: 0.2466
+        future: 0.3038
+      spatial:
+        thing: 0.4497
+        place: 0.3043
+        person: 0.2461
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3603
+      confidence: 0.1399
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_004
+  midi_file: candidates/hr_toppling_004.mid
+  rank: 4
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3602
+      confidence: 0.1396
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_005
+  midi_file: candidates/hr_toppling_005.mid
+  rank: 5
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3603
+      confidence: 0.1397
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_006
+  midi_file: candidates/hr_toppling_006.mid
+  rank: 6
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2868
+        known: 0.3602
+      confidence: 0.1395
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_007
+  midi_file: candidates/hr_toppling_007.mid
+  rank: 7
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4492
+        present: 0.2468
+        future: 0.304
+      spatial:
+        thing: 0.4493
+        place: 0.3044
+        person: 0.2463
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2869
+        known: 0.3601
+      confidence: 0.1393
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_008
+  midi_file: candidates/hr_toppling_008.mid
+  rank: 8
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4495
+        present: 0.2467
+        future: 0.3038
+      spatial:
+        thing: 0.4496
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3603
+      confidence: 0.1396
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_009
+  midi_file: candidates/hr_toppling_009.mid
+  rank: 9
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4493
+        present: 0.2468
+        future: 0.3039
+      spatial:
+        thing: 0.4494
+        place: 0.3043
+        person: 0.2463
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2868
+        known: 0.3601
+      confidence: 0.1394
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_010
+  midi_file: candidates/hr_toppling_010.mid
+  rank: 10
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3603
+      confidence: 0.1395
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_011
+  midi_file: candidates/hr_toppling_011.mid
+  rank: 11
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4495
+        present: 0.2467
+        future: 0.3038
+      spatial:
+        thing: 0.4496
+        place: 0.3042
+        person: 0.2461
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2867
+        known: 0.3603
+      confidence: 0.1396
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_012
+  midi_file: candidates/hr_toppling_012.mid
+  rank: 12
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.449
+        present: 0.2469
+        future: 0.304
+      spatial:
+        thing: 0.4491
+        place: 0.3045
+        person: 0.2464
+      ontological:
+        imagined: 0.353
+        forgotten: 0.287
+        known: 0.3601
+      confidence: 0.1389
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_013
+  midi_file: candidates/hr_toppling_013.mid
+  rank: 13
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2868
+        known: 0.3602
+      confidence: 0.1393
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_014
+  midi_file: candidates/hr_toppling_014.mid
+  rank: 14
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4493
+        present: 0.2468
+        future: 0.3039
+      spatial:
+        thing: 0.4494
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3531
+        forgotten: 0.2868
+        known: 0.3601
+      confidence: 0.1393
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_015
+  midi_file: candidates/hr_toppling_015.mid
+  rank: 15
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  total_bars: 4.0
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4491
+        present: 0.2469
+        future: 0.304
+      spatial:
+        thing: 0.4492
+        place: 0.3044
+        person: 0.2464
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2869
+        known: 0.36
+      confidence: 0.139
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_016
+  midi_file: candidates/hr_toppling_016.mid
+  rank: 16
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3603
+      confidence: 0.1393
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_017
+  midi_file: candidates/hr_toppling_017.mid
+  rank: 17
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 3.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4493
+        present: 0.2468
+        future: 0.3039
+      spatial:
+        thing: 0.4494
+        place: 0.3044
+        person: 0.2463
+      ontological:
+        imagined: 0.3531
+        forgotten: 0.2868
+        known: 0.3601
+      confidence: 0.1391
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_018
+  midi_file: candidates/hr_toppling_018.mid
+  rank: 18
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3531
+        forgotten: 0.2868
+        known: 0.3601
+      confidence: 0.1391
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_019
+  midi_file: candidates/hr_toppling_019.mid
+  rank: 19
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 5.0
+  - 1.0
+  - 0.5
+  - 0.5
+  total_bars: 7.0
+  scores:
+    composite: 0.3429
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3607
+      confidence: 0.1411
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_toppling_020
+  midi_file: candidates/hr_toppling_020.mid
+  rank: 20
+  section: toppling
+  chord_source: chord_001
+  distribution:
+  - 4.5
+  - 0.5
+  - 2.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.3429
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1409
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_001
+  midi_file: candidates/hr_worker_001.mid
+  rank: 21
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.1418
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_002
+  midi_file: candidates/hr_worker_002.mid
+  rank: 22
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.1418
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_003
+  midi_file: candidates/hr_worker_003.mid
+  rank: 23
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2462
+        future: 0.3037
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2866
+        known: 0.3607
+      confidence: 0.1411
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_004
+  midi_file: candidates/hr_worker_004.mid
+  rank: 24
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3607
+      confidence: 0.1411
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_005
+  midi_file: candidates/hr_worker_005.mid
+  rank: 25
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1411
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_006
+  midi_file: candidates/hr_worker_006.mid
+  rank: 26
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1412
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_007
+  midi_file: candidates/hr_worker_007.mid
+  rank: 27
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2464
+        future: 0.3038
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1405
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_008
+  midi_file: candidates/hr_worker_008.mid
+  rank: 28
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 3.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1407
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_009
+  midi_file: candidates/hr_worker_009.mid
+  rank: 29
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1408
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_010
+  midi_file: candidates/hr_worker_010.mid
+  rank: 30
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1414
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_011
+  midi_file: candidates/hr_worker_011.mid
+  rank: 31
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1406
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_012
+  midi_file: candidates/hr_worker_012.mid
+  rank: 32
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4504
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2864
+        known: 0.3607
+      confidence: 0.1411
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_013
+  midi_file: candidates/hr_worker_013.mid
+  rank: 33
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4497
+        present: 0.2465
+        future: 0.3038
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.1403
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_014
+  midi_file: candidates/hr_worker_014.mid
+  rank: 34
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4504
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2864
+        known: 0.3607
+      confidence: 0.141
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_015
+  midi_file: candidates/hr_worker_015.mid
+  rank: 35
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2865
+        known: 0.3606
+      confidence: 0.1408
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_016
+  midi_file: candidates/hr_worker_016.mid
+  rank: 36
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.304
+        person: 0.2457
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2865
+        known: 0.3606
+      confidence: 0.141
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_017
+  midi_file: candidates/hr_worker_017.mid
+  rank: 37
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  total_bars: 4.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3603
+      confidence: 0.1397
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_018
+  midi_file: candidates/hr_worker_018.mid
+  rank: 38
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4496
+        present: 0.2466
+        future: 0.3038
+      spatial:
+        thing: 0.4497
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2867
+        known: 0.3603
+      confidence: 0.1399
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_019
+  midi_file: candidates/hr_worker_019.mid
+  rank: 39
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 2.5
+  - 0.5
+  - 3.5
+  total_bars: 7.5
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.1418
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_worker_020
+  midi_file: candidates/hr_worker_020.mid
+  rank: 40
+  section: worker
+  chord_source: chord_002
+  distribution:
+  - 1.0
+  - 3.0
+  - 0.5
+  - 3.5
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.1419
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_001
+  midi_file: candidates/hr_queen_001.mid
+  rank: 41
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4507
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4508
+        place: 0.3039
+        person: 0.2453
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2863
+        known: 0.361
+      confidence: 0.1423
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_002
+  midi_file: candidates/hr_queen_002.mid
+  rank: 42
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.2459
+        future: 0.3035
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.1422
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_003
+  midi_file: candidates/hr_queen_003.mid
+  rank: 43
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.2459
+        future: 0.3035
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.1421
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_004
+  midi_file: candidates/hr_queen_004.mid
+  rank: 44
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.2461
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1417
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_005
+  midi_file: candidates/hr_queen_005.mid
+  rank: 45
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4508
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4509
+        place: 0.3038
+        person: 0.2453
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2862
+        known: 0.3609
+      confidence: 0.1422
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_006
+  midi_file: candidates/hr_queen_006.mid
+  rank: 46
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4507
+        present: 0.2459
+        future: 0.3034
+      spatial:
+        thing: 0.4508
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.142
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_007
+  midi_file: candidates/hr_queen_007.mid
+  rank: 47
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3606
+      confidence: 0.1409
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_008
+  midi_file: candidates/hr_queen_008.mid
+  rank: 48
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.2459
+        future: 0.3034
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.1419
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_009
+  midi_file: candidates/hr_queen_009.mid
+  rank: 49
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.2461
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2864
+        known: 0.3607
+      confidence: 0.1416
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_010
+  midi_file: candidates/hr_queen_010.mid
+  rank: 50
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2464
+        future: 0.3038
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1407
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_011
+  midi_file: candidates/hr_queen_011.mid
+  rank: 51
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  total_bars: 4.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4496
+        present: 0.2466
+        future: 0.3039
+      spatial:
+        thing: 0.4497
+        place: 0.3043
+        person: 0.2461
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2868
+        known: 0.3604
+      confidence: 0.1404
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_012
+  midi_file: candidates/hr_queen_012.mid
+  rank: 52
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.246
+        future: 0.3034
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2863
+        known: 0.3608
+      confidence: 0.1416
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_013
+  midi_file: candidates/hr_queen_013.mid
+  rank: 53
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.2461
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.3039
+        person: 0.2456
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2863
+        known: 0.3607
+      confidence: 0.1412
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_014
+  midi_file: candidates/hr_queen_014.mid
+  rank: 54
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3605
+      confidence: 0.1405
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_015
+  midi_file: candidates/hr_queen_015.mid
+  rank: 55
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2462
+        future: 0.3037
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3526
+        forgotten: 0.2867
+        known: 0.3607
+      confidence: 0.1405
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_016
+  midi_file: candidates/hr_queen_016.mid
+  rank: 56
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3041
+        person: 0.2459
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2866
+        known: 0.3604
+      confidence: 0.1404
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_017
+  midi_file: candidates/hr_queen_017.mid
+  rank: 57
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 3.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.4499
+        place: 0.3041
+        person: 0.2459
+      ontological:
+        imagined: 0.3531
+        forgotten: 0.2866
+        known: 0.3603
+      confidence: 0.14
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_018
+  midi_file: candidates/hr_queen_018.mid
+  rank: 58
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2463
+        future: 0.3036
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2865
+        known: 0.3605
+      confidence: 0.1403
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_019
+  midi_file: candidates/hr_queen_019.mid
+  rank: 59
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 2.0
+  - 0.5
+  - 1.5
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4507
+        present: 0.2459
+        future: 0.3034
+      spatial:
+        thing: 0.4508
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2863
+        known: 0.361
+      confidence: 0.1423
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_queen_020
+  midi_file: candidates/hr_queen_020.mid
+  rank: 60
+  section: queen
+  chord_source: chord_003
+  distribution:
+  - 3.0
+  - 0.5
+  - 1.5
+  - 2.5
+  total_bars: 7.5
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4507
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4508
+        place: 0.3039
+        person: 0.2453
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2863
+        known: 0.361
+      confidence: 0.1423
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_001
+  midi_file: candidates/hr_pasture_001.mid
+  rank: 61
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4511
+        present: 0.2456
+        future: 0.3033
+      spatial:
+        thing: 0.4512
+        place: 0.3037
+        person: 0.2451
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2861
+        known: 0.3611
+      confidence: 0.1429
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_002
+  midi_file: candidates/hr_pasture_002.mid
+  rank: 62
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4511
+        present: 0.2456
+        future: 0.3033
+      spatial:
+        thing: 0.4512
+        place: 0.3037
+        person: 0.2451
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2861
+        known: 0.3611
+      confidence: 0.1429
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_003
+  midi_file: candidates/hr_pasture_003.mid
+  rank: 63
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.451
+        present: 0.2457
+        future: 0.3033
+      spatial:
+        thing: 0.4511
+        place: 0.3038
+        person: 0.2452
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2862
+        known: 0.3611
+      confidence: 0.1427
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_004
+  midi_file: candidates/hr_pasture_004.mid
+  rank: 64
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4509
+        present: 0.2457
+        future: 0.3034
+      spatial:
+        thing: 0.451
+        place: 0.3038
+        person: 0.2452
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2862
+        known: 0.361
+      confidence: 0.1425
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_005
+  midi_file: candidates/hr_pasture_005.mid
+  rank: 65
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4509
+        present: 0.2457
+        future: 0.3034
+      spatial:
+        thing: 0.451
+        place: 0.3038
+        person: 0.2452
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2862
+        known: 0.361
+      confidence: 0.1425
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_006
+  midi_file: candidates/hr_pasture_006.mid
+  rank: 66
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4504
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1417
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_007
+  midi_file: candidates/hr_pasture_007.mid
+  rank: 67
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4508
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4509
+        place: 0.3038
+        person: 0.2453
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2862
+        known: 0.361
+      confidence: 0.1422
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_008
+  midi_file: candidates/hr_pasture_008.mid
+  rank: 68
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2863
+        known: 0.3608
+      confidence: 0.1419
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_009
+  midi_file: candidates/hr_pasture_009.mid
+  rank: 69
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2863
+        known: 0.3608
+      confidence: 0.1418
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_010
+  midi_file: candidates/hr_pasture_010.mid
+  rank: 70
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2865
+        known: 0.3606
+      confidence: 0.1412
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_011
+  midi_file: candidates/hr_pasture_011.mid
+  rank: 71
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1411
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_012
+  midi_file: candidates/hr_pasture_012.mid
+  rank: 72
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4507
+        present: 0.2459
+        future: 0.3034
+      spatial:
+        thing: 0.4508
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.142
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_013
+  midi_file: candidates/hr_pasture_013.mid
+  rank: 73
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2863
+        known: 0.3608
+      confidence: 0.1417
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_014
+  midi_file: candidates/hr_pasture_014.mid
+  rank: 74
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3041
+        person: 0.2459
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2866
+        known: 0.3605
+      confidence: 0.1409
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_015
+  midi_file: candidates/hr_pasture_015.mid
+  rank: 75
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  total_bars: 4.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4496
+        present: 0.2465
+        future: 0.3038
+      spatial:
+        thing: 0.4497
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.1404
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_016
+  midi_file: candidates/hr_pasture_016.mid
+  rank: 76
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4504
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2864
+        known: 0.3607
+      confidence: 0.1412
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_017
+  midi_file: candidates/hr_pasture_017.mid
+  rank: 77
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2865
+        known: 0.3605
+      confidence: 0.1408
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_018
+  midi_file: candidates/hr_pasture_018.mid
+  rank: 78
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 1.0
+  - 3.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2866
+        known: 0.3605
+      confidence: 0.1408
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_019
+  midi_file: candidates/hr_pasture_019.mid
+  rank: 79
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 4.0
+  - 0.5
+  - 0.5
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4512
+        present: 0.2455
+        future: 0.3033
+      spatial:
+        thing: 0.4513
+        place: 0.3037
+        person: 0.245
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2861
+        known: 0.3612
+      confidence: 0.1431
+      match: 0.1686
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_pasture_020
+  midi_file: candidates/hr_pasture_020.mid
+  rank: 80
+  section: pasture
+  chord_source: chord_005
+  distribution:
+  - 0.5
+  - 1.5
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4511
+        present: 0.2456
+        future: 0.3033
+      spatial:
+        thing: 0.4512
+        place: 0.3037
+        person: 0.2451
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2861
+        known: 0.3612
+      confidence: 0.1429
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_001
+  midi_file: candidates/hr_ministers_daughter_001.mid
+  rank: 81
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.451
+        present: 0.2457
+        future: 0.3033
+      spatial:
+        thing: 0.4511
+        place: 0.3037
+        person: 0.2452
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2861
+        known: 0.3611
+      confidence: 0.1428
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_002
+  midi_file: candidates/hr_ministers_daughter_002.mid
+  rank: 82
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.451
+        present: 0.2457
+        future: 0.3033
+      spatial:
+        thing: 0.4511
+        place: 0.3038
+        person: 0.2452
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2862
+        known: 0.3611
+      confidence: 0.1427
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_003
+  midi_file: candidates/hr_ministers_daughter_003.mid
+  rank: 83
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.451
+        present: 0.2457
+        future: 0.3033
+      spatial:
+        thing: 0.451
+        place: 0.3038
+        person: 0.2452
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2862
+        known: 0.3611
+      confidence: 0.1427
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_004
+  midi_file: candidates/hr_ministers_daughter_004.mid
+  rank: 84
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4508
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4509
+        place: 0.3038
+        person: 0.2453
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2862
+        known: 0.361
+      confidence: 0.1425
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_005
+  midi_file: candidates/hr_ministers_daughter_005.mid
+  rank: 85
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4508
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4509
+        place: 0.3038
+        person: 0.2453
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2862
+        known: 0.361
+      confidence: 0.1425
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_006
+  midi_file: candidates/hr_ministers_daughter_006.mid
+  rank: 86
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4509
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4509
+        place: 0.3038
+        person: 0.2452
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2862
+        known: 0.361
+      confidence: 0.1425
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_007
+  midi_file: candidates/hr_ministers_daughter_007.mid
+  rank: 87
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4507
+        present: 0.2459
+        future: 0.3035
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.1423
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_008
+  midi_file: candidates/hr_ministers_daughter_008.mid
+  rank: 88
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.2459
+        future: 0.3035
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.1422
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_009
+  midi_file: candidates/hr_ministers_daughter_009.mid
+  rank: 89
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.142
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_010
+  midi_file: candidates/hr_ministers_daughter_010.mid
+  rank: 90
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1419
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_011
+  midi_file: candidates/hr_ministers_daughter_011.mid
+  rank: 91
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.142
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_012
+  midi_file: candidates/hr_ministers_daughter_012.mid
+  rank: 92
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.5
+  total_bars: 5.5
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4501
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1413
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_013
+  midi_file: candidates/hr_ministers_daughter_013.mid
+  rank: 93
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1411
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_014
+  midi_file: candidates/hr_ministers_daughter_014.mid
+  rank: 94
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2464
+        future: 0.3038
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1409
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_015
+  midi_file: candidates/hr_ministers_daughter_015.mid
+  rank: 95
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 3.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.304
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1414
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_016
+  midi_file: candidates/hr_ministers_daughter_016.mid
+  rank: 96
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4502
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3606
+      confidence: 0.1413
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_017
+  midi_file: candidates/hr_ministers_daughter_017.mid
+  rank: 97
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2465
+        future: 0.3038
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1408
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_018
+  midi_file: candidates/hr_ministers_daughter_018.mid
+  rank: 98
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  total_bars: 4.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4495
+        present: 0.2466
+        future: 0.3039
+      spatial:
+        thing: 0.4496
+        place: 0.3043
+        person: 0.2461
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2868
+        known: 0.3604
+      confidence: 0.1403
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_019
+  midi_file: candidates/hr_ministers_daughter_019.mid
+  rank: 99
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 4.5
+  - 0.5
+  - 2.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4511
+        present: 0.2456
+        future: 0.3033
+      spatial:
+        thing: 0.4512
+        place: 0.3037
+        person: 0.2451
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2861
+        known: 0.3612
+      confidence: 0.143
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_ministers_daughter_020
+  midi_file: candidates/hr_ministers_daughter_020.mid
+  rank: 100
+  section: ministers_daughter
+  chord_source: chord_006
+  distribution:
+  - 0.5
+  - 2.5
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.451
+        present: 0.2457
+        future: 0.3033
+      spatial:
+        thing: 0.4511
+        place: 0.3037
+        person: 0.2452
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2861
+        known: 0.3611
+      confidence: 0.1428
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_001
+  midi_file: candidates/hr_royal_degradation_001.mid
+  rank: 101
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.1418
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_002
+  midi_file: candidates/hr_royal_degradation_002.mid
+  rank: 102
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.246
+        future: 0.3036
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1417
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_003
+  midi_file: candidates/hr_royal_degradation_003.mid
+  rank: 103
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1417
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_004
+  midi_file: candidates/hr_royal_degradation_004.mid
+  rank: 104
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4504
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2865
+        known: 0.3608
+      confidence: 0.1415
+      match: 0.1685
+  label: royal_degradation
+  status: approved
+  notes: ''
+- id: hr_royal_degradation_005
+  midi_file: candidates/hr_royal_degradation_005.mid
+  rank: 105
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1416
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_006
+  midi_file: candidates/hr_royal_degradation_006.mid
+  rank: 106
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1413
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_007
+  midi_file: candidates/hr_royal_degradation_007.mid
+  rank: 107
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4504
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1415
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_008
+  midi_file: candidates/hr_royal_degradation_008.mid
+  rank: 108
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1415
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_009
+  midi_file: candidates/hr_royal_degradation_009.mid
+  rank: 109
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4497
+        present: 0.2465
+        future: 0.3038
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2868
+        known: 0.3605
+      confidence: 0.1405
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_010
+  midi_file: candidates/hr_royal_degradation_010.mid
+  rank: 110
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.304
+        person: 0.2457
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2865
+        known: 0.3606
+      confidence: 0.1411
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_011
+  midi_file: candidates/hr_royal_degradation_011.mid
+  rank: 111
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1407
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_012
+  midi_file: candidates/hr_royal_degradation_012.mid
+  rank: 112
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  total_bars: 4.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2461
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2869
+        known: 0.3603
+      confidence: 0.14
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_013
+  midi_file: candidates/hr_royal_degradation_013.mid
+  rank: 113
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2864
+        known: 0.3606
+      confidence: 0.1411
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_014
+  midi_file: candidates/hr_royal_degradation_014.mid
+  rank: 114
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4496
+        present: 0.2466
+        future: 0.3039
+      spatial:
+        thing: 0.4496
+        place: 0.3043
+        person: 0.2461
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2868
+        known: 0.3604
+      confidence: 0.1401
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_015
+  midi_file: candidates/hr_royal_degradation_015.mid
+  rank: 115
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2465
+        future: 0.3037
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2866
+        known: 0.3604
+      confidence: 0.1404
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_016
+  midi_file: candidates/hr_royal_degradation_016.mid
+  rank: 116
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2463
+        future: 0.3036
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2865
+        known: 0.3605
+      confidence: 0.1408
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_017
+  midi_file: candidates/hr_royal_degradation_017.mid
+  rank: 117
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2465
+        future: 0.3038
+      spatial:
+        thing: 0.4499
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.1403
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_018
+  midi_file: candidates/hr_royal_degradation_018.mid
+  rank: 118
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 3.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4498
+        present: 0.2465
+        future: 0.3037
+      spatial:
+        thing: 0.4499
+        place: 0.3041
+        person: 0.2459
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2866
+        known: 0.3604
+      confidence: 0.1403
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_019
+  midi_file: candidates/hr_royal_degradation_019.mid
+  rank: 119
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 4.0
+  - 0.5
+  - 0.5
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2455
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.1419
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_royal_degradation_020
+  midi_file: candidates/hr_royal_degradation_020.mid
+  rank: 120
+  section: royal_degradation
+  chord_source: chord_007
+  distribution:
+  - 1.0
+  - 1.0
+  - 0.5
+  - 5.0
+  total_bars: 7.5
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4504
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1417
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_001
+  midi_file: candidates/hr_honey_001.mid
+  rank: 121
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 5.0
+  total_bars: 8.0
+  scores:
+    composite: 0.418
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.2459
+        future: 0.3035
+      spatial:
+        thing: 0.4506
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2864
+        known: 0.3609
+      confidence: 0.142
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_002
+  midi_file: candidates/hr_honey_002.mid
+  rank: 122
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 3.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.246
+        future: 0.3035
+      spatial:
+        thing: 0.4505
+        place: 0.304
+        person: 0.2455
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2864
+        known: 0.3608
+      confidence: 0.1417
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_003
+  midi_file: candidates/hr_honey_003.mid
+  rank: 123
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 3.0
+  total_bars: 6.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4499
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.45
+        place: 0.3042
+        person: 0.2459
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2867
+        known: 0.3605
+      confidence: 0.1408
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_004
+  midi_file: candidates/hr_honey_004.mid
+  rank: 124
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 4.0
+  - 1.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2462
+        future: 0.3036
+      spatial:
+        thing: 0.4503
+        place: 0.3041
+        person: 0.2457
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3607
+      confidence: 0.1412
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_005
+  midi_file: candidates/hr_honey_005.mid
+  rank: 125
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 4.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4503
+        present: 0.2461
+        future: 0.3036
+      spatial:
+        thing: 0.4504
+        place: 0.304
+        person: 0.2456
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2865
+        known: 0.3608
+      confidence: 0.1413
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_006
+  midi_file: candidates/hr_honey_006.mid
+  rank: 126
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 2.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4496
+        present: 0.2466
+        future: 0.3038
+      spatial:
+        thing: 0.4497
+        place: 0.3043
+        person: 0.2461
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2868
+        known: 0.3604
+      confidence: 0.1402
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_007
+  midi_file: candidates/hr_honey_007.mid
+  rank: 127
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4497
+        present: 0.2465
+        future: 0.3038
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.1402
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_008
+  midi_file: candidates/hr_honey_008.mid
+  rank: 128
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  total_bars: 4.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4493
+        present: 0.2468
+        future: 0.304
+      spatial:
+        thing: 0.4493
+        place: 0.3044
+        person: 0.2463
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2869
+        known: 0.3602
+      confidence: 0.1395
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_009
+  midi_file: candidates/hr_honey_009.mid
+  rank: 129
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 2.0
+  - 1.0
+  - 3.0
+  - 2.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2464
+        future: 0.3037
+      spatial:
+        thing: 0.4501
+        place: 0.3041
+        person: 0.2458
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2866
+        known: 0.3606
+      confidence: 0.1405
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_010
+  midi_file: candidates/hr_honey_010.mid
+  rank: 130
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 2.0
+  - 1.0
+  - 1.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4496
+        present: 0.2466
+        future: 0.3038
+      spatial:
+        thing: 0.4497
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2867
+        known: 0.3603
+      confidence: 0.14
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_011
+  midi_file: candidates/hr_honey_011.mid
+  rank: 131
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 7.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4497
+        present: 0.2466
+        future: 0.3038
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.1399
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_012
+  midi_file: candidates/hr_honey_012.mid
+  rank: 132
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  total_bars: 5.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2868
+        known: 0.3602
+      confidence: 0.1395
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_013
+  midi_file: candidates/hr_honey_013.mid
+  rank: 133
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2868
+        known: 0.3602
+      confidence: 0.1396
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_014
+  midi_file: candidates/hr_honey_014.mid
+  rank: 134
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 2.0
+  - 2.0
+  - 3.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4497
+        present: 0.2465
+        future: 0.3037
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.14
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_015
+  midi_file: candidates/hr_honey_015.mid
+  rank: 135
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 2.0
+  - 3.0
+  - 2.0
+  - 0.5
+  total_bars: 7.5
+  scores:
+    composite: 0.4179
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4497
+        present: 0.2466
+        future: 0.3038
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.1398
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_016
+  midi_file: candidates/hr_honey_016.mid
+  rank: 136
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 4.0
+  - 1.0
+  - 0.5
+  total_bars: 6.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4495
+        present: 0.2466
+        future: 0.3038
+      spatial:
+        thing: 0.4496
+        place: 0.3043
+        person: 0.2461
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2867
+        known: 0.3603
+      confidence: 0.1397
+      match: 0.1684
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_017
+  midi_file: candidates/hr_honey_017.mid
+  rank: 137
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 3.0
+  - 1.0
+  - 0.5
+  total_bars: 5.5
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4494
+        present: 0.2467
+        future: 0.3039
+      spatial:
+        thing: 0.4495
+        place: 0.3043
+        person: 0.2462
+      ontological:
+        imagined: 0.353
+        forgotten: 0.2868
+        known: 0.3602
+      confidence: 0.1394
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_018
+  midi_file: candidates/hr_honey_018.mid
+  rank: 138
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 2.0
+  - 4.0
+  - 1.0
+  total_bars: 8.0
+  scores:
+    composite: 0.4178
+    drum_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4497
+        present: 0.2466
+        future: 0.3037
+      spatial:
+        thing: 0.4498
+        place: 0.3042
+        person: 0.246
+      ontological:
+        imagined: 0.3529
+        forgotten: 0.2867
+        known: 0.3604
+      confidence: 0.1398
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_019
+  midi_file: candidates/hr_honey_019.mid
+  rank: 139
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 1.0
+  - 0.5
+  - 0.5
+  - 6.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4506
+        present: 0.2459
+        future: 0.3035
+      spatial:
+        thing: 0.4507
+        place: 0.3039
+        person: 0.2454
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2863
+        known: 0.3609
+      confidence: 0.1422
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
+- id: hr_honey_020
+  midi_file: candidates/hr_honey_020.mid
+  rank: 140
+  section: honey
+  chord_source: chord_010
+  distribution:
+  - 4.0
+  - 0.5
+  - 0.5
+  - 3.0
+  total_bars: 8.0
+  scores:
+    composite: 0.343
+    drum_alignment: 0.75
+    chromatic:
+      temporal:
+        past: 0.4507
+        present: 0.2458
+        future: 0.3034
+      spatial:
+        thing: 0.4508
+        place: 0.3039
+        person: 0.2453
+      ontological:
+        imagined: 0.3527
+        forgotten: 0.2863
+        known: 0.361
+      confidence: 0.1423
+      match: 0.1685
+  label: null
+  status: rejected
+  notes: ''
