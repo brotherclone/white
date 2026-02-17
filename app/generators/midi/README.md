@@ -12,17 +12,17 @@ python -m app.generators.midi.chord_pipeline \
     --song "song_proposal_Black (0x221f20)_sequential_dissolution_v2.yml"
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--thread` | *(required)* | Shrinkwrapped thread directory |
-| `--song` | *(required)* | Song proposal YAML filename |
-| `--seed` | 42 | Random seed for reproducibility |
-| `--num-candidates` | 200 | Total candidates to generate |
-| `--top-k` | 10 | Candidates to keep for review |
-| `--length` | 4 | Progression length in bars |
-| `--theory-weight` | 0.3 | Weight for music theory score |
-| `--chromatic-weight` | 0.7 | Weight for ChromaticScorer match |
-| `--onnx-path` | `training/data/fusion_model.onnx` | Path to ONNX model |
+| Flag                 | Default                           | Description                      |
+|----------------------|-----------------------------------|----------------------------------|
+| `--thread`           | *(required)*                      | Shrinkwrapped thread directory   |
+| `--song`             | *(required)*                      | Song proposal YAML filename      |
+| `--seed`             | 42                                | Random seed for reproducibility  |
+| `--num-candidates`   | 200                               | Total candidates to generate     |
+| `--top-k`            | 10                                | Candidates to keep for review    |
+| `--length`           | 4                                 | Progression length in bars       |
+| `--theory-weight`    | 0.3                               | Weight for music theory score    |
+| `--chromatic-weight` | 0.7                               | Weight for ChromaticScorer match |
+| `--onnx-path`        | `training/data/fusion_model.onnx` | Path to ONNX model               |
 
 **Output:** `<thread>/production/<song_slug>/chords/{candidates/, review.yml}`
 
@@ -35,18 +35,18 @@ python -m app.generators.midi.drum_pipeline \
     --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--production-dir` | *(required)* | Song production directory (must contain `chords/review.yml` with approved candidates) |
-| `--thread` | *(auto-detected)* | Thread directory (reads from chord review if omitted) |
-| `--song` | *(auto-detected)* | Song proposal filename (reads from chord review if omitted) |
-| `--seed` | 42 | Random seed |
-| `--top-k` | 5 | Candidates per section |
-| `--energy-weight` | 0.3 | Weight for energy appropriateness |
-| `--chromatic-weight` | 0.7 | Weight for ChromaticScorer match |
-| `--energy-override` | *(none)* | Override section energy: `verse=high,chorus=medium` |
-| `--genre-override` | *(none)* | Force genre families: `krautrock,ambient` |
-| `--onnx-path` | `training/data/fusion_model.onnx` | Path to ONNX model |
+| Flag                 | Default                           | Description                                                                           |
+|----------------------|-----------------------------------|---------------------------------------------------------------------------------------|
+| `--production-dir`   | *(required)*                      | Song production directory (must contain `chords/review.yml` with approved candidates) |
+| `--thread`           | *(auto-detected)*                 | Thread directory (reads from chord review if omitted)                                 |
+| `--song`             | *(auto-detected)*                 | Song proposal filename (reads from chord review if omitted)                           |
+| `--seed`             | 42                                | Random seed                                                                           |
+| `--top-k`            | 5                                 | Candidates per section                                                                |
+| `--energy-weight`    | 0.3                               | Weight for energy appropriateness                                                     |
+| `--chromatic-weight` | 0.7                               | Weight for ChromaticScorer match                                                      |
+| `--energy-override`  | *(none)*                          | Override section energy: `verse=high,chorus=medium`                                   |
+| `--genre-override`   | *(none)*                          | Force genre families: `krautrock,ambient`                                             |
+| `--onnx-path`        | `training/data/fusion_model.onnx` | Path to ONNX model                                                                    |
 
 **Genre families:** ambient, electronic, krautrock, rock, classical, experimental, folk, jazz
 
@@ -63,14 +63,14 @@ python -m app.generators.midi.harmonic_rhythm_pipeline \
     --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--production-dir` | *(required)* | Song production directory (must contain `chords/approved/` and `drums/approved/`) |
-| `--seed` | 42 | Random seed |
-| `--top-k` | 20 | Candidates per section |
-| `--alignment-weight` | 0.3 | Weight for drum accent alignment |
-| `--chromatic-weight` | 0.7 | Weight for ChromaticScorer temporal match |
-| `--onnx-path` | `training/data/fusion_model.onnx` | Path to ONNX model |
+| Flag                 | Default                           | Description                                                                       |
+|----------------------|-----------------------------------|-----------------------------------------------------------------------------------|
+| `--production-dir`   | *(required)*                      | Song production directory (must contain `chords/approved/` and `drums/approved/`) |
+| `--seed`             | 42                                | Random seed                                                                       |
+| `--top-k`            | 20                                | Candidates per section                                                            |
+| `--alignment-weight` | 0.3                               | Weight for drum accent alignment                                                  |
+| `--chromatic-weight` | 0.7                               | Weight for ChromaticScorer temporal match                                         |
+| `--onnx-path`        | `training/data/fusion_model.onnx` | Path to ONNX model                                                                |
 
 **Duration grid:** 0.5-bar increments. Min 0.5 bars per chord, max total = N * 2.0 bars.
 
@@ -85,11 +85,11 @@ python -m app.generators.midi.strum_pipeline \
     --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--production-dir` | *(required)* | Song production directory (must contain `chords/approved/`) |
-| `--mode` | `per-chord` | `per-chord` (each chord x each pattern), `progression` (full sequence x each pattern), or `both` |
-| `--patterns` | *(all)* | Comma-separated pattern names to include: `quarter,eighth,arp_up` |
+| Flag               | Default      | Description                                                                                      |
+|--------------------|--------------|--------------------------------------------------------------------------------------------------|
+| `--production-dir` | *(required)* | Song production directory (must contain `chords/approved/`)                                      |
+| `--mode`           | `per-chord`  | `per-chord` (each chord x each pattern), `progression` (full sequence x each pattern), or `both` |
+| `--patterns`       | *(all)*      | Comma-separated pattern names to include: `quarter,eighth,arp_up`                                |
 
 **4/4 patterns:** whole, half, quarter, eighth, push, arp_up, arp_down
 

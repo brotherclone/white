@@ -1,0 +1,225 @@
+production_dir: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/green__last_pollinators_elegy_v1
+pipeline: drum-generation
+bpm: 60
+time_sig: 3/4
+color: Green
+genre_families:
+- ambient
+- experimental
+generated: '2026-02-16T19:50:26.640916+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- toppling
+- worker
+- queen
+- pasture
+- ministers_daughter
+- royal_degradation
+- honey
+candidates:
+- id: drum_toppling_01
+  midi_file: candidates/drum_toppling_01.mid
+  rank: 1
+  section: toppling
+  chord_source: chord_001
+  genre_family: fallback
+  pattern_name: fallback_minimal
+  energy: medium
+  scores:
+    composite: 0.4176
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.136
+      match: 0.168
+  label: drums_toppling
+  status: approved
+  notes: ''
+- id: drum_worker_01
+  midi_file: candidates/drum_worker_01.mid
+  rank: 2
+  section: worker
+  chord_source: chord_002
+  genre_family: fallback
+  pattern_name: fallback_minimal
+  energy: medium
+  scores:
+    composite: 0.4176
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.136
+      match: 0.168
+  label: drums_worker
+  status: approved
+  notes: ''
+- id: drum_queen_01
+  midi_file: candidates/drum_queen_01.mid
+  rank: 3
+  section: queen
+  chord_source: chord_003
+  genre_family: fallback
+  pattern_name: fallback_minimal
+  energy: medium
+  scores:
+    composite: 0.4176
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.136
+      match: 0.168
+  label: drums_queen
+  status: approved
+  notes: ''
+- id: drum_pasture_01
+  midi_file: candidates/drum_pasture_01.mid
+  rank: 4
+  section: pasture
+  chord_source: chord_005
+  genre_family: fallback
+  pattern_name: fallback_minimal
+  energy: medium
+  scores:
+    composite: 0.4176
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.136
+      match: 0.168
+  label: drums_pasture
+  status: approved
+  notes: ''
+- id: drum_ministers_daughter_01
+  midi_file: candidates/drum_ministers_daughter_01.mid
+  rank: 5
+  section: ministers_daughter
+  chord_source: chord_006
+  genre_family: fallback
+  pattern_name: fallback_minimal
+  energy: medium
+  scores:
+    composite: 0.4176
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.136
+      match: 0.168
+  label: drums_ministers_daughter
+  status: approved
+  notes: ''
+- id: drum_royal_degradation_01
+  midi_file: candidates/drum_royal_degradation_01.mid
+  rank: 6
+  section: royal_degradation
+  chord_source: chord_007
+  genre_family: fallback
+  pattern_name: fallback_minimal
+  energy: medium
+  scores:
+    composite: 0.4176
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.136
+      match: 0.168
+  label: null
+  status: pending
+  notes: ''
+- id: drum_honey_01
+  midi_file: candidates/drum_honey_01.mid
+  rank: 7
+  section: honey
+  chord_source: chord_010
+  genre_family: fallback
+  pattern_name: fallback_minimal
+  energy: medium
+  scores:
+    composite: 0.4176
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.136
+      match: 0.168
+  label: drums_honey
+  status: approved
+  notes: ''
