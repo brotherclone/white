@@ -1,0 +1,160 @@
+production_dir: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/green__last_pollinators_elegy_v1
+pipeline: strum-generation
+bpm: 60
+time_sig: 3/4
+generated: '2026-02-16T20:05:48.090140+00:00'
+candidates:
+- id: honey_whole
+  midi_file: candidates/honey_whole.mid
+  rank: 1
+  source_chord: honey
+  pattern: whole
+  pattern_description: Whole — one hit for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: honey_beat
+  midi_file: candidates/honey_beat.mid
+  rank: 2
+  source_chord: honey
+  pattern: beat
+  pattern_description: Beat subdivision for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: pending
+  notes: ''
+- id: ministers_daughter_whole
+  midi_file: candidates/ministers_daughter_whole.mid
+  rank: 3
+  source_chord: ministers_daughter
+  pattern: whole
+  pattern_description: Whole — one hit for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: plain_ministers_daughter
+  status: approved
+  notes: ''
+- id: ministers_daughter_beat
+  midi_file: candidates/ministers_daughter_beat.mid
+  rank: 4
+  source_chord: ministers_daughter
+  pattern: beat
+  pattern_description: Beat subdivision for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: pasture_whole
+  midi_file: candidates/pasture_whole.mid
+  rank: 5
+  source_chord: pasture
+  pattern: whole
+  pattern_description: Whole — one hit for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: plain_pasture
+  status: approved
+  notes: ''
+- id: pasture_beat
+  midi_file: candidates/pasture_beat.mid
+  rank: 6
+  source_chord: pasture
+  pattern: beat
+  pattern_description: Beat subdivision for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: queen_whole
+  midi_file: candidates/queen_whole.mid
+  rank: 7
+  source_chord: queen
+  pattern: whole
+  pattern_description: Whole — one hit for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: plain_queen
+  status: approved
+  notes: ''
+- id: queen_beat
+  midi_file: candidates/queen_beat.mid
+  rank: 8
+  source_chord: queen
+  pattern: beat
+  pattern_description: Beat subdivision for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: royal_degradation_whole
+  midi_file: candidates/royal_degradation_whole.mid
+  rank: 9
+  source_chord: royal_degradation
+  pattern: whole
+  pattern_description: Whole — one hit for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: royal_degradation_beat
+  midi_file: candidates/royal_degradation_beat.mid
+  rank: 10
+  source_chord: royal_degradation
+  pattern: beat
+  pattern_description: Beat subdivision for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: the_royal_degradation
+  status: approved
+  notes: ''
+- id: toppling_whole
+  midi_file: candidates/toppling_whole.mid
+  rank: 11
+  source_chord: toppling
+  pattern: whole
+  pattern_description: Whole — one hit for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: toppling_plain
+  status: approved
+  notes: ''
+- id: toppling_beat
+  midi_file: candidates/toppling_beat.mid
+  rank: 12
+  source_chord: toppling
+  pattern: beat
+  pattern_description: Beat subdivision for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
+- id: worker_whole
+  midi_file: candidates/worker_whole.mid
+  rank: 13
+  source_chord: worker
+  pattern: whole
+  pattern_description: Whole — one hit for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: worker_plain
+  status: approved
+  notes: ''
+- id: worker_beat
+  midi_file: candidates/worker_beat.mid
+  rank: 14
+  source_chord: worker
+  pattern: beat
+  pattern_description: Beat subdivision for 3/4
+  is_arpeggio: false
+  mode: per-chord
+  label: null
+  status: rejected
+  notes: ''
