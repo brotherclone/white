@@ -72,7 +72,7 @@ python -m app.generators.midi.harmonic_rhythm_pipeline \
 | `--chromatic-weight` | 0.7                               | Weight for ChromaticScorer temporal match                                         |
 | `--onnx-path`        | `training/data/fusion_model.onnx` | Path to ONNX model                                                                |
 
-**Duration grid:** 0.5-bar increments. Min 0.5 bars per chord, max total = N * 2.0 bars.
+**Duration options:** 1 bar or 2 bars per chord. For N chords produces 2^N clean loop-aligned candidates.
 
 **Output:** `<production-dir>/harmonic_rhythm/{candidates/, review.yml}`
 
@@ -108,10 +108,34 @@ python -m app.generators.midi.promote_chords \
 
 Edit the `review.yml` first — set `status: approved` and `label: <your label>` on candidates you want to keep. The label becomes the filename in `approved/`.
 
+## Production Plan
+
+Generates `production_plan.yml` — the structural backbone that defines section sequence, bar counts, repeat counts, and vocals intent. This is the bridge between the per-phase loop pipeline and a final song manifest.
+
+```bash
+# Generate initial plan (run after approving chords)
+python -m app.generators.midi.production_plan \
+    --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
+
+# Refresh bar counts after re-running upstream phases (preserves human edits)
+python -m app.generators.midi.production_plan \
+    --production-dir ... --refresh
+
+# Bootstrap a partial manifest from the completed plan
+python -m app.generators.midi.production_plan \
+    --production-dir ... --bootstrap-manifest
+```
+
+Edit `production_plan.yml` to set `repeat` counts, `vocals` flags, `sounds_like` references, and reorder sections. The drum pipeline reads it automatically to annotate candidates with `next_section` context.
+
+**Output:** `<production-dir>/production_plan.yml`, optionally `manifest_bootstrap.yml`
+
 ## Production Directory Structure
 
 ```
 production/<song_slug>/
+├── production_plan.yml      # song structure: sections, bars, repeats, vocals
+├── manifest_bootstrap.yml   # partial manifest (generated on demand)
 ├── chords/
 │   ├── candidates/          # generated MIDI files
 │   ├── approved/            # promoted: verse.mid, chorus.mid, etc.
@@ -119,7 +143,7 @@ production/<song_slug>/
 ├── drums/
 │   ├── candidates/
 │   ├── approved/
-│   └── review.yml
+│   └── review.yml           # includes next_section when plan exists
 ├── harmonic_rhythm/
 │   ├── candidates/
 │   ├── approved/
@@ -128,16 +152,23 @@ production/<song_slug>/
 │   ├── candidates/
 │   ├── approved/
 │   └── review.yml
-├── bass/                    # future
-└── assembly/                # future
+├── bass/
+│   ├── candidates/
+│   ├── approved/
+│   └── review.yml
+└── melody/
+    ├── candidates/
+    ├── approved/
+    └── review.yml
 ```
 
 ## Pipeline Order
 
 1. **Chords** — harmonic foundation (requires song proposal)
 2. **Drums** — rhythmic foundation (requires approved chords)
-3. **Harmonic Rhythm** — variable chord durations (requires approved chords + drums)
-4. **Strums** — chord rhythm patterns (requires approved chords, uses harmonic rhythm if available)
-5. Bass — bass lines (future)
-6. Melody + Lyrics — vocal lines (future)
-7. Assembly — combine all layers (future)
+3. **Production Plan** — song structure document (generate after approving chords, edit before drums if possible)
+4. **Harmonic Rhythm** — variable chord durations (requires approved chords + drums)
+5. **Strums** — chord rhythm patterns (requires approved chords, uses harmonic rhythm if available)
+6. **Bass** — bass lines (requires approved chords + drums)
+7. **Melody** — vocal lines (requires approved chords + bass)
+8. Assembly — combine all layers (future)
