@@ -13,7 +13,6 @@ Core functions (no pipeline orchestration — see harmonic_rhythm_pipeline.py):
 """
 
 import io
-import random
 from itertools import product as iterproduct
 
 import mido
@@ -23,83 +22,43 @@ import mido
 # Distribution enumeration
 # ---------------------------------------------------------------------------
 
-# Duration grid: multiples of 0.5 bars
-GRID_UNIT = 0.5  # half a bar
-MIN_CHORD_DURATION = 0.5  # minimum bars per chord
-MAX_CHORD_DURATION_FACTOR = 2.0  # max total = N * this
+# Available durations per chord: exactly 1 bar or 2 bars
+CHORD_DURATIONS = [1.0, 2.0]
+# Retained for backward compatibility / test imports
+GRID_UNIT = 0.5
 MAX_CANDIDATES = 200
 
 
 def enumerate_distributions(
     n_chords: int,
-    seed: int = 42,
+    seed: int = 42,  # unused; retained for API compatibility
 ) -> list[list[float]]:
-    """Enumerate valid chord duration distributions on a half-bar grid.
+    """Enumerate chord duration distributions.
 
-    Each chord gets at least 0.5 bars. Total section length ranges from
-    N * 0.5 to N * 2.0 bars. Durations are multiples of 0.5.
+    Each chord gets exactly 1 bar or 2 bars — no other durations.
+    This guarantees all output loops align cleanly to bar boundaries.
 
-    If more than MAX_CANDIDATES distributions exist, randomly samples
-    MAX_CANDIDATES (always including the uniform baseline).
+    For N chords this produces 2^N combinations (e.g. 16 for a 4-chord
+    progression). If 2^N exceeds MAX_CANDIDATES, the first MAX_CANDIDATES
+    combinations are returned. The uniform 1-bar baseline is always included.
 
-    Returns list of distributions, each a list of N floats (bars per chord).
+    The seed parameter is retained for API compatibility but has no effect
+    since all valid distributions are fully enumerated.
     """
     if n_chords <= 0:
         return []
 
-    # Possible durations per chord: 0.5, 1.0, 1.5, 2.0, ..., up to N*2.0
-    min_total = n_chords * MIN_CHORD_DURATION
-    max_total = n_chords * MAX_CHORD_DURATION_FACTOR
-
-    # Each chord can be 1, 2, 3, ... half-bar units
-    # Max units per chord = max_total / GRID_UNIT (but practically limited)
-    max_units_per_chord = int(max_total / GRID_UNIT)
-    min_units_total = int(min_total / GRID_UNIT)
-    max_units_total = int(max_total / GRID_UNIT)
-
-    # Each chord gets at least 1 unit (0.5 bars)
-    # Generate all combinations where each chord has 1..max_units units
-    # and total is within bounds
-    per_chord_options = list(range(1, max_units_per_chord + 1))
-
-    # For small chord counts, enumerate exhaustively
-    # For larger counts, sample directly
     distributions = []
-    uniform = [1.0] * n_chords  # baseline: 1 bar each
+    for combo in iterproduct(CHORD_DURATIONS, repeat=n_chords):
+        distributions.append(list(combo))
+        if len(distributions) >= MAX_CANDIDATES:
+            break
 
-    if n_chords <= 6:
-        # Enumerate all combos (manageable for up to 6 chords)
-        for combo in iterproduct(per_chord_options, repeat=n_chords):
-            total = sum(combo)
-            if min_units_total <= total <= max_units_total:
-                dist = [u * GRID_UNIT for u in combo]
-                distributions.append(dist)
-    else:
-        # Too many combos — sample directly
-        rng = random.Random(seed)
-        seen = set()
-        attempts = 0
-        max_attempts = MAX_CANDIDATES * 20
-        while len(distributions) < MAX_CANDIDATES * 2 and attempts < max_attempts:
-            combo = tuple(rng.randint(1, max_units_per_chord) for _ in range(n_chords))
-            total = sum(combo)
-            if min_units_total <= total <= max_units_total and combo not in seen:
-                seen.add(combo)
-                distributions.append([u * GRID_UNIT for u in combo])
-            attempts += 1
-
-    # Ensure uniform baseline is always included
+    # Uniform 1-bar baseline is always first from iterproduct, but
+    # ensure it's present even if capping kicked in
+    uniform = [1.0] * n_chords
     if uniform not in distributions:
         distributions.append(uniform)
-
-    # Cap at MAX_CANDIDATES with seeded sampling
-    if len(distributions) > MAX_CANDIDATES:
-        rng = random.Random(seed)
-        # Remove uniform, sample, then re-add
-        distributions.remove(uniform)
-        sampled = rng.sample(distributions, MAX_CANDIDATES - 1)
-        sampled.append(uniform)
-        distributions = sampled
 
     return distributions
 
