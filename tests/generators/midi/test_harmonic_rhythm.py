@@ -75,14 +75,11 @@ class TestDistributionEnumeration:
         d2 = enumerate_distributions(4, seed=123)
         assert d1 == d2
 
-    def test_different_seeds_differ(self):
-        # With enough chords to trigger sampling, seeds should produce different results
+    def test_seed_has_no_effect(self):
+        # All distributions are fully enumerated; seed is a no-op
         d1 = enumerate_distributions(4, seed=1)
         d2 = enumerate_distributions(4, seed=999)
-        # They might differ if sampling is triggered (depends on combo count)
-        # At minimum both should be valid
-        assert len(d1) > 0
-        assert len(d2) > 0
+        assert d1 == d2
 
     def test_variety_exists(self):
         dists = enumerate_distributions(4)
