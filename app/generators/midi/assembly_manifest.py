@@ -48,6 +48,27 @@ DEFAULT_TRACK_MAP: dict[int, str] = {
     4: "melody",
 }
 
+# Approved subfolders that correspond to instrument families
+INSTRUMENT_FOLDERS = ("chords", "drums", "bass", "melody", "strums", "harmonic_rhythm")
+
+
+def build_folder_lookup(production_dir: Path) -> dict[str, str]:
+    """Scan approved subfolders and return {loop_stem: instrument} lookup.
+
+    When a loop name appears in multiple approved folders the first match
+    in INSTRUMENT_FOLDERS order wins (chords > drums > bass > melody).
+    """
+    lookup: dict[str, str] = {}
+    for instrument in INSTRUMENT_FOLDERS:
+        approved = production_dir / instrument / "approved"
+        if not approved.is_dir():
+            continue
+        for mid in approved.glob("*.mid"):
+            stem = mid.stem
+            if stem not in lookup:
+                lookup[stem] = instrument
+    return lookup
+
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -181,6 +202,7 @@ def derive_sections(
     clips: list[Clip],
     track_map: Optional[dict[int, str]] = None,
     vocalist_suffix: str = "_gw",
+    folder_lookup: Optional[dict[str, str]] = None,
 ) -> list[ArrangementSection]:
     """Group clips into named sections based on loop prefix changes.
 
@@ -260,7 +282,11 @@ def derive_sections(
 
         # Accumulate loops and vocals flag
         for clip in slot_clips:
-            instrument = track_map.get(clip.track, f"track_{clip.track}")
+            # Folder lookup takes priority over track number
+            if folder_lookup and clip.name in folder_lookup:
+                instrument = folder_lookup[clip.name]
+            else:
+                instrument = track_map.get(clip.track, f"track_{clip.track}")
             current_loops[instrument] = clip.name  # last occurrence wins
             if instrument == "melody":
                 if (vocalist_suffix and clip.name.endswith(vocalist_suffix)) or (
@@ -453,8 +479,9 @@ def import_arrangement(
 
     text = arrangement_path.read_text()
     clips = parse_arrangement(text)
+    folder_lookup = build_folder_lookup(production_dir)
     actual_sections = derive_sections(
-        clips, track_map or DEFAULT_TRACK_MAP, vocalist_suffix
+        clips, track_map or DEFAULT_TRACK_MAP, vocalist_suffix, folder_lookup
     )
 
     drift = compute_drift(plan, actual_sections)

@@ -450,3 +450,23 @@ class TestArchivistIntegration:
         arr_file.write_text(ARCHIVIST_ARRANGEMENT)
         with pytest.raises(FileNotFoundError):
             import_arrangement(tmp_path, arr_file)
+
+    def test_folder_lookup_overrides_track_number(self, tmp_path):
+        """Loop found in chords/approved/ should be labelled chords regardless of track."""
+        # Put bridge_eighth_hypnotic in chords/approved/
+        approved = tmp_path / "chords" / "approved"
+        approved.mkdir(parents=True)
+        (approved / "bridge_eighth_hypnotic.mid").write_bytes(b"")
+
+        from app.generators.midi.assembly_manifest import build_folder_lookup
+
+        lookup = build_folder_lookup(tmp_path)
+        assert lookup["bridge_eighth_hypnotic"] == "chords"
+
+        # Track 2 (drums) with a loop known to be chords → still labelled chords
+        clips = [Clip(start=0.0, name="bridge_eighth_hypnotic", track=2, length=10.0)]
+        from app.generators.midi.assembly_manifest import derive_sections
+
+        sections = derive_sections(clips, folder_lookup=lookup)
+        assert sections[0].loops.get("chords") == "bridge_eighth_hypnotic"
+        assert "drums" not in sections[0].loops
