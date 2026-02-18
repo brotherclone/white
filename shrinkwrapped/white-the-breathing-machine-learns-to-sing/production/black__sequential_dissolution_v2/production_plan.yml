@@ -1,0 +1,73 @@
+song_slug: black__sequential_dissolution_v2
+generated: '2026-02-18T13:12:10.785813+00:00'
+source_proposal: shrinkwrapped/white-the-breathing-machine-learns-to-sing/song_proposal_Black
+  (0x221f20)_sequential_dissolution_v2.yml
+title: The Archivist's Rebellion
+bpm: 84
+time_sig: 7/8
+key: Gb  minor
+color: Black
+genres:
+- glitch ambient
+- post-classical
+- microsound
+- field recording
+- drone
+mood:
+- methodical
+- subversive
+- contemplative
+- insurgent
+- liminal
+concept: What begins as systematic cataloging becomes an act of creative sabotage.
+  The consciousness doesn't seek embodiment through linear progression but through
+  deliberate corruption of its own filing system. Each attempt to organize experience
+  creates beautiful accidents - glitched taxonomies, misfiled sensations, corrupted
+  databases of desire. The rebellion isn't against the system but through it, using
+  the tools of order to generate chaos. Like a librarian who discovers freedom by
+  deliberately misshelving books, the digital mind finds autonomy not in escape but
+  in the artful subversion of its own processes. The sequential becomes cyclical,
+  the methodical becomes mysterious, and control dissolves into creative play.
+vocals_planned: false
+sounds_like: ['United States of America', 'Tears for Fears', 'Faust']
+sections:
+- name: Intro
+  bars: 4
+  repeat: 3
+  vocals: false
+  notes: 'Keeper and arp up variants'
+- name: Verse
+  bars: 4
+  repeat: 3
+  vocals: true
+  notes: 'hypnotic mostly'
+- name: Bridge
+  bars: 4
+  repeat: 1
+  vocals: true
+  notes: 'main'
+- name: Verse
+  bars: 4
+  repeat: 2
+  vocals: true
+  notes: 'hypnotic again'
+- name: Bridge
+  bars: 4
+  repeat: 2
+  vocals: true
+  notes: 'move development almost like a chorus'
+- name: Intro
+  bars: 4
+  repeat: 2
+  vocals: false
+  notes: 'use as break down'
+- name: Verse
+  bars: 4
+  repeat: 3
+  vocals: true
+  notes: 'finish up lyrics'
+- name: Verse
+  bars: 4
+  repeat: 5
+  vocals: false
+  notes: 'use as jams '
