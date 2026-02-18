@@ -46,6 +46,7 @@ class PlanSection:
     repeat: int = 1
     vocals: bool = False
     notes: str = ""
+    loops: dict = field(default_factory=dict)  # {instrument: loop_name}
     _bar_source: str = field(default="", repr=False)  # derivation source (internal)
 
 
@@ -156,6 +157,7 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
                 repeat=int(s.get("repeat", 1)),
                 vocals=bool(s.get("vocals", False)),
                 notes=str(s.get("notes", "") or ""),
+                loops=dict(s.get("loops") or {}),
             )
         )
 
@@ -201,6 +203,7 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
                 "repeat": s.repeat,
                 "vocals": s.vocals,
                 "notes": s.notes,
+                **({"loops": s.loops} if s.loops else {}),
             }
             for s in plan.sections
         ],
