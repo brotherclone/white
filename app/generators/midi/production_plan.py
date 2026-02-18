@@ -61,6 +61,9 @@ class ProductionPlan:
     source_proposal: Optional[str] = None
     vocals_planned: bool = False
     sounds_like: list = field(default_factory=list)
+    genres: list = field(default_factory=list)
+    mood: list = field(default_factory=list)
+    concept: str = ""
     sections: list = field(default_factory=list)  # list[PlanSection]
 
 
@@ -167,6 +170,9 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
         source_proposal=data.get("source_proposal"),
         vocals_planned=bool(data.get("vocals_planned", False)),
         sounds_like=data.get("sounds_like") or [],
+        genres=data.get("genres") or [],
+        mood=data.get("mood") or [],
+        concept=str(data.get("concept", "")),
         sections=sections,
     )
 
@@ -183,6 +189,9 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
         "time_sig": plan.time_sig,
         "key": plan.key,
         "color": plan.color,
+        "genres": plan.genres,
+        "mood": plan.mood,
+        "concept": plan.concept,
         "vocals_planned": plan.vocals_planned,
         "sounds_like": plan.sounds_like,
         "sections": [
@@ -216,24 +225,81 @@ def _read_chord_review(production_dir: Path) -> dict:
         return yaml.safe_load(f)
 
 
+def load_song_proposal(proposal_path: Path) -> dict:
+    """Load a song proposal YAML and return normalised metadata dict.
+
+    Handles both flat and nested tempo format (numerator/denominator dict
+    vs. "4/4" string), and the rainbow_color dict structure.
+    """
+    with open(proposal_path) as f:
+        raw = yaml.safe_load(f)
+
+    # Time signature — stored as {numerator: N, denominator: D}
+    tempo = raw.get("tempo", {})
+    if isinstance(tempo, dict):
+        time_sig = f"{tempo.get('numerator', 4)}/{tempo.get('denominator', 4)}"
+    else:
+        time_sig = str(tempo) if tempo else "4/4"
+
+    # Rainbow color name
+    color = raw.get("rainbow_color", {})
+    if isinstance(color, dict):
+        color = color.get("color_name", "")
+
+    return {
+        "title": str(raw.get("title", "")),
+        "bpm": int(raw.get("bpm", 120)),
+        "time_sig": time_sig,
+        "key": str(raw.get("key", "")),
+        "color": str(color),
+        "genres": raw.get("genres") or [],
+        "mood": raw.get("mood") or [],
+        "concept": str(raw.get("concept", "")),
+    }
+
+
 def _parse_time_sig(time_sig_str: str) -> tuple[int, int]:
     parts = str(time_sig_str).split("/")
     return (int(parts[0]), int(parts[1]))
 
 
-def generate_plan(production_dir: Path) -> ProductionPlan:
+def generate_plan(
+    production_dir: Path,
+    proposal_path: Optional[Path] = None,
+) -> ProductionPlan:
     """Generate a production_plan.yml from approved chord sections.
 
     Sections appear in the order they were labeled in the chord review.
     Bar counts are derived from approved MIDI files where available.
+
+    If proposal_path is given, title, time_sig, genres, mood, and concept
+    are read from the song proposal YAML (which is more authoritative than
+    the chord review for these fields).
     """
     chord_review = _read_chord_review(production_dir)
     bpm = int(chord_review.get("bpm", 120))
     color = str(chord_review.get("color", ""))
-    time_sig_str = str(chord_review.get("time_sig", "4/4"))
-    time_sig = _parse_time_sig(time_sig_str)
+    time_sig_str = str(chord_review.get("time_sig") or "4/4")
     key = str(chord_review.get("key", ""))
-    title = str(chord_review.get("title", ""))
+    title = str(chord_review.get("title") or "")
+    genres: list = []
+    mood: list = []
+    concept: str = ""
+
+    # Song proposal is authoritative for title, time_sig, genres, mood, concept
+    proposal_data: dict = {}
+    if proposal_path and proposal_path.exists():
+        proposal_data = load_song_proposal(proposal_path)
+        title = proposal_data.get("title", "") or title
+        time_sig_str = proposal_data.get("time_sig", "") or time_sig_str
+        key = proposal_data.get("key", "") or key
+        color = proposal_data.get("color", "") or color
+        bpm = proposal_data.get("bpm", bpm) or bpm
+        genres = proposal_data.get("genres", [])
+        mood = proposal_data.get("mood", [])
+        concept = proposal_data.get("concept", "")
+
+    time_sig = _parse_time_sig(time_sig_str)
 
     # Collect approved sections in order (first occurrence of each label)
     seen: set[str] = set()
@@ -280,6 +346,9 @@ def generate_plan(production_dir: Path) -> ProductionPlan:
         color=color,
         title=title,
         source_proposal=source_proposal,
+        genres=genres,
+        mood=mood,
+        concept=concept,
         sections=sections,
     )
 
@@ -385,8 +454,9 @@ def bootstrap_manifest(production_dir: Path) -> Path:
         "vocals": vocals_any,
         "lyrics": vocals_any,
         "sounds_like": plan.sounds_like,
-        "mood": [],
-        "genres": [],
+        "mood": plan.mood,
+        "genres": plan.genres,
+        "concept": plan.concept,
         "structure": structure,
         # Render-time fields — fill in after final render
         "release_date": None,
@@ -438,6 +508,11 @@ def main():
         "--production-dir", required=True, help="Song production directory"
     )
     parser.add_argument(
+        "--song-proposal",
+        default=None,
+        help="Path to song proposal YAML — populates title, time_sig, genres, mood, concept",
+    )
+    parser.add_argument(
         "--refresh",
         action="store_true",
         help="Refresh bar counts from current approved loops (preserves human edits)",
@@ -467,9 +542,23 @@ def main():
     print("PRODUCTION PLAN GENERATOR")
     print("=" * 60)
 
+    proposal_path = Path(args.song_proposal) if args.song_proposal else None
+    if proposal_path and not proposal_path.exists():
+        print(f"ERROR: Song proposal not found: {proposal_path}")
+        sys.exit(1)
+
     try:
         if args.refresh:
             plan = refresh_plan(prod_path)
+            # Apply proposal overrides on top of refreshed plan
+            if proposal_path:
+                proposal_data = load_song_proposal(proposal_path)
+                plan.title = proposal_data.get("title", "") or plan.title
+                plan.time_sig = proposal_data.get("time_sig", "") or plan.time_sig
+                plan.key = proposal_data.get("key", "") or plan.key
+                plan.genres = proposal_data.get("genres") or plan.genres
+                plan.mood = proposal_data.get("mood") or plan.mood
+                plan.concept = proposal_data.get("concept", "") or plan.concept
             print("Mode: refresh (bar counts updated, human edits preserved)")
         else:
             plan_path = prod_path / PLAN_FILENAME
@@ -478,7 +567,7 @@ def main():
                     f"ERROR: {PLAN_FILENAME} already exists. Use --refresh to update."
                 )
                 sys.exit(1)
-            plan = generate_plan(prod_path)
+            plan = generate_plan(prod_path, proposal_path=proposal_path)
             print("Mode: generate")
     except (FileNotFoundError, ValueError) as e:
         print(f"ERROR: {e}")
