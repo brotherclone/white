@@ -67,6 +67,6 @@ structure:
 release_date: null
 album_sequence: null
 main_audio_file: null
-TRT: null
+TRT: '[04:20.000]'
 lrc_file: null
 audio_tracks: []
