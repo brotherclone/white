@@ -34,39 +34,39 @@ concept: What begins as systematic cataloging becomes an act of creative sabotag
 structure:
 - section_name: Intro
   start_time: '[00:00.000]'
-  end_time: '[00:30.000]'
+  end_time: '[00:52.500]'
   description: Keeper and arp up variants
 - section_name: Verse
-  start_time: '[00:30.000]'
-  end_time: '[01:00.000]'
+  start_time: '[00:52.500]'
+  end_time: '[01:15.000]'
   description: hypnotic mostly
 - section_name: Bridge
-  start_time: '[01:00.000]'
-  end_time: '[01:10.000]'
+  start_time: '[01:15.000]'
+  end_time: '[01:55.000]'
   description: main
 - section_name: Verse
-  start_time: '[01:10.000]'
-  end_time: '[01:30.000]'
+  start_time: '[01:55.000]'
+  end_time: '[02:05.000]'
   description: hypnotic again
 - section_name: Bridge
-  start_time: '[01:30.000]'
-  end_time: '[01:50.000]'
+  start_time: '[02:05.000]'
+  end_time: '[02:45.000]'
   description: move development almost like a chorus
 - section_name: Intro
-  start_time: '[01:50.000]'
-  end_time: '[02:10.000]'
+  start_time: '[02:45.000]'
+  end_time: '[03:15.000]'
   description: use as break down
 - section_name: Verse
-  start_time: '[02:10.000]'
-  end_time: '[02:40.000]'
+  start_time: '[03:15.000]'
+  end_time: '[04:22.500]'
   description: finish up lyrics
 - section_name: Verse
-  start_time: '[02:40.000]'
-  end_time: '[03:30.000]'
+  start_time: '[04:22.500]'
+  end_time: '[04:47.500]'
   description: 'use as jams '
 release_date: null
 album_sequence: null
 main_audio_file: null
-TRT: null
+TRT: '[04:20.000]'
 lrc_file: null
 audio_tracks: []
