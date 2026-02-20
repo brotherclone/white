@@ -181,31 +181,51 @@ POST-TRAINING
     → Same review.yml + promote workflow as chords
     → 41 tests passing
                 │
- ✅ Music Production Pipeline — Strum Phase (COMPLETE 2026-02-15)
-    → OpenSpec: openspec/changes/add-strum-rhythm-generation/
-    → Patterns: app/generators/midi/strum_patterns.py
-    → Pipeline: app/generators/midi/strum_pipeline.py
-    → Applies rhythm patterns (whole/half/quarter/eighth/push/arpeggio) to approved chord voicings
-    → Per-chord mode (each chord × each pattern) and progression mode (full sequence)
-    → 4/4 and 7/8 patterns with fallback for other time sigs
-    → No ChromaticScorer (harmony unchanged)
-    → Same review.yml + promote workflow
-    → 24 tests passing
+ ✅ Music Production Pipeline — Chord Primitive Collapse (COMPLETE 2026-02-20)
+    → OpenSpec: openspec/changes/collapse-chord-primitive-phases/
+    → HR distribution + strum pattern baked into each chord candidate before promotion
+    → generate_scratch_beat() writes <id>_scratch.mid alongside each candidate
+    → promote_chords.py → promote_part.py (generic across all phases)
+    → One-per-label enforcement: duplicate approved label → error + no writes
+    → harmonic_rhythm_pipeline.py + strum_pipeline.py deleted (absorbed into chord_pipeline)
+    → strum_patterns.py absorbs apply_strum_pattern, strum_to_midi_bytes, parse_chord_voicings
                 │
- ✅ Music Production Pipeline — Harmonic Rhythm Phase (COMPLETE 2026-02-15)
-    → OpenSpec: openspec/changes/add-harmonic-rhythm-generation/
-    → Core: app/generators/midi/harmonic_rhythm.py
-    → Pipeline: app/generators/midi/harmonic_rhythm_pipeline.py
-    → Variable chord durations on half-bar grid (0.5, 1.0, 1.5, 2.0 bars)
-    → Reads approved drum MIDI for accent alignment scoring
-    → ChromaticScorer temporal mode scoring
-    → Composite: 30% drum alignment + 70% chromatic temporal
-    → Section expansion/contraction supported (N*0.5 to N*2.0 bars)
-    → Strum pipeline updated to consume approved harmonic rhythm
-    → 34 tests passing
+ ✅ Music Production Pipeline — Bass Phase (COMPLETE 2026-02-16)
+    → OpenSpec: openspec/changes/add-bass-line-generation/
+    → Template library: app/generators/midi/bass_patterns.py (20 templates, 4/4 + 7/8)
+    → Pipeline: app/generators/midi/bass_pipeline.py
+    → Interval/chord-tone based (root/5th/3rd/octave/approach/passing)
+    → Register clamp: MIDI 24-60 (C1-C4), transpose by octave
+    → Theory scoring: root adherence + kick alignment + voice leading
+    → Composite: 30% theory + 70% chromatic
+    → 66 tests passing
                 │
- ⑩ Next phases: bass, melody+lyrics, assembly
-    → Each follows same pattern: generate → score → human gate → approve
+ ✅ Music Production Pipeline — Melody Phase (COMPLETE 2026-02-17)
+    → OpenSpec: openspec/changes/add-melody-lyrics-generation/
+    → Template library: app/generators/midi/melody_patterns.py (19 templates, 4/4 + 7/8)
+    → Pipeline: app/generators/midi/melody_pipeline.py
+    → Interval-based contour (stepwise/arpeggiated/repeated/leap_step/pentatonic/scalar_run)
+    → Starting pitch: highest chord tone within singer range
+    → 5 singer registry (Busyayo/Gabriel/Robbie/Shirley/Katherine)
+    → strong_beat_chord_snap() snaps strong-beat notes to chord tones within 2 semitones
+    → Vocal synthesis: ACE Studio (imports standard MIDI + syllable parsing)
+    → Theory scoring: singability + chord-tone alignment + contour quality
+    → Composite: 30% theory + 70% chromatic
+    → 49 tests passing
+                │
+ ✅ Music Production Pipeline — Production Plan (COMPLETE 2026-02-20)
+    → OpenSpec: openspec/changes/add-production-plan/
+    → Pipeline: app/generators/midi/production_plan.py
+    → Generates production_plan.yml: section sequence, bar counts, repeat, vocals intent
+    → Bar count priority: hr_distribution (review.yml) → chord MIDI → chord count fallback
+    → --refresh: reloads bar counts, preserves human edits, warns orphaned sections
+    → --bootstrap-manifest: emits manifest_bootstrap.yml with all derivable fields + null render-time fields
+    → Drum pipeline reads plan for next_section annotation on candidates
+    → promote_chords.py → promote_part.py (reused across all phases)
+    → 28 tests passing
+                │
+ ⑪ Next: assembly — combine all approved loops into a full song arrangement
+    → Each loop phase follows same pattern: generate → score → human gate → approve
 ```
 
 ### What Changed Since Last RunPod Run
@@ -351,8 +371,12 @@ calls the scorer directly in-process. Scope is now:
 | Phase 10 (ONNX+Scorer)        | `add-production-deployment`       | **✅ Complete** (2026-02-14)     | Done                  |
 | **Chord Phase**               | `add-music-production-pipeline`   | **✅ Complete** (2026-02-14)     | Done                  |
 | **Drum Phase**                | `add-drum-pattern-generation`     | **✅ Complete** (2026-02-15)     | Done                  |
-| **Strum Phase**               | `add-strum-rhythm-generation`     | **✅ Complete** (2026-02-15)     | Done                  |
-| **Harmonic Rhythm Phase**     | `add-harmonic-rhythm-generation`  | **✅ Complete** (2026-02-15)     | Done                  |
+| **Strum Phase**               | `add-strum-rhythm-generation`     | **✅ Absorbed** (2026-02-20)     | Baked into chord primitive |
+| **Harmonic Rhythm Phase**     | `add-harmonic-rhythm-generation`  | **✅ Absorbed** (2026-02-20)     | Baked into chord primitive |
+| **Chord Primitive Collapse**  | `collapse-chord-primitive-phases` | **✅ Complete** (2026-02-20)     | Done                  |
+| **Bass Phase**                | `add-bass-line-generation`        | **✅ Complete** (2026-02-16)     | Done                  |
+| **Melody Phase**              | `add-melody-lyrics-generation`    | **✅ Complete** (2026-02-17)     | Done                  |
+| **Production Plan**           | `add-production-plan`             | **✅ Complete** (2026-02-20)     | Done                  |
 | Infrastructure                | `add-infrastructure-improvements` | Not Started                      | High                  |
 | Phase 8 (Interpretability)    | `add-model-interpretability`      | ~ Partial                        | Medium                |
 | Phase 9 (Augmentation)        | `add-data-augmentation`           | Not Started                      | Low                   |
