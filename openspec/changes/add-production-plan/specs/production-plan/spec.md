@@ -10,7 +10,7 @@ The system SHALL provide a command that generates a `production_plan.yml` file i
 - **AND** the song has an approved chord `review.yml` with at least one approved candidate
 - **THEN** a `production_plan.yml` is written to the production directory root
 - **AND** it contains one section entry per unique approved chord label
-- **AND** bar counts are derived from approved harmonic rhythm MIDI if present, otherwise from approved chord MIDI, otherwise from chord count
+- **AND** bar counts are derived from the `hr_distribution` field in the chord `review.yml` if present, otherwise from approved chord MIDI length, otherwise from chord count in the candidate
 - **AND** all sections default to `repeat: 1` and `vocals: false`
 - **AND** sections appear in the order they were labeled in the chord review
 
