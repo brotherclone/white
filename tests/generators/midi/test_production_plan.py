@@ -48,15 +48,16 @@ def _write_chord_review(chords_dir: Path, sections: list[dict], bpm: int = 120) 
     chords_dir.mkdir(parents=True, exist_ok=True)
     candidates = []
     for i, s in enumerate(sections):
-        candidates.append(
-            {
-                "id": f"chord_{i+1:03d}",
-                "label": s["label"],
-                "status": "approved",
-                "chords": [{"name": "C", "notes": ["C4", "E4", "G4"]}]
-                * s.get("chord_count", 4),
-            }
-        )
+        cand = {
+            "id": f"chord_{i+1:03d}",
+            "label": s["label"],
+            "status": "approved",
+            "chords": [{"name": "C", "notes": ["C4", "E4", "G4"]}]
+            * s.get("chord_count", 4),
+        }
+        if "hr_distribution" in s:
+            cand["hr_distribution"] = s["hr_distribution"]
+        candidates.append(cand)
     review = {
         "bpm": bpm,
         "time_sig": "4/4",
@@ -93,16 +94,20 @@ class TestDeriveBarCount:
         assert bars == 4
         assert source == "chords"
 
-    def test_harmonic_rhythm_takes_priority(self, tmp_path):
+    def test_hr_distribution_takes_priority(self, tmp_path):
         prod = tmp_path / "production" / "test_song"
-        # Write chord MIDI (4 bars)
+        # Write chord MIDI (4 bars) — should be overridden by hr_distribution
         _write_chord_midi(prod / "chords" / "approved", "verse", bars=4)
-        # Write harmonic rhythm MIDI (8 bars) — should win
-        _write_chord_midi(prod / "harmonic_rhythm" / "approved", "verse", bars=8)
-
-        bars, source = derive_bar_count("verse", prod, bpm=120, time_sig=(4, 4))
-        assert bars == 8
-        assert source == "harmonic_rhythm"
+        # hr_distribution sums to 6 bars — should win
+        bars, source = derive_bar_count(
+            "verse",
+            prod,
+            bpm=120,
+            time_sig=(4, 4),
+            hr_distribution=[1.5, 0.5, 2.0, 2.0],
+        )
+        assert bars == 6
+        assert source == "hr_distribution"
 
     def test_fallback_to_chord_count(self, tmp_path):
         prod = tmp_path / "production" / "test_song"
@@ -245,6 +250,23 @@ class TestGeneratePlan:
         plan = generate_plan(prod)
         assert plan.sections[0].bars == 8
         assert plan.sections[0]._bar_source == "chords"
+
+    def test_bar_count_from_hr_distribution(self, tmp_path):
+        # hr_distribution in review.yml takes priority over chord MIDI
+        prod = self._setup(
+            tmp_path,
+            [
+                {
+                    "label": "verse",
+                    "chord_count": 4,
+                    "hr_distribution": [1.5, 0.5, 2.0, 2.0],
+                }
+            ],
+        )
+        _write_chord_midi(prod / "chords" / "approved", "verse", bars=4)
+        plan = generate_plan(prod)
+        assert plan.sections[0].bars == 6  # sum([1.5, 0.5, 2.0, 2.0])
+        assert plan.sections[0]._bar_source == "hr_distribution"
 
     def test_deduplicates_repeated_labels(self, tmp_path):
         # Same label approved twice — only the first occurrence should appear

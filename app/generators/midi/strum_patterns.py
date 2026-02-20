@@ -7,7 +7,12 @@ rhythmic variations (half notes, quarters, eighths, syncopated, arpeggiated).
 Each pattern specifies onset positions and durations relative to a single bar.
 """
 
+import io
 from dataclasses import dataclass, field
+from pathlib import Path
+
+import mido
+import yaml
 
 
 @dataclass
@@ -203,3 +208,221 @@ def get_patterns_for_time_sig(
         matches = [p for p in matches if p.name in filter_names]
 
     return matches
+
+
+# ---------------------------------------------------------------------------
+# Pattern application and MIDI rendering (moved from strum_pipeline.py)
+# ---------------------------------------------------------------------------
+
+
+def apply_strum_pattern(
+    voicing: list[int],
+    pattern: StrumPattern,
+    velocity: int = 80,
+    ticks_per_beat: int = 480,
+) -> list[dict]:
+    """Apply a strum pattern to a chord voicing, producing MIDI events for one bar.
+
+    Returns list of {notes: [int], onset_tick: int, duration_ticks: int, velocity: int}.
+    For arpeggios, each onset has a single note from the chord.
+    For block patterns, each onset has all notes from the chord.
+    """
+    events = []
+
+    if pattern.is_arpeggio:
+        if not voicing:
+            return events
+        sorted_notes = sorted(voicing)
+        if pattern.arp_direction == "down":
+            sorted_notes = list(reversed(sorted_notes))
+
+        for i, (onset, duration) in enumerate(zip(pattern.onsets, pattern.durations)):
+            note = sorted_notes[i % len(sorted_notes)]
+            events.append(
+                {
+                    "notes": [note],
+                    "onset_tick": int(onset * ticks_per_beat),
+                    "duration_ticks": int(duration * ticks_per_beat),
+                    "velocity": velocity,
+                }
+            )
+    else:
+        for onset, duration in zip(pattern.onsets, pattern.durations):
+            events.append(
+                {
+                    "notes": list(voicing),
+                    "onset_tick": int(onset * ticks_per_beat),
+                    "duration_ticks": int(duration * ticks_per_beat),
+                    "velocity": velocity,
+                }
+            )
+
+    return events
+
+
+def strum_to_midi_bytes(
+    chords: list[list[int]],
+    pattern: StrumPattern,
+    bpm: int = 120,
+    velocity: int = 80,
+    ticks_per_beat: int = 480,
+    durations: list[float] | None = None,
+) -> bytes:
+    """Apply a strum pattern to a sequence of chord voicings and produce MIDI bytes.
+
+    Each chord gets one bar with the pattern applied, unless durations is provided.
+    When durations is given, each chord gets its assigned duration in bars — the
+    pattern repeats for longer chords and truncates for shorter ones.
+
+    Args:
+        durations: Optional list of bars per chord (from hr_distribution in review.yml).
+                   If None, each chord gets exactly 1.0 bar.
+    """
+    mid = mido.MidiFile(ticks_per_beat=ticks_per_beat)
+    track = mido.MidiTrack()
+    mid.tracks.append(track)
+
+    tempo = mido.bpm2tempo(bpm)
+    track.append(mido.MetaMessage("set_tempo", tempo=tempo, time=0))
+
+    bar_ticks = int(pattern.bar_length_beats() * ticks_per_beat)
+
+    all_events = []  # (abs_tick, note, velocity, is_on)
+
+    current_offset = 0
+    for chord_idx, voicing in enumerate(chords):
+        if durations is not None:
+            chord_dur_ticks = int(
+                durations[chord_idx] * pattern.bar_length_beats() * ticks_per_beat
+            )
+        else:
+            chord_dur_ticks = bar_ticks
+
+        pattern_offset = 0
+        while pattern_offset < chord_dur_ticks:
+            bar_events = apply_strum_pattern(voicing, pattern, velocity, ticks_per_beat)
+            for ev in bar_events:
+                abs_on = current_offset + pattern_offset + ev["onset_tick"]
+                if abs_on >= current_offset + chord_dur_ticks:
+                    break
+                abs_off = min(
+                    abs_on + ev["duration_ticks"],
+                    current_offset + chord_dur_ticks,
+                )
+                for note in ev["notes"]:
+                    all_events.append((abs_on, note, ev["velocity"], True))
+                    all_events.append((abs_off, note, 0, False))
+            pattern_offset += bar_ticks
+
+        current_offset += chord_dur_ticks
+
+    # Sort: by tick, note-offs before note-ons at same tick
+    all_events.sort(key=lambda e: (e[0], not e[3], e[1]))
+
+    prev_tick = 0
+    for abs_tick, note, vel, is_on in all_events:
+        delta = abs_tick - prev_tick
+        msg_type = "note_on" if is_on else "note_off"
+        track.append(mido.Message(msg_type, note=note, velocity=vel, time=delta))
+        prev_tick = abs_tick
+
+    track.append(mido.MetaMessage("end_of_track", time=0))
+
+    buf = io.BytesIO()
+    mid.save(file=buf)
+    return buf.getvalue()
+
+
+# ---------------------------------------------------------------------------
+# Chord MIDI parsing utilities (moved from strum_pipeline.py)
+# ---------------------------------------------------------------------------
+
+
+def parse_chord_voicings(midi_path: Path) -> list[dict]:
+    """Parse an approved chord MIDI file and extract voicings per bar.
+
+    Returns list of dicts: [{notes: [int, ...], velocity: int, bar_ticks: int}, ...]
+    """
+    mid = mido.MidiFile(str(midi_path))
+    tpb = mid.ticks_per_beat
+
+    events = []
+    abs_tick = 0
+    for msg in mid.tracks[0]:
+        abs_tick += msg.time
+        if msg.type == "note_on" and msg.velocity > 0:
+            events.append(
+                {"note": msg.note, "velocity": msg.velocity, "tick": abs_tick}
+            )
+
+    if not events:
+        return []
+
+    chords = []
+    current_tick = events[0]["tick"]
+    current_notes = []
+    current_vel = events[0]["velocity"]
+
+    for ev in events:
+        if ev["tick"] != current_tick:
+            chords.append(
+                {
+                    "notes": sorted(current_notes),
+                    "velocity": current_vel,
+                    "tick": current_tick,
+                }
+            )
+            current_tick = ev["tick"]
+            current_notes = []
+            current_vel = ev["velocity"]
+        current_notes.append(ev["note"])
+
+    if current_notes:
+        chords.append(
+            {
+                "notes": sorted(current_notes),
+                "velocity": current_vel,
+                "tick": current_tick,
+            }
+        )
+
+    if len(chords) >= 2:
+        bar_ticks = chords[1]["tick"] - chords[0]["tick"]
+    else:
+        bar_ticks = tpb * 4
+
+    for chord in chords:
+        chord["bar_ticks"] = bar_ticks
+
+    return chords
+
+
+def read_approved_harmonic_rhythm(production_dir: Path) -> dict[str, list[float]]:
+    """Read approved HR distributions for each section.
+
+    Reads from chords/review.yml (hr_distribution field on each approved candidate),
+    which is where HR is stored after the collapse-chord-primitive-phases refactor.
+    Returns dict mapping section label → list of bar durations per chord.
+    """
+    review_path = production_dir / "chords" / "review.yml"
+    if not review_path.exists():
+        return {}
+
+    with open(review_path) as f:
+        review = yaml.safe_load(f)
+
+    durations_by_section: dict[str, list[float]] = {}
+    for candidate in review.get("candidates", []):
+        status = str(candidate.get("status", "")).lower()
+        if status not in ("approved", "accepted"):
+            continue
+        label = candidate.get("label")
+        if not label:
+            continue
+        section_key = str(label).lower().replace("-", "_").replace(" ", "_")
+        if section_key not in durations_by_section:
+            dist = candidate.get("hr_distribution")
+            if dist and isinstance(dist, list):
+                durations_by_section[section_key] = [float(d) for d in dist]
+
+    return durations_by_section

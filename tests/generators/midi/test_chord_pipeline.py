@@ -286,10 +286,10 @@ class TestChordPipelineIntegration:
 # ---------------------------------------------------------------------------
 
 
-class TestPromoteChords:
+class TestPromotePart:
 
     def test_promote_approved(self, tmp_path):
-        from app.generators.midi.promote_chords import promote_chords
+        from app.generators.midi.promote_part import promote_part
 
         # Set up directory structure
         chords_dir = tmp_path / "chords"
@@ -335,15 +335,15 @@ class TestPromoteChords:
         with open(review_path, "w") as f:
             yaml.dump(review, f)
 
-        promote_chords(str(review_path))
+        promote_part(str(review_path))
 
         # Check promoted files
         assert (approved_dir / "verse_candidate.mid").exists()
         assert (approved_dir / "chorus_candidate.mid").exists()
         assert not (approved_dir / "unlabeled.mid").exists()  # rejected, not promoted
 
-    def test_promote_multiple_same_label(self, tmp_path):
-        from app.generators.midi.promote_chords import promote_chords
+    def test_promote_duplicate_label_fails(self, tmp_path, capsys):
+        from app.generators.midi.promote_part import promote_part
 
         chords_dir = tmp_path / "chords"
         candidates_dir = chords_dir / "candidates"
@@ -376,14 +376,51 @@ class TestPromoteChords:
         with open(review_path, "w") as f:
             yaml.dump(review, f)
 
-        promote_chords(str(review_path))
+        promote_part(str(review_path))
+
+        out = capsys.readouterr().out
+        assert "ERROR" in out
+        assert "verse_candidate" in out
+        # Nothing should be promoted
+        approved_dir = chords_dir / "approved"
+        assert not any(approved_dir.glob("*.mid"))
+
+    def test_promote_excludes_scratch_files(self, tmp_path):
+        from app.generators.midi.promote_part import promote_part
+
+        chords_dir = tmp_path / "chords"
+        candidates_dir = chords_dir / "candidates"
+        candidates_dir.mkdir(parents=True)
+
+        (candidates_dir / "chord_001.mid").write_bytes(b"MIDI1")
+        (candidates_dir / "chord_001_scratch.mid").write_bytes(b"SCRATCH")
+
+        review = {
+            "candidates": [
+                {
+                    "id": "chord_001",
+                    "midi_file": "candidates/chord_001.mid",
+                    "scratch_midi": "candidates/chord_001_scratch.mid",
+                    "rank": 1,
+                    "label": "verse",
+                    "status": "approved",
+                    "notes": "",
+                },
+            ]
+        }
+        review_path = chords_dir / "review.yml"
+        with open(review_path, "w") as f:
+            yaml.dump(review, f)
+
+        promote_part(str(review_path))
 
         approved_dir = chords_dir / "approved"
-        assert (approved_dir / "verse_candidate.mid").exists()
-        assert (approved_dir / "verse_candidate_2.mid").exists()
+        assert (approved_dir / "verse.mid").exists()
+        assert not (approved_dir / "verse_scratch.mid").exists()
+        assert not (approved_dir / "chord_001_scratch.mid").exists()
 
     def test_promote_no_approved(self, tmp_path, capsys):
-        from app.generators.midi.promote_chords import promote_chords
+        from app.generators.midi.promote_part import promote_part
 
         chords_dir = tmp_path / "chords"
         chords_dir.mkdir()
@@ -404,7 +441,7 @@ class TestPromoteChords:
         with open(review_path, "w") as f:
             yaml.dump(review, f)
 
-        promote_chords(str(review_path))
+        promote_part(str(review_path))
 
         captured = capsys.readouterr()
         assert "No approved candidates" in captured.out

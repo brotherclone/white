@@ -5,7 +5,7 @@ Harmonic rhythm generation — variable chord durations on a half-bar grid.
 Generates candidate duration distributions for chord progressions, scores them
 against drum accent alignment and ChromaticScorer temporal mode.
 
-Core functions (no pipeline orchestration — see harmonic_rhythm_pipeline.py):
+Core functions (used internally by chord_pipeline.py to bake HR into candidates):
 - enumerate_distributions: all valid half-bar distributions for N chords
 - extract_drum_accents: parse approved drum MIDI for strong beat positions
 - drum_alignment_score: fraction of chord onsets on strong beats

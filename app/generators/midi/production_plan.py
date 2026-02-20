@@ -100,29 +100,26 @@ def derive_bar_count(
     bpm: int,
     time_sig: tuple[int, int],
     chord_count_fallback: int = 4,
+    hr_distribution: Optional[list] = None,
 ) -> tuple[int, str]:
     """Derive bar count for a section label.
 
     Priority:
-    1. Approved harmonic rhythm MIDI (actual loop length post-rhythm)
-    2. Approved chord MIDI
-    3. chord_count_fallback (1 bar per chord)
+    1. hr_distribution from chord review.yml (sum of durations = total bars)
+    2. Approved chord MIDI length
+    3. chord_count_fallback (n chords × 1 bar default)
 
     Returns (bars, source_description).
     """
     label_key = label.lower().replace("-", "_").replace(" ", "_")
 
-    # 1. Harmonic rhythm approved
-    hr_dir = production_dir / "harmonic_rhythm" / "approved"
-    if hr_dir.exists():
-        for pattern in (f"{label_key}*.mid", f"hr_{label_key}*.mid"):
-            matches = sorted(hr_dir.glob(pattern))
-            if matches:
-                bars = _midi_bar_count(matches[0], bpm, time_sig)
-                if bars > 0:
-                    return bars, "harmonic_rhythm"
+    # 1. hr_distribution field from chord review candidate
+    if hr_distribution:
+        bars = int(sum(float(d) for d in hr_distribution))
+        if bars > 0:
+            return bars, "hr_distribution"
 
-    # 2. Chord approved
+    # 2. Chord approved MIDI
     chord_dir = production_dir / "chords" / "approved"
     if chord_dir.exists():
         matches = sorted(chord_dir.glob(f"{label_key}*.mid"))
@@ -319,7 +316,10 @@ def generate_plan(
             continue
         seen.add(label_key)
         chord_count = len(candidate.get("chords", [])) or 4
-        unique_sections.append({"label": label, "chord_count": chord_count})
+        hr_dist = candidate.get("hr_distribution")
+        unique_sections.append(
+            {"label": label, "chord_count": chord_count, "hr_distribution": hr_dist}
+        )
 
     if not unique_sections:
         raise ValueError("No approved chord sections found in chords/review.yml")
@@ -327,7 +327,12 @@ def generate_plan(
     sections = []
     for s in unique_sections:
         bars, source = derive_bar_count(
-            s["label"], production_dir, bpm, time_sig, s["chord_count"]
+            s["label"],
+            production_dir,
+            bpm,
+            time_sig,
+            s["chord_count"],
+            hr_distribution=s.get("hr_distribution"),
         )
         sec = PlanSection(name=s["label"], bars=bars)
         sec._bar_source = source

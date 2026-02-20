@@ -48,7 +48,7 @@ from app.generators.midi.chord_pipeline import (
     get_chromatic_target,
     load_song_proposal,
 )
-from app.generators.midi.strum_pipeline import (
+from app.generators.midi.strum_patterns import (
     parse_chord_voicings,
     read_approved_harmonic_rhythm,
 )
@@ -640,7 +640,7 @@ def run_melody_pipeline(
     print(f"Candidates: {total}")
     print(f"Review:     {review_path}")
     print(f"\nNext: Edit {review_path} to label and approve candidates")
-    print(f"Then: python -m app.generators.midi.promote_chords --review {review_path}")
+    print(f"Then: python -m app.generators.midi.promote_part --review {review_path}")
 
     return ranked_by_section
 
