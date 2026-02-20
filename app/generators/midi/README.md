@@ -54,55 +54,13 @@ python -m app.generators.midi.drum_pipeline \
 
 **Output:** `<production-dir>/drums/{candidates/, review.yml}`
 
-## Harmonic Rhythm Pipeline
-
-Generates variable chord duration distributions on a half-bar grid. Aligns chord changes with approved drum accent positions and scores with ChromaticScorer temporal mode. Section length can expand or contract.
-
-```bash
-python -m app.generators.midi.harmonic_rhythm_pipeline \
-    --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
-```
-
-| Flag                 | Default                           | Description                                                                       |
-|----------------------|-----------------------------------|-----------------------------------------------------------------------------------|
-| `--production-dir`   | *(required)*                      | Song production directory (must contain `chords/approved/` and `drums/approved/`) |
-| `--seed`             | 42                                | Random seed                                                                       |
-| `--top-k`            | 20                                | Candidates per section                                                            |
-| `--alignment-weight` | 0.3                               | Weight for drum accent alignment                                                  |
-| `--chromatic-weight` | 0.7                               | Weight for ChromaticScorer temporal match                                         |
-| `--onnx-path`        | `training/data/fusion_model.onnx` | Path to ONNX model                                                                |
-
-**Duration options:** 1 bar or 2 bars per chord. For N chords produces 2^N clean loop-aligned candidates.
-
-**Output:** `<production-dir>/harmonic_rhythm/{candidates/, review.yml}`
-
-## Strum Pipeline
-
-Applies rhythm patterns to approved chord MIDI files — same harmony, different time feel. If approved harmonic rhythm exists, chords get variable durations; otherwise defaults to 1 bar per chord. No ChromaticScorer scoring since harmony is unchanged.
-
-```bash
-python -m app.generators.midi.strum_pipeline \
-    --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
-```
-
-| Flag               | Default      | Description                                                                                      |
-|--------------------|--------------|--------------------------------------------------------------------------------------------------|
-| `--production-dir` | *(required)* | Song production directory (must contain `chords/approved/`)                                      |
-| `--mode`           | `per-chord`  | `per-chord` (each chord x each pattern), `progression` (full sequence x each pattern), or `both` |
-| `--patterns`       | *(all)*      | Comma-separated pattern names to include: `quarter,eighth,arp_up`                                |
-
-**4/4 patterns:** whole, half, quarter, eighth, push, arp_up, arp_down
-
-**7/8 patterns:** whole, grouped_322, grouped_223, eighth, arp_up, arp_down
-
-**Output:** `<production-dir>/strums/{candidates/, review.yml}`
 
 ## Promote
 
 Promotes approved candidates from any `review.yml` to the `approved/` directory. Works for chords, drums, and strums.
 
 ```bash
-python -m app.generators.midi.promote_chords \
+python -m app.generators.midi.promote_part \
     --review <path-to-review.yml>
 ```
 

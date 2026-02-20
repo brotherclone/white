@@ -3,7 +3,7 @@
 ## 1. Core Data Model and Generator
 
 - [ ] **Create `app/generators/midi/production_plan.py`** — data model (`ProductionPlanSection`, `ProductionPlan` as Pydantic models) + YAML serialization/deserialization
-- [ ] **Implement bar count derivation** — check approved harmonic rhythm MIDI length first, then approved chord MIDI, then chord count from review; report source used
+- [ ] **Implement bar count derivation** — read `hr_distribution` from chord `review.yml` if present, else approved chord MIDI length, else chord count from candidate; report source used
 - [ ] **Implement plan generation** — read chord `review.yml`, extract approved section labels in order, derive bar counts, write `production_plan.yml` with defaults
 - [ ] **Implement `--refresh` mode** — reload bar counts from current approved loops, preserve human-edited fields, warn on orphaned sections
 - [ ] **Implement `--bootstrap-manifest` mode** — read completed plan, compute section durations (bars × bar_duration_seconds), emit `manifest_bootstrap.yml` with derivable manifest fields pre-filled and render-time fields as `null`
@@ -16,7 +16,7 @@
 
 ## 3. Tests
 
-- [ ] **Unit tests for bar count derivation** — test all three sources: harmonic rhythm MIDI, chord MIDI, chord count fallback; test priority order
+- [ ] **Unit tests for bar count derivation** — test all three sources: hr_distribution field, chord MIDI length, chord count fallback; test priority order
 - [ ] **Unit tests for plan generation** — verify schema, section order, default values, correct section count from mock chord review
 - [ ] **Unit tests for `--refresh`** — verify human-edited fields are preserved, orphaned sections produce warnings
 - [ ] **Unit tests for `--bootstrap-manifest`** — verify manifest fields are present, durations correct, null fields present with correct keys

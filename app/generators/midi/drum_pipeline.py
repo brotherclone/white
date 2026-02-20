@@ -67,9 +67,13 @@ def read_approved_sections(production_dir: Path) -> list[dict]:
         label = candidate.get("label")
         if not label:
             continue
-        # Bar count = number of chords in the progression
-        chords = candidate.get("chords", [])
-        bar_count = len(chords) if chords else 4
+        # Bar count from HR distribution if available, else chord count, else default 4
+        hr_distribution = candidate.get("hr_distribution")
+        if hr_distribution:
+            bar_count = int(sum(hr_distribution))
+        else:
+            chords = candidate.get("chords", [])
+            bar_count = len(chords) if chords else 4
         sections.append(
             {
                 "label": label.lower().replace("-", "_").replace(" ", "_"),
@@ -556,7 +560,7 @@ def run_drum_pipeline(
     print(f"Candidates: {total}")
     print(f"Review:     {review_path}")
     print(f"\nNext: Edit {review_path} to label and approve candidates")
-    print(f"Then: python -m app.generators.midi.promote_chords --review {review_path}")
+    print(f"Then: python -m app.generators.midi.promote_part --review {review_path}")
 
     return ranked_by_section
 

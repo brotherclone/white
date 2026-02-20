@@ -26,6 +26,12 @@ import numpy as np
 import yaml
 
 from app.generators.midi.prototype.generator import ChordProgressionGenerator
+from app.generators.midi.harmonic_rhythm import enumerate_distributions
+from app.generators.midi.strum_patterns import (
+    StrumPattern,
+    get_patterns_for_time_sig,
+    strum_to_midi_bytes,
+)
 
 
 def _to_python(obj):
@@ -251,6 +257,68 @@ def write_midi_file(midi_bytes: bytes, path: Path):
 
 
 # ---------------------------------------------------------------------------
+# Chord primitive — HR + strum baking
+# ---------------------------------------------------------------------------
+
+
+def sample_hr_distribution(n_chords: int, rng) -> list[float]:
+    """Pick a random HR duration distribution for n_chords."""
+    distributions = enumerate_distributions(n_chords)
+    return rng.choice(distributions)
+
+
+def sample_strum_pattern(
+    time_sig: tuple[int, int], rng, filter_names: list[str] | None = None
+) -> StrumPattern:
+    """Pick a random strum pattern for the given time signature."""
+    patterns = get_patterns_for_time_sig(time_sig, filter_names)
+    return rng.choice(patterns)
+
+
+def progression_to_primitive_midi_bytes(
+    progression: list[dict],
+    bpm: int,
+    time_sig: tuple[int, int],
+    hr_dist: list[float],
+    strum_pattern: StrumPattern,
+) -> bytes:
+    """Generate primitive MIDI with HR distribution and strum articulation baked in."""
+    voicings = [chord.get("midi_notes", []) for chord in progression]
+    return strum_to_midi_bytes(voicings, strum_pattern, bpm=bpm, durations=hr_dist)
+
+
+def generate_scratch_beat(
+    bpm: int,
+    bar_count: int,
+    time_sig: tuple[int, int],
+    genre_families: list[str] | None = None,
+) -> bytes:
+    """Generate a minimal scratch drum MIDI for auditioning a chord primitive.
+
+    Uses the lowest-energy template from the inferred genre family.
+    """
+    from app.generators.midi.drum_patterns import (
+        ALL_TEMPLATES,
+        DEFAULT_GENRE_FAMILY,
+        select_templates,
+    )
+    from app.generators.midi.drum_pipeline import drum_pattern_to_midi_bytes
+
+    families = genre_families or [DEFAULT_GENRE_FAMILY]
+    templates = select_templates(ALL_TEMPLATES, time_sig, families, "low")
+    if not templates:
+        templates = select_templates(
+            ALL_TEMPLATES, time_sig, [DEFAULT_GENRE_FAMILY], "low"
+        )
+    if not templates:
+        templates = [
+            t for t in ALL_TEMPLATES if t.time_sig == time_sig
+        ] or ALL_TEMPLATES[:1]
+
+    return drum_pattern_to_midi_bytes(templates[0], bpm=bpm, bar_count=bar_count)
+
+
+# ---------------------------------------------------------------------------
 # Composite scoring
 # ---------------------------------------------------------------------------
 
@@ -336,8 +404,11 @@ def generate_review_yaml(
             {
                 "id": item["id"],
                 "midi_file": f"candidates/{item['id']}.mid",
+                "scratch_midi": f"candidates/{item['id']}_scratch.mid",
                 "rank": item["rank"],
                 "scores": _to_python(item["breakdown"]),
+                "hr_distribution": _to_python(item.get("hr_distribution", [])),
+                "strum_pattern": item.get("strum_pattern", "whole"),
                 "progression": item["summary"],
                 "chords": [
                     {
@@ -400,6 +471,7 @@ def run_chord_pipeline(
     theory_weight: float = 0.3,
     chromatic_weight: float = 0.7,
     onnx_path: Optional[str] = None,
+    strum_patterns: Optional[list[str]] = None,
 ):
     """Run the chord generation pipeline end-to-end.
 
@@ -411,6 +483,7 @@ def run_chord_pipeline(
     """
     import random as _random
 
+    rng = _random.Random(seed)
     _random.seed(seed)
     np.random.seed(seed)
 
@@ -436,6 +509,16 @@ def run_chord_pipeline(
     print(f"Target:  temporal={target['temporal']}")
     print(f"         spatial={target['spatial']}")
     print(f"         ontological={target['ontological']}")
+
+    # Infer genre families for scratch beat generation
+    from app.generators.midi.drum_patterns import (
+        DEFAULT_GENRE_FAMILY,
+        map_genres_to_families,
+    )
+
+    raw_proposal = song_info.get("raw_proposal", {})
+    genre_tags = raw_proposal.get("genres", []) or []
+    genre_families = map_genres_to_families(genre_tags) or [DEFAULT_GENRE_FAMILY]
 
     # --- 2. Generate chord candidates ---
     print(f"\nGenerating {num_candidates} candidates (seed={seed})...")
@@ -539,7 +622,7 @@ def run_chord_pipeline(
         item["rank"] = rank + 1
         item["id"] = f"chord_{rank + 1:03d}"
 
-    # --- 5. Write MIDI files ---
+    # --- 5. Write MIDI files (with HR + strum baked in) + scratch beats ---
     slug = song_slug(song_filename)
     output_dir = thread_path / "production" / slug / "chords"
     candidates_dir = output_dir / "candidates"
@@ -547,10 +630,28 @@ def run_chord_pipeline(
     candidates_dir.mkdir(parents=True, exist_ok=True)
     approved_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"\nWriting {len(top_candidates)} MIDI files to {candidates_dir}/")
+    time_sig = tuple(song_info["time_sig"])
+    print(
+        f"\nWriting {len(top_candidates)} chord primitives + scratch beats to {candidates_dir}/"
+    )
     for item in top_candidates:
-        midi_path = candidates_dir / f"{item['id']}.mid"
-        write_midi_file(item["midi_bytes"], midi_path)
+        n_chords = len(item["progression"])
+        hr_dist = sample_hr_distribution(n_chords, rng)
+        strum_pat = sample_strum_pattern(time_sig, rng, filter_names=strum_patterns)
+        bar_count = int(sum(hr_dist))
+
+        primitive_bytes = progression_to_primitive_midi_bytes(
+            item["progression"], song_info["bpm"], time_sig, hr_dist, strum_pat
+        )
+        scratch_bytes = generate_scratch_beat(
+            song_info["bpm"], bar_count, time_sig, genre_families
+        )
+
+        write_midi_file(primitive_bytes, candidates_dir / f"{item['id']}.mid")
+        write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
+
+        item["hr_distribution"] = hr_dist
+        item["strum_pattern"] = strum_pat.name
 
     # --- 6. Write review YAML ---
     review = generate_review_yaml(
@@ -579,10 +680,13 @@ def run_chord_pipeline(
             f"     theory={item['breakdown']['theory_total']:.3f}  chromatic={item['breakdown']['chromatic']['match']:.3f}  confidence={item['breakdown']['chromatic']['confidence']:.3f}"
         )
         print(f"     {item['summary']}")
+        print(
+            f"     HR: {item.get('hr_distribution', [])}  strum: {item.get('strum_pattern', '?')}"
+        )
 
     print(f"\nOutput: {output_dir}")
     print(f"Next: Edit {review_path} to label and approve candidates")
-    print(f"Then: python -m app.generators.midi.promote_chords --review {review_path}")
+    print(f"Then: python -m app.generators.midi.promote_part --review {review_path}")
 
     return top_candidates
 
@@ -638,8 +742,19 @@ def main():
         default=None,
         help="Path to fusion_model.onnx (default: training/data/fusion_model.onnx)",
     )
+    parser.add_argument(
+        "--strum-patterns",
+        default=None,
+        help="Comma-separated strum pattern names to use (e.g. whole,half,quarter). Default: all patterns for the time signature.",
+    )
 
     args = parser.parse_args()
+
+    strum_filter = (
+        [p.strip() for p in args.strum_patterns.split(",") if p.strip()]
+        if args.strum_patterns
+        else None
+    )
 
     run_chord_pipeline(
         thread_dir=args.thread,
@@ -651,6 +766,7 @@ def main():
         theory_weight=args.theory_weight,
         chromatic_weight=args.chromatic_weight,
         onnx_path=args.onnx_path,
+        strum_patterns=strum_filter,
     )
 
 

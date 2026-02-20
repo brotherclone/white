@@ -168,7 +168,7 @@ POST-TRAINING
     → Reads shrinkwrapped song proposal → Markov chord generation → ChromaticScorer scoring
     → Composite scoring (30% theory + 70% chromatic) → top-N MIDI files + review.yml
     → Human labels candidates (verse/chorus/bridge) in review.yml → promote to approved/
-    → Promotion tool: app/generators/midi/promote_chords.py
+    → Promotion tool: app/generators/midi/promote_part.py
                 │
  ✅ Music Production Pipeline — Drum Phase (COMPLETE 2026-02-15)
     → OpenSpec: openspec/changes/add-drum-pattern-generation/
