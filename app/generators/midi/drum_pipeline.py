@@ -67,9 +67,13 @@ def read_approved_sections(production_dir: Path) -> list[dict]:
         label = candidate.get("label")
         if not label:
             continue
-        # Bar count = number of chords in the progression
-        chords = candidate.get("chords", [])
-        bar_count = len(chords) if chords else 4
+        # Bar count from HR distribution if available, else chord count, else default 4
+        hr_distribution = candidate.get("hr_distribution")
+        if hr_distribution:
+            bar_count = int(sum(hr_distribution))
+        else:
+            chords = candidate.get("chords", [])
+            bar_count = len(chords) if chords else 4
         sections.append(
             {
                 "label": label.lower().replace("-", "_").replace(" ", "_"),
@@ -194,12 +198,25 @@ def generate_drum_review_yaml(
     seed: int,
     scoring_weights: dict,
     song_info: dict,
+    next_section_map: Optional[dict] = None,
 ) -> dict:
-    """Generate the review YAML structure for drum candidates."""
+    """Generate the review YAML structure for drum candidates.
+
+    next_section_map: optional dict mapping section display name → next section
+    name (or None for the last section). Populated from production_plan.yml when
+    present, enabling structure-aware fill generation in future phases.
+    """
+    if next_section_map is None:
+        next_section_map = {}
+
     all_candidates = []
     global_rank = 0
     for section in sections:
         section_key = section["_section_key"]
+        label_display = section["label_display"]
+        next_sec = next_section_map.get(label_display) or next_section_map.get(
+            section["label"]
+        )
         for item in ranked_by_section.get(section_key, []):
             global_rank += 1
             all_candidates.append(
@@ -207,7 +224,8 @@ def generate_drum_review_yaml(
                     "id": item["id"],
                     "midi_file": f"candidates/{item['id']}.mid",
                     "rank": global_rank,
-                    "section": section["label_display"],
+                    "section": label_display,
+                    "next_section": next_sec,
                     "chord_source": section.get("chord_id", ""),
                     "genre_family": item["genre_family"],
                     "pattern_name": item["pattern_name"],
@@ -508,6 +526,16 @@ def run_drum_pipeline(
         path.write_bytes(midi_bytes)
 
     # --- 7. Write review YAML ---
+    # Load production plan for next_section context (optional)
+    from app.generators.midi.production_plan import build_next_section_map, load_plan
+
+    prod_plan = load_plan(prod_path)
+    next_section_map = build_next_section_map(prod_plan) if prod_plan else {}
+    if next_section_map:
+        print(
+            f"\nProduction plan found — annotating next_section for {len(next_section_map)} sections"
+        )
+
     review = generate_drum_review_yaml(
         production_dir,
         sections,
@@ -515,6 +543,7 @@ def run_drum_pipeline(
         seed,
         {"energy": energy_weight, "chromatic": chromatic_weight},
         song_info,
+        next_section_map=next_section_map,
     )
     review_path = drums_dir / "review.yml"
     with open(review_path, "w") as f:
@@ -531,7 +560,7 @@ def run_drum_pipeline(
     print(f"Candidates: {total}")
     print(f"Review:     {review_path}")
     print(f"\nNext: Edit {review_path} to label and approve candidates")
-    print(f"Then: python -m app.generators.midi.promote_chords --review {review_path}")
+    print(f"Then: python -m app.generators.midi.promote_part --review {review_path}")
 
     return ranked_by_section
 

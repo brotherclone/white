@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Promote approved chord candidates from review.yml to the approved/ directory.
+Promote approved part candidates from review.yml to the approved/ directory.
 
 Reads a review.yml file, finds candidates with status=approved, and copies
 their MIDI files to the approved/ directory with label-based filenames.
 
 Usage:
-    python -m app.generators.midi.promote_chords \
+    python -m app.generators.midi.promote_part \
         --review shrinkwrapped/.../production/.../chords/review.yml
 """
 
@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 
-def promote_chords(review_path: str):
+def promote_part(review_path: str):
     """Read review.yml and promote approved candidates."""
     review_file = Path(review_path)
     if not review_file.exists():
@@ -27,9 +27,9 @@ def promote_chords(review_path: str):
     with open(review_file) as f:
         review = yaml.safe_load(f)
 
-    chords_dir = review_file.parent
-    candidates_dir = chords_dir / "candidates"
-    approved_dir = chords_dir / "approved"
+    part_dir = review_file.parent
+    candidates_dir = part_dir / "candidates"
+    approved_dir = part_dir / "approved"
     approved_dir.mkdir(parents=True, exist_ok=True)
 
     candidates = review.get("candidates", [])
@@ -37,6 +37,7 @@ def promote_chords(review_path: str):
         c
         for c in candidates
         if str(c.get("status", "")).lower() in ("approved", "accepted")
+        and not str(c.get("midi_file", "")).endswith("_scratch.mid")
     ]
 
     if not approved:
@@ -46,31 +47,42 @@ def promote_chords(review_path: str):
         )
         return
 
-    # Group by label for numbering
-    label_counts: dict[str, int] = {}
-    promoted = []
-
+    # Enforce one approved per label
+    label_to_candidates: dict[str, list] = {}
     for candidate in approved:
+        label = (
+            (candidate.get("label") or "unlabeled")
+            .replace("-", "_")
+            .replace(" ", "_")
+            .lower()
+        )
+        label_to_candidates.setdefault(label, []).append(candidate)
+
+    conflicts = {
+        label: cands for label, cands in label_to_candidates.items() if len(cands) > 1
+    }
+    if conflicts:
+        print("ERROR: Multiple approved candidates share the same label.")
+        print("Resolve by rejecting all but one per label, then re-run promotion.\n")
+        for label, cands in conflicts.items():
+            ids = ", ".join(c.get("id", "?") for c in cands)
+            print(f"  label '{label}': {ids}")
+        return
+
+    promoted = []
+    for label_clean, cands in label_to_candidates.items():
+        candidate = cands[0]
         label = candidate.get("label") or "unlabeled"
-        label_clean = label.replace("-", "_").replace(" ", "_").lower()
         midi_filename = candidate.get("midi_file", "")
         source = candidates_dir / Path(midi_filename).name
 
         if not source.exists():
-            source = chords_dir / midi_filename
+            source = part_dir / midi_filename
         if not source.exists():
             print(f"  WARNING: MIDI file not found: {source}")
             continue
 
-        # Number duplicates: verse.mid, verse_2.mid, verse_3.mid
-        count = label_counts.get(label_clean, 0) + 1
-        label_counts[label_clean] = count
-
-        if count == 1:
-            dest_name = f"{label_clean}.mid"
-        else:
-            dest_name = f"{label_clean}_{count}.mid"
-
+        dest_name = f"{label_clean}.mid"
         dest = approved_dir / dest_name
         shutil.copy2(source, dest)
         promoted.append(
@@ -94,11 +106,11 @@ def promote_chords(review_path: str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Promote approved chord candidates from review.yml"
+        description="Promote approved part candidates from review.yml"
     )
     parser.add_argument("--review", required=True, help="Path to review.yml")
     args = parser.parse_args()
-    promote_chords(args.review)
+    promote_part(args.review)
 
 
 if __name__ == "__main__":

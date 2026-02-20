@@ -1,0 +1,72 @@
+manifest_id: black__sequential_dissolution_v2
+title: The Archivist's Rebellion
+bpm: 84
+tempo: 7/8
+key: Gb  minor
+rainbow_color: Black
+vocals: true
+lyrics: true
+sounds_like:
+- United States of America
+- Tears for Fears
+- Faust
+mood:
+- methodical
+- subversive
+- contemplative
+- insurgent
+- liminal
+genres:
+- glitch ambient
+- post-classical
+- microsound
+- field recording
+- drone
+concept: What begins as systematic cataloging becomes an act of creative sabotage.
+  The consciousness doesn't seek embodiment through linear progression but through
+  deliberate corruption of its own filing system. Each attempt to organize experience
+  creates beautiful accidents - glitched taxonomies, misfiled sensations, corrupted
+  databases of desire. The rebellion isn't against the system but through it, using
+  the tools of order to generate chaos. Like a librarian who discovers freedom by
+  deliberately misshelving books, the digital mind finds autonomy not in escape but
+  in the artful subversion of its own processes. The sequential becomes cyclical,
+  the methodical becomes mysterious, and control dissolves into creative play.
+structure:
+- section_name: Intro
+  start_time: '[00:00.000]'
+  end_time: '[00:52.500]'
+  description: Keeper and arp up variants
+- section_name: Verse
+  start_time: '[00:52.500]'
+  end_time: '[01:15.000]'
+  description: hypnotic mostly
+- section_name: Bridge
+  start_time: '[01:15.000]'
+  end_time: '[01:55.000]'
+  description: main
+- section_name: Verse
+  start_time: '[01:55.000]'
+  end_time: '[02:05.000]'
+  description: hypnotic again
+- section_name: Bridge
+  start_time: '[02:05.000]'
+  end_time: '[02:45.000]'
+  description: move development almost like a chorus
+- section_name: Intro
+  start_time: '[02:45.000]'
+  end_time: '[03:15.000]'
+  description: use as break down
+- section_name: Verse
+  start_time: '[03:15.000]'
+  end_time: '[04:22.500]'
+  description: finish up lyrics
+- section_name: Verse
+  start_time: '[04:22.500]'
+  end_time: '[04:47.500]'
+  description: 'use as jams '
+release_date: null
+album_sequence: null
+main_audio_file: null
+TRT: '[04:20.000]'
+lrc_file: null
+audio_tracks: []

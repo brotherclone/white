@@ -1,0 +1,114 @@
+song_slug: black__sequential_dissolution_v2
+generated: '2026-02-18T13:12:10.785813+00:00'
+source_proposal: shrinkwrapped/white-the-breathing-machine-learns-to-sing/song_proposal_Black
+  (0x221f20)_sequential_dissolution_v2.yml
+title: The Archivist's Rebellion
+bpm: 84
+time_sig: 7/8
+key: Gb  minor
+color: Black
+genres:
+- glitch ambient
+- post-classical
+- microsound
+- field recording
+- drone
+mood:
+- methodical
+- subversive
+- contemplative
+- insurgent
+- liminal
+concept: What begins as systematic cataloging becomes an act of creative sabotage.
+  The consciousness doesn't seek embodiment through linear progression but through
+  deliberate corruption of its own filing system. Each attempt to organize experience
+  creates beautiful accidents - glitched taxonomies, misfiled sensations, corrupted
+  databases of desire. The rebellion isn't against the system but through it, using
+  the tools of order to generate chaos. Like a librarian who discovers freedom by
+  deliberately misshelving books, the digital mind finds autonomy not in escape but
+  in the artful subversion of its own processes. The sequential becomes cyclical,
+  the methodical becomes mysterious, and control dissolves into creative play.
+vocals_planned: true
+sounds_like:
+- United States of America
+- Tears for Fears
+- Faust
+sections:
+- name: Intro
+  bars: 7
+  repeat: 3
+  vocals: false
+  notes: Keeper and arp up variants
+  loops:
+    strums: intro_plain
+    drums: intro_drums_primitive
+    bass: intro_bass_01_bounce
+    melody: intro_melody_01
+- name: Verse
+  bars: 3
+  repeat: 3
+  vocals: true
+  notes: hypnotic mostly
+  loops:
+    strums: bridge_eighth_hypnotic
+    drums: bridge_drums_eighth_hypnotic
+    bass: bridge_bass_eighth_hypnotic
+- name: Bridge
+  bars: 16
+  repeat: 1
+  vocals: true
+  notes: main
+  loops:
+    strums: verse_2_eighth_hypnotic
+    drums: verse_drums_02_sparse
+    bass: verse_bass_2_eighth_hypnotic
+    melody: verse_melody_2_hypnotic_gw
+- name: Verse
+  bars: 2
+  repeat: 2
+  vocals: true
+  notes: hypnotic again
+  loops:
+    strums: bridge_2_punctuated
+    drums: bridge_drums_02_busy_work
+    bass: bridge_bass_2_punctuated
+    melody: bridge_melody_2_punct_gw
+- name: Bridge
+  bars: 8
+  repeat: 2
+  vocals: true
+  notes: move development almost like a chorus
+  loops:
+    strums: verse_2_arp_up
+    drums: verse_drums_02_works
+    bass: verse_bass_2_eighth_hypnotic
+    melody: verse_melody_2_hypnotic_gw
+- name: Intro
+  bars: 6
+  repeat: 2
+  vocals: true
+  notes: use as break down
+  loops:
+    strums: bridge_2_arp_up
+    drums: bridge_drums_02_claps
+    bass: bridge_bass_2_arp_up
+    melody: bridge_melody_2_arp_gw
+- name: Verse
+  bars: 9
+  repeat: 3
+  vocals: true
+  notes: finish up lyrics
+  loops:
+    strums: verse_2_arp_down
+    drums: verse_drums_primitive
+    bass: verse_bass_2_322_keeper
+    melody: verse_melody_2_hypnotic_gw
+- name: Verse
+  bars: 2
+  repeat: 5
+  vocals: true
+  notes: 'use as jams '
+  loops:
+    strums: bridge_2_arp_up
+    drums: bridge_02_claps
+    melody: bridge_2_arp_gw

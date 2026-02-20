@@ -54,3 +54,6 @@ chain_artifacts/**/debug/*.json
 **/transformation_traces.md
 *.logicx
 *.logicx/
+*.acep
+**/autosave/
+**/VocalSynth/
