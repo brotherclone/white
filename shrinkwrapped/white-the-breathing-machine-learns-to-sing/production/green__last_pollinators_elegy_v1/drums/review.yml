@@ -191,8 +191,8 @@ candidates:
         known: 0.3595
       confidence: 0.136
       match: 0.168
-  label: null
-  status: pending
+  label: drums_royal_degradation
+  status: approved
   notes: ''
 - id: drum_honey_01
   midi_file: candidates/drum_honey_01.mid

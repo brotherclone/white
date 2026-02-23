@@ -1,0 +1,101 @@
+song_slug: green__last_pollinators_elegy_v1
+color: Green
+title: The Silence Where Abundance Used to Hum
+evaluated: '2026-02-23T14:16:12.123793+00:00'
+phases_complete: 4
+phases:
+  chords:
+    complete: true
+    sections_found: 7
+    sections_approved: 7
+    coverage: 1.0
+    mean_theory: 0.8968
+    mean_chromatic_match: 0.1685
+    mean_chromatic_confidence: 0.1413
+    chromatic_consistency: 1.0
+    approved_labels:
+    - toppling
+    - worker
+    - queen
+    - pasture
+    - ministers_daughter
+    - royal_degradation
+    - honey
+  drums:
+    complete: true
+    sections_found: 7
+    sections_approved: 7
+    coverage: 1.0
+    mean_theory: 1.0
+    mean_chromatic_match: 0.168
+    mean_chromatic_confidence: 0.136
+    chromatic_consistency: 1.0
+    approved_labels:
+    - drums_toppling
+    - drums_worker
+    - drums_queen
+    - drums_pasture
+    - drums_ministers_daughter
+    - drums_royal_degradation
+    - drums_honey
+  bass:
+    complete: true
+    sections_found: 7
+    sections_approved: 7
+    coverage: 1.0
+    mean_theory: 0.812
+    mean_chromatic_match: 0.1682
+    mean_chromatic_confidence: 0.1375
+    chromatic_consistency: 0.9999
+    approved_labels:
+    - bass_toppling
+    - bass_worker_alt
+    - bass_worker
+    - bass_queen
+    - bass_queen_alt
+    - bass_pasture
+    - bass_ministers_daughter_alt
+    - bass_ministers_daughter
+    - bass_royal_degradation
+    - bass_royal_degradation_alt
+    - bass_honey_alt
+    - bass_honey
+  melody:
+    complete: true
+    sections_found: 7
+    sections_approved: 7
+    coverage: 1.0
+    mean_theory: 0.8011
+    mean_chromatic_match: 0.1681
+    mean_chromatic_confidence: 0.1375
+    chromatic_consistency: 0.9999
+    approved_labels:
+    - melody_toppling
+    - melody_worker
+    - melody_queen
+    - melody_queen_alt
+    - melody_pasture_alt
+    - melody_pasture
+    - melody_ministers_daughter
+    - melody_royal_degradation
+    - melody_honey
+total_bars: 107
+unique_sections: 7
+section_variety: 0.6364
+vocal_coverage: 0.5421
+has_lyrics: true
+lyric_syllable_density: 1.069
+max_drift_seconds: 45.0
+name_mismatches: 9
+structural_integrity: 0.05
+chromatic_alignment: 0.1682
+theory_quality: 0.8775
+production_completeness: 1.0
+lyric_maturity: 1.0
+composite_score: 0.5417
+airgigs_readiness: draft
+flags:
+- timing drift 45.0s
+- arrangement mismatch (9 sections)
+- low chromatic confidence
+- high theory quality

@@ -571,7 +571,11 @@ def run_bass_pipeline(
 
         templates = select_templates(ALL_TEMPLATES, time_sig, target_energy)
         if not templates:
-            print(f"  No templates for {time_sig} — using fallback")
+            print(
+                f"\n  ⚠️  WARNING: No bass templates exist for {time_sig[0]}/{time_sig[1]} time. "
+                f"Add templates to bass_patterns.py for this time signature. "
+                f"Falling back to root-on-1 only — results will be musically flat.\n"
+            )
             templates = [make_fallback_pattern(time_sig)]
 
         print(

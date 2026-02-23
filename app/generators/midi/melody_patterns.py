@@ -615,6 +615,130 @@ TEMPLATES_4_4_SCALAR = [
 ]
 
 # ---------------------------------------------------------------------------
+# 3/4 Templates (Waltz)
+# ---------------------------------------------------------------------------
+# 3/4 = 3 quarter-note beats. Beat 1 is the strong downbeat; 2 and 3 are light.
+# All onset positions in quarter-note units: 0.0, 1.0, 2.0 (+ 0.5, 1.5, 2.5 for eighths).
+
+TEMPLATES_3_4 = [
+    # --- Stepwise ---
+    MelodyPattern(
+        name="waltz_stepwise_sigh",
+        contour="stepwise",
+        energy="low",
+        time_sig=(3, 4),
+        description="Held note on 1, gentle step down on 2, rest — elegiac sigh",
+        intervals=[0, -2, -1],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[1.0, 1.0, 1.0],
+    ),
+    MelodyPattern(
+        name="waltz_stepwise_rise",
+        contour="stepwise",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Step up across all three beats — questioning phrase",
+        intervals=[0, 2, 1],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[1.0, 1.0, 1.0],
+    ),
+    MelodyPattern(
+        name="waltz_stepwise_wave",
+        contour="stepwise",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Wave motion with eighths — up on beats 1–2, back on 3",
+        intervals=[0, 2, -1, 2, -2],
+        rhythm=[0.0, 0.5, 1.0, 1.5, 2.0],
+        durations=[0.5, 0.5, 0.5, 0.5, 1.0],
+    ),
+    # --- Arpeggiated ---
+    MelodyPattern(
+        name="waltz_arp_gentle",
+        contour="arpeggiated",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Gentle triad arpeggio ascending on quarter notes",
+        intervals=[0, 4, 3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[1.0, 1.0, 1.0],
+    ),
+    MelodyPattern(
+        name="waltz_arp_fall",
+        contour="arpeggiated",
+        energy="low",
+        time_sig=(3, 4),
+        description="Falling arpeggio — high note drifting down through chord",
+        intervals=[0, -3, -4],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[1.0, 1.0, 1.0],
+    ),
+    MelodyPattern(
+        name="waltz_arp_flourish",
+        contour="arpeggiated",
+        energy="high",
+        time_sig=(3, 4),
+        description="Eighth-note arpeggio flourish across the bar",
+        intervals=[0, 4, 3, -3, -4, 5],
+        rhythm=[0.0, 0.5, 1.0, 1.5, 2.0, 2.5],
+        durations=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+    ),
+    # --- Repeated (memorial / toll) ---
+    MelodyPattern(
+        name="waltz_toll",
+        contour="repeated",
+        energy="low",
+        time_sig=(3, 4),
+        description="Single toll on beat 1, silence — sparse memorial note",
+        intervals=[0],
+        rhythm=[0.0],
+        durations=[1.5],
+    ),
+    MelodyPattern(
+        name="waltz_repeated_neighbor",
+        contour="repeated",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Repeated note with neighbor-tone decoration on beat 3",
+        intervals=[0, 0, 1, -1],
+        rhythm=[0.0, 1.0, 2.0, 2.5],
+        durations=[1.0, 1.0, 0.5, 0.5],
+    ),
+    # --- Leap-step ---
+    MelodyPattern(
+        name="waltz_leap_step",
+        contour="leap_step",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Leap up on beat 1, stepwise descent on 2–3",
+        intervals=[0, 5, -2, -2],
+        rhythm=[0.0, 0.5, 1.0, 2.0],
+        durations=[0.5, 0.5, 1.0, 1.0],
+    ),
+    # --- Pentatonic ---
+    MelodyPattern(
+        name="waltz_penta_minor",
+        contour="pentatonic",
+        energy="low",
+        time_sig=(3, 4),
+        description="Minor pentatonic fragment — mournful, sparse",
+        intervals=[0, 3, 2, -2],
+        rhythm=[0.0, 1.0, 1.5, 2.0],
+        durations=[1.0, 0.5, 0.5, 1.0],
+    ),
+    MelodyPattern(
+        name="waltz_penta_wave",
+        contour="pentatonic",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Major pentatonic wave across three beats",
+        intervals=[0, 2, 3, -2, -3],
+        rhythm=[0.0, 0.5, 1.0, 1.5, 2.0],
+        durations=[0.5, 0.5, 0.5, 0.5, 1.0],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # 7/8 Templates
 # ---------------------------------------------------------------------------
 # 7/8 = 3.5 quarter-note beats.
@@ -694,6 +818,8 @@ ALL_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_LEAP_STEP,
     *TEMPLATES_4_4_PENTATONIC,
     *TEMPLATES_4_4_SCALAR,
+    # 3/4 (waltz)
+    *TEMPLATES_3_4,
     # 7/8
     *TEMPLATES_7_8,
 ]
