@@ -241,6 +241,8 @@ def root_adherence(
     num, den = time_sig
     if num == 4 and den == 4:
         strong_beats = {0.0, 2.0}
+    elif num == 3 and den == 4:
+        strong_beats = {0.0}  # waltz: beat 1 is the only strong beat
     elif num == 7 and den == 8:
         strong_beats = {0.0}
     else:
@@ -554,6 +556,171 @@ TEMPLATES_4_4_SYNCOPATED = [
 ]
 
 # ---------------------------------------------------------------------------
+# 3/4 Templates (Waltz)
+# ---------------------------------------------------------------------------
+# 3/4 = 3 quarter-note beats. Beat 1 is the strong downbeat (oom);
+# beats 2 and 3 are light (pah-pah). All positions in quarter-note units.
+
+TEMPLATES_3_4 = [
+    # --- Root ---
+    BassPattern(
+        name="waltz_root_whole",
+        style="root",
+        energy="low",
+        time_sig=(3, 4),
+        description="Root on beat 1, held for full bar — drone/elegy feel",
+        notes=[(0, "root", "normal")],
+        note_durations=[3.0],
+    ),
+    BassPattern(
+        name="waltz_root_downbeat",
+        style="root",
+        energy="low",
+        time_sig=(3, 4),
+        description="Root on 1 accent, ghost on 3 — sparse waltz",
+        notes=[(0, "root", "accent"), (2, "root", "ghost")],
+        note_durations=[2.0, 1.0],
+    ),
+    BassPattern(
+        name="waltz_oom_pah_pah",
+        style="root",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Root on 1 (oom), 5th on 2+3 (pah-pah) — classic waltz bass",
+        notes=[
+            (0, "root", "accent"),
+            (1, "5th", "normal"),
+            (2, "5th", "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    BassPattern(
+        name="waltz_oom_pah_pah_varied",
+        style="root",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Root on 1, 5th on 2, 3rd on 3 — waltz with colour on beat 3",
+        notes=[
+            (0, "root", "accent"),
+            (1, "5th", "normal"),
+            (2, "3rd", "ghost"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    # --- Pedal ---
+    BassPattern(
+        name="waltz_pedal_held",
+        style="pedal",
+        energy="low",
+        time_sig=(3, 4),
+        description="Root held entire bar — sustained drone",
+        notes=[(0, "root", "normal")],
+        note_durations=[3.0],
+    ),
+    BassPattern(
+        name="waltz_pedal_pulse",
+        style="pedal",
+        energy="high",
+        time_sig=(3, 4),
+        description="Root re-attacked on every beat",
+        notes=[
+            (0, "root", "accent"),
+            (1, "root", "normal"),
+            (2, "root", "normal"),
+        ],
+        note_durations=[0.9, 0.9, 0.9],
+    ),
+    # --- Arpeggiated ---
+    BassPattern(
+        name="waltz_arp_root_5th",
+        style="arpeggiated",
+        energy="low",
+        time_sig=(3, 4),
+        description="Root on 1, 5th on 2, rest on 3",
+        notes=[(0, "root", "accent"), (1, "5th", "ghost")],
+        note_durations=[1.0, 2.0],
+    ),
+    BassPattern(
+        name="waltz_arp_triad",
+        style="arpeggiated",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Root-3rd-5th ascending on beats 1-2-3",
+        notes=[
+            (0, "root", "accent"),
+            (1, "3rd", "normal"),
+            (2, "5th", "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    BassPattern(
+        name="waltz_arp_triad_down",
+        style="arpeggiated",
+        energy="medium",
+        time_sig=(3, 4),
+        description="5th on 1, 3rd on 2, root on 3 — descending phrase ending",
+        notes=[
+            (0, "5th", "normal"),
+            (1, "3rd", "normal"),
+            (2, "root", "accent"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    # --- Walking ---
+    BassPattern(
+        name="waltz_walking",
+        style="walking",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Root on 1, 3rd on 2, approach on 3",
+        notes=[
+            (0, "root", "accent"),
+            (1, "3rd", "normal"),
+            (2, "chromatic_approach", "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    BassPattern(
+        name="waltz_walking_5th",
+        style="walking",
+        energy="high",
+        time_sig=(3, 4),
+        description="Root-5th-approach with eighth passing tone on 1.5",
+        notes=[
+            (0, "root", "accent"),
+            (0.5, "passing_tone", "ghost"),
+            (1, "5th", "normal"),
+            (2, "chromatic_approach", "normal"),
+        ],
+        note_durations=[0.5, 0.5, 1.0, 1.0],
+    ),
+    # --- Octave ---
+    BassPattern(
+        name="waltz_octave_drop",
+        style="octave",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Octave on 1, root on 2+3 — gravity-fall feel",
+        notes=[
+            (0, "octave_up", "accent"),
+            (1, "root", "normal"),
+            (2, "root", "ghost"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    # --- Syncopated ---
+    BassPattern(
+        name="waltz_syncopated",
+        style="syncopated",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Root on 1, 5th on 2.5 — anticipates beat 3",
+        notes=[(0, "root", "accent"), (2.5, "5th", "normal")],
+        note_durations=[2.5, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # 7/8 Templates
 # ---------------------------------------------------------------------------
 # 7/8 = 3.5 quarter-note beats. Group positions: 0, 1.5, 2.5 (3+2+2 grouping)
@@ -634,6 +801,8 @@ ALL_TEMPLATES: list[BassPattern] = [
     *TEMPLATES_4_4_ARP,
     *TEMPLATES_4_4_PEDAL,
     *TEMPLATES_4_4_SYNCOPATED,
+    # 3/4 (waltz)
+    *TEMPLATES_3_4,
     # 7/8
     *TEMPLATES_7_8,
 ]

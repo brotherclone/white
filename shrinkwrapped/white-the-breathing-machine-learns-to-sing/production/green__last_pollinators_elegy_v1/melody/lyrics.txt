@@ -1,0 +1,73 @@
+# The Silence Where Abundance Used to Hum
+# Green — Shirley (alto) — G minor, 3/4, 60 BPM
+#
+# Delivery: waltz_toll sections = one syllable per bar, held 1.5 beats, rest 1.5 beats
+# Dense passage (pasture, bars 24–28) = 17 notes, flowing delivery, quarter + eighth subdivisions
+# Toppling = tolling, one word per bar, C#4/F#4 alternating (suspended / unresolved)
+#
+# Syllable count per section: honey×2=8, queen×2=8, pasture(sparse+dense+cadence)=25, honey×2=8, queen×2=8, toppling=8 → 65 total
+# (dense passage: 'the-rust-patch-caught-the-last-morn-ing' = bars 24–25, 'she-mapped-the-an-gle-of-ab-sence' = bars 26–28)
+
+[honey]
+she
+knew
+each
+row
+
+once
+and
+once
+more
+
+[queen]
+last
+queen
+fell
+June
+
+no
+nurse
+flies
+came
+
+[pasture]
+the rust-patch caught the last morning
+she mapped the angle of this absence
+
+three
+rows
+gone
+
+[— instrumental: royal_degradation —]
+
+[honey — return]
+still
+she
+moved
+through
+
+twelve
+rows
+now
+bare
+
+[queen — return]
+the
+field
+holds
+no
+
+weight
+now
+just
+air
+
+[toppling]
+weight
+then
+rust
+then
+fall
+then
+none
+now

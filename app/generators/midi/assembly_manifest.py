@@ -16,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -40,6 +41,10 @@ SECTION_PREFIXES = {
     "outro": "Outro",
     "chorus": "Chorus",
 }
+
+# Instrument prefixes stripped when matching loop names against known section names
+_INSTRUMENT_PREFIXES = ("melody_", "bass_", "drums_", "chords_")
+_TRAILING_SUFFIX_RE = re.compile(r"(_alt|_\d+)+$")
 
 DEFAULT_TRACK_MAP: dict[int, str] = {
     1: "chords",
@@ -168,12 +173,20 @@ def parse_arrangement(text: str) -> list[Clip]:
         if base_offset is None:
             base_offset = start_secs
 
+        # Detect format: Logic exports two variants —
+        #   duration format: "00:00:10:00.00" → length_secs = 10.0 (< start_secs)
+        #   end-position format: "01:00:12:00.00" → length_secs >= start_secs, subtract to get duration
+        if length_secs >= start_secs:
+            clip_length = round(length_secs - start_secs, 3)
+        else:
+            clip_length = round(length_secs, 3)
+
         clips.append(
             Clip(
                 start=round(start_secs - base_offset, 3),
                 name=name,
                 track=track,
-                length=round(length_secs, 3),
+                length=clip_length,
             )
         )
 
@@ -185,9 +198,34 @@ def parse_arrangement(text: str) -> list[Clip]:
 # ---------------------------------------------------------------------------
 
 
-def _section_name_from_loop(loop_name: str) -> str:
-    """Derive canonical section name from a loop name prefix."""
-    lower = loop_name.lower()
+def _section_name_from_loop(
+    loop_name: str,
+    known_sections: Optional[frozenset] = None,
+) -> str:
+    """Derive canonical section name from a loop name.
+
+    When *known_sections* is provided (a frozenset of lowercase plan section
+    names) the function first tries a direct or prefix-stripped match against
+    those names before falling back to SECTION_PREFIXES.
+    """
+    lower = loop_name.strip().lower()
+
+    if known_sections:
+        # Direct match
+        if lower in known_sections:
+            return lower
+        # Strip one instrument prefix, then try direct + suffix-stripped match
+        for prefix in _INSTRUMENT_PREFIXES:
+            if lower.startswith(prefix):
+                stripped = lower[len(prefix) :]
+                if stripped in known_sections:
+                    return stripped
+                base = _TRAILING_SUFFIX_RE.sub("", stripped)
+                if base in known_sections:
+                    return base
+                break  # only strip the first matching instrument prefix
+
+    # Fall back to SECTION_PREFIXES (Intro/Verse/Bridge/etc.)
     for prefix, canonical in SECTION_PREFIXES.items():
         if (
             lower.startswith(prefix + "_")
@@ -203,16 +241,26 @@ def derive_sections(
     track_map: Optional[dict[int, str]] = None,
     vocalist_suffix: str = "_gw",
     folder_lookup: Optional[dict[str, str]] = None,
+    known_sections: Optional[frozenset] = None,
 ) -> list[ArrangementSection]:
-    """Group clips into named sections based on loop prefix changes.
+    """Group clips into named sections based on loop name changes.
 
-    A new section begins whenever the dominant loop prefix changes between
+    A new section begins whenever the dominant loop name changes between
     consecutive time slots (all clips sharing the same start time).
+
+    When *known_sections* is provided (a frozenset of lowercase plan section
+    names), section changes are only triggered by clips on designated chords
+    tracks.  This avoids spurious section boundaries caused by bass or drum
+    loops that overlap neighbouring sections.
 
     Args:
         clips: Output of parse_arrangement().
         track_map: Maps track number → instrument name.
         vocalist_suffix: Loop name suffix that marks a sung melody track.
+        folder_lookup: {loop_stem: instrument} from approved sub-folders.
+        known_sections: Frozenset of lowercase plan section names.  When
+            supplied, loop names are matched against these before falling back
+            to the built-in SECTION_PREFIXES.
 
     Returns:
         Ordered list of ArrangementSection objects.
@@ -223,25 +271,67 @@ def derive_sections(
     if track_map is None:
         track_map = DEFAULT_TRACK_MAP
 
+    # Identify which tracks carry chords (primary section-change triggers)
+    chords_track_nums: frozenset[int] = frozenset(
+        t for t, instr in track_map.items() if instr == "chords"
+    )
+
     # Group clips by start time → time slots
     slots: dict[float, list[Clip]] = {}
     for clip in clips:
         slots.setdefault(clip.start, []).append(clip)
     sorted_starts = sorted(slots.keys())
 
-    def _slot_name(slot_clips: list[Clip]) -> str:
-        # Prefer lower track numbers with a recognisable prefix
+    def _slot_name(slot_clips: list[Clip]) -> Optional[str]:
+        """Return the section name for this slot, or None to inherit.
+
+        When *known_sections* is set and chords tracks are defined in
+        track_map, only a clip on a chords track can trigger a new section.
+        If no qualifying chords clip is present, returns None so the caller
+        inherits the current section (avoiding false boundaries from
+        secondary-instrument loops that extend across section edges).
+        """
+        if known_sections and chords_track_nums:
+            for track_num in sorted(chords_track_nums):
+                for c in slot_clips:
+                    if c.track == track_num:
+                        n = _section_name_from_loop(c.name, known_sections)
+                        if n != "unknown":
+                            return n
+            # No chords clip with a recognisable name → inherit
+            return None
+
+        # Original fallback: try tracks in ascending order, then any track
         for track_num in sorted(track_map.keys()):
             for c in slot_clips:
                 if c.track == track_num:
-                    n = _section_name_from_loop(c.name)
+                    n = _section_name_from_loop(c.name, known_sections)
                     if n != "unknown":
                         return n
         for c in sorted(slot_clips, key=lambda x: x.track):
-            n = _section_name_from_loop(c.name)
+            n = _section_name_from_loop(c.name, known_sections)
             if n != "unknown":
                 return n
         return "unknown"
+
+    def _accumulate(slot_clips: list[Clip]) -> None:
+        nonlocal current_vocals
+        for clip in slot_clips:
+            if folder_lookup and clip.name in folder_lookup:
+                instrument = folder_lookup[clip.name]
+            else:
+                instrument = track_map.get(clip.track, f"track_{clip.track}")
+            # First occurrence wins: the opening clip for each instrument in a
+            # section defines the canonical loop.  This prevents overlapping
+            # secondary tracks (e.g. a honey bass loop extending into toppling)
+            # from overwriting the section's true instrument assignment.
+            if instrument not in current_loops:
+                current_loops[instrument] = clip.name
+            if instrument == "melody":
+                if (vocalist_suffix and clip.name.endswith(vocalist_suffix)) or (
+                    "vocal" in clip.name.lower()
+                ):
+                    current_vocals = True
 
     sections: list[ArrangementSection] = []
     current_name: Optional[str] = None
@@ -250,9 +340,14 @@ def derive_sections(
     current_vocals: bool = False
     warned_unknown: set[str] = set()
 
-    for i, slot_start in enumerate(sorted_starts):
+    for slot_start in sorted_starts:
         slot_clips = slots[slot_start]
         slot_name = _slot_name(slot_clips)
+
+        # None → inherit current section; just accumulate loops
+        if slot_name is None:
+            _accumulate(slot_clips)
+            continue
 
         if slot_name == "unknown":
             for c in slot_clips:
@@ -280,23 +375,12 @@ def derive_sections(
             current_loops = {}
             current_vocals = False
 
-        # Accumulate loops and vocals flag
-        for clip in slot_clips:
-            # Folder lookup takes priority over track number
-            if folder_lookup and clip.name in folder_lookup:
-                instrument = folder_lookup[clip.name]
-            else:
-                instrument = track_map.get(clip.track, f"track_{clip.track}")
-            current_loops[instrument] = clip.name  # last occurrence wins
-            if instrument == "melody":
-                if (vocalist_suffix and clip.name.endswith(vocalist_suffix)) or (
-                    "vocal" in clip.name.lower()
-                ):
-                    current_vocals = True
+        _accumulate(slot_clips)
 
     # Flush final section
     if current_name is not None:
         last_clips = slots[sorted_starts[-1]]
+        # clip.length is always a duration; add to the last slot's start
         end_time = sorted_starts[-1] + max(c.length for c in last_clips)
         sections.append(
             ArrangementSection(
@@ -369,19 +453,40 @@ def _seconds_per_bar(plan) -> float:
 
 
 def _update_plan(plan, actual_sections: list[ArrangementSection]) -> None:
-    """Mutate plan sections with actual bar counts, loops, and vocals."""
+    """Mutate plan sections with actual bar counts, loops, and vocals.
+
+    Matches detected arrangement sections to plan sections by name (first
+    unmatched wins).  Loop assignments are then propagated to any remaining
+    plan sections that share the same name but had no direct arrangement match
+    (e.g. repeated sections that the user arranged only once in the loop grid).
+    """
     spb = _seconds_per_bar(plan)
-    for i, actual in enumerate(actual_sections):
-        if i >= len(plan.sections):
+    plan_matched = [False] * len(plan.sections)
+    # section_name → loops dict from the first matched arrangement section
+    name_to_loops: dict[str, dict] = {}
+
+    for actual in actual_sections:
+        for i, sec in enumerate(plan.sections):
+            if plan_matched[i]:
+                continue
+            if sec.name != actual.name:
+                continue
+            plan_matched[i] = True
+            duration = actual.end - actual.start
+            total_bars = max(1, round(duration / spb))
+            sec.bars = max(1, round(total_bars / max(sec.repeat, 1)))
+            sec.loops = dict(actual.loops)
+            if not sec.vocals:
+                sec.vocals = actual.vocals
+            # Record loops for propagation to other sections with same name
+            if actual.name not in name_to_loops:
+                name_to_loops[actual.name] = dict(actual.loops)
             break
-        sec = plan.sections[i]
-        duration = actual.end - actual.start
-        total_bars = max(1, round(duration / spb))
-        sec.bars = max(1, round(total_bars / max(sec.repeat, 1)))
-        sec.loops = dict(actual.loops)
-        # Preserve an explicit human vocals=True; only set True from arrangement
-        if not sec.vocals:
-            sec.vocals = actual.vocals
+
+    # Propagate loop assignments to unmatched plan sections with the same name
+    for i, sec in enumerate(plan.sections):
+        if not plan_matched[i] and sec.name in name_to_loops:
+            sec.loops = dict(name_to_loops[sec.name])
 
     plan.vocals_planned = any(s.vocals for s in plan.sections)
 
@@ -480,8 +585,15 @@ def import_arrangement(
     text = arrangement_path.read_text()
     clips = parse_arrangement(text)
     folder_lookup = build_folder_lookup(production_dir)
+    known_sections: Optional[frozenset] = frozenset(
+        s.name.lower() for s in plan.sections
+    )
     actual_sections = derive_sections(
-        clips, track_map or DEFAULT_TRACK_MAP, vocalist_suffix, folder_lookup
+        clips,
+        track_map or DEFAULT_TRACK_MAP,
+        vocalist_suffix,
+        folder_lookup,
+        known_sections,
     )
 
     drift = compute_drift(plan, actual_sections)
