@@ -324,6 +324,17 @@ def generate_plan(
     if not unique_sections:
         raise ValueError("No approved chord sections found in chords/review.yml")
 
+    # Section names that conventionally carry lead vocals
+    _VOCAL_SECTIONS = {
+        "verse",
+        "chorus",
+        "hook",
+        "pre_chorus",
+        "post_chorus",
+        "refrain",
+        "bridge",
+    }
+
     sections = []
     for s in unique_sections:
         bars, source = derive_bar_count(
@@ -334,7 +345,11 @@ def generate_plan(
             s["chord_count"],
             hr_distribution=s.get("hr_distribution"),
         )
-        sec = PlanSection(name=s["label"], bars=bars)
+        label_key = s["label"].lower().replace("-", "_").replace(" ", "_")
+        vocals = any(
+            label_key == v or label_key.startswith(v + "_") for v in _VOCAL_SECTIONS
+        )
+        sec = PlanSection(name=s["label"], bars=bars, vocals=vocals)
         sec._bar_source = source
         sections.append(sec)
 

@@ -49,7 +49,6 @@ from app.generators.midi.chord_pipeline import (
     load_song_proposal,
 )
 from app.generators.midi.strum_patterns import (
-    parse_chord_voicings,
     read_approved_harmonic_rhythm,
 )
 
@@ -82,29 +81,17 @@ def read_approved_sections(chord_review: dict) -> list[dict]:
 def extract_section_chord_data(
     production_dir: Path,
 ) -> tuple[dict[str, list[list[int]]], dict]:
-    """Read approved chord voicings and review metadata."""
-    chord_review_path = production_dir / "chords" / "review.yml"
-    if not chord_review_path.exists():
-        raise FileNotFoundError(f"Chord review not found: {chord_review_path}")
+    """Read approved chord voicings and review metadata.
 
-    with open(chord_review_path) as f:
-        chord_review = yaml.safe_load(f)
+    Voicings are read directly from the chord review.yml ``chords`` field so
+    the count always matches ``hr_distribution`` — regardless of how many strum
+    events were baked into the MIDI file.
+    """
+    from app.generators.midi.bass_pipeline import (
+        extract_section_chord_data as _bass_extract,
+    )
 
-    approved_dir = production_dir / "chords" / "approved"
-    if not approved_dir.exists():
-        raise FileNotFoundError(f"No approved chords: {approved_dir}")
-
-    midi_files = sorted(approved_dir.glob("*.mid"))
-    if not midi_files:
-        raise FileNotFoundError("No approved chord MIDI files found")
-
-    chord_data: dict[str, list[list[int]]] = {}
-    for midi_file in midi_files:
-        label = midi_file.stem
-        voicings = parse_chord_voicings(midi_file)
-        chord_data[label] = [v["notes"] for v in voicings]
-
-    return chord_data, chord_review
+    return _bass_extract(production_dir)
 
 
 # ---------------------------------------------------------------------------

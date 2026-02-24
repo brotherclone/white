@@ -33,6 +33,7 @@ from app.generators.midi.strum_patterns import (
     get_patterns_for_time_sig,
     strum_to_midi_bytes,
 )
+from app.structures.music.core.enharmonic import normalize_to_flat
 
 
 def _to_python(obj):
@@ -131,7 +132,8 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
     """Parse key string like 'F# minor' into (root, mode).
 
     Returns (key_root, mode) where mode is 'Major' or 'Minor' to match
-    the chord prototype's convention.
+    the chord prototype's convention.  Enharmonic roots are normalised to
+    the spelling used in the chord database (e.g. A# → Bb, D# → Eb).
     """
     key_str = key_str.strip()
     # Handle unicode symbols
@@ -143,6 +145,9 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
 
     root = parts[0]
     mode_str = " ".join(parts[1:]).lower()
+
+    # Normalise enharmonic root to flat spelling used by the chord database
+    root = normalize_to_flat(root)
 
     if "minor" in mode_str or "min" in mode_str:
         mode = "Minor"
