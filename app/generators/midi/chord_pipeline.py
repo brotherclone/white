@@ -26,6 +26,7 @@ import numpy as np
 import yaml
 
 from app.generators.midi.prototype.generator import ChordProgressionGenerator
+from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 from app.generators.midi.harmonic_rhythm import enumerate_distributions
 from app.generators.midi.strum_patterns import (
     StrumPattern,
@@ -648,7 +649,9 @@ def run_chord_pipeline(
         )
 
         write_midi_file(primitive_bytes, candidates_dir / f"{item['id']}.mid")
+        _trim_midi(candidates_dir / f"{item['id']}.mid")
         write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
+        _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
 
         item["hr_distribution"] = hr_dist
         item["strum_pattern"] = strum_pat.name
