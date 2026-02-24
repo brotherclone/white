@@ -420,16 +420,38 @@ def _computed_section_start(plan, section_index: int) -> float:
 
 
 def compute_drift(plan, actual_sections: list[ArrangementSection]) -> list[DriftEntry]:
-    """Compare plan-computed section starts against actual arrangement times."""
+    """Compare plan-computed section starts against actual arrangement times.
+
+    Matches each actual section to the first unmatched plan section with the
+    same name, then reports timing delta against that section's computed start.
+    Positional matching was incorrect when the arrangement has fewer entries
+    than the plan (e.g. user arranged fewer repetitions than planned).
+    """
     entries: list[DriftEntry] = []
-    for i, actual in enumerate(actual_sections):
-        computed = _computed_section_start(plan, i)
-        plan_sec = plan.sections[i] if i < len(plan.sections) else None
-        plan_name = plan_sec.name if plan_sec else f"section_{i}"
+    plan_matched = [False] * len(plan.sections)
+
+    for actual in actual_sections:
+        # Find first unmatched plan section with matching name
+        matched_idx: Optional[int] = None
+        for i, sec in enumerate(plan.sections):
+            if not plan_matched[i] and sec.name == actual.name:
+                matched_idx = i
+                break
+
+        if matched_idx is not None:
+            plan_matched[matched_idx] = True
+            computed = _computed_section_start(plan, matched_idx)
+            plan_sec = plan.sections[matched_idx]
+        else:
+            # Section in arrangement has no matching plan entry — no drift to report
+            computed = actual.start
+            plan_sec = None
+
+        plan_name = plan_sec.name if plan_sec else actual.name
         vocals_changed = plan_sec is not None and plan_sec.vocals != actual.vocals
         entries.append(
             DriftEntry(
-                section_index=i,
+                section_index=len(entries),
                 plan_name=plan_name,
                 arrangement_name=actual.name,
                 computed_start=round(computed, 3),

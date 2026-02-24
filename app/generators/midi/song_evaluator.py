@@ -312,9 +312,13 @@ def _compute_structural_integrity(production_dir: Path) -> tuple:
     name_mismatches = sum(1 for s in sections if s.get("name_mismatch", False))
     total = len(sections)
 
-    drift_score = max(0.0, 1.0 - max_drift / 5.0)
+    # Section name match rate is the primary structural indicator.
+    # Timing drift reflects creative decisions (shorter arrangement than planned)
+    # and is informational only — penalise lightly with a 120s ceiling so a
+    # deliberately compact arrangement does not tank the score.
     mismatch_score = max(0.0, 1.0 - name_mismatches / total) if total > 0 else 1.0
-    structural_integrity = drift_score * 0.5 + mismatch_score * 0.5
+    drift_score = max(0.0, 1.0 - max_drift / 120.0)
+    structural_integrity = mismatch_score * 0.8 + drift_score * 0.2
 
     return structural_integrity, max_drift, name_mismatches
 

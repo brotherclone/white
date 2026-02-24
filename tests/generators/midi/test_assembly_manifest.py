@@ -287,13 +287,33 @@ class TestComputeDrift:
         assert drift[1].drift_seconds == -10.0
 
     def test_plan_name_vs_arrangement_name(self):
+        # When actual section has no matching plan entry (name-based matching),
+        # plan_name falls back to arrangement_name and drift_seconds is 0.
         plan = _make_plan([("Verse", 4, 3)])
         from app.generators.midi.assembly_manifest import ArrangementSection
 
         actual = [ArrangementSection(name="Bridge", start=0.0, end=30.0)]
         drift = compute_drift(plan, actual)
-        assert drift[0].plan_name == "Verse"
+        # No plan section named "Bridge" → plan_name == arrangement_name, no drift
+        assert drift[0].plan_name == "Bridge"
         assert drift[0].arrangement_name == "Bridge"
+        assert drift[0].drift_seconds == 0.0
+
+    def test_plan_name_matches_by_name_not_position(self):
+        # Plan: [honey, honey, queen]. Arrangement: [honey, queen].
+        # queen should match plan's queen (index 2), not honey (index 1).
+        plan = _make_plan([("honey", 5, 2), ("honey", 5, 2), ("queen", 5, 2)])
+        from app.generators.midi.assembly_manifest import ArrangementSection
+
+        actual = [
+            ArrangementSection(name="honey", start=0.0, end=30.0),
+            ArrangementSection(name="queen", start=30.0, end=60.0),
+        ]
+        drift = compute_drift(plan, actual)
+        assert drift[0].plan_name == "honey"
+        assert drift[0].arrangement_name == "honey"
+        assert drift[1].plan_name == "queen"
+        assert drift[1].arrangement_name == "queen"
 
     def test_vocals_flag_changed(self):
         plan = _make_plan([("Verse", 4, 2)])

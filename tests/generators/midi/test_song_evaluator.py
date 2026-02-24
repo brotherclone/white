@@ -484,12 +484,13 @@ def test_structural_integrity_no_drift_no_mismatch(tmp_path):
 
 
 def test_structural_integrity_large_drift(tmp_path):
-    # 5s drift → drift_score = 0
+    # 5s drift → drift_score = 1 - 5/120 ≈ 0.958; mismatch_score = 1.0
     sections = [{"drift_seconds": 5.0, "name_mismatch": False}]
     (tmp_path / "drift_report.yml").write_text(yaml.dump({"sections": sections}))
     integrity, max_drift, mismatches = _compute_structural_integrity(tmp_path)
     assert max_drift == 5.0
-    assert integrity == 0.0 * 0.5 + 1.0 * 0.5  # drift_score=0, mismatch_score=1 → 0.5
+    expected = 1.0 * 0.8 + (1.0 - 5.0 / 120.0) * 0.2
+    assert abs(integrity - expected) < 1e-6
 
 
 def test_structural_integrity_mismatch(tmp_path):
@@ -500,8 +501,9 @@ def test_structural_integrity_mismatch(tmp_path):
     (tmp_path / "drift_report.yml").write_text(yaml.dump({"sections": sections}))
     integrity, max_drift, mismatches = _compute_structural_integrity(tmp_path)
     assert mismatches == 1
-    # drift_score = 1.0, mismatch_score = 1 - 1/2 = 0.5
-    assert abs(integrity - (1.0 * 0.5 + 0.5 * 0.5)) < 1e-6
+    # mismatch_score = 1 - 1/2 = 0.5; drift_score = 1.0
+    expected = 0.5 * 0.8 + 1.0 * 0.2
+    assert abs(integrity - expected) < 1e-6
 
 
 # ---------------------------------------------------------------------------
