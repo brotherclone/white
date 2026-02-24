@@ -29,6 +29,7 @@ from typing import Optional
 import yaml
 
 from app.generators.midi.production_plan import load_plan
+from app.util.midi_cleanup import batch_trim as _midi_batch_trim
 
 EVALUATION_FILENAME = "song_evaluation.yml"
 COMPARISON_FILENAME = "comparison_report.yml"
@@ -397,6 +398,12 @@ def _collect_flags(report: "EvaluationReport") -> list:
 def evaluate(production_dir: Path) -> EvaluationReport:
     """Evaluate a song production directory and write song_evaluation.yml."""
     production_dir = Path(production_dir)
+
+    # Pre-flight: trim Logic-exported tempo track bloat from all approved MIDIs
+    for _phase in PHASES:
+        _approved = production_dir / _phase / "approved"
+        if _approved.exists():
+            _midi_batch_trim(_approved)
 
     plan = load_plan(production_dir)
     song_slug = production_dir.name
