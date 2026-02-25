@@ -1,0 +1,93 @@
+production_dir: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/yellow__pulsar_palace_temporal_symphony_v1
+pipeline: lyric-generation
+color: Yellow
+singer: Shirley
+generated: '2026-02-25T00:00:00+00:00'
+scoring_note: >
+  Chromatic scoring uses DeBERTa (lyric_text mode) + fusion model with null audio/MIDI.
+  All three candidates score nearly identically (~0.165 match, ~0.006 confidence).
+  This is expected: the model cannot discriminate between well-targeted lyric drafts at
+  this resolution. Chromatic scoring serves as a floor check only; selection is human.
+
+candidates:
+- id: lyrics_01
+  file: candidates/lyrics_01.txt
+  rank: 1
+  title: Temporal Needles
+  approach: third-person observational — two souls as instruments the Palace plays
+  scores:
+    chromatic:
+      match: 0.1647
+      confidence: 0.0066
+      temporal:
+        past: 0.3754
+        present: 0.3088
+        future: 0.3158
+      spatial:
+        thing: 0.3761
+        place: 0.3163
+        person: 0.3076
+      ontological:
+        imagined: 0.3403
+        forgotten: 0.3106
+        known: 0.3491
+  label: null
+  status: rejected
+  notes: ''
+
+- id: lyrics_02
+  file: candidates/lyrics_02.txt
+  rank: 2
+  title: Endless Questions
+  approach: first-person plural — both characters merged as one collapsed voice
+  scores:
+    chromatic:
+      match: 0.1648
+      confidence: 0.0062
+      temporal:
+        past: 0.3745
+        present: 0.3095
+        future: 0.3160
+      spatial:
+        thing: 0.3752
+        place: 0.3168
+        person: 0.3080
+      ontological:
+        imagined: 0.3395
+        forgotten: 0.3115
+        known: 0.3490
+  label: null
+  status: rejected
+  notes: ''
+
+- id: lyrics_03
+  file: candidates/lyrics_03.txt
+  rank: 3
+  title: Collapsed Light
+  approach: abstract/imagistic — hits chromatic target vocabulary directly
+  scores:
+    chromatic:
+      match: 0.1649
+      confidence: 0.0067
+      temporal:
+        past: 0.3734
+        present: 0.3103
+        future: 0.3163
+      spatial:
+        thing: 0.3741
+        place: 0.3168
+        person: 0.3091
+      ontological:
+        imagined: 0.3397
+        forgotten: 0.3118
+        known: 0.3486
+  label: pulsar_lyrics
+  status: accepted
+  notes: 'rewritten for melody density — all 6 passes paste-ready (ratio 1.00-1.07)'
+  fitting:
+    verse_1:   {syllables: 16, notes: 16, ratio: 1.00, verdict: paste-ready}
+    verse_2:   {syllables: 16, notes: 16, ratio: 1.00, verdict: paste-ready}
+    chorus_1:  {syllables: 35, notes: 35, ratio: 1.00, verdict: paste-ready}
+    verse_3:   {syllables: 16, notes: 15, ratio: 1.07, verdict: paste-ready}
+    verse_4:   {syllables: 17, notes: 16, ratio: 1.06, verdict: paste-ready}
+    chorus_2:  {syllables: 35, notes: 35, ratio: 1.00, verdict: paste-ready}

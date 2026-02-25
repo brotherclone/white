@@ -45,26 +45,92 @@ concept: 'The Palace exists as a living temporal instrument where displaced soul
   never resolve, and reality ripples intensify the pulsar''s chronological beacon
   synchronizing disparate time streams into a cosmic jukebox playing the music of
   collapsed possibilities across dimensional boundaries.'
-vocals_planned: false
-sounds_like: []
+vocals_planned: true
+sounds_like:
+- Bear in Heaven
+- Seefeel
 sections:
-- name: bridge
-  bars: 6
-  repeat: 1
-  vocals: false
-  notes: ''
-- name: chorus
-  bars: 7
-  repeat: 1
-  vocals: true
-  notes: ''
 - name: strobing_jams
   bars: 6
-  repeat: 1
+  repeat: 3
   vocals: false
-  notes: ''
+  notes: as intro sans strobes
+  loops:
+    drums: drums_strobing_jams_alt
+    bass: bass_strobing_jams_alt
 - name: verse
   bars: 4
-  repeat: 1
+  repeat: 3
   vocals: true
   notes: ''
+  loops:
+    chords: verse
+    drums: drums_verse
+    bass: bass_verse
+    melody: melody_verse
+- name: bridge
+  bars: 6
+  repeat: 2
+  vocals: false
+  notes: ''
+  loops:
+    chords: bridge
+    drums: drums_bridge
+    bass: bass_bridge
+- name: chorus
+  bars: 7
+  repeat: 2
+  vocals: true
+  notes: ''
+  loops:
+    chords: chorus
+    drums: drums_chorus
+    bass: bass_chorus
+    melody: melody_chorus_05
+- name: verse
+  bars: 4
+  repeat: 4
+  vocals: true
+  notes: more alts
+  loops:
+    chords: verse
+    drums: drums_verse
+    bass: bass_verse_alt
+    melody: melody_verse
+- name: bridge
+  bars: 6
+  repeat: 2
+  vocals: false
+  notes: breakdown
+  loops:
+    chords: bridge
+    drums: drums_bridge
+    bass: bass_bridge
+- name: chorus
+  bars: 7
+  repeat: 2
+  vocals: true
+  notes: ''
+  loops:
+    chords: chorus
+    drums: drums_chorus
+    bass: bass_chorus
+    melody: melody_chorus_05
+- name: bridge
+  bars: 6
+  repeat: 2
+  vocals: false
+  notes: ''
+  loops:
+    chords: bridge
+    bass: bass_bridge_alt
+    drums: drums_bridge_alt
+- name: strobing_jams
+  bars: 6
+  repeat: 5
+  vocals: false
+  notes: as outro
+  loops:
+    chords: strobing_jams
+    drums: drums_strobing_jams
+    bass: bass_strobing_jams

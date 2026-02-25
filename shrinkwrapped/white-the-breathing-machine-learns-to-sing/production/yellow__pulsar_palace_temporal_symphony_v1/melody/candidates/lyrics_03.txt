@@ -1,0 +1,42 @@
+# Candidate 03: "Collapsed Light" (rewritten for melody density)
+# Approach: abstract/imagistic — Present/Future/Place/Thing/Imagined/Known targets
+# Singer: Shirley, A# minor, 120 BPM
+#
+# Syllable targets: verse=12-17, chorus=26-37
+# [verse]      = melody_verse (monotone low)      bars 19-23, 57-61
+# [verse_alt]  = melody_verse_alt (arp up)        bars 27-31, 69-73
+# [chorus]     = melody_chorus (stepwise wave)    bars 43-50, 85-92
+
+[verse]
+Collapsed to light
+The place between two times
+A thing that knows
+
+[verse_alt]
+Red reads the past
+Green reads what's next
+The crossing is the only text
+
+[chorus]
+Collapsed to light
+From red and green to something bright
+The present is the place we find
+Where future folds through future's mind
+The pulsar plays
+
+[verse]
+The vestibule
+Two faces in the glass
+Suspended in the frame
+
+[verse_alt]
+One reads the past
+One reads what comes
+Two needles on the same groove line
+
+[chorus]
+Collapsed to light
+From red and green to something bright
+The present is the place we find
+Where future folds through future's mind
+The pulsar plays

@@ -113,6 +113,109 @@ class DriftEntry:
 # ---------------------------------------------------------------------------
 
 
+def _bars_beats_to_seconds(
+    bar: int,
+    beat: int,
+    subdiv: int,
+    tick: int,
+    bpm: float,
+    beats_per_bar: int,
+) -> float:
+    """Convert Logic Pro bar/beat/subdivision/tick position to seconds.
+
+    Logic displays positions as "Bar Beat Subdiv Tick" where:
+    - Bar and Beat are 1-indexed
+    - Subdiv is the 1/16-note position within the beat (1–4 in 4/4)
+    - Tick is the fine-grained position within the subdivision (1–240 typical)
+    """
+    total_beats = (bar - 1) * beats_per_bar + (beat - 1)
+    frac_beats = (subdiv - 1) / 4.0 + (tick - 1) / (4.0 * 240.0)
+    return (total_beats + frac_beats) * (60.0 / bpm)
+
+
+def _is_bar_beat_format(text: str) -> bool:
+    """Return True if text looks like Logic's bar/beat position format.
+
+    Timecode lines start with a token containing colons (``01:00:00:00.00``).
+    Bar/beat lines start with a bare integer (``1``, ``13``, …).
+    Returns True only when the first recognisable line begins with a pure integer.
+    """
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        first_token = stripped.split()[0] if stripped.split() else ""
+        if not first_token:
+            continue
+        # Bar/beat: pure integer (e.g. "1", "13")
+        # Timecode: contains colons (e.g. "01:00:00:00.00")
+        return first_token.isdigit()
+    return False
+
+
+def _parse_bar_position(pos_str: str) -> tuple[int, int, int, int]:
+    """Parse a Logic bar/beat position string '1 1 1 1' → (bar, beat, subdiv, tick)."""
+    parts = pos_str.strip().split()
+    bar = int(parts[0]) if len(parts) > 0 else 1
+    beat = int(parts[1]) if len(parts) > 1 else 1
+    subdiv = int(parts[2]) if len(parts) > 2 else 1
+    tick = int(parts[3]) if len(parts) > 3 else 1
+    return bar, beat, subdiv, tick
+
+
+def parse_arrangement_bars_beats(
+    text: str,
+    bpm: float = 120.0,
+    beats_per_bar: int = 4,
+) -> list[Clip]:
+    """Parse Logic Pro bar/beat format arrangement export → list of Clips.
+
+    Expected format per non-empty line (tab-delimited):
+        BAR BEAT SUBDIV TICK \\t loop_name \\t track_number \\t BAR BEAT SUBDIV TICK
+
+    The first position encountered is used as the base offset.
+    """
+    clips: list[Clip] = []
+    base_offset: Optional[float] = None
+
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        fields = [f.strip() for f in stripped.split("\t")]
+        if len(fields) < 4:
+            continue
+        try:
+            s_bar, s_beat, s_sub, s_tick = _parse_bar_position(fields[0])
+            e_bar, e_beat, e_sub, e_tick = _parse_bar_position(fields[3])
+            name = fields[1]
+            track = int(fields[2])
+        except (ValueError, IndexError):
+            continue
+
+        start_secs = _bars_beats_to_seconds(
+            s_bar, s_beat, s_sub, s_tick, bpm, beats_per_bar
+        )
+        end_secs = _bars_beats_to_seconds(
+            e_bar, e_beat, e_sub, e_tick, bpm, beats_per_bar
+        )
+
+        if base_offset is None:
+            base_offset = start_secs
+
+        clip_length = round(end_secs - start_secs, 3)
+        clips.append(
+            Clip(
+                start=round(start_secs - base_offset, 3),
+                name=name,
+                track=track,
+                length=clip_length,
+            )
+        )
+
+    return clips
+
+
 def _tc_to_seconds(tc: str) -> float:
     """Parse Logic Pro timecode HH:MM:SS:FF.sub → total seconds.
 
@@ -140,16 +243,25 @@ def _tc_to_seconds(tc: str) -> float:
     return h * 3600.0 + m * 60.0 + s
 
 
-def parse_arrangement(text: str) -> list[Clip]:
+def parse_arrangement(
+    text: str,
+    bpm: float = 120.0,
+    beats_per_bar: int = 4,
+) -> list[Clip]:
     """Parse Logic Pro arrangement export text → list of Clips.
 
-    Expected format per non-empty line:
-        HH:MM:SS:FF.sub   loop_name   track_number   HH:MM:SS:FF.sub
+    Supports two Logic export formats automatically:
+    - **Timecode** (``01:00:00:00.00  loop_name  track  00:00:10:00.00``):
+      the classic HH:MM:SS:FF format exported from Logic's timecode display.
+    - **Bar/beat** (tab-delimited ``1 1 1 1 \\t loop_name \\t track \\t 7 1 1 1``):
+      Logic's bar-and-beats position display.  Requires *bpm* and *beats_per_bar*
+      to convert positions to seconds.
 
-    The first position encountered is used as the base offset so that
-    clip starts are relative to the song start (handles Logic's 01:00:00:00
-    hour offset automatically).
+    The first position encountered is used as the base offset so that clip
+    starts are relative to the song start.
     """
+    if _is_bar_beat_format(text):
+        return parse_arrangement_bars_beats(text, bpm=bpm, beats_per_bar=beats_per_bar)
     clips: list[Clip] = []
     base_offset: Optional[float] = None
 
@@ -344,10 +456,20 @@ def derive_sections(
         slot_clips = slots[slot_start]
         slot_name = _slot_name(slot_clips)
 
-        # None → inherit current section; just accumulate loops
+        # None → inherit current section; just accumulate loops.
+        # Exception: if no section has started yet (current_name is None), fall back
+        # to any recognisable non-chords track so that sections that have no chords
+        # track at all (e.g. a drums-only intro) are still detected.
         if slot_name is None:
-            _accumulate(slot_clips)
-            continue
+            if current_name is None:
+                for c in sorted(slot_clips, key=lambda x: x.track):
+                    n = _section_name_from_loop(c.name, known_sections)
+                    if n != "unknown":
+                        slot_name = n
+                        break
+            if slot_name is None:
+                _accumulate(slot_clips)
+                continue
 
         if slot_name == "unknown":
             for c in slot_clips:
@@ -605,7 +727,9 @@ def import_arrangement(
         )
 
     text = arrangement_path.read_text()
-    clips = parse_arrangement(text)
+    time_sig_parts = plan.time_sig.split("/")
+    beats_per_bar = int(time_sig_parts[0])
+    clips = parse_arrangement(text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar)
     folder_lookup = build_folder_lookup(production_dir)
     known_sections: Optional[frozenset] = frozenset(
         s.name.lower() for s in plan.sections
