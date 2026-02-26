@@ -37,9 +37,8 @@ The pipeline SHALL score each candidate using ChromaticScorer in text-only mode
 
 ### Requirement: Lyric Fitting Score
 The pipeline SHALL compute a fitting score for each candidate by comparing syllable
-count against note count per vocal section, using the merged `melody/melody.mid` as
-the note source.  The score indicates how much manual note-splitting will be required
-in ACE Studio.
+count against note count per vocal section.  The score indicates how much manual
+note-splitting will be required in ACE Studio.
 
 Fitting ratio = syllables / notes for each melody pass.
 - **paste-ready**: 0.75–1.10 — syllables map directly to notes with minimal adjustment
@@ -47,11 +46,31 @@ Fitting ratio = syllables / notes for each melody pass.
 - **splits needed**: >1.30 — significant manual work in ACE Studio
 - **spacious**: <0.75 — melody has held notes; ACE Studio handles this automatically
 
+#### Note source: approved melody MIDIs per section
+Note counts SHALL be derived from the approved melody MIDI files in `melody/approved/`,
+not from a merged `melody/melody.mid` (which is never written by the pipeline).  For
+each vocal section, find the approved MIDI matching that section's label, count its
+`note_on` events (velocity > 0), and multiply by `plan_section.repeat` to get the
+total note count across all passes of that section.  This approach works without
+requiring the assembly step to have been run first.
+
+#### Syllable counting algorithm
+Syllable count SHALL use a vowel-cluster heuristic (no NLP dependency):
+1. Strip comment lines (starting with `#`) and section header lines (`[name]`)
+2. Split remaining text into words
+3. For each word, count contiguous vowel-character groups (`[aeiouAEIOU]`) as
+   syllables, with a floor of 1 syllable per word
+4. Sum across all lines for that section
+
+This algorithm is deterministic and sufficient for 1:1 fit checking; it may
+under-count on silent-e endings but that margin is absorbed by the 0.75–1.10
+paste-ready range.
+
 #### Scenario: Fitting computed per vocal pass
 - **WHEN** a candidate lyrics file is scored
-- **THEN** the pipeline counts notes per melody pass from `melody/melody.mid` using
-  bar boundaries from the arrangement (derived from `production_plan.yml` section
-  timings), and counts syllables per lyrics section using a vowel-group heuristic
+- **THEN** the pipeline counts notes per section from `melody/approved/<label>*.mid`
+  (multiplied by `section.repeat`), and counts syllables per lyrics section using the
+  vowel-cluster heuristic above
 - **AND** per-pass ratios and verdicts are stored in `lyrics_review.yml` under
   a `fitting` key on each candidate entry
 
@@ -74,12 +93,42 @@ chromatic scores and `status: pending`, following the same review pattern as MID
 #### Scenario: Review file written after generation
 - **WHEN** the pipeline completes
 - **THEN** `melody/lyrics_review.yml` exists with one entry per candidate
-- **AND** each entry has `id`, `file`, `chromatic` scores, and `status: pending`
+- **AND** each entry has `id`, `file`, `chromatic` scores, `fitting` scores, and `status: pending`
+
+#### Scenario: Incremental append — existing entries are never clobbered
+- **WHEN** `lyrics_review.yml` already exists with one or more entries
+- **THEN** the pipeline appends new candidates only; existing entries (including any
+  human-set `status` values) are preserved unchanged
+- **AND** the next candidate `id` is derived from the highest existing `id` + 1
 
 #### Scenario: Human approval workflow
 - **WHEN** a human sets one candidate's `status` to `approved`
 - **THEN** `promote_part.py` copies that file to `melody/lyrics.txt`
 - **AND** other candidates are rejected/ignored
+
+---
+
+### Requirement: Sync Candidates
+The pipeline SHALL support a `--sync-candidates` flag that registers manually-written
+`.txt` files in `melody/candidates/` that are not yet tracked in `lyrics_review.yml`,
+without regenerating or scoring anything.
+
+#### Scenario: Orphan draft picked up by sync
+- **WHEN** `lyric_pipeline.py --sync-candidates` is run
+- **THEN** any `.txt` file in `melody/candidates/` with no matching entry in
+  `lyrics_review.yml` is added as a stub entry with `status: pending` and no scores
+- **AND** existing entries are not modified
+
+---
+
+### Requirement: API Model
+The pipeline SHALL use `claude-sonnet-4-6` as the default generation model, with a
+`--model` CLI argument to override.  The model name SHALL be passed directly to the
+Anthropic SDK `model=` parameter.
+
+#### Scenario: Default model
+- **WHEN** `--model` is not supplied
+- **THEN** `claude-sonnet-4-6` is used
 
 ---
 

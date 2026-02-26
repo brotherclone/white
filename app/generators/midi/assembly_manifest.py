@@ -23,16 +23,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import mido
 import yaml
 
 from app.generators.midi.production_plan import (
     MANIFEST_BOOTSTRAP_FILENAME,
     PLAN_FILENAME,
     load_plan,
+    load_song_proposal,
     save_plan,
 )
 
 DRIFT_REPORT_FILENAME = "drift_report.yml"
+TRACK_MANIFEST_FILENAME = "track_manifest.yml"
 
 SECTION_PREFIXES = {
     "intro": "Intro",
@@ -745,10 +748,305 @@ def import_arrangement(
     drift = compute_drift(plan, actual_sections)
     _update_plan(plan, actual_sections)
     save_plan(plan, production_dir)
-    _update_manifest(production_dir, plan)
     _write_drift_report(production_dir, str(arrangement_path), drift)
 
     return drift
+
+
+# ---------------------------------------------------------------------------
+# Track manifest generation
+# ---------------------------------------------------------------------------
+
+
+def _resolve_proposal_path(
+    production_dir: Path, source_proposal: str
+) -> Optional[Path]:
+    """Try to resolve source_proposal relative to project root.
+
+    Walks up from production_dir trying each ancestor as project root.
+    Also tries inserting 'yml/' before the filename, since some songs store
+    proposals under a yml/ subdirectory within the thread.
+    """
+    sp = Path(source_proposal)
+    candidate = production_dir
+    for _ in range(10):
+        candidate = candidate.parent
+        direct = candidate / sp
+        if direct.exists():
+            return direct
+        # Try with 'yml/' inserted before the filename
+        with_yml = candidate / sp.parent / "yml" / sp.name
+        if with_yml.exists():
+            return with_yml
+    return None
+
+
+def generate_track_manifest(
+    production_dir: Path,
+    arrangement_path: Path,
+    song_proposal_path: Optional[Path] = None,
+    track_map: Optional[dict[int, str]] = None,
+    vocalist_suffix: str = "_gw",
+) -> Path:
+    """Generate track_manifest.yml from arrangement.txt + song proposal.
+
+    Reads arrangement clips, derives sections, and combines with song proposal
+    identity fields to produce a canonical track manifest. This replaces
+    manifest_bootstrap.yml as the bridge between the generative pipeline and
+    release. arrangement.txt is the authoritative source for structure; the
+    song proposal YAML is the authoritative source for song identity.
+
+    Args:
+        production_dir: Song production directory (must contain production_plan.yml).
+        arrangement_path: Path to Logic Pro arrangement export file.
+        song_proposal_path: Path to song proposal YAML. Auto-detected from
+            plan.source_proposal if not supplied.
+        track_map: {track_number: instrument_folder}. Defaults to DEFAULT_TRACK_MAP.
+        vocalist_suffix: Loop name suffix indicating a sung melody (default: _gw).
+
+    Returns:
+        Path to the written track_manifest.yml.
+    """
+    plan = load_plan(production_dir)
+    if plan is None:
+        raise FileNotFoundError(
+            f"No {PLAN_FILENAME} found in {production_dir}. Generate a plan first."
+        )
+
+    if track_map is None:
+        track_map = DEFAULT_TRACK_MAP
+
+    # Parse arrangement → clips
+    text = arrangement_path.read_text()
+    time_sig_parts = plan.time_sig.split("/")
+    beats_per_bar = int(time_sig_parts[0])
+    clips = parse_arrangement(text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar)
+
+    # Find song proposal (auto-detect from plan if not supplied)
+    if song_proposal_path is None and plan.source_proposal:
+        song_proposal_path = _resolve_proposal_path(
+            production_dir, plan.source_proposal
+        )
+
+    # Load proposal data — raw YAML (for singer field) + normalised dict
+    proposal_raw: dict = {}
+    proposal_data: dict = {}
+    if song_proposal_path is not None and song_proposal_path.exists():
+        with open(song_proposal_path) as f:
+            proposal_raw = yaml.safe_load(f)
+        proposal_data = load_song_proposal(song_proposal_path)
+
+    # Derive sections from clips
+    folder_lookup = build_folder_lookup(production_dir)
+    known_sections: Optional[frozenset] = frozenset(
+        s.name.lower() for s in plan.sections
+    )
+    sections = derive_sections(
+        clips, track_map, vocalist_suffix, folder_lookup, known_sections
+    )
+
+    # Render-time top-level flags
+    vocals = any(s.vocals for s in sections)
+    lyrics_path = production_dir / "melody" / "lyrics.txt"
+    lyrics = lyrics_path.exists()
+
+    # Singer lives in raw proposal but is not surfaced by load_song_proposal()
+    singer = proposal_raw.get("singer") if proposal_raw else None
+
+    data = {
+        "manifest_id": plan.song_slug,
+        "generated": datetime.now(timezone.utc).isoformat(),
+        "source_arrangement": str(arrangement_path),
+        "source_proposal": str(song_proposal_path) if song_proposal_path else None,
+        # Identity — from song proposal (fallback to plan)
+        "title": proposal_data.get("title", "") or plan.title,
+        "bpm": proposal_data.get("bpm") or plan.bpm,
+        "time_sig": proposal_data.get("time_sig", "") or plan.time_sig,
+        "key": proposal_data.get("key", "") or plan.key,
+        "rainbow_color": proposal_data.get("color", "") or plan.color,
+        "singer": singer,
+        "concept": proposal_data.get("concept", "") or plan.concept,
+        "mood": proposal_data.get("mood") or plan.mood,
+        "genres": proposal_data.get("genres") or plan.genres,
+        "sounds_like": plan.sounds_like,
+        # Track map (from --track-map arg)
+        "tracks": track_map,
+        # Clips (raw, from arrangement.txt)
+        "clips": [
+            {
+                "name": c.name,
+                "track": c.track,
+                "start": c.start,
+                "length": c.length,
+            }
+            for c in clips
+        ],
+        # Sections (derived from clips via derive_sections())
+        "sections": [
+            {
+                "name": s.name,
+                "start": s.start,
+                "end": s.end,
+                "vocals": s.vocals,
+                **({"loops": s.loops} if s.loops else {}),
+            }
+            for s in sections
+        ],
+        # Render-time fields (null until produced)
+        "vocals": vocals,
+        "lyrics": lyrics,
+        "release_date": None,
+        "album_sequence": None,
+        "main_audio_file": None,
+        "TRT": None,
+        "lrc_file": None,
+        "audio_tracks": [],
+    }
+
+    out_path = production_dir / TRACK_MANIFEST_FILENAME
+    with open(out_path, "w") as f:
+        yaml.dump(
+            data, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+        )
+    return out_path
+
+
+# ---------------------------------------------------------------------------
+# MIDI assembly (flatten loops to events)
+# ---------------------------------------------------------------------------
+
+
+def _find_midi_file(name: str, production_dir: Path, instrument: str) -> Optional[Path]:
+    """Find a MIDI by clip name in the instrument's approved/ then candidates/.
+
+    Falls back to searching all instrument folders so candidate-ID-named clips
+    (e.g. ``melody_verse_04``) are still found even when not promoted.
+    """
+    for subdir in ("approved", "candidates"):
+        path = production_dir / instrument / subdir / f"{name}.mid"
+        if path.exists():
+            return path
+    # Cross-folder fallback
+    for instr in INSTRUMENT_FOLDERS:
+        if instr == instrument:
+            continue
+        for subdir in ("approved", "candidates"):
+            path = production_dir / instr / subdir / f"{name}.mid"
+            if path.exists():
+                return path
+    return None
+
+
+def assemble_midi_tracks(
+    clips: list[Clip],
+    production_dir: Path,
+    output_dir: Path,
+    bpm: float,
+    track_map: Optional[dict[int, str]] = None,
+    ticks_per_beat: int = 480,
+) -> dict[int, Path]:
+    """Assemble full-length MIDI files from arrangement clips.
+
+    Reads each clip's MIDI from approved/ or candidates/, offsets all note
+    events to the clip's absolute bar position, and writes one continuous
+    MIDI per track.  No looping in the DAW is required — import the output
+    files directly.
+
+    Args:
+        clips: Output of parse_arrangement().
+        production_dir: Song production directory.
+        output_dir: Directory to write assembled MIDIs (created if absent).
+        bpm: Tempo used to convert seconds → ticks.
+        track_map: {track_number: instrument_folder}.  Defaults to DEFAULT_TRACK_MAP.
+        ticks_per_beat: MIDI resolution for output files.
+
+    Returns:
+        {track_number: output_path} for every track written.
+    """
+    if track_map is None:
+        track_map = DEFAULT_TRACK_MAP
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    by_track: dict[int, list[Clip]] = {}
+    for clip in clips:
+        by_track.setdefault(clip.track, []).append(clip)
+
+    written: dict[int, Path] = {}
+    missing: list[str] = []
+
+    for track_num, track_clips in sorted(by_track.items()):
+        instrument = track_map.get(track_num, f"track_{track_num}")
+        all_events: list[tuple[int, mido.Message]] = []
+
+        for clip in sorted(track_clips, key=lambda c: c.start):
+            midi_path = _find_midi_file(clip.name, production_dir, instrument)
+            if midi_path is None:
+                missing.append(f"{clip.name} (track {track_num}/{instrument})")
+                continue
+
+            base_tick = round(clip.start * bpm / 60.0 * ticks_per_beat)
+
+            src = mido.MidiFile(filename=str(midi_path))
+            scale = ticks_per_beat / src.ticks_per_beat
+
+            # Strip Logic's baked-in timeline offset: Logic full-project exports
+            # embed the region's absolute timeline position as leading silence.
+            # Find the earliest note_on tick across all tracks and subtract it
+            # so the MIDI is normalised to start at tick 0.
+            min_src_tick: Optional[int] = None
+            for track in src.tracks:
+                abs_t = 0
+                for msg in track:
+                    abs_t += msg.time
+                    if msg.type == "note_on" and msg.velocity > 0:
+                        if min_src_tick is None or abs_t < min_src_tick:
+                            min_src_tick = abs_t
+                        break
+            if min_src_tick is None:
+                min_src_tick = 0
+
+            for track in src.tracks:
+                abs_src = 0
+                for msg in track:
+                    abs_src += msg.time
+                    if msg.type in ("note_on", "note_off"):
+                        dest_tick = base_tick + round((abs_src - min_src_tick) * scale)
+                        all_events.append((dest_tick, msg.copy(time=0)))
+
+        if not all_events:
+            continue
+
+        all_events.sort(key=lambda e: (e[0], e[1].type == "note_on"))
+
+        out_mid = mido.MidiFile(ticks_per_beat=ticks_per_beat)
+        out_track = mido.MidiTrack()
+        out_mid.tracks.append(out_track)
+        out_track.append(
+            mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(bpm), time=0)
+        )
+
+        prev_tick = 0
+        for abs_tick, msg in all_events:
+            delta = abs_tick - prev_tick
+            out_track.append(msg.copy(time=delta))
+            prev_tick = abs_tick
+
+        out_track.append(mido.MetaMessage("end_of_track", time=0))
+
+        out_name = f"assembled_{instrument}.mid"
+        out_path = output_dir / out_name
+        out_mid.save(str(out_path))
+        written[track_num] = out_path
+        print(
+            f"  Track {track_num} ({instrument}): "
+            f"{len(track_clips)} clips → {out_path.name}"
+        )
+
+    for name in missing:
+        print(f"  WARNING: MIDI file not found: {name}", file=sys.stderr)
+
+    return written
 
 
 # ---------------------------------------------------------------------------
@@ -782,6 +1080,41 @@ def main() -> None:
         default="_gw",
         help="Loop name suffix indicating a sung melody (default: _gw)",
     )
+    parser.add_argument(
+        "--assemble",
+        action="store_true",
+        help=(
+            "After importing, generate full-length assembled MIDI files "
+            "(one per track) in <production-dir>/assembled/. "
+            "Events are placed at absolute positions — no DAW looping required."
+        ),
+    )
+    parser.add_argument(
+        "--assemble-only",
+        action="store_true",
+        help=(
+            "Skip plan/manifest update and only generate assembled MIDIs. "
+            "Requires arrangement file and an existing production_plan.yml."
+        ),
+    )
+    parser.add_argument(
+        "--generate-manifest",
+        action="store_true",
+        help="Generate track_manifest.yml from arrangement.txt + song proposal.",
+    )
+    parser.add_argument(
+        "--manifest-only",
+        action="store_true",
+        help=(
+            "Skip plan/drift update and only generate track_manifest.yml. "
+            "Requires arrangement file and an existing production_plan.yml."
+        ),
+    )
+    parser.add_argument(
+        "--song-proposal",
+        default=None,
+        help="Path to song proposal YAML (auto-detected from production_plan if absent).",
+    )
     args = parser.parse_args()
 
     prod_path = Path(args.production_dir)
@@ -796,6 +1129,48 @@ def main() -> None:
     except ValueError:
         print(f"ERROR: Invalid --track-map format: {args.track_map}")
         sys.exit(1)
+
+    text = arr_path.read_text()
+    proposal_path = Path(args.song_proposal) if args.song_proposal else None
+
+    if args.manifest_only:
+        print("=" * 60)
+        print("TRACK MANIFEST GENERATION (manifest-only)")
+        print("=" * 60)
+        try:
+            out = generate_track_manifest(
+                prod_path,
+                arr_path,
+                song_proposal_path=proposal_path,
+                track_map=track_map,
+                vocalist_suffix=args.vocalist_suffix,
+            )
+            print(f"\nTrack manifest written: {out}")
+        except FileNotFoundError as e:
+            print(f"ERROR: {e}")
+            sys.exit(1)
+        return
+
+    if args.assemble_only:
+        print("=" * 60)
+        print("MIDI ASSEMBLY (assemble-only)")
+        print("=" * 60)
+        plan = load_plan(prod_path)
+        if plan is None:
+            print(f"ERROR: No {PLAN_FILENAME} found in {prod_path}")
+            sys.exit(1)
+        time_sig_parts = plan.time_sig.split("/")
+        beats_per_bar = int(time_sig_parts[0])
+        clips = parse_arrangement(
+            text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar
+        )
+        out_dir = prod_path / "assembled"
+        print(f"\nAssembling {len(clips)} clips → {out_dir}/")
+        written = assemble_midi_tracks(
+            clips, prod_path, out_dir, float(plan.bpm), track_map
+        )
+        print(f"\nWrote {len(written)} assembled MIDI tracks to {out_dir}/")
+        return
 
     print("=" * 60)
     print("ASSEMBLY MANIFEST IMPORT")
@@ -824,9 +1199,35 @@ def main() -> None:
 
     print()
     print(f"production_plan.yml updated: {prod_path / PLAN_FILENAME}")
-    print(f"manifest_bootstrap.yml updated: {prod_path / MANIFEST_BOOTSTRAP_FILENAME}")
     if any_drift:
         print(f"drift_report.yml written: {prod_path / DRIFT_REPORT_FILENAME}")
+
+    if args.generate_manifest:
+        try:
+            out = generate_track_manifest(
+                prod_path,
+                arr_path,
+                song_proposal_path=proposal_path,
+                track_map=track_map,
+                vocalist_suffix=args.vocalist_suffix,
+            )
+            print(f"track_manifest.yml written: {out}")
+        except FileNotFoundError as e:
+            print(f"WARNING: track manifest generation failed: {e}", file=sys.stderr)
+
+    if args.assemble:
+        plan = load_plan(prod_path)
+        time_sig_parts = plan.time_sig.split("/")
+        beats_per_bar = int(time_sig_parts[0])
+        clips = parse_arrangement(
+            text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar
+        )
+        out_dir = prod_path / "assembled"
+        print(f"\nAssembling {len(clips)} clips → {out_dir}/")
+        written = assemble_midi_tracks(
+            clips, prod_path, out_dir, float(plan.bpm), track_map
+        )
+        print(f"Wrote {len(written)} assembled MIDI tracks")
 
 
 if __name__ == "__main__":

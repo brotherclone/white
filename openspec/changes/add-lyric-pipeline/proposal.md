@@ -32,7 +32,24 @@ lyric sets** (all vocal sections), not per-section files.
 - Song concept + color + target chromatic modes
 - Approved melody contour types per vocal section (informs phrase rhythm)
 - BPM + time signature (informs syllable density)
+- Per-section syllable targets derived from note counts (e.g. "verse: 12–17 syllables")
 The pipeline is self-contained; no external prompt management needed.
+Default model: `claude-sonnet-4-6` (overridable via `--model`).
+
+### Note source for fitting score
+Note counts come from `melody/approved/<label>*.mid` multiplied by `section.repeat` —
+not from a merged `melody/melody.mid`, which is never written by the pipeline.  This
+means fitting scores are available without running the assembly step first.
+
+### Syllable counting
+Vowel-cluster heuristic: count contiguous vowel-character groups per word, floor 1.
+No NLP dependency.  Comment lines (`# ...`) and section headers (`[name]`) are stripped
+before counting.
+
+### Incremental review file
+`lyrics_review.yml` is append-only.  Existing entries (including human `status` edits)
+are never overwritten.  A `--sync-candidates` flag registers manually-written `.txt`
+files in `melody/candidates/` as stub entries without scoring them.
 
 ## Impact
 - Affected specs: (new) `lyric-generation`

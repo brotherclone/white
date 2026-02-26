@@ -429,6 +429,13 @@ def refresh_plan(production_dir: Path) -> ProductionPlan:
 def bootstrap_manifest(production_dir: Path) -> Path:
     """Emit a partial manifest YAML from a completed production plan.
 
+    .. deprecated::
+        Use ``assembly_manifest.generate_track_manifest()`` with ``--generate-manifest``
+        instead. ``manifest_bootstrap.yml`` is derived from plan arithmetic; the new
+        ``track_manifest.yml`` reads structure from the authoritative ``arrangement.txt``
+        and identity from the song proposal YAML.  This function is retained for
+        existing songs that already have a ``manifest_bootstrap.yml``.
+
     All fields derivable from the plan are pre-filled. Fields that require
     a final render (audio files, TRT, timestamps) are written as null.
     """

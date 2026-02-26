@@ -4,7 +4,7 @@ bpm: 120
 time_sig: 4/4
 color: Yellow
 singer: Shirley
-generated: '2026-02-24T23:14:41.344258+00:00'
+generated: '2026-02-25T22:20:33.435358+00:00'
 seed: 42
 scoring_weights:
   theory: 0.3
@@ -78,8 +78,8 @@ candidates:
         known: 0.3632
       confidence: 0.0423
       match: 0.1662
-  label: null
-  status: rejected
+  label: melody_bridge
+  status: approved
   notes: ''
 - id: melody_bridge_03
   midi_file: candidates/melody_bridge_03.mid
@@ -210,8 +210,8 @@ candidates:
         known: 0.3632
       confidence: 0.0424
       match: 0.1662
-  label: null
-  status: rejected
+  label: melody_chorus
+  status: approved
   notes: ''
 - id: melody_chorus_02
   midi_file: candidates/melody_chorus_02.mid
@@ -243,9 +243,9 @@ candidates:
         known: 0.3632
       confidence: 0.0424
       match: 0.1662
-  label: melody_chorus
-  status: approved
-  notes: 'transposed up for range'
+  label: null
+  status: rejected
+  notes: ''
 - id: melody_chorus_03
   midi_file: candidates/melody_chorus_03.mid
   rank: 8
@@ -342,9 +342,9 @@ candidates:
         known: 0.3633
       confidence: 0.0426
       match: 0.1662
-  label: melody_chorus_alt
-  status: approved
-  notes: 'heavy edit'
+  label: null
+  status: rejected
+  notes: ''
 - id: melody_strobing_jams_01
   midi_file: candidates/melody_strobing_jams_01.mid
   rank: 11
@@ -474,8 +474,8 @@ candidates:
         known: 0.3632
       confidence: 0.0423
       match: 0.1662
-  label: null
-  status: rejected
+  label: melody_strobing_intro
+  status: approved
   notes: ''
 - id: melody_strobing_jams_05
   midi_file: candidates/melody_strobing_jams_05.mid
@@ -573,8 +573,8 @@ candidates:
         known: 0.3631
       confidence: 0.042
       match: 0.1661
-  label: melody_verse
-  status: accepted
+  label: melody_verse_alternate
+  status: approved
   notes: ''
 - id: melody_verse_03
   midi_file: candidates/melody_verse_03.mid
@@ -639,9 +639,9 @@ candidates:
         known: 0.3631
       confidence: 0.0423
       match: 0.1662
-  label: melody_verse_alt
-  status: accepted
-  notes: 'edited notes'
+  label: melody_verse
+  status: approved
+  notes: ''
 - id: melody_verse_05
   midi_file: candidates/melody_verse_05.mid
   rank: 20

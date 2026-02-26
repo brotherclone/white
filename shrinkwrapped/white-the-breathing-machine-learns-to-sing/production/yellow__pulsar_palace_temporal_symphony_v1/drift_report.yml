@@ -1,4 +1,4 @@
-generated: '2026-02-25T13:13:28.784385+00:00'
+generated: '2026-02-26T13:43:56.272605+00:00'
 source_arrangement: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/yellow__pulsar_palace_temporal_symphony_v1/arrangement.txt
 sections:
 - section_index: 0
@@ -7,6 +7,7 @@ sections:
   computed_start: '[00:00.000]'
   actual_start: '[00:00.000]'
   drift_seconds: 0.0
+  vocals_flag_changed: true
 - section_index: 1
   plan_name: verse
   arrangement_name: verse
@@ -30,9 +31,9 @@ sections:
 - section_index: 4
   plan_name: verse
   arrangement_name: verse
-  computed_start: '[01:52.000]'
+  computed_start: '[00:52.000]'
   actual_start: '[01:52.000]'
-  drift_seconds: 0.0
+  drift_seconds: 60.0
   vocals_flag_changed: true
 - section_index: 5
   plan_name: bridge
