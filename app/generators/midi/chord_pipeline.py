@@ -25,6 +25,7 @@ import mido
 import numpy as np
 import yaml
 
+from app.generators.artist_catalog import load_artist_context
 from app.generators.midi.prototype.generator import ChordProgressionGenerator
 from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 from app.generators.midi.harmonic_rhythm import enumerate_distributions
@@ -529,6 +530,13 @@ def run_chord_pipeline(
 
     raw_proposal = song_info.get("raw_proposal", {})
     genre_tags = raw_proposal.get("genres", []) or []
+
+    # Print style context from artist catalog (informational for human reviewing candidates)
+    sounds_like = raw_proposal.get("sounds_like") or []
+    if sounds_like:
+        artist_context = load_artist_context(sounds_like)
+        if artist_context:
+            print(f"\n{artist_context}\n")
     genre_families = map_genres_to_families(genre_tags) or [DEFAULT_GENRE_FAMILY]
 
     # --- 2. Generate chord candidates ---

@@ -1,0 +1,30 @@
+# Artist Style Catalog
+#
+# Canonical source of aesthetic descriptions for artists referenced in sounds_like
+# fields of song proposals and production plans.
+#
+# Schema (one top-level key per artist, key = exact name from sounds_like):
+#
+#   "Artist Name":
+#     slug: artist_name          # snake_case identifier for filenames
+#     status: draft | reviewed   # draft = generated, reviewed = human-approved
+#     description: |             # 100–200 words: sonic texture, production character,
+#       ...                      # lyrical/thematic tendencies, emotional register
+#     style_tags:                # genre / aesthetic tags
+#       - tag1
+#       - tag2
+#     # chromatic_hint:          # human-filled; uncomment and complete when reviewing
+#     #   temporal: past | present | future
+#     #   spatial: thing | place | person
+#     #   ontological: imagined | forgotten | known
+#     chromatic_score:           # populated by --score-chromatic; null until run
+#       temporal: {past: 0.0, present: 0.0, future: 0.0}
+#       spatial: {thing: 0.0, place: 0.0, person: 0.0}
+#       ontological: {imagined: 0.0, forgotten: 0.0, known: 0.0}
+#       confidence: 0.0
+#     discogs_id: null           # from training data, informational only
+#     notes: ""                  # freeform White-project framing
+#
+# To populate: python -m app.generators.artist_catalog --thread <thread_dir> --generate-missing
+# To score:    python -m app.generators.artist_catalog --score-chromatic
+# To review:   python -m app.generators.artist_catalog --summary
