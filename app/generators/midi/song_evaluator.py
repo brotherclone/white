@@ -537,6 +537,84 @@ def _write_evaluation(report: EvaluationReport, production_dir: Path) -> Path:
 
 
 # ---------------------------------------------------------------------------
+# Rescore lyrics (optional --rescore-lyrics flag)
+# ---------------------------------------------------------------------------
+
+
+def _rescore_lyrics(production_dir: Path, plan_concept: str, plan_color: str) -> dict:
+    """Score melody/lyrics.txt and melody/lyrics_draft.txt via ChromaticScorer text-only.
+
+    Returns a dict with some subset of:
+        lyrics_edited_chromatic_match, lyrics_draft_chromatic_match, lyrics_chromatic_delta
+
+    Missing files are handled gracefully (empty dict or partial result).
+    Exits with an error message if ChromaticScorer is unavailable.
+    """
+    from app.generators.midi.chord_pipeline import (
+        compute_chromatic_match,
+        get_chromatic_target,
+    )
+
+    melody_dir = production_dir / "melody"
+    lyrics_path = melody_dir / "lyrics.txt"
+    draft_path = melody_dir / "lyrics_draft.txt"
+
+    if not lyrics_path.exists():
+        print("WARNING: melody/lyrics.txt not found — skipping lyric rescore")
+        return {}
+
+    onnx_path = (
+        Path(__file__).parent.parent.parent.parent
+        / "training"
+        / "data"
+        / "fusion_model.onnx"
+    )
+    if not onnx_path.exists():
+        print("ERROR: ONNX model not found.")
+        print("Ensure training/data/fusion_model.onnx exists and run from .venv312.")
+        sys.exit(1)
+
+    try:
+        from training.chromatic_scorer import ChromaticScorer
+    except Exception as exc:
+        print(f"ERROR: Failed to import ChromaticScorer: {exc}")
+        print("Use .venv312/bin/python — ChromaticScorer requires torch + numpy 1.x.")
+        sys.exit(1)
+
+    scorer = ChromaticScorer(str(onnx_path))
+    concept_emb = scorer.prepare_concept(plan_concept) if plan_concept else None
+    target = get_chromatic_target(plan_color)
+
+    edited_text = lyrics_path.read_text(encoding="utf-8")
+    edited_results = scorer.score_batch(
+        [{"lyric_text": edited_text}], concept_emb=concept_emb
+    )
+    edited_match = compute_chromatic_match(edited_results[0], target)
+
+    result = {"lyrics_edited_chromatic_match": round(float(edited_match), 4)}
+
+    if not draft_path.exists():
+        print(
+            "WARNING: melody/lyrics_draft.txt not found — draft score omitted.\n"
+            "  (draft is written automatically at promotion time)"
+        )
+        return result
+
+    draft_text = draft_path.read_text(encoding="utf-8")
+    draft_results = scorer.score_batch(
+        [{"lyric_text": draft_text}], concept_emb=concept_emb
+    )
+    draft_match = compute_chromatic_match(draft_results[0], target)
+
+    result["lyrics_draft_chromatic_match"] = round(float(draft_match), 4)
+    result["lyrics_chromatic_delta"] = round(
+        float(edited_match) - float(draft_match), 4
+    )
+
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Rescore (optional --rescore flag)
 # ---------------------------------------------------------------------------
 
@@ -675,6 +753,11 @@ def main():
         action="store_true",
         help="Re-run ChromaticScorer on promoted MIDIs (requires ONNX model)",
     )
+    parser.add_argument(
+        "--rescore-lyrics",
+        action="store_true",
+        help="Score melody/lyrics.txt and lyrics_draft.txt, merge results into song_evaluation.yml",
+    )
     args = parser.parse_args()
 
     # Expand glob patterns
@@ -758,6 +841,31 @@ def main():
         report.airgigs_readiness = _determine_readiness(report.composite_score)
         report.flags = _collect_flags(report)
         _write_evaluation(report, prod_path)
+
+    if args.rescore_lyrics:
+        plan = load_plan(prod_path)
+        concept = plan.concept if plan else ""
+        color = plan.color if plan else ""
+        lyric_scores = _rescore_lyrics(prod_path, concept, color)
+        if lyric_scores:
+            eval_path = prod_path / EVALUATION_FILENAME
+            existing: dict = {}
+            if eval_path.exists():
+                with open(eval_path) as f:
+                    existing = yaml.safe_load(f) or {}
+            existing.update(lyric_scores)
+            with open(eval_path, "w") as f:
+                yaml.dump(
+                    existing,
+                    f,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    allow_unicode=True,
+                )
+            print("\nLyric rescore results:")
+            for k, v in lyric_scores.items():
+                print(f"  {k}: {v}")
+            print(f"\nUpdated: {eval_path}")
 
     # Print summary
     print(f"\n{'='*60}")

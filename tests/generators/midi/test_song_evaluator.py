@@ -7,6 +7,8 @@ import pytest
 import yaml
 
 from app.generators.midi.production_plan import PlanSection, ProductionPlan, save_plan
+from unittest.mock import MagicMock, patch
+
 from app.generators.midi.song_evaluator import (
     EVALUATION_FILENAME,
     PhaseReport,
@@ -18,6 +20,7 @@ from app.generators.midi.song_evaluator import (
     _compute_lyric_metrics,
     _compute_structural_integrity,
     _count_syllables,
+    _rescore_lyrics,
     _determine_readiness,
     _load_phase_report,
     evaluate,
@@ -734,3 +737,146 @@ def test_evaluate_green_song(green_production_dir, cleanup_evaluation):
     assert data["has_lyrics"] is True
     assert "composite_score" in data
     assert "airgigs_readiness" in data
+
+
+# ---------------------------------------------------------------------------
+# _rescore_lyrics tests
+# ---------------------------------------------------------------------------
+
+
+def _make_mock_scorer(edited_match=0.75, draft_match=0.60):
+    """Build a mock ChromaticScorer for lyric text scoring."""
+    mock = MagicMock()
+    import numpy as np
+
+    mock.prepare_concept.return_value = np.zeros(768, dtype=np.float32)
+
+    def _score_batch(candidates, concept_emb=None):
+        return [
+            {
+                "temporal": {"past": 0.7, "present": 0.2, "future": 0.1},
+                "spatial": {"thing": 0.6, "place": 0.3, "person": 0.1},
+                "ontological": {"imagined": 0.1, "forgotten": 0.1, "known": 0.8},
+                "confidence": 0.05,
+                "match": edited_match if i == 0 else draft_match,
+            }
+            for i, _ in enumerate(candidates)
+        ]
+
+    mock.score_batch.side_effect = _score_batch
+    return mock
+
+
+class TestRescoreLyrics:
+    def _make_prod_dir(self, tmp_path, lyrics_text=None, draft_text=None):
+        from app.generators.midi.production_plan import (
+            PlanSection,
+            ProductionPlan,
+            save_plan,
+        )
+
+        prod_dir = tmp_path / "production" / "test_song"
+        melody_dir = prod_dir / "melody"
+        melody_dir.mkdir(parents=True)
+
+        if lyrics_text is not None:
+            (melody_dir / "lyrics.txt").write_text(lyrics_text)
+        if draft_text is not None:
+            (melody_dir / "lyrics_draft.txt").write_text(draft_text)
+
+        plan = ProductionPlan(
+            song_slug="test_song",
+            generated="2026-01-01T00:00:00+00:00",
+            bpm=120,
+            time_sig="4/4",
+            key="C major",
+            color="Red",
+            title="Test Song",
+            concept="a red concept",
+            sections=[PlanSection(name="verse", bars=4, repeat=1, vocals=True)],
+        )
+        save_plan(plan, prod_dir)
+        return prod_dir
+
+    def test_rescore_lyrics_happy_path(self, tmp_path):
+        """Both lyrics.txt and lyrics_draft.txt scored; delta computed."""
+        prod_dir = self._make_prod_dir(
+            tmp_path,
+            lyrics_text="the edited line\nand another",
+            draft_text="the original draft\nfirst version",
+        )
+        mock_scorer = _make_mock_scorer(edited_match=0.75, draft_match=0.60)
+
+        with patch(
+            "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
+        ):
+            result = _rescore_lyrics(prod_dir, "a red concept", "Red")
+
+        assert "lyrics_edited_chromatic_match" in result
+        assert "lyrics_draft_chromatic_match" in result
+        assert "lyrics_chromatic_delta" in result
+        assert result["lyrics_chromatic_delta"] == round(
+            result["lyrics_edited_chromatic_match"]
+            - result["lyrics_draft_chromatic_match"],
+            4,
+        )
+
+    def test_rescore_lyrics_missing_draft(self, tmp_path):
+        """Missing draft → only edited match written, no error."""
+        prod_dir = self._make_prod_dir(tmp_path, lyrics_text="the edited line")
+        mock_scorer = _make_mock_scorer(edited_match=0.70)
+
+        with patch(
+            "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
+        ):
+            result = _rescore_lyrics(prod_dir, "a red concept", "Red")
+
+        assert "lyrics_edited_chromatic_match" in result
+        assert "lyrics_draft_chromatic_match" not in result
+        assert "lyrics_chromatic_delta" not in result
+
+    def test_rescore_lyrics_missing_lyrics_txt(self, tmp_path):
+        """Missing lyrics.txt → empty dict returned, no crash."""
+        prod_dir = self._make_prod_dir(tmp_path)  # no lyrics files
+
+        with patch("training.chromatic_scorer.ChromaticScorer"):
+            result = _rescore_lyrics(prod_dir, "a red concept", "Red")
+
+        assert result == {}
+
+    def test_rescore_lyrics_merges_into_existing_yml(self, tmp_path):
+        """Existing song_evaluation.yml fields are preserved after merge."""
+        prod_dir = self._make_prod_dir(
+            tmp_path,
+            lyrics_text="edited",
+            draft_text="draft",
+        )
+        eval_path = prod_dir / EVALUATION_FILENAME
+        existing = {
+            "composite_score": 0.72,
+            "airgigs_readiness": "demo",
+            "phases_complete": 4,
+        }
+        with open(eval_path, "w") as f:
+            yaml.dump(existing, f)
+
+        mock_scorer = _make_mock_scorer(edited_match=0.68, draft_match=0.55)
+        with patch(
+            "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
+        ):
+            lyric_scores = _rescore_lyrics(prod_dir, "a red concept", "Red")
+
+        # Simulate the CLI merge
+        with open(eval_path) as f:
+            data = yaml.safe_load(f)
+        data.update(lyric_scores)
+        with open(eval_path, "w") as f:
+            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+
+        with open(eval_path) as f:
+            merged = yaml.safe_load(f)
+
+        assert merged["composite_score"] == 0.72  # preserved
+        assert merged["airgigs_readiness"] == "demo"  # preserved
+        assert "lyrics_edited_chromatic_match" in merged
+        assert "lyrics_draft_chromatic_match" in merged
