@@ -34,6 +34,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from app.generators.artist_catalog import load_artist_context  # noqa: E402
 from app.generators.midi.chord_pipeline import (  # noqa: E402
     _to_python,
     compute_chromatic_match,
@@ -225,10 +226,13 @@ def _compute_fitting(candidate_text: str, vocal_sections: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def _build_prompt(plan, vocal_sections: list[dict], syllable_targets: dict) -> str:
+def _build_prompt(
+    plan, vocal_sections: list[dict], syllable_targets: dict, artist_context: str = ""
+) -> str:
     """Build the Claude prompt for lyric generation.
 
-    Includes song metadata, color target, and per-section syllable targets.
+    Includes song metadata, color target, per-section syllable targets, and
+    optional STYLE REFERENCES from the artist catalog.
     """
     target = get_chromatic_target(plan.color)
     temporal_modes = ["past", "present", "future"]
@@ -282,6 +286,9 @@ def _build_prompt(plan, vocal_sections: list[dict], syllable_targets: dict) -> s
                 f"    Target syllables: {lo}–{hi}  (≈{notes_per_bar:.1f} notes/bar)",
             ]
         )
+
+    if artist_context:
+        lines.extend(["", artist_context])
 
     lines.extend(
         [
@@ -549,7 +556,8 @@ def run_lyric_pipeline(
     }
 
     # --- 4. Build prompt ---
-    prompt = _build_prompt(plan, vocal_sections, syllable_targets)
+    artist_context = load_artist_context(plan.sounds_like or [])
+    prompt = _build_prompt(plan, vocal_sections, syllable_targets, artist_context)
 
     # --- 5. Generate candidates ---
     from anthropic import Anthropic
