@@ -1,7 +1,7 @@
 song_slug: green__last_pollinators_elegy_v1
 color: Green
 title: The Silence Where Abundance Used to Hum
-evaluated: '2026-02-23T14:16:12.123793+00:00'
+evaluated: '2026-02-24T16:29:09.993971+00:00'
 phases_complete: 4
 phases:
   chords:
@@ -85,17 +85,16 @@ section_variety: 0.6364
 vocal_coverage: 0.5421
 has_lyrics: true
 lyric_syllable_density: 1.069
-max_drift_seconds: 45.0
-name_mismatches: 9
-structural_integrity: 0.05
+max_drift_seconds: 93.0
+name_mismatches: 0
+structural_integrity: 0.845
 chromatic_alignment: 0.1682
 theory_quality: 0.8775
 production_completeness: 1.0
 lyric_maturity: 1.0
-composite_score: 0.5417
-airgigs_readiness: draft
+composite_score: 0.6212
+airgigs_readiness: demo
 flags:
-- timing drift 45.0s
-- arrangement mismatch (9 sections)
+- timing drift 93.0s
 - low chromatic confidence
 - high theory quality

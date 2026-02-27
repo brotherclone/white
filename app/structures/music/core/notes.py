@@ -2,6 +2,8 @@ from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
+from app.structures.music.core.enharmonic import flat_to_sharp, normalize_to_flat
+
 
 class Note(BaseModel):
 
@@ -49,27 +51,18 @@ tempered_notes = {
     "B": Note(pitch_name="B", pitch_alias=[], accidental=None, frequency=493, octave=4),
 }
 
+# Re-export for callers that import these from notes
+__all__ = [
+    "Note",
+    "tempered_notes",
+    "flat_to_sharp",
+    "normalize_to_flat",
+    "get_tempered_note",
+]
+
 
 def get_tempered_note(note_str: str) -> Note:
     # Normalize flat notation to sharp notation
-    flat_to_sharp = {
-        "Db": "C#",
-        "D♭": "C#",
-        "Eb": "D#",
-        "E♭": "D#",
-        "Gb": "F#",
-        "G♭": "F#",
-        "Ab": "G#",
-        "A♭": "G#",
-        "Bb": "A#",
-        "B♭": "A#",
-        "Cb": "B",
-        "C♭": "B",
-        "Fb": "E",
-        "F♭": "E",
-    }
-
-    # Convert flat notation to sharp if needed
     if note_str in flat_to_sharp:
         note_str = flat_to_sharp[note_str]
 

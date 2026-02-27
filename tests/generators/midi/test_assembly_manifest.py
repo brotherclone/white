@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import textwrap
+from pathlib import Path
 
 import pytest
 import yaml
@@ -12,6 +13,7 @@ from app.generators.midi.assembly_manifest import (
     _tc_to_seconds,
     compute_drift,
     derive_sections,
+    generate_track_manifest,
     import_arrangement,
     parse_arrangement,
 )
@@ -287,13 +289,33 @@ class TestComputeDrift:
         assert drift[1].drift_seconds == -10.0
 
     def test_plan_name_vs_arrangement_name(self):
+        # When actual section has no matching plan entry (name-based matching),
+        # plan_name falls back to arrangement_name and drift_seconds is 0.
         plan = _make_plan([("Verse", 4, 3)])
         from app.generators.midi.assembly_manifest import ArrangementSection
 
         actual = [ArrangementSection(name="Bridge", start=0.0, end=30.0)]
         drift = compute_drift(plan, actual)
-        assert drift[0].plan_name == "Verse"
+        # No plan section named "Bridge" → plan_name == arrangement_name, no drift
+        assert drift[0].plan_name == "Bridge"
         assert drift[0].arrangement_name == "Bridge"
+        assert drift[0].drift_seconds == 0.0
+
+    def test_plan_name_matches_by_name_not_position(self):
+        # Plan: [honey, honey, queen]. Arrangement: [honey, queen].
+        # queen should match plan's queen (index 2), not honey (index 1).
+        plan = _make_plan([("honey", 5, 2), ("honey", 5, 2), ("queen", 5, 2)])
+        from app.generators.midi.assembly_manifest import ArrangementSection
+
+        actual = [
+            ArrangementSection(name="honey", start=0.0, end=30.0),
+            ArrangementSection(name="queen", start=30.0, end=60.0),
+        ]
+        drift = compute_drift(plan, actual)
+        assert drift[0].plan_name == "honey"
+        assert drift[0].arrangement_name == "honey"
+        assert drift[1].plan_name == "queen"
+        assert drift[1].arrangement_name == "queen"
 
     def test_vocals_flag_changed(self):
         plan = _make_plan([("Verse", 4, 2)])
@@ -435,9 +457,9 @@ class TestArchivistIntegration:
         # Drift report written
         assert (tmp_path / "drift_report.yml").exists()
 
-        # Manifest updated
+        # manifest_bootstrap.yml is no longer mutated by import_arrangement()
         manifest = yaml.safe_load((tmp_path / "manifest_bootstrap.yml").read_text())
-        assert len(manifest["structure"]) == 5
+        assert manifest["structure"] == []  # unchanged sentinel
 
     def test_missing_arrangement_raises(self, tmp_path):
         plan = _make_plan([("Intro", 4, 1)])
@@ -470,3 +492,116 @@ class TestArchivistIntegration:
         sections = derive_sections(clips, folder_lookup=lookup)
         assert sections[0].loops.get("chords") == "bridge_eighth_hypnotic"
         assert "drums" not in sections[0].loops
+
+
+# ---------------------------------------------------------------------------
+# generate_track_manifest
+# ---------------------------------------------------------------------------
+
+_MANIFEST_ARRANGEMENT = textwrap.dedent(
+    """\
+    01:00:00:00.00     intro_arp        1     00:00:10:00.00
+    01:00:00:00.00     intro_drums      2     00:00:10:00.00
+    01:00:10:00.00     verse            1     00:00:10:00.00
+    01:00:10:00.00     verse_melody_gw  4     00:00:10:00.00
+    """
+)
+
+
+def _make_proposal_yaml(tmp_path: Path, **overrides) -> Path:
+    """Write a minimal song proposal YAML and return its path."""
+    proposal = {
+        "title": "Test Song Title",
+        "bpm": 100,
+        "key": "C minor",
+        "singer": "Shirley",
+        "mood": ["melancholy"],
+        "genres": ["ambient"],
+        "concept": "A test concept.",
+        "tempo": {"numerator": 4, "denominator": 4},
+        "rainbow_color": {"color_name": "Yellow"},
+    }
+    proposal.update(overrides)
+    path = tmp_path / "proposal.yml"
+    path.write_text(yaml.dump(proposal))
+    return path
+
+
+class TestGenerateTrackManifest:
+    def _setup(self, tmp_path) -> tuple:
+        """Return (prod_dir, arr_path) with plan + arrangement written."""
+        plan = _make_plan([("Intro", 4, 1), ("Verse", 4, 2)])
+        save_plan(plan, tmp_path)
+        arr_file = tmp_path / "arrangement.txt"
+        arr_file.write_text(_MANIFEST_ARRANGEMENT)
+        return tmp_path, arr_file
+
+    def test_writes_track_manifest_yml(self, tmp_path):
+        prod_dir, arr_path = self._setup(tmp_path)
+        proposal_path = _make_proposal_yaml(tmp_path)
+        out = generate_track_manifest(
+            prod_dir, arr_path, song_proposal_path=proposal_path
+        )
+        assert out.exists()
+        assert out.name == "track_manifest.yml"
+
+    def test_clips_in_manifest(self, tmp_path):
+        prod_dir, arr_path = self._setup(tmp_path)
+        proposal_path = _make_proposal_yaml(tmp_path)
+        generate_track_manifest(prod_dir, arr_path, song_proposal_path=proposal_path)
+        data = yaml.safe_load((prod_dir / "track_manifest.yml").read_text())
+        clip_names = {c["name"] for c in data["clips"]}
+        assert "intro_arp" in clip_names
+        assert "intro_drums" in clip_names
+        assert "verse_melody_gw" in clip_names
+
+    def test_sections_derived(self, tmp_path):
+        prod_dir, arr_path = self._setup(tmp_path)
+        generate_track_manifest(prod_dir, arr_path)
+        data = yaml.safe_load((prod_dir / "track_manifest.yml").read_text())
+        # Section names: "intro_arp" falls back to SECTION_PREFIXES → "Intro";
+        # "verse" direct-matches known_sections (lowercased from plan) → "verse".
+        section_names = [s["name"].lower() for s in data["sections"]]
+        assert "intro" in section_names
+        assert "verse" in section_names
+
+    def test_identity_from_proposal(self, tmp_path):
+        prod_dir, arr_path = self._setup(tmp_path)
+        proposal_path = _make_proposal_yaml(tmp_path)
+        generate_track_manifest(prod_dir, arr_path, song_proposal_path=proposal_path)
+        data = yaml.safe_load((prod_dir / "track_manifest.yml").read_text())
+        assert data["title"] == "Test Song Title"
+        assert data["key"] == "C minor"
+        assert data["singer"] == "Shirley"
+        # Plan has bpm=84 (from _make_plan → 7/8 plan), proposal has 100 — proposal wins
+        assert data["bpm"] == 100
+
+    def test_vocals_flag_true_when_any_section_vocal(self, tmp_path):
+        prod_dir, arr_path = self._setup(tmp_path)
+        # verse_melody_gw ends with _gw → vocals=True on that section
+        generate_track_manifest(prod_dir, arr_path)
+        data = yaml.safe_load((prod_dir / "track_manifest.yml").read_text())
+        assert data["vocals"] is True
+
+    def test_manifest_only_does_not_touch_plan(self, tmp_path):
+        """generate_track_manifest() does not mutate production_plan.yml."""
+        prod_dir, arr_path = self._setup(tmp_path)
+        plan_before = (prod_dir / "production_plan.yml").read_text()
+        generate_track_manifest(prod_dir, arr_path)
+        assert (prod_dir / "production_plan.yml").read_text() == plan_before
+
+    def test_import_arrangement_no_longer_writes_bootstrap(self, tmp_path):
+        """import_arrangement() must not modify manifest_bootstrap.yml."""
+        plan = _make_plan([("Intro", 4, 1)])
+        save_plan(plan, tmp_path)
+        arr_file = tmp_path / "arrangement.txt"
+        arr_file.write_text(_MANIFEST_ARRANGEMENT)
+
+        # Write a sentinel manifest; content must be unchanged after import
+        sentinel = "manifest_id: test_sentinel\nstructure: []\nbpm: 84\nTRT: null\n"
+        bootstrap_path = tmp_path / "manifest_bootstrap.yml"
+        bootstrap_path.write_text(sentinel)
+
+        import_arrangement(tmp_path, arr_file)
+
+        assert bootstrap_path.read_text() == sentinel

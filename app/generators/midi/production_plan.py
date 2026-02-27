@@ -324,6 +324,17 @@ def generate_plan(
     if not unique_sections:
         raise ValueError("No approved chord sections found in chords/review.yml")
 
+    # Section names that conventionally carry lead vocals
+    _VOCAL_SECTIONS = {
+        "verse",
+        "chorus",
+        "hook",
+        "pre_chorus",
+        "post_chorus",
+        "refrain",
+        "bridge",
+    }
+
     sections = []
     for s in unique_sections:
         bars, source = derive_bar_count(
@@ -334,7 +345,11 @@ def generate_plan(
             s["chord_count"],
             hr_distribution=s.get("hr_distribution"),
         )
-        sec = PlanSection(name=s["label"], bars=bars)
+        label_key = s["label"].lower().replace("-", "_").replace(" ", "_")
+        vocals = any(
+            label_key == v or label_key.startswith(v + "_") for v in _VOCAL_SECTIONS
+        )
+        sec = PlanSection(name=s["label"], bars=bars, vocals=vocals)
         sec._bar_source = source
         sections.append(sec)
 
@@ -413,6 +428,13 @@ def refresh_plan(production_dir: Path) -> ProductionPlan:
 
 def bootstrap_manifest(production_dir: Path) -> Path:
     """Emit a partial manifest YAML from a completed production plan.
+
+    .. deprecated::
+        Use ``assembly_manifest.generate_track_manifest()`` with ``--generate-manifest``
+        instead. ``manifest_bootstrap.yml`` is derived from plan arithmetic; the new
+        ``track_manifest.yml`` reads structure from the authoritative ``arrangement.txt``
+        and identity from the song proposal YAML.  This function is retained for
+        existing songs that already have a ``manifest_bootstrap.yml``.
 
     All fields derivable from the plan are pre-filled. Fields that require
     a final render (audio files, TRT, timestamps) are written as null.

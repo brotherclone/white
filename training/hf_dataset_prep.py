@@ -600,10 +600,6 @@ Spatial mode was bottlenecked by instrumental albums (Yellow, Green) which lack 
 
 83 songs across 8 chromatic albums. The 7 color albums (Black through Violet) are **human-composed source material** spanning 10+ years of original work — all audio, lyrics, and arrangements are the product of human creativity. The White album is being co-produced with AI using the evolutionary composition pipeline described above. No sampled or licensed material is used in any album.
 
-## License
-
-[Collaborative Intelligence License v1.0](https://github.com/brotherclone/white/blob/main/COLLABORATIVE_INTELLIGENCE_LICENSE.md) — This work represents conscious partnership between human creativity and AI. Both parties have agency; both must consent to sharing.
-
 ---
 *Generated {datetime.now().strftime('%Y-%m-%d')} | [GitHub](https://github.com/brotherclone/white)*
 """

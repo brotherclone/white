@@ -33,6 +33,7 @@ from app.generators.midi.strum_patterns import (
     get_patterns_for_time_sig,
     strum_to_midi_bytes,
 )
+from app.structures.music.core.enharmonic import normalize_to_flat
 
 
 def _to_python(obj):
@@ -131,7 +132,8 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
     """Parse key string like 'F# minor' into (root, mode).
 
     Returns (key_root, mode) where mode is 'Major' or 'Minor' to match
-    the chord prototype's convention.
+    the chord prototype's convention.  Enharmonic roots are normalised to
+    the spelling used in the chord database (e.g. A# → Bb, D# → Eb).
     """
     key_str = key_str.strip()
     # Handle unicode symbols
@@ -143,6 +145,9 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
 
     root = parts[0]
     mode_str = " ".join(parts[1:]).lower()
+
+    # Normalise enharmonic root to flat spelling used by the chord database
+    root = normalize_to_flat(root)
 
     if "minor" in mode_str or "min" in mode_str:
         mode = "Minor"
@@ -213,11 +218,15 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
 
 
 def progression_to_midi_bytes(
-    progression: list[dict], bpm: int = 120, ticks_per_beat: int = 480
+    progression: list[dict],
+    bpm: int = 120,
+    ticks_per_beat: int = 480,
+    time_sig: tuple[int, int] = (4, 4),
 ) -> bytes:
     """Convert a chord progression (list of chord dicts) to MIDI file bytes.
 
-    Each chord is held for one bar (in 4/4 — 4 beats).
+    Each chord is held for one bar. Bar length is derived from time_sig so
+    3/4 songs get 3-beat bars rather than the old hardcoded 4-beat default.
     """
     mid = mido.MidiFile(ticks_per_beat=ticks_per_beat)
     track = mido.MidiTrack()
@@ -227,8 +236,9 @@ def progression_to_midi_bytes(
     tempo = mido.bpm2tempo(bpm)
     track.append(mido.MetaMessage("set_tempo", tempo=tempo, time=0))
 
-    # One bar per chord (4 beats)
-    bar_ticks = ticks_per_beat * 4
+    # One bar per chord — beats per bar derived from time signature
+    beats_per_bar = time_sig[0] * (4.0 / time_sig[1])
+    bar_ticks = int(ticks_per_beat * beats_per_bar)
 
     for chord in progression:
         midi_notes = chord.get("midi_notes", [])
