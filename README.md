@@ -24,3 +24,14 @@ Start a new workflow
 python run_white_agent.py start
 ```
 
+## Testing
+
+Run `PYTHONPATH=. pytest tests/ --maxfail=5 --disable-warnings -v`
+
+## Clearing Discogs Cache
+Run `rm ~/.earthly_frames/cache/discogs_validation_cache.json`
+
+## License
+This work represents **conscious partnership** between human creativity and 
+emerging artificial intelligence.
+[Collaborative Intelligence License](./COLLABORATIVE_INTELLIGENCE_LICENSE.md)

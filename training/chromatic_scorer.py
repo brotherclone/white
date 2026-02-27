@@ -22,14 +22,32 @@ Usage:
 """
 
 import logging
+import sys
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
 
+# ---------------------------------------------------------------------------
+# venv sanity check
+# ---------------------------------------------------------------------------
+# ChromaticScorer requires torch + numpy 1.x. The project venv that satisfies
+# this is .venv312.  If you're on a different interpreter, warn early so the
+# error message is actionable rather than a cryptic NumPy/torch crash.
+
+_EXPECTED_VENV = ".venv312"
+_exe = Path(sys.executable)
+if _EXPECTED_VENV not in str(_exe):
+    print(
+        f"\n⚠  WARNING: ChromaticScorer is running under {_exe}\n"
+        f"   Expected .venv312 (torch + numpy 1.x compatible).\n"
+        f"   Use: .venv312/bin/python -m <pipeline> ...\n",
+        file=sys.stderr,
+    )
+
 # Import midi_bytes_to_piano_roll without triggering training.models.__init__
 # (which eagerly imports torch-dependent classifiers)
-import importlib.util as _ilu
+import importlib.util as _ilu  # noqa: E402
 
 _spec = _ilu.spec_from_file_location(
     "piano_roll_encoder",

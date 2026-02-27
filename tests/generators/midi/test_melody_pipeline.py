@@ -53,6 +53,12 @@ def production_dir(tmp_path):
                 "id": "chord_verse_01",
                 "label": "verse",
                 "status": "approved",
+                "chords": [
+                    {"notes": ["C3", "E3", "G3"]},
+                    {"notes": ["F3", "A3", "C4"]},
+                    {"notes": ["G3", "B3", "D4"]},
+                    {"notes": ["C3", "E3", "G3"]},
+                ],
             }
         ],
     }
@@ -262,7 +268,131 @@ class TestReviewYaml:
 
 
 # ---------------------------------------------------------------------------
-# 5. Integration (mock ChromaticScorer)
+# 5. Candidate sync
+# ---------------------------------------------------------------------------
+
+
+class TestSyncMelodyCandidates:
+
+    def _make_review(self, tmp_path, candidates=None):
+        melody_dir = tmp_path / "melody"
+        candidates_dir = melody_dir / "candidates"
+        candidates_dir.mkdir(parents=True)
+        (melody_dir / "approved").mkdir()
+
+        review = {
+            "pipeline": "melody-generation",
+            "bpm": 120,
+            "singer": "Shirley",
+            "candidates": candidates or [],
+        }
+        with open(melody_dir / "review.yml", "w") as f:
+            yaml.dump(review, f)
+        return melody_dir, candidates_dir
+
+    def test_adds_untracked_midi(self, tmp_path):
+        from app.generators.midi.melody_pipeline import sync_melody_candidates
+
+        melody_dir, candidates_dir = self._make_review(tmp_path)
+        (candidates_dir / "my_verse.mid").write_bytes(b"MIDI")
+
+        added = sync_melody_candidates(melody_dir)
+
+        assert added == 1
+        with open(melody_dir / "review.yml") as f:
+            review = yaml.safe_load(f)
+        ids = [c["id"] for c in review["candidates"]]
+        assert "my_verse" in ids
+        assert review["candidates"][0]["status"] == "pending"
+        assert review["candidates"][0]["section"] == "manual"
+
+    def test_skips_already_tracked(self, tmp_path):
+        from app.generators.midi.melody_pipeline import sync_melody_candidates
+
+        existing = [
+            {
+                "id": "melody_verse_01",
+                "midi_file": "candidates/melody_verse_01.mid",
+                "status": "approved",
+            }
+        ]
+        melody_dir, candidates_dir = self._make_review(tmp_path, candidates=existing)
+        (candidates_dir / "melody_verse_01.mid").write_bytes(b"MIDI")
+
+        added = sync_melody_candidates(melody_dir)
+
+        assert added == 0
+        with open(melody_dir / "review.yml") as f:
+            review = yaml.safe_load(f)
+        assert len(review["candidates"]) == 1  # no new entry
+
+    def test_skips_scratch_files(self, tmp_path):
+        from app.generators.midi.melody_pipeline import sync_melody_candidates
+
+        melody_dir, candidates_dir = self._make_review(tmp_path)
+        (candidates_dir / "drums_scratch.mid").write_bytes(b"MIDI")
+
+        added = sync_melody_candidates(melody_dir)
+
+        assert added == 0
+
+    def test_deduplicates_id_collision(self, tmp_path):
+        from app.generators.midi.melody_pipeline import sync_melody_candidates
+
+        existing = [
+            {"id": "my_verse", "midi_file": "candidates/other.mid", "status": "pending"}
+        ]
+        melody_dir, candidates_dir = self._make_review(tmp_path, candidates=existing)
+        (candidates_dir / "my_verse.mid").write_bytes(b"MIDI")
+
+        added = sync_melody_candidates(melody_dir)
+
+        assert added == 1
+        with open(melody_dir / "review.yml") as f:
+            review = yaml.safe_load(f)
+        new_ids = [c["id"] for c in review["candidates"]]
+        # Original id preserved, new entry gets suffix
+        assert "my_verse" in new_ids
+        assert "my_verse_2" in new_ids
+
+    def test_no_review_yml_returns_zero(self, tmp_path):
+        from app.generators.midi.melody_pipeline import sync_melody_candidates
+
+        melody_dir = tmp_path / "melody"
+        melody_dir.mkdir()
+        # No review.yml
+        added = sync_melody_candidates(melody_dir)
+        assert added == 0
+
+    def test_preserves_existing_entries(self, tmp_path):
+        from app.generators.midi.melody_pipeline import sync_melody_candidates
+
+        existing = [
+            {
+                "id": "melody_verse_01",
+                "midi_file": "candidates/melody_verse_01.mid",
+                "label": "melody_verse",
+                "status": "approved",
+                "scores": {"composite": 0.75},
+            }
+        ]
+        melody_dir, candidates_dir = self._make_review(tmp_path, candidates=existing)
+        (candidates_dir / "melody_verse_01.mid").write_bytes(b"MIDI")
+        (candidates_dir / "my_new.mid").write_bytes(b"MIDI")
+
+        added = sync_melody_candidates(melody_dir)
+
+        assert added == 1
+        with open(melody_dir / "review.yml") as f:
+            review = yaml.safe_load(f)
+        # Original entry intact with scores
+        orig = next(c for c in review["candidates"] if c["id"] == "melody_verse_01")
+        assert orig["label"] == "melody_verse"
+        assert orig["scores"]["composite"] == 0.75
+
+
+# ---------------------------------------------------------------------------
+# 6. Integration (mock ChromaticScorer)
 # ---------------------------------------------------------------------------
 
 
