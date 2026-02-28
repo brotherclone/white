@@ -30,43 +30,28 @@ def make_midi_bytes(note_count: int = 4, ticks_per_beat: int = 480) -> bytes:
     return buf.getvalue()
 
 
-def make_plan(
-    vocal_sections=None,
+def make_meta(
     color="Red",
     bpm=120,
     time_sig="4/4",
     key="C major",
     concept="a test concept",
     title="Test Song",
-):
-    """Create a minimal ProductionPlan-like mock."""
-    from app.generators.midi.production_plan import PlanSection, ProductionPlan
-
-    if vocal_sections is None:
-        vocal_sections = [("verse", 4, 2), ("chorus", 2, 4)]
-
-    sections = []
-    for name, bars, repeat in vocal_sections:
-        sections.append(
-            PlanSection(
-                name=name,
-                bars=bars,
-                repeat=repeat,
-                vocals=True,
-            )
-        )
-
-    return ProductionPlan(
-        song_slug="test_song",
-        generated="2026-01-01T00:00:00+00:00",
-        bpm=bpm,
-        time_sig=time_sig,
-        key=key,
-        color=color,
-        title=title,
-        concept=concept,
-        sections=sections,
-    )
+    sounds_like=None,
+) -> dict:
+    """Create a minimal song metadata dict (replaces ProductionPlan in tests)."""
+    return {
+        "color": color,
+        "bpm": bpm,
+        "time_sig": time_sig,
+        "key": key,
+        "concept": concept,
+        "title": title,
+        "sounds_like": sounds_like or [],
+        "genres": [],
+        "mood": [],
+        "singer": "",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -296,13 +281,12 @@ class TestLoadOrInitReview:
     def test_creates_fresh_when_missing(self, tmp_path):
         from app.generators.midi.lyric_pipeline import _load_or_init_review
 
-        plan = make_plan(vocal_sections=[("verse", 4, 2)])
-        review = _load_or_init_review(tmp_path, plan, model="claude-sonnet-4-6", seed=7)
+        meta = make_meta()
+        review = _load_or_init_review(tmp_path, meta, model="claude-sonnet-4-6", seed=7)
         assert review["pipeline"] == "lyric-generation"
         assert review["color"] == "Red"
         assert review["seed"] == 7
         assert review["candidates"] == []
-        assert "verse" in review["vocal_sections"]
 
     def test_loads_existing_file(self, tmp_path):
         from app.generators.midi.lyric_pipeline import (
@@ -318,8 +302,8 @@ class TestLoadOrInitReview:
         with open(review_path, "w") as f:
             yaml.dump(existing, f)
 
-        plan = make_plan()
-        result = _load_or_init_review(tmp_path, plan, model="m", seed=1)
+        meta = make_meta()
+        result = _load_or_init_review(tmp_path, meta, model="m", seed=1)
         # Existing entry must be preserved unchanged
         assert result["candidates"][0]["id"] == "lyrics_01"
         assert result["candidates"][0]["status"] == "approved"
@@ -340,8 +324,8 @@ class TestLoadOrInitReview:
         with open(review_path, "w") as f:
             yaml.dump(initial, f)
 
-        plan = make_plan()
-        review = _load_or_init_review(tmp_path, plan, model="m", seed=1)
+        meta = make_meta()
+        review = _load_or_init_review(tmp_path, meta, model="m", seed=1)
         new_id = _next_candidate_id(review)
         assert new_id == "lyrics_02"
         # Original entry untouched
@@ -358,7 +342,7 @@ class TestBuildPrompt:
     def test_has_concept(self):
         from app.generators.midi.lyric_pipeline import _build_prompt
 
-        plan = make_plan(concept="machines learning to breathe")
+        meta = make_meta(concept="machines learning to breathe")
         vocal_sections = [
             {
                 "name": "verse",
@@ -369,13 +353,13 @@ class TestBuildPrompt:
             }
         ]
         syllable_targets = {"verse": (15, 21)}
-        prompt = _build_prompt(plan, vocal_sections, syllable_targets)
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets)
         assert "machines learning to breathe" in prompt
 
     def test_has_syllable_targets(self):
         from app.generators.midi.lyric_pipeline import _build_prompt
 
-        plan = make_plan()
+        meta = make_meta()
         vocal_sections = [
             {
                 "name": "verse",
@@ -386,14 +370,14 @@ class TestBuildPrompt:
             }
         ]
         syllable_targets = {"verse": (39, 54)}
-        prompt = _build_prompt(plan, vocal_sections, syllable_targets)
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets)
         assert "39" in prompt
         assert "54" in prompt
 
     def test_has_section_headers(self):
         from app.generators.midi.lyric_pipeline import _build_prompt
 
-        plan = make_plan(vocal_sections=[("verse", 4, 2), ("chorus", 2, 4)])
+        meta = make_meta()
         vocal_sections = [
             {
                 "name": "verse",
@@ -411,7 +395,7 @@ class TestBuildPrompt:
             },
         ]
         syllable_targets = {"verse": (15, 21), "chorus": (7, 10)}
-        prompt = _build_prompt(plan, vocal_sections, syllable_targets)
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets)
         assert "[verse]" in prompt
         assert "[chorus]" in prompt
 
@@ -658,38 +642,36 @@ def _make_mock_scorer(match_score=0.7):
 
 
 def _make_production_dir(tmp_path):
-    """Set up a minimal production directory with plan + melody approved MIDI."""
-    from app.generators.midi.production_plan import (
-        PlanSection,
-        ProductionPlan,
-        save_plan,
-    )
+    """Set up a minimal production directory with arrangement.txt + melody approved MIDI.
 
+    arrangement.txt has one 'verse' clip on track 4 (8 s = 4 bars @ 120 BPM 4/4).
+    chords/review.yml supplies minimal metadata used as fallback when no proposal exists.
+    """
     prod_dir = tmp_path / "production" / "test_song"
     melody_dir = prod_dir / "melody"
     (melody_dir / "approved").mkdir(parents=True)
     (melody_dir / "candidates").mkdir(parents=True)
+    (prod_dir / "chords").mkdir(parents=True)
 
-    # Write a melody MIDI
+    # Write a melody MIDI (10 notes)
     midi_bytes = make_midi_bytes(note_count=10)
     (melody_dir / "approved" / "verse.mid").write_bytes(midi_bytes)
 
-    plan = ProductionPlan(
-        song_slug="test_song",
-        generated="2026-01-01T00:00:00+00:00",
-        bpm=120,
-        time_sig="4/4",
-        key="C major",
-        color="Red",
-        title="Test Song",
-        concept="a red concept",
-        sections=[
-            PlanSection(
-                name="verse", bars=4, repeat=1, vocals=True, loops={"melody": "verse"}
-            ),
-        ],
-    )
-    save_plan(plan, prod_dir)
+    # arrangement.txt: one verse clip on track 4, 8 seconds (4 bars @ 120 BPM 4/4)
+    arrangement = "01:00:00:00.00\tverse\t4\t00:00:08:00.00\n"
+    (prod_dir / "arrangement.txt").write_text(arrangement)
+
+    # chords/review.yml: minimal metadata (no thread/song_proposal → triggers fallback)
+    chord_review = {
+        "bpm": 120,
+        "time_sig": "4/4",
+        "key": "C major",
+        "color": "Red",
+        "song_slug": "test_song",
+    }
+    with open(prod_dir / "chords" / "review.yml", "w") as f:
+        yaml.dump(chord_review, f)
+
     return prod_dir
 
 
