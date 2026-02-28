@@ -4,8 +4,6 @@ import json
 
 import yaml
 
-from app.generators.midi.production_plan import PlanSection, ProductionPlan, save_plan
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -90,26 +88,21 @@ def _make_prod_dir(
     melody_dir = prod_dir / "melody"
     (melody_dir / "candidates").mkdir(parents=True)
     (melody_dir / "approved").mkdir(parents=True)
+    (prod_dir / "chords").mkdir(parents=True)
 
-    plan = ProductionPlan(
-        song_slug=slug,
-        generated="2026-01-01T00:00:00+00:00",
-        bpm=120,
-        time_sig="4/4",
-        key="C major",
-        color="Red",
-        title="Test Song",
-        concept="a red concept",
-        sections=[
-            PlanSection(
-                name="verse", bars=4, repeat=1, vocals=True, loops={"melody": "verse"}
-            ),
-            PlanSection(
-                name="chorus", bars=2, repeat=2, vocals=True, loops={"melody": "chorus"}
-            ),
-        ],
+    # arrangement.txt: verse (4 bars = 8s) once, chorus (2 bars = 4s) twice — all track 4
+    # At 120 BPM 4/4: secs_per_bar = 2.0
+    arrangement = (
+        "01:00:00:00.00\tverse\t4\t00:00:08:00.00\n"
+        "01:00:08:00.00\tchorus\t4\t00:00:04:00.00\n"
+        "01:00:12:00.00\tchorus\t4\t00:00:04:00.00\n"
     )
-    save_plan(plan, prod_dir)
+    (prod_dir / "arrangement.txt").write_text(arrangement)
+
+    # chords/review.yml: minimal metadata (no thread → triggers fallback path)
+    chord_review = {"bpm": 120, "time_sig": "4/4", "key": "C major", "color": "Red"}
+    with open(prod_dir / "chords" / "review.yml", "w") as f:
+        yaml.dump(chord_review, f)
 
     if lyrics is not None:
         (melody_dir / "lyrics.txt").write_text(lyrics)
