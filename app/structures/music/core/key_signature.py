@@ -3,6 +3,7 @@ from enum import Enum
 from pydantic import BaseModel, model_validator
 
 from app.structures.music.core.notes import Note
+from app.structures.music.core.enharmonic import normalize_to_flat
 
 
 class ModeName(Enum):
@@ -49,6 +50,10 @@ class KeySignature(BaseModel):
 
             note_str, mode_str = parts
             mode_str = mode_str.lower()
+
+            # Normalise sharp spellings to flat (e.g. A# → Bb) so the
+            # note_map lookup always succeeds for enharmonic equivalents.
+            note_str = normalize_to_flat(note_str)
 
             # Note mapping: string -> (pitch_name, accidental)
             note_map = {

@@ -87,7 +87,10 @@ class TestKeyParsing:
         from app.generators.midi.chord_pipeline import parse_key_string
 
         assert parse_key_string("C major") == ("C", "Major")
-        assert parse_key_string("F# minor") == ("F#", "Minor")
+        assert parse_key_string("F# minor") == (
+            "Gb",
+            "Minor",
+        )  # F# → Gb via normalize_to_flat
         assert parse_key_string("Bb major") == ("Bb", "Major")
 
     def test_unicode_accidentals(self):

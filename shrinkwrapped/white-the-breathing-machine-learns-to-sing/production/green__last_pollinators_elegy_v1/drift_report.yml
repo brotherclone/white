@@ -1,5 +1,5 @@
-generated: '2026-02-22T21:42:12.669489+00:00'
-source_arrangement: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/green__last_pollinators_elegy_v1/arrangement.txt
+generated: '2026-02-24T16:29:06.741602+00:00'
+source_arrangement: /Volumes/LucidNonsense/White/shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/green__last_pollinators_elegy_v1/arrangement.txt
 sections:
 - section_index: 0
   plan_name: honey
@@ -8,71 +8,59 @@ sections:
   actual_start: '[00:00.000]'
   drift_seconds: 0.0
 - section_index: 1
-  plan_name: honey
+  plan_name: queen
   arrangement_name: queen
-  computed_start: '[00:30.000]'
-  actual_start: '[00:30.000]'
-  drift_seconds: 0.0
-  vocals_flag_changed: true
-  name_mismatch: true
-- section_index: 2
-  plan_name: queen
-  arrangement_name: pasture
   computed_start: '[01:00.000]'
-  actual_start: '[01:00.000]'
-  drift_seconds: 0.0
-  vocals_flag_changed: true
-  name_mismatch: true
-- section_index: 3
-  plan_name: pasture
-  arrangement_name: royal_degradation
-  computed_start: '[01:30.000]'
-  actual_start: '[01:30.000]'
-  drift_seconds: 0.0
-  vocals_flag_changed: true
-  name_mismatch: true
-- section_index: 4
-  plan_name: royal_degradation
-  arrangement_name: toppling
-  computed_start: '[02:00.000]'
-  actual_start: '[02:00.000]'
-  drift_seconds: 0.0
-  name_mismatch: true
-- section_index: 5
-  plan_name: honey
-  arrangement_name: worker
-  computed_start: '[02:30.000]'
-  actual_start: '[02:21.000]'
-  drift_seconds: -9.0
-  vocals_flag_changed: true
-  name_mismatch: true
-- section_index: 6
-  plan_name: queen
-  arrangement_name: ministers_daughter
-  computed_start: '[03:00.000]'
-  actual_start: '[02:48.000]'
-  drift_seconds: -12.0
-  vocals_flag_changed: true
-  name_mismatch: true
-- section_index: 7
-  plan_name: toppling
-  arrangement_name: worker
-  computed_start: '[03:30.000]'
-  actual_start: '[03:12.000]'
-  drift_seconds: -18.0
-  vocals_flag_changed: true
-  name_mismatch: true
-- section_index: 8
-  plan_name: worker
-  arrangement_name: ministers_daughter
-  computed_start: '[03:54.000]'
-  actual_start: '[03:24.000]'
+  actual_start: '[00:30.000]'
   drift_seconds: -30.0
-  name_mismatch: true
-- section_index: 9
-  plan_name: ministers_daughter
+  vocals_flag_changed: true
+- section_index: 2
+  plan_name: pasture
+  arrangement_name: pasture
+  computed_start: '[01:30.000]'
+  actual_start: '[01:00.000]'
+  drift_seconds: -30.0
+  vocals_flag_changed: true
+- section_index: 3
+  plan_name: royal_degradation
   arrangement_name: royal_degradation
+  computed_start: '[02:00.000]'
+  actual_start: '[01:30.000]'
+  drift_seconds: -30.0
+- section_index: 4
+  plan_name: toppling
+  arrangement_name: toppling
+  computed_start: '[03:30.000]'
+  actual_start: '[02:00.000]'
+  drift_seconds: -90.0
+  vocals_flag_changed: true
+- section_index: 5
+  plan_name: worker
+  arrangement_name: worker
+  computed_start: '[03:54.000]'
+  actual_start: '[02:21.000]'
+  drift_seconds: -93.0
+- section_index: 6
+  plan_name: ministers_daughter
+  arrangement_name: ministers_daughter
   computed_start: '[04:21.000]'
+  actual_start: '[02:48.000]'
+  drift_seconds: -93.0
+- section_index: 7
+  plan_name: worker
+  arrangement_name: worker
+  computed_start: '[03:12.000]'
+  actual_start: '[03:12.000]'
+  drift_seconds: 0.0
+- section_index: 8
+  plan_name: ministers_daughter
+  arrangement_name: ministers_daughter
+  computed_start: '[03:24.000]'
+  actual_start: '[03:24.000]'
+  drift_seconds: 0.0
+- section_index: 9
+  plan_name: royal_degradation
+  arrangement_name: royal_degradation
+  computed_start: '[04:45.000]'
   actual_start: '[03:36.000]'
-  drift_seconds: -45.0
-  name_mismatch: true
+  drift_seconds: -69.0

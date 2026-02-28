@@ -49,7 +49,6 @@ from app.generators.midi.chord_pipeline import (
     load_song_proposal,
 )
 from app.generators.midi.strum_patterns import (
-    parse_chord_voicings,
     read_approved_harmonic_rhythm,
 )
 
@@ -82,29 +81,17 @@ def read_approved_sections(chord_review: dict) -> list[dict]:
 def extract_section_chord_data(
     production_dir: Path,
 ) -> tuple[dict[str, list[list[int]]], dict]:
-    """Read approved chord voicings and review metadata."""
-    chord_review_path = production_dir / "chords" / "review.yml"
-    if not chord_review_path.exists():
-        raise FileNotFoundError(f"Chord review not found: {chord_review_path}")
+    """Read approved chord voicings and review metadata.
 
-    with open(chord_review_path) as f:
-        chord_review = yaml.safe_load(f)
+    Voicings are read directly from the chord review.yml ``chords`` field so
+    the count always matches ``hr_distribution`` — regardless of how many strum
+    events were baked into the MIDI file.
+    """
+    from app.generators.midi.bass_pipeline import (
+        extract_section_chord_data as _bass_extract,
+    )
 
-    approved_dir = production_dir / "chords" / "approved"
-    if not approved_dir.exists():
-        raise FileNotFoundError(f"No approved chords: {approved_dir}")
-
-    midi_files = sorted(approved_dir.glob("*.mid"))
-    if not midi_files:
-        raise FileNotFoundError("No approved chord MIDI files found")
-
-    chord_data: dict[str, list[list[int]]] = {}
-    for midi_file in midi_files:
-        label = midi_file.stem
-        voicings = parse_chord_voicings(midi_file)
-        chord_data[label] = [v["notes"] for v in voicings]
-
-    return chord_data, chord_review
+    return _bass_extract(production_dir)
 
 
 # ---------------------------------------------------------------------------
@@ -304,6 +291,96 @@ def generate_melody_review_yaml(
         "sections_found": [s["label_display"] for s in sections],
         "candidates": all_candidates,
     }
+
+
+# ---------------------------------------------------------------------------
+# Candidate sync (manual MIDI injection / rollback support)
+# ---------------------------------------------------------------------------
+
+
+def sync_melody_candidates(melody_dir: Path) -> int:
+    """Scan candidates/ for .mid files not tracked in review.yml and add stubs.
+
+    Safe to run after dropping in a manually edited or hand-composed MIDI.
+    Does NOT wipe existing candidates or regenerate anything.
+
+    Returns the number of new entries added.
+    """
+    review_path = melody_dir / "review.yml"
+    candidates_dir = melody_dir / "candidates"
+
+    if not review_path.exists():
+        print(f"ERROR: No review.yml found at {review_path}")
+        print("Run the melody pipeline first to create a review.yml base.")
+        return 0
+
+    with open(review_path) as f:
+        review = yaml.safe_load(f) or {}
+
+    existing_files = {
+        Path(c["midi_file"]).name
+        for c in review.get("candidates", [])
+        if c.get("midi_file")
+    }
+    existing_ids = {c["id"] for c in review.get("candidates", []) if c.get("id")}
+
+    if not candidates_dir.exists():
+        print(f"No candidates/ directory at {candidates_dir}")
+        return 0
+
+    new_files = sorted(
+        f
+        for f in candidates_dir.glob("*.mid")
+        if f.name not in existing_files and not f.name.endswith("_scratch.mid")
+    )
+
+    if not new_files:
+        print("All candidate files are already tracked in review.yml")
+        return 0
+
+    singer = review.get("singer", "")
+    added = 0
+    for midi_file in new_files:
+        stub_id = midi_file.stem
+        if stub_id in existing_ids:
+            i = 2
+            while f"{stub_id}_{i}" in existing_ids:
+                i += 1
+            stub_id = f"{stub_id}_{i}"
+
+        stub = {
+            "id": stub_id,
+            "midi_file": f"candidates/{midi_file.name}",
+            "rank": None,
+            "section": "manual",
+            "chord_source": "manual",
+            "contour": "manual",
+            "pattern_name": "manual",
+            "energy": "unknown",
+            "singer": singer,
+            "scores": None,
+            "label": None,
+            "status": "pending",
+            "notes": "manually added — set label and status: approved to promote",
+        }
+        review.setdefault("candidates", []).append(stub)
+        existing_ids.add(stub_id)
+        print(f"  + {midi_file.name}  →  id: {stub_id}")
+        added += 1
+
+    with open(review_path, "w") as f:
+        yaml.dump(
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+        )
+
+    print(f"\nAdded {added} entries to review.yml")
+    print(f"Edit {review_path}")
+    print("Set label: <name> and status: approved, then run promote_part")
+    return added
 
 
 # ---------------------------------------------------------------------------
@@ -664,6 +741,14 @@ def main():
         help="Song production directory (must contain chords/approved/)",
     )
     parser.add_argument(
+        "--sync-candidates",
+        action="store_true",
+        help=(
+            "Scan candidates/ for .mid files not in review.yml and add stub entries. "
+            "Does not regenerate or wipe anything. Use after dropping in manual MIDIs."
+        ),
+    )
+    parser.add_argument(
         "--thread",
         default=None,
         help="Shrinkwrapped thread directory (optional)",
@@ -709,6 +794,11 @@ def main():
     )
 
     args = parser.parse_args()
+
+    if args.sync_candidates:
+        melody_dir = Path(args.production_dir) / "melody"
+        sync_melody_candidates(melody_dir)
+        return
 
     run_melody_pipeline(
         production_dir=args.production_dir,

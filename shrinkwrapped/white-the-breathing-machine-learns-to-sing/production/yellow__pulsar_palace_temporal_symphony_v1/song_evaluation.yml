@@ -1,0 +1,91 @@
+song_slug: yellow__pulsar_palace_temporal_symphony_v1
+color: Yellow
+title: 'The Temporal Resonance Chamber: Palace of Collapsed Possibilities'
+evaluated: '2026-02-25T13:13:37.170149+00:00'
+phases_complete: 4
+phases:
+  chords:
+    complete: true
+    sections_found: 4
+    sections_approved: 4
+    coverage: 1.0
+    mean_theory: 0.8773
+    mean_chromatic_match: 0.1662
+    mean_chromatic_confidence: 0.0426
+    chromatic_consistency: 1.0
+    approved_labels:
+    - bridge
+    - chorus
+    - strobing_jams
+    - verse
+  drums:
+    complete: true
+    sections_found: 4
+    sections_approved: 4
+    coverage: 1.0
+    mean_theory: 1.0
+    mean_chromatic_match: 0.1662
+    mean_chromatic_confidence: 0.0423
+    chromatic_consistency: 1.0
+    approved_labels:
+    - drums_bridge
+    - drums_bridge_alt
+    - drums_chorus
+    - drums_strobing_jams
+    - drums_strobing_jams_alt
+    - drums_verse
+    - drums_verse_alt
+    - drums_verse_alt2
+  bass:
+    complete: true
+    sections_found: 4
+    sections_approved: 4
+    coverage: 1.0
+    mean_theory: 0.8556
+    mean_chromatic_match: 0.1661
+    mean_chromatic_confidence: 0.0421
+    chromatic_consistency: 0.9999
+    approved_labels:
+    - bass_bridge
+    - bass_bridge_alt
+    - bass_chorus
+    - bass_chorus_alt
+    - bass_strobing_jams
+    - bass_strobing_jams_alt
+    - bass_strobing_jams_alt2
+    - bass_verse
+    - bass_verse_alt
+    - bass_verse_alt_3
+    - bass_verse_alt_4
+  melody:
+    complete: true
+    sections_found: 4
+    sections_approved: 2
+    coverage: 0.5
+    mean_theory: 0.8264
+    mean_chromatic_match: 0.1662
+    mean_chromatic_confidence: 0.0423
+    chromatic_consistency: 1.0
+    approved_labels:
+    - melody_chorus
+    - melody_chorus_alt
+    - melody_verse
+    - melody_verse_alt
+total_bars: 140
+unique_sections: 4
+section_variety: 0.4444
+vocal_coverage: 0.4
+has_lyrics: false
+lyric_syllable_density: 0.0
+max_drift_seconds: 0.0
+name_mismatches: 0
+structural_integrity: 1.0
+chromatic_alignment: 0.1662
+theory_quality: 0.8898
+production_completeness: 1.0
+lyric_maturity: 0.0
+composite_score: 0.5889
+airgigs_readiness: demo
+flags:
+- low chromatic confidence
+- high theory quality

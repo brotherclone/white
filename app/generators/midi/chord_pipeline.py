@@ -25,13 +25,16 @@ import mido
 import numpy as np
 import yaml
 
+from app.generators.artist_catalog import load_artist_context
 from app.generators.midi.prototype.generator import ChordProgressionGenerator
+from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 from app.generators.midi.harmonic_rhythm import enumerate_distributions
 from app.generators.midi.strum_patterns import (
     StrumPattern,
     get_patterns_for_time_sig,
     strum_to_midi_bytes,
 )
+from app.structures.music.core.enharmonic import normalize_to_flat
 
 
 def _to_python(obj):
@@ -130,7 +133,8 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
     """Parse key string like 'F# minor' into (root, mode).
 
     Returns (key_root, mode) where mode is 'Major' or 'Minor' to match
-    the chord prototype's convention.
+    the chord prototype's convention.  Enharmonic roots are normalised to
+    the spelling used in the chord database (e.g. A# → Bb, D# → Eb).
     """
     key_str = key_str.strip()
     # Handle unicode symbols
@@ -142,6 +146,9 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
 
     root = parts[0]
     mode_str = " ".join(parts[1:]).lower()
+
+    # Normalise enharmonic root to flat spelling used by the chord database
+    root = normalize_to_flat(root)
 
     if "minor" in mode_str or "min" in mode_str:
         mode = "Minor"
@@ -212,11 +219,15 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
 
 
 def progression_to_midi_bytes(
-    progression: list[dict], bpm: int = 120, ticks_per_beat: int = 480
+    progression: list[dict],
+    bpm: int = 120,
+    ticks_per_beat: int = 480,
+    time_sig: tuple[int, int] = (4, 4),
 ) -> bytes:
     """Convert a chord progression (list of chord dicts) to MIDI file bytes.
 
-    Each chord is held for one bar (in 4/4 — 4 beats).
+    Each chord is held for one bar. Bar length is derived from time_sig so
+    3/4 songs get 3-beat bars rather than the old hardcoded 4-beat default.
     """
     mid = mido.MidiFile(ticks_per_beat=ticks_per_beat)
     track = mido.MidiTrack()
@@ -226,8 +237,9 @@ def progression_to_midi_bytes(
     tempo = mido.bpm2tempo(bpm)
     track.append(mido.MetaMessage("set_tempo", tempo=tempo, time=0))
 
-    # One bar per chord (4 beats)
-    bar_ticks = ticks_per_beat * 4
+    # One bar per chord — beats per bar derived from time signature
+    beats_per_bar = time_sig[0] * (4.0 / time_sig[1])
+    bar_ticks = int(ticks_per_beat * beats_per_bar)
 
     for chord in progression:
         midi_notes = chord.get("midi_notes", [])
@@ -518,6 +530,13 @@ def run_chord_pipeline(
 
     raw_proposal = song_info.get("raw_proposal", {})
     genre_tags = raw_proposal.get("genres", []) or []
+
+    # Print style context from artist catalog (informational for human reviewing candidates)
+    sounds_like = raw_proposal.get("sounds_like") or []
+    if sounds_like:
+        artist_context = load_artist_context(sounds_like)
+        if artist_context:
+            print(f"\n{artist_context}\n")
     genre_families = map_genres_to_families(genre_tags) or [DEFAULT_GENRE_FAMILY]
 
     # --- 2. Generate chord candidates ---
@@ -648,7 +667,9 @@ def run_chord_pipeline(
         )
 
         write_midi_file(primitive_bytes, candidates_dir / f"{item['id']}.mid")
+        _trim_midi(candidates_dir / f"{item['id']}.mid")
         write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
+        _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
 
         item["hr_distribution"] = hr_dist
         item["strum_pattern"] = strum_pat.name

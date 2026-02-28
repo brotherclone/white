@@ -46,7 +46,6 @@ from app.generators.midi.chord_pipeline import (
     load_song_proposal,
 )
 from app.generators.midi.strum_patterns import (
-    parse_chord_voicings,
     read_approved_harmonic_rhythm,
 )
 
@@ -136,11 +135,36 @@ def read_approved_kick_onsets(
 # Chord root extraction
 # ---------------------------------------------------------------------------
 
+_NOTE_PC = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
+
+
+def _note_name_to_midi(note_str: str) -> int:
+    """Convert a note name like 'G2', 'D#4', 'Bb3' to a MIDI note number."""
+    s = note_str.strip()
+    # Split trailing digit(s) as octave
+    i = len(s) - 1
+    while i >= 0 and s[i].isdigit():
+        i -= 1
+    pitch_part = s[: i + 1]
+    octave = int(s[i + 1 :])
+    pc = pitch_part[0].upper()
+    acc = pitch_part[1:] if len(pitch_part) > 1 else ""
+    midi = (octave + 1) * 12 + _NOTE_PC[pc]
+    if acc in ("#", "♯"):
+        midi += 1
+    elif acc in ("b", "♭"):
+        midi -= 1
+    return midi
+
 
 def extract_section_chord_data(
     production_dir: Path,
 ) -> tuple[dict[str, list[list[int]]], dict]:
     """Read approved chord voicings and review metadata.
+
+    Voicings are read directly from the chord review.yml ``chords`` field so
+    the count always matches ``hr_distribution`` — regardless of how many strum
+    events were baked into the MIDI file.
 
     Returns:
         chord_data: dict mapping section label → list of voicings (note lists)
@@ -153,19 +177,32 @@ def extract_section_chord_data(
     with open(chord_review_path) as f:
         chord_review = yaml.safe_load(f)
 
-    approved_dir = production_dir / "chords" / "approved"
-    if not approved_dir.exists():
-        raise FileNotFoundError(f"No approved chords: {approved_dir}")
-
-    midi_files = sorted(approved_dir.glob("*.mid"))
-    if not midi_files:
-        raise FileNotFoundError("No approved chord MIDI files found")
-
     chord_data: dict[str, list[list[int]]] = {}
-    for midi_file in midi_files:
-        label = midi_file.stem
-        voicings = parse_chord_voicings(midi_file)
-        chord_data[label] = [v["notes"] for v in voicings]
+    for candidate in chord_review.get("candidates", []):
+        status = str(candidate.get("status", "")).lower()
+        if status not in ("approved", "accepted"):
+            continue
+        label = candidate.get("label")
+        if not label:
+            continue
+        key = str(label).lower().replace("-", "_").replace(" ", "_")
+        if key in chord_data:
+            continue
+        voicings = []
+        for chord in candidate.get("chords", []):
+            midi_notes = []
+            for n in chord.get("notes", []):
+                try:
+                    midi_notes.append(_note_name_to_midi(str(n)))
+                except (ValueError, KeyError):
+                    pass
+            if midi_notes:
+                voicings.append(sorted(midi_notes))
+        if voicings:
+            chord_data[key] = voicings
+
+    if not chord_data:
+        raise FileNotFoundError("No approved chord voicings found in chords/review.yml")
 
     return chord_data, chord_review
 
