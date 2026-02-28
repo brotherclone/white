@@ -1,0 +1,84 @@
+production_dir: shrinkwrapped/white-the-breathing-machine-learns-to-sing/production/black__sequential_dissolution_v2
+pipeline: lyric-generation
+bpm: 84
+time_sig: 7/8
+color: Black
+generated: '2026-02-28T14:50:49.349608+00:00'
+seed: 42
+model: claude-sonnet-4-6
+scoring_weights:
+  chromatic: 1.0
+vocal_sections:
+- Verse
+- Bridge
+- Intro
+candidates:
+- id: lyrics_01
+  file: candidates/lyrics_01.txt
+  rank: 1
+  chromatic: null
+  fitting:
+    Verse:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    Bridge:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    Intro:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    overall: paste-ready
+  status: approved
+  notes: 'needs additions and edits'
+- id: lyrics_02
+  file: candidates/lyrics_02.txt
+  rank: 2
+  chromatic: null
+  fitting:
+    Verse:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    Bridge:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    Intro:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    overall: paste-ready
+  status: rejected
+  notes: ''
+- id: lyrics_03
+  file: candidates/lyrics_03.txt
+  rank: 3
+  chromatic: null
+  fitting:
+    Verse:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    Bridge:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    Intro:
+      syllables: 0
+      notes: 0
+      ratio: 1.0
+      verdict: paste-ready
+    overall: paste-ready
+  status: rejected
+  notes: ''

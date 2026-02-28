@@ -1,7 +1,11 @@
 # production-plan Specification
 
 ## Purpose
-TBD - created by archiving change add-production-plan. Update Purpose after archive.
+DEPRECATED — `production_plan.yml` is no longer part of the standard workflow.
+The arrangement (`arrangement.txt` exported from Logic) is the source of truth
+for song structure. Downstream pipelines read from `arrangement.txt` + the song
+proposal YAML directly. The code (`production_plan.py`) is retained but not
+invoked. See change `update-lyric-pipeline-remove-plan`.
 ## Requirements
 ### Requirement: Production Plan Generation
 
