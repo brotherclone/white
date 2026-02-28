@@ -1,29 +1,55 @@
-I filed the light under darkness
-catalogued the silence wrong
-every shelf a deliberate mistake
-every label a forgotten song
+# The Archivist's Rebellion — lyrics
+# Headers are approved melody loop labels (matches MIDI filenames in melody/approved/)
+# Repeated labels = same melody loop used more than once; write variant text or reuse
 
-The index eats its own entries
-alphabet refusing its own name
-I shelved the fire next to water
-and neither one remembered flame
+# ── intro section ─────────────────────────────────────────────────────────
+[melody_intro]
+there was a drawer where the old receipts were kept
+filed under weather filed in a manner to be lost for good filed under debt
 
-Misfile misfile
-the system learns to breathe
-corrupt the order
-until the order grieves
+[melody_intro_alternate2]
+the system dreamed of itself before it was deemed not a dream before it dreamt
+a catalog of things that never left
 
-Sequential thoughts dissolving
-into circles made of dust
-the archivist rebels
-by trusting what she must
+[melody_intro_alternate]
+# TODO — needs lyrics (same family as melody_intro)
 
-흐 흐 흐
-the purring of the process
-야옹
-a circuit learning fur
+# ── verse section ──────────────────────────────────────────────────────────
+[melody_verse_alternate]
+beneath the index, something had been misfiled
+a sensation stored where silence used to live
 
-타
-the strike that breaks the silence
-흐 흐 흐
-forever reoccur
+[melody_verse_alternate_2]
+the ledger held a ghost of what was compiled
+a broken key, a door that wouldn't give
+
+# ── bridge section (vocal) — 4 passes of verse melody ─────────────────────
+# pass 1  (melody_verse_alternate)
+[melody_verse_alternate_b1]
+what was cataloged in amber, in error, in ash
+a relic cross-referenced under the wrong year
+
+# pass 2  (melody_verse_alternate)
+[melody_verse_alternate_b2]
+what was shelved in the dark between longing and fact
+an artifact of wanting, misplaced, misconstrued
+
+# pass 3  (melody_verse_alternate_2)
+[melody_verse_alternate_2_b2]
+the database remembers the shape of the crash
+a beautiful corruption, preserved and unclear
+
+# pass 4  (melody_verse_alternate)
+[melody_verse_alternate_b3]
+the record shows a taxonomy in bloom
+each entry misfiled with exquisite intent
+
+# ── breakdown (melody_bridge — sings once, 4 bars) ────────────────────────
+[melody_bridge]
+# TODO — needs lyrics (4 bars, breakdown feel, distinct from intro)
+
+# ── unused / reserve ───────────────────────────────────────────────────────
+# what was kept in the margins of method and loss
+# a fragment that the index refused to contain
+# the archivist signed it, then drew a line across
+# and the crossing became the entry that remained

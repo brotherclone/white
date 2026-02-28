@@ -25,8 +25,11 @@ from pathlib import Path
 
 import yaml
 
-from app.generators.midi.lyric_pipeline import _compute_fitting, _read_vocal_sections
-from app.generators.midi.production_plan import load_plan
+from app.generators.midi.lyric_pipeline import (
+    _compute_fitting,
+    _find_and_load_proposal,
+    read_vocal_sections_from_arrangement,
+)
 
 LYRICS_REVIEW_FILENAME = "lyrics_review.yml"
 EVALUATION_FILENAME = "song_evaluation.yml"
@@ -52,23 +55,44 @@ def collect_song_record(production_dir: Path) -> dict | None:
     if not lyrics_path.exists():
         return None
 
-    plan = load_plan(production_dir)
     song_slug = production_dir.name
-    color = plan.color if plan else ""
-    concept = plan.concept if plan else ""
-    bpm = plan.bpm if plan else 0
-    time_sig = plan.time_sig if plan else ""
-    key = getattr(plan, "key", "") if plan else ""
 
-    # Vocal sections + note counts (from lyric_pipeline helper)
+    # Load metadata from proposal (via chords/review.yml thread) or chord review fallback
+    meta = _find_and_load_proposal(production_dir)
+    if not meta:
+        chord_review_path = production_dir / "chords" / "review.yml"
+        if chord_review_path.exists():
+            with open(chord_review_path) as f:
+                cr = yaml.safe_load(f) or {}
+            meta = {
+                "color": str(cr.get("color", "")),
+                "concept": "",
+                "bpm": int(cr.get("bpm", 0)),
+                "time_sig": str(cr.get("time_sig", "")),
+                "key": str(cr.get("key", "")),
+            }
+        else:
+            meta = {"color": "", "concept": "", "bpm": 0, "time_sig": "", "key": ""}
+
+    color = meta.get("color", "")
+    concept = meta.get("concept", "")
+    bpm = meta.get("bpm", 0)
+    time_sig = meta.get("time_sig", "")
+    key = meta.get("key", "")
+
+    # Vocal sections — from arrangement.txt when present; legacy fallback to
+    # vocal_sections stored in lyrics_review.yml header (old pipeline format)
     vocal_sections: list[dict] = []
-    if plan:
+    arrangement_path = production_dir / "arrangement.txt"
+    if arrangement_path.exists() and bpm and time_sig:
         try:
-            vocal_sections = _read_vocal_sections(plan, melody_dir)
+            vocal_sections = read_vocal_sections_from_arrangement(
+                arrangement_path, melody_dir, bpm, time_sig
+            )
         except Exception:
             pass
 
-    # Singer — from lyrics_review.yml header (most reliable) or plan
+    # Singer — from lyrics_review.yml header
     singer = ""
     review_data: dict = {}
     review_path = melody_dir / LYRICS_REVIEW_FILENAME
@@ -76,6 +100,9 @@ def collect_song_record(production_dir: Path) -> dict | None:
         with open(review_path) as f:
             review_data = yaml.safe_load(f) or {}
         singer = review_data.get("singer", "")
+        # Legacy: vocal_sections stored in old review header (pre-arrangement.txt pipeline)
+        if not vocal_sections:
+            vocal_sections = review_data.get("vocal_sections") or []
 
     # draft_chromatic_match — from the approved candidate in lyrics_review.yml
     draft_chromatic_match = None

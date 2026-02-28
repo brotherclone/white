@@ -35,9 +35,9 @@ sounds_like:
 - Faust
 sections:
 - name: Intro
-  bars: 7
-  repeat: 3
-  vocals: false
+  bars: 4
+  repeat: 4
+  vocals: true
   notes: Keeper and arp up variants
   loops:
     strums: intro_plain
@@ -54,8 +54,8 @@ sections:
     drums: bridge_drums_eighth_hypnotic
     bass: bridge_bass_eighth_hypnotic
 - name: Bridge
-  bars: 16
-  repeat: 1
+  bars: 4
+  repeat: 4
   vocals: true
   notes: main
   loops:
@@ -74,8 +74,8 @@ sections:
     bass: bridge_bass_2_punctuated
     melody: bridge_melody_2_punct_gw
 - name: Bridge
-  bars: 8
-  repeat: 2
+  bars: 4
+  repeat: 1
   vocals: true
   notes: move development almost like a chorus
   loops:
@@ -84,8 +84,8 @@ sections:
     bass: verse_bass_2_eighth_hypnotic
     melody: verse_melody_2_hypnotic_gw
 - name: Intro
-  bars: 6
-  repeat: 2
+  bars: 4
+  repeat: 1
   vocals: true
   notes: use as break down
   loops:
