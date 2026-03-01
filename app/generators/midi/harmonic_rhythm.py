@@ -3,7 +3,7 @@
 Harmonic rhythm generation — variable chord durations on a half-bar grid.
 
 Generates candidate duration distributions for chord progressions, scores them
-against drum accent alignment and ChromaticScorer temporal mode.
+against drum accent alignment and Refractor temporal mode.
 
 Core functions (used internally by chord_pipeline.py to bake HR into candidates):
 - enumerate_distributions: all valid half-bar distributions for N chords
@@ -13,9 +13,9 @@ Core functions (used internally by chord_pipeline.py to bake HR into candidates)
 """
 
 import io
-from itertools import product as iterproduct
-
 import mido
+
+from itertools import product as iterproduct
 
 
 # ---------------------------------------------------------------------------
@@ -217,7 +217,7 @@ def distribution_to_midi_bytes(
     """Generate block-chord MIDI from a chord progression with variable durations.
 
     Each chord is sustained for its assigned duration (in bars). This produces
-    simple whole-note-style MIDI suitable for ChromaticScorer evaluation.
+    simple whole-note-style MIDI suitable for Refractor evaluation.
 
     Args:
         chords: list of voicings, each a list of MIDI note numbers

@@ -45,6 +45,7 @@ VELOCITY = {
 # ---------------------------------------------------------------------------
 
 
+# ToDo: Convert to Pydantic model if we want validation and better IDE support. For now, dataclass is sufficient for static templates.
 @dataclass
 class DrumPattern:
     """A single-bar drum pattern template.

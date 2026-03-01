@@ -551,7 +551,7 @@ class TestDrumCompositeScore:
 class TestDrumPipelineIntegration:
 
     def test_full_pipeline_with_mock_scorer(self, tmp_path, monkeypatch):
-        """Run the pipeline end-to-end with a mocked ChromaticScorer."""
+        """Run the pipeline end-to-end with a mocked Refractor."""
         # Set up mock production directory
         chords_dir = tmp_path / "chords"
         chords_dir.mkdir(parents=True)
@@ -610,7 +610,7 @@ class TestDrumPipelineIntegration:
         with open(tmp_path / "manifest.yml", "w") as f:
             yaml.dump({"concept": "Test concept for Red"}, f)
 
-        # Mock ChromaticScorer
+        # Mock Refractor
         import numpy as np
 
         class MockScorer:
@@ -638,7 +638,7 @@ class TestDrumPipelineIntegration:
 
         # Monkeypatch the scorer at the source module (imported lazily inside run_drum_pipeline)
         monkeypatch.setattr(
-            "training.chromatic_scorer.ChromaticScorer",
+            "training.refractor.Refractor",
             MockScorer,
         )
 

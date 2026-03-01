@@ -128,7 +128,7 @@ MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
     → Learned null embeddings + modality dropout (p=0.15)
     → Results: temporal 90%, spatial 93%, ontological 91%
     → Spatial mode: 62% → 93% (target was >85%) ✓
-    → Model: training/data/fusion_model.pt (16.4 MB)
+    → Model: training/data/refractor.pt (16.4 MB)
 ```
 
 ### Track B: Agent Pipeline (Local, No GPU)
@@ -154,9 +154,9 @@ MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
 POST-TRAINING
 ══════════════════════════════════
 
- ✅ ONNX Export + ChromaticScorer (COMPLETE 2026-02-14)
-    → ONNX export: training/data/fusion_model.onnx (16 MB, CPU inference)
-    → ChromaticScorer class: training/chromatic_scorer.py
+ ✅ ONNX Export + Refractor (COMPLETE 2026-02-14)
+    → ONNX export: training/data/refractor.onnx (16 MB, CPU inference)
+    → Refractor class: training/refractor.py
     → score(midi_bytes, concept_emb=...) → {temporal, spatial, ontological, confidence}
     → score_batch(candidates, concept_emb=...) → ranked list for 50+ candidates
     → Lazy-loaded DeBERTa + CLAP encoders (MIDI-only scoring never loads CLAP)
@@ -165,7 +165,7 @@ POST-TRAINING
  ✅ Music Production Pipeline — Chord Phase (COMPLETE 2026-02-14)
     → OpenSpec: openspec/changes/add-music-production-pipeline/
     → Pipeline: app/generators/midi/chord_pipeline.py
-    → Reads shrinkwrapped song proposal → Markov chord generation → ChromaticScorer scoring
+    → Reads shrinkwrapped song proposal → Markov chord generation → Refractor scoring
     → Composite scoring (30% theory + 70% chromatic) → top-N MIDI files + review.yml
     → Human labels candidates (verse/chorus/bridge) in review.yml → promote to approved/
     → Promotion tool: app/generators/midi/promote_part.py
@@ -333,7 +333,7 @@ Core multimodal model combining audio, MIDI, and text:
 **Change**: `add-data-augmentation`
 **Priority**: Low
 
-### Phase 10: ONNX Export + ChromaticScorer
+### Phase 10: ONNX Export + Refractor
 **Change**: `add-production-deployment` (revised — no API, direct import)
 **Priority**: ✅ COMPLETE (2026-02-14)
 **Status**: Complete
@@ -341,7 +341,7 @@ Core multimodal model combining audio, MIDI, and text:
 Revised scope (2026-02-13): No FastAPI endpoint needed. The Evolutionary Music Generator
 calls the scorer directly in-process. Scope is now:
 - ONNX export of `MultimodalFusionModel` (4.3M params → fast CPU inference)
-- `ChromaticScorer` class that loads ONNX model + handles piano roll conversion
+- `Refractor` class that loads ONNX model + handles piano roll conversion
 - Interface: `score(midi_bytes, audio_waveform, concept_text) → {temporal, spatial, ontological, confidence}`
 - Batch interface: `score_batch(candidates) → ranked list` for 50+ candidates per stage
 - DeBERTa + CLAP encoders still needed at inference for new text/audio — either precompute or lazy-load
@@ -441,4 +441,4 @@ All 27 mode combinations now mapped to 8 albums.
 
 *Last Updated: 2026-02-12*
 
-**Status**: Phases 1, 2, 3, 4, 10 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3 complete** (2026-02-13): Multimodal fusion model achieves 90% temporal, 93% spatial, 91% ontological. **Phase 10 complete** (2026-02-14): ChromaticScorer class with ONNX inference, batch scoring for 50+ candidates, lazy-loaded DeBERTa/CLAP encoders. **Chord phase complete** (2026-02-14): Full chord generation pipeline with Markov chains + ChromaticScorer composite scoring + human review. **Drum phase complete** (2026-02-15): Template-based drum pattern generation with 8 genre families (including motorik/krautrock), velocity dynamics, section-aware energy mapping. **Next: strums, bass, melody+lyrics.** GPU execution on Modal (serverless).
+**Status**: Phases 1, 2, 3, 4, 10 complete. Extraction pipeline fully operational: 11,605 segments, all 8 colors, 85.4% audio, 44.3% MIDI. Published to HuggingFace as `earthlyframes/white-training-data` v0.2.0 (public, 15.3 GB media included). **Phase 3 complete** (2026-02-13): Multimodal fusion model achieves 90% temporal, 93% spatial, 91% ontological. **Phase 10 complete** (2026-02-14): Refractor class with ONNX inference, batch scoring for 50+ candidates, lazy-loaded DeBERTa/CLAP encoders. **Chord phase complete** (2026-02-14): Full chord generation pipeline with Markov chains + Refractor composite scoring + human review. **Drum phase complete** (2026-02-15): Template-based drum pattern generation with 8 genre families (including motorik/krautrock), velocity dynamics, section-aware energy mapping. **Next: strums, bass, melody+lyrics.** GPU execution on Modal (serverless).

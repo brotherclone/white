@@ -7,12 +7,12 @@ TBD - created by archiving change cleanup-dead-code. Update Purpose after archiv
 
 Completed Modal/RunPod training and data-pipeline scripts SHALL live under
 `training/archive/` rather than `training/`, so that the active training
-surface (`train.py`, `train_phase_four.py`, `chromatic_scorer.py`) is clearly
+surface (`train.py`, `train_phase_four.py`, `refractor.py`) is clearly
 distinguished from finished work.
 
 #### Scenario: Archive directory contains completed scripts
 
-- **GIVEN** the training phase jobs are complete (fusion_model.pt committed,
+- **GIVEN** the training phase jobs are complete (refractor.pt committed,
   HuggingFace dataset v0.2.0 published)
 - **THEN** `training/archive/` SHALL contain:
   `hf_dataset_prep.py`, `push_to_hub_fixed.py`
@@ -21,7 +21,7 @@ distinguished from finished work.
 #### Scenario: Active training scripts remain at training/ root
 
 - **WHEN** `training/` root is listed
-- **THEN** `train.py`, `train_phase_four.py`, `chromatic_scorer.py`,
+- **THEN** `train.py`, `train_phase_four.py`, `refractor.py`,
   `validate_concepts.py`, `verify_extraction.py` SHALL still be present
   at root level
 

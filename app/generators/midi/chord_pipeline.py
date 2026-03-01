@@ -4,7 +4,7 @@ Chord generation pipeline for the Music Production Pipeline.
 
 Reads a song proposal from a shrinkwrapped thread, generates chord progression
 candidates via Markov chains, scores them with both music theory metrics and
-ChromaticScorer, and writes the top candidates as MIDI files with a review YAML.
+Refractor, and writes the top candidates as MIDI files with a review YAML.
 
 Usage:
     python -m app.generators.midi.chord_pipeline \
@@ -17,13 +17,13 @@ import argparse
 import io
 import re
 import sys
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Optional
-
 import mido
 import numpy as np
 import yaml
+
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
 
 from app.generators.artist_catalog import load_artist_context
 from app.generators.midi.prototype.generator import ChordProgressionGenerator
@@ -336,7 +336,7 @@ def generate_scratch_beat(
 
 
 def compute_chromatic_match(scorer_result: dict, target: dict) -> float:
-    """Compute how well ChromaticScorer output matches the target distribution.
+    """Compute how well Refractor output matches the target distribution.
 
     Uses dot product between predicted and target distributions (range 0-1).
     Higher = better match.
@@ -489,7 +489,7 @@ def run_chord_pipeline(
 
     1. Load song proposal
     2. Generate chord candidates via Markov chains
-    3. Score with theory + ChromaticScorer
+    3. Score with theory + Refractor
     4. Write top-k as MIDI files
     5. Write review.yml
     """
@@ -559,12 +559,12 @@ def run_chord_pipeline(
         )
         sys.exit(1)
 
-    # --- 3. Score with ChromaticScorer ---
-    print("\nScoring with ChromaticScorer...")
+    # --- 3. Score with Refractor ---
+    print("\nScoring with Refractor...")
 
-    from training.chromatic_scorer import ChromaticScorer
+    from training.refractor import Refractor
 
-    scorer = ChromaticScorer(onnx_path=onnx_path) if onnx_path else ChromaticScorer()
+    scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 
     # Prepare concept embedding once
     concept_text = song_info["concept"]
@@ -588,7 +588,7 @@ def run_chord_pipeline(
             }
         )
 
-    # Batch score with ChromaticScorer
+    # Batch score with Refractor
     scorer_candidates = [{"midi_bytes": c["midi_bytes"]} for c in midi_candidates]
     scorer_results = scorer.score_batch(scorer_candidates, concept_emb=concept_emb)
 
@@ -761,7 +761,7 @@ def main():
     parser.add_argument(
         "--onnx-path",
         default=None,
-        help="Path to fusion_model.onnx (default: training/data/fusion_model.onnx)",
+        help="Path to refractor.onnx (default: training/data/refractor.onnx)",
     )
     parser.add_argument(
         "--strum-patterns",

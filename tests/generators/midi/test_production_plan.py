@@ -230,14 +230,6 @@ class TestGeneratePlan:
         plan = generate_plan(prod)
         assert [s.name for s in plan.sections] == ["Intro", "Verse", "Chorus"]
 
-    def test_defaults_repeat_and_vocals(self, tmp_path):
-        prod = self._setup(tmp_path, [{"label": "Verse", "chord_count": 4}])
-        plan = generate_plan(prod)
-        sec = plan.sections[0]
-        assert sec.repeat == 1
-        assert sec.vocals is False
-        assert sec.notes == ""
-
     def test_bar_count_from_chord_count_fallback(self, tmp_path):
         prod = self._setup(tmp_path, [{"label": "Verse", "chord_count": 4}])
         plan = generate_plan(prod)

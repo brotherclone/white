@@ -25,6 +25,7 @@ from app.util.lrc_utils import load_lrc
 logger = logging.getLogger(__name__)
 
 
+# ToDo Convert to pydantic model if we want to add validation or more complex logic later
 @dataclass
 class AudioSegmentSpec:
     """Specification for an audio segment to extract."""
@@ -33,7 +34,7 @@ class AudioSegmentSpec:
     end_seconds: float
     text: str
     source_file: str
-    segment_type: str  # "lyric", "structure", or "combined"
+    segment_type: str  # "lyric", "structure", or "combined" #ToDo: Convert to Enum if we want stricter typing
     metadata: (
         dict  # Additional metadata like structure section, original timestamps, etc.
     )

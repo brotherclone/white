@@ -3,7 +3,7 @@
 Lyric generation pipeline for the Music Production Pipeline.
 
 Generates N complete lyric drafts (all vocal sections) via Claude API, scores
-each with ChromaticScorer in text-only mode, computes a syllable fitting score
+each with Refractor in text-only mode, computes a syllable fitting score
 (syllables vs. melody notes) per section, and writes melody/lyrics_review.yml
 (append-only). Integrates with promote_part.py to copy an approved .txt to
 melody/lyrics.txt.
@@ -28,15 +28,13 @@ import argparse
 import math
 import re
 import sys
+import mido
+import yaml
+
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
-
-import mido
-import yaml
 from dotenv import load_dotenv
-
-load_dotenv()
 
 from app.generators.artist_catalog import load_artist_context  # noqa: E402
 from app.generators.midi.chord_pipeline import (  # noqa: E402
@@ -45,6 +43,8 @@ from app.generators.midi.chord_pipeline import (  # noqa: E402
     get_chromatic_target,
 )
 from app.generators.midi.song_evaluator import _count_syllables  # noqa: E402
+
+load_dotenv()
 
 LYRICS_REVIEW_FILENAME = "lyrics_review.yml"
 
@@ -667,18 +667,16 @@ def run_lyric_pipeline(
         text = _call_api(client, prompt, model)
         texts.append(text)
 
-    # --- 7. Score with ChromaticScorer (text-only) ---
+    # --- 7. Score with Refractor (text-only) ---
     scorer_results_map: dict[int, Optional[dict]] = {}
     target = get_chromatic_target(meta.get("color", ""))
 
     if not skip_scoring:
-        print("\nLoading ChromaticScorer...")
+        print("\nLoading Refractor...")
         try:
-            from training.chromatic_scorer import ChromaticScorer
+            from training.refractor import Refractor
 
-            scorer = (
-                ChromaticScorer(onnx_path=onnx_path) if onnx_path else ChromaticScorer()
-            )
+            scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
             concept_text = (
                 meta.get("concept") or f"{meta.get('color', '')} chromatic concept"
             )
@@ -693,9 +691,9 @@ def run_lyric_pipeline(
                 idx = scorer_candidates.index(result["candidate"])
                 scorer_results_map[idx] = result
         except Exception as e:
-            print(f"  Warning: ChromaticScorer unavailable ({e}), skipping scoring")
+            print(f"  Warning: Refractor unavailable ({e}), skipping scoring")
     else:
-        print("\nSkipping ChromaticScorer (--skip-scoring)")
+        print("\nSkipping Refractor (--skip-scoring)")
 
     # --- 8. Compute fitting + chromatic match ---
     scored_entries = []
@@ -825,12 +823,12 @@ def main():
     parser.add_argument(
         "--onnx-path",
         default=None,
-        help="Path to fusion_model.onnx (default: training/data/fusion_model.onnx)",
+        help="Path to refractor.onnx (default: training/data/refractor.onnx)",
     )
     parser.add_argument(
         "--skip-scoring",
         action="store_true",
-        help="Skip ChromaticScorer (useful when torch/DeBERTa unavailable locally)",
+        help="Skip Refractor (useful when torch/DeBERTa unavailable locally)",
     )
 
     args = parser.parse_args()

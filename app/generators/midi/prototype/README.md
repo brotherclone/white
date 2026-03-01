@@ -276,7 +276,7 @@ app/generators/midi/prototype/
 
 This prototype is used by the **Chord Generation Pipeline** (`app/generators/midi/chord_pipeline.py`), which adds:
 - Reads song proposals from shrinkwrapped threads (key, BPM, concept, color)
-- ChromaticScorer integration (scores chord progressions for chromatic consistency)
+- Refractor integration (scores chord progressions for chromatic consistency)
 - Composite scoring (music theory + chromatic fitness)
 - MIDI file output + YAML review interface for human labeling
 

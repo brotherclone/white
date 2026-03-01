@@ -17,7 +17,7 @@ Usage:
     python -m app.generators.artist_catalog \
         --from-training-data --generate-missing
 
-    # Score all reviewed descriptions through ChromaticScorer
+    # Score all reviewed descriptions through Refractor
     python -m app.generators.artist_catalog --score-chromatic
 
     # Show catalog status
@@ -27,15 +27,17 @@ Usage:
 import argparse
 import re
 import sys
+import yaml
+
 from pathlib import Path
 from typing import Optional
-
-import yaml
 from dotenv import load_dotenv
 
 load_dotenv()
 
-CATALOG_DEFAULT_PATH = Path(__file__).parent.parent / "data" / "artist_catalog.yml"
+CATALOG_DEFAULT_PATH = (
+    Path(__file__).parent.parent / "app" / "reference" / "music" / "artist_catalog.yml"
+)
 TRAINING_PARQUET_PATH = (
     Path(__file__).parent.parent.parent
     / "training"
@@ -308,7 +310,7 @@ def generate_missing(
 
 
 # ---------------------------------------------------------------------------
-# ChromaticScorer scoring
+# Refractor scoring
 # ---------------------------------------------------------------------------
 
 
@@ -316,20 +318,20 @@ def score_chromatic(
     catalog_path: Path = CATALOG_DEFAULT_PATH,
     onnx_path: Optional[str] = None,
 ) -> None:
-    """Score all non-null descriptions through ChromaticScorer text-only mode."""
+    """Score all non-null descriptions through Refractor text-only mode."""
     catalog = load_catalog(catalog_path)
     if not catalog:
         print("Catalog is empty.")
         return
 
     try:
-        from training.chromatic_scorer import ChromaticScorer
+        from training.refractor import Refractor
     except Exception as exc:
-        print(f"ERROR: Failed to import ChromaticScorer: {exc}")
-        print("Use .venv312/bin/python — ChromaticScorer requires torch + numpy 1.x.")
+        print(f"ERROR: Failed to import Refractor: {exc}")
+        print("Use .venv312/bin/python — Refractor requires torch + numpy 1.x.")
         sys.exit(1)
 
-    scorer = ChromaticScorer(onnx_path)
+    scorer = Refractor(onnx_path)
     scored = 0
     skipped = 0
 
@@ -458,7 +460,7 @@ def main():
     parser.add_argument(
         "--score-chromatic",
         action="store_true",
-        help="Score all non-null descriptions through ChromaticScorer (.venv312)",
+        help="Score all non-null descriptions through Refractor (.venv312)",
     )
     parser.add_argument(
         "--summary",
@@ -472,7 +474,7 @@ def main():
     )
     parser.add_argument(
         "--onnx-path",
-        help="Path to fusion_model.onnx (for --score-chromatic)",
+        help="Path to refractor.onnx (for --score-chromatic)",
     )
     args = parser.parse_args()
 

@@ -3,7 +3,7 @@
 Bass line generation pipeline for the Music Production Pipeline.
 
 Reads approved chords, harmonic rhythm, and drum patterns. Generates bass line
-candidates from templates, scores with theory + ChromaticScorer composite,
+candidates from templates, scores with theory + Refractor composite,
 writes top candidates as MIDI files with a review YAML.
 
 Pipeline position: chords → drums → harmonic rhythm → strums → BASS → melody
@@ -17,13 +17,13 @@ Usage:
 import argparse
 import io
 import sys
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Optional
-
 import mido
 import numpy as np
 import yaml
+
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
 
 from app.generators.midi.bass_patterns import (
     ALL_TEMPLATES,
@@ -449,7 +449,7 @@ def run_bass_pipeline(
 
     1. Read approved chords, harmonic rhythm, drums
     2. Generate bass candidates from templates
-    3. Score with theory + ChromaticScorer
+    3. Score with theory + Refractor
     4. Write top-k per section as MIDI files
     5. Write review.yml
     """
@@ -519,11 +519,11 @@ def run_bass_pipeline(
     else:
         print("  No approved drums — kick alignment scoring disabled")
 
-    # --- 5. Load ChromaticScorer ---
-    print("\nLoading ChromaticScorer...")
-    from training.chromatic_scorer import ChromaticScorer
+    # --- 5. Load Refractor ---
+    print("\nLoading Refractor...")
+    from training.refractor import Refractor
 
-    scorer = ChromaticScorer(onnx_path=onnx_path) if onnx_path else ChromaticScorer()
+    scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 
     concept_text = song_info.get("concept", "")
     if not concept_text:
@@ -668,7 +668,7 @@ def run_bass_pipeline(
                 }
             )
 
-        # Score with ChromaticScorer
+        # Score with Refractor
         print(f"  Scoring {len(candidates)} candidates...")
         scorer_candidates = [{"midi_bytes": c["midi_bytes"]} for c in candidates]
         scorer_results = scorer.score_batch(scorer_candidates, concept_emb=concept_emb)
@@ -822,7 +822,7 @@ def main():
     parser.add_argument(
         "--onnx-path",
         default=None,
-        help="Path to fusion_model.onnx (default: training/data/fusion_model.onnx)",
+        help="Path to refractor.onnx (default: training/data/refractor.onnx)",
     )
 
     args = parser.parse_args()

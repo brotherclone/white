@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-Phase 3.2: MIDI Piano Roll + Multimodal Fusion Training on Modal
+Phase 5: MIDI Piano Roll + Multimodal Fusion Training on Modal (5 modalities)
 
 Two-phase execution:
 1. CPU preprocess: Read midi_binary from media parquet -> piano rolls [128, 256]
 2. GPU train: PianoRollEncoder CNN (unfrozen) + fusion MLP + regression heads
 
 Input modalities:
-    - Audio:   512-dim (CLAP, frozen precomputed)
-    - MIDI:    512-dim (PianoRollEncoder CNN, trained jointly)
-    - Concept: 768-dim (DeBERTa, frozen precomputed)
-    - Lyric:   768-dim (DeBERTa, frozen precomputed)
-    Total fusion input: 2560-dim
+    - Audio:       512-dim (CLAP, frozen precomputed)
+    - MIDI:        512-dim (PianoRollEncoder CNN, trained jointly)
+    - Concept:     768-dim (DeBERTa, frozen precomputed)
+    - Lyric:       768-dim (DeBERTa, frozen precomputed)
+    - Sounds-like: 768-dim (DeBERTa, frozen precomputed, song-level broadcast)
+    Total fusion input: 3328-dim
 
 Usage:
     # Dry run (verify data access + piano roll conversion)
@@ -25,6 +26,10 @@ Usage:
 
     # Skip preprocess (reuse existing piano rolls from volume)
     modal run training/modal_midi_fusion.py --skip-preprocess
+
+    # Fine-tune from Phase 3 weights (Phase 5 recommended approach)
+    modal run training/modal_midi_fusion.py --skip-preprocess \\
+        --finetune-from refractor.pt --epochs 30 --lr 1e-5
 
     # Custom training params
     modal run training/modal_midi_fusion.py --skip-preprocess --epochs 100 --lr 5e-4
@@ -285,6 +290,8 @@ def preprocess_piano_rolls(dry_run: bool = False, start_row_group: int = 0):
 def train_fusion(
     deberta_parquet_bytes: bytes,
     clap_parquet_bytes: bytes,
+    sounds_like_parquet_bytes: bytes | None = None,
+    finetune_from_bytes: bytes | None = None,
     epochs: int = 50,
     batch_size: int = 32,
     lr: float = 1e-4,
@@ -341,6 +348,21 @@ def train_fusion(
     clap_df = pd.read_parquet(io.BytesIO(clap_parquet_bytes))
     print(f"  CLAP: {len(clap_df)} rows")
 
+    # Sounds-like embeddings (optional — graceful fallback if bytes is None)
+    sounds_like_lookup: dict = {}
+    if sounds_like_parquet_bytes is not None:
+        print("Loading sounds-like embeddings...")
+        sl_df = pd.read_parquet(io.BytesIO(sounds_like_parquet_bytes))
+        for _, row in sl_df.iterrows():
+            sid = str(row["segment_id"])
+            emb = np.array(row["sounds_like_emb"], dtype=np.float32)
+            has = bool(row.get("has_sounds_like", False))
+            sounds_like_lookup[sid] = (emb, has)
+        n_has = sum(1 for _, h in sounds_like_lookup.values() if h)
+        print(f"  Sounds-like: {len(sounds_like_lookup)} rows, {n_has} with coverage")
+    else:
+        print("Sounds-like embeddings: not provided (null path for all segments)")
+
     # ----------------------------------------------------------------
     # 2. JOIN BY SEGMENT_ID
     # ----------------------------------------------------------------
@@ -388,6 +410,8 @@ def train_fusion(
     has_audio = []
     midi_rolls = []
     has_midi = []
+    sounds_like_embs = []
+    has_sounds_like = []
     temporal_labels = []
     spatial_labels = []
     ontological_labels = []
@@ -419,14 +443,24 @@ def train_fusion(
             midi_rolls.append(np.zeros((128, 256), dtype=np.float32))
             has_midi.append(False)
 
+        # Sounds-like embedding (song-level, broadcast per segment)
+        if sid in sounds_like_lookup:
+            sl_emb, sl_has = sounds_like_lookup[sid]
+            sounds_like_embs.append(sl_emb)
+            has_sounds_like.append(sl_has)
+        else:
+            sounds_like_embs.append(np.zeros(768, dtype=np.float32))
+            has_sounds_like.append(False)
+
         # Mode labels (from DeBERTa df — same source as training_full)
         temporal_labels.append(row.get(t_col))
         spatial_labels.append(row.get(s_col))
         ontological_labels.append(row.get(o_col))
 
     print(f"  Aligned: {len(segment_ids)} segments")
-    print(f"  Audio: {sum(has_audio)}/{len(has_audio)}")
-    print(f"  MIDI:  {sum(has_midi)}/{len(has_midi)}")
+    print(f"  Audio:       {sum(has_audio)}/{len(has_audio)}")
+    print(f"  MIDI:        {sum(has_midi)}/{len(has_midi)}")
+    print(f"  Sounds-like: {sum(has_sounds_like)}/{len(has_sounds_like)}")
     print(f"  Lyric: {sum(has_lyrics)}/{len(has_lyrics)}")
 
     # Free the large original arrays
@@ -437,9 +471,11 @@ def train_fusion(
     lyric_embs = np.stack(lyric_embs)  # [N, 768]
     audio_embs = np.stack(audio_embs)  # [N, 512]
     midi_rolls = np.stack(midi_rolls)  # [N, 128, 256]
+    sounds_like_embs = np.stack(sounds_like_embs)  # [N, 768]
     has_audio = np.array(has_audio)
     has_midi = np.array(has_midi)
     has_lyrics = np.array(has_lyrics)
+    has_sounds_like = np.array(has_sounds_like)
 
     # ----------------------------------------------------------------
     # 3. SOFT TARGETS
@@ -519,9 +555,11 @@ def train_fusion(
                 "audio_emb": torch.from_numpy(audio_embs[i]),
                 "concept_emb": torch.from_numpy(concept_embs[i]),
                 "lyric_emb": torch.from_numpy(lyric_embs[i]),
+                "sounds_like_emb": torch.from_numpy(sounds_like_embs[i]),
                 "has_audio": torch.tensor(has_audio[i], dtype=torch.bool),
                 "has_midi": torch.tensor(has_midi[i], dtype=torch.bool),
                 "has_lyric": torch.tensor(has_lyrics[i], dtype=torch.bool),
+                "has_sounds_like": torch.tensor(has_sounds_like[i], dtype=torch.bool),
                 "temporal_target": torch.from_numpy(temporal_targets[i]),
                 "spatial_target": torch.from_numpy(spatial_targets[i]),
                 "ontological_target": torch.from_numpy(ontological_targets[i]),
@@ -600,10 +638,11 @@ def train_fusion(
             self.null_midi = nn.Parameter(torch.randn(512) * 0.02)
             self.null_concept = nn.Parameter(torch.randn(768) * 0.02)
             self.null_lyric = nn.Parameter(torch.randn(768) * 0.02)
+            self.null_sounds_like = nn.Parameter(torch.randn(768) * 0.02)
 
-            # Fusion MLP: [audio 512 + midi 512 + concept 768 + lyric 768] = 2560
+            # Fusion MLP: [audio 512 + midi 512 + concept 768 + lyric 768 + sounds_like 768] = 3328
             self.fusion = nn.Sequential(
-                nn.Linear(2560, 1024),
+                nn.Linear(3328, 1024),
                 nn.ReLU(),
                 nn.Dropout(0.3),
                 nn.Linear(1024, 512),
@@ -626,6 +665,8 @@ def train_fusion(
             has_audio,
             has_midi,
             has_lyric,
+            sounds_like_emb,
+            has_sounds_like,
         ):
             batch_size = piano_roll.size(0)
 
@@ -636,6 +677,7 @@ def train_fusion(
             audio_mask = has_audio.unsqueeze(1)  # [batch, 1]
             midi_mask = has_midi.unsqueeze(1)
             lyric_mask = has_lyric.unsqueeze(1)
+            sounds_like_mask = has_sounds_like.unsqueeze(1)
 
             # Modality dropout during training: randomly mask out present modalities
             if self.training and self.modality_dropout > 0:
@@ -651,9 +693,14 @@ def train_fusion(
                     torch.rand(batch_size, 1, device=piano_roll.device)
                     < self.modality_dropout
                 )
+                drop_sounds_like = (
+                    torch.rand(batch_size, 1, device=piano_roll.device)
+                    < self.modality_dropout
+                )
                 audio_mask = audio_mask & ~drop_audio
                 midi_mask = midi_mask & ~drop_midi
                 lyric_mask = lyric_mask & ~drop_lyric
+                sounds_like_mask = sounds_like_mask & ~drop_sounds_like
 
             # Substitute null embeddings where modality is absent
             audio_emb = torch.where(
@@ -666,9 +713,16 @@ def train_fusion(
             lyric_emb = torch.where(
                 lyric_mask, lyric_emb, self.null_lyric.expand(batch_size, -1)
             )
+            sounds_like_emb = torch.where(
+                sounds_like_mask,
+                sounds_like_emb,
+                self.null_sounds_like.expand(batch_size, -1),
+            )
 
             # Fuse
-            fused = torch.cat([audio_emb, midi_emb, concept_emb, lyric_emb], dim=-1)
+            fused = torch.cat(
+                [audio_emb, midi_emb, concept_emb, lyric_emb, sounds_like_emb], dim=-1
+            )
             fused = self.fusion(fused)
 
             return {
@@ -679,6 +733,23 @@ def train_fusion(
             }
 
     model = MultimodalFusionModel(modality_dropout=modality_dropout).to(device)
+
+    # Fine-tune from Phase 3 weights: load matching layers, skip incompatible ones
+    if finetune_from_bytes is not None:
+        print("\nFine-tuning from provided checkpoint (Phase 3 → Phase 5)...")
+        checkpoint = torch.load(io.BytesIO(finetune_from_bytes), map_location=device)
+        old_state = checkpoint["model_state_dict"]
+        new_state = model.state_dict()
+        loaded, skipped = 0, 0
+        for k, v in old_state.items():
+            if k in new_state and new_state[k].shape == v.shape:
+                new_state[k] = v
+                loaded += 1
+            else:
+                skipped += 1
+                print(f"  Skip (shape mismatch / new key): {k}")
+        model.load_state_dict(new_state)
+        print(f"  Loaded {loaded} tensors, skipped {skipped} (re-init)")
 
     total_params = sum(p.numel() for p in model.parameters())
     cnn_params = sum(p.numel() for p in model.midi_encoder.parameters())
@@ -698,7 +769,7 @@ def train_fusion(
     kl_loss_fn = nn.KLDivLoss(reduction="batchmean")
     mse_loss_fn = nn.MSELoss()
 
-    best_val_loss = float("inf")
+    best_mean_acc = 0.0
     best_val_metrics = {}
     best_model_state = None
     patience_counter = 0
@@ -722,9 +793,11 @@ def train_fusion(
             audio_emb = batch["audio_emb"].to(device)
             concept_emb = batch["concept_emb"].to(device)
             lyric_emb = batch["lyric_emb"].to(device)
+            sl_emb = batch["sounds_like_emb"].to(device)
             h_audio = batch["has_audio"].to(device)
             h_midi = batch["has_midi"].to(device)
             h_lyric = batch["has_lyric"].to(device)
+            h_sl = batch["has_sounds_like"].to(device)
 
             preds = model(
                 piano_roll,
@@ -734,6 +807,8 @@ def train_fusion(
                 h_audio,
                 h_midi,
                 h_lyric,
+                sl_emb,
+                h_sl,
             )
 
             # KL divergence for distribution targets
@@ -776,9 +851,11 @@ def train_fusion(
                 audio_emb = batch["audio_emb"].to(device)
                 concept_emb = batch["concept_emb"].to(device)
                 lyric_emb = batch["lyric_emb"].to(device)
+                sl_emb = batch["sounds_like_emb"].to(device)
                 h_audio = batch["has_audio"].to(device)
                 h_midi = batch["has_midi"].to(device)
                 h_lyric = batch["has_lyric"].to(device)
+                h_sl = batch["has_sounds_like"].to(device)
 
                 preds = model(
                     piano_roll,
@@ -788,6 +865,8 @@ def train_fusion(
                     h_audio,
                     h_midi,
                     h_lyric,
+                    sl_emb,
+                    h_sl,
                 )
 
                 loss_t = kl_loss_fn(
@@ -829,28 +908,33 @@ def train_fusion(
         scheduler.step(avg_val_loss)
         current_lr = optimizer.param_groups[0]["lr"]
 
+        mean_acc = (
+            mode_acc["temporal"] + mode_acc["spatial"] + mode_acc["ontological"]
+        ) / 3
+
         print(
             f"Epoch {epoch + 1:3d}/{epochs} | "
             f"Train {avg_train_loss:.4f} | Val {avg_val_loss:.4f} | "
             f"T {mode_acc['temporal']:.1%} S {mode_acc['spatial']:.1%} "
-            f"O {mode_acc['ontological']:.1%} | lr={current_lr:.1e}"
+            f"O {mode_acc['ontological']:.1%} | mean {mean_acc:.1%} | lr={current_lr:.1e}"
         )
 
-        # Early stopping on val loss
-        if avg_val_loss < best_val_loss:
-            best_val_loss = avg_val_loss
+        # Early stopping on mean accuracy (more stable than val_loss at fine-tune plateau)
+        if mean_acc > best_mean_acc:
+            best_mean_acc = mean_acc
             best_val_metrics = {
                 "epoch": epoch + 1,
                 "val_loss": avg_val_loss,
                 "temporal_acc": mode_acc["temporal"],
                 "spatial_acc": mode_acc["spatial"],
                 "ontological_acc": mode_acc["ontological"],
+                "mean_acc": mean_acc,
             }
             best_model_state = {
                 k: v.cpu().clone() for k, v in model.state_dict().items()
             }
             patience_counter = 0
-            print(f"  ** New best model (val_loss={avg_val_loss:.4f})")
+            print(f"  ** New best model (mean_acc={mean_acc:.1%})")
         else:
             patience_counter += 1
             if patience_counter >= patience_limit:
@@ -870,6 +954,7 @@ def train_fusion(
     print(f"  Temporal mode:   {best_val_metrics['temporal_acc']:.1%}")
     print(f"  Spatial mode:    {best_val_metrics['spatial_acc']:.1%}")
     print(f"  Ontological mode:{best_val_metrics['ontological_acc']:.1%}")
+    print(f"  Mean accuracy:   {best_val_metrics.get('mean_acc', 0):.1%}")
 
     buf = io.BytesIO()
     torch.save(
@@ -889,7 +974,8 @@ def train_fusion(
                     "midi": 512,
                     "concept": 768,
                     "lyric": 768,
-                    "fusion_input": 2560,
+                    "sounds_like": 768,
+                    "fusion_input": 3328,
                 },
             },
         },
@@ -912,6 +998,7 @@ def main(
     epochs: int = 50,
     batch_size: int = 32,
     lr: float = 1e-4,
+    finetune_from: str = "",
 ):
     """Orchestrate piano roll preprocessing and fusion training."""
     from pathlib import Path
@@ -931,12 +1018,13 @@ def main(
 
     # --- Phase 2: Train fusion model ---
     print("\n" + "=" * 60)
-    print("PHASE 2: Training fusion model (GPU)")
+    print("PHASE 5: Training fusion model (GPU) — 5th modality")
     print("=" * 60)
 
     # Read local embedding files to pass as bytes
     deberta_path = data_dir / "training_data_with_embeddings.parquet"
     clap_path = data_dir / "training_data_clap_embeddings.parquet"
+    sounds_like_path = data_dir / "sounds_like_embeddings.parquet"
 
     if not deberta_path.exists():
         print(f"ERROR: DeBERTa embeddings not found: {deberta_path}")
@@ -950,20 +1038,42 @@ def main(
     print(f"DeBERTa embeddings: {len(deberta_bytes) / 1e6:.1f} MB")
     print(f"CLAP embeddings:    {len(clap_bytes) / 1e6:.1f} MB")
 
+    sounds_like_bytes = None
+    if sounds_like_path.exists():
+        sounds_like_bytes = sounds_like_path.read_bytes()
+        print(f"Sounds-like embs:   {len(sounds_like_bytes) / 1e6:.1f} MB")
+    else:
+        print(f"Sounds-like embs:   NOT FOUND ({sounds_like_path}) — null path")
+
+    finetune_bytes = None
+    if finetune_from:
+        ft_path = Path(finetune_from)
+        if not ft_path.is_absolute():
+            ft_path = data_dir / finetune_from
+        if ft_path.exists():
+            finetune_bytes = ft_path.read_bytes()
+            print(f"Fine-tune from:     {ft_path} ({len(finetune_bytes) / 1e6:.1f} MB)")
+        else:
+            print(
+                f"WARNING: --finetune-from path not found: {ft_path}, training from scratch"
+            )
+
     model_bytes = train_fusion.remote(
         deberta_parquet_bytes=deberta_bytes,
         clap_parquet_bytes=clap_bytes,
+        sounds_like_parquet_bytes=sounds_like_bytes,
+        finetune_from_bytes=finetune_bytes,
         epochs=epochs,
         batch_size=batch_size,
         lr=lr,
     )
 
     # Save model locally
-    output_path = data_dir / "fusion_model.pt"
+    output_path = data_dir / "refractor.pt"
     output_path.write_bytes(model_bytes)
 
     size_mb = len(model_bytes) / (1024 * 1024)
     print(f"\nSaved: {output_path} ({size_mb:.1f} MB)")
     print("\n" + "=" * 60)
-    print("PHASE 3.2: MULTIMODAL FUSION TRAINING COMPLETE")
+    print("PHASE 5: MULTIMODAL FUSION TRAINING COMPLETE")
     print("=" * 60)

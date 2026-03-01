@@ -102,7 +102,7 @@ The drum generator SHALL write candidate MIDI files to the song's production dru
 
 ### Requirement: Composite Scoring
 
-The drum pipeline SHALL score each candidate using energy appropriateness and ChromaticScorer, producing a single composite ranking per section.
+The drum pipeline SHALL score each candidate using energy appropriateness and Refractor, producing a single composite ranking per section.
 
 #### Scenario: Energy appropriateness scoring
 
@@ -112,7 +112,7 @@ The drum pipeline SHALL score each candidate using energy appropriateness and Ch
 #### Scenario: Chromatic scoring
 
 - **WHEN** a drum candidate is scored
-- **THEN** the pipeline SHALL convert the candidate to MIDI bytes and score with `ChromaticScorer.score()`
+- **THEN** the pipeline SHALL convert the candidate to MIDI bytes and score with `Refractor.score()`
 - **AND** the concept embedding SHALL be computed once and reused across all candidates
 
 #### Scenario: Composite ranking

@@ -4,7 +4,7 @@ Music production pipeline tools. Each phase follows the same pattern: **generate
 
 ## Chord Pipeline
 
-Generates chord progression candidates from a song proposal using Markov chains, scores them with music theory metrics + ChromaticScorer, and writes top candidates for human review.
+Generates chord progression candidates from a song proposal using Markov chains, scores them with music theory metrics + Refractor, and writes top candidates for human review.
 
 ```bash
 python -m app.generators.midi.chord_pipeline \
@@ -21,14 +21,14 @@ python -m app.generators.midi.chord_pipeline \
 | `--top-k`            | 10                                | Candidates to keep for review    |
 | `--length`           | 4                                 | Progression length in bars       |
 | `--theory-weight`    | 0.3                               | Weight for music theory score    |
-| `--chromatic-weight` | 0.7                               | Weight for ChromaticScorer match |
-| `--onnx-path`        | `training/data/fusion_model.onnx` | Path to ONNX model               |
+| `--chromatic-weight` | 0.7                               | Weight for Refractor match |
+| `--onnx-path`        | `training/data/refractor.onnx` | Path to ONNX model               |
 
 **Output:** `<thread>/production/<song_slug>/chords/{candidates/, review.yml}`
 
 ## Drum Pipeline
 
-Generates drum pattern candidates for approved chord sections. Reads the chord `review.yml` to determine song sections (verse, chorus, bridge, etc.), maps genre tags to template families, and scores with energy appropriateness + ChromaticScorer.
+Generates drum pattern candidates for approved chord sections. Reads the chord `review.yml` to determine song sections (verse, chorus, bridge, etc.), maps genre tags to template families, and scores with energy appropriateness + Refractor.
 
 ```bash
 python -m app.generators.midi.drum_pipeline \
@@ -43,10 +43,10 @@ python -m app.generators.midi.drum_pipeline \
 | `--seed`             | 42                                | Random seed                                                                           |
 | `--top-k`            | 5                                 | Candidates per section                                                                |
 | `--energy-weight`    | 0.3                               | Weight for energy appropriateness                                                     |
-| `--chromatic-weight` | 0.7                               | Weight for ChromaticScorer match                                                      |
+| `--chromatic-weight` | 0.7                               | Weight for Refractor match                                                      |
 | `--energy-override`  | *(none)*                          | Override section energy: `verse=high,chorus=medium`                                   |
 | `--genre-override`   | *(none)*                          | Force genre families: `krautrock,ambient`                                             |
-| `--onnx-path`        | `training/data/fusion_model.onnx` | Path to ONNX model                                                                    |
+| `--onnx-path`        | `training/data/refractor.onnx` | Path to ONNX model                                                                    |
 
 **Genre families:** ambient, electronic, krautrock, rock, classical, experimental, folk, jazz
 

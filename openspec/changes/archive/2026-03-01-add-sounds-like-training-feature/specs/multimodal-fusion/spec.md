@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: MultimodalFusionModel — 5th Modality
 
@@ -56,7 +56,7 @@ Modal volume and pass it to the model as the 5th modality.
 
 #### Scenario: Phase 5 fine-tune from Phase 3 weights
 
-- **WHEN** `--finetune-from fusion_model.pt` is passed
+- **WHEN** `--finetune-from refractor.pt` is passed
 - **THEN** the script loads Phase 3 weights for all layers that exist in both models
 - **AND** the `null_sounds_like` parameter and the resized first fusion layer are
   freshly initialised
@@ -78,9 +78,9 @@ tensors as named inputs in the ONNX graph.
 
 ---
 
-### Requirement: ChromaticScorer — Optional Sounds-Like Injection
+### Requirement: Refractor — Optional Sounds-Like Injection
 
-`training/chromatic_scorer.py` SHALL optionally accept sounds-like context for
+`training/refractor.py` SHALL optionally accept sounds-like context for
 inference, while remaining backward-compatible when called without it.
 
 #### Scenario: Score with sounds_like texts

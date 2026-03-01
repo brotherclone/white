@@ -1,12 +1,12 @@
 """
-ChromaticScorer — fitness function for evolutionary music composition.
+Refractor — fitness function for evolutionary music composition.
 
 Wraps the ONNX-exported multimodal fusion model with lazy-loaded DeBERTa
 and CLAP encoders. Designed for CPU inference with batch scoring of 50+
 candidates per evolutionary stage.
 
 Usage:
-    scorer = ChromaticScorer()
+    scorer = Refractor()
 
     # Encode concept text once, reuse across all candidates
     concept_emb = scorer.prepare_concept("RED temporal=Past spatial=Thing ontological=Known")
@@ -31,7 +31,7 @@ import numpy as np
 # ---------------------------------------------------------------------------
 # venv sanity check
 # ---------------------------------------------------------------------------
-# ChromaticScorer requires torch + numpy 1.x. The project venv that satisfies
+# Refractor requires torch + numpy 1.x. The project venv that satisfies
 # this is .venv312.  If you're on a different interpreter, warn early so the
 # error message is actionable rather than a cryptic NumPy/torch crash.
 
@@ -39,7 +39,7 @@ _EXPECTED_VENV = ".venv312"
 _exe = Path(sys.executable)
 if _EXPECTED_VENV not in str(_exe):
     print(
-        f"\n⚠  WARNING: ChromaticScorer is running under {_exe}\n"
+        f"\n⚠  WARNING: Refractor is running under {_exe}\n"
         f"   Expected .venv312 (torch + numpy 1.x compatible).\n"
         f"   Use: .venv312/bin/python -m <pipeline> ...\n",
         file=sys.stderr,
@@ -65,7 +65,7 @@ SPATIAL_MODES = ["Thing", "Place", "Person"]
 ONTOLOGICAL_MODES = ["Imagined", "Forgotten", "Known"]
 
 
-class ChromaticScorer:
+class Refractor:
     """Scores audio/MIDI candidates against chromatic concepts.
 
     The ONNX model (16 MB) loads immediately. DeBERTa (~400 MB) and CLAP
@@ -77,13 +77,13 @@ class ChromaticScorer:
         """Initialize the scorer with an ONNX model.
 
         Args:
-            onnx_path: Path to fusion_model.onnx. Defaults to
-                training/data/fusion_model.onnx relative to this file.
+            onnx_path: Path to refractor.onnx. Defaults to
+                training/data/refractor.onnx relative to this file.
         """
         import onnxruntime as ort
 
         if onnx_path is None:
-            onnx_path = str(Path(__file__).parent / "data" / "fusion_model.onnx")
+            onnx_path = str(Path(__file__).parent / "data" / "refractor.onnx")
 
         if not Path(onnx_path).exists():
             raise FileNotFoundError(f"ONNX model not found: {onnx_path}")
@@ -178,6 +178,22 @@ class ChromaticScorer:
     # Scoring
     # ------------------------------------------------------------------
 
+    def prepare_sounds_like(self, artist_descriptions: list[str]) -> np.ndarray:
+        """Embed a list of artist description strings, mean-pool to 768-dim.
+
+        Args:
+            artist_descriptions: List of aesthetic description strings (one per artist).
+
+        Returns:
+            768-dim float32 numpy array (zero vector if list is empty).
+        """
+        if not artist_descriptions:
+            return np.zeros(768, dtype=np.float32)
+
+        self._load_deberta()
+        embeddings = [self._encode_text(desc) for desc in artist_descriptions]
+        return np.mean(embeddings, axis=0).astype(np.float32)
+
     def score(
         self,
         midi_bytes: Optional[bytes] = None,
@@ -187,6 +203,8 @@ class ChromaticScorer:
         concept_emb: Optional[np.ndarray] = None,
         audio_emb: Optional[np.ndarray] = None,
         lyric_emb: Optional[np.ndarray] = None,
+        sounds_like_texts: Optional[list[str]] = None,
+        sounds_like_emb: Optional[np.ndarray] = None,
     ) -> dict:
         """Score a single candidate.
 
@@ -195,6 +213,10 @@ class ChromaticScorer:
         Precomputed embeddings take priority when both are provided.
 
         At minimum, concept_text or concept_emb must be provided.
+
+        sounds_like_texts: list of artist description strings to embed on-the-fly.
+        sounds_like_emb: pre-computed 768-dim embedding (takes priority).
+        When neither is provided the null path is used (backward compatible).
 
         Returns:
             {
@@ -221,7 +243,18 @@ class ChromaticScorer:
                 raise ValueError("Either concept_text or concept_emb is required")
             concept_emb = self.prepare_concept(concept_text)
 
-        results = self.score_batch([candidate], concept_emb=concept_emb)
+        # Resolve sounds_like embedding
+        resolved_sl_emb = None
+        if sounds_like_emb is not None:
+            resolved_sl_emb = sounds_like_emb
+        elif sounds_like_texts is not None:
+            resolved_sl_emb = self.prepare_sounds_like(sounds_like_texts)
+
+        results = self.score_batch(
+            [candidate],
+            concept_emb=concept_emb,
+            sounds_like_emb=resolved_sl_emb,
+        )
         return results[0]
 
     def score_batch(
@@ -230,6 +263,7 @@ class ChromaticScorer:
         concept_emb: Optional[np.ndarray] = None,
         concept_text: Optional[str] = None,
         lyric_emb: Optional[np.ndarray] = None,
+        sounds_like_emb: Optional[np.ndarray] = None,
     ) -> list[dict]:
         """Score multiple candidates in one ONNX call.
 
@@ -241,8 +275,11 @@ class ChromaticScorer:
             - "lyric_emb": np.ndarray (precomputed 768-dim DeBERTa embedding)
 
         concept_emb/concept_text apply to all candidates (same concept for
-        the whole evolutionary batch). lyric_emb applies to all candidates
-        unless overridden per-candidate.
+        the whole evolutionary batch). lyric_emb and sounds_like_emb apply
+        to all candidates unless overridden per-candidate.
+
+        sounds_like_emb: optional 768-dim embedding broadcast across the batch.
+            When None, the null path is used (has_sounds_like=False for all).
 
         Returns:
             List of dicts sorted by confidence (descending), each containing:
@@ -267,14 +304,21 @@ class ChromaticScorer:
             concept_emb.reshape(1, 768), (batch_size, 768)
         ).copy()
         lyric_embs = np.zeros((batch_size, 768), dtype=np.float32)
+        sounds_like_embs = np.zeros((batch_size, 768), dtype=np.float32)
         has_audio = np.zeros(batch_size, dtype=bool)
         has_midi = np.zeros(batch_size, dtype=bool)
         has_lyric = np.zeros(batch_size, dtype=bool)
+        has_sounds_like = np.zeros(batch_size, dtype=bool)
 
         # Fill batch-level lyric embedding if provided
         if lyric_emb is not None:
             lyric_embs[:] = lyric_emb.reshape(1, 768)
             has_lyric[:] = True
+
+        # Fill batch-level sounds_like embedding if provided
+        if sounds_like_emb is not None:
+            sounds_like_embs[:] = sounds_like_emb.reshape(1, 768)
+            has_sounds_like[:] = True
 
         # Process each candidate
         for i, candidate in enumerate(candidates):
@@ -307,19 +351,25 @@ class ChromaticScorer:
                 lyric_embs[i] = self.prepare_lyric(candidate["lyric_text"])
                 has_lyric[i] = True
 
+        # Detect whether ONNX model supports sounds_like inputs
+        input_names = {inp.name for inp in self._session.get_inputs()}
+        use_sounds_like = "sounds_like_emb" in input_names
+
+        feed = {
+            "piano_roll": piano_rolls,
+            "audio_emb": audio_embs,
+            "concept_emb": concept_embs,
+            "lyric_emb": lyric_embs,
+            "has_audio": has_audio,
+            "has_midi": has_midi,
+            "has_lyric": has_lyric,
+        }
+        if use_sounds_like:
+            feed["sounds_like_emb"] = sounds_like_embs
+            feed["has_sounds_like"] = has_sounds_like
+
         # Run ONNX inference
-        outputs = self._session.run(
-            None,
-            {
-                "piano_roll": piano_rolls,
-                "audio_emb": audio_embs,
-                "concept_emb": concept_embs,
-                "lyric_emb": lyric_embs,
-                "has_audio": has_audio,
-                "has_midi": has_midi,
-                "has_lyric": has_lyric,
-            },
-        )
+        outputs = self._session.run(None, feed)
         temporal, spatial, ontological, confidence = outputs
 
         # Build result list
