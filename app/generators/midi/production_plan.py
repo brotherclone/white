@@ -22,13 +22,13 @@ Usage:
 
 import argparse
 import sys
+import mido
+import yaml
+
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
-
-import mido
-import yaml
 
 PLAN_FILENAME = "production_plan.yml"
 MANIFEST_BOOTSTRAP_FILENAME = "manifest_bootstrap.yml"

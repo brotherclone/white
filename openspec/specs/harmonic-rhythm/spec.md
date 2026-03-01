@@ -66,7 +66,7 @@ The harmonic rhythm generator SHALL score each candidate distribution based on h
 
 ### Requirement: Chromatic Temporal Scoring
 
-The harmonic rhythm generator SHALL score each candidate using ChromaticScorer, focusing on temporal mode alignment.
+The harmonic rhythm generator SHALL score each candidate using Refractor, focusing on temporal mode alignment.
 
 #### Scenario: MIDI generation for scoring
 
@@ -81,7 +81,7 @@ The harmonic rhythm generator SHALL score each candidate using ChromaticScorer, 
 
 #### Scenario: Temporal match extraction
 
-- **WHEN** ChromaticScorer returns results for a candidate
+- **WHEN** Refractor returns results for a candidate
 - **THEN** the pipeline SHALL extract the temporal mode match against the color's chromatic target
 - **AND** use this as the chromatic component of the composite score
 
@@ -126,7 +126,7 @@ The harmonic rhythm pipeline SHALL be invocable from the command line.
 #### Scenario: Basic invocation
 
 - **WHEN** the user runs the harmonic rhythm pipeline CLI
-- **THEN** it SHALL accept `--production-dir` (path to song production directory) and optional `--seed`, `--top-k` (per section), `--onnx-path` (ChromaticScorer model path)
+- **THEN** it SHALL accept `--production-dir` (path to song production directory) and optional `--seed`, `--top-k` (per section), `--onnx-path` (Refractor model path)
 
 #### Scenario: Progress output
 

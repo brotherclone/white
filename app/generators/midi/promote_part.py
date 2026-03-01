@@ -12,10 +12,10 @@ Usage:
 
 import argparse
 import shutil
-from pathlib import Path
-
 import mido
 import yaml
+
+from pathlib import Path
 
 
 def _rewrite_track_names(midi_path: Path, label: str) -> None:

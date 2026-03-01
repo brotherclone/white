@@ -5,7 +5,7 @@
 The lyric pipeline generates drafts that humans edit in ACE Studio for syllable fit and
 artistic quality. Once editing happens, the draft is overwritten and the signal is lost.
 Capturing (draft → edited) pairs closes the feedback loop: it enables post-edit rescoring
-to measure how much human judgment diverged from the initial ChromaticScorer ranking, and
+to measure how much human judgment diverged from the initial Refractor ranking, and
 accumulates structured training data that can later be used for few-shot prompt injection
 or DPO-style fine-tuning when enough songs are complete.
 
@@ -15,7 +15,7 @@ or DPO-style fine-tuning when enough songs are complete.
   and also writes `lyrics_draft.txt` — the pre-edit snapshot — so human edits can be
   diffed against the original.
 - **Post-edit rescoring**: `song_evaluator.py` gains a `--rescore-lyrics` flag that runs
-  ChromaticScorer on the current `lyrics.txt` (post-edit) and appends the score to
+  Refractor on the current `lyrics.txt` (post-edit) and appends the score to
   `song_evaluation.yml` alongside the original draft score.
 - **Feedback dataset export**: A new `lyric_feedback_export.py` CLI walks all production
   directories, collects (draft, edited) pairs with metadata, computes per-section fitting

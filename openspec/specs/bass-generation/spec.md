@@ -104,7 +104,7 @@ The bass pipeline SHALL write candidate MIDI files to the song's production bass
 
 ### Requirement: Composite Scoring
 
-The bass pipeline SHALL score each candidate using theory metrics and ChromaticScorer, producing a single composite ranking per section.
+The bass pipeline SHALL score each candidate using theory metrics and Refractor, producing a single composite ranking per section.
 
 #### Scenario: Theory scoring
 
@@ -118,7 +118,7 @@ The bass pipeline SHALL score each candidate using theory metrics and ChromaticS
 #### Scenario: Chromatic scoring
 
 - **WHEN** a bass candidate is scored
-- **THEN** the pipeline SHALL convert the candidate to MIDI bytes and score with `ChromaticScorer.score()`
+- **THEN** the pipeline SHALL convert the candidate to MIDI bytes and score with `Refractor.score()`
 - **AND** the concept embedding SHALL be computed once and reused across all candidates
 
 #### Scenario: Composite ranking

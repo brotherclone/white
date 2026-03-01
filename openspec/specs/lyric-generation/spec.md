@@ -23,7 +23,7 @@ color target, approved melody patterns, and BPM/time-signature.
 ---
 
 ### Requirement: Lyric Chromatic Scoring
-The pipeline SHALL score each candidate using ChromaticScorer in text-only mode
+The pipeline SHALL score each candidate using Refractor in text-only mode
 (DeBERTa lyric embedding + concept embedding, null audio/MIDI inputs).
 
 #### Scenario: Scoring produces chromatic output

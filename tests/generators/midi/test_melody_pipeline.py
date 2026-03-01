@@ -392,14 +392,14 @@ class TestSyncMelodyCandidates:
 
 
 # ---------------------------------------------------------------------------
-# 6. Integration (mock ChromaticScorer)
+# 6. Integration (mock Refractor)
 # ---------------------------------------------------------------------------
 
 
 class TestMelodyPipelineIntegration:
 
     def test_full_pipeline_with_mock_scorer(self, production_dir):
-        """Run the full pipeline with a mocked ChromaticScorer."""
+        """Run the full pipeline with a mocked Refractor."""
         mock_scorer = MagicMock()
         mock_scorer.prepare_concept.return_value = MagicMock(shape=(768,))
 
@@ -423,9 +423,7 @@ class TestMelodyPipelineIntegration:
 
         mock_scorer.score_batch = mock_score_batch
 
-        with patch(
-            "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
-        ):
+        with patch("training.refractor.Refractor", return_value=mock_scorer):
             from app.generators.midi.melody_pipeline import run_melody_pipeline
 
             result = run_melody_pipeline(

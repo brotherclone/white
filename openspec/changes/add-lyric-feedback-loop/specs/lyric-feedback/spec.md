@@ -2,7 +2,7 @@
 
 ### Requirement: Post-Edit Lyric Rescoring
 
-`song_evaluator.py` SHALL accept a `--rescore-lyrics` flag that runs ChromaticScorer on
+`song_evaluator.py` SHALL accept a `--rescore-lyrics` flag that runs Refractor on
 the current `melody/lyrics.txt` (post-ACE-edit version) and writes the score alongside
 the draft score in `song_evaluation.yml`.
 
@@ -10,7 +10,7 @@ the draft score in `song_evaluation.yml`.
 
 - **WHEN** `song_evaluator <production_dir> --rescore-lyrics` is run
 - **AND** both `melody/lyrics.txt` and `melody/lyrics_draft.txt` exist
-- **THEN** ChromaticScorer scores both files in text-only mode
+- **THEN** Refractor scores both files in text-only mode
 - **AND** `song_evaluation.yml` is updated with `lyrics_draft_chromatic_match` and
   `lyrics_edited_chromatic_match` fields
 - **AND** the delta (`edited − draft`) is recorded as `lyrics_chromatic_delta`
@@ -27,9 +27,9 @@ the draft score in `song_evaluation.yml`.
 - **THEN** rescoring is skipped with a clear warning
 - **AND** no fields are written to `song_evaluation.yml`
 
-#### Scenario: Rescore without ChromaticScorer
+#### Scenario: Rescore without Refractor
 
-- **WHEN** `--rescore-lyrics` is run but ChromaticScorer is unavailable (wrong venv)
+- **WHEN** `--rescore-lyrics` is run but Refractor is unavailable (wrong venv)
 - **THEN** the pipeline exits with a clear error directing the user to use `.venv312`
 
 ---

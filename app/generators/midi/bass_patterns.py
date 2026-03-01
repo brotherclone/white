@@ -30,6 +30,7 @@ ENERGY_ORDER = ["low", "medium", "high"]
 # ---------------------------------------------------------------------------
 
 
+# ToDo: Convert to pydantic model if we want validation and better IDE support. For now,
 @dataclass
 class BassPattern:
     """A single-bar bass pattern template.

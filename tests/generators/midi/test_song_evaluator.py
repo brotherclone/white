@@ -745,7 +745,7 @@ def test_evaluate_green_song(green_production_dir, cleanup_evaluation):
 
 
 def _make_mock_scorer(edited_match=0.75, draft_match=0.60):
-    """Build a mock ChromaticScorer for lyric text scoring."""
+    """Build a mock Refractor for lyric text scoring."""
     mock = MagicMock()
     import numpy as np
 
@@ -807,9 +807,7 @@ class TestRescoreLyrics:
         )
         mock_scorer = _make_mock_scorer(edited_match=0.75, draft_match=0.60)
 
-        with patch(
-            "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
-        ):
+        with patch("training.refractor.Refractor", return_value=mock_scorer):
             result = _rescore_lyrics(prod_dir, "a red concept", "Red")
 
         assert "lyrics_edited_chromatic_match" in result
@@ -826,9 +824,7 @@ class TestRescoreLyrics:
         prod_dir = self._make_prod_dir(tmp_path, lyrics_text="the edited line")
         mock_scorer = _make_mock_scorer(edited_match=0.70)
 
-        with patch(
-            "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
-        ):
+        with patch("training.refractor.Refractor", return_value=mock_scorer):
             result = _rescore_lyrics(prod_dir, "a red concept", "Red")
 
         assert "lyrics_edited_chromatic_match" in result
@@ -839,7 +835,7 @@ class TestRescoreLyrics:
         """Missing lyrics.txt → empty dict returned, no crash."""
         prod_dir = self._make_prod_dir(tmp_path)  # no lyrics files
 
-        with patch("training.chromatic_scorer.ChromaticScorer"):
+        with patch("training.refractor.Refractor"):
             result = _rescore_lyrics(prod_dir, "a red concept", "Red")
 
         assert result == {}
@@ -861,9 +857,7 @@ class TestRescoreLyrics:
             yaml.dump(existing, f)
 
         mock_scorer = _make_mock_scorer(edited_match=0.68, draft_match=0.55)
-        with patch(
-            "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
-        ):
+        with patch("training.refractor.Refractor", return_value=mock_scorer):
             lyric_scores = _rescore_lyrics(prod_dir, "a red concept", "Red")
 
         # Simulate the CLI merge

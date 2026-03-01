@@ -8,7 +8,7 @@
 
 - [ ] 2.1 Add `--rescore-lyrics` CLI flag
 - [ ] 2.2 Implement `_rescore_lyrics(production_dir, plan_concept)` — scores `lyrics.txt`
-       and `lyrics_draft.txt` via ChromaticScorer text-only, returns dict with
+       and `lyrics_draft.txt` via Refractor text-only, returns dict with
        `draft_chromatic_match`, `edited_chromatic_match`, `lyrics_chromatic_delta`
 - [ ] 2.3 When `--rescore-lyrics` is set, call `_rescore_lyrics` and merge results into
        `song_evaluation.yml` (load → update → write, do not discard existing fields)

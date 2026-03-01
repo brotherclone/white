@@ -34,7 +34,7 @@ broadcast across all segments of the same song — analogous to `concept_emb`.
   + `has_sounds_like` arguments
 - **`training/export_onnx.py`** — updated dummy inputs for ONNX export to include the new
   5th modality tensor
-- **`training/chromatic_scorer.py`** — extended to optionally accept
+- **`training/refractor.py`** — extended to optionally accept
   `sounds_like_emb` (pre-computed externally) or `sounds_like_texts` (list of artist
   description strings to embed on-the-fly); null vector used when neither is provided
 - **`tests/training/test_sounds_like_embeddings.py`** — unit tests for the
@@ -44,7 +44,7 @@ broadcast across all segments of the same song — analogous to `concept_emb`.
 
 - Not training on audio, lyrics, MIDI, or any content from the reference artists
 - Not using Discogs API for lookups — Discogs IDs remain informational metadata
-- Not adding a 5th dimension to any ChromaticScorer-exposed axis — the output shape
+- Not adding a 5th dimension to any Refractor-exposed axis — the output shape
   (temporal/spatial/ontological/confidence) is unchanged
 - Not blocking the re-train on catalog completeness — a song with no catalog matches
   gets `has_sounds_like: False` and the null embedding, same as a song with no audio
@@ -64,5 +64,5 @@ broadcast across all segments of the same song — analogous to `concept_emb`.
   - `training/models/multimodal_fusion.py` — 5th modality, 2560→3328 input dim
   - `training/modal_midi_fusion.py` — load + pass sounds_like modality
   - `training/export_onnx.py` — dummy input for new modality
-  - `training/chromatic_scorer.py` — optional sounds_like injection
+  - `training/refractor.py` — optional sounds_like injection
   - `tests/training/test_sounds_like_embeddings.py` — new tests

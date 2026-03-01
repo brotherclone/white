@@ -98,9 +98,9 @@ roughly 60–80% coverage after a first pass of catalog generation + review, mea
 | `has_sounds_like` | bool | True when artists_found > 0 |
 | `sounds_like_emb` | list[float32] (768) | mean-pooled embedding |
 
-## ChromaticScorer Integration
+## Refractor Integration
 
-`chromatic_scorer.py` already works without sounds_like (null path). Adding
+`refractor.py` already works without sounds_like (null path). Adding
 optional injection allows the lyric pipeline and artist catalog CLI to score
 descriptions with style context:
 
@@ -122,7 +122,7 @@ re-scoring with `--rescore-lyrics` and the catalog is available.
 ## Training Strategy
 
 - Phase 5 is a **continuation from Phase 3 weights** (not from scratch):
-  - Load `fusion_model.pt` as initialisation
+  - Load `refractor.pt` as initialisation
   - The `null_sounds_like` parameter is freshly initialised (the rest of the
     weights are preserved)
   - The fusion MLP first layer is re-initialised (input dim changed: 2560→3328)

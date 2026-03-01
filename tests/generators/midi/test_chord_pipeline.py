@@ -212,7 +212,7 @@ _chord_data = Path(
 )
 _has_chord_data = _chord_data.exists()
 
-_onnx_path = Path("/Volumes/LucidNonsense/White/training/data/fusion_model.onnx")
+_onnx_path = Path("/Volumes/LucidNonsense/White/training/data/refractor.onnx")
 try:
     import onnxruntime  # noqa: F401
 
@@ -231,6 +231,7 @@ _has_thread = _thread_dir.exists()
     not (_has_chord_data and _has_onnx and _has_thread),
     reason="Requires chord data, ONNX model, onnxruntime, and shrinkwrapped thread",
 )
+@pytest.mark.venv312
 class TestChordPipelineIntegration:
 
     def test_full_pipeline(self, tmp_path):

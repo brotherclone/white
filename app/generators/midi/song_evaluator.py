@@ -12,7 +12,7 @@ Usage:
     # Cross-song comparison (rank multiple songs)
     python -m app.generators.midi.song_evaluator --compare <dir1> <dir2> ...
 
-    # Optional: re-score promoted MIDIs with ChromaticScorer
+    # Optional: re-score promoted MIDIs with Refractor
     python -m app.generators.midi.song_evaluator <production_dir> --rescore
 """
 
@@ -21,12 +21,12 @@ import glob as globmod
 import re
 import statistics
 import sys
+import yaml
+
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
-
-import yaml
 
 from app.generators.midi.production_plan import load_plan
 from app.util.midi_cleanup import batch_trim as _midi_batch_trim
@@ -49,6 +49,7 @@ _THEORY_FIELDS: dict[str, Optional[tuple]] = {
 # ---------------------------------------------------------------------------
 
 
+# ToDo: Convert to Pydantic for validation and better type safety (song_evaluation.yml is a critical output)
 @dataclass
 class PhaseReport:
     phase: str
@@ -63,6 +64,7 @@ class PhaseReport:
     approved_labels: list
 
 
+# ToDo: Convert to Pydantic for validation and better type safety (song_evaluation.yml is a critical output)
 @dataclass
 class EvaluationReport:
     song_slug: str
@@ -542,13 +544,13 @@ def _write_evaluation(report: EvaluationReport, production_dir: Path) -> Path:
 
 
 def _rescore_lyrics(production_dir: Path, plan_concept: str, plan_color: str) -> dict:
-    """Score melody/lyrics.txt and melody/lyrics_draft.txt via ChromaticScorer text-only.
+    """Score melody/lyrics.txt and melody/lyrics_draft.txt via Refractor text-only.
 
     Returns a dict with some subset of:
         lyrics_edited_chromatic_match, lyrics_draft_chromatic_match, lyrics_chromatic_delta
 
     Missing files are handled gracefully (empty dict or partial result).
-    Exits with an error message if ChromaticScorer is unavailable.
+    Exits with an error message if Refractor is unavailable.
     """
     from app.generators.midi.chord_pipeline import (
         compute_chromatic_match,
@@ -567,21 +569,21 @@ def _rescore_lyrics(production_dir: Path, plan_concept: str, plan_color: str) ->
         Path(__file__).parent.parent.parent.parent
         / "training"
         / "data"
-        / "fusion_model.onnx"
+        / "refractor.onnx"
     )
     if not onnx_path.exists():
         print("ERROR: ONNX model not found.")
-        print("Ensure training/data/fusion_model.onnx exists and run from .venv312.")
+        print("Ensure training/data/refractor.onnx exists and run from .venv312.")
         sys.exit(1)
 
     try:
-        from training.chromatic_scorer import ChromaticScorer
+        from training.refractor import Refractor
     except Exception as exc:
-        print(f"ERROR: Failed to import ChromaticScorer: {exc}")
-        print("Use .venv312/bin/python — ChromaticScorer requires torch + numpy 1.x.")
+        print(f"ERROR: Failed to import Refractor: {exc}")
+        print("Use .venv312/bin/python — Refractor requires torch + numpy 1.x.")
         sys.exit(1)
 
-    scorer = ChromaticScorer(str(onnx_path))
+    scorer = Refractor(str(onnx_path))
     concept_emb = scorer.prepare_concept(plan_concept) if plan_concept else None
     target = get_chromatic_target(plan_color)
 
@@ -622,28 +624,28 @@ def _rescore_lyrics(production_dir: Path, plan_concept: str, plan_color: str) ->
 def _rescore_phases(
     report: EvaluationReport, production_dir: Path, plan_concept: str
 ) -> None:
-    """Re-score promoted MIDIs using ChromaticScorer. Mutates report in-place."""
+    """Re-score promoted MIDIs using Refractor. Mutates report in-place."""
     import importlib.util
 
     scorer_path = (
-        Path(__file__).parent.parent.parent.parent / "training" / "chromatic_scorer.py"
+        Path(__file__).parent.parent.parent.parent / "training" / "refractor.py"
     )
     onnx_path = (
         Path(__file__).parent.parent.parent.parent
         / "training"
         / "data"
-        / "fusion_model.onnx"
+        / "refractor.onnx"
     )
     if not scorer_path.exists() or not onnx_path.exists():
-        print("WARNING: ChromaticScorer or ONNX model not found; skipping rescore")
+        print("WARNING: Refractor or ONNX model not found; skipping rescore")
         return
 
-    spec = importlib.util.spec_from_file_location("chromatic_scorer", scorer_path)
+    spec = importlib.util.spec_from_file_location("refractor", scorer_path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    ChromaticScorer = mod.ChromaticScorer
+    Refractor = mod.Refractor
 
-    scorer = ChromaticScorer(str(onnx_path))
+    scorer = Refractor(str(onnx_path))
     concept_emb = scorer.prepare_concept(plan_concept) if plan_concept else None
 
     for phase, pr in report.phases.items():
@@ -751,7 +753,7 @@ def main():
     parser.add_argument(
         "--rescore",
         action="store_true",
-        help="Re-run ChromaticScorer on promoted MIDIs (requires ONNX model)",
+        help="Re-run Refractor on promoted MIDIs (requires ONNX model)",
     )
     parser.add_argument(
         "--rescore-lyrics",

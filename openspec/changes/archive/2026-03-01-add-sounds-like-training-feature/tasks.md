@@ -51,7 +51,7 @@
 - [ ] 4.2 Add `sounds_like_emb` with `{0: "batch"}` dynamic axis to ONNX export call
 - [ ] 4.3 Verify exported ONNX runs via `onnxruntime` with and without sounds_like
 
-## 5. ChromaticScorer — optional sounds_like injection
+## 5. Refractor — optional sounds_like injection
 
 - [ ] 5.1 Add `sounds_like_texts: list[str] | None = None` and
        `sounds_like_emb: np.ndarray | None = None` parameters to `score()`
@@ -79,8 +79,8 @@
 
 - [ ] 7.1 Upload `sounds_like_embeddings.parquet` to Modal volume
 - [ ] 7.2 Run `modal run training/modal_midi_fusion.py --skip-preprocess
-         --finetune-from fusion_model.pt --epochs 30 --lr 1e-5` (Phase 5)
+         --finetune-from refractor.pt --epochs 30 --lr 1e-5` (Phase 5)
 - [ ] 7.3 Export ONNX: `modal run training/export_onnx.py`
-- [ ] 7.4 Copy `fusion_model.pt` + `fusion_model.onnx` to `training/data/`
+- [ ] 7.4 Copy `refractor.pt` + `refractor.onnx` to `training/data/`
 - [ ] 7.5 Run `python -m pytest tests/training/` to verify scorer still passes
 - [ ] 7.6 Compare Phase 5 vs Phase 3 accuracy metrics; update MEMORY.md

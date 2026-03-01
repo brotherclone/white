@@ -1,4 +1,4 @@
-"""Tests for ChromaticScorer — fitness function for evolutionary music composition."""
+"""Tests for Refractor — fitness function for evolutionary music composition."""
 
 import io
 from pathlib import Path
@@ -60,9 +60,9 @@ class TestScorerWithMockedONNX:
 
     @pytest.fixture
     def scorer(self):
-        from training.chromatic_scorer import ChromaticScorer
+        from training.refractor import Refractor
 
-        s = ChromaticScorer.__new__(ChromaticScorer)
+        s = Refractor.__new__(Refractor)
         s._session = _make_mock_session()
         s._deberta_tokenizer = None
         s._deberta_model = None
@@ -246,7 +246,7 @@ _onnx_path = (
     Path(__file__).resolve().parent.parent.parent
     / "training"
     / "data"
-    / "fusion_model.onnx"
+    / "refractor.onnx"
 )
 _has_onnx = _onnx_path.exists()
 
@@ -262,13 +262,13 @@ except ImportError:
     not (_has_onnx and _has_ort), reason="ONNX model or onnxruntime not available"
 )
 class TestScorerIntegration:
-    """Integration tests using the real fusion_model.onnx."""
+    """Integration tests using the real refractor.onnx."""
 
     @pytest.fixture
     def scorer(self):
-        from training.chromatic_scorer import ChromaticScorer
+        from training.refractor import Refractor
 
-        return ChromaticScorer(onnx_path=str(_onnx_path))
+        return Refractor(onnx_path=str(_onnx_path))
 
     def test_score_single_midi(self, scorer):
         """Score a single MIDI candidate with precomputed concept embedding."""
