@@ -56,36 +56,41 @@ OPTIONAL_KEYWORDS: list[str] = [
 # ---------------------------------------------------------------------------
 
 
-def _post(client: httpx.Client, url: str, payload: dict) -> dict:
-    """POST a JSON-RPC message; parse JSON or first SSE data line."""
-    resp = client.post(
-        url,
-        json=payload,
-        headers={
-            "Content-Type": "application/json",
-            "Accept": "application/json, text/event-stream",
-        },
-    )
-    resp.raise_for_status()
-
+def _parse_response(resp: httpx.Response) -> dict:
+    """Parse JSON or first SSE data line from a response."""
     content_type = resp.headers.get("content-type", "")
     if "text/event-stream" in content_type:
-        # Parse first data: line from SSE stream
         for line in resp.text.splitlines():
             line = line.strip()
             if line.startswith("data:"):
                 return json.loads(line[5:].strip())
         raise ValueError("SSE stream contained no data: line")
-
     return resp.json()
 
 
-def _initialize(client: httpx.Client, url: str) -> dict:
-    """Send MCP initialize handshake; return server capabilities."""
-    result = _post(
-        client,
+def _post(
+    client: httpx.Client,
+    url: str,
+    payload: dict,
+    session_id: Optional[str] = None,
+) -> dict:
+    """POST a JSON-RPC message; parse JSON or first SSE data line."""
+    headers: dict[str, str] = {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream",
+    }
+    if session_id:
+        headers["Mcp-Session-Id"] = session_id
+    resp = client.post(url, json=payload, headers=headers)
+    resp.raise_for_status()
+    return _parse_response(resp)
+
+
+def _initialize(client: httpx.Client, url: str) -> tuple[dict, Optional[str]]:
+    """Send MCP initialize handshake; return (server_capabilities, session_id)."""
+    resp = client.post(
         url,
-        {
+        json={
             "jsonrpc": "2.0",
             "method": "initialize",
             "id": 1,
@@ -95,16 +100,30 @@ def _initialize(client: httpx.Client, url: str) -> dict:
                 "clientInfo": {"name": "white-probe", "version": "1.0"},
             },
         },
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream",
+        },
     )
+    resp.raise_for_status()
+    session_id: Optional[str] = resp.headers.get("Mcp-Session-Id")
+    result = _parse_response(resp)
     # Send initialized notification (fire-and-forget; ignore response)
     try:
-        _post(client, url, {"jsonrpc": "2.0", "method": "notifications/initialized"})
+        _post(
+            client,
+            url,
+            {"jsonrpc": "2.0", "method": "notifications/initialized"},
+            session_id=session_id,
+        )
     except Exception:
         pass
-    return result.get("result", {})
+    return result.get("result", {}), session_id
 
 
-def _list_tools(client: httpx.Client, url: str) -> list[dict]:
+def _list_tools(
+    client: httpx.Client, url: str, session_id: Optional[str] = None
+) -> list[dict]:
     """Call tools/list and return the tools array."""
     result = _post(
         client,
@@ -114,6 +133,7 @@ def _list_tools(client: httpx.Client, url: str) -> list[dict]:
             "method": "tools/list",
             "id": 2,
         },
+        session_id=session_id,
     )
     if "error" in result:
         raise RuntimeError(f"tools/list error: {result['error']}")
@@ -222,7 +242,7 @@ def run_probe(url: str = ACE_STUDIO_URL) -> int:
             timeout=httpx.Timeout(REQUEST_TIMEOUT, connect=CONNECT_TIMEOUT)
         ) as client:
             try:
-                server_info = _initialize(client, url)
+                server_info, session_id = _initialize(client, url)
             except httpx.ConnectError:
                 print("ERROR: Could not connect to ACE Studio MCP server.")
                 print(f"       Is ACE Studio 2.0 running? Expected server at {url}")
@@ -233,11 +253,13 @@ def run_probe(url: str = ACE_STUDIO_URL) -> int:
                 write_feasibility("Connection timed out connecting to " + url)
                 return 1
 
+            if session_id:
+                print(f"  Session ID: {session_id}")
             print(f"  Connected. Server info: {json.dumps(server_info, indent=4)}")
 
             # --- List tools ---
             try:
-                tools = _list_tools(client, url)
+                tools = _list_tools(client, url, session_id=session_id)
             except Exception as e:
                 print(f"ERROR: tools/list failed: {e}")
                 write_feasibility(f"tools/list call failed: {e}")
