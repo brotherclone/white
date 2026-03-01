@@ -57,3 +57,4 @@ chain_artifacts/**/debug/*.json
 *.acep
 **/autosave/
 **/VocalSynth/
+app/reference/mcp/ace_studio/tool_manifest.json
