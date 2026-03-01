@@ -237,7 +237,7 @@ class AceStudioClient:
         """Search available sound sources by name keyword; returns list of singer dicts."""
         result = self._call(
             "get_available_sound_source_list",
-            type="sing",
+            type="voice",
             keyword=keyword,
             language=language,
         )
@@ -255,7 +255,7 @@ class AceStudioClient:
         """Load a singer onto a track by sound-source ID (from find_singer results)."""
         kwargs: dict = {
             "trackIndex": track_index,
-            "soundSourceType": "sing",
+            "soundSourceType": "voice",
             "id": singer_id,
             "group": group,
         }

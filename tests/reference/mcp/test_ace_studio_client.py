@@ -287,7 +287,7 @@ class TestFindSinger:
         client.find_singer("Shirley")
         args = client._http.post.call_args.kwargs["json"]["params"]["arguments"]
         assert args["keyword"] == "Shirley"
-        assert args["type"] == "sing"
+        assert args["type"] == "voice"
 
     def test_returns_list_from_response(self):
         client = _make_client()
@@ -306,7 +306,7 @@ class TestLoadSinger:
         args = client._http.post.call_args.kwargs["json"]["params"]["arguments"]
         assert args["trackIndex"] == 0
         assert args["id"] == 42
-        assert args["soundSourceType"] == "sing"
+        assert args["soundSourceType"] == "voice"
 
     def test_passes_router_id_when_given(self):
         client = _make_client()
