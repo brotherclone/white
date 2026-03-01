@@ -83,7 +83,17 @@ def _make_client() -> AceStudioClient:
     client._session_id = "test-session-id"
     client._call_id = 0
     client._tools = dict(MINIMAL_TOOLS)
-    client._http = MagicMock()
+    client._connected = True
+    client._timeout = httpx.Timeout(30.0)
+
+    # Inject a mock via the _make_http_client seam so _raw_post uses it.
+    mock_http = MagicMock()
+    mock_ctx = MagicMock()
+    mock_ctx.__enter__ = MagicMock(return_value=mock_http)
+    mock_ctx.__exit__ = MagicMock(return_value=False)
+    client._make_http_client = MagicMock(return_value=mock_ctx)
+    # Expose mock_http as _http so tests can set return values the same way.
+    client._http = mock_http
     return client
 
 
@@ -140,9 +150,9 @@ class TestCall:
     def test_passes_kwargs_as_arguments(self):
         client = _make_client()
         client._http.post.return_value = _tool_resp({})
-        client._call("set_tempo_automation", points=[{"tick": 0, "tempo": 120}])
+        client._call("set_tempo_automation", points=[{"pos": 0, "value": 120}])
         payload = client._http.post.call_args.kwargs["json"]
-        assert payload["params"]["arguments"]["points"][0]["tempo"] == 120
+        assert payload["params"]["arguments"]["points"][0]["value"] == 120
 
     def test_includes_session_id_header(self):
         client = _make_client()
@@ -218,8 +228,8 @@ class TestSetTempo:
         client._http.post.return_value = _tool_resp({})
         client.set_tempo(140.0)
         args = client._http.post.call_args.kwargs["json"]["params"]["arguments"]
-        assert args["points"][0]["tempo"] == 140.0
-        assert args["points"][0]["tick"] == 0
+        assert args["points"][0]["value"] == 140.0
+        assert args["points"][0]["pos"] == 0
 
     def test_calls_correct_tool(self):
         client = _make_client()
@@ -238,7 +248,7 @@ class TestSetTimeSignature:
         sig = args["signatures"][0]
         assert sig["numerator"] == 3
         assert sig["denominator"] == 4
-        assert sig["tick"] == 0
+        assert sig["barPos"] == 0
 
 
 class TestListTracks:
@@ -371,12 +381,16 @@ class TestConnectionError:
         ):
             client = AceStudioClient()
 
-        with patch("httpx.Client") as mock_cls:
-            mock_http = MagicMock()
-            mock_http.post.side_effect = httpx.ConnectError("refused")
-            mock_cls.return_value = mock_http
-            with pytest.raises(ConnectionError, match="Cannot reach ACE Studio"):
-                client.connect()
+        # Inject a _make_http_client seam that raises ConnectError on post
+        mock_http = MagicMock()
+        mock_http.post.side_effect = httpx.ConnectError("refused")
+        mock_ctx = MagicMock()
+        mock_ctx.__enter__ = MagicMock(return_value=mock_http)
+        mock_ctx.__exit__ = MagicMock(return_value=False)
+        client._make_http_client = MagicMock(return_value=mock_ctx)
+
+        with pytest.raises(ConnectionError, match="Cannot reach ACE Studio"):
+            client.connect()
 
     def test_not_connected_raises_runtime_error(self):
         client = AceStudioClient.__new__(AceStudioClient)
@@ -384,7 +398,9 @@ class TestConnectionError:
         client._session_id = None
         client._call_id = 0
         client._tools = {}
-        client._http = None
+        client._connected = False
+        client._timeout = httpx.Timeout(30.0)
+        client._make_http_client = MagicMock()
         with pytest.raises(RuntimeError, match="not connected"):
             client._raw_post({"jsonrpc": "2.0", "method": "tools/call", "id": 1})
 

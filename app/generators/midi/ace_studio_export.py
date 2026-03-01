@@ -158,11 +158,8 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
     # Connect and export
     try:
         with AceStudioClient() as ace:
-            # 1 — Project metadata
-            ace.set_tempo(bpm)
-            ace.set_time_signature(num, den)
-
-            # 2 — Track selection (use first available track)
+            # 1 — Track selection first (ACE Studio invalidates track list after
+            # project metadata changes, so we must read tracks before set_tempo)
             tracks = ace.list_tracks()
             if not tracks:
                 log.warning(
@@ -171,6 +168,11 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
                 )
                 return None
             track_index = 0
+
+            # 2 — Project metadata (must come AFTER list_tracks; ACE Studio
+            # returns an empty track list on subsequent calls after set_tempo)
+            ace.set_tempo(bpm)
+            ace.set_time_signature(num, den)
 
             # 3 — Singer
             singer_id: Optional[int] = None

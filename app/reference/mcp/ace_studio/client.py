@@ -67,30 +67,29 @@ class AceStudioClient:
         self._session_id: Optional[str] = None
         self._call_id = 0
         self._tools: dict = self._load_manifest()
-        self._http: Optional[httpx.Client] = None
+        self._connected: bool = False
+        self._timeout = httpx.Timeout(REQUEST_TIMEOUT, connect=CONNECT_TIMEOUT)
 
     # ------------------------------------------------------------------
     # Lifecycle
     # ------------------------------------------------------------------
 
     def connect(self) -> "AceStudioClient":
-        """Open HTTP connection and perform the MCP initialize handshake."""
-        self._http = httpx.Client(
-            timeout=httpx.Timeout(REQUEST_TIMEOUT, connect=CONNECT_TIMEOUT)
-        )
+        """Perform the MCP initialize handshake and mark the client as connected."""
+        # ACE Studio's HTTP/1.1 keep-alive implementation returns stale responses
+        # when connections are reused, so we use a fresh httpx.Client per request
+        # (see _raw_post).  We use a sentinel to track connected state.
+        self._connected = True
         try:
             self._handshake()
         except httpx.ConnectError as exc:
-            self._http.close()
-            self._http = None
+            self._connected = False
             raise ConnectionError(f"Cannot reach ACE Studio at {self._url}") from exc
         return self
 
     def close(self) -> None:
-        """Close the underlying HTTP connection."""
-        if self._http is not None:
-            self._http.close()
-            self._http = None
+        """Mark the client as disconnected."""
+        self._connected = False
 
     def __enter__(self) -> "AceStudioClient":
         return self.connect()
@@ -108,12 +107,16 @@ class AceStudioClient:
             return json.loads(TOOL_MANIFEST_PATH.read_text())["tools"]
         return {}
 
+    def _make_http_client(self) -> httpx.Client:
+        """Return a fresh httpx.Client for a single request. Override in tests."""
+        return httpx.Client(timeout=self._timeout)
+
     def _next_id(self) -> int:
         self._call_id += 1
         return self._call_id
 
     def _raw_post(self, payload: dict) -> httpx.Response:
-        if self._http is None:
+        if not self._connected:
             raise RuntimeError("Client not connected — call connect() first")
         headers: dict[str, str] = {
             "Content-Type": "application/json",
@@ -121,7 +124,10 @@ class AceStudioClient:
         }
         if self._session_id:
             headers["Mcp-Session-Id"] = self._session_id
-        resp = self._http.post(self._url, json=payload, headers=headers)
+        # ACE Studio's HTTP/1.1 keep-alive returns stale responses when connections
+        # are reused. Using a fresh httpx.Client per request is the only reliable fix.
+        with self._make_http_client() as client:
+            resp = client.post(self._url, json=payload, headers=headers)
         resp.raise_for_status()
         return resp
 
@@ -142,6 +148,10 @@ class AceStudioClient:
             }
         )
         self._session_id = resp.headers.get("Mcp-Session-Id")
+        # Consume the response body so the connection is released back to the pool.
+        # Without this, httpx holds the TCP connection open with an unread body,
+        # and subsequent requests on the same connection read stale data.
+        _parse_mcp_response(resp)
         try:
             self._post({"jsonrpc": "2.0", "method": "notifications/initialized"})
         except Exception:
@@ -177,13 +187,17 @@ class AceStudioClient:
                 content[0].get("text", "unknown error") if content else "unknown error"
             )
             raise RuntimeError(f"Tool {tool_name!r} returned error: {msg}")
-        # Unwrap MCP content block → JSON where possible
-        content = result.get("content", [])
-        if content and content[0].get("type") == "text":
-            try:
-                return json.loads(content[0]["text"])
-            except (json.JSONDecodeError, KeyError):
-                return {"text": content[0]["text"]}
+        # Prefer structuredContent (ACE Studio 2025-03-26 always includes it)
+        if "structuredContent" in result:
+            return result["structuredContent"]
+        # Scan all content blocks for the first valid JSON one
+        for block in result.get("content", []):
+            if block.get("type") == "text":
+                try:
+                    return json.loads(block["text"])
+                except (json.JSONDecodeError, KeyError):
+                    continue
+        # Fall back to the raw result
         return result
 
     # ------------------------------------------------------------------
@@ -196,14 +210,14 @@ class AceStudioClient:
 
     def set_tempo(self, bpm: float) -> dict:
         """Set a single constant tempo (BPM) from tick 0."""
-        return self._call("set_tempo_automation", points=[{"tick": 0, "tempo": bpm}])
+        return self._call("set_tempo_automation", points=[{"pos": 0, "value": bpm}])
 
     def set_time_signature(self, numerator: int, denominator: int) -> dict:
-        """Set a single time signature from tick 0."""
+        """Set a single time signature from bar 0."""
         return self._call(
             "set_timesignature_list",
             signatures=[
-                {"tick": 0, "numerator": numerator, "denominator": denominator}
+                {"barPos": 0, "numerator": numerator, "denominator": denominator}
             ],
         )
 
