@@ -16,6 +16,12 @@ sections_found:
 - harvester
 - sky_crane
 candidates:
+- id: lyrics_v1
+  file: candidates/lyrics_draft.txt
+  label: lyrics_v1
+  status: approved
+  notes: 'Blue Present/Place/Forgotten — rust signal memorial, harvester as chorus'
+
 - id: melody_harrows_01
   midi_file: candidates/melody_harrows_01.mid
   rank: 1
@@ -47,7 +53,7 @@ candidates:
       confidence: 0.0106
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_harrows_02
   midi_file: candidates/melody_harrows_02.mid
@@ -79,8 +85,8 @@ candidates:
         known: 0.3857
       confidence: 0.0104
       match: 0.1758
-  label: null
-  status: pending
+  label: melody_harrows
+  status: approved
   notes: ''
 - id: melody_harrows_03
   midi_file: candidates/melody_harrows_03.mid
@@ -112,8 +118,8 @@ candidates:
         known: 0.3862
       confidence: 0.0106
       match: 0.1759
-  label: null
-  status: pending
+  label: melody_harrows_alternative
+  status: approved
   notes: ''
 - id: melody_harrows_04
   midi_file: candidates/melody_harrows_04.mid
@@ -145,8 +151,8 @@ candidates:
         known: 0.3863
       confidence: 0.0108
       match: 0.176
-  label: null
-  status: pending
+  label: melody_harrows_stiff
+  status: approved
   notes: ''
 - id: melody_harrows_05
   midi_file: candidates/melody_harrows_05.mid
@@ -179,7 +185,7 @@ candidates:
       confidence: 0.0105
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_conveyor_01
   midi_file: candidates/melody_conveyor_01.mid
@@ -212,7 +218,7 @@ candidates:
       confidence: 0.0104
       match: 0.1758
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_conveyor_02
   midi_file: candidates/melody_conveyor_02.mid
@@ -244,8 +250,8 @@ candidates:
         known: 0.3854
       confidence: 0.0104
       match: 0.1758
-  label: null
-  status: pending
+  label: melody_conveyor_alternative
+  status: approved
   notes: ''
 - id: melody_conveyor_03
   midi_file: candidates/melody_conveyor_03.mid
@@ -278,7 +284,7 @@ candidates:
       confidence: 0.0106
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_conveyor_04
   midi_file: candidates/melody_conveyor_04.mid
@@ -310,8 +316,8 @@ candidates:
         known: 0.3859
       confidence: 0.0104
       match: 0.1758
-  label: null
-  status: pending
+  label: melody_conveyor
+  status: approved
   notes: ''
 - id: melody_conveyor_05
   midi_file: candidates/melody_conveyor_05.mid
@@ -344,7 +350,7 @@ candidates:
       confidence: 0.0106
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_sprayer_01
   midi_file: candidates/melody_sprayer_01.mid
@@ -376,8 +382,8 @@ candidates:
         known: 0.3856
       confidence: 0.0105
       match: 0.1758
-  label: null
-  status: pending
+  label: melody_sprayer
+  status: approved
   notes: ''
 - id: melody_sprayer_02
   midi_file: candidates/melody_sprayer_02.mid
@@ -410,7 +416,7 @@ candidates:
       confidence: 0.0106
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_sprayer_03
   midi_file: candidates/melody_sprayer_03.mid
@@ -443,7 +449,7 @@ candidates:
       confidence: 0.0107
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_sprayer_04
   midi_file: candidates/melody_sprayer_04.mid
@@ -475,8 +481,8 @@ candidates:
         known: 0.3862
       confidence: 0.0107
       match: 0.176
-  label: null
-  status: pending
+  label: melody_sprayer_alternative
+  status: approved
   notes: ''
 - id: melody_sprayer_05
   midi_file: candidates/melody_sprayer_05.mid
@@ -509,7 +515,7 @@ candidates:
       confidence: 0.0107
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_harvester_01
   midi_file: candidates/melody_harvester_01.mid
@@ -541,8 +547,8 @@ candidates:
         known: 0.3855
       confidence: 0.0105
       match: 0.1758
-  label: null
-  status: pending
+  label: melody_harvester_stiff
+  status: approved
   notes: ''
 - id: melody_harvester_02
   midi_file: candidates/melody_harvester_02.mid
@@ -575,7 +581,7 @@ candidates:
       confidence: 0.0107
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_harvester_03
   midi_file: candidates/melody_harvester_03.mid
@@ -607,8 +613,8 @@ candidates:
         known: 0.3856
       confidence: 0.0106
       match: 0.1759
-  label: null
-  status: pending
+  label: melody_harvester
+  status: approved
   notes: ''
 - id: melody_harvester_04
   midi_file: candidates/melody_harvester_04.mid
@@ -641,7 +647,7 @@ candidates:
       confidence: 0.0106
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_harvester_05
   midi_file: candidates/melody_harvester_05.mid
@@ -674,7 +680,7 @@ candidates:
       confidence: 0.0105
       match: 0.1758
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_sky_crane_01
   midi_file: candidates/melody_sky_crane_01.mid
@@ -707,7 +713,7 @@ candidates:
       confidence: 0.0107
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_sky_crane_02
   midi_file: candidates/melody_sky_crane_02.mid
@@ -740,7 +746,7 @@ candidates:
       confidence: 0.0106
       match: 0.1759
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_sky_crane_03
   midi_file: candidates/melody_sky_crane_03.mid
@@ -773,7 +779,7 @@ candidates:
       confidence: 0.0107
       match: 0.176
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: melody_sky_crane_04
   midi_file: candidates/melody_sky_crane_04.mid
@@ -805,8 +811,8 @@ candidates:
         known: 0.3865
       confidence: 0.0107
       match: 0.176
-  label: null
-  status: pending
+  label: melody_sky_crane
+  status: approved
   notes: ''
 - id: melody_sky_crane_05
   midi_file: candidates/melody_sky_crane_05.mid
@@ -839,5 +845,5 @@ candidates:
       confidence: 0.0108
       match: 0.176
   label: null
-  status: pending
+  status: rejected
   notes: ''
