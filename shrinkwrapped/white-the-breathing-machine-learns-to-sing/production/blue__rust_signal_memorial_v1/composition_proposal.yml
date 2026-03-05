@@ -1,0 +1,583 @@
+proposed_by: claude
+generated: '2026-03-05T13:34:22.084859+00:00'
+color_target: Blue
+title: The Iron Oxidation Frequency (Memorial for Abundance Machinery)
+loop_inventory:
+  chords:
+  - label: harrows
+    bars: 0
+    score: 0.3055
+    energy: ''
+    notes: ''
+  - label: conveyor
+    bars: 0
+    score: 0.3043
+    energy: ''
+    notes: ''
+  - label: sprayer
+    bars: 0
+    score: 0.3005
+    energy: ''
+    notes: ''
+  - label: harvester
+    bars: 0
+    score: 0.3005
+    energy: ''
+    notes: ''
+  - label: sky_crane
+    bars: 0
+    score: 0.2992
+    energy: ''
+    notes: ''
+  drums:
+  - label: drums_harrows_alternate
+    bars: 7
+    score: 0.4234
+    energy: medium
+    notes: ''
+  - label: drums_harrows
+    bars: 7
+    score: 0.2734
+    energy: high
+    notes: ''
+  - label: drums_conveyor
+    bars: 6
+    score: 0.2732
+    energy: high
+    notes: ''
+  - label: drums_sprayer_alternate
+    bars: 7
+    score: 0.4234
+    energy: medium
+    notes: ''
+  - label: drums_sprayer
+    bars: 7
+    score: 0.2734
+    energy: high
+    notes: ''
+  - label: drums_harvester
+    bars: 4
+    score: 0.2734
+    energy: high
+    notes: ''
+  - label: drums_harvester_sparse
+    bars: 4
+    score: 0.2731
+    energy: low
+    notes: ''
+  - label: drums_sky_crane
+    bars: 7
+    score: 0.4234
+    energy: medium
+    notes: ''
+  bass:
+  - label: bass_harrows_stiff
+    bars: 7
+    score: 0.3798
+    energy: low
+    notes: ''
+  - label: bass_harrows
+    bars: 7
+    score: 0.3299
+    energy: low
+    notes: ''
+  - label: bass_conveyor_stiff
+    bars: 6
+    score: 0.4199
+    energy: low
+    notes: ''
+  - label: bass_conveyor
+    bars: 6
+    score: 0.3699
+    energy: low
+    notes: ''
+  - label: bass_conveyor_syncopated
+    bars: 6
+    score: 0.3698
+    energy: medium
+    notes: ''
+  - label: bass_sprayer_alternate
+    bars: 7
+    score: 0.3467
+    energy: medium
+    notes: ''
+  - label: bass_sprayer
+    bars: 7
+    score: 0.3467
+    energy: low
+    notes: ''
+  - label: bass_harvester
+    bars: 4
+    score: 0.3998
+    energy: low
+    notes: ''
+  - label: bass_harvester_downbeat
+    bars: 4
+    score: 0.3498
+    energy: low
+    notes: ''
+  - label: bass_sky_crane_drone
+    bars: 7
+    score: 0.4067
+    energy: low
+    notes: ''
+  - label: bass_sky_crane
+    bars: 7
+    score: 0.3566
+    energy: low
+    notes: ''
+  melody:
+  - label: lyrics_v1
+    bars: 0
+    score: 0.0
+    energy: ''
+    notes: Blue Present/Place/Forgotten — rust signal memorial, harvester as chorus
+  - label: melody_harrows
+    bars: 7
+    score: 0.3795
+    energy: medium
+    notes: ''
+  - label: melody_harrows_alternative
+    bars: 7
+    score: 0.3772
+    energy: low
+    notes: ''
+  - label: melody_harrows_stiff
+    bars: 6
+    score: 0.3694
+    energy: low
+    notes: ''
+  - label: melody_conveyor_alternative
+    bars: 6
+    score: 0.3698
+    energy: medium
+    notes: ''
+  - label: melody_conveyor
+    bars: 6
+    score: 0.3562
+    energy: low
+    notes: ''
+  - label: melody_sprayer
+    bars: 7
+    score: 0.3782
+    energy: medium
+    notes: ''
+  - label: melody_sprayer_alternative
+    bars: 6
+    score: 0.3646
+    energy: low
+    notes: ''
+  - label: melody_harvester_stiff
+    bars: 4
+    score: 0.3768
+    energy: low
+    notes: ''
+  - label: melody_harvester
+    bars: 4
+    score: 0.37
+    energy: medium
+    notes: ''
+  - label: melody_sky_crane
+    bars: 7
+    score: 0.3644
+    energy: low
+    notes: ''
+sounds_like:
+- Grouper
+- William Basinski
+- Johann Johannsson (Miners' Hymns era)
+- Matana Roberts
+- Stars of the Lid
+- Tim Hecker (Ravedeath, 1972)
+proposed_sections:
+- name: field_initialization
+  repeat: 2
+  energy_note: 'Near-silence. The machinery has not yet been identified as dying.
+    Bass drone
+
+    only — a single frequency held like a held breath, or a hive not yet opened.
+
+    No percussion. The rust is already there but has not been catalogued. This is
+
+    the moment before forensic attention arrives. Sky crane bass drone functions
+
+    as the composition''s lowest tonal anchor — a frequency present in the place
+
+    before anything is known to be absent.
+
+    '
+  transition_note: 'On the second repeat''s final beat, a single chord voicing enters
+    mid-decay,
+
+    as if picked up mid-transmission. No attack. The chord arrives already
+
+    partially forgotten.
+
+    '
+  loops:
+    chords: null
+    drums: null
+    bass: bass_sky_crane_drone
+    melody: null
+- name: documentation_begins
+  repeat: 3
+  energy_note: 'The forensic lens focuses. Chords enter with the mechanical precision
+    of
+
+    equipment logs — not emotional, but present. Sky crane harmonics establish
+
+    the place: vast, industrial, emptied. The waltz meter now audible as a
+
+    three-decade pulse. Still no drums. The absence of rhythmic life is itself
+
+    the first piece of evidence. Bass shifts to sky crane melodic line,
+
+    introducing motion without urgency — the motion of a conveyor still running
+
+    after the workers have gone.
+
+    '
+  transition_note: 'Third repeat introduces a very low melody loop — sky crane melody,
+    nearly
+
+    submerged — as a ghost signal. One bar before the section ends, it cuts.
+
+    The silence of that cut is the first documented absence.
+
+    '
+  loops:
+    chords: sky_crane
+    drums: null
+    bass: bass_sky_crane
+    melody: melody_sky_crane
+- name: rust_signal_transmission
+  repeat: 4
+  energy_note: 'Drums enter — sparse harvester pattern, the lowest energy drum loop
+
+    available. Four-beat loop against 3/4 creates a slow polyrhythmic drift,
+
+    the meter slipping like memory. This is the three-decade collapse cycle
+
+    made rhythmic: something that used to align no longer aligns. Harvester
+
+    chords replace sky crane — we have moved from the aerial view to ground
+
+    level, to the actual field. Bass is harvester downbeat: deliberate,
+
+    heavy-footed, a crew that has diminished to three. The iron oxidation
+
+    frequency is now structurally present in the composition — not stated,
+
+    but load-bearing.
+
+    '
+  transition_note: 'On the fourth repeat, drums_harvester_sparse drops to silence
+    on beat two
+
+    of every bar, creating a stuttered absence — the bee wing frequency gap.
+
+    The section does not end so much as develop a hole the next section falls
+
+    through.
+
+    '
+  loops:
+    chords: harvester
+    drums: drums_harvester_sparse
+    bass: bass_harvester_downbeat
+    melody: melody_harvester_stiff
+- name: abundance_record
+  repeat: 4
+  energy_note: 'The first vocal entry. lyrics_v1 carries the memorial transmission:
+    what
+
+    abundance machinery sounded like when it was operational. Full harvester
+
+    bass replaces downbeat-only variant — slightly more weight, the full
+
+    systemic picture now in frame. Drums remain sparse. The melody_harvester
+
+    loop is the living abundance frequency — medium register, present tense,
+
+    still audible. This is the composition''s emotional center, but the
+
+    emotion is forensic: documentation of what was, stated clearly so it
+
+    can be accurately mourned. The waltz meter here is the bee''s three-part
+
+    body: head, thorax, abdomen — the identification patch on the thorax
+
+    already rust-stained.
+
+    '
+  transition_note: 'Fourth repeat doubles the drum loop — drums_harvester replaces
+    sparse
+
+    variant for the final pass only, a single moment of full mechanical
+
+    operation before the machinery begins demonstrably failing. Then cuts
+
+    back to sparse, as if the surge was a malfunction report, not recovery.
+
+    '
+  loops:
+    chords: harvester
+    drums: drums_harvester_sparse
+    bass: bass_harvester
+    melody: lyrics_v1
+- name: pollinator_range_contraction
+  repeat: 3
+  energy_note: 'The composition''s most dissonant structural moment. Harrows chords
+    —
+
+    the highest-scored chord loop, carrying maximum harmonic tension.
+
+    Drums shift to drums_harrows_alternate: medium energy, the alternating
+
+    pattern creating an irregular pulse that mimics range contraction —
+
+    the 28-state territory pressing inward. Bass is harrows_stiff: rigid,
+
+    inflexible, the bureaucratic stiffness of a system that cannot respond
+
+    to its own emergency. Melody harrows alternative runs underneath lyrics_v1
+
+    for the first two repeats, creating a doubling effect — human voice and
+
+    phantom frequency simultaneously, the crews teaching technique to empty air.
+
+    '
+  transition_note: 'Third repeat: vocals drop. Only the phantom melody_harrows_alternative
+
+    remains, now clearly the ghost signal — the frequency that was there
+
+    before the voice, and persists after. The section ends on an unresolved
+
+    bar, beat three landing without resolution.
+
+    '
+  loops:
+    chords: harrows
+    drums: drums_harrows_alternate
+    bass: bass_harrows_stiff
+    melody: lyrics_v1
+- name: toxic_exposure_log
+  repeat: 3
+  energy_note: 'Sprayer section. This is the mechanism. Conveyor and sprayer share
+    the
+
+    composition''s grimly functional register — not dramatic, not elegiac,
+
+    operational. Sprayer chords are the most systemically precise: this is
+
+    the sound of the technology working exactly as designed. Bass sprayer
+
+    (low, not syncopated) moves in straight lines. Drums_sprayer: high
+
+    energy marker but at 60 BPM "high" means relentless, not loud —
+
+    a machine that does not vary its application. Melody_sprayer is the
+
+    only melody loop here: no vocals. The absent voice is now structural.
+
+    The humans who mixed the chemicals have been documented and filed.
+
+    '
+  transition_note: 'On the third repeat, drums_sprayer_alternate replaces drums_sprayer
+    —
+
+    the alternating pattern introduces the first rhythmic hesitation in
+
+    the machinery itself. Something in the system is beginning to register
+
+    its own report. Bass drops to null on the final four beats: the
+
+    foundation frequency goes missing before the section formally ends.
+
+    '
+  loops:
+    chords: sprayer
+    drums: drums_sprayer
+    bass: bass_sprayer
+    melody: melody_sprayer
+- name: conveyor_of_eliminated_frequencies
+  repeat: 4
+  energy_note: 'Conveyor section — the transmission belt carrying the rust signal
+    from
+
+    biological to human to sonic. This is the composition''s longest sustained
+
+    mechanical sequence, and it should feel like duration: something moving
+
+    things from one state to another without end. Bass_conveyor_stiff: maximum
+
+    rigidity, the stiffest available bass, the conveyor belt that does not flex.
+
+    Drums_conveyor: high energy marking, six-beat loop against 3/4 creating
+
+    another slow polyrhythmic drift — two cycles of forgetting running
+
+    simultaneously. Chords: conveyor, which scores almost identically to
+
+    harrows and sprayer — the three industrial chord loops exist in the same
+
+    tonal territory, and here they complete the circuit. Melody_conveyor_alternative:
+
+    medium register, the ghost of the harrows melody now appearing in the
+
+    conveyor context — a frequency that has traveled through several machines
+
+    and arrived changed.
+
+    '
+  transition_note: 'Fourth repeat: bass shifts from conveyor_stiff to bass_conveyor_syncopated
+
+    for the final two bars only. The syncopation is the only moment of
+
+    rhythmic life in the bass across the entire arrangement — it arrives too
+
+    late, lasts too briefly, and the section ends mid-syncopation, cut off
+
+    before resolution. The thing that could have moved differently did not
+
+    move differently in time.
+
+    '
+  loops:
+    chords: conveyor
+    drums: drums_conveyor
+    bass: bass_conveyor_stiff
+    melody: melody_conveyor_alternative
+- name: sterile_perfection_achieved
+  repeat: 2
+  energy_note: 'Return to sky_crane — aerial view again, but now we know what we are
+
+    looking at. The same drone as field_initialization but now loaded with
+
+    everything the composition has documented. Chords re-enter but in their
+
+    most suspended voicing: sky_crane chords. Drums_sky_crane (medium energy,
+
+    seven-beat loop) introduces the final polyrhythmic layer — seven against
+
+    three, the most irresolvable ratio in the arrangement, the longest it
+
+    takes for the downbeats to re-align. Melody_sky_crane returns: the same
+
+    ghost signal from documentation_begins, but now understood as memorial
+
+    technology rather than ambient signal. The vocals do not return. The voice
+
+    that documented the abundance is itself now archived.
+
+    '
+  transition_note: 'Second repeat strips drums after bar four. Only chords and sky
+    crane drone
+
+    bass remain. The section should feel like arriving at a correct answer to
+
+    a question that should not have had an answer.
+
+    '
+  loops:
+    chords: sky_crane
+    drums: drums_sky_crane
+    bass: bass_sky_crane_drone
+    melody: melody_sky_crane
+- name: rust_signal_complete
+  repeat: 3
+  energy_note: 'Final dissolution. Bass_sky_crane_drone only — returning to the
+
+    field_initialization state, but the loop now carries harmonic memory
+
+    of everything that passed through it. No chords, no drums, no melody.
+
+    The iron oxidation frequency completes its transmission: biological rust
+
+    on bee thorax, chemical rust on work jacket, sonic rust on this frequency
+
+    as it decays. At 60 BPM in 3/4, three repeats = nine bars = the three
+
+    decades collapsed to nine measures. The last bar ends on beat one. Beats
+
+    two and three of the final bar are silence — the two missing beats are
+
+    the two things that were eliminated. The composition does not fade.
+
+    It stops, having completed its documentation function.
+
+    '
+  transition_note: 'No transition. The transmission ends. The record is complete.
+
+    '
+  loops:
+    chords: null
+    drums: null
+    bass: bass_sky_crane_drone
+    melody: null
+rationale: '**
+
+
+  The central compositional problem for a Blue song is the tension between *present*
+  and *forgotten* — the thing is happening now, but it is not being perceived. The
+  place exists but cannot be located. This is why the arrangement refuses to resolve
+  into traditional song form: verse-chorus-bridge implies a structure that knows where
+  it is, and a Blue composition cannot know where it is.
+
+
+  **The drone-anchor architecture.** `bass_sky_crane_drone` opens and closes the piece,
+  functioning as the composition''s tonal immune system — the frequency that was always
+  there before the forgetting began and remains after. By withholding this loop''s
+  full context until the final section, the return at `rust_signal_complete` lands
+  as recognition rather than recapitulation. You remember the room you''re in, briefly,
+  before the transmission ends.
+
+
+  **Polyrhythmic drift as forgetting-made-structural.** The choice to introduce loops
+  with beat-counts that don''t divide evenly into 3/4 (4-beat harvester loops, 6-beat
+  conveyor loops, 7-beat harrows/sprayer/sky crane loops) creates persistent low-frequency
+  polyrhythmic drift throughout the arrangement. This isn''t metric complexity for
+  its own sake — it''s the compositional equivalent of the place you can''t quite
+  locate. The downbeats align, then drift, then realign differently. The three-decade
+  collapse cycle has this quality: things that were synchronized (bees, harvests,
+  crews, applications) slowly phase out of relationship with each other.
+
+
+  **The vocal placement as forensic evidence, not emotional center.** `lyrics_v1`
+  enters in `abundance_record` and exits definitively in `pollinator_range_contraction`,
+  where it drops mid-section and is replaced by phantom melody only. This is deliberate:
+  the human documentation voice is present during the record of abundance and present
+  during the record of contraction, then archived. Its absence in the conveyor and
+  final sections is not mourning — it''s completion of the documentation protocol.
+  The voice filed its report. The voice is gone. The frequencies continue.
+
+
+  **The stiffness gradient as toxicological timeline.** The arrangement moves through
+  `bass_harvester_downbeat` → `bass_harvester` → `bass_harrows_stiff` → `bass_sprayer`
+  → `bass_conveyor_stiff` as a progressive rigidity sequence. The "stiff" variants
+  are not harsher-sounding necessarily, but they carry the label''s meaning compositionally:
+  a system losing its ability to flex and respond. The one exception — `bass_conveyor_syncopated`
+  entering for two bars at the end of the conveyor section — is the composition''s
+  most precisely placed gesture. It is the syncopation that arrived too late. The
+  body that could have moved differently, that didn''t, that now has been documented
+  as not having moved differently.
+
+
+  **The `drums_harvester_sparse` choice over high-energy variants.** At 60 BPM, "sparse"
+  low-energy drums serve the memorial-technology mood more accurately than high-energy
+  variants. High energy at this tempo reads as relentless rather than vital. The sparse
+  pattern has gaps in it — those gaps are the 230 BPS phantom bee wing frequencies
+  rendered as structured absence. The one moment where full `drums_harvester` enters
+  (the single-pass surge in `abundance_record`, repeat four) is framed explicitly
+  as malfunction rather than climax: the system briefly achieving full operation,
+  then dropping back. This is how you document an industrial accident without dramatizing
+  it.
+
+
+  **Sounds-like reasoning.** Grouper for the way dissolution is treated as presence
+  rather than absence. Basinski for the explicit use of degradation as memorial technology
+  — *Disintegration Loops* as compositional ancestor. Jóhann Jóhannsson''s *Miners''
+  Hymns* for the precise emotional register of industrial documentation that refuses
+  to aestheticize suffering. Matana Roberts for forensic jazz — testimony as composition.
+  Stars of the Lid and Hecker for the sustained-frequency drone architecture and the
+  way melody can function as ghost-signal rather than narrative.'

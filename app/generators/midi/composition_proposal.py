@@ -25,6 +25,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 PROPOSAL_FILENAME = "composition_proposal.yml"
 
 # Instruments in pipeline order
@@ -238,7 +242,8 @@ Return your response in two parts:
 1. A fenced YAML block (```yaml ... ```) with the structured proposal
 2. A "Rationale:" section with prose explaining your compositional reasoning
 
-The YAML block MUST follow this exact schema:
+The YAML block MUST follow this exact schema. Use YAML block scalars (|) for
+energy_note and transition_note — never bare strings with colons, which break parsing:
 ```yaml
 sounds_like:
   - Artist Name
@@ -246,8 +251,10 @@ sounds_like:
 proposed_sections:
   - name: <loop_label>
     repeat: <integer>
-    energy_note: <brief energy/mood description>
-    transition_note: <how this section moves into the next>
+    energy_note: |
+      Brief energy/mood description. May contain colons freely.
+    transition_note: |
+      How this section moves into the next.
     loops:
       chords: <chord_loop_label or null>
       drums: <drum_loop_label or null>
@@ -293,7 +300,7 @@ def call_claude(system: str, user: str, model: str = "claude-sonnet-4-6") -> str
     client = Anthropic()
     response = client.messages.create(
         model=model,
-        max_tokens=2048,
+        max_tokens=4096,
         system=system,
         messages=[{"role": "user", "content": user}],
     )
