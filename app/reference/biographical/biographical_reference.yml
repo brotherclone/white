@@ -835,8 +835,6 @@ years:
       emotional_landscape:
       choice_points:
 
-
-  # ToDo: Fill in 2002
   2002:
     world_events:
       major:
@@ -857,10 +855,19 @@ years:
     personal_context:
       summary: "Age 27 - late twenties establishment"
       key_events:
-        - "Release first LP"
+        - "Release first Your Team Ring album, Homelife"
+        - "Touring with Timesbold and shows with Flaming Fire and Pothole Skinny"
       influences:
+         - "Freak folk music scene"
+         - "Game design theory from gameLab at LEGO"
       emotional_landscape:
+        - "Feeling like I'm finally finding my creative voice"
+        - "Excited about the future and possibilities"
+        - "This is my peak social life - I have a large group of friends and collaborators"
       choice_points:
+        - "What if I never released that album?"
+        - "What if I never toured with Timesbold?"
+        - "What if I quit LEGO to do something else?"
 
   2003:
     world_events:
@@ -1027,7 +1034,6 @@ years:
       emotional_landscape:
       choice_points:
 
-  # ToDo: Fill in 2008
   2008:
     world_events:
       major:
@@ -1048,11 +1054,17 @@ years:
     personal_context:
       summary: "Age 33 - financial crisis impact"
       key_events:
-        - "Silas born"
-        - "Moved to suburbs"
+        - "In the middle of the night we go to hospital, several weeks before Ali's due date. Later that evening my son, Silas James Rand Walsh is born. He's a healthy, beautiful baby and we are overjoyed."
+        - "Financial crisis hits and I worry about my job at LEGO and our financial future, having just taken on a big mortgage myself.."
       influences:
+         - "Life in the Maryland suburbs is weird. It's the most diverse place on the planet, but boring still."
+         - "Lack of maternity leave and support for new parents in the US is shocking."
       emotional_landscape:
+        - "Financial anxiety"
+        - "Overwhelming love for my son"
       choice_points:
+        - "What if I had a different job that was more secure during the financial crisis?"
+        - "What if we could take more time off to be with Silas?"
 
 
   # ToDo: Fill in 2009

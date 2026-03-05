@@ -58,6 +58,7 @@ class SingerRange:
 SINGERS: dict[str, SingerRange] = {
     "busyayo": SingerRange("Busyayo", 45, 64, "baritone"),
     "gabriel": SingerRange("Gabriel", 48, 67, "tenor"),
+    "gabe": SingerRange("Gabriel", 48, 67, "tenor"),
     "robbie": SingerRange("Robbie", 48, 67, "tenor"),
     "shirley": SingerRange("Shirley", 53, 72, "alto"),
     "katherine": SingerRange("Katherine", 57, 76, "alto"),

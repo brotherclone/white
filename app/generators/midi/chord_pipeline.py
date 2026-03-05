@@ -207,6 +207,7 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
         "time_sig": (time_sig_num, time_sig_den),
         "concept": song_concept or concept,
         "color_name": color_name,
+        "singer": proposal.get("singer", ""),
         "song_filename": song_filename,
         "thread_dir": str(thread_dir),
         "raw_proposal": proposal,
