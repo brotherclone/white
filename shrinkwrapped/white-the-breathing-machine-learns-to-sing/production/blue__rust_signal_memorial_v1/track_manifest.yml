@@ -36,7 +36,7 @@ genres:
 - industrial ambient
 - field recording integration
 - phantom frequency composition
-sounds_like: []
+sounds_like: [Scott Walker, Radiohead]
 tracks:
   1: chords
   2: drums
@@ -377,8 +377,8 @@ sections:
     drums: drums_sprayer
     bass: bass_sprayer
     melody: melody_sprayer
-vocals: false
-lyrics: false
+vocals: true
+lyrics: true
 release_date: null
 album_sequence: null
 main_audio_file: null
