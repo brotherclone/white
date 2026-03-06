@@ -671,10 +671,89 @@ def _update_manifest(production_dir: Path, plan) -> None:
         )
 
 
+def compute_proposal_drift(
+    proposal_path: Path,
+    actual_sections: list[ArrangementSection],
+) -> Optional[dict]:
+    """Compare a composition_proposal.yml against actual arrangement sections.
+
+    Returns a dict with:
+      sections_added   — names in arrangement but absent from proposal
+      sections_removed — names in proposal but absent from arrangement
+      repeat_deltas    — [{name, proposed, actual}] where repeat count changed
+      order_changed    — True if shared section ordering differs
+
+    Returns None if the proposal file cannot be loaded or has no proposed_sections.
+    """
+    if not proposal_path.exists():
+        return None
+    try:
+        with open(proposal_path) as f:
+            proposal = yaml.safe_load(f) or {}
+    except Exception:
+        return None
+
+    proposed_sections = proposal.get("proposed_sections") or []
+    if not proposed_sections:
+        return None
+
+    proposed_names = [s.get("name", "") for s in proposed_sections]
+    proposed_repeats = {
+        s.get("name", ""): int(s.get("repeat", 1)) for s in proposed_sections
+    }
+    actual_names = [s.name for s in actual_sections]
+    actual_repeats: dict[str, int] = {}
+    for s in actual_sections:
+        actual_repeats[s.name] = actual_repeats.get(s.name, 0) + 1
+
+    proposed_set = set(proposed_names)
+    actual_set = set(actual_names)
+
+    sections_added = sorted(actual_set - proposed_set)
+    sections_removed = sorted(proposed_set - actual_set)
+
+    repeat_deltas = []
+    for name in proposed_set & actual_set:
+        p_repeat = proposed_repeats.get(name, 1)
+        a_repeat = actual_repeats.get(name, 1)
+        if p_repeat != a_repeat:
+            repeat_deltas.append(
+                {"name": name, "proposed": p_repeat, "actual": a_repeat}
+            )
+    repeat_deltas.sort(key=lambda x: x["name"])
+
+    # Order changed: compare relative order of shared sections
+    shared = proposed_set & actual_set
+    proposed_order = [n for n in proposed_names if n in shared]
+    actual_order = [n for n in actual_names if n in shared]
+    # Deduplicate while preserving order for comparison
+    seen: set = set()
+    proposed_dedup = []
+    for n in proposed_order:
+        if n not in seen:
+            proposed_dedup.append(n)
+            seen.add(n)
+    seen = set()
+    actual_dedup = []
+    for n in actual_order:
+        if n not in seen:
+            actual_dedup.append(n)
+            seen.add(n)
+    order_changed = proposed_dedup != actual_dedup
+
+    return {
+        "sections_added": sections_added,
+        "sections_removed": sections_removed,
+        "repeat_deltas": repeat_deltas,
+        "order_changed": order_changed,
+    }
+
+
 def _write_drift_report(
     production_dir: Path,
     source_arrangement: str,
     drift_entries: list[DriftEntry],
+    proposal_drift: Optional[dict] = None,
 ) -> Path:
     entries = []
     for e in drift_entries:
@@ -697,6 +776,8 @@ def _write_drift_report(
         "source_arrangement": source_arrangement,
         "sections": entries,
     }
+    if proposal_drift is not None:
+        data["proposal_drift"] = proposal_drift
     out_path = production_dir / DRIFT_REPORT_FILENAME
     with open(out_path, "w") as f:
         yaml.dump(
@@ -748,7 +829,13 @@ def import_arrangement(
     drift = compute_drift(plan, actual_sections)
     _update_plan(plan, actual_sections)
     save_plan(plan, production_dir)
-    _write_drift_report(production_dir, str(arrangement_path), drift)
+
+    from app.generators.midi.composition_proposal import PROPOSAL_FILENAME
+
+    proposal_drift = compute_proposal_drift(
+        production_dir / PROPOSAL_FILENAME, actual_sections
+    )
+    _write_drift_report(production_dir, str(arrangement_path), drift, proposal_drift)
 
     return drift
 
