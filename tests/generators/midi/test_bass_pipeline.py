@@ -437,14 +437,14 @@ class TestReadApprovedSections:
 
 
 # ---------------------------------------------------------------------------
-# 7. Integration test (mocked ChromaticScorer)
+# 7. Integration test (mocked Refractor)
 # ---------------------------------------------------------------------------
 
 
 class TestIntegration:
 
     def test_end_to_end_with_mock_scorer(self, tmp_path, monkeypatch):
-        """Run the full pipeline with a mocked ChromaticScorer."""
+        """Run the full pipeline with a mocked Refractor."""
         prod_dir = setup_production_dir(
             tmp_path,
             voicings=[[60, 64, 67], [55, 59, 62]],  # C major, G major
@@ -478,7 +478,7 @@ class TestIntegration:
                 ]
 
         monkeypatch.setattr(
-            "training.chromatic_scorer.ChromaticScorer",
+            "training.refractor.Refractor",
             MockScorer,
         )
 
@@ -563,7 +563,7 @@ class TestIntegration:
                 ]
 
         monkeypatch.setattr(
-            "training.chromatic_scorer.ChromaticScorer",
+            "training.refractor.Refractor",
             MockScorer,
         )
 
@@ -613,7 +613,7 @@ class TestIntegration:
                 ]
 
         monkeypatch.setattr(
-            "training.chromatic_scorer.ChromaticScorer",
+            "training.refractor.Refractor",
             MockScorer,
         )
 

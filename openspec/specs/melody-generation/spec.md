@@ -125,7 +125,7 @@ The melody pipeline SHALL write candidate MIDI files to the song's production me
 
 ### Requirement: Composite Scoring
 
-The melody pipeline SHALL score each candidate using theory metrics and ChromaticScorer, producing a single composite ranking per section.
+The melody pipeline SHALL score each candidate using theory metrics and Refractor, producing a single composite ranking per section.
 
 #### Scenario: Theory scoring — singability
 

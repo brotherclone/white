@@ -4,7 +4,7 @@ Melody generation pipeline for the Music Production Pipeline.
 
 Reads approved chords, harmonic rhythm, and song proposal metadata. Generates
 melody candidates from contour templates within singer vocal range constraints,
-scores with theory + ChromaticScorer composite, writes top candidates as MIDI
+scores with theory + Refractor composite, writes top candidates as MIDI
 files with a review YAML.
 
 Pipeline position: chords → drums → harmonic rhythm → strums → bass → MELODY
@@ -18,13 +18,13 @@ Usage:
 import argparse
 import io
 import sys
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Optional
-
 import mido
 import numpy as np
 import yaml
+
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
 
 from app.generators.midi.melody_patterns import (
     ALL_TEMPLATES,
@@ -497,11 +497,11 @@ def run_melody_pipeline(
     else:
         print("  No approved harmonic rhythm — using 1 bar per chord")
 
-    # --- 5. Load ChromaticScorer ---
-    print("\nLoading ChromaticScorer...")
-    from training.chromatic_scorer import ChromaticScorer
+    # --- 5. Load Refractor ---
+    print("\nLoading Refractor...")
+    from training.refractor import Refractor
 
-    scorer = ChromaticScorer(onnx_path=onnx_path) if onnx_path else ChromaticScorer()
+    scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 
     concept_text = song_info.get("concept", "")
     if not concept_text:
@@ -616,7 +616,7 @@ def run_melody_pipeline(
                 }
             )
 
-        # Score with ChromaticScorer
+        # Score with Refractor
         print(f"  Scoring {len(candidates)} candidates...")
         scorer_candidates = [{"midi_bytes": c["midi_bytes"]} for c in candidates]
         scorer_results = scorer.score_batch(scorer_candidates, concept_emb=concept_emb)
@@ -790,7 +790,7 @@ def main():
     parser.add_argument(
         "--onnx-path",
         default=None,
-        help="Path to fusion_model.onnx (default: training/data/fusion_model.onnx)",
+        help="Path to refractor.onnx (default: training/data/refractor.onnx)",
     )
 
     args = parser.parse_args()

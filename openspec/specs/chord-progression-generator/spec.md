@@ -1,5 +1,8 @@
 # Chord Progression Generator
 
+## Purpose
+Generate chord progressions from a MIDI corpus using Markov transition graphs and chromatic scoring, producing ranked candidates for human review.
+
 ## Requirements
 
 ### Requirement: MIDI Corpus Database

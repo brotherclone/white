@@ -67,8 +67,9 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
             self.null_midi = nn.Parameter(torch.randn(512) * 0.02)
             self.null_concept = nn.Parameter(torch.randn(768) * 0.02)
             self.null_lyric = nn.Parameter(torch.randn(768) * 0.02)
+            self.null_sounds_like = nn.Parameter(torch.randn(768) * 0.02)
             self.fusion = nn.Sequential(
-                nn.Linear(2560, 1024),
+                nn.Linear(3328, 1024),
                 nn.ReLU(),
                 nn.Dropout(0.3),
                 nn.Linear(1024, 512),
@@ -89,6 +90,8 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
             has_audio,
             has_midi,
             has_lyric,
+            sounds_like_emb,
+            has_sounds_like,
         ):
             batch_size = piano_roll.size(0)
             midi_emb = self.midi_encoder(piano_roll)
@@ -96,6 +99,7 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
             audio_mask = has_audio.unsqueeze(1)
             midi_mask = has_midi.unsqueeze(1)
             lyric_mask = has_lyric.unsqueeze(1)
+            sounds_like_mask = has_sounds_like.unsqueeze(1)
 
             # No modality dropout at inference (model.eval())
 
@@ -108,8 +112,15 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
             lyric_emb = torch.where(
                 lyric_mask, lyric_emb, self.null_lyric.expand(batch_size, -1)
             )
+            sounds_like_emb = torch.where(
+                sounds_like_mask,
+                sounds_like_emb,
+                self.null_sounds_like.expand(batch_size, -1),
+            )
 
-            fused = torch.cat([audio_emb, midi_emb, concept_emb, lyric_emb], dim=-1)
+            fused = torch.cat(
+                [audio_emb, midi_emb, concept_emb, lyric_emb, sounds_like_emb], dim=-1
+            )
             fused = self.fusion(fused)
 
             return (
@@ -142,6 +153,8 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
         torch.ones(batch, dtype=torch.bool),  # has_audio
         torch.ones(batch, dtype=torch.bool),  # has_midi
         torch.ones(batch, dtype=torch.bool),  # has_lyric
+        torch.randn(batch, 768),  # sounds_like_emb
+        torch.ones(batch, dtype=torch.bool),  # has_sounds_like
     )
 
     onnx_buf = io.BytesIO()
@@ -157,6 +170,8 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
             "has_audio",
             "has_midi",
             "has_lyric",
+            "sounds_like_emb",
+            "has_sounds_like",
         ],
         output_names=["temporal", "spatial", "ontological", "confidence"],
         dynamic_axes={
@@ -167,6 +182,8 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
             "has_audio": {0: "batch"},
             "has_midi": {0: "batch"},
             "has_lyric": {0: "batch"},
+            "sounds_like_emb": {0: "batch"},
+            "has_sounds_like": {0: "batch"},
             "temporal": {0: "batch"},
             "spatial": {0: "batch"},
             "ontological": {0: "batch"},
@@ -209,6 +226,8 @@ def export_fusion_model(model_weights: bytes, verify: bool = False):
             "has_audio": np.array([True]),
             "has_midi": np.array([True]),
             "has_lyric": np.array([True]),
+            "sounds_like_emb": np.random.randn(1, 768).astype(np.float32),
+            "has_sounds_like": np.array([True]),
         }
         outputs = sess.run(None, inputs)
         temporal, spatial, ontological, confidence = outputs
@@ -244,7 +263,7 @@ def main(verify: bool = True):
     from pathlib import Path
 
     data_dir = Path(__file__).parent / "data"
-    model_path = data_dir / "fusion_model.pt"
+    model_path = data_dir / "refractor.pt"
 
     if not model_path.exists():
         print(f"ERROR: Model not found: {model_path}")
@@ -255,7 +274,7 @@ def main(verify: bool = True):
 
     onnx_bytes = export_fusion_model.remote(model_weights=model_bytes, verify=verify)
 
-    output_path = data_dir / "fusion_model.onnx"
+    output_path = data_dir / "refractor.onnx"
     output_path.write_bytes(onnx_bytes)
 
     size_mb = len(onnx_bytes) / (1024 * 1024)

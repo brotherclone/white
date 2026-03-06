@@ -30,6 +30,7 @@ ENERGY_ORDER = ["low", "medium", "high"]
 # ---------------------------------------------------------------------------
 
 
+# ToDo: Convert to pydantic model if we want validation and better IDE support. For now,
 @dataclass
 class BassPattern:
     """A single-bar bass pattern template.
@@ -613,9 +614,9 @@ TEMPLATES_3_4 = [
         style="pedal",
         energy="low",
         time_sig=(3, 4),
-        description="Root held entire bar — sustained drone",
-        notes=[(0, "root", "normal")],
-        note_durations=[3.0],
+        description="Root on 1 held to 3, ghost re-attack on 3 — pedal with subtle pulse",
+        notes=[(0, "root", "normal"), (2, "root", "ghost")],
+        note_durations=[2.0, 1.0],
     ),
     BassPattern(
         name="waltz_pedal_pulse",

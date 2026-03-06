@@ -45,6 +45,7 @@ VELOCITY = {
 # ---------------------------------------------------------------------------
 
 
+# ToDo: Convert to Pydantic model if we want validation and better IDE support. For now, dataclass is sufficient for static templates.
 @dataclass
 class DrumPattern:
     """A single-bar drum pattern template.
@@ -85,6 +86,7 @@ GENRE_FAMILY_KEYWORDS = {
     "classical": ["classical", "post-classical", "orchestral", "chamber"],
     "experimental": ["experimental", "noise", "industrial", "avant-garde"],
     "folk": ["folk", "acoustic", "singer-songwriter"],
+    "americana": ["americana", "country", "bluegrass", "appalachian", "roots", "waltz"],
     "jazz": ["jazz", "swing", "bebop", "fusion"],
 }
 
@@ -866,6 +868,107 @@ def make_fallback_pattern(time_sig: tuple[int, int]) -> DrumPattern:
 
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 3/4 Americana
+# ---------------------------------------------------------------------------
+
+TEMPLATES_3_4_AMERICANA = [
+    DrumPattern(
+        name="americana_waltz_brushes",
+        genre_family="americana",
+        energy="low",
+        time_sig=(3, 4),
+        description="Waltz brushes — ghost snare swishes on all three beats, kick on 1",
+        voices={
+            "kick": [(0, "normal")],
+            "snare": [(0, "ghost"), (1, "ghost"), (2, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="americana_waltz",
+        genre_family="americana",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Country waltz — kick on 1, snare on 2 and 3, closed hat on eighths",
+        voices={
+            "kick": [(0, "accent")],
+            "snare": [(1, "normal"), (2, "normal")],
+            "hh_closed": [
+                (0, "ghost"),
+                (0.5, "ghost"),
+                (1, "ghost"),
+                (1.5, "ghost"),
+                (2, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="americana_waltz_driving",
+        genre_family="americana",
+        energy="high",
+        time_sig=(3, 4),
+        description="Driving waltz — accented kick on 1, snare accent on 3, hi-hat eighths with open on 2",
+        voices={
+            "kick": [(0, "accent"), (1.5, "ghost")],
+            "snare": [(1, "normal"), (2, "accent")],
+            "hh_closed": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1.5, "ghost"),
+                (2, "normal"),
+                (2.5, "ghost"),
+            ],
+            "hh_open": [(1, "normal")],
+        },
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 3/4 Experimental
+# ---------------------------------------------------------------------------
+
+TEMPLATES_3_4_EXPERIMENTAL = [
+    DrumPattern(
+        name="experimental_3_4_sparse",
+        genre_family="experimental",
+        energy="low",
+        time_sig=(3, 4),
+        description="Sparse 3/4 — kick on 1, rimshot ghost on beat 2.5, silence elsewhere",
+        voices={
+            "kick": [(0, "normal")],
+            "rimshot": [(2.5, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="experimental_3_4_industrial",
+        genre_family="experimental",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Industrial 3/4 — accented kick on 1, clap on 2, tom low ghost on 2.5 and 3",
+        voices={
+            "kick": [(0, "accent")],
+            "clap": [(1, "accent")],
+            "tom_low": [(1.5, "ghost"), (2, "ghost")],
+            "hh_closed": [(0.5, "ghost"), (2.5, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="experimental_3_4_polyrhythm",
+        genre_family="experimental",
+        energy="high",
+        time_sig=(3, 4),
+        description="Polyrhythmic 3/4 — kick on 1 and 1.5 (hemiola feel), snare ghost on 2, clap on 3",
+        voices={
+            "kick": [(0, "accent"), (1.5, "normal")],
+            "snare": [(1, "ghost")],
+            "clap": [(2, "accent")],
+            "tom_high": [(0.5, "ghost"), (2.5, "ghost")],
+        },
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -884,4 +987,7 @@ ALL_TEMPLATES: list[DrumPattern] = [
     *TEMPLATES_7_8_ELECTRONIC,
     *TEMPLATES_7_8_KRAUTROCK,
     *TEMPLATES_7_8_ROCK,
+    # 3/4
+    *TEMPLATES_3_4_AMERICANA,
+    *TEMPLATES_3_4_EXPERIMENTAL,
 ]

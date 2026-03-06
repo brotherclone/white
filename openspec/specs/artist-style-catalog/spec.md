@@ -118,9 +118,9 @@ entries can be edited and promoted to `status: reviewed`.
 
 ---
 
-### Requirement: ChromaticScorer Scoring of Descriptions
+### Requirement: Refractor Scoring of Descriptions
 
-The catalog CLI SHALL optionally score all descriptions through ChromaticScorer in
+The catalog CLI SHALL optionally score all descriptions through Refractor in
 text-only mode to provide an objective chromatic coordinate for each artist's description,
 reported as raw mode probabilities (not matched against a specific color target).
 

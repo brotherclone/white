@@ -623,7 +623,7 @@ class TestPromotePartTxt:
 
 
 def _make_mock_scorer(match_score=0.7):
-    """Build a mock ChromaticScorer that returns deterministic results."""
+    """Build a mock Refractor that returns deterministic results."""
     mock = MagicMock()
     import numpy as np
 
@@ -703,9 +703,7 @@ class TestRunPipelineIntegration:
 
         with (
             patch("anthropic.Anthropic", return_value=mock_client),
-            patch(
-                "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
-            ),
+            patch("training.refractor.Refractor", return_value=mock_scorer),
         ):
             run_lyric_pipeline(
                 production_dir=str(prod_dir),
@@ -748,9 +746,7 @@ class TestRunPipelineIntegration:
 
         with (
             patch("anthropic.Anthropic", return_value=mock_client),
-            patch(
-                "training.chromatic_scorer.ChromaticScorer", return_value=mock_scorer
-            ),
+            patch("training.refractor.Refractor", return_value=mock_scorer),
         ):
             run_lyric_pipeline(
                 production_dir=str(prod_dir),
@@ -801,7 +797,7 @@ class TestRunPipelineIntegration:
             with (
                 patch("anthropic.Anthropic", return_value=mock_client),
                 patch(
-                    "training.chromatic_scorer.ChromaticScorer",
+                    "training.refractor.Refractor",
                     return_value=mock_scorer,
                 ),
             ):

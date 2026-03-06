@@ -119,7 +119,12 @@ def batch_trim(approved_dir: Path, dry_run: bool = False) -> list[dict]:
     """
     report = []
     for midi_path in sorted(approved_dir.rglob("*.mid")):
-        mid = mido.MidiFile(midi_path)
+        if midi_path.stat().st_size == 0:
+            continue
+        try:
+            mid = mido.MidiFile(midi_path)
+        except Exception:
+            continue
         ppq = mid.ticks_per_beat
 
         last_note_tick = 0

@@ -55,7 +55,7 @@ promotion without further post-processing.
 
 ### Requirement: Composite Scoring
 
-The pipeline SHALL score each candidate using both music theory metrics (from the chord prototype) and chromatic fitness (from ChromaticScorer), producing a single composite ranking.
+The pipeline SHALL score each candidate using both music theory metrics (from the chord prototype) and chromatic fitness (from Refractor), producing a single composite ranking.
 
 #### Scenario: Music theory scoring
 
@@ -65,7 +65,7 @@ The pipeline SHALL score each candidate using both music theory metrics (from th
 #### Scenario: Chromatic scoring
 
 - **WHEN** a chord progression candidate is scored
-- **THEN** the pipeline SHALL convert the candidate to MIDI bytes, encode the concept text via `ChromaticScorer.prepare_concept()`, and score with `ChromaticScorer.score()`
+- **THEN** the pipeline SHALL convert the candidate to MIDI bytes, encode the concept text via `Refractor.prepare_concept()`, and score with `Refractor.score()`
 - **AND** the concept embedding SHALL be computed once and reused across all candidates in the batch
 
 #### Scenario: Composite ranking

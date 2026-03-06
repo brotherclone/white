@@ -4,14 +4,14 @@ Canonical MultimodalFusionModel definition.
 This is the authoritative model architecture used by:
 - training/modal_midi_fusion.py (training on Modal GPU)
 - training/export_onnx.py (ONNX export on Modal)
-- training/chromatic_scorer.py (CPU inference via ONNX)
+- training/refractor.py (CPU inference via ONNX)
 
 Architecture:
     PianoRollEncoder CNN (1.1M params, unfrozen during training)
-    + multimodal fusion MLP (3.2M params)
+    + multimodal fusion MLP (~3.2M params)
     + 4 regression heads (temporal, spatial, ontological, confidence)
 
-Input: [audio 512 + MIDI 512 + concept 768 + lyric 768] = 2560-dim
+Input: [audio 512 + MIDI 512 + concept 768 + lyric 768 + sounds_like 768] = 3328-dim
 Output: temporal [3], spatial [3], ontological [3], confidence [1]
 """
 
@@ -73,10 +73,11 @@ if TORCH_AVAILABLE:
             self.null_midi = nn.Parameter(torch.randn(512) * 0.02)
             self.null_concept = nn.Parameter(torch.randn(768) * 0.02)
             self.null_lyric = nn.Parameter(torch.randn(768) * 0.02)
+            self.null_sounds_like = nn.Parameter(torch.randn(768) * 0.02)
 
-            # Fusion MLP: [audio 512 + midi 512 + concept 768 + lyric 768] = 2560
+            # Fusion MLP: [audio 512 + midi 512 + concept 768 + lyric 768 + sounds_like 768] = 3328
             self.fusion = nn.Sequential(
-                nn.Linear(2560, 1024),
+                nn.Linear(3328, 1024),
                 nn.ReLU(),
                 nn.Dropout(0.3),
                 nn.Linear(1024, 512),
@@ -99,6 +100,8 @@ if TORCH_AVAILABLE:
             has_audio,
             has_midi,
             has_lyric,
+            sounds_like_emb=None,
+            has_sounds_like=None,
         ):
             batch_size = piano_roll.size(0)
             midi_emb = self.midi_encoder(piano_roll)
@@ -106,6 +109,17 @@ if TORCH_AVAILABLE:
             audio_mask = has_audio.unsqueeze(1)
             midi_mask = has_midi.unsqueeze(1)
             lyric_mask = has_lyric.unsqueeze(1)
+
+            # Default sounds_like to null path when not provided
+            if sounds_like_emb is None:
+                sounds_like_emb = torch.zeros(
+                    batch_size, 768, device=piano_roll.device, dtype=piano_roll.dtype
+                )
+            if has_sounds_like is None:
+                has_sounds_like = torch.zeros(
+                    batch_size, dtype=torch.bool, device=piano_roll.device
+                )
+            sounds_like_mask = has_sounds_like.unsqueeze(1)
 
             if self.training and self.modality_dropout > 0:
                 drop_audio = (
@@ -120,9 +134,14 @@ if TORCH_AVAILABLE:
                     torch.rand(batch_size, 1, device=piano_roll.device)
                     < self.modality_dropout
                 )
+                drop_sounds_like = (
+                    torch.rand(batch_size, 1, device=piano_roll.device)
+                    < self.modality_dropout
+                )
                 audio_mask = audio_mask & ~drop_audio
                 midi_mask = midi_mask & ~drop_midi
                 lyric_mask = lyric_mask & ~drop_lyric
+                sounds_like_mask = sounds_like_mask & ~drop_sounds_like
 
             audio_emb = torch.where(
                 audio_mask, audio_emb, self.null_audio.expand(batch_size, -1)
@@ -133,8 +152,15 @@ if TORCH_AVAILABLE:
             lyric_emb = torch.where(
                 lyric_mask, lyric_emb, self.null_lyric.expand(batch_size, -1)
             )
+            sounds_like_emb = torch.where(
+                sounds_like_mask,
+                sounds_like_emb,
+                self.null_sounds_like.expand(batch_size, -1),
+            )
 
-            fused = torch.cat([audio_emb, midi_emb, concept_emb, lyric_emb], dim=-1)
+            fused = torch.cat(
+                [audio_emb, midi_emb, concept_emb, lyric_emb, sounds_like_emb], dim=-1
+            )
             fused = self.fusion(fused)
 
             return {

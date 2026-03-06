@@ -62,4 +62,4 @@ exclude = [
     "**/*.ipynb",
     "training/notebooks/*.ipynb",
 ]
-
+per-file-ignores = { "tests/generators/midi/test_chord_pipeline.py" = ["F401"] }

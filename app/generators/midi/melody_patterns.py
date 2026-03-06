@@ -7,9 +7,9 @@ use relative interval sequences (signed semitone deltas) rather than absolute
 pitches, so the pipeline resolves them to actual MIDI pitches within any
 singer's vocal range.
 """
-
-from dataclasses import dataclass, field
 import logging
+from dataclasses import dataclass, field
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ ENERGY_ORDER = ["low", "medium", "high"]
 # ---------------------------------------------------------------------------
 
 
+# ToDo: Convert to pydantic models for better validation and defaults if this grows more complex
 @dataclass
 class SingerRange:
     """A singer's vocal range constraint.
@@ -57,6 +58,7 @@ class SingerRange:
 SINGERS: dict[str, SingerRange] = {
     "busyayo": SingerRange("Busyayo", 45, 64, "baritone"),
     "gabriel": SingerRange("Gabriel", 48, 67, "tenor"),
+    "gabe": SingerRange("Gabriel", 48, 67, "tenor"),
     "robbie": SingerRange("Robbie", 48, 67, "tenor"),
     "shirley": SingerRange("Shirley", 53, 72, "alto"),
     "katherine": SingerRange("Katherine", 57, 76, "alto"),
