@@ -825,9 +825,18 @@ def main():
 
     report = evaluate(prod_path)
 
+    # Resolve concept + color from plan, falling back to song proposal when no plan.
+    def _resolve_concept_color(prod: Path) -> tuple[str, str]:
+        plan = load_plan(prod)
+        if plan and (plan.concept or plan.color):
+            return plan.concept or "", plan.color or ""
+        from app.generators.midi.composition_proposal import load_song_proposal_data
+
+        meta = load_song_proposal_data(prod)
+        return meta.get("concept", ""), meta.get("color", "")
+
     if args.rescore:
-        plan = load_plan(prod_path)
-        concept = plan.concept if plan else ""
+        concept, _ = _resolve_concept_color(prod_path)
         _rescore_phases(report, prod_path, concept)
         completed = [pr for pr in report.phases.values() if pr.complete]
         report.chromatic_alignment = _safe_mean(
@@ -845,9 +854,7 @@ def main():
         _write_evaluation(report, prod_path)
 
     if args.rescore_lyrics:
-        plan = load_plan(prod_path)
-        concept = plan.concept if plan else ""
-        color = plan.color if plan else ""
+        concept, color = _resolve_concept_color(prod_path)
         lyric_scores = _rescore_lyrics(prod_path, concept, color)
         if lyric_scores:
             eval_path = prod_path / EVALUATION_FILENAME
