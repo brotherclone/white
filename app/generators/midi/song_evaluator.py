@@ -732,6 +732,113 @@ def _write_comparison_report(reports: list) -> Path:
 
 
 # ---------------------------------------------------------------------------
+# ACE actuals (--ace-import)
+# ---------------------------------------------------------------------------
+
+
+def _compute_ace_actuals(production_dir: Path) -> dict:
+    """Compute actual vocal metrics from the ACE Studio export MIDI.
+
+    Returns dict with:
+        actual_vocal_coverage   — total ACE note duration / total melody arrangement duration
+        actual_syllable_density — total word count / total melody bars
+        ace_chromatic_alignment — Refractor text-only score on the ACE word list
+    """
+    from app.generators.midi.ace_studio_import import find_ace_export, parse_ace_export
+    from app.generators.midi.drift_report import (
+        _parse_arrangement_sections,
+        _load_bpm,
+        _load_time_sig,
+        MELODY_TRACK,
+    )
+
+    midi_path = find_ace_export(production_dir)
+    if midi_path is None:
+        print("WARNING: No ACE Studio export MIDI found — skipping ace-import")
+        return {}
+
+    word_events, _ = parse_ace_export(midi_path)
+    if not word_events:
+        return {}
+
+    arrangement_path = production_dir / "arrangement.txt"
+    if not arrangement_path.exists():
+        print("WARNING: arrangement.txt not found — skipping ace-import")
+        return {}
+
+    bpm = _load_bpm(production_dir)
+    time_sig = _load_time_sig(production_dir)
+    beats_per_bar = int(time_sig.split("/")[0])
+
+    # Melody section durations in seconds
+    sections = _parse_arrangement_sections(arrangement_path, track=MELODY_TRACK)
+    total_melody_sec = sum(end - start for _, start, end in sections)
+    total_melody_beats = total_melody_sec * bpm / 60.0
+    total_melody_bars = total_melody_beats / beats_per_bar if beats_per_bar else 0.0
+
+    # Actual vocal coverage: sum of note durations / total melody duration
+    vocal_beats = sum(
+        max(0.0, w.get("end_beat", w["start_beat"]) - w["start_beat"])
+        for w in word_events
+    )
+    actual_vocal_coverage = (
+        round(vocal_beats / total_melody_beats, 4) if total_melody_beats > 0 else None
+    )
+
+    # Actual syllable density: words / melody bars
+    actual_syllable_density = (
+        round(len(word_events) / total_melody_bars, 4)
+        if total_melody_bars > 0
+        else None
+    )
+
+    result: dict = {
+        "total_ace_words": len(word_events),
+        "actual_vocal_coverage": actual_vocal_coverage,
+        "actual_syllable_density": actual_syllable_density,
+    }
+
+    # ACE chromatic alignment via Refractor text-only
+    from app.generators.midi.chord_pipeline import (
+        compute_chromatic_match,
+        get_chromatic_target,
+    )
+
+    onnx_path = (
+        Path(__file__).parent.parent.parent.parent
+        / "training"
+        / "data"
+        / "refractor.onnx"
+    )
+    if onnx_path.exists():
+        try:
+            from training.refractor import Refractor
+
+            from app.generators.midi.composition_proposal import load_song_proposal_data
+
+            meta = load_song_proposal_data(production_dir)
+            concept = meta.get("concept", "")
+            color = meta.get("color", "")
+
+            scorer = Refractor(str(onnx_path))
+            concept_emb = scorer.prepare_concept(concept) if concept else None
+            target = get_chromatic_target(color)
+            ace_text = " ".join(w["word"] for w in word_events)
+            scores = scorer.score_batch(
+                [{"lyric_text": ace_text}], concept_emb=concept_emb
+            )
+            result["ace_chromatic_alignment"] = round(
+                float(compute_chromatic_match(scores[0], target)), 4
+            )
+        except Exception as exc:
+            print(f"WARNING: Could not compute ace_chromatic_alignment: {exc}")
+    else:
+        print("WARNING: refractor.onnx not found — ace_chromatic_alignment skipped")
+
+    return result
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -759,6 +866,11 @@ def main():
         "--rescore-lyrics",
         action="store_true",
         help="Score melody/lyrics.txt and lyrics_draft.txt, merge results into song_evaluation.yml",
+    )
+    parser.add_argument(
+        "--ace-import",
+        action="store_true",
+        help="Compute actual vocal metrics from ACE Studio export MIDI (vocal coverage, syllable density, chromatic alignment)",
     )
     args = parser.parse_args()
 
@@ -873,6 +985,28 @@ def main():
                 )
             print("\nLyric rescore results:")
             for k, v in lyric_scores.items():
+                print(f"  {k}: {v}")
+            print(f"\nUpdated: {eval_path}")
+
+    if args.ace_import:
+        ace_actuals = _compute_ace_actuals(prod_path)
+        if ace_actuals:
+            eval_path = prod_path / EVALUATION_FILENAME
+            existing_eval: dict = {}
+            if eval_path.exists():
+                with open(eval_path) as f:
+                    existing_eval = yaml.safe_load(f) or {}
+            existing_eval["ace_actuals"] = ace_actuals
+            with open(eval_path, "w") as f:
+                yaml.dump(
+                    existing_eval,
+                    f,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    allow_unicode=True,
+                )
+            print("\nACE actuals:")
+            for k, v in ace_actuals.items():
                 print(f"  {k}: {v}")
             print(f"\nUpdated: {eval_path}")
 
