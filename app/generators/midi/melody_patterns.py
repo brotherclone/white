@@ -56,12 +56,20 @@ class SingerRange:
 
 
 SINGERS: dict[str, SingerRange] = {
-    "busyayo": SingerRange("Busyayo", 45, 64, "baritone"),
+    "busayo": SingerRange("Busayo", 45, 64, "baritone"),
+    "busyayo": SingerRange("Busayo", 45, 64, "baritone"),  # legacy spelling
     "gabriel": SingerRange("Gabriel", 48, 67, "tenor"),
     "gabe": SingerRange("Gabriel", 48, 67, "tenor"),
     "robbie": SingerRange("Robbie", 48, 67, "tenor"),
     "shirley": SingerRange("Shirley", 53, 72, "alto"),
     "katherine": SingerRange("Katherine", 57, 76, "alto"),
+    # Bass-baritone with falsetto ceiling
+    "marvin": SingerRange("Marvin", 40, 69, "baritone"),
+    # Parody tenor — same range as Gabriel
+    "aloy": SingerRange("Aloysius", 48, 67, "tenor"),
+    "aloysius": SingerRange("Aloysius", 48, 67, "tenor"),
+    # 50s-style bright tenor — sits a little higher
+    "remez": SingerRange("Remez", 50, 72, "tenor"),
 }
 
 
