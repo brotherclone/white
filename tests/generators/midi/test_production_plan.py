@@ -7,7 +7,7 @@ import mido
 import pytest
 import yaml
 
-from app.generators.midi.production_plan import (
+from app.generators.midi.production.production_plan import (
     MANIFEST_BOOTSTRAP_FILENAME,
     PLAN_FILENAME,
     PlanSection,

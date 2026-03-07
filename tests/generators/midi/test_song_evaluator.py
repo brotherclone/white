@@ -6,10 +6,14 @@ from pathlib import Path
 import pytest
 import yaml
 
-from app.generators.midi.production_plan import PlanSection, ProductionPlan, save_plan
+from app.generators.midi.production.production_plan import (
+    PlanSection,
+    ProductionPlan,
+    save_plan,
+)
 from unittest.mock import MagicMock, patch
 
-from app.generators.midi.song_evaluator import (
+from app.generators.midi.production.song_evaluator import (
     EVALUATION_FILENAME,
     PhaseReport,
     EvaluationReport,
@@ -769,7 +773,7 @@ def _make_mock_scorer(edited_match=0.75, draft_match=0.60):
 
 class TestRescoreLyrics:
     def _make_prod_dir(self, tmp_path, lyrics_text=None, draft_text=None):
-        from app.generators.midi.production_plan import (
+        from app.generators.midi.production.production_plan import (
             PlanSection,
             ProductionPlan,
             save_plan,

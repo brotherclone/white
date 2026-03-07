@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from app.generators.midi.assembly_manifest import (
+from app.generators.midi.production.assembly_manifest import (
     Clip,
     _tc_to_seconds,
     compute_drift,
@@ -17,7 +17,7 @@ from app.generators.midi.assembly_manifest import (
     import_arrangement,
     parse_arrangement,
 )
-from app.generators.midi.production_plan import (
+from app.generators.midi.production.production_plan import (
     PlanSection,
     ProductionPlan,
     load_plan,
@@ -261,7 +261,7 @@ class TestComputeDrift:
         # At 84 BPM, 7/8: spb = (7 * 0.5) * (60/84) = 2.5s
         # Intro: 4 bars × 3 = 12 bars × 2.5 = 30s
         plan = _make_plan([("Intro", 4, 3)])
-        from app.generators.midi.assembly_manifest import ArrangementSection
+        from app.generators.midi.production.assembly_manifest import ArrangementSection
 
         actual = [ArrangementSection(name="Intro", start=0.0, end=30.0)]
         drift = compute_drift(plan, actual)
@@ -270,7 +270,7 @@ class TestComputeDrift:
 
     def test_positive_drift(self):
         plan = _make_plan([("Intro", 4, 3)])
-        from app.generators.midi.assembly_manifest import ArrangementSection
+        from app.generators.midi.production.assembly_manifest import ArrangementSection
 
         actual = [ArrangementSection(name="Intro", start=10.0, end=40.0)]
         drift = compute_drift(plan, actual)
@@ -278,7 +278,7 @@ class TestComputeDrift:
 
     def test_negative_drift(self):
         plan = _make_plan([("Intro", 4, 3), ("Bridge", 4, 1)])
-        from app.generators.midi.assembly_manifest import ArrangementSection
+        from app.generators.midi.production.assembly_manifest import ArrangementSection
 
         # Bridge should start at 30s, but actually starts at 20s
         actual = [
@@ -292,7 +292,7 @@ class TestComputeDrift:
         # When actual section has no matching plan entry (name-based matching),
         # plan_name falls back to arrangement_name and drift_seconds is 0.
         plan = _make_plan([("Verse", 4, 3)])
-        from app.generators.midi.assembly_manifest import ArrangementSection
+        from app.generators.midi.production.assembly_manifest import ArrangementSection
 
         actual = [ArrangementSection(name="Bridge", start=0.0, end=30.0)]
         drift = compute_drift(plan, actual)
@@ -305,7 +305,7 @@ class TestComputeDrift:
         # Plan: [honey, honey, queen]. Arrangement: [honey, queen].
         # queen should match plan's queen (index 2), not honey (index 1).
         plan = _make_plan([("honey", 5, 2), ("honey", 5, 2), ("queen", 5, 2)])
-        from app.generators.midi.assembly_manifest import ArrangementSection
+        from app.generators.midi.production.assembly_manifest import ArrangementSection
 
         actual = [
             ArrangementSection(name="honey", start=0.0, end=30.0),
@@ -320,7 +320,7 @@ class TestComputeDrift:
     def test_vocals_flag_changed(self):
         plan = _make_plan([("Verse", 4, 2)])
         plan.sections[0].vocals = False
-        from app.generators.midi.assembly_manifest import ArrangementSection
+        from app.generators.midi.production.assembly_manifest import ArrangementSection
 
         actual = [ArrangementSection(name="Verse", start=0.0, end=20.0, vocals=True)]
         drift = compute_drift(plan, actual)
@@ -329,7 +329,7 @@ class TestComputeDrift:
     def test_vocals_flag_unchanged(self):
         plan = _make_plan([("Verse", 4, 2)])
         plan.sections[0].vocals = True
-        from app.generators.midi.assembly_manifest import ArrangementSection
+        from app.generators.midi.production.assembly_manifest import ArrangementSection
 
         actual = [ArrangementSection(name="Verse", start=0.0, end=20.0, vocals=True)]
         drift = compute_drift(plan, actual)
@@ -480,14 +480,14 @@ class TestArchivistIntegration:
         approved.mkdir(parents=True)
         (approved / "bridge_eighth_hypnotic.mid").write_bytes(b"")
 
-        from app.generators.midi.assembly_manifest import build_folder_lookup
+        from app.generators.midi.production.assembly_manifest import build_folder_lookup
 
         lookup = build_folder_lookup(tmp_path)
         assert lookup["bridge_eighth_hypnotic"] == "chords"
 
         # Track 2 (drums) with a loop known to be chords → still labelled chords
         clips = [Clip(start=0.0, name="bridge_eighth_hypnotic", track=2, length=10.0)]
-        from app.generators.midi.assembly_manifest import derive_sections
+        from app.generators.midi.production.assembly_manifest import derive_sections
 
         sections = derive_sections(clips, folder_lookup=lookup)
         assert sections[0].loops.get("chords") == "bridge_eighth_hypnotic"

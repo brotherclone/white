@@ -7,12 +7,12 @@ from pathlib import Path
 
 import yaml
 
-from app.generators.midi.composition_proposal import (
+from app.generators.midi.production.composition_proposal import (
     build_loop_inventory,
     parse_response,
     write_proposal,
 )
-from app.generators.midi.assembly_manifest import (
+from app.generators.midi.production.assembly_manifest import (
     ArrangementSection,
     compute_proposal_drift,
 )
