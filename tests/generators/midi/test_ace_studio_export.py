@@ -1,5 +1,5 @@
 """
-Tests for app.generators.midi.ace_studio_export
+Tests for app.generators.midi.production.ace_studio_export
 """
 
 from pathlib import Path
@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import mido
 import yaml
 
-from app.generators.midi.ace_studio_export import (
+from app.generators.midi.production.ace_studio_export import (
     export_to_ace_studio,
     flatten_lyrics,
     parse_midi_notes,
@@ -224,7 +224,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result is not None
@@ -234,7 +235,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         for key in ("project_id", "track_index", "singer", "note_count", "title"):
@@ -244,7 +246,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             export_to_ace_studio(prod)
         ace.set_tempo.assert_called_once_with(60.0)
@@ -253,7 +256,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             export_to_ace_studio(prod)
         ace.set_time_signature.assert_called_once_with(3, 4)
@@ -262,7 +266,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace(singer_id=42)
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             export_to_ace_studio(prod)
         ace.find_singer.assert_called_once_with("Shirley")
@@ -272,7 +277,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             export_to_ace_studio(prod)
         call_args = ace.add_clip.call_args
@@ -284,7 +290,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             export_to_ace_studio(prod)
         # open_editor must be called before add_notes_with_lyrics
@@ -297,7 +304,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result["note_count"] == 4  # 4 notes in fixture MIDI
@@ -306,7 +314,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result["singer"] == "Shirley"
@@ -315,7 +324,8 @@ class TestExportHappyPath:
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace(project_name="My ACE Project")
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result["project_id"] == "My ACE Project"
@@ -333,7 +343,8 @@ class TestExportReturnsNoneWhenUnreachable:
         ctx.__enter__.side_effect = ConnectionError("refused")
         ctx.__exit__ = MagicMock(return_value=False)
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result is None
@@ -346,7 +357,8 @@ class TestExportReturnsNoneWhenUnreachable:
         ctx.__enter__.side_effect = ConnectionError("refused")
         ctx.__exit__ = MagicMock(return_value=False)
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             with caplog.at_level(logging.WARNING):
                 export_to_ace_studio(prod)
@@ -398,7 +410,8 @@ class TestExportSkipsWhenNoTracks:
         ctx, ace = _mock_ace()
         ace.list_tracks.return_value = []
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result is None
@@ -415,7 +428,8 @@ class TestExportContinuesWhenSingerMissing:
         ctx, ace = _mock_ace()
         ace.find_singer.return_value = []  # singer not found
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result is not None
@@ -425,7 +439,8 @@ class TestExportContinuesWhenSingerMissing:
         ctx, ace = _mock_ace()
         ace.find_singer.return_value = []
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result["singer_id"] is None
@@ -435,7 +450,8 @@ class TestExportContinuesWhenSingerMissing:
         ctx, ace = _mock_ace()
         ace.find_singer.return_value = []
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             export_to_ace_studio(prod)
         ace.load_singer.assert_not_called()
@@ -446,7 +462,8 @@ class TestExportContinuesWhenSingerMissing:
         (prod / "melody" / "review.yml").unlink()
         ctx, ace = _mock_ace()
         with patch(
-            "app.generators.midi.ace_studio_export.AceStudioClient", return_value=ctx
+            "app.generators.midi.production.ace_studio_export.AceStudioClient",
+            return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
         assert result is not None

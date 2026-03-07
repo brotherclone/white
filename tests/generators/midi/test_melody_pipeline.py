@@ -76,7 +76,7 @@ def production_dir(tmp_path):
 class TestSectionReading:
 
     def test_read_approved_sections(self, production_dir):
-        from app.generators.midi.melody_pipeline import read_approved_sections
+        from app.generators.midi.pipelines.melody_pipeline import read_approved_sections
 
         with open(production_dir / "chords" / "review.yml") as f:
             chord_review = yaml.safe_load(f)
@@ -87,7 +87,7 @@ class TestSectionReading:
         assert sections[0]["chord_id"] == "chord_verse_01"
 
     def test_read_approved_sections_skips_pending(self):
-        from app.generators.midi.melody_pipeline import read_approved_sections
+        from app.generators.midi.pipelines.melody_pipeline import read_approved_sections
 
         review = {
             "candidates": [
@@ -108,7 +108,9 @@ class TestSectionReading:
 class TestMelodyMidiGeneration:
 
     def test_melody_notes_to_midi_bytes(self):
-        from app.generators.midi.melody_pipeline import melody_notes_to_midi_bytes
+        from app.generators.midi.pipelines.melody_pipeline import (
+            melody_notes_to_midi_bytes,
+        )
 
         notes = [(0.0, 60, 1.0), (1.0, 62, 1.0), (2.0, 64, 2.0)]
         midi_bytes = melody_notes_to_midi_bytes(notes, bpm=120)
@@ -121,8 +123,10 @@ class TestMelodyMidiGeneration:
         assert len(mid.tracks) == 1
 
     def test_generate_melody_for_section(self):
-        from app.generators.midi.melody_patterns import ALL_TEMPLATES, SINGERS
-        from app.generators.midi.melody_pipeline import generate_melody_for_section
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES, SINGERS
+        from app.generators.midi.pipelines.melody_pipeline import (
+            generate_melody_for_section,
+        )
 
         voicings = [[48, 52, 55], [53, 57, 60]]  # C, F
         singer = SINGERS["gabriel"]
@@ -142,8 +146,10 @@ class TestMelodyMidiGeneration:
             assert singer.low <= note <= singer.high
 
     def test_generate_melody_with_durations(self):
-        from app.generators.midi.melody_patterns import ALL_TEMPLATES, SINGERS
-        from app.generators.midi.melody_pipeline import generate_melody_for_section
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES, SINGERS
+        from app.generators.midi.pipelines.melody_pipeline import (
+            generate_melody_for_section,
+        )
 
         voicings = [[48, 52, 55], [53, 57, 60]]
         singer = SINGERS["gabriel"]
@@ -167,7 +173,7 @@ class TestMelodyMidiGeneration:
 class TestCompositeScoring:
 
     def test_melody_composite_score(self):
-        from app.generators.midi.melody_pipeline import melody_composite_score
+        from app.generators.midi.pipelines.melody_pipeline import melody_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.8, "present": 0.1, "future": 0.1},
@@ -195,7 +201,7 @@ class TestCompositeScoring:
         assert "chromatic" in breakdown
 
     def test_custom_weights(self):
-        from app.generators.midi.melody_pipeline import melody_composite_score
+        from app.generators.midi.pipelines.melody_pipeline import melody_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.5, "present": 0.25, "future": 0.25},
@@ -223,7 +229,9 @@ class TestCompositeScoring:
 class TestReviewYaml:
 
     def test_generate_melody_review_yaml(self):
-        from app.generators.midi.melody_pipeline import generate_melody_review_yaml
+        from app.generators.midi.pipelines.melody_pipeline import (
+            generate_melody_review_yaml,
+        )
 
         sections = [
             {
@@ -291,7 +299,7 @@ class TestSyncMelodyCandidates:
         return melody_dir, candidates_dir
 
     def test_adds_untracked_midi(self, tmp_path):
-        from app.generators.midi.melody_pipeline import sync_melody_candidates
+        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
 
         melody_dir, candidates_dir = self._make_review(tmp_path)
         (candidates_dir / "my_verse.mid").write_bytes(b"MIDI")
@@ -307,7 +315,7 @@ class TestSyncMelodyCandidates:
         assert review["candidates"][0]["section"] == "manual"
 
     def test_skips_already_tracked(self, tmp_path):
-        from app.generators.midi.melody_pipeline import sync_melody_candidates
+        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
 
         existing = [
             {
@@ -327,7 +335,7 @@ class TestSyncMelodyCandidates:
         assert len(review["candidates"]) == 1  # no new entry
 
     def test_skips_scratch_files(self, tmp_path):
-        from app.generators.midi.melody_pipeline import sync_melody_candidates
+        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
 
         melody_dir, candidates_dir = self._make_review(tmp_path)
         (candidates_dir / "drums_scratch.mid").write_bytes(b"MIDI")
@@ -337,7 +345,7 @@ class TestSyncMelodyCandidates:
         assert added == 0
 
     def test_deduplicates_id_collision(self, tmp_path):
-        from app.generators.midi.melody_pipeline import sync_melody_candidates
+        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
 
         existing = [
             {"id": "my_verse", "midi_file": "candidates/other.mid", "status": "pending"}
@@ -356,7 +364,7 @@ class TestSyncMelodyCandidates:
         assert "my_verse_2" in new_ids
 
     def test_no_review_yml_returns_zero(self, tmp_path):
-        from app.generators.midi.melody_pipeline import sync_melody_candidates
+        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
 
         melody_dir = tmp_path / "melody"
         melody_dir.mkdir()
@@ -365,7 +373,7 @@ class TestSyncMelodyCandidates:
         assert added == 0
 
     def test_preserves_existing_entries(self, tmp_path):
-        from app.generators.midi.melody_pipeline import sync_melody_candidates
+        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
 
         existing = [
             {
@@ -424,7 +432,9 @@ class TestMelodyPipelineIntegration:
         mock_scorer.score_batch = mock_score_batch
 
         with patch("training.refractor.Refractor", return_value=mock_scorer):
-            from app.generators.midi.melody_pipeline import run_melody_pipeline
+            from app.generators.midi.pipelines.melody_pipeline import (
+                run_melody_pipeline,
+            )
 
             result = run_melody_pipeline(
                 production_dir=str(production_dir),

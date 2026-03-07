@@ -7,7 +7,7 @@ from pathlib import Path
 import mido
 import pytest
 
-from app.generators.midi.drift_report import (
+from app.generators.midi.production.drift_report import (
     _levenshtein,
     _parse_timecode,
     compare_section,
@@ -337,7 +337,7 @@ class TestIntegrationBlue:
         assert len(report["sections"]) > 0
 
     def test_total_word_count_matches_ace_export(self):
-        from app.generators.midi.ace_studio_import import load_ace_export
+        from app.generators.midi.production.ace_studio_import import load_ace_export
 
         words = load_ace_export(BLUE_PROD)
         report = generate_drift_report(BLUE_PROD)

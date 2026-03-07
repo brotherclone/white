@@ -5,7 +5,7 @@ import io
 import mido
 import pytest
 
-from app.generators.midi.harmonic_rhythm import (
+from app.generators.midi.patterns.harmonic_rhythm import (
     GRID_UNIT,
     MAX_CANDIDATES,
     accents_to_halfbar_mask,

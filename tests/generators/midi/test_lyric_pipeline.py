@@ -61,7 +61,7 @@ def make_meta(
 
 class TestCountNotes:
     def test_count_notes(self, tmp_path):
-        from app.generators.midi.lyric_pipeline import _count_notes
+        from app.generators.midi.pipelines.lyric_pipeline import _count_notes
 
         midi_path = tmp_path / "test.mid"
         midi_path.write_bytes(make_midi_bytes(note_count=8))
@@ -69,7 +69,7 @@ class TestCountNotes:
 
     def test_count_notes_zero_velocity_excluded(self, tmp_path):
         """note_off encoded as note_on velocity=0 should not be counted."""
-        from app.generators.midi.lyric_pipeline import _count_notes
+        from app.generators.midi.pipelines.lyric_pipeline import _count_notes
 
         mid = mido.MidiFile(ticks_per_beat=480)
         track = mido.MidiTrack()
@@ -84,7 +84,7 @@ class TestCountNotes:
         assert _count_notes(path) == 1
 
     def test_count_notes_missing_file(self, tmp_path):
-        from app.generators.midi.lyric_pipeline import _count_notes
+        from app.generators.midi.pipelines.lyric_pipeline import _count_notes
 
         assert _count_notes(tmp_path / "nonexistent.mid") == 0
 
@@ -96,26 +96,26 @@ class TestCountNotes:
 
 class TestFittingVerdict:
     def test_spacious(self):
-        from app.generators.midi.lyric_pipeline import _fitting_verdict
+        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(0.50) == "spacious"
         assert _fitting_verdict(0.74) == "spacious"
 
     def test_paste_ready(self):
-        from app.generators.midi.lyric_pipeline import _fitting_verdict
+        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(0.75) == "paste-ready"
         assert _fitting_verdict(1.00) == "paste-ready"
         assert _fitting_verdict(1.10) == "paste-ready"
 
     def test_tight_but_workable(self):
-        from app.generators.midi.lyric_pipeline import _fitting_verdict
+        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(1.11) == "tight but workable"
         assert _fitting_verdict(1.30) == "tight but workable"
 
     def test_splits_needed(self):
-        from app.generators.midi.lyric_pipeline import _fitting_verdict
+        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(1.31) == "splits needed"
         assert _fitting_verdict(2.00) == "splits needed"
@@ -129,7 +129,7 @@ class TestFittingVerdict:
 class TestComputeFitting:
     def test_ratio_calculation(self):
         """Given known syllables/notes, verify ratio and verdict."""
-        from app.generators.midi.lyric_pipeline import _compute_fitting
+        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
 
         # "Hello world" = 3 syllables, "beautiful morning" = 5 syllables → 8 total
         text = "[verse]\nHello world\nbeautiful morning\n"
@@ -142,7 +142,7 @@ class TestComputeFitting:
 
     def test_overall_verdict_worst_wins(self):
         """If one section is 'tight but workable', overall should reflect that."""
-        from app.generators.midi.lyric_pipeline import _compute_fitting
+        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
 
         # verse: 8 syllables / 10 notes = 0.8 → paste-ready
         # chorus: lots of syllables for few notes → splits needed
@@ -158,7 +158,7 @@ class TestComputeFitting:
 
     def test_overall_spacious_treated_as_paste_ready(self):
         """A spacious verdict alone should yield 'paste-ready' overall (not 'spacious')."""
-        from app.generators.midi.lyric_pipeline import _compute_fitting
+        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
 
         text = "[verse]\nHi\n"  # 1 syllable
         vocal_sections = [{"name": "verse", "total_notes": 10}]  # ratio = 0.1
@@ -168,7 +168,7 @@ class TestComputeFitting:
 
     def test_strips_comment_lines(self):
         """Lines starting with # should not contribute syllables."""
-        from app.generators.midi.lyric_pipeline import _compute_fitting
+        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
 
         text = "[verse]\n# stage direction\nHello world\n"
         vocal_sections = [{"name": "verse", "total_notes": 3}]
@@ -178,7 +178,7 @@ class TestComputeFitting:
 
     def test_zero_notes_ratio_defaults_to_one(self):
         """Section with 0 notes should default to ratio=1.0."""
-        from app.generators.midi.lyric_pipeline import _compute_fitting
+        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
 
         text = "[verse]\nHello\n"
         vocal_sections = [{"name": "verse", "total_notes": 0}]
@@ -193,7 +193,7 @@ class TestComputeFitting:
 
 class TestParseSections:
     def test_basic_parsing(self):
-        from app.generators.midi.lyric_pipeline import _parse_sections
+        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
 
         text = "[verse]\nline one\nline two\n[chorus]\nchorus line\n"
         result = _parse_sections(text)
@@ -202,7 +202,7 @@ class TestParseSections:
         assert "chorus" in result
 
     def test_strips_comment_lines(self):
-        from app.generators.midi.lyric_pipeline import _parse_sections
+        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
 
         text = "[verse]\n# a comment\nreal line\n"
         result = _parse_sections(text)
@@ -210,13 +210,13 @@ class TestParseSections:
         assert "# a comment" not in result["verse"]
 
     def test_empty_if_no_headers(self):
-        from app.generators.midi.lyric_pipeline import _parse_sections
+        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
 
         result = _parse_sections("just some text without headers")
         assert result == {}
 
     def test_section_name_lowercased(self):
-        from app.generators.midi.lyric_pipeline import _parse_sections
+        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
 
         text = "[Verse]\nsome line\n"
         result = _parse_sections(text)
@@ -247,13 +247,13 @@ class TestSyllableTargets:
 
 class TestNextCandidateId:
     def test_empty_review(self):
-        from app.generators.midi.lyric_pipeline import _next_candidate_id
+        from app.generators.midi.pipelines.lyric_pipeline import _next_candidate_id
 
         review = {"candidates": []}
         assert _next_candidate_id(review) == "lyrics_01"
 
     def test_with_existing_candidates(self):
-        from app.generators.midi.lyric_pipeline import _next_candidate_id
+        from app.generators.midi.pipelines.lyric_pipeline import _next_candidate_id
 
         review = {
             "candidates": [
@@ -266,7 +266,7 @@ class TestNextCandidateId:
 
     def test_gaps_still_increment_from_max(self):
         """Gaps in numbering should not affect the next ID (uses max)."""
-        from app.generators.midi.lyric_pipeline import _next_candidate_id
+        from app.generators.midi.pipelines.lyric_pipeline import _next_candidate_id
 
         review = {"candidates": [{"id": "lyrics_01"}, {"id": "lyrics_05"}]}
         assert _next_candidate_id(review) == "lyrics_06"
@@ -279,7 +279,7 @@ class TestNextCandidateId:
 
 class TestLoadOrInitReview:
     def test_creates_fresh_when_missing(self, tmp_path):
-        from app.generators.midi.lyric_pipeline import _load_or_init_review
+        from app.generators.midi.pipelines.lyric_pipeline import _load_or_init_review
 
         meta = make_meta()
         review = _load_or_init_review(tmp_path, meta, model="claude-sonnet-4-6", seed=7)
@@ -289,7 +289,7 @@ class TestLoadOrInitReview:
         assert review["candidates"] == []
 
     def test_loads_existing_file(self, tmp_path):
-        from app.generators.midi.lyric_pipeline import (
+        from app.generators.midi.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             _load_or_init_review,
         )
@@ -310,7 +310,7 @@ class TestLoadOrInitReview:
 
     def test_review_append_preserves_existing(self, tmp_path):
         """Existing approved entry must not be touched after a second run."""
-        from app.generators.midi.lyric_pipeline import (
+        from app.generators.midi.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             _load_or_init_review,
             _next_candidate_id,
@@ -340,7 +340,7 @@ class TestLoadOrInitReview:
 
 class TestBuildPrompt:
     def test_has_concept(self):
-        from app.generators.midi.lyric_pipeline import _build_prompt
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
 
         meta = make_meta(concept="machines learning to breathe")
         vocal_sections = [
@@ -357,7 +357,7 @@ class TestBuildPrompt:
         assert "machines learning to breathe" in prompt
 
     def test_has_syllable_targets(self):
-        from app.generators.midi.lyric_pipeline import _build_prompt
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
 
         meta = make_meta()
         vocal_sections = [
@@ -375,7 +375,7 @@ class TestBuildPrompt:
         assert "54" in prompt
 
     def test_has_section_headers(self):
-        from app.generators.midi.lyric_pipeline import _build_prompt
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
 
         meta = make_meta()
         vocal_sections = [
@@ -407,7 +407,7 @@ class TestBuildPrompt:
 
 class TestSyncLyricCandidates:
     def test_adds_untracked_stub(self, tmp_path):
-        from app.generators.midi.lyric_pipeline import (
+        from app.generators.midi.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             sync_lyric_candidates,
         )
@@ -430,7 +430,7 @@ class TestSyncLyricCandidates:
         assert "lyrics_04" in ids
 
     def test_skips_already_tracked(self, tmp_path):
-        from app.generators.midi.lyric_pipeline import (
+        from app.generators.midi.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             sync_lyric_candidates,
         )
@@ -458,7 +458,7 @@ class TestSyncLyricCandidates:
         assert added == 0
 
     def test_no_review_returns_zero(self, tmp_path):
-        from app.generators.midi.lyric_pipeline import sync_lyric_candidates
+        from app.generators.midi.pipelines.lyric_pipeline import sync_lyric_candidates
 
         melody_dir = tmp_path / "melody"
         melody_dir.mkdir()
@@ -487,7 +487,7 @@ class TestPromotePartTxt:
 
     def test_promote_txt_happy_path(self, tmp_path):
         """Approved .txt candidate gets copied to melody/lyrics.txt."""
-        from app.generators.midi.promote_part import promote_part
+        from app.generators.midi.production.promote_part import promote_part
 
         part_dir, review_path = self._make_review(
             tmp_path,
@@ -507,7 +507,7 @@ class TestPromotePartTxt:
 
     def test_promote_txt_conflict_fails(self, tmp_path):
         """Two approved .txt candidates → error, no copy performed."""
-        from app.generators.midi.promote_part import promote_part
+        from app.generators.midi.production.promote_part import promote_part
 
         part_dir, review_path = self._make_review(
             tmp_path,
@@ -533,7 +533,7 @@ class TestPromotePartTxt:
 
     def test_promote_midi_unchanged(self, tmp_path):
         """Existing MIDI promotion logic still works alongside .txt support."""
-        from app.generators.midi.promote_part import promote_part
+        from app.generators.midi.production.promote_part import promote_part
 
         part_dir = tmp_path / "melody"
         cand_dir = part_dir / "candidates"
@@ -563,7 +563,7 @@ class TestPromotePartTxt:
 
     def test_promote_clean_removes_lyrics_txt(self, tmp_path):
         """--clean should unlink lyrics.txt if it exists."""
-        from app.generators.midi.promote_part import promote_part
+        from app.generators.midi.production.promote_part import promote_part
 
         part_dir = tmp_path / "melody"
         (part_dir / "approved").mkdir(parents=True)
@@ -581,7 +581,7 @@ class TestPromotePartTxt:
 
     def test_promote_txt_writes_draft(self, tmp_path):
         """Approved .txt promotion also writes lyrics_draft.txt alongside lyrics.txt."""
-        from app.generators.midi.promote_part import promote_part
+        from app.generators.midi.production.promote_part import promote_part
 
         part_dir, review_path = self._make_review(
             tmp_path,
@@ -601,7 +601,7 @@ class TestPromotePartTxt:
 
     def test_promote_clean_removes_draft(self, tmp_path):
         """--clean unlinks lyrics_draft.txt if it exists."""
-        from app.generators.midi.promote_part import promote_part
+        from app.generators.midi.production.promote_part import promote_part
 
         part_dir = tmp_path / "melody"
         (part_dir / "approved").mkdir(parents=True)
@@ -679,7 +679,7 @@ class TestRunPipelineIntegration:
     def test_run_pipeline_writes_candidate_files(self, tmp_path):
         """Pipeline should write N .txt files in melody/candidates/."""
         import numpy as np
-        from app.generators.midi.lyric_pipeline import run_lyric_pipeline
+        from app.generators.midi.pipelines.lyric_pipeline import run_lyric_pipeline
 
         prod_dir = _make_production_dir(tmp_path)
 
@@ -719,7 +719,7 @@ class TestRunPipelineIntegration:
     def test_run_pipeline_writes_review_yml(self, tmp_path):
         """Pipeline should write lyrics_review.yml with one candidate entry."""
         import numpy as np
-        from app.generators.midi.lyric_pipeline import (
+        from app.generators.midi.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             run_lyric_pipeline,
         )
@@ -766,7 +766,7 @@ class TestRunPipelineIntegration:
 
     def test_run_pipeline_appends_not_overwrites(self, tmp_path):
         """Second run should append new entries; first entry must be preserved."""
-        from app.generators.midi.lyric_pipeline import (
+        from app.generators.midi.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             run_lyric_pipeline,
         )

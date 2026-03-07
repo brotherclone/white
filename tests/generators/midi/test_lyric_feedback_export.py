@@ -129,7 +129,9 @@ def _make_prod_dir(
 class TestCollectSongRecord:
     def test_happy_path(self, tmp_path):
         """Returns a full record with both texts and fitting metrics."""
-        from app.generators.midi.lyric_feedback_export import collect_song_record
+        from app.generators.midi.production.lyric_feedback_export import (
+            collect_song_record,
+        )
 
         prod_dir = _make_prod_dir(tmp_path)
         record = collect_song_record(prod_dir)
@@ -149,7 +151,9 @@ class TestCollectSongRecord:
 
     def test_edited_chromatic_match_from_eval(self, tmp_path):
         """lyrics_edited_chromatic_match pulled from song_evaluation.yml."""
-        from app.generators.midi.lyric_feedback_export import collect_song_record
+        from app.generators.midi.production.lyric_feedback_export import (
+            collect_song_record,
+        )
 
         prod_dir = _make_prod_dir(
             tmp_path,
@@ -160,7 +164,9 @@ class TestCollectSongRecord:
 
     def test_edited_chromatic_match_null_when_no_eval(self, tmp_path):
         """edited_chromatic_match is null when song_evaluation.yml absent."""
-        from app.generators.midi.lyric_feedback_export import collect_song_record
+        from app.generators.midi.production.lyric_feedback_export import (
+            collect_song_record,
+        )
 
         prod_dir = _make_prod_dir(tmp_path)
         record = collect_song_record(prod_dir)
@@ -168,7 +174,9 @@ class TestCollectSongRecord:
 
     def test_no_lyrics_returns_none(self, tmp_path):
         """Returns None when lyrics.txt doesn't exist."""
-        from app.generators.midi.lyric_feedback_export import collect_song_record
+        from app.generators.midi.production.lyric_feedback_export import (
+            collect_song_record,
+        )
 
         prod_dir = _make_prod_dir(tmp_path, lyrics=None, draft=None)
         (prod_dir / "melody" / "lyrics.txt").unlink(missing_ok=True)
@@ -177,7 +185,9 @@ class TestCollectSongRecord:
 
     def test_no_draft_returns_partial_record(self, tmp_path):
         """Missing draft → record with draft_text=null and edited=null."""
-        from app.generators.midi.lyric_feedback_export import collect_song_record
+        from app.generators.midi.production.lyric_feedback_export import (
+            collect_song_record,
+        )
 
         prod_dir = _make_prod_dir(tmp_path, draft=None)
         record = collect_song_record(prod_dir)
@@ -190,7 +200,9 @@ class TestCollectSongRecord:
 
     def test_no_edits_detected(self, tmp_path):
         """Identical texts → edited=False."""
-        from app.generators.midi.lyric_feedback_export import collect_song_record
+        from app.generators.midi.production.lyric_feedback_export import (
+            collect_song_record,
+        )
 
         prod_dir = _make_prod_dir(tmp_path, lyrics=LYRICS_DRAFT, draft=LYRICS_DRAFT)
         record = collect_song_record(prod_dir)
@@ -198,7 +210,9 @@ class TestCollectSongRecord:
 
     def test_vocal_sections_excludes_approved_label(self, tmp_path):
         """approved_label is stripped from the vocal_sections output."""
-        from app.generators.midi.lyric_feedback_export import collect_song_record
+        from app.generators.midi.production.lyric_feedback_export import (
+            collect_song_record,
+        )
 
         prod_dir = _make_prod_dir(tmp_path)
         record = collect_song_record(prod_dir)
@@ -214,7 +228,7 @@ class TestCollectSongRecord:
 class TestExportFeedback:
     def test_writes_jsonl(self, tmp_path):
         """Each song produces one JSON line."""
-        from app.generators.midi.lyric_feedback_export import export_feedback
+        from app.generators.midi.production.lyric_feedback_export import export_feedback
 
         dirs = [
             _make_prod_dir(tmp_path, slug="song_a"),
@@ -233,7 +247,7 @@ class TestExportFeedback:
 
     def test_skips_dirs_without_lyrics(self, tmp_path):
         """Directories with no lyrics.txt are silently skipped."""
-        from app.generators.midi.lyric_feedback_export import export_feedback
+        from app.generators.midi.production.lyric_feedback_export import export_feedback
 
         dirs = [
             _make_prod_dir(tmp_path, slug="with_lyrics"),
@@ -248,7 +262,7 @@ class TestExportFeedback:
 
     def test_summary_counts(self, tmp_path):
         """Summary counts confirmed_edits, no_edits, null_drafts correctly."""
-        from app.generators.midi.lyric_feedback_export import export_feedback
+        from app.generators.midi.production.lyric_feedback_export import export_feedback
 
         dirs = [
             _make_prod_dir(
@@ -269,7 +283,7 @@ class TestExportFeedback:
 
     def test_size_advisory_printed(self, tmp_path, capsys):
         """Advisory message printed when confirmed edits < 20."""
-        from app.generators.midi.lyric_feedback_export import export_feedback
+        from app.generators.midi.production.lyric_feedback_export import export_feedback
 
         dirs = [_make_prod_dir(tmp_path, slug="only_one")]
         output = tmp_path / "out.jsonl"
@@ -280,7 +294,7 @@ class TestExportFeedback:
 
     def test_no_advisory_when_enough_data(self, tmp_path, capsys):
         """No advisory when >= 20 confirmed-edit songs."""
-        from app.generators.midi.lyric_feedback_export import export_feedback
+        from app.generators.midi.production.lyric_feedback_export import export_feedback
 
         dirs = [
             _make_prod_dir(

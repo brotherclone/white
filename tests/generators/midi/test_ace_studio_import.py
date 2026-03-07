@@ -7,7 +7,7 @@ from pathlib import Path
 import mido
 import pytest
 
-from app.generators.midi.ace_studio_import import (
+from app.generators.midi.production.ace_studio_import import (
     _beat_to_timestamp,
     export_lrc,
     find_ace_export,

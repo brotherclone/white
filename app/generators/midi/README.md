@@ -2,12 +2,47 @@
 
 Music production pipeline tools. Each phase follows the same pattern: **generate → score → human review → promote**.
 
+## Chord Generator (`chord_generator/`)
+
+The underlying chord generation engine. Parses a corpus of 2,746 MIDI files into a fast columnar database (Polars/Parquet) and two Markov transition graphs (NetworkX), then generates candidate chord progressions using brute-force sampling + music theory scoring.
+
+**Data files** (pre-built, committed):
+- `chord_generator/data/chords.parquet` — 1,594 individual chords indexed by key, mode, function, category
+- `chord_generator/data/progressions.parquet` — 9,104 chord entries from 1,152 progressions
+- `chord_generator/data/chord_transition_graph.pkl` — 22 nodes, 247 edges (chord-level)
+- `chord_generator/data/function_transition_graph.pkl` — 93 nodes, 588 edges (Roman-numeral function level, **primary generation graph**)
+
+**Three generation modes** (exposed via `ChordProgressionGenerator`):
+
+| Mode | Method | When to use |
+|---|---|---|
+| Random | `generate_progression_random()` | Exploration, variety |
+| Graph-guided | `generate_progression_graph_guided()` | Theory-coherent progressions |
+| Brute-force | `generate_progression_brute_force()` | Production use — scores 1,000+ candidates |
+
+**Internal scoring** (theory-only, used inside brute-force):
+- `melody` — rewards stepwise motion in the top voice
+- `voice_leading` — rewards minimal total movement between chords
+- `variety` — penalises repetition (unique chord ratio)
+- `graph_probability` — rewards transitions common in the corpus
+
+Default weights: melody=0.25, voice_leading=0.30, variety=0.15, graph_probability=0.30. These feed into `chord_pipeline.py`'s composite score as the **theory component** (30% theory / 70% Refractor chromatic).
+
+**Rebuild the database** (only needed if the MIDI corpus changes):
+```bash
+python -m app.generators.midi.chord_generator.build_database
+```
+
+See `chord_generator/README.md` for full data schema and query examples.
+
+---
+
 ## Chord Pipeline
 
 Generates chord progression candidates from a song proposal using Markov chains, scores them with music theory metrics + Refractor, and writes top candidates for human review.
 
 ```bash
-python -m app.generators.midi.chord_pipeline \
+python -m app.generators.midi.pipelines.chord_pipeline \
     --thread shrinkwrapped/white-the-breathing-machine-learns-to-sing \
     --song "song_proposal_Black (0x221f20)_sequential_dissolution_v2.yml"
 ```
@@ -31,7 +66,7 @@ python -m app.generators.midi.chord_pipeline \
 Generates drum pattern candidates for approved chord sections. Reads the chord `review.yml` to determine song sections (verse, chorus, bridge, etc.), maps genre tags to template families, and scores with energy appropriateness + Refractor.
 
 ```bash
-python -m app.generators.midi.drum_pipeline \
+python -m app.generators.midi.pipelines.drum_pipeline \
     --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
 ```
 
@@ -60,7 +95,7 @@ python -m app.generators.midi.drum_pipeline \
 Promotes approved candidates from any `review.yml` to the `approved/` directory. Works for chords, drums, and strums.
 
 ```bash
-python -m app.generators.midi.promote_part \
+python -m app.generators.midi.production.promote_part \
     --review <path-to-review.yml>
 ```
 
@@ -72,15 +107,15 @@ Generates `production_plan.yml` — the structural backbone that defines section
 
 ```bash
 # Generate initial plan (run after approving chords)
-python -m app.generators.midi.production_plan \
+python -m app.generators.midi.production.production_plan \
     --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
 
 # Refresh bar counts after re-running upstream phases (preserves human edits)
-python -m app.generators.midi.production_plan \
+python -m app.generators.midi.production.production_plan \
     --production-dir ... --refresh
 
 # Bootstrap a partial manifest from the completed plan
-python -m app.generators.midi.production_plan \
+python -m app.generators.midi.production.production_plan \
     --production-dir ... --bootstrap-manifest
 ```
 
