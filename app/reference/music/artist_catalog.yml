@@ -3148,3 +3148,59 @@ The Jesus and Mary Chain:
   chromatic_score: null
   discogs_id: 243280
   notes: (canonical spelling — same entry as 'The Jesus And Mary Chain')
+
+Bruce Springsteen:
+  slug: bruce_springsteen
+  status: draft
+  description: |
+    Bruce Springsteen is a vocal-forward artist whose work centers on storytelling through plainspoken yet emotionally charged imagery—working-class landscapes, open highways, industrial towns, and characters caught between aspiration and resignation. His sonic palette blends muscular rock instrumentation with soulful undertones: prominent saxophone, layered guitars, organ, and propulsive rhythm sections create dense, arena-scaled textures. Production ranges from raw and live-feeling to polished and anthemic, often emphasizing dynamic contrast—sparse verses opening into expansive choruses. Lyrically, recurring motifs include escape, loyalty, disillusionment, love under pressure, and American mythology examined with both romanticism and grit. Emotionally, his register oscillates between defiant energy and brooding melancholy, frequently holding both simultaneously. His voice—raspy, earnest, and physically committed—functions as the primary instrument, carrying a psychological weight that blends communal solidarity with deep personal longing.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""
+
+Lankum:
+  slug: lankum
+  status: draft
+  description: |
+    Lankum creates dense, drone-saturated folk music with a heavily layered sonic texture. Their production favours slow accumulation — instruments and voices building into overwhelming, almost suffocating walls of sound, with uilleann pipes, fiddle, and concertina generating sustained, reedy timbres beneath close-miked vocals. The approach is deliberately raw yet immersive, favouring long arcs of tension over conventional structure. Lyrically, they draw on traditional balladry, exploring death, suffering, poverty, moral corruption, and the grinding weight of ordinary life, rendered through stark, plainspoken imagery with roots in Irish and British folk traditions. The emotional register is dark, mournful, and fatalistic — occasionally tipping into something ritualistic or trance-inducing. Vocals are central, often unison or close harmony, sitting within rather than above the instrumental texture, creating a communal, incantatory quality throughout.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""
+
+Phosphorescent:
+  slug: phosphorescent
+  status: draft
+  description: |
+    Phosphorescent blends intimate, weathered folk with slow-burning country and gospel, wrapped in a hazy, reverb-drenched production aesthetic. The sonic texture favors warm analog warmth — dusty guitars, pedal steel, understated percussion, and layered vocal harmonies that drift like smoke through open space. Production is simultaneously sparse and immersive, with deliberate lo-fi graininess softened by luminous, cathedral-like reverb. Lyrically, the work gravitates toward longing, spiritual searching, romantic dissolution, and the ache of impermanence, rendered through elemental imagery — night skies, rivers, light, wandering. The tone is confessional yet mythic, personal grief elevated into something ritualistic. Emotionally, the register is melancholic but not despairing — suffused with a bittersweet transcendence, a yearning that feels both exhausted and quietly luminous. The project is primarily vocal-led, with Matthew Houck's rough-hewn, emotionally exposed voice as the central instrument.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""
+
+The National:
+  slug: the_national
+  status: draft
+  description: |
+    The National is a vocal-led ensemble with a distinctive baritone voice anchoring dense, layered arrangements. Sonically, production favors orchestral accretion — strings, horns, and treated guitars build gradually over spare rhythmic foundations, creating a warm yet pressurized studio texture. Dynamic shifts move between hushed intimacy and swelling, near-cathartic release without dramatic rupture. Lyrically, imagery draws from domestic interiors, urban alienation, and strained relationships, rendered through fragmented, oblique observation rather than direct narrative. Themes circle adult anxiety, middle-class discomfort, memory, and emotional paralysis. The tone is cerebral but emotionally porous — irony and vulnerability coexist without resolution. The emotional register occupies a sustained, melancholic tension: rarely outright despairing, rarely resolved, hovering in a grey-lit psychological space that feels simultaneously private and expansive. Rhythmic structures tend toward propulsive steadiness beneath the textural complexity.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""

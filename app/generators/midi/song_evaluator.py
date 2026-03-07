@@ -235,24 +235,45 @@ def _count_syllables(line: str) -> int:
 # ---------------------------------------------------------------------------
 
 
-def _compute_arrangement_metrics(production_dir: Path) -> dict:
-    """Read production_plan.yml and compute arrangement-level metrics."""
-    plan = load_plan(production_dir)
-    if plan is None or not plan.sections:
-        return {
-            "total_bars": 0,
-            "unique_sections": 0,
-            "section_variety": 0.0,
-            "vocal_coverage": 0.0,
-            "vocal_bars": 0,
-        }
+def _parse_arrangement_txt_metrics(production_dir: Path) -> dict | None:
+    """Parse arrangement.txt (bar-position format) for total bars and section variety.
 
-    total_bars = sum(s.bars * s.repeat for s in plan.sections)
-    vocal_bars = sum(s.bars * s.repeat for s in plan.sections if s.vocals)
-    all_names = [s.name for s in plan.sections]
+    Logic Pro bar-position format: start_bar _ _ _  label  track  clip_bars _ _ _
+    Vocal clips are on track 4 (melody track).
+    Returns None if arrangement.txt is absent or unparseable.
+    """
+    arr_path = production_dir / "arrangement.txt"
+    if not arr_path.exists():
+        return None
+
+    clips: list[tuple[int, str, int, int]] = []  # (start_bar, label, track, clip_bars)
+    try:
+        for line in arr_path.read_text().splitlines():
+            parts = line.split()
+            # Format: start_bar beat sub tick  label  track  clip_bars 0 0 0
+            if len(parts) < 8:
+                continue
+            start_bar = int(parts[0])
+            label = parts[4]
+            track = int(parts[5])
+            clip_bars = int(parts[6])
+            clips.append((start_bar, label, track, clip_bars))
+    except (ValueError, IndexError):
+        return None
+
+    if not clips:
+        return None
+
+    total_bars = max(start + bars for start, _, _, bars in clips) - 1
+    chord_clips = [(s, lbl) for s, lbl, t, _ in clips if t == 1]  # track 1 = chords
+    vocal_clips = [(s, lbl, b) for s, lbl, t, b in clips if t == 4]  # track 4 = melody
+
+    all_names = [lbl for _, lbl in chord_clips]
     unique_names = set(all_names)
     unique_sections = len(unique_names)
     section_variety = unique_sections / len(all_names) if all_names else 0.0
+
+    vocal_bars = sum(b for _, _, b in vocal_clips)
     vocal_coverage = vocal_bars / total_bars if total_bars > 0 else 0.0
 
     return {
@@ -261,6 +282,42 @@ def _compute_arrangement_metrics(production_dir: Path) -> dict:
         "section_variety": section_variety,
         "vocal_coverage": vocal_coverage,
         "vocal_bars": vocal_bars,
+    }
+
+
+def _compute_arrangement_metrics(production_dir: Path) -> dict:
+    """Read production_plan.yml and compute arrangement-level metrics.
+
+    Falls back to parsing arrangement.txt when no production_plan.yml exists
+    (arrangement-first songs that skipped the plan phase).
+    """
+    plan = load_plan(production_dir)
+    if plan is not None and plan.sections:
+        total_bars = sum(s.bars * s.repeat for s in plan.sections)
+        vocal_bars = sum(s.bars * s.repeat for s in plan.sections if s.vocals)
+        all_names = [s.name for s in plan.sections]
+        unique_names = set(all_names)
+        unique_sections = len(unique_names)
+        section_variety = unique_sections / len(all_names) if all_names else 0.0
+        vocal_coverage = vocal_bars / total_bars if total_bars > 0 else 0.0
+        return {
+            "total_bars": total_bars,
+            "unique_sections": unique_sections,
+            "section_variety": section_variety,
+            "vocal_coverage": vocal_coverage,
+            "vocal_bars": vocal_bars,
+        }
+
+    arr_metrics = _parse_arrangement_txt_metrics(production_dir)
+    if arr_metrics:
+        return arr_metrics
+
+    return {
+        "total_bars": 0,
+        "unique_sections": 0,
+        "section_variety": 0.0,
+        "vocal_coverage": 0.0,
+        "vocal_bars": 0,
     }
 
 
@@ -413,8 +470,15 @@ def evaluate(production_dir: Path) -> EvaluationReport:
 
     plan = load_plan(production_dir)
     song_slug = production_dir.name
-    color = plan.color if plan else ""
-    title = plan.title if plan else ""
+    if plan and (plan.color or plan.title):
+        color = plan.color or ""
+        title = plan.title or ""
+    else:
+        from app.generators.midi.composition_proposal import load_song_proposal_data
+
+        _meta = load_song_proposal_data(production_dir)
+        color = _meta.get("color", "")
+        title = _meta.get("title", "")
 
     # Phase reports
     phases: dict = {}
