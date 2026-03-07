@@ -245,8 +245,12 @@ def bass_pattern_to_midi_bytes(
     all_events = []  # (abs_tick, note, velocity, is_on)
     resolved_notes = []  # (abs_beat_position, midi_note) for scoring
 
+    tonic_voicing = voicings[0] if voicings else []
     current_offset_ticks = 0
     for chord_idx, voicing in enumerate(voicings):
+        # Pedal-style patterns lock to the tonic (first chord) regardless of changes
+        if pattern.style == "pedal":
+            voicing = tonic_voicing
         if durations is not None:
             chord_dur_beats = durations[chord_idx] * bar_beats
         else:
