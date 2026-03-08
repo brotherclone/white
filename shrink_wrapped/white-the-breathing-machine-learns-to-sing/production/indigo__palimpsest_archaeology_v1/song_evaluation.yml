@@ -1,0 +1,94 @@
+song_slug: indigo__palimpsest_archaeology_v1
+color: Indigo
+title: The Cassette Bearer's Quantum Elegy
+evaluated: '2026-03-08T14:25:19.686511+00:00'
+phases_complete: 4
+phases:
+  chords:
+    complete: true
+    sections_found: 4
+    sections_approved: 4
+    coverage: 1.0
+    mean_theory: 0.8681
+    mean_chromatic_match: 0.1805
+    mean_chromatic_confidence: 0.0234
+    chromatic_consistency: 1.0
+    approved_labels:
+    - head
+    - runout
+    - oxidation
+    - peeling_sticker
+  drums:
+    complete: true
+    sections_found: 4
+    sections_approved: 4
+    coverage: 1.0
+    mean_theory: 0.6667
+    mean_chromatic_match: 0.1811
+    mean_chromatic_confidence: 0.0264
+    chromatic_consistency: 0.9999
+    approved_labels:
+    - drum_head
+    - drum_head_alt
+    - drum_runout
+    - drum_oxidation
+    - drum_oxidation_alt
+    - drum_peeling_sticker
+  bass:
+    complete: true
+    sections_found: 4
+    sections_approved: 4
+    coverage: 1.0
+    mean_theory: 0.8397
+    mean_chromatic_match: 0.181
+    mean_chromatic_confidence: 0.0254
+    chromatic_consistency: 0.9998
+    approved_labels:
+    - bass_head
+    - bass_head_alt
+    - bass_runout
+    - bass_oxidation
+    - bass_oxidation_alt
+    - bass_peeling_sticker_drone
+    - bass_peeling_sticker
+  melody:
+    complete: true
+    sections_found: 4
+    sections_approved: 3
+    coverage: 0.75
+    mean_theory: 0.8299
+    mean_chromatic_match: 0.1807
+    mean_chromatic_confidence: 0.0241
+    chromatic_consistency: 0.9999
+    approved_labels:
+    - melody_head
+    - melody_head_alt
+    - melody_oxidation
+    - melody_peeling_sticker
+total_bars: 62
+unique_sections: 4
+section_variety: 1.0
+vocal_coverage: 0.9839
+has_lyrics: true
+lyric_syllable_density: 2.5738
+max_drift_seconds: 150.45
+name_mismatches: 0
+structural_integrity: 0.8
+chromatic_alignment: 0.1808
+theory_quality: 0.8011
+production_completeness: 1.0
+lyric_maturity: 1.0
+composite_score: 0.6026
+airgigs_readiness: demo
+flags:
+- timing drift 150.4s
+- low chromatic confidence
+- high theory quality
+lyrics_edited_chromatic_match: 0.1737
+lyrics_draft_chromatic_match: 0.1737
+lyrics_chromatic_delta: 0.0
+ace_actuals:
+  total_ace_words: 88
+  actual_vocal_coverage: null
+  actual_syllable_density: null
+  ace_chromatic_alignment: 0.1739

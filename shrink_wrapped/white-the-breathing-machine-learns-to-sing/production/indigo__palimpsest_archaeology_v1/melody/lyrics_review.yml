@@ -1,0 +1,122 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/indigo__palimpsest_archaeology_v1
+pipeline: lyric-generation
+bpm: 67
+time_sig: 3/4
+color: Indigo
+generated: '2026-03-08T14:04:19.259320+00:00'
+seed: 42
+model: claude-sonnet-4-6
+scoring_weights:
+  chromatic: 1.0
+candidates:
+- id: lyrics_01
+  file: candidates/lyrics_01.txt
+  rank: 1
+  chromatic:
+    temporal:
+      past: 0.4211727976799011
+      present: 0.2637173533439636
+      future: 0.31510981917381287
+    spatial:
+      thing: 0.42206230759620667
+      place: 0.3145786225795746
+      person: 0.26335909962654114
+    ontological:
+      imagined: 0.3360687494277954
+      forgotten: 0.30668777227401733
+      known: 0.3572434186935425
+    confidence: 0.0125
+    match: 0.1739
+  fitting:
+    melody_head:
+      syllables: 29
+      notes: 30
+      ratio: 0.967
+      verdict: paste-ready
+    melody_oxidation:
+      syllables: 33
+      notes: 38
+      ratio: 0.868
+      verdict: paste-ready
+    melody_peeling_sticker:
+      syllables: 54
+      notes: 66
+      ratio: 0.818
+      verdict: paste-ready
+    overall: paste-ready
+  status: rejected
+  notes: ''
+- id: lyrics_02
+  file: candidates/lyrics_02.txt
+  rank: 2
+  chromatic:
+    temporal:
+      past: 0.41741296648979187
+      present: 0.2640761435031891
+      future: 0.31851089000701904
+    spatial:
+      thing: 0.41822540760040283
+      place: 0.31789857149124146
+      person: 0.2638760209083557
+    ontological:
+      imagined: 0.3393203020095825
+      forgotten: 0.30730000138282776
+      known: 0.35337963700294495
+    confidence: 0.0119
+    match: 0.1738
+  fitting:
+    melody_head:
+      syllables: 25
+      notes: 30
+      ratio: 0.833
+      verdict: paste-ready
+    melody_oxidation:
+      syllables: 41
+      notes: 38
+      ratio: 1.079
+      verdict: paste-ready
+    melody_peeling_sticker:
+      syllables: 116
+      notes: 66
+      ratio: 1.758
+      verdict: splits needed
+    overall: splits needed
+  status: rejected
+  notes: ''
+- id: lyrics_03
+  file: candidates/lyrics_03.txt
+  rank: 3
+  chromatic:
+    temporal:
+      past: 0.41658833622932434
+      present: 0.2654266059398651
+      future: 0.3179849684238434
+    spatial:
+      thing: 0.41724279522895813
+      place: 0.31761491298675537
+      person: 0.2651422917842865
+    ontological:
+      imagined: 0.33297351002693176
+      forgotten: 0.3095225989818573
+      known: 0.35750389099121094
+    confidence: 0.0095
+    match: 0.1735
+  fitting:
+    melody_head:
+      syllables: 24
+      notes: 30
+      ratio: 0.8
+      verdict: paste-ready
+    melody_oxidation:
+      syllables: 52
+      notes: 38
+      ratio: 1.368
+      verdict: splits needed
+    melody_peeling_sticker:
+      syllables: 80
+      notes: 66
+      ratio: 1.212
+      verdict: tight but workable
+    overall: splits needed
+  status: approved
+  notes: 'small change to first person'
