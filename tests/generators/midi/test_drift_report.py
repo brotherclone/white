@@ -317,7 +317,7 @@ class TestGenerateDriftReport:
 
 
 BLUE_PROD = Path(
-    "shrinkwrapped/white-the-breathing-machine-learns-to-sing/"
+    "shrink_wrapped/white-the-breathing-machine-learns-to-sing/"
     "production/blue__rust_signal_memorial_v1"
 )
 

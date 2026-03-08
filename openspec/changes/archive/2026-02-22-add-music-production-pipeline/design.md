@@ -2,7 +2,7 @@
 
 The White project has three existing systems that need to be connected:
 
-1. **Shrinkwrapped threads** (`shrinkwrapped/`) — 29 threads, each with song proposals per color containing key, bpm, time signature, concept text, genres, and moods
+1. **shrink_wrapped threads** (`shrink_wrapped/`) — 29 threads, each with song proposals per color containing key, bpm, time signature, concept text, genres, and moods
 2. **Chord prototype** (`app/generators/midi/prototype/`) — Markov chain generator with 1,594 chords, function transition graphs (93 nodes, 588 edges), brute-force generation (1000 candidates in 0.5s), and music theory scoring
 3. **ChromaticScorer** (`training/chromatic_scorer.py`) — ONNX-based scorer that evaluates MIDI against chromatic concepts (90%+ accuracy across temporal/spatial/ontological dimensions)
 
@@ -103,10 +103,10 @@ candidates:
 
 ### Decision: Working directory per song
 
-Each song gets a working directory under the shrinkwrapped thread:
+Each song gets a working directory under the shrink_wrapped thread:
 
 ```
-shrinkwrapped/white-the-breathing-machine-learns-to-sing/
+shrink_wrapped/white-the-breathing-machine-learns-to-sing/
 ├── manifest.yml
 ├── yml/song_proposal_Black...yml
 ├── production/                          # NEW

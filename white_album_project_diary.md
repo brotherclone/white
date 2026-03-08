@@ -19,7 +19,7 @@ Checked in at start of session to load context from the project diary, then revi
 - ⏳ **Blocker:** Phase 3.1/3.2 - MIDI CNN + fusion model training
 
 **Agent Pipeline (Track B) - Status:**
-- ✅ Shrinkwrapped 20 threads (manifest.yml per thread, 210MB freed)
+- ✅ shrink_wrapped 20 threads (manifest.yml per thread, 210MB freed)
 - ✅ Result feedback metrics (key entropy, BPM variance, constraint injection)
 
 **Migration:** RunPod → Modal (serverless GPU, no storage provisioning nightmares)

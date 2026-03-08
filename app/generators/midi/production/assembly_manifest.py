@@ -9,7 +9,7 @@ from the computed plan.
 
 Usage:
     python -m app.generators.midi.production.assembly_manifest \
-        --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2 \
+        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
         --arrangement archivist_arrangement.txt
 """
 

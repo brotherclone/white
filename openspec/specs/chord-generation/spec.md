@@ -5,9 +5,9 @@ TBD - created by archiving change add-music-production-pipeline. Update Purpose 
 ## Requirements
 ### Requirement: Chord Pipeline Input
 
-The chord generation pipeline SHALL accept a song proposal YAML file path and a shrinkwrapped thread directory as input. It SHALL extract key, mode, BPM, time signature, concept text, and rainbow color from the song proposal and thread manifest.
+The chord generation pipeline SHALL accept a song proposal YAML file path and a shrink_wrapped thread directory as input. It SHALL extract key, mode, BPM, time signature, concept text, and rainbow color from the song proposal and thread manifest.
 
-#### Scenario: Load song proposal from shrinkwrapped thread
+#### Scenario: Load song proposal from shrink_wrapped thread
 
 - **WHEN** the pipeline is invoked with a thread directory and song proposal filename
 - **THEN** it SHALL parse the song proposal YAML for key, BPM, time signature, and concept
@@ -110,7 +110,7 @@ The chord pipeline SHALL be invocable from the command line.
 #### Scenario: Basic invocation
 
 - **WHEN** the user runs the pipeline CLI
-- **THEN** it SHALL accept `--thread` (shrinkwrapped thread directory), `--song` (song proposal filename), and optional `--seed`, `--num-candidates`, `--top-k`, `--theory-weight`, `--chromatic-weight` parameters
+- **THEN** it SHALL accept `--thread` (shrink_wrapped thread directory), `--song` (song proposal filename), and optional `--seed`, `--num-candidates`, `--top-k`, `--theory-weight`, `--chromatic-weight` parameters
 
 #### Scenario: Progress output
 

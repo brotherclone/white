@@ -10,7 +10,7 @@ no copyrighted content), then human-reviewed.
 Usage:
     # Generate descriptions for all uncatalogued artists in a thread
     python -m app.generators.artist_catalog \
-        --thread shrinkwrapped/white-the-breathing-machine-learns-to-sing \
+        --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
         --generate-missing
 
     # Also scan training data parquet

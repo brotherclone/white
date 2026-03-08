@@ -1,11 +1,11 @@
 """Generate negative constraints from prior chain results to prevent convergence.
 
-Reads shrinkwrapped/index.yml (or a custom path) and produces negative_constraints.yml
+Reads shrink_wrapped/index.yml (or a custom path) and produces negative_constraints.yml
 with key/BPM avoidance rules, concept keyword warnings, title exclusions, and diversity metrics.
 
 Usage:
     python -m app.util.generate_negative_constraints                        # default paths
-    python -m app.util.generate_negative_constraints --index shrinkwrapped/index.yml
+    python -m app.util.generate_negative_constraints --index shrink_wrapped/index.yml
     python -m app.util.generate_negative_constraints --output constraints.yml
     python -m app.util.generate_negative_constraints --dry-run
 """
@@ -273,13 +273,13 @@ def analyze_dialogue_openers(
 ) -> dict:
     """Detect repeated dialogue opener patterns in interview/voice outputs.
 
-    Scans markdown files in shrinkwrapped directories for Walsh dialogue responses.
+    Scans markdown files in shrink_wrapped directories for Walsh dialogue responses.
     Falls back to checking thread metadata fields if no markdown files are available.
     """
     # Collect all text that might contain dialogue
     all_responses = []
 
-    # Primary source: scan markdown files in shrinkwrapped directories
+    # Primary source: scan markdown files in shrink_wrapped directories
     if shrinkwrap_dir and shrinkwrap_dir.exists():
         for t in threads:
             dir_name = t.get("directory", "")
@@ -346,7 +346,7 @@ def generate_constraints(
     """Generate negative constraints from index data.
 
     Args:
-        index_path: Path to shrinkwrapped/index.yml.
+        index_path: Path to shrink_wrapped/index.yml.
         manual_constraints: Optional dict of manually added constraints to preserve.
 
     Returns:
@@ -511,14 +511,14 @@ def main():
     parser.add_argument(
         "--index",
         type=Path,
-        default=Path("shrinkwrapped/index.yml"),
-        help="Path to shrinkwrapped index.yml (default: shrinkwrapped/index.yml)",
+        default=Path("shrink_wrapped/index.yml"),
+        help="Path to shrink_wrapped index.yml (default: shrink_wrapped/index.yml)",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("shrinkwrapped/negative_constraints.yml"),
-        help="Output path for constraints file (default: shrinkwrapped/negative_constraints.yml)",
+        default=Path("shrink_wrapped/negative_constraints.yml"),
+        help="Output path for constraints file (default: shrink_wrapped/negative_constraints.yml)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Print constraints without writing"

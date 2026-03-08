@@ -9,7 +9,7 @@ song manifest.
 Usage:
     # Generate initial plan from approved chords
     python -m app.generators.midi.production.production_plan \
-        --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
+        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2
 
     # Refresh bar counts from current approved loops (preserves human edits)
     python -m app.generators.midi.production.production_plan \

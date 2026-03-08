@@ -11,7 +11,7 @@ Pipeline position: chords → drums → harmonic rhythm → strums → bass → 
 
 Usage:
     python -m app.generators.midi.pipelines.melody_pipeline \
-        --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2 \
+        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
         --singer gabriel --seed 42 --top-k 5
 """
 
@@ -755,7 +755,7 @@ def main():
     parser.add_argument(
         "--thread",
         default=None,
-        help="Shrinkwrapped thread directory (optional)",
+        help="shrink_wrapped thread directory (optional)",
     )
     parser.add_argument(
         "--song",

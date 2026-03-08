@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 
 from app.util.shrinkwrap_chain_artifacts import (
+    clean_filename,
     copy_thread_files,
     find_debug_files,
     generate_directory_name,
@@ -12,6 +13,8 @@ from app.util.shrinkwrap_chain_artifacts import (
     is_evp_intermediate,
     is_uuid,
     parse_thread,
+    resolve_collision,
+    rewrite_file_name_field,
     shrinkwrap,
     shrinkwrap_thread,
     slugify,
@@ -441,7 +444,7 @@ class TestShrinkwrapThread:
         add_content_files(thread_dir)
         add_debug_files(thread_dir)
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         output.mkdir()
 
         existing = set()
@@ -464,7 +467,7 @@ class TestShrinkwrapThread:
         thread_id = "c59be431-6527-4424-83fd-4dea6a83edf5"
         make_thread(artifacts, thread_id, title="Dry Run Song")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         existing = set()
         result = shrinkwrap_thread(
             artifacts / thread_id, output, existing, dry_run=True
@@ -487,7 +490,7 @@ class TestShrinkwrap:
         )
         add_content_files(artifacts / "bbbbbbbb-1111-2222-3333-444444444444")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         result = shrinkwrap(artifacts, output)
 
         assert result["processed"] == 2
@@ -503,7 +506,7 @@ class TestShrinkwrap:
         )
         add_content_files(artifacts / "aaaaaaaa-1111-2222-3333-444444444444")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         result1 = shrinkwrap(artifacts, output)
         assert result1["processed"] == 1
 
@@ -516,7 +519,7 @@ class TestShrinkwrap:
         make_thread(artifacts, target_id, title="Target")
         make_thread(artifacts, "bbbbbbbb-1111-2222-3333-444444444444", title="Other")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         result = shrinkwrap(artifacts, output, thread_filter=target_id)
 
         assert result["processed"] == 1
@@ -526,3 +529,195 @@ class TestShrinkwrap:
     def test_missing_artifacts_dir(self, tmp_path):
         result = shrinkwrap(tmp_path / "nonexistent", tmp_path / "out")
         assert result["processed"] == 0
+
+
+class TestCleanFilename:
+    """Task 4.1 — one test per cleaning rule plus the pass-through."""
+
+    def test_uuid_char_prefix(self):
+        assert (
+            clean_filename(
+                "a56f0abe-663e-4763-b40f-dac3c936aa02_g_arbitrarys_survey.md"
+            )
+            == "arbitrarys_survey.md"
+        )
+
+    def test_uuid_char_prefix_html(self):
+        assert (
+            clean_filename(
+                "5546ede0-e6e9-4bea-bf3a-9aac594c0fa2_t_UNKNOWN_ARTIFACT_NAME.html"
+            )
+            == "UNKNOWN_ARTIFACT_NAME.html"
+        )
+
+    def test_white_agent_prefix(self):
+        assert (
+            clean_filename(
+                "white_agent_12c27cb8-d3d8-4513-bc0e-57b8f4449222_AGENT_VOICES.md"
+            )
+            == "agent_voices.md"
+        )
+
+    def test_white_agent_prefix_chromatic(self):
+        assert (
+            clean_filename(
+                "white_agent_12c27cb8-d3d8-4513-bc0e-57b8f4449222_CHROMATIC_SYNTHESIS.md"
+            )
+            == "chromatic_synthesis.md"
+        )
+
+    def test_all_song_proposals(self):
+        assert (
+            clean_filename(
+                "all_song_proposals_12c27cb8-d3d8-4513-bc0e-57b8f4449222.yml"
+            )
+            == "all_song_proposals.yml"
+        )
+
+    def test_all_song_proposals_md(self):
+        assert (
+            clean_filename("all_song_proposals_12c27cb8-d3d8-4513-bc0e-57b8f4449222.md")
+            == "all_song_proposals.md"
+        )
+
+    def test_song_proposal_color_hex(self):
+        assert (
+            clean_filename(
+                "song_proposal_Black (0x231f20)_neural_network_incarnation_v2.yml"
+            )
+            == "neural_network_incarnation_v2.yml"
+        )
+
+    def test_song_proposal_single_char(self):
+        assert (
+            clean_filename(
+                "song_proposal_Y_unstable_pantry_crystalline_collapse_v1.yml"
+            )
+            == "unstable_pantry_crystalline_collapse_v1.yml"
+        )
+
+    def test_song_proposal_word_color(self):
+        assert (
+            clean_filename("song_proposal_indigo_indigo_proposal_1770995946421.yml")
+            == "indigo_proposal_1770995946421.yml"
+        )
+
+    def test_no_match_passthrough(self):
+        assert clean_filename("agent_voices.md") == "agent_voices.md"
+
+    def test_no_match_regular_yml(self):
+        assert clean_filename("newspaper_article.yml") == "newspaper_article.yml"
+
+
+class TestResolveCollision:
+    """Task 4.2 — collision suffix logic."""
+
+    def test_no_collision(self):
+        assert resolve_collision("foo.md", set()) == "foo.md"
+
+    def test_first_collision(self):
+        assert resolve_collision("foo.md", {"foo.md"}) == "foo_2.md"
+
+    def test_second_collision(self):
+        assert resolve_collision("foo.md", {"foo.md", "foo_2.md"}) == "foo_3.md"
+
+    def test_no_extension(self):
+        assert resolve_collision("readme", {"readme"}) == "readme_2"
+
+    def test_dotfile(self):
+        # Hidden files have no suffix in pathlib; suffix appended after stem
+        assert resolve_collision(".gitignore", {".gitignore"}) == ".gitignore_2"
+
+
+class TestRewriteFileNameField:
+    def test_rewrites_yml(self, tmp_path):
+        f = tmp_path / "test.yml"
+        f.write_text("artifact_id: abc\nfile_name: old_name.yml\ntitle: test\n")
+        rewrite_file_name_field(f, "new_name.yml")
+        assert "file_name: new_name.yml" in f.read_text()
+
+    def test_rewrites_md_yaml_body(self, tmp_path):
+        f = tmp_path / "test.md"
+        f.write_text("artifact_id: abc\nfile_name: old_name.md\ncontent: hello\n")
+        rewrite_file_name_field(f, "new_name.md")
+        assert "file_name: new_name.md" in f.read_text()
+
+    def test_no_field_unchanged(self, tmp_path):
+        original = "title: test\nconcept: something\n"
+        f = tmp_path / "test.yml"
+        f.write_text(original)
+        rewrite_file_name_field(f, "whatever.yml")
+        assert f.read_text() == original
+
+    def test_missing_file_no_error(self, tmp_path):
+        # Should not raise
+        rewrite_file_name_field(tmp_path / "nonexistent.yml", "x.yml")
+
+
+class TestCleanFilenameIntegration:
+    """Task 4.3 — shrinkwrap integration: clean names and file_name field rewrite."""
+
+    def test_files_have_clean_names(self, tmp_path):
+        thread_id = "c59be431-6527-4424-83fd-4dea6a83edf5"
+        artifacts = tmp_path / "chain_artifacts"
+        thread_dir = make_thread(artifacts, thread_id, title="Clean Song")
+
+        # Add files with raw UUID-prefixed names
+        yml_dir = thread_dir / "yml"
+        yml_dir.mkdir(exist_ok=True)
+        raw_yml = yml_dir / "03e1727a-0e7f-4624-b049-efdd817b08f8_r_bandwidth_wars.yml"
+        raw_yml.write_text(
+            "file_name: 03e1727a-0e7f-4624-b049-efdd817b08f8_r_bandwidth_wars.yml\ntitle: test\n"
+        )
+
+        md_dir = thread_dir / "md"
+        md_dir.mkdir(exist_ok=True)
+        raw_md = md_dir / f"white_agent_{thread_id}_CHROMATIC_SYNTHESIS.md"
+        raw_md.write_text(
+            f"file_name: white_agent_{thread_id}_CHROMATIC_SYNTHESIS.md\ncontent: stuff\n"
+        )
+
+        output = tmp_path / "shrink_wrapped"
+        output.mkdir()
+        shrinkwrap_thread(thread_dir, output, set())
+
+        out_dir = output / "white-clean-song"
+
+        # Raw UUID prefix stripped
+        assert (out_dir / "yml" / "bandwidth_wars.yml").exists()
+        assert not (out_dir / "yml" / raw_yml.name).exists()
+
+        # white_agent prefix stripped and lowercased
+        assert (out_dir / "md" / "chromatic_synthesis.md").exists()
+        assert not (out_dir / "md" / raw_md.name).exists()
+
+        # file_name field rewritten inside the yml
+        text = (out_dir / "yml" / "bandwidth_wars.yml").read_text()
+        assert "file_name: bandwidth_wars.yml" in text
+
+        # file_name field rewritten inside the md
+        text = (out_dir / "md" / "chromatic_synthesis.md").read_text()
+        assert "file_name: chromatic_synthesis.md" in text
+
+    def test_collision_produces_numbered_suffix(self, tmp_path):
+        thread_id = "c59be431-6527-4424-83fd-4dea6a83edf5"
+        artifacts = tmp_path / "chain_artifacts"
+        thread_dir = make_thread(artifacts, thread_id, title="Collision Song")
+
+        html_dir = thread_dir / "html"
+        html_dir.mkdir()
+        # Two files that both clean to character_sheet.html
+        (
+            html_dir / "aaaaaaaa-1111-2222-3333-444444444401_y_character_sheet.html"
+        ).write_text("sheet 1")
+        (
+            html_dir / "aaaaaaaa-1111-2222-3333-444444444402_y_character_sheet.html"
+        ).write_text("sheet 2")
+
+        output = tmp_path / "shrink_wrapped"
+        output.mkdir()
+        shrinkwrap_thread(thread_dir, output, set())
+
+        out_html = output / "white-collision-song" / "html"
+        assert (out_html / "character_sheet.html").exists()
+        assert (out_html / "character_sheet_2.html").exists()
