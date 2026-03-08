@@ -1,0 +1,1139 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/green__last_pollinators_elegy_v1
+pipeline: bass-generation
+bpm: 60
+time_sig: 3/4
+color: Green
+generated: '2026-02-22T14:21:36.257892+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+sections_found:
+- toppling
+- worker
+- queen
+- pasture
+- ministers_daughter
+- royal_degradation
+- honey
+candidates:
+- id: bass_toppling_01
+  midi_file: candidates/bass_toppling_01.mid
+  rank: 1
+  section: toppling
+  chord_source: chord_001
+  style: root
+  pattern_name: waltz_root_whole
+  energy: low
+  scores:
+    composite: 0.4143
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4486
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.1362
+      match: 0.168
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_toppling_02
+  midi_file: candidates/bass_toppling_02.mid
+  rank: 2
+  section: toppling
+  chord_source: chord_001
+  style: pedal
+  pattern_name: waltz_pedal_held
+  energy: low
+  scores:
+    composite: 0.4143
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4486
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.1362
+      match: 0.168
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_toppling_03
+  midi_file: candidates/bass_toppling_03.mid
+  rank: 3
+  section: toppling
+  chord_source: chord_001
+  style: syncopated
+  pattern_name: waltz_syncopated
+  energy: medium
+  scores:
+    composite: 0.3644
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.449
+        present: 0.247
+        future: 0.304
+      spatial:
+        thing: 0.4491
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1384
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_toppling_04
+  midi_file: candidates/bass_toppling_04.mid
+  rank: 4
+  section: toppling
+  chord_source: chord_001
+  style: arpeggiated
+  pattern_name: waltz_arp_root_5th
+  energy: low
+  scores:
+    composite: 0.3644
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1379
+      match: 0.1682
+  label: bass_toppling
+  status: approved
+  notes: ''
+- id: bass_toppling_05
+  midi_file: candidates/bass_toppling_05.mid
+  rank: 5
+  section: toppling
+  chord_source: chord_001
+  style: root
+  pattern_name: waltz_root_downbeat
+  energy: low
+  scores:
+    composite: 0.3643
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4486
+        place: 0.3045
+        person: 0.2469
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.1361
+      match: 0.168
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_worker_01
+  midi_file: candidates/bass_worker_01.mid
+  rank: 6
+  section: worker
+  chord_source: chord_002
+  style: root
+  pattern_name: waltz_root_whole
+  energy: low
+  scores:
+    composite: 0.4143
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4488
+        present: 0.2472
+        future: 0.304
+      spatial:
+        thing: 0.4489
+        place: 0.3045
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1372
+      match: 0.1681
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_worker_02
+  midi_file: candidates/bass_worker_02.mid
+  rank: 7
+  section: worker
+  chord_source: chord_002
+  style: pedal
+  pattern_name: waltz_pedal_held
+  energy: low
+  scores:
+    composite: 0.4143
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4488
+        present: 0.2472
+        future: 0.304
+      spatial:
+        thing: 0.4489
+        place: 0.3045
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1372
+      match: 0.1681
+  label: bass_worker_alt
+  status: approved
+  notes: ''
+- id: bass_worker_03
+  midi_file: candidates/bass_worker_03.mid
+  rank: 8
+  section: worker
+  chord_source: chord_002
+  style: syncopated
+  pattern_name: waltz_syncopated
+  energy: medium
+  scores:
+    composite: 0.3645
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4491
+        present: 0.247
+        future: 0.3039
+      spatial:
+        thing: 0.4492
+        place: 0.3044
+        person: 0.2464
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.36
+      confidence: 0.1386
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_worker_04
+  midi_file: candidates/bass_worker_04.mid
+  rank: 9
+  section: worker
+  chord_source: chord_002
+  style: arpeggiated
+  pattern_name: waltz_arp_root_5th
+  energy: low
+  scores:
+    composite: 0.3644
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1381
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_worker_05
+  midi_file: candidates/bass_worker_05.mid
+  rank: 10
+  section: worker
+  chord_source: chord_002
+  style: root
+  pattern_name: waltz_root_downbeat
+  energy: low
+  scores:
+    composite: 0.3642
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4484
+        present: 0.2475
+        future: 0.3041
+      spatial:
+        thing: 0.4485
+        place: 0.3045
+        person: 0.247
+      ontological:
+        imagined: 0.3536
+        forgotten: 0.2869
+        known: 0.3595
+      confidence: 0.1359
+      match: 0.168
+  label: bass_worker
+  status: approved
+  notes: ''
+- id: bass_queen_01
+  midi_file: candidates/bass_queen_01.mid
+  rank: 11
+  section: queen
+  chord_source: chord_003
+  style: root
+  pattern_name: waltz_root_whole
+  energy: low
+  scores:
+    composite: 0.3744
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4488
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.4489
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1377
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_queen_02
+  midi_file: candidates/bass_queen_02.mid
+  rank: 12
+  section: queen
+  chord_source: chord_003
+  style: pedal
+  pattern_name: waltz_pedal_held
+  energy: low
+  scores:
+    composite: 0.3744
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4488
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.4489
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1377
+      match: 0.1682
+  label: bass_queen
+  status: approved
+  notes: ''
+- id: bass_queen_03
+  midi_file: candidates/bass_queen_03.mid
+  rank: 13
+  section: queen
+  chord_source: chord_003
+  style: syncopated
+  pattern_name: waltz_syncopated
+  energy: medium
+  scores:
+    composite: 0.3245
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.449
+        present: 0.247
+        future: 0.304
+      spatial:
+        thing: 0.4491
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1385
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_queen_04
+  midi_file: candidates/bass_queen_04.mid
+  rank: 14
+  section: queen
+  chord_source: chord_003
+  style: arpeggiated
+  pattern_name: waltz_arp_root_5th
+  energy: low
+  scores:
+    composite: 0.3244
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1381
+      match: 0.1682
+  label: bass_queen_alt
+  status: approved
+  notes: ''
+- id: bass_queen_05
+  midi_file: candidates/bass_queen_05.mid
+  rank: 15
+  section: queen
+  chord_source: chord_003
+  style: root
+  pattern_name: waltz_root_downbeat
+  energy: low
+  scores:
+    composite: 0.3242
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.5667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4483
+        present: 0.2476
+        future: 0.3041
+      spatial:
+        thing: 0.4484
+        place: 0.3045
+        person: 0.2471
+      ontological:
+        imagined: 0.3537
+        forgotten: 0.2869
+        known: 0.3594
+      confidence: 0.1355
+      match: 0.1679
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_pasture_01
+  midi_file: candidates/bass_pasture_01.mid
+  rank: 16
+  section: pasture
+  chord_source: chord_005
+  style: root
+  pattern_name: waltz_root_whole
+  energy: low
+  scores:
+    composite: 0.411
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9333
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1377
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_pasture_02
+  midi_file: candidates/bass_pasture_02.mid
+  rank: 17
+  section: pasture
+  chord_source: chord_005
+  style: pedal
+  pattern_name: waltz_pedal_held
+  energy: low
+  scores:
+    composite: 0.411
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9333
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1377
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_pasture_03
+  midi_file: candidates/bass_pasture_03.mid
+  rank: 18
+  section: pasture
+  chord_source: chord_005
+  style: syncopated
+  pattern_name: waltz_syncopated
+  energy: medium
+  scores:
+    composite: 0.3611
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4491
+        present: 0.247
+        future: 0.3039
+      spatial:
+        thing: 0.4492
+        place: 0.3044
+        person: 0.2464
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1385
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_pasture_04
+  midi_file: candidates/bass_pasture_04.mid
+  rank: 19
+  section: pasture
+  chord_source: chord_005
+  style: arpeggiated
+  pattern_name: waltz_arp_root_5th
+  energy: low
+  scores:
+    composite: 0.3611
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.287
+        known: 0.3599
+      confidence: 0.1379
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_pasture_05
+  midi_file: candidates/bass_pasture_05.mid
+  rank: 20
+  section: pasture
+  chord_source: chord_005
+  style: root
+  pattern_name: waltz_root_downbeat
+  energy: low
+  scores:
+    composite: 0.3609
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.9333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4483
+        present: 0.2476
+        future: 0.3041
+      spatial:
+        thing: 0.4484
+        place: 0.3045
+        person: 0.2471
+      ontological:
+        imagined: 0.3537
+        forgotten: 0.2869
+        known: 0.3594
+      confidence: 0.1354
+      match: 0.1679
+  label: bass_pasture
+  status: approved
+  notes: ''
+- id: bass_ministers_daughter_01
+  midi_file: candidates/bass_ministers_daughter_01.mid
+  rank: 21
+  section: ministers_daughter
+  chord_source: chord_006
+  style: root
+  pattern_name: waltz_root_whole
+  energy: low
+  scores:
+    composite: 0.3944
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1376
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_ministers_daughter_02
+  midi_file: candidates/bass_ministers_daughter_02.mid
+  rank: 22
+  section: ministers_daughter
+  chord_source: chord_006
+  style: pedal
+  pattern_name: waltz_pedal_held
+  energy: low
+  scores:
+    composite: 0.3944
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7667
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1376
+      match: 0.1682
+  label: bass_ministers_daughter_alt
+  status: approved
+  notes: ''
+- id: bass_ministers_daughter_03
+  midi_file: candidates/bass_ministers_daughter_03.mid
+  rank: 23
+  section: ministers_daughter
+  chord_source: chord_006
+  style: syncopated
+  pattern_name: waltz_syncopated
+  energy: medium
+  scores:
+    composite: 0.3445
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.449
+        present: 0.247
+        future: 0.304
+      spatial:
+        thing: 0.4491
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1384
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_ministers_daughter_04
+  midi_file: candidates/bass_ministers_daughter_04.mid
+  rank: 24
+  section: ministers_daughter
+  chord_source: chord_006
+  style: arpeggiated
+  pattern_name: waltz_arp_root_5th
+  energy: low
+  scores:
+    composite: 0.3444
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.287
+        known: 0.3599
+      confidence: 0.1379
+      match: 0.1682
+  label: bass_ministers_daughter
+  status: approved
+  notes: ''
+- id: bass_ministers_daughter_05
+  midi_file: candidates/bass_ministers_daughter_05.mid
+  rank: 25
+  section: ministers_daughter
+  chord_source: chord_006
+  style: root
+  pattern_name: waltz_root_downbeat
+  energy: low
+  scores:
+    composite: 0.3442
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7667
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4483
+        present: 0.2476
+        future: 0.3041
+      spatial:
+        thing: 0.4484
+        place: 0.3045
+        person: 0.2471
+      ontological:
+        imagined: 0.3537
+        forgotten: 0.2869
+        known: 0.3594
+      confidence: 0.1354
+      match: 0.1679
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_royal_degradation_01
+  midi_file: candidates/bass_royal_degradation_01.mid
+  rank: 26
+  section: royal_degradation
+  chord_source: chord_007
+  style: root
+  pattern_name: waltz_root_whole
+  energy: low
+  scores:
+    composite: 0.391
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7333
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1376
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_royal_degradation_02
+  midi_file: candidates/bass_royal_degradation_02.mid
+  rank: 27
+  section: royal_degradation
+  chord_source: chord_007
+  style: pedal
+  pattern_name: waltz_pedal_held
+  energy: low
+  scores:
+    composite: 0.391
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7333
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1376
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_royal_degradation_03
+  midi_file: candidates/bass_royal_degradation_03.mid
+  rank: 28
+  section: royal_degradation
+  chord_source: chord_007
+  style: syncopated
+  pattern_name: waltz_syncopated
+  energy: medium
+  scores:
+    composite: 0.3411
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.449
+        present: 0.247
+        future: 0.304
+      spatial:
+        thing: 0.4491
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1384
+      match: 0.1683
+  label: bass_royal_degradation
+  status: approved
+  notes: ''
+- id: bass_royal_degradation_04
+  midi_file: candidates/bass_royal_degradation_04.mid
+  rank: 29
+  section: royal_degradation
+  chord_source: chord_007
+  style: arpeggiated
+  pattern_name: waltz_arp_root_5th
+  energy: low
+  scores:
+    composite: 0.3411
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3045
+        person: 0.2466
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.287
+        known: 0.3599
+      confidence: 0.138
+      match: 0.1682
+  label: bass_royal_degradation_alt
+  status: approved
+  notes: ''
+- id: bass_royal_degradation_05
+  midi_file: candidates/bass_royal_degradation_05.mid
+  rank: 30
+  section: royal_degradation
+  chord_source: chord_007
+  style: root
+  pattern_name: waltz_root_downbeat
+  energy: low
+  scores:
+    composite: 0.3409
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.7333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4483
+        present: 0.2476
+        future: 0.3041
+      spatial:
+        thing: 0.4484
+        place: 0.3045
+        person: 0.2471
+      ontological:
+        imagined: 0.3537
+        forgotten: 0.2869
+        known: 0.3594
+      confidence: 0.1355
+      match: 0.1679
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_honey_01
+  midi_file: candidates/bass_honey_01.mid
+  rank: 31
+  section: honey
+  chord_source: chord_010
+  style: root
+  pattern_name: waltz_root_whole
+  energy: low
+  scores:
+    composite: 0.381
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.6333
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1376
+      match: 0.1682
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_honey_02
+  midi_file: candidates/bass_honey_02.mid
+  rank: 32
+  section: honey
+  chord_source: chord_010
+  style: pedal
+  pattern_name: waltz_pedal_held
+  energy: low
+  scores:
+    composite: 0.381
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.6333
+      kick_alignment: 1.0
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2466
+      ontological:
+        imagined: 0.3533
+        forgotten: 0.2869
+        known: 0.3598
+      confidence: 0.1376
+      match: 0.1682
+  label: bass_honey_alt
+  status: approved
+  notes: ''
+- id: bass_honey_03
+  midi_file: candidates/bass_honey_03.mid
+  rank: 33
+  section: honey
+  chord_source: chord_010
+  style: syncopated
+  pattern_name: waltz_syncopated
+  energy: medium
+  scores:
+    composite: 0.3311
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.6333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.449
+        present: 0.247
+        future: 0.304
+      spatial:
+        thing: 0.4491
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.2869
+        known: 0.3599
+      confidence: 0.1384
+      match: 0.1683
+  label: null
+  status: rejected
+  notes: ''
+- id: bass_honey_04
+  midi_file: candidates/bass_honey_04.mid
+  rank: 34
+  section: honey
+  chord_source: chord_010
+  style: arpeggiated
+  pattern_name: waltz_arp_root_5th
+  energy: low
+  scores:
+    composite: 0.3311
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.6333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4489
+        present: 0.2471
+        future: 0.304
+      spatial:
+        thing: 0.449
+        place: 0.3044
+        person: 0.2465
+      ontological:
+        imagined: 0.3532
+        forgotten: 0.287
+        known: 0.3599
+      confidence: 0.138
+      match: 0.1682
+  label: bass_honey
+  status: approved
+  notes: ''
+- id: bass_honey_05
+  midi_file: candidates/bass_honey_05.mid
+  rank: 35
+  section: honey
+  chord_source: chord_010
+  style: root
+  pattern_name: waltz_root_downbeat
+  energy: low
+  scores:
+    composite: 0.3309
+    theory:
+      root_adherence: 1.0
+      voice_leading: 0.6333
+      kick_alignment: 0.5
+    chromatic:
+      temporal:
+        past: 0.4483
+        present: 0.2476
+        future: 0.3041
+      spatial:
+        thing: 0.4484
+        place: 0.3045
+        person: 0.2471
+      ontological:
+        imagined: 0.3537
+        forgotten: 0.2869
+        known: 0.3594
+      confidence: 0.1354
+      match: 0.1679
+  label: null
+  status: rejected
+  notes: ''

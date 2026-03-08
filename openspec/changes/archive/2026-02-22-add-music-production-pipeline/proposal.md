@@ -2,16 +2,16 @@
 
 ## Why
 
-The White Concept Agent generates rich chromatic concepts and the ChromaticScorer (Phase 10) can evaluate MIDI against those concepts. But there is no system to *compose music* from a shrinkwrapped concept. The gap between "here is a concept for a RED song" and "here are chord progressions to record in Logic Pro" requires a generation + scoring + human review pipeline.
+The White Concept Agent generates rich chromatic concepts and the ChromaticScorer (Phase 10) can evaluate MIDI against those concepts. But there is no system to *compose music* from a shrink_wrapped concept. The gap between "here is a concept for a RED song" and "here are chord progressions to record in Logic Pro" requires a generation + scoring + human review pipeline.
 
 This first iteration focuses on **chord generation** — the foundational layer that all subsequent music (drums, bass, melody) builds upon. A working chord pipeline proves the pattern (generate → score → human gate → approve) before scaling to additional instruments.
 
 ## What Changes
 
-- New **chord generation pipeline** that reads a song proposal from a shrinkwrapped thread, generates chord progression candidates via the existing Markov chain prototype, scores them with ChromaticScorer, and presents top candidates for human labeling
+- New **chord generation pipeline** that reads a song proposal from a shrink_wrapped thread, generates chord progression candidates via the existing Markov chain prototype, scores them with ChromaticScorer, and presents top candidates for human labeling
 - New **production review interface** — YAML-based review files where the human labels candidates (verse-candidate, chorus-candidate, bridge-candidate, etc.) and approves/rejects them
 - Connects the existing chord prototype (`app/generators/midi/prototype/`) with the ChromaticScorer (`training/chromatic_scorer.py`) into an end-to-end workflow
-- One song proposal at a time — the user picks a color/song from a shrinkwrapped thread
+- One song proposal at a time — the user picks a color/song from a shrink_wrapped thread
 
 ## Impact
 
@@ -27,7 +27,7 @@ This first iteration focuses on **chord generation** — the foundational layer 
 ## Architecture Overview
 
 ```
-Shrinkwrapped Thread
+shrink_wrapped Thread
     │
     └── Song Proposal (one color, e.g. Black from "Breathing Machine")
          │  key: F# minor, bpm: 84, time_sig: 7/8, concept: "..."

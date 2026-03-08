@@ -1,10 +1,10 @@
 # Implementation Tasks
 
 ## 1. Constraint Generation
-- [x] 1.1 Read shrink-wrapped `shrinkwrapped/index.yml` to collect all prior results
+- [x] 1.1 Read shrink-wrapped `shrink_wrapped/index.yml` to collect all prior results
 - [x] 1.2 Extract key fields: title, bpm, key, concept (first 200 chars), rainbow_color
 - [x] 1.3 Detect clusters: group by (bpm +/- 5, key, similar concept via marker phrase matching)
-- [x] 1.4 Generate `shrinkwrapped/negative_constraints.yml` with:
+- [x] 1.4 Generate `shrink_wrapped/negative_constraints.yml` with:
   - List of specific (bpm, key) pairs to deprioritize
   - List of concept keywords/phrases to avoid (e.g., "transmigration", "seven chromatic methodologies")
   - List of titles already used
@@ -17,7 +17,7 @@
 - [x] 2.4 Support manual overrides (preserved on regeneration via `manual_overrides` key)
 
 ## 3. White Agent Integration
-- [x] 3.1 Load negative constraints at workflow start (`start_workflow()`) from `shrinkwrapped/index.yml`
+- [x] 3.1 Load negative constraints at workflow start (`start_workflow()`) from `shrink_wrapped/index.yml`
 - [x] 3.2 Inject constraints into the initial proposal prompt (`initiate_song_proposal()`)
 - [x] 3.3 Inject constraints into rewrite prompt (`rewrite_proposal_with_synthesis()`)
 - [x] 3.4 Log when constraints are loaded and injected

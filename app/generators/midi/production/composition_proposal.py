@@ -10,7 +10,7 @@ arrangement when both files exist.
 
 Usage:
     python -m app.generators.midi.production.composition_proposal \
-        --production-dir shrinkwrapped/.../production/blue__rust_signal_memorial_v1
+        --production-dir shrink_wrapped/.../production/blue__rust_signal_memorial_v1
 """
 
 from __future__ import annotations

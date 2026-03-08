@@ -6,7 +6,7 @@ Reads from chain_artifacts/ (untouched) and writes clean copies to an output dir
 - Generates manifest.yml per thread and index.yml at top level
 
 Usage:
-    python -m app.util.shrinkwrap_chain_artifacts                              # output to shrinkwrapped/
+    python -m app.util.shrinkwrap_chain_artifacts                              # output to shrink_wrapped/
     python -m app.util.shrinkwrap_chain_artifacts --output-dir my_output       # custom output dir
     python -m app.util.shrinkwrap_chain_artifacts --dry-run                    # preview changes
     python -m app.util.shrinkwrap_chain_artifacts --archive                    # include debug in .debug/
@@ -67,6 +67,96 @@ def slugify(text: str) -> str:
     text = re.sub(r"-+", "-", text)  # Collapse multiple hyphens
     text = text.strip("-")  # Remove leading/trailing hyphens
     return text[:80]  # Cap length
+
+
+# Compiled patterns for clean_filename(), applied in order.
+_UUID_PREFIX_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_[a-zA-Z]_(.+)$",
+    re.IGNORECASE,
+)
+_WHITE_AGENT_RE = re.compile(
+    r"^white_agent_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_(.+)$",
+    re.IGNORECASE,
+)
+_ALL_PROPOSALS_RE = re.compile(
+    r"^(all_song_proposals)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(\..+)$",
+    re.IGNORECASE,
+)
+_SONG_PROPOSAL_RE = re.compile(
+    r"^song_proposal_.+?_(.+)$",
+    re.IGNORECASE,
+)
+
+
+def clean_filename(raw_name: str) -> str:
+    """Return a human-readable filename by stripping UUID/agent/color prefixes.
+
+    Rules (applied in order; first match wins):
+    1. <uuid>_<char>_<name>.<ext>              → <name>.<ext>
+    2. white_agent_<thread-uuid>_<TYPE>.<ext>  → <type_lowercase>.<ext>
+    3. all_song_proposals_<thread-uuid>.<ext>  → all_song_proposals.<ext>
+    4. song_proposal_<Color...>_<name>.<ext>   → <name>.<ext>
+    5. No match                                → unchanged
+    """
+    m = _UUID_PREFIX_RE.match(raw_name)
+    if m:
+        return m.group(1)
+
+    m = _WHITE_AGENT_RE.match(raw_name)
+    if m:
+        return m.group(1).lower()
+
+    m = _ALL_PROPOSALS_RE.match(raw_name)
+    if m:
+        return f"{m.group(1)}{m.group(2)}"
+
+    m = _SONG_PROPOSAL_RE.match(raw_name)
+    if m:
+        return m.group(1)
+
+    return raw_name
+
+
+def resolve_collision(clean_name: str, used: set[str]) -> str:
+    """Append _2, _3, … before the extension until the name is unique in *used*."""
+    if clean_name not in used:
+        return clean_name
+    p = Path(clean_name)
+    stem, suffix = p.stem, p.suffix
+    counter = 2
+    while True:
+        candidate = f"{stem}_{counter}{suffix}"
+        if candidate not in used:
+            return candidate
+        counter += 1
+
+
+def rewrite_file_name_field(file_path: Path, clean_name: str) -> None:
+    """Rewrite a bare ``file_name:`` line in a copied file to *clean_name*.
+
+    Uses line-level replacement to avoid YAML round-trip issues with Python
+    object tags that appear in some chain artifact files.  Best-effort: any
+    read/write error is silently ignored so the file is still usable.
+    """
+    try:
+        text = file_path.read_text(encoding="utf-8")
+    except Exception:
+        return
+
+    new_lines = []
+    replaced = False
+    for line in text.splitlines(keepends=True):
+        if not replaced and re.match(r"^file_name:\s+", line):
+            new_lines.append(f"file_name: {clean_name}\n")
+            replaced = True
+        else:
+            new_lines.append(line)
+
+    if replaced:
+        try:
+            file_path.write_text("".join(new_lines), encoding="utf-8")
+        except Exception:
+            pass
 
 
 def is_debug_file(filename: str) -> bool:
@@ -235,12 +325,17 @@ def copy_thread_files(
     dest_dir: Path,
     include_debug: bool = False,
 ) -> dict:
-    """Copy non-debug files from source thread to destination.
+    """Copy non-debug files from source thread to destination with clean names.
 
-    This function avoids creating destination subdirectories unless files
-    are actually copied into them. Debug files are only written into a
-    `.debug/` subdirectory if `include_debug` is True and at least one
-    debug file is being archived.
+    Each output filename is run through ``clean_filename()`` to strip UUID
+    prefixes, color-char codes, and agent/thread-name prefixes.  Collisions
+    within the same subdirectory are resolved by appending ``_2``, ``_3``, …
+    before the extension.  After copying, any ``file_name:`` field inside the
+    file is rewritten to the clean name.
+
+    Debug files are only written into a ``.debug/`` subdirectory when
+    ``include_debug`` is True.  Destination subdirectories are created lazily
+    (only when at least one file lands there).
 
     Returns:
         Dict with file counts: copied, skipped_debug, skipped_evp.
@@ -249,16 +344,17 @@ def copy_thread_files(
     skipped_debug = 0
     skipped_evp = 0
 
-    # Track whether we've created the .debug directory yet
     debug_dest = None
+    # Per-subdirectory sets of already-used clean names for collision detection.
+    used_names: dict[str, set[str]] = {}
 
     for subdir in sorted(source_dir.iterdir()):
         if not subdir.is_dir():
             continue
 
-        # We'll only create this when we need to copy a non-debug file into it
         dest_subdir = dest_dir / subdir.name
         dest_subdir_created = False
+        subdir_used = used_names.setdefault(subdir.name, set())
 
         for f in sorted(subdir.iterdir()):
             if not f.is_file():
@@ -272,7 +368,6 @@ def copy_thread_files(
 
             if is_debug_file(f.name):
                 if include_debug:
-                    # Lazily create .debug/ only when the first debug file is copied
                     if debug_dest is None:
                         debug_dest = dest_dir / ".debug"
                         debug_dest.mkdir(parents=True, exist_ok=True)
@@ -282,12 +377,18 @@ def copy_thread_files(
                     skipped_debug += 1
                 continue
 
-            # Non-debug, non-evp file: ensure dest_subdir exists then copy
+            # Non-debug, non-evp: clean the name, resolve collisions, then copy.
             if not dest_subdir_created:
                 dest_subdir.mkdir(parents=True, exist_ok=True)
                 dest_subdir_created = True
 
-            shutil.copy2(str(f), str(dest_subdir / f.name))
+            clean_name = clean_filename(f.name)
+            clean_name = resolve_collision(clean_name, subdir_used)
+            subdir_used.add(clean_name)
+
+            dest_path = dest_subdir / clean_name
+            shutil.copy2(str(f), str(dest_path))
+            rewrite_file_name_field(dest_path, clean_name)
             copied += 1
 
     return {
@@ -361,7 +462,7 @@ def shrinkwrap_thread(
 def load_orphaned_manifests(output_dir: Path, known_dirs: set[str]) -> list[dict]:
     """Load manifests from output directories not already tracked.
 
-    When chain_artifacts are deleted or become unparseable, the shrinkwrapped
+    When chain_artifacts are deleted or become unparseable, the shrink_wrapped
     output directories (with their manifests) are the only remaining record.
     This scans for those orphaned directories so the index stays complete.
     """
@@ -525,8 +626,8 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("shrinkwrapped"),
-        help="Output directory for clean artifacts (default: shrinkwrapped/)",
+        default=Path("shrink_wrapped"),
+        help="Output directory for clean artifacts (default: shrink_wrapped/)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Preview changes without writing files"

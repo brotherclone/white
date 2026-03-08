@@ -7,7 +7,7 @@ their MIDI files to the approved/ directory with label-based filenames.
 
 Usage:
     python -m app.generators.midi.production.promote_part \
-        --review shrinkwrapped/.../production/.../chords/review.yml
+        --review shrink_wrapped/.../production/.../chords/review.yml
 """
 
 import argparse

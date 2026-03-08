@@ -222,14 +222,14 @@ except ImportError:
 _has_onnx = _onnx_path.exists() and _has_ort
 
 _thread_dir = Path(
-    "/Volumes/LucidNonsense/White/shrinkwrapped/white-the-breathing-machine-learns-to-sing"
+    "/Volumes/LucidNonsense/White/shrink_wrapped/white-the-breathing-machine-learns-to-sing"
 )
 _has_thread = _thread_dir.exists()
 
 
 @pytest.mark.skipif(
     not (_has_chord_data and _has_onnx and _has_thread),
-    reason="Requires chord data, ONNX model, onnxruntime, and shrinkwrapped thread",
+    reason="Requires chord data, ONNX model, onnxruntime, and shrink_wrapped thread",
 )
 @pytest.mark.venv312
 class TestChordPipelineIntegration:

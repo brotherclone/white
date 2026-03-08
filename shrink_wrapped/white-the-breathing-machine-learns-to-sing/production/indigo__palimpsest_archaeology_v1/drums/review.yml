@@ -1,0 +1,381 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/indigo__palimpsest_archaeology_v1
+pipeline: drum-generation
+bpm: 67
+time_sig: 3/4
+color: Indigo
+genre_families:
+- ambient
+- experimental
+- folk
+- rock
+generated: '2026-03-08T12:50:01.375987+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- head
+- runout
+- oxidation
+- peeling_sticker
+candidates:
+- id: drum_head_01
+  midi_file: candidates/drum_head_01.mid
+  rank: 1
+  section: head
+  next_section: null
+  chord_source: chord_002
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.4268
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4434
+        present: 0.2357
+        future: 0.3209
+      spatial:
+        thing: 0.4444
+        place: 0.3199
+        person: 0.2357
+      ontological:
+        imagined: 0.2992
+        forgotten: 0.3182
+        known: 0.3826
+      confidence: 0.0266
+      match: 0.1811
+  label: drum_head
+  status: approved
+  notes: ''
+- id: drum_head_02
+  midi_file: candidates/drum_head_02.mid
+  rank: 2
+  section: head
+  next_section: null
+  chord_source: chord_002
+  genre_family: experimental
+  pattern_name: experimental_3_4_polyrhythm
+  energy: high
+  scores:
+    composite: 0.2769
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4435
+        present: 0.2358
+        future: 0.3207
+      spatial:
+        thing: 0.4444
+        place: 0.3198
+        person: 0.2358
+      ontological:
+        imagined: 0.2994
+        forgotten: 0.3181
+        known: 0.3824
+      confidence: 0.0274
+      match: 0.1812
+  label: drum_head_alt
+  status: approved
+  notes: ''
+- id: drum_head_03
+  midi_file: candidates/drum_head_03.mid
+  rank: 3
+  section: head
+  next_section: null
+  chord_source: chord_002
+  genre_family: experimental
+  pattern_name: experimental_3_4_sparse
+  energy: low
+  scores:
+    composite: 0.2766
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4407
+        present: 0.2375
+        future: 0.3218
+      spatial:
+        thing: 0.4416
+        place: 0.3209
+        person: 0.2375
+      ontological:
+        imagined: 0.2975
+        forgotten: 0.3198
+        known: 0.3826
+      confidence: 0.025
+      match: 0.1808
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_runout_01
+  midi_file: candidates/drum_runout_01.mid
+  rank: 4
+  section: runout
+  next_section: null
+  chord_source: chord_005
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.4267
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.442
+        present: 0.2363
+        future: 0.3218
+      spatial:
+        thing: 0.4428
+        place: 0.3208
+        person: 0.2363
+      ontological:
+        imagined: 0.2988
+        forgotten: 0.3191
+        known: 0.3821
+      confidence: 0.0256
+      match: 0.181
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_runout_02
+  midi_file: candidates/drum_runout_02.mid
+  rank: 5
+  section: runout
+  next_section: null
+  chord_source: chord_005
+  genre_family: experimental
+  pattern_name: experimental_3_4_polyrhythm
+  energy: high
+  scores:
+    composite: 0.2768
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4418
+        present: 0.2364
+        future: 0.3218
+      spatial:
+        thing: 0.4427
+        place: 0.3209
+        person: 0.2365
+      ontological:
+        imagined: 0.2988
+        forgotten: 0.3194
+        known: 0.3818
+      confidence: 0.0267
+      match: 0.1812
+  label: drum_runout
+  status: approved
+  notes: ''
+- id: drum_runout_03
+  midi_file: candidates/drum_runout_03.mid
+  rank: 6
+  section: runout
+  next_section: null
+  chord_source: chord_005
+  genre_family: experimental
+  pattern_name: experimental_3_4_sparse
+  energy: low
+  scores:
+    composite: 0.2767
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4421
+        present: 0.2364
+        future: 0.3215
+      spatial:
+        thing: 0.443
+        place: 0.3206
+        person: 0.2364
+      ontological:
+        imagined: 0.2973
+        forgotten: 0.3194
+        known: 0.3832
+      confidence: 0.0255
+      match: 0.181
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_oxidation_01
+  midi_file: candidates/drum_oxidation_01.mid
+  rank: 7
+  section: oxidation
+  next_section: null
+  chord_source: chord_007
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.4267
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4423
+        present: 0.2361
+        future: 0.3216
+      spatial:
+        thing: 0.4432
+        place: 0.3206
+        person: 0.2361
+      ontological:
+        imagined: 0.2986
+        forgotten: 0.3189
+        known: 0.3824
+      confidence: 0.0257
+      match: 0.181
+  label: drum_oxidation
+  status: approved
+  notes: ''
+- id: drum_oxidation_02
+  midi_file: candidates/drum_oxidation_02.mid
+  rank: 8
+  section: oxidation
+  next_section: null
+  chord_source: chord_007
+  genre_family: experimental
+  pattern_name: experimental_3_4_polyrhythm
+  energy: high
+  scores:
+    composite: 0.2768
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4417
+        present: 0.2365
+        future: 0.3218
+      spatial:
+        thing: 0.4426
+        place: 0.3209
+        person: 0.2366
+      ontological:
+        imagined: 0.2986
+        forgotten: 0.3193
+        known: 0.3821
+      confidence: 0.0264
+      match: 0.1811
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_oxidation_03
+  midi_file: candidates/drum_oxidation_03.mid
+  rank: 9
+  section: oxidation
+  next_section: null
+  chord_source: chord_007
+  genre_family: experimental
+  pattern_name: experimental_3_4_sparse
+  energy: low
+  scores:
+    composite: 0.2766
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4413
+        present: 0.2369
+        future: 0.3218
+      spatial:
+        thing: 0.4422
+        place: 0.3209
+        person: 0.2369
+      ontological:
+        imagined: 0.2972
+        forgotten: 0.3198
+        known: 0.383
+      confidence: 0.0252
+      match: 0.1809
+  label: drum_oxidation_alt
+  status: approved
+  notes: ''
+- id: drum_peeling_sticker_01
+  midi_file: candidates/drum_peeling_sticker_01.mid
+  rank: 10
+  section: peeling_sticker
+  next_section: null
+  chord_source: chord_009
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.4267
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.442
+        present: 0.2363
+        future: 0.3218
+      spatial:
+        thing: 0.4428
+        place: 0.3208
+        person: 0.2363
+      ontological:
+        imagined: 0.2988
+        forgotten: 0.3191
+        known: 0.3821
+      confidence: 0.0256
+      match: 0.181
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_peeling_sticker_02
+  midi_file: candidates/drum_peeling_sticker_02.mid
+  rank: 11
+  section: peeling_sticker
+  next_section: null
+  chord_source: chord_009
+  genre_family: experimental
+  pattern_name: experimental_3_4_polyrhythm
+  energy: high
+  scores:
+    composite: 0.2768
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4418
+        present: 0.2364
+        future: 0.3218
+      spatial:
+        thing: 0.4427
+        place: 0.3209
+        person: 0.2365
+      ontological:
+        imagined: 0.2988
+        forgotten: 0.3194
+        known: 0.3818
+      confidence: 0.0267
+      match: 0.1812
+  label: drum_peeling_sticker
+  status: approved
+  notes: ''
+- id: drum_peeling_sticker_03
+  midi_file: candidates/drum_peeling_sticker_03.mid
+  rank: 12
+  section: peeling_sticker
+  next_section: null
+  chord_source: chord_009
+  genre_family: experimental
+  pattern_name: experimental_3_4_sparse
+  energy: low
+  scores:
+    composite: 0.2767
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4421
+        present: 0.2364
+        future: 0.3215
+      spatial:
+        thing: 0.443
+        place: 0.3206
+        person: 0.2364
+      ontological:
+        imagined: 0.2973
+        forgotten: 0.3194
+        known: 0.3832
+      confidence: 0.0255
+      match: 0.181
+  label: null
+  status: rejected
+  notes: ''
