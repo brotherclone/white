@@ -231,7 +231,7 @@ class TestFindAceExport:
 
 
 REAL_MIDI = Path(
-    "shrinkwrapped/white-the-breathing-machine-learns-to-sing/"
+    "shrink_wrapped/white-the-breathing-machine-learns-to-sing/"
     "production/blue__rust_signal_memorial_v1/VocalSynthv0_1_Anderson.mid"
 )
 

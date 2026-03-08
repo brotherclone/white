@@ -43,13 +43,13 @@ Generates chord progression candidates from a song proposal using Markov chains,
 
 ```bash
 python -m app.generators.midi.pipelines.chord_pipeline \
-    --thread shrinkwrapped/white-the-breathing-machine-learns-to-sing \
+    --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
     --song "song_proposal_Black (0x221f20)_sequential_dissolution_v2.yml"
 ```
 
 | Flag                 | Default                           | Description                      |
 |----------------------|-----------------------------------|----------------------------------|
-| `--thread`           | *(required)*                      | Shrinkwrapped thread directory   |
+| `--thread`           | *(required)*                      | shrink_wrapped thread directory   |
 | `--song`             | *(required)*                      | Song proposal YAML filename      |
 | `--seed`             | 42                                | Random seed for reproducibility  |
 | `--num-candidates`   | 200                               | Total candidates to generate     |
@@ -67,7 +67,7 @@ Generates drum pattern candidates for approved chord sections. Reads the chord `
 
 ```bash
 python -m app.generators.midi.pipelines.drum_pipeline \
-    --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
+    --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2
 ```
 
 | Flag                 | Default                           | Description                                                                           |
@@ -108,7 +108,7 @@ Generates `production_plan.yml` — the structural backbone that defines section
 ```bash
 # Generate initial plan (run after approving chords)
 python -m app.generators.midi.production.production_plan \
-    --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2
+    --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2
 
 # Refresh bar counts after re-running upstream phases (preserves human edits)
 python -m app.generators.midi.production.production_plan \

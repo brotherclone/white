@@ -8,7 +8,7 @@ Writes drift_report.yml with per-section and overall metrics.
 
 Usage:
     python -m app.generators.midi.production.drift_report \
-        --production-dir shrinkwrapped/.../production/blue__rust_signal_memorial_v1
+        --production-dir shrink_wrapped/.../production/blue__rust_signal_memorial_v1
 """
 
 from __future__ import annotations

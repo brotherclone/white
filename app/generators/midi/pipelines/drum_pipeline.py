@@ -8,7 +8,7 @@ and writes top candidates as MIDI files with a review YAML.
 
 Usage:
     python -m app.generators.midi.pipelines.drum_pipeline \
-        --production-dir shrinkwrapped/.../production/black__sequential_dissolution_v2 \
+        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
         --seed 42 --top-k 5
 """
 
@@ -598,7 +598,7 @@ def main():
     parser.add_argument(
         "--thread",
         default=None,
-        help="Shrinkwrapped thread directory (optional, auto-detected from chord review)",
+        help="shrink_wrapped thread directory (optional, auto-detected from chord review)",
     )
     parser.add_argument(
         "--song",

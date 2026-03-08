@@ -123,18 +123,18 @@ class WhiteAgent(BaseModel):
 
         # Auto-shrinkwrap any new chain artifact threads before loading constraints
         artifacts_dir = Path(self._artifact_base_path())
-        output_dir = Path(os.getenv("SHRINKWRAP_OUTPUT_DIR", "shrinkwrapped"))
+        output_dir = Path(os.getenv("SHRINKWRAP_OUTPUT_DIR", "shrink_wrapped"))
         if artifacts_dir.exists():
             try:
                 result = shrinkwrap(artifacts_dir, output_dir)
                 if result["processed"] > 0:
-                    logger.info(f"Shrinkwrapped {result['processed']} new thread(s)")
+                    logger.info(f"shrink_wrapped {result['processed']} new thread(s)")
             except Exception as e:
                 logger.warning(f"Auto-shrinkwrap failed: {e}")
 
-        # Load negative constraints from shrinkwrapped corpus (all prior results)
+        # Load negative constraints from shrink_wrapped corpus (all prior results)
         negative_constraints_text = None
-        shrinkwrap_index = Path("shrinkwrapped/index.yml")
+        shrinkwrap_index = Path("shrink_wrapped/index.yml")
         constraints_path = (
             shrinkwrap_index if shrinkwrap_index.exists() else output_dir / "index.yml"
         )

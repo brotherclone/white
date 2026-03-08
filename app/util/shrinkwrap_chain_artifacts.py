@@ -6,7 +6,7 @@ Reads from chain_artifacts/ (untouched) and writes clean copies to an output dir
 - Generates manifest.yml per thread and index.yml at top level
 
 Usage:
-    python -m app.util.shrinkwrap_chain_artifacts                              # output to shrinkwrapped/
+    python -m app.util.shrinkwrap_chain_artifacts                              # output to shrink_wrapped/
     python -m app.util.shrinkwrap_chain_artifacts --output-dir my_output       # custom output dir
     python -m app.util.shrinkwrap_chain_artifacts --dry-run                    # preview changes
     python -m app.util.shrinkwrap_chain_artifacts --archive                    # include debug in .debug/
@@ -361,7 +361,7 @@ def shrinkwrap_thread(
 def load_orphaned_manifests(output_dir: Path, known_dirs: set[str]) -> list[dict]:
     """Load manifests from output directories not already tracked.
 
-    When chain_artifacts are deleted or become unparseable, the shrinkwrapped
+    When chain_artifacts are deleted or become unparseable, the shrink_wrapped
     output directories (with their manifests) are the only remaining record.
     This scans for those orphaned directories so the index stays complete.
     """
@@ -525,8 +525,8 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("shrinkwrapped"),
-        help="Output directory for clean artifacts (default: shrinkwrapped/)",
+        default=Path("shrink_wrapped"),
+        help="Output directory for clean artifacts (default: shrink_wrapped/)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Preview changes without writing files"

@@ -11,7 +11,7 @@ This module merges those fragments back into single word events.
 
 Usage:
     python -m app.generators.midi.production.ace_studio_import \
-        --production-dir shrinkwrapped/.../production/blue__rust_signal_memorial_v1
+        --production-dir shrink_wrapped/.../production/blue__rust_signal_memorial_v1
 
     python -m app.generators.midi.production.ace_studio_import \
         --production-dir ... --lrc-out path/to/output.lrc

@@ -441,7 +441,7 @@ class TestShrinkwrapThread:
         add_content_files(thread_dir)
         add_debug_files(thread_dir)
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         output.mkdir()
 
         existing = set()
@@ -464,7 +464,7 @@ class TestShrinkwrapThread:
         thread_id = "c59be431-6527-4424-83fd-4dea6a83edf5"
         make_thread(artifacts, thread_id, title="Dry Run Song")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         existing = set()
         result = shrinkwrap_thread(
             artifacts / thread_id, output, existing, dry_run=True
@@ -487,7 +487,7 @@ class TestShrinkwrap:
         )
         add_content_files(artifacts / "bbbbbbbb-1111-2222-3333-444444444444")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         result = shrinkwrap(artifacts, output)
 
         assert result["processed"] == 2
@@ -503,7 +503,7 @@ class TestShrinkwrap:
         )
         add_content_files(artifacts / "aaaaaaaa-1111-2222-3333-444444444444")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         result1 = shrinkwrap(artifacts, output)
         assert result1["processed"] == 1
 
@@ -516,7 +516,7 @@ class TestShrinkwrap:
         make_thread(artifacts, target_id, title="Target")
         make_thread(artifacts, "bbbbbbbb-1111-2222-3333-444444444444", title="Other")
 
-        output = tmp_path / "shrinkwrapped"
+        output = tmp_path / "shrink_wrapped"
         result = shrinkwrap(artifacts, output, thread_filter=target_id)
 
         assert result["processed"] == 1

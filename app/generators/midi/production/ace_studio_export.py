@@ -21,7 +21,7 @@ Returns None (with a warning) if ACE Studio is unreachable or files are missing.
 
 Usage:
     python -m app.generators.midi.production.ace_studio_export \
-        --production-dir shrinkwrapped/.../production/green__last_pollinators_elegy_v1
+        --production-dir shrink_wrapped/.../production/green__last_pollinators_elegy_v1
 """
 
 from __future__ import annotations

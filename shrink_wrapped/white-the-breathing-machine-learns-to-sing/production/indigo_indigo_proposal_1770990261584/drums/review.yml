@@ -1,0 +1,744 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/indigo_indigo_proposal_1770990261584
+pipeline: drum-generation
+bpm: 120
+time_sig: 4/4
+color: indigo
+genre_families:
+- experimental
+- folk
+- rock
+generated: '2026-03-06T13:52:15.716838+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- rural_introspection
+- three_liter_mountain_dew
+- tanker
+- rebar_cybernetics
+- sleep_aside_the_tracks
+- no_oil_for_blood
+- missed_off_ramp
+- liberal_arts_degree_revenge
+candidates:
+- id: drum_rural_introspection_01
+  midi_file: candidates/drum_rural_introspection_01.mid
+  rank: 1
+  section: rural_introspection
+  next_section: null
+  chord_source: chord_001
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4352
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5011
+        present: 0.2097
+        future: 0.2891
+      spatial:
+        thing: 0.5024
+        place: 0.2881
+        person: 0.2095
+      ontological:
+        imagined: 0.3521
+        forgotten: 0.2734
+        known: 0.3744
+      confidence: 0.1081
+      match: 0.1931
+  label: drum_rural_introspection_alt
+  status: approved
+  notes: ''
+- id: drum_rural_introspection_02
+  midi_file: candidates/drum_rural_introspection_02.mid
+  rank: 2
+  section: rural_introspection
+  next_section: null
+  chord_source: chord_001
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4347
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.2102
+        future: 0.2895
+      spatial:
+        thing: 0.5015
+        place: 0.2885
+        person: 0.21
+      ontological:
+        imagined: 0.3512
+        forgotten: 0.2741
+        known: 0.3747
+      confidence: 0.1041
+      match: 0.1924
+  label: drum_rural_introspection
+  status: approved
+  notes: ''
+- id: drum_rural_introspection_03
+  midi_file: candidates/drum_rural_introspection_03.mid
+  rank: 3
+  section: rural_introspection
+  next_section: null
+  chord_source: chord_001
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.4344
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.2102
+        future: 0.2898
+      spatial:
+        thing: 0.5012
+        place: 0.2887
+        person: 0.21
+      ontological:
+        imagined: 0.352
+        forgotten: 0.274
+        known: 0.374
+      confidence: 0.1019
+      match: 0.192
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_three_liter_mountain_dew_01
+  midi_file: candidates/drum_three_liter_mountain_dew_01.mid
+  rank: 4
+  section: three_liter_mountain_dew
+  next_section: null
+  chord_source: chord_003
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4352
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.501
+        present: 0.2095
+        future: 0.2895
+      spatial:
+        thing: 0.5022
+        place: 0.2884
+        person: 0.2093
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2731
+        known: 0.374
+      confidence: 0.1083
+      match: 0.1931
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_three_liter_mountain_dew_02
+  midi_file: candidates/drum_three_liter_mountain_dew_02.mid
+  rank: 5
+  section: three_liter_mountain_dew
+  next_section: null
+  chord_source: chord_003
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4347
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5002
+        present: 0.2101
+        future: 0.2897
+      spatial:
+        thing: 0.5014
+        place: 0.2886
+        person: 0.2099
+      ontological:
+        imagined: 0.3517
+        forgotten: 0.2738
+        known: 0.3745
+      confidence: 0.1046
+      match: 0.1925
+  label: drum_three_liter_mountain_dew
+  status: approved
+  notes: ''
+- id: drum_three_liter_mountain_dew_03
+  midi_file: candidates/drum_three_liter_mountain_dew_03.mid
+  rank: 6
+  section: three_liter_mountain_dew
+  next_section: null
+  chord_source: chord_003
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.4344
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.21
+        future: 0.29
+      spatial:
+        thing: 0.5012
+        place: 0.2889
+        person: 0.2098
+      ontological:
+        imagined: 0.3521
+        forgotten: 0.2739
+        known: 0.374
+      confidence: 0.1016
+      match: 0.192
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_tanker_01
+  midi_file: candidates/drum_tanker_01.mid
+  rank: 7
+  section: tanker
+  next_section: null
+  chord_source: chord_005
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4346
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4993
+        present: 0.2107
+        future: 0.2899
+      spatial:
+        thing: 0.5006
+        place: 0.289
+        person: 0.2104
+      ontological:
+        imagined: 0.3489
+        forgotten: 0.2753
+        known: 0.3759
+      confidence: 0.1033
+      match: 0.1924
+  label: drum_tanker
+  status: approved
+  notes: ''
+- id: drum_tanker_02
+  midi_file: candidates/drum_tanker_02.mid
+  rank: 8
+  section: tanker
+  next_section: null
+  chord_source: chord_005
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4342
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4982
+        present: 0.2114
+        future: 0.2903
+      spatial:
+        thing: 0.4995
+        place: 0.2893
+        person: 0.2112
+      ontological:
+        imagined: 0.3486
+        forgotten: 0.2757
+        known: 0.3757
+      confidence: 0.1001
+      match: 0.1918
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_tanker_03
+  midi_file: candidates/drum_tanker_03.mid
+  rank: 9
+  section: tanker
+  next_section: null
+  chord_source: chord_005
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.434
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.498
+        present: 0.2115
+        future: 0.2905
+      spatial:
+        thing: 0.4993
+        place: 0.2894
+        person: 0.2113
+      ontological:
+        imagined: 0.3497
+        forgotten: 0.2755
+        known: 0.3748
+      confidence: 0.0987
+      match: 0.1915
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_rebar_cybernetics_01
+  midi_file: candidates/drum_rebar_cybernetics_01.mid
+  rank: 10
+  section: rebar_cybernetics
+  next_section: null
+  chord_source: chord_006
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4352
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.501
+        present: 0.2095
+        future: 0.2895
+      spatial:
+        thing: 0.5022
+        place: 0.2884
+        person: 0.2093
+      ontological:
+        imagined: 0.3528
+        forgotten: 0.2731
+        known: 0.374
+      confidence: 0.1083
+      match: 0.1931
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_rebar_cybernetics_02
+  midi_file: candidates/drum_rebar_cybernetics_02.mid
+  rank: 11
+  section: rebar_cybernetics
+  next_section: null
+  chord_source: chord_006
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4347
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5002
+        present: 0.2101
+        future: 0.2897
+      spatial:
+        thing: 0.5014
+        place: 0.2886
+        person: 0.2099
+      ontological:
+        imagined: 0.3517
+        forgotten: 0.2738
+        known: 0.3745
+      confidence: 0.1046
+      match: 0.1925
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_rebar_cybernetics_03
+  midi_file: candidates/drum_rebar_cybernetics_03.mid
+  rank: 12
+  section: rebar_cybernetics
+  next_section: null
+  chord_source: chord_006
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.4344
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.21
+        future: 0.29
+      spatial:
+        thing: 0.5012
+        place: 0.2889
+        person: 0.2098
+      ontological:
+        imagined: 0.3521
+        forgotten: 0.2739
+        known: 0.374
+      confidence: 0.1016
+      match: 0.192
+  label: drum_rebar_cybernetics
+  status: approved
+  notes: ''
+- id: drum_sleep_aside_the_tracks_01
+  midi_file: candidates/drum_sleep_aside_the_tracks_01.mid
+  rank: 13
+  section: sleep_aside_the_tracks
+  next_section: null
+  chord_source: chord_007
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4343
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4976
+        present: 0.2122
+        future: 0.2902
+      spatial:
+        thing: 0.4989
+        place: 0.2893
+        person: 0.2119
+      ontological:
+        imagined: 0.3473
+        forgotten: 0.2762
+        known: 0.3766
+      confidence: 0.1009
+      match: 0.1919
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_sleep_aside_the_tracks_02
+  midi_file: candidates/drum_sleep_aside_the_tracks_02.mid
+  rank: 14
+  section: sleep_aside_the_tracks
+  next_section: null
+  chord_source: chord_007
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4339
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4968
+        present: 0.2127
+        future: 0.2905
+      spatial:
+        thing: 0.4981
+        place: 0.2895
+        person: 0.2124
+      ontological:
+        imagined: 0.3476
+        forgotten: 0.2763
+        known: 0.3761
+      confidence: 0.0981
+      match: 0.1913
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_sleep_aside_the_tracks_03
+  midi_file: candidates/drum_sleep_aside_the_tracks_03.mid
+  rank: 15
+  section: sleep_aside_the_tracks
+  next_section: null
+  chord_source: chord_007
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.4339
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4967
+        present: 0.2126
+        future: 0.2906
+      spatial:
+        thing: 0.498
+        place: 0.2896
+        person: 0.2123
+      ontological:
+        imagined: 0.3488
+        forgotten: 0.276
+        known: 0.3752
+      confidence: 0.0978
+      match: 0.1912
+  label: drum_sleep_aside_the_tracks
+  status: approved
+  notes: ''
+- id: drum_no_oil_for_blood_01
+  midi_file: candidates/drum_no_oil_for_blood_01.mid
+  rank: 16
+  section: no_oil_for_blood
+  next_section: null
+  chord_source: chord_008
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4352
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5011
+        present: 0.2097
+        future: 0.2891
+      spatial:
+        thing: 0.5024
+        place: 0.2881
+        person: 0.2095
+      ontological:
+        imagined: 0.3521
+        forgotten: 0.2734
+        known: 0.3744
+      confidence: 0.1081
+      match: 0.1931
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_no_oil_for_blood_02
+  midi_file: candidates/drum_no_oil_for_blood_02.mid
+  rank: 17
+  section: no_oil_for_blood
+  next_section: null
+  chord_source: chord_008
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4347
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.2102
+        future: 0.2895
+      spatial:
+        thing: 0.5015
+        place: 0.2885
+        person: 0.21
+      ontological:
+        imagined: 0.3512
+        forgotten: 0.2741
+        known: 0.3747
+      confidence: 0.1041
+      match: 0.1924
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_no_oil_for_blood_03
+  midi_file: candidates/drum_no_oil_for_blood_03.mid
+  rank: 18
+  section: no_oil_for_blood
+  next_section: null
+  chord_source: chord_008
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.4344
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.2102
+        future: 0.2898
+      spatial:
+        thing: 0.5012
+        place: 0.2887
+        person: 0.21
+      ontological:
+        imagined: 0.352
+        forgotten: 0.274
+        known: 0.374
+      confidence: 0.1019
+      match: 0.192
+  label: drum_no_oil_for_blood
+  status: approved
+  notes: ''
+- id: drum_missed_off_ramp_01
+  midi_file: candidates/drum_missed_off_ramp_01.mid
+  rank: 19
+  section: missed_off_ramp
+  next_section: null
+  chord_source: chord_009
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4343
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4976
+        present: 0.2122
+        future: 0.2902
+      spatial:
+        thing: 0.4989
+        place: 0.2893
+        person: 0.2119
+      ontological:
+        imagined: 0.3473
+        forgotten: 0.2762
+        known: 0.3766
+      confidence: 0.1009
+      match: 0.1919
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_missed_off_ramp_02
+  midi_file: candidates/drum_missed_off_ramp_02.mid
+  rank: 20
+  section: missed_off_ramp
+  next_section: null
+  chord_source: chord_009
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4339
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4968
+        present: 0.2127
+        future: 0.2905
+      spatial:
+        thing: 0.4981
+        place: 0.2895
+        person: 0.2124
+      ontological:
+        imagined: 0.3476
+        forgotten: 0.2763
+        known: 0.3761
+      confidence: 0.0981
+      match: 0.1913
+  label: drum_missed_off_ramp
+  status: approved
+  notes: ''
+- id: drum_missed_off_ramp_03
+  midi_file: candidates/drum_missed_off_ramp_03.mid
+  rank: 21
+  section: missed_off_ramp
+  next_section: null
+  chord_source: chord_009
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.4339
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4967
+        present: 0.2126
+        future: 0.2906
+      spatial:
+        thing: 0.498
+        place: 0.2896
+        person: 0.2123
+      ontological:
+        imagined: 0.3488
+        forgotten: 0.276
+        known: 0.3752
+      confidence: 0.0978
+      match: 0.1912
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_liberal_arts_degree_revenge_01
+  midi_file: candidates/drum_liberal_arts_degree_revenge_01.mid
+  rank: 22
+  section: liberal_arts_degree_revenge
+  next_section: null
+  chord_source: chord_010
+  genre_family: rock
+  pattern_name: rock_basic
+  energy: medium
+  scores:
+    composite: 0.4352
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5011
+        present: 0.2097
+        future: 0.2891
+      spatial:
+        thing: 0.5024
+        place: 0.2881
+        person: 0.2095
+      ontological:
+        imagined: 0.3521
+        forgotten: 0.2734
+        known: 0.3744
+      confidence: 0.1081
+      match: 0.1931
+  label: drum_liberal_arts_degree_revenge_alt
+  status: approved
+  notes: ''
+- id: drum_liberal_arts_degree_revenge_02
+  midi_file: candidates/drum_liberal_arts_degree_revenge_02.mid
+  rank: 23
+  section: liberal_arts_degree_revenge
+  next_section: null
+  chord_source: chord_010
+  genre_family: experimental
+  pattern_name: experimental_stutter
+  energy: medium
+  scores:
+    composite: 0.4347
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5003
+        present: 0.2102
+        future: 0.2895
+      spatial:
+        thing: 0.5015
+        place: 0.2885
+        person: 0.21
+      ontological:
+        imagined: 0.3512
+        forgotten: 0.2741
+        known: 0.3747
+      confidence: 0.1041
+      match: 0.1924
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_liberal_arts_degree_revenge_03
+  midi_file: candidates/drum_liberal_arts_degree_revenge_03.mid
+  rank: 24
+  section: liberal_arts_degree_revenge
+  next_section: null
+  chord_source: chord_010
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.4344
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.5
+        present: 0.2102
+        future: 0.2898
+      spatial:
+        thing: 0.5012
+        place: 0.2887
+        person: 0.21
+      ontological:
+        imagined: 0.352
+        forgotten: 0.274
+        known: 0.374
+      confidence: 0.1019
+      match: 0.192
+  label: drum_liberal_arts_degree_revenge
+  status: approved
+  notes: ''

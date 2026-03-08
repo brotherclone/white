@@ -2,13 +2,13 @@
 """
 Chord generation pipeline for the Music Production Pipeline.
 
-Reads a song proposal from a shrinkwrapped thread, generates chord progression
+Reads a song proposal from a shrink_wrapped thread, generates chord progression
 candidates via Markov chains, scores them with both music theory metrics and
 Refractor, and writes the top candidates as MIDI files with a review YAML.
 
 Usage:
     python -m app.generators.midi.pipelines.chord_pipeline \
-        --thread shrinkwrapped/white-the-breathing-machine-learns-to-sing \
+        --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
         --song "song_proposal_Black (0x221f20)_sequential_dissolution_v2.yml" \
         --seed 42 --num-candidates 200 --top-k 10
 """
@@ -159,7 +159,7 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
 
 
 def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
-    """Load and parse a song proposal from a shrinkwrapped thread.
+    """Load and parse a song proposal from a shrink_wrapped thread.
 
     Returns dict with: key_root, mode, bpm, time_sig, concept, color_name, raw_proposal.
     """
@@ -725,7 +725,7 @@ def main():
         description="Chord generation pipeline — generate, score, and review chord progressions"
     )
     parser.add_argument(
-        "--thread", required=True, help="Shrinkwrapped thread directory"
+        "--thread", required=True, help="shrink_wrapped thread directory"
     )
     parser.add_argument("--song", required=True, help="Song proposal YAML filename")
     parser.add_argument(

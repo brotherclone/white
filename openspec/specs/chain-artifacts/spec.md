@@ -8,7 +8,7 @@ The system SHALL generate a negative constraints file from prior chain results t
 
 #### Scenario: Constraint file generation
 - **WHEN** the constraint generator is run after shrink-wrapping
-- **THEN** `shrinkwrapped/negative_constraints.yml` is created from `shrinkwrapped/index.yml`
+- **THEN** `shrink_wrapped/negative_constraints.yml` is created from `shrink_wrapped/index.yml`
 
 #### Scenario: Key/BPM clustering detection
 - **WHEN** more than 30% of prior proposals share the same key and similar BPM (within +/- 5)
@@ -30,7 +30,7 @@ The system SHALL generate a negative constraints file from prior chain results t
 The system SHALL incorporate negative constraints when generating new song proposals to increase output diversity.
 
 #### Scenario: Constraint loading at workflow start
-- **WHEN** a new chain workflow starts and `shrinkwrapped/index.yml` exists
+- **WHEN** a new chain workflow starts and `shrink_wrapped/index.yml` exists
 - **THEN** the constraints are loaded and made available to the White agent
 
 #### Scenario: Soft avoidance
@@ -92,7 +92,7 @@ The system SHALL maintain a top-level index of all shrink-wrapped chain artifact
 
 #### Scenario: Index generation
 - **WHEN** shrink-wrap processes threads
-- **THEN** `shrinkwrapped/index.yml` is updated with an entry per shrink-wrapped thread
+- **THEN** `shrink_wrapped/index.yml` is updated with an entry per shrink-wrapped thread
 
 #### Scenario: Index entry structure
 - **WHEN** an entry is added to the index

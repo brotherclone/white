@@ -16,7 +16,7 @@ Pipeline position: chords → drums → bass → melody → arrangement export �
 
 Usage:
     python -m app.generators.midi.pipelines.lyric_pipeline \\
-        --production-dir shrinkwrapped/.../production/yellow__... \\
+        --production-dir shrink_wrapped/.../production/yellow__... \\
         --num-candidates 3
 
     # Register manually placed .txt files

@@ -45,7 +45,7 @@ and write a JSONL file suitable for prompt engineering or future fine-tuning.
 
 #### Scenario: Export from a thread
 
-- **WHEN** `lyric_feedback_export --thread <shrinkwrapped_dir> --output feedback.jsonl` is run
+- **WHEN** `lyric_feedback_export --thread <shrink_wrapped_dir> --output feedback.jsonl` is run
 - **THEN** every production directory under the thread that has both `lyrics.txt` and
   `lyrics_draft.txt` is included
 - **AND** each output record contains: `song_slug`, `color`, `concept`, `bpm`, `time_sig`,

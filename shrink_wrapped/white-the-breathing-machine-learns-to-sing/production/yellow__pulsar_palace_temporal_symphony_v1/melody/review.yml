@@ -1,0 +1,677 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/yellow__pulsar_palace_temporal_symphony_v1
+pipeline: melody-generation
+bpm: 120
+time_sig: 4/4
+color: Yellow
+singer: Shirley
+generated: '2026-02-25T22:20:33.435358+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+sections_found:
+- bridge
+- chorus
+- strobing_jams
+- verse
+candidates:
+- id: melody_bridge_01
+  midi_file: candidates/melody_bridge_01.mid
+  rank: 1
+  section: bridge
+  chord_source: chord_001
+  contour: leap_step
+  pattern_name: leap_up_step_down_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3756
+    theory:
+      singability: 0.6019
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9907
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.2589
+        future: 0.315
+      spatial:
+        thing: 0.4258
+        place: 0.3157
+        person: 0.2584
+      ontological:
+        imagined: 0.3307
+        forgotten: 0.3061
+        known: 0.3632
+      confidence: 0.0424
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_bridge_02
+  midi_file: candidates/melody_bridge_02.mid
+  rank: 2
+  section: bridge
+  chord_source: chord_001
+  contour: repeated
+  pattern_name: repeated_monotone_low
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.3647
+    theory:
+      singability: 0.7196
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7639
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.259
+        future: 0.3149
+      spatial:
+        thing: 0.4258
+        place: 0.3156
+        person: 0.2585
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3632
+      confidence: 0.0423
+      match: 0.1662
+  label: melody_bridge
+  status: approved
+  notes: ''
+- id: melody_bridge_03
+  midi_file: candidates/melody_bridge_03.mid
+  rank: 3
+  section: bridge
+  chord_source: chord_001
+  contour: pentatonic
+  pattern_name: penta_major_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.361
+    theory:
+      singability: 0.6411
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8056
+    chromatic:
+      temporal:
+        past: 0.4262
+        present: 0.259
+        future: 0.3149
+      spatial:
+        thing: 0.4259
+        place: 0.3156
+        person: 0.2585
+      ontological:
+        imagined: 0.3309
+        forgotten: 0.306
+        known: 0.3631
+      confidence: 0.0424
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_bridge_04
+  midi_file: candidates/melody_bridge_04.mid
+  rank: 4
+  section: bridge
+  chord_source: chord_001
+  contour: arpeggiated
+  pattern_name: arp_up_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3391
+    theory:
+      singability: 0.4362
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7917
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.259
+        future: 0.3149
+      spatial:
+        thing: 0.4259
+        place: 0.3156
+        person: 0.2585
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3632
+      confidence: 0.0424
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_bridge_05
+  midi_file: candidates/melody_bridge_05.mid
+  rank: 5
+  section: bridge
+  chord_source: chord_001
+  contour: repeated
+  pattern_name: repeated_oscillating_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3382
+    theory:
+      singability: 0.4476
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7708
+    chromatic:
+      temporal:
+        past: 0.4263
+        present: 0.2589
+        future: 0.3148
+      spatial:
+        thing: 0.426
+        place: 0.3156
+        person: 0.2584
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3632
+      confidence: 0.0425
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_chorus_01
+  midi_file: candidates/melody_chorus_01.mid
+  rank: 6
+  section: chorus
+  chord_source: chord_003
+  contour: arpeggiated
+  pattern_name: arp_up_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3718
+    theory:
+      singability: 0.5951
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9603
+    chromatic:
+      temporal:
+        past: 0.4262
+        present: 0.2589
+        future: 0.3149
+      spatial:
+        thing: 0.426
+        place: 0.3156
+        person: 0.2584
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3632
+      confidence: 0.0424
+      match: 0.1662
+  label: melody_chorus
+  status: approved
+  notes: ''
+- id: melody_chorus_02
+  midi_file: candidates/melody_chorus_02.mid
+  rank: 7
+  section: chorus
+  chord_source: chord_003
+  contour: leap_step
+  pattern_name: leap_up_step_down_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3713
+    theory:
+      singability: 0.6211
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9286
+    chromatic:
+      temporal:
+        past: 0.4262
+        present: 0.2589
+        future: 0.3149
+      spatial:
+        thing: 0.4259
+        place: 0.3157
+        person: 0.2584
+      ontological:
+        imagined: 0.3307
+        forgotten: 0.3061
+        known: 0.3632
+      confidence: 0.0424
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_chorus_03
+  midi_file: candidates/melody_chorus_03.mid
+  rank: 8
+  section: chorus
+  chord_source: chord_003
+  contour: leap_step
+  pattern_name: leap_down_step_up_high
+  energy: high
+  singer: Shirley
+  scores:
+    composite: 0.3674
+    theory:
+      singability: 0.6436
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8671
+    chromatic:
+      temporal:
+        past: 0.4265
+        present: 0.2585
+        future: 0.315
+      spatial:
+        thing: 0.4262
+        place: 0.3158
+        person: 0.258
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.3062
+        known: 0.3636
+      confidence: 0.0428
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_chorus_04
+  midi_file: candidates/melody_chorus_04.mid
+  rank: 9
+  section: chorus
+  chord_source: chord_003
+  contour: pentatonic
+  pattern_name: penta_major_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3602
+    theory:
+      singability: 0.6376
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8016
+    chromatic:
+      temporal:
+        past: 0.4262
+        present: 0.2589
+        future: 0.3149
+      spatial:
+        thing: 0.4259
+        place: 0.3156
+        person: 0.2584
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3632
+      confidence: 0.0425
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_chorus_05
+  midi_file: candidates/melody_chorus_05.mid
+  rank: 10
+  section: chorus
+  chord_source: chord_003
+  contour: stepwise
+  pattern_name: stepwise_wave_high
+  energy: high
+  singer: Shirley
+  scores:
+    composite: 0.3449
+    theory:
+      singability: 0.4718
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8135
+    chromatic:
+      temporal:
+        past: 0.4264
+        present: 0.2588
+        future: 0.3149
+      spatial:
+        thing: 0.4261
+        place: 0.3156
+        person: 0.2583
+      ontological:
+        imagined: 0.3307
+        forgotten: 0.306
+        known: 0.3633
+      confidence: 0.0426
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_strobing_jams_01
+  midi_file: candidates/melody_strobing_jams_01.mid
+  rank: 11
+  section: strobing_jams
+  chord_source: chord_004
+  contour: leap_step
+  pattern_name: leap_down_step_up_high
+  energy: high
+  singer: Shirley
+  scores:
+    composite: 0.3681
+    theory:
+      singability: 0.6426
+      chord_tone_alignment: 1.0
+      contour_quality: 0.875
+    chromatic:
+      temporal:
+        past: 0.4262
+        present: 0.2589
+        future: 0.3149
+      spatial:
+        thing: 0.4259
+        place: 0.3157
+        person: 0.2584
+      ontological:
+        imagined: 0.3307
+        forgotten: 0.3061
+        known: 0.3632
+      confidence: 0.0425
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_strobing_jams_02
+  midi_file: candidates/melody_strobing_jams_02.mid
+  rank: 12
+  section: strobing_jams
+  chord_source: chord_004
+  contour: leap_step
+  pattern_name: leap_up_step_down_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3596
+    theory:
+      singability: 0.599
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8333
+    chromatic:
+      temporal:
+        past: 0.426
+        present: 0.2589
+        future: 0.3151
+      spatial:
+        thing: 0.4257
+        place: 0.3159
+        person: 0.2584
+      ontological:
+        imagined: 0.3305
+        forgotten: 0.3063
+        known: 0.3632
+      confidence: 0.0424
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_strobing_jams_03
+  midi_file: candidates/melody_strobing_jams_03.mid
+  rank: 13
+  section: strobing_jams
+  chord_source: chord_004
+  contour: arpeggiated
+  pattern_name: arp_up_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3568
+    theory:
+      singability: 0.5855
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8194
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.259
+        future: 0.3149
+      spatial:
+        thing: 0.4258
+        place: 0.3157
+        person: 0.2585
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3631
+      confidence: 0.0423
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_strobing_jams_04
+  midi_file: candidates/melody_strobing_jams_04.mid
+  rank: 14
+  section: strobing_jams
+  chord_source: chord_004
+  contour: stepwise
+  pattern_name: stepwise_ascend_low
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.3527
+    theory:
+      singability: 0.3921
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9722
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.259
+        future: 0.3149
+      spatial:
+        thing: 0.4259
+        place: 0.3156
+        person: 0.2585
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3632
+      confidence: 0.0423
+      match: 0.1662
+  label: melody_strobing_intro
+  status: approved
+  notes: ''
+- id: melody_strobing_jams_05
+  midi_file: candidates/melody_strobing_jams_05.mid
+  rank: 15
+  section: strobing_jams
+  chord_source: chord_004
+  contour: repeated
+  pattern_name: repeated_monotone_low
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.3479
+    theory:
+      singability: 0.7077
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6083
+    chromatic:
+      temporal:
+        past: 0.426
+        present: 0.2591
+        future: 0.3149
+      spatial:
+        thing: 0.4257
+        place: 0.3156
+        person: 0.2587
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.3061
+        known: 0.3632
+      confidence: 0.0421
+      match: 0.1661
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_verse_01
+  midi_file: candidates/melody_verse_01.mid
+  rank: 16
+  section: verse
+  chord_source: chord_009
+  contour: leap_step
+  pattern_name: leap_down_step_up_high
+  energy: high
+  singer: Shirley
+  scores:
+    composite: 0.3789
+    theory:
+      singability: 0.643
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9826
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.259
+        future: 0.315
+      spatial:
+        thing: 0.4258
+        place: 0.3157
+        person: 0.2585
+      ontological:
+        imagined: 0.3307
+        forgotten: 0.3061
+        known: 0.3632
+      confidence: 0.0424
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_verse_02
+  midi_file: candidates/melody_verse_02.mid
+  rank: 17
+  section: verse
+  chord_source: chord_009
+  contour: repeated
+  pattern_name: repeated_monotone_low
+  energy: low
+  singer: Shirley
+  scores:
+    composite: 0.373
+    theory:
+      singability: 0.7411
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8264
+    chromatic:
+      temporal:
+        past: 0.4258
+        present: 0.2592
+        future: 0.3149
+      spatial:
+        thing: 0.4256
+        place: 0.3157
+        person: 0.2588
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.3061
+        known: 0.3631
+      confidence: 0.042
+      match: 0.1661
+  label: melody_verse_alternate
+  status: approved
+  notes: ''
+- id: melody_verse_03
+  midi_file: candidates/melody_verse_03.mid
+  rank: 18
+  section: verse
+  chord_source: chord_009
+  contour: leap_step
+  pattern_name: leap_up_step_down_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3727
+    theory:
+      singability: 0.6058
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9583
+    chromatic:
+      temporal:
+        past: 0.426
+        present: 0.259
+        future: 0.3149
+      spatial:
+        thing: 0.4258
+        place: 0.3157
+        person: 0.2586
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.3061
+        known: 0.3631
+      confidence: 0.0423
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_verse_04
+  midi_file: candidates/melody_verse_04.mid
+  rank: 19
+  section: verse
+  chord_source: chord_009
+  contour: arpeggiated
+  pattern_name: arp_up_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3678
+    theory:
+      singability: 0.5911
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9236
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.2591
+        future: 0.3149
+      spatial:
+        thing: 0.4258
+        place: 0.3156
+        person: 0.2586
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.306
+        known: 0.3631
+      confidence: 0.0423
+      match: 0.1662
+  label: melody_verse
+  status: approved
+  notes: ''
+- id: melody_verse_05
+  midi_file: candidates/melody_verse_05.mid
+  rank: 20
+  section: verse
+  chord_source: chord_009
+  contour: pentatonic
+  pattern_name: penta_major_med
+  energy: medium
+  singer: Shirley
+  scores:
+    composite: 0.3613
+    theory:
+      singability: 0.6301
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8194
+    chromatic:
+      temporal:
+        past: 0.4261
+        present: 0.2591
+        future: 0.3148
+      spatial:
+        thing: 0.4258
+        place: 0.3156
+        person: 0.2586
+      ontological:
+        imagined: 0.3309
+        forgotten: 0.306
+        known: 0.3631
+      confidence: 0.0424
+      match: 0.1662
+  label: null
+  status: rejected
+  notes: ''

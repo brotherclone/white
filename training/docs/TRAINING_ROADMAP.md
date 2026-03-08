@@ -135,7 +135,7 @@ MODAL GPU EXECUTION (migrated from RunPod 2026-02-12)
 
 ```
  ✅ add-shrinkwrap-chain-artifacts (COMPLETE 2026-02-07)
-    → 20 threads shrinkwrapped to shrinkwrapped/ directory
+    → 20 threads shrink_wrapped to shrink_wrapped/ directory
     → EVP intermediates stripped (135 files, 210MB freed from chain_artifacts)
     → manifest.yml per thread + index.yml generated
     → 47 tests passing
@@ -165,7 +165,7 @@ POST-TRAINING
  ✅ Music Production Pipeline — Chord Phase (COMPLETE 2026-02-14)
     → OpenSpec: openspec/changes/add-music-production-pipeline/
     → Pipeline: app/generators/midi/chord_pipeline.py
-    → Reads shrinkwrapped song proposal → Markov chord generation → Refractor scoring
+    → Reads shrink_wrapped song proposal → Markov chord generation → Refractor scoring
     → Composite scoring (30% theory + 70% chromatic) → top-N MIDI files + review.yml
     → Human labels candidates (verse/chorus/bridge) in review.yml → promote to approved/
     → Promotion tool: app/generators/midi/promote_part.py

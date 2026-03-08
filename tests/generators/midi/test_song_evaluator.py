@@ -681,7 +681,7 @@ def test_flag_low_confidence():
 # ---------------------------------------------------------------------------
 
 GREEN_SONG_DIR = Path(
-    "shrinkwrapped/white-the-breathing-machine-learns-to-sing/"
+    "shrink_wrapped/white-the-breathing-machine-learns-to-sing/"
     "production/green__last_pollinators_elegy_v1"
 )
 

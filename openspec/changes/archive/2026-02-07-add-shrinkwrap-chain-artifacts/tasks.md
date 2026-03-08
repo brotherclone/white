@@ -16,7 +16,7 @@
 - [x] 3.1 Extract final song title from last `SongProposalIteration`
 - [x] 3.2 Slugify title for filesystem safety (lowercase, hyphens, no special chars)
 - [x] 3.3 Prepend album color prefix (e.g., `white-the-prism-protocol`)
-- [x] 3.4 Copy thread to output directory with slug name (outputs to `shrinkwrapped/`, chain_artifacts untouched)
+- [x] 3.4 Copy thread to output directory with slug name (outputs to `shrink_wrapped/`, chain_artifacts untouched)
 - [x] 3.5 Handle name collisions (append `-2`, `-3`, etc.)
 
 ## 4. Summary Manifest
@@ -25,10 +25,10 @@
   - agent_name (which agent generated final proposal)
   - thread_id (original UUID for traceability)
   - timestamp
-- [x] 4.2 Generate a top-level `shrinkwrapped/index.yml` listing all shrink-wrapped threads
+- [x] 4.2 Generate a top-level `shrink_wrapped/index.yml` listing all shrink-wrapped threads
 - [x] 4.3 Include iteration count (how many agents contributed)
 
 ## 5. Batch Processing
 - [x] 5.1 Process all threads in `chain_artifacts/` in one command
-- [x] 5.2 Skip already-shrinkwrapped threads (detect by directory name in output)
+- [x] 5.2 Skip already-shrink_wrapped threads (detect by directory name in output)
 - [x] 5.3 Print summary: N threads processed, N skipped, N failed

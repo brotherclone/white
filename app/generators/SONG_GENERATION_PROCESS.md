@@ -189,7 +189,7 @@ python -m app.generators.midi.production.song_evaluator <dir> --rescore-lyrics
 
 # Export (draft → edited) pairs for training:
 python -m app.generators.midi.production.lyric_feedback_export \
-    --thread shrinkwrapped/white-the-breathing-machine-learns-to-sing \
+    --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
     --output lyric_feedback.jsonl
 ```
 

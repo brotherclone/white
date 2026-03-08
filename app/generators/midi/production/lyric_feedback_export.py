@@ -9,12 +9,12 @@ file suitable for few-shot prompt engineering or future LoRA fine-tuning.
 Usage:
     # Export all songs in a thread
     python -m app.generators.midi.production.lyric_feedback_export \
-        --thread shrinkwrapped/white-the-breathing-machine-learns-to-sing \
+        --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
         --output lyric_feedback.jsonl
 
     # Single song
     python -m app.generators.midi.production.lyric_feedback_export \
-        --production-dir shrinkwrapped/.../production/yellow__... \
+        --production-dir shrink_wrapped/.../production/yellow__... \
         --output lyric_feedback.jsonl
 """
 

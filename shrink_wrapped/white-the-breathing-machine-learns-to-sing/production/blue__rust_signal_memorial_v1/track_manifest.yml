@@ -1,0 +1,387 @@
+manifest_id: blue__rust_signal_memorial_v1
+generated: '2026-03-03T13:32:03.360092+00:00'
+source_arrangement: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/blue__rust_signal_memorial_v1/arrangement.txt
+source_proposal: shrink_wrapped/white-the-breathing-machine-learns-to-sing/yml/song_proposal_Blue
+  (0x00ff)_rust_signal_memorial_v1.yml
+title: The Iron Oxidation Frequency (Memorial for Abundance Machinery)
+bpm: 60
+time_sig: 3/4
+key: G minor
+rainbow_color: Blue
+singer: Gabe
+concept: 'This composition functions as preservation technology documenting the exact
+  moment abundance machinery turns against its operators. The rust signal—identical
+  iron oxidation marking bee thorax identification patches, human work jacket stains,
+  and compositional memorial frequencies—transmits across biological, human, and technological
+  scales as forensic evidence of systematic elimination. At 60 BPM dying-system heartbeat
+  tempo, phantom bee wing frequencies (230 BPS) become audible as structured absence
+  rather than loss. The three-beat waltz mirrors the three-decade collapse cycle where
+  28-state pollinator ranges contract to functional extinction while human crews simultaneously
+  diminish from 12 to 3 workers teaching technique to empty air. This is not mourning
+  but mechanical documentation: how civilizations achieve sterile perfection by eliminating
+  the living abundance-makers they depend upon. The composition preserves the sound
+  abundance used to make as memorial technology, completing the rust-signal transmission
+  from biological iron oxidation through human toxic exposure to sonic preservation
+  of eliminated frequencies.'
+mood:
+- forensic
+- rust-stained
+- phantom-presence
+- mechanical-precision
+- silent-abundance
+- memorial-technology
+genres:
+- memorial drone
+- ecological documentation
+- industrial ambient
+- field recording integration
+- phantom frequency composition
+sounds_like: [Scott Walker, Radiohead]
+tracks:
+  1: chords
+  2: drums
+  3: bass
+  4: melody
+clips:
+- name: conveyor
+  track: 1
+  start: 0.0
+  length: 18.0
+- name: drums_conveyor
+  track: 2
+  start: 0.0
+  length: 18.0
+- name: conveyor
+  track: 1
+  start: 18.0
+  length: 18.0
+- name: drums_conveyor
+  track: 2
+  start: 18.0
+  length: 18.0
+- name: bass_conveyor_stiff
+  track: 3
+  start: 18.0
+  length: 18.0
+- name: conveyor
+  track: 1
+  start: 36.0
+  length: 18.0
+- name: drums_conveyor
+  track: 2
+  start: 36.0
+  length: 18.0
+- name: bass_conveyor_syncopated
+  track: 3
+  start: 36.0
+  length: 18.0
+- name: melody_conveyor
+  track: 4
+  start: 36.0
+  length: 18.0
+- name: conveyor
+  track: 1
+  start: 54.0
+  length: 18.0
+- name: drums_conveyor
+  track: 2
+  start: 54.0
+  length: 18.0
+- name: bass_conveyor_stiff
+  track: 3
+  start: 54.0
+  length: 18.0
+- name: melody_conveyor_alternative
+  track: 4
+  start: 54.0
+  length: 18.0
+- name: harrows
+  track: 1
+  start: 72.0
+  length: 21.0
+- name: drums_harrows
+  track: 2
+  start: 72.0
+  length: 21.0
+- name: bass_harrows
+  track: 3
+  start: 72.0
+  length: 21.0
+- name: melody_harrows
+  track: 4
+  start: 72.0
+  length: 21.0
+- name: harvester
+  track: 1
+  start: 93.0
+  length: 12.0
+- name: drums_harvester
+  track: 2
+  start: 93.0
+  length: 12.0
+- name: bass_harvester
+  track: 3
+  start: 93.0
+  length: 12.0
+- name: melody_harvester
+  track: 4
+  start: 93.0
+  length: 12.0
+- name: harvester
+  track: 1
+  start: 105.0
+  length: 12.0
+- name: drums_harvester_sparse
+  track: 2
+  start: 105.0
+  length: 12.0
+- name: bass_harvester_downbeat
+  track: 3
+  start: 105.0
+  length: 12.0
+- name: melody_harvester_stiff
+  track: 4
+  start: 105.0
+  length: 12.0
+- name: bass_conveyor_stiff
+  track: 3
+  start: 117.0
+  length: 18.0
+- name: melody_conveyor
+  track: 4
+  start: 117.0
+  length: 18.0
+- name: conveyor
+  track: 1
+  start: 135.0
+  length: 18.0
+- name: drums_conveyor
+  track: 2
+  start: 135.0
+  length: 18.0
+- name: bass_conveyor
+  track: 3
+  start: 135.0
+  length: 18.0
+- name: melody_conveyor
+  track: 4
+  start: 135.0
+  length: 18.0
+- name: sprayer
+  track: 1
+  start: 153.0
+  length: 21.0
+- name: drums_sprayer
+  track: 2
+  start: 153.0
+  length: 21.0
+- name: bass_sprayer
+  track: 3
+  start: 153.0
+  length: 21.0
+- name: melody_sprayer
+  track: 4
+  start: 153.0
+  length: 21.0
+- name: harvester
+  track: 1
+  start: 174.0
+  length: 12.0
+- name: drums_harvester
+  track: 2
+  start: 174.0
+  length: 12.0
+- name: bass_harvester
+  track: 3
+  start: 174.0
+  length: 12.0
+- name: melody_harvester
+  track: 4
+  start: 174.0
+  length: 12.0
+- name: harvester
+  track: 1
+  start: 186.0
+  length: 12.0
+- name: drums_harvester_sparse
+  track: 2
+  start: 186.0
+  length: 12.0
+- name: bass_harvester_downbeat
+  track: 3
+  start: 186.0
+  length: 12.0
+- name: melody_harvester_stiff
+  track: 4
+  start: 186.0
+  length: 12.0
+- name: conveyor
+  track: 1
+  start: 197.0
+  length: 18.0
+- name: drums_conveyor
+  track: 2
+  start: 197.0
+  length: 18.0
+- name: bass_conveyor_stiff
+  track: 3
+  start: 197.0
+  length: 18.0
+- name: melody_conveyor
+  track: 4
+  start: 197.0
+  length: 18.0
+- name: conveyor
+  track: 1
+  start: 216.0
+  length: 18.0
+- name: drums_conveyor
+  track: 2
+  start: 216.0
+  length: 18.0
+- name: bass_conveyor
+  track: 3
+  start: 216.0
+  length: 18.0
+- name: melody_conveyor_alternative
+  track: 4
+  start: 216.0
+  length: 18.0
+- name: sky_crane
+  track: 1
+  start: 234.0
+  length: 21.0
+- name: drums_sky_crane
+  track: 2
+  start: 234.0
+  length: 21.0
+- name: bass_sky_crane_drone
+  track: 3
+  start: 234.0
+  length: 21.0
+- name: melody_sky_crane
+  track: 4
+  start: 234.0
+  length: 21.0
+- name: sprayer
+  track: 1
+  start: 255.0
+  length: 21.0
+- name: drums_sprayer
+  track: 2
+  start: 255.0
+  length: 21.0
+- name: bass_sprayer
+  track: 3
+  start: 255.0
+  length: 21.0
+- name: melody_sprayer
+  track: 4
+  start: 255.0
+  length: 21.0
+- name: sprayer
+  track: 1
+  start: 276.0
+  length: 21.0
+- name: drums_sprayer_alternate
+  track: 2
+  start: 276.0
+  length: 21.0
+- name: bass_sprayer_alternate
+  track: 3
+  start: 276.0
+  length: 21.0
+- name: melody_sprayer_alternative
+  track: 4
+  start: 276.0
+  length: 21.0
+sections:
+- name: conveyor
+  start: 0.0
+  end: 72.0
+  vocals: false
+  loops:
+    chords: conveyor
+    drums: drums_conveyor
+    bass: bass_conveyor_stiff
+    melody: melody_conveyor
+- name: harrows
+  start: 72.0
+  end: 93.0
+  vocals: false
+  loops:
+    chords: harrows
+    drums: drums_harrows
+    bass: bass_harrows
+    melody: melody_harrows
+- name: harvester
+  start: 93.0
+  end: 135.0
+  vocals: false
+  loops:
+    chords: harvester
+    drums: drums_harvester
+    bass: bass_harvester
+    melody: melody_harvester
+- name: conveyor
+  start: 135.0
+  end: 153.0
+  vocals: false
+  loops:
+    chords: conveyor
+    drums: drums_conveyor
+    bass: bass_conveyor
+    melody: melody_conveyor
+- name: sprayer
+  start: 153.0
+  end: 174.0
+  vocals: false
+  loops:
+    chords: sprayer
+    drums: drums_sprayer
+    bass: bass_sprayer
+    melody: melody_sprayer
+- name: harvester
+  start: 174.0
+  end: 197.0
+  vocals: false
+  loops:
+    chords: harvester
+    drums: drums_harvester
+    bass: bass_harvester
+    melody: melody_harvester
+- name: conveyor
+  start: 197.0
+  end: 234.0
+  vocals: false
+  loops:
+    chords: conveyor
+    drums: drums_conveyor
+    bass: bass_conveyor_stiff
+    melody: melody_conveyor
+- name: sky_crane
+  start: 234.0
+  end: 255.0
+  vocals: false
+  loops:
+    chords: sky_crane
+    drums: drums_sky_crane
+    bass: bass_sky_crane_drone
+    melody: melody_sky_crane
+- name: sprayer
+  start: 255.0
+  end: 297.0
+  vocals: false
+  loops:
+    chords: sprayer
+    drums: drums_sprayer
+    bass: bass_sprayer
+    melody: melody_sprayer
+vocals: true
+lyrics: true
+release_date: null
+album_sequence: null
+main_audio_file: null
+TRT: null
+lrc_file: null
+audio_tracks: []
