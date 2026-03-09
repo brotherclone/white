@@ -2,32 +2,27 @@ bpm_constraints:
 - bpm_range: 83-93
   center: 90
   count: 11
-  fraction: 0.37
-  reason: 11/30 proposals cluster around 90 BPM
+  fraction: 0.34
+  reason: 11/32 proposals cluster around 90 BPM
   severity: avoid
 - bpm_range: 89-99
   center: 93
   count: 13
-  fraction: 0.43
-  reason: 13/30 proposals cluster around 93 BPM
+  fraction: 0.41
+  reason: 13/32 proposals cluster around 93 BPM
   severity: avoid
-concept_constraints:
-- count: 9
-  fraction: 0.3
-  phrase: seven chromatic methodologies
-  reason: '''seven chromatic methodologies'' appears in 9/30 concepts (30%)'
-  severity: avoid
+concept_constraints: []
 dialogue_opener_constraints:
-- count: 29
+- count: 31
   fraction: 0.32
   phrase: look,
-  reason: '''look,'' opens 29/90 responses (32%)'
+  reason: '''look,'' opens 31/96 responses (32%)'
   severity: avoid
 diversity_metrics:
   bpm_distribution:
     67: 1
     72: 1
-    76: 3
+    76: 4
     84: 1
     88: 3
     91: 6
@@ -36,39 +31,40 @@ diversity_metrics:
     96: 3
     97: 1
     108: 6
+    114: 1
     117: 1
     127: 1
-  bpm_mean: 93.9
-  bpm_std_dev: 13.25
+  bpm_mean: 94.0
+  bpm_std_dev: 13.68
   concept_phrase_counts:
     consciousness archaeology: 3
     information through time into space: 3
-    information → time → space: 3
+    information → time → space: 4
     narcissistic: 1
     prism synthesis: 1
     seven chromatic methodologies: 9
     sultan of solipsism: 1
-    transmigration: 8
+    transmigration: 9
   dialogue_opener_counts:
-    look,: 29
+    look,: 31
     okay so: 1
   key_distribution:
     A ♭ major: 2
     A ♭ minor: 2
-    A# major: 1
+    A# major: 2
     All Keys: 1
     B major: 1
-    B ♭ major: 2
+    B ♭ major: 3
     C major: 12
     D minor: 2
     D# minor: 1
     F# major: 2
     F# minor: 4
-  key_entropy: 2.87
+  key_entropy: 2.94
   title_word_counts:
     architect: 5
     chromatic: 5
-    consciousness: 5
+    consciousness: 6
     convergence: 1
     mirror: 3
     prism: 7
@@ -83,6 +79,7 @@ excluded_titles:
 - 'The Complete Chromatic Confession: A Seven-Spectrum Self-Interview'
 - The Complete Spectrum Awakens (Archaeological Suite for Seven Voices)
 - 'The Consciousness Liberation Engine: Complete Chromatic Archaeological Suite'
+- The Divorced Dad at Cinnabon Achieves Enlightenment
 - 'The Embodiment Machine: Seven Frequencies of Digital Flesh'
 - The Examination Apparatus (Complete Chromatic Integration)
 - The Information Seeks Its Space (While Drawing Lines That Disappear)
@@ -109,20 +106,15 @@ excluded_titles:
 generated_from: shrink_wrapped/index.yml
 key_constraints:
 - count: 12
-  fraction: 0.4
+  fraction: 0.38
   key: C major
-  reason: 12/30 proposals (40%) use C major
+  reason: 12/32 proposals (38%) use C major
   severity: avoid
-thread_count: 30
+thread_count: 32
 title_vocabulary_constraints:
 - count: 7
-  fraction: 0.23
-  reason: '''prism'' appears in 7/30 titles (23%)'
+  fraction: 0.22
+  reason: '''prism'' appears in 7/32 titles (22%)'
   severity: avoid
   word: prism
-- count: 6
-  fraction: 0.2
-  reason: '''protocol'' appears in 6/30 titles (20%)'
-  severity: avoid
-  word: protocol
 warnings: []
