@@ -245,9 +245,10 @@ class TestReviewYaml:
             "verse": [
                 {
                     "id": "melody_verse_01",
-                    "contour": "stepwise",
-                    "pattern_name": "stepwise_ascend_med",
+                    "contour": "declarative",
+                    "pattern_name": "decl_arc_med",
                     "energy": "medium",
+                    "use_case": "vocal",
                     "breakdown": {
                         "composite": 0.75,
                         "theory": {"singability": 0.8},
@@ -273,6 +274,7 @@ class TestReviewYaml:
         assert review["candidates"][0]["label"] is None
         assert review["candidates"][0]["status"] == "pending"
         assert review["candidates"][0]["singer"] == "Gabriel"
+        assert review["candidates"][0]["use_case"] == "vocal"
 
 
 # ---------------------------------------------------------------------------
@@ -459,3 +461,4 @@ class TestMelodyPipelineIntegration:
         assert review["pipeline"] == "melody-generation"
         assert review["singer"] == "Gabriel"
         assert len(review["candidates"]) > 0
+        assert all("use_case" in c for c in review["candidates"])

@@ -270,6 +270,7 @@ def generate_melody_review_yaml(
                     "contour": item["contour"],
                     "pattern_name": item["pattern_name"],
                     "energy": item["energy"],
+                    "use_case": item.get("use_case", "vocal"),
                     "singer": singer_name,
                     "scores": _to_python(item["breakdown"]),
                     "label": None,
@@ -594,7 +595,7 @@ def run_melody_pipeline(
             )
 
             # Theory scoring
-            sing = singability_score(resolved_notes, singer)
+            sing = singability_score(resolved_notes, singer, time_sig)
             ct = chord_tone_alignment(resolved_notes, chord_tones_pc, time_sig)
             cq = contour_quality(resolved_notes)
             theory = melody_theory_score(sing, ct, cq)
@@ -615,6 +616,7 @@ def run_melody_pipeline(
                     "pattern_name": tmpl.name,
                     "contour": tmpl.contour,
                     "energy": tmpl.energy,
+                    "use_case": tmpl.use_case,
                 }
             )
 
@@ -653,6 +655,7 @@ def run_melody_pipeline(
                     "pattern_name": cand["pattern_name"],
                     "contour": cand["contour"],
                     "energy": cand["energy"],
+                    "use_case": cand["use_case"],
                     "description": cand["template"].description,
                 }
             )

@@ -98,6 +98,12 @@ class TestMelodyPatternTemplates:
             "leap_step",
             "pentatonic",
             "scalar_run",
+            "declarative",
+            "call_and_rest",
+            "haiku",
+            "incantatory",
+            "drone_and_step",
+            "conversational",
         }
         for t in ALL_TEMPLATES:
             assert t.contour in valid, f"{t.name}: invalid contour '{t.contour}'"
@@ -468,3 +474,158 @@ class TestTheoryScoring:
         assert melody_theory_score(0.6, 0.9, 0.3) == pytest.approx(0.6)
         assert melody_theory_score(1.0, 1.0, 1.0) == pytest.approx(1.0)
         assert melody_theory_score(0.0, 0.0, 0.0) == pytest.approx(0.0)
+
+
+# ---------------------------------------------------------------------------
+# 8. use_case field and vocal template constraints
+# ---------------------------------------------------------------------------
+
+
+class TestUseCaseField:
+
+    def test_all_templates_have_use_case(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        for t in ALL_TEMPLATES:
+            assert t.use_case in (
+                "vocal",
+                "lead",
+            ), f"{t.name}: invalid use_case '{t.use_case}'"
+
+    def test_existing_lead_templates_marked_lead(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        lead_templates = [t for t in ALL_TEMPLATES if t.use_case == "lead"]
+        assert (
+            len(lead_templates) >= 12
+        ), f"Expected >= 12 lead templates, got {len(lead_templates)}"
+
+    def test_vocal_4_4_minimum_count(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        vocal_4_4 = [
+            t for t in ALL_TEMPLATES if t.use_case == "vocal" and t.time_sig == (4, 4)
+        ]
+        assert (
+            len(vocal_4_4) >= 30
+        ), f"Expected >= 30 vocal 4/4 templates, got {len(vocal_4_4)}"
+
+    def test_six_vocal_archetypes_present(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        vocal_4_4_contours = {
+            t.contour
+            for t in ALL_TEMPLATES
+            if t.use_case == "vocal" and t.time_sig == (4, 4)
+        }
+        for archetype in (
+            "declarative",
+            "call_and_rest",
+            "haiku",
+            "incantatory",
+            "drone_and_step",
+            "conversational",
+        ):
+            assert (
+                archetype in vocal_4_4_contours
+            ), f"Missing vocal archetype: {archetype}"
+
+    def test_vocal_templates_max_six_onsets_per_bar_4_4(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        for t in ALL_TEMPLATES:
+            if t.use_case != "vocal" or t.time_sig != (4, 4):
+                continue
+            onset_count = len(t.rhythm)
+            assert (
+                onset_count <= 6
+            ), f"{t.name}: vocal 4/4 template has {onset_count} onsets (max 6)"
+
+    def test_vocal_templates_have_rest_gap(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        for t in ALL_TEMPLATES:
+            if t.use_case != "vocal":
+                continue
+            if t.durations is None:
+                continue
+            # Check that at least one gap of >= 0.5 beats exists between onset+dur and next onset
+            has_rest = False
+            for i in range(len(t.rhythm) - 1):
+                note_end = t.rhythm[i] + t.durations[i]
+                next_onset = t.rhythm[i + 1]
+                if next_onset - note_end >= 0.5:
+                    has_rest = True
+                    break
+            assert has_rest, f"{t.name}: vocal template has no rest gap >= 0.5 beats"
+
+    def test_vocal_templates_have_held_note(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        for t in ALL_TEMPLATES:
+            if t.use_case != "vocal":
+                continue
+            if t.durations is None:
+                continue
+            has_held = any(d >= 1.5 for d in t.durations)
+            assert has_held, f"{t.name}: vocal template has no note >= 1.5 beats"
+
+    def test_select_templates_defaults_to_vocal(self):
+        from app.generators.midi.patterns.melody_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
+
+        results = select_templates(ALL_TEMPLATES, (4, 4), "medium")
+        for t in results:
+            assert (
+                t.use_case == "vocal"
+            ), f"select_templates returned lead template: {t.name}"
+
+    def test_select_templates_lead_use_case(self):
+        from app.generators.midi.patterns.melody_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
+
+        results = select_templates(ALL_TEMPLATES, (4, 4), "medium", use_case="lead")
+        assert len(results) > 0
+        for t in results:
+            assert t.use_case == "lead", f"Expected lead template, got: {t.name}"
+
+    def test_vocal_3_4_templates_present(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        vocal_3_4 = [
+            t for t in ALL_TEMPLATES if t.use_case == "vocal" and t.time_sig == (3, 4)
+        ]
+        assert (
+            len(vocal_3_4) >= 4
+        ), f"Expected >= 4 vocal 3/4 templates, got {len(vocal_3_4)}"
+
+    def test_vocal_6_8_templates_present(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        vocal_6_8 = [
+            t for t in ALL_TEMPLATES if t.use_case == "vocal" and t.time_sig == (6, 8)
+        ]
+        assert (
+            len(vocal_6_8) >= 4
+        ), f"Expected >= 4 vocal 6/8 templates, got {len(vocal_6_8)}"
+
+    def test_singability_dense_pattern_scores_lower(self):
+        from app.generators.midi.patterns.melody_patterns import (
+            singability_score,
+            SINGERS,
+        )
+
+        singer = SINGERS["gabriel"]
+        # Sparse: 3 held notes with rests
+        sparse = [(0.0, 55, 1.5), (2.0, 57, 1.5)]
+        # Dense: 8 rapid notes, no rests
+        dense = [(i * 0.5, 55 + i % 3, 0.4) for i in range(8)]
+        sparse_score = singability_score(sparse, singer, (4, 4))
+        dense_score = singability_score(dense, singer, (4, 4))
+        assert (
+            sparse_score > dense_score
+        ), f"Sparse ({sparse_score:.3f}) should score higher than dense ({dense_score:.3f})"

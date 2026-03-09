@@ -10,21 +10,45 @@ The melody generator SHALL define contour pattern templates as structured data w
 #### Scenario: Template structure
 
 - **WHEN** a melody contour template is defined
-- **THEN** it SHALL include: name, contour type (stepwise/arpeggiated/repeated/leap_step/pentatonic/scalar_run), energy level, time signature, description, intervals (signed semitone deltas), rhythm (onset positions in beats), and optional durations
+- **THEN** it SHALL include: name, contour type, energy level, time signature, use_case ("vocal" or "lead"), description, intervals (signed semitone deltas), rhythm (onset positions in beats), and optional durations
 - **AND** the first interval SHALL always be 0 (starting note, resolved from chord)
 - **AND** rhythm and intervals lists SHALL have equal length
 
-#### Scenario: 4/4 template availability
+#### Scenario: use_case — vocal constraints
+
+- **WHEN** a template has use_case "vocal"
+- **THEN** it SHALL have no more than 6 onsets per bar in 4/4 time
+- **AND** at least one explicit rest (gap ≥ 0.5 beats) within each bar
+- **AND** at least one note with duration ≥ 1.5 beats per bar
+
+#### Scenario: use_case — lead
+
+- **WHEN** a template has use_case "lead"
+- **THEN** it MAY have any note density and is intended for instrument tracks, not singer parts
+- **AND** it SHALL be excluded from vocal candidate generation
+
+#### Scenario: Template selection filters by use_case
+
+- **WHEN** the pipeline generates a melody for a singer
+- **THEN** it SHALL only select templates with use_case "vocal"
+- **AND** lead templates SHALL not appear in vocal candidate output
+
+#### Scenario: 4/4 vocal template availability
 
 - **WHEN** the song proposal has a 4/4 time signature
-- **THEN** the generator SHALL have at least 12 templates across multiple contour types
-- **AND** contour types SHALL include at least: stepwise, arpeggiated, repeated, and leap_step
+- **THEN** the generator SHALL have at least 30 vocal templates
+- **AND** vocal templates SHALL cover at least 6 named archetypes: declarative, call_and_rest, haiku, incantatory, drone_and_step, conversational
 
-#### Scenario: 7/8 template availability
+#### Scenario: 4/4 lead template availability
 
-- **WHEN** the song proposal has a 7/8 time signature
-- **THEN** the generator SHALL have at least 6 templates using group-aligned onset positions
-- **AND** onset positions SHALL respect asymmetric groupings (e.g., 3+2+2 or 2+2+3)
+- **WHEN** a lead instrument part is being generated in 4/4
+- **THEN** the generator SHALL have at least 12 lead templates
+
+#### Scenario: Other time signature vocal template availability
+
+- **WHEN** the song proposal has a 3/4, 6/8, or 7/8 time signature
+- **THEN** the generator SHALL have at least 4 vocal templates for that time signature
+- **AND** onset positions SHALL respect the meter's natural stress patterns
 
 #### Scenario: Custom time signature fallback
 
@@ -39,12 +63,12 @@ The melody generator SHALL enforce singer-specific vocal range constraints on al
 #### Scenario: Singer registry
 
 - **WHEN** the pipeline is initialized
-- **THEN** it SHALL define vocal ranges for: Busyayo (A2–E4, baritone), Gabriel (C3–G4, tenor), Robbie (C3–G4, tenor), Shirley (F3–C5, low alto), Katherine (A3–E5, high alto)
+- **THEN** it SHALL define vocal ranges for: Busayo (baritone), Gabriel (tenor), Robbie (tenor), Shirley (alto), Katherine (alto), Marvin (bass-baritone), Aloysius (tenor), Remez (tenor)
 
 #### Scenario: Range clamping
 
 - **WHEN** a resolved melody note falls outside the assigned singer's range
-- **THEN** the pipeline SHALL mirror the interval direction (e.g., +3 becomes -3) to keep the note in range
+- **THEN** the pipeline SHALL mirror the interval direction to keep the note in range
 - **AND** if mirroring also exceeds range, clamp to the nearest range boundary
 
 #### Scenario: Singer assignment
@@ -133,7 +157,9 @@ The melody pipeline SHALL score each candidate using theory metrics and Refracto
 - **THEN** the pipeline SHALL penalize intervals larger than an octave
 - **AND** reward stepwise motion (1–2 semitones)
 - **AND** penalize melodies using less than 50% of the singer's available range
-- **AND** require at least one rest per 4 bars of melody
+- **AND** penalize more than 6 note onsets per bar in 4/4 (show-tune density)
+- **AND** reward held notes with duration ≥ 1.5 beats
+- **AND** require at least one rest per bar of vocal melody (not per 4 bars)
 
 #### Scenario: Theory scoring — chord-tone alignment
 
@@ -153,7 +179,6 @@ The melody pipeline SHALL score each candidate using theory metrics and Refracto
 - **WHEN** all candidates for a section are scored
 - **THEN** the pipeline SHALL compute: `composite = 0.30 * theory + 0.70 * chromatic`
 - **AND** rank candidates by composite score descending per section
-- **AND** present top-k candidates per section in the review file
 
 ### Requirement: Review File Generation
 
@@ -163,13 +188,7 @@ The melody pipeline SHALL generate a YAML review file alongside the MIDI candida
 
 - **WHEN** the melody pipeline completes scoring and MIDI output
 - **THEN** it SHALL write a `review.yml` file in the song's melody directory
-- **AND** each candidate SHALL include: id, midi file path, rank, section, contour type, pattern name, energy level, singer, composite score, and score breakdowns
-
-#### Scenario: Chromatic synthesis reference
-
-- **WHEN** chromatic synthesis thematic text is available for a section
-- **THEN** the review file SHALL include a `thematic_reference` field per section containing the relevant excerpt
-- **AND** this field is for human context only and does not affect scoring
+- **AND** each candidate SHALL include: id, midi file path, rank, section, contour type, pattern name, energy level, use_case, singer, composite score, and score breakdowns
 
 #### Scenario: Annotation placeholders
 
