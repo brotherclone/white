@@ -6,3 +6,4 @@ class VanityInterviewerType(str, Enum):
     VANITY_PRESSING_FAN = "vanity_pressing_fan"
     EXPERIMENTAL_PURIST = "experimental_purist"
     EARNEST_BUT_WRONG = "earnest_but_wrong"
+    GHOST_STORY = "ghost_story"

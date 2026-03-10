@@ -8,6 +8,7 @@ EXPECTED = {
     "EXPERIMENTAL_PURIST": "experimental_purist",
     "VANITY_PRESSING_FAN": "vanity_pressing_fan",
     "EARNEST_BUT_WRONG": "earnest_but_wrong",
+    "GHOST_STORY": "ghost_story",
 }
 
 
@@ -34,6 +35,7 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("experimental_purist", VanityInterviewerType.EXPERIMENTAL_PURIST),
         ("vanity_pressing_fan", VanityInterviewerType.VANITY_PRESSING_FAN),
         ("earnest_but_wrong", VanityInterviewerType.EARNEST_BUT_WRONG),
+        ("ghost_story", VanityInterviewerType.GHOST_STORY),
     ],
 )
 def test_lookup_by_value(value, member):
@@ -64,3 +66,4 @@ def test_values_are_unique():
 def test_enum_members_are_enum_instances():
     assert isinstance(VanityInterviewerType.VANITY_PRESSING_FAN, enum.Enum)
     assert isinstance(VanityInterviewerType.EARNEST_BUT_WRONG, enum.Enum)
+    assert isinstance(VanityInterviewerType.GHOST_STORY, enum.Enum)

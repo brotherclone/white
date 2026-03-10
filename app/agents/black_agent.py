@@ -23,7 +23,7 @@ from app.agents.tools.speech_tools import transcription_from_speech_to_text
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.agent_settings import AgentSettings
 from app.util.agent_state_utils import get_state_snapshot
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
+from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
 from app.structures.artifacts.sigil_artifact import SigilArtifact
@@ -215,7 +215,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             return state
 
     @agent_error_handler("ThreadKeepr")
-    @skip_chance(1.0)
     def generate_sigil(self, state: BlackAgentState) -> BlackAgentState:
         """Generate a sigil artifact (fire-and-forget, no HitL pause)"""
         get_state_snapshot(

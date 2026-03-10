@@ -249,7 +249,7 @@ def generate_directory_name(metadata: dict, existing_names: set[str]) -> str:
     """Generate a clean directory name from metadata."""
     color = slugify(metadata["rainbow_color"])
     title = slugify(metadata["title"])
-    base_name = f"{color}-{title}" if title else color
+    base_name = title if title else color
 
     # Handle collisions
     name = base_name
@@ -350,6 +350,11 @@ def copy_thread_files(
 
     for subdir in sorted(source_dir.iterdir()):
         if not subdir.is_dir():
+            continue
+
+        # Always skip the debug/ subdirectory — state snapshots are never useful
+        # in the shrinkwrapped output.  Use --archive for debug inclusion.
+        if subdir.name == "debug":
             continue
 
         dest_subdir = dest_dir / subdir.name

@@ -1,0 +1,705 @@
+song_proposal: chromatic_transmigration_complete_v1.yml
+thread: shrink_wrapped/the-sigil-completes-its-own-archaeology
+key: Bb major
+bpm: 104
+color: White
+generated: '2026-03-10T20:32:29.259132+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+candidates:
+- id: chord_001
+  midi_file: candidates/chord_001.mid
+  scratch_midi: candidates/chord_001_scratch.mid
+  rank: 1
+  scores:
+    composite: 0.331
+    theory:
+      melody: 1.0
+      voice_leading: 0.8056
+      variety: 1.0
+      graph_probability: 0.2213
+    theory_total: 0.7081
+    chromatic:
+      temporal:
+        past: 0.4084
+        present: 0.2395
+        future: 0.3521
+      spatial:
+        thing: 0.4091
+        place: 0.3506
+        person: 0.2403
+      ontological:
+        imagined: 0.2845
+        forgotten: 0.3473
+        known: 0.3682
+      confidence: 0.0166
+      match: 0.1694
+  hr_distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 2.0
+  strum_pattern: whole
+  progression: I(Bbmaj6Add9) - vi(Gm7) - V(FmajAdd9) - vi(Gm9)
+  chords:
+  - function: I
+    name: Bbmaj6Add9
+    notes:
+    - A#2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: vi
+    name: Gm7
+    notes:
+    - G2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: V
+    name: FmajAdd9
+    notes:
+    - F2
+    - A3
+    - C4
+    - F4
+    - G4
+  - function: vi
+    name: Gm9
+    notes:
+    - G2
+    - A3
+    - A#3
+    - D4
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_002
+  midi_file: candidates/chord_002.mid
+  scratch_midi: candidates/chord_002_scratch.mid
+  rank: 2
+  scores:
+    composite: 0.328
+    theory:
+      melody: 1.0
+      voice_leading: 0.6944
+      variety: 1.0
+      graph_probability: 0.2983
+    theory_total: 0.6978
+    chromatic:
+      temporal:
+        past: 0.4084
+        present: 0.2396
+        future: 0.352
+      spatial:
+        thing: 0.4091
+        place: 0.3505
+        person: 0.2404
+      ontological:
+        imagined: 0.2846
+        forgotten: 0.3472
+        known: 0.3682
+      confidence: 0.0166
+      match: 0.1694
+  hr_distribution:
+  - 2.0
+  - 1.0
+  - 1.0
+  - 1.0
+  strum_pattern: grouped_322
+  progression: I(Bb Maj) - V(F9) - III(D7(#5#9)) - iv(EbmAdd9)
+  chords:
+  - function: I
+    name: Bb Maj
+    notes:
+    - A#2
+    - A#3
+    - D4
+    - F4
+  - function: V
+    name: F9
+    notes:
+    - F2
+    - A3
+    - C4
+    - D#4
+    - G4
+  - function: III
+    name: D7(#5#9)
+    notes:
+    - D2
+    - F#3
+    - A#3
+    - C4
+    - F4
+  - function: iv
+    name: EbmAdd9
+    notes:
+    - D#2
+    - D#3
+    - F#3
+    - A#3
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_003
+  midi_file: candidates/chord_003.mid
+  scratch_midi: candidates/chord_003_scratch.mid
+  rank: 3
+  scores:
+    composite: 0.328
+    theory:
+      melody: 1.0
+      voice_leading: 0.8611
+      variety: 0.75
+      graph_probability: 0.2565
+    theory_total: 0.6978
+    chromatic:
+      temporal:
+        past: 0.409
+        present: 0.2391
+        future: 0.3518
+      spatial:
+        thing: 0.4097
+        place: 0.3504
+        person: 0.2399
+      ontological:
+        imagined: 0.2849
+        forgotten: 0.3468
+        known: 0.3683
+      confidence: 0.0168
+      match: 0.1695
+  hr_distribution:
+  - 1.0
+  - 2.0
+  - 2.0
+  - 2.0
+  strum_pattern: grouped_322
+  progression: I(Bbmaj6Add9) - III(D7(#5#9)) - III(D7(#5#9)) - iv(EbmAdd9)
+  chords:
+  - function: I
+    name: Bbmaj6Add9
+    notes:
+    - A#2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: III
+    name: D7(#5#9)
+    notes:
+    - D2
+    - F#3
+    - A#3
+    - C4
+    - F4
+  - function: III
+    name: D7(#5#9)
+    notes:
+    - D2
+    - F#3
+    - A#3
+    - C4
+    - F4
+  - function: iv
+    name: EbmAdd9
+    notes:
+    - D#2
+    - D#3
+    - F#3
+    - A#3
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_004
+  midi_file: candidates/chord_004.mid
+  scratch_midi: candidates/chord_004_scratch.mid
+  rank: 4
+  scores:
+    composite: 0.3225
+    theory:
+      melody: 1.0
+      voice_leading: 0.75
+      variety: 1.0
+      graph_probability: 0.1819
+    theory_total: 0.6796
+    chromatic:
+      temporal:
+        past: 0.4085
+        present: 0.2395
+        future: 0.3519
+      spatial:
+        thing: 0.4092
+        place: 0.3505
+        person: 0.2403
+      ontological:
+        imagined: 0.2848
+        forgotten: 0.3471
+        known: 0.3681
+      confidence: 0.0167
+      match: 0.1694
+  hr_distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 2.0
+  strum_pattern: arp_down
+  progression: I(Bbmaj9) - ii(Cm7) - iv(EbmAdd9) - III(D7(#5#9))
+  chords:
+  - function: I
+    name: Bbmaj9
+    notes:
+    - A#2
+    - F3
+    - A3
+    - C4
+    - D4
+  - function: ii
+    name: Cm7
+    notes:
+    - C3
+    - G3
+    - A#3
+    - D#4
+  - function: iv
+    name: EbmAdd9
+    notes:
+    - D#2
+    - D#3
+    - F#3
+    - A#3
+    - F4
+  - function: III
+    name: D7(#5#9)
+    notes:
+    - D2
+    - F#3
+    - A#3
+    - C4
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_005
+  midi_file: candidates/chord_005.mid
+  scratch_midi: candidates/chord_005_scratch.mid
+  rank: 5
+  scores:
+    composite: 0.3206
+    theory:
+      melody: 1.0
+      voice_leading: 0.7778
+      variety: 1.0
+      graph_probability: 0.1336
+    theory_total: 0.6734
+    chromatic:
+      temporal:
+        past: 0.4089
+        present: 0.2393
+        future: 0.3518
+      spatial:
+        thing: 0.4096
+        place: 0.3504
+        person: 0.2401
+      ontological:
+        imagined: 0.2847
+        forgotten: 0.3469
+        known: 0.3684
+      confidence: 0.0167
+      match: 0.1694
+  hr_distribution:
+  - 1.0
+  - 1.0
+  - 2.0
+  - 1.0
+  strum_pattern: arp_up
+  progression: I(Bb Maj) - vi(Gm7) - I(Bbmaj6Add9) - V(F9)
+  chords:
+  - function: I
+    name: Bb Maj
+    notes:
+    - A#2
+    - A#3
+    - D4
+    - F4
+  - function: vi
+    name: Gm7
+    notes:
+    - G2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: I
+    name: Bbmaj6Add9
+    notes:
+    - A#2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: V
+    name: F9
+    notes:
+    - F2
+    - A3
+    - C4
+    - D#4
+    - G4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_006
+  midi_file: candidates/chord_006.mid
+  scratch_midi: candidates/chord_006_scratch.mid
+  rank: 6
+  scores:
+    composite: 0.3173
+    theory:
+      melody: 1.0
+      voice_leading: 0.6111
+      variety: 1.0
+      graph_probability: 0.2628
+    theory_total: 0.6622
+    chromatic:
+      temporal:
+        past: 0.4086
+        present: 0.2395
+        future: 0.3519
+      spatial:
+        thing: 0.4093
+        place: 0.3504
+        person: 0.2402
+      ontological:
+        imagined: 0.2848
+        forgotten: 0.347
+        known: 0.3682
+      confidence: 0.0166
+      match: 0.1694
+  hr_distribution:
+  - 2.0
+  - 2.0
+  - 1.0
+  - 2.0
+  strum_pattern: whole
+  progression: I(Bbmaj6Add9) - iv(EbminMaj9) - V(FmajAdd9) - iv(EbmAdd9)
+  chords:
+  - function: I
+    name: Bbmaj6Add9
+    notes:
+    - A#2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: iv
+    name: EbminMaj9
+    notes:
+    - D#2
+    - F#3
+    - A#3
+    - D4
+    - F4
+  - function: V
+    name: FmajAdd9
+    notes:
+    - F2
+    - A3
+    - C4
+    - F4
+    - G4
+  - function: iv
+    name: EbmAdd9
+    notes:
+    - D#2
+    - D#3
+    - F#3
+    - A#3
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_007
+  midi_file: candidates/chord_007.mid
+  scratch_midi: candidates/chord_007_scratch.mid
+  rank: 7
+  scores:
+    composite: 0.313
+    theory:
+      melody: 0.8333
+      voice_leading: 0.6667
+      variety: 1.0
+      graph_probability: 0.2983
+    theory_total: 0.6478
+    chromatic:
+      temporal:
+        past: 0.4085
+        present: 0.2396
+        future: 0.352
+      spatial:
+        thing: 0.4092
+        place: 0.3505
+        person: 0.2403
+      ontological:
+        imagined: 0.2847
+        forgotten: 0.3472
+        known: 0.3681
+      confidence: 0.0166
+      match: 0.1694
+  hr_distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  strum_pattern: whole
+  progression: I(Bbmaj9) - V(F9) - III(D7(#5#9)) - iv(EbmAdd9)
+  chords:
+  - function: I
+    name: Bbmaj9
+    notes:
+    - A#2
+    - F3
+    - A3
+    - C4
+    - D4
+  - function: V
+    name: F9
+    notes:
+    - F2
+    - A3
+    - C4
+    - D#4
+    - G4
+  - function: III
+    name: D7(#5#9)
+    notes:
+    - D2
+    - F#3
+    - A#3
+    - C4
+    - F4
+  - function: iv
+    name: EbmAdd9
+    notes:
+    - D#2
+    - D#3
+    - F#3
+    - A#3
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_008
+  midi_file: candidates/chord_008.mid
+  scratch_midi: candidates/chord_008_scratch.mid
+  rank: 8
+  scores:
+    composite: 0.3129
+    theory:
+      melody: 0.8333
+      voice_leading: 0.8056
+      variety: 0.75
+      graph_probability: 0.284
+    theory_total: 0.6477
+    chromatic:
+      temporal:
+        past: 0.4086
+        present: 0.2393
+        future: 0.352
+      spatial:
+        thing: 0.4093
+        place: 0.3505
+        person: 0.2401
+      ontological:
+        imagined: 0.2847
+        forgotten: 0.347
+        known: 0.3682
+      confidence: 0.0167
+      match: 0.1694
+  hr_distribution:
+  - 1.0
+  - 2.0
+  - 2.0
+  - 1.0
+  strum_pattern: grouped_322
+  progression: I(Bbmaj7) - III(D7) - iv(EbminMaj9) - iv(EbminMaj9)
+  chords:
+  - function: I
+    name: Bbmaj7
+    notes:
+    - A#2
+    - F3
+    - D4
+    - A4
+  - function: III
+    name: D7
+    notes:
+    - D2
+    - F#3
+    - C4
+    - D4
+    - A4
+  - function: iv
+    name: EbminMaj9
+    notes:
+    - D#2
+    - F#3
+    - A#3
+    - D4
+    - F4
+  - function: iv
+    name: EbminMaj9
+    notes:
+    - D#2
+    - F#3
+    - A#3
+    - D4
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_009
+  midi_file: candidates/chord_009.mid
+  scratch_midi: candidates/chord_009_scratch.mid
+  rank: 9
+  scores:
+    composite: 0.3108
+    theory:
+      melody: 1.0
+      voice_leading: 0.7778
+      variety: 0.75
+      graph_probability: 0.1494
+    theory_total: 0.6407
+    chromatic:
+      temporal:
+        past: 0.4087
+        present: 0.2394
+        future: 0.352
+      spatial:
+        thing: 0.4094
+        place: 0.3505
+        person: 0.2401
+      ontological:
+        imagined: 0.2848
+        forgotten: 0.347
+        known: 0.3682
+      confidence: 0.0167
+      match: 0.1694
+  hr_distribution:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  strum_pattern: arp_up
+  progression: I(Bbmaj6Add9) - I(Bbmaj6Add9) - VII(FmajAdd9;A) - III(D7(#5#9))
+  chords:
+  - function: I
+    name: Bbmaj6Add9
+    notes:
+    - A#2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: I
+    name: Bbmaj6Add9
+    notes:
+    - A#2
+    - G3
+    - A#3
+    - D4
+    - F4
+  - function: VII
+    name: FmajAdd9;A
+    notes:
+    - A2
+    - F3
+    - C4
+    - F4
+    - G4
+  - function: III
+    name: D7(#5#9)
+    notes:
+    - D2
+    - F#3
+    - A#3
+    - C4
+    - F4
+  label: null
+  status: pending
+  notes: ''
+- id: chord_010
+  midi_file: candidates/chord_010.mid
+  scratch_midi: candidates/chord_010_scratch.mid
+  rank: 10
+  scores:
+    composite: 0.3101
+    theory:
+      melody: 1.0
+      voice_leading: 0.5278
+      variety: 1.0
+      graph_probability: 0.2668
+    theory_total: 0.6384
+    chromatic:
+      temporal:
+        past: 0.4088
+        present: 0.2393
+        future: 0.352
+      spatial:
+        thing: 0.4095
+        place: 0.3505
+        person: 0.2401
+      ontological:
+        imagined: 0.2848
+        forgotten: 0.347
+        known: 0.3682
+      confidence: 0.0168
+      match: 0.1695
+  hr_distribution:
+  - 1.0
+  - 2.0
+  - 2.0
+  - 1.0
+  strum_pattern: arp_down
+  progression: I(Bb Maj) - V(F Maj) - iv(EbmAdd9) - I(Bbmaj6Add9)
+  chords:
+  - function: I
+    name: Bb Maj
+    notes:
+    - A#2
+    - A#3
+    - D4
+    - F4
+  - function: V
+    name: F Maj
+    notes:
+    - F3
+    - A3
+    - C4
+    - F4
+  - function: iv
+    name: EbmAdd9
+    notes:
+    - D#2
+    - D#3
+    - F#3
+    - A#3
+    - F4
+  - function: I
+    name: Bbmaj6Add9
+    notes:
+    - A#2
+    - G3
+    - A#3
+    - D4
+    - F4
+  label: null
+  status: pending
+  notes: ''
