@@ -21,7 +21,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel
 
 from app.agents.black_agent import BlackAgent
 from app.agents.blue_agent import BlueAgent
@@ -60,7 +60,6 @@ class WhiteAgent(BaseModel):
     agents: Dict[str, Any] = {}
     settings: AgentSettings = AgentSettings()
     song_proposal: SongProposal = SongProposal(iterations=[])
-    _auto_chord_generation: bool = PrivateAttr(default=False)
 
     def __init__(self, **data):
         if "settings" not in data or data["settings"] is None:
@@ -84,31 +83,11 @@ class WhiteAgent(BaseModel):
         """Return the base path for artifacts from the environment variable."""
         return os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
 
-    def _invoke_chord_pipeline_safe(self, thread_dir: str, song_filename: str) -> None:
-        """Safely invoke the chord pipeline in-process; never raises."""
-        from app.generators.midi.pipelines.chord_pipeline import run_chord_pipeline
-
-        try:
-            run_chord_pipeline(
-                thread_dir=thread_dir,
-                song_filename=song_filename,
-                seed=42,
-                num_candidates=200,
-                top_k=10,
-            )
-            production_dir = Path(thread_dir) / "production"
-            logger.info(f"✓ Chord pipeline complete → {production_dir}")
-        except SystemExit as e:
-            logger.warning(f"Chord pipeline exited with code {e.code}; continuing.")
-        except Exception as e:
-            logger.warning(f"Chord pipeline failed: {e}; continuing.")
-
     def start_workflow(
         self,
         user_input: str | None = None,
         enabled_agents: List[str] | None = None,
         stop_after_agent: str | None = None,
-        auto_chord_generation: Optional[bool] = None,
     ) -> MainAgentState:
         """
         Start a new Prism workflow from the beginning.
@@ -170,13 +149,6 @@ class WhiteAgent(BaseModel):
                     )
             except Exception as e:
                 logger.warning(f"Failed to load negative constraints: {e}")
-
-        if auto_chord_generation is not None:
-            self._auto_chord_generation = auto_chord_generation
-        else:
-            self._auto_chord_generation = (
-                os.getenv("AUTO_CHORD_GENERATION", "false").lower() == "true"
-            )
 
         workflow = self.build_workflow()
         thread_id = str(uuid4())
@@ -2584,23 +2556,6 @@ Structure your synthesis as the final creative brief before manifestation.
         except Exception as e:
             logger.error(f"Finalization failed: {e}", exc_info=True)
             raise
-
-        if self._auto_chord_generation:
-            mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
-            iterations = state.song_proposals.iterations if state.song_proposals else []
-            if mock_mode:
-                logger.warning("Chord auto-kickoff skipped: MOCK_MODE is active")
-            elif not iterations:
-                logger.warning(
-                    "Chord auto-kickoff skipped: no song proposal iterations"
-                )
-            else:
-                final = iterations[-1]
-                thread_dir = str(Path(self._artifact_base_path()) / state.thread_id)
-                song_filename = (
-                    f"song_proposal_{final.rainbow_color}_{final.iteration_id}.yml"
-                )
-                self._invoke_chord_pipeline_safe(thread_dir, song_filename)
 
         return state
 

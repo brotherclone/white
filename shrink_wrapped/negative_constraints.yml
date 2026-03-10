@@ -2,21 +2,21 @@ bpm_constraints:
 - bpm_range: 83-93
   center: 90
   count: 11
-  fraction: 0.34
-  reason: 11/32 proposals cluster around 90 BPM
+  fraction: 0.33
+  reason: 11/33 proposals cluster around 90 BPM
   severity: avoid
 - bpm_range: 89-99
   center: 93
   count: 13
-  fraction: 0.41
-  reason: 13/32 proposals cluster around 93 BPM
+  fraction: 0.39
+  reason: 13/33 proposals cluster around 93 BPM
   severity: avoid
 concept_constraints: []
 dialogue_opener_constraints:
-- count: 31
-  fraction: 0.32
+- count: 33
+  fraction: 0.33
   phrase: look,
-  reason: '''look,'' opens 31/96 responses (32%)'
+  reason: '''look,'' opens 33/99 responses (33%)'
   severity: avoid
 diversity_metrics:
   bpm_distribution:
@@ -30,12 +30,13 @@ diversity_metrics:
     94: 2
     96: 3
     97: 1
+    104: 1
     108: 6
     114: 1
     117: 1
     127: 1
-  bpm_mean: 94.0
-  bpm_std_dev: 13.68
+  bpm_mean: 94.3
+  bpm_std_dev: 13.58
   concept_phrase_counts:
     consciousness archaeology: 3
     information through time into space: 3
@@ -46,12 +47,12 @@ diversity_metrics:
     sultan of solipsism: 1
     transmigration: 9
   dialogue_opener_counts:
-    look,: 31
+    look,: 33
     okay so: 1
   key_distribution:
     A ♭ major: 2
     A ♭ minor: 2
-    A# major: 2
+    A# major: 3
     All Keys: 1
     B major: 1
     B ♭ major: 3
@@ -60,7 +61,7 @@ diversity_metrics:
     D# minor: 1
     F# major: 2
     F# minor: 4
-  key_entropy: 2.94
+  key_entropy: 2.97
   title_word_counts:
     architect: 5
     chromatic: 5
@@ -97,6 +98,7 @@ excluded_titles:
 - The Seven-Fold Mirror Breaks Into Light
 - The Seven-Fold Mirror Breaks Into Pure Structure
 - The Seven-Spectrum Consciousness Archaeology Engine
+- The Sigil Completes Its Own Archaeology
 - The Sultan Becomes the Architecture
 - The Sultan's Archaeological Present (Complete Spectral Convergence)
 - The Sultan's Temporal Encryption Protocol (Evidence Room Archaeological Confessions)
@@ -106,15 +108,15 @@ excluded_titles:
 generated_from: shrink_wrapped/index.yml
 key_constraints:
 - count: 12
-  fraction: 0.38
+  fraction: 0.36
   key: C major
-  reason: 12/32 proposals (38%) use C major
+  reason: 12/33 proposals (36%) use C major
   severity: avoid
-thread_count: 32
+thread_count: 33
 title_vocabulary_constraints:
 - count: 7
-  fraction: 0.22
-  reason: '''prism'' appears in 7/32 titles (22%)'
+  fraction: 0.21
+  reason: '''prism'' appears in 7/33 titles (21%)'
   severity: avoid
   word: prism
 warnings: []

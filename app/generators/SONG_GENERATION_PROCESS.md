@@ -5,8 +5,10 @@ Status labels: **[IMPLEMENTED]** | **[PARTIAL]** | **[CONCEPTUAL]**
 This document tracks the full pipeline for generating a White project song.
 Steps marked **[HUMAN STEP]** require manual action in Logic Pro or ACE Studio.
 
-> **Python environment**: Use `.venv312` for all pipeline commands — Refractor requires numpy 1.x / torch compatibility.
-> Example: `.venv312/bin/python -m app.generators.midi.pipelines.chord_pipeline ...`
+> **Python environment**: Use `.venv312` for all pipeline commands — Refractor requires numpy 1.x / torch compatibility (transformers 4.x; `.venv` has 5.x which blocks `torch.load`).
+> Example: `.venv312/bin/python app/generators/midi/pipelines/chord_pipeline.py ...`
+
+> **Handoff from agents**: The White agent chain runs to shrinkwrap (`app/util/shrinkwrap_chain_artifacts.py`), producing a human-readable directory under `shrink_wrapped/<song-title>/`. Production pipeline steps (chord gen onward) are manual from there — chord generation is **not** auto-triggered from the agent.
 
 ---
 
@@ -30,17 +32,20 @@ Catalogs `sounds_like` artists from the proposal into `app/reference/music/artis
 ## 1. Chord Phase **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.pipelines.chord_pipeline \
-    --production-dir <dir> --song-proposal <yml>
+.venv312/bin/python app/generators/midi/pipelines/chord_pipeline.py \
+    --thread shrink_wrapped/<song-title> \
+    --song <iteration_id>.yml \
+    --num-candidates 200 --top-k 10
 ```
 
-Generates N candidate chord progressions (Markov + theory scoring + Refractor chromatic scoring). Writes `chords/candidates/` + `chords/review.yml`.
+`--song` is a filename inside `<thread>/yml/`. The pipeline creates `<thread>/production/<iteration_id>/chords/`. Generates candidates via Markov + theory scoring + Refractor chromatic scoring.
 
 **Human step**: Open `chords/review.yml`, set `label` and `status: approved` on chosen candidates.
 
 ```bash
+PYTHONPATH=/Volumes/LucidNonsense/White \
 .venv312/bin/python -m app.generators.midi.production.promote_part \
-    --review <dir>/chords/review.yml
+    --review shrink_wrapped/<song-title>/production/<slug>/chords/review.yml
 ```
 
 ---
@@ -158,13 +163,13 @@ Promotes to `melody/lyrics.txt`. Original draft preserved as `melody/lyrics_draf
     --assemble
 ```
 
-Reads `arrangement.txt` and approved loop MIDIs. Assembles full-length MIDI files (one per track) into `assembled/`. Updates `production_plan.yml` and `drift_report.yml` with actual section timings.
+Reads `arrangement.txt` and approved loop MIDIs. Assembles full-length MIDI files (one per track) into `assembled/`. Updates `production_plan.yml` with actual section timings and writes a structural `drift_report.yml` (section timing vs computed plan).
 
 Output: `assembled/assembled_chords.mid`, `assembled_drums.mid`, `assembled_bass.mid`, `assembled_melody.mid`.
 
 ---
 
-## 10. ACE Studio — Vocal Synthesis **[IMPLEMENTED]**
+## 10. ACE Studio — Vocal Synthesis **[PARTIAL]**
 
 ```bash
 .venv312/bin/python -m app.generators.midi.production.ace_studio_export \
@@ -173,12 +178,12 @@ Output: `assembled/assembled_chords.mid`, `assembled_drums.mid`, `assembled_bass
 
 Pushes `assembled/assembled_melody.mid` + `melody/lyrics.txt` to the open ACE Studio project via MCP (localhost:21572). Sets BPM, time signature, loads singer, inserts all notes with lyrics.
 
-**Singer mapping**: White project singer names (Shirley, Gabriel, etc.) map to ACE Studio voice names. See `app/reference/mcp/ace_studio/singer_voices.yml`. If the singer isn't found automatically, select the voice manually in ACE Studio.
+**Singer mapping**: White project singer names map to ACE Studio voice names via `app/reference/mcp/ace_studio/singer_voices.yml`. Only Shirley → Ember Rose is confirmed; others are null. If the singer isn't resolved automatically, select the voice manually in ACE Studio.
 
 **Human step in ACE Studio**:
 - Confirm or select the correct voice (see `singer_voices.yml` for the mapping).
 - Refine syllable fit, timing, and phrasing.
-- Render and export.
+- Render and export the MIDI (`VocalSynthv*.mid`). Save to `melody/` or the production root.
 
 **Post-render** — parse ACE Studio's MIDI export back to LRC:
 ```bash
@@ -189,15 +194,17 @@ Writes `vocal_alignment.lrc`.
 
 ---
 
-## 11. Drift Report **[PARTIAL]**
+## 11. Drift Report **[IMPLEMENTED]**
 
 ```bash
 .venv312/bin/python -m app.generators.midi.production.drift_report --production-dir <dir>
 ```
 
-Compares ACE Studio vocal export against approved melody loops. Requires `VocalSynthv*.mid` in the production directory (ACE Studio export).
+Compares ACE Studio vocal export against approved melody loops. Looks for `VocalSynthv*.mid` in the production root or `melody/` subfolder. Supports both Logic Pro export formats (SMPTE timecode and bar/beat); BPM and time signature are read from `production_plan.yml`.
 
-**Note**: Assembly manifest also writes a structural `drift_report.yml` (section timing vs plan) during step 9 — that's separate from this post-render vocal drift report.
+Reports per-section pitch match %, rhythm drift (beats), note count delta, word count, and a global lyric edit distance (Levenshtein) against `melody/lyrics.txt`.
+
+**Note**: Overwrites the structural `drift_report.yml` written by assembly manifest in step 9.
 
 ---
 
@@ -218,6 +225,8 @@ Compares ACE Studio vocal export against approved melody loops. Requires `VocalS
 ```
 
 Reports color, phases complete, total bars, vocal coverage, chromatic alignment, theory quality, production completeness, and lyric maturity. Writes `song_evaluation.yml`.
+
+**Known gap**: `--rescore-lyrics` reads concept+color from `production_plan.yml`; for arrangement-first songs with no plan, these are empty. Pass `--song-proposal` as a fallback (not yet implemented).
 
 ---
 
@@ -243,10 +252,13 @@ Song proposals include an `INFRANYM PROTOCOL` block. Manual tool: `app/agents/to
 
 ## Known Bugs / Pending Fixes
 
-| Bug | Location | Priority |
-|-----|----------|----------|
-| Indigo Agent infranym MIDI writes 0 bytes | `app/agents/indigo_agent.py` | Medium |
-| `CATALOG_DEFAULT_PATH` double-`app/` path | `app/generators/artist_catalog.py` | Low |
-| `collect_sounds_like()` misses `song_proposal.yml` | `app/generators/artist_catalog.py` | Low |
-| Melody templates too note-dense for vocal use | `app/generators/midi/patterns/melody_patterns.py` | High — see `redesign-melody-templates` openspec |
-| Singer `find_singer()` uses White name not ACE name | `app/generators/midi/production/ace_studio_export.py` | Medium — needs `singer_voices.yml` wired in |
+| Bug                                                          | Location                                              | Priority                                        |
+|--------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------|
+| Indigo Agent infranym MIDI writes 0 bytes                    | `app/agents/indigo_agent.py`                          | Medium                                          |
+| `CATALOG_DEFAULT_PATH` double-`app/` path                    | `app/generators/artist_catalog.py`                    | Low                                             |
+| `collect_sounds_like()` misses `song_proposal.yml`           | `app/generators/artist_catalog.py`                    | Low                                             |
+| Melody templates too note-dense for vocal use                | `app/generators/midi/patterns/melody_patterns.py`     | High — see `redesign-melody-templates` openspec |
+| `singer_voices.yml` not wired into `ace_studio_export.py`    | `app/generators/midi/production/ace_studio_export.py` | Medium — see `wire-singer-voices-registry` openspec |
+| `--rescore-lyrics` needs `--song-proposal` fallback          | `app/generators/midi/production/song_evaluator.py`    | Low                                             |
+| Drift report overwrites structural drift from assembly step  | `app/generators/midi/production/drift_report.py`      | Low — consider separate filenames               |
+| `.venv` uses transformers 5.x — blocks `torch.load` on torch 2.2.2 | `pyproject.toml` / `.venv`                     | Medium — use `.venv312` for all pipeline steps  |

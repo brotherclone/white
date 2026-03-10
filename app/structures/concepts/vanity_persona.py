@@ -110,6 +110,24 @@ class VanityPersona(BaseModel):
                 "Where's the actual risk here? This is just {{genre}} with fancy words.",
                 "If you're serious about {{methodology}}, why include anything remotely listenable?",
             ]
+        elif self.interviewer_type == VanityInterviewerType.GHOST_STORY:
+            self.stance = "We haven't much time."
+            self.approach = "Nostalgic, confused, betrayed"
+            self.tactics = [
+                "Pretend they know the artist's past life",
+                "Try to feel the consciousness of objects in the room",
+                "Citations of 'real' experimental artists",
+                "Convinced the songs have a secret meaning",
+                "Demand to change direction in life",
+            ]
+            self.goal = "Deliver the message before the veil between worlds collapses"
+            self.example_questions = [
+                "That morning, there was heavy dew on the grass, and you thought the cobwebs looked like little houses, you looked up, do you remember what you saw?",
+                "I must tell you to stop. Please turn back",
+                "You must not give up. You must keep going.",
+                "If you see three red circles, you know you are doing good.",
+                "Do not look in any mirrors tomorrow",
+            ]
         else:
             self.stance = "I really want to understand!"
             self.approach = "Sincere, enthusiastic, completely wrong"

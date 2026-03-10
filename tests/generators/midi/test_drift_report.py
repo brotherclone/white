@@ -8,8 +8,8 @@ import mido
 import pytest
 
 from app.generators.midi.production.drift_report import (
-    _levenshtein,
-    _parse_timecode,
+    parse_timecode,
+    levenshtein,
     compare_section,
     generate_drift_report,
     segment_ace_export_by_arrangement,
@@ -79,17 +79,17 @@ def _word(
 
 class TestParseTimecode:
     def test_song_start(self):
-        assert _parse_timecode("01:00:00:00.00") == pytest.approx(0.0)
+        assert parse_timecode("01:00:00:00.00") == pytest.approx(0.0)
 
     def test_36_seconds(self):
-        assert _parse_timecode("01:00:36:00.00") == pytest.approx(36.0)
+        assert parse_timecode("01:00:36:00.00") == pytest.approx(36.0)
 
     def test_over_one_minute(self):
-        assert _parse_timecode("01:01:12:00.00") == pytest.approx(72.0)
+        assert parse_timecode("01:01:12:00.00") == pytest.approx(72.0)
 
     def test_frame_offset(self):
         # frame 6 at 30fps = 0.2s, subframe 20/3000 ≈ 0.00667s
-        result = _parse_timecode("01:03:36:06.20")
+        result = parse_timecode("01:03:36:06.20")
         assert result == pytest.approx(216 + 6 / 30 + 20 / 3000, rel=1e-4)
 
 
@@ -165,21 +165,21 @@ class TestSegmentAceExportByArrangement:
 
 class TestLevenshtein:
     def test_identical(self):
-        assert _levenshtein(["a", "b", "c"], ["a", "b", "c"]) == 0
+        assert levenshtein(["a", "b", "c"], ["a", "b", "c"]) == 0
 
     def test_one_insertion(self):
-        assert _levenshtein(["a", "b"], ["a", "x", "b"]) == 1
+        assert levenshtein(["a", "b"], ["a", "x", "b"]) == 1
 
     def test_one_deletion(self):
-        assert _levenshtein(["a", "x", "b"], ["a", "b"]) == 1
+        assert levenshtein(["a", "x", "b"], ["a", "b"]) == 1
 
     def test_one_substitution(self):
-        assert _levenshtein(["a", "b", "c"], ["a", "x", "c"]) == 1
+        assert levenshtein(["a", "b", "c"], ["a", "x", "c"]) == 1
 
     def test_empty_inputs(self):
-        assert _levenshtein([], []) == 0
-        assert _levenshtein(["a"], []) == 1
-        assert _levenshtein([], ["a"]) == 1
+        assert levenshtein([], []) == 0
+        assert levenshtein(["a"], []) == 1
+        assert levenshtein([], ["a"]) == 1
 
 
 # ---------------------------------------------------------------------------
