@@ -812,7 +812,11 @@ def import_arrangement(
 
     text = arrangement_path.read_text()
     time_sig_parts = plan.time_sig.split("/")
-    beats_per_bar = int(time_sig_parts[0])
+    beats_per_bar = (
+        int(time_sig_parts[0])
+        * (4.0 / int(time_sig_parts[1]))
+        * (4.0 / int(time_sig_parts[1]))
+    )
     clips = parse_arrangement(text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar)
     folder_lookup = build_folder_lookup(production_dir)
     known_sections: Optional[frozenset] = frozenset(
@@ -906,7 +910,7 @@ def generate_track_manifest(
     # Parse arrangement → clips
     text = arrangement_path.read_text()
     time_sig_parts = plan.time_sig.split("/")
-    beats_per_bar = int(time_sig_parts[0])
+    beats_per_bar = int(time_sig_parts[0]) * (4.0 / int(time_sig_parts[1]))
     clips = parse_arrangement(text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar)
 
     # Find song proposal (auto-detect from plan if not supplied)
@@ -1247,7 +1251,7 @@ def main() -> None:
             print(f"ERROR: No {PLAN_FILENAME} found in {prod_path}")
             sys.exit(1)
         time_sig_parts = plan.time_sig.split("/")
-        beats_per_bar = int(time_sig_parts[0])
+        beats_per_bar = int(time_sig_parts[0]) * (4.0 / int(time_sig_parts[1]))
         clips = parse_arrangement(
             text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar
         )
@@ -1305,7 +1309,7 @@ def main() -> None:
     if args.assemble:
         plan = load_plan(prod_path)
         time_sig_parts = plan.time_sig.split("/")
-        beats_per_bar = int(time_sig_parts[0])
+        beats_per_bar = int(time_sig_parts[0]) * (4.0 / int(time_sig_parts[1]))
         clips = parse_arrangement(
             text, bpm=float(plan.bpm), beats_per_bar=beats_per_bar
         )

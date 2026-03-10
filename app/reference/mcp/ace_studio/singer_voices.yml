@@ -1,0 +1,37 @@
+# Earthly Frames member → ACE Studio voice mapping
+#
+# White project singer names (used in song proposals + melody pipeline) mapped
+# to the ACE Studio sound source name passed to find_singer() in ace_studio_export.py.
+#
+# Add entries as new voices are confirmed. Use null for unassigned.
+
+singers:
+  Shirley:
+    ace_studio_voice: Ember Rose
+    voice_type: alto
+    midi_range: [53, 72]
+    notes: Confirmed 2026-03-10
+
+  Gabriel:
+    ace_studio_voice: null
+    voice_type: tenor
+    midi_range: [48, 67]
+    notes: Unassigned
+
+  Robbie:
+    ace_studio_voice: null
+    voice_type: tenor
+    midi_range: [48, 67]
+    notes: Unassigned
+
+  Katherine:
+    ace_studio_voice: null
+    voice_type: alto
+    midi_range: [57, 76]
+    notes: Unassigned
+
+  Busyayo:
+    ace_studio_voice: null
+    voice_type: baritone
+    midi_range: [45, 64]
+    notes: Unassigned

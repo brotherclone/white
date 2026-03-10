@@ -25,28 +25,11 @@ from app.generators.midi.production.ace_studio_import import (
     find_ace_export,
     parse_ace_export,
 )
+from app.generators.midi.production.assembly_manifest import parse_arrangement
+from app.generators.midi.production.production_plan import load_plan
 
 DRIFT_REPORT_FILENAME = "drift_report.yml"
 MELODY_TRACK = 4  # Logic Pro track number for melody in arrangement.txt
-
-
-# ---------------------------------------------------------------------------
-# Timecode parsing
-# ---------------------------------------------------------------------------
-
-
-def _parse_timecode(tc: str) -> float:
-    """Parse a Logic Pro SMPTE timecode to seconds from song start.
-
-    Format: HH:MM:SS:FF.sf  (30fps, 100 subframes per frame)
-    Song start offset is 01:00:00:00.00, so HH=1 → 0 seconds.
-    """
-    parts = tc.strip().split(":")
-    hh, mm, ss = int(parts[0]), int(parts[1]), int(parts[2])
-    frame_parts = parts[3].split(".")
-    ff = int(frame_parts[0])
-    sf = int(frame_parts[1]) if len(frame_parts) > 1 else 0
-    return (hh - 1) * 3600 + mm * 60 + ss + ff / 30.0 + sf / 3000.0
 
 
 # ---------------------------------------------------------------------------
@@ -55,27 +38,34 @@ def _parse_timecode(tc: str) -> float:
 
 
 def _parse_arrangement_sections(
-    arrangement_path: Path, track: int = MELODY_TRACK
+    arrangement_path: Path, production_dir: Path, track: int = MELODY_TRACK
 ) -> list[tuple[str, float, float]]:
     """Return (label, start_sec, end_sec) for the given track number.
 
-    arrangement.txt format: start_tc  label  track_num  end_tc
+    Supports both Logic Pro bar/beat format and SMPTE timecode format via
+    parse_arrangement from assembly_manifest.  BPM and time_sig are read
+    from production_plan.yml when available.
     """
+    plan = load_plan(production_dir)
+    bpm = float(plan.bpm) if plan else 120.0
+    beats_per_bar = 4.0
+    if plan:
+        parts = plan.time_sig.split("/")
+        beats_per_bar = int(parts[0]) * (4.0 / int(parts[1]))
+
+    text = arrangement_path.read_text()
+    clips = parse_arrangement(text, bpm=bpm, beats_per_bar=beats_per_bar)
+    melody_clips = [c for c in clips if c.track == track]
+    # Derive section ends from the next clip's start (clip.length is unreliable
+    # when the end column encodes a length in bar-beat format rather than an
+    # absolute position).  The last section gets a generous ceiling.
     sections: list[tuple[str, float, float]] = []
-    with open(arrangement_path) as f:
-        for line in f:
-            parts = line.split()
-            if len(parts) < 4:
-                continue
-            start_tc, label, track_num, end_tc = (
-                parts[0],
-                parts[1],
-                int(parts[2]),
-                parts[3],
-            )
-            if track_num != track:
-                continue
-            sections.append((label, _parse_timecode(start_tc), _parse_timecode(end_tc)))
+    for i, clip in enumerate(melody_clips):
+        if i + 1 < len(melody_clips):
+            end = melody_clips[i + 1].start
+        else:
+            end = clip.start + 3600.0  # generous ceiling for the last section
+        sections.append((clip.name, clip.start, end))
     return sections
 
 
@@ -85,7 +75,10 @@ def _parse_arrangement_sections(
 
 
 def segment_ace_export_by_arrangement(
-    word_events: list[dict], arrangement_path: Path, bpm: int
+    word_events: list[dict],
+    arrangement_path: Path,
+    bpm: int,
+    production_dir: Path = None,
 ) -> dict[str, list]:
     """Map ACE word events to arrangement sections.
 
@@ -95,7 +88,10 @@ def segment_ace_export_by_arrangement(
 
     Returns {section_label: [word_event, ...]} — empty sections omitted.
     """
-    sections = _parse_arrangement_sections(arrangement_path, track=MELODY_TRACK)
+    prod_dir = production_dir if production_dir is not None else arrangement_path.parent
+    sections = _parse_arrangement_sections(
+        arrangement_path, prod_dir, track=MELODY_TRACK
+    )
     result: dict[str, list] = {label: [] for label, _, _ in sections}
 
     for word in word_events:
@@ -280,7 +276,9 @@ def generate_drift_report(production_dir: Path) -> dict:
     melody_approved_dir = production_dir / "melody" / "approved"
 
     # Segment words into sections
-    segmented = segment_ace_export_by_arrangement(word_events, arrangement_path, bpm)
+    segmented = segment_ace_export_by_arrangement(
+        word_events, arrangement_path, bpm, production_dir=production_dir
+    )
 
     # Per-section comparison
     sections_data: list[dict] = []
