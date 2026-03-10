@@ -1,0 +1,526 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/orange__franklin_mine_metronome_conspiracy_v1
+pipeline: melody-generation
+bpm: 91
+time_sig: 7/8
+color: Orange
+singer: Shirley
+generated: '2026-03-10T11:33:00.062630+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+sections_found:
+- slow_learner
+- franklinite
+- mineral_museum
+candidates:
+- id: melody_slow_learner_01
+  midi_file: candidates/melody_slow_learner_01.mid
+  rank: 1
+  section: slow_learner
+  chord_source: chord_002
+  contour: call_and_rest
+  pattern_name: vocal_7_8_step_med
+  energy: medium
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4196
+    theory:
+      singability: 0.8747
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9778
+    chromatic:
+      temporal:
+        past: 0.4694
+        present: 0.2263
+        future: 0.3043
+      spatial:
+        thing: 0.4707
+        place: 0.3033
+        person: 0.226
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2963
+        known: 0.3738
+      confidence: 0.0744
+      match: 0.1919
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_slow_learner_02
+  midi_file: candidates/melody_slow_learner_02.mid
+  rank: 2
+  section: slow_learner
+  chord_source: chord_002
+  contour: declarative
+  pattern_name: vocal_7_8_surge_high
+  energy: high
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.404
+    theory:
+      singability: 0.867
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8289
+    chromatic:
+      temporal:
+        past: 0.4693
+        present: 0.2266
+        future: 0.3041
+      spatial:
+        thing: 0.4707
+        place: 0.303
+        person: 0.2263
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2964
+        known: 0.3736
+      confidence: 0.0752
+      match: 0.192
+  label: melody_slow_learner
+  status: approved
+  notes: ''
+- id: melody_slow_learner_03
+  midi_file: candidates/melody_slow_learner_03.mid
+  rank: 3
+  section: slow_learner
+  chord_source: chord_002
+  contour: haiku
+  pattern_name: vocal_7_8_haiku_low
+  energy: low
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4029
+    theory:
+      singability: 0.8517
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8333
+    chromatic:
+      temporal:
+        past: 0.4692
+        present: 0.2265
+        future: 0.3042
+      spatial:
+        thing: 0.4706
+        place: 0.3032
+        person: 0.2263
+      ontological:
+        imagined: 0.3302
+        forgotten: 0.2963
+        known: 0.3735
+      confidence: 0.0746
+      match: 0.192
+  label: melody_slow_learner_alternate
+  status: approved
+  notes: ''
+- id: melody_slow_learner_04
+  midi_file: candidates/melody_slow_learner_04.mid
+  rank: 4
+  section: slow_learner
+  chord_source: chord_002
+  contour: declarative
+  pattern_name: vocal_7_8_arc_med
+  energy: medium
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4028
+    theory:
+      singability: 0.8568
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8278
+    chromatic:
+      temporal:
+        past: 0.469
+        present: 0.2268
+        future: 0.3042
+      spatial:
+        thing: 0.4704
+        place: 0.3031
+        person: 0.2265
+      ontological:
+        imagined: 0.3301
+        forgotten: 0.2964
+        known: 0.3735
+      confidence: 0.0745
+      match: 0.1919
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_slow_learner_05
+  midi_file: candidates/melody_slow_learner_05.mid
+  rank: 5
+  section: slow_learner
+  chord_source: chord_002
+  contour: drone_and_step
+  pattern_name: vocal_7_8_hold_low
+  energy: low
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.3855
+    theory:
+      singability: 0.8332
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6778
+    chromatic:
+      temporal:
+        past: 0.4699
+        present: 0.2259
+        future: 0.3042
+      spatial:
+        thing: 0.4713
+        place: 0.3031
+        person: 0.2256
+      ontological:
+        imagined: 0.33
+        forgotten: 0.296
+        known: 0.3739
+      confidence: 0.0747
+      match: 0.192
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_franklinite_01
+  midi_file: candidates/melody_franklinite_01.mid
+  rank: 6
+  section: franklinite
+  chord_source: chord_008
+  contour: call_and_rest
+  pattern_name: vocal_7_8_step_med
+  energy: medium
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4068
+    theory:
+      singability: 0.8537
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8704
+    chromatic:
+      temporal:
+        past: 0.4695
+        present: 0.2263
+        future: 0.3043
+      spatial:
+        thing: 0.4708
+        place: 0.3032
+        person: 0.226
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2964
+        known: 0.3736
+      confidence: 0.0743
+      match: 0.1919
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_franklinite_02
+  midi_file: candidates/melody_franklinite_02.mid
+  rank: 7
+  section: franklinite
+  chord_source: chord_008
+  contour: declarative
+  pattern_name: vocal_7_8_arc_med
+  energy: medium
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4057
+    theory:
+      singability: 0.8667
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8472
+    chromatic:
+      temporal:
+        past: 0.4693
+        present: 0.2264
+        future: 0.3043
+      spatial:
+        thing: 0.4707
+        place: 0.3032
+        person: 0.2261
+      ontological:
+        imagined: 0.3299
+        forgotten: 0.2965
+        known: 0.3736
+      confidence: 0.0745
+      match: 0.1919
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_franklinite_03
+  midi_file: candidates/melody_franklinite_03.mid
+  rank: 8
+  section: franklinite
+  chord_source: chord_008
+  contour: haiku
+  pattern_name: vocal_7_8_haiku_low
+  energy: low
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4055
+    theory:
+      singability: 0.8596
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8519
+    chromatic:
+      temporal:
+        past: 0.4694
+        present: 0.2263
+        future: 0.3043
+      spatial:
+        thing: 0.4707
+        place: 0.3032
+        person: 0.2261
+      ontological:
+        imagined: 0.33
+        forgotten: 0.2965
+        known: 0.3735
+      confidence: 0.0747
+      match: 0.192
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_franklinite_04
+  midi_file: candidates/melody_franklinite_04.mid
+  rank: 9
+  section: franklinite
+  chord_source: chord_008
+  contour: drone_and_step
+  pattern_name: vocal_7_8_hold_low
+  energy: low
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4006
+    theory:
+      singability: 0.8308
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8333
+    chromatic:
+      temporal:
+        past: 0.4689
+        present: 0.2266
+        future: 0.3045
+      spatial:
+        thing: 0.4703
+        place: 0.3034
+        person: 0.2263
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.2966
+        known: 0.3737
+      confidence: 0.0735
+      match: 0.1917
+  label: melody_franklinite_alternate
+  status: approved
+  notes: ''
+- id: melody_franklinite_05
+  midi_file: candidates/melody_franklinite_05.mid
+  rank: 10
+  section: franklinite
+  chord_source: chord_008
+  contour: declarative
+  pattern_name: vocal_7_8_surge_high
+  energy: high
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.3903
+    theory:
+      singability: 0.8709
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6889
+    chromatic:
+      temporal:
+        past: 0.4692
+        present: 0.2265
+        future: 0.3044
+      spatial:
+        thing: 0.4705
+        place: 0.3033
+        person: 0.2262
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.2967
+        known: 0.3737
+      confidence: 0.0744
+      match: 0.1919
+  label: melody_franklinite
+  status: approved
+  notes: ''
+- id: melody_mineral_museum_01
+  midi_file: candidates/melody_mineral_museum_01.mid
+  rank: 11
+  section: mineral_museum
+  chord_source: chord_009
+  contour: declarative
+  pattern_name: vocal_7_8_surge_high
+  energy: high
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.416
+    theory:
+      singability: 0.8821
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9389
+    chromatic:
+      temporal:
+        past: 0.4679
+        present: 0.2276
+        future: 0.3045
+      spatial:
+        thing: 0.4692
+        place: 0.3035
+        person: 0.2273
+      ontological:
+        imagined: 0.3294
+        forgotten: 0.2969
+        known: 0.3738
+      confidence: 0.0725
+      match: 0.1913
+  label: melody_mineral_museum
+  status: approved
+  notes: ''
+- id: melody_mineral_museum_02
+  midi_file: candidates/melody_mineral_museum_02.mid
+  rank: 12
+  section: mineral_museum
+  chord_source: chord_009
+  contour: declarative
+  pattern_name: vocal_7_8_arc_med
+  energy: medium
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.416
+    theory:
+      singability: 0.8684
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9514
+    chromatic:
+      temporal:
+        past: 0.4678
+        present: 0.2275
+        future: 0.3047
+      spatial:
+        thing: 0.4692
+        place: 0.3036
+        person: 0.2272
+      ontological:
+        imagined: 0.3296
+        forgotten: 0.2969
+        known: 0.3735
+      confidence: 0.0727
+      match: 0.1914
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_mineral_museum_03
+  midi_file: candidates/melody_mineral_museum_03.mid
+  rank: 13
+  section: mineral_museum
+  chord_source: chord_009
+  contour: drone_and_step
+  pattern_name: vocal_7_8_hold_low
+  energy: low
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4154
+    theory:
+      singability: 0.8412
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9722
+    chromatic:
+      temporal:
+        past: 0.4687
+        present: 0.2266
+        future: 0.3047
+      spatial:
+        thing: 0.4701
+        place: 0.3036
+        person: 0.2263
+      ontological:
+        imagined: 0.3293
+        forgotten: 0.2966
+        known: 0.3741
+      confidence: 0.0731
+      match: 0.1916
+  label: melody_mineral_museum_plain
+  status: approved
+  notes: ''
+- id: melody_mineral_museum_04
+  midi_file: candidates/melody_mineral_museum_04.mid
+  rank: 14
+  section: mineral_museum
+  chord_source: chord_009
+  contour: haiku
+  pattern_name: vocal_7_8_haiku_low
+  energy: low
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.4147
+    theory:
+      singability: 0.8628
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9444
+    chromatic:
+      temporal:
+        past: 0.4678
+        present: 0.2275
+        future: 0.3047
+      spatial:
+        thing: 0.4692
+        place: 0.3036
+        person: 0.2272
+      ontological:
+        imagined: 0.3295
+        forgotten: 0.2969
+        known: 0.3736
+      confidence: 0.0725
+      match: 0.1914
+  label: melody_mineral_museum_alternate
+  status: approved
+  notes: ''
+- id: melody_mineral_museum_05
+  midi_file: candidates/melody_mineral_museum_05.mid
+  rank: 15
+  section: mineral_museum
+  chord_source: chord_009
+  contour: call_and_rest
+  pattern_name: vocal_7_8_step_med
+  energy: medium
+  use_case: vocal
+  singer: Shirley
+  scores:
+    composite: 0.3967
+    theory:
+      singability: 0.8769
+      chord_tone_alignment: 1.0
+      contour_quality: 0.75
+    chromatic:
+      temporal:
+        past: 0.4682
+        present: 0.2271
+        future: 0.3047
+      spatial:
+        thing: 0.4695
+        place: 0.3037
+        person: 0.2268
+      ontological:
+        imagined: 0.3292
+        forgotten: 0.2969
+        known: 0.3739
+      confidence: 0.0726
+      match: 0.1914
+  label: null
+  status: rejected
+  notes: ''
