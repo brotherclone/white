@@ -178,7 +178,7 @@ Output: `assembled/assembled_chords.mid`, `assembled_drums.mid`, `assembled_bass
 
 Pushes `assembled/assembled_melody.mid` + `melody/lyrics.txt` to the open ACE Studio project via MCP (localhost:21572). Sets BPM, time signature, loads singer, inserts all notes with lyrics.
 
-**Singer mapping**: White project singer names map to ACE Studio voice names via `app/reference/mcp/ace_studio/singer_voices.yml`. Only Shirley → Ember Rose is confirmed; others are null. If the singer isn't resolved automatically, select the voice manually in ACE Studio.
+**Singer mapping**: White project singer names are automatically resolved to ACE Studio voice names via `app/reference/mcp/ace_studio/singer_voices.yml`. All six singers are now mapped (Shirley → Elirah, Gabriel → Mangus, Robbie → Anderson, Katherine → Emma, Busyayo → Golden G, Marvin → Trey L). If a name is absent from the registry the White project name is passed directly as a fallback.
 
 **Human step in ACE Studio**:
 - Confirm or select the correct voice (see `singer_voices.yml` for the mapping).
@@ -258,7 +258,6 @@ Song proposals include an `INFRANYM PROTOCOL` block. Manual tool: `app/agents/to
 | `CATALOG_DEFAULT_PATH` double-`app/` path                    | `app/generators/artist_catalog.py`                    | Low                                             |
 | `collect_sounds_like()` misses `song_proposal.yml`           | `app/generators/artist_catalog.py`                    | Low                                             |
 | Melody templates too note-dense for vocal use                | `app/generators/midi/patterns/melody_patterns.py`     | High — see `redesign-melody-templates` openspec |
-| `singer_voices.yml` not wired into `ace_studio_export.py`    | `app/generators/midi/production/ace_studio_export.py` | Medium — see `wire-singer-voices-registry` openspec |
 | `--rescore-lyrics` needs `--song-proposal` fallback          | `app/generators/midi/production/song_evaluator.py`    | Low                                             |
 | Drift report overwrites structural drift from assembly step  | `app/generators/midi/production/drift_report.py`      | Low — consider separate filenames               |
 | `.venv` uses transformers 5.x — blocks `torch.load` on torch 2.2.2 | `pyproject.toml` / `.venv`                     | Medium — use `.venv312` for all pipeline steps  |
