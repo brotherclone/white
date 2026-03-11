@@ -264,6 +264,93 @@ def test_for_prompt_original_label_visibility():
     assert "Original Label Text" not in p3
 
 
+def _make_minimal(title="Test Title", **kwargs):
+    return QuantumTapeLabelArtifact(
+        title=title,
+        date_range="1998-06 to 1999-11",
+        recording_quality=QuantumTapeRecordingQuality.SP,
+        counter_start=0,
+        **kwargs,
+    )
+
+
+def test_artifact_name_derived_from_title():
+    m = _make_minimal(title="Summer in Portland 1998")
+    assert "UNKNOWN" not in (m.file_name or "")
+    assert "UNKNOWN" not in m.artifact_name
+
+
+def test_artifact_name_explicit_override():
+    m = _make_minimal(title="Some Title", artifact_name="my_override")
+    assert m.artifact_name == "my_override"
+
+
+def test_save_file_renders_all_template_slots(tmp_path, monkeypatch):
+    import app.structures.artifacts.quantum_tape_label_artifact as qmod
+
+    template_file = Path(qmod.__file__).parent / "templates" / "quantum_tape.html"
+    monkeypatch.setattr(qmod, "get_template_path", lambda name: template_file)
+
+    base = tmp_path / "out"
+    base.mkdir()
+
+    m = _make_minimal(
+        base_path=str(base),
+        year_documented="1998",
+        original_date="1998",
+        original_title="Gabe Walsh — 1998",
+        tapeover_date="Jun 1998 – Nov 1999",
+        tapeover_title="The Lost Portland Chapter",
+        subject_name="Gabe Walsh",
+        age_during="22–23",
+        location="Portland, OR",
+        catalog_number="QT-B-1998-ABCDEF",
+    )
+    m.save_file()
+
+    content = Path(m.get_artifact_path()).read_text(encoding="utf-8")
+    for value in [
+        "1998",
+        "Gabe Walsh — 1998",
+        "Jun 1998",
+        "The Lost Portland Chapter",
+        "Gabe Walsh",
+        "22–23",
+        "Portland, OR",
+        "QT-B-1998-ABCDEF",
+    ]:
+        assert value in content, f"Expected '{value}' in rendered HTML"
+
+
+def test_flatten_includes_template_fields():
+    m = _make_minimal(
+        year_documented="2001",
+        original_date="2001",
+        original_title="Gabe Walsh — 2001",
+        tapeover_date="Jan 2001 – Dec 2002",
+        tapeover_title="Alternate 2001",
+        subject_name="Gabe Walsh",
+        age_during="25–27",
+        location="Brooklyn, NY",
+        catalog_number="QT-B-2001-ZZZTOP",
+    )
+    flat = m.flatten()
+    for key in [
+        "year_documented",
+        "original_date",
+        "original_title",
+        "tapeover_date",
+        "tapeover_title",
+        "subject_name",
+        "age_during",
+        "location",
+        "catalog_number",
+    ]:
+        assert key in flat, f"Expected '{key}' in flatten() output"
+    assert flat["subject_name"] == "Gabe Walsh"
+    assert flat["catalog_number"] == "QT-B-2001-ZZZTOP"
+
+
 def test_save_file_renders_template(tmp_path, monkeypatch):
     # Create a minimal template that uses variables and an OR-default for original_label_text
     template_content = "<html>\n<h1>${title}</h1>\n<p>${date_range}</p>\n<p>${original_label_text || 'NO_LABEL'}</p>\n</html>"

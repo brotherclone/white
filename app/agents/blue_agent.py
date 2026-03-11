@@ -1097,19 +1097,36 @@ The tape has been recorded over. What life exists on it now?
         )[0]
         note = self._generate_a_cryptic_note(alternate)
         base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
+        start = alternate.period.start_date
+        end = alternate.period.end_date
+        original_label = f"Gabe Walsh \u2014 {start.year}"
+        tapeover_date_str = f"{start.strftime('%b %Y')} \u2013 {end.strftime('%b %Y')}"
+        age_range = alternate.period.age_range
+        age_str = f"{age_range[0]}\u2013{age_range[1]}"
+        location_str = getattr(alternate.period, "location", None) or "Unknown"
+        catalog_str = f"QT-B-{start.year}-{state.thread_id[:6].upper()}"
         label = QuantumTapeLabelArtifact(
             thread_id=state.thread_id,
             base_path=base_path,
             image_path=f"{base_path}/img",
             title=alternate.title,
-            date_range=f"{alternate.period.start_date} to {alternate.period.end_date}",
+            date_range=f"{start} to {end}",
             recording_quality=quality,
             counter_start=random.randint(0, 9999),
             counter_end=random.randint(1000, 9999),
             notes=note,
             original_label_visible=True,
-            original_label_text=f"Gabe Walsh - {alternate.period.start_date.year}",
+            original_label_text=original_label,
             tape_degradation=random.uniform(0.1, 0.4),
+            year_documented=str(start.year),
+            original_date=str(start.year),
+            original_title=original_label,
+            tapeover_date=tapeover_date_str,
+            tapeover_title=alternate.title,
+            subject_name="Gabe Walsh",
+            age_during=age_str,
+            location=location_str,
+            catalog_number=catalog_str,
         )
         try:
             label.save_file()

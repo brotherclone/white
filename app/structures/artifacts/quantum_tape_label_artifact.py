@@ -62,7 +62,42 @@ class QuantumTapeLabelArtifact(HtmlChainArtifactFile, ABC):
         default=None, description="Handwriting style of the notes"
     )
 
+    # Template fields — must match quantum_tape.html variable names exactly
+    year_documented: Optional[str] = Field(
+        default=None, description="Year the tape was archived (e.g. '2003')"
+    )
+    original_date: Optional[str] = Field(
+        default=None, description="A-side real-timeline label date"
+    )
+    original_title: Optional[str] = Field(
+        default=None, description="A-side real-timeline label text"
+    )
+    tapeover_date: Optional[str] = Field(
+        default=None, description="B-side alternate-timeline date range"
+    )
+    tapeover_title: Optional[str] = Field(
+        default=None, description="B-side alternate-timeline title"
+    )
+    subject_name: Optional[str] = Field(
+        default=None, description="Biographical subject name"
+    )
+    age_during: Optional[str] = Field(
+        default=None, description="Subject age range during the period (e.g. '22–24')"
+    )
+    location: Optional[str] = Field(
+        default=None, description="Geographic location during the period"
+    )
+    catalog_number: Optional[str] = Field(
+        default=None, description="Unique tape catalog identifier"
+    )
+
     def __init__(self, **data):
+        if data.get("artifact_name") in (None, "UNKNOWN_ARTIFACT_NAME") and isinstance(
+            data.get("title"), str
+        ):
+            from app.util.string_utils import sanitize_for_filename
+
+            data["artifact_name"] = sanitize_for_filename(data["title"])
         super().__init__(**data)
 
     def flatten(self):
@@ -71,6 +106,15 @@ class QuantumTapeLabelArtifact(HtmlChainArtifactFile, ABC):
             parent_data = {}
         return {
             **parent_data,
+            "year_documented": self.year_documented,
+            "original_date": self.original_date,
+            "original_title": self.original_title,
+            "tapeover_date": self.tapeover_date,
+            "tapeover_title": self.tapeover_title,
+            "subject_name": self.subject_name,
+            "age_during": self.age_during,
+            "location": self.location,
+            "catalog_number": self.catalog_number,
         }
 
     def save_file(self):
