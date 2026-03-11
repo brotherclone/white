@@ -42,6 +42,73 @@ log = logging.getLogger(__name__)
 # ACE Studio internal ticks-per-beat (standard for most DAWs and ACE Studio)
 ACE_TPB = 480
 
+# Default registry path (relative to project root via __file__)
+_DEFAULT_REGISTRY = (
+    Path(__file__).parents[4]
+    / "app"
+    / "reference"
+    / "mcp"
+    / "ace_studio"
+    / "singer_voices.yml"
+)
+
+
+# ---------------------------------------------------------------------------
+# Singer registry helpers
+# ---------------------------------------------------------------------------
+
+
+def load_singer_registry(path: Optional[Path] = None) -> dict:
+    """Load singer_voices.yml and return a dict keyed by lowercase singer name.
+
+    Returns {} (with a warning) if the file is missing or unreadable.
+    """
+    registry_path = Path(path) if path else _DEFAULT_REGISTRY
+    if not registry_path.exists():
+        log.warning("singer_voices.yml not found at %s; registry empty", registry_path)
+        return {}
+    try:
+        data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+        singers = data.get("singers", {}) or {}
+        return {k.lower(): v for k, v in singers.items()}
+    except Exception as exc:
+        log.warning("Failed to load singer registry: %s", exc)
+        return {}
+
+
+def resolve_ace_voice_name(singer_name: str, registry: dict) -> str:
+    """Resolve a White project singer name to the ACE Studio voice name.
+
+    Resolution order:
+    1. Look up lowercase singer_name in registry.
+    2. If found and ace_studio_voice is non-null, return that voice name.
+    3. If found but ace_studio_voice is null, log warning and fall back to
+       the White project name.
+    4. If not in registry, log debug and fall back to the White project name.
+    """
+    if not singer_name:
+        return singer_name
+
+    entry = registry.get(singer_name.lower())
+
+    if entry is None:
+        log.debug(
+            "Singer %r not in registry; passing name directly to find_singer()",
+            singer_name,
+        )
+        return singer_name
+
+    ace_voice = entry.get("ace_studio_voice")
+    if ace_voice:
+        return ace_voice
+
+    log.warning(
+        "Singer %r has no ace_studio_voice assigned in singer_voices.yml; "
+        "falling back to White project name",
+        singer_name,
+    )
+    return singer_name
+
 
 # ---------------------------------------------------------------------------
 # MIDI helpers
@@ -146,6 +213,10 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
         review = yaml.safe_load(melody_review_file.read_text(encoding="utf-8"))
         singer_name = review.get("singer", "")
 
+    # Resolve White project name → ACE Studio voice name
+    registry = load_singer_registry()
+    ace_voice_name = resolve_ace_voice_name(singer_name, registry)
+
     # Parse inputs
     notes = parse_midi_notes(assembled_midi)
     if not notes:
@@ -176,8 +247,8 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
 
             # 3 — Singer
             singer_id: Optional[int] = None
-            if singer_name:
-                candidates = ace.find_singer(singer_name)
+            if ace_voice_name:
+                candidates = ace.find_singer(ace_voice_name)
                 if candidates:
                     singer_id = candidates[0].get("id")
                     if singer_id is not None:
@@ -185,12 +256,12 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
                     else:
                         log.warning(
                             "Singer %r found but ID missing in response; skipping singer load",
-                            singer_name,
+                            ace_voice_name,
                         )
                 else:
                     log.warning(
                         "Singer %r not found in ACE Studio sound sources; skipping singer load",
-                        singer_name,
+                        ace_voice_name,
                     )
 
             # 4 — Add clip spanning full assembled duration
@@ -213,6 +284,7 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
                 "project_id": project_id,
                 "track_index": track_index,
                 "singer": singer_name,
+                "ace_studio_voice": ace_voice_name,
                 "singer_id": singer_id,
                 "note_count": len(notes),
                 "total_ticks": total_ticks,
