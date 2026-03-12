@@ -22,28 +22,10 @@ Usage:
 """
 
 import logging
-import sys
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
-
-# ---------------------------------------------------------------------------
-# venv sanity check
-# ---------------------------------------------------------------------------
-# Refractor requires torch + numpy 1.x. The project venv that satisfies
-# this is .venv312.  If you're on a different interpreter, warn early so the
-# error message is actionable rather than a cryptic NumPy/torch crash.
-
-_EXPECTED_VENV = ".venv312"
-_exe = Path(sys.executable)
-if _EXPECTED_VENV not in str(_exe):
-    print(
-        f"\n⚠  WARNING: Refractor is running under {_exe}\n"
-        f"   Expected .venv312 (torch + numpy 1.x compatible).\n"
-        f"   Use: .venv312/bin/python -m <pipeline> ...\n",
-        file=sys.stderr,
-    )
 
 # Import midi_bytes_to_piano_roll without triggering training.models.__init__
 # (which eagerly imports torch-dependent classifiers)
@@ -422,7 +404,7 @@ class Refractor:
         attention_mask = tokens["attention_mask"].unsqueeze(-1)
         embeddings = output.last_hidden_state * attention_mask
         pooled = embeddings.sum(dim=1) / attention_mask.sum(dim=1)
-        return pooled.squeeze(0).numpy().astype(np.float32)
+        return np.array(pooled.squeeze(0).tolist(), dtype=np.float32)
 
     def _encode_audio(self, waveform: np.ndarray, sr: int) -> np.ndarray:
         """Encode audio with CLAP, return 512-dim embedding."""
@@ -444,4 +426,4 @@ class Refractor:
             audio_features = self._clap_model.audio_model(**inputs)
             audio_embeds = self._clap_model.audio_projection(audio_features[0][:, 0, :])
 
-        return audio_embeds.squeeze(0).numpy().astype(np.float32)
+        return np.array(audio_embeds.squeeze(0).tolist(), dtype=np.float32)

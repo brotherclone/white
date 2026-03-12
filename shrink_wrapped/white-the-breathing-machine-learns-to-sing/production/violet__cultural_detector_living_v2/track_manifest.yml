@@ -1,0 +1,288 @@
+manifest_id: violet__cultural_detector_living_v2
+generated: '2026-03-12T12:24:28.112641+00:00'
+source_arrangement: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/violet__cultural_detector_living_v2/arrangement.txt
+source_proposal: shrink_wrapped/white-the-breathing-machine-learns-to-sing/yml/song_proposal_Violet
+  (0xad86d6)_cultural_detector_living_v2.yml
+title: 'The Confessional Mirror: Living Infranym Suite (For Rowan)'
+bpm: 67
+time_sig: 4/4
+key: F# minor
+rainbow_color: Violet
+singer: Shirley
+concept: 'Fine, Rowan - this IS therapy with a marketing budget, and that''s precisely
+  the fucking point. The Sultan''s triple-layer infranym system doesn''t just demonstrate
+  cultural pathology, it BECOMES the pathology by defensively explaining itself while
+  missing the pattern it''s creating. Yes, this is pop music with extra steps - but
+  those extra steps are the Cinnabon divorced dad methodology made audible: the 67
+  BPM morse duration creates temporal constraint that forces accidental archaeology
+  of manufactured authenticity. The rebracketing isn''t about reconstructing lost
+  synesthesia, it''s about building new perceptual architectures that can contain
+  the exact kind of pretentious self-justification happening right now in this concept
+  field. The Sultan thinks they''re being Stockhausen but they''re actually gas station
+  sushi revealing the supply chain - and that''s not a bug, that''s the feature. This
+  song operates as living proof that cultural pathology detection requires participating
+  in the pathology to make it visible, which sounds like bullshit until you realize
+  we''re all just divorced dads at Cinnabon pretending we understand Merzbow. The
+  infranym lives: authenticity inversion through compulsive self-defense made flesh.'
+mood:
+- compulsively honest
+- accidentally revealing
+- narcissistically profound
+- temporally trapped
+- authentically manufactured
+- defensively pretentious
+- divorced dad energy
+genres:
+- confessional pop
+- authenticity folk
+- algorithmic indie
+- manufactured nostalgia
+- gentrification rock
+- therapy with marketing budget
+- palatable avant-garde
+sounds_like: []
+tracks:
+  1: chords
+  2: drums
+  3: bass
+  4: melody
+clips:
+- name: bass_detector_pedal
+  track: 3
+  start: 0.0
+  length: 9.626
+- name: Hidden Message
+  track: 5
+  start: 4.179
+  length: 1.865
+- name: detector
+  track: 1
+  start: 14.328
+  length: -4.702
+- name: drum_detector_stutter
+  track: 2
+  start: 14.328
+  length: -4.702
+- name: bass_detector_whole
+  track: 3
+  start: 14.328
+  length: -4.702
+- name: melody_detector
+  track: 4
+  start: 14.328
+  length: -4.702
+- name: detector
+  track: 1
+  start: 28.657
+  length: -19.031
+- name: drum_detector_stutter
+  track: 2
+  start: 28.657
+  length: -19.031
+- name: bass_detector_whole
+  track: 3
+  start: 28.657
+  length: -19.031
+- name: melody_detector
+  track: 4
+  start: 28.657
+  length: -19.031
+- name: living
+  track: 1
+  start: 42.985
+  length: -22.613
+- name: drum_living_simple
+  track: 2
+  start: 42.985
+  length: -22.613
+- name: bass_living_pedal
+  track: 3
+  start: 42.985
+  length: -22.613
+- name: melody_living_alternate
+  track: 4
+  start: 42.985
+  length: -22.613
+- name: cultural
+  track: 1
+  start: 68.06
+  length: -51.27
+- name: drum_cultural_basic
+  track: 2
+  start: 68.06
+  length: -51.27
+- name: bass_cultural_half
+  track: 3
+  start: 68.06
+  length: -51.27
+- name: melody_cultural
+  track: 4
+  start: 68.06
+  length: -51.27
+- name: cultural
+  track: 1
+  start: 89.552
+  length: -72.762
+- name: drum_cultural_basic
+  track: 2
+  start: 89.552
+  length: -72.762
+- name: bass_cultural_half
+  track: 3
+  start: 89.552
+  length: -72.762
+- name: melody_cultural
+  track: 4
+  start: 89.552
+  length: -72.762
+- name: detector
+  track: 1
+  start: 111.045
+  length: -101.419
+- name: drum_detector_stutter
+  track: 2
+  start: 111.045
+  length: -101.419
+- name: bass_detector_bounce
+  track: 3
+  start: 111.045
+  length: -101.419
+- name: melody_detector
+  track: 4
+  start: 111.045
+  length: -101.419
+- name: living
+  track: 1
+  start: 125.373
+  length: -105.001
+- name: drum_living_simple
+  track: 2
+  start: 125.373
+  length: -105.001
+- name: bass_living_pedal
+  track: 3
+  start: 125.373
+  length: -105.001
+- name: melody_living
+  track: 4
+  start: 125.373
+  length: -105.001
+- name: cultural
+  track: 1
+  start: 150.448
+  length: -133.658
+- name: bass_cultural_sparse
+  track: 3
+  start: 150.448
+  length: -133.658
+- name: melody_cultural
+  track: 4
+  start: 150.448
+  length: -133.658
+- name: drum_detector_industrial
+  track: 2
+  start: 157.612
+  length: -147.986
+- name: cultural
+  track: 1
+  start: 171.94
+  length: -155.15
+- name: bass_cultural_sparse
+  track: 3
+  start: 171.94
+  length: -155.15
+- name: melody_cultural
+  track: 4
+  start: 171.94
+  length: -155.15
+- name: drum_detector_industrial
+  track: 2
+  start: 179.104
+  length: -169.479
+- name: cultural
+  track: 1
+  start: 193.433
+  length: -176.643
+- name: drum_cultural_basic
+  track: 2
+  start: 193.433
+  length: -176.643
+- name: bass_cultural_quarter
+  track: 3
+  start: 193.433
+  length: -176.643
+- name: cultural
+  track: 1
+  start: 214.925
+  length: -198.135
+- name: drum_cultural_basic
+  track: 2
+  start: 214.925
+  length: -198.135
+- name: bass_cultural_quarter
+  track: 3
+  start: 214.925
+  length: -198.135
+sections:
+- name: detector
+  start: 14.328
+  end: 42.985
+  vocals: false
+  loops:
+    chords: detector
+    drums: drum_detector_stutter
+    bass: bass_detector_whole
+    melody: melody_detector
+- name: living
+  start: 42.985
+  end: 68.06
+  vocals: false
+  loops:
+    chords: living
+    drums: drum_living_simple
+    bass: bass_living_pedal
+    melody: melody_living_alternate
+- name: cultural
+  start: 68.06
+  end: 111.045
+  vocals: false
+  loops:
+    chords: cultural
+    drums: drum_cultural_basic
+    bass: bass_cultural_half
+    melody: melody_cultural
+- name: detector
+  start: 111.045
+  end: 125.373
+  vocals: false
+  loops:
+    chords: detector
+    drums: drum_detector_stutter
+    bass: bass_detector_bounce
+    melody: melody_detector
+- name: living
+  start: 125.373
+  end: 150.448
+  vocals: false
+  loops:
+    chords: living
+    drums: drum_living_simple
+    bass: bass_living_pedal
+    melody: melody_living
+- name: cultural
+  start: 150.448
+  end: 16.79
+  vocals: false
+  loops:
+    chords: cultural
+    bass: bass_cultural_sparse
+    melody: melody_cultural
+    drums: drum_detector_industrial
+vocals: false
+lyrics: true
+release_date: null
+album_sequence: null
+main_audio_file: null
+TRT: null
+lrc_file: null
+audio_tracks: []
