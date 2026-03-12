@@ -639,14 +639,16 @@ def _rescore_lyrics(production_dir: Path, plan_concept: str, plan_color: str) ->
     )
     if not onnx_path.exists():
         print("ERROR: ONNX model not found.")
-        print("Ensure training/data/refractor.onnx exists and run from .venv312.")
+        print("Ensure training/data/refractor.onnx exists.")
         sys.exit(1)
 
     try:
         from training.refractor import Refractor
     except Exception as exc:
         print(f"ERROR: Failed to import Refractor: {exc}")
-        print("Use .venv312/bin/python — Refractor requires torch + numpy 1.x.")
+        print(
+            "Check that dependencies are installed and training/data/refractor.onnx exists."
+        )
         sys.exit(1)
 
     scorer = Refractor(str(onnx_path))

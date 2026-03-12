@@ -1,0 +1,137 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/violet__cultural_detector_living_v2
+pipeline: lyric-generation
+bpm: 67
+time_sig: 4/4
+color: Violet
+generated: '2026-03-12T12:18:12.346776+00:00'
+seed: 42
+model: claude-sonnet-4-6
+scoring_weights:
+  chromatic: 1.0
+candidates:
+- id: lyrics_01
+  file: candidates/lyrics_01.txt
+  rank: 1
+  chromatic:
+    temporal:
+      past: 0.43747830390930176
+      present: 0.2596431374549866
+      future: 0.30287861824035645
+    spatial:
+      thing: 0.43944334983825684
+      place: 0.3015729784965515
+      person: 0.25898364186286926
+    ontological:
+      imagined: 0.3580474555492401
+      forgotten: 0.2936975359916687
+      known: 0.3482550382614136
+    confidence: 0.0346
+    match: 0.1575
+  fitting:
+    melody_detector:
+      syllables: 40
+      notes: 48
+      ratio: 0.833
+      verdict: paste-ready
+    melody_living_alternate:
+      syllables: 24
+      notes: 28
+      ratio: 0.857
+      verdict: paste-ready
+    melody_cultural:
+      syllables: 104
+      notes: 96
+      ratio: 1.083
+      verdict: paste-ready
+    melody_living:
+      syllables: 30
+      notes: 42
+      ratio: 0.714
+      verdict: spacious
+    overall: paste-ready
+  status: approved
+  notes: ''
+- id: lyrics_02
+  file: candidates/lyrics_02.txt
+  rank: 2
+  chromatic:
+    temporal:
+      past: 0.4426468312740326
+      present: 0.25444960594177246
+      future: 0.30290359258651733
+    spatial:
+      thing: 0.4445245563983917
+      place: 0.30153074860572815
+      person: 0.2539446949958801
+    ontological:
+      imagined: 0.35955119132995605
+      forgotten: 0.29290977120399475
+      known: 0.3475390672683716
+    confidence: 0.0387
+    match: 0.1571
+  fitting:
+    melody_detector:
+      syllables: 34
+      notes: 48
+      ratio: 0.708
+      verdict: spacious
+    melody_living_alternate:
+      syllables: 29
+      notes: 28
+      ratio: 1.036
+      verdict: paste-ready
+    melody_cultural:
+      syllables: 131
+      notes: 96
+      ratio: 1.365
+      verdict: splits needed
+    melody_living:
+      syllables: 55
+      notes: 42
+      ratio: 1.31
+      verdict: splits needed
+    overall: splits needed
+  status: rejected
+  notes: ''
+- id: lyrics_03
+  file: candidates/lyrics_03.txt
+  rank: 3
+  chromatic:
+    temporal:
+      past: 0.4427339732646942
+      present: 0.25576794147491455
+      future: 0.301498144865036
+    spatial:
+      thing: 0.444570928812027
+      place: 0.3001449406147003
+      person: 0.2552841305732727
+    ontological:
+      imagined: 0.3570791184902191
+      forgotten: 0.2922693192958832
+      known: 0.3506515920162201
+    confidence: 0.034
+    match: 0.1564
+  fitting:
+    melody_detector:
+      syllables: 47
+      notes: 48
+      ratio: 0.979
+      verdict: paste-ready
+    melody_living_alternate:
+      syllables: 20
+      notes: 28
+      ratio: 0.714
+      verdict: spacious
+    melody_cultural:
+      syllables: 116
+      notes: 96
+      ratio: 1.208
+      verdict: tight but workable
+    melody_living:
+      syllables: 54
+      notes: 42
+      ratio: 1.286
+      verdict: tight but workable
+    overall: tight but workable
+  status: rejected
+  notes: ''

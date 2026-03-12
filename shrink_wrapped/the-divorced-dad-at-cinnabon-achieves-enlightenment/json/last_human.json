@@ -1,0 +1,65 @@
+adaptation_attempts:
+- Tried using modern fish finders but couldn't afford maintenance
+- Attempted to join commercial fishing cooperatives but lacked required licenses
+- Petitioned local government to preserve traditional fishing zones
+- Started recording river songs on her phone to preserve them
+age: 67
+artifact_id: 7ad60648-1d6f-4aad-b4aa-041e4b5a98bc
+artifact_name: last_human
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- json
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- last_human
+daily_routine: Chen would wake at 4 AM to listen to the river's voice - the subtle
+  sounds of fish movements, water currents, and seasonal changes her grandmother taught
+  her to interpret. She'd cast her nets based on these acoustic cues, just as her
+  family had for eight generations. Afternoons were spent mending nets while reciting
+  the old river songs that encoded fishing wisdom.
+documentation_type: !!python/object/apply:app.structures.enums.last_human_documentation_type.LastHumanDocumentationType
+- displacement
+environmental_stressor: Acoustic pollution from increased commercial shipping and
+  dam construction drowning out natural river sounds essential for traditional fishing
+  methods
+family_situation: Widow, her three children moved to Wuhan for factory work. Granddaughter
+  visits monthly, trying to learn the old songs but struggles with the Mandarin-dominated
+  education system erasing their local dialect.
+file_name: last_human.json
+final_thought: The river no longer speaks in the old language - only the roar of progress
+  drowning out twenty generations of wisdom.
+last_days_scenario: "Chen sits by the Yangtze at dawn, holding her grandfather's carved\
+  \ bamboo pole. The water churns brown with sediment from the new dam upstream. Container\
+  \ ships blast their horns every few minutes, their engines drowning out the subtle\
+  \ sounds she once used to locate fish schools. Her nets come up empty - the fish\
+  \ have fled or died, and she can no longer hear their movements through the industrial\
+  \ cacophony. \n\nThe government relocation notice crumples in her pocket. Her traditional\
+  \ fishing grounds will become a new port facility next month. At 67, she's too old\
+  \ to learn new skills, too poor to relocate to approved areas. Her granddaughter\
+  \ texts in simplified characters Chen barely recognizes, asking if she's \"ready\
+  \ to modernize.\" \n\nChen whispers the old river songs - prayers that once called\
+  \ fish and predicted floods - but her voice is lost in the diesel rumble of progress.\
+  \ Like the baiji dolphins her grandmother once described as \"river goddesses,\"\
+  \ Chen and her ancient knowledge are being erased by the same forces: habitat destruction\
+  \ disguised as development, acoustic pollution severing communication with the natural\
+  \ world, and the systematic elimination of indigenous wisdom in favor of industrial\
+  \ efficiency.\n\nThe bamboo pole, carved with symbols her great-grandmother could\
+  \ read in the water's surface, now points toward a river that no longer remembers\
+  \ its own name."
+latitude: 29.7167
+location: Shishou, Hubei Province, China (Yangtze River)
+longitude: 112.4167
+name: Chen Meihua
+occupation: Traditional fisherman and oral historian
+parallel_vulnerability: !!python/object/apply:app.structures.enums.last_human_vulnerability_type.LastHumanVulnerabilityType
+- displacement
+pronouns: she/her
+rainbow_color_mnemonic_character_value: G
+significant_object: A bamboo fishing pole carved with traditional river symbols by
+  her grandfather, now silent in waters too noisy to read
+thread_id: 36643aa1-81ac-44f5-b677-c03543388244
+vulnerability_details: Like the baiji navigating by echolocation in muddy waters,
+  Chen relied on generational knowledge of river sounds and seasonal patterns to fish
+  sustainably. Industrial noise from new shipping lanes and dam construction has made
+  her traditional navigation methods obsolete, forcing displacement from ancestral
+  fishing grounds.
+year_documented: 2034

@@ -126,7 +126,7 @@ reported as raw mode probabilities (not matched against a specific color target)
 
 #### Scenario: Score chromatic
 
-- **WHEN** `artist_catalog.py --score-chromatic` is run (using `.venv312`)
+- **WHEN** `artist_catalog.py --score-chromatic` is run
 - **THEN** for each entry with a non-null `description`, the description is encoded via
   DeBERTa and scored through the ONNX fusion model
 - **AND** the `chromatic_score` field is written with temporal/spatial/ontological

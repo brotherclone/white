@@ -32,8 +32,8 @@ the draft score in `song_evaluation.yml`.
 
 #### Scenario: Rescore without Refractor
 
-- **WHEN** `--rescore-lyrics` is run but Refractor is unavailable (wrong venv)
-- **THEN** the pipeline exits with a clear error directing the user to use `.venv312`
+- **WHEN** `--rescore-lyrics` is run but Refractor is unavailable
+- **THEN** the pipeline exits with a clear error
 
 ---
 
