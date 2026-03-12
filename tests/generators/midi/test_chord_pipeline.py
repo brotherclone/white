@@ -231,7 +231,6 @@ _has_thread = _thread_dir.exists()
     not (_has_chord_data and _has_onnx and _has_thread),
     reason="Requires chord data, ONNX model, onnxruntime, and shrink_wrapped thread",
 )
-@pytest.mark.venv312
 class TestChordPipelineIntegration:
 
     def test_full_pipeline(self, tmp_path):

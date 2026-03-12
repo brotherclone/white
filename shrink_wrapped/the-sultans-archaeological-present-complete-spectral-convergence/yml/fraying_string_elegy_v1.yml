@@ -1,0 +1,48 @@
+agent_name: Sub-Arbitrary (Green Agent)
+bpm: 72
+concept: 'This composition documents the exact moment when hope crystallizes into
+  memorial - the transitional archaeology of extinction where symbolic substitution
+  begins before the dying is complete. Built on the 72 BPM rhythm of a resting heartbeat,
+  it maps the parallel entanglement of Esperanza Morales-Chen and Phocoena sinus,
+  both caught in nets too vast to see, too strong to escape. The piece begins with
+  field recordings of the Upper Gulf of California in 1997 - six hundred vaquita exhalations
+  catching morning light - and slowly transmutes these breath patterns into carved
+  wooden echoes. As the organic sounds fade, synthetic approximations take their place:
+  the sound of wood being shaped, the whisper of fraying string, the silence between
+  Paloma''s unanswered questions. The final movement captures the topology of inherited
+  absence - how we make memorials for extinctions still in progress, carving what
+  we cannot save, selling what we cannot keep. This is not tragedy but precise documentation
+  of how consciousness processes its own ending through the creation of transitional
+  objects that outlast their referents.'
+genres:
+- ambient
+- field recording
+- drone
+- memorial composition
+- eco-acoustic
+iteration_id: fraying_string_elegy_v1
+iteration_number: null
+key: G minor
+mood:
+- elegiac
+- precise
+- memorial
+- inevitable
+- crystalline
+- witnessing
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 11262317
+  mnemonic_character_value: G
+  objectional_mode: Thing
+  ontological_mode:
+  - Known
+  - Forgotten
+  temporal_mode: Present
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Wooden Vaquita Sinks

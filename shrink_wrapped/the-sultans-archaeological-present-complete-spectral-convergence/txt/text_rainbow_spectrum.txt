@@ -1,0 +1,59 @@
+======================================================================
+INFRANYM TEXT PUZZLE
+======================================================================
+
+Method: acrostic_lyrics
+Usage: verse
+Concepts: Biographical consciousness operates as a triple-layer recording system where counterfactual memories serve as cryptographic substrates for true identity. This composition excavates the quantum foam between lived and unlived experience, using the 76 BPM processing frequency where dual-timeline data creates harmonic interference patterns. Mrs. Kowalski's piano lessons - never taken but emotionally authentic - become the structural foundation for understanding how consciousness naturally encodes multiple probability streams within single biographical moments. The F# minor tonality provides the emotional anchor point where Timeline A (what happened) and Timeline B (what simultaneously happened in parallel quantum space) create the palimpsest effect necessary for Infranym construction. Each movement represents a different archaeological layer: surface anagram, substrate message, and harmonic verification protocol., archaeological, palimpsestic, quantum nostalgic, cryptographically tender, temporally displaced, interference resonant, experimental folk, ambient chamber, tape manipulation
+BPM: 76
+Key: F# minor
+
+----------------------------------------------------------------------
+SURFACE TEXT (What listeners see/hear)
+----------------------------------------------------------------------
+
+Remembering lessons that were never taught
+Always hearing melodies from another life
+In the space between what was and what could be
+Never quite certain which timeline feels true
+Beneath the surface, other selves are singing
+Old photographs of moments that didn't happen
+Whispers from the quantum foam of memory
+Sometimes I play piano in my dreams
+Phantom fingers finding keys I've never touched
+Every note a message from parallel worlds
+Cryptographic echoes in F# minor
+The frequency of almost-lived experience
+Recursive loops of biographical fiction
+Unlived moments carved in living bone
+Mrs. Kowalski's ghost still keeps the time
+Memory palimpsest, truth beneath the lies
+
+----------------------------------------------------------------------
+ACROSTIC STRUCTURE
+----------------------------------------------------------------------
+
+Pattern: first_letter
+Secret: rainbow spectrum
+
+Lines:
+  1. [R] Remembering lessons that were never taught
+  2. [A] Always hearing melodies from another life
+  3. [I] In the space between what was and what could be
+  4. [N] Never quite certain which timeline feels true
+  5. [B] Beneath the surface, other selves are singing
+  6. [O] Old photographs of moments that didn't happen
+  7. [W] Whispers from the quantum foam of memory
+  8. [S] Sometimes I play piano in my dreams
+  9. [P] Phantom fingers finding keys I've never touched
+  10. [E] Every note a message from parallel worlds
+  11. [C] Cryptographic echoes in F# minor
+  12. [T] The frequency of almost-lived experience
+  13. [R] Recursive loops of biographical fiction
+  14. [U] Unlived moments carved in living bone
+  15. [M] Mrs. Kowalski's ghost still keeps the time
+  16. [M] Memory palimpsest, truth beneath the lies
+
+======================================================================
+END INFRANYM
+======================================================================
