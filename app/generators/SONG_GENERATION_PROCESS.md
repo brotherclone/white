@@ -5,8 +5,7 @@ Status labels: **[IMPLEMENTED]** | **[PARTIAL]** | **[CONCEPTUAL]**
 This document tracks the full pipeline for generating a White project song.
 Steps marked **[HUMAN STEP]** require manual action in Logic Pro or ACE Studio.
 
-> **Python environment**: Use `.venv312` for all pipeline commands — Refractor requires numpy 1.x / torch compatibility (transformers 4.x; `.venv` has 5.x which blocks `torch.load`).
-> Example: `.venv312/bin/python app/generators/midi/pipelines/chord_pipeline.py ...`
+> **Python environment**: Use `.venv/bin/python` for all pipeline commands.
 
 > **Handoff from agents**: The White agent chain runs to shrinkwrap (`app/util/shrinkwrap_chain_artifacts.py`), producing a human-readable directory under `shrink_wrapped/<song-title>/`. Production pipeline steps (chord gen onward) are manual from there — chord generation is **not** auto-triggered from the agent.
 
@@ -19,7 +18,7 @@ The color agent generates `song_proposal_*.yml` with concept, mood, key, BPM, si
 
 ### 0.2 Artist Catalog **[PARTIAL]**
 ```bash
-.venv312/bin/python -m app.generators.artist_catalog --thread <thread_dir> --generate-missing
+.venv/bin/python -m app.generators.artist_catalog --thread <thread_dir> --generate-missing
 ```
 Catalogs `sounds_like` artists from the proposal into `app/reference/music/artist_catalog.yml`. Feeds style context into lyric generation.
 
@@ -32,7 +31,7 @@ Catalogs `sounds_like` artists from the proposal into `app/reference/music/artis
 ## 1. Chord Phase **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python app/generators/midi/pipelines/chord_pipeline.py \
+.venv/bin/python app/generators/midi/pipelines/chord_pipeline.py \
     --thread shrink_wrapped/<song-title> \
     --song <iteration_id>.yml \
     --num-candidates 200 --top-k 10
@@ -44,7 +43,7 @@ Catalogs `sounds_like` artists from the proposal into `app/reference/music/artis
 
 ```bash
 PYTHONPATH=/Volumes/LucidNonsense/White \
-.venv312/bin/python -m app.generators.midi.production.promote_part \
+.venv/bin/python -m app.generators.midi.production.promote_part \
     --review shrink_wrapped/<song-title>/production/<slug>/chords/review.yml
 ```
 
@@ -53,7 +52,7 @@ PYTHONPATH=/Volumes/LucidNonsense/White \
 ## 2. Drum Phase **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.pipelines.drum_pipeline --production-dir <dir>
+.venv/bin/python -m app.generators.midi.pipelines.drum_pipeline --production-dir <dir>
 ```
 
 Reads approved chord sections, picks drum templates by genre family + energy. Writes `drums/candidates/` + `drums/review.yml`.
@@ -61,7 +60,7 @@ Reads approved chord sections, picks drum templates by genre family + energy. Wr
 **Human step**: Label and approve in `drums/review.yml`, then promote.
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.promote_part \
+.venv/bin/python -m app.generators.midi.production.promote_part \
     --review <dir>/drums/review.yml
 ```
 
@@ -70,7 +69,7 @@ Reads approved chord sections, picks drum templates by genre family + energy. Wr
 ## 3. Bass Phase **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.pipelines.bass_pipeline --production-dir <dir>
+.venv/bin/python -m app.generators.midi.pipelines.bass_pipeline --production-dir <dir>
 ```
 
 Reads approved chords + kick onsets. Generates bass lines (root, walking, pedal, arpeggiated, octave styles). Clamps to MIDI 24–60. Writes `bass/candidates/` + `bass/review.yml`.
@@ -78,7 +77,7 @@ Reads approved chords + kick onsets. Generates bass lines (root, walking, pedal,
 **Human step**: Label and approve, then promote.
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.promote_part \
+.venv/bin/python -m app.generators.midi.production.promote_part \
     --review <dir>/bass/review.yml
 ```
 
@@ -87,7 +86,7 @@ Reads approved chords + kick onsets. Generates bass lines (root, walking, pedal,
 ## 4. Melody Phase **[PARTIAL]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.pipelines.melody_pipeline --production-dir <dir>
+.venv/bin/python -m app.generators.midi.pipelines.melody_pipeline --production-dir <dir>
 ```
 
 Singer is auto-detected from the song proposal. Reads approved chords, generates melodic contour from interval templates, enforces vocal range. Writes `melody/candidates/` + `melody/review.yml`.
@@ -95,7 +94,7 @@ Singer is auto-detected from the song proposal. Reads approved chords, generates
 **Human step**: Label and approve, then promote.
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.promote_part \
+.venv/bin/python -m app.generators.midi.production.promote_part \
     --review <dir>/melody/review.yml
 ```
 
@@ -106,7 +105,7 @@ Singer is auto-detected from the song proposal. Reads approved chords, generates
 ## 5. Composition Proposal **[IMPLEMENTED — optional]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.composition_proposal \
+.venv/bin/python -m app.generators.midi.production.composition_proposal \
     --production-dir <dir> --song-proposal <yml>
 ```
 
@@ -125,7 +124,7 @@ Claude proposes a full arrangement arc (section order, energy, transitions, soun
 ## 7. Production Plan **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.production_plan \
+.venv/bin/python -m app.generators.midi.production.production_plan \
     --production-dir <dir> --song-proposal <yml>
 ```
 
@@ -136,7 +135,7 @@ Reads approved chord sections and bar counts. Writes `production_plan.yml` with 
 ## 8. Lyric Generation **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.pipelines.lyric_pipeline --production-dir <dir>
+.venv/bin/python -m app.generators.midi.pipelines.lyric_pipeline --production-dir <dir>
 ```
 
 Generates 3 lyric drafts via Claude API, scores each with Refractor (chromatic alignment). Writes `melody/lyrics_review.yml` + candidate `.txt` files.
@@ -144,7 +143,7 @@ Generates 3 lyric drafts via Claude API, scores each with Refractor (chromatic a
 **Human step**: Read candidates, set `status: approved` on chosen draft in `lyrics_review.yml`, then promote.
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.promote_part \
+.venv/bin/python -m app.generators.midi.production.promote_part \
     --review <dir>/melody/lyrics_review.yml
 ```
 
@@ -157,7 +156,7 @@ Promotes to `melody/lyrics.txt`. Original draft preserved as `melody/lyrics_draf
 ## 9. Assembly **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.assembly_manifest \
+.venv/bin/python -m app.generators.midi.production.assembly_manifest \
     --production-dir <dir> \
     --arrangement <dir>/arrangement.txt \
     --assemble
@@ -172,7 +171,7 @@ Output: `assembled/assembled_chords.mid`, `assembled_drums.mid`, `assembled_bass
 ## 10. ACE Studio — Vocal Synthesis **[PARTIAL]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.ace_studio_export \
+.venv/bin/python -m app.generators.midi.production.ace_studio_export \
     --production-dir <dir>
 ```
 
@@ -187,7 +186,7 @@ Pushes `assembled/assembled_melody.mid` + `melody/lyrics.txt` to the open ACE St
 
 **Post-render** — parse ACE Studio's MIDI export back to LRC:
 ```bash
-.venv312/bin/python -m app.generators.midi.production.ace_studio_import \
+.venv/bin/python -m app.generators.midi.production.ace_studio_import \
     --production-dir <dir>
 ```
 Writes `vocal_alignment.lrc`.
@@ -197,7 +196,7 @@ Writes `vocal_alignment.lrc`.
 ## 11. Drift Report **[IMPLEMENTED]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.drift_report --production-dir <dir>
+.venv/bin/python -m app.generators.midi.production.drift_report --production-dir <dir>
 ```
 
 Compares ACE Studio vocal export against approved melody loops. Looks for `VocalSynthv*.mid` in the production root or `melody/` subfolder. Supports both Logic Pro export formats (SMPTE timecode and bar/beat); BPM and time signature are read from `production_plan.yml`.
@@ -212,16 +211,16 @@ Reports per-section pitch match %, rhythm drift (beats), note count delta, word 
 
 ```bash
 # Basic evaluation:
-.venv312/bin/python -m app.generators.midi.production.song_evaluator <dir>
+.venv/bin/python -m app.generators.midi.production.song_evaluator <dir>
 
 # Include ACE import metrics (after vocal render):
-.venv312/bin/python -m app.generators.midi.production.song_evaluator <dir> --ace-import
+.venv/bin/python -m app.generators.midi.production.song_evaluator <dir> --ace-import
 
 # Re-score chromatic alignment:
-.venv312/bin/python -m app.generators.midi.production.song_evaluator <dir> --rescore
+.venv/bin/python -m app.generators.midi.production.song_evaluator <dir> --rescore
 
 # Re-score lyrics after ACE editing:
-.venv312/bin/python -m app.generators.midi.production.song_evaluator <dir> --rescore-lyrics
+.venv/bin/python -m app.generators.midi.production.song_evaluator <dir> --rescore-lyrics
 ```
 
 Reports color, phases complete, total bars, vocal coverage, chromatic alignment, theory quality, production completeness, and lyric maturity. Writes `song_evaluation.yml`.
@@ -233,7 +232,7 @@ Reports color, phases complete, total bars, vocal coverage, chromatic alignment,
 ## 13. Lyric Feedback Export **[PARTIAL]**
 
 ```bash
-.venv312/bin/python -m app.generators.midi.production.lyric_feedback_export \
+.venv/bin/python -m app.generators.midi.production.lyric_feedback_export \
     --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
     --output lyric_feedback.jsonl
 ```
@@ -260,4 +259,3 @@ Song proposals include an `INFRANYM PROTOCOL` block. Manual tool: `app/agents/to
 | Melody templates too note-dense for vocal use                | `app/generators/midi/patterns/melody_patterns.py`     | High — see `redesign-melody-templates` openspec |
 | `--rescore-lyrics` needs `--song-proposal` fallback          | `app/generators/midi/production/song_evaluator.py`    | Low                                             |
 | Drift report overwrites structural drift from assembly step  | `app/generators/midi/production/drift_report.py`      | Low — consider separate filenames               |
-| `.venv` uses transformers 5.x — blocks `torch.load` on torch 2.2.2 | `pyproject.toml` / `.venv`                     | Medium — use `.venv312` for all pipeline steps  |

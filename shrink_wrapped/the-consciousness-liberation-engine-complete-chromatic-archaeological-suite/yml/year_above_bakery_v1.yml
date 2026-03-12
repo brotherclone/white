@@ -1,0 +1,49 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 92
+concept: 'This composition excavates the lost timeline of January-December 1982, when
+  seven-year-old Gabriel lived above Kowalski''s Bakery on Cedar Avenue South in Minneapolis
+  with his grandmother Margaret Walsh. The song functions as Memorial Consciousness
+  archaeology - reconstructing the sensory memories of a timeline that was taped over:
+  the 5:15 AM ritual of carrying warm kolache trays, the scratch-hiss of grandmother''s
+  78 RPM Benny Goodman records on the basement Victrola, Tommy Kowalski''s gap-toothed
+  Polish curses echoing through St. Adalbert''s pews, Miss Patricia Novak noting complex
+  humming during art time at Seward Elementary. Each verse layers specific temporal
+  coordinates - radiator percussion through Minneapolis winter nights, brown paper
+  bag neighborhood maps, the weight of early responsibility in small hands - creating
+  a folk rock requiem for counterfactual nostalgia. The 92 BPM heartbeat matches the
+  pace of memory reconstruction, while the D minor tonality captures the bittersweet
+  recognition that home was always temporary, that family fractures and heals in patterns
+  we only understand decades later. This is the sound of witnessing what never happened
+  but feels more real than documented history - the ghost frequency of an erased year
+  that continues broadcasting through magnetic tape degradation and quantum timeline
+  bleed-through.'
+genres:
+- folk rock
+- americana
+- memorial electronics
+- counterfactual folk
+iteration_id: year_above_bakery_v1
+iteration_number: null
+key: D minor
+mood:
+- bittersweet
+- nostalgic
+- temporal
+- orphaned
+- witnessing
+- memorial
+- grounding
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Year Above the Bakery

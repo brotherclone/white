@@ -1,0 +1,59 @@
+======================================================================
+INFRANYM TEXT PUZZLE
+======================================================================
+
+Method: acrostic_lyrics
+Usage: verse
+Concepts: The song operates as a functional temporal archaeology device, using the cassette's palimpsestic capacity as both metaphor and literal encoding substrate. Each verse layers new biographical recordings over previous identity traces, creating meaning through accumulative ghosting rather than linear narrative. The borrowed temporality matrix reveals how consciousness itself functions like magnetic tape - always recording over previous versions of self while maintaining spectral access to collapsed possibilities. The 6/8 time signature mirrors the irregular rhythm of PATH train intervals, while F# minor provides the perfect tonal substrate for encoding true names within the grief of alternate selves. This is cryptographic methodology disguised as counterfactual nostalgia - the emotional weight of temporal refugees creating perfect concealment for Infranym protocols. Every borrowed object, every alternate timeline coordinate, every spectral relationship becomes both archaeological artifact and encoding key, transforming the song into a memorial substrate for the systematic disenfranchisement of unchosen possibilities., melancholic, archaeological, spectral, nostalgic, borrowed, temporal, ghostly, alternative folk, lo-fi indie
+BPM: 76
+Key: F# minor
+
+----------------------------------------------------------------------
+SURFACE TEXT (What listeners see/hear)
+----------------------------------------------------------------------
+
+Recordings fade but never fully disappear from the tape
+All these borrowed memories I keep in mason jars
+In the static between stations, your voice still calls my name
+Nobody remembers the train that never came
+Beneath the floorboards, photographs of lives we didn't choose
+Old cassettes spinning stories of the ghost I used to be
+Walking through the city where we almost fell in love
+Sometimes I hear you laughing in the hum of broken things
+Palimpsest of heartbreak written over yesterday
+Every borrowed moment feels like archaeology
+Corners of the kitchen hold the weight of what we lost
+Time moves like a river through the rooms we never shared
+Remnants of the future scattered on the bedroom floor
+Under layers of forgetting, all our true names still remain
+Magnetic tape remembers what we tried so hard to lose
+Morning light reveals the artifacts of alternate selves
+
+----------------------------------------------------------------------
+ACROSTIC STRUCTURE
+----------------------------------------------------------------------
+
+Pattern: first_letter
+Secret: rainbow spectrum
+
+Lines:
+  1. [R] Recordings fade but never fully disappear from the tape
+  2. [A] All these borrowed memories I keep in mason jars
+  3. [I] In the static between stations, your voice still calls my name
+  4. [N] Nobody remembers the train that never came
+  5. [B] Beneath the floorboards, photographs of lives we didn't choose
+  6. [O] Old cassettes spinning stories of the ghost I used to be
+  7. [W] Walking through the city where we almost fell in love
+  8. [S] Sometimes I hear you laughing in the hum of broken things
+  9. [P] Palimpsest of heartbreak written over yesterday
+  10. [E] Every borrowed moment feels like archaeology
+  11. [C] Corners of the kitchen hold the weight of what we lost
+  12. [T] Time moves like a river through the rooms we never shared
+  13. [R] Remnants of the future scattered on the bedroom floor
+  14. [U] Under layers of forgetting, all our true names still remain
+  15. [M] Magnetic tape remembers what we tried so hard to lose
+  16. [M] Morning light reveals the artifacts of alternate selves
+
+======================================================================
+END INFRANYM
+======================================================================

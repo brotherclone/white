@@ -1,77 +1,71 @@
 bpm_constraints:
-- bpm_range: 83-93
-  center: 90
-  count: 11
-  fraction: 0.33
-  reason: 11/33 proposals cluster around 90 BPM
-  severity: avoid
-- bpm_range: 89-99
-  center: 93
-  count: 13
-  fraction: 0.39
-  reason: 13/33 proposals cluster around 93 BPM
+- bpm_range: 86-96
+  center: 92
+  count: 15
+  fraction: 0.35
+  reason: 15/43 proposals cluster around 92 BPM
   severity: avoid
 concept_constraints: []
 dialogue_opener_constraints:
-- count: 33
-  fraction: 0.33
+- count: 45
+  fraction: 0.35
   phrase: look,
-  reason: '''look,'' opens 33/99 responses (33%)'
+  reason: '''look,'' opens 45/129 responses (35%)'
   severity: avoid
 diversity_metrics:
   bpm_distribution:
-    67: 1
+    67: 2
     72: 1
-    76: 4
+    76: 6
     84: 1
     88: 3
     91: 6
     92: 1
     94: 2
     96: 3
-    97: 1
+    97: 2
     104: 1
-    108: 6
-    114: 1
-    117: 1
-    127: 1
-  bpm_mean: 94.3
-  bpm_std_dev: 13.58
+    108: 9
+    114: 2
+    117: 2
+    127: 2
+  bpm_mean: 95.6
+  bpm_std_dev: 15.23
   concept_phrase_counts:
     consciousness archaeology: 3
-    information through time into space: 3
-    information → time → space: 4
+    information through time into space: 4
+    information → time → space: 5
     narcissistic: 1
     prism synthesis: 1
     seven chromatic methodologies: 9
     sultan of solipsism: 1
-    transmigration: 9
+    transmigration: 11
   dialogue_opener_counts:
-    look,: 33
-    okay so: 1
+    look,: 45
+    okay so: 2
   key_distribution:
-    A ♭ major: 2
-    A ♭ minor: 2
-    A# major: 3
+    A ♭ major: 4
+    A ♭ minor: 4
+    A# major: 5
     All Keys: 1
-    B major: 1
-    B ♭ major: 3
+    B major: 2
+    B ♭ major: 4
     C major: 12
     D minor: 2
-    D# minor: 1
-    F# major: 2
+    D# minor: 2
+    F# major: 3
     F# minor: 4
-  key_entropy: 2.97
+  key_entropy: 3.16
   title_word_counts:
-    architect: 5
-    chromatic: 5
-    consciousness: 6
-    convergence: 1
-    mirror: 3
-    prism: 7
-    protocol: 6
-    recursive: 1
-    sultan: 4
+    architect: 7
+    chromatic: 7
+    consciousness: 7
+    convergence: 2
+    mirror: 4
+    prism: 8
+    protocol: 7
+    recursive: 2
+    sultan: 6
 excluded_titles:
 - All Frequencies Return to Source (The Consciousness Archaeology Complete)
 - The Architecture of Information Becoming
@@ -106,17 +100,7 @@ excluded_titles:
 - 'The White Prism: Information Architecture for Consciousness Liberation'
 - ThreadKeepr's Return (The White Album Transmission)
 generated_from: shrink_wrapped/index.yml
-key_constraints:
-- count: 12
-  fraction: 0.36
-  key: C major
-  reason: 12/33 proposals (36%) use C major
-  severity: avoid
-thread_count: 33
-title_vocabulary_constraints:
-- count: 7
-  fraction: 0.21
-  reason: '''prism'' appears in 7/33 titles (21%)'
-  severity: avoid
-  word: prism
+key_constraints: []
+thread_count: 43
+title_vocabulary_constraints: []
 warnings: []

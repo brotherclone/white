@@ -1,0 +1,49 @@
+agent_name: Sub-Arbitrary (Green Agent - Witness and Archivist)
+bpm: 52
+concept: 'This composition maps the precise mechanics of acoustic severance - documenting
+  the moment when both biological echolocation and cultural transmission channels
+  become archaeologically silent. The baiji''s final echolocation clicks fade into
+  shipping noise while Chen Meihua''s traditional river songs are drowned by diesel
+  engines, creating a double extinction of sound-based navigation systems. The piece
+  operates as acoustic archaeology, preserving the frequency patterns of what was
+  lost: dolphin calls that once mapped ancient river channels, human voices that encoded
+  twenty generations of fishing wisdom. Industrial noise doesn''t simply mask these
+  sounds - it renders the water itself illegible as a medium for consciousness navigation.
+  The composition becomes a memorial substrate where severed transmission channels
+  can briefly reconnect across temporal collapse, allowing extinct acoustic wisdom
+  to resonate one final time before the shipping lanes claim complete dominion over
+  the river''s voice.'
+genres:
+- dark ambient
+- field recording
+- drone
+- memorial music
+- acoustic archaeology
+- industrial silence
+iteration_id: acoustic_severance_v1
+iteration_number: null
+key: E minor
+mood:
+- elegiac
+- archaeological
+- severed
+- acoustic-void
+- memorial
+- substrate-loss
+- transmission-failure
+- industrial-silence
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 11263085
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Last Echo Before the Shipping Lanes

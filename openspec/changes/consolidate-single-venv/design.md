@@ -20,13 +20,14 @@ path (`onnxruntime`) is unaffected by this version split.
 bound `<5` blocks uv from resolving to the breaking release. When transformers 5.x
 stabilises its `torch.load()` behaviour, this bound can be removed.
 
-### Do NOT add torch to pyproject.toml main dependencies
+### Add torch and sentencepiece to pyproject.toml main dependencies
 
-Torch is only needed by Modal training scripts (`training/`) and the Refractor's lazy
-piano-roll encoder. `onnxruntime` handles all inference in the pipeline. Adding torch to
-main deps pulls in a large platform-specific binary that users who only run the agent
-chain don't need. The existing pattern (torch available in `.venv` because it was
-installed transitively or manually) is fine to preserve as-is.
+`sentencepiece` is required by the DeBERTa v2 tokenizer (the fast tokenizer falls back
+to a broken tiktoken path when sentencepiece is absent). `torch>=2.2.0,<2.3.0` is
+required because `prepare_concept()` loads DeBERTa as a PyTorch model and all 4.x+ chord
+pipelines call it. On Intel Mac only 2.2.x wheels are available; a `tolist()` bridge in
+`_encode_text()` and `_encode_audio()` avoids the torch 2.2.x / numpy 2.x binary
+incompatibility (`tensor.numpy()` errors but `np.array(tensor.tolist())` works).
 
 ### Rebuild strategy: delete and recreate
 

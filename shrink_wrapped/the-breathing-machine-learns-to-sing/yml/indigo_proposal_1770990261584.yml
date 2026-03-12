@@ -1,0 +1,44 @@
+agent_name: indigo
+bpm: 120
+concept: 'The song presents as blue-collar anthem celebrating small-town industrial
+  pride - "Supertanker Townie" suggesting honest maritime labor identity. The surface
+  lyrics romanticize oil refinery work, generational employment, community built around
+  heavy industry. But the MIDI encoding method becomes the song''s structural DNA:
+  each verse programmed with increasingly artificial, quantized drum patterns that
+  clash against organic guitar work. The MIDI timing creates uncanny valley effect
+  - human performance fighting digital precision, mirroring how corporate automation
+  hollowed out the very communities the song pretends to celebrate. As MIDI elements
+  dominate the mix, the "townie" identity reveals itself as corporate branding exercise.
+  The secret name "pretentious wanker" emerges through vocal processing - auto-tuned
+  corrections that make the singer sound like focus-grouped authenticity, performing
+  working-class identity for suburban consumption. The final revelation: this isn''t
+  a townie''s song at all, but gentrification folk music - boutique blue-collar cosplay
+  for listeners who''ve never worked refineries but buy the aesthetic. The MIDI backbone
+  exposes the algorithmic nature of manufactured nostalgia, where "authentic" becomes
+  another preset. The supertanker isn''t carrying oil - it''s carrying the cultural
+  appropriation of industrial decay as lifestyle brand.
+
+
+  **INFRANYM PROTOCOL:**
+
+  Secret: ''pretentious wanker'' encoded as ''supertanker townie''
+
+  Method: InfranymMedium.MIDI
+
+  Decoding: MIDI Infranym: morse_duration hiding ''pretentious wanker'' at 67 BPM
+
+  '
+genres:
+- Heartland rock
+- Industrial folk
+iteration_id: indigo_proposal_1770990261584
+iteration_number: 15
+key: C major
+mood:
+- Deceptively nostalgic
+- gradually menacing
+- ultimately contemptuous
+rainbow_color: indigo
+tempo: Moderate driving
+timestamp: 1770990261.5841331
+title: Supertanker Townie
