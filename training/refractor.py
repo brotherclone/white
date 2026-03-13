@@ -416,14 +416,15 @@ class Refractor:
 
             waveform = librosa.resample(waveform, orig_sr=sr, target_sr=48000)
 
-        # Use CLAP audio model directly (transformers 5.x compatible)
         inputs = self._clap_processor(
-            audio=waveform,
+            audios=[waveform],
             sampling_rate=48000,
             return_tensors="pt",
         )
         with torch.no_grad():
-            audio_features = self._clap_model.audio_model(**inputs)
-            audio_embeds = self._clap_model.audio_projection(audio_features[0][:, 0, :])
+            # get_audio_features handles pooling + projection internally.
+            # For long files CLAP windows the audio; mean-pool across windows.
+            audio_embeds = self._clap_model.get_audio_features(**inputs)
 
-        return np.array(audio_embeds.squeeze(0).tolist(), dtype=np.float32)
+        # audio_embeds: (num_windows, 512) — mean-pool to (512,)
+        return np.array(audio_embeds.mean(dim=0).tolist(), dtype=np.float32)
