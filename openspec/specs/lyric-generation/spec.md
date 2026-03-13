@@ -39,23 +39,26 @@ The pipeline SHALL score each candidate using Refractor in text-only mode
 ---
 
 ### Requirement: Lyric Fitting Score
-The pipeline SHALL compute a fitting score for each candidate by comparing syllable
-count against note count per vocal section.  The score indicates how much manual
-note-splitting will be required in ACE Studio.
+The pipeline SHALL compute a per-phrase syllable fitting score for each candidate by
+comparing syllable count per lyric line against note count per MIDI phrase group within
+each vocal section. The overall verdict for a section is driven by the worst-case phrase,
+not the section mean.
 
-Fitting ratio = syllables / notes for each melody pass.
+A MIDI phrase group is a sequence of note-on events separated from adjacent events by
+a rest of at least 0.5 beats. Single-note phrases are permitted.
+
+Fitting ratio = syllables / notes for each phrase.
 - **paste-ready**: 0.75–1.10 — syllables map directly to notes with minimal adjustment
 - **tight but workable**: 1.10–1.30 — a few notes will need splitting
 - **splits needed**: >1.30 — significant manual work in ACE Studio
 - **spacious**: <0.75 — melody has held notes; ACE Studio handles this automatically
 
+When the approved MIDI file for a section is not available, the pipeline SHALL fall back
+to section-level fitting (total syllables / total notes) with no error.
+
 #### Note source: approved melody MIDIs per section
 Note counts SHALL be derived from the approved melody MIDI files in `melody/approved/`,
-not from a merged `melody/melody.mid` (which is never written by the pipeline).  For
-each vocal section, find the approved MIDI matching that section's label, count its
-`note_on` events (velocity > 0), and multiply by `plan_section.repeat` to get the
-total note count across all passes of that section.  This approach works without
-requiring the assembly step to have been run first.
+not from a merged `melody/melody.mid` (which is never written by the pipeline).
 
 #### Syllable counting algorithm
 Syllable count SHALL use a vowel-cluster heuristic (no NLP dependency):
@@ -65,29 +68,30 @@ Syllable count SHALL use a vowel-cluster heuristic (no NLP dependency):
    syllables, with a floor of 1 syllable per word
 4. Sum across all lines for that section
 
-This algorithm is deterministic and sufficient for 1:1 fit checking; it may
-under-count on silent-e endings but that margin is absorbed by the 0.75–1.10
-paste-ready range.
+#### Scenario: Per-phrase fitting computed when MIDI available
+- **WHEN** the approved MIDI for a section exists in `melody/approved/`
+- **THEN** the pipeline extracts phrase groups separated by rests ≥ 0.5 beats,
+  scores each lyric line against its corresponding phrase's note count, and records
+  per-phrase ratios, verdicts, worst_ratio, worst_verdict, mean_ratio, and overall
+  in `lyrics_review.yml`
 
-#### Scenario: Fitting computed per vocal pass
-- **WHEN** a candidate lyrics file is scored
-- **THEN** the pipeline counts notes per section from `melody/approved/<label>*.mid`
-  (multiplied by `section.repeat`), and counts syllables per lyrics section using the
-  vowel-cluster heuristic above
-- **AND** per-pass ratios and verdicts are stored in `lyrics_review.yml` under
-  a `fitting` key on each candidate entry
+#### Scenario: Worst-case phrase drives overall verdict
+- **WHEN** a section has 4 phrases and 3 are paste-ready but 1 is splits-needed
+- **THEN** the section's overall verdict is "splits needed"
+
+#### Scenario: Fallback to section-level when no MIDI
+- **WHEN** no approved MIDI exists for a section
+- **THEN** fitting falls back to total syllables / total notes for that section;
+  no error is raised
+
+#### Scenario: Prompt includes phrase structure
+- **WHEN** phrase data is available before the Claude API call
+- **THEN** the generation prompt includes per-phrase note counts and syllable target
+  ranges, and instructs Claude to write exactly one line per phrase
 
 #### Scenario: Paste-ready target
-- **WHEN** all passes have ratio 0.75–1.10
+- **WHEN** all phrases in all sections have ratio 0.75–1.10
 - **THEN** the candidate is flagged as paste-ready (no splits expected in ACE Studio)
-
-#### Scenario: Fitting informs prompt
-- **WHEN** the Claude API prompt is built for lyric generation
-- **THEN** it includes per-section syllable targets derived from note counts
-  (e.g. "verse: 12–17 syllables, chorus: 26–37 syllables")
-- **AND** the generated lyrics are constrained to those targets
-
----
 
 ### Requirement: Lyric Review File
 The pipeline SHALL write `melody/lyrics_review.yml` listing all candidates with their
@@ -184,4 +188,30 @@ diffed against the original generated text.
 
 - **WHEN** `promote_part --clean` is run on a melody review file
 - **THEN** both `lyrics.txt` and `lyrics_draft.txt` are removed if they exist
+
+### Requirement: Keyword Hybrid Chromatic Scoring Fallback
+When Refractor text-mode confidence is below 0.2, the pipeline SHALL blend the
+Refractor output with a keyword-based chromatic score to improve differentiation
+between candidates whose content signals (second-person address, future-tense verbs,
+imagined/fabricated language) would otherwise be masked by low-confidence base-rate
+predictions.
+
+Blend weights:
+- confidence < 0.1 → 30% Refractor + 70% keyword
+- 0.1 ≤ confidence < 0.2 → 70% Refractor + 30% keyword
+- confidence ≥ 0.2 → 100% Refractor (no blending)
+
+#### Scenario: Low-confidence blending applied
+- **WHEN** Refractor returns confidence < 0.2 for a lyric candidate
+- **THEN** the keyword scorer is run on the candidate text and the two distributions
+  are blended before `compute_chromatic_match()` is called
+
+#### Scenario: High-confidence Refractor result not blended
+- **WHEN** Refractor returns confidence ≥ 0.2
+- **THEN** the keyword score is not computed; Refractor output is used directly
+
+#### Scenario: Blended confidence raised
+- **WHEN** blending is applied
+- **THEN** the effective confidence passed to `compute_chromatic_match()` is increased
+  by 0.15 (capped at 0.5) so the match weight reflects the hybrid signal strength
 

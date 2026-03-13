@@ -31,6 +31,7 @@ import sys
 import mido
 import yaml
 
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -52,7 +53,7 @@ MELODY_CHANNEL = 4  # track 4 in arrangement.txt = melody = vocal
 
 
 # ---------------------------------------------------------------------------
-# Note counting
+# Note counting + phrase extraction
 # ---------------------------------------------------------------------------
 
 
@@ -68,6 +69,73 @@ def _count_notes(midi_path: Path) -> int:
             if msg.type == "note_on" and msg.velocity > 0:
                 count += 1
     return count
+
+
+@dataclass
+class Phrase:
+    start_tick: int
+    end_tick: int
+    note_count: int
+
+
+def extract_phrases(midi_path: Path, rest_threshold_beats: float = 0.5) -> list[Phrase]:
+    """Group note-on events into phrases separated by rests.
+
+    A new phrase begins when the gap between consecutive note-on events
+    exceeds rest_threshold_beats (default 0.5 beats = half a beat).
+    Single-note phrases are allowed.
+
+    Returns a list of Phrase objects in order.
+    """
+    try:
+        mid = mido.MidiFile(str(midi_path))
+    except Exception:
+        return []
+
+    ticks_per_beat = mid.ticks_per_beat or 480
+    threshold_ticks = int(rest_threshold_beats * ticks_per_beat)
+
+    # Collect all note-on absolute ticks across all tracks
+    note_ticks: list[int] = []
+    for track in mid.tracks:
+        abs_tick = 0
+        for msg in track:
+            abs_tick += msg.time
+            if msg.type == "note_on" and msg.velocity > 0:
+                note_ticks.append(abs_tick)
+
+    if not note_ticks:
+        return []
+
+    note_ticks.sort()
+
+    phrases: list[Phrase] = []
+    phrase_start = note_ticks[0]
+    phrase_notes = [note_ticks[0]]
+
+    for tick in note_ticks[1:]:
+        if tick - phrase_notes[-1] > threshold_ticks:
+            phrases.append(
+                Phrase(
+                    start_tick=phrase_start,
+                    end_tick=phrase_notes[-1],
+                    note_count=len(phrase_notes),
+                )
+            )
+            phrase_start = tick
+            phrase_notes = [tick]
+        else:
+            phrase_notes.append(tick)
+
+    phrases.append(
+        Phrase(
+            start_tick=phrase_start,
+            end_tick=phrase_notes[-1],
+            note_count=len(phrase_notes),
+        )
+    )
+
+    return phrases
 
 
 # ---------------------------------------------------------------------------
@@ -258,46 +326,328 @@ def _fitting_verdict(ratio: float) -> str:
         return "splits needed"
 
 
-def _compute_fitting(candidate_text: str, vocal_sections: list[dict]) -> dict:
-    """Compute syllable fitting for each vocal section.
+def _verdict_rank(verdict: str) -> int:
+    """Rank verdict severity; spacious == paste-ready (both = 0)."""
+    v = verdict if verdict != "spacious" else "paste-ready"
+    return _VERDICT_ORDER.index(v)
 
-    Parses [section_name] blocks from candidate_text, counts syllables per
-    section (stripping # comment lines and [header] lines), and computes ratio
-    against melody note counts.
+
+def _compute_fitting(
+    candidate_text: str,
+    vocal_sections: list[dict],
+    melody_dir: Path,
+) -> dict:
+    """Compute per-phrase syllable fitting for each vocal section.
+
+    When an approved MIDI exists, extracts phrase structure and scores each
+    lyric line against its corresponding phrase's note count.  Falls back to
+    section-level ratio when no MIDI or no phrases are detected.
+
+    The overall verdict is driven by the worst-case phrase, not the mean.
     """
     parsed = _parse_sections(candidate_text)
     result: dict = {}
-    worst_idx = 0
+    worst_verdict = "paste-ready"
 
     for sec in vocal_sections:
         name = sec["name"]
-        notes = sec["total_notes"]
+        midi_path = melody_dir / "approved" / f"{name}.mid"
+        phrases = extract_phrases(midi_path) if midi_path.exists() else []
+
         lyric_text = parsed.get(name, "")
-        syllable_count = sum(
-            _count_syllables(line)
+        lyric_lines = [
+            line.strip()
             for line in lyric_text.splitlines()
             if line.strip() and not line.strip().startswith("#")
-        )
-        if notes > 0:
-            ratio = syllable_count / notes
+        ]
+
+        if phrases:
+            phrase_data = []
+            for i, phrase in enumerate(phrases):
+                line_text = lyric_lines[i] if i < len(lyric_lines) else ""
+                syl = _count_syllables(line_text) if line_text else 0
+                notes = phrase.note_count
+                ratio = round(syl / notes, 3) if notes > 0 else 1.0
+                verdict = _fitting_verdict(ratio)
+                phrase_data.append(
+                    {
+                        "notes": notes,
+                        "syllables": syl,
+                        "ratio": ratio,
+                        "verdict": verdict,
+                    }
+                )
+
+            worst_r = max(p["ratio"] for p in phrase_data)
+            worst_v = _fitting_verdict(worst_r)
+            mean_r = round(sum(p["ratio"] for p in phrase_data) / len(phrase_data), 3)
+
+            result[name] = {
+                "phrases": phrase_data,
+                "worst_ratio": round(worst_r, 3),
+                "worst_verdict": worst_v,
+                "mean_ratio": mean_r,
+                "overall": worst_v,
+            }
         else:
-            ratio = 1.0
+            # Fallback: section-level ratio (no MIDI available)
+            total_notes = sec["total_notes"]
+            syllable_count = sum(_count_syllables(line) for line in lyric_lines)
+            ratio = round(syllable_count / total_notes, 3) if total_notes > 0 else 1.0
+            worst_v = _fitting_verdict(ratio)
+            result[name] = {
+                "syllables": syllable_count,
+                "notes": total_notes,
+                "ratio": ratio,
+                "verdict": worst_v,
+            }
 
-        verdict = _fitting_verdict(ratio)
-        verdict_for_rank = verdict if verdict != "spacious" else "paste-ready"
-        verdict_idx = _VERDICT_ORDER.index(verdict_for_rank)
-        if verdict_idx > worst_idx:
-            worst_idx = verdict_idx
+        if _verdict_rank(worst_v) > _verdict_rank(worst_verdict):
+            worst_verdict = worst_v
 
-        result[name] = {
-            "syllables": syllable_count,
-            "notes": notes,
-            "ratio": round(ratio, 3),
-            "verdict": verdict,
-        }
-
-    result["overall"] = _VERDICT_ORDER[worst_idx]
+    result["overall"] = worst_verdict
     return result
+
+
+# ---------------------------------------------------------------------------
+# Keyword-based chromatic scoring (Bug 2 hybrid fallback)
+# ---------------------------------------------------------------------------
+
+_TEMPORAL_KEYWORDS: dict[str, list[str]] = {
+    "past": [
+        "used to",
+        "back then",
+        "ago",
+        "yesterday",
+        "once was",
+        "always was",
+        "i remember",
+        "she remembered",
+        "he remembered",
+        "they remembered",
+        "had been",
+        "was there",
+        "were there",
+        "before you",
+        "before she",
+        "the old",
+        "left behind",
+    ],
+    "present": [
+        "right now",
+        "in this moment",
+        "still here",
+        "still breathing",
+        "still standing",
+        "still watching",
+        "happening now",
+        "as we speak",
+        "in this room",
+        "in this place",
+        "this very",
+        "at this moment",
+    ],
+    "future": [
+        "will be",
+        "will walk",
+        "will remember",
+        "will find",
+        "will come",
+        "going to",
+        "one day",
+        "someday",
+        "tomorrow",
+        "soon you",
+        "soon she",
+        "when you will",
+        "you will",
+        "she will",
+        "they will",
+        "might become",
+        "could become",
+        "shall",
+        "still to come",
+    ],
+}
+
+_SPATIAL_KEYWORDS: dict[str, list[str]] = {
+    "thing": [
+        "object",
+        "artifact",
+        "machine",
+        "device",
+        "stone",
+        "metal",
+        "wood",
+        "instrument",
+        "tool",
+        "structure",
+        "substance",
+        "material",
+        "fragment",
+        "piece of",
+        "the thing",
+        "the item",
+    ],
+    "place": [
+        "city",
+        "room",
+        "street",
+        "road",
+        "field",
+        "river",
+        "mountain",
+        "valley",
+        "home",
+        "door",
+        "wall",
+        "ground",
+        "sky",
+        "land",
+        "world",
+        "somewhere",
+        "anywhere",
+        "every where",
+        "this place",
+        "that place",
+        "the space",
+    ],
+    "person": [
+        "you",
+        "your",
+        "yours",
+        "she",
+        "her",
+        "he",
+        "his",
+        "they",
+        "their",
+        "name",
+        "face",
+        "eyes",
+        "hands",
+        "voice",
+        "body",
+        "heart",
+        "soul",
+        "woman",
+        "man",
+        "someone",
+        "whoever",
+        "the one who",
+    ],
+}
+
+_ONTOLOGICAL_KEYWORDS: dict[str, list[str]] = {
+    "imagined": [
+        "imagine",
+        "imagined",
+        "maybe",
+        "perhaps",
+        "possibly",
+        "what if",
+        "might be",
+        "could be",
+        "seems like",
+        "appears to",
+        "like a dream",
+        "fabricated",
+        "invented",
+        "conjured",
+        "not sure if",
+        "possibly real",
+        "fully fabricated",
+        "possibly imagined",
+    ],
+    "forgotten": [
+        "forgotten",
+        "erased",
+        "vanished",
+        "gone now",
+        "no longer here",
+        "disappeared",
+        "faded away",
+        "buried",
+        "lost forever",
+        "never found",
+        "unnamed",
+        "unknown",
+        "left no trace",
+        "wiped away",
+    ],
+    "known": [
+        "i know",
+        "she knows",
+        "we know",
+        "it is real",
+        "this is real",
+        "certain",
+        "without doubt",
+        "undeniable",
+        "proven",
+        "obvious",
+        "always been",
+        "never changes",
+        "confirmed",
+        "recognized",
+    ],
+}
+
+
+def _keyword_score(text: str) -> dict:
+    """Keyword-based chromatic scoring for low-confidence Refractor fallback.
+
+    Returns a result dict with temporal/spatial/ontological dicts keyed by
+    mode name, matching the Refractor result structure.
+    """
+    text_lower = text.lower()
+
+    def score_dim(
+        keywords_by_mode: dict[str, list[str]], mode_names: list[str]
+    ) -> dict:
+        raw = {}
+        for mode in mode_names:
+            count = sum(text_lower.count(kw) for kw in keywords_by_mode.get(mode, []))
+            raw[mode] = float(count) + 0.1  # floor avoids all-zero distributions
+        total = sum(raw.values())
+        return {m: raw[m] / total for m in mode_names}
+
+    return {
+        "temporal": score_dim(_TEMPORAL_KEYWORDS, ["past", "present", "future"]),
+        "spatial": score_dim(_SPATIAL_KEYWORDS, ["thing", "place", "person"]),
+        "ontological": score_dim(
+            _ONTOLOGICAL_KEYWORDS, ["imagined", "forgotten", "known"]
+        ),
+        "confidence": 0.5,  # neutral — keyword scorer has no calibrated confidence
+    }
+
+
+def _blend_scores(
+    refractor_result: dict, keyword_result: dict, confidence: float
+) -> dict:
+    """Blend Refractor and keyword scores when Refractor confidence is low.
+
+    Weights:
+      - confidence < 0.1  → 30% Refractor, 70% keyword
+      - 0.1 ≤ confidence < 0.2 → 70% Refractor, 30% keyword
+      - confidence ≥ 0.2 → 100% Refractor (caller should skip blending)
+    """
+    if confidence < 0.1:
+        w_r, w_k = 0.3, 0.7
+    else:
+        w_r, w_k = 0.7, 0.3
+
+    blended: dict = {}
+    for dim in ("temporal", "spatial", "ontological"):
+        r_dim = refractor_result.get(dim, {})
+        k_dim = keyword_result.get(dim, {})
+        modes = list(r_dim.keys()) or list(k_dim.keys())
+        blended[dim] = {
+            m: r_dim.get(m, 0.0) * w_r + k_dim.get(m, 0.0) * w_k for m in modes
+        }
+    # Raise effective confidence so compute_chromatic_match weights it fairly
+    blended["confidence"] = min(confidence + 0.15, 0.5)
+    return blended
 
 
 # ---------------------------------------------------------------------------
@@ -360,6 +710,8 @@ def _build_prompt(
         lo, hi = syllable_targets.get(name, (0, 0))
         denom = max(sec["bars"] * sec["repeat"], 1)
         notes_per_bar = sec["total_notes"] / denom
+        phrases: list[Phrase] = sec.get("phrases", [])
+
         lines.extend(
             [
                 "",
@@ -369,6 +721,21 @@ def _build_prompt(
                 f"    Target syllables: {lo}–{hi}  (≈{notes_per_bar:.1f} notes/bar)",
             ]
         )
+
+        if phrases:
+            phrase_counts = [p.note_count for p in phrases]
+            phrase_lo = [math.floor(n * 0.8) for n in phrase_counts]
+            phrase_hi = [math.ceil(n * 1.15) for n in phrase_counts]
+            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            lines.extend(
+                [
+                    f"    Phrases: {len(phrases)} phrases with {phrase_counts} notes respectively",
+                    f"    Syllable targets per phrase: [{ranges_str}]",
+                    f"    IMPORTANT: Write exactly {len(phrases)} lines for this section,"
+                    " one line per phrase.",
+                    "    Each line should contain approximately the syllable count shown.",
+                ]
+            )
 
     if artist_context:
         lines.extend(["", artist_context])
@@ -381,6 +748,7 @@ def _build_prompt(
             "  Write one block per unique loop label.",
             "  Output only the lyrics — no commentary, no explanations.",
             "  Lines starting with # are ignored (you may use them for stage directions).",
+            "  When phrase counts are given, write exactly that many lines per section.",
             "",
             "Example:",
             "  [melody_verse_alternate]",
@@ -638,11 +1006,18 @@ def run_lyric_pipeline(
         )
         sys.exit(1)
 
+    # --- 3b. Extract MIDI phrase structure per section ---
+    approved_dir = melody_dir / "approved"
+    for sec in vocal_sections:
+        midi_path = approved_dir / f"{sec['name']}.mid"
+        sec["phrases"] = extract_phrases(midi_path) if midi_path.exists() else []
+
     print(f"\nVocal sections ({len(vocal_sections)}) from arrangement:")
     for sec in vocal_sections:
+        phrase_info = f", {len(sec['phrases'])} phrases" if sec["phrases"] else ""
         print(
             f"  {sec['name']}: {sec['bars']}b × {sec['repeat']}"
-            f" = {sec['total_notes']} notes"
+            f" = {sec['total_notes']} notes{phrase_info}"
         )
 
     # --- 4. Syllable targets ---
@@ -701,8 +1076,16 @@ def run_lyric_pipeline(
     scored_entries = []
     for idx, text in enumerate(texts):
         result = scorer_results_map.get(idx)
+
+        # Bug 2 fix: blend keyword scores when Refractor confidence is very low
+        if result is not None:
+            confidence = result.get("confidence", 1.0)
+            if confidence < 0.2:
+                keyword_result = _keyword_score(text)
+                result = _blend_scores(result, keyword_result, confidence)
+
         chromatic_match = compute_chromatic_match(result, target) if result else 0.0
-        fitting = _compute_fitting(text, vocal_sections)
+        fitting = _compute_fitting(text, vocal_sections, melody_dir)
         scored_entries.append(
             {
                 "text": text,

@@ -1,11 +1,14 @@
 """Tests for the lyric generation pipeline."""
 
 import io
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import mido
 import pytest
 import yaml
+
+_NO_MIDI_DIR = Path("/nonexistent")
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +137,7 @@ class TestComputeFitting:
         # "Hello world" = 3 syllables, "beautiful morning" = 5 syllables → 8 total
         text = "[verse]\nHello world\nbeautiful morning\n"
         vocal_sections = [{"name": "verse", "total_notes": 10}]
-        result = _compute_fitting(text, vocal_sections)
+        result = _compute_fitting(text, vocal_sections, _NO_MIDI_DIR)
         assert result["verse"]["syllables"] == 8
         assert result["verse"]["notes"] == 10
         assert result["verse"]["ratio"] == pytest.approx(0.8, abs=0.001)
@@ -151,7 +154,7 @@ class TestComputeFitting:
             {"name": "verse", "total_notes": 10},
             {"name": "chorus", "total_notes": 5},
         ]
-        result = _compute_fitting(text, vocal_sections)
+        result = _compute_fitting(text, vocal_sections, _NO_MIDI_DIR)
         # chorus syllables >> 5 notes → splits needed
         assert result["chorus"]["verdict"] == "splits needed"
         assert result["overall"] == "splits needed"
@@ -162,7 +165,7 @@ class TestComputeFitting:
 
         text = "[verse]\nHi\n"  # 1 syllable
         vocal_sections = [{"name": "verse", "total_notes": 10}]  # ratio = 0.1
-        result = _compute_fitting(text, vocal_sections)
+        result = _compute_fitting(text, vocal_sections, _NO_MIDI_DIR)
         assert result["verse"]["verdict"] == "spacious"
         assert result["overall"] == "paste-ready"
 
@@ -172,7 +175,7 @@ class TestComputeFitting:
 
         text = "[verse]\n# stage direction\nHello world\n"
         vocal_sections = [{"name": "verse", "total_notes": 3}]
-        result = _compute_fitting(text, vocal_sections)
+        result = _compute_fitting(text, vocal_sections, _NO_MIDI_DIR)
         # Only "Hello world" = 3 syllables
         assert result["verse"]["syllables"] == 3
 
@@ -182,7 +185,7 @@ class TestComputeFitting:
 
         text = "[verse]\nHello\n"
         vocal_sections = [{"name": "verse", "total_notes": 0}]
-        result = _compute_fitting(text, vocal_sections)
+        result = _compute_fitting(text, vocal_sections, _NO_MIDI_DIR)
         assert result["verse"]["ratio"] == 1.0
 
 
