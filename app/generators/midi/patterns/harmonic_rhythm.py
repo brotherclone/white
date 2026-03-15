@@ -141,6 +141,7 @@ def accents_to_halfbar_mask(
 
 
 def default_accent_mask(time_sig: tuple[int, int] = (4, 4)) -> list[float]:
+    # ToDo: This is stupid
     """Fallback accent mask when no approved drums exist.
 
     Only bar starts (every 1.0 bar boundary) are marked as strong.
