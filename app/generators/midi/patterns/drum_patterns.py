@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 # ---------------------------------------------------------------------------
 # GM Percussion MIDI mapping (channel 10)
 # ---------------------------------------------------------------------------
-
+# ToDo: Move to refereneces
 GM_PERCUSSION = {
     "kick": 36,
     "snare": 38,
@@ -28,6 +28,10 @@ GM_PERCUSSION = {
     "tom_mid": 47,
     "tom_low": 45,
     "clap": 39,
+    "tambourine": 54,
+    "cowbell": 56,
+    "conga_high": 63,
+    "conga_low": 64,
 }
 
 # ---------------------------------------------------------------------------
@@ -88,6 +92,16 @@ GENRE_FAMILY_KEYWORDS = {
     "folk": ["folk", "acoustic", "singer-songwriter"],
     "americana": ["americana", "country", "bluegrass", "appalachian", "roots", "waltz"],
     "jazz": ["jazz", "swing", "bebop", "fusion"],
+    "breakbeat": [
+        "breakbeat",
+        "hip-hop",
+        "boom bap",
+        "break",
+        "funk",
+        "soul",
+        "r&b",
+        "groove",
+    ],
 }
 
 DEFAULT_GENRE_FAMILY = "electronic"
@@ -969,6 +983,455 @@ TEMPLATES_3_4_EXPERIMENTAL = [
 ]
 
 # ---------------------------------------------------------------------------
+# 4/4 Breakbeat (classic breaks + energy variants)
+# ---------------------------------------------------------------------------
+# Grid mapping: 16th-note positions in quarter-beat floats
+#   1=0.0  1e=0.25  1+=0.5  1a=0.75
+#   2=1.0  2e=1.25  2+=1.5  2a=1.75
+#   3=2.0  3e=2.25  3+=2.5  3a=2.75
+#   4=3.0  4e=3.25  4+=3.5  4a=3.75
+
+TEMPLATES_4_4_BREAKBEAT = [
+    # -------------------------------------------------------------------
+    # 9 classic medium-energy breaks (transcribed from reference patterns)
+    # -------------------------------------------------------------------
+    DrumPattern(
+        name="billie_jean",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Billie Jean — syncopated kick on 1/1a/2+/3/3a/4+, snare on 2 and 4, 8th-note hats",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.75, "normal"),
+                (1.5, "normal"),
+                (2.0, "accent"),
+                (2.75, "normal"),
+                (3.5, "normal"),
+            ],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "normal"),
+                (1.5, "ghost"),
+                (2.0, "normal"),
+                (2.5, "ghost"),
+                (3.0, "normal"),
+                (3.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="funky_drummer",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="The Funky Drummer — Clyde Stubblefield ghost-note snare complexity, 16th hats",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.75, "normal"),
+                (2.0, "normal"),
+                (2.75, "normal"),
+            ],
+            "snare": [
+                (1.0, "accent"),
+                (1.75, "ghost"),
+                (2.5, "ghost"),
+                (3.0, "accent"),
+                (3.25, "ghost"),
+            ],
+            "hh_closed": [
+                (0.0, "normal"),
+                (0.25, "ghost"),
+                (0.5, "normal"),
+                (0.75, "ghost"),
+                (1.0, "normal"),
+                (1.25, "ghost"),
+                (1.5, "normal"),
+                (1.75, "ghost"),
+                (2.0, "normal"),
+                (2.25, "ghost"),
+                (2.5, "normal"),
+                (2.75, "ghost"),
+                (3.0, "normal"),
+                (3.25, "ghost"),
+                (3.5, "normal"),
+                (3.75, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="impeach_the_president",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Impeach The President — syncopated kick on 1/1+/3/4+, open hat on offbeats",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.5, "normal"),
+                (2.0, "normal"),
+                (3.5, "normal"),
+            ],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "normal"),
+                (1.5, "ghost"),
+                (2.0, "normal"),
+                (2.5, "ghost"),
+                (3.0, "normal"),
+                (3.5, "ghost"),
+            ],
+            "hh_open": [(1.5, "normal"), (3.5, "normal")],
+        },
+    ),
+    DrumPattern(
+        name="when_the_levee_breaks",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="When The Levee Breaks — half-time thunder, dense kick, snare on beat 3, ghost hats",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.5, "normal"),
+                (0.75, "normal"),
+                (2.75, "normal"),
+            ],
+            "snare": [(2.0, "accent")],
+            "hh_closed": [
+                (0.0, "ghost"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+                (3.0, "ghost"),
+                (3.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="walk_this_way",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Walk This Way — busy syncopated kick, snare on 2 and 4, open hat on offbeats",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.75, "normal"),
+                (1.75, "normal"),
+                (2.0, "accent"),
+                (2.75, "normal"),
+                (3.75, "normal"),
+            ],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "normal"),
+                (1.5, "ghost"),
+                (2.0, "normal"),
+                (2.5, "ghost"),
+                (3.0, "normal"),
+                (3.5, "ghost"),
+            ],
+            "hh_open": [(1.5, "ghost"), (3.5, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="its_a_new_day",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="It's A New Day — James Brown kick on 1/1a/3/3a, snare on 2 and 4",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.75, "normal"),
+                (2.0, "accent"),
+                (2.75, "normal"),
+            ],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "normal"),
+                (1.5, "ghost"),
+                (2.0, "normal"),
+                (2.5, "ghost"),
+                (3.0, "normal"),
+                (3.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="papa_was_too",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Papa Was Too — kick 1/2+/3/4+, snare with ghost on 2 and 4, offbeat tambourine",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (1.5, "normal"),
+                (2.0, "normal"),
+                (3.5, "normal"),
+            ],
+            "snare": [(1.0, "accent"), (2.75, "ghost"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "normal"),
+                (1.5, "ghost"),
+                (2.0, "normal"),
+                (2.5, "ghost"),
+                (3.0, "normal"),
+                (3.5, "ghost"),
+            ],
+            "tambourine": [
+                (0.25, "ghost"),
+                (0.75, "ghost"),
+                (1.25, "ghost"),
+                (1.75, "ghost"),
+                (2.25, "ghost"),
+                (2.75, "ghost"),
+                (3.25, "ghost"),
+                (3.75, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="the_big_beat",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="The Big Beat — kick on 1/2+/3/4+, snare and clap on 2 and 4",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (1.5, "normal"),
+                (2.0, "normal"),
+                (3.5, "normal"),
+            ],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "clap": [(1.0, "normal"), (3.0, "accent")],
+        },
+    ),
+    DrumPattern(
+        name="ashleys_roachclip",
+        genre_family="breakbeat",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Ashley's Roachclip — kick/snare backbone with open hat and conga syncopation",
+        voices={
+            "kick": [(0.0, "accent"), (1.5, "normal"), (2.5, "normal")],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+                (3.0, "ghost"),
+                (3.5, "ghost"),
+            ],
+            "hh_open": [(1.5, "normal"), (2.5, "normal")],
+            "conga_high": [(0.25, "normal"), (1.75, "normal"), (2.75, "normal")],
+            "conga_low": [(0.75, "ghost"), (1.25, "ghost"), (3.25, "ghost")],
+        },
+    ),
+    # -------------------------------------------------------------------
+    # Low-energy variants
+    # -------------------------------------------------------------------
+    DrumPattern(
+        name="breakbeat_sparse",
+        genre_family="breakbeat",
+        energy="low",
+        time_sig=(4, 4),
+        description="Sparse boom-bap skeleton — kick on 1, snare on 3, ghost hat pulse",
+        voices={
+            "kick": [(0.0, "accent")],
+            "snare": [(2.0, "accent")],
+            "hh_closed": [
+                (0.0, "ghost"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+                (3.0, "ghost"),
+                (3.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="funky_drummer_stripped",
+        genre_family="breakbeat",
+        energy="low",
+        time_sig=(4, 4),
+        description="Funky Drummer stripped — kick/snare ghost skeleton, no hats",
+        voices={
+            "kick": [(0.0, "accent"), (0.75, "normal"), (2.0, "normal")],
+            "snare": [
+                (1.0, "accent"),
+                (1.75, "ghost"),
+                (2.5, "ghost"),
+                (3.0, "accent"),
+                (3.25, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="when_the_levee_breaks_ghost",
+        genre_family="breakbeat",
+        energy="low",
+        time_sig=(4, 4),
+        description="Levee feel at low volume — ghosted kick cluster, quiet snare on 3",
+        voices={
+            "kick": [(0.0, "ghost"), (0.5, "ghost"), (0.75, "ghost"), (2.75, "ghost")],
+            "snare": [(2.0, "normal")],
+            "hh_closed": [
+                (0.0, "ghost"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+                (3.0, "ghost"),
+                (3.5, "ghost"),
+            ],
+        },
+    ),
+    # -------------------------------------------------------------------
+    # High-energy variants
+    # -------------------------------------------------------------------
+    DrumPattern(
+        name="billie_jean_full",
+        genre_family="breakbeat",
+        energy="high",
+        time_sig=(4, 4),
+        description="Billie Jean full — all kicks accented, snare accented, crash on 1",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.75, "accent"),
+                (1.5, "accent"),
+                (2.0, "accent"),
+                (2.75, "accent"),
+                (3.5, "accent"),
+            ],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "accent"),
+                (0.5, "normal"),
+                (1.0, "accent"),
+                (1.5, "normal"),
+                (2.0, "accent"),
+                (2.5, "normal"),
+                (3.0, "accent"),
+                (3.5, "normal"),
+            ],
+            "crash": [(0.0, "normal")],
+        },
+    ),
+    DrumPattern(
+        name="funky_drummer_heavy",
+        genre_family="breakbeat",
+        energy="high",
+        time_sig=(4, 4),
+        description="Funky Drummer heavy — cowbell on offbeats, accented snares, driving 16th hats",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (0.75, "accent"),
+                (2.0, "accent"),
+                (2.75, "accent"),
+            ],
+            "snare": [
+                (1.0, "accent"),
+                (1.75, "ghost"),
+                (2.5, "ghost"),
+                (3.0, "accent"),
+                (3.25, "ghost"),
+            ],
+            "hh_closed": [
+                (0.0, "accent"),
+                (0.25, "ghost"),
+                (0.5, "normal"),
+                (0.75, "ghost"),
+                (1.0, "accent"),
+                (1.25, "ghost"),
+                (1.5, "normal"),
+                (1.75, "ghost"),
+                (2.0, "accent"),
+                (2.25, "ghost"),
+                (2.5, "normal"),
+                (2.75, "ghost"),
+                (3.0, "accent"),
+                (3.25, "ghost"),
+                (3.5, "normal"),
+                (3.75, "ghost"),
+            ],
+            "cowbell": [
+                (0.5, "normal"),
+                (1.5, "normal"),
+                (2.5, "normal"),
+                (3.5, "normal"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="breakbeat_driving",
+        genre_family="breakbeat",
+        energy="high",
+        time_sig=(4, 4),
+        description="Driving breakbeat — four-on-floor kick with breakbeat snare and open hat offbeats",
+        voices={
+            "kick": [
+                (0.0, "accent"),
+                (1.0, "accent"),
+                (2.0, "accent"),
+                (3.0, "accent"),
+            ],
+            "snare": [(1.0, "accent"), (3.0, "accent")],
+            "hh_closed": [
+                (0.0, "accent"),
+                (0.25, "ghost"),
+                (0.5, "normal"),
+                (0.75, "ghost"),
+                (1.0, "accent"),
+                (1.25, "ghost"),
+                (1.5, "normal"),
+                (1.75, "ghost"),
+                (2.0, "accent"),
+                (2.25, "ghost"),
+                (2.5, "normal"),
+                (2.75, "ghost"),
+                (3.0, "accent"),
+                (3.25, "ghost"),
+                (3.5, "normal"),
+                (3.75, "ghost"),
+            ],
+            "hh_open": [
+                (0.5, "normal"),
+                (1.5, "normal"),
+                (2.5, "normal"),
+                (3.5, "normal"),
+            ],
+        },
+    ),
+]
+
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -990,4 +1453,6 @@ ALL_TEMPLATES: list[DrumPattern] = [
     # 3/4
     *TEMPLATES_3_4_AMERICANA,
     *TEMPLATES_3_4_EXPERIMENTAL,
+    # 4/4 Breakbeat
+    *TEMPLATES_4_4_BREAKBEAT,
 ]

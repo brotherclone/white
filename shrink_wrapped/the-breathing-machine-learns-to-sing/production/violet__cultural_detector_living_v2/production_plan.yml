@@ -1,0 +1,45 @@
+song_slug: violet__cultural_detector_living_v2
+generated: '2026-03-12T12:22:32.781531+00:00'
+source_proposal: shrink_wrapped/white-the-breathing-machine-learns-to-sing/song_proposal_Violet
+  (0xad86d6)_cultural_detector_living_v2.yml
+title: ''
+bpm: 67
+time_sig: 4/4
+key: Gb minor
+color: Violet
+genres: []
+mood: []
+concept: ''
+vocals_planned: false
+sounds_like: []
+sections:
+- name: cultural
+  bars: 12
+  repeat: 1
+  vocals: false
+  notes: ''
+  loops:
+    chords: cultural
+    drums: drum_cultural_basic
+    bass: bass_cultural_half
+    melody: melody_cultural
+- name: living
+  bars: 7
+  repeat: 1
+  vocals: false
+  notes: ''
+  loops:
+    chords: living
+    drums: drum_living_simple
+    bass: bass_living_pedal
+    melody: melody_living_alternate
+- name: detector
+  bars: 8
+  repeat: 1
+  vocals: false
+  notes: ''
+  loops:
+    chords: detector
+    drums: drum_detector_stutter
+    bass: bass_detector_whole
+    melody: melody_detector

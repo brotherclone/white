@@ -57,18 +57,14 @@ class SingerRange:
 
 SINGERS: dict[str, SingerRange] = {
     "busayo": SingerRange("Busayo", 45, 64, "baritone"),
-    "busyayo": SingerRange("Busayo", 45, 64, "baritone"),  # legacy spelling
     "gabriel": SingerRange("Gabriel", 48, 67, "tenor"),
     "gabe": SingerRange("Gabriel", 48, 67, "tenor"),
     "robbie": SingerRange("Robbie", 48, 67, "tenor"),
     "shirley": SingerRange("Shirley", 53, 72, "alto"),
     "katherine": SingerRange("Katherine", 57, 76, "alto"),
-    # Bass-baritone with falsetto ceiling
     "marvin": SingerRange("Marvin", 40, 69, "baritone"),
-    # Parody tenor — same range as Gabriel
     "aloy": SingerRange("Aloysius", 48, 67, "tenor"),
     "aloysius": SingerRange("Aloysius", 48, 67, "tenor"),
-    # 50s-style bright tenor — sits a little higher
     "remez": SingerRange("Remez", 50, 72, "tenor"),
 }
 
@@ -80,9 +76,14 @@ class MelodyPattern:
     Attributes:
         name: Unique pattern identifier.
         contour: Contour type — stepwise, arpeggiated, repeated,
-                 leap_step, pentatonic, scalar_run.
+                 leap_step, pentatonic, scalar_run (lead); declarative,
+                 call_and_rest, haiku, incantatory, drone_and_step,
+                 conversational (vocal).
         energy: Energy level — "low", "medium", or "high".
         time_sig: Tuple of (numerator, denominator).
+        use_case: "vocal" — sparse, syllable-friendly, ≤6 onsets/bar,
+                  ≥1 rest, ≥1 held note ≥1.5 beats.
+                  "lead" — any density, for instrument tracks.
         description: Human-readable description.
         intervals: Signed semitone deltas from previous note.
                    First element is always 0 (resolved from chord).
@@ -95,6 +96,7 @@ class MelodyPattern:
     energy: str
     time_sig: tuple[int, int]
     description: str
+    use_case: str = "vocal"
     intervals: list[int] = field(default_factory=list)
     rhythm: list[float] = field(default_factory=list)
     durations: list[float] | None = None
@@ -278,11 +280,14 @@ def select_templates(
     all_templates: list[MelodyPattern],
     time_sig: tuple[int, int],
     target_energy: str,
+    use_case: str = "vocal",
 ) -> list[MelodyPattern]:
-    """Select templates matching time signature and energy (exact + adjacent)."""
+    """Select templates matching time signature, use_case, and energy (exact + adjacent)."""
     results = []
     for t in all_templates:
         if t.time_sig != time_sig:
+            continue
+        if t.use_case != use_case:
             continue
         dist = energy_distance(t.energy, target_energy)
         if dist <= 1:
@@ -298,6 +303,7 @@ def make_fallback_pattern(time_sig: tuple[int, int]) -> MelodyPattern:
         name="fallback_repeated",
         contour="repeated",
         energy="medium",
+        use_case="vocal",
         time_sig=time_sig,
         description=f"Fallback — repeated root on beat 1 for {time_sig[0]}/{time_sig[1]}",
         intervals=[0],
@@ -313,18 +319,23 @@ def make_fallback_pattern(time_sig: tuple[int, int]) -> MelodyPattern:
 def singability_score(
     notes: list[tuple[float, int, float]],
     singer: SingerRange,
+    time_sig: tuple[int, int] = (4, 4),
 ) -> float:
     """Score melody singability (0.0–1.0).
 
     Components:
     - Interval penalty: large leaps (> octave) penalised, stepwise rewarded
     - Range usage: melodies using < 50% of available range penalised
-    - Rest placement: at least one rest per 4 bars
+    - Rest placement: at least one rest per bar
+    - Density: penalise > 6 onsets/bar in 4/4
+    - Hold: reward notes with duration ≥ 1.5 beats
     """
     if len(notes) < 2:
         return 0.5
 
     pitches = [n for _, n, _ in notes]
+    num, den = time_sig
+    bar_length = num * (4.0 / den)
 
     # --- Interval penalty ---
     intervals = [abs(pitches[i + 1] - pitches[i]) for i in range(len(pitches) - 1)]
@@ -356,9 +367,7 @@ def singability_score(
         else:
             range_component = 1.0
 
-    # --- Rest placement ---
-    # Check if there are gaps between notes (onset + dur < next onset)
-    bar_length = 4.0  # assume 4/4 for this heuristic
+    # --- Rest placement (≥1 per bar) ---
     total_beats = notes[-1][0] + notes[-1][2] if notes else 0.0
     bars_count = max(1, total_beats / bar_length)
 
@@ -369,10 +378,33 @@ def singability_score(
         if onset_next > onset_i + dur_i + 0.1:  # small tolerance
             gap_count += 1
 
-    rest_ratio = gap_count / bars_count
-    rest_component = min(1.0, rest_ratio * 4.0)  # 1 rest per 4 bars = full score
+    rests_per_bar = gap_count / bars_count
+    rest_component = min(1.0, rests_per_bar)  # 1 rest per bar = full score
 
-    return (interval_component + range_component + rest_component) / 3.0
+    # --- Density (penalise > 6 onsets/bar in 4/4) ---
+    if time_sig == (4, 4):
+        onsets_per_bar = len(notes) / bars_count
+        if onsets_per_bar <= 6:
+            density_component = 1.0
+        else:
+            density_component = max(0.0, 1.0 - (onsets_per_bar - 6) / 6)
+    else:
+        density_component = 1.0  # no density penalty for other time sigs
+
+    # --- Hold (reward notes ≥ 1.5 beats) ---
+    durs = [d for _, _, d in notes]
+    held_count = sum(1 for d in durs if d >= 1.5)
+    hold_component = min(
+        1.0, held_count / bars_count
+    )  # 1 held note per bar = full score
+
+    return (
+        interval_component
+        + range_component
+        + rest_component
+        + density_component
+        + hold_component
+    ) / 5.0
 
 
 def chord_tone_alignment(
@@ -817,19 +849,620 @@ TEMPLATES_7_8 = [
 ]
 
 # ---------------------------------------------------------------------------
-# All templates registry
+# Mark all existing templates as lead (instrument tracks)
+# New vocal templates are defined below.
 # ---------------------------------------------------------------------------
 
-ALL_TEMPLATES: list[MelodyPattern] = [
-    # 4/4
+_EXISTING_LEAD_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_STEPWISE,
     *TEMPLATES_4_4_ARPEGGIATED,
     *TEMPLATES_4_4_REPEATED,
     *TEMPLATES_4_4_LEAP_STEP,
     *TEMPLATES_4_4_PENTATONIC,
     *TEMPLATES_4_4_SCALAR,
-    # 3/4 (waltz)
     *TEMPLATES_3_4,
-    # 7/8
     *TEMPLATES_7_8,
+]
+for _t in _EXISTING_LEAD_TEMPLATES:
+    _t.use_case = "lead"
+
+
+# ===========================================================================
+# VOCAL TEMPLATES
+# ===========================================================================
+# All vocal templates satisfy:
+#   - use_case = "vocal"
+#   - ≤ 6 onsets per bar in 4/4
+#   - ≥ 1 gap of ≥ 0.5 beats between consecutive notes
+#   - ≥ 1 note with duration ≥ 1.5 beats
+#
+# Structure: most templates open with a held note (dur ≥ 1.5),
+# followed by a breath (onset[1] ≥ onset[0]+dur[0]+0.5), then a
+# continuation phrase. Haiku/three-motif variants use equal short-short-LONG.
+
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Declarative
+# (strong opening statement, held opener, breath, resolution)
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_DECLARATIVE = [
+    MelodyPattern(
+        name="decl_long_low",
+        contour="declarative",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="One long held statement, breath, quiet step-down resolution",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.5],
+        durations=[2.0, 1.5],
+    ),
+    MelodyPattern(
+        name="decl_cadence_low",
+        contour="declarative",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Cadential descent — long hold then two-note landing",
+        intervals=[0, -2, -1],
+        rhythm=[0.0, 2.0, 3.0],
+        durations=[1.5, 0.75, 1.0],
+    ),
+    MelodyPattern(
+        name="decl_arc_med",
+        contour="declarative",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Rising to peak then fall — classical phrase arc",
+        intervals=[0, 2, -1, -2],
+        rhythm=[0.0, 2.0, 2.75, 3.5],
+        durations=[1.5, 0.5, 0.5, 0.5],
+    ),
+    MelodyPattern(
+        name="decl_proclamation_med",
+        contour="declarative",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Deliberate declaration — held opener then three-note resolution",
+        intervals=[0, 3, -1, -2],
+        rhythm=[0.0, 2.0, 2.5, 3.0],
+        durations=[1.5, 0.4, 0.4, 1.0],
+    ),
+    MelodyPattern(
+        name="decl_surge_high",
+        contour="declarative",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="Urgent statement — held opener, breath, five-note surge",
+        intervals=[0, 2, 1, 2, -1, -3],
+        rhythm=[0.0, 2.0, 2.25, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.2, 0.2, 0.4, 0.4, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Call and Rest
+# (phrase, long silence, quiet response — Nebraska phrasing)
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_CALL_AND_REST = [
+    MelodyPattern(
+        name="call_rest_sparse_low",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Call and long rest — minimal Nebraska-style phrase",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.5],
+        durations=[2.0, 1.5],
+    ),
+    MelodyPattern(
+        name="call_rest_echo_low",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Held call, long rest, quiet echo one step up",
+        intervals=[0, 2],
+        rhythm=[0.0, 2.5],
+        durations=[1.5, 1.5],
+    ),
+    MelodyPattern(
+        name="call_rest_question_med",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Rising question, breath, falling answer",
+        intervals=[0, 2, -1, -2],
+        rhythm=[0.0, 2.0, 2.75, 3.5],
+        durations=[1.5, 0.5, 0.5, 0.5],
+    ),
+    MelodyPattern(
+        name="call_rest_resolve_med",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Call held then quiet response — Springsteen verse feel",
+        intervals=[0, -3, 2, -1],
+        rhythm=[0.0, 2.0, 2.5, 3.5],
+        durations=[1.5, 0.4, 0.75, 0.5],
+    ),
+    MelodyPattern(
+        name="call_rest_drive_high",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="Emphatic call, breath, energized five-note response",
+        intervals=[0, 3, -1, 2, -1, -3],
+        rhythm=[0.0, 2.0, 2.25, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.2, 0.2, 0.4, 0.4, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Haiku
+# (three short motifs with breathing rests; often short-short-LONG)
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_HAIKU = [
+    MelodyPattern(
+        name="haiku_step_low",
+        contour="haiku",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Three syllables, two breaths — stepwise descent to long resolution",
+        intervals=[0, -2, 1],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 2.0],
+    ),
+    MelodyPattern(
+        name="haiku_leap_low",
+        contour="haiku",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Leap up, step back, hold — three-image haiku",
+        intervals=[0, 2, -3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 2.0],
+    ),
+    MelodyPattern(
+        name="haiku_four_med",
+        contour="haiku",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Four syllables with uniform breathing, long final resolution",
+        intervals=[0, 2, -2, -1],
+        rhythm=[0.0, 1.0, 2.0, 3.0],
+        durations=[0.5, 0.5, 0.5, 1.5],
+    ),
+    MelodyPattern(
+        name="haiku_arch_med",
+        contour="haiku",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Arch shape across three breath groups, held resolution",
+        intervals=[0, 3, -1, -2],
+        rhythm=[0.0, 1.0, 2.0, 3.0],
+        durations=[0.5, 0.5, 0.5, 1.5],
+    ),
+    MelodyPattern(
+        name="haiku_intense_high",
+        contour="haiku",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="Intensifying motifs — held opener, breath, three urgent closing notes",
+        intervals=[0, 2, -1, 3, -1],
+        rhythm=[0.0, 2.0, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.4, 0.4, 0.4, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Incantatory
+# (repetitive, narrow interval range, chant-like)
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_INCANTATORY = [
+    MelodyPattern(
+        name="incant_monotone_low",
+        contour="incantatory",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Monotone chant — long repeated root, breath, neighbor inflection",
+        intervals=[0, 0, 2],
+        rhythm=[0.0, 2.0, 3.0],
+        durations=[1.5, 0.75, 1.0],
+    ),
+    MelodyPattern(
+        name="incant_oscillate_low",
+        contour="incantatory",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Oscillating two-note chant, uniform rests, long resolution",
+        intervals=[0, 1, 0, -1],
+        rhythm=[0.0, 1.0, 2.0, 3.0],
+        durations=[0.5, 0.5, 0.5, 1.5],
+    ),
+    MelodyPattern(
+        name="incant_neighbor_med",
+        contour="incantatory",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Long held root, breath, neighbor-tone decoration",
+        intervals=[0, 0, 1, -1],
+        rhythm=[0.0, 2.0, 2.5, 3.5],
+        durations=[1.5, 0.4, 0.75, 0.5],
+    ),
+    MelodyPattern(
+        name="incant_step_med",
+        contour="incantatory",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Step-repeat pattern — held opener, three narrow-step returns",
+        intervals=[0, 2, -1, 0, -1],
+        rhythm=[0.0, 2.0, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.4, 0.4, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="incant_pulse_high",
+        contour="incantatory",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="Driving incantation — held opener then five narrow-range pulses",
+        intervals=[0, 1, -1, 2, -1, 1],
+        rhythm=[0.0, 2.0, 2.25, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.2, 0.2, 0.4, 0.4, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Drone and Step
+# (long sustained root, breath, one or two movements away — Lankum style)
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_DRONE_AND_STEP = [
+    MelodyPattern(
+        name="drone_step_down_low",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Long drone then single step down — stillness and gravity",
+        intervals=[0, -2],
+        rhythm=[0.0, 3.0],
+        durations=[2.5, 1.0],
+    ),
+    MelodyPattern(
+        name="drone_step_resolve_low",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Long drone, breath, two-note descent to tonic",
+        intervals=[0, -2, 1],
+        rhythm=[0.0, 2.5, 3.5],
+        durations=[2.0, 0.75, 0.5],
+    ),
+    MelodyPattern(
+        name="drone_step_rise_med",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Held root, breath, single step up then fall — questioning",
+        intervals=[0, 2, -1],
+        rhythm=[0.0, 2.0, 3.0],
+        durations=[1.5, 0.75, 1.0],
+    ),
+    MelodyPattern(
+        name="drone_step_leap_med",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Very long drone, breath, leap down and two-note close",
+        intervals=[0, -3, 2, -1],
+        rhythm=[0.0, 2.5, 3.0, 3.5],
+        durations=[2.0, 0.4, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="drone_step_surge_high",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="Held root, breath, ascending four-note phrase",
+        intervals=[0, 2, 1, -1, -2],
+        rhythm=[0.0, 2.0, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.4, 0.4, 0.4, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Conversational
+# (speech-rhythm irregular phrasing, natural breath patterns)
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_CONVERSATIONAL = [
+    MelodyPattern(
+        name="conv_spoken_low",
+        contour="conversational",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Spoken-word feel — long opening thought, breath, quiet aside",
+        intervals=[0, -1, 2],
+        rhythm=[0.0, 2.0, 3.5],
+        durations=[1.5, 1.25, 0.5],
+    ),
+    MelodyPattern(
+        name="conv_murmur_low",
+        contour="conversational",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Low murmur — held opener, breath, two-note trailing phrase",
+        intervals=[0, 2, -2, 1],
+        rhythm=[0.0, 2.0, 3.0, 3.5],
+        durations=[1.5, 0.75, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="conv_aside_med",
+        contour="conversational",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Statement and aside — held thought, breath, offhand three-note remark",
+        intervals=[0, -1, 3, -2],
+        rhythm=[0.0, 2.0, 2.75, 3.5],
+        durations=[1.5, 0.5, 0.5, 0.5],
+    ),
+    MelodyPattern(
+        name="conv_syncopated_med",
+        contour="conversational",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Syncopated speech — long opener, breath, four-note conversational run",
+        intervals=[0, 2, -1, 1, -2],
+        rhythm=[0.0, 2.0, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.4, 0.4, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="conv_animated_high",
+        contour="conversational",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="Animated speech — held opener then five-note rapid commentary",
+        intervals=[0, 1, 2, -1, 2, -3],
+        rhythm=[0.0, 2.0, 2.25, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.2, 0.2, 0.4, 0.4, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 3/4 Vocal
+# (bar = 3.0 beats; ≤ 6 onsets, ≥ 0.5 gap, ≥ 1.5 dur)
+# ---------------------------------------------------------------------------
+
+VOCAL_3_4 = [
+    MelodyPattern(
+        name="vocal_waltz_sigh",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="low",
+        time_sig=(3, 4),
+        description="Waltz sigh — long hold, breath, single step-down close",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.0],
+        durations=[1.5, 1.0],
+    ),
+    MelodyPattern(
+        name="vocal_waltz_step",
+        contour="declarative",
+        use_case="vocal",
+        energy="low",
+        time_sig=(3, 4),
+        description="Waltz step — short-short-LONG descending motif",
+        intervals=[0, -2, 1],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 2.0],
+    ),
+    MelodyPattern(
+        name="vocal_waltz_question",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Waltz question — held note, breath, two-note resolution",
+        intervals=[0, 2, -1],
+        rhythm=[0.0, 2.0, 2.5],
+        durations=[1.5, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="vocal_waltz_haiku",
+        contour="haiku",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Waltz haiku — three beats, three images, uniform breathing",
+        intervals=[0, 2, -3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 2.0],
+    ),
+    MelodyPattern(
+        name="vocal_waltz_surge",
+        contour="declarative",
+        use_case="vocal",
+        energy="high",
+        time_sig=(3, 4),
+        description="Waltz surge — held opener, breath, three-note close",
+        intervals=[0, 2, 1, -2],
+        rhythm=[0.0, 2.0, 2.25, 2.75],
+        durations=[1.5, 0.2, 0.4, 0.25],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 6/8 Vocal
+# (bar = 3.0 beats; compound duple, strong at 0.0 and 1.5)
+# ---------------------------------------------------------------------------
+
+VOCAL_6_8 = [
+    MelodyPattern(
+        name="six_eight_drone_low",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="low",
+        time_sig=(6, 8),
+        description="6/8 long drone, breath, single step landing",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.0],
+        durations=[1.5, 1.0],
+    ),
+    MelodyPattern(
+        name="six_eight_sway_low",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="low",
+        time_sig=(6, 8),
+        description="6/8 lilting sway — held downbeat, breath, step resolution",
+        intervals=[0, 2, -1],
+        rhythm=[0.0, 2.0, 2.5],
+        durations=[1.5, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="six_eight_verse_med",
+        contour="declarative",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(6, 8),
+        description="6/8 verse phrase — held opener, quick turn, rest built in",
+        intervals=[0, 2, -1],
+        rhythm=[0.0, 2.0, 2.5],
+        durations=[1.5, 0.4, 0.4],
+    ),
+    MelodyPattern(
+        name="six_eight_haiku_med",
+        contour="haiku",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(6, 8),
+        description="6/8 haiku — two groups with rest, held close",
+        intervals=[0, 2, -3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 1.5],
+    ),
+    MelodyPattern(
+        name="six_eight_drive_high",
+        contour="declarative",
+        use_case="vocal",
+        energy="high",
+        time_sig=(6, 8),
+        description="6/8 driving phrase — held opener, breath, three-note finish",
+        intervals=[0, 2, -1, -2],
+        rhythm=[0.0, 2.0, 2.25, 2.75],
+        durations=[1.5, 0.2, 0.4, 0.25],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 7/8 Vocal
+# (bar = 3.5 beats; ≤ 6 onsets, ≥ 0.5 gap, ≥ 1.5 dur)
+# ---------------------------------------------------------------------------
+
+VOCAL_7_8 = [
+    MelodyPattern(
+        name="vocal_7_8_hold_low",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="low",
+        time_sig=(7, 8),
+        description="7/8 long drone, breath on group 3, step-down close",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.0],
+        durations=[1.5, 1.5],
+    ),
+    MelodyPattern(
+        name="vocal_7_8_haiku_low",
+        contour="haiku",
+        use_case="vocal",
+        energy="low",
+        time_sig=(7, 8),
+        description="7/8 haiku — short-short-LONG across asymmetric groups",
+        intervals=[0, 2, -3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 2.0],
+    ),
+    MelodyPattern(
+        name="vocal_7_8_arc_med",
+        contour="declarative",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(7, 8),
+        description="7/8 arc — held opener, breath, three-note resolution within bar",
+        intervals=[0, 2, -1, -2],
+        rhythm=[0.0, 2.0, 2.5, 3.0],
+        durations=[1.5, 0.4, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="vocal_7_8_step_med",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(7, 8),
+        description="7/8 step — two quick motifs then long held resolution",
+        intervals=[0, -1, 3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 1.5],
+    ),
+    MelodyPattern(
+        name="vocal_7_8_surge_high",
+        contour="declarative",
+        use_case="vocal",
+        energy="high",
+        time_sig=(7, 8),
+        description="7/8 surge — held opener then four-note ascending phrase",
+        intervals=[0, 2, 1, -1, -2],
+        rhythm=[0.0, 2.0, 2.5, 3.0, 3.25],
+        durations=[1.5, 0.4, 0.4, 0.2, 0.25],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# All templates registry
+# ---------------------------------------------------------------------------
+
+ALL_TEMPLATES: list[MelodyPattern] = [
+    # Existing templates reclassified as lead (instrument tracks)
+    *_EXISTING_LEAD_TEMPLATES,
+    # New 4/4 vocal templates
+    *VOCAL_4_4_DECLARATIVE,
+    *VOCAL_4_4_CALL_AND_REST,
+    *VOCAL_4_4_HAIKU,
+    *VOCAL_4_4_INCANTATORY,
+    *VOCAL_4_4_DRONE_AND_STEP,
+    *VOCAL_4_4_CONVERSATIONAL,
+    # New vocal templates for other time signatures
+    *VOCAL_3_4,
+    *VOCAL_6_8,
+    *VOCAL_7_8,
 ]

@@ -66,6 +66,13 @@ def find_ace_export(production_dir: Path) -> Optional[Path]:
     if direct:
         return direct[0]
 
+    # Fallback: VocalSynthv*.mid inside melody/ subfolder
+    melody_direct = sorted(
+        (production_dir / "melody").glob("VocalSynthv*.mid"), reverse=True
+    )
+    if melody_direct:
+        return melody_direct[0]
+
     return None
 
 

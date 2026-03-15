@@ -1,0 +1,41 @@
+overall_pitch_match: 0.7191
+overall_rhythm_drift: 8.9545
+total_lyric_edits: 81
+total_word_count: 214
+sections:
+- pitch_match_pct: 0.8
+  rhythm_drift_beats: 2.4
+  lyric_edit_distance: null
+  note_count_delta: 27
+  section: melody_slow_learner
+  word_count: 52
+- pitch_match_pct: 0.8667
+  rhythm_drift_beats: 15.3333
+  lyric_edit_distance: null
+  note_count_delta: 37
+  section: melody_slow_learner_alternate
+  word_count: 52
+- pitch_match_pct: 0.6
+  rhythm_drift_beats: 16.8125
+  lyric_edit_distance: null
+  note_count_delta: 29
+  section: melody_mineral_museum
+  word_count: 49
+- pitch_match_pct: 0.6667
+  rhythm_drift_beats: 14.25
+  lyric_edit_distance: null
+  note_count_delta: 6
+  section: melody_mineral_museum_alternate
+  word_count: 18
+- pitch_match_pct: 0.6667
+  rhythm_drift_beats: 4.7167
+  lyric_edit_distance: null
+  note_count_delta: 6
+  section: melody_franklinite
+  word_count: 36
+- pitch_match_pct: 0.7143
+  rhythm_drift_beats: 0.2143
+  lyric_edit_distance: null
+  note_count_delta: -1
+  section: melody_mineral_museum_plain
+  word_count: 7

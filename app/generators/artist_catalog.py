@@ -328,7 +328,9 @@ def score_chromatic(
         from training.refractor import Refractor
     except Exception as exc:
         print(f"ERROR: Failed to import Refractor: {exc}")
-        print("Use .venv312/bin/python — Refractor requires torch + numpy 1.x.")
+        print(
+            "Check that training/data/refractor.onnx exists and dependencies are installed."
+        )
         sys.exit(1)
 
     scorer = Refractor(onnx_path)
@@ -460,7 +462,7 @@ def main():
     parser.add_argument(
         "--score-chromatic",
         action="store_true",
-        help="Score all non-null descriptions through Refractor (.venv312)",
+        help="Score all non-null descriptions through Refractor",
     )
     parser.add_argument(
         "--summary",

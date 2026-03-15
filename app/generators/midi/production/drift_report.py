@@ -25,17 +25,22 @@ from app.generators.midi.production.ace_studio_import import (
     find_ace_export,
     parse_ace_export,
 )
+from app.generators.midi.production.assembly_manifest import (
+    _is_bar_beat_format,
+    parse_arrangement,
+)
+from app.generators.midi.production.production_plan import load_plan
 
 DRIFT_REPORT_FILENAME = "drift_report.yml"
 MELODY_TRACK = 4  # Logic Pro track number for melody in arrangement.txt
 
 
 # ---------------------------------------------------------------------------
-# Timecode parsing
+# Timecode parsing (SMPTE format)
 # ---------------------------------------------------------------------------
 
 
-def _parse_timecode(tc: str) -> float:
+def parse_timecode(tc: str) -> float:
     """Parse a Logic Pro SMPTE timecode to seconds from song start.
 
     Format: HH:MM:SS:FF.sf  (30fps, 100 subframes per frame)
@@ -55,28 +60,63 @@ def _parse_timecode(tc: str) -> float:
 
 
 def _parse_arrangement_sections(
-    arrangement_path: Path, track: int = MELODY_TRACK
+    arrangement_path: Path, production_dir: Path = None, track: int = MELODY_TRACK
 ) -> list[tuple[str, float, float]]:
     """Return (label, start_sec, end_sec) for the given track number.
 
-    arrangement.txt format: start_tc  label  track_num  end_tc
+    For SMPTE timecode arrangements: parses directly using _parse_timecode,
+    giving song-absolute seconds (01:00:00:00 = 0s).
+
+    For bar/beat arrangements: uses parse_arrangement from assembly_manifest
+    with BPM and time_sig from production_plan.yml.  Section ends are derived
+    from the next clip's start because the end column encodes a clip length in
+    bar-beat form which parse_arrangement cannot currently decode correctly.
     """
-    sections: list[tuple[str, float, float]] = []
-    with open(arrangement_path) as f:
-        for line in f:
+    text = arrangement_path.read_text()
+
+    if not _is_bar_beat_format(text):
+        # SMPTE path: _parse_timecode gives absolute song seconds.
+        sections: list[tuple[str, float, float]] = []
+        for line in text.splitlines():
             parts = line.split()
             if len(parts) < 4:
                 continue
-            start_tc, label, track_num, end_tc = (
-                parts[0],
-                parts[1],
-                int(parts[2]),
-                parts[3],
-            )
+            try:
+                start_tc, label, track_num, end_tc = (
+                    parts[0],
+                    parts[1],
+                    int(parts[2]),
+                    parts[3],
+                )
+            except (ValueError, IndexError):
+                continue
             if track_num != track:
                 continue
-            sections.append((label, _parse_timecode(start_tc), _parse_timecode(end_tc)))
-    return sections
+            sections.append((label, parse_timecode(start_tc), parse_timecode(end_tc)))
+        return sections
+
+    # Bar/beat path: load BPM and time_sig from production_plan.yml.
+    prod_dir = production_dir if production_dir is not None else arrangement_path.parent
+    plan = load_plan(prod_dir)
+    bpm = float(plan.bpm) if plan else 120.0
+    beats_per_bar = 4.0
+    if plan:
+        ts_parts = plan.time_sig.split("/")
+        beats_per_bar = int(ts_parts[0]) * (4.0 / int(ts_parts[1]))
+
+    clips = parse_arrangement(text, bpm=bpm, beats_per_bar=beats_per_bar)
+    melody_clips = [c for c in clips if c.track == track]
+    # Derive section ends from the next clip's start; last section gets a
+    # generous ceiling so all trailing words are captured.
+    result: list[tuple[str, float, float]] = []
+    for i, clip in enumerate(melody_clips):
+        end = (
+            melody_clips[i + 1].start
+            if i + 1 < len(melody_clips)
+            else clip.start + 3600.0
+        )
+        result.append((clip.name, clip.start, end))
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -85,7 +125,10 @@ def _parse_arrangement_sections(
 
 
 def segment_ace_export_by_arrangement(
-    word_events: list[dict], arrangement_path: Path, bpm: int
+    word_events: list[dict],
+    arrangement_path: Path,
+    bpm: int,
+    production_dir: Path = None,
 ) -> dict[str, list]:
     """Map ACE word events to arrangement sections.
 
@@ -95,7 +138,10 @@ def segment_ace_export_by_arrangement(
 
     Returns {section_label: [word_event, ...]} — empty sections omitted.
     """
-    sections = _parse_arrangement_sections(arrangement_path, track=MELODY_TRACK)
+    prod_dir = production_dir if production_dir is not None else arrangement_path.parent
+    sections = _parse_arrangement_sections(
+        arrangement_path, prod_dir, track=MELODY_TRACK
+    )
     result: dict[str, list] = {label: [] for label, _, _ in sections}
 
     for word in word_events:
@@ -138,7 +184,7 @@ def _load_approved_notes(midi_path: Path) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 
-def _levenshtein(a: list[str], b: list[str]) -> int:
+def levenshtein(a: list[str], b: list[str]) -> int:
     """Edit distance between two word sequences."""
     m, n = len(a), len(b)
     dp = list(range(n + 1))
@@ -223,7 +269,7 @@ def _compute_lyric_edits(production_dir: Path, ace_words: list[dict]) -> Optiona
                 if not line.strip().startswith("#") and not line.strip().startswith("[")
             ]
             ace_word_list = [w["word"].lower() for w in ace_words]
-            return _levenshtein(approved_words, ace_word_list)
+            return levenshtein(approved_words, ace_word_list)
     return None
 
 
@@ -280,7 +326,9 @@ def generate_drift_report(production_dir: Path) -> dict:
     melody_approved_dir = production_dir / "melody" / "approved"
 
     # Segment words into sections
-    segmented = segment_ace_export_by_arrangement(word_events, arrangement_path, bpm)
+    segmented = segment_ace_export_by_arrangement(
+        word_events, arrangement_path, bpm, production_dir=production_dir
+    )
 
     # Per-section comparison
     sections_data: list[dict] = []

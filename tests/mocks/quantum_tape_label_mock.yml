@@ -6,7 +6,16 @@ counter_start: 1
 counter_end: 921
 notes: This is a mock quantum tape label for testing purposes.
 original_label_visible: True
-original_label_text: "Quantum Tape Label"
+original_label_text: "Gabe Walsh — 1990"
 tape_degradation: 0.4
 tape_brand: "Quantum Tape Brand"
 handwriting_style: mock style
+year_documented: "1990"
+original_date: "1990"
+original_title: "Gabe Walsh — 1990"
+tapeover_date: "Jan 1990 – Dec 2000"
+tapeover_title: "mock quantum tape label"
+subject_name: "Gabe Walsh"
+age_during: "22–32"
+location: "Portland, OR"
+catalog_number: "QT-B-1990-MOCK00"

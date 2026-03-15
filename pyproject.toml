@@ -5,7 +5,7 @@ packages = ["app", "staged_raw_material"]
 name = "white"
 version = "0.1.0"
 description = "System for creation of White album in The Rainbow Table"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "discogs-client>=2.3.0",
     "httpx>=0.28.1",
@@ -47,7 +47,9 @@ dependencies = [
     "ipykernel>=7.1.0",
     "datasets>=4.5.0",
     "networkx",
-    "transformers",
+    "transformers>=4.47,<5",
+    "sentencepiece>=0.2.0",
+    "torch>=2.2.0,<2.3.0",
     "onnxruntime"
 ]
 

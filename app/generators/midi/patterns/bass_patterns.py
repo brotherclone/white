@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-
+# ToDo: Move to refereneces
 BASS_REGISTER_MIN = 24  # C1
 BASS_REGISTER_MAX = 60  # C4
 BASS_CHANNEL = 0

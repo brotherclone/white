@@ -1,0 +1,43 @@
+# Earthly Frames member → ACE Studio voice mapping
+#
+# White project singer names (used in song proposals + melody pipeline) mapped
+# to the ACE Studio sound source name passed to find_singer() in ace_studio_export.py.
+#
+# Add entries as new voices are confirmed. Use null for unassigned.
+
+singers:
+  Shirley:
+    ace_studio_voice: Elirah
+    voice_type: alto
+    midi_range: [53, 72]
+    notes: Edited
+
+  Gabriel:
+    ace_studio_voice: Mangus
+    voice_type: tenor
+    midi_range: [48, 67]
+    notes: Manually assigned
+
+  Robbie:
+    ace_studio_voice: Anderson
+    voice_type: tenor
+    midi_range: [48, 67]
+    notes: Manually assigned
+
+  Katherine:
+    ace_studio_voice: Emma
+    voice_type: alto
+    midi_range: [57, 76]
+    notes: Manually assigned
+
+  Busyayo:
+    ace_studio_voice: Golden G
+    voice_type: baritone
+    midi_range: [45, 64]
+    notes: Manually assigned
+
+  Marvin:
+    ace_studio_voice: Trey L
+    voice_type: bass-baritone
+    midi_range: [40, 60]
+    notes: Manually assigned

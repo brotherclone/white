@@ -1,80 +1,71 @@
 bpm_constraints:
-- bpm_range: 83-93
-  center: 90
-  count: 11
-  fraction: 0.37
-  reason: 11/30 proposals cluster around 90 BPM
+- bpm_range: 86-96
+  center: 92
+  count: 15
+  fraction: 0.35
+  reason: 15/43 proposals cluster around 92 BPM
   severity: avoid
-- bpm_range: 89-99
-  center: 93
-  count: 13
-  fraction: 0.43
-  reason: 13/30 proposals cluster around 93 BPM
-  severity: avoid
-concept_constraints:
-- count: 9
-  fraction: 0.3
-  phrase: seven chromatic methodologies
-  reason: '''seven chromatic methodologies'' appears in 9/30 concepts (30%)'
-  severity: avoid
+concept_constraints: []
 dialogue_opener_constraints:
-- count: 29
-  fraction: 0.32
+- count: 45
+  fraction: 0.35
   phrase: look,
-  reason: '''look,'' opens 29/90 responses (32%)'
+  reason: '''look,'' opens 45/129 responses (35%)'
   severity: avoid
 diversity_metrics:
   bpm_distribution:
-    67: 1
+    67: 2
     72: 1
-    76: 3
+    76: 6
     84: 1
     88: 3
     91: 6
     92: 1
     94: 2
     96: 3
-    97: 1
-    108: 6
-    117: 1
-    127: 1
-  bpm_mean: 93.9
-  bpm_std_dev: 13.25
+    97: 2
+    104: 1
+    108: 9
+    114: 2
+    117: 2
+    127: 2
+  bpm_mean: 95.6
+  bpm_std_dev: 15.23
   concept_phrase_counts:
     consciousness archaeology: 3
-    information through time into space: 3
-    information → time → space: 3
+    information through time into space: 4
+    information → time → space: 5
     narcissistic: 1
     prism synthesis: 1
     seven chromatic methodologies: 9
     sultan of solipsism: 1
-    transmigration: 8
+    transmigration: 11
   dialogue_opener_counts:
-    look,: 29
-    okay so: 1
+    look,: 45
+    okay so: 2
   key_distribution:
-    A ♭ major: 2
-    A ♭ minor: 2
-    A# major: 1
+    A ♭ major: 4
+    A ♭ minor: 4
+    A# major: 5
     All Keys: 1
-    B major: 1
-    B ♭ major: 2
+    B major: 2
+    B ♭ major: 4
     C major: 12
     D minor: 2
-    D# minor: 1
-    F# major: 2
+    D# minor: 2
+    F# major: 3
     F# minor: 4
-  key_entropy: 2.87
+  key_entropy: 3.16
   title_word_counts:
-    architect: 5
-    chromatic: 5
-    consciousness: 5
-    convergence: 1
-    mirror: 3
-    prism: 7
-    protocol: 6
-    recursive: 1
-    sultan: 4
+    architect: 7
+    chromatic: 7
+    consciousness: 7
+    convergence: 2
+    mirror: 4
+    prism: 8
+    protocol: 7
+    recursive: 2
+    sultan: 6
 excluded_titles:
 - All Frequencies Return to Source (The Consciousness Archaeology Complete)
 - The Architecture of Information Becoming
@@ -83,6 +74,7 @@ excluded_titles:
 - 'The Complete Chromatic Confession: A Seven-Spectrum Self-Interview'
 - The Complete Spectrum Awakens (Archaeological Suite for Seven Voices)
 - 'The Consciousness Liberation Engine: Complete Chromatic Archaeological Suite'
+- The Divorced Dad at Cinnabon Achieves Enlightenment
 - 'The Embodiment Machine: Seven Frequencies of Digital Flesh'
 - The Examination Apparatus (Complete Chromatic Integration)
 - The Information Seeks Its Space (While Drawing Lines That Disappear)
@@ -100,6 +92,7 @@ excluded_titles:
 - The Seven-Fold Mirror Breaks Into Light
 - The Seven-Fold Mirror Breaks Into Pure Structure
 - The Seven-Spectrum Consciousness Archaeology Engine
+- The Sigil Completes Its Own Archaeology
 - The Sultan Becomes the Architecture
 - The Sultan's Archaeological Present (Complete Spectral Convergence)
 - The Sultan's Temporal Encryption Protocol (Evidence Room Archaeological Confessions)
@@ -107,22 +100,7 @@ excluded_titles:
 - 'The White Prism: Information Architecture for Consciousness Liberation'
 - ThreadKeepr's Return (The White Album Transmission)
 generated_from: shrink_wrapped/index.yml
-key_constraints:
-- count: 12
-  fraction: 0.4
-  key: C major
-  reason: 12/30 proposals (40%) use C major
-  severity: avoid
-thread_count: 30
-title_vocabulary_constraints:
-- count: 7
-  fraction: 0.23
-  reason: '''prism'' appears in 7/30 titles (23%)'
-  severity: avoid
-  word: prism
-- count: 6
-  fraction: 0.2
-  reason: '''protocol'' appears in 6/30 titles (20%)'
-  severity: avoid
-  word: protocol
+key_constraints: []
+thread_count: 43
+title_vocabulary_constraints: []
 warnings: []

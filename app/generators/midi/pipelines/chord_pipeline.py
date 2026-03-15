@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Optional
 
 from app.generators.artist_catalog import load_artist_context
+from app.generators.midi.production.init_production import load_initial_proposal
 from app.generators.midi.chord_generator.generator import ChordProgressionGenerator
 from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 from app.generators.midi.patterns.harmonic_rhythm import enumerate_distributions
@@ -532,8 +533,14 @@ def run_chord_pipeline(
     raw_proposal = song_info.get("raw_proposal", {})
     genre_tags = raw_proposal.get("genres", []) or []
 
+    # Resolve production dir early so we can read initial_proposal.yml
+    _prod_slug = song_slug(song_filename)
+    _production_dir = thread_path / "production" / _prod_slug
+    _initial = load_initial_proposal(_production_dir)
+
     # Print style context from artist catalog (informational for human reviewing candidates)
-    sounds_like = raw_proposal.get("sounds_like") or []
+    # Prefer sounds_like from initial_proposal.yml (Claude-generated); fall back to proposal YAML
+    sounds_like = _initial.get("sounds_like") or raw_proposal.get("sounds_like") or []
     if sounds_like:
         artist_context = load_artist_context(sounds_like)
         if artist_context:
@@ -722,7 +729,10 @@ def run_chord_pipeline(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Chord generation pipeline — generate, score, and review chord progressions"
+        description=(
+            "Chord generation pipeline — generate, score, and review chord progressions. "
+            "Run init_production.py first to generate initial_proposal.yml with artist context."
+        )
     )
     parser.add_argument(
         "--thread", required=True, help="shrink_wrapped thread directory"

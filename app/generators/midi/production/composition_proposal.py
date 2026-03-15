@@ -27,6 +27,8 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
+from app.generators.midi.production.init_production import load_initial_proposal
+
 load_dotenv()
 
 PROPOSAL_FILENAME = "composition_proposal.yml"
@@ -112,6 +114,10 @@ def load_song_proposal_data(production_dir: Path) -> dict:
     else:
         time_sig = "4/4"
 
+    # Prefer sounds_like from initial_proposal.yml (Claude-generated before pipeline ran)
+    _initial = load_initial_proposal(production_dir)
+    sounds_like = _initial.get("sounds_like") or raw.get("sounds_like") or []
+
     return {
         "title": str(raw.get("title", "")),
         "bpm": int(raw.get("bpm", 120)),
@@ -121,7 +127,7 @@ def load_song_proposal_data(production_dir: Path) -> dict:
         "concept": str(raw.get("concept", "")),
         "mood": raw.get("mood") or [],
         "genres": raw.get("genres") or [],
-        "sounds_like": raw.get("sounds_like") or [],
+        "sounds_like": sounds_like,
         "singer": str(raw.get("singer") or chord_review.get("singer", "")),
     }
 

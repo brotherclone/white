@@ -1,0 +1,198 @@
+production_dir: shrink_wrapped/white-the-breathing-machine-learns-to-sing/production/orange__franklin_mine_metronome_conspiracy_v1
+pipeline: drum-generation
+bpm: 91
+time_sig: 7/8
+color: Orange
+genre_families:
+- ambient
+- folk
+generated: '2026-03-10T11:09:32.595145+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- slow_learner
+- franklinite
+- mineral_museum
+candidates:
+- id: drum_slow_learner_01
+  midi_file: candidates/drum_slow_learner_01.mid
+  rank: 1
+  section: slow_learner
+  next_section: null
+  chord_source: chord_002
+  genre_family: ambient
+  pattern_name: ambient_7_pulse
+  energy: medium
+  scores:
+    composite: 0.4349
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.471
+        present: 0.2249
+        future: 0.3041
+      spatial:
+        thing: 0.4724
+        place: 0.303
+        person: 0.2246
+      ontological:
+        imagined: 0.3303
+        forgotten: 0.2955
+        known: 0.3742
+      confidence: 0.0773
+      match: 0.1927
+  label: drum_slow_learner
+  status: approved
+  notes: ''
+- id: drum_slow_learner_02
+  midi_file: candidates/drum_slow_learner_02.mid
+  rank: 2
+  section: slow_learner
+  next_section: null
+  chord_source: chord_002
+  genre_family: ambient
+  pattern_name: ambient_7_sparse
+  energy: low
+  scores:
+    composite: 0.285
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4707
+        present: 0.2253
+        future: 0.3041
+      spatial:
+        thing: 0.472
+        place: 0.3029
+        person: 0.225
+      ontological:
+        imagined: 0.3308
+        forgotten: 0.2954
+        known: 0.3738
+      confidence: 0.0782
+      match: 0.1928
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_franklinite_01
+  midi_file: candidates/drum_franklinite_01.mid
+  rank: 3
+  section: franklinite
+  next_section: null
+  chord_source: chord_008
+  genre_family: ambient
+  pattern_name: ambient_7_pulse
+  energy: medium
+  scores:
+    composite: 0.4349
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4715
+        present: 0.2244
+        future: 0.3042
+      spatial:
+        thing: 0.4728
+        place: 0.303
+        person: 0.2242
+      ontological:
+        imagined: 0.3305
+        forgotten: 0.2953
+        known: 0.3742
+      confidence: 0.0775
+      match: 0.1928
+  label: drum_franklinite
+  status: approved
+  notes: ''
+- id: drum_franklinite_02
+  midi_file: candidates/drum_franklinite_02.mid
+  rank: 4
+  section: franklinite
+  next_section: null
+  chord_source: chord_008
+  genre_family: ambient
+  pattern_name: ambient_7_sparse
+  energy: low
+  scores:
+    composite: 0.2852
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4714
+        present: 0.2246
+        future: 0.3039
+      spatial:
+        thing: 0.4728
+        place: 0.3028
+        person: 0.2244
+      ontological:
+        imagined: 0.3313
+        forgotten: 0.2949
+        known: 0.3737
+      confidence: 0.0789
+      match: 0.1931
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_mineral_museum_01
+  midi_file: candidates/drum_mineral_museum_01.mid
+  rank: 5
+  section: mineral_museum
+  next_section: null
+  chord_source: chord_009
+  genre_family: ambient
+  pattern_name: ambient_7_pulse
+  energy: medium
+  scores:
+    composite: 0.4347
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4701
+        present: 0.2257
+        future: 0.3042
+      spatial:
+        thing: 0.4715
+        place: 0.3031
+        person: 0.2254
+      ontological:
+        imagined: 0.3297
+        forgotten: 0.296
+        known: 0.3743
+      confidence: 0.0766
+      match: 0.1924
+  label: drum_mineral_museum
+  status: approved
+  notes: ''
+- id: drum_mineral_museum_02
+  midi_file: candidates/drum_mineral_museum_02.mid
+  rank: 6
+  section: mineral_museum
+  next_section: null
+  chord_source: chord_009
+  genre_family: ambient
+  pattern_name: ambient_7_sparse
+  energy: low
+  scores:
+    composite: 0.2848
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4697
+        present: 0.2262
+        future: 0.3042
+      spatial:
+        thing: 0.4711
+        place: 0.3031
+        person: 0.2259
+      ontological:
+        imagined: 0.3305
+        forgotten: 0.2957
+        known: 0.3738
+      confidence: 0.0778
+      match: 0.1926
+  label: drum_mineral_museum_sparse
+  status: approved
+  notes: ''

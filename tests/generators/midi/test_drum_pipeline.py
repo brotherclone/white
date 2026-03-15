@@ -140,6 +140,117 @@ class TestDrumPatternTemplates:
 
 
 # ---------------------------------------------------------------------------
+# 9. Breakbeat family
+# ---------------------------------------------------------------------------
+
+
+class TestBreakbeatFamily:
+
+    def test_breakbeat_family_in_genre_keywords(self):
+        from app.generators.midi.patterns.drum_patterns import GENRE_FAMILY_KEYWORDS
+
+        assert "breakbeat" in GENRE_FAMILY_KEYWORDS
+
+    def test_hip_hop_maps_to_breakbeat(self):
+        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+
+        result = map_genres_to_families(["hip-hop", "art-pop"])
+        assert "breakbeat" in result
+
+    def test_funk_maps_to_breakbeat(self):
+        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+
+        result = map_genres_to_families(["neo-soul", "funk"])
+        assert "breakbeat" in result
+
+    def test_unrelated_tag_does_not_map_to_breakbeat(self):
+        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+
+        result = map_genres_to_families(["ambient", "drone"])
+        assert "breakbeat" not in result
+
+    def test_new_gm_voices_present(self):
+        from app.generators.midi.patterns.drum_patterns import GM_PERCUSSION
+
+        assert GM_PERCUSSION["tambourine"] == 54
+        assert GM_PERCUSSION["cowbell"] == 56
+        assert GM_PERCUSSION["conga_high"] == 63
+        assert GM_PERCUSSION["conga_low"] == 64
+
+    def test_breakbeat_has_all_energy_levels(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        energies = {
+            t.energy
+            for t in ALL_TEMPLATES
+            if t.genre_family == "breakbeat" and t.time_sig == (4, 4)
+        }
+        for level in ["low", "medium", "high"]:
+            assert level in energies, f"breakbeat missing energy={level}"
+
+    def test_nine_classic_breaks_present(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        names = {t.name for t in ALL_TEMPLATES}
+        classic_breaks = [
+            "billie_jean",
+            "funky_drummer",
+            "impeach_the_president",
+            "when_the_levee_breaks",
+            "walk_this_way",
+            "its_a_new_day",
+            "papa_was_too",
+            "the_big_beat",
+            "ashleys_roachclip",
+        ]
+        for name in classic_breaks:
+            assert name in names, f"Classic break missing: {name}"
+            t = next(x for x in ALL_TEMPLATES if x.name == name)
+            assert t.energy == "medium", f"{name} should be medium energy"
+
+    def test_funky_drummer_has_ghost_notes(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        funky = next(t for t in ALL_TEMPLATES if t.name == "funky_drummer")
+        all_hits = [
+            vel for voice_hits in funky.voices.values() for _, vel in voice_hits
+        ]
+        assert "ghost" in all_hits, "funky_drummer must have ghost velocity hits"
+
+    def test_papa_was_too_has_tambourine(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        papa = next(t for t in ALL_TEMPLATES if t.name == "papa_was_too")
+        assert "tambourine" in papa.voices
+
+    def test_ashleys_roachclip_has_congas(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        ashley = next(t for t in ALL_TEMPLATES if t.name == "ashleys_roachclip")
+        assert "conga_high" in ashley.voices or "conga_low" in ashley.voices
+
+    def test_all_breakbeat_positions_are_16th_grid(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        breakbeats = [t for t in ALL_TEMPLATES if t.genre_family == "breakbeat"]
+        for t in breakbeats:
+            for voice_name, hits in t.voices.items():
+                for pos, _ in hits:
+                    assert (
+                        0.0 <= pos <= 3.75
+                    ), f"{t.name}/{voice_name}: pos {pos} out of range"
+                    assert (
+                        abs(pos % 0.25) < 1e-9
+                    ), f"{t.name}/{voice_name}: pos {pos} not on 16th grid"
+
+    def test_minimum_15_breakbeat_templates(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        count = len([t for t in ALL_TEMPLATES if t.genre_family == "breakbeat"])
+        assert count >= 15, f"Only {count} breakbeat templates (need >= 15)"
+
+
+# ---------------------------------------------------------------------------
 # 2. Genre family mapping
 # ---------------------------------------------------------------------------
 
