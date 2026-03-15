@@ -38,6 +38,9 @@ from typing import Optional
 from dotenv import load_dotenv
 
 from app.generators.artist_catalog import load_artist_context  # noqa: E402
+from app.generators.midi.production.init_production import (
+    load_initial_proposal,
+)  # noqa: E402
 from app.generators.midi.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
     compute_chromatic_match,
@@ -225,7 +228,6 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
             )
 
             meta = load_song_proposal(candidate)
-            meta["sounds_like"] = []  # not stored in proposal; defaults to empty
             meta["singer"] = str(chord_review.get("singer", ""))
             return meta
 
@@ -988,6 +990,13 @@ def run_lyric_pipeline(
                 "ERROR: Could not load song metadata (no proposal or chord review found)"
             )
             sys.exit(1)
+
+    # Prefer sounds_like from initial_proposal.yml (Claude-generated before pipeline ran)
+    _initial = load_initial_proposal(prod_path)
+    if _initial.get("sounds_like"):
+        meta["sounds_like"] = _initial["sounds_like"]
+    elif not meta.get("sounds_like"):
+        meta["sounds_like"] = []
 
     print(f"Song:  {meta.get('title', '(untitled)')}")
     print(f"Color: {meta.get('color', '')}")
