@@ -10,6 +10,7 @@ import yaml
 from app.generators.midi.production.init_production import (
     _parse_sounds_like_response,
     load_initial_proposal,
+    load_song_context,
     write_initial_proposal,
     init_production,
 )
@@ -271,3 +272,113 @@ class TestInitProductionIntegration:
         loaded = yaml.safe_load(out.read_text())
         assert "New Artist" in loaded["sounds_like"]
         assert "Old Artist" not in loaded["sounds_like"]
+
+
+# ---------------------------------------------------------------------------
+# 5.5 Unit: song_context.yml written alongside initial_proposal.yml
+# ---------------------------------------------------------------------------
+
+
+class TestSongContextYml:
+
+    def _make_meta(self) -> dict:
+        return {
+            "title": "My Song",
+            "song_slug": "my-song",
+            "song_proposal": "my_song.yml",
+            "thread": "/path/to/thread",
+            "color": "Red",
+            "concept": "Memory and loss",
+            "singer": "Gabriel",
+            "key": "C major",
+            "bpm": 120,
+            "time_sig": "4/4",
+            "genres": ["folk", "ambient"],
+            "mood": ["melancholic"],
+        }
+
+    def test_song_context_written_alongside_initial_proposal(self, tmp_path):
+        write_initial_proposal(tmp_path, self._make_meta(), ["Sufjan Stevens"])
+        assert (tmp_path / "initial_proposal.yml").exists()
+        assert (tmp_path / "song_context.yml").exists()
+
+    def test_song_context_round_trip(self, tmp_path):
+        meta = self._make_meta()
+        write_initial_proposal(tmp_path, meta, ["Sufjan Stevens", "Bon Iver"])
+        ctx = load_song_context(tmp_path)
+        assert ctx["color"] == "Red"
+        assert ctx["concept"] == "Memory and loss"
+        assert ctx["title"] == "My Song"
+        assert ctx["key"] == "C major"
+        assert ctx["bpm"] == 120
+        assert ctx["time_sig"] == "4/4"
+        assert ctx["singer"] == "Gabriel"
+        assert ctx["sounds_like"] == ["Sufjan Stevens", "Bon Iver"]
+        assert ctx["genres"] == ["folk", "ambient"]
+        assert ctx["schema_version"] == "1"
+        assert ctx["proposed_by"] == "claude"
+
+    def test_song_context_has_phases_block(self, tmp_path):
+        write_initial_proposal(tmp_path, self._make_meta(), [])
+        ctx = load_song_context(tmp_path)
+        assert "phases" in ctx
+        assert ctx["phases"]["chords"] == "pending"
+        assert ctx["phases"]["drums"] == "pending"
+        assert ctx["phases"]["lyrics"] == "pending"
+
+    def test_load_song_context_returns_empty_when_missing(self, tmp_path):
+        result = load_song_context(tmp_path)
+        assert result == {}
+
+    def test_load_song_context_returns_empty_for_nonexistent_dir(self, tmp_path):
+        result = load_song_context(tmp_path / "nonexistent")
+        assert result == {}
+
+
+# ---------------------------------------------------------------------------
+# 5.6 Unit: load_initial_proposal falls back to song_context.yml
+# ---------------------------------------------------------------------------
+
+
+class TestLoadInitialProposalFallback:
+
+    def test_falls_back_to_song_context_when_initial_proposal_absent(self, tmp_path):
+        # Write only song_context.yml (simulates migrated dir)
+        import yaml as _yaml
+
+        ctx = {
+            "schema_version": "1",
+            "generated": "2026-01-01T00:00:00+00:00",
+            "proposed_by": "claude",
+            "sounds_like": ["Grouper", "The Caretaker"],
+            "color": "Violet",
+            "concept": "A dream of forgetting",
+            "singer": "Katherine",
+            "key": "D minor",
+            "bpm": 80,
+            "time_sig": "4/4",
+            "genres": ["ambient"],
+            "mood": ["dreamy"],
+            "phases": {},
+        }
+        (tmp_path / "song_context.yml").write_text(_yaml.dump(ctx))
+        # No initial_proposal.yml present
+        result = load_initial_proposal(tmp_path)
+        assert result["sounds_like"] == ["Grouper", "The Caretaker"]
+        assert result["color"] == "Violet"
+
+    def test_prefers_initial_proposal_when_both_exist(self, tmp_path):
+        import yaml as _yaml
+
+        (tmp_path / "initial_proposal.yml").write_text(
+            _yaml.dump({"sounds_like": ["From initial"], "color": "Red"})
+        )
+        (tmp_path / "song_context.yml").write_text(
+            _yaml.dump({"sounds_like": ["From context"], "color": "Blue"})
+        )
+        result = load_initial_proposal(tmp_path)
+        assert result["sounds_like"] == ["From initial"]
+
+    def test_returns_empty_when_neither_exists(self, tmp_path):
+        result = load_initial_proposal(tmp_path)
+        assert result == {}

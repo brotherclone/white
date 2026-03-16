@@ -29,6 +29,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 INITIAL_PROPOSAL_FILENAME = "initial_proposal.yml"
+SONG_CONTEXT_FILENAME = "song_context.yml"
 
 
 # ---------------------------------------------------------------------------
@@ -114,17 +115,29 @@ def write_initial_proposal(
     meta: dict,
     sounds_like: list[str],
 ) -> Path:
-    """Write initial_proposal.yml to the production directory.
+    """Write initial_proposal.yml and song_context.yml to the production directory.
+
+    Writes both files so that all pipeline phases can read canonical song metadata
+    from song_context.yml while backward compat with initial_proposal.yml is preserved.
 
     Fields written: sounds_like, color, concept, singer, key, bpm, time_sig,
-    generated timestamp, proposed_by.
+    title, song_slug, song_proposal, thread, genres, mood, schema_version,
+    generated timestamp, proposed_by, phases.
+
+    .. deprecated::
+        initial_proposal.yml is superseded by song_context.yml and will be removed
+        in a future release. New code should call load_song_context() instead of
+        load_initial_proposal().
     """
     production_dir = Path(production_dir)
     production_dir.mkdir(parents=True, exist_ok=True)
 
-    data = {
+    now = datetime.now(timezone.utc).isoformat()
+
+    # --- initial_proposal.yml (legacy) ---
+    legacy_data = {
         "proposed_by": "claude",
-        "generated": datetime.now(timezone.utc).isoformat(),
+        "generated": now,
         "sounds_like": sounds_like,
         "color": meta.get("color", ""),
         "concept": meta.get("concept", ""),
@@ -133,26 +146,106 @@ def write_initial_proposal(
         "bpm": meta.get("bpm"),
         "time_sig": meta.get("time_sig", "4/4"),
     }
-
-    out_path = production_dir / INITIAL_PROPOSAL_FILENAME
-    with open(out_path, "w") as f:
+    legacy_path = production_dir / INITIAL_PROPOSAL_FILENAME
+    with open(legacy_path, "w") as f:
         yaml.dump(
-            data, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            legacy_data,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
         )
 
-    return out_path
+    # --- song_context.yml (canonical) ---
+    _write_song_context(production_dir, meta, sounds_like, now)
+
+    return legacy_path
+
+
+def _write_song_context(
+    production_dir: Path,
+    meta: dict,
+    sounds_like: list[str],
+    generated: str | None = None,
+) -> Path:
+    """Write song_context.yml — the canonical static metadata store.
+
+    Returns the path to song_context.yml.
+    """
+    if generated is None:
+        generated = datetime.now(timezone.utc).isoformat()
+
+    context_data = {
+        "schema_version": "1",
+        "generated": generated,
+        "proposed_by": "claude",
+        # Identity
+        "title": meta.get("title", ""),
+        "song_slug": meta.get("song_slug", ""),
+        "song_proposal": meta.get("song_proposal", ""),
+        "thread": meta.get("thread", ""),
+        # Chromatic
+        "color": meta.get("color", ""),
+        "concept": meta.get("concept", ""),
+        # Musical
+        "key": meta.get("key", ""),
+        "bpm": meta.get("bpm"),
+        "time_sig": meta.get("time_sig", "4/4"),
+        "singer": meta.get("singer", ""),
+        # Creative context
+        "sounds_like": sounds_like,
+        "genres": meta.get("genres") or [],
+        "mood": meta.get("mood") or [],
+        # Phase status (updated by migration script)
+        "phases": meta.get("phases")
+        or {
+            "chords": "pending",
+            "drums": "pending",
+            "bass": "pending",
+            "melody": "pending",
+            "lyrics": "pending",
+            "composition_proposal": "pending",
+        },
+    }
+
+    ctx_path = production_dir / SONG_CONTEXT_FILENAME
+    with open(ctx_path, "w") as f:
+        yaml.dump(
+            context_data,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+        )
+    return ctx_path
+
+
+def load_song_context(production_dir: Path) -> dict:
+    """Load song_context.yml from the production directory.
+
+    Returns {} if the file does not exist (graceful fallback for dirs that
+    predate this change).
+    """
+    path = Path(production_dir) / SONG_CONTEXT_FILENAME
+    if not path.exists():
+        return {}
+    with open(path) as f:
+        return yaml.safe_load(f) or {}
 
 
 def load_initial_proposal(production_dir: Path) -> dict:
     """Load initial_proposal.yml from the production directory.
 
-    Returns {} if the file does not exist.
+    Falls back to song_context.yml if initial_proposal.yml is absent
+    (transparent backward compat for production dirs migrated to song_context.yml).
+
+    Returns {} if neither file exists.
     """
     path = Path(production_dir) / INITIAL_PROPOSAL_FILENAME
-    if not path.exists():
-        return {}
-    with open(path) as f:
-        return yaml.safe_load(f) or {}
+    if path.exists():
+        return yaml.safe_load(path.read_text()) or {}
+    # Fallback: song_context.yml contains a superset of initial_proposal.yml fields
+    return load_song_context(production_dir)
 
 
 # ---------------------------------------------------------------------------

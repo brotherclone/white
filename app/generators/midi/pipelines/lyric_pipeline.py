@@ -40,6 +40,7 @@ from dotenv import load_dotenv
 from app.generators.artist_catalog import load_artist_context  # noqa: E402
 from app.generators.midi.production.init_production import (
     load_initial_proposal,
+    load_song_context,
 )  # noqa: E402
 from app.generators.midi.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
@@ -202,8 +203,8 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
     """Find and load the song proposal for a production directory.
 
     Reads thread + song_proposal from chords/review.yml to resolve the path.
-    Returns a metadata dict with: title, bpm, time_sig, key, color, concept,
-    genres, mood, singer, sounds_like (empty — not in proposal YAML).
+    Returns a normalised metadata dict with: title, bpm, time_sig, key, color,
+    concept, genres, mood, singer, sounds_like.
     Returns {} if the proposal cannot be found.
     """
     chord_review_path = production_dir / "chords" / "review.yml"
@@ -217,19 +218,41 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
     if not thread or not song_proposal_file:
         return {}
 
-    # Proposals live in <thread>/yml/<file>
+    thread_path = Path(thread)
     for candidate in [
-        Path(thread) / "yml" / song_proposal_file,
-        Path(thread) / song_proposal_file,
+        thread_path / "yml" / song_proposal_file,
+        thread_path / song_proposal_file,
     ]:
         if candidate.exists():
             from app.generators.midi.production.production_plan import (
-                load_song_proposal,
+                load_song_proposal_unified,
             )
 
-            meta = load_song_proposal(candidate)
-            meta["singer"] = str(chord_review.get("singer", ""))
-            return meta
+            unified = load_song_proposal_unified(candidate, thread_dir=thread_path)
+
+            # Prefer sounds_like from song_context.yml (written by init_production)
+            _ctx = load_song_context(production_dir)
+            sounds_like = _ctx.get("sounds_like") or unified.get("sounds_like") or []
+
+            # Singer: song_context > proposal > chord_review
+            singer = (
+                _ctx.get("singer")
+                or unified.get("singer")
+                or str(chord_review.get("singer", ""))
+            )
+
+            return {
+                "title": unified["title"],
+                "bpm": unified["bpm"],
+                "time_sig": unified["time_sig"],
+                "key": unified["key"],
+                "color": unified["color"],
+                "concept": unified["concept"],
+                "genres": unified["genres"],
+                "mood": unified["mood"],
+                "singer": singer,
+                "sounds_like": sounds_like,
+            }
 
     return {}
 
