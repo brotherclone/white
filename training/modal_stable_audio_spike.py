@@ -45,6 +45,7 @@ spike_image = (
         "huggingface_hub",
         # CLAP for audio embedding
         "laion-clap",
+        "torchvision",
         # Stable Audio scheduler dependency
         "torchsde",
         # Refractor ONNX scoring
@@ -206,18 +207,15 @@ def generate_and_score(
 
     # Refractor scoring (audio-only, null concept)
     print("  Scoring with Refractor...")
-    import sys
 
-    sys.path.insert(0, "/root")  # project root in Modal container
-
-    # Refractor ONNX is stored in the volume
-    onnx_path = f"{CACHE_DIR}/refractor.onnx"
+    # Refractor ONNX — download from HF dataset if not cached in volume
+    onnx_path = f"{CACHE_DIR}/data/models/fusion_model.onnx"
     if not os.path.exists(onnx_path):
         from huggingface_hub import hf_hub_download
 
         onnx_path = hf_hub_download(
             repo_id="earthlyframes/white-training-data",
-            filename="models/refractor.onnx",
+            filename="data/models/fusion_model.onnx",
             repo_type="dataset",
             local_dir=CACHE_DIR,
         )
@@ -253,20 +251,73 @@ def generate_and_score(
     spatial_dist = _softmax(outputs[1][0])
     ontological_dist = _softmax(outputs[2][0])
 
-    # Compute chromatic match against target
-    from app.generators.midi.pipelines.chord_pipeline import (
-        compute_chromatic_match,
-        get_chromatic_target,
-    )
+    # Compute chromatic match against target (inlined from chord_pipeline.py)
+    _CHROMATIC_TARGETS = {
+        "Red": {
+            "temporal": [0.8, 0.1, 0.1],
+            "spatial": [0.8, 0.1, 0.1],
+            "ontological": [0.1, 0.1, 0.8],
+        },
+        "Orange": {
+            "temporal": [0.8, 0.1, 0.1],
+            "spatial": [0.1, 0.8, 0.1],
+            "ontological": [0.8, 0.1, 0.1],
+        },
+        "Yellow": {
+            "temporal": [0.1, 0.8, 0.1],
+            "spatial": [0.1, 0.8, 0.1],
+            "ontological": [0.1, 0.1, 0.8],
+        },
+        "Green": {
+            "temporal": [0.1, 0.8, 0.1],
+            "spatial": [0.1, 0.8, 0.1],
+            "ontological": [0.1, 0.8, 0.1],
+        },
+        "Blue": {
+            "temporal": [0.8, 0.1, 0.1],
+            "spatial": [0.1, 0.1, 0.8],
+            "ontological": [0.1, 0.1, 0.8],
+        },
+        "Indigo": {
+            "temporal": [0.1, 0.1, 0.8],
+            "spatial": [0.8, 0.1, 0.1],
+            "ontological": [0.1, 0.8, 0.1],
+        },
+        "Violet": {
+            "temporal": [0.1, 0.8, 0.1],
+            "spatial": [0.1, 0.1, 0.8],
+            "ontological": [0.8, 0.1, 0.1],
+        },
+        "Black": {
+            "temporal": [1 / 3, 1 / 3, 1 / 3],
+            "spatial": [1 / 3, 1 / 3, 1 / 3],
+            "ontological": [1 / 3, 1 / 3, 1 / 3],
+        },
+    }
+    _TEMPORAL_MODES = ["past", "present", "future"]
+    _SPATIAL_MODES = ["thing", "place", "person"]
+    _ONTOLOGICAL_MODES = ["imagined", "forgotten", "known"]
 
-    target = get_chromatic_target(color)
+    target = _CHROMATIC_TARGETS.get(color, _CHROMATIC_TARGETS["Black"])
     score_dict = {
-        "temporal": {str(i): float(v) for i, v in enumerate(temporal_dist)},
-        "spatial": {str(i): float(v) for i, v in enumerate(spatial_dist)},
-        "ontological": {str(i): float(v) for i, v in enumerate(ontological_dist)},
+        "temporal": {m: float(v) for m, v in zip(_TEMPORAL_MODES, temporal_dist)},
+        "spatial": {m: float(v) for m, v in zip(_SPATIAL_MODES, spatial_dist)},
+        "ontological": {
+            m: float(v) for m, v in zip(_ONTOLOGICAL_MODES, ontological_dist)
+        },
         "confidence": 1.0,
     }
-    chromatic_match = float(compute_chromatic_match(score_dict, target))
+
+    match = 0.0
+    for dim, modes in [
+        ("temporal", _TEMPORAL_MODES),
+        ("spatial", _SPATIAL_MODES),
+        ("ontological", _ONTOLOGICAL_MODES),
+    ]:
+        target_arr = np.array(target[dim])
+        pred_arr = np.array([score_dict[dim][m] for m in modes])
+        match += np.dot(pred_arr, target_arr)
+    chromatic_match = float((match / 3.0) * (0.5 + 0.5 * score_dict["confidence"]))
 
     result = {
         "color": color,
