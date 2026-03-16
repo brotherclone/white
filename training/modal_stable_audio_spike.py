@@ -43,9 +43,7 @@ spike_image = (
         "soundfile",
         "numpy",
         "huggingface_hub",
-        # CLAP for audio embedding
-        "laion-clap",
-        "torchvision",
+        # (transformers already pulled in above — ClapModel uses laion/larger_clap_music)
         # Stable Audio scheduler dependency
         "torchsde",
         # Refractor ONNX scoring
@@ -180,16 +178,21 @@ def generate_and_score(
             "dry_run": True,
         }
 
-    # CLAP embedding
+    # CLAP embedding — use same model as corpus extraction (laion/larger_clap_music)
     print("  Computing CLAP embedding...")
-    import laion_clap
+    from transformers import ClapModel, ClapProcessor
 
-    clap_model = laion_clap.CLAP_Module(enable_fusion=False, amodel="HTSAT-base")
-    clap_model.load_ckpt()  # downloads music CLAP checkpoint
+    clap_processor = ClapProcessor.from_pretrained(
+        "laion/larger_clap_music",
+        cache_dir=f"{CACHE_DIR}/hf_cache",
+    )
+    clap_model = ClapModel.from_pretrained(
+        "laion/larger_clap_music",
+        cache_dir=f"{CACHE_DIR}/hf_cache",
+    ).to("cuda")
     clap_model.eval()
 
-    # CLAP expects mono 48kHz — resample from 44.1kHz
-    # Simple linear interp resample
+    # Processor expects 48kHz — resample from 44.1kHz
     target_sr = 48000
     ratio = target_sr / SAMPLE_RATE
     n_orig = len(audio_np)
@@ -199,11 +202,15 @@ def generate_and_score(
     mono_resampled = np.interp(indices, np.arange(n_orig), mono).astype(np.float32)
 
     with torch.no_grad():
-        audio_input = torch.from_numpy(mono_resampled).unsqueeze(0)
-        clap_emb = clap_model.get_audio_embedding_from_data(
-            x=audio_input, use_tensor=True
+        inputs = clap_processor(
+            audios=mono_resampled, sampling_rate=target_sr, return_tensors="pt"
         )
-        clap_emb_np = clap_emb.cpu().float().numpy()[0]  # (512,)
+        inputs = {k: v.to("cuda") for k, v in inputs.items()}
+        audio_emb = clap_model.audio_model(**inputs)
+        pooled = audio_emb.pooler_output  # (1, hidden_size)
+        clap_emb_np = (
+            clap_model.audio_projection(pooled).cpu().float().numpy()[0]
+        )  # (512,)
 
     # Refractor scoring (audio-only, null concept)
     print("  Scoring with Refractor...")
