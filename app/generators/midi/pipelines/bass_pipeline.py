@@ -48,6 +48,7 @@ from app.generators.midi.pipelines.chord_pipeline import (
 from app.generators.midi.patterns.strum_patterns import (
     read_approved_harmonic_rhythm,
 )
+from app.generators.midi.production.init_production import load_song_context
 
 
 # ---------------------------------------------------------------------------
@@ -530,6 +531,10 @@ def run_bass_pipeline(
     scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 
     concept_text = song_info.get("concept", "")
+    if not concept_text:
+        # Try song_context.yml (written by init_production before any phase runs)
+        _ctx = load_song_context(prod_path)
+        concept_text = _ctx.get("concept", "")
     if not concept_text:
         concept_text = f"{song_info['color_name']} chromatic concept"
         print(f"  Warning: No concept text, using fallback: '{concept_text}'")

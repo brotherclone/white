@@ -162,56 +162,37 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
 def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
     """Load and parse a song proposal from a shrink_wrapped thread.
 
-    Returns dict with: key_root, mode, bpm, time_sig, concept, color_name, raw_proposal.
+    Returns dict with: key_root, mode, bpm, time_sig (tuple), concept,
+    color_name, singer, song_filename, thread_dir, raw_proposal.
+
+    Delegates to load_song_proposal_unified for all parsing; remaps fields
+    to the chord_pipeline convention (color_name, time_sig as tuple).
     """
-    song_path = thread_dir / "yml" / song_filename
+    from app.generators.midi.production.production_plan import (
+        load_song_proposal_unified,
+    )
+
+    song_path = Path(thread_dir) / "yml" / song_filename
     if not song_path.exists():
         raise FileNotFoundError(f"Song proposal not found: {song_path}")
 
-    with open(song_path) as f:
-        proposal = yaml.safe_load(f)
+    unified = load_song_proposal_unified(song_path, thread_dir=Path(thread_dir))
 
-    # Parse key
-    key_str = proposal.get("key", "C major")
-    key_root, mode = parse_key_string(key_str)
-
-    # Parse BPM
-    bpm = proposal.get("bpm", 120)
-
-    # Parse time signature
-    tempo = proposal.get("tempo", {})
-    time_sig_num = tempo.get("numerator", 4) if isinstance(tempo, dict) else 4
-    time_sig_den = tempo.get("denominator", 4) if isinstance(tempo, dict) else 4
-
-    # Parse color
-    rainbow_color = proposal.get("rainbow_color", {})
-    if isinstance(rainbow_color, dict):
-        color_name = rainbow_color.get("color_name", "White")
-    else:
-        color_name = str(rainbow_color)
-
-    # Get concept from thread manifest
-    manifest_path = thread_dir / "manifest.yml"
-    concept = ""
-    if manifest_path.exists():
-        with open(manifest_path) as f:
-            manifest = yaml.safe_load(f)
-        concept = manifest.get("concept", "")
-
-    # Also get the song-level concept if available
-    song_concept = proposal.get("concept", "")
+    # chord_pipeline uses time_sig as a tuple and color_name (not color)
+    ts_parts = unified["time_sig"].split("/")
+    time_sig_tuple = (int(ts_parts[0]), int(ts_parts[1]))
 
     return {
-        "key_root": key_root,
-        "mode": mode,
-        "bpm": bpm,
-        "time_sig": (time_sig_num, time_sig_den),
-        "concept": song_concept or concept,
-        "color_name": color_name,
-        "singer": proposal.get("singer", ""),
+        "key_root": unified["key_root"],
+        "mode": unified["mode"],
+        "bpm": unified["bpm"],
+        "time_sig": time_sig_tuple,
+        "concept": unified["concept"],
+        "color_name": unified["color"],
+        "singer": unified["singer"],
         "song_filename": song_filename,
         "thread_dir": str(thread_dir),
-        "raw_proposal": proposal,
+        "raw_proposal": unified["raw_proposal"],
     }
 
 

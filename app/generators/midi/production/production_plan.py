@@ -258,6 +258,84 @@ def load_song_proposal(proposal_path: Path) -> dict:
     }
 
 
+def load_song_proposal_unified(
+    proposal_path: Path,
+    thread_dir: Optional[Path] = None,
+) -> dict:
+    """Canonical song proposal loader — single implementation for all pipeline phases.
+
+    Supersedes the four divergent load_song_proposal implementations:
+    - production_plan.load_song_proposal (this module)
+    - chord_pipeline.load_song_proposal
+    - lyric_pipeline._find_and_load_proposal (reads from chord_review)
+    - composition_proposal.load_song_proposal_data
+
+    Returns a normalised dict with all fields required by any pipeline phase:
+        title, bpm, time_sig (always "N/N" string), key, key_root, mode,
+        color, concept, genres, mood, singer, sounds_like, thread_dir, song_filename
+
+    Args:
+        proposal_path: Full path to the song proposal YAML file.
+        thread_dir: Optional thread directory; if provided, manifest.yml is checked
+                    for concept fallback (same as chord_pipeline behaviour).
+    """
+    with open(proposal_path) as f:
+        raw = yaml.safe_load(f) or {}
+
+    # Time signature — handles {numerator: N, denominator: D} dict or "4/4" string
+    tempo = raw.get("tempo", {})
+    if isinstance(tempo, dict):
+        time_sig = f"{tempo.get('numerator', 4)}/{tempo.get('denominator', 4)}"
+    else:
+        time_sig = str(tempo) if tempo else "4/4"
+
+    # Rainbow color
+    color_raw = raw.get("rainbow_color", {})
+    if isinstance(color_raw, dict):
+        color = str(color_raw.get("color_name", ""))
+    else:
+        color = str(color_raw or "")
+
+    # Key — return both combined string and parsed components
+    key_str = str(raw.get("key", "C major"))
+    key_root, mode = _parse_key_components(key_str)
+
+    # Concept — song proposal first; manifest.yml fallback if thread_dir provided
+    concept = str(raw.get("concept", ""))
+    if not concept and thread_dir:
+        manifest_path = Path(thread_dir) / "manifest.yml"
+        if manifest_path.exists():
+            with open(manifest_path) as f:
+                manifest = yaml.safe_load(f) or {}
+            concept = str(manifest.get("concept", ""))
+
+    return {
+        "title": str(raw.get("title", "")),
+        "bpm": int(raw.get("bpm", 120)),
+        "time_sig": time_sig,
+        "key": key_str,
+        "key_root": key_root,
+        "mode": mode,
+        "color": color,
+        "concept": concept,
+        "genres": raw.get("genres") or [],
+        "mood": raw.get("mood") or [],
+        "singer": str(raw.get("singer", "")),
+        "sounds_like": raw.get("sounds_like") or [],
+        "thread_dir": str(thread_dir) if thread_dir else "",
+        "song_filename": proposal_path.name,
+        "raw_proposal": raw,
+    }
+
+
+def _parse_key_components(key_str: str) -> tuple[str, str]:
+    """Parse a key string like 'F# minor' into (root, mode) components."""
+    parts = key_str.strip().rsplit(" ", 1)
+    if len(parts) == 2 and parts[1].lower() in ("minor", "major"):
+        return parts[0], parts[1].capitalize()
+    return key_str, "Major"
+
+
 def _parse_time_sig(time_sig_str: str) -> tuple[int, int]:
     parts = str(time_sig_str).split("/")
     return (int(parts[0]), int(parts[1]))
