@@ -35,9 +35,9 @@ spike_image = (
     modal.Image.debian_slim(python_version="3.11")
     .apt_install("libsndfile1", "ffmpeg")
     .pip_install(
-        "torch==2.2.2",
-        "diffusers>=0.27.0",
-        "transformers",
+        "torch==2.4.0",
+        "diffusers==0.30.3",
+        "transformers==4.46.3",
         "accelerate",
         "safetensors",
         "soundfile",
@@ -45,6 +45,10 @@ spike_image = (
         "huggingface_hub",
         # CLAP for audio embedding
         "laion-clap",
+        # Stable Audio scheduler dependency
+        "torchsde",
+        # Refractor ONNX scoring
+        "onnxruntime",
     )
 )
 
