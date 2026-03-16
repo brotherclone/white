@@ -81,3 +81,22 @@ clear go/no-go recommendation for a follow-on production feature.
 - **THEN** the recommendation section documents why and suggests revisiting when better
   open-weight audio generation models become available
 
+
+---
+
+### Requirement: Granular Grain Synthesizer
+`training/tools/grain_synthesizer.py` SHALL produce chromatic audio textures by
+crossfading Refractor-scored corpus grains into a configurable-length WAV.
+
+#### Scenario: synthesize produces WAV and grain map
+- **WHEN** `synthesize(color, duration_s, grain_pool=...)` is called
+- **THEN** a WAV file and `*_grain_map.yml` are written; WAV duration is within
+  one grain length of the target; output is stereo float32 PCM
+
+#### Scenario: mixed mono/stereo pool handled transparently
+- **WHEN** the grain pool contains a mix of mono and stereo source files
+- **THEN** all grains are up-mixed to stereo before crossfade; output is always stereo
+
+#### Scenario: empty pool raises before audio operations
+- **WHEN** retrieve_by_color returns no reachable segments
+- **THEN** synthesize raises ValueError with a clear message before any audio I/O
