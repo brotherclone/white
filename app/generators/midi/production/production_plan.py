@@ -66,6 +66,8 @@ class ProductionPlan:
     mood: list = field(default_factory=list)
     concept: str = ""
     sections: list = field(default_factory=list)  # list[PlanSection]
+    proposed_by: str = ""  # "claude" when arrangement was AI-proposed
+    rationale: str = ""  # Claude's compositional reasoning
 
 
 # ---------------------------------------------------------------------------
@@ -173,6 +175,8 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
         mood=data.get("mood") or [],
         concept=str(data.get("concept", "")),
         sections=sections,
+        proposed_by=str(data.get("proposed_by", "")),
+        rationale=str(data.get("rationale", "")),
     )
 
 
@@ -182,6 +186,7 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
     data = {
         "song_slug": plan.song_slug,
         "generated": plan.generated,
+        "proposed_by": plan.proposed_by or None,
         "source_proposal": plan.source_proposal,
         "title": plan.title,
         "bpm": plan.bpm,
@@ -193,6 +198,7 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
         "concept": plan.concept,
         "vocals_planned": plan.vocals_planned,
         "sounds_like": plan.sounds_like,
+        "rationale": plan.rationale or None,
         "sections": [
             {
                 "name": s.name,
@@ -584,6 +590,173 @@ def bootstrap_manifest(production_dir: Path) -> Path:
 
 
 # ---------------------------------------------------------------------------
+# Claude arrangement proposal
+# ---------------------------------------------------------------------------
+
+_CHROMATIC_CONTEXT = """
+The White Project uses a chromatic synthesis framework where each rainbow color maps
+to a set of axes:
+
+  Red    — Past / Thing / Known
+  Orange — Past / Place / Known
+  Yellow — Present / Place / Imagined
+  Green  — Present / Person / Imagined
+  Blue   — Present / Place / Forgotten
+  Indigo — Known, Forgotten (doesn't fit the standard axes — Indigo "isn't real")
+  Violet — Future / Person / Imagined
+  White  — synthesis of all colors
+
+The arrangement should serve the color's axes at every structural level: how sections
+rise and fall, how the song breathes, where tension accumulates and releases.
+""".strip()
+
+
+def _build_arrangement_prompt(plan: ProductionPlan) -> tuple[str, str]:
+    """Build system + user prompt asking Claude to propose an arrangement arc."""
+    mood_str = ", ".join(plan.mood) if plan.mood else "not specified"
+    genres_str = ", ".join(plan.genres) if plan.genres else "not specified"
+
+    system = f"""{_CHROMATIC_CONTEXT}
+
+You are a compositional collaborator on the White Project. You have been given a set
+of approved chord loop sections and must propose a complete song arrangement arc —
+how many times each section repeats and in what order, and why.
+
+Be specific and opinionated. Make real artistic choices that serve the concept and
+the color's chromatic axes. The human will use your proposal as a starting point in
+Logic Pro; they may follow it, diverge from it, or use it as a foil.
+
+Return your response in two parts:
+1. A fenced YAML block (```yaml ... ```) with the structured proposal
+2. A "Rationale:" section with prose explaining your compositional reasoning
+
+The YAML block MUST follow this exact schema:
+```yaml
+proposed_sections:
+  - name: <section_name>
+    repeat: <integer>
+    energy_note: <brief energy/mood description>
+  - name: <section_name>
+    repeat: <integer>
+    energy_note: <brief energy/mood description>
+```
+
+Only use section names from the available sections listed below. You may repeat
+sections (e.g. Verse appearing multiple times in the list with different repeat counts
+to create an A-B-A structure). The total runtime should feel like a complete song.
+"""
+
+    sections_table = "\n".join(
+        f"  {s.name:<20} {s.bars} bars" + ("  [vocals]" if s.vocals else "")
+        for s in plan.sections
+    )
+
+    user = f"""Song: {plan.title or plan.song_slug}
+Color: {plan.color}
+Key: {plan.key}  BPM: {plan.bpm}  Time sig: {plan.time_sig}
+Genres: {genres_str}
+Mood: {mood_str}
+
+Concept:
+{plan.concept.strip() if plan.concept else "(no concept provided)"}
+
+Available sections:
+{sections_table}
+
+Propose a complete song arrangement using these sections. Set repeat counts,
+decide if any sections should appear more than once in different positions, and
+explain the energy arc you're imagining.
+"""
+    return system, user
+
+
+def _parse_arrangement_response(raw: str, plan: ProductionPlan) -> tuple[list, str]:
+    """Parse Claude's response into (updated_sections, rationale).
+
+    Matches proposed section names back to the plan's existing PlanSection objects,
+    updating repeat counts. Unrecognised names are skipped. If parsing fails entirely,
+    the original sections are returned unchanged.
+    """
+    import re
+
+    # Extract fenced YAML block
+    match = re.search(r"```yaml\s*(.*?)```", raw, re.DOTALL)
+    structured: dict = {}
+    if match:
+        try:
+            structured = yaml.safe_load(match.group(1)) or {}
+        except yaml.YAMLError:
+            pass
+
+    # Extract rationale
+    rationale = ""
+    rat_match = re.search(r"Rationale:\s*(.*)", raw, re.DOTALL | re.IGNORECASE)
+    if rat_match:
+        rationale = rat_match.group(1).strip()
+    elif not structured:
+        rationale = raw.strip()
+
+    proposed = structured.get("proposed_sections") or []
+    if not proposed:
+        return list(plan.sections), rationale
+
+    # Build lookup by normalised name
+    section_by_key = {
+        s.name.lower().replace("-", "_").replace(" ", "_"): s for s in plan.sections
+    }
+
+    updated: list[PlanSection] = []
+    for entry in proposed:
+        name = str(entry.get("name", "")).strip()
+        key = name.lower().replace("-", "_").replace(" ", "_")
+        original = section_by_key.get(key)
+        if original is None:
+            print(f"  Warning: proposed section '{name}' not in plan — skipped")
+            continue
+        repeat = int(entry.get("repeat", 1))
+        energy_note = str(entry.get("energy_note", "") or "").strip()
+        sec = PlanSection(
+            name=original.name,
+            bars=original.bars,
+            repeat=max(1, repeat),
+            vocals=original.vocals,
+            notes=energy_note or original.notes,
+            loops=dict(original.loops),
+        )
+        updated.append(sec)
+
+    if not updated:
+        return list(plan.sections), rationale
+
+    return updated, rationale
+
+
+def propose_arrangement(plan: ProductionPlan) -> ProductionPlan:
+    """Call Claude to propose an arrangement arc and update the plan in place.
+
+    Sets plan.sections (with Claude's repeat counts), plan.rationale, and
+    plan.proposed_by = "claude". Returns the modified plan.
+    """
+    from anthropic import Anthropic
+
+    system, user = _build_arrangement_prompt(plan)
+    client = Anthropic()
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=2048,
+        system=system,
+        messages=[{"role": "user", "content": user}],
+    )
+    raw = response.content[0].text
+
+    updated_sections, rationale = _parse_arrangement_response(raw, plan)
+    plan.sections = updated_sections
+    plan.rationale = rationale
+    plan.proposed_by = "claude"
+    return plan
+
+
+# ---------------------------------------------------------------------------
 # next_section map helper (used by drum pipeline)
 # ---------------------------------------------------------------------------
 
@@ -629,6 +802,11 @@ def main():
         "--bootstrap-manifest",
         action="store_true",
         help="Emit partial manifest YAML from completed plan",
+    )
+    parser.add_argument(
+        "--propose",
+        action="store_true",
+        help="Call Claude to propose an arrangement arc (repeat counts, energy arc, rationale)",
     )
     args = parser.parse_args()
 
@@ -677,6 +855,11 @@ def main():
                 sys.exit(1)
             plan = generate_plan(prod_path, proposal_path=proposal_path)
             print("Mode: generate")
+
+        if args.propose:
+            print("\nCalling Claude to propose arrangement arc...")
+            plan = propose_arrangement(plan)
+            print("  Arrangement proposed by Claude.")
     except (FileNotFoundError, ValueError) as e:
         print(f"ERROR: {e}")
         sys.exit(1)
@@ -687,6 +870,8 @@ def main():
     print(f"BPM:     {plan.bpm}")
     print(f"Time:    {plan.time_sig}")
     print(f"Color:   {plan.color}")
+    if plan.proposed_by:
+        print(f"Proposed by: {plan.proposed_by}")
     print(f"\nSections ({len(plan.sections)}):")
     for sec in plan.sections:
         source = f"[from {sec._bar_source}]" if sec._bar_source else ""
@@ -694,8 +879,15 @@ def main():
             f"  {sec.name:<15} {sec.bars} bars × {sec.repeat}"
             f"  vocals={sec.vocals}  {source}"
         )
+    if plan.rationale:
+        print(
+            f"\nRationale:\n{plan.rationale[:500]}{'...' if len(plan.rationale) > 500 else ''}"
+        )
     print(f"\nPlan written: {out_path}")
-    print(f"Edit {PLAN_FILENAME} to set repeat counts, vocals, and section order")
+    if not plan.proposed_by:
+        print(f"Edit {PLAN_FILENAME} to set repeat counts, vocals, and section order")
+    else:
+        print(f"Edit {PLAN_FILENAME} to override Claude's arrangement choices")
 
     return plan
 
