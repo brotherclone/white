@@ -205,12 +205,12 @@ def generate_and_score(
         inputs = clap_processor(
             audios=mono_resampled, sampling_rate=target_sr, return_tensors="pt"
         )
-        inputs = {k: v.to("cuda") for k, v in inputs.items()}
-        audio_emb = clap_model.audio_model(**inputs)
-        pooled = audio_emb.pooler_output  # (1, hidden_size)
-        clap_emb_np = (
-            clap_model.audio_projection(pooled).cpu().float().numpy()[0]
-        )  # (512,)
+        input_features = inputs["input_features"].to("cuda")
+        audio_out = clap_model.audio_model(input_features=input_features)
+        pooled = audio_out.pooler_output  # (1, hidden_size)
+        projected = clap_model.audio_projection(pooled)  # (1, 512)
+        projected = torch.nn.functional.normalize(projected, dim=-1)
+        clap_emb_np = projected.cpu().float().numpy()[0]  # (512,)
 
     # Refractor scoring (audio-only, null concept)
     print("  Scoring with Refractor...")
@@ -230,10 +230,18 @@ def generate_and_score(
     import onnxruntime as ort
 
     sess = ort.InferenceSession(onnx_path)
+
+    # Inspect what inputs the model actually needs
+    input_names = [i.name for i in sess.get_inputs()]
+    print(f"  ONNX inputs: {input_names}")
+
     null_concept = np.zeros(768, dtype=np.float32)
     null_midi = np.zeros(512, dtype=np.float32)
     null_lyric = np.zeros(768, dtype=np.float32)
     null_sounds_like = np.zeros(768, dtype=np.float32)
+    null_piano_roll = np.zeros(
+        (1, 1, 128, 256), dtype=np.float32
+    )  # (batch, channels, pitch, time)
 
     inputs = {
         "concept_emb": null_concept[np.newaxis],
@@ -241,12 +249,15 @@ def generate_and_score(
         "midi_emb": null_midi[np.newaxis],
         "lyric_emb": null_lyric[np.newaxis],
         "sounds_like_emb": null_sounds_like[np.newaxis],
-        "has_concept": np.array([[0.0]], dtype=np.float32),
-        "has_audio": np.array([[1.0]], dtype=np.float32),
-        "has_midi": np.array([[0.0]], dtype=np.float32),
-        "has_lyric": np.array([[0.0]], dtype=np.float32),
-        "has_sounds_like": np.array([[0.0]], dtype=np.float32),
+        "has_concept": np.array([False]),
+        "has_audio": np.array([True]),
+        "has_midi": np.array([False]),
+        "has_lyric": np.array([False]),
+        "has_sounds_like": np.array([False]),
+        "piano_roll": null_piano_roll,
     }
+    # Only pass inputs the model actually expects
+    inputs = {k: v for k, v in inputs.items() if k in input_names}
     outputs = sess.run(None, inputs)
 
     # outputs: [temporal_dist, spatial_dist, ontological_dist] each shape (1, n_classes)
