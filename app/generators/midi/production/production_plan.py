@@ -140,12 +140,21 @@ def derive_bar_count(
 
 
 def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
-    """Load existing production_plan.yml, or return None if absent."""
+    """Load existing production_plan.yml, or return None if absent.
+
+    Fields omitted from the YAML (bpm, time_sig, key, color, sounds_like) are
+    filled from song_context.yml when present, then fall back to safe defaults.
+    """
     plan_path = production_dir / PLAN_FILENAME
     if not plan_path.exists():
         return None
     with open(plan_path) as f:
         data = yaml.safe_load(f)
+
+    # Fill fields that may be absent in plans written after 5.3 cleanup
+    from app.generators.midi.production.init_production import load_song_context
+
+    ctx = load_song_context(production_dir)
 
     sections = []
     for s in data.get("sections", []):
@@ -163,14 +172,14 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
     return ProductionPlan(
         song_slug=data.get("song_slug", ""),
         generated=data.get("generated", ""),
-        bpm=int(data.get("bpm", 120)),
-        time_sig=str(data.get("time_sig", "4/4")),
-        key=str(data.get("key", "")),
-        color=str(data.get("color", "")),
+        bpm=int(data.get("bpm") or ctx.get("bpm") or 120),
+        time_sig=str(data.get("time_sig") or ctx.get("time_sig") or "4/4"),
+        key=str(data.get("key") or ctx.get("key") or ""),
+        color=str(data.get("color") or ctx.get("color") or ""),
         title=str(data.get("title", "")),
         source_proposal=data.get("source_proposal"),
         vocals_planned=bool(data.get("vocals_planned", False)),
-        sounds_like=data.get("sounds_like") or [],
+        sounds_like=data.get("sounds_like") or ctx.get("sounds_like") or [],
         genres=data.get("genres") or [],
         mood=data.get("mood") or [],
         concept=str(data.get("concept", "")),
@@ -181,7 +190,12 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
 
 
 def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
-    """Write production_plan.yml and return its path."""
+    """Write production_plan.yml and return its path.
+
+    Fields that duplicate song_context.yml (bpm, time_sig, key, color,
+    sounds_like) are intentionally omitted; load_plan() pulls them from
+    song_context.yml when present.
+    """
     plan_path = production_dir / PLAN_FILENAME
     data = {
         "song_slug": plan.song_slug,
@@ -189,15 +203,10 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
         "proposed_by": plan.proposed_by or None,
         "source_proposal": plan.source_proposal,
         "title": plan.title,
-        "bpm": plan.bpm,
-        "time_sig": plan.time_sig,
-        "key": plan.key,
-        "color": plan.color,
         "genres": plan.genres,
         "mood": plan.mood,
         "concept": plan.concept,
         "vocals_planned": plan.vocals_planned,
-        "sounds_like": plan.sounds_like,
         "rationale": plan.rationale or None,
         "sections": [
             {
@@ -328,6 +337,7 @@ def load_song_proposal_unified(
         "mood": raw.get("mood") or [],
         "singer": str(raw.get("singer", "")),
         "sounds_like": raw.get("sounds_like") or [],
+        "sub_proposals": [str(p) for p in (raw.get("sub_proposals") or [])],
         "thread_dir": str(thread_dir) if thread_dir else "",
         "song_filename": proposal_path.name,
         "raw_proposal": raw,

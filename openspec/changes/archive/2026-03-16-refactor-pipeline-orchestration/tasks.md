@@ -46,10 +46,10 @@
       a string; `color` is always present; `color_name` returned for chord_pipeline callers
 
 ## Phase 5 — Cleanup (low priority, can be deferred)
-- [ ] 5.1 Deprecate `initial_proposal.yml`: update docstring of `write_initial_proposal()`
+- [x] 5.1 Deprecate `initial_proposal.yml`: update docstring of `write_initial_proposal()`
       noting it will be removed in a future release; continue writing it for now
-- [ ] 5.2 Remove `song_proposal` and `thread` fields from `chords/review.yml` output in
+- [x] 5.2 Remove `song_proposal` and `thread` fields from `chords/review.yml` output in
       `chord_pipeline.py` (these are now in `song_context.yml`); keep reading them for
       backward compat with existing dirs
-- [ ] 5.3 Update `production_plan.py`: drop `sounds_like`, `bpm`, `color`, `time_sig`,
+- [x] 5.3 Update `production_plan.py`: drop `sounds_like`, `bpm`, `color`, `time_sig`,
       `key` from `ProductionPlan` YAML output (these are in `song_context.yml`)
