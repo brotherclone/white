@@ -190,6 +190,7 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
         "concept": unified["concept"],
         "color_name": unified["color"],
         "singer": unified["singer"],
+        "sub_proposals": unified.get("sub_proposals") or [],
         "song_filename": song_filename,
         "thread_dir": str(thread_dir),
         "raw_proposal": unified["raw_proposal"],
@@ -395,34 +396,33 @@ def generate_review_yaml(
     """Generate the review YAML structure."""
     candidates = []
     for item in ranked_candidates:
-        candidates.append(
-            {
-                "id": item["id"],
-                "midi_file": f"candidates/{item['id']}.mid",
-                "scratch_midi": f"candidates/{item['id']}_scratch.mid",
-                "rank": item["rank"],
-                "scores": _to_python(item["breakdown"]),
-                "hr_distribution": _to_python(item.get("hr_distribution", [])),
-                "strum_pattern": item.get("strum_pattern", "whole"),
-                "progression": item["summary"],
-                "chords": [
-                    {
-                        "function": c.get("function", "?"),
-                        "name": c.get("chord_name", "?"),
-                        "notes": c.get("note_names", []),
-                    }
-                    for c in item["progression"]
-                ],
-                # Human annotation fields
-                "label": None,
-                "status": "pending",
-                "notes": "",
-            }
-        )
+        entry = {
+            "id": item["id"],
+            "midi_file": f"candidates/{item['id']}.mid",
+            "scratch_midi": f"candidates/{item['id']}_scratch.mid",
+            "rank": item["rank"],
+            "scores": _to_python(item["breakdown"]),
+            "hr_distribution": _to_python(item.get("hr_distribution", [])),
+            "strum_pattern": item.get("strum_pattern", "whole"),
+            "progression": item["summary"],
+            "chords": [
+                {
+                    "function": c.get("function", "?"),
+                    "name": c.get("chord_name", "?"),
+                    "notes": c.get("note_names", []),
+                }
+                for c in item.get("progression") or []
+            ],
+            # Human annotation fields
+            "label": None,
+            "status": "pending",
+            "notes": "",
+        }
+        if item.get("bar_sources"):
+            entry["bar_sources"] = item["bar_sources"]
+        candidates.append(entry)
 
-    return {
-        "song_proposal": song_info["song_filename"],
-        "thread": str(song_info["thread_dir"]),
+    review = {
         "key": f"{song_info['key_root']} {song_info['mode'].lower()}",
         "bpm": song_info["bpm"],
         "color": song_info["color_name"],
@@ -431,6 +431,9 @@ def generate_review_yaml(
         "scoring_weights": scoring_weights,
         "candidates": candidates,
     }
+    if song_info.get("sub_proposals"):
+        review["sub_proposals"] = song_info["sub_proposals"]
+    return review
 
 
 # ---------------------------------------------------------------------------
@@ -452,6 +455,126 @@ def song_slug(song_filename: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# White synthesis — donor-mode candidate generation
+# ---------------------------------------------------------------------------
+
+
+def is_white_mode(song_info: dict) -> bool:
+    """Return True when the song is White (donor + cut-up mode)."""
+    return str(song_info.get("color_name", "")).strip().capitalize() == "White"
+
+
+def generate_white_candidates(
+    song_info: dict,
+    bar_pool: list[dict],
+    num_candidates: int,
+    top_k: int,
+    seed: int,
+    progression_length: int,
+    theory_weight: float,
+    chromatic_weight: float,
+    onnx_path: Optional[str],
+) -> list[dict]:
+    """Generate White chord candidates by random cut-up of the bar pool.
+
+    Each candidate draws `progression_length` bars from the pool with
+    replacement, shuffles them, concatenates into a MIDI, and scores with
+    Refractor + theory metrics.  Returns a ranked list of top_k dicts
+    matching the format expected by generate_review_yaml().
+    """
+    import random as _random
+
+    from training.refractor import Refractor
+    from app.generators.midi.pipelines.white_rebracketing import concatenate_bars
+
+    rng = _random.Random(seed)
+    tpb = 480
+
+    if not bar_pool:
+        raise ValueError("generate_white_candidates: bar_pool is empty")
+
+    scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
+    target = get_chromatic_target(song_info["color_name"])
+
+    concept_text = (
+        song_info.get("concept") or f"{song_info['color_name']} chromatic concept"
+    )
+    concept_emb = scorer.prepare_concept(concept_text)
+
+    bpm = song_info["bpm"]
+    raw_candidates = []
+
+    for _ in range(num_candidates):
+        drawn = rng.choices(bar_pool, k=progression_length)
+        rng.shuffle(drawn)
+        midi_bytes = concatenate_bars([b["midi_bytes"] for b in drawn], tpb, bpm)
+        raw_candidates.append(
+            {
+                "midi_bytes": midi_bytes,
+                "bar_sources": [
+                    {
+                        "source_dir": b["source_dir"],
+                        "donor_color": b["donor_color"],
+                        "source_file": b["source_file"],
+                        "bar_index": b["bar_index"],
+                    }
+                    for b in drawn
+                ],
+            }
+        )
+
+    # Score with Refractor
+    scorer_results = scorer.score_batch(
+        [{"midi_bytes": c["midi_bytes"]} for c in raw_candidates],
+        concept_emb=concept_emb,
+    )
+    scorer_by_idx = {id(r["candidate"]["midi_bytes"]): r for r in scorer_results}
+
+    scored = []
+    for cand in raw_candidates:
+        sr = scorer_by_idx.get(id(cand["midi_bytes"]))
+        if sr is None:
+            continue
+        chromatic_match = compute_chromatic_match(sr, target)
+        # Theory score is 0 for cut-up candidates (no chord-function analysis available)
+        theory_score = 0.0
+        theory_breakdown = {
+            "melody": 0.0,
+            "voice_leading": 0.0,
+            "variety": 0.0,
+            "graph_probability": 0.0,
+        }
+        comp, breakdown = composite_score(
+            theory_score,
+            theory_breakdown,
+            chromatic_match,
+            sr,
+            theory_weight,
+            chromatic_weight,
+        )
+        scored.append(
+            {
+                "composite": comp,
+                "breakdown": breakdown,
+                "midi_bytes": cand["midi_bytes"],
+                "bar_sources": cand["bar_sources"],
+                # White candidates have no chord-function progression; use bar sources as summary
+                "progression": [],
+                "summary": f"cut-up ({len(cand['bar_sources'])} bars from "
+                f"{len({b['donor_color'] for b in cand['bar_sources']})} colors)",
+            }
+        )
+
+    scored.sort(key=lambda x: x["composite"], reverse=True)
+    top = scored[:top_k]
+    for rank, item in enumerate(top):
+        item["rank"] = rank + 1
+        item["id"] = f"chord_{rank + 1:03d}"
+
+    return top
+
+
+# ---------------------------------------------------------------------------
 # Main pipeline
 # ---------------------------------------------------------------------------
 
@@ -467,6 +590,7 @@ def run_chord_pipeline(
     chromatic_weight: float = 0.7,
     onnx_path: Optional[str] = None,
     strum_patterns: Optional[list[str]] = None,
+    sub_proposals: Optional[list[str]] = None,
 ):
     """Run the chord generation pipeline end-to-end.
 
@@ -529,6 +653,92 @@ def run_chord_pipeline(
     genre_families = map_genres_to_families(genre_tags) or [DEFAULT_GENRE_FAMILY]
 
     # --- 2. Generate chord candidates ---
+    # Merge CLI sub_proposals into song_info (CLI takes precedence over proposal YAML)
+    if sub_proposals:
+        song_info["sub_proposals"] = list(sub_proposals)
+
+    if is_white_mode(song_info):
+        # White donor + cut-up mode
+        from app.generators.midi.pipelines.white_rebracketing import build_bar_pool
+
+        sub_dirs = [Path(p) for p in song_info.get("sub_proposals", [])]
+        if not sub_dirs:
+            print(
+                "ERROR: White mode requires sub_proposals (via --sub-proposals or proposal YAML)"
+            )
+            sys.exit(1)
+
+        white_key = f"{song_info['key_root']} {song_info['mode'].lower()}"
+        print(
+            f"\nWhite synthesis mode — building bar pool from {len(sub_dirs)} sub-proposal(s)..."
+        )
+        for p in sub_dirs:
+            if not Path(p).exists() or not (Path(p) / "chords" / "review.yml").exists():
+                print(
+                    f"ERROR: sub-proposal path missing or has no chords/review.yml: {p}"
+                )
+                sys.exit(1)
+
+        bar_pool = build_bar_pool(sub_dirs, white_key, song_info["bpm"])
+        print(f"  Bar pool: {len(bar_pool)} bars from {len(sub_dirs)} sub-proposal(s)")
+
+        print(f"\nGenerating {num_candidates} cut-up candidates (seed={seed})...")
+        top_candidates = generate_white_candidates(
+            song_info=song_info,
+            bar_pool=bar_pool,
+            num_candidates=num_candidates,
+            top_k=top_k,
+            seed=seed,
+            progression_length=progression_length,
+            theory_weight=theory_weight,
+            chromatic_weight=chromatic_weight,
+            onnx_path=onnx_path,
+        )
+
+        # Write White candidate MIDIs directly (no HR/strum re-application needed —
+        # bars already carry their original rhythm; just write + scratch beat)
+        slug = song_slug(song_filename)
+        output_dir = thread_path / "production" / slug / "chords"
+        candidates_dir = output_dir / "candidates"
+        approved_dir = output_dir / "approved"
+        candidates_dir.mkdir(parents=True, exist_ok=True)
+        approved_dir.mkdir(parents=True, exist_ok=True)
+
+        time_sig = tuple(song_info["time_sig"])
+        print(
+            f"\nWriting {len(top_candidates)} White cut-up candidates to {candidates_dir}/"
+        )
+        for item in top_candidates:
+            write_midi_file(item["midi_bytes"], candidates_dir / f"{item['id']}.mid")
+            _trim_midi(candidates_dir / f"{item['id']}.mid")
+            bar_count = progression_length
+            scratch_bytes = generate_scratch_beat(
+                song_info["bpm"], bar_count, time_sig, genre_families
+            )
+            write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
+            _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
+
+        review = generate_review_yaml(
+            song_info,
+            top_candidates,
+            seed,
+            {"theory": theory_weight, "chromatic": chromatic_weight},
+        )
+        review_path = output_dir / "review.yml"
+        with open(review_path, "w") as f:
+            yaml.dump(
+                review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            )
+
+        print(f"Review file: {review_path}")
+        print(f"\nOutput: {output_dir}")
+        print(f"Next: Edit {review_path} to label and approve candidates")
+        print(
+            f"Then: python -m app.generators.midi.production.promote_part --review {review_path}"
+        )
+        return top_candidates
+
+    # --- Non-White: Markov generation ---
     print(f"\nGenerating {num_candidates} candidates (seed={seed})...")
     gen = ChordProgressionGenerator()
 
@@ -762,6 +972,14 @@ def main():
         default=None,
         help="Comma-separated strum pattern names to use (e.g. whole,half,quarter). Default: all patterns for the time signature.",
     )
+    parser.add_argument(
+        "--sub-proposals",
+        nargs="+",
+        default=None,
+        metavar="DIR",
+        help="(White mode) Production dirs to draw donor chord material from. "
+        "Space-separated paths. Also readable from sub_proposals in the song proposal YAML.",
+    )
 
     args = parser.parse_args()
 
@@ -782,6 +1000,7 @@ def main():
         chromatic_weight=args.chromatic_weight,
         onnx_path=args.onnx_path,
         strum_patterns=strum_filter,
+        sub_proposals=args.sub_proposals,
     )
 
 

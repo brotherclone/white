@@ -30,6 +30,8 @@ Catalogs `sounds_like` artists from the proposal into `app/reference/music/artis
 
 ## 1. Chord Phase **[IMPLEMENTED]**
 
+### 1a. Color songs (Markov generation)
+
 ```bash
 .venv/bin/python app/generators/midi/pipelines/chord_pipeline.py \
     --thread shrink_wrapped/<song-title> \
@@ -38,6 +40,33 @@ Catalogs `sounds_like` artists from the proposal into `app/reference/music/artis
 ```
 
 `--song` is a filename inside `<thread>/yml/`. The pipeline creates `<thread>/production/<iteration_id>/chords/`. Generates candidates via Markov + theory scoring + Refractor chromatic scoring.
+
+### 1b. White song (donor cut-up mode) **[IMPLEMENTED]**
+
+The White song inherits material from its color sub-songs rather than generating from scratch. Add `sub_proposals` to the White song proposal YAML, or pass them on the CLI:
+
+```bash
+.venv/bin/python app/generators/midi/pipelines/chord_pipeline.py \
+    --thread shrink_wrapped/<song-title> \
+    --song <white_proposal>.yml \
+    --num-candidates 200 --top-k 10 \
+    --sub-proposals \
+        shrink_wrapped/<title>/production/red__<slug> \
+        shrink_wrapped/<title>/production/blue__<slug> \
+        ...
+```
+
+Or embed in the proposal YAML:
+```yaml
+sub_proposals:
+  - shrink_wrapped/<title>/production/red__<slug>
+  - shrink_wrapped/<title>/production/blue__<slug>
+  ...
+```
+
+**What happens**: approved chord MIDIs from each sub-proposal are transposed to the White key, re-temped to the White BPM, sliced into individual bars, then randomly drawn and shuffled (Burroughs/Gysin cut-up) to form each candidate. Each candidate's `bar_sources` in `review.yml` records the exact provenance — which bar from which color and MIDI file. Drums, bass, melody, and lyrics run exactly as for any color song.
+
+**Lyric cut-up**: if `sub_proposals` are present in `song_context.yml`, the lyric pipeline automatically collects approved sub-lyrics and feeds them to Claude as cut-up source material. No extra flags needed.
 
 **Human step**: Open `chords/review.yml`, set `label` and `status: approved` on chosen candidates.
 
