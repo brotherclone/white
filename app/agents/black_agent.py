@@ -61,7 +61,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,
-            max_tokens=self.settings.max_tokens,
         )
         self.current_session_sigils = []
 

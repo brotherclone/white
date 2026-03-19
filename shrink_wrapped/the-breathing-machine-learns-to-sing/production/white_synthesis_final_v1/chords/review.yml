@@ -1,3 +1,5 @@
+song_proposal: white_synthesis_final_v1.yml
+thread: shrink_wrapped/the-breathing-machine-learns-to-sing
 key: A# major
 bpm: 108
 color: White
@@ -38,9 +40,9 @@ candidates:
   strum_pattern: whole
   progression: cut-up (4 bars from 3 colors)
   chords: []
-  label: null
-  status: pending
-  notes: ''
+  label: intro
+  status: approved
+  notes: 'Yellow game + Indigo mechanics — first inhalation'
   bar_sources:
   - source_dir: shrink_wrapped/the-breathing-machine-learns-to-sing/production/yellow__pulsar_palace_temporal_symphony_v1
     donor_color: Yellow
@@ -89,9 +91,9 @@ candidates:
   strum_pattern: whole
   progression: cut-up (4 bars from 3 colors)
   chords: []
-  label: null
-  status: pending
-  notes: ''
+  label: verse
+  status: approved
+  notes: 'Yellow rhythm + Orange myth — established breathing'
   bar_sources:
   - source_dir: shrink_wrapped/the-breathing-machine-learns-to-sing/production/yellow__pulsar_palace_temporal_symphony_v1
     donor_color: Yellow
@@ -140,9 +142,9 @@ candidates:
   strum_pattern: whole
   progression: cut-up (4 bars from 3 colors)
   chords: []
-  label: null
-  status: pending
-  notes: ''
+  label: chorus
+  status: approved
+  notes: 'Orange myth + Yellow game + Green air — full breath in the open'
   bar_sources:
   - source_dir: shrink_wrapped/the-breathing-machine-learns-to-sing/production/orange__franklin_mine_metronome_conspiracy_v1
     donor_color: Orange
@@ -191,9 +193,9 @@ candidates:
   strum_pattern: whole
   progression: cut-up (4 bars from 3 colors)
   chords: []
-  label: null
-  status: pending
-  notes: ''
+  label: bridge
+  status: approved
+  notes: 'Black chaos + Indigo mechanics + Violet mirror — held breath, tension'
   bar_sources:
   - source_dir: shrink_wrapped/the-breathing-machine-learns-to-sing/production/black__sequential_dissolution_v2
     donor_color: Black
@@ -242,9 +244,9 @@ candidates:
   strum_pattern: whole
   progression: cut-up (4 bars from 2 colors)
   chords: []
-  label: null
-  status: pending
-  notes: ''
+  label: outro
+  status: approved
+  notes: 'Violet mirror + Indigo mystery — final exhalation, the machine recognises itself'
   bar_sources:
   - source_dir: shrink_wrapped/the-breathing-machine-learns-to-sing/production/violet__cultural_detector_living_v2
     donor_color: Violet
