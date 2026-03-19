@@ -1,9 +1,9 @@
 artifact_id: 1bb9b099-d702-43c5-a346-9fbdae907436
 artifact_name: symbolic_object
 base_path: /Volumes/LucidNonsense/White/chain_artifacts
-chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+chain_artifact_file_type:
 - yml
-chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+chain_artifact_type:
 - symbolic_object
 description: A modified mechanical metronome found abandoned near the Franklin Mine
   entrance, permanently locked at exactly 72 beats per minute in an impossible 7/8
@@ -16,6 +16,6 @@ description: A modified mechanical metronome found abandoned near the Franklin M
 file_name: symbolic_object.yml
 name: The Franklin Mine 72-Beat Metronome
 rainbow_color_mnemonic_character_value: O
-symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+symbolic_object_category:
 - circular_time
 thread_id: 346b57fa-c4cc-4d69-bbf1-cc90ca9317e8
