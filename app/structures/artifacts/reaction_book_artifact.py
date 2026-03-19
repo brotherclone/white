@@ -71,7 +71,7 @@ class ReactionBookChainArtifact(ChainArtifact, ABC):
         file = Path(self.file_path, self.file_name)
         with open(file, "w") as f:
             yaml.dump(
-                self.model_dump(mode="python"),
+                self.model_dump(mode="json"),
                 f,
                 default_flow_style=False,
                 allow_unicode=True,
