@@ -98,7 +98,7 @@ class NewspaperArtifact(ChainArtifact, ABC):
                 f.write(self.to_markdown())
             else:
                 yaml.dump(
-                    self.model_dump(mode="python"),
+                    self.model_dump(mode="json"),
                     f,
                     default_flow_style=False,
                     allow_unicode=True,
