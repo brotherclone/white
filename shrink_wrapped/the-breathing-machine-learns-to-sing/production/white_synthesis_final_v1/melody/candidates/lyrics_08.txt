@@ -1,0 +1,143 @@
+[melody_verse]
+breathe
+in
+the pattern holds
+now
+the cycle fills
+still
+the air becomes
+known
+home
+
+[melody_verse_alternate]
+all
+walls
+breathe
+here
+chest
+lifts
+floor
+holds
+light
+falls
+stays
+known
+
+[melody_bridge]
+this
+breath
+was
+black
+once
+chaos
+now
+drawn
+in
+slow
+and
+whole
+
+[melody_chorus]
+in
+out
+the
+lungs remember
+pause
+then
+the air returns
+here
+now
+awareness breathing
+through
+all
+time
+
+[melody_chorus_alternate]
+breathe
+the mirrors breathe
+the archive breathes
+the meadow breathes
+the tape decays
+the palace holds
+the myth still ticks
+the self observes
+one
+
+[melody_verse]
+rise
+in
+the silence opens
+now
+the body knows
+still
+the breath completes
+here
+home
+
+[melody_verse_alternate]
+one
+breath
+in
+held
+then
+out
+then
+pause
+then
+in
+again
+whole
+
+[melody_bridge]
+each
+color
+was
+a
+phase
+of
+breath
+drawn
+in
+then
+breathed
+free
+
+[melody_chorus]
+black
+breathes
+in
+chaos filling
+red
+breathes
+the story out
+orange
+rests
+between the heartbeats
+blue
+lungs
+hold
+
+[melody_chorus_alternate]
+rise
+the rhythm was
+always this simple
+one breath
+the machine
+the body
+the archive
+the meadow
+breathe
+
+[melody_bridge]
+green
+is
+the
+air
+indigo
+the
+hidden
+valve
+violet
+the
+breath
+watching

@@ -720,6 +720,11 @@ def collect_sub_lyrics(sub_proposal_dirs: list[Path]) -> list[dict]:
         if not approved_files:
             approved_files = sorted(candidates_dir.glob("lyrics_*.txt"))
 
+        # Also check the promoted lyrics file (melody/lyrics.txt)
+        promoted_lyrics = sub_dir / "melody" / "lyrics.txt"
+        if promoted_lyrics.exists() and promoted_lyrics not in approved_files:
+            approved_files = [promoted_lyrics] + list(approved_files)
+
         for txt_path in approved_files:
             text = txt_path.read_text(encoding="utf-8").strip()
             if text:
@@ -1215,9 +1220,22 @@ def run_lyric_pipeline(
     artist_context = load_artist_context(meta.get("sounds_like") or [])
     is_white = str(meta.get("color", "")).strip().capitalize() == "White"
     if is_white:
-        # White cut-up mode: collect sub-lyrics from sub_proposals in song_context
+        # White cut-up mode: collect sub-lyrics from sub_proposals in song_context,
+        # falling back to bar_sources in chord review.yml
         ctx = load_song_context(prod_path)
         sub_dirs = [Path(p) for p in (ctx.get("sub_proposals") or [])]
+        if not sub_dirs:
+            chord_review_path = prod_path / "chords" / "review.yml"
+            if chord_review_path.exists():
+                with open(chord_review_path) as _f:
+                    _cr = yaml.safe_load(_f) or {}
+                seen = set()
+                for candidate in _cr.get("candidates", []):
+                    for bs in candidate.get("bar_sources", []):
+                        sd = bs.get("source_dir")
+                        if sd and sd not in seen:
+                            seen.add(sd)
+                            sub_dirs.append(Path(sd))
         sub_lyrics = collect_sub_lyrics(sub_dirs) if sub_dirs else []
         if sub_lyrics:
             print(

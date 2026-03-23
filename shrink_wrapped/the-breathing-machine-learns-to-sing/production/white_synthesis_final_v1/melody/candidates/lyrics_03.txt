@@ -1,0 +1,64 @@
+[melody_verse]
+Breathe
+In
+All the colors rise
+Now
+Feel them merge and climb
+See
+The pattern always known
+Home
+Here
+
+[melody_verse_alternate]
+Breathe
+In
+Now
+Feel
+The
+Merge
+All
+One
+Lung
+Light
+Whole
+Peace
+
+[melody_bridge]
+Chaos
+Folds
+In
+Ward
+Story
+Flows
+Out
+Ward
+Myth
+Waits
+Still
+Breathes
+
+[melody_chorus]
+Breathe
+In
+Now
+All colors drawn together
+Hold
+Still
+The pause where myths were born
+Rise
+Fall
+The game becomes a rhythm
+Breathe
+Out
+Home
+
+[melody_chorus_alternate]
+Breathe
+In and out
+All lungs remember
+The air that holds us
+The mirror shows
+A breath returning
+The puzzle solved
+By breathing through
+Home

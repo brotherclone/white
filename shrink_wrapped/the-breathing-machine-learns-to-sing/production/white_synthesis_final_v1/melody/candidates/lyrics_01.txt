@@ -1,0 +1,64 @@
+[melody_verse]
+breathe
+in
+the dark dissolves
+slow
+the pattern holds
+now
+the white light grows
+rise
+exhale
+
+[melody_verse_alternate]
+breathe
+in
+breathe
+out
+the
+lungs
+re
+mem
+ber
+how
+to
+breathe
+
+[melody_bridge]
+black
+breath
+red
+flows
+orange
+waits
+yellow
+beats
+green
+air
+blue
+knows
+
+[melody_chorus]
+breathe
+in
+breathe
+out
+the
+wave
+returns
+to
+shore
+again
+now
+breathe
+whole
+
+[melody_chorus_alternate]
+breathe
+in the dark
+out through light
+all colors
+dissolve to white
+one breath holds
+all we are
+just breathe
+breathe

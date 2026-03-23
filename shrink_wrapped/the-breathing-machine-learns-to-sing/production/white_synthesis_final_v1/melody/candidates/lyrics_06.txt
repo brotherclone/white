@@ -1,0 +1,64 @@
+[melody_verse]
+breathe
+in
+the archive opens
+now
+the mirror shows
+here
+the palace glows
+known
+home
+
+[melody_verse_alternate]
+all
+breathe
+now
+chest
+rise
+fall
+walls
+know
+room
+holds
+one
+beat
+
+[melody_bridge]
+in
+out
+pause
+then
+in
+out
+hold
+then
+in
+out
+pause
+breathe
+
+[melody_chorus]
+here
+now
+breathe
+the chaos in
+hold
+still
+the story out
+wait
+return
+the air between
+known
+white
+light
+
+[melody_chorus_alternate]
+breathe
+the tape unspools
+the palace glows
+the hive remembers
+the mirror shows
+the archive holds
+the metronome
+still ticking now
+breathe

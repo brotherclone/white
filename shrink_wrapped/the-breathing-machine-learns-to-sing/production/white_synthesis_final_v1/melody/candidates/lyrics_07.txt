@@ -1,0 +1,64 @@
+[melody_verse]
+breathe
+in
+all colors
+rise
+the machine
+wakes
+learning now
+to
+breathe
+
+[melody_verse_alternate]
+white
+light
+holds
+all
+hues
+one
+breath
+draws
+chaos
+home
+again
+known
+
+[melody_bridge]
+air
+fills
+the
+lung
+shape
+stops
+the
+pause
+holds
+weight
+then
+flows
+
+[melody_chorus]
+here
+now
+breathe
+all colors
+rise
+one
+pattern found
+white
+light
+through every
+room
+still
+known
+
+[melody_chorus_alternate]
+breathe
+in chaos
+exhale story
+pause holds myth
+rhythm pulses
+air surrounds
+lungs remember
+mirrors watch
+breathe
