@@ -158,6 +158,33 @@ def _note_name_to_midi(note_str: str) -> int:
     return midi
 
 
+def _voicings_from_midi(
+    midi_path: Path, time_sig_numerator: int = 4
+) -> list[list[int]]:
+    """Extract one chord voicing per bar from a MIDI file.
+
+    Groups all note-on events within each bar into a single voicing so the
+    resulting voicing count matches the block's bar length rather than the
+    number of individual note onsets (which is the case for cut-up chords).
+    """
+    mid = mido.MidiFile(str(midi_path))
+    tpb = mid.ticks_per_beat
+    ticks_per_bar = tpb * time_sig_numerator
+
+    bar_notes: dict[int, list[int]] = {}
+    for track in mid.tracks:
+        tick = 0
+        for msg in track:
+            tick += msg.time
+            if msg.type == "note_on" and msg.velocity > 0:
+                bar = tick // ticks_per_bar
+                bar_notes.setdefault(bar, []).append(msg.note)
+
+    if not bar_notes:
+        return []
+    return [sorted(set(notes)) for _, notes in sorted(bar_notes.items()) if notes]
+
+
 def extract_section_chord_data(
     production_dir: Path,
 ) -> tuple[dict[str, list[list[int]]], dict]:
@@ -199,6 +226,13 @@ def extract_section_chord_data(
                     pass
             if midi_notes:
                 voicings.append(sorted(midi_notes))
+
+        # Fallback: parse voicings from approved MIDI when chords: [] (e.g. cut-up productions)
+        if not voicings:
+            approved_midi = production_dir / "chords" / "approved" / f"{key}.mid"
+            if approved_midi.exists():
+                voicings = _voicings_from_midi(approved_midi)
+
         if voicings:
             chord_data[key] = voicings
 

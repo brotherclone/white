@@ -1,0 +1,64 @@
+[melody_verse]
+breathe
+in
+all the colors know
+this
+the pattern runs
+through
+every living thing
+now
+here
+
+[melody_verse_alternate]
+draw
+in
+hold
+still
+pass
+through
+breathe
+out
+let
+fall
+be
+born
+
+[melody_bridge]
+white
+light
+holds
+all
+the
+breath
+that
+black
+once
+broke
+a
+part
+
+[melody_chorus]
+this
+is
+the
+breathing machine
+now
+it
+learns to
+sing
+in
+every key
+at
+once
+whole
+
+[melody_chorus_alternate]
+breathe
+the archive in
+the chaos out
+the mirror sees
+the lungs recall
+the rhythm plays
+the air remains
+the pause between
+whole

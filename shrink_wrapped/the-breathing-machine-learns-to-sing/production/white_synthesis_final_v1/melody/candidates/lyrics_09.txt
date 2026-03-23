@@ -1,0 +1,158 @@
+[melody_verse]
+breathe
+in
+all color
+now
+becomes
+one
+the pattern
+holds
+still
+
+[melody_verse_alternate]
+draw
+down
+each
+hue
+black
+blooms
+red
+flows
+orange
+rests
+yellow
+beats
+
+[melody_bridge]
+lungs
+hold
+green
+air
+blue
+knows
+indigo
+hides
+violet
+shows
+white
+breathes
+
+[melody_chorus]
+here
+now
+all
+colors breathing
+one
+source
+always known
+the
+chest
+rises falling
+same
+as
+always
+
+[melody_chorus_alternate]
+breathe
+in all the chaos
+the story exhales
+the myth holds still
+the game keeps rhythm
+the air is green
+the lungs remember
+the hidden turns
+breathe
+
+[melody_verse]
+breathe
+out
+every
+color
+returning
+home
+the circle
+holds
+closed
+
+[melody_verse_alternate]
+white
+light
+each
+breath
+maps
+what
+was
+always
+one
+living
+machine
+breathing
+
+[melody_bridge]
+in
+holds
+out
+holds
+pause
+fills
+space
+stays
+all
+scales
+one
+breath
+
+[melody_chorus]
+now
+here
+each
+breath completing
+the
+arc
+always turning
+the
+same
+pattern breathing
+all
+machines
+breathe
+
+[melody_chorus_alternate]
+breathe
+the chaos opens
+the story continues
+the myth suspends
+the game resumes
+the air receives
+the lungs expand
+the mirror clears
+breathe
+
+[melody_bridge]
+white
+holds
+all
+breathes
+one
+pulse
+same
+ground
+the
+breath
+was
+always
+
+[melody_chorus]
+this
+breath
+this
+moment passing
+through
+all
+color showing
+the
+same
+one thing breathing
+you
+already
+breathe
