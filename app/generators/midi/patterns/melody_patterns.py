@@ -1452,6 +1452,112 @@ VOCAL_7_8 = [
 # All templates registry
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Anacrusis
+# (opening rest, phrase enters mid-bar — pickup or late-arrival feel)
+# All satisfy: ≤6 onsets, ≥1 held note ≥1.5 beats, rhythm[0] > 0.
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_ANACRUSIS = [
+    MelodyPattern(
+        name="anacrusis_settle_low",
+        contour="anacrusis",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="2-beat opening rest, long settling note — ghostly late arrival",
+        intervals=[0, -2],
+        rhythm=[2.0, 3.5],
+        durations=[1.5, 0.5],
+    ),
+    MelodyPattern(
+        name="anacrusis_whisper_low",
+        contour="anacrusis",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="1-beat opening rest, held note, breath, quiet two-note close",
+        intervals=[0, -2, 1],
+        rhythm=[1.0, 3.0, 3.5],
+        durations=[1.5, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="anacrusis_arrival_med",
+        contour="anacrusis",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="1.5-beat rest, long held note, breath, two-note resolution",
+        intervals=[0, 3, -2],
+        rhythm=[1.5, 3.5, 3.75],
+        durations=[1.5, 0.2, 0.25],
+    ),
+    MelodyPattern(
+        name="anacrusis_drive_high",
+        contour="anacrusis",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="1-beat rest, held note, breath, three-note urgent close",
+        intervals=[0, 2, -1, -3],
+        rhythm=[1.0, 3.0, 3.25, 3.75],
+        durations=[1.5, 0.2, 0.4, 0.25],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Vocal — Dotted
+# (alternating long-short note pairs — Irish/folk lilt, rhythmically distinct
+#  from the straight-note templates that dominate all other groups)
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_DOTTED = [
+    MelodyPattern(
+        name="dotted_lilt_low",
+        contour="dotted",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Dotted-quarter + eighth pair, breath, long resolution — lilting folk feel",
+        intervals=[0, -2, 1, -3],
+        rhythm=[0.0, 1.5, 2.0, 3.5],
+        durations=[1.5, 0.4, 1.0, 0.5],
+    ),
+    MelodyPattern(
+        name="dotted_inquiry_low",
+        contour="dotted",
+        use_case="vocal",
+        energy="low",
+        time_sig=(4, 4),
+        description="Dotted rising inquiry, breath at mid-bar, two-note answer",
+        intervals=[0, 2, -1, -2],
+        rhythm=[0.0, 1.5, 3.0, 3.5],
+        durations=[1.5, 1.0, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="dotted_stride_med",
+        contour="dotted",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Ascending dotted stride — long-short opener, breath, stepwise descent",
+        intervals=[0, 3, -1, -2, 1],
+        rhythm=[0.0, 1.5, 2.5, 3.0, 3.5],
+        durations=[1.5, 0.4, 0.4, 0.4, 0.5],
+    ),
+    MelodyPattern(
+        name="dotted_surge_high",
+        contour="dotted",
+        use_case="vocal",
+        energy="high",
+        time_sig=(4, 4),
+        description="Dotted opener, breath, four-note ascending surge — urgent folk cry",
+        intervals=[0, 2, 1, 2, -3],
+        rhythm=[0.0, 2.0, 3.0, 3.25, 3.75],
+        durations=[1.5, 0.75, 0.2, 0.4, 0.25],
+    ),
+]
+
 ALL_TEMPLATES: list[MelodyPattern] = [
     # Existing templates reclassified as lead (instrument tracks)
     *_EXISTING_LEAD_TEMPLATES,
@@ -1462,6 +1568,8 @@ ALL_TEMPLATES: list[MelodyPattern] = [
     *VOCAL_4_4_INCANTATORY,
     *VOCAL_4_4_DRONE_AND_STEP,
     *VOCAL_4_4_CONVERSATIONAL,
+    *VOCAL_4_4_ANACRUSIS,
+    *VOCAL_4_4_DOTTED,
     # New vocal templates for other time signatures
     *VOCAL_3_4,
     *VOCAL_6_8,
