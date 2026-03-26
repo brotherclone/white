@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Chain Artifact YAML Serialization
 Chain artifact `save_file()` implementations that emit YAML SHALL produce output that is
