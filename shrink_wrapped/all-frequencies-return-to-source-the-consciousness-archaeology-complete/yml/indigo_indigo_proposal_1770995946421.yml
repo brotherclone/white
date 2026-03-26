@@ -43,6 +43,8 @@ mood:
 - playful
 - revelatory
 rainbow_color: indigo
-tempo: Moderate
+tempo:
+  numerator: 4
+  denominator: 4
 timestamp: 1770995946.421511
 title: Adult Hun Repenter

@@ -148,7 +148,7 @@ def collect_song_record(production_dir: Path) -> dict | None:
             "draft_chromatic_match": draft_chromatic_match,
             "edited_chromatic_match": edited_chromatic_match,
             "draft_fitting": None,
-            "edited_fitting": _compute_fitting(edited_text, vocal_sections),
+            "edited_fitting": _compute_fitting(edited_text, vocal_sections, melody_dir),
         }
 
     draft_text = draft_path.read_text(encoding="utf-8")
@@ -158,8 +158,8 @@ def collect_song_record(production_dir: Path) -> dict | None:
         print(f"  note: no edits detected for {song_slug}")
 
     # Per-section fitting for both texts
-    draft_fitting = _compute_fitting(draft_text, vocal_sections)
-    edited_fitting = _compute_fitting(edited_text, vocal_sections)
+    draft_fitting = _compute_fitting(draft_text, vocal_sections, melody_dir)
+    edited_fitting = _compute_fitting(edited_text, vocal_sections, melody_dir)
 
     return {
         "song_slug": song_slug,

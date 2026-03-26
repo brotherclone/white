@@ -1,0 +1,471 @@
+production_dir: shrink_wrapped/the-breathing-machine-learns-to-sing/production/white_synthesis_final_v1
+pipeline: drum-generation
+bpm: 108
+time_sig: 4/4
+color: White
+genre_families:
+- ambient
+- electronic
+- folk
+generated: '2026-03-18T12:52:30.812108+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- intro
+- verse
+- chorus
+- bridge
+- outro
+candidates:
+- id: drum_intro_01
+  midi_file: candidates/drum_intro_01.mid
+  rank: 1
+  section: intro
+  next_section: null
+  chord_source: chord_001
+  genre_family: ambient
+  pattern_name: ambient_breath
+  energy: low
+  scores:
+    composite: 0.4277
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4492
+        present: 0.2295
+        future: 0.3213
+      spatial:
+        thing: 0.4506
+        place: 0.3198
+        person: 0.2296
+      ontological:
+        imagined: 0.329
+        forgotten: 0.3064
+        known: 0.3646
+      confidence: 0.095
+      match: 0.1825
+  label: drum_intro
+  status: approved
+  notes: ''
+- id: drum_intro_02
+  midi_file: candidates/drum_intro_02.mid
+  rank: 2
+  section: intro
+  next_section: null
+  chord_source: chord_001
+  genre_family: folk
+  pattern_name: folk_brushes
+  energy: low
+  scores:
+    composite: 0.4277
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2289
+        future: 0.3211
+      spatial:
+        thing: 0.4514
+        place: 0.3196
+        person: 0.229
+      ontological:
+        imagined: 0.3285
+        forgotten: 0.3063
+        known: 0.3652
+      confidence: 0.0948
+      match: 0.1825
+  label: drum_intro_alternate
+  status: approved
+  notes: ''
+- id: drum_intro_03
+  midi_file: candidates/drum_intro_03.mid
+  rank: 3
+  section: intro
+  next_section: null
+  chord_source: chord_001
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.4277
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2292
+        future: 0.3206
+      spatial:
+        thing: 0.4516
+        place: 0.3191
+        person: 0.2293
+      ontological:
+        imagined: 0.3279
+        forgotten: 0.3064
+        known: 0.3657
+      confidence: 0.0944
+      match: 0.1824
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_verse_01
+  midi_file: candidates/drum_verse_01.mid
+  rank: 4
+  section: verse
+  next_section: null
+  chord_source: chord_002
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4282
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4516
+        present: 0.2288
+        future: 0.3196
+      spatial:
+        thing: 0.453
+        place: 0.3182
+        person: 0.2288
+      ontological:
+        imagined: 0.328
+        forgotten: 0.3056
+        known: 0.3664
+      confidence: 0.0989
+      match: 0.1832
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_verse_02
+  midi_file: candidates/drum_verse_02.mid
+  rank: 5
+  section: verse
+  next_section: null
+  chord_source: chord_002
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.428
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.2291
+        future: 0.3203
+      spatial:
+        thing: 0.4519
+        place: 0.3189
+        person: 0.2292
+      ontological:
+        imagined: 0.3286
+        forgotten: 0.3059
+        known: 0.3655
+      confidence: 0.0973
+      match: 0.1829
+  label: drum_verse_alternate
+  status: approved
+  notes: ''
+- id: drum_verse_03
+  midi_file: candidates/drum_verse_03.mid
+  rank: 6
+  section: verse
+  next_section: null
+  chord_source: chord_002
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.428
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4512
+        present: 0.2286
+        future: 0.3202
+      spatial:
+        thing: 0.4526
+        place: 0.3187
+        person: 0.2287
+      ontological:
+        imagined: 0.3278
+        forgotten: 0.306
+        known: 0.3662
+      confidence: 0.0971
+      match: 0.1828
+  label: drum_verse
+  status: approved
+  notes: ''
+- id: drum_chorus_01
+  midi_file: candidates/drum_chorus_01.mid
+  rank: 7
+  section: chorus
+  next_section: null
+  chord_source: chord_003
+  genre_family: electronic
+  pattern_name: electronic_four_on_floor
+  energy: high
+  scores:
+    composite: 0.43
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4536
+        present: 0.2286
+        future: 0.3179
+      spatial:
+        thing: 0.455
+        place: 0.3165
+        person: 0.2285
+      ontological:
+        imagined: 0.3281
+        forgotten: 0.3048
+        known: 0.3671
+      confidence: 0.1143
+      match: 0.1857
+  label: drum_chorus
+  status: approved
+  notes: ''
+- id: drum_chorus_02
+  midi_file: candidates/drum_chorus_02.mid
+  rank: 8
+  section: chorus
+  next_section: null
+  chord_source: chord_003
+  genre_family: ambient
+  pattern_name: ambient_build
+  energy: high
+  scores:
+    composite: 0.4283
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4517
+        present: 0.2288
+        future: 0.3195
+      spatial:
+        thing: 0.4531
+        place: 0.3181
+        person: 0.2288
+      ontological:
+        imagined: 0.3272
+        forgotten: 0.3059
+        known: 0.3669
+      confidence: 0.1001
+      match: 0.1833
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_chorus_03
+  midi_file: candidates/drum_chorus_03.mid
+  rank: 9
+  section: chorus
+  next_section: null
+  chord_source: chord_003
+  genre_family: folk
+  pattern_name: folk_driving
+  energy: high
+  scores:
+    composite: 0.4281
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4511
+        present: 0.2288
+        future: 0.3201
+      spatial:
+        thing: 0.4525
+        place: 0.3187
+        person: 0.2288
+      ontological:
+        imagined: 0.3279
+        forgotten: 0.3059
+        known: 0.3661
+      confidence: 0.0983
+      match: 0.1831
+  label: drum_chorus_alternate
+  status: approved
+  notes: ''
+- id: drum_bridge_01
+  midi_file: candidates/drum_bridge_01.mid
+  rank: 10
+  section: bridge
+  next_section: null
+  chord_source: chord_004
+  genre_family: ambient
+  pattern_name: ambient_breath
+  energy: low
+  scores:
+    composite: 0.4277
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4492
+        present: 0.2295
+        future: 0.3213
+      spatial:
+        thing: 0.4506
+        place: 0.3198
+        person: 0.2296
+      ontological:
+        imagined: 0.329
+        forgotten: 0.3064
+        known: 0.3646
+      confidence: 0.095
+      match: 0.1825
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_bridge_02
+  midi_file: candidates/drum_bridge_02.mid
+  rank: 11
+  section: bridge
+  next_section: null
+  chord_source: chord_004
+  genre_family: folk
+  pattern_name: folk_brushes
+  energy: low
+  scores:
+    composite: 0.4277
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.45
+        present: 0.2289
+        future: 0.3211
+      spatial:
+        thing: 0.4514
+        place: 0.3196
+        person: 0.229
+      ontological:
+        imagined: 0.3285
+        forgotten: 0.3063
+        known: 0.3652
+      confidence: 0.0948
+      match: 0.1825
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_bridge_03
+  midi_file: candidates/drum_bridge_03.mid
+  rank: 12
+  section: bridge
+  next_section: null
+  chord_source: chord_004
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.4277
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4502
+        present: 0.2292
+        future: 0.3206
+      spatial:
+        thing: 0.4516
+        place: 0.3191
+        person: 0.2293
+      ontological:
+        imagined: 0.3279
+        forgotten: 0.3064
+        known: 0.3657
+      confidence: 0.0944
+      match: 0.1824
+  label: drum_bridge
+  status: approved
+  notes: ''
+- id: drum_outro_01
+  midi_file: candidates/drum_outro_01.mid
+  rank: 13
+  section: outro
+  next_section: null
+  chord_source: chord_005
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4282
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4516
+        present: 0.2288
+        future: 0.3196
+      spatial:
+        thing: 0.453
+        place: 0.3182
+        person: 0.2288
+      ontological:
+        imagined: 0.328
+        forgotten: 0.3056
+        known: 0.3664
+      confidence: 0.0989
+      match: 0.1832
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_outro_02
+  midi_file: candidates/drum_outro_02.mid
+  rank: 14
+  section: outro
+  next_section: null
+  chord_source: chord_005
+  genre_family: folk
+  pattern_name: folk_simple
+  energy: medium
+  scores:
+    composite: 0.428
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4505
+        present: 0.2291
+        future: 0.3203
+      spatial:
+        thing: 0.4519
+        place: 0.3189
+        person: 0.2292
+      ontological:
+        imagined: 0.3286
+        forgotten: 0.3059
+        known: 0.3655
+      confidence: 0.0973
+      match: 0.1829
+  label: drum_outro
+  status: approved
+  notes: ''
+- id: drum_outro_03
+  midi_file: candidates/drum_outro_03.mid
+  rank: 15
+  section: outro
+  next_section: null
+  chord_source: chord_005
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.428
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4512
+        present: 0.2286
+        future: 0.3202
+      spatial:
+        thing: 0.4526
+        place: 0.3187
+        person: 0.2287
+      ontological:
+        imagined: 0.3278
+        forgotten: 0.306
+        known: 0.3662
+      confidence: 0.0971
+      match: 0.1828
+  label: null
+  status: rejected
+  notes: ''

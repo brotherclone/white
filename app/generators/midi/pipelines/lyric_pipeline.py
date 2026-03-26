@@ -40,6 +40,7 @@ from dotenv import load_dotenv
 from app.generators.artist_catalog import load_artist_context  # noqa: E402
 from app.generators.midi.production.init_production import (
     load_initial_proposal,
+    load_song_context,
 )  # noqa: E402
 from app.generators.midi.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
@@ -202,8 +203,8 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
     """Find and load the song proposal for a production directory.
 
     Reads thread + song_proposal from chords/review.yml to resolve the path.
-    Returns a metadata dict with: title, bpm, time_sig, key, color, concept,
-    genres, mood, singer, sounds_like (empty — not in proposal YAML).
+    Returns a normalised metadata dict with: title, bpm, time_sig, key, color,
+    concept, genres, mood, singer, sounds_like.
     Returns {} if the proposal cannot be found.
     """
     chord_review_path = production_dir / "chords" / "review.yml"
@@ -217,19 +218,41 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
     if not thread or not song_proposal_file:
         return {}
 
-    # Proposals live in <thread>/yml/<file>
+    thread_path = Path(thread)
     for candidate in [
-        Path(thread) / "yml" / song_proposal_file,
-        Path(thread) / song_proposal_file,
+        thread_path / "yml" / song_proposal_file,
+        thread_path / song_proposal_file,
     ]:
         if candidate.exists():
             from app.generators.midi.production.production_plan import (
-                load_song_proposal,
+                load_song_proposal_unified,
             )
 
-            meta = load_song_proposal(candidate)
-            meta["singer"] = str(chord_review.get("singer", ""))
-            return meta
+            unified = load_song_proposal_unified(candidate, thread_dir=thread_path)
+
+            # Prefer sounds_like from song_context.yml (written by init_production)
+            _ctx = load_song_context(production_dir)
+            sounds_like = _ctx.get("sounds_like") or unified.get("sounds_like") or []
+
+            # Singer: song_context > proposal > chord_review
+            singer = (
+                _ctx.get("singer")
+                or unified.get("singer")
+                or str(chord_review.get("singer", ""))
+            )
+
+            return {
+                "title": unified["title"],
+                "bpm": unified["bpm"],
+                "time_sig": unified["time_sig"],
+                "key": unified["key"],
+                "color": unified["color"],
+                "concept": unified["concept"],
+                "genres": unified["genres"],
+                "mood": unified["mood"],
+                "singer": singer,
+                "sounds_like": sounds_like,
+            }
 
     return {}
 
@@ -657,6 +680,161 @@ def _blend_scores(
 # ---------------------------------------------------------------------------
 
 
+def collect_sub_lyrics(sub_proposal_dirs: list[Path]) -> list[dict]:
+    """Collect approved (or all) lyric texts from each sub-proposal directory.
+
+    For each dir, checks melody/candidates/lyrics_review.yml for approved entries;
+    falls back to all melody/candidates/lyrics_*.txt files if no review exists.
+    Returns list of {source_dir, color, lyrics_text} dicts.
+    """
+    results = []
+    for sub_dir in sub_proposal_dirs:
+        sub_dir = Path(sub_dir)
+        candidates_dir = sub_dir / "melody" / "candidates"
+        if not candidates_dir.exists():
+            continue
+
+        review_path = candidates_dir / "lyrics_review.yml"
+        # Determine donor color from song_context or chord review
+        color = ""
+        ctx_path = sub_dir / "song_context.yml"
+        if ctx_path.exists():
+            with open(ctx_path) as f:
+                color = (yaml.safe_load(f) or {}).get("color", "")
+        if not color:
+            cr_path = sub_dir / "chords" / "review.yml"
+            if cr_path.exists():
+                with open(cr_path) as f:
+                    color = (yaml.safe_load(f) or {}).get("color", "")
+
+        approved_files: list[Path] = []
+        if review_path.exists():
+            with open(review_path) as f:
+                review = yaml.safe_load(f) or {}
+            for entry in review.get("candidates", []):
+                if entry.get("status") == "approved":
+                    txt_path = candidates_dir / entry["file"]
+                    if txt_path.exists():
+                        approved_files.append(txt_path)
+
+        if not approved_files:
+            approved_files = sorted(candidates_dir.glob("lyrics_*.txt"))
+
+        # Also check the promoted lyrics file (melody/lyrics.txt)
+        promoted_lyrics = sub_dir / "melody" / "lyrics.txt"
+        if promoted_lyrics.exists() and promoted_lyrics not in approved_files:
+            approved_files = [promoted_lyrics] + list(approved_files)
+
+        for txt_path in approved_files:
+            text = txt_path.read_text(encoding="utf-8").strip()
+            if text:
+                results.append(
+                    {"source_dir": str(sub_dir), "color": color, "lyrics_text": text}
+                )
+
+    return results
+
+
+def _build_white_cutup_prompt(
+    meta: dict,
+    vocal_sections: list[dict],
+    syllable_targets: dict,
+    sub_lyrics: list[dict],
+    artist_context: str = "",
+) -> str:
+    """Build the Claude prompt for White lyric cut-up generation.
+
+    Includes sub-lyrics as explicit source material for a Burroughs/Gysin cut-up.
+    Falls back to a standard synthesis prompt if sub_lyrics is empty.
+    """
+    lines = [
+        f'You are writing lyrics for "{meta.get("title", "")}" — the White synthesis song.',
+        "",
+        "SONG METADATA:",
+        "  Color: White (synthesis of all colors)",
+        f"  BPM: {meta.get('bpm', '')}",
+        f"  Time signature: {meta.get('time_sig', '')}",
+        f"  Key: {meta.get('key', '')}",
+        f"  Concept: {meta.get('concept', '')}",
+        "",
+    ]
+
+    if sub_lyrics:
+        lines += [
+            "SOURCE LYRICS (cut-up material from the color sub-songs):",
+            "Use these as raw material. Extract phrases, images, and lines.",
+            "Recombine and transform them into a coherent new lyric that feels",
+            "synthesised rather than collaged — the seams should disappear.",
+            "Shared vocabulary, echoed images, and rhythmic callbacks to the source",
+            "material are all welcome. Do NOT reproduce complete verses verbatim.",
+            "",
+        ]
+        for src in sub_lyrics:
+            color_label = src.get("color") or "unknown"
+            lines.append(f"## {color_label}")
+            lines.append(src["lyrics_text"])
+            lines.append("")
+    else:
+        lines += [
+            "This is a White synthesis song — a convergence of all chromatic themes.",
+            "Write lyrics that draw together the threads of memory, place, and transformation.",
+            "",
+        ]
+
+    if artist_context:
+        lines.extend(["", artist_context, ""])
+
+    lines += [
+        "SECTIONS TO WRITE:",
+        "(Headers are melody loop labels — each maps to one MIDI clip.)",
+    ]
+
+    import math as _math
+
+    for sec in vocal_sections:
+        name = sec["name"]
+        lo, hi = syllable_targets.get(name, (0, 0))
+        denom = max(sec["bars"] * sec["repeat"], 1)
+        notes_per_bar = sec["total_notes"] / denom
+        phrases: list = sec.get("phrases", [])
+
+        lines.extend(
+            [
+                "",
+                f"  [{name}]",
+                f"    Bars per loop: {sec['bars']}  ×  {sec['repeat']} occurrence(s)",
+                f"    Target syllables: {lo}–{hi}  (≈{notes_per_bar:.1f} notes/bar)",
+            ]
+        )
+        if phrases:
+            phrase_counts = [p.note_count for p in phrases]
+            phrase_lo = [_math.floor(n * 0.8) for n in phrase_counts]
+            phrase_hi = [_math.ceil(n * 1.15) for n in phrase_counts]
+            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            lines.extend(
+                [
+                    f"    Phrases: {len(phrases)} phrases with {phrase_counts} notes",
+                    f"    Syllable targets per phrase: [{ranges_str}]",
+                    f"    Write exactly {len(phrases)} lines for this section.",
+                ]
+            )
+
+    lines.extend(
+        [
+            "",
+            "OUTPUT FORMAT:",
+            "  Use [loop_label] headers exactly as listed above.",
+            "  Write one block per unique loop label.",
+            "  Output only the lyrics — no commentary, no explanations.",
+            "  Lines starting with # are ignored.",
+            "",
+            "Now write the complete White synthesis lyrics:",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
 def _build_prompt(
     meta: dict,
     vocal_sections: list[dict],
@@ -1040,7 +1218,36 @@ def run_lyric_pipeline(
 
     # --- 5. Build prompt ---
     artist_context = load_artist_context(meta.get("sounds_like") or [])
-    prompt = _build_prompt(meta, vocal_sections, syllable_targets, artist_context)
+    is_white = str(meta.get("color", "")).strip().capitalize() == "White"
+    if is_white:
+        # White cut-up mode: collect sub-lyrics from sub_proposals in song_context,
+        # falling back to bar_sources in chord review.yml
+        ctx = load_song_context(prod_path)
+        sub_dirs = [Path(p) for p in (ctx.get("sub_proposals") or [])]
+        if not sub_dirs:
+            chord_review_path = prod_path / "chords" / "review.yml"
+            if chord_review_path.exists():
+                with open(chord_review_path) as _f:
+                    _cr = yaml.safe_load(_f) or {}
+                seen = set()
+                for candidate in _cr.get("candidates", []):
+                    for bs in candidate.get("bar_sources", []):
+                        sd = bs.get("source_dir")
+                        if sd and sd not in seen:
+                            seen.add(sd)
+                            sub_dirs.append(Path(sd))
+        sub_lyrics = collect_sub_lyrics(sub_dirs) if sub_dirs else []
+        if sub_lyrics:
+            print(
+                f"\nWhite cut-up mode: collected lyrics from {len(sub_lyrics)} sub-song(s)"
+            )
+        else:
+            print("\nWhite cut-up mode: no sub-lyrics found — using synthesis fallback")
+        prompt = _build_white_cutup_prompt(
+            meta, vocal_sections, syllable_targets, sub_lyrics, artist_context
+        )
+    else:
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets, artist_context)
 
     # --- 6. Generate candidates ---
     from anthropic import Anthropic

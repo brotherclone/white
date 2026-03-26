@@ -27,7 +27,7 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
-from app.generators.midi.production.init_production import load_initial_proposal
+from app.generators.midi.production.init_production import load_song_context
 
 load_dotenv()
 
@@ -101,34 +101,37 @@ def load_song_proposal_data(production_dir: Path) -> dict:
     if not proposal_path:
         return {}
 
-    with open(proposal_path) as f:
-        raw = yaml.safe_load(f) or {}
+    thread = chord_review.get("thread", "")
+    thread_dir = Path(thread) if thread else None
 
-    color = raw.get("rainbow_color", {})
-    if isinstance(color, dict):
-        color = color.get("color_name", "")
+    from app.generators.midi.production.production_plan import (
+        load_song_proposal_unified,
+    )
 
-    tempo = raw.get("tempo", {})
-    if isinstance(tempo, dict):
-        time_sig = f"{tempo.get('numerator', 4)}/{tempo.get('denominator', 4)}"
-    else:
-        time_sig = "4/4"
+    unified = load_song_proposal_unified(proposal_path, thread_dir=thread_dir)
 
-    # Prefer sounds_like from initial_proposal.yml (Claude-generated before pipeline ran)
-    _initial = load_initial_proposal(production_dir)
-    sounds_like = _initial.get("sounds_like") or raw.get("sounds_like") or []
+    # Prefer sounds_like from song_context.yml (written by init_production)
+    _ctx = load_song_context(production_dir)
+    sounds_like = _ctx.get("sounds_like") or unified.get("sounds_like") or []
+
+    # Singer: song_context > proposal > chord_review
+    singer = (
+        _ctx.get("singer")
+        or unified.get("singer")
+        or str(chord_review.get("singer", ""))
+    )
 
     return {
-        "title": str(raw.get("title", "")),
-        "bpm": int(raw.get("bpm", 120)),
-        "time_sig": str(raw.get("time_sig") or time_sig),
-        "key": str(raw.get("key", "")),
-        "color": str(color) or str(chord_review.get("color", "")),
-        "concept": str(raw.get("concept", "")),
-        "mood": raw.get("mood") or [],
-        "genres": raw.get("genres") or [],
+        "title": unified["title"],
+        "bpm": unified["bpm"],
+        "time_sig": unified["time_sig"],
+        "key": unified["key"],
+        "color": unified["color"] or str(chord_review.get("color", "")),
+        "concept": unified["concept"],
+        "mood": unified["mood"],
+        "genres": unified["genres"],
         "sounds_like": sounds_like,
-        "singer": str(raw.get("singer") or chord_review.get("singer", "")),
+        "singer": singer,
     }
 
 

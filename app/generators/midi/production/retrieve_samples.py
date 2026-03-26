@@ -12,6 +12,10 @@ Usage:
 
     python -m app.generators.midi.production.retrieve_samples \
         --color Blue --top-n 5 --copy-audio
+
+    # Auto-read color from song_context.yml in a production dir
+    python -m app.generators.midi.production.retrieve_samples \
+        --production-dir shrink_wrapped/.../production/violet__... --top-n 10
 """
 
 from __future__ import annotations
@@ -26,6 +30,8 @@ from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 import yaml
+
+from app.generators.midi.production.init_production import load_song_context
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -468,8 +474,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--color",
-        required=True,
-        help=f"Target color ({', '.join(VALID_COLORS)})",
+        default=None,
+        help=f"Target color ({', '.join(VALID_COLORS)}). Required unless --production-dir is given.",
+    )
+    parser.add_argument(
+        "--production-dir",
+        default=None,
+        help="Song production directory; reads color (and concept) from song_context.yml.",
     )
     parser.add_argument(
         "--top-n",
@@ -479,8 +490,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--output-dir",
-        default="./sample_retrieval",
-        help="Output directory for sample_map.yml (default: ./sample_retrieval)",
+        default=None,
+        help="Output directory for sample_map.yml (default: <production-dir>/sample_retrieval or ./sample_retrieval)",
     )
     parser.add_argument(
         "--parquet",
@@ -495,16 +506,48 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.color not in VALID_COLORS:
+    # Resolve color — from --production-dir/song_context.yml or explicit --color
+    color = args.color
+    song_context: dict = {}
+    if args.production_dir:
+        prod_path = Path(args.production_dir)
+        if not prod_path.exists():
+            print(
+                f"ERROR: Production directory not found: {prod_path}", file=sys.stderr
+            )
+            sys.exit(1)
+        song_context = load_song_context(prod_path)
+        if not color:
+            color = song_context.get("color", "")
+
+    if not color:
         print(
-            f"ERROR: Unknown color '{args.color}'. Valid: {', '.join(VALID_COLORS)}",
+            "ERROR: --color is required unless --production-dir is given with a song_context.yml.",
             file=sys.stderr,
         )
         sys.exit(1)
 
-    output_dir = Path(args.output_dir)
+    if color not in VALID_COLORS:
+        print(
+            f"ERROR: Unknown color '{color}'. Valid: {', '.join(VALID_COLORS)}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
-    print(f"Color:      {args.color}")
+    # Resolve output dir
+    if args.output_dir:
+        output_dir = Path(args.output_dir)
+    elif args.production_dir:
+        output_dir = Path(args.production_dir) / "sample_retrieval"
+    else:
+        output_dir = Path("./sample_retrieval")
+
+    if song_context:
+        print(f"Production: {args.production_dir}")
+        title = song_context.get("title", "")
+        if title:
+            print(f"Song:       {title}")
+    print(f"Color:      {color}")
     print(f"Top-N:      {args.top_n}")
     print(f"Output:     {output_dir}")
     print()
@@ -512,14 +555,14 @@ def main() -> None:
     print("Loading CLAP index...")
     df = load_clap_index(parquet_path=args.parquet)
     total = len(df)
-    color_count = (df["color"] == args.color).sum()
-    print(f"  {total} segments total, {color_count} labeled {args.color}")
+    color_count = (df["color"] == color).sum()
+    print(f"  {total} segments total, {color_count} labeled {color}")
 
-    print(f"Scoring and ranking top {args.top_n} {args.color} segments...")
-    results = retrieve_by_color(df, args.color, top_n=args.top_n)
+    print(f"Scoring and ranking top {args.top_n} {color} segments...")
+    results = retrieve_by_color(df, color, top_n=args.top_n)
 
     if not results:
-        print(f"No segments found for color '{args.color}'.")
+        print(f"No segments found for color '{color}'.")
         sys.exit(0)
 
     # Print ranked table
@@ -533,7 +576,7 @@ def main() -> None:
         )
 
     # Write sample_map.yml
-    out_path = write_sample_map(results, output_dir, args.color)
+    out_path = write_sample_map(results, output_dir, color)
     print(f"\nWritten: {out_path}")
 
     # Optional audio copy

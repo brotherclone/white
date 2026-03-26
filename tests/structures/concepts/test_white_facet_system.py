@@ -1,4 +1,7 @@
-from app.structures.concepts.white_facet_system import WhiteFacetSystem
+from app.structures.concepts.white_facet_system import (
+    WhiteFacetSystem,
+    get_facet_statistics,
+)
 from app.structures.enums.white_facet import WhiteFacet
 
 
@@ -63,3 +66,99 @@ def test_facet_prompt_includes_facet_mode():
     prompt, returned_facet = WhiteFacetSystem.build_white_initial_prompt(a_facet=facet)
     assert returned_facet == facet
     assert facet.value.upper() in prompt
+
+
+# ---------------------------------------------------------------------------
+# log_facet_selection
+# ---------------------------------------------------------------------------
+
+
+def test_log_facet_selection_returns_dict():
+    facet = WhiteFacet.CATEGORICAL
+    result = WhiteFacetSystem.log_facet_selection(facet)
+    assert isinstance(result, dict)
+
+
+def test_log_facet_selection_has_expected_keys():
+    result = WhiteFacetSystem.log_facet_selection(WhiteFacet.RELATIONAL)
+    assert "facet" in result
+    assert "description" in result
+    assert "example_style" in result
+
+
+def test_log_facet_selection_facet_value():
+    facet = WhiteFacet.PHENOMENOLOGICAL
+    result = WhiteFacetSystem.log_facet_selection(facet)
+    assert result["facet"] == facet.value
+
+
+def test_log_facet_selection_all_facets():
+    for facet in WhiteFacet:
+        result = WhiteFacetSystem.log_facet_selection(facet)
+        assert result["facet"] == facet.value
+        assert isinstance(result["description"], str)
+        assert isinstance(result["example_style"], str)
+
+
+# ---------------------------------------------------------------------------
+# get_facet_statistics
+# ---------------------------------------------------------------------------
+
+
+def test_get_facet_statistics_keys():
+    stats = get_facet_statistics()
+    assert "total_facets" in stats
+    assert "facets" in stats
+    assert "has_system_prompts" in stats
+    assert "has_descriptions" in stats
+    assert "has_examples" in stats
+
+
+def test_get_facet_statistics_total_count():
+    stats = get_facet_statistics()
+    assert stats["total_facets"] == len(list(WhiteFacet))
+
+
+def test_get_facet_statistics_all_data_present():
+    stats = get_facet_statistics()
+    assert stats["has_system_prompts"] is True
+    assert stats["has_descriptions"] is True
+    assert stats["has_examples"] is True
+
+
+def test_get_facet_statistics_facets_list():
+    stats = get_facet_statistics()
+    assert set(stats["facets"]) == {f.value for f in WhiteFacet}
+
+
+# ---------------------------------------------------------------------------
+# get_facet_prompt — all facets
+# ---------------------------------------------------------------------------
+
+
+def test_get_facet_prompt_all_facets():
+    for facet in WhiteFacet:
+        prompt = WhiteFacetSystem.get_facet_prompt(facet)
+        assert isinstance(prompt, str)
+        assert len(prompt) > 0
+
+
+# ---------------------------------------------------------------------------
+# select_weighted_facet — distribution sanity
+# ---------------------------------------------------------------------------
+
+
+def test_select_weighted_facet_returns_valid_facet():
+    for _ in range(20):
+        facet = WhiteFacetSystem.select_weighted_facet()
+        assert isinstance(facet, WhiteFacet)
+
+
+def test_select_random_facet_covers_all_over_many_trials():
+    import random
+
+    random.seed(0)
+    seen = set()
+    for _ in range(200):
+        seen.add(WhiteFacetSystem.select_random_facet())
+    assert seen == set(WhiteFacet)

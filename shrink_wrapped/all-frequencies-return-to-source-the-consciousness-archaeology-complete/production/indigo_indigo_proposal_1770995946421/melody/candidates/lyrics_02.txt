@@ -1,0 +1,99 @@
+[melody_flush_of_serfs]
+lost
+thing
+gone
+dark
+deep
+blue
+shade
+fades
+time
+slips
+cold
+void
+left
+past
+dust
+erased
+still
+blind
+far
+gone
+now
+
+[melody_xamot]
+lost
+thing
+deep shade
+fades
+time slips
+dark
+void left
+blind
+dust falls
+gone
+now
+
+[melody_saul_feels_like_dancing]
+far
+blue
+lost
+deep shade
+cold
+void
+time slips
+dark
+gone
+dust falls
+blind
+fades
+now
+
+[melody_flush_of_serfs_alternate]
+lost
+thing
+deep shade
+cold
+void left
+dark
+time slips
+blind
+dust falls
+gone
+fades out
+still
+blue deep
+erased
+now
+
+[melody_tomax]
+far
+lost
+thing
+deep shade
+cold
+void
+time slips
+dark
+blind
+dust falls
+gone
+still
+fades out
+erased
+deep
+now
+
+[melody_saul_feels_like_dancing_alternate]
+lost
+thing
+gone
+dark
+deep
+blue
+fades
+cold
+void
+blind
+dust
+now

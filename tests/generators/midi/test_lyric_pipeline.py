@@ -829,3 +829,156 @@ class TestRunPipelineIntegration:
         assert final["candidates"][0]["status"] == "approved"
         # Second entry has incremented ID
         assert final["candidates"][1]["id"] == "lyrics_02"
+
+
+# ---------------------------------------------------------------------------
+# White lyric cut-up functions
+# ---------------------------------------------------------------------------
+
+
+class TestCollectSubLyrics:
+    def test_finds_approved_from_review(self, tmp_path):
+        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+
+        prod = tmp_path / "prod_red"
+        cands = prod / "melody" / "candidates"
+        cands.mkdir(parents=True)
+        (cands / "lyrics_01.txt").write_text("Red verse one\nRed chorus")
+        (cands / "lyrics_02.txt").write_text("Red draft two")
+        review = {
+            "candidates": [
+                {"id": "lyrics_01", "file": "lyrics_01.txt", "status": "approved"},
+                {"id": "lyrics_02", "file": "lyrics_02.txt", "status": "pending"},
+            ]
+        }
+        with open(cands / "lyrics_review.yml", "w") as f:
+            import yaml
+
+            yaml.dump(review, f)
+        # chord review for color
+        (prod / "chords").mkdir()
+        with open(prod / "chords" / "review.yml", "w") as f:
+            yaml.dump({"color": "Red", "bpm": 80, "key": "C minor"}, f)
+
+        results = collect_sub_lyrics([prod])
+        assert len(results) == 1
+        assert results[0]["color"] == "Red"
+        assert "Red verse one" in results[0]["lyrics_text"]
+
+    def test_fallback_to_all_txt_when_no_review(self, tmp_path):
+        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+
+        prod = tmp_path / "prod_blue"
+        cands = prod / "melody" / "candidates"
+        cands.mkdir(parents=True)
+        (cands / "lyrics_01.txt").write_text("Blue text one")
+        (cands / "lyrics_02.txt").write_text("Blue text two")
+
+        results = collect_sub_lyrics([prod])
+        assert len(results) == 2
+
+    def test_empty_when_no_melody_candidates(self, tmp_path):
+        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+
+        prod = tmp_path / "prod_empty"
+        prod.mkdir()
+        results = collect_sub_lyrics([prod])
+        assert results == []
+
+    def test_skips_empty_txt(self, tmp_path):
+        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+
+        prod = tmp_path / "prod_empty_txt"
+        cands = prod / "melody" / "candidates"
+        cands.mkdir(parents=True)
+        (cands / "lyrics_01.txt").write_text("   ")  # whitespace only
+
+        results = collect_sub_lyrics([prod])
+        assert results == []
+
+
+class TestBuildWhiteCutupPrompt:
+    def _dummy_meta(self):
+        return {
+            "title": "Test White Song",
+            "color": "White",
+            "bpm": 108,
+            "time_sig": "4/4",
+            "key": "Bb major",
+            "concept": "synthesis concept",
+        }
+
+    def _dummy_sections(self):
+        return [
+            {
+                "name": "verse",
+                "bars": 4,
+                "repeat": 1,
+                "total_notes": 16,
+                "contour": "stepwise",
+                "phrases": [],
+            }
+        ]
+
+    def _dummy_targets(self):
+        return {"verse": (12, 17)}
+
+    def test_source_lyrics_section_present(self):
+        from app.generators.midi.pipelines.lyric_pipeline import (
+            _build_white_cutup_prompt,
+        )
+
+        sub_lyrics = [
+            {
+                "source_dir": "/tmp/red",
+                "color": "Red",
+                "lyrics_text": "Red line one\nRed line two",
+            },
+        ]
+        prompt = _build_white_cutup_prompt(
+            self._dummy_meta(),
+            self._dummy_sections(),
+            self._dummy_targets(),
+            sub_lyrics,
+        )
+        assert "## Red" in prompt
+        assert "Red line one" in prompt
+        assert "[verse]" in prompt
+
+    def test_fallback_prompt_when_no_sub_lyrics(self):
+        from app.generators.midi.pipelines.lyric_pipeline import (
+            _build_white_cutup_prompt,
+        )
+
+        prompt = _build_white_cutup_prompt(
+            self._dummy_meta(), self._dummy_sections(), self._dummy_targets(), []
+        )
+        assert "White synthesis" in prompt
+        assert "[verse]" in prompt
+        assert "## " not in prompt  # no source sections
+
+    def test_non_white_pipeline_unchanged(self, tmp_path):
+        """Non-White color songs use the standard _build_prompt, not the cut-up variant."""
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+
+        meta = {
+            "title": "Blue Song",
+            "color": "Blue",
+            "bpm": 60,
+            "time_sig": "4/4",
+            "key": "G minor",
+            "concept": "blue concept",
+        }
+        sections = [
+            {
+                "name": "verse",
+                "bars": 4,
+                "repeat": 1,
+                "total_notes": 16,
+                "contour": "stepwise",
+                "phrases": [],
+            }
+        ]
+        prompt = _build_prompt(meta, sections, {"verse": (12, 17)})
+        assert "SOURCE LYRICS" not in prompt
+        assert "cut-up" not in prompt

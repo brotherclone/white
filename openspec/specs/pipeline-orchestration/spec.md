@@ -1,75 +1,89 @@
 # pipeline-orchestration Specification
 
 ## Purpose
-TBD - created by archiving change spike-pipeline-orchestration-design. Update Purpose after archive.
+Defines how song metadata flows through the music production pipeline — from the initial
+song proposal through chord, drum, bass, melody, and lyric generation phases.
 ## Requirements
-### Requirement: Pipeline Data Flow Map
-The spike SHALL produce a complete map of cross-phase data dependencies, showing which
-files each pipeline phase reads and writes and which fields flow between phases.
+### Requirement: Canonical Song Context
+Every production directory SHALL contain a `song_context.yml` written by
+`init_production.py` before any MIDI phase runs, serving as the single source of truth
+for static song metadata across all phases.
 
-#### Scenario: Dependency graph produced
-- **WHEN** the spike is complete
-- **THEN** `design_report.md` contains a dependency graph (ASCII or Mermaid) covering
-  all pipeline phases from chord generation through mix scoring
+#### Scenario: song_context.yml written on init
+- **WHEN** `init_production` is run on a production directory
+- **THEN** `song_context.yml` is written containing `title`, `color`, `concept`, `key`,
+  `bpm`, `time_sig`, `singer`, `sounds_like`, `genres`, `mood`, `song_proposal`,
+  `thread`, and `phases` (all initially `pending`)
 
-#### Scenario: sounds_like and concept fully traced
-- **WHEN** the spike traces sounds_like and concept through the pipeline
-- **THEN** every function that reads or writes either field is documented, including
-  cases where the field is silently zeroed out or overwritten
+#### Scenario: all pipeline phases read concept from song_context.yml
+- **WHEN** drum, bass, or melody pipeline is run on a directory containing
+  `song_context.yml`
+- **THEN** the concept embedding is computed from `song_context["concept"]` rather than
+  the fallback `f"{color_name} chromatic concept"` string
 
----
-
-### Requirement: load_song_proposal Consolidation Assessment
-The spike SHALL audit all implementations of song proposal loading and produce a
-recommendation on whether and how to consolidate them.
-
-#### Scenario: All implementations identified
-- **WHEN** the audit is complete
-- **THEN** `design_report.md` lists every load_song_proposal variant with its file
-  location, returned field set, and callers
-
-#### Scenario: Consolidation is feasible
-- **WHEN** a single loader can satisfy all callers
-- **THEN** the report proposes a canonical implementation location and migration path
-
-#### Scenario: Consolidation is not worth it
-- **WHEN** divergence between callers is fundamental and unification would require
-  significant caller changes
-- **THEN** the report documents why and recommends leaving implementations separate
-  with shared utilities for common parsing
+#### Scenario: graceful fallback for pre-migration dirs
+- **WHEN** a pipeline phase runs on a directory that has no `song_context.yml`
+- **THEN** the phase falls back to the previous behavior (chord_review + proposal YAML
+  navigation) without error
 
 ---
 
-### Requirement: Production Context Schema Proposal
-The spike SHALL define a proposed `song_context.yml` schema that could serve as the
-canonical source of truth for song metadata across all pipeline phases.
+### Requirement: Unified Song Proposal Loader
+A single `load_song_proposal_unified()` function in `production_plan.py` SHALL replace
+the four divergent `load_song_proposal` implementations.
 
-#### Scenario: Schema covers all pipeline needs
-- **WHEN** the proposed schema is evaluated against each pipeline phase's metadata needs
-- **THEN** every field currently re-read from the song proposal YAML per phase is
-  represented in the schema
+#### Scenario: unified loader returns canonical field set
+- **WHEN** `load_song_proposal_unified(proposal_path)` is called
+- **THEN** the returned dict contains `title`, `bpm`, `time_sig` (always a string),
+  `key`, `color`, `concept`, `genres`, `mood`, `singer`, `sounds_like`, `key_root`,
+  `mode`
 
-#### Scenario: Backward compatible migration exists
-- **WHEN** existing production directories (lacking song_context.yml) are evaluated
-- **THEN** the report documents a migration path that reconstructs song_context.yml
-  from existing files without re-running any MIDI generation phase
+#### Scenario: time_sig is always a string
+- **WHEN** any load_song_proposal variant is called
+- **THEN** `time_sig` in the returned dict is always a string (e.g. `"4/4"`), never a
+  tuple — callers that need integer components parse it themselves
 
 ---
 
-### Requirement: Pipeline Design Spike Report
-The spike SHALL produce `training/spikes/pipeline-orchestration/design_report.md`
-with findings, schema proposals, migration strategy, and a scoped recommendation for
-a follow-on refactor.
+### Requirement: Production Dir Migration
+A migration script SHALL allow existing production directories to gain `song_context.yml`
+without re-running any MIDI generation phase.
 
-#### Scenario: Report contains all required sections
-- **WHEN** the spike is complete
-- **THEN** `design_report.md` contains sections covering the data flow map,
-  load_song_proposal audit, phase review schema comparison, proposed song_context.yml
-  schema, migration strategy, and recommended refactor scope
+#### Scenario: migration is non-destructive
+- **WHEN** `migrate_production_dir.py` is run on an existing production directory
+- **THEN** no existing files (review.yml, candidates, MIDI files) are modified; only
+  `song_context.yml` is created
 
-#### Scenario: Scope recommendation is actionable
-- **WHEN** the refactor scope is assessed
-- **THEN** the recommendation breaks the work into sequenced increments (e.g. "phase 1:
-  consolidate loaders; phase 2: add song_context.yml; phase 3: update pipeline phases")
-  rather than a single big-bang rewrite, with an honest estimate of effort per phase
+#### Scenario: migration succeeds from chord_review alone
+- **WHEN** a production directory has `chords/review.yml` and a reachable song proposal
+  YAML
+- **THEN** migration produces a valid `song_context.yml` with all required fields
+
+### Requirement: White Song Proposal — Sub-Proposals Field
+The song proposal schema SHALL support an optional `sub_proposals` field: an ordered list
+of production directory paths whose approved chord and lyric material is used as source
+material for White synthesis.
+
+`load_song_proposal_unified()` SHALL read `sub_proposals` from the proposal YAML and
+include it in the returned dict as a list of strings (empty list if absent).
+`song_context.yml` SHALL record `sub_proposals` when written by `init_production.py`.
+
+#### Scenario: sub_proposals read from proposal YAML
+
+- **WHEN** a song proposal YAML contains a `sub_proposals` list of path strings
+- **THEN** `load_song_proposal_unified()` returns `sub_proposals` as a list of strings
+- **AND** `song_context.yml` written by `init_production.py` includes the `sub_proposals` list
+
+#### Scenario: sub_proposals absent defaults to empty list
+
+- **WHEN** a song proposal YAML has no `sub_proposals` field
+- **THEN** `load_song_proposal_unified()` returns `sub_proposals: []`
+- **AND** non-White pipelines behave identically to before
+
+#### Scenario: White pipeline resolves sub_proposals at runtime
+
+- **WHEN** the chord or lyric pipeline is invoked on a White production directory
+- **THEN** `sub_proposals` paths are resolved relative to the project root
+- **AND** a clear error is raised for any path that does not exist or has no
+  `chords/review.yml`
 

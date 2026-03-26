@@ -1,0 +1,99 @@
+[melody_flush_of_serfs]
+lost
+thing
+deep
+blue
+void
+hid
+den
+far
+gone
+dark
+cold
+vast
+steel
+drift
+ing
+sealed
+rust
+ed
+dust
+gone
+still
+
+[melody_xamot]
+wait
+ed
+fades
+slow
+drifts
+gone
+sealed
+lost
+buried
+cold
+still
+
+[melody_saul_feels_like_dancing]
+dim
+blue
+rust
+fades slow
+gone
+cold
+buried deep
+lost
+drift
+sealed away
+void
+dark
+hid
+
+[melody_flush_of_serfs_alternate]
+lost
+cold
+deep void
+drift
+sealed slow
+rust
+buried
+dark
+fades out
+gone
+hid far
+still
+drifts
+blue
+dim
+
+[melody_tomax]
+dim
+void
+rust
+fades slow
+lost
+cold
+buried far
+dark
+drift
+sealed deep
+gone
+hid
+still waits
+blue
+vast
+still
+
+[melody_saul_feels_like_dancing_alternate]
+gone
+rust
+cold
+lost
+void
+dim
+hid
+far
+drift
+sealed
+still
+blue

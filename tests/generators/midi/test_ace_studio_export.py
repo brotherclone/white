@@ -270,7 +270,7 @@ class TestExportHappyPath:
             return_value=ctx,
         ):
             export_to_ace_studio(prod)
-        ace.find_singer.assert_called_once_with("Shirley")
+        ace.find_singer.assert_called_once_with("Elirah")
         ace.load_singer.assert_called_once_with(0, 42)
 
     def test_adds_clip_with_correct_track(self, tmp_path):

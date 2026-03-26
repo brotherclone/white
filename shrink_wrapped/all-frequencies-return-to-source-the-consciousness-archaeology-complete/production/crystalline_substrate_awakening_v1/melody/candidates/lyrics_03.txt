@@ -1,0 +1,88 @@
+[melody_barely_tippy]
+here
+this mossy ground
+still
+the paths have gone
+now
+the stones forget
+green
+what names were carved
+breathe
+the place remains
+
+[melody_open_welds]
+look
+here
+now
+this ground
+soft
+green
+grown over
+lost
+still
+no name
+just
+moss
+breathe
+
+[melody_open_welds_alternate]
+here
+this place
+still stands
+green grows
+through cracks
+roots spread
+light falls
+mist drifts
+gone
+
+[melody_golden_pinecones_alternate]
+moss
+grown
+still
+green
+damp
+ground
+old
+path
+lost
+now
+here
+breathe
+
+[melody_golden_pinecones]
+soft
+green
+damp
+earth
+no
+name
+just
+roots
+still
+light
+falls
+here
+mist
+holds
+this
+place
+stays
+breathe
+
+[melody_barely_tippy_alternate]
+here
+still
+green
+moss
+grows
+soft
+ground
+lost
+light
+falls
+damp
+breathe
+this
+place
+stays

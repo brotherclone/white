@@ -467,14 +467,14 @@ Remove `song_proposal` and `thread` from `chords/review.yml` — these are now i
 
 ### What to Change (ordered by value/risk)
 
-| Priority | Change | Value | Risk | Estimate |
-|---|---|---|---|---|
-| 1 | Write `song_context.yml` in `init_production.py` | Unblocks all phases | None | ~1h |
-| 2 | Write `migrate_production_dir.py` | Existing dirs get context | Low | ~1h |
-| 3 | Propagate `concept` to drum/bass/melody via `song_context.yml` | Correct scoring | Low | ~2h |
-| 4 | Unified `load_song_proposal` | Eliminates 3 divergent implementations | Medium | ~3h |
-| 5 | Deprecate `initial_proposal.yml` (alias to song_context.yml) | Removes duplication | Low | ~1h |
-| 6 | Drop `song_proposal`/`thread` from chord_review | Cosmetic | Low | ~30m |
+| Priority | Change                                                         | Value                                  | Risk   | Estimate |
+|----------|----------------------------------------------------------------|----------------------------------------|--------|----------|
+| 1        | Write `song_context.yml` in `init_production.py`               | Unblocks all phases                    | None   | ~1h      |
+| 2        | Write `migrate_production_dir.py`                              | Existing dirs get context              | Low    | ~1h      |
+| 3        | Propagate `concept` to drum/bass/melody via `song_context.yml` | Correct scoring                        | Low    | ~2h      |
+| 4        | Unified `load_song_proposal`                                   | Eliminates 3 divergent implementations | Medium | ~3h      |
+| 5        | Deprecate `initial_proposal.yml` (alias to song_context.yml)   | Removes duplication                    | Low    | ~1h      |
+| 6        | Drop `song_proposal`/`thread` from chord_review                | Cosmetic                               | Low    | ~30m     |
 
 **Total estimate: ~8.5 hours (~2 sessions)**
 

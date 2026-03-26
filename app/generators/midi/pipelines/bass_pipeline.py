@@ -48,6 +48,7 @@ from app.generators.midi.pipelines.chord_pipeline import (
 from app.generators.midi.patterns.strum_patterns import (
     read_approved_harmonic_rhythm,
 )
+from app.generators.midi.production.init_production import load_song_context
 
 
 # ---------------------------------------------------------------------------
@@ -135,6 +136,8 @@ def read_approved_kick_onsets(
 # Chord root extraction
 # ---------------------------------------------------------------------------
 
+# ToDo: Most likely duplicate work should use the core note objects
+
 _NOTE_PC = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 
 
@@ -155,6 +158,33 @@ def _note_name_to_midi(note_str: str) -> int:
     elif acc in ("b", "♭"):
         midi -= 1
     return midi
+
+
+def _voicings_from_midi(
+    midi_path: Path, time_sig_numerator: int = 4
+) -> list[list[int]]:
+    """Extract one chord voicing per bar from a MIDI file.
+
+    Groups all note-on events within each bar into a single voicing so the
+    resulting voicing count matches the block's bar length rather than the
+    number of individual note onsets (which is the case for cut-up chords).
+    """
+    mid = mido.MidiFile(str(midi_path))
+    tpb = mid.ticks_per_beat
+    ticks_per_bar = tpb * time_sig_numerator
+
+    bar_notes: dict[int, list[int]] = {}
+    for track in mid.tracks:
+        tick = 0
+        for msg in track:
+            tick += msg.time
+            if msg.type == "note_on" and msg.velocity > 0:
+                bar = tick // ticks_per_bar
+                bar_notes.setdefault(bar, []).append(msg.note)
+
+    if not bar_notes:
+        return []
+    return [sorted(set(notes)) for _, notes in sorted(bar_notes.items()) if notes]
 
 
 def extract_section_chord_data(
@@ -198,6 +228,13 @@ def extract_section_chord_data(
                     pass
             if midi_notes:
                 voicings.append(sorted(midi_notes))
+
+        # Fallback: parse voicings from approved MIDI when chords: [] (e.g. cut-up productions)
+        if not voicings:
+            approved_midi = production_dir / "chords" / "approved" / f"{key}.mid"
+            if approved_midi.exists():
+                voicings = _voicings_from_midi(approved_midi)
+
         if voicings:
             chord_data[key] = voicings
 
@@ -530,6 +567,10 @@ def run_bass_pipeline(
     scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 
     concept_text = song_info.get("concept", "")
+    if not concept_text:
+        # Try song_context.yml (written by init_production before any phase runs)
+        _ctx = load_song_context(prod_path)
+        concept_text = _ctx.get("concept", "")
     if not concept_text:
         concept_text = f"{song_info['color_name']} chromatic concept"
         print(f"  Warning: No concept text, using fallback: '{concept_text}'")
