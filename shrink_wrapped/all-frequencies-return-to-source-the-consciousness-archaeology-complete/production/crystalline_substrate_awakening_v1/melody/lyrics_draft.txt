@@ -1,0 +1,88 @@
+[melody_barely_tippy]
+here
+the moss grows
+still
+on broken stone
+and
+no one names
+this
+forgotten ground
+now
+it remains
+
+[melody_open_welds]
+green
+moss
+grows
+on stone
+and
+damp
+cold earth
+no
+name
+was left
+just
+this
+place
+
+[melody_open_welds_alternate]
+here
+the ground
+still holds
+no name
+just green
+and moss
+and stone
+and rain
+now
+
+[melody_golden_pinecones_alternate]
+still
+here
+and
+green
+just
+moss
+no
+name
+cold
+ground
+now
+breathe
+
+[melody_golden_pinecones]
+still
+green
+moss
+cold
+stone
+damp
+ground
+no
+name
+just
+here
+now
+breathe
+in
+this
+lost
+quiet
+place
+
+[melody_barely_tippy_alternate]
+still
+green
+moss
+stone
+damp
+cold
+no
+name
+just
+here
+now
+breathe
+this
+lost
+place

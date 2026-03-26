@@ -748,6 +748,9 @@ def propose_arrangement(plan: ProductionPlan) -> ProductionPlan:
     plan.proposed_by = "claude". Returns the modified plan.
     """
     from anthropic import Anthropic
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
     system, user = _build_arrangement_prompt(plan)
     client = Anthropic()

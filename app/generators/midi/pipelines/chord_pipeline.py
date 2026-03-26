@@ -183,7 +183,7 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
     time_sig_tuple = (int(ts_parts[0]), int(ts_parts[1]))
 
     return {
-        "key_root": unified["key_root"],
+        "key_root": normalize_to_flat(unified["key_root"]),
         "mode": unified["mode"],
         "bpm": unified["bpm"],
         "time_sig": time_sig_tuple,
