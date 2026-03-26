@@ -136,6 +136,8 @@ def read_approved_kick_onsets(
 # Chord root extraction
 # ---------------------------------------------------------------------------
 
+# ToDo: Most likely duplicate work should use the core note objects
+
 _NOTE_PC = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 
 
