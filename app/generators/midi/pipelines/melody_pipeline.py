@@ -52,6 +52,11 @@ from app.generators.midi.patterns.strum_patterns import (
     read_approved_harmonic_rhythm,
 )
 from app.generators.midi.production.init_production import load_song_context
+from app.util.diversity_tracker import (
+    diversity_factor,
+    find_album_dir,
+    load_registry,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -536,6 +541,14 @@ def run_melody_pipeline(
             section["_section_key"] = label
 
     # --- 7. Generate and score per section ---
+    # Load album-level diversity registry (penalty for overused templates).
+    _album_dir = find_album_dir(prod_path)
+    _diversity_registry: dict[str, int] = (
+        load_registry(_album_dir) if _album_dir else {}
+    )
+    if _diversity_registry:
+        print(f"  Diversity registry: {len(_diversity_registry)} template(s) tracked")
+
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []
 
@@ -652,6 +665,7 @@ def run_melody_pipeline(
                 theory_weight,
                 chromatic_weight,
             )
+            comp *= diversity_factor(cand["pattern_name"], _diversity_registry)
             scored.append(
                 {
                     "composite": comp,
