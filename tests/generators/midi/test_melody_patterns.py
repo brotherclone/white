@@ -104,6 +104,8 @@ class TestMelodyPatternTemplates:
             "incantatory",
             "drone_and_step",
             "conversational",
+            "anacrusis",
+            "dotted",
         }
         for t in ALL_TEMPLATES:
             assert t.contour in valid, f"{t.name}: invalid contour '{t.contour}'"
@@ -549,8 +551,10 @@ class TestUseCaseField:
                 continue
             if t.durations is None:
                 continue
-            # Check that at least one gap of >= 0.5 beats exists between onset+dur and next onset
-            has_rest = False
+            # A vocal template satisfies the breath-gap requirement if either:
+            # (a) there is a gap >= 0.5 beats between consecutive notes, OR
+            # (b) the first note starts >= 0.5 beats into the bar (anacrusis opening rest).
+            has_rest = t.rhythm[0] >= 0.5
             for i in range(len(t.rhythm) - 1):
                 note_end = t.rhythm[i] + t.durations[i]
                 next_onset = t.rhythm[i + 1]

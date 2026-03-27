@@ -791,6 +791,82 @@ TEMPLATES_7_8 = [
 ]
 
 # ---------------------------------------------------------------------------
+# 4/4 Reggae
+# ---------------------------------------------------------------------------
+# One-drop and skank feels: root arrives short on beat 1 then sits on offbeats.
+# Very different rhythmic pocket from the existing syncopated patterns.
+
+TEMPLATES_4_4_REGGAE = [
+    BassPattern(
+        name="reggae_drop_low",
+        style="reggae",
+        energy="low",
+        time_sig=(4, 4),
+        description="One-drop feel — short root on 1, held 5th from beat 2",
+        notes=[(0, "root", "accent"), (2.0, "5th", "normal")],
+        note_durations=[0.4, 2.0],
+    ),
+    BassPattern(
+        name="reggae_skank_med",
+        style="reggae",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Reggae skank — short root on 1, offbeat ghost hits at 1.5 and 3.5",
+        notes=[
+            (0, "root", "accent"),
+            (1.5, "root", "ghost"),
+            (2.5, "5th", "normal"),
+            (3.5, "root", "ghost"),
+        ],
+        note_durations=[0.4, 0.9, 0.9, 0.4],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Descending Arpeggiated
+# ---------------------------------------------------------------------------
+# All existing 4/4 arp templates ascend (root → 3rd → 5th → octave).
+# These descend, landing on the root with gravity.
+
+TEMPLATES_4_4_DESCENDING_ARP = [
+    BassPattern(
+        name="descend_triad_low",
+        style="arpeggiated",
+        energy="low",
+        time_sig=(4, 4),
+        description="Descending triad — 5th → 3rd → root settling on beat 3",
+        notes=[(0, "5th", "normal"), (1, "3rd", "normal"), (2, "root", "accent")],
+        note_durations=[1.0, 1.0, 2.0],
+    ),
+    BassPattern(
+        name="descend_octave_drop_med",
+        style="octave",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Octave drop — high root on 1, falls to low root on 2, 5th close",
+        notes=[(0, "octave_up", "accent"), (2, "root", "normal"), (3, "5th", "ghost")],
+        note_durations=[2.0, 0.9, 1.0],
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 4/4 Rest on downbeat
+# ---------------------------------------------------------------------------
+# Silence on beat 1 — creates unexpected space, pulls listener forward.
+
+TEMPLATES_4_4_REST_DOWNBEAT = [
+    BassPattern(
+        name="rest_downbeat_med",
+        style="syncopated",
+        energy="medium",
+        time_sig=(4, 4),
+        description="Silence on beat 1, enters on beat 2 — counter-intuitive space",
+        notes=[(1, "root", "accent"), (2.5, "5th", "normal"), (3.5, "root", "ghost")],
+        note_durations=[1.0, 0.9, 0.4],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -802,6 +878,9 @@ ALL_TEMPLATES: list[BassPattern] = [
     *TEMPLATES_4_4_ARP,
     *TEMPLATES_4_4_PEDAL,
     *TEMPLATES_4_4_SYNCOPATED,
+    *TEMPLATES_4_4_REGGAE,
+    *TEMPLATES_4_4_DESCENDING_ARP,
+    *TEMPLATES_4_4_REST_DOWNBEAT,
     # 3/4 (waltz)
     *TEMPLATES_3_4,
     # 7/8

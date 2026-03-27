@@ -17,6 +17,13 @@ import yaml
 
 from pathlib import Path
 
+from app.util.diversity_tracker import (
+    find_album_dir,
+    load_registry,
+    record_use,
+    save_registry,
+)
+
 
 def _rewrite_track_names(midi_path: Path, label: str) -> None:
     """Rewrite track_name MetaMessages in a promoted MIDI to match the label.
@@ -170,8 +177,20 @@ def promote_part(review_path: str, clean: bool = False):
                 "source": str(source.name),
                 "dest": str(dest_name),
                 "rank": candidate.get("rank"),
+                "pattern_name": candidate.get("pattern_name"),
             }
         )
+
+    # Record promoted template names in the album diversity registry.
+    if promoted:
+        _album_dir = find_album_dir(review_file)
+        if _album_dir:
+            _registry = load_registry(_album_dir)
+            for p in promoted:
+                tmpl = p.get("pattern_name")
+                if tmpl:
+                    record_use(tmpl, _registry)
+            save_registry(_album_dir, _registry)
 
     # Summary
     if promoted:
