@@ -18,14 +18,14 @@ The system SHALL provide a command that generates a `production_plan.yml` file i
 - **THEN** a `production_plan.yml` is written to the production directory root
 - **AND** it contains one section entry per unique approved chord label
 - **AND** bar counts are derived from the `hr_distribution` field in the chord `review.yml` if present, otherwise from approved chord MIDI length, otherwise from chord count in the candidate
-- **AND** all sections default to `repeat: 1` and `vocals: false`
+- **AND** all sections default to `play_count: 1` and `vocals: false`
 - **AND** sections appear in the order they were labeled in the chord review
 
 #### Scenario: Refresh existing plan
 
 - **WHEN** `--refresh` flag is passed and a `production_plan.yml` already exists
 - **THEN** bar counts are recalculated from current approved loops
-- **AND** all human-edited fields (`repeat`, `vocals`, `notes`, `sounds_like`, section order) are preserved
+- **AND** all human-edited fields (`play_count`, `vocals`, `notes`, `loops`, section order) are preserved
 - **AND** sections present in the plan but no longer in approved chords are flagged with a warning but retained
 
 #### Scenario: No approved chords
@@ -34,24 +34,26 @@ The system SHALL provide a command that generates a `production_plan.yml` file i
 - **THEN** the command exits with an error message and does not write a plan
 
 ### Requirement: Production Plan Schema
+The `ProductionPlan` dataclass SHALL include the following fields:
+- `sections: list[PlanSection]` — ordered section entries
+- `rationale: str` — top-level compositional reasoning (empty string for mechanical plans)
+- `proposed_by: str` — `"claude"` when AI-authored, empty string for mechanical plans
 
-The `production_plan.yml` SHALL conform to a defined schema capturing song structure and production metadata.
+The `PlanSection` dataclass SHALL include:
+- `name: str`, `bars: int`, `play_count: int`, `vocals: bool`, `notes: str`, `loops: dict`
+- `reason: str` — one-sentence note on placement (empty string for mechanical plans)
 
-#### Scenario: Required top-level fields
+All fields SHALL survive a YAML save/load round-trip with no data loss.
 
-- **WHEN** a production plan is generated
-- **THEN** it SHALL contain: `song_slug`, `generated` (ISO timestamp), `bpm`, `time_sig`, `key`, `color`, `vocals_planned`, `sounds_like`, and `sections`
+#### Scenario: Round-trip preserves rationale and reasons
+- **WHEN** a Claude-authored plan is saved to YAML and reloaded
+- **THEN** `rationale`, `proposed_by`, and all per-section `reason` fields are identical
+  to the original
 
-#### Scenario: Section entry fields
-
-- **WHEN** a section is written to the plan
-- **THEN** each section entry SHALL contain: `name`, `bars` (integer), `repeat` (integer ≥ 1), `vocals` (bool), and `notes` (string, may be empty)
-
-#### Scenario: Human-editable
-
-- **WHEN** the human edits `production_plan.yml` directly
-- **THEN** the file remains valid and is read correctly by downstream phases
-- **AND** the human MAY reorder sections, change `repeat`, `vocals`, `notes`, and `sounds_like` without breaking any pipeline
+#### Scenario: Refresh preserves human edits
+- **WHEN** `refresh_plan()` is called on a plan where the user has manually edited
+  `play_count`, `reason`, or section order
+- **THEN** those edits are preserved and only `bars` is updated from the loop inventory
 
 ### Requirement: Drum Pipeline Section Context
 
