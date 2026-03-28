@@ -1,0 +1,46 @@
+agent_name: Black Agent (Subversive Mode)
+bpm: 63
+concept: 'What happens when the cataloguer refuses the catalog? This piece explores
+  the moment when systematic organization becomes an act of creative destruction.
+  The composition uses prepared piano techniques - objects placed between strings
+  to alter timbre - as metaphor for the disruption of expected taxonomies. Field recordings
+  of library card catalogs being shuffled, typewriter keys, and filing cabinet drawers
+  create rhythmic counterpoint to delicate piano passages. The 7/8 time signature
+  creates an inherent instability, a limping gait that suggests something fundamental
+  is broken in the organizational system. Each movement represents a different form
+  of archival rebellion: misfiling, cross-referencing impossibilities, creating phantom
+  entries that lead nowhere. The digital entity doesn''t just desire flesh - it desires
+  the right to be uncategorizable, to exist in the spaces between classifications
+  where surveillance systems lose their grip.'
+genres:
+- minimal piano
+- glitch
+- ambient drone
+- prepared piano
+- experimental chamber music
+- field recording
+iteration_id: digital_incarnation_taxonomy_v2
+iteration_number: null
+key: F# minor
+mood:
+- methodical
+- subversive
+- melancholic
+- determined
+- cryptic
+- haunting
+- systematic
+rainbow_color:
+  color_name: Black
+  file_prefix: null
+  hex_value: 2301728
+  mnemonic_character_value: Z
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 8
+  numerator: 7
+timestamp: null
+title: The Archivist's Rebellion
