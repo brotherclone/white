@@ -1,38 +1,4 @@
-# composition-proposal Specification
-
-## Purpose
-TBD - created by archiving change add-claude-composition-proposal. Update Purpose after archive.
-## Requirements
-### Requirement: Loop Inventory Collection
-
-Before generating a composition proposal, the system SHALL collect the approved loop
-inventory across all pipeline phases for the song.
-
-The inventory SHALL be derived from the approved review files (`chords/review.yml`,
-`drums/review.yml`, `bass/review.yml`, `melody/review.yml`) and contain, per approved
-loop: label, instrument, bar count, composite score, and any human notes from the
-review file. Loops not yet approved (status ≠ `approved`) SHALL be excluded.
-
-#### Scenario: Full inventory — all four instruments approved
-
-- **WHEN** `build_loop_inventory(production_dir)` is called
-- **AND** approved loops exist for chords, drums, bass, and melody
-- **THEN** a dict is returned with keys `chords`, `drums`, `bass`, `melody`
-- **AND** each value is a list of loop dicts with `label`, `bars`, `score`, `notes`
-
-#### Scenario: Partial inventory — some instruments not yet approved
-
-- **WHEN** approved loops exist for only some instruments
-- **THEN** the inventory dict contains only those instruments
-- **AND** a warning is logged listing missing instruments
-- **AND** the proposal proceeds with whatever is available
-
-#### Scenario: No approved loops at all
-
-- **WHEN** no approved loops exist across any instrument
-- **THEN** the command exits with an error: `"No approved loops found — run pipeline phases before generating a composition proposal"`
-
----
+## MODIFIED Requirements
 
 ### Requirement: Claude Composition Proposal
 
@@ -56,8 +22,8 @@ The model SHALL be `claude-sonnet-4-6`.
 
 `generate_plan()` SHALL accept a `use_claude: bool = True` parameter. When `True`
 it calls `propose_arrangement()` after building the mechanical inventory. When the
-API is unavailable or `use_claude=False`, it SHALL fall back to the mechanical
-plan without failing; it MAY print a warning to stdout but MUST NOT raise.
+API is unavailable or `use_claude=False`, it falls back silently to the mechanical
+plan with no error.
 
 The old mechanical-only path SHALL be available as `generate_plan_mechanical()`.
 
@@ -76,9 +42,9 @@ The `PlanSection` dataclass SHALL carry:
 - **THEN** `composition_proposal.yml` is written to the production directory
 - **AND** it contains `proposed_by: claude`, `generated` (ISO timestamp),
   `color_target`, `loop_inventory`, `rationale`, and `proposed_sections`
-- **AND** each entry in `proposed_sections` has: `name`, `play_count` (int ≥ 1;
-  `repeat` accepted as a legacy alias), `energy_note` (string), `transition_note`
-  (string), `loops` (dict mapping instrument → loop label)
+- **AND** each entry in `proposed_sections` has: `name`, `repeat` (int ≥ 1),
+  `energy_note` (string), `transition_note` (string), `loops` (dict mapping
+  instrument → loop label)
 - **AND** the top-level output contains a `sounds_like` list
 
 #### Scenario: Claude-authored plan via generate_plan
@@ -111,30 +77,3 @@ The `PlanSection` dataclass SHALL carry:
 - **WHEN** the Claude API call raises a connection error during CLI invocation
 - **THEN** the command exits with code 1 and a clear error message
 - **AND** no `composition_proposal.yml` is written
-
-### Requirement: Composition Proposal Drift
-
-When a `composition_proposal.yml` exists, the assembly manifest importer SHALL
-compute a proposal drift block showing how the human's Logic arrangement diverged
-from Claude's proposal.
-
-Proposal drift is computed at the section level by comparing `proposed_sections`
-in the proposal against the sections derived from `arrangement.txt`. The drift block
-SHALL include:
-- `sections_added` — section names present in the arrangement but absent from the proposal
-- `sections_removed` — section names in the proposal but absent from the arrangement
-- `repeat_deltas` — list of `{name, proposed, actual}` dicts where repeat count changed
-- `order_changed` — bool, true if the relative ordering of shared sections differs
-
-#### Scenario: Proposal drift computed on import
-
-- **WHEN** `python -m app.generators.midi.assembly_manifest --import-arrangement ...` is run
-- **AND** `composition_proposal.yml` exists in the production directory
-- **THEN** the drift report includes a `proposal_drift` block with the four fields above
-
-#### Scenario: No proposal — drift skipped
-
-- **WHEN** `composition_proposal.yml` does not exist
-- **THEN** the drift report is written without a `proposal_drift` block
-- **AND** no warning is emitted
-
