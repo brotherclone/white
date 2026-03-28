@@ -165,8 +165,10 @@ class TestPlanIO:
             color="Black",
             title="Test Song",
             sections=[
-                PlanSection(name="verse", bars=4, repeat=2, vocals=True, notes="main"),
-                PlanSection(name="chorus", bars=2, repeat=3, vocals=True),
+                PlanSection(
+                    name="verse", bars=4, play_count=2, vocals=True, notes="main"
+                ),
+                PlanSection(name="chorus", bars=2, play_count=3, vocals=True),
             ],
         )
         save_plan(plan, tmp_path)
@@ -179,7 +181,7 @@ class TestPlanIO:
         assert len(loaded.sections) == 2
         assert loaded.sections[0].name == "verse"
         assert loaded.sections[0].bars == 4
-        assert loaded.sections[0].repeat == 2
+        assert loaded.sections[0].play_count == 2
         assert loaded.sections[0].vocals is True
         assert loaded.sections[0].notes == "main"
         assert loaded.sections[1].name == "chorus"
@@ -326,13 +328,13 @@ class TestRefreshPlan:
     def test_refresh_preserves_human_edits(self, tmp_path):
         prod, plan = self._make_plan(tmp_path, [{"label": "verse", "chord_count": 4}])
         # Simulate human edits
-        plan.sections[0].repeat = 3
+        plan.sections[0].play_count = 3
         plan.sections[0].vocals = True
         plan.sections[0].notes = "main section"
         save_plan(plan, prod)
 
         refreshed = refresh_plan(prod)
-        assert refreshed.sections[0].repeat == 3
+        assert refreshed.sections[0].play_count == 3
         assert refreshed.sections[0].vocals is True
         assert refreshed.sections[0].notes == "main section"
 
@@ -385,8 +387,8 @@ class TestBootstrapManifest:
 
     def test_bootstrap_structure_contains_sections(self, tmp_path):
         sections = [
-            PlanSection(name="verse", bars=4, repeat=2),
-            PlanSection(name="chorus", bars=2, repeat=3),
+            PlanSection(name="verse", bars=4, play_count=2),
+            PlanSection(name="chorus", bars=2, play_count=3),
         ]
         prod = self._make_plan_file(tmp_path, sections)
         bootstrap_manifest(prod)
@@ -404,8 +406,8 @@ class TestBootstrapManifest:
         # verse: 4 bars × 2 repeats = 8 bars = 16 seconds (0:00 → 0:16)
         # chorus: 2 bars × 3 repeats = 6 bars = 12 seconds (0:16 → 0:28)
         sections = [
-            PlanSection(name="verse", bars=4, repeat=2),
-            PlanSection(name="chorus", bars=2, repeat=3),
+            PlanSection(name="verse", bars=4, play_count=2),
+            PlanSection(name="chorus", bars=2, play_count=3),
         ]
         prod = self._make_plan_file(tmp_path, sections)
         bootstrap_manifest(prod)

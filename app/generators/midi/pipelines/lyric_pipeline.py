@@ -273,7 +273,7 @@ def read_vocal_sections_from_arrangement(
     Track 4 (MELODY_CHANNEL) clips are vocal by definition — no vocals flag needed.
     Returns one entry per unique clip label, in first-seen order.
 
-    Each entry: {approved_label, name, bars, repeat, total_notes, contour}
+    Each entry: {approved_label, name, bars, play_count, total_notes, contour}
     """
     clips = parse_arrangement(arrangement_path)
 
@@ -311,20 +311,20 @@ def read_vocal_sections_from_arrangement(
     sections = []
     for label in order:
         data = seen[label]
-        repeat = data["count"]
-        loop_duration = data["total_duration"] / repeat
+        play_count = data["count"]
+        loop_duration = data["total_duration"] / play_count
         bars = max(round(loop_duration / secs_per_bar), 1)
 
         midi_path = approved_dir / f"{label}.mid"
         per_loop_notes = _count_notes(midi_path) if midi_path.exists() else 0
-        total_notes = per_loop_notes * repeat
+        total_notes = per_loop_notes * play_count
 
         sections.append(
             {
                 "approved_label": label,
                 "name": label,
                 "bars": bars,
-                "repeat": repeat,
+                "play_count": play_count,
                 "total_notes": total_notes,
                 "contour": contour_by_label.get(label, "stepwise"),
             }
@@ -794,7 +794,7 @@ def _build_white_cutup_prompt(
     for sec in vocal_sections:
         name = sec["name"]
         lo, hi = syllable_targets.get(name, (0, 0))
-        denom = max(sec["bars"] * sec["repeat"], 1)
+        denom = max(sec["bars"] * sec["play_count"], 1)
         notes_per_bar = sec["total_notes"] / denom
         phrases: list = sec.get("phrases", [])
 
@@ -802,7 +802,7 @@ def _build_white_cutup_prompt(
             [
                 "",
                 f"  [{name}]",
-                f"    Bars per loop: {sec['bars']}  ×  {sec['repeat']} occurrence(s)",
+                f"    Bars per loop: {sec['bars']}  ×  {sec['play_count']} occurrence(s)",
                 f"    Target syllables: {lo}–{hi}  (≈{notes_per_bar:.1f} notes/bar)",
             ]
         )
@@ -888,7 +888,7 @@ def _build_prompt(
     for sec in vocal_sections:
         name = sec["name"]
         lo, hi = syllable_targets.get(name, (0, 0))
-        denom = max(sec["bars"] * sec["repeat"], 1)
+        denom = max(sec["bars"] * sec["play_count"], 1)
         notes_per_bar = sec["total_notes"] / denom
         phrases: list[Phrase] = sec.get("phrases", [])
 
@@ -896,7 +896,7 @@ def _build_prompt(
             [
                 "",
                 f"  [{name}]",
-                f"    Bars per loop: {sec['bars']}  ×  {sec['repeat']} occurrence(s)",
+                f"    Bars per loop: {sec['bars']}  ×  {sec['play_count']} occurrence(s)",
                 f"    Melody contour: {sec['contour']}",
                 f"    Target syllables: {lo}–{hi}  (≈{notes_per_bar:.1f} notes/bar)",
             ]
@@ -1203,7 +1203,7 @@ def run_lyric_pipeline(
     for sec in vocal_sections:
         phrase_info = f", {len(sec['phrases'])} phrases" if sec["phrases"] else ""
         print(
-            f"  {sec['name']}: {sec['bars']}b × {sec['repeat']}"
+            f"  {sec['name']}: {sec['bars']}b × {sec['play_count']}"
             f" = {sec['total_notes']} notes{phrase_info}"
         )
 

@@ -540,7 +540,7 @@ def _computed_section_start(plan, section_index: int) -> float:
     for i, sec in enumerate(plan.sections):
         if i == section_index:
             return cursor
-        cursor += sec.bars * sec.repeat * spb
+        cursor += sec.bars * sec.play_count * spb
     return cursor
 
 
@@ -621,7 +621,7 @@ def _update_plan(plan, actual_sections: list[ArrangementSection]) -> None:
             plan_matched[i] = True
             duration = actual.end - actual.start
             total_bars = max(1, round(duration / spb))
-            sec.bars = max(1, round(total_bars / max(sec.repeat, 1)))
+            sec.bars = max(1, round(total_bars / max(sec.play_count, 1)))
             sec.loops = dict(actual.loops)
             if not sec.vocals:
                 sec.vocals = actual.vocals
@@ -650,7 +650,7 @@ def _update_manifest(production_dir: Path, plan) -> None:
     cursor = 0.0
     structure = []
     for sec in plan.sections:
-        duration = sec.bars * sec.repeat * spb
+        duration = sec.bars * sec.play_count * spb
         end = cursor + duration
         structure.append(
             {
@@ -680,7 +680,7 @@ def compute_proposal_drift(
     Returns a dict with:
       sections_added   — names in arrangement but absent from proposal
       sections_removed — names in proposal but absent from arrangement
-      repeat_deltas    — [{name, proposed, actual}] where repeat count changed
+      play_count_deltas    — [{name, proposed, actual}] where repeat count changed
       order_changed    — True if shared section ordering differs
 
     Returns None if the proposal file cannot be loaded or has no proposed_sections.
@@ -699,7 +699,8 @@ def compute_proposal_drift(
 
     proposed_names = [s.get("name", "") for s in proposed_sections]
     proposed_repeats = {
-        s.get("name", ""): int(s.get("repeat", 1)) for s in proposed_sections
+        s.get("name", ""): int(s.get("play_count", s.get("repeat", 1)))
+        for s in proposed_sections
     }
     actual_names = [s.name for s in actual_sections]
     actual_repeats: dict[str, int] = {}
@@ -712,15 +713,15 @@ def compute_proposal_drift(
     sections_added = sorted(actual_set - proposed_set)
     sections_removed = sorted(proposed_set - actual_set)
 
-    repeat_deltas = []
+    play_count_deltas = []
     for name in proposed_set & actual_set:
         p_repeat = proposed_repeats.get(name, 1)
         a_repeat = actual_repeats.get(name, 1)
         if p_repeat != a_repeat:
-            repeat_deltas.append(
+            play_count_deltas.append(
                 {"name": name, "proposed": p_repeat, "actual": a_repeat}
             )
-    repeat_deltas.sort(key=lambda x: x["name"])
+    play_count_deltas.sort(key=lambda x: x["name"])
 
     # Order changed: compare relative order of shared sections
     shared = proposed_set & actual_set
@@ -744,7 +745,7 @@ def compute_proposal_drift(
     return {
         "sections_added": sections_added,
         "sections_removed": sections_removed,
-        "repeat_deltas": repeat_deltas,
+        "play_count_deltas": play_count_deltas,
         "order_changed": order_changed,
     }
 

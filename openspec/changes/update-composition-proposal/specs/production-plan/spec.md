@@ -7,7 +7,7 @@ The `ProductionPlan` dataclass SHALL include the following fields:
 - `proposed_by: str` — `"claude"` or `"mechanical"`
 
 The `PlanSection` dataclass SHALL include:
-- `label: str`, `bars: int`, `repeat: int`, `energy: str`
+- `label: str`, `bars: int`, `play_count: int`, `energy: str`
 - `reason: str` — one-sentence note on placement (empty string for mechanical plans)
 
 All fields SHALL survive a YAML save/load round-trip with no data loss.
@@ -19,5 +19,5 @@ All fields SHALL survive a YAML save/load round-trip with no data loss.
 
 #### Scenario: Refresh preserves human edits
 - **WHEN** `refresh_plan()` is called on a plan where the user has manually edited
-  `repeat`, `reason`, or section order
+  `play_count`, `reason`, or section order
 - **THEN** those edits are preserved and only `bars` is updated from the loop inventory

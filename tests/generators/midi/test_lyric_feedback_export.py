@@ -37,14 +37,14 @@ LYRICS_REVIEW = {
         {
             "name": "verse",
             "bars": 4,
-            "repeat": 1,
+            "play_count": 1,
             "total_notes": 20,
             "contour": "stepwise",
         },
         {
             "name": "chorus",
             "bars": 2,
-            "repeat": 2,
+            "play_count": 2,
             "total_notes": 10,
             "contour": "arpeggiated",
         },
