@@ -1,0 +1,42 @@
+agent_name: indigo
+bpm: 84
+concept: 'The song masquerades as a bitter retail worker''s anthem - verses catalog
+  the daily humiliations of minimum wage service, choruses sneer at entitled shoppers
+  as "store scum" who treat employees like dirt. But the audio encoding runs deeper:
+  between verses, field recordings capture actual customer voices - fragments of phone
+  calls, conversations, personal moments accidentally preserved in the acoustic space
+  of commerce. These voices layer and overlap, creating a spectral chorus that gradually
+  reveals itself as the true subject. The "scum" transforms from insult to archaeology
+  - these are the accumulated traces of human presence, the emotional residue left
+  behind by people just trying to buy what they need. The final revelation inverts
+  the power dynamic: the customers aren''t the enemy but fellow victims of a system
+  that degrades everyone it touches. The retail space becomes a confessional booth
+  where private vulnerabilities leak into public audio, and the song''s contempt dissolves
+  into recognition. The lo-fi production mimics the degraded quality of security footage
+  and overhead speakers, while the moderate shuffle tempo allows space for these ghostly
+  customer voices to emerge from the mix like developing photographs.
+
+
+  **INFRANYM PROTOCOL:**
+
+  Secret: ''customers'' encoded as ''store scum''
+
+  Method: InfranymMedium.AUDIO
+
+  Decoding: Audio: Alien Transmission: customers
+
+  '
+genres:
+- Lo-fi indie folk
+- field recording collage
+iteration_id: indigo_proposal_1770824470543
+iteration_number: 15
+key: A minor
+mood:
+- Contemptuous
+- nostalgic
+- revelatory
+rainbow_color: indigo
+tempo: Moderate shuffle
+timestamp: 1770824470.544472
+title: Store Scum

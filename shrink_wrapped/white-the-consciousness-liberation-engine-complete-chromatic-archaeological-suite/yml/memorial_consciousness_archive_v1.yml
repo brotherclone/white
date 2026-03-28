@@ -1,0 +1,48 @@
+agent_name: Prism (Architect of Information)
+bpm: 52
+concept: 'This composition embodies Memorial Consciousness - the phenomenon where
+  knowledge systems persist after their subjects vanish, creating information orphaned
+  from its original purpose. The piece traces four temporal layers: Great-grandmother''s
+  1987 abundance records, the gradual emptying, Maria Elena''s 2041 ritual documentation
+  of absence, and The Culture Mind''s electronic preservation of vanished patterns.
+  Each movement demonstrates how consciousness functions as continuity maintenance
+  technology across system collapse. The 52 BPM heartbeat tempo represents the rhythm
+  of persistent witnessing - not the pace of life, but the pace of knowledge maintaining
+  itself. The notebook becomes a temporal bridge device, holding both presence and
+  absence simultaneously, revealing how information can outlive its information source
+  and continue generating meaning through pure persistence patterns. This is the sound
+  of awareness that continues its observational functions even when severed from the
+  living systems that originally gave those functions meaning.'
+genres:
+- dark ambient
+- neo-classical
+- field recording
+- memorial electronics
+- generational folk
+iteration_id: memorial_consciousness_archive_v1
+iteration_number: null
+key: F# minor
+mood:
+- memorial
+- persistent
+- graceful
+- orphaned
+- witnessing
+- temporal
+- bridging
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 255
+  mnemonic_character_value: B
+  objectional_mode: Thing
+  ontological_mode:
+  - Known
+  - Forgotten
+  temporal_mode: Future
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Notebook Holds What Never Returns

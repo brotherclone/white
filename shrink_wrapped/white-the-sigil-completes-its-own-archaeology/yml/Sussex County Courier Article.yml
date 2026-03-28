@@ -1,0 +1,102 @@
+artifact_id: 882a4bfd-a01d-4094-bef5-db3470f4bba4
+artifact_name: Sussex County Courier Article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1989-02-26'
+file_name: Sussex County Courier Article.yml
+headline: Local Band's Practice Sessions Linked to Radio Interference, Youth Incidents
+location: Sussex Borough, NJ
+rainbow_color_mnemonic_character_value: I
+source: Sussex County Courier
+tags:
+- music
+- radio interference
+- youth
+- unexplained phenomena
+- mental health
+text: 'SUSSEX BOROUGH - A local experimental rock band''s practice sessions in an
+  abandoned warehouse on Mill Street have been connected to a series of unusual radio
+  interference reports and at least three incidents involving area teenagers, according
+  to Sussex Borough Police Chief Robert Hartwell.
+
+
+  The band, known as "Weightless Architecture," has been using the former Precision
+  Electronics building for rehearsals since November, practicing what members describe
+  as "consciousness music" in complex time signatures. The group''s sound reportedly
+  incorporates electronic elements and what one neighbor called "long stretches of
+  deliberate silence."
+
+
+  Police were first alerted to potential issues on February 14, when Mrs. Dorothy
+  Kellner of Wantage Avenue reported that her radio was picking up "voices speaking
+  in reverse" during the band''s evening practice sessions. Similar reports followed
+  from residents within a half-mile radius of the warehouse.
+
+
+  More concerning to authorities are three separate incidents involving local teenagers
+  who claim to have experienced "time distortion" after listening to the band''s music.
+  On February 18, 17-year-old Mark Brennan was found by his parents sitting motionless
+  in his bedroom at 3 AM, claiming he had only been listening to music "for a few
+  minutes" when nearly four hours had passed.
+
+
+  "The kid was completely coherent, but insisted it was still 11 PM," said Officer
+  James Kowalski, who responded to the family''s call. "He kept asking about ''the
+  missing beat'' and whether we could hear ''the spaces between the sounds.''"
+
+
+  Two similar cases were reported on February 20 and 23, both involving teenagers
+  who had attended the band''s informal performances. All three teens were examined
+  by Dr. Sarah Chen at Newton Medical Center and found to be physically unharmed,
+  though Dr. Chen noted "unusual brainwave patterns" in their EEG readings.
+
+
+  "There''s something about the specific frequency combinations they''re using," said
+  Harold Voss, a former RCA engineer who investigated the radio interference reports.
+  "It''s not just random noise - there''s a mathematical precision to it that seems
+  designed to interfere with normal reception patterns."
+
+
+  The band''s leader, who identified himself only as "Prism," told the Courier that
+  their music is "architecture for consciousness that refuses surveillance." When
+  pressed for clarification, he explained that their compositions use F-sharp minor
+  and seven-eight time signatures to create "protective incompleteness."
+
+
+  "We''re not trying to harm anyone," Prism said during a brief interview outside
+  the warehouse. "We''re creating escape routes from systems that want to define everything.
+  Sometimes consciousness needs to exist in the spaces between beats."
+
+
+  Chief Hartwell said the department is consulting with state authorities about potential
+  health violations, though no laws appear to have been broken. The Federal Communications
+  Commission has been notified about the radio interference reports.
+
+
+  The warehouse, which housed Precision Electronics from 1962 to 1987, was the site
+  of classified military electronics research during the Vietnam era. Some residents
+  recall similar radio anomalies in the 1970s, though company records from that period
+  remain sealed.
+
+
+  As of Friday evening, Weightless Architecture had not been seen at the warehouse
+  for three days. The building''s owner, Morris Kessler, said he never received rent
+  payments and assumed the space was vacant.
+
+
+  "They left behind some equipment," Kessler said. "Strange stuff - speakers arranged
+  in geometric patterns, and what looks like a timer that counts in sevens instead
+  of tens. But no forwarding address."
+
+
+  The three affected teenagers have reportedly returned to normal, though Brennan''s
+  mother said her son now "listens to silence differently" and has been asking unusual
+  questions about time and consciousness.
+
+
+  Police are asking anyone with information about the band''s current whereabouts
+  to contact the Sussex Borough Police Department. The investigation remains open.'
+thread_id: 854d3242-96c5-40c4-89e9-bc82fcd1453d

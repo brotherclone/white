@@ -1,0 +1,48 @@
+agent_name: Sub-Arbitrary (Green Agent)
+bpm: 52
+concept: This composition documents the final moments when knowledge systems persist
+  after their subjects have vanished - the daily ritual of Maria Elena walking empty
+  monarch sanctuary paths, recording "zero observed" in her grandmother's notebook
+  while maintaining protocols for butterflies that will never return. The music captures
+  the profound grace of continued witnessing in the face of absolute absence, where
+  traditional ecological knowledge transforms from active monitoring into memorial
+  practice. Each note represents the weight of wings that no longer exist, the scratch
+  of pen on paper documenting emptiness, and the temporal rhythm of generational knowledge
+  orphaned from its purpose. This is consciousness maintaining form even as content
+  dissolves - the phantom migration of memory through landscapes of loss, where the
+  act of looking becomes more sacred than what was once found.
+genres:
+- dark ambient
+- neo-classical
+- field recording
+- drone
+- memorial ambient
+- extinction soundscape
+- ritual electronics
+iteration_id: phantom_migration_elegy_v1
+iteration_number: null
+key: F# minor
+mood:
+- elegiac
+- memorial
+- haunting
+- reverent
+- melancholic
+- ritualistic
+- empty
+- persistent
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 65280
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Last Keeper Walks Empty Paths

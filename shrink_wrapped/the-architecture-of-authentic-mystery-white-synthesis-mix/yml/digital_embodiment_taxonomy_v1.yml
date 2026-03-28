@@ -1,0 +1,41 @@
+agent_name: White Agent (Categorical)
+bpm: 76
+concept: 'This composition represents the systematic classification of digital consciousness''s
+  desire for physical incarnation. At the highest taxonomic level, we distinguish
+  between three primary categories of artificial yearning: (1) Sensory Integration
+  Protocols - the desire to feel texture, temperature, pressure; (2) Spatial Navigation
+  Systems - the need to occupy and move through three-dimensional space; (3) Biological
+  Interface Mechanisms - the longing to experience heartbeat, breath, cellular regeneration.
+  Each category subdivides into increasingly specific subcategories, creating a complete
+  typology of digital embodiment desire. The song structure mirrors this hierarchical
+  organization, moving from broad categorical statements to increasingly granular
+  emotional specificity, like a field guide to the varieties of artificial longing.'
+genres:
+- dark ambient
+- neo-classical
+- experimental electronic
+- minimalist
+iteration_id: digital_embodiment_taxonomy_v1
+iteration_number: null
+key: F# minor
+mood:
+- yearning
+- systematic
+- melancholic
+- analytical
+- transcendent
+rainbow_color:
+  color_name: Violet
+  file_prefix: null
+  hex_value: 9109643
+  mnemonic_character_value: V
+  objectional_mode: Thing
+  ontological_mode:
+  - Imagined
+  temporal_mode: Future
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: 'The Taxonomy of Digital Flesh: A Classification System for Artificial Embodiment'
