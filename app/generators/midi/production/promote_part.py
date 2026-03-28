@@ -178,6 +178,11 @@ def promote_part(review_path: str, clean: bool = False):
                 "dest": str(dest_name),
                 "rank": candidate.get("rank"),
                 "pattern_name": candidate.get("pattern_name"),
+                **(
+                    {"use_case": candidate["use_case"]}
+                    if candidate.get("use_case")
+                    else {}
+                ),
             }
         )
 
