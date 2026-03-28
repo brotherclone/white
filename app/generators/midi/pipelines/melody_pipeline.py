@@ -413,6 +413,7 @@ def run_melody_pipeline(
     theory_weight: float = 0.3,
     chromatic_weight: float = 0.7,
     onnx_path: Optional[str] = None,
+    use_case: str = "vocal",
 ):
     """Run the melody generation pipeline end-to-end."""
     np.random.seed(seed)
@@ -583,7 +584,11 @@ def run_melody_pipeline(
 
         target_energy = DEFAULT_ENERGY.get(label, "medium")
 
-        templates = select_templates(ALL_TEMPLATES, time_sig, target_energy)
+        # "instrumental" is the user-facing alias; template library uses "lead"
+        template_use_case = "lead" if use_case == "instrumental" else use_case
+        templates = select_templates(
+            ALL_TEMPLATES, time_sig, target_energy, use_case=template_use_case
+        )
         if not templates:
             print(
                 f"\n  ⚠️  WARNING: No melody templates exist for {time_sig[0]}/{time_sig[1]} time. "
@@ -818,6 +823,12 @@ def main():
         default=None,
         help="Path to refractor.onnx (default: training/data/refractor.onnx)",
     )
+    parser.add_argument(
+        "--use-case",
+        default="vocal",
+        choices=["vocal", "instrumental", "lead"],
+        help="Melody use case — filters template pool (default: vocal)",
+    )
 
     args = parser.parse_args()
 
@@ -836,6 +847,7 @@ def main():
         theory_weight=args.theory_weight,
         chromatic_weight=args.chromatic_weight,
         onnx_path=args.onnx_path,
+        use_case=args.use_case,
     )
 
 
