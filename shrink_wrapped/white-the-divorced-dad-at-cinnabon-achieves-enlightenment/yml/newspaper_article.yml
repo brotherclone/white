@@ -1,0 +1,19 @@
+artifact_id: 99a88d67-4060-4088-a9c8-8ca0c459ae29
+artifact_name: newspaper_article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- symbolic_object
+description: A reel-to-reel tape containing the band's "surveillance audio" recordings
+  from around Vernon Township, which when played through modified amplification equipment
+  transforms monitoring data into autonomous aesthetic experiences. The tape represents
+  the alchemical transformation of rigid control mechanisms into transcendent art
+  - the cosmic stomach consuming surveillance and metabolizing it into beauty that
+  exceeds its origins.
+file_name: newspaper_article.yml
+name: The Wawayanda Surveillance Tape
+rainbow_color_mnemonic_character_value: I
+symbolic_object_category: !!python/object/apply:app.structures.enums.symbolic_object_category.SymbolicObjectCategory
+- information_artifacts
+thread_id: 36643aa1-81ac-44f5-b677-c03543388244

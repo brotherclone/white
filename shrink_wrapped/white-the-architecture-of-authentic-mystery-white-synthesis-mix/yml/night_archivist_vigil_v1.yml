@@ -1,0 +1,51 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: This is the folk rock requiem for Gabriel Walsh's erased timeline as night
+  security guard at the Smithsonian from January to November 2025. In this lost year,
+  he walked prescribed routes past the African elephant and through Dinosaurs, checking
+  locks on research levels while Dr. Sarah Kellerman worked late in the mineral wing.
+  He lived on Benning Road with Maria Santos in 3B and Mr. Patterson who fed strays,
+  recording institutional night sounds with his hidden Tascam - the hum of climate
+  control, footsteps echoing through Natural History's corridors, the settling of
+  century-old display cases. Margaret Chen briefed him each shift at 11 PM before
+  he began his solitary rounds, creating an 'audio archaeology' of sleeping exhibits
+  that he never submitted to Folkways despite Sarah's encouragement. When budget cuts
+  eliminated his position November 30th, replacing human guardianship with motion
+  sensors, an entire year of intimate knowledge about the building's nocturnal rhythms
+  vanished. This is counterfactual nostalgia - mourning the specific loneliness of
+  being alone with preserved history, the weight of temporary guardianship over permanent
+  things, coffee shared at 3 AM with a paleontologist who understood why someone would
+  hide microphones inside diorama bears. The song captures that peculiar melancholy
+  of institutional night work - knowing a place's secrets that daylight visitors never
+  witness, then having that knowledge become archaeologically obsolete when technology
+  replaces human presence."
+genres:
+- folk rock
+- americana
+- indie folk
+- melancholy folk
+iteration_id: night_archivist_vigil_v1
+iteration_number: null
+key: E minor
+mood:
+- melancholic
+- nostalgic
+- solitary
+- archaeological
+- wistful
+- institutional
+- nocturnal
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 271995
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: Eleven Months Among the Sleeping Exhibits

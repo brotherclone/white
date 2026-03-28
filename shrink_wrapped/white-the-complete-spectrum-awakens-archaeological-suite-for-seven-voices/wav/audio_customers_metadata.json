@@ -1,0 +1,34 @@
+{
+  "title": "6967c99e-7f3a-4170-8c0d-db21449ca93f_audio_infranym",
+  "duration_ms": 1592,
+  "tempo_bpm": 67,
+  "key_signature": "F# minor",
+  "layers": {
+    "surface": {
+      "text": "customers",
+      "voice_profile": "proclaim",
+      "duration_ms": 1592
+    },
+    "reverse": {
+      "text": "customers",
+      "voice_profile": "distorted",
+      "duration_ms": 1592
+    },
+    "submerged": {
+      "text": "customers",
+      "voice_profile": "ancient",
+      "duration_ms": 1592
+    }
+  },
+  "files": {
+    "composite": "/Volumes/LucidNonsense/White/chain_artifacts/6967c99e-7f3a-4170-8c0d-db21449ca93f/wav/audio_customers.wav",
+    "layers": {
+      "surface": "/Volumes/LucidNonsense/White/chain_artifacts/6967c99e-7f3a-4170-8c0d-db21449ca93f/wav/audio_customers_surface.wav",
+      "reverse": "/Volumes/LucidNonsense/White/chain_artifacts/6967c99e-7f3a-4170-8c0d-db21449ca93f/wav/audio_customers_reverse.wav",
+      "submerged": "/Volumes/LucidNonsense/White/chain_artifacts/6967c99e-7f3a-4170-8c0d-db21449ca93f/wav/audio_customers_submerged.wav"
+    }
+  },
+  "puzzle_solution": "customers",
+  "color_agent": "Indigo",
+  "album": "Untitled White Album"
+}

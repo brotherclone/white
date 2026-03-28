@@ -1,0 +1,77 @@
+abstract: A twisting tale of corruption and code. Murder in the Message Queue updates
+  the detective story for the digital era.
+acquisition_date: January 2024
+acquisition_notes: Acquired at auction, provenance unclear
+artifact_id: 6014ebc6-bc6b-41a3-b2ac-e079a1a862bf
+artifact_name: murder_in_the_message_queue
+author: Jim Chandler
+author_credentials: null
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+catalog_number: RA-2014-NOR-4296
+chain_artifact_file_type: yml
+chain_artifact_type: REDChainArtifactBook
+condition: fragmentary
+danger_level: 3
+edition: 1st
+excerpts:
+- 'The message queue hummed like a dying neon sign in the rain. Detective Ray Marlowe
+  squinted at the terminal screen, the green phosphor glow painting shadows across
+  his stubbled face. Three bodies in two days, all connected to the same distributed
+  system. Someone was using the network like a weapon, and the victims were piling
+  up faster than packets in a buffer overflow.
+
+
+  The first corpse belonged to Tommy "The Router" Kowalski, found face-down in his
+  cubicle at DataFlow Industries. The coroner said heart attack, but Ray knew better.
+  Tommy''s last commit to the codebase was at 11:47 PM—a single line that shouldn''t
+  have been there. A line that looked innocent enough until you understood what it
+  really did.
+
+
+  Ray lit another Lucky Strike and stared at the code. In this city, information was
+  currency, and someone had just counterfeited the Federal Reserve. The message queue
+  kept humming its electric lullaby, but Ray could hear something else underneath—the
+  sound of digital footsteps, walking toward another kill.'
+- 'The rain hammered the windows of the Bit & Byte Diner like machine-gun fire. Sarah
+  Chen sat in the corner booth, her laptop casting blue light across her porcelain
+  features. She was the kind of systems architect who could make grown programmers
+  weep—beautiful, brilliant, and dangerous as a buffer underrun.
+
+
+  "You''re playing with fire, Ray," she said without looking up from her screen. Her
+  fingers danced across the keyboard like a pianist performing her own funeral march.
+  "The Syndicate doesn''t like it when people ask questions about their infrastructure."
+
+
+  Ray slid into the booth opposite her, the vinyl creaking like old leather. "Three
+  programmers are dead, sweetheart. Someone''s been poisoning the well, and I intend
+  to find out who."
+
+
+  She finally looked up, her dark eyes reflecting the diner''s neon. "The message
+  queue isn''t just a communication protocol, detective. It''s a weapon. And whoever''s
+  pulling the strings has been planning this for a very long time."
+
+
+  Outside, the city''s data centers hummed with electronic life, but Ray could feel
+  death in the digital air.'
+file_name: murder_in_the_message_queue.yml
+isbn: 978-4-5929-1656-4
+language: English
+notable_quote: '"She walked in like bad code—beautiful, dangerous, and bound to crash
+  the system."'
+pages: 507
+publisher: Pulp Noir Editions
+publisher_type: occult
+rainbow_color_mnemonic_character_value: R
+related_works: []
+subtitle: null
+suppression_history: null
+tags:
+- murder
+- noir
+thread_id: 854d3242-96c5-40c4-89e9-bc82fcd1453d
+title: Murder in the Message Queue
+translated_from: null
+translator: null
+year: 2014
