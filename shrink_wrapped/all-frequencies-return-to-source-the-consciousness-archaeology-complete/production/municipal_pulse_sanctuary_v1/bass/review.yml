@@ -40,8 +40,8 @@ candidates:
         known: 0.3679
       confidence: 0.0152
       match: 0.1763
-  label: null
-  status: pending
+  label: bass
+  status: approved
   notes: ''
 - id: bass_arp_02
   midi_file: candidates/bass_arp_02.mid
@@ -72,8 +72,8 @@ candidates:
         known: 0.3676
       confidence: 0.0149
       match: 0.1762
-  label: null
-  status: pending
+  label: bass_alternate
+  status: approved
   notes: ''
 - id: bass_arp_03
   midi_file: candidates/bass_arp_03.mid
@@ -105,7 +105,7 @@ candidates:
       confidence: 0.0146
       match: 0.1761
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: bass_arp_04
   midi_file: candidates/bass_arp_04.mid
@@ -137,7 +137,7 @@ candidates:
       confidence: 0.0146
       match: 0.1761
   label: null
-  status: pending
+  status: rejected
   notes: ''
 - id: bass_arp_05
   midi_file: candidates/bass_arp_05.mid
@@ -169,5 +169,5 @@ candidates:
       confidence: 0.0148
       match: 0.176
   label: null
-  status: pending
+  status: rejected
   notes: ''
