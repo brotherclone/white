@@ -422,10 +422,14 @@ def generate_review_yaml(
             entry["bar_sources"] = item["bar_sources"]
         candidates.append(entry)
 
+    time_sig = song_info.get("time_sig", (4, 4))
     review = {
         "key": f"{song_info['key_root']} {song_info['mode'].lower()}",
         "bpm": song_info["bpm"],
+        "time_sig": f"{time_sig[0]}/{time_sig[1]}",
         "color": song_info["color_name"],
+        "thread": song_info.get("thread_dir", ""),
+        "song_proposal": song_info.get("song_filename", ""),
         "generated": datetime.now(timezone.utc).isoformat(),
         "seed": seed,
         "scoring_weights": scoring_weights,
