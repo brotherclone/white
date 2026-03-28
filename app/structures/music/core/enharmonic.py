@@ -24,9 +24,11 @@ flat_to_sharp: dict[str, str] = {
 sharp_to_flat: dict[str, str] = {
     "C#": "Db",
     "D#": "Eb",
+    "E#": "F",
     "F#": "Gb",
     "G#": "Ab",
     "A#": "Bb",
+    "B#": "C",
 }
 
 
@@ -35,5 +37,8 @@ def normalize_to_flat(note_str: str) -> str:
 
     Used when targeting systems (e.g. the chord database) that store
     accidentals as flats rather than sharps.
+
+    Handles both ASCII ``#`` and unicode ``♯`` sharp symbols.
     """
-    return sharp_to_flat.get(note_str, note_str)
+    normalised = note_str.replace("♯", "#")
+    return sharp_to_flat.get(normalised, normalised)

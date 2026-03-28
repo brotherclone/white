@@ -243,7 +243,7 @@ class TestChordPipelineCaller:
         from app.generators.midi.pipelines.chord_pipeline import load_song_proposal
 
         result = load_song_proposal(thread_dir, "song.yml")
-        assert result["key_root"] == "F#"
+        assert result["key_root"] == "Gb"  # F# normalised to flat spelling for chord DB
         assert result["mode"] == "Minor"
 
     def test_bpm_is_int(self, tmp_path):
