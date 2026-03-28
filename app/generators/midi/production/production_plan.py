@@ -186,8 +186,8 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
         mood=data.get("mood") or [],
         concept=str(data.get("concept", "")),
         sections=sections,
-        proposed_by=str(data.get("proposed_by", "")),
-        rationale=str(data.get("rationale", "")),
+        proposed_by=str(data.get("proposed_by") or ""),
+        rationale=str(data.get("rationale") or ""),
     )
 
 
@@ -202,14 +202,14 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
     data = {
         "song_slug": plan.song_slug,
         "generated": plan.generated,
-        "proposed_by": plan.proposed_by or None,
+        **({"proposed_by": plan.proposed_by} if plan.proposed_by else {}),
         "source_proposal": plan.source_proposal,
         "title": plan.title,
         "genres": plan.genres,
         "mood": plan.mood,
         "concept": plan.concept,
         "vocals_planned": plan.vocals_planned,
-        "rationale": plan.rationale or None,
+        **({"rationale": plan.rationale} if plan.rationale else {}),
         "sections": [
             {
                 "name": s.name,
@@ -485,8 +485,8 @@ def generate_plan(
     author a real arrangement arc with repeat counts, energy notes, and
     rationale.
 
-    Falls back silently to the mechanical plan if the Anthropic API is
-    unavailable or use_claude=False.
+    Falls back to the mechanical plan if the Anthropic API is unavailable or
+    use_claude=False; prints a warning to stdout on fallback but does not raise.
     """
     plan = generate_plan_mechanical(production_dir, proposal_path=proposal_path)
     if use_claude:
@@ -536,6 +536,7 @@ def refresh_plan(production_dir: Path) -> ProductionPlan:
             vocals=sec.vocals,
             notes=sec.notes,
             reason=sec.reason,
+            loops=dict(sec.loops),
         )
         updated._bar_source = source
         refreshed.append(updated)

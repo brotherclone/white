@@ -56,8 +56,8 @@ The model SHALL be `claude-sonnet-4-6`.
 
 `generate_plan()` SHALL accept a `use_claude: bool = True` parameter. When `True`
 it calls `propose_arrangement()` after building the mechanical inventory. When the
-API is unavailable or `use_claude=False`, it falls back silently to the mechanical
-plan with no error.
+API is unavailable or `use_claude=False`, it SHALL fall back to the mechanical
+plan without failing; it MAY print a warning to stdout but MUST NOT raise.
 
 The old mechanical-only path SHALL be available as `generate_plan_mechanical()`.
 
@@ -76,9 +76,9 @@ The `PlanSection` dataclass SHALL carry:
 - **THEN** `composition_proposal.yml` is written to the production directory
 - **AND** it contains `proposed_by: claude`, `generated` (ISO timestamp),
   `color_target`, `loop_inventory`, `rationale`, and `proposed_sections`
-- **AND** each entry in `proposed_sections` has: `name`, `repeat` (int ≥ 1),
-  `energy_note` (string), `transition_note` (string), `loops` (dict mapping
-  instrument → loop label)
+- **AND** each entry in `proposed_sections` has: `name`, `play_count` (int ≥ 1;
+  `repeat` accepted as a legacy alias), `energy_note` (string), `transition_note`
+  (string), `loops` (dict mapping instrument → loop label)
 - **AND** the top-level output contains a `sounds_like` list
 
 #### Scenario: Claude-authored plan via generate_plan

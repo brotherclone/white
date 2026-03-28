@@ -18,14 +18,14 @@ The system SHALL provide a command that generates a `production_plan.yml` file i
 - **THEN** a `production_plan.yml` is written to the production directory root
 - **AND** it contains one section entry per unique approved chord label
 - **AND** bar counts are derived from the `hr_distribution` field in the chord `review.yml` if present, otherwise from approved chord MIDI length, otherwise from chord count in the candidate
-- **AND** all sections default to `repeat: 1` and `vocals: false`
+- **AND** all sections default to `play_count: 1` and `vocals: false`
 - **AND** sections appear in the order they were labeled in the chord review
 
 #### Scenario: Refresh existing plan
 
 - **WHEN** `--refresh` flag is passed and a `production_plan.yml` already exists
 - **THEN** bar counts are recalculated from current approved loops
-- **AND** all human-edited fields (`repeat`, `vocals`, `notes`, `sounds_like`, section order) are preserved
+- **AND** all human-edited fields (`play_count`, `vocals`, `notes`, `loops`, section order) are preserved
 - **AND** sections present in the plan but no longer in approved chords are flagged with a warning but retained
 
 #### Scenario: No approved chords
@@ -37,10 +37,10 @@ The system SHALL provide a command that generates a `production_plan.yml` file i
 The `ProductionPlan` dataclass SHALL include the following fields:
 - `sections: list[PlanSection]` — ordered section entries
 - `rationale: str` — top-level compositional reasoning (empty string for mechanical plans)
-- `proposed_by: str` — `"claude"` or `"mechanical"`
+- `proposed_by: str` — `"claude"` when AI-authored, empty string for mechanical plans
 
 The `PlanSection` dataclass SHALL include:
-- `label: str`, `bars: int`, `play_count: int`, `energy: str`
+- `name: str`, `bars: int`, `play_count: int`, `vocals: bool`, `notes: str`, `loops: dict`
 - `reason: str` — one-sentence note on placement (empty string for mechanical plans)
 
 All fields SHALL survive a YAML save/load round-trip with no data loss.

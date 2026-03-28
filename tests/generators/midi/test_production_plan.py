@@ -559,25 +559,10 @@ class TestClaudeCompositionProposal:
             sections=sections,
         )
 
-    def test_propose_arrangement_sets_proposed_by(self, monkeypatch):
+    def test_propose_arrangement_sets_proposed_by(self, monkeypatch, tmp_path):
         from app.generators.midi.production import production_plan as pp
 
-        class FakeContent:
-            text = _MOCK_CLAUDE_RESPONSE
-
-        class FakeResponse:
-            content = [FakeContent()]
-
-        class FakeMessages:
-            def create(self, **kwargs):
-                return FakeResponse()
-
-        class FakeClient:
-            messages = FakeMessages()
-
-        monkeypatch.setattr(pp, "propose_arrangement", lambda plan: _apply_mock(plan))
-
-        def _apply_mock(plan):
+        def _fake_propose(plan):
             from app.generators.midi.production.production_plan import (
                 _parse_arrangement_response,
             )
@@ -590,11 +575,21 @@ class TestClaudeCompositionProposal:
             plan.proposed_by = "claude"
             return plan
 
-        plan = self._make_plan()
-        result = _apply_mock(plan)
+        monkeypatch.setattr(pp, "propose_arrangement", _fake_propose)
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_chord_review(
+            prod / "chords",
+            [
+                {"label": "Intro", "chord_count": 2},
+                {"label": "Verse", "chord_count": 4},
+                {"label": "Chorus", "chord_count": 4},
+                {"label": "Outro", "chord_count": 2},
+            ],
+        )
+        result = generate_plan(prod, use_claude=True)
         assert result.proposed_by == "claude"
         assert result.rationale != ""
-        assert "Rationale" in result.rationale or len(result.rationale) > 10
 
     def test_propose_arrangement_sets_reason_on_sections(self):
         from app.generators.midi.production.production_plan import (
