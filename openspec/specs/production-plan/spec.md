@@ -34,24 +34,26 @@ The system SHALL provide a command that generates a `production_plan.yml` file i
 - **THEN** the command exits with an error message and does not write a plan
 
 ### Requirement: Production Plan Schema
+The `ProductionPlan` dataclass SHALL include the following fields:
+- `sections: list[PlanSection]` — ordered section entries
+- `rationale: str` — top-level compositional reasoning (empty string for mechanical plans)
+- `proposed_by: str` — `"claude"` or `"mechanical"`
 
-The `production_plan.yml` SHALL conform to a defined schema capturing song structure and production metadata.
+The `PlanSection` dataclass SHALL include:
+- `label: str`, `bars: int`, `play_count: int`, `energy: str`
+- `reason: str` — one-sentence note on placement (empty string for mechanical plans)
 
-#### Scenario: Required top-level fields
+All fields SHALL survive a YAML save/load round-trip with no data loss.
 
-- **WHEN** a production plan is generated
-- **THEN** it SHALL contain: `song_slug`, `generated` (ISO timestamp), `bpm`, `time_sig`, `key`, `color`, `vocals_planned`, `sounds_like`, and `sections`
+#### Scenario: Round-trip preserves rationale and reasons
+- **WHEN** a Claude-authored plan is saved to YAML and reloaded
+- **THEN** `rationale`, `proposed_by`, and all per-section `reason` fields are identical
+  to the original
 
-#### Scenario: Section entry fields
-
-- **WHEN** a section is written to the plan
-- **THEN** each section entry SHALL contain: `name`, `bars` (integer), `repeat` (integer ≥ 1), `vocals` (bool), and `notes` (string, may be empty)
-
-#### Scenario: Human-editable
-
-- **WHEN** the human edits `production_plan.yml` directly
-- **THEN** the file remains valid and is read correctly by downstream phases
-- **AND** the human MAY reorder sections, change `repeat`, `vocals`, `notes`, and `sounds_like` without breaking any pipeline
+#### Scenario: Refresh preserves human edits
+- **WHEN** `refresh_plan()` is called on a plan where the user has manually edited
+  `play_count`, `reason`, or section order
+- **THEN** those edits are preserved and only `bars` is updated from the loop inventory
 
 ### Requirement: Drum Pipeline Section Context
 

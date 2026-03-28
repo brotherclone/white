@@ -16,6 +16,7 @@ from app.generators.midi.production.production_plan import (
     build_next_section_map,
     derive_bar_count,
     generate_plan,
+    generate_plan_mechanical,
     load_plan,
     refresh_plan,
     save_plan,
@@ -229,19 +230,19 @@ class TestGeneratePlan:
             {"label": "Chorus", "chord_count": 4},
         ]
         prod = self._setup(tmp_path, sections)
-        plan = generate_plan(prod)
+        plan = generate_plan_mechanical(prod)
         assert [s.name for s in plan.sections] == ["Intro", "Verse", "Chorus"]
 
     def test_bar_count_from_chord_count_fallback(self, tmp_path):
         prod = self._setup(tmp_path, [{"label": "Verse", "chord_count": 4}])
-        plan = generate_plan(prod)
+        plan = generate_plan_mechanical(prod)
         assert plan.sections[0].bars == 4
         assert plan.sections[0]._bar_source == "chord_count"
 
     def test_bar_count_from_chord_midi(self, tmp_path):
         prod = self._setup(tmp_path, [{"label": "verse", "chord_count": 4}])
         _write_chord_midi(prod / "chords" / "approved", "verse", bars=8)
-        plan = generate_plan(prod)
+        plan = generate_plan_mechanical(prod)
         assert plan.sections[0].bars == 8
         assert plan.sections[0]._bar_source == "chords"
 
@@ -258,7 +259,7 @@ class TestGeneratePlan:
             ],
         )
         _write_chord_midi(prod / "chords" / "approved", "verse", bars=4)
-        plan = generate_plan(prod)
+        plan = generate_plan_mechanical(prod)
         assert plan.sections[0].bars == 6  # sum([1.5, 0.5, 2.0, 2.0])
         assert plan.sections[0]._bar_source == "hr_distribution"
 
@@ -272,14 +273,14 @@ class TestGeneratePlan:
                 {"label": "Chorus", "chord_count": 4},
             ],
         )
-        plan = generate_plan(prod)
+        plan = generate_plan_mechanical(prod)
         names = [s.name for s in plan.sections]
         assert names.count("Verse") == 1
         assert len(plan.sections) == 2
 
     def test_metadata_from_chord_review(self, tmp_path):
         prod = self._setup(tmp_path, [{"label": "Verse", "chord_count": 4}], bpm=88)
-        plan = generate_plan(prod)
+        plan = generate_plan_mechanical(prod)
         assert plan.bpm == 88
         assert plan.color == "Black"
         assert plan.time_sig == "4/4"
@@ -293,13 +294,13 @@ class TestGeneratePlan:
         with open(chords_dir / "review.yml", "w") as f:
             yaml.dump({"bpm": 120, "candidates": []}, f)
         with pytest.raises(ValueError, match="No approved"):
-            generate_plan(prod)
+            generate_plan_mechanical(prod)
 
     def test_raises_when_no_chord_review(self, tmp_path):
         prod = tmp_path / "production" / "test_song"
         prod.mkdir(parents=True)
         with pytest.raises(FileNotFoundError):
-            generate_plan(prod)
+            generate_plan_mechanical(prod)
 
 
 # ---------------------------------------------------------------------------
@@ -312,7 +313,7 @@ class TestRefreshPlan:
         prod = tmp_path / "production" / "test_song"
         prod.mkdir(parents=True)
         _write_chord_review(prod / "chords", sections)
-        plan = generate_plan(prod)
+        plan = generate_plan_mechanical(prod)
         save_plan(plan, prod)
         return prod, plan
 
@@ -504,3 +505,215 @@ class TestBuildNextSectionMap:
             color="",
         )
         assert build_next_section_map(plan) == {}
+
+
+# ---------------------------------------------------------------------------
+# Claude composition proposal
+# ---------------------------------------------------------------------------
+
+
+_MOCK_CLAUDE_RESPONSE = """\
+```yaml
+proposed_sections:
+  - name: Intro
+    play_count: 1
+    energy_note: sparse and atmospheric
+  - name: Verse
+    play_count: 2
+    energy_note: builds tension
+  - name: Chorus
+    play_count: 3
+    energy_note: full release
+  - name: Outro
+    play_count: 1
+    energy_note: decay and silence
+```
+
+Rationale:
+The arrangement follows a classic arc — sparse intro, double verse to build,
+triple chorus for catharsis, then a single outro to dissolve. The color's axes
+demand accumulation before release.
+"""
+
+
+class TestClaudeCompositionProposal:
+    def _make_plan(self, sections=None):
+        if sections is None:
+            sections = [
+                PlanSection(name="Intro", bars=2),
+                PlanSection(name="Verse", bars=4, vocals=True),
+                PlanSection(name="Chorus", bars=4, vocals=True),
+                PlanSection(name="Outro", bars=2),
+            ]
+        return ProductionPlan(
+            song_slug="test_song",
+            generated="2026-02-18T10:00:00Z",
+            bpm=120,
+            time_sig="4/4",
+            key="C minor",
+            color="Black",
+            title="Test Song",
+            concept="A song about entropy",
+            mood=["melancholic", "abstract"],
+            genres=["krautrock"],
+            sections=sections,
+        )
+
+    def test_propose_arrangement_sets_proposed_by(self, monkeypatch):
+        from app.generators.midi.production import production_plan as pp
+
+        class FakeContent:
+            text = _MOCK_CLAUDE_RESPONSE
+
+        class FakeResponse:
+            content = [FakeContent()]
+
+        class FakeMessages:
+            def create(self, **kwargs):
+                return FakeResponse()
+
+        class FakeClient:
+            messages = FakeMessages()
+
+        monkeypatch.setattr(pp, "propose_arrangement", lambda plan: _apply_mock(plan))
+
+        def _apply_mock(plan):
+            from app.generators.midi.production.production_plan import (
+                _parse_arrangement_response,
+            )
+
+            updated, rationale = _parse_arrangement_response(
+                _MOCK_CLAUDE_RESPONSE, plan
+            )
+            plan.sections = updated
+            plan.rationale = rationale
+            plan.proposed_by = "claude"
+            return plan
+
+        plan = self._make_plan()
+        result = _apply_mock(plan)
+        assert result.proposed_by == "claude"
+        assert result.rationale != ""
+        assert "Rationale" in result.rationale or len(result.rationale) > 10
+
+    def test_propose_arrangement_sets_reason_on_sections(self):
+        from app.generators.midi.production.production_plan import (
+            _parse_arrangement_response,
+        )
+
+        plan = self._make_plan()
+        updated, rationale = _parse_arrangement_response(_MOCK_CLAUDE_RESPONSE, plan)
+        assert updated[0].reason == "sparse and atmospheric"
+        assert updated[1].reason == "builds tension"
+        assert updated[2].reason == "full release"
+        assert updated[3].reason == "decay and silence"
+
+    def test_propose_arrangement_sets_play_counts(self):
+        from app.generators.midi.production.production_plan import (
+            _parse_arrangement_response,
+        )
+
+        plan = self._make_plan()
+        updated, _ = _parse_arrangement_response(_MOCK_CLAUDE_RESPONSE, plan)
+        counts = {s.name: s.play_count for s in updated}
+        assert counts["Intro"] == 1
+        assert counts["Verse"] == 2
+        assert counts["Chorus"] == 3
+        assert counts["Outro"] == 1
+
+    def test_generate_plan_mechanical_still_works(self, tmp_path):
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_chord_review(
+            prod / "chords",
+            [{"label": "Verse", "chord_count": 4}],
+        )
+        plan = generate_plan_mechanical(prod)
+        assert plan.sections[0].name == "Verse"
+        assert plan.proposed_by == ""
+        assert plan.rationale == ""
+
+    def test_generate_plan_use_claude_false_skips_claude(self, tmp_path):
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_chord_review(
+            prod / "chords",
+            [{"label": "Verse", "chord_count": 4}],
+        )
+        plan = generate_plan(prod, use_claude=False)
+        assert plan.proposed_by == ""
+        assert plan.rationale == ""
+
+    def test_generate_plan_falls_back_on_api_error(self, tmp_path, monkeypatch):
+        from app.generators.midi.production import production_plan as pp
+
+        def _raise(_plan):
+            raise RuntimeError("API unavailable")
+
+        monkeypatch.setattr(pp, "propose_arrangement", _raise)
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_chord_review(
+            prod / "chords",
+            [{"label": "Verse", "chord_count": 4}],
+        )
+        plan = generate_plan(prod, use_claude=True)
+        # Fell back to mechanical — no Claude fields
+        assert plan.proposed_by == ""
+        assert plan.rationale == ""
+
+
+class TestReasonFieldRoundTrip:
+    def test_reason_saved_and_loaded(self, tmp_path):
+        plan = ProductionPlan(
+            song_slug="s",
+            generated="",
+            bpm=120,
+            time_sig="4/4",
+            key="",
+            color="",
+            sections=[
+                PlanSection(
+                    name="verse", bars=4, play_count=2, reason="build tension here"
+                ),
+                PlanSection(name="chorus", bars=4, reason=""),
+            ],
+        )
+        save_plan(plan, tmp_path)
+        loaded = load_plan(tmp_path)
+        assert loaded.sections[0].reason == "build tension here"
+        assert loaded.sections[1].reason == ""
+
+    def test_reason_absent_in_yaml_defaults_to_empty(self, tmp_path):
+        # Write plan YAML without reason field (old format)
+        plan_path = tmp_path / PLAN_FILENAME
+        data = {
+            "song_slug": "s",
+            "generated": "",
+            "sections": [
+                {
+                    "name": "verse",
+                    "bars": 4,
+                    "play_count": 1,
+                    "vocals": False,
+                    "notes": "",
+                }
+            ],
+        }
+        with open(plan_path, "w") as f:
+            yaml.dump(data, f)
+        loaded = load_plan(tmp_path)
+        assert loaded.sections[0].reason == ""
+
+    def test_refresh_preserves_reason(self, tmp_path):
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_chord_review(prod / "chords", [{"label": "verse", "chord_count": 4}])
+        plan = generate_plan_mechanical(prod)
+        plan.sections[0].reason = "Claude said: slow burn"
+        plan.proposed_by = "claude"
+        save_plan(plan, prod)
+
+        refreshed = refresh_plan(prod)
+        assert refreshed.sections[0].reason == "Claude said: slow burn"
+        assert refreshed.proposed_by == "claude"
