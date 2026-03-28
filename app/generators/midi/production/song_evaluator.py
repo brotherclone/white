@@ -293,8 +293,8 @@ def _compute_arrangement_metrics(production_dir: Path) -> dict:
     """
     plan = load_plan(production_dir)
     if plan is not None and plan.sections:
-        total_bars = sum(s.bars * s.repeat for s in plan.sections)
-        vocal_bars = sum(s.bars * s.repeat for s in plan.sections if s.vocals)
+        total_bars = sum(s.bars * s.play_count for s in plan.sections)
+        vocal_bars = sum(s.bars * s.play_count for s in plan.sections if s.vocals)
         all_names = [s.name for s in plan.sections]
         unique_names = set(all_names)
         unique_sections = len(unique_names)
