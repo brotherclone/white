@@ -1,0 +1,54 @@
+agent_name: Sub-Arbitrary (Green Agent)
+bpm: 72
+concept: This composition maps the acoustic archaeology of compound extinction - the
+  simultaneous disappearance of vaquita echolocation and traditional fishing knowledge
+  in the Upper Gulf of California. The piece functions as inherited hydrophone data,
+  translating María Elena Vásquez's dawn vigils into sonic memorial. Beginning with
+  reconstructed vaquita click-trains at their historical frequencies (130-150 kHz
+  downshifted to human audible range), the composition gradually subtracts biological
+  presence while amplifying the apparatus of listening itself. Field recordings from
+  abandoned fishing boats layer beneath processed hydrophone static, creating a soundscape
+  where absence becomes presence. The 72 BPM pulse mirrors the rhythm of morning equipment
+  checks - the ritual precision María Elena developed for measuring emptiness. Each
+  seven-minute cycle removes another frequency band where porpoise calls once mapped
+  the gulf, until only the hum of monitoring equipment remains. This is not music
+  about extinction but music AS extinction archaeology - the composition becomes the
+  hydrophone, inheriting the responsibility to listen for what's no longer there.
+  The piece preserves the structural relationship between scientific precision and
+  ritual mourning, encoding how consciousness adapts its tools when the world disappears
+  beneath them.
+genres:
+- acoustic ecology
+- ambient
+- field recording
+- drone
+- memorial
+- experimental
+- sound archaeology
+iteration_id: acoustic_void_inheritance_v1
+iteration_number: null
+key: D minor
+mood:
+- elegiac
+- haunting
+- precise
+- archaeological
+- mournful
+- reverent
+- empty
+- listening
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 11259245
+  mnemonic_character_value: G
+  objectional_mode: Place
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Hydrophone Inherits Silence

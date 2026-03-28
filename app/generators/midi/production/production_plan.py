@@ -43,9 +43,10 @@ MANIFEST_BOOTSTRAP_FILENAME = "manifest_bootstrap.yml"
 class PlanSection:
     name: str
     bars: int
-    repeat: int = 1
+    play_count: int = 1
     vocals: bool = False
     notes: str = ""
+    reason: str = ""  # Claude's per-section compositional note
     loops: dict = field(default_factory=dict)  # {instrument: loop_name}
     _bar_source: str = field(default="", repr=False)  # derivation source (internal)
 
@@ -162,9 +163,10 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
             PlanSection(
                 name=s["name"],
                 bars=int(s["bars"]),
-                repeat=int(s.get("repeat", 1)),
+                play_count=int(s.get("play_count", s.get("repeat", 1))),
                 vocals=bool(s.get("vocals", False)),
                 notes=str(s.get("notes", "") or ""),
+                reason=str(s.get("reason", "") or ""),
                 loops=dict(s.get("loops") or {}),
             )
         )
@@ -184,8 +186,8 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
         mood=data.get("mood") or [],
         concept=str(data.get("concept", "")),
         sections=sections,
-        proposed_by=str(data.get("proposed_by", "")),
-        rationale=str(data.get("rationale", "")),
+        proposed_by=str(data.get("proposed_by") or ""),
+        rationale=str(data.get("rationale") or ""),
     )
 
 
@@ -200,21 +202,22 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
     data = {
         "song_slug": plan.song_slug,
         "generated": plan.generated,
-        "proposed_by": plan.proposed_by or None,
+        **({"proposed_by": plan.proposed_by} if plan.proposed_by else {}),
         "source_proposal": plan.source_proposal,
         "title": plan.title,
         "genres": plan.genres,
         "mood": plan.mood,
         "concept": plan.concept,
         "vocals_planned": plan.vocals_planned,
-        "rationale": plan.rationale or None,
+        **({"rationale": plan.rationale} if plan.rationale else {}),
         "sections": [
             {
                 "name": s.name,
                 "bars": s.bars,
-                "repeat": s.repeat,
+                "play_count": s.play_count,
                 "vocals": s.vocals,
                 "notes": s.notes,
+                **({"reason": s.reason} if s.reason else {}),
                 **({"loops": s.loops} if s.loops else {}),
             }
             for s in plan.sections
@@ -357,11 +360,11 @@ def _parse_time_sig(time_sig_str: str) -> tuple[int, int]:
     return (int(parts[0]), int(parts[1]))
 
 
-def generate_plan(
+def generate_plan_mechanical(
     production_dir: Path,
     proposal_path: Optional[Path] = None,
 ) -> ProductionPlan:
-    """Generate a production_plan.yml from approved chord sections.
+    """Generate a production_plan.yml from approved chord sections (mechanical).
 
     Sections appear in the order they were labeled in the chord review.
     Bar counts are derived from approved MIDI files where available.
@@ -470,6 +473,32 @@ def generate_plan(
     )
 
 
+def generate_plan(
+    production_dir: Path,
+    proposal_path: Optional[Path] = None,
+    use_claude: bool = True,
+) -> ProductionPlan:
+    """Generate a production plan, optionally with Claude arrangement proposal.
+
+    Builds a mechanical inventory from approved chord sections, then — if
+    use_claude=True (default) — calls propose_arrangement() to have Claude
+    author a real arrangement arc with repeat counts, energy notes, and
+    rationale.
+
+    Falls back to the mechanical plan if the Anthropic API is unavailable or
+    use_claude=False; prints a warning to stdout on fallback but does not raise.
+    """
+    plan = generate_plan_mechanical(production_dir, proposal_path=proposal_path)
+    if use_claude:
+        try:
+            plan = propose_arrangement(plan)
+        except Exception as e:
+            print(
+                f"  Warning: Claude arrangement unavailable ({e}) — using mechanical plan"
+            )
+    return plan
+
+
 def refresh_plan(production_dir: Path) -> ProductionPlan:
     """Reload bar counts from current approved loops, preserving human edits."""
     existing = load_plan(production_dir)
@@ -503,9 +532,11 @@ def refresh_plan(production_dir: Path) -> ProductionPlan:
         updated = PlanSection(
             name=sec.name,
             bars=bars,
-            repeat=sec.repeat,
+            play_count=sec.play_count,
             vocals=sec.vocals,
             notes=sec.notes,
+            reason=sec.reason,
+            loops=dict(sec.loops),
         )
         updated._bar_source = source
         refreshed.append(updated)
@@ -549,7 +580,7 @@ def bootstrap_manifest(production_dir: Path) -> Path:
     structure = []
     cursor = 0.0
     for sec in plan.sections:
-        total_bars = sec.bars * sec.repeat
+        total_bars = sec.bars * sec.play_count
         duration = total_bars * seconds_per_bar
         end = cursor + duration
 
@@ -644,10 +675,10 @@ The YAML block MUST follow this exact schema:
 ```yaml
 proposed_sections:
   - name: <section_name>
-    repeat: <integer>
+    play_count: <integer — total number of times this block plays>
     energy_note: <brief energy/mood description>
   - name: <section_name>
-    repeat: <integer>
+    play_count: <integer — total number of times this block plays>
     energy_note: <brief energy/mood description>
 ```
 
@@ -723,14 +754,15 @@ def _parse_arrangement_response(raw: str, plan: ProductionPlan) -> tuple[list, s
         if original is None:
             print(f"  Warning: proposed section '{name}' not in plan — skipped")
             continue
-        repeat = int(entry.get("repeat", 1))
+        play_count = int(entry.get("play_count", entry.get("repeat", 1)))
         energy_note = str(entry.get("energy_note", "") or "").strip()
         sec = PlanSection(
             name=original.name,
             bars=original.bars,
-            repeat=max(1, repeat),
+            play_count=max(1, play_count),
             vocals=original.vocals,
-            notes=energy_note or original.notes,
+            notes=original.notes,
+            reason=energy_note,
             loops=dict(original.loops),
         )
         updated.append(sec)
@@ -817,9 +849,9 @@ def main():
         help="Emit partial manifest YAML from completed plan",
     )
     parser.add_argument(
-        "--propose",
+        "--no-claude",
         action="store_true",
-        help="Call Claude to propose an arrangement arc (repeat counts, energy arc, rationale)",
+        help="Skip Claude arrangement proposal and use the mechanical section inventory",
     )
     args = parser.parse_args()
 
@@ -846,6 +878,7 @@ def main():
         print(f"ERROR: Song proposal not found: {proposal_path}")
         sys.exit(1)
 
+    use_claude = not args.no_claude
     try:
         if args.refresh:
             plan = refresh_plan(prod_path)
@@ -866,13 +899,10 @@ def main():
                     f"ERROR: {PLAN_FILENAME} already exists. Use --refresh to update."
                 )
                 sys.exit(1)
-            plan = generate_plan(prod_path, proposal_path=proposal_path)
-            print("Mode: generate")
-
-        if args.propose:
-            print("\nCalling Claude to propose arrangement arc...")
-            plan = propose_arrangement(plan)
-            print("  Arrangement proposed by Claude.")
+            plan = generate_plan(
+                prod_path, proposal_path=proposal_path, use_claude=use_claude
+            )
+            print(f"Mode: generate ({'claude' if use_claude else 'mechanical'})")
     except (FileNotFoundError, ValueError) as e:
         print(f"ERROR: {e}")
         sys.exit(1)
@@ -888,9 +918,10 @@ def main():
     print(f"\nSections ({len(plan.sections)}):")
     for sec in plan.sections:
         source = f"[from {sec._bar_source}]" if sec._bar_source else ""
+        reason_str = f"  — {sec.reason}" if sec.reason else ""
         print(
-            f"  {sec.name:<15} {sec.bars} bars × {sec.repeat}"
-            f"  vocals={sec.vocals}  {source}"
+            f"  {sec.name:<15} {sec.bars} bars × {sec.play_count}"
+            f"  vocals={sec.vocals}  {source}{reason_str}"
         )
     if plan.rationale:
         print(
@@ -898,7 +929,7 @@ def main():
         )
     print(f"\nPlan written: {out_path}")
     if not plan.proposed_by:
-        print(f"Edit {PLAN_FILENAME} to set repeat counts, vocals, and section order")
+        print(f"Edit {PLAN_FILENAME} to set play_count, vocals, and section order")
     else:
         print(f"Edit {PLAN_FILENAME} to override Claude's arrangement choices")
 

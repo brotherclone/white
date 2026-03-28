@@ -1,0 +1,52 @@
+agent_name: Prism (Information Architect)
+bpm: 68
+concept: 'This composition functions as a self-inverting classification engine where
+  systematic documentation of phantom phenomena creates the very presence it attempts
+  to catalog. The piece operates through three nested taxonomic systems - medical,
+  musical, and meta-taxonomic - that progressively dissolve their own authority. Beginning
+  with sterile clinical observation at 68 BPM (a documentation heartbeat), the 7/8
+  time signature creates a phantom limb reaching perpetually for the missing eighth
+  beat. F# minor''s six sharps represent maximum harmonic complexity before enharmonic
+  collapse, while EVP fragments serve as conjuration grammar for undocumentable phenomena.
+  The composition transmigrates from INFORMATION (clinical data) toward TIME (obsessive
+  repetition) through reverse taxonomy - unclassifying in order to bring into being
+  what classification cannot contain. Each phase dissolves boundaries: observer becomes
+  observed, documentation becomes confession, absence becomes more present than actual
+  sound. The missing elements achieve materialization through strategic incompletion,
+  creating a phantom limb of music itself.'
+genres:
+- dark ambient
+- glitch
+- field recording
+- experimental electronic
+- drone
+- industrial
+- neoclassical
+- EVP
+iteration_id: phantom_taxonomy_dissolution_v1
+iteration_number: null
+key: F# minor
+mood:
+- clinical
+- obsessive
+- dissolving
+- intimate
+- conjuring
+- systematic
+- vulnerable
+- haunting
+rainbow_color:
+  color_name: Black
+  file_prefix: null
+  hex_value: 0
+  mnemonic_character_value: Z
+  objectional_mode: Thing
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Present
+  transmigrational_mode: null
+tempo:
+  denominator: 8
+  numerator: 7
+timestamp: null
+title: Field Guide to Phantom Limbs

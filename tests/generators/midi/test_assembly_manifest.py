@@ -243,8 +243,8 @@ class TestDeriveSections:
 
 
 def _make_plan(sections_spec: list[tuple]) -> ProductionPlan:
-    """Create a minimal ProductionPlan from (name, bars, repeat) tuples."""
-    sections = [PlanSection(name=n, bars=b, repeat=r) for n, b, r in sections_spec]
+    """Create a minimal ProductionPlan from (name, bars, play_count) tuples."""
+    sections = [PlanSection(name=n, bars=b, play_count=r) for n, b, r in sections_spec]
     return ProductionPlan(
         song_slug="test_song",
         generated="2026-01-01T00:00:00+00:00",

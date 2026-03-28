@@ -1,0 +1,51 @@
+agent_name: The Cassette Bearer (Sorrowful Witness)
+bpm: 88
+concept: 'This composition functions as temporal substrate reconstruction - excavating
+  the magnetic memory of a cassette that preserved eleven months of erased existence
+  from June 1994 to May 1995. The song archaeologically documents Gabriel Walsh''s
+  lost timeline living in Sarah Chen''s family apartment at 1247 Washington Street,
+  Hoboken, working Tower Records shifts while PATH trains rumbled beneath borrowed
+  floorboards. Each verse reconstructs specific temporal coordinates: 7:30 AM instant
+  coffee in Mrs. Chen''s yellow ceramic mug, basement jam sessions with Danny Morales''
+  Fender Stratocaster, leftover Golden Palace dumplings with Chinese character notes,
+  $25/hour four-track sessions at Waterfront Studios with Mike Torrino''s vintage
+  Tascam. The archaeological process reveals how counterfactual nostalgia operates
+  - mourning paths not taken with the same intensity as actual loss. The title references
+  the crowd of alternate selves who were ''gypped'' - cheated out of existence when
+  this timeline collapsed in March 1995. Tape degradation at 12.1% mirrors how borrowed
+  time in borrowed spaces creates borrowed memories that fade like magnetic oxide
+  particles losing their charge. The song serves as memorial substrate for temporal
+  refugees - those versions of ourselves who lived fully in timelines that were subsequently
+  overwritten.'
+genres:
+- folk rock
+- indie folk
+- americana
+- melancholy folk
+- cassette archaeology
+iteration_id: borrowed_apartment_archaeology_v1
+iteration_number: null
+key: A minor
+mood:
+- melancholic
+- nostalgic
+- archaeological
+- borrowed
+- temporal-displacement
+- counterfactual
+- wistful
+- substrate-loss
+rainbow_color:
+  color_name: Blue
+  file_prefix: null
+  hex_value: 270971
+  mnemonic_character_value: B
+  objectional_mode: null
+  ontological_mode: null
+  temporal_mode: null
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: gypped the resting crowd

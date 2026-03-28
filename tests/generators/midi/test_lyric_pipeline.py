@@ -350,7 +350,7 @@ class TestBuildPrompt:
             {
                 "name": "verse",
                 "bars": 4,
-                "repeat": 2,
+                "play_count": 2,
                 "total_notes": 20,
                 "contour": "stepwise",
             }
@@ -367,7 +367,7 @@ class TestBuildPrompt:
             {
                 "name": "verse",
                 "bars": 4,
-                "repeat": 1,
+                "play_count": 1,
                 "total_notes": 52,
                 "contour": "arpeggiated",
             }
@@ -385,14 +385,14 @@ class TestBuildPrompt:
             {
                 "name": "verse",
                 "bars": 4,
-                "repeat": 2,
+                "play_count": 2,
                 "total_notes": 20,
                 "contour": "stepwise",
             },
             {
                 "name": "chorus",
                 "bars": 2,
-                "repeat": 4,
+                "play_count": 4,
                 "total_notes": 10,
                 "contour": "arpeggiated",
             },
@@ -913,7 +913,7 @@ class TestBuildWhiteCutupPrompt:
             {
                 "name": "verse",
                 "bars": 4,
-                "repeat": 1,
+                "play_count": 1,
                 "total_notes": 16,
                 "contour": "stepwise",
                 "phrases": [],
@@ -973,7 +973,7 @@ class TestBuildWhiteCutupPrompt:
             {
                 "name": "verse",
                 "bars": 4,
-                "repeat": 1,
+                "play_count": 1,
                 "total_notes": 16,
                 "contour": "stepwise",
                 "phrases": [],

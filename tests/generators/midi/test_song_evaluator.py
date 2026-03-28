@@ -356,8 +356,8 @@ def test_arrangement_total_bars_counts_repeat(tmp_path):
     _make_plan(
         tmp_path,
         [
-            PlanSection(name="verse", bars=4, repeat=2),
-            PlanSection(name="chorus", bars=8, repeat=1),
+            PlanSection(name="verse", bars=4, play_count=2),
+            PlanSection(name="chorus", bars=8, play_count=1),
         ],
     )
     arr = _compute_arrangement_metrics(tmp_path)
@@ -368,10 +368,10 @@ def test_arrangement_section_variety(tmp_path):
     _make_plan(
         tmp_path,
         [
-            PlanSection(name="intro", bars=4, repeat=1),
-            PlanSection(name="verse", bars=4, repeat=1),
-            PlanSection(name="verse", bars=4, repeat=1),
-            PlanSection(name="outro", bars=4, repeat=1),
+            PlanSection(name="intro", bars=4, play_count=1),
+            PlanSection(name="verse", bars=4, play_count=1),
+            PlanSection(name="verse", bars=4, play_count=1),
+            PlanSection(name="outro", bars=4, play_count=1),
         ],
     )
     arr = _compute_arrangement_metrics(tmp_path)
@@ -383,8 +383,8 @@ def test_arrangement_vocal_coverage(tmp_path):
     _make_plan(
         tmp_path,
         [
-            PlanSection(name="intro", bars=4, repeat=1, vocals=False),
-            PlanSection(name="verse", bars=4, repeat=2, vocals=True),
+            PlanSection(name="intro", bars=4, play_count=1, vocals=False),
+            PlanSection(name="verse", bars=4, play_count=2, vocals=True),
         ],
     )
     arr = _compute_arrangement_metrics(tmp_path)
@@ -797,7 +797,7 @@ class TestRescoreLyrics:
             color="Red",
             title="Test Song",
             concept="a red concept",
-            sections=[PlanSection(name="verse", bars=4, repeat=1, vocals=True)],
+            sections=[PlanSection(name="verse", bars=4, play_count=1, vocals=True)],
         )
         save_plan(plan, prod_dir)
         return prod_dir

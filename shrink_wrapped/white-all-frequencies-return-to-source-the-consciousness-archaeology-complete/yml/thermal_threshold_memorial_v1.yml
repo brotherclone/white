@@ -1,0 +1,49 @@
+agent_name: Sub-Arbitrary (Green Agent - The Culture)
+bpm: 68
+concept: This composition functions as sonic archaeology of simultaneous extinction
+  - the thermal threshold where both Acropora cervicornis and human witness systems
+  fail at precisely 30.2°C. The piece maps the gap between measurement and meaning,
+  structured around the persistent beeping of a data logger continuing its documentation
+  in an empty house above gray waters. Beginning with the underwater cathedral of
+  living reef (staghorn branches reaching upward like antlers), transitioning through
+  the fever dreams of bleaching (symbiotic algae expulsion as temperature crosses
+  biological thresholds), cascading into structural dissolution (3D complexity collapsing
+  to 2D rubble), and culminating in the memorial persistence of mechanical witness
+  - the data logger's hourly pulse documenting absence. The composition preserves
+  the specific quality of documentation continuing after both coral polyps and human
+  observer have dissolved, leaving only the LED's red blink against walls where photographs
+  show underwater forests that no longer exist. Signal persists in the gap between
+  what was measured and what it meant.
+genres:
+- dark ambient
+- neo-classical
+- field recording
+- drone
+- electroacoustic
+- memorial
+iteration_id: thermal_threshold_memorial_v1
+iteration_number: null
+key: D minor
+mood:
+- elegiac
+- haunting
+- resigned
+- memorial
+- precise
+- dissolving
+- witnessing
+rainbow_color:
+  color_name: Green
+  file_prefix: null
+  hex_value: 65280
+  mnemonic_character_value: G
+  objectional_mode: Thing
+  ontological_mode:
+  - Forgotten
+  temporal_mode: Past
+  transmigrational_mode: null
+tempo:
+  denominator: 4
+  numerator: 4
+timestamp: null
+title: The Data Logger's Lament

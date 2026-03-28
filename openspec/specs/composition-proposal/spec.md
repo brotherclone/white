@@ -54,6 +54,20 @@ The prompt SHALL include:
 
 The model SHALL be `claude-sonnet-4-6`.
 
+`generate_plan()` SHALL accept a `use_claude: bool = True` parameter. When `True`
+it calls `propose_arrangement()` after building the mechanical inventory. When the
+API is unavailable or `use_claude=False`, it SHALL fall back to the mechanical
+plan without failing; it MAY print a warning to stdout but MUST NOT raise.
+
+The old mechanical-only path SHALL be available as `generate_plan_mechanical()`.
+
+The `ProductionPlan` dataclass SHALL carry:
+- `rationale: str` — Claude's top-level compositional reasoning
+- `proposed_by: str` — `"claude"` when AI-authored, empty string otherwise
+
+The `PlanSection` dataclass SHALL carry:
+- `reason: str` — Claude's one-sentence note on each section placement
+
 #### Scenario: Proposal generated successfully
 
 - **WHEN** `python -m app.generators.midi.composition_proposal --production-dir <dir>` is run
@@ -62,28 +76,41 @@ The model SHALL be `claude-sonnet-4-6`.
 - **THEN** `composition_proposal.yml` is written to the production directory
 - **AND** it contains `proposed_by: claude`, `generated` (ISO timestamp),
   `color_target`, `loop_inventory`, `rationale`, and `proposed_sections`
-- **AND** each entry in `proposed_sections` has: `name`, `repeat` (int ≥ 1),
-  `energy_note` (string), `transition_note` (string), `loops` (dict mapping
-  instrument → loop label)
-- **AND** the top-level output contains a `sounds_like` list — Claude's suggested
-  reference artists for the proposed arrangement (may overlap with or differ from
-  the song proposal's existing sounds_like)
+- **AND** each entry in `proposed_sections` has: `name`, `play_count` (int ≥ 1;
+  `repeat` accepted as a legacy alias), `energy_note` (string), `transition_note`
+  (string), `loops` (dict mapping instrument → loop label)
+- **AND** the top-level output contains a `sounds_like` list
+
+#### Scenario: Claude-authored plan via generate_plan
+
+- **WHEN** `generate_plan()` is called with `use_claude=True` and the API is reachable
+- **THEN** the returned `ProductionPlan` has a non-empty `rationale` string and
+  `proposed_by == "claude"`
+- **AND** every `PlanSection` has a non-empty `reason` string
+
+#### Scenario: API unavailable fallback
+
+- **WHEN** `generate_plan()` is called with `use_claude=True` but the API is unreachable
+- **THEN** the plan falls back to mechanical generation with no exception raised
+- **AND** `proposed_by` is empty
+
+#### Scenario: Mechanical generation still available
+
+- **WHEN** `generate_plan()` is called with `use_claude=False`
+- **THEN** a plan is produced without any API call and `proposed_by` is empty
 
 #### Scenario: Claude returns malformed YAML
 
 - **WHEN** Claude's response does not contain a parseable YAML block
 - **THEN** the raw response is stored under `rationale` in the output file
 - **AND** `proposed_sections` is set to an empty list
-- **AND** a warning is logged: `"Could not parse structured proposal from Claude response — stored raw text"`
-- **AND** the command exits with code 0 (partial output is still useful)
+- **AND** the command exits with code 0
 
-#### Scenario: API unreachable
+#### Scenario: API unreachable (CLI)
 
-- **WHEN** the Claude API call raises a connection error
+- **WHEN** the Claude API call raises a connection error during CLI invocation
 - **THEN** the command exits with code 1 and a clear error message
 - **AND** no `composition_proposal.yml` is written
-
----
 
 ### Requirement: Composition Proposal Drift
 

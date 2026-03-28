@@ -1,0 +1,99 @@
+artifact_id: 6dee8a8b-5ceb-424e-b0cf-5d5fece1d633
+artifact_name: Sussex County Courier - Strange Frequencies Article
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: !!python/object/apply:app.structures.enums.chain_artifact_file_type.ChainArtifactFileType
+- yml
+chain_artifact_type: !!python/object/apply:app.structures.enums.chain_artifact_type.ChainArtifactType
+- newspaper_article
+date: '1980-06-24'
+file_name: Sussex County Courier - Strange Frequencies Article.yml
+  Frequencies Article.yml
+headline: Local Band's Equipment Malfunctions Lead to Psychiatric Episodes at Vernon
+  High
+location: Vernon Township, NJ
+rainbow_color_mnemonic_character_value: O
+source: Sussex County Courier
+tags:
+- local music
+- unexplained phenomena
+- mental health
+- teenage delinquency
+- surveillance
+text: 'VERNON TOWNSHIP - A series of unexplained incidents at Vernon Township High
+  School has prompted an investigation by both school officials and Sussex County
+  health authorities after several students experienced what medical personnel are
+  describing as "acute dissociative episodes" during a scheduled assembly last Friday.
+
+
+  The incidents occurred during a performance by local rock band "Metabolic Bridge,"
+  composed of five Vernon High students who had been granted permission to perform
+  as part of the school''s year-end activities. According to witnesses, the band''s
+  electronic equipment began producing what senior class president Jennifer Walsh
+  described as "sounds that weren''t music anymore - like the amplifiers were digesting
+  something."
+
+
+  Principal Robert Hendricks reported that approximately 20 minutes into the performance,
+  several audience members began exhibiting unusual behavior. "Students were standing
+  up and moving in synchronized patterns," Hendricks said. "They seemed to be responding
+  to frequencies that the rest of us couldn''t hear clearly."
+
+
+  Seven students were transported to Newton Memorial Hospital for observation after
+  displaying symptoms including temporary memory loss, repetitive speech patterns,
+  and what Dr. Patricia Morse described as "a form of collective echolalia - they
+  kept repeating the phrase ''m to the'' in unison."
+
+
+  Band member David Chen, 17, claimed the equipment malfunctioned after they attempted
+  to incorporate what he called "surveillance audio" into their set. "We''d been recording
+  around town - just ambient sounds, police scanners, that kind of thing," Chen explained.
+  "When we played it back through our system, something changed. The sounds started...
+  processing differently."
+
+
+  The band''s lead vocalist, Sarah Kline, 18, remains hospitalized for psychiatric
+  evaluation after reportedly claiming she could "hear the town thinking" during the
+  performance. Her parents declined to comment.
+
+
+  School custodian Frank Petrosky, who was operating the assembly''s recording equipment,
+  reported that his surveillance cameras captured only static during the 20-minute
+  period when the incidents occurred. "Never seen anything like it," Petrosky said.
+  "It''s like the cameras were trying to digest what they were seeing instead of just
+  recording it."
+
+
+  The band''s equipment was confiscated by school officials and is currently being
+  examined by technicians from Bell Laboratories in Murray Hill. A preliminary report
+  suggests the amplification system had been modified in ways that "exceed conventional
+  understanding of audio processing."
+
+
+  Sussex County Sheriff''s Department spokesman Lieutenant Michael Torres confirmed
+  that several noise complaints had been filed against the band in recent months,
+  with residents reporting that their music could be heard "from inside houses with
+  all windows closed" and that the sounds seemed to "follow you home."
+
+
+  The band, which formed six months ago, had been rehearsing in an abandoned radar
+  installation on the Wawayanda State Park border. Park officials report no record
+  of granting permission for such use, and the installation, built during World War
+  II, was supposedly decommissioned in 1963.
+
+
+  Three of the five band members - Chen, bassist Michael Torres (no relation to the
+  sheriff''s spokesman), and drummer Lisa Varga - were released to their parents following
+  questioning. Their whereabouts are currently unknown, as all three failed to return
+  home Sunday evening.
+
+
+  Vernon Township has suspended all student musical performances pending the completion
+  of the investigation. The school''s audio-visual equipment room remains sealed by
+  order of the health department.
+
+
+  Anyone with information regarding the missing students is asked to contact the Sussex
+  County Sheriff''s Department. Residents experiencing unusual auditory phenomena
+  are advised to report incidents to the county health office.'
+thread_id: 36643aa1-81ac-44f5-b677-c03543388244

@@ -462,3 +462,69 @@ class TestMelodyPipelineIntegration:
         assert review["singer"] == "Gabriel"
         assert len(review["candidates"]) > 0
         assert all("use_case" in c for c in review["candidates"])
+        assert all(
+            c["use_case"] in ("vocal", "instrumental") for c in review["candidates"]
+        )
+
+
+class TestUseCasePromotion:
+    def _write_review(self, melody_dir, candidates, tmp_path):
+        candidates_dir = melody_dir / "candidates"
+        candidates_dir.mkdir(parents=True)
+        for c in candidates:
+            (candidates_dir / f"{c['id']}.mid").write_bytes(b"MIDI")
+        review = {"pipeline": "melody-generation", "candidates": candidates}
+        review_path = melody_dir / "review.yml"
+        with open(review_path, "w") as f:
+            yaml.dump(review, f)
+        return review_path
+
+    def test_use_case_carried_into_review_yml(self, tmp_path):
+        """use_case written to review.yml is readable after promotion approval."""
+        from app.generators.midi.production.promote_part import promote_part
+
+        melody_dir = tmp_path / "melody"
+        review_path = self._write_review(
+            melody_dir,
+            [
+                {
+                    "id": "mel_001",
+                    "midi_file": "candidates/mel_001.mid",
+                    "rank": 1,
+                    "label": "verse",
+                    "status": "approved",
+                    "use_case": "vocal",
+                    "pattern_name": "stepwise_ascent",
+                    "notes": "",
+                }
+            ],
+            tmp_path,
+        )
+        promote_part(str(review_path))
+        assert (melody_dir / "approved" / "verse.mid").exists()
+        # use_case is preserved in the review.yml candidate entry
+        with open(review_path) as f:
+            review = yaml.safe_load(f)
+        assert review["candidates"][0]["use_case"] == "vocal"
+
+    def test_use_case_absent_does_not_error(self, tmp_path):
+        from app.generators.midi.production.promote_part import promote_part
+
+        melody_dir = tmp_path / "melody"
+        review_path = self._write_review(
+            melody_dir,
+            [
+                {
+                    "id": "mel_001",
+                    "midi_file": "candidates/mel_001.mid",
+                    "rank": 1,
+                    "label": "verse",
+                    "status": "approved",
+                    "notes": "",
+                }
+            ],
+            tmp_path,
+        )
+        # Should not raise even when use_case is absent
+        promote_part(str(review_path))
+        assert (melody_dir / "approved" / "verse.mid").exists()

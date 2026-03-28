@@ -250,7 +250,7 @@ class TestComputeProposalDrift:
         _write_proposal_yml(
             tmp_path / "composition_proposal.yml",
             [
-                {"name": "verse", "repeat": 1},
+                {"name": "verse", "play_count": 1},
             ],
         )
         actual = [self._make_section("verse"), self._make_section("chorus")]
@@ -262,8 +262,8 @@ class TestComputeProposalDrift:
         _write_proposal_yml(
             tmp_path / "composition_proposal.yml",
             [
-                {"name": "verse", "repeat": 1},
-                {"name": "outro", "repeat": 1},
+                {"name": "verse", "play_count": 1},
+                {"name": "outro", "play_count": 1},
             ],
         )
         actual = [self._make_section("verse")]
@@ -275,22 +275,22 @@ class TestComputeProposalDrift:
         _write_proposal_yml(
             tmp_path / "composition_proposal.yml",
             [
-                {"name": "verse", "repeat": 3},
+                {"name": "verse", "play_count": 3},
             ],
         )
         actual = [self._make_section("verse"), self._make_section("verse")]
         result = compute_proposal_drift(tmp_path / "composition_proposal.yml", actual)
         assert any(
             d["name"] == "verse" and d["proposed"] == 3 and d["actual"] == 2
-            for d in result["repeat_deltas"]
+            for d in result["play_count_deltas"]
         )
 
     def test_order_changed(self, tmp_path):
         _write_proposal_yml(
             tmp_path / "composition_proposal.yml",
             [
-                {"name": "verse", "repeat": 1},
-                {"name": "chorus", "repeat": 1},
+                {"name": "verse", "play_count": 1},
+                {"name": "chorus", "play_count": 1},
             ],
         )
         actual = [self._make_section("chorus"), self._make_section("verse")]
@@ -301,8 +301,8 @@ class TestComputeProposalDrift:
         _write_proposal_yml(
             tmp_path / "composition_proposal.yml",
             [
-                {"name": "verse", "repeat": 1},
-                {"name": "chorus", "repeat": 1},
+                {"name": "verse", "play_count": 1},
+                {"name": "chorus", "play_count": 1},
             ],
         )
         actual = [self._make_section("verse"), self._make_section("chorus")]
