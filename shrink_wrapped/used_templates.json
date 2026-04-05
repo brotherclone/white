@@ -1,8 +1,15 @@
 {
-  "ambient_7_pulse": 1,
+  "ambient_7_pulse": 3,
+  "arp_7_322": 1,
+  "electronic_7_223": 1,
+  "electronic_7_322": 2,
   "motorik_7_322": 1,
-  "octave_7_bounce": 1,
+  "octave_7_bounce": 3,
   "penta_7_modal": 1,
   "repeated_7_pulse": 1,
-  "root_7_322": 1
+  "root_7_322": 2,
+  "root_7_sparse": 1,
+  "vocal_7_8_haiku_low": 1,
+  "vocal_7_8_hold_low": 3,
+  "walking_7": 1
 }
