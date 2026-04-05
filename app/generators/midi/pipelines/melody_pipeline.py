@@ -52,6 +52,12 @@ from app.generators.midi.patterns.strum_patterns import (
     read_approved_harmonic_rhythm,
 )
 from app.generators.midi.production.init_production import load_song_context
+from app.util.phrase_dynamics import (
+    DynamicCurve,
+    apply_dynamics_curve,
+    infer_curve,
+    parse_curve,
+)
 from app.util.diversity_tracker import (
     diversity_factor,
     find_album_dir,
@@ -152,6 +158,7 @@ def melody_notes_to_midi_bytes(
     resolved_notes: list[tuple[float, int, float]],
     bpm: int = 120,
     ticks_per_beat: int = 480,
+    curve: DynamicCurve = DynamicCurve.FLAT,
 ) -> bytes:
     """Convert resolved melody notes to MIDI bytes.
 
@@ -178,6 +185,9 @@ def melody_notes_to_midi_bytes(
         velocity = VELOCITY["normal"]
         events.append((on_tick, note, velocity, True))
         events.append((off_tick, note, 0, False))
+
+    # Apply phrase-level dynamics before sort
+    events = apply_dynamics_curve(events, curve, min_vel=60, max_vel=127)
 
     events.sort(key=lambda e: (e[0], not e[3], e[1]))
 
@@ -209,6 +219,7 @@ def generate_melody_for_section(
     singer: SingerRange,
     bpm: int = 120,
     durations: list[float] | None = None,
+    curve: DynamicCurve = DynamicCurve.FLAT,
 ) -> tuple[bytes, list[tuple[float, int, float]]]:
     """Generate melody MIDI for an entire section from a pattern and chord voicings.
 
@@ -253,7 +264,7 @@ def generate_melody_for_section(
 
         offset_beats += chord_dur_beats
 
-    midi_bytes = melody_notes_to_midi_bytes(all_notes, bpm=bpm)
+    midi_bytes = melody_notes_to_midi_bytes(all_notes, bpm=bpm, curve=curve)
     return midi_bytes, all_notes
 
 
@@ -630,6 +641,11 @@ def run_melody_pipeline(
 
         target_energy = DEFAULT_ENERGY.get(label, "medium")
 
+        # Determine dynamic curve for this section
+        _dynamics_map: dict = song_info.get("raw_proposal", {}).get("dynamics", {})
+        raw_curve = _dynamics_map.get(label) or _dynamics_map.get(section_key)
+        section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
+
         # "instrumental" is the user-facing alias; template library uses "lead"
         template_use_case = "lead" if use_case == "instrumental" else use_case
         templates = select_templates(
@@ -661,6 +677,7 @@ def run_melody_pipeline(
                 singer,
                 bpm=bpm,
                 durations=section_durations,
+                curve=section_curve,
             )
 
             # Theory scoring
