@@ -50,7 +50,8 @@ dependencies = [
     "transformers>=4.47,<5",
     "sentencepiece>=0.2.0",
     "torch>=2.2.0,<2.3.0",
-    "onnxruntime"
+    "onnxruntime",
+    "rich>=13.0.0"
 ]
 
 [project.optional-dependencies]
