@@ -60,6 +60,49 @@ from app.util.diversity_tracker import (
 
 
 # ---------------------------------------------------------------------------
+# Melodic continuity helpers
+# ---------------------------------------------------------------------------
+
+
+def last_note_of_midi(midi_bytes: bytes) -> Optional[int]:
+    """Return MIDI pitch of the last note-on event, or None if no notes found."""
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    last_pitch = None
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type == "note_on" and msg.velocity > 0:
+                last_pitch = msg.note
+    return last_pitch
+
+
+def first_note_of_candidate(candidate: dict) -> Optional[int]:
+    """Return MIDI pitch of the first note-on event in candidate's MIDI bytes."""
+    midi_bytes = candidate.get("midi_bytes")
+    if not midi_bytes:
+        return None
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type == "note_on" and msg.velocity > 0:
+                return msg.note
+    return None
+
+
+def continuity_penalty(
+    first_note: Optional[int],
+    last_note: Optional[int],
+    max_semitones: int = 4,
+) -> float:
+    """Return 0.85 if interval exceeds max_semitones, else 1.0.
+
+    Returns 1.0 (no penalty) when either note is None.
+    """
+    if first_note is None or last_note is None:
+        return 1.0
+    return 0.85 if abs(first_note - last_note) > max_semitones else 1.0
+
+
+# ---------------------------------------------------------------------------
 # Read approved sections and chord data (reuse from bass pipeline pattern)
 # ---------------------------------------------------------------------------
 
@@ -468,6 +511,9 @@ def run_melody_pipeline(
     print(f"Time:  {time_sig[0]}/{time_sig[1]}")
     print(f"Color: {song_info['color_name']}")
 
+    # Melodic continuity config
+    continuity_semitones: int = int(song_info.get("melodic_continuity_semitones", 4))
+
     # --- 3. Determine singer ---
     if singer_name:
         singer_key = singer_name.lower().strip()
@@ -553,7 +599,7 @@ def run_melody_pipeline(
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []
 
-    for section in sections:
+    for section_idx, section in enumerate(sections):
         section_key = section["_section_key"]
         label = section["label"]
         label_display = section["label_display"]
@@ -643,6 +689,18 @@ def run_melody_pipeline(
                 }
             )
 
+        # Preceding approved section's last note (for continuity penalty)
+        preceding_last_note: Optional[int] = None
+        if section_idx > 0:
+            prev_label = sections[section_idx - 1]["label"]
+            approved_midi = prod_path / "melody" / "approved" / f"{prev_label}.mid"
+            if approved_midi.exists():
+                preceding_last_note = last_note_of_midi(approved_midi.read_bytes())
+                if preceding_last_note is not None:
+                    print(
+                        f"  Continuity anchor: {prev_label} last note = {preceding_last_note} (max leap {continuity_semitones} st)"
+                    )
+
         # Score with Refractor
         print(f"  Scoring {len(candidates)} candidates...")
         scorer_candidates = [{"midi_bytes": c["midi_bytes"]} for c in candidates]
@@ -671,6 +729,11 @@ def run_melody_pipeline(
                 chromatic_weight,
             )
             comp *= diversity_factor(cand["pattern_name"], _diversity_registry)
+            comp *= continuity_penalty(
+                first_note_of_candidate(cand),
+                preceding_last_note,
+                continuity_semitones,
+            )
             scored.append(
                 {
                     "composite": comp,

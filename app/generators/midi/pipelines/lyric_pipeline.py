@@ -294,38 +294,32 @@ def read_vocal_sections_from_arrangement(
             if label and status in ("approved", "accepted"):
                 contour_by_label[label] = cand.get("contour", "stepwise")
 
-    # Collect track 4 clips, accumulate per unique label
+    # Collect track 4 clips in arrangement order — one entry per instance.
+    # Duplicate labels get _2, _3 suffixes for internal tracking; display_label
+    # stays as the original name so [headers] in the lyrics file are unsuffixed.
     melody_clips = [c for c in clips if c["channel"] == MELODY_CHANNEL]
-    seen: dict[str, dict] = {}
-    order: list[str] = []
-
-    for clip in melody_clips:
-        label = clip["clip_name"]
-        if label not in seen:
-            seen[label] = {"count": 0, "total_duration": 0.0}
-            order.append(label)
-        seen[label]["count"] += 1
-        seen[label]["total_duration"] += clip["duration_secs"]
+    label_seen_count: dict[str, int] = {}
 
     approved_dir = melody_dir / "approved"
     sections = []
-    for label in order:
-        data = seen[label]
-        play_count = data["count"]
-        loop_duration = data["total_duration"] / play_count
-        bars = max(round(loop_duration / secs_per_bar), 1)
+    for clip in melody_clips:
+        label = clip["clip_name"]
+        label_seen_count[label] = label_seen_count.get(label, 0) + 1
+        n = label_seen_count[label]
+        instance_key = label if n == 1 else f"{label}_{n}"
 
+        bars = max(round(clip["duration_secs"] / secs_per_bar), 1)
         midi_path = approved_dir / f"{label}.mid"
         per_loop_notes = _count_notes(midi_path) if midi_path.exists() else 0
-        total_notes = per_loop_notes * play_count
 
         sections.append(
             {
-                "approved_label": label,
-                "name": label,
+                "approved_label": label,  # base label → MIDI filename
+                "name": instance_key,  # unique key for fitting dict
+                "display_label": label,  # [header] shown in lyrics file
                 "bars": bars,
-                "play_count": play_count,
-                "total_notes": total_notes,
+                "play_count": 1,
+                "total_notes": per_loop_notes,
                 "contour": contour_by_label.get(label, "stepwise"),
             }
         )
@@ -376,7 +370,9 @@ def _compute_fitting(
 
     for sec in vocal_sections:
         name = sec["name"]
-        midi_path = melody_dir / "approved" / f"{name}.mid"
+        # Strip instance suffix (_2, _3, …) to find the base MIDI file
+        base_label = re.sub(r"_\d+$", "", name)
+        midi_path = melody_dir / "approved" / f"{base_label}.mid"
         phrases = extract_phrases(midi_path) if midi_path.exists() else []
 
         lyric_text = parsed.get(name, "")
@@ -387,6 +383,8 @@ def _compute_fitting(
         ]
 
         if phrases:
+            # Scale phrases to cover all plays of this loop
+            phrases = phrases * sec.get("play_count", 1)
             phrase_data = []
             for i, phrase in enumerate(phrases):
                 line_text = lyric_lines[i] if i < len(lyric_lines) else ""
@@ -807,15 +805,21 @@ def _build_white_cutup_prompt(
             ]
         )
         if phrases:
-            phrase_counts = [p.note_count for p in phrases]
+            all_phrases = phrases * sec["play_count"]
+            phrase_counts = [p.note_count for p in all_phrases]
             phrase_lo = [_math.floor(n * 0.8) for n in phrase_counts]
             phrase_hi = [_math.ceil(n * 1.15) for n in phrase_counts]
             ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            play_note = (
+                f" ({len(phrases)} per loop × {sec['play_count']} plays)"
+                if sec["play_count"] > 1
+                else ""
+            )
             lines.extend(
                 [
-                    f"    Phrases: {len(phrases)} phrases with {phrase_counts} notes",
+                    f"    Phrases: {len(all_phrases)} phrases{play_note} with {phrase_counts} notes",
                     f"    Syllable targets per phrase: [{ranges_str}]",
-                    f"    Write exactly {len(phrases)} lines for this section.",
+                    f"    Write exactly {len(all_phrases)} lines for this section.",
                 ]
             )
 
@@ -824,7 +828,7 @@ def _build_white_cutup_prompt(
             "",
             "OUTPUT FORMAT:",
             "  Use [loop_label] headers exactly as listed above.",
-            "  Write one block per unique loop label.",
+            "  Write one block per section instance in arrangement order.",
             "  Output only the lyrics — no commentary, no explanations.",
             "  Lines starting with # are ignored.",
             "",
@@ -903,15 +907,22 @@ def _build_prompt(
         )
 
         if phrases:
-            phrase_counts = [p.note_count for p in phrases]
+            # Scale phrase list to cover all plays of this loop
+            all_phrases = phrases * sec["play_count"]
+            phrase_counts = [p.note_count for p in all_phrases]
             phrase_lo = [math.floor(n * 0.8) for n in phrase_counts]
             phrase_hi = [math.ceil(n * 1.15) for n in phrase_counts]
             ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            play_note = (
+                f" ({len(phrases)} per loop × {sec['play_count']} plays)"
+                if sec["play_count"] > 1
+                else ""
+            )
             lines.extend(
                 [
-                    f"    Phrases: {len(phrases)} phrases with {phrase_counts} notes respectively",
+                    f"    Phrases: {len(all_phrases)} phrases{play_note} with {phrase_counts} notes respectively",
                     f"    Syllable targets per phrase: [{ranges_str}]",
-                    f"    IMPORTANT: Write exactly {len(phrases)} lines for this section,"
+                    f"    IMPORTANT: Write exactly {len(all_phrases)} lines for this section,"
                     " one line per phrase.",
                     "    Each line should contain approximately the syllable count shown.",
                 ]
@@ -925,7 +936,7 @@ def _build_prompt(
             "",
             "OUTPUT FORMAT:",
             "  Use [loop_label] headers exactly as listed above.",
-            "  Write one block per unique loop label.",
+            "  Write one block per section instance in arrangement order.",
             "  Output only the lyrics — no commentary, no explanations.",
             "  Lines starting with # are ignored (you may use them for stage directions).",
             "  When phrase counts are given, write exactly that many lines per section.",
