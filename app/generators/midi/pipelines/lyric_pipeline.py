@@ -295,8 +295,8 @@ def read_vocal_sections_from_arrangement(
                 contour_by_label[label] = cand.get("contour", "stepwise")
 
     # Collect track 4 clips in arrangement order — one entry per instance.
-    # Duplicate labels get _2, _3 suffixes for internal tracking; display_label
-    # stays as the original name so [headers] in the lyrics file are unsuffixed.
+    # Duplicate labels get _2, _3 suffixes; the prompt uses these suffixed names
+    # as [headers] so Claude writes one block per arrangement instance.
     melody_clips = [c for c in clips if c["channel"] == MELODY_CHANNEL]
     label_seen_count: dict[str, int] = {}
 
@@ -314,9 +314,8 @@ def read_vocal_sections_from_arrangement(
 
         sections.append(
             {
-                "approved_label": label,  # base label → MIDI filename
-                "name": instance_key,  # unique key for fitting dict
-                "display_label": label,  # [header] shown in lyrics file
+                "approved_label": label,  # base label → MIDI filename (strip _N suffix)
+                "name": instance_key,  # unique instance key used as [header]
                 "bars": bars,
                 "play_count": 1,
                 "total_notes": per_loop_notes,

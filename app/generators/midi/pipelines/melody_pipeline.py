@@ -689,10 +689,12 @@ def run_melody_pipeline(
                 }
             )
 
-        # Preceding approved section's last note (for continuity penalty)
+        # Preceding approved section's last note (for continuity penalty).
+        # Scan backward to find the nearest prior section that has an approved MIDI —
+        # skipping any gaps where the human hasn't approved yet.
         preceding_last_note: Optional[int] = None
-        if section_idx > 0:
-            prev_label = sections[section_idx - 1]["label"]
+        for prev_idx in range(section_idx - 1, -1, -1):
+            prev_label = sections[prev_idx]["label"]
             approved_midi = prod_path / "melody" / "approved" / f"{prev_label}.mid"
             if approved_midi.exists():
                 preceding_last_note = last_note_of_midi(approved_midi.read_bytes())
@@ -700,6 +702,7 @@ def run_melody_pipeline(
                     print(
                         f"  Continuity anchor: {prev_label} last note = {preceding_last_note} (max leap {continuity_semitones} st)"
                     )
+                break
 
         # Score with Refractor
         print(f"  Scoring {len(candidates)} candidates...")
@@ -729,10 +732,11 @@ def run_melody_pipeline(
                 chromatic_weight,
             )
             comp *= diversity_factor(cand["pattern_name"], _diversity_registry)
+            # Derive first note from in-memory resolved_notes (avoids reparsing MIDI)
+            _rn = cand.get("resolved_notes") or []
+            _first_note = _rn[0][1] if _rn else None
             comp *= continuity_penalty(
-                first_note_of_candidate(cand),
-                preceding_last_note,
-                continuity_semitones,
+                _first_note, preceding_last_note, continuity_semitones
             )
             scored.append(
                 {
