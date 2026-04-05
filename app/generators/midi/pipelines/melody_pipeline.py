@@ -644,9 +644,7 @@ def run_melody_pipeline(
         # Determine dynamic curve for this section
         _dynamics_map: dict = song_info.get("raw_proposal", {}).get("dynamics", {})
         raw_curve = _dynamics_map.get(label) or _dynamics_map.get(section_key)
-        section_curve = (
-            parse_curve(raw_curve) if raw_curve else infer_curve(target_energy)
-        )
+        section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
 
         # "instrumental" is the user-facing alias; template library uses "lead"
         template_use_case = "lead" if use_case == "instrumental" else use_case

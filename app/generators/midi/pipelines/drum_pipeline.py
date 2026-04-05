@@ -450,9 +450,7 @@ def run_drum_pipeline(
 
         # Determine dynamic curve for this section
         raw_curve = dynamics_map.get(label) or dynamics_map.get(section_key)
-        section_curve = (
-            parse_curve(raw_curve) if raw_curve else infer_curve(target_energy)
-        )
+        section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
 
         # Generate MIDI for each template
         candidates = []
