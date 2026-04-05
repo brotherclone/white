@@ -802,6 +802,125 @@ def propose_arrangement(plan: ProductionPlan) -> ProductionPlan:
 
 
 # ---------------------------------------------------------------------------
+# Sync plan from arrangement.txt
+# ---------------------------------------------------------------------------
+
+
+def parse_arrangement_sections(arrangement_path: Path) -> list[dict]:
+    """Parse arrangement.txt and return per-instance section data.
+
+    Arrangement lines have the format:
+        bar beat subdivision tick <TAB> name <TAB> track <TAB> length_bars ...
+
+    Track 1 = chord/section clip (defines section identity and bar count).
+    Track 4 = melody/vocals clip (presence means vocals=True for that instance).
+
+    Returns list of dicts ordered by bar_start:
+        {bar_start, section_name, bars, has_vocals}
+    """
+    by_bar: dict[int, dict] = {}
+
+    for line in arrangement_path.read_text().splitlines():
+        parts = line.strip().split("\t")
+        if len(parts) < 3:
+            continue
+        position_parts = parts[0].strip().split()
+        if not position_parts:
+            continue
+        try:
+            bar_start = int(position_parts[0])
+        except ValueError:
+            continue
+        try:
+            track = int(parts[2].strip())
+        except ValueError:
+            continue
+
+        name = parts[1].strip()
+        bars = 1
+        if len(parts) > 3:
+            try:
+                bars = int(parts[3].strip().split()[0])
+            except (ValueError, IndexError):
+                pass
+
+        if bar_start not in by_bar:
+            by_bar[bar_start] = {"tracks": {}}
+        by_bar[bar_start]["tracks"][track] = {"name": name, "bars": bars}
+
+    instances = []
+    for bar_start in sorted(by_bar):
+        tracks = by_bar[bar_start]["tracks"]
+        if 1 not in tracks:
+            continue
+        instances.append(
+            {
+                "bar_start": bar_start,
+                "section_name": tracks[1]["name"],
+                "bars": tracks[1]["bars"],
+                "has_vocals": 4 in tracks,
+            }
+        )
+    return instances
+
+
+def sync_plan_from_arrangement(
+    production_dir: Path,
+    arrangement_path: Optional[Path] = None,
+) -> ProductionPlan:
+    """Rebuild plan sections from arrangement.txt.
+
+    Expands grouped (play_count > 1) entries into individual play_count=1
+    entries — one per section instance — and sets vocals per instance from
+    track 4 (melody) presence in the arrangement.
+
+    All other plan fields (rationale, concept, genres, etc.) are preserved.
+    Per-section reason/notes/loops are carried forward by section name match.
+    """
+    existing = load_plan(production_dir)
+    if existing is None:
+        raise FileNotFoundError(
+            f"No {PLAN_FILENAME} found in {production_dir}. Generate a plan first."
+        )
+
+    arr_path = arrangement_path or (production_dir / "arrangement.txt")
+    if not arr_path.exists():
+        raise FileNotFoundError(f"No arrangement.txt found at {arr_path}")
+
+    instances = parse_arrangement_sections(arr_path)
+    if not instances:
+        raise ValueError(f"No section instances parsed from {arr_path}")
+
+    # Preserve per-section metadata from existing plan (first match by name)
+    section_meta: dict[str, PlanSection] = {}
+    for sec in existing.sections:
+        key = sec.name.lower().replace("-", "_").replace(" ", "_")
+        if key not in section_meta:
+            section_meta[key] = sec
+
+    new_sections = []
+    for inst in instances:
+        name = inst["section_name"]
+        key = name.lower().replace("-", "_").replace(" ", "_")
+        orig = section_meta.get(key)
+        new_sections.append(
+            PlanSection(
+                name=name,
+                bars=inst["bars"],
+                play_count=1,
+                vocals=inst["has_vocals"],
+                notes=orig.notes if orig else "",
+                reason=orig.reason if orig else "",
+                loops=dict(orig.loops) if orig else {},
+            )
+        )
+
+    existing.sections = new_sections
+    existing.generated = datetime.now(timezone.utc).isoformat()
+    return existing
+
+
+# ---------------------------------------------------------------------------
 # next_section map helper (used by drum pipeline)
 # ---------------------------------------------------------------------------
 
@@ -853,12 +972,39 @@ def main():
         action="store_true",
         help="Skip Claude arrangement proposal and use the mechanical section inventory",
     )
+    parser.add_argument(
+        "--sync-from-arrangement",
+        action="store_true",
+        help=(
+            "Rebuild sections from arrangement.txt — expands play_count groups into "
+            "individual entries and sets vocals per instance from track 4 presence"
+        ),
+    )
     args = parser.parse_args()
 
     prod_path = Path(args.production_dir)
     if not prod_path.exists():
         print(f"ERROR: Production directory not found: {prod_path}")
         sys.exit(1)
+
+    if args.sync_from_arrangement:
+        try:
+            arr_path = prod_path / "arrangement.txt"
+            instances = (
+                parse_arrangement_sections(arr_path) if arr_path.exists() else []
+            )
+            plan = sync_plan_from_arrangement(prod_path)
+            out_path = save_plan(plan, prod_path)
+            print(f"Synced {len(plan.sections)} section instances from arrangement.txt")
+            for i, sec in enumerate(plan.sections):
+                bar = instances[i]["bar_start"] if i < len(instances) else "?"
+                vocals_str = "vocals" if sec.vocals else "      "
+                print(f"  bar {bar:<4} {sec.name:<15} {sec.bars} bars  {vocals_str}")
+            print(f"Plan written: {out_path}")
+        except (FileNotFoundError, ValueError) as e:
+            print(f"ERROR: {e}")
+            sys.exit(1)
+        return
 
     if args.bootstrap_manifest:
         try:

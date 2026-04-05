@@ -16,7 +16,19 @@ Steps marked **[HUMAN STEP]** require manual action in Logic Pro or ACE Studio.
 ### 0.1 Song Proposal **[IMPLEMENTED]**
 The color agent generates `song_proposal_*.yml` with concept, mood, key, BPM, singer, rainbow_color, and genres. Proposals live in `<thread>/yml/`.
 
-### 0.2 Artist Catalog **[PARTIAL]**
+### 0.2 Init Production **[IMPLEMENTED]**
+
+Run before chord generation to create the production directory and generate `sounds_like` artists via Claude:
+
+```bash
+.venv/bin/python -m app.generators.midi.production.init_production \
+    --production-dir shrink_wrapped/<song-title>/production/<iteration_id> \
+    --song-proposal shrink_wrapped/<song-title>/yml/<iteration_id>.yml
+```
+
+Writes `initial_proposal.yml` with 5–7 reference artists and `song_context.yml`. Downstream phases read `song_context.yml` for BPM, key, concept, and `sounds_like`.
+
+### 0.3 Artist Catalog **[PARTIAL]**
 ```bash
 .venv/bin/python -m app.generators.artist_catalog --thread <thread_dir> --generate-missing
 ```
@@ -120,6 +132,8 @@ Reads approved chords + kick onsets. Generates bass lines (root, walking, pedal,
 
 Singer is auto-detected from the song proposal. Reads approved chords, generates melodic contour from interval templates, enforces vocal range. Writes `melody/candidates/` + `melody/review.yml`.
 
+**Melodic continuity**: If `melody/approved/<prev_section>.mid` exists from a prior run, candidates for the next section are penalised (0.85×) when their first note leaps more than 4 semitones from the last note of the approved preceding section. Configurable via `melodic_continuity_semitones` in the song proposal YAML (default: 4).
+
 **Human step**: Label and approve, then promote.
 
 ```bash
@@ -131,37 +145,63 @@ Singer is auto-detected from the song proposal. Reads approved chords, generates
 
 ---
 
-## 5. Composition Proposal **[IMPLEMENTED — optional]**
+## 5. Production Plan **[IMPLEMENTED]**
 
-```bash
-.venv/bin/python -m app.generators.midi.production.composition_proposal \
-    --production-dir <dir> --song-proposal <yml>
-```
-
-Claude proposes a full arrangement arc (section order, energy, transitions, sounds_like references, rationale). Writes `composition_proposal.yml`. Use as a guide in Logic — not binding.
-
----
-
-## 6. Logic Pro Arrangement **[HUMAN STEP]**
-
-- Assemble approved loops in Logic Pro, using `composition_proposal.yml` as a guide (or compose freely).
-- Export arrangement as `arrangement.txt` (Logic bar-position format).
-- Save Claude's proposal as `arrangement_claude.txt` alongside for diff tracking.
-
----
-
-## 7. Production Plan **[IMPLEMENTED]**
+Generate **before** Logic arrangement — Claude proposes an arrangement arc with section order, repeat counts, energy notes, and compositional rationale.
 
 ```bash
 .venv/bin/python -m app.generators.midi.production.production_plan \
     --production-dir <dir> --song-proposal <yml>
 ```
 
-Reads approved chord sections and bar counts. Writes `production_plan.yml` with section order, bar lengths, and BPM. Edit to set repeat counts and vocal flags.
+Writes `production_plan.yml` with `proposed_by: claude` and a full `rationale` block. Use Claude's proposal as a creative starting point in Logic — you can follow it, diverge from it, or use it as a foil.
+
+To skip Claude and use a mechanical inventory:
+```bash
+... --no-claude
+```
+
+### 5a. Bootstrap Manifest
+
+After the plan is generated (but before Logic assembly), emit a metadata scaffold:
+
+```bash
+.venv/bin/python -m app.generators.midi.production.production_plan \
+    --production-dir <dir> --bootstrap-manifest
+```
+
+Writes `manifest_bootstrap.yml` with all derivable fields pre-filled (title, BPM, key, structure with computed timecodes). Fill in render-time fields (`main_audio_file`, `TRT`, etc.) after final export.
 
 ---
 
-## 8. Lyric Generation **[IMPLEMENTED]**
+## 6. Logic Pro Arrangement **[HUMAN STEP]**
+
+- Assemble approved loops in Logic Pro using `production_plan.yml` as a guide.
+- Export arrangement as `arrangement.txt` (Logic bar-position format).
+- Save Claude's plan as `arrangement_claude.txt` alongside for reference.
+
+---
+
+## 7. Sync Plan from Arrangement **[IMPLEMENTED]**
+
+After arranging in Logic, resync the production plan to reflect what you actually built:
+
+```bash
+.venv/bin/python -m app.generators.midi.production.production_plan \
+    --production-dir <dir> --sync-from-arrangement
+```
+
+This reads `arrangement.txt` and rebuilds `production_plan.yml` sections with:
+- One entry per section **instance** (`play_count: 1` each — no grouped repeats)
+- `vocals: true/false` derived from whether a melody clip is on track 4
+- Bar counts from the arrangement itself
+- All other plan fields (rationale, concept, genres) preserved
+
+Run this any time the Logic arrangement diverges from the generated plan. The `--refresh` flag only updates bar counts from approved MIDI; `--sync-from-arrangement` is the authoritative resync from the actual arrangement.
+
+---
+
+## 8. Lyric Generation **[IMPLEMENTED]** *(vocals songs only)*
 
 ```bash
 .venv/bin/python -m app.generators.midi.pipelines.lyric_pipeline --production-dir <dir>
@@ -222,7 +262,7 @@ Writes `vocal_alignment.lrc`.
 
 ---
 
-## 11. Drift Report **[IMPLEMENTED]**
+## 11. Drift Report **[IMPLEMENTED]** *(vocals songs only)*
 
 ```bash
 .venv/bin/python -m app.generators.midi.production.drift_report --production-dir <dir>
