@@ -74,7 +74,8 @@ def phase_status(production_dir: Path, phase: str) -> str:
     if not candidates:
         return STATUS_NO_CANDIDATES
 
-    if any(str(c.get("status", "")).lower() == "approved" for c in candidates):
+    approved_statuses = {"approved", "accepted"}
+    if any(str(c.get("status", "")).lower() in approved_statuses for c in candidates):
         return STATUS_APPROVED
 
     return STATUS_PENDING
@@ -160,7 +161,7 @@ def scan_production_dir(production_dir: Path, album_slug: str) -> SongStatus:
         or "?"
     )
 
-    # Singer: melody review candidates > plan > chord review
+    # Singer: plan > chord review > melody review candidates
     singer = plan.get("singer") or chord_review.get("singer") or ""
     if not singer:
         for cand in melody_review.get("candidates", []):
@@ -186,7 +187,7 @@ def scan_production_dir(production_dir: Path, album_slug: str) -> SongStatus:
         bpm=bpm,
         phase_statuses=phases,
         total_approved_bars=total_bars,
-        plan_present=bool(plan),
+        plan_present=(production_dir / "production_plan.yml").exists(),
         lyrics_present=lyrics_present,
     )
 
