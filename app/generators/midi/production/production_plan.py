@@ -30,6 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+
 PLAN_FILENAME = "production_plan.yml"
 MANIFEST_BOOTSTRAP_FILENAME = "manifest_bootstrap.yml"
 
@@ -802,6 +803,124 @@ def propose_arrangement(plan: ProductionPlan) -> ProductionPlan:
 
 
 # ---------------------------------------------------------------------------
+# Sync plan from arrangement.txt
+# ---------------------------------------------------------------------------
+
+
+def parse_arrangement_sections(
+    arrangement_path: Path,
+    bpm: float = 120.0,
+    beats_per_bar: int = 4,
+) -> list[dict]:
+    """Parse arrangement.txt and return per-instance section data.
+
+    Handles both Logic Pro export formats (bar/beat and SMPTE timecode) by
+    delegating to assembly_manifest.parse_arrangement for format detection.
+
+    Track 1 = chord/section clip (defines section identity and bar count).
+    Track 4 = melody/vocals clip (presence means vocals=True for that instance).
+
+    Returns list of dicts ordered by start time:
+        {bar_start, section_name, bars, has_vocals}
+    """
+    # Lazy import to avoid circular dependency (assembly_manifest imports production_plan)
+    from app.generators.midi.production.assembly_manifest import (
+        parse_arrangement as _parse_clips,
+    )
+
+    text = arrangement_path.read_text()
+    clips = _parse_clips(text, bpm=bpm, beats_per_bar=beats_per_bar)
+
+    secs_per_bar = (60.0 / bpm) * beats_per_bar
+
+    # Group clips by their start time (rounded to nearest 10ms to avoid float noise)
+    by_start: dict[int, dict] = {}
+    for clip in clips:
+        key = round(clip.start * 100)  # centisecond bucket
+        if key not in by_start:
+            by_start[key] = {"start_secs": clip.start, "tracks": {}}
+        bars = max(1, round(clip.length / secs_per_bar))
+        by_start[key]["tracks"][clip.track] = {"name": clip.name, "bars": bars}
+
+    instances = []
+    for key in sorted(by_start):
+        tracks = by_start[key]["tracks"]
+        if 1 not in tracks:
+            continue
+        # Use 1-based bar number derived from start position
+        bar_start = max(1, round(by_start[key]["start_secs"] / secs_per_bar) + 1)
+        instances.append(
+            {
+                "bar_start": bar_start,
+                "section_name": tracks[1]["name"],
+                "bars": tracks[1]["bars"],
+                "has_vocals": 4 in tracks,
+            }
+        )
+    return instances
+
+
+def sync_plan_from_arrangement(
+    production_dir: Path,
+    arrangement_path: Optional[Path] = None,
+) -> ProductionPlan:
+    """Rebuild plan sections from arrangement.txt.
+
+    Expands grouped (play_count > 1) entries into individual play_count=1
+    entries — one per section instance — and sets vocals per instance from
+    track 4 (melody) presence in the arrangement.
+
+    All other plan fields (rationale, concept, genres, etc.) are preserved.
+    Per-section reason/notes/loops are carried forward by section name match.
+    """
+    existing = load_plan(production_dir)
+    if existing is None:
+        raise FileNotFoundError(
+            f"No {PLAN_FILENAME} found in {production_dir}. Generate a plan first."
+        )
+
+    arr_path = arrangement_path or (production_dir / "arrangement.txt")
+    if not arr_path.exists():
+        raise FileNotFoundError(f"No arrangement.txt found at {arr_path}")
+
+    _num, _den = (existing.time_sig or "4/4").split("/")
+    _beats_per_bar = int(_num) * (4 // int(_den))
+    instances = parse_arrangement_sections(
+        arr_path, bpm=float(existing.bpm or 120), beats_per_bar=_beats_per_bar
+    )
+    if not instances:
+        raise ValueError(f"No section instances parsed from {arr_path}")
+
+    # Preserve per-section metadata from existing plan (first match by name)
+    section_meta: dict[str, PlanSection] = {}
+    for sec in existing.sections:
+        key = sec.name.lower().replace("-", "_").replace(" ", "_")
+        if key not in section_meta:
+            section_meta[key] = sec
+
+    new_sections = []
+    for inst in instances:
+        name = inst["section_name"]
+        key = name.lower().replace("-", "_").replace(" ", "_")
+        orig = section_meta.get(key)
+        new_sections.append(
+            PlanSection(
+                name=name,
+                bars=inst["bars"],
+                play_count=1,
+                vocals=inst["has_vocals"],
+                notes=orig.notes if orig else "",
+                reason=orig.reason if orig else "",
+                loops=dict(orig.loops) if orig else {},
+            )
+        )
+
+    existing.sections = new_sections
+    existing.generated = datetime.now(timezone.utc).isoformat()
+    return existing
+
+
+# ---------------------------------------------------------------------------
 # next_section map helper (used by drum pipeline)
 # ---------------------------------------------------------------------------
 
@@ -853,12 +972,34 @@ def main():
         action="store_true",
         help="Skip Claude arrangement proposal and use the mechanical section inventory",
     )
+    parser.add_argument(
+        "--sync-from-arrangement",
+        action="store_true",
+        help=(
+            "Rebuild sections from arrangement.txt — expands play_count groups into "
+            "individual entries and sets vocals per instance from track 4 presence"
+        ),
+    )
     args = parser.parse_args()
 
     prod_path = Path(args.production_dir)
     if not prod_path.exists():
         print(f"ERROR: Production directory not found: {prod_path}")
         sys.exit(1)
+
+    if args.sync_from_arrangement:
+        try:
+            plan = sync_plan_from_arrangement(prod_path)
+            out_path = save_plan(plan, prod_path)
+            print(f"Synced {len(plan.sections)} section instances from arrangement.txt")
+            for sec in plan.sections:
+                vocals_str = "vocals" if sec.vocals else "      "
+                print(f"  {sec.name:<20} {sec.bars} bars  {vocals_str}")
+            print(f"Plan written: {out_path}")
+        except (FileNotFoundError, ValueError) as e:
+            print(f"ERROR: {e}")
+            sys.exit(1)
+        return
 
     if args.bootstrap_manifest:
         try:
