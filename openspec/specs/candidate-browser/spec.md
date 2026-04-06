@@ -22,12 +22,12 @@ entry by keystroke, updating `review.yml` without leaving the terminal.
 
 #### Scenario: Approve a candidate
 - **WHEN** a candidate row is selected and the user presses `a`
-- **THEN** the corresponding `review.yml` entry is updated to `label: approved` and
-  the row's label column updates immediately
+- **THEN** the corresponding `review.yml` entry is updated to `status: approved` and
+  the row's status column updates immediately
 
 #### Scenario: Reject a candidate
 - **WHEN** a candidate row is selected and the user presses `r`
-- **THEN** the corresponding `review.yml` entry is updated to `label: rejected`
+- **THEN** the corresponding `review.yml` entry is updated to `status: rejected`
 
 #### Scenario: Already-approved entries not editable
 - **WHEN** an `approved` entry is selected and the user presses `a` or `r`

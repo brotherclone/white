@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { fetchCandidates, approveCandidates, rejectCandidate, midiUrl } from "@/lib/api";
+import { fetchCandidates, approveCandidate, rejectCandidate, midiUrl } from "@/lib/api";
 import { Candidate, CandidateStatus } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
@@ -55,7 +55,7 @@ export default function Home() {
 
   const handleApprove = async (id: string) => {
     setAll(prev => prev.map(c => c.id === id ? { ...c, status: "approved" as CandidateStatus } : c));
-    try { await approveCandidates(id); }
+    try { await approveCandidate(id); }
     catch { setAll(prev => prev.map(c => c.id === id ? { ...c, status: "pending" as CandidateStatus } : c)); }
   };
 
@@ -71,13 +71,17 @@ export default function Home() {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       if (!focused || tag === "INPUT" || tag === "SELECT") return;
-      if (e.key === "a") handleApprove(focused);
-      if (e.key === "r") handleReject(focused);
+
+      const focusedCandidate = all.find(c => c.id === focused);
+      if (!focusedCandidate) return;
+
+      if (e.key === "a" && focusedCandidate.status === "pending") handleApprove(focused);
+      if (e.key === "r" && focusedCandidate.status === "pending") handleReject(focused);
       if (e.key === "p") handlePlay(focused);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [focused]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [all, focused]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const SortIcon = ({ k }: { k: SortKey }) =>
     sortKey === k ? <span className="ml-1 text-zinc-400">{sortAsc ? "↑" : "↓"}</span> : null;
@@ -173,7 +177,7 @@ export default function Home() {
                       >✓</button>
                       <button
                         onClick={() => handleReject(c.id)}
-                        disabled={c.status === "rejected"}
+                        disabled={c.status === "approved" || c.status === "accepted" || c.status === "rejected"}
                         title="Reject (r)"
                         className="px-2 py-0.5 text-xs rounded bg-red-900 hover:bg-red-800 text-red-100 font-medium disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >✗</button>
