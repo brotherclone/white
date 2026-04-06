@@ -173,7 +173,7 @@ export default function Home() {
                       >✓</button>
                       <button
                         onClick={() => handleReject(c.id)}
-                        disabled={c.status === "rejected"}
+                        disabled={c.status === "approved" || c.status === "accepted" || c.status === "rejected"}
                         title="Reject (r)"
                         className="px-2 py-0.5 text-xs rounded bg-red-900 hover:bg-red-800 text-red-100 font-medium disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >✗</button>
