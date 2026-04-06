@@ -9,7 +9,7 @@ export async function fetchCandidates(phase?: string, section?: string) {
   return res.json();
 }
 
-export async function approveCandidates(id: string) {
+export async function approveCandidate(id: string) {
   const res = await fetch(`${BASE}/candidates/${encodeURIComponent(id)}/approve`, { method: "POST" });
   if (!res.ok) throw new Error("Approve failed");
   return res.json();

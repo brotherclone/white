@@ -354,19 +354,29 @@ def run_browser(
                         offset = selected_idx - page + 1
                 elif key == "a":
                     entry = entries[selected_idx]
-                    approve_candidate(entry)
-                    status_msg = f"✓ Approved {entry.candidate_id}"
-                    # Advance to next non-approved
-                    for i in range(selected_idx + 1, len(entries)):
-                        if entries[i].status not in ("approved", "accepted"):
-                            selected_idx = i
-                            if selected_idx >= offset + page:
-                                offset = selected_idx - page + 1
-                            break
+                    if entry.status in ("approved", "accepted"):
+                        status_msg = (
+                            f"No change for {entry.candidate_id}: status is {entry.status}"
+                        )
+                    else:
+                        approve_candidate(entry)
+                        status_msg = f"✓ Approved {entry.candidate_id}"
+                        # Advance to next non-approved
+                        for i in range(selected_idx + 1, len(entries)):
+                            if entries[i].status not in ("approved", "accepted"):
+                                selected_idx = i
+                                if selected_idx >= offset + page:
+                                    offset = selected_idx - page + 1
+                                break
                 elif key == "r":
                     entry = entries[selected_idx]
-                    reject_candidate(entry)
-                    status_msg = f"✗ Rejected {entry.candidate_id}"
+                    if entry.status in ("approved", "accepted", "rejected"):
+                        status_msg = (
+                            f"No change for {entry.candidate_id}: status is {entry.status}"
+                        )
+                    else:
+                        reject_candidate(entry)
+                        status_msg = f"✗ Rejected {entry.candidate_id}"
                 elif key == "p":
                     entry = entries[selected_idx]
                     if entry.midi_file.exists():

@@ -68,10 +68,10 @@ def create_app(production_dir: Path) -> FastAPI:
 
     def _serialise(entry: CandidateEntry) -> dict:
         d = asdict(entry)
+        d.pop("midi_file", None)
+        d.pop("review_yml", None)
         d["id"] = entry.candidate_id
         d["midi_url"] = f"/midi/{entry.candidate_id}"
-        d["midi_file"] = str(entry.midi_file)
-        d["review_yml"] = str(entry.review_yml)
         return d
 
     # ------------------------------------------------------------------
@@ -123,6 +123,9 @@ def main() -> None:
     parser.add_argument("--production-dir", type=Path, required=True)
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument(
+        "--host", type=str, default="127.0.0.1", help="Host to bind to"
+    )
+    parser.add_argument(
         "--no-open", action="store_true", help="Don't open browser on start"
     )
     args = parser.parse_args()
@@ -146,8 +149,8 @@ def main() -> None:
         threading.Thread(target=_open, daemon=True).start()
 
     print(f"Serving candidates from: {production_dir}")
-    print(f"API: http://localhost:{args.port}")
-    uvicorn.run(app, host="0.0.0.0", port=args.port, log_level="warning")
+    print(f"API: http://{args.host}:{args.port}")
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
 
 
 if __name__ == "__main__":

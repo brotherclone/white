@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { fetchCandidates, approveCandidates, rejectCandidate, midiUrl } from "@/lib/api";
+import { fetchCandidates, approveCandidate, rejectCandidate, midiUrl } from "@/lib/api";
 import { Candidate, CandidateStatus } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
@@ -55,7 +55,7 @@ export default function Home() {
 
   const handleApprove = async (id: string) => {
     setAll(prev => prev.map(c => c.id === id ? { ...c, status: "approved" as CandidateStatus } : c));
-    try { await approveCandidates(id); }
+    try { await approveCandidate(id); }
     catch { setAll(prev => prev.map(c => c.id === id ? { ...c, status: "pending" as CandidateStatus } : c)); }
   };
 
@@ -71,13 +71,17 @@ export default function Home() {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       if (!focused || tag === "INPUT" || tag === "SELECT") return;
-      if (e.key === "a") handleApprove(focused);
-      if (e.key === "r") handleReject(focused);
+
+      const focusedCandidate = all.find(c => c.id === focused);
+      if (!focusedCandidate) return;
+
+      if (e.key === "a" && focusedCandidate.status === "pending") handleApprove(focused);
+      if (e.key === "r" && focusedCandidate.status === "pending") handleReject(focused);
       if (e.key === "p") handlePlay(focused);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [focused]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [all, focused]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const SortIcon = ({ k }: { k: SortKey }) =>
     sortKey === k ? <span className="ml-1 text-zinc-400">{sortAsc ? "↑" : "↓"}</span> : null;
