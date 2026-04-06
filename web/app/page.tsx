@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fetchCandidates, approveCandidates, rejectCandidate, midiUrl } from "@/lib/api";
 import { Candidate, CandidateStatus } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
@@ -145,9 +145,8 @@ export default function Home() {
               <tr><td colSpan={7} className="px-3 py-10 text-center text-zinc-500 font-sans">No candidates found.</td></tr>
             )}
             {visible.map(c => (
-              <>
+              <React.Fragment key={c.id}>
                 <tr
-                  key={c.id}
                   tabIndex={0}
                   onClick={() => { setExpanded(e => e === c.id ? null : c.id); setFocused(c.id); }}
                   onFocus={() => setFocused(c.id)}
@@ -195,21 +194,14 @@ export default function Home() {
                     </td>
                   </tr>
                 )}
-                {expanded === c.id && playingId !== c.id && (
-                  <tr key={`${c.id}-detail`} className="bg-zinc-900/30 border-b border-zinc-800/60">
+                {expanded === c.id && (
+                  <tr className="bg-zinc-900/30 border-b border-zinc-800/60">
                     <td colSpan={7} className="px-4 py-3">
                       <ScorePanel scores={c.scores} />
                     </td>
                   </tr>
                 )}
-                {expanded === c.id && playingId === c.id && (
-                  <tr key={`${c.id}-detail-playing`} className="bg-zinc-900/30 border-b border-zinc-800/60">
-                    <td colSpan={7} className="px-4 py-3">
-                      <ScorePanel scores={c.scores} />
-                    </td>
-                  </tr>
-                )}
-              </>
+              </React.Fragment>
             ))}
           </tbody>
         </table>
