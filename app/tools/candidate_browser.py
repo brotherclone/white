@@ -10,15 +10,15 @@ Usage:
     python -m app.tools.candidate_browser --production-dir ... --section intro
 
 Keymap:
-    ↑ / k    move up
-    ↓ / j    move down
+    w / s    move up / down
     a        approve selected candidate
     r        reject selected candidate
     p        play selected MIDI (macOS open)
-    q / ESC  quit
+    q        quit
 """
 
 import argparse
+import shutil
 import subprocess
 import sys
 import termios
@@ -27,8 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
-from rich.console import Console
-from rich.layout import Layout
+from rich.console import Console, Group
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
@@ -47,6 +46,9 @@ _STATUS_COLOR = {
     "pending": "yellow",
 }
 
+# Fixed overhead lines: detail panel (8) + help bar (3) + table chrome (4: box top/header/divider/box bottom)
+_FIXED_OVERHEAD = 15
+
 
 # ---------------------------------------------------------------------------
 # Data layer
@@ -56,7 +58,7 @@ _STATUS_COLOR = {
 @dataclass
 class CandidateEntry:
     phase: str
-    section: str  # "" for phases without sections (chords/drums/bass)
+    section: str  # "" for phases without per-section candidates (chords/drums/bass)
     candidate_id: str
     midi_file: Path  # absolute
     review_yml: Path  # absolute
@@ -68,7 +70,6 @@ class CandidateEntry:
 
 
 def _abs_midi(review_yml: Path, midi_relative: str) -> Path:
-    """Resolve midi_file path (relative to review.yml's parent dir)."""
     return (review_yml.parent / midi_relative).resolve()
 
 
@@ -84,7 +85,6 @@ def _load_review(review_yml: Path) -> list[CandidateEntry]:
     for c in data.get("candidates", []):
         midi_rel = c.get("midi_file", "")
         midi_path = _abs_midi(review_yml, midi_rel) if midi_rel else Path()
-        # Template name: pattern_name > template > progression > id
         template = (
             c.get("pattern_name")
             or c.get("template")
@@ -124,22 +124,18 @@ def load_all_candidates(
         if section_filter:
             loaded = [e for e in loaded if e.section == section_filter]
         entries.extend(loaded)
-    # Sort: phase order → section → rank
     phase_idx = {p: i for i, p in enumerate(PHASES)}
     entries.sort(key=lambda e: (phase_idx.get(e.phase, 99), e.section, e.rank))
     return entries
 
 
 def _update_review_yml(review_yml: Path, candidate_id: str, new_status: str) -> None:
-    """Write new_status to the matching candidate entry in review.yml."""
     with open(review_yml) as f:
         data = yaml.safe_load(f) or {}
-
     for c in data.get("candidates", []):
         if c.get("id") == candidate_id:
             c["status"] = new_status
             break
-
     with open(review_yml, "w") as f:
         yaml.dump(data, f, allow_unicode=True, sort_keys=False)
 
@@ -164,50 +160,57 @@ def play_candidate(entry: CandidateEntry) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _score_bar(value: float, width: int = 10) -> str:
+def _score_bar(value: float, width: int = 8) -> str:
     filled = round(value * width)
     bar = "█" * filled + "░" * (width - filled)
     color = "green" if value >= 0.5 else "yellow" if value >= 0.3 else "red"
     return f"[{color}]{bar}[/{color}] {value:.3f}"
 
 
+def _page_size() -> int:
+    return max(3, shutil.get_terminal_size().lines - _FIXED_OVERHEAD)
+
+
 def build_candidate_table(
     entries: list[CandidateEntry],
     selected_idx: int,
+    offset: int,
 ) -> Table:
+    page = _page_size()
+    visible = entries[offset : offset + page]
+
     table = Table(
         box=box.SIMPLE_HEAVY,
         show_header=True,
         header_style="bold white",
         expand=True,
-        highlight=False,
+        pad_edge=False,
     )
-    table.add_column("#", justify="right", no_wrap=True, min_width=3)
+    table.add_column(" ", justify="left", no_wrap=True, width=2)
     table.add_column("Phase", no_wrap=True, min_width=7)
-    table.add_column("Section", no_wrap=True, min_width=12)
-    table.add_column("ID", no_wrap=True, min_width=18)
-    table.add_column("Template", no_wrap=True, min_width=24)
-    table.add_column("Score", no_wrap=True, min_width=18)
+    table.add_column("Section", no_wrap=True, min_width=10)
+    table.add_column("ID", no_wrap=True, min_width=16)
+    table.add_column("Template", no_wrap=True, min_width=20)
+    table.add_column("Score", no_wrap=True, min_width=16)
     table.add_column("Status", no_wrap=True, min_width=8)
 
-    for i, e in enumerate(entries):
-        is_selected = i == selected_idx
-        row_style = "bold on dark_blue" if is_selected else ""
-        prefix = "▶ " if is_selected else "  "
-
+    for i, e in enumerate(visible):
+        abs_idx = offset + i
+        is_sel = abs_idx == selected_idx
+        sel_marker = "[bold cyan]▶[/bold cyan]" if is_sel else " "
         status_color = _STATUS_COLOR.get(e.status, "white")
         status_str = f"[{status_color}]{e.status}[/{status_color}]"
         score_bar = _score_bar(e.composite_score)
+        id_str = f"[bold]{e.candidate_id}[/bold]" if is_sel else e.candidate_id
 
         table.add_row(
-            f"{i + 1}",
-            f"{prefix}{e.phase}",
+            sel_marker,
+            e.phase,
             e.section or "—",
-            e.candidate_id,
-            e.template[:32],
+            id_str,
+            e.template[:28],
             score_bar,
             status_str,
-            style=row_style,
         )
 
     return table
@@ -215,101 +218,91 @@ def build_candidate_table(
 
 def build_detail_panel(entry: CandidateEntry | None) -> Panel:
     if entry is None:
-        return Panel("[dim]No candidate selected[/dim]", title="Score Breakdown")
+        return Panel(
+            "[dim]No candidate selected[/dim]", title="Score Breakdown", height=8
+        )
 
-    lines: list[str] = []
-    lines.append(
-        f"[bold]{entry.candidate_id}[/bold]  phase=[cyan]{entry.phase}[/cyan]  section=[cyan]{entry.section or '—'}[/cyan]"
-    )
-    lines.append(f"Template: [yellow]{entry.template}[/yellow]")
-    lines.append(f"MIDI: [dim]{entry.midi_file}[/dim]")
-    lines.append("")
+    lines: list[str] = [
+        f"[bold]{entry.candidate_id}[/bold]  "
+        f"phase=[cyan]{entry.phase}[/cyan]  "
+        f"section=[cyan]{entry.section or '—'}[/cyan]",
+        f"Template: [yellow]{entry.template}[/yellow]",
+        "",
+    ]
 
     scores = entry.scores
     comp = scores.get("composite", 0.0)
-    lines.append(f"Composite  {_score_bar(comp)}")
+    lines.append(f"Composite   {_score_bar(comp)}")
 
-    theory_total = scores.get("theory_total") or scores.get("theory", {}).get("total")
+    theory_total = scores.get("theory_total")
     if theory_total is not None:
-        lines.append(f"Theory     {_score_bar(float(theory_total))}")
+        lines.append(f"Theory      {_score_bar(float(theory_total))}")
     elif isinstance(scores.get("theory"), dict):
-        for k, v in scores["theory"].items():
-            lines.append(f"  {k:<22} {_score_bar(float(v))}")
+        theory_vals = list(scores["theory"].values())
+        if theory_vals:
+            mean_theory = sum(float(v) for v in theory_vals) / len(theory_vals)
+            lines.append(f"Theory      {_score_bar(mean_theory)}")
 
     chroma = scores.get("chromatic", {})
     if isinstance(chroma, dict):
         match = chroma.get("match")
         if match is not None:
-            lines.append(f"Chromatic  {_score_bar(float(match))}")
-        conf = chroma.get("confidence")
-        if conf is not None:
-            lines.append(f"  confidence  {float(conf):.4f}")
+            lines.append(f"Chromatic   {_score_bar(float(match))}")
 
-    return Panel("\n".join(lines), title="Score Breakdown", border_style="dim")
-
-
-def build_help_bar() -> str:
-    keys = [
-        ("↑/k", "up"),
-        ("↓/j", "down"),
-        ("a", "approve"),
-        ("r", "reject"),
-        ("p", "play"),
-        ("q", "quit"),
-    ]
-    parts = [f"[bold]{k}[/bold] {label}" for k, label in keys]
-    return "  ".join(parts)
+    return Panel(
+        "\n".join(lines), title="Score Breakdown", border_style="dim", height=8
+    )
 
 
-def build_layout(
+def build_help_bar(total: int, selected_idx: int, status_msg: str) -> Panel:
+    keys = "  [bold]w[/bold] up  [bold]s[/bold] down  [bold]a[/bold] approve  [bold]r[/bold] reject  [bold]p[/bold] play  [bold]q[/bold] quit"
+    counter = f"  [dim]{selected_idx + 1}/{total}[/dim]"
+    msg = f"  [bold yellow]{status_msg}[/bold yellow]" if status_msg else ""
+    return Panel(keys + counter + msg, border_style="dim", height=3)
+
+
+def build_screen(
     entries: list[CandidateEntry],
     selected_idx: int,
-    status_msg: str = "",
-) -> Layout:
+    offset: int,
+    status_msg: str,
+) -> Group:
     selected = entries[selected_idx] if entries else None
-
-    layout = Layout()
-    layout.split_column(
-        Layout(name="table", ratio=3),
-        Layout(name="detail", ratio=2),
-        Layout(name="footer", size=3),
+    title = Panel(
+        f"[bold cyan]Candidate Browser[/bold cyan]  "
+        f"[dim]{len(entries)} candidates — {sum(1 for e in entries if e.status in ('approved','accepted'))} approved[/dim]",
+        height=3,
     )
-
-    layout["table"].update(
-        Panel(
-            build_candidate_table(entries, selected_idx),
-            title=f"[bold cyan]Candidate Browser[/bold cyan]  [dim]{len(entries)} candidates[/dim]",
-        )
+    table_panel = Panel(
+        build_candidate_table(entries, selected_idx, offset),
+        border_style="blue",
     )
-    layout["detail"].update(build_detail_panel(selected))
-    footer_text = build_help_bar()
-    if status_msg:
-        footer_text += f"  [bold yellow]{status_msg}[/bold yellow]"
-    layout["footer"].update(Panel(footer_text, border_style="dim"))
-
-    return layout
+    return Group(
+        title,
+        table_panel,
+        build_detail_panel(selected),
+        build_help_bar(len(entries), selected_idx, status_msg),
+    )
 
 
 # ---------------------------------------------------------------------------
-# Keyboard input (raw terminal, no extra deps)
+# Keyboard input
 # ---------------------------------------------------------------------------
 
 
-def _read_key(fd: int) -> str:
-    """Read one keypress from fd; returns a string key name."""
+def _read_key() -> str:
     ch = sys.stdin.read(1)
     if ch == "\x1b":
-        # Possible escape sequence
         try:
             seq = sys.stdin.read(2)
         except Exception:
             return "esc"
         if seq == "[A":
-            return "up"
+            return "w"
         if seq == "[B":
-            return "down"
+            return "s"
         return "esc"
-    return ch
+    return ch.lower()
 
 
 # ---------------------------------------------------------------------------
@@ -329,8 +322,9 @@ def run_browser(
         return
 
     selected_idx = 0
+    offset = 0
     status_msg = ""
-    console = Console(width=160)
+    console = Console()
 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
@@ -338,29 +332,36 @@ def run_browser(
     try:
         tty.setraw(fd)
         with Live(
-            build_layout(entries, selected_idx, status_msg),
+            build_screen(entries, selected_idx, offset, status_msg),
             console=console,
             refresh_per_second=20,
             screen=True,
         ) as live:
             while True:
-                key = _read_key(fd)
+                key = _read_key()
                 status_msg = ""
+                page = _page_size()
 
-                if key in ("q", "\x1b", "esc"):
+                if key in ("q", "esc", "\x03"):
                     break
-                elif key in ("k", "up"):
+                elif key == "w":
                     selected_idx = max(0, selected_idx - 1)
-                elif key in ("j", "down"):
+                    if selected_idx < offset:
+                        offset = selected_idx
+                elif key == "s":
                     selected_idx = min(len(entries) - 1, selected_idx + 1)
+                    if selected_idx >= offset + page:
+                        offset = selected_idx - page + 1
                 elif key == "a":
                     entry = entries[selected_idx]
                     approve_candidate(entry)
                     status_msg = f"✓ Approved {entry.candidate_id}"
-                    # Advance to next unapproved if possible
+                    # Advance to next non-approved
                     for i in range(selected_idx + 1, len(entries)):
                         if entries[i].status not in ("approved", "accepted"):
                             selected_idx = i
+                            if selected_idx >= offset + page:
+                                offset = selected_idx - page + 1
                             break
                 elif key == "r":
                     entry = entries[selected_idx]
@@ -370,11 +371,11 @@ def run_browser(
                     entry = entries[selected_idx]
                     if entry.midi_file.exists():
                         play_candidate(entry)
-                        status_msg = f"▶ Playing {entry.midi_file.name}"
+                        status_msg = f"▶ {entry.midi_file.name}"
                     else:
                         status_msg = f"MIDI not found: {entry.midi_file.name}"
 
-                live.update(build_layout(entries, selected_idx, status_msg))
+                live.update(build_screen(entries, selected_idx, offset, status_msg))
 
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
