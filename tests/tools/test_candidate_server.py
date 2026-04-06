@@ -1,0 +1,211 @@
+"""Tests for app/tools/candidate_server.py — API endpoints via TestClient."""
+
+import yaml
+import pytest
+from pathlib import Path
+from fastapi.testclient import TestClient
+
+from app.tools.candidate_server import create_app
+
+
+# ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
+
+
+def _write_review(path: Path, data: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        yaml.dump(data, f, allow_unicode=True, sort_keys=False)
+
+
+def _make_candidate(
+    id: str,
+    status: str = "pending",
+    rank: int = 1,
+    composite: float = 0.5,
+    section: str = "",
+) -> dict:
+    return {
+        "id": id,
+        "midi_file": f"candidates/{id}.mid",
+        "rank": rank,
+        "section": section,
+        "pattern_name": "test_pattern",
+        "status": status,
+        "scores": {"composite": composite, "theory": {}, "chromatic": {}},
+    }
+
+
+@pytest.fixture
+def prod_dir(tmp_path):
+    prod = tmp_path / "song_v1"
+    _write_review(
+        prod / "chords" / "review.yml",
+        {
+            "candidates": [
+                _make_candidate("chord_001", status="pending", rank=1),
+                _make_candidate("chord_002", status="approved", rank=2),
+            ]
+        },
+    )
+    _write_review(
+        prod / "melody" / "review.yml",
+        {
+            "candidates": [
+                _make_candidate("mel_intro_01", status="pending", section="intro"),
+                _make_candidate("mel_verse_01", status="rejected", section="verse"),
+            ]
+        },
+    )
+    return prod
+
+
+@pytest.fixture
+def client(prod_dir):
+    app = create_app(prod_dir)
+    return TestClient(app)
+
+
+# ---------------------------------------------------------------------------
+# GET /candidates
+# ---------------------------------------------------------------------------
+
+
+class TestListCandidates:
+    def test_returns_all_candidates(self, client):
+        resp = client.get("/candidates")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data) == 4
+
+    def test_phase_filter(self, client):
+        resp = client.get("/candidates?phase=chords")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data) == 2
+        assert all(c["phase"] == "chords" for c in data)
+
+    def test_section_filter(self, client):
+        resp = client.get("/candidates?phase=melody&section=intro")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data) == 1
+        assert data[0]["section"] == "intro"
+
+    def test_candidate_has_expected_fields(self, client):
+        resp = client.get("/candidates")
+        c = resp.json()[0]
+        for field in (
+            "id",
+            "phase",
+            "section",
+            "template",
+            "status",
+            "rank",
+            "composite_score",
+            "midi_url",
+            "scores",
+        ):
+            assert field in c, f"Missing field: {field}"
+
+    def test_midi_url_format(self, client):
+        resp = client.get("/candidates")
+        for c in resp.json():
+            assert c["midi_url"] == f"/midi/{c['id']}"
+
+    def test_statuses_preserved(self, client):
+        resp = client.get("/candidates")
+        by_id = {c["id"]: c["status"] for c in resp.json()}
+        assert by_id["chord_001"] == "pending"
+        assert by_id["chord_002"] == "approved"
+        assert by_id["mel_verse_01"] == "rejected"
+
+
+# ---------------------------------------------------------------------------
+# POST /candidates/{id}/approve
+# ---------------------------------------------------------------------------
+
+
+class TestApprove:
+    def test_approve_updates_status(self, client, prod_dir):
+        resp = client.post("/candidates/chord_001/approve")
+        assert resp.status_code == 200
+        assert resp.json() == {"ok": True, "id": "chord_001", "status": "approved"}
+
+    def test_approve_persisted_to_yml(self, client, prod_dir):
+        client.post("/candidates/chord_001/approve")
+        with open(prod_dir / "chords" / "review.yml") as f:
+            data = yaml.safe_load(f)
+        statuses = {c["id"]: c["status"] for c in data["candidates"]}
+        assert statuses["chord_001"] == "approved"
+
+    def test_approve_unknown_returns_404(self, client):
+        resp = client.post("/candidates/does_not_exist/approve")
+        assert resp.status_code == 404
+
+    def test_approve_reflected_in_list(self, client):
+        client.post("/candidates/chord_001/approve")
+        resp = client.get("/candidates?phase=chords")
+        by_id = {c["id"]: c["status"] for c in resp.json()}
+        assert by_id["chord_001"] == "approved"
+
+
+# ---------------------------------------------------------------------------
+# POST /candidates/{id}/reject
+# ---------------------------------------------------------------------------
+
+
+class TestReject:
+    def test_reject_updates_status(self, client, prod_dir):
+        resp = client.post("/candidates/chord_001/reject")
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "rejected"
+
+    def test_reject_persisted_to_yml(self, client, prod_dir):
+        client.post("/candidates/chord_001/reject")
+        with open(prod_dir / "chords" / "review.yml") as f:
+            data = yaml.safe_load(f)
+        statuses = {c["id"]: c["status"] for c in data["candidates"]}
+        assert statuses["chord_001"] == "rejected"
+
+    def test_reject_unknown_returns_404(self, client):
+        resp = client.post("/candidates/nope/reject")
+        assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /midi/{id}
+# ---------------------------------------------------------------------------
+
+
+class TestMidi:
+    def test_midi_returns_404_when_file_missing(self, client):
+        # midi_file paths in fixtures don't actually exist on disk
+        resp = client.get("/midi/chord_001")
+        assert resp.status_code == 404
+
+    def test_midi_streams_file_when_present(self, client, prod_dir):
+        # Write a real (minimal) MIDI file
+        midi_path = prod_dir / "chords" / "candidates" / "chord_001.mid"
+        midi_path.parent.mkdir(parents=True, exist_ok=True)
+        midi_path.write_bytes(b"MThd\x00\x00\x00\x06\x00\x01\x00\x01\x01\xe0")
+        resp = client.get("/midi/chord_001")
+        assert resp.status_code == 200
+        assert "midi" in resp.headers["content-type"]
+
+    def test_midi_unknown_candidate_returns_404(self, client):
+        resp = client.get("/midi/ghost_candidate")
+        assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /production-dir
+# ---------------------------------------------------------------------------
+
+
+class TestProductionDir:
+    def test_returns_production_dir(self, client, prod_dir):
+        resp = client.get("/production-dir")
+        assert resp.status_code == 200
+        assert str(prod_dir) in resp.json()["production_dir"]
