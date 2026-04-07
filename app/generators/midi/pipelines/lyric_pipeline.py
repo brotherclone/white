@@ -47,6 +47,10 @@ from app.generators.midi.pipelines.chord_pipeline import (  # noqa: E402
     compute_chromatic_match,
     get_chromatic_target,
 )
+from app.generators.midi.production.production_plan import (  # noqa: E402
+    _infer_repeat_type,
+    _normalize_repeat_type,
+)
 from app.generators.midi.production.song_evaluator import _count_syllables  # noqa: E402
 
 load_dotenv()
@@ -267,13 +271,19 @@ def read_vocal_sections_from_arrangement(
     melody_dir: Path,
     bpm: int,
     time_sig_str: str,
+    production_dir: Optional[Path] = None,
 ) -> list[dict]:
     """Extract vocal sections from arrangement.txt.
 
     Track 4 (MELODY_CHANNEL) clips are vocal by definition — no vocals flag needed.
-    Returns one entry per unique clip label, in first-seen order.
+    Returns one entry per clip instance in arrangement order.
 
-    Each entry: {approved_label, name, bars, play_count, total_notes, contour}
+    Each entry: {approved_label, name, bars, play_count, total_notes, contour,
+                 lyric_repeat_type}
+
+    lyric_repeat_type is loaded from production_plan.yml when production_dir is
+    given; otherwise inferred from the label.  For 'exact' labels, instances
+    beyond the first are tagged 'exact_repeat' so the prompt builder can skip them.
     """
     clips = parse_arrangement(arrangement_path)
 
@@ -294,11 +304,27 @@ def read_vocal_sections_from_arrangement(
             if label and status in ("approved", "accepted"):
                 contour_by_label[label] = cand.get("contour", "stepwise")
 
+    # Load lyric_repeat_type overrides from production_plan.yml
+    repeat_type_by_label: dict[str, str] = {}
+    if production_dir is not None:
+        plan_path = production_dir / "production_plan.yml"
+        if plan_path.exists():
+            with open(plan_path) as f:
+                plan_data = yaml.safe_load(f) or {}
+            for sec in plan_data.get("sections", []):
+                lbl = sec.get("name", "")
+                rt = _normalize_repeat_type(sec.get("lyric_repeat_type"))
+                if lbl and rt != "fresh":
+                    # Only store explicit overrides; 'fresh' is the default anyway
+                    repeat_type_by_label[lbl] = rt
+
     # Collect track 4 clips in arrangement order — one entry per instance.
     # Duplicate labels get _2, _3 suffixes; the prompt uses these suffixed names
     # as [headers] so Claude writes one block per arrangement instance.
     melody_clips = [c for c in clips if c["channel"] == MELODY_CHANNEL]
     label_seen_count: dict[str, int] = {}
+    # Track first-seen instance key for exact labels (for exact_repeat copying)
+    exact_first_instance: dict[str, str] = {}
 
     approved_dir = melody_dir / "approved"
     sections = []
@@ -312,6 +338,17 @@ def read_vocal_sections_from_arrangement(
         midi_path = approved_dir / f"{label}.mid"
         per_loop_notes = _count_notes(midi_path) if midi_path.exists() else 0
 
+        # Determine repeat type: plan override > infer from label
+        base_repeat_type = repeat_type_by_label.get(label) or _infer_repeat_type(label)
+
+        if base_repeat_type == "exact" and n == 1:
+            exact_first_instance[label] = instance_key
+            lyric_repeat_type = "exact"
+        elif base_repeat_type == "exact" and n > 1:
+            lyric_repeat_type = "exact_repeat"
+        else:
+            lyric_repeat_type = base_repeat_type
+
         sections.append(
             {
                 "approved_label": label,  # base label → MIDI filename (strip _N suffix)
@@ -320,6 +357,10 @@ def read_vocal_sections_from_arrangement(
                 "play_count": 1,
                 "total_notes": per_loop_notes,
                 "contour": contour_by_label.get(label, "stepwise"),
+                "lyric_repeat_type": lyric_repeat_type,
+                "exact_source": exact_first_instance.get(
+                    label
+                ),  # for exact_repeat copies
             }
         )
 
@@ -369,6 +410,15 @@ def _compute_fitting(
 
     for sec in vocal_sections:
         name = sec["name"]
+        repeat_type = sec.get("lyric_repeat_type", "fresh")
+
+        # exact_repeat instances copy fitting from their source instance
+        if repeat_type == "exact_repeat":
+            source_key = sec.get("exact_source") or re.sub(r"_\d+$", "", name)
+            if source_key in result:
+                result[name] = result[source_key]
+            continue
+
         # Strip instance suffix (_2, _3, …) to find the base MIDI file
         base_label = re.sub(r"_\d+$", "", name)
         midi_path = melody_dir / "approved" / f"{base_label}.mid"
@@ -788,8 +838,16 @@ def _build_white_cutup_prompt(
 
     import math as _math
 
+    variation_count_cutup: dict[str, int] = {}
+
     for sec in vocal_sections:
+        repeat_type = sec.get("lyric_repeat_type", "fresh")
+
+        if repeat_type == "exact_repeat":
+            continue
+
         name = sec["name"]
+        base_label = sec.get("approved_label", name)
         lo, hi = syllable_targets.get(name, (0, 0))
         denom = max(sec["bars"] * sec["play_count"], 1)
         notes_per_bar = sec["total_notes"] / denom
@@ -803,6 +861,22 @@ def _build_white_cutup_prompt(
                 f"    Target syllables: {lo}–{hi}  (≈{notes_per_bar:.1f} notes/bar)",
             ]
         )
+
+        if repeat_type == "exact":
+            lines.append(
+                "    # This section repeats verbatim — write it once, it will be reused"
+            )
+        elif repeat_type == "variation":
+            variation_count_cutup[base_label] = (
+                variation_count_cutup.get(base_label, 0) + 1
+            )
+            n = variation_count_cutup[base_label]
+            if n > 1:
+                lines.append(
+                    f"    # Variation {n} of {base_label}: same meter and rhyme scheme"
+                    f" as {base_label}, but new images and lines"
+                )
+
         if phrases:
             all_phrases = phrases * sec["play_count"]
             phrase_counts = [p.note_count for p in all_phrases]
@@ -827,7 +901,8 @@ def _build_white_cutup_prompt(
             "",
             "OUTPUT FORMAT:",
             "  Use [loop_label] headers exactly as listed above.",
-            "  Write one block per section instance in arrangement order.",
+            "  Write one block per unique section (exact sections appear once — the",
+            "  arrangement handles repetition). Variation instances each get their own block.",
             "  Output only the lyrics — no commentary, no explanations.",
             "  Lines starting with # are ignored.",
             "",
@@ -888,8 +963,18 @@ def _build_prompt(
         "(Headers are melody loop labels — each maps to one MIDI clip.)",
     ]
 
+    # Track variation instance counts per base label for numbering
+    variation_count: dict[str, int] = {}
+
     for sec in vocal_sections:
+        repeat_type = sec.get("lyric_repeat_type", "fresh")
+
+        # exact_repeat instances are skipped — they reuse the first block
+        if repeat_type == "exact_repeat":
+            continue
+
         name = sec["name"]
+        base_label = sec.get("approved_label", name)
         lo, hi = syllable_targets.get(name, (0, 0))
         denom = max(sec["bars"] * sec["play_count"], 1)
         notes_per_bar = sec["total_notes"] / denom
@@ -904,6 +989,19 @@ def _build_prompt(
                 f"    Target syllables: {lo}–{hi}  (≈{notes_per_bar:.1f} notes/bar)",
             ]
         )
+
+        if repeat_type == "exact":
+            lines.append(
+                "    # This section repeats verbatim — write it once, it will be reused"
+            )
+        elif repeat_type == "variation":
+            variation_count[base_label] = variation_count.get(base_label, 0) + 1
+            n = variation_count[base_label]
+            if n > 1:
+                lines.append(
+                    f"    # Variation {n} of {base_label}: same meter and rhyme scheme"
+                    f" as {base_label}, but new images and lines"
+                )
 
         if phrases:
             # Scale phrase list to cover all plays of this loop
@@ -935,7 +1033,8 @@ def _build_prompt(
             "",
             "OUTPUT FORMAT:",
             "  Use [loop_label] headers exactly as listed above.",
-            "  Write one block per section instance in arrangement order.",
+            "  Write one block per unique section (exact sections appear once — the",
+            "  arrangement handles repetition). Variation instances each get their own block.",
             "  Output only the lyrics — no commentary, no explanations.",
             "  Lines starting with # are ignored (you may use them for stage directions).",
             "  When phrase counts are given, write exactly that many lines per section.",
@@ -1194,7 +1293,11 @@ def run_lyric_pipeline(
 
     # --- 3. Read vocal sections from arrangement ---
     vocal_sections = read_vocal_sections_from_arrangement(
-        arrangement_path, melody_dir, meta["bpm"], meta["time_sig"]
+        arrangement_path,
+        melody_dir,
+        meta["bpm"],
+        meta["time_sig"],
+        production_dir=prod_path,
     )
     if not vocal_sections:
         print("ERROR: No melody clips found on track 4 in arrangement.txt")
@@ -1206,7 +1309,9 @@ def run_lyric_pipeline(
     # --- 3b. Extract MIDI phrase structure per section ---
     approved_dir = melody_dir / "approved"
     for sec in vocal_sections:
-        midi_path = approved_dir / f"{sec['name']}.mid"
+        # Use approved_label (base label) — MIDI files are stored under the base
+        # label even when the instance key has a _2/_3 suffix.
+        midi_path = approved_dir / f"{sec['approved_label']}.mid"
         sec["phrases"] = extract_phrases(midi_path) if midi_path.exists() else []
 
     print(f"\nVocal sections ({len(vocal_sections)}) from arrangement:")
