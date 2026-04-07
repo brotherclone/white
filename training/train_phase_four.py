@@ -9,10 +9,10 @@ Usage:
     python runpod_train_phase4.py --skip-deps  # If deps already installed
 """
 
+import shutil
 import subprocess
 import sys
 from pathlib import Path
-import shutil
 
 
 def install_dependencies():

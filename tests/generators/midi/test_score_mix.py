@@ -10,10 +10,9 @@ import yaml
 
 from app.generators.midi.production.score_mix import (
     chromatic_drift_report,
-    write_mix_score,
     score_mix,
+    write_mix_score,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
@@ -243,8 +242,8 @@ class TestScoreMixIntegration:
 
     def _make_audio_file(self, tmp_path: Path) -> Path:
         """Create a dummy WAV file."""
-        import wave
         import struct
+        import wave
 
         wav_path = tmp_path / "bounce.wav"
         with wave.open(str(wav_path), "w") as f:

@@ -5,9 +5,10 @@ Extends the binary classifier to predict specific rebracketing types
 (spatial, temporal, causal, perceptual, memory, ontological, narrative, identity).
 """
 
+from typing import Dict, List, Optional
+
 import torch
 import torch.nn as nn
-from typing import List, Optional, Dict
 
 
 class MultiClassRebracketingClassifier(nn.Module):

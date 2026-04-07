@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile

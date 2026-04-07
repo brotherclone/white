@@ -28,25 +28,25 @@ import argparse
 import math
 import re
 import sys
-import mido
-import yaml
-
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+
+import mido
+import yaml
 from dotenv import load_dotenv
 
 from app.generators.artist_catalog import load_artist_context  # noqa: E402
-from app.generators.midi.production.init_production import (
-    load_initial_proposal,
-    load_song_context,
-)  # noqa: E402
 from app.generators.midi.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
     compute_chromatic_match,
     get_chromatic_target,
 )
+from app.generators.midi.production.init_production import (
+    load_initial_proposal,
+    load_song_context,
+)  # noqa: E402
 from app.generators.midi.production.production_plan import (  # noqa: E402
     _infer_repeat_type,
     _normalize_repeat_type,

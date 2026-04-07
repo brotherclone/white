@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.util.clean_mock_artifacts import find_mock_dirs, delete_paths, main
+from app.util.clean_mock_artifacts import delete_paths, find_mock_dirs, main
 
 
 def test_find_mock_dirs_top_level_only(tmp_path: Path):

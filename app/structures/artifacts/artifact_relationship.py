@@ -1,5 +1,6 @@
-from typing import List, Dict
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Dict, List
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ArtifactRelationship(BaseModel):

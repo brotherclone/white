@@ -1,18 +1,18 @@
 import logging
 import os
-
 from abc import ABC
-from typing import Union, Optional
-from pydantic import Field
+from typing import Optional, Union
+
 from dotenv import load_dotenv
+from pydantic import Field
 
 from app.agents.tools.encodings.acrostic_encoding import AcrosticEncoding
 from app.agents.tools.encodings.anagram_encodings import AnagramEncoding
 from app.agents.tools.encodings.riddle_encoding import RiddleEncoding
 from app.agents.tools.infranym_text_tools import (
     create_acrostic_encoding,
-    create_riddle_encoding,
     create_anagram_encoding,
+    create_riddle_encoding,
 )
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.chain_artifact_type import ChainArtifactType

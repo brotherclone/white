@@ -14,11 +14,11 @@ import argparse
 import logging
 import math
 import re
-import yaml
-
 from collections import Counter
 from pathlib import Path
 from typing import Optional
+
+import yaml
 
 logger = logging.getLogger(__name__)
 

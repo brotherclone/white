@@ -5,27 +5,28 @@ Returns ConceptExtractionResult with no redundancy.
 """
 
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
-from app.extractors.manifest_extractor.scoring_functions import (
-    score_rebracketing_intensity,
-    score_temporal_complexity,
-    score_ontological_uncertainty,
-    score_memory_discrepancy,
-    score_boundary_fluidity,
-    score_rebracketing_coverage,
-    check_has_rebracketing_markers,
-    calculate_basic_text_features,
+from app.extractors.manifest_extractor.concept_extraction_result import (
+    ConceptExtractionResult,
 )
 from app.extractors.manifest_extractor.rebracketing_type_classifier import (
     classify_by_domain,
 )
+from app.extractors.manifest_extractor.scoring_functions import (
+    calculate_basic_text_features,
+    check_has_rebracketing_markers,
+    score_boundary_fluidity,
+    score_memory_discrepancy,
+    score_ontological_uncertainty,
+    score_rebracketing_coverage,
+    score_rebracketing_intensity,
+    score_temporal_complexity,
+)
 from app.structures.concepts.methodology_feature import MethodologyFeature
 from app.structures.concepts.rainbow_table_color import get_rainbow_table_color
 from app.structures.concepts.rebracketing_analysis import RebracketingAnalysis
-from app.extractors.manifest_extractor.concept_extraction_result import (
-    ConceptExtractionResult,
-)
 
 
 class ConceptExtractor(BaseModel):

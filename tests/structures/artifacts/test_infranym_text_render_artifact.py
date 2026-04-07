@@ -1,4 +1,5 @@
 import os
+
 from PIL import Image
 
 from app.structures.artifacts.infranym_text_render_artifact import (

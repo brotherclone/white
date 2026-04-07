@@ -1,10 +1,12 @@
-import pytest
 from pathlib import Path
 from typing import Any, Iterable, cast
+
+import pytest
 from PIL import Image
+
 from app.agents.tools.image_tools import (
-    composite_images,
     composite_character_portrait,
+    composite_images,
 )
 
 

@@ -1,6 +1,7 @@
-import pytest
 import os
+
 import numpy as np
+import pytest
 from PIL import Image
 
 from app.structures.artifacts.infranym_encoded_image_artifact import (

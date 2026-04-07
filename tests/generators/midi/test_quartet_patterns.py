@@ -15,7 +15,6 @@ from app.generators.midi.pipelines.quartet_pipeline import (
     resolve_parallel_violations,
 )
 
-
 # ---------------------------------------------------------------------------
 # 1. clamp_to_voice_range
 # ---------------------------------------------------------------------------

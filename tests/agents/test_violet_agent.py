@@ -1,15 +1,15 @@
 import pytest
 
 from app.agents.states.violet_agent_state import VioletAgentState
-from app.agents.violet_agent import VioletAgent
 from app.agents.states.white_agent_state import MainAgentState
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
-from app.structures.concepts.vanity_persona import VanityPersona
-from app.structures.concepts.vanity_interview_question import VanityInterviewQuestion
-from app.structures.concepts.vanity_interview_response import VanityInterviewResponse
+from app.agents.violet_agent import VioletAgent
 from app.structures.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
 )
+from app.structures.concepts.vanity_interview_question import VanityInterviewQuestion
+from app.structures.concepts.vanity_interview_response import VanityInterviewResponse
+from app.structures.concepts.vanity_persona import VanityPersona
+from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 @pytest.fixture

@@ -61,12 +61,13 @@ def extract_clap_embeddings(
     batch_size: int = 4,
 ):
     """Extract CLAP audio embeddings, streaming row groups from media parquet."""
-    import torch
+    from pathlib import Path
+
+    import librosa
     import numpy as np
     import pandas as pd
     import pyarrow.parquet as pq
-    import librosa
-    from pathlib import Path
+    import torch
     from huggingface_hub import hf_hub_download
     from tqdm import tqdm
 

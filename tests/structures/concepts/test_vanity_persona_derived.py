@@ -1,7 +1,7 @@
 import pytest
 
-from app.structures.enums.vanity_interviewer_type import VanityInterviewerType
 from app.structures.concepts.vanity_persona import VanityPersona
+from app.structures.enums.vanity_interviewer_type import VanityInterviewerType
 
 
 @pytest.fixture

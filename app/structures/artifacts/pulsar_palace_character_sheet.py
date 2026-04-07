@@ -1,18 +1,17 @@
 import logging
 import os
-from typing import Optional, TYPE_CHECKING
-
-import yaml
-
 from abc import ABC
 from pathlib import Path
-from pydantic import Field, ConfigDict
+from typing import TYPE_CHECKING, Optional
+
+import yaml
 from dotenv import load_dotenv
+from pydantic import ConfigDict, Field
 
 from app.structures.artifacts.html_artifact_file import HtmlChainArtifactFile
 from app.structures.artifacts.template_renderer import (
-    get_template_path,
     HTMLTemplateRenderer,
+    get_template_path,
 )
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType

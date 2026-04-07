@@ -18,13 +18,12 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-import mido
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import mido
+import yaml
 from dotenv import load_dotenv
 
 from app.generators.midi.production.init_production import load_song_context

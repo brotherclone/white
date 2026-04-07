@@ -5,6 +5,7 @@ Text encoder using DeBERTa.
 Wraps HuggingFace transformers with configurable pooling and layer freezing.
 """
 import re
+
 import torch
 import torch.nn as nn
 from transformers import AutoModel

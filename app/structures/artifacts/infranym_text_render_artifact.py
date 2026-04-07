@@ -1,10 +1,10 @@
 import logging
-import numpy as np
 import os
-
-from typing import Tuple
-from dotenv import load_dotenv
 from abc import ABC
+from typing import Tuple
+
+import numpy as np
+from dotenv import load_dotenv
 from PIL import Image, ImageDraw, ImageFont
 from pydantic import Field
 

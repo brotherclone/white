@@ -1,11 +1,11 @@
 """Tests for midi_cleanup — MIDI tempo track trimming."""
 
-import pytest
-import mido
 from pathlib import Path
 
-from app.util.midi_cleanup import batch_trim, trim_midi_tempo_track
+import mido
+import pytest
 
+from app.util.midi_cleanup import batch_trim, trim_midi_tempo_track
 
 # ---------------------------------------------------------------------------
 # Helpers: build synthetic MIDI files

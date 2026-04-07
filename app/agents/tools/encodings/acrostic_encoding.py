@@ -1,4 +1,5 @@
 from typing import List
+
 from pydantic import Field, field_validator
 
 from app.structures.concepts.infranym_text_encoding import InfranymTextEncoding

@@ -1,14 +1,15 @@
 """Tests for training data verification tool."""
 
+import logging
+from io import BytesIO
+from pathlib import Path
+
 import mido
 import numpy as np
 import polars as pl
 import pyarrow as pa
 import pyarrow.parquet as pq
-import logging
 
-from io import BytesIO
-from pathlib import Path
 from training.verify_extraction import (
     extract_segments,
     format_coverage_report,

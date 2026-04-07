@@ -1,6 +1,6 @@
 from app.reference.music.blue_agent_instruments import (
-    BLUE_AGENT_INSTRUMENTS,
     BLUE_AGENT_INSTRUMENTATION_COLOR,
+    BLUE_AGENT_INSTRUMENTS,
 )
 
 

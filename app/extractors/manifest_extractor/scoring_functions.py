@@ -6,23 +6,23 @@ All use proper word boundary matching from word_matching.py
 """
 
 from app.extractors.manifest_extractor.word_matching import (
+    calculate_coverage,
+    calculate_density,
+    count_pattern_matches,
     count_word_matches,
     find_unique_word_matches,
-    count_pattern_matches,
-    calculate_density,
-    calculate_coverage,
-)
-from app.reference.rebracketing_words.temporal_words import (
-    TEMPORAL_WORDS,
-    TEMPORAL_DEIXIS_PATTERNS,
-)
-from app.reference.rebracketing_words.rebracketing_words import (
-    REBRACKETING_WORDS,
-    ONTOLOGICAL_UNCERTAINTY,
-    REALITY_CORRECTIONS,
 )
 from app.reference.rebracketing_words.discrepancy_words import DISCREPANCY_WORDS
 from app.reference.rebracketing_words.fluidity_words import FLUIDITY_WORDS
+from app.reference.rebracketing_words.rebracketing_words import (
+    ONTOLOGICAL_UNCERTAINTY,
+    REALITY_CORRECTIONS,
+    REBRACKETING_WORDS,
+)
+from app.reference.rebracketing_words.temporal_words import (
+    TEMPORAL_DEIXIS_PATTERNS,
+    TEMPORAL_WORDS,
+)
 
 
 def score_rebracketing_intensity(text: str) -> float:

@@ -22,7 +22,6 @@ from app.extractors.manifest_extractor.scoring_functions import (
     score_temporal_complexity,
 )
 
-
 # ---------------------------------------------------------------------------
 # score_rebracketing_intensity
 # ---------------------------------------------------------------------------
@@ -50,7 +49,9 @@ class TestScoreRebracketingIntensity:
     def test_more_markers_means_higher_score(self):
         sparse = "the quick brown fox jumps over the lazy dog"
         dense = "actually really in fact it seemed different rather than not"
-        assert score_rebracketing_intensity(dense) > score_rebracketing_intensity(sparse)
+        assert score_rebracketing_intensity(dense) > score_rebracketing_intensity(
+            sparse
+        )
 
     def test_word_boundary_not_subword(self):
         # "real" is not in the word lists; "really" is in REALITY_CORRECTIONS
@@ -74,18 +75,24 @@ class TestScoreTemporalComplexity:
 
     def test_text_with_temporal_words_scores_positive(self):
         # "when", "before", "after" are all in TEMPORAL_WORDS
-        score = score_temporal_complexity("when I was young before the storm after the rain")
+        score = score_temporal_complexity(
+            "when I was young before the storm after the rain"
+        )
         assert score > 0.0
 
     def test_temporal_deixis_pattern_boosts_score(self):
         # Patterns are weighted x2; "the year was" is a deixis pattern
         without_pattern = "yesterday I walked and then I ran and later I slept"
         with_pattern = "the year was 1993 when I first heard that song"
-        assert score_temporal_complexity(with_pattern) > score_temporal_complexity(without_pattern)
+        assert score_temporal_complexity(with_pattern) > score_temporal_complexity(
+            without_pattern
+        )
 
     def test_score_capped_at_one(self):
         # Extremely dense temporal text should not exceed 1.0
-        dense = " ".join(["when", "before", "after", "during", "while", "then", "now"] * 5)
+        dense = " ".join(
+            ["when", "before", "after", "during", "while", "then", "now"] * 5
+        )
         assert score_temporal_complexity(dense) <= 1.0
 
     def test_score_never_negative(self):
@@ -138,7 +145,9 @@ class TestScoreOntologicalUncertainty:
         both = "it seemed like a dream but was actually real"
         # With both markers the branch uses /5.0 vs /10.0, so same density
         # gives a higher score
-        assert score_ontological_uncertainty(both) >= score_ontological_uncertainty(only_uncertainty)
+        assert score_ontological_uncertainty(both) >= score_ontological_uncertainty(
+            only_uncertainty
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -166,7 +175,9 @@ class TestScoreMemoryDiscrepancy:
 
     def test_more_discrepancy_words_means_higher_score(self):
         sparse = "it was different from what I expected"
-        dense = "it was actually really different and changed rather than staying instead"
+        dense = (
+            "it was actually really different and changed rather than staying instead"
+        )
         assert score_memory_discrepancy(dense) > score_memory_discrepancy(sparse)
 
     def test_score_never_negative(self):
@@ -254,7 +265,9 @@ class TestCheckHasRebracketingMarkers:
         assert check_has_rebracketing_markers("") is False
 
     def test_text_without_markers_returns_false(self):
-        assert check_has_rebracketing_markers("the sun shines brightly overhead") is False
+        assert (
+            check_has_rebracketing_markers("the sun shines brightly overhead") is False
+        )
 
     def test_text_with_marker_returns_true(self):
         assert check_has_rebracketing_markers("it was actually true") is True
@@ -302,7 +315,9 @@ class TestCalculateBasicTextFeatures:
         assert result["word_count"] == 3
 
     def test_sentence_count(self):
-        result = calculate_basic_text_features("First sentence. Second sentence. Third.")
+        result = calculate_basic_text_features(
+            "First sentence. Second sentence. Third."
+        )
         assert result["sentence_count"] == 3
 
     def test_avg_word_length(self):

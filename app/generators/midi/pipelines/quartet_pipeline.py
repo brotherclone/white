@@ -23,12 +23,12 @@ import argparse
 import io
 import random
 import sys
-import mido
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+
+import mido
+import yaml
 
 from app.generators.midi.patterns.quartet_patterns import (
     QUARTET_CHANNELS,
@@ -45,7 +45,6 @@ from app.generators.midi.pipelines.chord_pipeline import (
     get_chromatic_target,
 )
 from app.generators.midi.production.init_production import load_song_context
-
 
 QUARTET_DIR_NAME = "quartet"
 REVIEW_FILENAME = "review.yml"

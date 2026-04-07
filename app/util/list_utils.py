@@ -1,5 +1,5 @@
 import math
-from typing import TypeVar, Sequence
+from typing import Sequence, TypeVar
 
 T = TypeVar("T")
 

@@ -16,7 +16,6 @@ from app.generators.midi.patterns.harmonic_rhythm import (
     extract_drum_accents,
 )
 
-
 # ===========================================================================
 # Distribution enumeration
 # ===========================================================================

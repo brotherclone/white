@@ -22,7 +22,6 @@ from app.util.shrinkwrap_chain_artifacts import (
     write_manifest,
 )
 
-
 # --- Helpers ---
 
 

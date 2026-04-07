@@ -1,9 +1,10 @@
 import os
+
 import pytest
 
 from app.agents.tools.speech_tools import (
-    transcription_from_speech_to_text,
     evp_speech_to_text,
+    transcription_from_speech_to_text,
 )
 
 

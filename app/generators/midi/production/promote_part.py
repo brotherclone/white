@@ -12,10 +12,10 @@ Usage:
 
 import argparse
 import shutil
+from pathlib import Path
+
 import mido
 import yaml
-
-from pathlib import Path
 
 from app.util.diversity_tracker import (
     find_album_dir,

@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.image_text_style import ImageTextStyle

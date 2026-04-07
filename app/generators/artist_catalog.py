@@ -27,10 +27,10 @@ Usage:
 import argparse
 import re
 import sys
-import yaml
-
 from pathlib import Path
 from typing import Optional
+
+import yaml
 from dotenv import load_dotenv
 
 load_dotenv()

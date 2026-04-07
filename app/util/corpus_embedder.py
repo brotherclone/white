@@ -17,7 +17,7 @@ import os
 import re
 from collections import Counter
 from pathlib import Path
-from typing import List, Tuple, Optional, Dict
+from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

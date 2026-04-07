@@ -11,14 +11,13 @@ import pytest
 import yaml
 
 from app.generators.midi.pipelines.white_rebracketing import (
+    _root_to_semitone,
     build_bar_pool,
     concatenate_bars,
     extract_bars,
     set_midi_bpm,
     transpose_midi,
-    _root_to_semitone,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

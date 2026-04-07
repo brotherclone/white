@@ -1,5 +1,6 @@
-import yaml
 import os
+
+import yaml
 
 
 def test_alternate_timeline_mocks():

@@ -11,11 +11,12 @@ Total outputs: 10
 - Confidence: chromatic_confidence with sigmoid [0, 1]
 """
 
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import List, Dict, Tuple, Optional
-from dataclasses import dataclass
 
 
 @dataclass

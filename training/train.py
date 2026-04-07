@@ -6,26 +6,27 @@ Usage:
 """
 
 import argparse
-import yaml
+import json
 from pathlib import Path
+
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer
-from torch.optim import AdamW
-from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
-from tqdm import tqdm
-import json
+import yaml
+from core.multiclass_metrics import MultiClassMetrics, MultiLabelMetrics, top_k_accuracy
+from core.multiclass_pipeline import build_multiclass_dataloaders
 
 # Local imports
 from core.pipeline import build_dataloaders
-from core.multiclass_pipeline import build_multiclass_dataloaders
-from core.multiclass_metrics import MultiClassMetrics, MultiLabelMetrics, top_k_accuracy
-from models.text_encoder import TextEncoder
 from models.classifier import BinaryClassifier, RainbowModel
 from models.multiclass_classifier import (
-    MultiClassRebracketingClassifier,
     MultiClassRainbowModel,
+    MultiClassRebracketingClassifier,
 )
+from models.text_encoder import TextEncoder
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
+from tqdm import tqdm
+from transformers import AutoTokenizer
 
 try:
     import wandb

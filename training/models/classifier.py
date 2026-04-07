@@ -4,9 +4,10 @@ Binary classifier for rebracketing detection.
 Simple MLP head on top of text embeddings.
 """
 
+from typing import List
+
 import torch
 import torch.nn as nn
-from typing import List
 
 
 class BinaryClassifier(nn.Module):

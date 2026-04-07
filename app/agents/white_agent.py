@@ -8,13 +8,13 @@ present by shifting the angle of perception through successive refraction.
 
 import logging
 import os
-import time
-import yaml
 import re
-
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
+
+import yaml
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.checkpoint.memory import MemorySaver
@@ -30,10 +30,10 @@ from app.agents.indigo_agent import IndigoAgent
 from app.agents.orange_agent import OrangeAgent
 from app.agents.red_agent import RedAgent
 from app.agents.states.white_agent_state import (
+    ArtifactRelationship,
+    FacetEvolution,
     MainAgentState,
     TransformationTrace,
-    FacetEvolution,
-    ArtifactRelationship,
 )
 from app.agents.tools.text_tools import save_markdown
 from app.agents.violet_agent import VioletAgent
@@ -41,6 +41,7 @@ from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.agents.yellow_agent import YellowAgent
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.concepts.white_facet_system import WhiteFacetSystem
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.synthesis_prompt_template import SynthesisPromptTemplate
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
@@ -49,7 +50,6 @@ from app.util.generate_negative_constraints import (
     generate_constraints,
 )
 from app.util.shrinkwrap_chain_artifacts import shrinkwrap
-from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 logging.basicConfig(level=logging.INFO)
 

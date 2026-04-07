@@ -5,19 +5,18 @@ Validates generated concepts using the Rainbow Table ontological regression mode
 Provides accept/reject decisions with actionable suggestions for improvement.
 """
 
-import warnings
-import yaml
 import hashlib
 import time
-import torch
-import numpy as np
-
+import warnings
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import torch
+import yaml
 from models.multitask_model import MultiTaskRainbowModel
 from models.text_encoder import TextEncoder
-
 
 # Type hints for optional dependencies
 try:

@@ -21,15 +21,14 @@ Usage:
     # → sorted list with scores + original candidate data
 """
 
+# Import midi_bytes_to_piano_roll without triggering training.models.__init__
+# (which eagerly imports torch-dependent classifiers)
+import importlib.util as _ilu  # noqa: E402
 import logging
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
-
-# Import midi_bytes_to_piano_roll without triggering training.models.__init__
-# (which eagerly imports torch-dependent classifiers)
-import importlib.util as _ilu  # noqa: E402
 
 _spec = _ilu.spec_from_file_location(
     "piano_roll_encoder",

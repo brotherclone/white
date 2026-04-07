@@ -1,12 +1,12 @@
 """Tests for app/tools/candidate_server.py — API endpoints via TestClient."""
 
-import yaml
-import pytest
 from pathlib import Path
+
+import pytest
+import yaml
 from fastapi.testclient import TestClient
 
 from app.tools.candidate_server import create_app
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

@@ -15,20 +15,20 @@ Layer 3 (Submerged): Frequency-isolated - subliminal, discoverable
 All layers are AUDIBLE with careful listening, not digital headers.
 """
 
-import time as teatime
-import logging
-import pyttsx3
-import numpy as np
 import json
-
-from pydub import AudioSegment
-from pydub.effects import low_pass_filter, high_pass_filter
+import logging
+import time as teatime
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
-from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
+import numpy as np
+import pyttsx3
+from pydub import AudioSegment
+from pydub.effects import high_pass_filter, low_pass_filter
+
 from app.structures.artifacts.infranym_voice_composition import InfranymVoiceComposition
+from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
+from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
 
 logger = logging.getLogger(__name__)
 

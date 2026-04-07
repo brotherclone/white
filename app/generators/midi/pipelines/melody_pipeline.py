@@ -18,21 +18,21 @@ Usage:
 import argparse
 import io
 import sys
-import mido
-import numpy as np
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import mido
+import numpy as np
+import yaml
+
 from app.generators.midi.patterns.melody_patterns import (
     ALL_TEMPLATES,
     MELODY_CHANNEL,
+    SINGERS,
     VELOCITY,
     MelodyPattern,
     SingerRange,
-    SINGERS,
     chord_tone_alignment,
     contour_quality,
     infer_singer,
@@ -42,28 +42,27 @@ from app.generators.midi.patterns.melody_patterns import (
     select_templates,
     singability_score,
 )
+from app.generators.midi.patterns.strum_patterns import (
+    read_approved_harmonic_rhythm,
+)
 from app.generators.midi.pipelines.chord_pipeline import (
     _to_python,
     compute_chromatic_match,
     get_chromatic_target,
     load_song_proposal,
 )
-from app.generators.midi.patterns.strum_patterns import (
-    read_approved_harmonic_rhythm,
-)
 from app.generators.midi.production.init_production import load_song_context
+from app.util.diversity_tracker import (
+    diversity_factor,
+    find_album_dir,
+    load_registry,
+)
 from app.util.phrase_dynamics import (
     DynamicCurve,
     apply_dynamics_curve,
     infer_curve,
     parse_curve,
 )
-from app.util.diversity_tracker import (
-    diversity_factor,
-    find_album_dir,
-    load_registry,
-)
-
 
 # ---------------------------------------------------------------------------
 # Melodic continuity helpers

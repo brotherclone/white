@@ -2,12 +2,12 @@
 Build Polars/Parquet database from MIDI chord library.
 """
 
-import polars as pl
-import networkx as nx
 import pickle
-
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
+
+import networkx as nx
+import polars as pl
 
 from .midi_parser import parse_all_chords, parse_all_progressions
 

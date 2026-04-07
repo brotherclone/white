@@ -1,10 +1,10 @@
 import logging
-
 from abc import ABC
-from typing import Union, Optional, List
-from mido import MidiFile, MidiTrack, MetaMessage, Message
-from pydantic import Field
+from typing import List, Optional, Union
+
 from dotenv import load_dotenv
+from mido import Message, MetaMessage, MidiFile, MidiTrack
+from pydantic import Field
 
 from app.agents.tools.encodings.morse_duration_encoding import MorseDurationEncoding
 from app.agents.tools.encodings.note_cipher_encoding import NoteCipherEncoding
@@ -218,9 +218,9 @@ class InfranymMidiArtifact(MidiArtifactFile, ABC):
 if __name__ == "__main__":
     # Import functions for testing (avoids circular import at module level)
     from app.agents.tools.infranym_midi_tools import (
-        generate_note_cipher,
-        generate_morse_duration,
         add_carrier_melody_to_artifact,
+        generate_morse_duration,
+        generate_note_cipher,
     )
 
     # Test 1: Note Cipher
