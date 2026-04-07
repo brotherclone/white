@@ -1,4 +1,4 @@
-from typing import List, Optional, Annotated
+from typing import Annotated, List, Optional
 
 from pydantic import Field
 

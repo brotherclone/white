@@ -13,10 +13,9 @@ Core functions (used internally by chord_pipeline.py to bake HR into candidates)
 """
 
 import io
-import mido
-
 from itertools import product as iterproduct
 
+import mido
 
 # ---------------------------------------------------------------------------
 # Distribution enumeration

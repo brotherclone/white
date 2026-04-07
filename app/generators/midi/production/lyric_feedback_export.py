@@ -21,9 +21,9 @@ Usage:
 import argparse
 import json
 import sys
-import yaml
-
 from pathlib import Path
+
+import yaml
 
 from app.generators.midi.pipelines.lyric_pipeline import (
     _compute_fitting,

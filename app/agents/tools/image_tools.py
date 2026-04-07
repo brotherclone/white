@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import List, Union
+
 from PIL import Image
 
 

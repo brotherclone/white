@@ -8,10 +8,10 @@ import mido
 import pytest
 
 from app.generators.midi.production.drift_report import (
-    parse_timecode,
-    levenshtein,
     compare_section,
     generate_drift_report,
+    levenshtein,
+    parse_timecode,
     segment_ace_export_by_arrangement,
     write_drift_report,
 )

@@ -1,6 +1,7 @@
 import json
 import os
 import random
+
 from dotenv import load_dotenv
 
 from app.structures.artifacts.species_extinction_artifact import (

@@ -1,11 +1,11 @@
 import os
-import yaml
-
 from abc import ABC
 from pathlib import Path
-from typing import List, Optional, Dict
-from pydantic import Field
+from typing import Dict, List, Optional
+
+import yaml
 from dotenv import load_dotenv
+from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.population_data import PopulationData

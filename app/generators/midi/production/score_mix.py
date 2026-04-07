@@ -204,11 +204,11 @@ def score_mix(
         and chromatic_match. drift_report contains per-dimension deltas and
         overall_drift.
     """
-    from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
     from app.generators.midi.pipelines.chord_pipeline import (
         compute_chromatic_match,
         get_chromatic_target,
     )
+    from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
 
     production_dir = Path(production_dir)
     audio_path = Path(audio_path)

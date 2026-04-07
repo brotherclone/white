@@ -1,6 +1,6 @@
 import datetime
+from typing import Dict, List, Literal, Optional
 
-from typing import List, Optional, Literal, Dict
 from pydantic import BaseModel, Field, computed_field
 
 from app.structures.concepts.biographical_event import BiographicalEvent

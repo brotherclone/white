@@ -15,14 +15,26 @@ Usage:
 import argparse
 import io
 import sys
-import mido
-import numpy as np
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import mido
+import numpy as np
+import yaml
+
+from app.generators.midi.patterns.drum_patterns import (
+    ALL_TEMPLATES,
+    DEFAULT_GENRE_FAMILY,
+    DEFAULT_SECTION_ENERGY,
+    GM_PERCUSSION,
+    VELOCITY,
+    DrumPattern,
+    energy_appropriateness,
+    make_fallback_pattern,
+    map_genres_to_families,
+    select_templates,
+)
 from app.generators.midi.pipelines.chord_pipeline import (
     _to_python,
     compute_chromatic_match,
@@ -35,18 +47,6 @@ from app.util.phrase_dynamics import (
     apply_dynamics_curve,
     infer_curve,
     parse_curve,
-)
-from app.generators.midi.patterns.drum_patterns import (
-    ALL_TEMPLATES,
-    DEFAULT_GENRE_FAMILY,
-    DEFAULT_SECTION_ENERGY,
-    GM_PERCUSSION,
-    VELOCITY,
-    DrumPattern,
-    energy_appropriateness,
-    make_fallback_pattern,
-    map_genres_to_families,
-    select_templates,
 )
 
 # ---------------------------------------------------------------------------

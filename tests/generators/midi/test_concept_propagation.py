@@ -9,12 +9,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 from app.generators.midi.production.init_production import (
     load_song_context,
     write_initial_proposal,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

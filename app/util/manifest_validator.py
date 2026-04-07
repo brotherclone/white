@@ -4,11 +4,11 @@ import os
 import re
 import sys
 import time
-import discogs_client
-import yaml
-
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+import discogs_client
+import yaml
 from dotenv import load_dotenv
 
 

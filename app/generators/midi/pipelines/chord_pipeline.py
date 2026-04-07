@@ -17,25 +17,25 @@ import argparse
 import io
 import re
 import sys
-import mido
-import numpy as np
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import mido
+import numpy as np
+import yaml
+
 from app.generators.artist_catalog import load_artist_context
-from app.generators.midi.production.init_production import load_initial_proposal
 from app.generators.midi.chord_generator.generator import ChordProgressionGenerator
-from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 from app.generators.midi.patterns.harmonic_rhythm import enumerate_distributions
 from app.generators.midi.patterns.strum_patterns import (
     StrumPattern,
     get_patterns_for_time_sig,
     strum_to_midi_bytes,
 )
+from app.generators.midi.production.init_production import load_initial_proposal
 from app.structures.music.core.enharmonic import normalize_to_flat
+from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 
 
 def _to_python(obj):
@@ -488,8 +488,8 @@ def generate_white_candidates(
     """
     import random as _random
 
-    from training.refractor import Refractor
     from app.generators.midi.pipelines.white_rebracketing import concatenate_bars
+    from training.refractor import Refractor
 
     rng = _random.Random(seed)
     tpb = 480

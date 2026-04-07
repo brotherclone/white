@@ -52,12 +52,12 @@ MAX_LENGTH = 512
 )
 def extract_embeddings(batch_size: int = 32, dry_run: bool = False):
     """Extract DeBERTa embeddings for all training segments."""
-    import torch
     import numpy as np
     import pandas as pd
+    import torch
     from huggingface_hub import hf_hub_download
-    from transformers import AutoTokenizer, AutoModel
     from tqdm import tqdm
+    from transformers import AutoModel, AutoTokenizer
 
     # --- 1. Load data from HuggingFace ---
     # Download the specific parquet file directly (avoids repo tree listing timeout)

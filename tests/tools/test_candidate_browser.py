@@ -1,15 +1,15 @@
 """Tests for app/tools/candidate_browser.py — data layer only (no UI)."""
 
-import yaml
 from pathlib import Path
+
+import yaml
 
 from app.tools.candidate_browser import (
     CandidateEntry,
     approve_candidate,
-    reject_candidate,
     load_all_candidates,
+    reject_candidate,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

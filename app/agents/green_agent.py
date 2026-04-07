@@ -2,21 +2,20 @@ import json
 import logging
 import os
 import time
-import yaml
-
 from abc import ABC
+
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.constants import START, END
+from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
 
 from app.agents.states.green_agent_state import GreenAgentState
 from app.agents.states.white_agent_state import MainAgentState
-from app.agents.tools.extinction_tools import load_green_corpus, get_random_species
+from app.agents.tools.extinction_tools import get_random_species, load_green_corpus
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
 from app.structures.artifacts.last_human_artifact import LastHumanArtifact
 from app.structures.artifacts.last_human_species_extinction_narative_artifact import (
@@ -31,6 +30,7 @@ from app.structures.concepts.last_human_species_extinction_parallel_moment impor
 )
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.manifests.song_proposal import SongProposalIteration
+from app.util.agent_state_utils import get_state_snapshot
 
 load_dotenv()
 

@@ -36,8 +36,9 @@ Integration points:
     - Could also live in the chord export pipeline right after mido.MidiFile.save()
 """
 
-import mido
 from pathlib import Path
+
+import mido
 
 
 def trim_midi_tempo_track(

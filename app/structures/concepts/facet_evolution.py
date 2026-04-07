@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
-from pydantic import BaseModel, Field, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.structures.enums.white_facet import WhiteFacet
 

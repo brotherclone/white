@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 
 

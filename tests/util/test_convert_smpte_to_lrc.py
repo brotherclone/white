@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.util.convert_smpte_to_lrc import convert_timestamp, convert_text, main
+from app.util.convert_smpte_to_lrc import convert_text, convert_timestamp, main
 
 
 def test_convert_timestamp_basic():

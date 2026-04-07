@@ -1,6 +1,6 @@
 import enum
-import pytest
 
+import pytest
 
 from app.structures.enums.infranym_method import InfranymMethod
 

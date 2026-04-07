@@ -19,11 +19,11 @@ Example: Song with guitar, vocals, fiddle and 10 lyric segments:
 import logging
 import os
 import tempfile
+from pathlib import Path
+from typing import Dict, List, Optional
+
 import numpy as np
 import polars as pl
-
-from pathlib import Path
-from typing import List, Optional, Dict
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 

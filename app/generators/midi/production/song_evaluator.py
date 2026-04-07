@@ -21,12 +21,12 @@ import glob as globmod
 import re
 import statistics
 import sys
-import yaml
-
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+
+import yaml
 
 from app.generators.midi.production.production_plan import load_plan
 from app.util.midi_cleanup import batch_trim as _midi_batch_trim
@@ -817,10 +817,10 @@ def _compute_ace_actuals(production_dir: Path) -> dict:
         parse_ace_export,
     )
     from app.generators.midi.production.drift_report import (
-        _parse_arrangement_sections,
+        MELODY_TRACK,
         _load_bpm,
         _load_time_sig,
-        MELODY_TRACK,
+        _parse_arrangement_sections,
     )
 
     midi_path = find_ace_export(production_dir)
@@ -883,11 +883,10 @@ def _compute_ace_actuals(production_dir: Path) -> dict:
     )
     if onnx_path.exists():
         try:
-            from training.refractor import Refractor
-
             from app.generators.midi.production.composition_proposal import (
                 load_song_proposal_data,
             )
+            from training.refractor import Refractor
 
             meta = load_song_proposal_data(production_dir)
             concept = meta.get("concept", "")

@@ -1,9 +1,9 @@
 import pytest
 
 from app.util.list_utils import (
+    interpolate_numeric_list,
     pick_by_fraction,
     pick_by_fraction_centered,
-    interpolate_numeric_list,
 )
 
 

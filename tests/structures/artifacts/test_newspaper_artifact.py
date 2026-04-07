@@ -1,10 +1,9 @@
 import pytest
-
 from pydantic import ValidationError
 
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
-from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 
 
 def test_newspaper_artifact_defaults():

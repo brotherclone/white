@@ -4,9 +4,10 @@ Unit tests for ConceptValidator and related classes.
 Tests validation logic, caching, and result generation.
 """
 
-import pytest
-import numpy as np
 import time
+
+import numpy as np
+import pytest
 
 
 class TestValidationStatus:

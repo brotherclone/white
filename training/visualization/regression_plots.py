@@ -10,8 +10,9 @@ Provides plotting functions for:
 - Prediction intervals
 """
 
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 
 from training.core.soft_targets import SoftTargets

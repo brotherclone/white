@@ -9,15 +9,16 @@ Extends the binary pipeline to support:
 - Stratified splitting
 """
 
+from collections import Counter
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 import torch
-from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer
-from collections import Counter
 
 
 class LabelEncoder:

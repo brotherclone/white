@@ -18,10 +18,10 @@ import logging
 import re
 import shutil
 import uuid
-import yaml
-
 from pathlib import Path
 from typing import Optional
+
+import yaml
 
 from app.util.generate_negative_constraints import (
     generate_constraints,

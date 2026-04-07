@@ -1,10 +1,10 @@
 import logging
 import os
-import yaml
-
 from abc import ABC
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
+
+import yaml
 from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
@@ -60,11 +60,11 @@ class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
         # Rebuild model to resolve forward references if needed
         if not hasattr(self.__class__, "_rebuilt"):
             # Import at runtime to make both PulsarPalaceCharacter and PulsarPalaceCharacterSheet available for model_rebuild
-            from app.structures.concepts.pulsar_palace_character import (
-                PulsarPalaceCharacter as _PulsarPalaceCharacter,
-            )
             from app.structures.artifacts.pulsar_palace_character_sheet import (
                 PulsarPalaceCharacterSheet as _PulsarPalaceCharacterSheet,
+            )
+            from app.structures.concepts.pulsar_palace_character import (
+                PulsarPalaceCharacter as _PulsarPalaceCharacter,
             )
 
             # Rebuild all three models with the complete namespace

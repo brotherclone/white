@@ -8,11 +8,11 @@ Each pattern specifies onset positions and durations relative to a single bar.
 """
 
 import io
-import mido
-import yaml
-
 from dataclasses import dataclass, field
 from pathlib import Path
+
+import mido
+import yaml
 
 
 @dataclass

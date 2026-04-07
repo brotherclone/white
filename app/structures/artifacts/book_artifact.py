@@ -1,11 +1,11 @@
 import os
-import yaml
-
-from dotenv import load_dotenv
 from abc import ABC
-from typing import List, Optional
-from pydantic import Field, BaseModel
 from pathlib import Path
+from typing import List, Optional
+
+import yaml
+from dotenv import load_dotenv
+from pydantic import BaseModel, Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.book_condition import BookCondition

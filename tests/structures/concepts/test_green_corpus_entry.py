@@ -1,11 +1,12 @@
-import pytest
 from datetime import datetime
+
+import pytest
 from pydantic import ValidationError
 
-from app.structures.concepts.green_corpus_entry import GreenCorpusEntry
 from app.structures.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )
+from app.structures.concepts.green_corpus_entry import GreenCorpusEntry
 from app.structures.enums.extinction_cause import ExtinctionCause
 
 

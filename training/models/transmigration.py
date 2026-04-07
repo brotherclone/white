@@ -8,18 +8,17 @@ Extends the basic TransmigrationCalculator with:
 - Path visualization utilities
 """
 
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
-
 import torch
-
 from models.rainbow_table_regression_head import (
-    OntologicalScores,
-    TEMPORAL_MODES,
-    SPATIAL_MODES,
-    ONTOLOGICAL_MODES,
     ALBUM_MAPPING,
+    ONTOLOGICAL_MODES,
+    SPATIAL_MODES,
+    TEMPORAL_MODES,
+    OntologicalScores,
 )
 
 

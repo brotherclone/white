@@ -5,8 +5,8 @@ Tests label encoding/decoding, class distribution analysis,
 and edge cases.
 """
 
-import pytest
 import numpy as np
+import pytest
 import torch
 from core.multiclass_pipeline import LabelEncoder
 

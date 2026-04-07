@@ -1,5 +1,4 @@
 import importlib
-
 from unittest.mock import patch
 
 from app.agents.black_agent import BlackAgent

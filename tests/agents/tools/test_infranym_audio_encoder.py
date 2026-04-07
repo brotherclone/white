@@ -6,16 +6,16 @@ Tests the three-layer audio steganography encoder for musical composition.
 
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, mock_open, patch
+
 import numpy as np
 import pytest
-
 from pydub import AudioSegment
 
 from app.agents.tools.infranym_audio_encoder import InfranymAudioEncoder
-from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
-from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
 from app.structures.artifacts.infranym_voice_composition import InfranymVoiceComposition
+from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
+from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
 
 
 @pytest.fixture

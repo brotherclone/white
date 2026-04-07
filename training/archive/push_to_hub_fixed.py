@@ -1,4 +1,4 @@
-from training.hf_dataset_prep import DATASET_ORG, DATASET_NAME, create_dataset_card
+from training.hf_dataset_prep import DATASET_NAME, DATASET_ORG, create_dataset_card
 
 
 def push_to_hub(datasets: dict, version: str, private: bool = True):

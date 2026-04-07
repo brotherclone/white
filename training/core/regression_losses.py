@@ -8,11 +8,12 @@ Includes:
 - Per-target weighting support
 """
 
+from dataclasses import dataclass
+from typing import Dict, Literal, Optional, Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Dict, Optional, Tuple, Literal
-from dataclasses import dataclass
 
 
 @dataclass

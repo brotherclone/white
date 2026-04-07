@@ -1,9 +1,9 @@
 import os
-import yaml
-
 from abc import ABC
 from pathlib import Path
 from typing import Dict, List
+
+import yaml
 from dotenv import load_dotenv
 from pydantic import Field
 

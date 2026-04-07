@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List
+
 from pydantic import BaseModel, Field
 
 from app.structures.artifacts.species_extinction_artifact import (

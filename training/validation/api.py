@@ -5,9 +5,10 @@ Provides real-time concept validation via HTTP API.
 Supports single and batch validation with caching.
 """
 
-from typing import Dict, List, Optional, Any
-from pydantic import BaseModel, Field
 import time
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field
 
 # FastAPI imports (with fallback for environments without it)
 try:

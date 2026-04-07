@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, date
+from datetime import date, datetime
 from textwrap import shorten
 from typing import Any, Optional
 

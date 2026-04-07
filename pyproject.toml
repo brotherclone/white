@@ -67,4 +67,15 @@ exclude = [
     "**/*.ipynb",
     "training/notebooks/*.ipynb",
 ]
+
+[tool.ruff.lint]
+extend-select = ["I"]
 per-file-ignores = { "tests/generators/midi/test_chord_pipeline.py" = ["F401"] }
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "training", "tests"]
+# Inline imports inside functions are allowed only to break circular imports.
+# All other imports must appear at the top of the file in three blocks:
+#   1. import x  (stdlib)
+#   2. from third_party import y
+#   3. from app / local import z

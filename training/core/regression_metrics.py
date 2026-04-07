@@ -9,10 +9,11 @@ Includes:
 - Per-target and aggregate metrics
 """
 
-import torch
-import numpy as np
-from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import torch
 from scipy import stats as scipy_stats
 
 

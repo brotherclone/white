@@ -3,7 +3,7 @@ import os
 import tempfile
 from abc import ABC
 from pathlib import Path
-from typing import Optional, List
+from typing import List, Optional
 
 import yaml
 from dotenv import load_dotenv
@@ -12,8 +12,8 @@ from pydantic import Field, field_validator
 from app.structures.artifacts.book_artifact import BookArtifact
 from app.structures.artifacts.html_artifact_file import HtmlChainArtifactFile
 from app.structures.artifacts.template_renderer import (
-    get_template_path,
     HTMLTemplateRenderer,
+    get_template_path,
 )
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType

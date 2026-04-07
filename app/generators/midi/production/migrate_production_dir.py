@@ -19,9 +19,9 @@ from __future__ import annotations
 
 import argparse
 import sys
-import yaml
-
 from pathlib import Path
+
+import yaml
 
 from app.generators.midi.production.init_production import (
     SONG_CONTEXT_FILENAME,
@@ -29,7 +29,6 @@ from app.generators.midi.production.init_production import (
     load_initial_proposal,
 )
 from app.generators.midi.production.production_plan import load_song_proposal
-
 
 # Phase review filenames to check for completion
 _PHASE_REVIEW_FILES = {
