@@ -36,3 +36,9 @@ from training.refractor import y
 
 - **Never put imports inside functions or methods**, except to break a genuine circular-import cycle. In that case add a `# circular import` comment so the reason is explicit.
 - This is enforced by ruff (`I` rules / isort) in pre-commit — `ruff check --fix` will sort automatically.
+
+## Prefer Pydantic for structured data
+
+When a function returns a dict or JSON payload that has a defined shape — API responses, pipeline outputs, review entries, anything that flows between components — prefer a Pydantic model over a raw `dict`. Pydantic models live in `app/structures/` (not `models/`, which is reserved for ML model definitions) and give both humans and Claude a self-documenting schema with validation and metadata.
+
+This is a heuristic, not a hard rule. A one-off helper that returns two values doesn't need a model. But if the same shape appears in multiple places, or if it crosses a boundary (API response, YAML round-trip, pipeline stage handoff), a `structures/` Pydantic class is the right move.
