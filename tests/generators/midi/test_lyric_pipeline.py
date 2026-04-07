@@ -982,3 +982,214 @@ class TestBuildWhiteCutupPrompt:
         prompt = _build_prompt(meta, sections, {"verse": (12, 17)})
         assert "SOURCE LYRICS" not in prompt
         assert "cut-up" not in prompt
+
+
+# ---------------------------------------------------------------------------
+# Lyric repeat type — read_vocal_sections_from_arrangement
+# ---------------------------------------------------------------------------
+
+
+def _make_arrangement_txt(sections: list[dict], bpm: int = 120) -> str:
+    """Build a minimal arrangement.txt with track-4 melody clips.
+
+    sections: list of {name, bars} dicts.
+    """
+    lines = []
+    secs_per_bar = (4.0 / 4) * (60.0 / bpm)  # 4/4 assumed
+    cursor = 0.0
+    for s in sections:
+        dur = s["bars"] * secs_per_bar
+
+        def _tc(t):
+            h = int(t // 3600)
+            t %= 3600
+            m = int(t // 60)
+            t %= 60
+            frames = (t - int(t)) * 30
+            return f"{h:02d}:{m:02d}:{int(t):02d}:{frames:05.2f}"
+
+        lines.append(f"{_tc(cursor)}\t{s['name']}\t4\t{_tc(dur)}")
+        cursor += dur
+    return "\n".join(lines) + "\n"
+
+
+class TestReadVocalSectionsRepeatType:
+    def _make_melody_dir(self, tmp_path):
+        melody_dir = tmp_path / "melody"
+        melody_dir.mkdir()
+        return melody_dir
+
+    def test_chorus_x3_produces_exact_then_exact_repeat(self, tmp_path):
+        from app.generators.midi.pipelines.lyric_pipeline import (
+            read_vocal_sections_from_arrangement,
+        )
+
+        arr = tmp_path / "arrangement.txt"
+        arr.write_text(
+            _make_arrangement_txt(
+                [
+                    {"name": "chorus", "bars": 4},
+                    {"name": "chorus", "bars": 4},
+                    {"name": "chorus", "bars": 4},
+                ]
+            )
+        )
+        melody_dir = self._make_melody_dir(tmp_path)
+        sections = read_vocal_sections_from_arrangement(arr, melody_dir, 120, "4/4")
+        assert len(sections) == 3
+        assert sections[0]["lyric_repeat_type"] == "exact"
+        assert sections[1]["lyric_repeat_type"] == "exact_repeat"
+        assert sections[2]["lyric_repeat_type"] == "exact_repeat"
+
+    def test_verse_x2_produces_two_variation_entries(self, tmp_path):
+        from app.generators.midi.pipelines.lyric_pipeline import (
+            read_vocal_sections_from_arrangement,
+        )
+
+        arr = tmp_path / "arrangement.txt"
+        arr.write_text(
+            _make_arrangement_txt(
+                [
+                    {"name": "verse", "bars": 4},
+                    {"name": "verse", "bars": 4},
+                ]
+            )
+        )
+        melody_dir = self._make_melody_dir(tmp_path)
+        sections = read_vocal_sections_from_arrangement(arr, melody_dir, 120, "4/4")
+        assert len(sections) == 2
+        assert sections[0]["lyric_repeat_type"] == "variation"
+        assert sections[1]["lyric_repeat_type"] == "variation"
+
+    def test_plan_override_takes_priority(self, tmp_path):
+        """lyric_repeat_type in production_plan.yml overrides label inference."""
+        import yaml
+        from app.generators.midi.pipelines.lyric_pipeline import (
+            read_vocal_sections_from_arrangement,
+        )
+
+        arr = tmp_path / "arrangement.txt"
+        arr.write_text(_make_arrangement_txt([{"name": "bridge", "bars": 4}]))
+        (tmp_path / "production_plan.yml").write_text(
+            yaml.dump(
+                {
+                    "sections": [
+                        {"name": "bridge", "lyric_repeat_type": "exact", "bars": 4}
+                    ]
+                }
+            )
+        )
+        melody_dir = self._make_melody_dir(tmp_path)
+        sections = read_vocal_sections_from_arrangement(
+            arr, melody_dir, 120, "4/4", production_dir=tmp_path
+        )
+        assert sections[0]["lyric_repeat_type"] == "exact"
+
+
+# ---------------------------------------------------------------------------
+# Lyric repeat type — prompt builder
+# ---------------------------------------------------------------------------
+
+
+class TestBuildPromptRepeatTypes:
+    def _meta(self):
+        return {
+            "title": "T",
+            "color": "Red",
+            "bpm": 120,
+            "time_sig": "4/4",
+            "key": "C major",
+            "concept": "test",
+        }
+
+    def _sec(self, name, approved_label=None, repeat_type="fresh"):
+        return {
+            "name": name,
+            "approved_label": approved_label or name,
+            "bars": 4,
+            "play_count": 1,
+            "total_notes": 16,
+            "contour": "stepwise",
+            "phrases": [],
+            "lyric_repeat_type": repeat_type,
+        }
+
+    def test_exact_repeat_section_skipped(self):
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+
+        sections = [
+            self._sec("chorus", repeat_type="exact"),
+            self._sec("chorus_2", approved_label="chorus", repeat_type="exact_repeat"),
+            self._sec("chorus_3", approved_label="chorus", repeat_type="exact_repeat"),
+        ]
+        prompt = _build_prompt(self._meta(), sections, {})
+        assert "[chorus]" in prompt
+        assert "[chorus_2]" not in prompt
+        assert "[chorus_3]" not in prompt
+
+    def test_exact_annotation_present(self):
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+
+        sections = [self._sec("chorus", repeat_type="exact")]
+        prompt = _build_prompt(self._meta(), sections, {})
+        assert "repeats verbatim" in prompt
+
+    def test_variation_annotation_on_second_instance(self):
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+
+        sections = [
+            self._sec("verse", repeat_type="variation"),
+            self._sec("verse_2", approved_label="verse", repeat_type="variation"),
+        ]
+        prompt = _build_prompt(self._meta(), sections, {})
+        assert "[verse]" in prompt
+        assert "[verse_2]" in prompt
+        assert "Variation 2 of verse" in prompt
+
+    def test_fresh_sections_unchanged(self):
+        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+
+        sections = [self._sec("bridge", repeat_type="fresh")]
+        prompt = _build_prompt(self._meta(), sections, {})
+        assert "[bridge]" in prompt
+        assert "verbatim" not in prompt
+        # No per-section variation annotation (boilerplate mentions "Variation" in format docs)
+        assert "Variation 1 of" not in prompt
+        assert "Variation 2 of" not in prompt
+
+
+# ---------------------------------------------------------------------------
+# Lyric repeat type — _compute_fitting exact_repeat copy
+# ---------------------------------------------------------------------------
+
+
+class TestComputeFittingExactRepeat:
+    def test_exact_repeat_copies_from_source(self, tmp_path):
+        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+
+        # First instance is 'chorus', second is 'chorus_2' (exact_repeat)
+        vocal_sections = [
+            {
+                "name": "chorus",
+                "total_notes": 8,
+                "play_count": 1,
+                "lyric_repeat_type": "exact",
+                "exact_source": "chorus",
+            },
+            {
+                "name": "chorus_2",
+                "total_notes": 8,
+                "play_count": 1,
+                "lyric_repeat_type": "exact_repeat",
+                "exact_source": "chorus",
+            },
+        ]
+        # Only write lyrics for the base section (no [chorus_2] block)
+        text = "[chorus]\nHello world\nBeautiful day\n"
+        melody_dir = tmp_path / "melody"
+        melody_dir.mkdir()
+        result = _compute_fitting(text, vocal_sections, melody_dir)
+        # chorus_2 should have the same fitting result as chorus
+        assert "chorus" in result
+        assert "chorus_2" in result
+        assert result["chorus_2"] == result["chorus"]
