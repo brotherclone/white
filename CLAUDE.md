@@ -24,13 +24,13 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 Imports must appear at the top of every file in exactly three blocks, separated by blank lines:
 
 ```python
-import os          # 1. bare stdlib/third-party imports
+import os          # 1. stdlib
 import sys
+from pathlib import Path
 
-from pathlib import Path          # 2. from third-party import
-import yaml
+import yaml        # 2. third-party
 
-from app.generators.midi import x   # 3. from local/app import
+from app.generators.midi import x   # 3. first-party (app / training / tests)
 from training.refractor import y
 ```
 
