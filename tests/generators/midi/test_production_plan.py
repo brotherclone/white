@@ -719,6 +719,43 @@ class TestReasonFieldRoundTrip:
 # ---------------------------------------------------------------------------
 
 
+class TestNormalizeRepeatType:
+    def test_valid_values_pass_through(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type("exact") == "exact"
+        assert _normalize_repeat_type("variation") == "variation"
+        assert _normalize_repeat_type("fresh") == "fresh"
+
+    def test_uppercase_normalised(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type("Exact") == "exact"
+        assert _normalize_repeat_type("VARIATION") == "variation"
+
+    def test_invalid_value_falls_back_to_fresh(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type("typo") == "fresh"
+        assert (
+            _normalize_repeat_type("exact_repeat") == "fresh"
+        )  # internal sentinel not valid in YAML
+
+    def test_none_and_empty_return_fresh(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type(None) == "fresh"
+        assert _normalize_repeat_type("") == "fresh"
+
+
 class TestInferRepeatType:
     def test_chorus_exact(self):
         from app.generators.midi.production.production_plan import _infer_repeat_type

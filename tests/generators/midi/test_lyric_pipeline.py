@@ -1085,6 +1085,58 @@ class TestReadVocalSectionsRepeatType:
         )
         assert sections[0]["lyric_repeat_type"] == "exact"
 
+    def test_plan_override_typo_normalised_to_fresh(self, tmp_path):
+        """A typo like 'Exact' in production_plan.yml is normalised to 'fresh', not 'exact'."""
+        import yaml
+        from app.generators.midi.pipelines.lyric_pipeline import (
+            read_vocal_sections_from_arrangement,
+        )
+
+        arr = tmp_path / "arrangement.txt"
+        arr.write_text(_make_arrangement_txt([{"name": "bridge", "bars": 4}]))
+        # Typo: capitalised 'Exact' — should normalise to 'exact' (valid)
+        (tmp_path / "production_plan.yml").write_text(
+            yaml.dump(
+                {
+                    "sections": [
+                        {"name": "bridge", "lyric_repeat_type": "Exact", "bars": 4}
+                    ]
+                }
+            )
+        )
+        melody_dir = self._make_melody_dir(tmp_path)
+        sections = read_vocal_sections_from_arrangement(
+            arr, melody_dir, 120, "4/4", production_dir=tmp_path
+        )
+        # 'Exact' normalises to 'exact' which is valid — override should apply
+        assert sections[0]["lyric_repeat_type"] == "exact"
+
+    def test_plan_override_invalid_falls_back_to_inferred(self, tmp_path):
+        """An unrecognised repeat type in production_plan.yml falls back to label inference."""
+        import yaml
+        from app.generators.midi.pipelines.lyric_pipeline import (
+            read_vocal_sections_from_arrangement,
+        )
+
+        arr = tmp_path / "arrangement.txt"
+        arr.write_text(_make_arrangement_txt([{"name": "chorus", "bars": 4}]))
+        # Invalid value — should normalise to 'fresh', so label inference kicks in → 'exact'
+        (tmp_path / "production_plan.yml").write_text(
+            yaml.dump(
+                {
+                    "sections": [
+                        {"name": "chorus", "lyric_repeat_type": "nonsense", "bars": 4}
+                    ]
+                }
+            )
+        )
+        melody_dir = self._make_melody_dir(tmp_path)
+        sections = read_vocal_sections_from_arrangement(
+            arr, melody_dir, 120, "4/4", production_dir=tmp_path
+        )
+        # 'nonsense' → 'fresh' (normalised), no override stored → inferred from 'chorus' → 'exact'
+        assert sections[0]["lyric_repeat_type"] == "exact"
+
 
 # ---------------------------------------------------------------------------
 # Lyric repeat type — prompt builder

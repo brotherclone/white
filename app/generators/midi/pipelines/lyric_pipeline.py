@@ -47,9 +47,10 @@ from app.generators.midi.pipelines.chord_pipeline import (  # noqa: E402
     compute_chromatic_match,
     get_chromatic_target,
 )
-from app.generators.midi.production.production_plan import (
+from app.generators.midi.production.production_plan import (  # noqa: E402
     _infer_repeat_type,
-)  # noqa: E402
+    _normalize_repeat_type,
+)
 from app.generators.midi.production.song_evaluator import _count_syllables  # noqa: E402
 
 load_dotenv()
@@ -312,8 +313,9 @@ def read_vocal_sections_from_arrangement(
                 plan_data = yaml.safe_load(f) or {}
             for sec in plan_data.get("sections", []):
                 lbl = sec.get("name", "")
-                rt = sec.get("lyric_repeat_type", "")
-                if lbl and rt:
+                rt = _normalize_repeat_type(sec.get("lyric_repeat_type"))
+                if lbl and rt != "fresh":
+                    # Only store explicit overrides; 'fresh' is the default anyway
                     repeat_type_by_label[lbl] = rt
 
     # Collect track 4 clips in arrangement order — one entry per instance.
@@ -1291,7 +1293,11 @@ def run_lyric_pipeline(
 
     # --- 3. Read vocal sections from arrangement ---
     vocal_sections = read_vocal_sections_from_arrangement(
-        arrangement_path, melody_dir, meta["bpm"], meta["time_sig"]
+        arrangement_path,
+        melody_dir,
+        meta["bpm"],
+        meta["time_sig"],
+        production_dir=prod_path,
     )
     if not vocal_sections:
         print("ERROR: No melody clips found on track 4 in arrangement.txt")
@@ -1303,7 +1309,9 @@ def run_lyric_pipeline(
     # --- 3b. Extract MIDI phrase structure per section ---
     approved_dir = melody_dir / "approved"
     for sec in vocal_sections:
-        midi_path = approved_dir / f"{sec['name']}.mid"
+        # Use approved_label (base label) — MIDI files are stored under the base
+        # label even when the instance key has a _2/_3 suffix.
+        midi_path = approved_dir / f"{sec['approved_label']}.mid"
         sec["phrases"] = extract_phrases(midi_path) if midi_path.exists() else []
 
     print(f"\nVocal sections ({len(vocal_sections)}) from arrangement:")

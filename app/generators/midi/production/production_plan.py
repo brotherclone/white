@@ -78,6 +78,23 @@ class ProductionPlan:
 # ---------------------------------------------------------------------------
 
 
+_VALID_REPEAT_TYPES = {"exact", "variation", "fresh"}
+
+
+def _normalize_repeat_type(value) -> str:
+    """Normalise a lyric_repeat_type value to lowercase and validate.
+
+    Accepts any truthy string; lowercases it and returns it if it is one of
+    the three valid values.  Falls back to 'fresh' on None, empty, or unknown
+    values so that a human typo (e.g. 'Exact') is silently corrected rather
+    than silently breaking prompt generation.
+    """
+    if not value:
+        return "fresh"
+    normalised = str(value).strip().lower()
+    return normalised if normalised in _VALID_REPEAT_TYPES else "fresh"
+
+
 def _infer_repeat_type(label: str) -> str:
     """Infer lyric_repeat_type from a section label.
 
@@ -194,7 +211,7 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
                 vocals=bool(s.get("vocals", False)),
                 notes=str(s.get("notes", "") or ""),
                 reason=str(s.get("reason", "") or ""),
-                lyric_repeat_type=str(s.get("lyric_repeat_type", "") or "fresh"),
+                lyric_repeat_type=_normalize_repeat_type(s.get("lyric_repeat_type")),
                 loops=dict(s.get("loops") or {}),
             )
         )
