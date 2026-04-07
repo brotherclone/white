@@ -48,6 +48,7 @@ class PlanSection:
     vocals: bool = False
     notes: str = ""
     reason: str = ""  # Claude's per-section compositional note
+    lyric_repeat_type: str = "fresh"  # exact | variation | fresh
     loops: dict = field(default_factory=dict)  # {instrument: loop_name}
     _bar_source: str = field(default="", repr=False)  # derivation source (internal)
 
@@ -70,6 +71,48 @@ class ProductionPlan:
     sections: list = field(default_factory=list)  # list[PlanSection]
     proposed_by: str = ""  # "claude" when arrangement was AI-proposed
     rationale: str = ""  # Claude's compositional reasoning
+
+
+# ---------------------------------------------------------------------------
+# Repeat type inference
+# ---------------------------------------------------------------------------
+
+
+_VALID_REPEAT_TYPES = {"exact", "variation", "fresh"}
+
+
+def _normalize_repeat_type(value) -> str:
+    """Normalise a lyric_repeat_type value to lowercase and validate.
+
+    Accepts any truthy string; lowercases it and returns it if it is one of
+    the three valid values.  Falls back to 'fresh' on None, empty, or unknown
+    values so that a human typo (e.g. 'Exact') is silently corrected rather
+    than silently breaking prompt generation.
+    """
+    if not value:
+        return "fresh"
+    normalised = str(value).strip().lower()
+    return normalised if normalised in _VALID_REPEAT_TYPES else "fresh"
+
+
+def _infer_repeat_type(label: str) -> str:
+    """Infer lyric_repeat_type from a section label.
+
+    Rules (checked against the normalised lowercase label):
+      - Contains 'pre_chorus' (checked before 'chorus') → 'variation'
+      - Contains 'verse' → 'variation'
+      - Contains 'chorus', 'refrain', or 'hook' → 'exact'
+      - Anything else → 'fresh'
+    """
+    norm = label.lower().replace("-", "_").replace(" ", "_")
+    # pre_chorus must be checked before chorus (it contains the word 'chorus')
+    if "pre_chorus" in norm:
+        return "variation"
+    if any(kw in norm for kw in ("verse",)):
+        return "variation"
+    if any(kw in norm for kw in ("chorus", "refrain", "hook")):
+        return "exact"
+    return "fresh"
 
 
 # ---------------------------------------------------------------------------
@@ -168,6 +211,7 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
                 vocals=bool(s.get("vocals", False)),
                 notes=str(s.get("notes", "") or ""),
                 reason=str(s.get("reason", "") or ""),
+                lyric_repeat_type=_normalize_repeat_type(s.get("lyric_repeat_type")),
                 loops=dict(s.get("loops") or {}),
             )
         )
@@ -219,6 +263,11 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
                 "vocals": s.vocals,
                 "notes": s.notes,
                 **({"reason": s.reason} if s.reason else {}),
+                **(
+                    {"lyric_repeat_type": s.lyric_repeat_type}
+                    if s.lyric_repeat_type and s.lyric_repeat_type != "fresh"
+                    else {}
+                ),
                 **({"loops": s.loops} if s.loops else {}),
             }
             for s in plan.sections
@@ -447,7 +496,12 @@ def generate_plan_mechanical(
         vocals = any(
             label_key == v or label_key.startswith(v + "_") for v in _VOCAL_SECTIONS
         )
-        sec = PlanSection(name=s["label"], bars=bars, vocals=vocals)
+        sec = PlanSection(
+            name=s["label"],
+            bars=bars,
+            vocals=vocals,
+            lyric_repeat_type=_infer_repeat_type(s["label"]),
+        )
         sec._bar_source = source
         sections.append(sec)
 
@@ -537,6 +591,7 @@ def refresh_plan(production_dir: Path) -> ProductionPlan:
             vocals=sec.vocals,
             notes=sec.notes,
             reason=sec.reason,
+            lyric_repeat_type=sec.lyric_repeat_type,
             loops=dict(sec.loops),
         )
         updated._bar_source = source
@@ -911,6 +966,9 @@ def sync_plan_from_arrangement(
                 vocals=inst["has_vocals"],
                 notes=orig.notes if orig else "",
                 reason=orig.reason if orig else "",
+                lyric_repeat_type=(
+                    orig.lyric_repeat_type if orig else _infer_repeat_type(name)
+                ),
                 loops=dict(orig.loops) if orig else {},
             )
         )

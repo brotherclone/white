@@ -1,5 +1,8 @@
-## ADDED Requirements
+# candidate-browser-web Specification
 
+## Purpose
+TBD - created by archiving change add-candidate-browser-web. Update Purpose after archive.
+## Requirements
 ### Requirement: FastAPI Backend
 `app/tools/candidate_server.py` SHALL expose a FastAPI application with the following
 endpoints and CORS enabled for `http://localhost:3000`:
@@ -78,3 +81,9 @@ consume the FastAPI backend at `http://localhost:8000`.
 The existing terminal browser (`app/tools/candidate_browser.py`) SHALL remain unchanged.
 The server's data layer SHALL import `load_all_candidates`, `approve_candidate`, and
 `reject_candidate` directly from `app/tools/candidate_browser.py`.
+
+#### Scenario: Terminal browser unaffected
+- **GIVEN** the FastAPI server is installed
+- **WHEN** `candidate_browser.py` is imported or run directly
+- **THEN** it operates exactly as before with no changes to its public API
+
