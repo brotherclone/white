@@ -9,12 +9,11 @@ import yaml
 
 from app.generators.midi.production.init_production import (
     _parse_sounds_like_response,
+    init_production,
     load_initial_proposal,
     load_song_context,
     write_initial_proposal,
-    init_production,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

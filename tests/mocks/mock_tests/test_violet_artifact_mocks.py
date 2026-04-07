@@ -1,6 +1,7 @@
-import yaml
 import os
+
 import pytest
+import yaml
 
 
 def test_circle_jerk_interview():

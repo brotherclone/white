@@ -2,33 +2,33 @@ import logging
 import os
 import random
 import time
-import yaml
-
 from abc import ABC
 from datetime import datetime, timedelta
 from typing import Optional
+
+import yaml
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
+from langchain_core.messages import HumanMessage
 from langgraph.constants import START
 from langgraph.graph.state import StateGraph
-from langchain_core.messages import HumanMessage
 from pydantic import Field
 
 from app.agents.states.orange_agent_state import OrangeAgentState
 from app.agents.states.white_agent_state import MainAgentState
-from app.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus, get_corpus
 from app.agents.workflow.agent_error_handler import agent_error_handler
+from app.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus, get_corpus
+from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.structures.enums.symbolic_object_category import SymbolicObjectCategory
-from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
 from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.symbolic_object_category import SymbolicObjectCategory
 from app.structures.manifests.song_proposal import SongProposalIteration
+from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
-from app.structures.agents.agent_settings import AgentSettings
 
 load_dotenv()
 

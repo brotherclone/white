@@ -1,10 +1,9 @@
 import json
-import polars as pl
-
 from pathlib import Path
 
-from app.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus
+import polars as pl
 
+from app.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus
 
 TEST_STORY = {
     "headline": "Strange Lights Over Township",

@@ -22,6 +22,7 @@ Usage:
 """
 
 import json
+
 import modal
 
 app = modal.App("white-stable-audio-spike")
@@ -114,8 +115,9 @@ def generate_and_score(
     dry_run: bool = False,
 ) -> dict:
     """Generate one audio clip and score it with CLAP + Refractor."""
-    import time
     import os
+    import time
+
     import numpy as np
     import soundfile as sf
     import torch

@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.extinction_cause import ExtinctionCause

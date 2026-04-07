@@ -2,7 +2,6 @@
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # 1. Template validation
 # ---------------------------------------------------------------------------
@@ -167,8 +166,8 @@ class TestClampAndInfer:
 
     def test_clamp_within_range_unchanged(self):
         from app.generators.midi.patterns.melody_patterns import (
-            clamp_to_singer_range,
             SINGERS,
+            clamp_to_singer_range,
         )
 
         singer = SINGERS["gabriel"]
@@ -176,8 +175,8 @@ class TestClampAndInfer:
 
     def test_clamp_above_range_octave_down(self):
         from app.generators.midi.patterns.melody_patterns import (
-            clamp_to_singer_range,
             SINGERS,
+            clamp_to_singer_range,
         )
 
         singer = SINGERS["gabriel"]  # 48-67
@@ -186,8 +185,8 @@ class TestClampAndInfer:
 
     def test_clamp_below_range_octave_up(self):
         from app.generators.midi.patterns.melody_patterns import (
-            clamp_to_singer_range,
             SINGERS,
+            clamp_to_singer_range,
         )
 
         singer = SINGERS["gabriel"]  # 48-67
@@ -196,8 +195,8 @@ class TestClampAndInfer:
 
     def test_clamp_extreme_value(self):
         from app.generators.midi.patterns.melody_patterns import (
-            clamp_to_singer_range,
             SINGERS,
+            clamp_to_singer_range,
         )
 
         singer = SINGERS["gabriel"]
@@ -206,8 +205,8 @@ class TestClampAndInfer:
 
     def test_infer_singer_returns_singer_range(self):
         from app.generators.midi.patterns.melody_patterns import (
-            infer_singer,
             SingerRange,
+            infer_singer,
         )
 
         result = infer_singer(48)
@@ -231,9 +230,9 @@ class TestMelodyResolution:
 
     def test_resolve_basic_pattern(self):
         from app.generators.midi.patterns.melody_patterns import (
-            resolve_melody_notes,
             ALL_TEMPLATES,
             SINGERS,
+            resolve_melody_notes,
         )
 
         pattern = ALL_TEMPLATES[0]
@@ -248,9 +247,9 @@ class TestMelodyResolution:
 
     def test_resolve_all_templates(self):
         from app.generators.midi.patterns.melody_patterns import (
-            resolve_melody_notes,
             ALL_TEMPLATES,
             SINGERS,
+            resolve_melody_notes,
         )
 
         voicing = [60, 64, 67]  # C major
@@ -265,9 +264,9 @@ class TestMelodyResolution:
 
     def test_resolve_with_empty_voicing_uses_fallback(self):
         from app.generators.midi.patterns.melody_patterns import (
-            resolve_melody_notes,
             ALL_TEMPLATES,
             SINGERS,
+            resolve_melody_notes,
         )
 
         notes = resolve_melody_notes(ALL_TEMPLATES[0], [], SINGERS["gabriel"])
@@ -275,9 +274,9 @@ class TestMelodyResolution:
 
     def test_phrase_ending_resolves_to_root_or_fifth(self):
         from app.generators.midi.patterns.melody_patterns import (
-            resolve_melody_notes,
             ALL_TEMPLATES,
             SINGERS,
+            resolve_melody_notes,
         )
 
         voicing = [48, 52, 55]  # C major: root=C, 5th=G
@@ -305,8 +304,8 @@ class TestStrongBeatSnap:
 
     def test_snap_to_chord_tone(self):
         from app.generators.midi.patterns.melody_patterns import (
-            strong_beat_chord_snap,
             SINGERS,
+            strong_beat_chord_snap,
         )
 
         singer = SINGERS["gabriel"]
@@ -318,8 +317,8 @@ class TestStrongBeatSnap:
 
     def test_no_snap_on_weak_beat(self):
         from app.generators.midi.patterns.melody_patterns import (
-            strong_beat_chord_snap,
             SINGERS,
+            strong_beat_chord_snap,
         )
 
         singer = SINGERS["gabriel"]
@@ -331,8 +330,8 @@ class TestStrongBeatSnap:
 
     def test_no_snap_if_already_chord_tone(self):
         from app.generators.midi.patterns.melody_patterns import (
-            strong_beat_chord_snap,
             SINGERS,
+            strong_beat_chord_snap,
         )
 
         singer = SINGERS["gabriel"]
@@ -412,8 +411,8 @@ class TestTheoryScoring:
 
     def test_singability_basic(self):
         from app.generators.midi.patterns.melody_patterns import (
-            singability_score,
             SINGERS,
+            singability_score,
         )
 
         singer = SINGERS["gabriel"]
@@ -424,8 +423,8 @@ class TestTheoryScoring:
 
     def test_singability_large_leaps_penalised(self):
         from app.generators.midi.patterns.melody_patterns import (
-            singability_score,
             SINGERS,
+            singability_score,
         )
 
         singer = SINGERS["gabriel"]
@@ -619,8 +618,8 @@ class TestUseCaseField:
 
     def test_singability_dense_pattern_scores_lower(self):
         from app.generators.midi.patterns.melody_patterns import (
-            singability_score,
             SINGERS,
+            singability_score,
         )
 
         singer = SINGERS["gabriel"]

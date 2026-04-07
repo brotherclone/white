@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.rebracketing_analysis_type import RebracketingAnalysisType

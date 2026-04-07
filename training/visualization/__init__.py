@@ -10,14 +10,14 @@ This module provides plotting and visualization tools for:
 """
 
 from visualization.regression_plots import (
-    plot_target_distribution,
-    plot_soft_vs_hard_targets,
+    RegressionVisualizer,
     plot_album_balance,
     plot_calibration_curve,
     plot_ontological_space,
-    plot_prediction_intervals,
     plot_per_dimension_metrics,
-    RegressionVisualizer,
+    plot_prediction_intervals,
+    plot_soft_vs_hard_targets,
+    plot_target_distribution,
 )
 
 __all__ = [

@@ -1,12 +1,12 @@
 import logging
 import os
 import random
-import yaml
-
 from abc import ABC
+
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.constants import START, END
+from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
 from pydantic import Field
 
@@ -14,7 +14,6 @@ from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.yellow_agent_state import YellowAgentState
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
 )
@@ -27,6 +26,7 @@ from app.structures.generators.character_action_generator import (
 from app.structures.generators.markov_room_generator import MarkovRoomGenerator
 from app.structures.generators.music_extractor import MusicExtractor
 from app.structures.manifests.song_proposal import SongProposalIteration
+from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()

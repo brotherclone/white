@@ -1,5 +1,6 @@
-import pytest
 import inspect
+
+import pytest
 
 MODULE_NAME = "app.agents.states.violet_agent_state"
 CLASS_NAME = "VioletAgentState"

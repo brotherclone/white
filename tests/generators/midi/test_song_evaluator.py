@@ -2,6 +2,7 @@
 
 import statistics
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -11,12 +12,10 @@ from app.generators.midi.production.production_plan import (
     ProductionPlan,
     save_plan,
 )
-from unittest.mock import MagicMock, patch
-
 from app.generators.midi.production.song_evaluator import (
     EVALUATION_FILENAME,
-    PhaseReport,
     EvaluationReport,
+    PhaseReport,
     _chromatic_consistency,
     _collect_flags,
     _compute_arrangement_metrics,
@@ -24,12 +23,11 @@ from app.generators.midi.production.song_evaluator import (
     _compute_lyric_metrics,
     _compute_structural_integrity,
     _count_syllables,
-    _rescore_lyrics,
     _determine_readiness,
     _load_phase_report,
+    _rescore_lyrics,
     evaluate,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.last_human_documentation_type import (

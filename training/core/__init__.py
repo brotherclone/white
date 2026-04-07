@@ -9,52 +9,52 @@ This module provides:
 - Regression metrics: MAE, RMSE, R², calibration metrics, etc.
 """
 
-from core.pipeline import build_dataloaders
-from core.multiclass_pipeline import (
-    build_multiclass_dataloaders,
-    LabelEncoder,
-    MultiClassRainbowDataset,
-)
 from core.multiclass_metrics import (
     MultiClassMetrics,
     MultiLabelMetrics,
     top_k_accuracy,
 )
+from core.multiclass_pipeline import (
+    LabelEncoder,
+    MultiClassRainbowDataset,
+    build_multiclass_dataloaders,
+)
+from core.pipeline import build_dataloaders
 from core.regression_losses import (
-    MSELoss,
-    HuberLoss,
-    SmoothL1Loss,
-    KLDivergenceLoss,
-    DistributionMSELoss,
-    PerTargetWeightedLoss,
-    OntologicalRegressionLoss,
     CombinedClassificationRegressionLoss,
+    DistributionMSELoss,
+    HuberLoss,
+    KLDivergenceLoss,
+    MSELoss,
+    OntologicalRegressionLoss,
+    PerTargetWeightedLoss,
     RegressionLossOutput,
+    SmoothL1Loss,
 )
 from core.regression_metrics import (
-    RegressionMetrics,
     CalibrationMetrics,
+    DistributionMetrics,
+    OntologicalRegressionEvaluator,
+    RegressionMetrics,
+    UncertaintyCalibration,
+    compute_all_metrics,
     compute_mae,
     compute_mse,
-    compute_rmse,
-    compute_r2,
     compute_pearson_correlation,
-    compute_spearman_correlation,
-    compute_all_metrics,
     compute_per_target_metrics,
-    DistributionMetrics,
-    UncertaintyCalibration,
-    OntologicalRegressionEvaluator,
-)
-from core.soft_targets import (
-    SoftTargets,
-    SoftTargetGenerator,
-    TargetConsistencyValidator,
-    generate_soft_targets_from_dataframe,
+    compute_r2,
+    compute_rmse,
+    compute_spearman_correlation,
 )
 from core.regression_pipeline import (
     MultiTaskRainbowDataset,
     build_multitask_dataloaders,
+)
+from core.soft_targets import (
+    SoftTargetGenerator,
+    SoftTargets,
+    TargetConsistencyValidator,
+    generate_soft_targets_from_dataframe,
 )
 
 __all__ = [

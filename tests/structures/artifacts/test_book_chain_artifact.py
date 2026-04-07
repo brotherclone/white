@@ -1,7 +1,7 @@
 from app.structures.artifacts.reaction_book_artifact import ReactionBookChainArtifact
 from app.structures.enums.book_condition import BookCondition
-from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
+from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.publisher_type import PublisherType
 
 

@@ -1,12 +1,12 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 
-from unittest.mock import MagicMock, patch
 from app.agents.states.white_agent_state import (
+    FacetEvolution,
     MainAgentState,
     TransformationTrace,
-    FacetEvolution,
 )
-
 from app.agents.white_agent import WhiteAgent
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.enums.white_facet import WhiteFacet

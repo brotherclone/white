@@ -50,7 +50,10 @@ dependencies = [
     "transformers>=4.47,<5",
     "sentencepiece>=0.2.0",
     "torch>=2.2.0,<2.3.0",
-    "onnxruntime"
+    "onnxruntime",
+    "rich>=13.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0"
 ]
 
 [project.optional-dependencies]
@@ -64,4 +67,15 @@ exclude = [
     "**/*.ipynb",
     "training/notebooks/*.ipynb",
 ]
+
+[tool.ruff.lint]
+extend-select = ["I"]
 per-file-ignores = { "tests/generators/midi/test_chord_pipeline.py" = ["F401"] }
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "training", "tests", "core", "models", "validation", "visualization"]
+# Inline imports inside functions are allowed only to break circular imports.
+# All other imports must appear at the top of the file in three blocks:
+#   1. stdlib  (import os / from pathlib import Path)
+#   2. third-party  (import yaml / from langchain import ...)
+#   3. first-party  (from app import ... / from training import ...)

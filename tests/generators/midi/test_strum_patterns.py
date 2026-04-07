@@ -1,10 +1,11 @@
 """Tests for strum_patterns — pattern templates and MIDI rendering."""
 
 import io
+from pathlib import Path
+
 import mido
 import pytest
 import yaml
-from pathlib import Path
 
 from app.generators.midi.patterns.strum_patterns import (
     PATTERNS_4_4,
@@ -17,7 +18,6 @@ from app.generators.midi.patterns.strum_patterns import (
     read_approved_harmonic_rhythm,
     strum_to_midi_bytes,
 )
-
 
 # ---------------------------------------------------------------------------
 # StrumPattern.bar_length_beats

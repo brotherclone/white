@@ -4,8 +4,8 @@ Unit tests for soft target generation and validation.
 Tests SoftTargetGenerator, TargetConsistencyValidator, and related utilities.
 """
 
-import pytest
 import numpy as np
+import pytest
 import torch
 
 
@@ -315,7 +315,7 @@ class TestTargetConsistencyValidator:
 
     def test_dataset_validation(self):
         """Test full dataset validation."""
-        from core.soft_targets import TargetConsistencyValidator, SoftTargets
+        from core.soft_targets import SoftTargets, TargetConsistencyValidator
 
         targets = SoftTargets(
             temporal=np.array(

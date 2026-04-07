@@ -18,21 +18,21 @@ Usage:
 import argparse
 import io
 import sys
-import mido
-import numpy as np
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import mido
+import numpy as np
+import yaml
+
 from app.generators.midi.patterns.melody_patterns import (
     ALL_TEMPLATES,
     MELODY_CHANNEL,
+    SINGERS,
     VELOCITY,
     MelodyPattern,
     SingerRange,
-    SINGERS,
     chord_tone_alignment,
     contour_quality,
     infer_singer,
@@ -42,14 +42,14 @@ from app.generators.midi.patterns.melody_patterns import (
     select_templates,
     singability_score,
 )
+from app.generators.midi.patterns.strum_patterns import (
+    read_approved_harmonic_rhythm,
+)
 from app.generators.midi.pipelines.chord_pipeline import (
     _to_python,
     compute_chromatic_match,
     get_chromatic_target,
     load_song_proposal,
-)
-from app.generators.midi.patterns.strum_patterns import (
-    read_approved_harmonic_rhythm,
 )
 from app.generators.midi.production.init_production import load_song_context
 from app.util.diversity_tracker import (
@@ -57,6 +57,54 @@ from app.util.diversity_tracker import (
     find_album_dir,
     load_registry,
 )
+from app.util.phrase_dynamics import (
+    DynamicCurve,
+    apply_dynamics_curve,
+    infer_curve,
+    parse_curve,
+)
+
+# ---------------------------------------------------------------------------
+# Melodic continuity helpers
+# ---------------------------------------------------------------------------
+
+
+def last_note_of_midi(midi_bytes: bytes) -> Optional[int]:
+    """Return MIDI pitch of the last note-on event, or None if no notes found."""
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    last_pitch = None
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type == "note_on" and msg.velocity > 0:
+                last_pitch = msg.note
+    return last_pitch
+
+
+def first_note_of_candidate(candidate: dict) -> Optional[int]:
+    """Return MIDI pitch of the first note-on event in candidate's MIDI bytes."""
+    midi_bytes = candidate.get("midi_bytes")
+    if not midi_bytes:
+        return None
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type == "note_on" and msg.velocity > 0:
+                return msg.note
+    return None
+
+
+def continuity_penalty(
+    first_note: Optional[int],
+    last_note: Optional[int],
+    max_semitones: int = 4,
+) -> float:
+    """Return 0.85 if interval exceeds max_semitones, else 1.0.
+
+    Returns 1.0 (no penalty) when either note is None.
+    """
+    if first_note is None or last_note is None:
+        return 1.0
+    return 0.85 if abs(first_note - last_note) > max_semitones else 1.0
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +157,7 @@ def melody_notes_to_midi_bytes(
     resolved_notes: list[tuple[float, int, float]],
     bpm: int = 120,
     ticks_per_beat: int = 480,
+    curve: DynamicCurve = DynamicCurve.FLAT,
 ) -> bytes:
     """Convert resolved melody notes to MIDI bytes.
 
@@ -135,6 +184,9 @@ def melody_notes_to_midi_bytes(
         velocity = VELOCITY["normal"]
         events.append((on_tick, note, velocity, True))
         events.append((off_tick, note, 0, False))
+
+    # Apply phrase-level dynamics before sort
+    events = apply_dynamics_curve(events, curve, min_vel=60, max_vel=127)
 
     events.sort(key=lambda e: (e[0], not e[3], e[1]))
 
@@ -166,6 +218,7 @@ def generate_melody_for_section(
     singer: SingerRange,
     bpm: int = 120,
     durations: list[float] | None = None,
+    curve: DynamicCurve = DynamicCurve.FLAT,
 ) -> tuple[bytes, list[tuple[float, int, float]]]:
     """Generate melody MIDI for an entire section from a pattern and chord voicings.
 
@@ -210,7 +263,7 @@ def generate_melody_for_section(
 
         offset_beats += chord_dur_beats
 
-    midi_bytes = melody_notes_to_midi_bytes(all_notes, bpm=bpm)
+    midi_bytes = melody_notes_to_midi_bytes(all_notes, bpm=bpm, curve=curve)
     return midi_bytes, all_notes
 
 
@@ -468,6 +521,9 @@ def run_melody_pipeline(
     print(f"Time:  {time_sig[0]}/{time_sig[1]}")
     print(f"Color: {song_info['color_name']}")
 
+    # Melodic continuity config
+    continuity_semitones: int = int(song_info.get("melodic_continuity_semitones", 4))
+
     # --- 3. Determine singer ---
     if singer_name:
         singer_key = singer_name.lower().strip()
@@ -553,7 +609,7 @@ def run_melody_pipeline(
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []
 
-    for section in sections:
+    for section_idx, section in enumerate(sections):
         section_key = section["_section_key"]
         label = section["label"]
         label_display = section["label_display"]
@@ -583,6 +639,11 @@ def run_melody_pipeline(
         )
 
         target_energy = DEFAULT_ENERGY.get(label, "medium")
+
+        # Determine dynamic curve for this section
+        _dynamics_map: dict = song_info.get("raw_proposal", {}).get("dynamics", {})
+        raw_curve = _dynamics_map.get(label) or _dynamics_map.get(section_key)
+        section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
 
         # "instrumental" is the user-facing alias; template library uses "lead"
         template_use_case = "lead" if use_case == "instrumental" else use_case
@@ -615,6 +676,7 @@ def run_melody_pipeline(
                 singer,
                 bpm=bpm,
                 durations=section_durations,
+                curve=section_curve,
             )
 
             # Theory scoring
@@ -642,6 +704,21 @@ def run_melody_pipeline(
                     "use_case": tmpl.use_case,
                 }
             )
+
+        # Preceding approved section's last note (for continuity penalty).
+        # Scan backward to find the nearest prior section that has an approved MIDI —
+        # skipping any gaps where the human hasn't approved yet.
+        preceding_last_note: Optional[int] = None
+        for prev_idx in range(section_idx - 1, -1, -1):
+            prev_label = sections[prev_idx]["label"]
+            approved_midi = prod_path / "melody" / "approved" / f"{prev_label}.mid"
+            if approved_midi.exists():
+                preceding_last_note = last_note_of_midi(approved_midi.read_bytes())
+                if preceding_last_note is not None:
+                    print(
+                        f"  Continuity anchor: {prev_label} last note = {preceding_last_note} (max leap {continuity_semitones} st)"
+                    )
+                break
 
         # Score with Refractor
         print(f"  Scoring {len(candidates)} candidates...")
@@ -671,6 +748,12 @@ def run_melody_pipeline(
                 chromatic_weight,
             )
             comp *= diversity_factor(cand["pattern_name"], _diversity_registry)
+            # Derive first note from in-memory resolved_notes (avoids reparsing MIDI)
+            _rn = cand.get("resolved_notes") or []
+            _first_note = _rn[0][1] if _rn else None
+            comp *= continuity_penalty(
+                _first_note, preceding_last_note, continuity_semitones
+            )
             scored.append(
                 {
                     "composite": comp,

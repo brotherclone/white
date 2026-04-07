@@ -22,11 +22,10 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-
-import mido
-
 from pathlib import Path
 from typing import Optional
+
+import mido
 
 PROPOSAL_FILENAME = "vocal_alignment.lrc"
 

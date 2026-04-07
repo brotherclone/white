@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from app.agents.states.black_agent_state import BlackAgentState
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact

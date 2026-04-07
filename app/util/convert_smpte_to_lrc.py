@@ -27,10 +27,9 @@ Use --inplace to overwrite files with the converted content.
 from __future__ import annotations
 
 import argparse
+import logging
 import re
 import sys
-import logging
-
 from pathlib import Path
 
 # Pattern matches e.g. 01:01:06:11.49 or 1:2:3:4 or 00:12:34:56

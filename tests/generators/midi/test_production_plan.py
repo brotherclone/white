@@ -22,7 +22,6 @@ from app.generators.midi.production.production_plan import (
     save_plan,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -712,3 +711,135 @@ class TestReasonFieldRoundTrip:
         refreshed = refresh_plan(prod)
         assert refreshed.sections[0].reason == "Claude said: slow burn"
         assert refreshed.proposed_by == "claude"
+
+
+# ---------------------------------------------------------------------------
+# Lyric repeat type
+# ---------------------------------------------------------------------------
+
+
+class TestNormalizeRepeatType:
+    def test_valid_values_pass_through(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type("exact") == "exact"
+        assert _normalize_repeat_type("variation") == "variation"
+        assert _normalize_repeat_type("fresh") == "fresh"
+
+    def test_uppercase_normalised(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type("Exact") == "exact"
+        assert _normalize_repeat_type("VARIATION") == "variation"
+
+    def test_invalid_value_falls_back_to_fresh(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type("typo") == "fresh"
+        assert (
+            _normalize_repeat_type("exact_repeat") == "fresh"
+        )  # internal sentinel not valid in YAML
+
+    def test_none_and_empty_return_fresh(self):
+        from app.generators.midi.production.production_plan import (
+            _normalize_repeat_type,
+        )
+
+        assert _normalize_repeat_type(None) == "fresh"
+        assert _normalize_repeat_type("") == "fresh"
+
+
+class TestInferRepeatType:
+    def test_chorus_exact(self):
+        from app.generators.midi.production.production_plan import _infer_repeat_type
+
+        assert _infer_repeat_type("chorus") == "exact"
+        assert _infer_repeat_type("melody_chorus") == "exact"
+        assert _infer_repeat_type("refrain") == "exact"
+        assert _infer_repeat_type("hook") == "exact"
+
+    def test_verse_variation(self):
+        from app.generators.midi.production.production_plan import _infer_repeat_type
+
+        assert _infer_repeat_type("verse") == "variation"
+        assert _infer_repeat_type("melody_verse") == "variation"
+        assert _infer_repeat_type("pre_chorus") == "variation"
+        assert _infer_repeat_type("pre-chorus") == "variation"
+
+    def test_other_fresh(self):
+        from app.generators.midi.production.production_plan import _infer_repeat_type
+
+        assert _infer_repeat_type("bridge") == "fresh"
+        assert _infer_repeat_type("outro") == "fresh"
+        assert _infer_repeat_type("intro") == "fresh"
+
+
+class TestLyricRepeatTypeRoundTrip:
+    def test_exact_saved_and_loaded(self, tmp_path):
+        """lyric_repeat_type='exact' persists through save/load."""
+        plan = ProductionPlan(
+            song_slug="test",
+            generated="2026-01-01",
+            bpm=120,
+            time_sig="4/4",
+            key="C major",
+            color="Red",
+            sections=[PlanSection(name="chorus", bars=4, lyric_repeat_type="exact")],
+        )
+        save_plan(plan, tmp_path)
+        loaded = load_plan(tmp_path)
+        assert loaded.sections[0].lyric_repeat_type == "exact"
+
+    def test_fresh_omitted_from_yaml_but_defaults_on_load(self, tmp_path):
+        """lyric_repeat_type='fresh' is omitted from YAML but loads as 'fresh'."""
+        plan = ProductionPlan(
+            song_slug="test",
+            generated="2026-01-01",
+            bpm=120,
+            time_sig="4/4",
+            key="C major",
+            color="Red",
+            sections=[PlanSection(name="bridge", bars=4, lyric_repeat_type="fresh")],
+        )
+        save_plan(plan, tmp_path)
+        raw = (tmp_path / "production_plan.yml").read_text()
+        assert "lyric_repeat_type" not in raw
+        loaded = load_plan(tmp_path)
+        assert loaded.sections[0].lyric_repeat_type == "fresh"
+
+    def test_human_override_survives_refresh(self, tmp_path):
+        """A human-set lyric_repeat_type is preserved across --refresh."""
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_chord_review(prod / "chords", [{"label": "bridge", "chord_count": 4}])
+        plan = generate_plan_mechanical(prod)
+        # Human overrides bridge from 'fresh' to 'exact'
+        plan.sections[0].lyric_repeat_type = "exact"
+        save_plan(plan, prod)
+
+        refreshed = refresh_plan(prod)
+        assert refreshed.sections[0].lyric_repeat_type == "exact"
+
+    def test_generate_plan_mechanical_populates_repeat_type(self, tmp_path):
+        """generate_plan_mechanical infers lyric_repeat_type from section labels."""
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_chord_review(
+            prod / "chords",
+            [
+                {"label": "chorus", "chord_count": 4},
+                {"label": "verse", "chord_count": 4},
+                {"label": "bridge", "chord_count": 4},
+            ],
+        )
+        plan = generate_plan_mechanical(prod)
+        by_name = {s.name: s for s in plan.sections}
+        assert by_name["chorus"].lyric_repeat_type == "exact"
+        assert by_name["verse"].lyric_repeat_type == "variation"
+        assert by_name["bridge"].lyric_repeat_type == "fresh"

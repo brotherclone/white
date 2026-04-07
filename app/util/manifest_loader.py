@@ -1,6 +1,6 @@
 import os
 import random
-from typing import List, Sequence, Any
+from typing import Any, List, Sequence
 
 import yaml
 from dotenv import load_dotenv

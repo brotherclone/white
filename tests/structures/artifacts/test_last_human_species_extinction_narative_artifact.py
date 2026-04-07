@@ -1,20 +1,20 @@
 from app.structures.artifacts.base_artifact import ChainArtifact
+from app.structures.artifacts.last_human_artifact import LastHumanArtifact
 from app.structures.artifacts.last_human_species_extinction_narative_artifact import (
     LastHumanSpeciesExtinctionNarrativeArtifact,
 )
 from app.structures.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )
-from app.structures.artifacts.last_human_artifact import LastHumanArtifact
 from app.structures.concepts.last_human_species_extinction_parallel_moment import (
     LastHumanSpeciesExtinctionParallelMoment,
 )
 from app.structures.enums.extinction_cause import ExtinctionCause
-from app.structures.enums.last_human_vulnerability_type import (
-    LastHumanVulnerabilityType,
-)
 from app.structures.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
+)
+from app.structures.enums.last_human_vulnerability_type import (
+    LastHumanVulnerabilityType,
 )
 
 

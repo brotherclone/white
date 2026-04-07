@@ -1,44 +1,43 @@
 import datetime
 import logging
 import os
-import time
-import yaml
-import re
 import random
-
+import re
+import time
 from abc import ABC
+
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.constants import START, END
+from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 
+from app.agents.states.blue_agent_state import BlueAgentState
+from app.agents.states.white_agent_state import MainAgentState
+from app.agents.tools.biographical_tools import (
+    get_year_analysis,
+    load_biographical_data,
+)
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.reference.biographical.places_frequented import (
+    ALL_LOCATIONS,
+    DMV_LOCATIONS,
     EUROPE_LOCATIONS,
-    US_LOCATIONS,
     NEW_JERSEY_LOCATIONS,
     NEW_YORK_LOCATIONS,
-    DMV_LOCATIONS,
-    ALL_LOCATIONS,
+    US_LOCATIONS,
 )
 from app.reference.biographical.ytr_lyrics import YOUR_TEAM_RING_TAPE_LYRIC_FRAGMENTS
 from app.reference.music.blue_agent_instruments import (
-    BLUE_AGENT_INSTRUMENTS,
     BLUE_AGENT_INSTRUMENTATION_COLOR,
+    BLUE_AGENT_INSTRUMENTS,
 )
 from app.reference.rebracketing_words.fantasy_genre_words import FANTASY_GENRE_WORDS
 from app.reference.rebracketing_words.wish_fulfillment_words import (
     WISH_FULFILLMENT_WORDS,
 )
 from app.structures.agents.agent_settings import AgentSettings
-from app.agents.states.blue_agent_state import BlueAgentState
-from app.agents.states.white_agent_state import MainAgentState
-from app.agents.tools.biographical_tools import (
-    load_biographical_data,
-    get_year_analysis,
-)
-from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
@@ -69,6 +68,7 @@ from app.structures.enums.quantum_tape_lyrical_theme import QuantumTapeLyricalTh
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.structures.music.core.key_signature import KeySignature, Mode, ModeName
 from app.structures.music.core.notes import Note
+from app.util.agent_state_utils import get_state_snapshot
 from app.util.list_utils import pick_by_fraction
 from app.util.manifest_loader import (
     get_my_reference_proposals,

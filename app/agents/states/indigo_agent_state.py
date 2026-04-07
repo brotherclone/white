@@ -1,4 +1,5 @@
-from typing import Optional, Dict, Any, List, Annotated
+from typing import Annotated, Any, Dict, List, Optional
+
 from langchain_anthropic import ChatAnthropic
 from pydantic import Field
 
@@ -7,11 +8,11 @@ from app.structures.artifacts.infranym_audio_artifact import InfranymAudioArtifa
 from app.structures.artifacts.infranym_encoded_image_artifact import (
     InfranymEncodedImageArtifact,
 )
+from app.structures.artifacts.infranym_midi_artifact import InfranymMidiArtifact
+from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.artifacts.infranym_text_render_artifact import (
     InfranymTextRenderArtifact,
 )
-from app.structures.artifacts.infranym_midi_artifact import InfranymMidiArtifact
-from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.enums.infranym_medium import InfranymMedium
 from app.structures.enums.infranym_method import InfranymMethod
 from app.util.agent_state_utils import safe_add

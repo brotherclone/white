@@ -1,10 +1,10 @@
-from pydantic import ValidationError
 import pytest
+from pydantic import ValidationError
 
+from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )
-from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.population_data import PopulationData
 from app.structures.enums.extinction_cause import ExtinctionCause
 

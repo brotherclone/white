@@ -12,7 +12,6 @@ from app.structures.concepts.pulsar_palace_character import (
 )
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 
-
 IMAGE_PATH = "img"
 
 

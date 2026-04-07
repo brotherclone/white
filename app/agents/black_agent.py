@@ -2,9 +2,9 @@ import logging
 import os
 import random
 import time
-import yaml
-
 from abc import ABC
+
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables import RunnableConfig
@@ -22,7 +22,6 @@ from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import transcription_from_speech_to_text
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.agent_settings import AgentSettings
-from app.util.agent_state_utils import get_state_snapshot
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
 from app.structures.artifacts.evp_artifact import EVPArtifact
@@ -34,6 +33,7 @@ from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.sigil_state import SigilState
 from app.structures.enums.sigil_type import SigilType
 from app.structures.manifests.song_proposal import SongProposalIteration
+from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()

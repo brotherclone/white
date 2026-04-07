@@ -17,13 +17,13 @@ Usage:
 import argparse
 import io
 import sys
-import mido
-import numpy as np
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+
+import mido
+import numpy as np
+import yaml
 
 from app.generators.midi.patterns.bass_patterns import (
     ALL_TEMPLATES,
@@ -39,14 +39,14 @@ from app.generators.midi.patterns.bass_patterns import (
     select_templates,
     voice_leading_score,
 )
+from app.generators.midi.patterns.strum_patterns import (
+    read_approved_harmonic_rhythm,
+)
 from app.generators.midi.pipelines.chord_pipeline import (
     _to_python,
     compute_chromatic_match,
     get_chromatic_target,
     load_song_proposal,
-)
-from app.generators.midi.patterns.strum_patterns import (
-    read_approved_harmonic_rhythm,
 )
 from app.generators.midi.production.init_production import load_song_context
 from app.util.diversity_tracker import (
@@ -54,7 +54,12 @@ from app.util.diversity_tracker import (
     find_album_dir,
     load_registry,
 )
-
+from app.util.phrase_dynamics import (
+    DynamicCurve,
+    apply_dynamics_curve,
+    infer_curve,
+    parse_curve,
+)
 
 # ---------------------------------------------------------------------------
 # Kick onset extraction from drum MIDI
@@ -260,6 +265,7 @@ def bass_pattern_to_midi_bytes(
     bpm: int = 120,
     ticks_per_beat: int = 480,
     durations: list[float] | None = None,
+    curve: DynamicCurve = DynamicCurve.FLAT,
 ) -> tuple[bytes, list[tuple[float, int]]]:
     """Generate bass MIDI bytes from a pattern and chord voicings.
 
@@ -342,6 +348,9 @@ def bass_pattern_to_midi_bytes(
             pattern_offset_ticks += bar_ticks
 
         current_offset_ticks += chord_dur_ticks
+
+    # Apply phrase-level dynamics before sort
+    all_events = apply_dynamics_curve(all_events, curve, min_vel=50, max_vel=110)
 
     # Sort: by tick, note-offs before note-ons at same tick
     all_events.sort(key=lambda e: (e[0], not e[3], e[1]))
@@ -664,6 +673,11 @@ def run_bass_pipeline(
         }
         target_energy = DEFAULT_ENERGY.get(label, "medium")
 
+        # Determine dynamic curve for this section
+        _dynamics_map: dict = song_info.get("raw_proposal", {}).get("dynamics", {})
+        raw_curve = _dynamics_map.get(label) or _dynamics_map.get(section_key)
+        section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
+
         templates = select_templates(ALL_TEMPLATES, time_sig, target_energy)
         if not templates:
             print(
@@ -681,7 +695,11 @@ def run_bass_pipeline(
         candidates = []
         for tmpl in templates:
             midi_bytes, resolved_notes = bass_pattern_to_midi_bytes(
-                tmpl, voicings, bpm=bpm, durations=section_durations
+                tmpl,
+                voicings,
+                bpm=bpm,
+                durations=section_durations,
+                curve=section_curve,
             )
 
             # Theory scoring

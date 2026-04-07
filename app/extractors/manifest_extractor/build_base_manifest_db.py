@@ -1,9 +1,9 @@
 import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import polars as pl
 import yaml
-
-from pathlib import Path
-from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
@@ -12,10 +12,10 @@ from app.extractors.manifest_extractor.concept_extraction_result import (
 )
 from app.extractors.manifest_extractor.concept_extractor import ConceptExtractor
 from app.structures.concepts.rainbow_table_color import (
-    RainbowTableColor,
-    RainbowColorTemporalMode,
-    RainbowTableTransmigrationalMode,
     RainbowColorObjectionalMode,
+    RainbowColorTemporalMode,
+    RainbowTableColor,
+    RainbowTableTransmigrationalMode,
 )
 from app.structures.manifests.manifest import Manifest
 from app.structures.manifests.manifest_song_structure import ManifestSongStructure
@@ -23,8 +23,8 @@ from app.structures.manifests.manifest_sounds_like import ManifestSoundsLike
 from app.structures.manifests.manifest_track import ManifestTrack
 from app.structures.music.core.key_signature import KeySignature
 from app.structures.music.core.time_signature import TimeSignature
-from app.util.string_utils import format_date
 from app.util.lrc_utils import extract_lyrics_from_lrc, parse_lrc_time
+from app.util.string_utils import format_date
 
 load_dotenv()
 

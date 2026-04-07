@@ -4,7 +4,7 @@ import os
 import random
 import warnings
 from fractions import Fraction
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import soundfile as sf

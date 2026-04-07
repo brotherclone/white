@@ -145,11 +145,11 @@ def preprocess_piano_rolls(dry_run: bool = False, start_row_group: int = 0):
     Saves piano_rolls.npz to the Modal volume for the training step.
     """
     import shutil
+    from pathlib import Path
 
     import numpy as np
     import pyarrow.parquet as pq
     from huggingface_hub import hf_hub_download
-    from pathlib import Path
     from tqdm import tqdm
 
     # --- 1. Get media parquet (cached in volume) ---
@@ -303,13 +303,13 @@ def train_fusion(
 ):
     """Train PianoRollEncoder CNN + multimodal fusion MLP + regression heads."""
     import io
+    from pathlib import Path
 
     import numpy as np
     import pandas as pd
     import torch
     import torch.nn as nn
     import torch.nn.functional as F
-    from pathlib import Path
     from sklearn.model_selection import train_test_split
     from torch.utils.data import DataLoader, Dataset
 

@@ -1,9 +1,10 @@
-import pytest
-from pydantic import ValidationError
 import datetime
 
-from app.structures.concepts.biographical_period import BiographicalPeriod
+import pytest
+from pydantic import ValidationError
+
 from app.structures.concepts.biographical_event import BiographicalEvent
+from app.structures.concepts.biographical_period import BiographicalPeriod
 from app.structures.enums.biographical_timeline_detail_level import (
     BiographicalTimelineDetailLevel,
 )

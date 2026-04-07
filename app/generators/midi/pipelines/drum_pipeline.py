@@ -15,21 +15,14 @@ Usage:
 import argparse
 import io
 import sys
-import mido
-import numpy as np
-import yaml
-
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from app.generators.midi.pipelines.chord_pipeline import (
-    _to_python,
-    compute_chromatic_match,
-    get_chromatic_target,
-    load_song_proposal,
-)
-from app.generators.midi.production.init_production import load_song_context
+import mido
+import numpy as np
+import yaml
+
 from app.generators.midi.patterns.drum_patterns import (
     ALL_TEMPLATES,
     DEFAULT_GENRE_FAMILY,
@@ -41,6 +34,19 @@ from app.generators.midi.patterns.drum_patterns import (
     make_fallback_pattern,
     map_genres_to_families,
     select_templates,
+)
+from app.generators.midi.pipelines.chord_pipeline import (
+    _to_python,
+    compute_chromatic_match,
+    get_chromatic_target,
+    load_song_proposal,
+)
+from app.generators.midi.production.init_production import load_song_context
+from app.util.phrase_dynamics import (
+    DynamicCurve,
+    apply_dynamics_curve,
+    infer_curve,
+    parse_curve,
 )
 
 # ---------------------------------------------------------------------------
@@ -99,6 +105,7 @@ def drum_pattern_to_midi_bytes(
     bpm: int = 120,
     bar_count: int = 4,
     ticks_per_beat: int = 480,
+    curve: DynamicCurve = DynamicCurve.FLAT,
 ) -> bytes:
     """Convert a drum pattern to MIDI bytes, repeating for bar_count bars.
 
@@ -131,6 +138,9 @@ def drum_pattern_to_midi_bytes(
                 note_dur = ticks_per_beat // 4
                 events.append((abs_tick, note, velocity, True))
                 events.append((abs_tick + note_dur, note, 0, False))
+
+    # Apply phrase-level dynamics before sort
+    events = apply_dynamics_curve(events, curve, min_vel=45, max_vel=127)
 
     # Sort by absolute tick, note-offs before note-ons at same tick
     events.sort(key=lambda e: (e[0], not e[3], e[1]))
@@ -375,6 +385,7 @@ def run_drum_pipeline(
     # --- 5. Generate and score per section ---
     target = get_chromatic_target(song_info["color_name"])
     time_sig = tuple(song_info["time_sig"])
+    dynamics_map: dict = song_info.get("raw_proposal", {}).get("dynamics", {})
 
     # Load Refractor
     print("\nLoading Refractor...")
@@ -437,11 +448,15 @@ def run_drum_pipeline(
 
         print(f"  Templates: {len(templates)} candidates")
 
+        # Determine dynamic curve for this section
+        raw_curve = dynamics_map.get(label) or dynamics_map.get(section_key)
+        section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
+
         # Generate MIDI for each template
         candidates = []
         for tmpl in templates:
             midi_bytes = drum_pattern_to_midi_bytes(
-                tmpl, bpm=song_info["bpm"], bar_count=bar_count
+                tmpl, bpm=song_info["bpm"], bar_count=bar_count, curve=section_curve
             )
             e_score = energy_appropriateness(tmpl.energy, target_energy)
             candidates.append(

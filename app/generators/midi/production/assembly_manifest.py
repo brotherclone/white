@@ -18,13 +18,13 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-import mido
-import yaml
-
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+
+import mido
+import yaml
 
 from app.generators.midi.production.production_plan import (
     MANIFEST_BOOTSTRAP_FILENAME,

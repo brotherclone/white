@@ -1,6 +1,6 @@
-import pytest
 import datetime
 
+import pytest
 from pydantic import ValidationError
 
 from app.structures.artifacts.alternate_timeline_artifact import (
@@ -9,10 +9,10 @@ from app.structures.artifacts.alternate_timeline_artifact import (
 from app.structures.concepts.alternate_life_detail import AlternateLifeDetail
 from app.structures.concepts.biographical_period import BiographicalPeriod
 from app.structures.concepts.divergence_point import DivergencePoint
-from app.structures.enums.quantum_tape_emotional_tone import QuantumTapeEmotionalTone
 from app.structures.enums.biographical_timeline_detail_level import (
     BiographicalTimelineDetailLevel,
 )
+from app.structures.enums.quantum_tape_emotional_tone import QuantumTapeEmotionalTone
 
 
 def create_valid_narrative() -> str:

@@ -9,12 +9,11 @@ import pandas as pd
 import yaml
 
 from app.generators.midi.production.retrieve_samples import (
+    copy_audio_files,
     retrieve_by_clap_similarity,
     retrieve_by_color,
     write_sample_map,
-    copy_audio_files,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
@@ -387,8 +386,8 @@ class TestIntegrationRetrieve:
 
     def test_copy_audio_cuts_from_source_when_segment_missing(self, tmp_path):
         """Falls back to cutting from source WAV when segment WAV doesn't exist."""
-        import soundfile as sf
         import numpy as np
+        import soundfile as sf
 
         # Write a real WAV source (1 second of silence at 16kHz)
         src_dir = tmp_path / "src"

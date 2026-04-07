@@ -2,8 +2,8 @@ from enum import Enum
 
 from pydantic import BaseModel, model_validator
 
-from app.structures.music.core.notes import Note
 from app.structures.music.core.enharmonic import normalize_to_flat
+from app.structures.music.core.notes import Note
 
 
 class ModeName(Enum):

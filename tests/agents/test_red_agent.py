@@ -1,6 +1,7 @@
+import importlib
+
 import pytest
 import yaml
-import importlib
 
 from app.agents.red_agent import RedAgent
 from app.agents.states.red_agent_state import RedAgentState

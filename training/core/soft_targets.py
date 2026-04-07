@@ -12,12 +12,12 @@ Features:
 - Target validation and consistency checks
 """
 
+import warnings
+from dataclasses import dataclass
+from typing import Dict, List, Literal, Optional, Tuple
+
 import numpy as np
 import torch
-from typing import Dict, List, Optional, Tuple, Literal
-from dataclasses import dataclass
-import warnings
-
 
 # Mode definitions
 TEMPORAL_MODES = ["past", "present", "future"]

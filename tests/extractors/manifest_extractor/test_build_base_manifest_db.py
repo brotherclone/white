@@ -1,9 +1,10 @@
 import os
 from pathlib import Path
 from unittest.mock import Mock, patch
+
+import polars as pl
 import pytest
 import yaml
-import polars as pl
 from pydantic import BaseModel
 
 from app.extractors.manifest_extractor.build_base_manifest_db import BuildBaseManifestDB
