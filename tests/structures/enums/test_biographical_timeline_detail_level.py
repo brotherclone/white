@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.biographical_timeline_detail_level import (

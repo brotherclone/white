@@ -1,16 +1,16 @@
-from app.structures.artifacts.base_artifact import ChainArtifact
-from app.structures.artifacts.rescue_decision_artifact import RescueDecisionArtifact
 from app.structures.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
+from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.artifacts.last_human_artifact import LastHumanArtifact
+from app.structures.artifacts.rescue_decision_artifact import RescueDecisionArtifact
 from app.structures.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )
 from app.structures.enums.extinction_cause import ExtinctionCause
-from app.structures.enums.last_human_vulnerability_type import (
-    LastHumanVulnerabilityType,
-)
 from app.structures.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
+)
+from app.structures.enums.last_human_vulnerability_type import (
+    LastHumanVulnerabilityType,
 )
 
 
@@ -444,12 +444,14 @@ def test_for_prompt_sections_order():
 
     # Find section headers
     decision_idx = next(
-        i for i, l in enumerate(lines) if "## The Arbitrary's Decision" in l
+        i for i, line in enumerate(lines) if "## The Arbitrary's Decision" in line
     )
-    justification_idx = next(i for i, l in enumerate(lines) if "## Justification" in l)
-    rationale_idx = next(i for i, l in enumerate(lines) if "## Rationale" in l)
+    justification_idx = next(
+        i for i, line in enumerate(lines) if "## Justification" in line
+    )
+    rationale_idx = next(i for i, line in enumerate(lines) if "## Rationale" in line)
     reflection_idx = next(
-        i for i, l in enumerate(lines) if "## The Mind's Reflection" in l
+        i for i, line in enumerate(lines) if "## The Mind's Reflection" in line
     )
 
     # Verify order

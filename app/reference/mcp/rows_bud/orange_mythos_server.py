@@ -1,10 +1,12 @@
 import os
 import sys
 from pathlib import Path
-from dotenv import load_dotenv
 from typing import List, Optional
+
 from anthropic import Anthropic
+from dotenv import load_dotenv
 from fastmcp import FastMCP
+
 from app.reference.mcp.rows_bud.orange_corpus import get_corpus
 
 project_root = Path(__file__).parent.parent.parent.parent.parent

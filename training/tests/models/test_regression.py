@@ -478,8 +478,8 @@ class TestTransmigrationCalculator:
     def test_total_distance(self):
         """Test total transmigration distance."""
         from models.rainbow_table_regression_head import (
-            TransmigrationCalculator,
             OntologicalScores,
+            TransmigrationCalculator,
         )
 
         source = OntologicalScores(
@@ -504,8 +504,8 @@ class TestTransmigrationCalculator:
     def test_distances_to_all_albums(self):
         """Test computing distances to all albums."""
         from models.rainbow_table_regression_head import (
-            TransmigrationCalculator,
             OntologicalScores,
+            TransmigrationCalculator,
         )
 
         # Orange album concept: Past_Thing_Imagined

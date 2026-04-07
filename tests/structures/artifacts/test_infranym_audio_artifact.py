@@ -5,16 +5,16 @@ Tests the infranym audio artifact class which generates three-layer audio compos
 with steganographic puzzle content.
 """
 
-import pytest
 import tempfile
-
 from unittest.mock import Mock
 
+import pytest
+
 from app.structures.artifacts.infranym_audio_artifact import InfranymAudioArtifact
+from app.structures.artifacts.infranym_voice_composition import InfranymVoiceComposition
+from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
 from app.structures.enums.chain_artifact_type import ChainArtifactType
 from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
-from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
-from app.structures.artifacts.infranym_voice_composition import InfranymVoiceComposition
 
 
 @pytest.fixture

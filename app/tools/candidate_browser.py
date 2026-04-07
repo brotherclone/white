@@ -27,11 +27,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
+from rich import box
 from rich.console import Console, Group
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
-from rich import box
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -355,9 +355,7 @@ def run_browser(
                 elif key == "a":
                     entry = entries[selected_idx]
                     if entry.status in ("approved", "accepted"):
-                        status_msg = (
-                            f"No change for {entry.candidate_id}: status is {entry.status}"
-                        )
+                        status_msg = f"No change for {entry.candidate_id}: status is {entry.status}"
                     else:
                         approve_candidate(entry)
                         status_msg = f"✓ Approved {entry.candidate_id}"
@@ -371,9 +369,7 @@ def run_browser(
                 elif key == "r":
                     entry = entries[selected_idx]
                     if entry.status in ("approved", "accepted", "rejected"):
-                        status_msg = (
-                            f"No change for {entry.candidate_id}: status is {entry.status}"
-                        )
+                        status_msg = f"No change for {entry.candidate_id}: status is {entry.status}"
                     else:
                         reject_candidate(entry)
                         status_msg = f"✗ Rejected {entry.candidate_id}"

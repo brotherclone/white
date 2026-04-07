@@ -3,6 +3,7 @@ import uuid
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType

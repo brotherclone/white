@@ -3,47 +3,46 @@ import os
 import random
 import re
 import time
-import yaml
-
 from abc import ABC
 from typing import Dict, List
+
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain_core.output_parsers import StrOutputParser
-from langgraph.constants import START, END
+from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
 
 from app.agents.states.indigo_agent_state import IndigoAgentState
 from app.agents.states.white_agent_state import MainAgentState
+from app.agents.tools.infranym_midi_tools import (
+    add_carrier_melody_to_artifact,
+    generate_morse_duration,
+    generate_note_cipher,
+)
+from app.agents.tools.infranym_text_tools import (
+    create_acrostic_encoding,
+    create_anagram_encoding,
+    create_riddle_encoding,
+)
+from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.reference.gaming.anagram_pairs import ANAGRAM_PAIRS
 from app.structures.agents.agent_settings import AgentSettings
-from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.util.agent_state_utils import get_state_snapshot
-
-from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.artifacts.infranym_audio_artifact import InfranymAudioArtifact
 from app.structures.artifacts.infranym_encoded_image_artifact import (
     InfranymEncodedImageArtifact,
 )
+from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
 from app.structures.artifacts.infranym_text_render_artifact import (
     InfranymTextRenderArtifact,
 )
 from app.structures.enums.image_text_style import ImageTextStyle
 from app.structures.enums.infranym_medium import InfranymMedium
 from app.structures.manifests.song_proposal import SongProposalIteration
-from app.agents.tools.infranym_midi_tools import (
-    generate_note_cipher,
-    generate_morse_duration,
-    add_carrier_melody_to_artifact,
-)
-from app.agents.tools.infranym_text_tools import (
-    create_acrostic_encoding,
-    create_riddle_encoding,
-    create_anagram_encoding,
-)
 from app.structures.music.core.key_signature import KeySignature
 from app.structures.music.core.notes import Note
+from app.util.agent_state_utils import get_state_snapshot
 
 load_dotenv()
 

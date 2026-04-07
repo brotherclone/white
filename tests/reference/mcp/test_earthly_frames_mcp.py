@@ -1,6 +1,6 @@
-import pytest
-
 from unittest.mock import AsyncMock, patch
+
+import pytest
 
 
 def test_earthly_frames_mcp():

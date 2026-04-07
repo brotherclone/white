@@ -10,19 +10,17 @@ These tests verify that:
 """
 
 import sys
-import pytest
-
 from dataclasses import dataclass, field
-from typing import List, Optional, Literal
+from typing import List, Literal, Optional
 from unittest.mock import MagicMock
-from langgraph.graph import StateGraph, END
 
+import pytest
+from langgraph.graph import END, StateGraph
 from validation.concept_validator import (
     ConceptValidator,
     ValidationResult,
     ValidationStatus,
 )
-
 
 # Mock torch before importing validation components (for Intel Mac without torch)
 sys.modules["torch"] = MagicMock()

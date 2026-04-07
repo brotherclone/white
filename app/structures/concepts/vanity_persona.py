@@ -1,6 +1,6 @@
 import random
+from typing import List, Optional
 
-from typing import Optional, List
 from pydantic import BaseModel, Field
 
 from app.reference.music.indie_publications.critic_names import (
@@ -8,10 +8,10 @@ from app.reference.music.indie_publications.critic_names import (
     CRITIC_LAST_NAMES,
 )
 from app.reference.music.indie_publications.publications import (
-    NOSTALGIC_PUBLICATIONS,
-    EXPERIMENTAL_PUBLICATIONS,
     BLOG_PUBLICATIONS,
+    EXPERIMENTAL_PUBLICATIONS,
     MUSIC_PUBLICATIONS,
+    NOSTALGIC_PUBLICATIONS,
 )
 from app.structures.enums.vanity_interviewer_type import VanityInterviewerType
 

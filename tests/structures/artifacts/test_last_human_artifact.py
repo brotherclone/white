@@ -1,14 +1,13 @@
 import pytest
-
 from pydantic import ValidationError
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.artifacts.last_human_artifact import LastHumanArtifact
-from app.structures.enums.last_human_vulnerability_type import (
-    LastHumanVulnerabilityType,
-)
 from app.structures.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
+)
+from app.structures.enums.last_human_vulnerability_type import (
+    LastHumanVulnerabilityType,
 )
 
 

@@ -1,4 +1,5 @@
 import enum
+
 import pytest
 
 from app.structures.enums.quantum_tape_lyrical_theme import QuantumTapeLyricalTheme

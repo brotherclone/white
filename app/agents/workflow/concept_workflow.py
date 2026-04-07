@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
 
 from dotenv import load_dotenv
 from langsmith import traceable

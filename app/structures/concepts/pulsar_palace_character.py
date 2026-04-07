@@ -1,15 +1,16 @@
 import os
 from pathlib import Path
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
+
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.agents.tools.gaming_tools import no_repeat_roll_dice, roll_dice
 from app.agents.tools.image_tools import composite_character_portrait
-from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 from app.structures.artifacts.character_portrait_artifact import (
     CharacterPortraitArtifact,
 )
+from app.structures.artifacts.image_artifact_file import ImageChainArtifactFile
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 
 if TYPE_CHECKING:

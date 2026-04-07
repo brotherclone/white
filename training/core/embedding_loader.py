@@ -16,11 +16,12 @@ Usage:
     embedding = encoder.encode("concept text here")
 """
 
+from pathlib import Path
+from typing import Optional, Union
+
 import numpy as np
 import pandas as pd
 import torch
-from pathlib import Path
-from typing import Optional, Union
 
 
 class PrecomputedEmbeddingLoader:
@@ -154,7 +155,7 @@ class DeBERTaEmbeddingEncoder:
         if self._model is not None:
             return
 
-        from transformers import AutoTokenizer, AutoModel
+        from transformers import AutoModel, AutoTokenizer
 
         print("Loading DeBERTa tokenizer...")
         self._tokenizer = AutoTokenizer.from_pretrained(self.MODEL_NAME)

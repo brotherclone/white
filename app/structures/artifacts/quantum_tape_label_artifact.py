@@ -1,16 +1,16 @@
 import os
-import yaml
-
 from abc import ABC
 from pathlib import Path
 from typing import Optional
-from pydantic import Field
+
+import yaml
 from dotenv import load_dotenv
+from pydantic import Field
 
 from app.structures.artifacts.html_artifact_file import HtmlChainArtifactFile
 from app.structures.artifacts.template_renderer import (
-    get_template_path,
     HTMLTemplateRenderer,
+    get_template_path,
 )
 from app.structures.enums.quantum_tape_recording_quality import (
     QuantumTapeRecordingQuality,

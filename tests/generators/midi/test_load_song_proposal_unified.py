@@ -11,12 +11,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import yaml
 import pytest
+import yaml
 
-from app.generators.midi.production.production_plan import load_song_proposal_unified
 from app.generators.midi.production.init_production import write_initial_proposal
-
+from app.generators.midi.production.production_plan import load_song_proposal_unified
 
 # ---------------------------------------------------------------------------
 # Fixtures

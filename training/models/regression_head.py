@@ -5,9 +5,10 @@ Predicts continuous values like intensity, fluidity, temporal complexity,
 and supports bounded/unbounded outputs with uncertainty estimation.
 """
 
+from typing import Dict, List, Literal, Optional, Tuple
+
 import torch
 import torch.nn as nn
-from typing import List, Optional, Literal, Tuple, Dict
 
 
 class RegressionHead(nn.Module):

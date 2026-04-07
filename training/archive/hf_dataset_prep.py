@@ -26,12 +26,12 @@ Usage:
 """
 
 import argparse
-from pathlib import Path
-from datetime import datetime
-import pandas as pd
 import io
-import numpy as np
+from datetime import datetime
+from pathlib import Path
 
+import numpy as np
+import pandas as pd
 
 # Dataset configuration
 DATASET_NAME = "white-training-data"
@@ -126,8 +126,8 @@ def create_playable_preview(
     Returns:
         HuggingFace Dataset with playable audio
     """
-    from datasets import Dataset, Features, Audio, Value
     import pyarrow.parquet as pq
+    from datasets import Audio, Dataset, Features, Value
 
     print(f"\n{'='*60}")
     print("CREATING PLAYABLE AUDIO PREVIEW")

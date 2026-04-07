@@ -1,13 +1,13 @@
-from typing import Any, Dict, List, Optional, Annotated
+from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.structures.agents.base_rainbow_agent_state import dedupe_artifacts
+from app.structures.artifacts.artifact_relationship import ArtifactRelationship
 from app.structures.concepts.facet_evolution import FacetEvolution
 from app.structures.concepts.transformation_trace import TransformationTrace
 from app.structures.enums.white_facet import WhiteFacet
 from app.structures.manifests.song_proposal import SongProposal
-from app.structures.artifacts.artifact_relationship import ArtifactRelationship
-from app.structures.agents.base_rainbow_agent_state import dedupe_artifacts
 
 
 def merge_document_syntheses(

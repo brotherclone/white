@@ -1,13 +1,13 @@
-from unittest.mock import mock_open, patch, MagicMock
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 import yaml
 
 from app.util.manifest_loader import (
-    load_manifest,
-    sample_reference_artists,
     get_my_reference_proposals,
     get_sounds_like_by_color,
+    load_manifest,
+    sample_reference_artists,
 )
 
 

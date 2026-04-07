@@ -7,10 +7,9 @@ from pathlib import Path
 import yaml
 
 from app.generators.midi.production.migrate_production_dir import (
-    migrate_production_dir,
     _detect_phase_status,
+    migrate_production_dir,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

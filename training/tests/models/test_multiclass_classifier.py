@@ -7,8 +7,8 @@ Tests model architecture, forward pass, predictions, and class weight computatio
 import pytest
 import torch
 from models.multiclass_classifier import (
-    MultiClassRebracketingClassifier,
     MultiClassRainbowModel,
+    MultiClassRebracketingClassifier,
 )
 
 

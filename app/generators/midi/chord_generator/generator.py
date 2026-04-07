@@ -2,11 +2,12 @@
 Chord progression generator using brute-force + scoring approach.
 """
 
-import polars as pl
 import pickle
 import random
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
+
+import polars as pl
 
 
 class ChordProgressionGenerator:

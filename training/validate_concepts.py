@@ -25,25 +25,25 @@ Usage:
     python validate_concepts.py --proposals-dir /chain_artifacts/
 """
 
+import argparse
+import json
+import sys
+from dataclasses import asdict, dataclass
+from enum import Enum
+from pathlib import Path
+from typing import Dict, List, Optional
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pathlib import Path
 import yaml
-import json
-import argparse
-from typing import Dict, List, Optional
-from dataclasses import dataclass, asdict
-from enum import Enum
-import sys
-import numpy as np
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Import embedding encoder for inference
 from core.embedding_loader import DeBERTaEmbeddingEncoder
-
 
 # ============================================================================
 # VALIDATION RESULT TYPES (Same as before, but standalone)

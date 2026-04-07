@@ -1,7 +1,8 @@
 import os
+
 import yaml
-from pydantic import Field, BaseModel
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field
 
 load_dotenv()
 

@@ -1,10 +1,11 @@
 import os
+from abc import ABC
+from pathlib import Path
+
 import numpy as np
 from dotenv import load_dotenv
-from abc import ABC
 from pydantic import Field
 from scipy.io import wavfile
-from pathlib import Path
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType

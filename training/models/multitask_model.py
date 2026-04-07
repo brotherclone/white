@@ -11,17 +11,18 @@ Loss weighting strategies:
 - Gradient normalization (GradNorm)
 """
 
+from dataclasses import dataclass
+from typing import Dict, List, Literal, Optional, Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Dict, Optional, Tuple, Literal, List
-from dataclasses import dataclass
 
-from .rainbow_table_regression_head import (
-    RainbowTableRegressionHead,
-    OntologicalScores,
-)
 from .multiclass_classifier import MultiClassRebracketingClassifier
+from .rainbow_table_regression_head import (
+    OntologicalScores,
+    RainbowTableRegressionHead,
+)
 
 
 @dataclass

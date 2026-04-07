@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
 

@@ -1,5 +1,5 @@
-from typing import Any, List, Optional, Annotated
 from operator import add
+from typing import Annotated, Any, List, Optional
 
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import mido
-    from mido import MidiFile, MidiTrack, MetaMessage
+    from mido import MetaMessage, MidiFile, MidiTrack
 
     MIDO_AVAILABLE = True
 except ImportError:

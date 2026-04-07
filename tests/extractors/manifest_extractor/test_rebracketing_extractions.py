@@ -5,12 +5,12 @@ Tests word boundary matching, temporal scoring, ontological uncertainty,
 and the full concept extraction pipeline.
 """
 
-from app.extractors.manifest_extractor.word_matching import count_word_matches
-from app.extractors.manifest_extractor.scoring_functions import (
-    score_temporal_complexity,
-    score_ontological_uncertainty,
-)
 from app.extractors.manifest_extractor.concept_extractor import ConceptExtractor
+from app.extractors.manifest_extractor.scoring_functions import (
+    score_ontological_uncertainty,
+    score_temporal_complexity,
+)
+from app.extractors.manifest_extractor.word_matching import count_word_matches
 
 
 def test_word_boundary_matching():

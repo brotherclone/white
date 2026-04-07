@@ -1,7 +1,8 @@
 """Tests for song_evaluator pure-logic helpers."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from app.generators.midi.production.song_evaluator import (
     _chromatic_consistency,
@@ -10,7 +11,6 @@ from app.generators.midi.production.song_evaluator import (
     _parse_arrangement_txt_metrics,
     _safe_mean,
 )
-
 
 # ---------------------------------------------------------------------------
 # _safe_mean

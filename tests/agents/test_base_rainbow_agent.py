@@ -1,7 +1,7 @@
-import pytest
-
 from abc import ABC
 from types import SimpleNamespace
+
+import pytest
 
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from app.structures.artifacts.base_artifact import ChainArtifact

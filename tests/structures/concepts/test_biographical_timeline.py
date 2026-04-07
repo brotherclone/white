@@ -1,9 +1,10 @@
-import pytest
-from pydantic import ValidationError
 import datetime
 
-from app.structures.concepts.biographical_timeline import BiographicalTimeline
+import pytest
+from pydantic import ValidationError
+
 from app.structures.concepts.biographical_period import BiographicalPeriod
+from app.structures.concepts.biographical_timeline import BiographicalTimeline
 
 
 def test_create_valid_model():

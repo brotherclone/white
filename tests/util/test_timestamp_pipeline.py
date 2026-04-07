@@ -19,9 +19,9 @@ from app.util.timestamp_audio_extractor import (
 from app.util.timestamp_pipeline import (
     PipelineConfig,
     SegmentMetadata,
-    process_track_directory,
     process_multiple_tracks,
     process_staged_raw_material,
+    process_track_directory,
 )
 
 

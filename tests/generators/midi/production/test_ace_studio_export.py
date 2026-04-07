@@ -15,7 +15,6 @@ from app.generators.midi.production.ace_studio_export import (
     resolve_ace_voice_name,
 )
 
-
 # ---------------------------------------------------------------------------
 # load_singer_registry
 # ---------------------------------------------------------------------------

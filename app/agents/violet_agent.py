@@ -12,18 +12,17 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langgraph.constants import START, END
+from langgraph.constants import END, START
 from langgraph.graph import StateGraph
+
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
 )
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.concepts.vanity_persona import VanityPersona
 from app.structures.concepts.vanity_interview_question import (
     VanityInterviewQuestion,
     VanityInterviewQuestionOutput,
@@ -31,7 +30,9 @@ from app.structures.concepts.vanity_interview_question import (
 from app.structures.concepts.vanity_interview_response import (
     VanityInterviewResponse,
 )
+from app.structures.concepts.vanity_persona import VanityPersona
 from app.structures.manifests.song_proposal import SongProposalIteration
+from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()

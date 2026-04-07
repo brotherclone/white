@@ -8,19 +8,20 @@ Provides per-class and aggregate metrics including:
 - Top-k accuracy
 """
 
-import torch
-import numpy as np
 from typing import Dict, List, Optional, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+import torch
 from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
     confusion_matrix,
     f1_score,
     precision_score,
     recall_score,
-    accuracy_score,
-    classification_report,
 )
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 class MultiClassMetrics:

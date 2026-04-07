@@ -1,8 +1,8 @@
 import os
 import re
 import sys
-
 from typing import ClassVar, List, Tuple
+
 from pydantic import BaseModel
 
 

@@ -17,9 +17,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
+from rich import box
 from rich.console import Console
 from rich.table import Table
-from rich import box
 
 # ---------------------------------------------------------------------------
 # Rainbow color ordering (for sort)

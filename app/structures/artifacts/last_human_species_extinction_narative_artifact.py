@@ -1,12 +1,12 @@
 import errno
 import os
 import tempfile
-import yaml
-
-from dotenv import load_dotenv
 from abc import ABC
 from pathlib import Path
 from typing import Dict, List
+
+import yaml
+from dotenv import load_dotenv
 from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact

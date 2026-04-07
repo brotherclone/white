@@ -1,9 +1,9 @@
 import logging
 import os
 import time
-import yaml
-
 from abc import ABC
+
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
@@ -15,11 +15,11 @@ from app.agents.tools.book_tool import BookMaker
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.structures.agents.agent_settings import AgentSettings
 from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.util.agent_state_utils import get_state_snapshot
 from app.structures.artifacts.book_artifact import BookArtifact, BookPageCollection
 from app.structures.concepts.book_evaluation import BookEvaluationDecision
 from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
 from app.structures.manifests.song_proposal import SongProposalIteration
+from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 
 load_dotenv()

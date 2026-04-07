@@ -1,11 +1,11 @@
 import os
 import random
-import yaml
-
 from abc import ABC
 from typing import Optional
+
+import yaml
 from dotenv import load_dotenv
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 
 from app.agents.tools.infranym_audio_encoder import InfranymAudioEncoder
 from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile

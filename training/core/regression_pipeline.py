@@ -7,19 +7,20 @@ Extends the existing pipelines to support:
 - Target validation and normalization
 """
 
-import torch
-from torch.utils.data import Dataset, DataLoader
-import pandas as pd
-import numpy as np
-from typing import Dict, Optional, Tuple, Any
 import warnings
+from typing import Any, Dict, Optional, Tuple
 
+import numpy as np
+import pandas as pd
+import torch
+from torch.utils.data import DataLoader, Dataset
+
+from .multiclass_pipeline import LabelEncoder
 from .soft_targets import (
     SoftTargetGenerator,
     SoftTargets,
     generate_soft_targets_from_dataframe,
 )
-from .multiclass_pipeline import LabelEncoder
 
 
 class MultiTaskRainbowDataset(Dataset):

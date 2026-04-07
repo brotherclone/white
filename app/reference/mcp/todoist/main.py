@@ -1,8 +1,8 @@
 import logging
-import requests
 import os
 from typing import Any, Dict, List, Optional
 
+import requests
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 

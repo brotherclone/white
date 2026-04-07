@@ -2,8 +2,9 @@
 
 import json
 import os
+from unittest.mock import MagicMock, mock_open, patch
+
 import pytest
-from unittest.mock import mock_open, patch, MagicMock
 
 from app.agents.tools.extinction_tools import (
     load_green_corpus,

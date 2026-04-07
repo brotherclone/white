@@ -1,20 +1,20 @@
 """Tests for app/tools/song_dashboard.py"""
 
-import yaml
 from pathlib import Path
+
+import yaml
 
 from app.tools.song_dashboard import (
     STATUS_APPROVED,
-    STATUS_PENDING,
     STATUS_NO_CANDIDATES,
     STATUS_NOT_STARTED,
-    phase_status,
-    scan_production_dir,
-    scan_album,
+    STATUS_PENDING,
     _color_rank,
     build_table,
+    phase_status,
+    scan_album,
+    scan_production_dir,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -253,9 +253,9 @@ class TestColorRank:
 class TestBuildTable:
     def _make_status(self, color="red", slug="red__test_v1"):
         from app.tools.song_dashboard import (
-            SongStatus,
             STATUS_APPROVED,
             STATUS_NOT_STARTED,
+            SongStatus,
         )
 
         return SongStatus(

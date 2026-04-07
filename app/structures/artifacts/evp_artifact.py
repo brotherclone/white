@@ -1,10 +1,10 @@
 import logging
 import os
-import yaml
-
 from abc import ABC
 from pathlib import Path
 from typing import Optional
+
+import yaml
 from dotenv import load_dotenv
 from pydantic import Field
 

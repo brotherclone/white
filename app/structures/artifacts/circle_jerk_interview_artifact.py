@@ -1,11 +1,10 @@
 import os
-
-import yaml
-
 from abc import ABC
 from pathlib import Path
-from pydantic import Field
+
+import yaml
 from dotenv import load_dotenv
+from pydantic import Field
 
 from app.structures.artifacts.base_artifact import ChainArtifact
 from app.structures.concepts.vanity_interview_question import VanityInterviewQuestion

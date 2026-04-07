@@ -1,6 +1,7 @@
+import datetime
+
 import pytest
 from pydantic import ValidationError
-import datetime
 
 from app.structures.concepts.biographical_event import BiographicalEvent
 

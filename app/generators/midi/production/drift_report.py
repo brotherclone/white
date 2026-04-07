@@ -15,11 +15,11 @@ from __future__ import annotations
 
 import argparse
 import sys
-import yaml
-import mido
-
 from pathlib import Path
 from typing import Optional
+
+import mido
+import yaml
 
 from app.generators.midi.production.ace_studio_import import (
     find_ace_export,

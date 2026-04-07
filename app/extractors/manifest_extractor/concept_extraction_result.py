@@ -1,4 +1,4 @@
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 from app.structures.concepts.methodology_feature import MethodologyFeature
 from app.structures.concepts.rebracketing_analysis import RebracketingAnalysis

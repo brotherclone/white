@@ -1,5 +1,5 @@
-from pydantic import BaseModel, ValidationError
 import pytest
+from pydantic import BaseModel, ValidationError
 
 from app.structures.concepts.last_human_species_extinction_parallel_moment import (
     LastHumanSpeciesExtinctionParallelMoment,

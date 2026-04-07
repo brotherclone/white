@@ -3,11 +3,11 @@ MIDI Parser for chord library.
 Extracts chord data, progressions, and relationships from MIDI files.
 """
 
-import mido
 import re
-
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
+
+import mido
 
 # ToDo: Use Pydantic Note model for better structure and validation
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
