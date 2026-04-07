@@ -15,7 +15,7 @@ import yaml
 
 
 def _make_melody_midi(notes: list[int], bpm: int = 120, tpb: int = 480) -> bytes:
-    """Create a melody MIDI with one note per quarter-beat on channel 0."""
+    """Create a melody MIDI with one note per beat (quarter note, 4/4) on channel 0."""
     mid = mido.MidiFile(ticks_per_beat=tpb)
     track = mido.MidiTrack()
     mid.tracks.append(track)
@@ -199,8 +199,8 @@ class TestGenerateQuartet:
         with pytest.raises(FileNotFoundError):
             generate_quartet(prod, "nonexistent_section", top_k=1)
 
-    def test_no_scorer_falls_back_gracefully(self, tmp_path):
-        """When Refractor is unavailable, scoring falls back to counterpoint-only."""
+    def test_no_scorer_composite_equals_counterpoint(self, tmp_path):
+        """When Refractor is unavailable, composite score equals counterpoint (no 0.5 bias)."""
         from app.generators.midi.pipelines.quartet_pipeline import generate_quartet
 
         prod = tmp_path / "production" / "test_song"
@@ -208,11 +208,11 @@ class TestGenerateQuartet:
         _write_song_context(prod)
         _write_melody_approved(prod, "verse", [60, 62, 64, 65])
 
-        # Pass scorer=None and patch training.refractor to be unavailable
         with patch.dict("sys.modules", {"training.refractor": None}):
             candidates = generate_quartet(prod, "verse", top_k=1, seed=0, scorer=None)
-        assert len(candidates) == 1
-        assert candidates[0]["composite_score"] >= 0.0
+        c = candidates[0]
+        assert c["composite_score"] == c["scores"]["counterpoint"]
+        assert c["scores"]["chromatic"] is None
 
 
 # ---------------------------------------------------------------------------
@@ -310,3 +310,42 @@ class TestWriteQuartetCandidates:
             data = yaml.safe_load(f)
         chorus_entries = [c for c in data["candidates"] if c["label"] == "chorus"]
         assert len(chorus_entries) == 1  # replaced, not appended
+
+    def test_review_uses_midi_file_key(self, tmp_path):
+        """review.yml entries use 'midi_file' so promote_part.py recognises them."""
+        from app.generators.midi.pipelines.quartet_pipeline import (
+            write_quartet_candidates,
+        )
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_song_context(prod)
+        _, review_path = write_quartet_candidates(
+            self._make_candidates("verse", 1), prod, "verse"
+        )
+
+        with open(review_path) as f:
+            data = yaml.safe_load(f)
+        cand = data["candidates"][0]
+        assert "midi_file" in cand
+        assert cand["midi_file"].startswith("candidates/")
+        assert "file" not in cand
+
+    def test_stale_midi_files_cleaned_on_regenerate(self, tmp_path):
+        """Old MIDI files for a section are removed before writing new candidates."""
+        from app.generators.midi.pipelines.quartet_pipeline import (
+            write_quartet_candidates,
+        )
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_song_context(prod)
+
+        # Write 3 candidates first
+        write_quartet_candidates(self._make_candidates("chorus", 3), prod, "chorus")
+        cands_dir = prod / "quartet" / "candidates"
+        assert len(list(cands_dir.glob("chorus_quartet_*.mid"))) == 3
+
+        # Regenerate with 1 candidate — stale files should be gone
+        write_quartet_candidates(self._make_candidates("chorus", 1), prod, "chorus")
+        assert len(list(cands_dir.glob("chorus_quartet_*.mid"))) == 1

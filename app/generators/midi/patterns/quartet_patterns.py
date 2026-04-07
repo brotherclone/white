@@ -151,9 +151,13 @@ def fix_voice_crossing(
     tenor: list[int],
     bass_voice: list[int],
 ) -> tuple[list[int], list[int], list[int]]:
-    """Swap adjacent voices beat-by-beat when crossing is detected.
+    """Clamp voices beat-by-beat to enforce soprano ≥ alto ≥ tenor ≥ bass_voice.
 
-    Order invariant: soprano ≥ alto ≥ tenor ≥ bass_voice (by MIDI pitch).
+    When a voice exceeds the one above it, it is pulled down to one semitone
+    below that voice, then range-clamped.  This is a greedy downward push
+    rather than a true swap — it preserves the soprano and prioritises the
+    upper voices when cascading corrections is needed.
+
     Returns corrected (alto, tenor, bass_voice) lists.
     """
     n = len(soprano)

@@ -79,36 +79,53 @@ def extract_note_events(
 ) -> list[tuple[int, int, int]]:
     """Extract (abs_tick, pitch, duration_ticks) triples from melody MIDI.
 
-    Duration is estimated as the gap to the next note-on or note-off event.
+    Pairs each note-on with the next note-off for the same pitch using a
+    per-pitch queue, so repeated pitches each get their correct duration.
     Returns events sorted by abs_tick.
     """
+    from collections import defaultdict, deque
+
     mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
     tpb = mid.ticks_per_beat or 480
 
-    on_events: list[tuple[int, int]] = []  # (abs_tick, pitch)
-    off_events: dict[int, int] = {}  # pitch → first off abs_tick
-
+    # First pass: collect all on/off events in order
+    raw: list[tuple[int, str, int]] = []  # (abs_tick, type, pitch)
     for track in mid.tracks:
         abs_tick = 0
         for msg in track:
             abs_tick += msg.time
             if msg.type == "note_on" and msg.velocity > 0:
-                on_events.append((abs_tick, msg.note))
+                raw.append((abs_tick, "on", msg.note))
             elif msg.type == "note_off" or (
                 msg.type == "note_on" and msg.velocity == 0
             ):
-                if msg.note not in off_events:
-                    off_events[msg.note] = abs_tick
+                raw.append((abs_tick, "off", msg.note))
+    raw.sort(key=lambda x: x[0])
+
+    # Second pass: pair each note-on with the next note-off for the same pitch
+    pending: dict[int, deque] = defaultdict(deque)  # pitch → queue of on-ticks
+    on_events: list[tuple[int, int]] = []  # (abs_tick, pitch) in order
+    off_by_on: dict[tuple[int, int], int] = {}  # (on_tick, pitch) → off_tick
+
+    for abs_tick, kind, pitch in raw:
+        if kind == "on":
+            pending[pitch].append(abs_tick)
+            on_events.append((abs_tick, pitch))
+        elif kind == "off" and pending[pitch]:
+            on_tick = pending[pitch].popleft()
+            off_by_on[(on_tick, pitch)] = abs_tick
 
     on_events.sort(key=lambda x: x[0])
 
     result = []
     for i, (tick, pitch) in enumerate(on_events):
-        if i + 1 < len(on_events):
-            default_dur = on_events[i + 1][0] - tick
+        off_tick = off_by_on.get((tick, pitch))
+        if off_tick is not None:
+            dur = max(off_tick - tick, tpb // 4)
+        elif i + 1 < len(on_events):
+            dur = max(on_events[i + 1][0] - tick, tpb // 4)
         else:
-            default_dur = tpb  # quarter note fallback
-        dur = max(off_events.get(pitch, tick + default_dur) - tick, tpb // 4)
+            dur = tpb  # quarter note fallback for final note
         result.append((tick, pitch, dur))
 
     return result
@@ -314,11 +331,12 @@ def score_quartet_candidate(
         target = get_chromatic_target(color)
         chromatic_val = compute_chromatic_match(scorer_result, target)
         confidence = float(scorer_result.get("confidence", 0.5))
+        composite = round(0.30 * mean_cp + 0.70 * chromatic_val, 3)
     else:
-        chromatic_val = 0.5
+        # No Refractor available — composite is counterpoint score only
+        chromatic_val = None
         confidence = 0.0
-
-    composite = round(0.30 * mean_cp + 0.70 * chromatic_val, 3)
+        composite = mean_cp
 
     return {
         "counterpoint": mean_cp,
@@ -507,6 +525,11 @@ def write_quartet_candidates(
     ctx = load_song_context(production_dir)
     color = str(ctx.get("color", ""))
 
+    # Remove stale MIDI files for this section before writing new ones
+    label_key = section.lower().replace("-", "_").replace(" ", "_")
+    for stale in candidates_dir.glob(f"{label_key}_quartet_*.mid"):
+        stale.unlink()
+
     review_entries = []
     for cand in candidates:
         filename = f"{cand['id']}.mid"
@@ -518,7 +541,7 @@ def write_quartet_candidates(
                 "label": cand["label"],
                 "section": cand["section"],
                 "singer": cand["singer"],
-                "file": filename,
+                "midi_file": f"candidates/{filename}",
                 "alto_pattern": cand["alto_pattern"],
                 "tenor_pattern": cand["tenor_pattern"],
                 "bass_voice_pattern": cand["bass_voice_pattern"],
