@@ -66,6 +66,8 @@ class CandidateEntry:
     rank: int
     composite_score: float
     template: str
+    label: str = ""
+    use_case: str = ""
     scores: dict = field(default_factory=dict)
 
 
@@ -102,6 +104,8 @@ def _load_review(review_yml: Path) -> list[CandidateEntry]:
                 rank=int(c.get("rank", 99)),
                 composite_score=float(c.get("scores", {}).get("composite", 0.0)),
                 template=template,
+                label=str(c.get("label", "") or ""),
+                use_case=str(c.get("use_case", "") or ""),
                 scores=c.get("scores", {}),
             )
         )
@@ -129,25 +133,35 @@ def load_all_candidates(
     return entries
 
 
-def _update_review_yml(review_yml: Path, candidate_id: str, new_status: str) -> None:
+def _update_review_yml(review_yml: Path, candidate_id: str, **fields) -> None:
     with open(review_yml) as f:
         data = yaml.safe_load(f) or {}
     for c in data.get("candidates", []):
         if c.get("id") == candidate_id:
-            c["status"] = new_status
+            c.update(fields)
             break
     with open(review_yml, "w") as f:
         yaml.dump(data, f, allow_unicode=True, sort_keys=False)
 
 
 def approve_candidate(entry: CandidateEntry) -> None:
-    _update_review_yml(entry.review_yml, entry.candidate_id, "approved")
+    _update_review_yml(entry.review_yml, entry.candidate_id, status="approved")
     entry.status = "approved"
 
 
 def reject_candidate(entry: CandidateEntry) -> None:
-    _update_review_yml(entry.review_yml, entry.candidate_id, "rejected")
+    _update_review_yml(entry.review_yml, entry.candidate_id, status="rejected")
     entry.status = "rejected"
+
+
+def set_label(entry: CandidateEntry, label: str) -> None:
+    _update_review_yml(entry.review_yml, entry.candidate_id, label=label or None)
+    entry.label = label
+
+
+def set_use_case(entry: CandidateEntry, use_case: str) -> None:
+    _update_review_yml(entry.review_yml, entry.candidate_id, use_case=use_case)
+    entry.use_case = use_case
 
 
 def play_candidate(entry: CandidateEntry) -> None:

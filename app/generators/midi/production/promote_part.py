@@ -24,6 +24,60 @@ from app.util.diversity_tracker import (
     save_registry,
 )
 
+_QUARTET_VOICES = ["soprano", "alto", "tenor", "bass_voice"]
+_QUARTET_CHANNELS = {"soprano": 0, "alto": 1, "tenor": 2, "bass_voice": 3}
+
+
+def _split_quartet_midi(source: Path, approved_dir: Path, label_clean: str) -> None:
+    """Split a multi-channel quartet MIDI into one file per voice.
+
+    Writes <label>_soprano.mid, <label>_alto.mid, <label>_tenor.mid,
+    <label>_bass_voice.mid alongside the combined file.  Tempo/meta
+    events from track 0 are included in every split file.
+    """
+    try:
+        mid = mido.MidiFile(filename=str(source))
+    except Exception as e:
+        print(f"  Warning: could not split quartet MIDI {source.name}: {e}")
+        return
+
+    for voice, channel in _QUARTET_CHANNELS.items():
+        split = mido.MidiFile(ticks_per_beat=mid.ticks_per_beat)
+        track = mido.MidiTrack()
+        split.tracks.append(track)
+
+        track.append(
+            mido.MetaMessage("track_name", name=f"{label_clean}_{voice}", time=0)
+        )
+
+        # Replay all tracks, keeping only messages for this channel + meta
+        # Preserve delta-time correctly by accumulating abs ticks then re-diffing
+        events: list[tuple[int, object]] = []
+        for src_track in mid.tracks:
+            abs_tick = 0
+            for msg in src_track:
+                abs_tick += msg.time
+                if msg.is_meta:
+                    if msg.type in ("set_tempo", "time_signature", "key_signature"):
+                        events.append((abs_tick, msg.copy(time=0)))
+                elif hasattr(msg, "channel") and msg.channel == channel:
+                    events.append((abs_tick, msg.copy(time=0)))
+
+        events.sort(key=lambda x: x[0])
+
+        prev_tick = 0
+        for abs_tick, msg in events:
+            delta = abs_tick - prev_tick
+            track.append(msg.copy(time=delta))
+            prev_tick = abs_tick
+
+        track.append(mido.MetaMessage("end_of_track", time=0))
+
+        dest = approved_dir / f"{label_clean}_{voice}.mid"
+        split.save(str(dest))
+
+    print(f"  → split into {', '.join(f'{v}.mid' for v in _QUARTET_VOICES)}")
+
 
 def _rewrite_track_names(midi_path: Path, label: str) -> None:
     """Rewrite track_name MetaMessages in a promoted MIDI to match the label.
@@ -170,6 +224,10 @@ def promote_part(review_path: str, clean: bool = False):
         dest = approved_dir / dest_name
         shutil.copy2(source, dest)
         _rewrite_track_names(dest, label_clean)
+
+        # Quartet phase: also split into per-voice files
+        if part_dir.name == "quartet":
+            _split_quartet_midi(dest, approved_dir, label_clean)
         promoted.append(
             {
                 "id": candidate.get("id"),

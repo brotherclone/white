@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Optional
 
 import mido
+import numpy as np
 import yaml
 
 from app.generators.midi.patterns.quartet_patterns import (
@@ -49,6 +50,21 @@ from app.generators.midi.production.init_production import load_song_context
 QUARTET_DIR_NAME = "quartet"
 REVIEW_FILENAME = "review.yml"
 MAX_OFFSET_CHANGE = 4  # semitones — cap per-beat leap in a generated voice
+
+
+def _to_python(obj):
+    """Recursively convert numpy types to native Python for YAML serialization."""
+    if isinstance(obj, dict):
+        return {k: _to_python(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_python(v) for v in obj]
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.floating):
+        return float(obj)
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj
 
 
 # ---------------------------------------------------------------------------
@@ -349,6 +365,123 @@ def score_quartet_candidate(
 
 
 # ---------------------------------------------------------------------------
+# Simple-voicings helpers
+# ---------------------------------------------------------------------------
+
+_NOTE_NAME_TO_PC: dict[str, int] = {
+    "C": 0,
+    "D": 2,
+    "E": 4,
+    "F": 5,
+    "G": 7,
+    "A": 9,
+    "B": 11,
+}
+
+
+def _note_name_to_pc(name: str) -> int:
+    """Convert a note name string like 'D#2' or 'Gb3' to a pitch class 0–11."""
+    letter = name[0].upper()
+    pc = _NOTE_NAME_TO_PC.get(letter, 0)
+    for ch in name[1:]:
+        if ch == "#":
+            pc += 1
+        elif ch == "b":
+            pc -= 1
+        else:
+            break  # hit the octave digit
+    return pc % 12
+
+
+def triad_pcs_from_chord_notes(notes: list[str]) -> set[int]:
+    """Return the root/3rd/5th pitch classes from a chord's note-name list.
+
+    Root is the lowest note's pitch class.  The 3rd and 5th are identified
+    by their interval above the root (minor 3rd=3, major 3rd=4, perfect 5th=7).
+    Any remaining notes (extensions, 7ths, 9ths, etc.) are excluded so that
+    lower voices snap to consonant chord tones only.
+    """
+    if not notes:
+        return set()
+    pcs = [_note_name_to_pc(n) for n in notes]
+    root = pcs[0]
+    triad: set[int] = {root}
+    for pc in pcs[1:]:
+        interval = (pc - root) % 12
+        if interval in (3, 4, 7):  # min3, maj3, p5
+            triad.add(pc)
+    # Fallback: if we only found the root, include the next two unique PCs
+    if len(triad) < 2:
+        for pc in pcs[1:]:
+            triad.add(pc)
+            if len(triad) >= 3:
+                break
+    return triad
+
+
+def snap_note_to_triad(note: int, triad_pcs: set[int]) -> int:
+    """Snap a MIDI note to the nearest pitch in triad_pcs (across all octaves)."""
+    if not triad_pcs:
+        return note
+    best, best_dist = note, float("inf")
+    for pc in triad_pcs:
+        # Find the closest octave of this pitch class to the soprano note
+        delta = (pc - note % 12) % 12
+        if delta > 6:
+            delta -= 12  # prefer downward snap when equidistant
+        candidate = note + delta
+        dist = abs(candidate - note)
+        if dist < best_dist:
+            best_dist = dist
+            best = candidate
+    return best
+
+
+def load_section_triad_map(production_dir: Path, label_key: str) -> list[set[int]]:
+    """Return a list of triad pitch-class sets, one per chord in the section.
+
+    Reads chords/review.yml and finds the approved candidate whose label
+    matches label_key.  Returns [] if the data is unavailable.
+    """
+    review_path = production_dir / "chords" / "review.yml"
+    if not review_path.exists():
+        return []
+    with open(review_path) as f:
+        data = yaml.safe_load(f) or {}
+    for cand in data.get("candidates", []):
+        cand_label = (
+            str(cand.get("label", "") or "").lower().replace("-", "_").replace(" ", "_")
+        )
+        if cand_label == label_key and cand.get("status") in (
+            "approved",
+            "accepted",
+        ):
+            chords = cand.get("chords", [])
+            return [triad_pcs_from_chord_notes(c.get("notes", [])) for c in chords]
+    return []
+
+
+def snap_soprano_to_triads(
+    soprano_notes: list[int],
+    triad_map: list[set[int]],
+) -> list[int]:
+    """Snap each soprano note to the nearest triad tone of its chord.
+
+    Maps notes evenly across chords when note count and chord count differ.
+    Returns the original list unchanged if triad_map is empty.
+    """
+    if not triad_map:
+        return soprano_notes
+    n_notes = len(soprano_notes)
+    n_chords = len(triad_map)
+    snapped = []
+    for i, note in enumerate(soprano_notes):
+        chord_idx = min(int(i * n_chords / n_notes), n_chords - 1)
+        snapped.append(snap_note_to_triad(note, triad_map[chord_idx]))
+    return snapped
+
+
+# ---------------------------------------------------------------------------
 # Main generation function
 # ---------------------------------------------------------------------------
 
@@ -360,6 +493,7 @@ def generate_quartet(
     top_k: int = 3,
     seed: Optional[int] = None,
     scorer=None,
+    simple_voicings: bool = False,
 ) -> list[dict]:
     """Generate quartet candidates for one approved melody section.
 
@@ -400,6 +534,16 @@ def generate_quartet(
     soprano_midi_bytes = midi_path.read_bytes()
     soprano_notes = extract_soprano_notes(soprano_midi_bytes)
     note_events = extract_note_events(soprano_midi_bytes)
+
+    if simple_voicings:
+        triad_map = load_section_triad_map(production_dir, label_key)
+        if triad_map:
+            soprano_notes = snap_soprano_to_triads(soprano_notes, triad_map)
+            print(
+                f"  simple-voicings: snapped soprano notes to triads ({len(triad_map)} chords)"
+            )
+        else:
+            print("  simple-voicings: no chord data found, proceeding without snapping")
 
     # Load Refractor for chromatic scoring (optional — falls back gracefully)
     _scorer = scorer
@@ -491,6 +635,7 @@ def generate_quartet(
                 "alto_pattern": ap.name,
                 "tenor_pattern": tp.name,
                 "bass_voice_pattern": bp.name,
+                "simple_voicings": simple_voicings,
                 "scores": scores,
                 "composite_score": scores["composite"],
                 "midi_bytes": midi_bytes,
@@ -544,8 +689,9 @@ def write_quartet_candidates(
                 "alto_pattern": cand["alto_pattern"],
                 "tenor_pattern": cand["tenor_pattern"],
                 "bass_voice_pattern": cand["bass_voice_pattern"],
-                "scores": cand["scores"],
-                "composite_score": cand["composite_score"],
+                "simple_voicings": cand.get("simple_voicings", False),
+                "scores": _to_python(cand["scores"]),
+                "composite_score": _to_python(cand["composite_score"]),
                 "status": "pending",
             }
         )
@@ -597,6 +743,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--singer", default="gabriel", help="Singer name (metadata only)")
     p.add_argument("--top-k", type=int, default=3, help="Candidates per section")
     p.add_argument("--seed", type=int, default=None, help="Random seed")
+    p.add_argument(
+        "--simple-voicings",
+        action="store_true",
+        help="Snap soprano notes to triad tones (root/3rd/5th) before harmonising, "
+        "reducing dissonance from extended chord voicings.",
+    )
     return p
 
 
@@ -637,6 +789,7 @@ def main(argv: Optional[list[str]] = None) -> None:
                 singer=args.singer,
                 top_k=args.top_k,
                 seed=args.seed,
+                simple_voicings=args.simple_voicings,
             )
         except FileNotFoundError as e:
             print(f"  Skipped: {e}")
