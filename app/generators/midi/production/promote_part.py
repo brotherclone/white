@@ -41,13 +41,6 @@ def _split_quartet_midi(source: Path, approved_dir: Path, label_clean: str) -> N
         print(f"  Warning: could not split quartet MIDI {source.name}: {e}")
         return
 
-    # Collect tempo/meta track (messages with no channel, i.e. track 0 meta events)
-    meta_msgs: list = []
-    for track in mid.tracks:
-        for msg in track:
-            if msg.is_meta:
-                meta_msgs.append(msg)
-
     for voice, channel in _QUARTET_CHANNELS.items():
         split = mido.MidiFile(ticks_per_beat=mid.ticks_per_beat)
         track = mido.MidiTrack()

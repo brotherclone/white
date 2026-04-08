@@ -449,7 +449,10 @@ def load_section_triad_map(production_dir: Path, label_key: str) -> list[set[int
     with open(review_path) as f:
         data = yaml.safe_load(f) or {}
     for cand in data.get("candidates", []):
-        if str(cand.get("label", "")).lower() == label_key and cand.get("status") in (
+        cand_label = (
+            str(cand.get("label", "") or "").lower().replace("-", "_").replace(" ", "_")
+        )
+        if cand_label == label_key and cand.get("status") in (
             "approved",
             "accepted",
         ):

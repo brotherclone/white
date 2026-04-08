@@ -68,15 +68,23 @@ export default function Home() {
   const handlePlay = (id: string) => setPlayingId(prev => prev === id ? null : id);
 
   const handleLabel = async (id: string, label: string) => {
+    const prev_label = all.find(c => c.id === id)?.label;
     setAll(prev => prev.map(c => c.id === id ? { ...c, label } : c));
     try { await setLabel(id, label); }
-    catch { /* silent — local state already updated optimistically */ }
+    catch {
+      setAll(prev => prev.map(c => c.id === id ? { ...c, label: prev_label ?? "" } : c));
+      setError("Could not save label — edit reverted.");
+    }
   };
 
   const handleUseCase = async (id: string, use_case: string) => {
+    const prev_use_case = all.find(c => c.id === id)?.use_case;
     setAll(prev => prev.map(c => c.id === id ? { ...c, use_case } : c));
     try { await setUseCase(id, use_case); }
-    catch { /* silent */ }
+    catch {
+      setAll(prev => prev.map(c => c.id === id ? { ...c, use_case: prev_use_case ?? "" } : c));
+      setError("Could not save use case — edit reverted.");
+    }
   };
 
   useEffect(() => {
@@ -184,9 +192,10 @@ export default function Home() {
                   <td className="px-3 py-2" onClick={e => e.stopPropagation()}>
                     <input
                       type="text"
-                      value={c.label ?? ""}
+                      defaultValue={c.label ?? ""}
                       placeholder="unlabeled"
-                      onChange={e => handleLabel(c.id, e.target.value)}
+                      onBlur={e => handleLabel(c.id, e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
                       className="w-full bg-transparent border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-blue-500"
                     />
                   </td>
