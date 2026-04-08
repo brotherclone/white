@@ -21,6 +21,26 @@ export async function rejectCandidate(id: string) {
   return res.json();
 }
 
+export async function setUseCase(id: string, use_case: string) {
+  const res = await fetch(`${BASE}/candidates/${encodeURIComponent(id)}/use_case`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ use_case }),
+  });
+  if (!res.ok) throw new Error("Use case update failed");
+  return res.json();
+}
+
+export async function setLabel(id: string, label: string) {
+  const res = await fetch(`${BASE}/candidates/${encodeURIComponent(id)}/label`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ label }),
+  });
+  if (!res.ok) throw new Error("Label update failed");
+  return res.json();
+}
+
 export function midiUrl(id: string) {
   return `${BASE}/midi/${encodeURIComponent(id)}`;
 }

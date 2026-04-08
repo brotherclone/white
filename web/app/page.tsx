@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { fetchCandidates, approveCandidate, rejectCandidate, midiUrl } from "@/lib/api";
+import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl } from "@/lib/api";
 import { Candidate, CandidateStatus } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
@@ -66,6 +66,18 @@ export default function Home() {
   };
 
   const handlePlay = (id: string) => setPlayingId(prev => prev === id ? null : id);
+
+  const handleLabel = async (id: string, label: string) => {
+    setAll(prev => prev.map(c => c.id === id ? { ...c, label } : c));
+    try { await setLabel(id, label); }
+    catch { /* silent — local state already updated optimistically */ }
+  };
+
+  const handleUseCase = async (id: string, use_case: string) => {
+    setAll(prev => prev.map(c => c.id === id ? { ...c, use_case } : c));
+    try { await setUseCase(id, use_case); }
+    catch { /* silent */ }
+  };
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -138,15 +150,17 @@ export default function Home() {
               <Th k="template" label="Template" className="min-w-36" />
               <Th k="composite_score" label="Score" className="min-w-44" />
               <Th k="status" label="Status" className="w-28" />
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider w-32">Label</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider w-28">Use</th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider w-28">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={7} className="px-3 py-10 text-center text-zinc-500 font-sans">Loading…</td></tr>
+              <tr><td colSpan={9} className="px-3 py-10 text-center text-zinc-500 font-sans">Loading…</td></tr>
             )}
             {!loading && visible.length === 0 && (
-              <tr><td colSpan={7} className="px-3 py-10 text-center text-zinc-500 font-sans">No candidates found.</td></tr>
+              <tr><td colSpan={9} className="px-3 py-10 text-center text-zinc-500 font-sans">No candidates found.</td></tr>
             )}
             {visible.map(c => (
               <React.Fragment key={c.id}>
@@ -167,6 +181,29 @@ export default function Home() {
                   <td className="px-3 py-2 text-zinc-300 max-w-xs truncate font-sans text-xs" title={c.template}>{c.template}</td>
                   <td className="px-3 py-2"><ScoreBar value={c.composite_score} /></td>
                   <td className="px-3 py-2"><StatusBadge status={c.status} /></td>
+                  <td className="px-3 py-2" onClick={e => e.stopPropagation()}>
+                    <input
+                      type="text"
+                      value={c.label ?? ""}
+                      placeholder="unlabeled"
+                      onChange={e => handleLabel(c.id, e.target.value)}
+                      className="w-full bg-transparent border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                    />
+                  </td>
+                  <td className="px-3 py-2" onClick={e => e.stopPropagation()}>
+                    {c.use_case ? (
+                      <button
+                        onClick={() => handleUseCase(c.id, c.use_case === "vocal" ? "instrumental" : "vocal")}
+                        className={`px-2 py-0.5 text-xs rounded font-medium transition-colors ${
+                          c.use_case === "vocal"
+                            ? "bg-violet-800 hover:bg-violet-700 text-violet-100"
+                            : "bg-zinc-700 hover:bg-zinc-600 text-zinc-200"
+                        }`}
+                      >
+                        {c.use_case === "vocal" ? "vocal" : "instr"}
+                      </button>
+                    ) : <span className="text-zinc-600">—</span>}
+                  </td>
                   <td className="px-3 py-2" onClick={e => e.stopPropagation()}>
                     <div className="flex gap-1">
                       <button
@@ -193,14 +230,14 @@ export default function Home() {
                 </tr>
                 {playingId === c.id && (
                   <tr key={`${c.id}-player`} className="bg-zinc-900/60 border-b border-zinc-800/60">
-                    <td colSpan={7} className="px-4 py-3">
+                    <td colSpan={9} className="px-4 py-3">
                       <MidiPlayer url={midiUrl(c.id)} />
                     </td>
                   </tr>
                 )}
                 {expanded === c.id && (
                   <tr className="bg-zinc-900/30 border-b border-zinc-800/60">
-                    <td colSpan={7} className="px-4 py-3">
+                    <td colSpan={9} className="px-4 py-3">
                       <ScorePanel scores={c.scores} />
                     </td>
                   </tr>

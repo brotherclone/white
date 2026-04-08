@@ -23,5 +23,7 @@ export interface Candidate {
   rank: number;
   composite_score: number;
   midi_url: string;
+  label: string;
+  use_case: string;
   scores: Scores;
 }

@@ -19,12 +19,15 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
 from app.tools.candidate_browser import (
     CandidateEntry,
     approve_candidate,
     load_all_candidates,
     reject_candidate,
+    set_label,
+    set_use_case,
 )
 
 # ---------------------------------------------------------------------------
@@ -95,6 +98,24 @@ def create_app(production_dir: Path) -> FastAPI:
         reject_candidate(entry)
         return {"ok": True, "id": candidate_id, "status": "rejected"}
 
+    class LabelBody(BaseModel):
+        label: str
+
+    @app.patch("/candidates/{candidate_id}/label")
+    def label(candidate_id: str, body: LabelBody):
+        entry = _find(candidate_id)
+        set_label(entry, body.label)
+        return {"ok": True, "id": candidate_id, "label": body.label}
+
+    class UseCaseBody(BaseModel):
+        use_case: str
+
+    @app.patch("/candidates/{candidate_id}/use_case")
+    def use_case(candidate_id: str, body: UseCaseBody):
+        entry = _find(candidate_id)
+        set_use_case(entry, body.use_case)
+        return {"ok": True, "id": candidate_id, "use_case": body.use_case}
+
     @app.get("/midi/{candidate_id}")
     def get_midi(candidate_id: str):
         entry = _find(candidate_id)
@@ -122,9 +143,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Candidate browser API server")
     parser.add_argument("--production-dir", type=Path, required=True)
     parser.add_argument("--port", type=int, default=8000)
-    parser.add_argument(
-        "--host", type=str, default="127.0.0.1", help="Host to bind to"
-    )
+    parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind to")
     parser.add_argument(
         "--no-open", action="store_true", help="Don't open browser on start"
     )
