@@ -245,6 +245,10 @@ def retrieve_by_color(
 ) -> list[dict]:
     """Return top-N segments matching a color target, sorted by chromatic_match.
 
+    For White (synthesis color with no labeled corpus segments), falls back to
+    scoring all segments against the uniform White target [1/3, 1/3, 1/3] and
+    returns the top-N by chromatic_match across the full corpus.
+
     Args:
         df: DataFrame from load_clap_index.
         color: Target color name (Red, Blue, Violet, etc.).
@@ -264,7 +268,13 @@ def retrieve_by_color(
 
     filtered = df[df["color"] == color].copy()
     if filtered.empty:
-        return []
+        if color == "White":
+            # White is the synthesis color — no labeled segments exist.
+            # Score the full corpus against the uniform White target.
+            filtered = df.copy()
+            filtered["_cross_color"] = True
+        else:
+            return []
 
     filtered["chromatic_match"] = _compute_chromatic_match_for_df(
         filtered, color, _scorer
@@ -558,6 +568,11 @@ def main() -> None:
     color_count = (df["color"] == color).sum()
     print(f"  {total} segments total, {color_count} labeled {color}")
 
+    if color == "White" and color_count == 0:
+        print(
+            f"  White is the synthesis color — no labeled corpus segments. "
+            f"Scoring all {total} segments against the uniform White target."
+        )
     print(f"Scoring and ranking top {args.top_n} {color} segments...")
     results = retrieve_by_color(df, color, top_n=args.top_n)
 

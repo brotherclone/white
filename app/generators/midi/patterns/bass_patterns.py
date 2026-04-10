@@ -9,6 +9,9 @@ so the pipeline resolves them to actual MIDI notes from any chord voicing.
 
 from dataclasses import dataclass, field
 
+from app.structures.enums.bass_chord_tone import BassChordTone
+from app.structures.enums.bass_style import BassStyle
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -52,11 +55,11 @@ class BassPattern:
     """
 
     name: str
-    style: str
+    style: BassStyle
     energy: str
     time_sig: tuple[int, int]
     description: str
-    notes: list[tuple[float, str, str]] = field(default_factory=list)
+    notes: list[tuple[float, BassChordTone, str]] = field(default_factory=list)
     note_durations: list[float] | None = None
 
     def bar_length_beats(self) -> float:
@@ -130,7 +133,7 @@ def extract_chord_tones(voicing: list[int]) -> dict[str, int]:
 
 
 def resolve_tone(
-    tone_selection: str,
+    tone_selection: BassChordTone,
     voicing: list[int],
     next_voicing: list[int] | None = None,
 ) -> int:
@@ -215,7 +218,7 @@ def make_fallback_pattern(time_sig: tuple[int, int]) -> BassPattern:
     """Generate a minimal fallback pattern for unsupported time signatures."""
     return BassPattern(
         name="fallback_root",
-        style="root",
+        style=BassStyle.ROOT,
         energy="medium",
         time_sig=time_sig,
         description=f"Fallback — root on 1 for {time_sig[0]}/{time_sig[1]}",
@@ -334,7 +337,7 @@ def bass_theory_score(
 TEMPLATES_4_4_ROOT = [
     BassPattern(
         name="root_whole",
-        style="root",
+        style=BassStyle.ROOT,
         energy="low",
         time_sig=(4, 4),
         description="Root on beat 1, held for whole bar",
@@ -343,7 +346,7 @@ TEMPLATES_4_4_ROOT = [
     ),
     BassPattern(
         name="root_half",
-        style="root",
+        style=BassStyle.ROOT,
         energy="medium",
         time_sig=(4, 4),
         description="Root on 1 and 3",
@@ -352,7 +355,7 @@ TEMPLATES_4_4_ROOT = [
     ),
     BassPattern(
         name="root_quarter",
-        style="root",
+        style=BassStyle.ROOT,
         energy="high",
         time_sig=(4, 4),
         description="Root on every beat",
@@ -373,7 +376,7 @@ TEMPLATES_4_4_ROOT = [
 TEMPLATES_4_4_OCTAVE = [
     BassPattern(
         name="octave_sparse",
-        style="octave",
+        style=BassStyle.OCTAVE,
         energy="low",
         time_sig=(4, 4),
         description="Root on 1, octave on 3",
@@ -382,7 +385,7 @@ TEMPLATES_4_4_OCTAVE = [
     ),
     BassPattern(
         name="octave_bounce",
-        style="octave",
+        style=BassStyle.OCTAVE,
         energy="medium",
         time_sig=(4, 4),
         description="Root-octave alternating on quarters",
@@ -396,7 +399,7 @@ TEMPLATES_4_4_OCTAVE = [
     ),
     BassPattern(
         name="octave_eighth",
-        style="octave",
+        style=BassStyle.OCTAVE,
         energy="high",
         time_sig=(4, 4),
         description="Root-octave alternating on eighths",
@@ -421,7 +424,7 @@ TEMPLATES_4_4_OCTAVE = [
 TEMPLATES_4_4_WALKING = [
     BassPattern(
         name="walking_quarter",
-        style="walking",
+        style=BassStyle.WALKING,
         energy="medium",
         time_sig=(4, 4),
         description="Root-3rd-5th-approach on quarters",
@@ -435,7 +438,7 @@ TEMPLATES_4_4_WALKING = [
     ),
     BassPattern(
         name="walking_eighth",
-        style="walking",
+        style=BassStyle.WALKING,
         energy="high",
         time_sig=(4, 4),
         description="Walking quarters with eighth-note passing tones",
@@ -460,7 +463,7 @@ TEMPLATES_4_4_WALKING = [
 TEMPLATES_4_4_ARP = [
     BassPattern(
         name="arp_root_5th",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="low",
         time_sig=(4, 4),
         description="Root on 1, 5th on 3",
@@ -469,7 +472,7 @@ TEMPLATES_4_4_ARP = [
     ),
     BassPattern(
         name="arp_triad",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="medium",
         time_sig=(4, 4),
         description="Root-3rd-5th on quarters, rest on 4",
@@ -482,7 +485,7 @@ TEMPLATES_4_4_ARP = [
     ),
     BassPattern(
         name="arp_full",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="high",
         time_sig=(4, 4),
         description="Root-3rd-5th-octave on quarters",
@@ -503,7 +506,7 @@ TEMPLATES_4_4_ARP = [
 TEMPLATES_4_4_PEDAL = [
     BassPattern(
         name="pedal_whole",
-        style="pedal",
+        style=BassStyle.PEDAL,
         energy="low",
         time_sig=(4, 4),
         description="Root held entire bar",
@@ -512,7 +515,7 @@ TEMPLATES_4_4_PEDAL = [
     ),
     BassPattern(
         name="pedal_pulse",
-        style="pedal",
+        style=BassStyle.PEDAL,
         energy="medium",
         time_sig=(4, 4),
         description="Root repeated on quarters (re-attacked)",
@@ -533,7 +536,7 @@ TEMPLATES_4_4_PEDAL = [
 TEMPLATES_4_4_SYNCOPATED = [
     BassPattern(
         name="syncopated_offbeat",
-        style="syncopated",
+        style=BassStyle.SYNCOPATED,
         energy="medium",
         time_sig=(4, 4),
         description="Root on 1, 5th on 2.5",
@@ -542,7 +545,7 @@ TEMPLATES_4_4_SYNCOPATED = [
     ),
     BassPattern(
         name="syncopated_funk",
-        style="syncopated",
+        style=BassStyle.SYNCOPATED,
         energy="high",
         time_sig=(4, 4),
         description="Root on 1, ghost on 1.5, 5th on 2.5, root on 3.5",
@@ -566,7 +569,7 @@ TEMPLATES_3_4 = [
     # --- Root ---
     BassPattern(
         name="waltz_root_whole",
-        style="root",
+        style=BassStyle.ROOT,
         energy="low",
         time_sig=(3, 4),
         description="Root on beat 1, held for full bar — drone/elegy feel",
@@ -575,7 +578,7 @@ TEMPLATES_3_4 = [
     ),
     BassPattern(
         name="waltz_root_downbeat",
-        style="root",
+        style=BassStyle.ROOT,
         energy="low",
         time_sig=(3, 4),
         description="Root on 1 accent, ghost on 3 — sparse waltz",
@@ -584,7 +587,7 @@ TEMPLATES_3_4 = [
     ),
     BassPattern(
         name="waltz_oom_pah_pah",
-        style="root",
+        style=BassStyle.ROOT,
         energy="medium",
         time_sig=(3, 4),
         description="Root on 1 (oom), 5th on 2+3 (pah-pah) — classic waltz bass",
@@ -597,7 +600,7 @@ TEMPLATES_3_4 = [
     ),
     BassPattern(
         name="waltz_oom_pah_pah_varied",
-        style="root",
+        style=BassStyle.ROOT,
         energy="medium",
         time_sig=(3, 4),
         description="Root on 1, 5th on 2, 3rd on 3 — waltz with colour on beat 3",
@@ -611,7 +614,7 @@ TEMPLATES_3_4 = [
     # --- Pedal ---
     BassPattern(
         name="waltz_pedal_held",
-        style="pedal",
+        style=BassStyle.PEDAL,
         energy="low",
         time_sig=(3, 4),
         description="Root on 1 held to 3, ghost re-attack on 3 — pedal with subtle pulse",
@@ -620,7 +623,7 @@ TEMPLATES_3_4 = [
     ),
     BassPattern(
         name="waltz_pedal_pulse",
-        style="pedal",
+        style=BassStyle.PEDAL,
         energy="high",
         time_sig=(3, 4),
         description="Root re-attacked on every beat",
@@ -634,7 +637,7 @@ TEMPLATES_3_4 = [
     # --- Arpeggiated ---
     BassPattern(
         name="waltz_arp_root_5th",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="low",
         time_sig=(3, 4),
         description="Root on 1, 5th on 2, rest on 3",
@@ -643,7 +646,7 @@ TEMPLATES_3_4 = [
     ),
     BassPattern(
         name="waltz_arp_triad",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="medium",
         time_sig=(3, 4),
         description="Root-3rd-5th ascending on beats 1-2-3",
@@ -656,7 +659,7 @@ TEMPLATES_3_4 = [
     ),
     BassPattern(
         name="waltz_arp_triad_down",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="medium",
         time_sig=(3, 4),
         description="5th on 1, 3rd on 2, root on 3 — descending phrase ending",
@@ -670,7 +673,7 @@ TEMPLATES_3_4 = [
     # --- Walking ---
     BassPattern(
         name="waltz_walking",
-        style="walking",
+        style=BassStyle.WALKING,
         energy="medium",
         time_sig=(3, 4),
         description="Root on 1, 3rd on 2, approach on 3",
@@ -683,7 +686,7 @@ TEMPLATES_3_4 = [
     ),
     BassPattern(
         name="waltz_walking_5th",
-        style="walking",
+        style=BassStyle.WALKING,
         energy="high",
         time_sig=(3, 4),
         description="Root-5th-approach with eighth passing tone on 1.5",
@@ -698,7 +701,7 @@ TEMPLATES_3_4 = [
     # --- Octave ---
     BassPattern(
         name="waltz_octave_drop",
-        style="octave",
+        style=BassStyle.OCTAVE,
         energy="medium",
         time_sig=(3, 4),
         description="Octave on 1, root on 2+3 — gravity-fall feel",
@@ -712,7 +715,7 @@ TEMPLATES_3_4 = [
     # --- Syncopated ---
     BassPattern(
         name="waltz_syncopated",
-        style="syncopated",
+        style=BassStyle.SYNCOPATED,
         energy="medium",
         time_sig=(3, 4),
         description="Root on 1, 5th on 2.5 — anticipates beat 3",
@@ -729,7 +732,7 @@ TEMPLATES_3_4 = [
 TEMPLATES_7_8 = [
     BassPattern(
         name="root_7_sparse",
-        style="root",
+        style=BassStyle.ROOT,
         energy="low",
         time_sig=(7, 8),
         description="Root on 1 only",
@@ -738,7 +741,7 @@ TEMPLATES_7_8 = [
     ),
     BassPattern(
         name="root_7_322",
-        style="root",
+        style=BassStyle.ROOT,
         energy="medium",
         time_sig=(7, 8),
         description="Root on group starts (0, 1.5, 2.5)",
@@ -751,7 +754,7 @@ TEMPLATES_7_8 = [
     ),
     BassPattern(
         name="octave_7_bounce",
-        style="octave",
+        style=BassStyle.OCTAVE,
         energy="medium",
         time_sig=(7, 8),
         description="Root-octave on group boundaries",
@@ -764,7 +767,7 @@ TEMPLATES_7_8 = [
     ),
     BassPattern(
         name="walking_7",
-        style="walking",
+        style=BassStyle.WALKING,
         energy="medium",
         time_sig=(7, 8),
         description="Walking on group start positions",
@@ -777,7 +780,7 @@ TEMPLATES_7_8 = [
     ),
     BassPattern(
         name="arp_7_322",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="medium",
         time_sig=(7, 8),
         description="Root-5th-3rd on group starts",
@@ -799,7 +802,7 @@ TEMPLATES_7_8 = [
 TEMPLATES_4_4_REGGAE = [
     BassPattern(
         name="reggae_drop_low",
-        style="reggae",
+        style=BassStyle.REGGAE,
         energy="low",
         time_sig=(4, 4),
         description="One-drop feel — short root on 1, held 5th from beat 2",
@@ -808,7 +811,7 @@ TEMPLATES_4_4_REGGAE = [
     ),
     BassPattern(
         name="reggae_skank_med",
-        style="reggae",
+        style=BassStyle.REGGAE,
         energy="medium",
         time_sig=(4, 4),
         description="Reggae skank — short root on 1, offbeat ghost hits at 1.5 and 3.5",
@@ -831,7 +834,7 @@ TEMPLATES_4_4_REGGAE = [
 TEMPLATES_4_4_DESCENDING_ARP = [
     BassPattern(
         name="descend_triad_low",
-        style="arpeggiated",
+        style=BassStyle.ARPEGGIATED,
         energy="low",
         time_sig=(4, 4),
         description="Descending triad — 5th → 3rd → root settling on beat 3",
@@ -840,7 +843,7 @@ TEMPLATES_4_4_DESCENDING_ARP = [
     ),
     BassPattern(
         name="descend_octave_drop_med",
-        style="octave",
+        style=BassStyle.OCTAVE,
         energy="medium",
         time_sig=(4, 4),
         description="Octave drop — high root on 1, falls to low root on 2, 5th close",
@@ -857,7 +860,7 @@ TEMPLATES_4_4_DESCENDING_ARP = [
 TEMPLATES_4_4_REST_DOWNBEAT = [
     BassPattern(
         name="rest_downbeat_med",
-        style="syncopated",
+        style=BassStyle.SYNCOPATED,
         energy="medium",
         time_sig=(4, 4),
         description="Silence on beat 1, enters on beat 2 — counter-intuitive space",

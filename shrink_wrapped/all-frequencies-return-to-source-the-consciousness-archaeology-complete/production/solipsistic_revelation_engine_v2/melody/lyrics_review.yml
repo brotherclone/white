@@ -1,0 +1,2207 @@
+production_dir: shrink_wrapped/all-frequencies-return-to-source-the-consciousness-archaeology-complete/production/solipsistic_revelation_engine_v2
+pipeline: lyric-generation
+bpm: 134
+time_sig: 7/8
+color: Violet
+generated: '2026-04-08T12:31:05.189453+00:00'
+seed: 42
+model: claude-sonnet-4-6
+scoring_weights:
+  chromatic: 1.0
+candidates:
+- id: lyrics_01
+  file: candidates/lyrics_01.txt
+  rank: 1
+  chromatic:
+    temporal:
+      past: 0.36723197897275284
+      present: 0.3076001291473706
+      future: 0.3251678963502248
+    spatial:
+      thing: 0.1389232744078536
+      place: 0.09657320571946097
+      person: 0.7645035064616403
+    ontological:
+      imagined: 0.3332652439673741
+      forgotten: 0.3219251861174901
+      known: 0.3448095877965291
+    confidence: 0.1633
+    match: 0.2489
+  fitting:
+    verse:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_2:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_3:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.1
+      overall: splits needed
+    verse_4:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.2
+      overall: splits needed
+    chorus_2:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus_3:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    bridge:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.19
+      overall: splits needed
+    chorus_4:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus_5:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_5:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    overall: splits needed
+  status: rejected
+  notes: ''
+- id: lyrics_02
+  file: candidates/lyrics_02.txt
+  rank: 2
+  chromatic:
+    temporal:
+      past: 0.36444286604722337
+      present: 0.3086784352858861
+      future: 0.3268787165482839
+    spatial:
+      thing: 0.13464986198935017
+      place: 0.09682029002699358
+      person: 0.7685298569243529
+    ontological:
+      imagined: 0.3327148099740346
+      forgotten: 0.323193155725797
+      known: 0.34409204324086506
+    confidence: 0.1594
+    match: 0.2487
+  fitting:
+    verse:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_2:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_3:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_4:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus_2:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus_3:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    bridge:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus_4:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus_5:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_5:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    overall: paste-ready
+  status: approved
+  notes: ''
+- id: lyrics_03
+  file: candidates/lyrics_03.txt
+  rank: 3
+  chromatic:
+    temporal:
+      past: 0.3641997506221135
+      present: 0.3091930707295735
+      future: 0.32660717864831285
+    spatial:
+      thing: 0.13623292069686085
+      place: 0.0983510993028942
+      person: 0.7654159978816383
+    ontological:
+      imagined: 0.3327121009429296
+      forgotten: 0.3230483700831731
+      known: 0.34423952897389726
+    confidence: 0.1592
+    match: 0.2483
+  fitting:
+    verse:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_2:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.056
+      overall: splits needed
+    verse_3:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    verse_4:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.2
+      overall: splits needed
+    chorus_2:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.056
+      overall: splits needed
+    chorus_3:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.056
+      overall: splits needed
+    bridge:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    chorus_4:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.056
+      overall: splits needed
+    chorus_5:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 2
+        ratio: 2.0
+        verdict: splits needed
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 2.0
+      worst_verdict: splits needed
+      mean_ratio: 1.056
+      overall: splits needed
+    verse_5:
+      phrases:
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      - notes: 1
+        syllables: 1
+        ratio: 1.0
+        verdict: paste-ready
+      worst_ratio: 1.0
+      worst_verdict: paste-ready
+      mean_ratio: 1.0
+      overall: paste-ready
+    overall: splits needed
+  status: rejected
+  notes: ''
