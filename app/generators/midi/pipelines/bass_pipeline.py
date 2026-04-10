@@ -49,6 +49,7 @@ from app.generators.midi.pipelines.chord_pipeline import (
     load_song_proposal,
 )
 from app.generators.midi.production.init_production import load_song_context
+from app.structures.enums.bass_style import BassStyle
 from app.util.diversity_tracker import (
     diversity_factor,
     find_album_dir,
@@ -297,7 +298,7 @@ def bass_pattern_to_midi_bytes(
     current_offset_ticks = 0
     for chord_idx, voicing in enumerate(voicings):
         # Pedal-style patterns lock to the tonic (first chord) regardless of changes
-        if pattern.style == "pedal":
+        if pattern.style == BassStyle.PEDAL:
             voicing = tonic_voicing
         if durations is not None:
             chord_dur_beats = durations[chord_idx] * bar_beats
@@ -739,7 +740,7 @@ def run_bass_pipeline(
                     "theory": theory,
                     "theory_breakdown": theory_breakdown,
                     "pattern_name": tmpl.name,
-                    "style": tmpl.style,
+                    "style": tmpl.style.value,
                     "energy": tmpl.energy,
                 }
             )
