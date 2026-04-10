@@ -346,7 +346,7 @@ def read_vocal_sections_from_arrangement(
             exact_first_instance[label] = instance_key
             lyric_repeat_type = LyricRepeatType.EXACT
         elif base_repeat_type == LyricRepeatType.EXACT and n > 1:
-            lyric_repeat_type = "exact_repeat"
+            lyric_repeat_type = LyricRepeatType.EXACT_REPEAT
         else:
             lyric_repeat_type = base_repeat_type
 
@@ -411,7 +411,7 @@ def _compute_fitting(
 
     for sec in vocal_sections:
         name = sec["name"]
-        repeat_type = sec.get("lyric_repeat_type", "fresh")
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
 
         # exact_repeat instances copy fitting from their source instance
         if repeat_type == LyricRepeatType.EXACT_REPEAT:
@@ -842,7 +842,7 @@ def _build_white_cutup_prompt(
     variation_count_cutup: dict[str, int] = {}
 
     for sec in vocal_sections:
-        repeat_type = sec.get("lyric_repeat_type", "fresh")
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
 
         if repeat_type == LyricRepeatType.EXACT_REPEAT:
             continue
@@ -968,7 +968,7 @@ def _build_prompt(
     variation_count: dict[str, int] = {}
 
     for sec in vocal_sections:
-        repeat_type = sec.get("lyric_repeat_type", "fresh")
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
 
         # exact_repeat instances are skipped — they reuse the first block
         if repeat_type == LyricRepeatType.EXACT_REPEAT:

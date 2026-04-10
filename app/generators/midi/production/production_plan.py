@@ -82,16 +82,17 @@ class ProductionPlan:
 def _normalize_repeat_type(value) -> LyricRepeatType:
     """Normalise a lyric_repeat_type value and validate.
 
-    Accepts any truthy string; lowercases it and returns the matching
-    LyricRepeatType. Falls back to FRESH on None, empty, or unknown values
-    so that a human typo (e.g. 'Exact') is silently corrected rather than
+    Accepts a LyricRepeatType, a string, or None. Returns the matching
+    LyricRepeatType, falling back to FRESH on empty or unknown values so
+    that a human typo (e.g. 'Exact') is silently corrected rather than
     silently breaking prompt generation.
     """
+    if isinstance(value, LyricRepeatType):
+        return value
     if not value:
         return LyricRepeatType.FRESH
-    normalised = str(value).strip().lower()
     try:
-        return LyricRepeatType(normalised)
+        return LyricRepeatType(str(value).strip().lower())
     except ValueError:
         return LyricRepeatType.FRESH
 
