@@ -1,0 +1,139 @@
+color: White
+generated: '2026-04-10T12:23:36.053353+00:00'
+count: 15
+results:
+- rank: 1
+  segment_id: 05_05_seg_0001_track_02
+  song_slug: Met with Great Malthusianism
+  color: Green
+  match: 0.2907
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/05_05/05_05_seg_0001_track_02.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/05_05/05_05_02_runner.wav
+  start_seconds: 0.0
+  end_seconds: 30.0
+- rank: 2
+  segment_id: 02_01_seg_0026_track_06
+  song_slug: A Doorbell for Finite Beings
+  color: Red
+  match: 0.2907
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/02_01/02_01_seg_0026_track_06.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/02_01/02_01_07.wav
+  start_seconds: 150.042
+  end_seconds: 153.235
+- rank: 3
+  segment_id: 02_01_seg_0022_track_06
+  song_slug: A Doorbell for Finite Beings
+  color: Red
+  match: 0.2907
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/02_01/02_01_seg_0022_track_06.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/02_01/02_01_07.wav
+  start_seconds: 120.103
+  end_seconds: 123.256
+- rank: 4
+  segment_id: 03_08_seg_0016_track_02
+  song_slug: Here Comes the Mechanical Bride
+  color: Orange
+  match: 0.2906
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/03_08/03_08_seg_0016_track_02.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/03_08/03_08_02_gm_bass.wav
+  start_seconds: 157.082
+  end_seconds: 178.161
+- rank: 5
+  segment_id: 03_08_seg_0020_track_02
+  song_slug: Here Comes the Mechanical Bride
+  color: Orange
+  match: 0.2904
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/03_08/03_08_seg_0020_track_02.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/03_08/03_08_02_gm_bass.wav
+  start_seconds: 201.063
+  end_seconds: 204.063
+- rank: 6
+  segment_id: 02_01_seg_0011_track_06
+  song_slug: A Doorbell for Finite Beings
+  color: Red
+  match: 0.2904
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/02_01/02_01_seg_0011_track_06.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/02_01/02_01_07.wav
+  start_seconds: 82.124
+  end_seconds: 86.473
+- rank: 7
+  segment_id: 01_01_seg_0016_track_10
+  song_slug: The Conjurer's Thread
+  color: Black
+  match: 0.2903
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/01_01/01_01_seg_0016_track_10.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01_12.wav
+  start_seconds: 92.0
+  end_seconds: 95.124
+- rank: 8
+  segment_id: 01_01_seg_0016_track_11
+  song_slug: The Conjurer's Thread
+  color: Black
+  match: 0.2903
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/01_01/01_01_seg_0016_track_11.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01_12.wav
+  start_seconds: 92.0
+  end_seconds: 95.124
+- rank: 9
+  segment_id: 02_01_seg_0029_track_06
+  song_slug: A Doorbell for Finite Beings
+  color: Red
+  match: 0.2903
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/02_01/02_01_seg_0029_track_06.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/02_01/02_01_07.wav
+  start_seconds: 161.045
+  end_seconds: 164.25
+- rank: 10
+  segment_id: 02_04_seg_0010_track_01
+  song_slug: The Imagined Lives of Shirley Kudirka
+  color: Red
+  match: 0.2903
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/02_04/02_04_seg_0010_track_01.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/02_04/02_04_03_organ.wav
+  start_seconds: 69.0
+  end_seconds: 84.001
+- rank: 11
+  segment_id: 02_01_seg_0008_track_06
+  song_slug: A Doorbell for Finite Beings
+  color: Red
+  match: 0.2902
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/02_01/02_01_seg_0008_track_06.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/02_01/02_01_07.wav
+  start_seconds: 71.157
+  end_seconds: 74.276
+- rank: 12
+  segment_id: 01_01_seg_0021_track_10
+  song_slug: The Conjurer's Thread
+  color: Black
+  match: 0.2901
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/01_01/01_01_seg_0021_track_10.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01_12.wav
+  start_seconds: 109.062
+  end_seconds: 112.23400000000001
+- rank: 13
+  segment_id: 01_01_seg_0021_track_11
+  song_slug: The Conjurer's Thread
+  color: Black
+  match: 0.2901
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/01_01/01_01_seg_0021_track_11.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/01_01/01_01_12.wav
+  start_seconds: 109.062
+  end_seconds: 112.23400000000001
+- rank: 14
+  segment_id: 05_05_seg_0002_track_02
+  song_slug: Met with Great Malthusianism
+  color: Green
+  match: 0.2901
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/05_05/05_05_seg_0002_track_02.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/05_05/05_05_02_runner.wav
+  start_seconds: 28.0
+  end_seconds: 58.0
+- rank: 15
+  segment_id: 03_03_seg_0017_track_03
+  song_slug: Tangier
+  color: Orange
+  match: 0.2901
+  audio_path: /Volumes/LucidNonsense/White/staged_raw_material/../training/output/track_segments/03_03/03_03_seg_0017_track_03.wav
+  source_audio_file: /Volumes/LucidNonsense/White/staged_raw_material/03_03/03_03_05_bass.wav
+  start_seconds: 163.156
+  end_seconds: 176.146
