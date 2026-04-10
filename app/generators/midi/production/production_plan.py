@@ -30,6 +30,8 @@ from typing import Optional
 import mido
 import yaml
 
+from app.structures.enums.lyric_repeat_type import LyricRepeatType
+
 PLAN_FILENAME = "production_plan.yml"
 MANIFEST_BOOTSTRAP_FILENAME = "manifest_bootstrap.yml"
 
@@ -77,41 +79,42 @@ class ProductionPlan:
 # ---------------------------------------------------------------------------
 
 
-_VALID_REPEAT_TYPES = {"exact", "variation", "fresh"}
+def _normalize_repeat_type(value) -> LyricRepeatType:
+    """Normalise a lyric_repeat_type value and validate.
 
-
-def _normalize_repeat_type(value) -> str:
-    """Normalise a lyric_repeat_type value to lowercase and validate.
-
-    Accepts any truthy string; lowercases it and returns it if it is one of
-    the three valid values.  Falls back to 'fresh' on None, empty, or unknown
-    values so that a human typo (e.g. 'Exact') is silently corrected rather
-    than silently breaking prompt generation.
+    Accepts a LyricRepeatType, a string, or None. Returns the matching
+    LyricRepeatType, falling back to FRESH on empty or unknown values so
+    that a human typo (e.g. 'Exact') is silently corrected rather than
+    silently breaking prompt generation.
     """
+    if isinstance(value, LyricRepeatType):
+        return value
     if not value:
-        return "fresh"
-    normalised = str(value).strip().lower()
-    return normalised if normalised in _VALID_REPEAT_TYPES else "fresh"
+        return LyricRepeatType.FRESH
+    try:
+        return LyricRepeatType(str(value).strip().lower())
+    except ValueError:
+        return LyricRepeatType.FRESH
 
 
-def _infer_repeat_type(label: str) -> str:
+def _infer_repeat_type(label: str) -> LyricRepeatType:
     """Infer lyric_repeat_type from a section label.
 
     Rules (checked against the normalised lowercase label):
-      - Contains 'pre_chorus' (checked before 'chorus') → 'variation'
-      - Contains 'verse' → 'variation'
-      - Contains 'chorus', 'refrain', or 'hook' → 'exact'
-      - Anything else → 'fresh'
+      - Contains 'pre_chorus' (checked before 'chorus') → VARIATION
+      - Contains 'verse' → VARIATION
+      - Contains 'chorus', 'refrain', or 'hook' → EXACT
+      - Anything else → FRESH
     """
     norm = label.lower().replace("-", "_").replace(" ", "_")
     # pre_chorus must be checked before chorus (it contains the word 'chorus')
     if "pre_chorus" in norm:
-        return "variation"
-    if any(kw in norm for kw in ("verse",)):
-        return "variation"
+        return LyricRepeatType.VARIATION
+    if "verse" in norm:
+        return LyricRepeatType.VARIATION
     if any(kw in norm for kw in ("chorus", "refrain", "hook")):
-        return "exact"
-    return "fresh"
+        return LyricRepeatType.EXACT
+    return LyricRepeatType.FRESH
 
 
 # ---------------------------------------------------------------------------
