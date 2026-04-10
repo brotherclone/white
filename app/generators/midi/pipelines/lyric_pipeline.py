@@ -165,11 +165,33 @@ def _parse_timecode_secs(tc: str) -> float:
         return 0.0
 
 
+def _parse_bar_beat_bars(tc: str) -> Optional[int]:
+    """Parse a Logic bar/beat string like '8 0 0 0', returning bar count.
+
+    Returns None if the string looks like a timecode (contains ':') or cannot
+    be parsed.
+    """
+    tc = tc.strip()
+    if ":" in tc:
+        return None
+    parts = tc.split()
+    if not parts:
+        return None
+    try:
+        return int(parts[0])
+    except ValueError:
+        return None
+
+
 def parse_arrangement(arrangement_path: Path) -> list[dict]:
     """Parse arrangement.txt into a list of clip dicts.
 
-    Each dict: {timecode_secs, clip_name, channel, duration_secs}
-    Lines are tab-separated: timecode  clip_name  channel  duration
+    Handles two Logic export formats:
+    - Timecode format: HH:MM:SS:FF  clip_name  channel  HH:MM:SS:FF
+    - Bar/beat format: B B B B      clip_name  channel  B B B B
+
+    Each dict: {timecode_secs, clip_name, channel, duration_secs, duration_bars}
+    duration_bars is set when bar/beat format is detected; duration_secs may be 0.0.
     """
     clips = []
     with open(arrangement_path) as f:
@@ -185,12 +207,14 @@ def parse_arrangement(arrangement_path: Path) -> list[dict]:
                 clip_name = parts[1]
                 channel = int(parts[2])
                 duration_secs = _parse_timecode_secs(parts[3])
+                duration_bars = _parse_bar_beat_bars(parts[3])
                 clips.append(
                     {
                         "timecode_secs": timecode_secs,
                         "clip_name": clip_name,
                         "channel": channel,
                         "duration_secs": duration_secs,
+                        "duration_bars": duration_bars,
                     }
                 )
             except (ValueError, IndexError):
@@ -272,10 +296,12 @@ def read_vocal_sections_from_arrangement(
     bpm: int,
     time_sig_str: str,
     production_dir: Optional[Path] = None,
+    melody_channel: int = MELODY_CHANNEL,
 ) -> list[dict]:
     """Extract vocal sections from arrangement.txt.
 
-    Track 4 (MELODY_CHANNEL) clips are vocal by definition — no vocals flag needed.
+    The melody_channel identifies which track carries vocal clips (default: 4).
+    Override with --melody-channel when using non-standard Logic track layouts.
     Returns one entry per clip instance in arrangement order.
 
     Each entry: {approved_label, name, bars, play_count, total_notes, contour,
@@ -318,10 +344,10 @@ def read_vocal_sections_from_arrangement(
                     # Only store explicit overrides; 'fresh' is the default anyway
                     repeat_type_by_label[lbl] = rt
 
-    # Collect track 4 clips in arrangement order — one entry per instance.
+    # Collect melody-channel clips in arrangement order — one entry per instance.
     # Duplicate labels get _2, _3 suffixes; the prompt uses these suffixed names
     # as [headers] so Claude writes one block per arrangement instance.
-    melody_clips = [c for c in clips if c["channel"] == MELODY_CHANNEL]
+    melody_clips = [c for c in clips if c["channel"] == melody_channel]
     label_seen_count: dict[str, int] = {}
     # Track first-seen instance key for exact labels (for exact_repeat copying)
     exact_first_instance: dict[str, str] = {}
@@ -334,7 +360,10 @@ def read_vocal_sections_from_arrangement(
         n = label_seen_count[label]
         instance_key = label if n == 1 else f"{label}_{n}"
 
-        bars = max(round(clip["duration_secs"] / secs_per_bar), 1)
+        if clip.get("duration_bars") is not None:
+            bars = max(clip["duration_bars"], 1)
+        else:
+            bars = max(round(clip["duration_secs"] / secs_per_bar), 1)
         midi_path = approved_dir / f"{label}.mid"
         per_loop_notes = _count_notes(midi_path) if midi_path.exists() else 0
 
@@ -1223,10 +1252,11 @@ def run_lyric_pipeline(
     seed: int = 42,
     onnx_path: Optional[str] = None,
     skip_scoring: bool = False,
+    melody_channel: int = MELODY_CHANNEL,
 ) -> dict:
     """Run the lyric generation pipeline end-to-end.
 
-    Reads vocal sections from arrangement.txt (track 4 = vocal).
+    Reads vocal sections from arrangement.txt (melody_channel = vocal, default 4).
     Reads song metadata from the song proposal YAML.
     No production_plan.yml required.
 
@@ -1298,11 +1328,14 @@ def run_lyric_pipeline(
         meta["bpm"],
         meta["time_sig"],
         production_dir=prod_path,
+        melody_channel=melody_channel,
     )
     if not vocal_sections:
-        print("ERROR: No melody clips found on track 4 in arrangement.txt")
         print(
-            "Export the arrangement from Logic after placing melody clips on track 4."
+            f"ERROR: No melody clips found on track {melody_channel} in arrangement.txt"
+        )
+        print(
+            f"Export the arrangement from Logic after placing melody clips on track {melody_channel}."
         )
         sys.exit(1)
 
@@ -1548,6 +1581,12 @@ def main():
         action="store_true",
         help="Skip Refractor (useful when torch/DeBERTa unavailable locally)",
     )
+    parser.add_argument(
+        "--melody-channel",
+        type=int,
+        default=MELODY_CHANNEL,
+        help=f"Logic track number carrying melody/vocal clips (default: {MELODY_CHANNEL})",
+    )
 
     args = parser.parse_args()
 
@@ -1563,6 +1602,7 @@ def main():
         seed=args.seed,
         onnx_path=args.onnx_path,
         skip_scoring=args.skip_scoring,
+        melody_channel=args.melody_channel,
     )
 
 

@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
 """
-Four-part (SATB/quartet) voice pattern library for the Music Production Pipeline.
+String quartet voice pattern library for the Music Production Pipeline.
 
-Expresses alto, tenor, and bass-voice as signed semitone offset templates
-relative to the soprano (melody) voice. Each VoicePattern provides an offset
-per beat that the pipeline resolves to absolute MIDI pitches and clamps to the
-target voice range.
+Instruments: Violin I (soprano/melody), Violin II, Viola, Cello.
 
-Counterpoint constraints:
-  - No parallel perfect 5ths (interval 7) or octaves (interval 12) between
-    soprano and any lower voice on consecutive beats.
-  - Voice crossing detected and corrected post-generation (alto must stay below
-    soprano; tenor below alto; bass-voice below tenor).
-  - Per-beat offset change capped at ±4 semitones to prevent awkward leaps.
+Violin II and Viola are generated using MelodyPattern contour templates
+(independent melodic lines, chord-tone aware, instrument-register clamped).
+Cello is generated using BassPattern templates (chord-tone based, rhythmically
+independent from the melody).
+
+Legacy VoicePattern offset templates are kept for the simple-voicings fallback
+path only.
 """
 
 from dataclasses import dataclass, field
 
 # ---------------------------------------------------------------------------
-# Voice ranges
+# Voice ranges (legacy — used by simple-voicings fallback)
 # ---------------------------------------------------------------------------
 
 VOICE_RANGES: dict[str, tuple[int, int]] = {
@@ -28,6 +26,22 @@ VOICE_RANGES: dict[str, tuple[int, int]] = {
 }
 
 VOICE_ORDER = ["soprano", "alto", "tenor", "bass_voice"]
+
+# ---------------------------------------------------------------------------
+# String instrument ranges
+# Used by the main generation path (melody/bass pattern approach).
+# Expressed as (low, high) MIDI note numbers.
+# ---------------------------------------------------------------------------
+
+INSTRUMENT_RANGES: dict[str, tuple[int, int]] = {
+    "violin_i": (
+        55,
+        84,
+    ),  # G3–C6  (soprano/melody — not clamped here, comes from approved melody)
+    "violin_ii": (55, 79),  # G3–G5  (harmony voice, slightly below violin I)
+    "viola": (48, 69),  # C3–A4  (inner voice, stepwise preferred)
+    "cello": (36, 57),  # C2–A3  (bass voice, cello register)
+}
 
 # ---------------------------------------------------------------------------
 # Velocity
@@ -44,6 +58,11 @@ VELOCITY = {
 # ---------------------------------------------------------------------------
 
 QUARTET_CHANNELS = {
+    "violin_i": 0,
+    "violin_ii": 1,
+    "viola": 2,
+    "cello": 3,
+    # Legacy aliases
     "soprano": 0,
     "alto": 1,
     "tenor": 2,
