@@ -50,6 +50,7 @@ class PlanSection:
     notes: str = ""
     reason: str = ""  # Claude's per-section compositional note
     lyric_repeat_type: str = "fresh"  # exact | variation | fresh
+    arc: float = 0.0  # emotional intensity 0.0–1.0 (0=silence, 1=peak)
     loops: dict = field(default_factory=dict)  # {instrument: loop_name}
     _bar_source: str = field(default="", repr=False)  # derivation source (internal)
 
@@ -86,13 +87,22 @@ def _normalize_repeat_type(value) -> LyricRepeatType:
     LyricRepeatType, falling back to FRESH on empty or unknown values so
     that a human typo (e.g. 'Exact') is silently corrected rather than
     silently breaking prompt generation.
+
+    EXACT_REPEAT is an internal sentinel set programmatically — it must not
+    be accepted from external YAML input and is treated as FRESH here.
     """
     if isinstance(value, LyricRepeatType):
+        # Enum instances are always passed through as-is (including EXACT_REPEAT,
+        # which is set programmatically, never from YAML)
         return value
     if not value:
         return LyricRepeatType.FRESH
+    normalised = str(value).strip().lower()
+    # EXACT_REPEAT is an internal sentinel — reject it as an external string value
+    if normalised == LyricRepeatType.EXACT_REPEAT.value:
+        return LyricRepeatType.FRESH
     try:
-        return LyricRepeatType(str(value).strip().lower())
+        return LyricRepeatType(normalised)
     except ValueError:
         return LyricRepeatType.FRESH
 
@@ -115,6 +125,34 @@ def _infer_repeat_type(label: str) -> LyricRepeatType:
     if any(kw in norm for kw in ("chorus", "refrain", "hook")):
         return LyricRepeatType.EXACT
     return LyricRepeatType.FRESH
+
+
+def _infer_arc_from_label(label: str) -> float:
+    """Infer arc (emotional intensity 0.0–1.0) from a section label.
+
+    Rules (checked against normalised lowercase label):
+      - intro, outro → 0.15
+      - bridge → 0.20
+      - verse → 0.35
+      - pre_chorus → 0.55
+      - chorus, refrain, hook → 0.75
+      - climax, peak → 0.90
+      - anything else → 0.40
+    """
+    norm = label.lower().replace("-", "_").replace(" ", "_")
+    if "pre_chorus" in norm:
+        return 0.55
+    if any(kw in norm for kw in ("intro", "outro")):
+        return 0.15
+    if "bridge" in norm:
+        return 0.20
+    if "verse" in norm:
+        return 0.35
+    if any(kw in norm for kw in ("chorus", "refrain", "hook")):
+        return 0.75
+    if any(kw in norm for kw in ("climax", "peak")):
+        return 0.90
+    return 0.40
 
 
 # ---------------------------------------------------------------------------
@@ -215,6 +253,7 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
                 reason=str(s.get("reason", "") or ""),
                 lyric_repeat_type=_normalize_repeat_type(s.get("lyric_repeat_type")),
                 loops=dict(s.get("loops") or {}),
+                arc=float(s.get("arc", 0.0)),
             )
         )
 
@@ -266,11 +305,19 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
                 "notes": s.notes,
                 **({"reason": s.reason} if s.reason else {}),
                 **(
-                    {"lyric_repeat_type": s.lyric_repeat_type}
-                    if s.lyric_repeat_type and s.lyric_repeat_type != "fresh"
+                    {
+                        "lyric_repeat_type": (
+                            s.lyric_repeat_type.value
+                            if isinstance(s.lyric_repeat_type, LyricRepeatType)
+                            else str(s.lyric_repeat_type)
+                        )
+                    }
+                    if s.lyric_repeat_type
+                    and s.lyric_repeat_type != LyricRepeatType.FRESH
                     else {}
                 ),
                 **({"loops": s.loops} if s.loops else {}),
+                **({"arc": round(s.arc, 3)} if s.arc else {}),
             }
             for s in plan.sections
         ],
@@ -503,6 +550,7 @@ def generate_plan_mechanical(
             bars=bars,
             vocals=vocals,
             lyric_repeat_type=_infer_repeat_type(s["label"]),
+            arc=_infer_arc_from_label(s["label"]),
         )
         sec._bar_source = source
         sections.append(sec)
@@ -595,6 +643,7 @@ def refresh_plan(production_dir: Path) -> ProductionPlan:
             reason=sec.reason,
             lyric_repeat_type=sec.lyric_repeat_type,
             loops=dict(sec.loops),
+            arc=sec.arc,  # preserve human override
         )
         updated._bar_source = source
         refreshed.append(updated)
@@ -822,6 +871,7 @@ def _parse_arrangement_response(raw: str, plan: ProductionPlan) -> tuple[list, s
             notes=original.notes,
             reason=energy_note,
             loops=dict(original.loops),
+            arc=original.arc,
         )
         updated.append(sec)
 
@@ -972,6 +1022,7 @@ def sync_plan_from_arrangement(
                     orig.lyric_repeat_type if orig else _infer_repeat_type(name)
                 ),
                 loops=dict(orig.loops) if orig else {},
+                arc=orig.arc if orig else _infer_arc_from_label(name),
             )
         )
 

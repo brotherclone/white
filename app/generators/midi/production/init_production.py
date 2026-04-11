@@ -30,6 +30,49 @@ load_dotenv()
 INITIAL_PROPOSAL_FILENAME = "initial_proposal.yml"
 SONG_CONTEXT_FILENAME = "song_context.yml"
 
+# Artists whose appearance in sounds_like indicates an ambient/shoegaze/drone aesthetic
+_AMBIENT_CLUSTER: set[str] = {
+    "grouper",
+    "beach house",
+    "my bloody valentine",
+    "mbv",
+    "low",
+    "julianna barwick",
+    "boards of canada",
+    "stars of the lid",
+    "arca",
+    "william basinski",
+    "the caretaker",
+    "harold budd",
+    "brian eno",
+    "slowdive",
+    "cocteau twins",
+    "portishead",
+    "mazzy star",
+    "cigarettes after sex",
+    "cigarettes after sex",
+    "chelsea wolfe",
+    "daughter",
+}
+
+
+def _detect_aesthetic_hints(sounds_like: list[str]) -> dict | None:
+    """Return an aesthetic_hints dict if the sounds_like list implies a cluster.
+
+    Returns None when no cluster is detected (no hints written to song_context).
+    """
+    if not sounds_like:
+        return None
+    lowered = {name.lower() for name in sounds_like}
+    ambient_matches = lowered & _AMBIENT_CLUSTER
+    if len(ambient_matches) >= 2:
+        return {
+            "density": "sparse",
+            "texture": "hazy",
+            "vocal_register": "lamentful",
+        }
+    return None
+
 
 # ---------------------------------------------------------------------------
 # Prompt building
@@ -174,6 +217,27 @@ def _write_song_context(
     if generated is None:
         generated = datetime.now(timezone.utc).isoformat()
 
+    aesthetic_hints = _detect_aesthetic_hints(sounds_like)
+
+    # Style reference profile — extract from local MIDI files if available
+    from app.generators.midi.style_reference import (
+        aggregate_profiles,
+        load_or_extract_profile,
+    )
+
+    _style_profiles = []
+    for _artist in sounds_like:
+        _prof = load_or_extract_profile(_artist)
+        if _prof is not None:
+            _style_profiles.append(_prof)
+        else:
+            import logging as _logging
+
+            _logging.getLogger(__name__).debug(
+                "No style reference MIDI for %r — skipping", _artist
+            )
+    _style_ref_profile = aggregate_profiles(_style_profiles)
+
     context_data = {
         "schema_version": "1",
         "generated": generated,
@@ -195,6 +259,14 @@ def _write_song_context(
         "sounds_like": sounds_like,
         "genres": meta.get("genres") or [],
         "mood": meta.get("mood") or [],
+        # Aesthetic hints — written when sounds_like implies a recognised cluster
+        **({"aesthetic_hints": aesthetic_hints} if aesthetic_hints else {}),
+        # Style reference profile — averaged features from sounds_like MIDI files
+        **(
+            {"style_reference_profile": _style_ref_profile.model_dump()}
+            if _style_ref_profile
+            else {}
+        ),
         # Phase status (updated by migration script)
         "phases": meta.get("phases")
         or {

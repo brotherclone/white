@@ -4,57 +4,27 @@
 TBD - created by archiving change add-melody-lyrics-generation. Update Purpose after archive.
 ## Requirements
 ### Requirement: Melody Contour Templates
+Each `MelodyPattern` in the template library SHALL carry an optional `tags: list[str]`
+field drawn from a controlled vocabulary: `stepwise`, `arpeggiated`, `descent`,
+`wide_interval`, `sparse`, `dense`, `lamentful`. Existing patterns without tags
+behave identically.
 
-The melody generator SHALL define contour pattern templates as structured data with relative interval sequences and rhythmic positions. Each template SHALL specify signed semitone deltas from the previous note, allowing the pipeline to resolve templates to actual MIDI pitches within any singer's vocal range.
+The library SHALL include the following additional lamentful/sparse templates:
+- `slow_descent` — stepwise downward motion, quarter notes, phrase every 2 bars
+- `breath_phrase` — 3-note phrase, long rest, 3-note phrase
+- `pentatonic_lament` — minor pentatonic, descending, held notes
+- `floating_repeat` — same 2-3 note motif repeated at slightly different rhythmic positions
+- `single_line` — one note per bar, whole-note or dotted half
 
-#### Scenario: Template structure
+All new templates SHALL carry `lamentful`, `sparse`, or `stepwise` tags as appropriate.
 
-- **WHEN** a melody contour template is defined
-- **THEN** it SHALL include: name, contour type, energy level, time signature, use_case ("vocal" or "lead"), description, intervals (signed semitone deltas), rhythm (onset positions in beats), and optional durations
-- **AND** the first interval SHALL always be 0 (starting note, resolved from chord)
-- **AND** rhythm and intervals lists SHALL have equal length
+#### Scenario: Tag field present on all patterns
+- **WHEN** the melody pattern library is loaded
+- **THEN** every `MelodyPattern` has a `tags` attribute (empty list if none assigned)
 
-#### Scenario: use_case — vocal constraints
-
-- **WHEN** a template has use_case "vocal"
-- **THEN** it SHALL have no more than 6 onsets per bar in 4/4 time
-- **AND** at least one explicit rest (gap ≥ 0.5 beats) within each bar
-- **AND** at least one note with duration ≥ 1.5 beats per bar
-
-#### Scenario: use_case — lead
-
-- **WHEN** a template has use_case "lead"
-- **THEN** it MAY have any note density and is intended for instrument tracks, not singer parts
-- **AND** it SHALL be excluded from vocal candidate generation
-
-#### Scenario: Template selection filters by use_case
-
-- **WHEN** the pipeline generates a melody for a singer
-- **THEN** it SHALL only select templates with use_case "vocal"
-- **AND** lead templates SHALL not appear in vocal candidate output
-
-#### Scenario: 4/4 vocal template availability
-
-- **WHEN** the song proposal has a 4/4 time signature
-- **THEN** the generator SHALL have at least 30 vocal templates
-- **AND** vocal templates SHALL cover at least 6 named archetypes: declarative, call_and_rest, haiku, incantatory, drone_and_step, conversational
-
-#### Scenario: 4/4 lead template availability
-
-- **WHEN** a lead instrument part is being generated in 4/4
-- **THEN** the generator SHALL have at least 12 lead templates
-
-#### Scenario: Other time signature vocal template availability
-
-- **WHEN** the song proposal has a 3/4, 6/8, or 7/8 time signature
-- **THEN** the generator SHALL have at least 4 vocal templates for that time signature
-- **AND** onset positions SHALL respect the meter's natural stress patterns
-
-#### Scenario: Custom time signature fallback
-
-- **WHEN** the song proposal has a time signature without specific templates
-- **THEN** the generator SHALL fall back to a minimal repeated-root pattern on beat 1
-- **AND** log a warning about the unsupported time signature
+#### Scenario: Lamentful templates available
+- **WHEN** the library is filtered for patterns tagged `lamentful`
+- **THEN** at least 4 patterns are returned
 
 ### Requirement: Singer Vocal Ranges
 
@@ -148,37 +118,21 @@ The melody pipeline SHALL write candidate MIDI files to the song's production me
 - **AND** the directories SHALL be created if they do not exist
 
 ### Requirement: Composite Scoring
+The melody pipeline composite scoring SHALL incorporate style reference profile
+adjustments when `style_reference_profile` is present in `song_context.yml`.
 
-The melody pipeline SHALL score each candidate using theory metrics and Refractor, producing a single composite ranking per section.
+- High `rest_ratio` (> 0.5) → boost sparse/stepwise melody templates
+- Low `note_density` (< 2.0) → boost sparse templates; penalise dense
+- High `mean_duration_beats` (> 1.5) → boost descent/stepwise templates
 
-#### Scenario: Theory scoring — singability
+#### Scenario: Sparse reference boosts sparse melody
+- **WHEN** `style_reference_profile.rest_ratio` is 0.61
+- **AND** a sparse and a dense melody template are candidates
+- **THEN** the sparse template receives a higher score adjustment
 
-- **WHEN** a melody candidate is scored for singability
-- **THEN** the pipeline SHALL penalize intervals larger than an octave
-- **AND** reward stepwise motion (1–2 semitones)
-- **AND** penalize melodies using less than 50% of the singer's available range
-- **AND** penalize more than 6 note onsets per bar in 4/4 (show-tune density)
-- **AND** reward held notes with duration ≥ 1.5 beats
-- **AND** require at least one rest per bar of vocal melody (not per 4 bars)
-
-#### Scenario: Theory scoring — chord-tone alignment
-
-- **WHEN** a melody candidate is scored for chord-tone alignment
-- **THEN** the pipeline SHALL compute the fraction of strong-beat notes that are chord tones (root, 3rd, 5th)
-- **AND** passing tones on weak beats SHALL not penalize the score
-
-#### Scenario: Theory scoring — contour quality
-
-- **WHEN** a melody candidate is scored for contour quality
-- **THEN** the pipeline SHALL reward arch-shaped contours with a climax roughly 2/3 through the section
-- **AND** penalize more than 4 consecutive identical pitches
-- **AND** reward resolution to a stable chord tone on the final note
-
-#### Scenario: Composite ranking
-
-- **WHEN** all candidates for a section are scored
-- **THEN** the pipeline SHALL compute: `composite = 0.30 * theory + 0.70 * chromatic`
-- **AND** rank candidates by composite score descending per section
+#### Scenario: Missing profile — no adjustment
+- **WHEN** no `style_reference_profile` is present
+- **THEN** melody scoring proceeds unchanged
 
 ### Requirement: Review File Generation
 
@@ -273,4 +227,15 @@ The curve SHALL be determined by (in priority order):
 #### Scenario: Flat preserves existing velocities
 - **WHEN** the effective curve is FLAT
 - **THEN** note velocities are identical to the pre-curve values (no-op)
+
+### Requirement: Melody Pipeline Evolve Flag
+The melody pipeline CLI SHALL accept `--evolve`, `--generations` (int, default 8), and
+`--population` (int, default 30) flags. When `--evolve` is passed, evolved melody
+candidates SHALL be merged into the standard candidate pool before scoring. Evolved
+candidates SHALL have their `id` field begin with `evolved_`.
+
+#### Scenario: --evolve flag merges melody candidates
+- **GIVEN** the melody pipeline is run with `--evolve`
+- **WHEN** candidate generation completes
+- **THEN** the candidate pool contains both hand-coded and evolved patterns
 

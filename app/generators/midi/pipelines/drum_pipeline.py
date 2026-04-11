@@ -23,6 +23,11 @@ import mido
 import numpy as np
 import yaml
 
+from app.generators.midi.patterns.aesthetic_hints import (
+    aesthetic_tag_adjustment,
+    arc_to_energy,
+    style_profile_tag_adjustment,
+)
 from app.generators.midi.patterns.drum_patterns import (
     ALL_TEMPLATES,
     DEFAULT_GENRE_FAMILY,
@@ -42,6 +47,7 @@ from app.generators.midi.pipelines.chord_pipeline import (
     load_song_proposal,
 )
 from app.generators.midi.production.init_production import load_song_context
+from app.structures.music.narrative_constraints import narrative_tag_adjustment
 from app.util.phrase_dynamics import (
     DynamicCurve,
     apply_dynamics_curve,
@@ -280,6 +286,9 @@ def run_drum_pipeline(
     energy_overrides: Optional[dict[str, str]] = None,
     genre_overrides: Optional[list[str]] = None,
     onnx_path: Optional[str] = None,
+    evolve: bool = False,
+    evolve_generations: int = 8,
+    evolve_population: int = 30,
 ):
     """Run the drum generation pipeline end-to-end.
 
@@ -393,16 +402,35 @@ def run_drum_pipeline(
 
     scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 
-    concept_text = song_info.get("concept", "")
-    if not concept_text:
-        # Try song_context.yml (written by init_production before any phase runs)
-        _ctx = load_song_context(prod_path)
-        concept_text = _ctx.get("concept", "")
+    _ctx = load_song_context(prod_path)
+    concept_text = song_info.get("concept", "") or _ctx.get("concept", "")
     if not concept_text:
         concept_text = f"{song_info['color_name']} chromatic concept"
         print(f"  Warning: No concept text, using fallback: '{concept_text}'")
     concept_emb = scorer.prepare_concept(concept_text)
     print(f"  Concept encoded ({concept_emb.shape[0]}-dim)")
+    aesthetic_hints = _ctx.get("aesthetic_hints") or {}
+    _style_profile = _ctx.get("style_reference_profile") or {}
+
+    # Load production plan for arc-aware energy targeting
+    from app.generators.midi.production.production_plan import (
+        build_next_section_map,
+        load_plan,
+    )
+
+    prod_plan = load_plan(prod_path)
+    _arc_by_label: dict[str, float] = {}
+    if prod_plan:
+        for _ps in prod_plan.sections:
+            _arc_by_label[_ps.name.lower().replace("-", "_").replace(" ", "_")] = (
+                _ps.arc
+            )
+
+    # Load composition narrative for rhythm_character constraints
+    from app.generators.midi.production.composition_narrative import load_narrative
+    from app.structures.music.narrative_constraints import extract_constraints
+
+    _narrative = load_narrative(prod_path)
 
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []  # (filename, midi_bytes)
@@ -430,7 +458,12 @@ def run_drum_pipeline(
         label = section["label"]
         label_display = section["label_display"]
         bar_count = section["bar_count"]
-        target_energy = section_energy.get(label, "medium")
+        label_key = label.lower().replace("-", "_").replace(" ", "_")
+        arc = _arc_by_label.get(label_key)
+        if arc is not None:
+            target_energy = arc_to_energy(arc)
+        else:
+            target_energy = section_energy.get(label, "medium")
 
         print(
             f"\n--- Section: {label_display} [{section_key}] ({bar_count} bars, energy={target_energy}) ---"
@@ -448,6 +481,25 @@ def run_drum_pipeline(
 
         print(f"  Templates: {len(templates)} candidates")
 
+        # Evolutionary breeding (opt-in)
+        if evolve and templates:
+            from app.generators.midi.patterns.pattern_evolution import (
+                breed_drum_patterns,
+            )
+
+            print(
+                f"  Breeding evolved candidates ({evolve_generations} generations, population {evolve_population})..."
+            )
+            evolved = breed_drum_patterns(
+                concept_emb,
+                seed_patterns=templates,
+                generations=evolve_generations,
+                population_size=evolve_population,
+                top_n=top_k,
+            )
+            templates = templates + evolved
+            print(f"  Templates after breeding: {len(templates)} candidates")
+
         # Determine dynamic curve for this section
         raw_curve = dynamics_map.get(label) or dynamics_map.get(section_key)
         section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
@@ -459,6 +511,7 @@ def run_drum_pipeline(
                 tmpl, bpm=song_info["bpm"], bar_count=bar_count, curve=section_curve
             )
             e_score = energy_appropriateness(tmpl.energy, target_energy)
+            is_evolved = "evolved" in getattr(tmpl, "tags", [])
             candidates.append(
                 {
                     "template": tmpl,
@@ -467,6 +520,7 @@ def run_drum_pipeline(
                     "pattern_name": tmpl.name,
                     "genre_family": tmpl.genre_family,
                     "energy": tmpl.energy,
+                    "is_evolved": is_evolved,
                 }
             )
 
@@ -497,6 +551,18 @@ def run_drum_pipeline(
                 energy_weight,
                 chromatic_weight,
             )
+            _tmpl_tags = getattr(cand["template"], "tags", [])
+            tag_adj = aesthetic_tag_adjustment(
+                _tmpl_tags, aesthetic_hints
+            ) + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "drums")
+            if _narrative:
+                _narr_constraints = extract_constraints(label, _narrative)
+                tag_adj += narrative_tag_adjustment(
+                    _narr_constraints, _tmpl_tags, "drums"
+                )
+            comp = round(comp + tag_adj, 4)
+            breakdown["tag_adjustment"] = tag_adj
+            breakdown["composite"] = comp
             scored.append(
                 {
                     "composite": comp,
@@ -506,6 +572,7 @@ def run_drum_pipeline(
                     "genre_family": cand["genre_family"],
                     "energy": cand["energy"],
                     "description": cand["template"].description,
+                    "is_evolved": cand.get("is_evolved", False),
                 }
             )
 
@@ -515,7 +582,8 @@ def run_drum_pipeline(
 
         for rank, item in enumerate(top):
             item["rank"] = rank + 1
-            item["id"] = f"drum_{section_key}_{rank + 1:02d}"
+            prefix = "evolved_" if item.get("is_evolved") else ""
+            item["id"] = f"{prefix}drum_{section_key}_{rank + 1:02d}"
             all_midi_outputs.append((f"{item['id']}.mid", item["midi_bytes"]))
 
         ranked_by_section[section_key] = top
@@ -546,13 +614,7 @@ def run_drum_pipeline(
         path.write_bytes(midi_bytes)
 
     # --- 7. Write review YAML ---
-    # Load production plan for next_section context (optional)
-    from app.generators.midi.production.production_plan import (
-        build_next_section_map,
-        load_plan,
-    )
-
-    prod_plan = load_plan(prod_path)
+    # prod_plan already loaded above for arc-aware energy targeting
     next_section_map = build_next_section_map(prod_plan) if prod_plan else {}
     if next_section_map:
         print(
@@ -661,6 +723,23 @@ def main():
         default=None,
         help="Path to refractor.onnx (default: training/data/refractor.onnx)",
     )
+    parser.add_argument(
+        "--evolve",
+        action="store_true",
+        help="Breed evolved drum pattern candidates via evolutionary algorithm",
+    )
+    parser.add_argument(
+        "--generations",
+        type=int,
+        default=8,
+        help="Number of evolutionary generations (default: 8, only used with --evolve)",
+    )
+    parser.add_argument(
+        "--population",
+        type=int,
+        default=30,
+        help="Evolutionary population size (default: 30, only used with --evolve)",
+    )
 
     args = parser.parse_args()
 
@@ -683,6 +762,9 @@ def main():
         energy_overrides=energy_overrides,
         genre_overrides=genre_overrides,
         onnx_path=args.onnx_path,
+        evolve=args.evolve,
+        evolve_generations=args.generations,
+        evolve_population=args.population,
     )
 
 

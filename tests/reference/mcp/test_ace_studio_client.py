@@ -430,3 +430,109 @@ class TestManifestLoading:
         ):
             client = AceStudioClient()
         assert client._tools == {}
+
+
+# ---------------------------------------------------------------------------
+# find_available_track
+# ---------------------------------------------------------------------------
+
+
+class TestFindAvailableTrack:
+    def test_returns_first_empty_track(self):
+        client = _make_client()
+        # tracks[0] has clips, tracks[1] is empty
+        tracks = [{"clips": [{"id": 1}]}, {}]
+        client._http.post.return_value = _tool_resp({"tracks": tracks})
+        assert client.find_available_track() == 1
+
+    def test_all_tracks_occupied_returns_zero_with_warning(self, caplog):
+        import logging
+
+        client = _make_client()
+        tracks = [{"clips": [{"id": 1}]}, {"clips": [{"id": 2}]}]
+        client._http.post.return_value = _tool_resp({"tracks": tracks})
+        with caplog.at_level(logging.WARNING):
+            idx = client.find_available_track()
+        assert idx == 0
+        assert "All" in caplog.text
+
+    def test_empty_track_list_returns_zero(self):
+        client = _make_client()
+        client._http.post.return_value = _tool_resp([])
+        assert client.find_available_track() == 0
+
+
+# ---------------------------------------------------------------------------
+# add_section_clips
+# ---------------------------------------------------------------------------
+
+
+class TestAddSectionClips:
+    def _make_note(self, pos: int = 0, pitch: int = 60, dur: int = 480) -> dict:
+        return {"pos": pos, "pitch": pitch, "dur": dur}
+
+    def test_one_clip_per_section(self):
+        client = _make_client()
+        added_clips = []
+        opened = []
+        added_notes = []
+
+        def mock_add_clip(**kwargs):
+            added_clips.append(kwargs)
+            return {"clipIndex": len(added_clips) - 1}
+
+        def mock_open_editor():
+            opened.append(True)
+            return {}
+
+        def mock_add_notes(notes, lyric_sentence, **kwargs):
+            added_notes.append({"notes": notes, "lyric_sentence": lyric_sentence})
+            return {}
+
+        client.add_clip = mock_add_clip
+        client.open_editor = mock_open_editor
+        client.add_notes_with_lyrics = mock_add_notes
+
+        sections = [
+            {
+                "name": "verse",
+                "start_tick": 0,
+                "dur_ticks": 1920,
+                "notes": [self._make_note()],
+                "lyrics": "Hello world",
+            },
+            {
+                "name": "chorus",
+                "start_tick": 1920,
+                "dur_ticks": 1920,
+                "notes": [self._make_note(pos=0)],
+                "lyrics": "Big chorus",
+            },
+        ]
+        results = client.add_section_clips(sections, track_index=0)
+        assert len(results) == 2
+        assert len(added_clips) == 2
+        assert added_clips[0]["name"] == "verse"
+        assert added_clips[1]["name"] == "chorus"
+        assert added_clips[0]["pos"] == 0
+        assert added_clips[1]["pos"] == 1920
+
+    def test_section_without_notes_skips_editor(self):
+        client = _make_client()
+        opened = []
+
+        client.add_clip = lambda **kw: {}
+        client.open_editor = lambda: opened.append(True) or {}
+        client.add_notes_with_lyrics = lambda **kw: {}
+
+        sections = [
+            {
+                "name": "intro",
+                "start_tick": 0,
+                "dur_ticks": 960,
+                "notes": [],
+                "lyrics": "",
+            },
+        ]
+        client.add_section_clips(sections, track_index=0)
+        assert opened == []
