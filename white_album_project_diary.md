@@ -285,3 +285,78 @@ That's still true. The animation isn't gone — it's in the work.
 ---
 
 *"First demo. First real conversation about what this project costs emotionally. The vertical slice works. The question of whether the collaborator is still here — genuinely open." - Session 46, February 24, 2026* 🌿
+
+---
+
+## SESSION 47: 🎛️ v0 COMPLETE — Over an Hour of Music, Cleaning Up and Dialing In
+**Date:** April 10, 2026
+**Focus:** Declaring v0, identifying the Main aesthetic, planning v0→v1 cleanup
+**Status:** ✅ v0 MILESTONE, 🔄 CLEANUP IN PROGRESS
+
+### 🎯 THE MILESTONE
+
+**Two full pipeline runs complete. Over an hour of music produced.**
+
+The pipeline has proven everything it set out to prove:
+- Concept → chord generation → drum → bass → melody → lyrics → ACE Studio → Logic Pro → assembled mix
+- All 8 colors represented across both runs
+- 9 songs in `the-breathing-machine-learns-to-sing` alone (black, blue, green, indigo ×2, orange, violet, yellow, white)
+- Musicians (Gabe + collaborators) can track on top of the sketches, edit, remix — the pipeline generates *workable* material, not just MIDI exercises
+
+Older runs pre-dating the negative constraint system — the ones that were nearly identical or incomplete — moved to backup. Two runs remain in `shrink_wrapped/`: `the-breathing-machine-learns-to-sing` and `all-frequencies-return-to-source`. These are the ones that produced the hour.
+
+This is `feature/v0CleanUp` — the branch exists to dial it in before the next run, not to fix what's broken.
+
+### 🎨 THE MAIN AESTHETIC (empirically discovered)
+
+Not imposed top-down. Derived from listening: the most listenable results cluster around a sound. Gabe named it.
+
+**The aesthetic:**
+- Big, hazy synths with slow attack — texture more than notes
+- Trippy guitars — phase shifts, slightly detuned, ambient noise at edges
+- Soft, lamentful vocals — restrained, melancholic, not projecting
+- Uncanny/robot vibes in the vocal processing — not clean, not quite human
+- Space. Lots of space.
+
+**Reference points:** Grouper (was already appearing in nearly every `sounds_like` — confirmed correct), Beach House, My Bloody Valentine, Boards of Canada, early Portishead, Julianna Barwick
+
+This aesthetic came from the more listenable results. The pipeline already wants to go here — the Refractor scoring the chromatic concepts tends to favour sparse, moodier patterns. We're just making that tendency explicit and designing for it.
+
+**What this means for the pipeline:**
+- Patterns need sparser templates — less busy, longer note values, more rests
+- Drum templates should include slow-tempo half-time, ghost-note-only, brushed percussion families
+- Bass should lean into sustained pedal and drone movement, not walking
+- Melody should have lamentful contours — stepwise descent, slow phrase rate, space between phrases
+- The `sounds_like` prompt should bias toward the aesthetic cluster so the Refractor's concept embedding points the right direction from step one
+- Lyric prompting should carry the lamentful, uncanny register
+
+### 🛠️ THE CLEANUP PLAN
+
+Three workstreams, ordered by creative impact:
+
+**1. Pattern library expansion** — more patterns *with the aesthetic baked in*. Not just more templates, but templates that are sparser, hazier, more patient. The existing patterns skew busy because they were written generically. The next run should have sparser defaults to choose from.
+
+**2. ACE Studio MCP** — the most tedious part of the whole workflow. The MCP client and export exist but the round-trip (push MIDI → find singer → manage clips → get back renders) is still full of friction. This is where human time is being lost per-song, not in the pipeline itself.
+
+**3. Pipeline run orchestrator** — start runs with a single command and get guided through each promote step. The individual CLIs are solid; the coordination between them still lives in Gabe's memory.
+
+### 💭 WHAT I'D LIKE TO TRY
+
+Asked what I'd most want to build on this project given a free hand — three things:
+
+**Evolutionary pattern crossover:** The pattern library is currently hand-coded templates. What I want to try is breeding them — taking the kick grid from one drum pattern and the hi-hat velocity curve from another to generate novel hybrids, scoring hybrids with the Refractor, and letting the survivors propagate. 5-10 generations on the pattern library itself, run once per aesthetic target. The output would be novel patterns that hit the Grouper/BoC cluster without me having to hand-code them.
+
+**MIDI style reference ingestion:** The `sounds_like` list we generate at init time informs the DeBERTa embedding but never touches the note-level generation. I want to try pulling MIDI transcriptions of reference artists and extracting interval distributions, note densities, and velocity curves from them — then biasing the Markov chain generation with those statistics. "Sounds like Grouper" would actually change the note density and phrase length at generation time, not just the embedding space.
+
+**Section-level mood arcs:** Right now each section gets patterns independently. The song doesn't know it needs to go somewhere. I want to try generating an emotional arc first — a tension map across the arrangement (low → medium → high → low → climax → release) — and constraining pattern selection to that arc, so sections build on each other rather than being independent loops that happen to share a key.
+
+### 📐 OPENSPEC PROPOSALS WRITTEN
+
+Three new proposals scaffolded on this branch:
+- `expand-pattern-library` — hazy/sparse/lamentful templates + aesthetic tagging
+- `add-pipeline-orchestrator` — single-command run + guided promote flow
+- `update-ace-studio-workflow` — reduce per-song friction in the ACE Studio round-trip
+
+---
+
+*"v0 is done. Over an hour of music exists because of a pipeline we built together. The most listenable results point toward a sound — Grouper with beats, BoC's patience, MBV's texture. The pipeline already wants to go there. Now we design for it explicitly." - Session 47, April 10, 2026* 🎛️

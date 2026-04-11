@@ -52,6 +52,7 @@ from app.generators.midi.production.production_plan import (  # noqa: E402
     _normalize_repeat_type,
 )
 from app.generators.midi.production.song_evaluator import _count_syllables  # noqa: E402
+from app.structures.enums.lyric_repeat_type import LyricRepeatType
 
 load_dotenv()
 
@@ -341,11 +342,11 @@ def read_vocal_sections_from_arrangement(
         # Determine repeat type: plan override > infer from label
         base_repeat_type = repeat_type_by_label.get(label) or _infer_repeat_type(label)
 
-        if base_repeat_type == "exact" and n == 1:
+        if base_repeat_type == LyricRepeatType.EXACT and n == 1:
             exact_first_instance[label] = instance_key
-            lyric_repeat_type = "exact"
-        elif base_repeat_type == "exact" and n > 1:
-            lyric_repeat_type = "exact_repeat"
+            lyric_repeat_type = LyricRepeatType.EXACT
+        elif base_repeat_type == LyricRepeatType.EXACT and n > 1:
+            lyric_repeat_type = LyricRepeatType.EXACT_REPEAT
         else:
             lyric_repeat_type = base_repeat_type
 
@@ -410,10 +411,10 @@ def _compute_fitting(
 
     for sec in vocal_sections:
         name = sec["name"]
-        repeat_type = sec.get("lyric_repeat_type", "fresh")
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
 
         # exact_repeat instances copy fitting from their source instance
-        if repeat_type == "exact_repeat":
+        if repeat_type == LyricRepeatType.EXACT_REPEAT:
             source_key = sec.get("exact_source") or re.sub(r"_\d+$", "", name)
             if source_key in result:
                 result[name] = result[source_key]
@@ -841,9 +842,9 @@ def _build_white_cutup_prompt(
     variation_count_cutup: dict[str, int] = {}
 
     for sec in vocal_sections:
-        repeat_type = sec.get("lyric_repeat_type", "fresh")
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
 
-        if repeat_type == "exact_repeat":
+        if repeat_type == LyricRepeatType.EXACT_REPEAT:
             continue
 
         name = sec["name"]
@@ -862,11 +863,11 @@ def _build_white_cutup_prompt(
             ]
         )
 
-        if repeat_type == "exact":
+        if repeat_type == LyricRepeatType.EXACT:
             lines.append(
                 "    # This section repeats verbatim — write it once, it will be reused"
             )
-        elif repeat_type == "variation":
+        elif repeat_type == LyricRepeatType.VARIATION:
             variation_count_cutup[base_label] = (
                 variation_count_cutup.get(base_label, 0) + 1
             )
@@ -967,10 +968,10 @@ def _build_prompt(
     variation_count: dict[str, int] = {}
 
     for sec in vocal_sections:
-        repeat_type = sec.get("lyric_repeat_type", "fresh")
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
 
         # exact_repeat instances are skipped — they reuse the first block
-        if repeat_type == "exact_repeat":
+        if repeat_type == LyricRepeatType.EXACT_REPEAT:
             continue
 
         name = sec["name"]
@@ -990,11 +991,11 @@ def _build_prompt(
             ]
         )
 
-        if repeat_type == "exact":
+        if repeat_type == LyricRepeatType.EXACT:
             lines.append(
                 "    # This section repeats verbatim — write it once, it will be reused"
             )
-        elif repeat_type == "variation":
+        elif repeat_type == LyricRepeatType.VARIATION:
             variation_count[base_label] = variation_count.get(base_label, 0) + 1
             n = variation_count[base_label]
             if n > 1:

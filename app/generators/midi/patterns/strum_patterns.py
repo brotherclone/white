@@ -14,6 +14,8 @@ from pathlib import Path
 import mido
 import yaml
 
+from app.structures.enums.arp_direction import ArpDirection
+
 
 @dataclass
 class StrumPattern:
@@ -34,7 +36,7 @@ class StrumPattern:
     time_sig: tuple[int, int]
     description: str
     is_arpeggio: bool = False
-    arp_direction: str = "up"
+    arp_direction: ArpDirection = ArpDirection.UP
     onsets: list[float] = field(default_factory=list)
     durations: list[float] = field(default_factory=list)
 
@@ -88,7 +90,7 @@ PATTERNS_4_4 = [
         time_sig=(4, 4),
         description="Arpeggio up — chord tones played low to high across sixteenth subdivisions",
         is_arpeggio=True,
-        arp_direction="up",
+        arp_direction=ArpDirection.UP,
         onsets=[i * 0.25 for i in range(16)],
         durations=[0.25] * 16,
     ),
@@ -97,7 +99,7 @@ PATTERNS_4_4 = [
         time_sig=(4, 4),
         description="Arpeggio down — chord tones played high to low across sixteenth subdivisions",
         is_arpeggio=True,
-        arp_direction="down",
+        arp_direction=ArpDirection.DOWN,
         onsets=[i * 0.25 for i in range(16)],
         durations=[0.25] * 16,
     ),
@@ -141,7 +143,7 @@ PATTERNS_7_8 = [
         time_sig=(7, 8),
         description="Arpeggio up across 7/8 bar in eighth-note subdivisions",
         is_arpeggio=True,
-        arp_direction="up",
+        arp_direction=ArpDirection.UP,
         onsets=[i * 0.5 for i in range(7)],
         durations=[0.5] * 7,
     ),
@@ -150,7 +152,7 @@ PATTERNS_7_8 = [
         time_sig=(7, 8),
         description="Arpeggio down across 7/8 bar in eighth-note subdivisions",
         is_arpeggio=True,
-        arp_direction="down",
+        arp_direction=ArpDirection.DOWN,
         onsets=[i * 0.5 for i in range(7)],
         durations=[0.5] * 7,
     ),
@@ -233,7 +235,7 @@ def apply_strum_pattern(
         if not voicing:
             return events
         sorted_notes = sorted(voicing)
-        if pattern.arp_direction == "down":
+        if pattern.arp_direction == ArpDirection.DOWN:
             sorted_notes = list(reversed(sorted_notes))
 
         for i, (onset, duration) in enumerate(zip(pattern.onsets, pattern.durations)):
