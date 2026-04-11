@@ -1173,11 +1173,20 @@ class TestBuildPromptRepeatTypes:
 
     def test_exact_repeat_section_skipped(self):
         from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from app.structures.enums.lyric_repeat_type import LyricRepeatType
 
         sections = [
             self._sec("chorus", repeat_type="exact"),
-            self._sec("chorus_2", approved_label="chorus", repeat_type="exact_repeat"),
-            self._sec("chorus_3", approved_label="chorus", repeat_type="exact_repeat"),
+            self._sec(
+                "chorus_2",
+                approved_label="chorus",
+                repeat_type=LyricRepeatType.EXACT_REPEAT,
+            ),
+            self._sec(
+                "chorus_3",
+                approved_label="chorus",
+                repeat_type=LyricRepeatType.EXACT_REPEAT,
+            ),
         ]
         prompt = _build_prompt(self._meta(), sections, {})
         assert "[chorus]" in prompt
@@ -1223,21 +1232,24 @@ class TestBuildPromptRepeatTypes:
 class TestComputeFittingExactRepeat:
     def test_exact_repeat_copies_from_source(self, tmp_path):
         from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+        from app.structures.enums.lyric_repeat_type import LyricRepeatType
 
         # First instance is 'chorus', second is 'chorus_2' (exact_repeat)
+        # Use the enum directly — the pipeline stores LyricRepeatType.EXACT_REPEAT,
+        # never the raw string (which _normalize_repeat_type rejects as external input)
         vocal_sections = [
             {
                 "name": "chorus",
                 "total_notes": 8,
                 "play_count": 1,
-                "lyric_repeat_type": "exact",
+                "lyric_repeat_type": LyricRepeatType.EXACT,
                 "exact_source": "chorus",
             },
             {
                 "name": "chorus_2",
                 "total_notes": 8,
                 "play_count": 1,
-                "lyric_repeat_type": "exact_repeat",
+                "lyric_repeat_type": LyricRepeatType.EXACT_REPEAT,
                 "exact_source": "chorus",
             },
         ]

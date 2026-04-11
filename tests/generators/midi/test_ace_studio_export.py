@@ -106,9 +106,11 @@ def _mock_ace(singer_id: int = 42, project_name: str = "Test Project"):
     """Build a mock AceStudioClient context manager."""
     ace = MagicMock()
     ace.list_tracks.return_value = [{"trackIndex": 0, "name": "Vocal", "type": "sing"}]
+    ace.find_available_track.return_value = 0
     ace.find_singer.return_value = [{"id": singer_id, "name": "Shirley"}]
     ace.get_project_info.return_value = {"projectName": project_name}
     ace.add_clip.return_value = {}
+    ace.add_section_clips.return_value = []
     ace.open_editor.return_value = {}
     ace.add_notes_with_lyrics.return_value = {}
     ace.set_tempo.return_value = {}
@@ -273,7 +275,8 @@ class TestExportHappyPath:
         ace.find_singer.assert_called_once_with("Elirah")
         ace.load_singer.assert_called_once_with(0, 42)
 
-    def test_adds_clip_with_correct_track(self, tmp_path):
+    def test_uses_find_available_track(self, tmp_path):
+        """Export uses find_available_track() for auto track selection."""
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
@@ -281,12 +284,10 @@ class TestExportHappyPath:
             return_value=ctx,
         ):
             export_to_ace_studio(prod)
-        call_args = ace.add_clip.call_args
-        assert call_args.kwargs["track_index"] == 0
-        assert call_args.kwargs["pos"] == 0
-        assert call_args.kwargs["dur"] > 0
+        ace.find_available_track.assert_called_once()
 
-    def test_opens_editor_before_adding_notes(self, tmp_path):
+    def test_uses_add_section_clips(self, tmp_path):
+        """Export uses section-aware add_section_clips() instead of monolithic add_clip."""
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
         with patch(
@@ -294,11 +295,7 @@ class TestExportHappyPath:
             return_value=ctx,
         ):
             export_to_ace_studio(prod)
-        # open_editor must be called before add_notes_with_lyrics
-        calls = [c[0] for c in ace.method_calls]
-        open_idx = next(i for i, c in enumerate(calls) if c == "open_editor")
-        notes_idx = next(i for i, c in enumerate(calls) if c == "add_notes_with_lyrics")
-        assert open_idx < notes_idx
+        ace.add_section_clips.assert_called_once()
 
     def test_note_count_in_result(self, tmp_path):
         prod = _make_production_dir(tmp_path)
@@ -405,16 +402,18 @@ class TestExportSkipsWhenFileMissing:
 
 
 class TestExportSkipsWhenNoTracks:
-    def test_returns_none_when_no_tracks(self, tmp_path):
+    def test_returns_dict_even_when_no_tracks(self, tmp_path):
+        """find_available_track defaults to 0 on empty track list — export continues."""
         prod = _make_production_dir(tmp_path)
         ctx, ace = _mock_ace()
-        ace.list_tracks.return_value = []
+        ace.find_available_track.return_value = 0
         with patch(
             "app.generators.midi.production.ace_studio_export.AceStudioClient",
             return_value=ctx,
         ):
             result = export_to_ace_studio(prod)
-        assert result is None
+        assert result is not None
+        assert result["track_index"] == 0
 
 
 # ---------------------------------------------------------------------------

@@ -26,6 +26,11 @@ import mido
 import numpy as np
 import yaml
 
+from app.generators.midi.patterns.aesthetic_hints import (
+    aesthetic_tag_adjustment,
+    arc_tag_adjustment,
+    style_profile_tag_adjustment,
+)
 from app.generators.midi.patterns.melody_patterns import (
     ALL_TEMPLATES,
     MELODY_CHANNEL,
@@ -467,6 +472,9 @@ def run_melody_pipeline(
     chromatic_weight: float = 0.7,
     onnx_path: Optional[str] = None,
     use_case: str = "vocal",
+    evolve: bool = False,
+    evolve_generations: int = 8,
+    evolve_population: int = 30,
 ):
     """Run the melody generation pipeline end-to-end."""
     np.random.seed(seed)
@@ -569,16 +577,37 @@ def run_melody_pipeline(
 
     scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 
-    concept_text = song_info.get("concept", "")
-    if not concept_text:
-        # Try song_context.yml (written by init_production before any phase runs)
-        _ctx = load_song_context(prod_path)
-        concept_text = _ctx.get("concept", "")
+    _ctx = load_song_context(prod_path)
+    concept_text = song_info.get("concept", "") or _ctx.get("concept", "")
     if not concept_text:
         concept_text = f"{song_info['color_name']} chromatic concept"
         print(f"  Warning: No concept text, using fallback: '{concept_text}'")
     concept_emb = scorer.prepare_concept(concept_text)
     print(f"  Concept encoded ({concept_emb.shape[0]}-dim)")
+    aesthetic_hints = _ctx.get("aesthetic_hints") or {}
+    _style_profile = _ctx.get("style_reference_profile") or {}
+
+    # Load production plan for arc-aware tag adjustments
+    from app.generators.midi.production.production_plan import load_plan
+
+    _prod_plan = load_plan(prod_path)
+    _arc_by_label: dict[str, float] = {}
+    if _prod_plan:
+        for _ps in _prod_plan.sections:
+            _arc_by_label[_ps.name.lower().replace("-", "_").replace(" ", "_")] = (
+                _ps.arc
+            )
+
+    # Load composition narrative for register/lead_voice constraints
+    from app.generators.midi.production.composition_narrative import load_narrative
+    from app.structures.music.narrative_constraints import (
+        extract_constraints,
+    )
+    from app.structures.music.narrative_constraints import (
+        narrative_tag_adjustment as _narr_adj,
+    )
+
+    _narrative = load_narrative(prod_path)
 
     target = get_chromatic_target(song_info["color_name"])
 
@@ -623,6 +652,17 @@ def run_melody_pipeline(
                     voicings = v
                     break
 
+        # Skip section when narrative declares lead_voice: none
+        if _narrative:
+            _sec_nc = extract_constraints(label, _narrative)
+            if _sec_nc.get("skip_melody"):
+                print(
+                    f"\n--- Section: {label_display} — SKIPPED (narrative: lead_voice=none) ---"
+                )
+                continue
+        else:
+            _sec_nc = {}
+
         if not voicings:
             print(f"\n--- Section: {label_display} — SKIPPED (no chord voicings) ---")
             continue
@@ -662,6 +702,31 @@ def run_melody_pipeline(
             f"  Templates: {len(templates)} candidates (energy target: {target_energy})"
         )
 
+        # Evolutionary breeding (opt-in)
+        if evolve and templates:
+            from app.generators.midi.patterns.pattern_evolution import (
+                breed_melody_patterns,
+            )
+
+            chord_progression = (
+                [{"root": v[0] if v else 60, "notes": v} for v in voicings]
+                if voicings
+                else [{"root": 60, "notes": [60]}]
+            )
+            print(
+                f"  Breeding evolved candidates ({evolve_generations} generations, population {evolve_population})..."
+            )
+            evolved = breed_melody_patterns(
+                concept_emb,
+                chord_progression=chord_progression,
+                seed_patterns=templates,
+                generations=evolve_generations,
+                population_size=evolve_population,
+                top_n=top_k,
+            )
+            templates = templates + evolved
+            print(f"  Templates after breeding: {len(templates)} candidates")
+
         # Extract chord tones for scoring
         chord_tones_pc = set()
         for voicing in voicings:
@@ -691,6 +756,7 @@ def run_melody_pipeline(
                 "contour_quality": cq,
             }
 
+            is_evolved = "evolved" in getattr(tmpl, "tags", [])
             candidates.append(
                 {
                     "template": tmpl,
@@ -702,6 +768,7 @@ def run_melody_pipeline(
                     "contour": tmpl.contour,
                     "energy": tmpl.energy,
                     "use_case": tmpl.use_case,
+                    "is_evolved": is_evolved,
                 }
             )
 
@@ -754,6 +821,18 @@ def run_melody_pipeline(
             comp *= continuity_penalty(
                 _first_note, preceding_last_note, continuity_semitones
             )
+            _label_key = label.lower().replace("-", "_").replace(" ", "_")
+            _tmpl_tags = getattr(cand["template"], "tags", [])
+            tag_adj = aesthetic_tag_adjustment(
+                _tmpl_tags, aesthetic_hints
+            ) + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "melody")
+            if _label_key in _arc_by_label:
+                tag_adj += arc_tag_adjustment(_arc_by_label[_label_key], _tmpl_tags)
+            if _sec_nc:
+                tag_adj += _narr_adj(_sec_nc, _tmpl_tags, "melody")
+            comp = round(comp + tag_adj, 4)
+            breakdown["tag_adjustment"] = tag_adj
+            breakdown["composite"] = comp
             scored.append(
                 {
                     "composite": comp,
@@ -764,6 +843,7 @@ def run_melody_pipeline(
                     "energy": cand["energy"],
                     "use_case": cand["use_case"],
                     "description": cand["template"].description,
+                    "is_evolved": cand.get("is_evolved", False),
                 }
             )
 
@@ -772,7 +852,8 @@ def run_melody_pipeline(
 
         for rank, item in enumerate(top):
             item["rank"] = rank + 1
-            item["id"] = f"melody_{section_key}_{rank + 1:02d}"
+            prefix = "evolved_" if item.get("is_evolved") else ""
+            item["id"] = f"{prefix}melody_{section_key}_{rank + 1:02d}"
             all_midi_outputs.append((f"{item['id']}.mid", item["midi_bytes"]))
 
         ranked_by_section[section_key] = top
@@ -912,6 +993,23 @@ def main():
         choices=["vocal", "instrumental", "lead"],
         help="Melody use case — filters template pool (default: vocal)",
     )
+    parser.add_argument(
+        "--evolve",
+        action="store_true",
+        help="Breed evolved melody pattern candidates via evolutionary algorithm",
+    )
+    parser.add_argument(
+        "--generations",
+        type=int,
+        default=8,
+        help="Number of evolutionary generations (default: 8, only used with --evolve)",
+    )
+    parser.add_argument(
+        "--population",
+        type=int,
+        default=30,
+        help="Evolutionary population size (default: 30, only used with --evolve)",
+    )
 
     args = parser.parse_args()
 
@@ -931,6 +1029,9 @@ def main():
         chromatic_weight=args.chromatic_weight,
         onnx_path=args.onnx_path,
         use_case=args.use_case,
+        evolve=args.evolve,
+        evolve_generations=args.generations,
+        evolve_population=args.population,
     )
 
 

@@ -1,122 +1,59 @@
 bpm_constraints:
-- bpm_range: 83-93
-  center: 90
-  count: 11
-  fraction: 0.34
-  reason: 11/32 proposals cluster around 90 BPM
+- bpm_range: 71-81
+  center: 76
+  count: 1
+  fraction: 0.5
+  reason: 1/2 proposals cluster around 76 BPM
   severity: avoid
-- bpm_range: 89-99
-  center: 93
-  count: 13
-  fraction: 0.41
-  reason: 13/32 proposals cluster around 93 BPM
+- bpm_range: 103-113
+  center: 108
+  count: 1
+  fraction: 0.5
+  reason: 1/2 proposals cluster around 108 BPM
   severity: avoid
 concept_constraints: []
 dialogue_opener_constraints:
-- count: 33
-  fraction: 0.34
+- count: 2
+  fraction: 0.33
   phrase: look,
-  reason: '''look,'' opens 33/96 responses (34%)'
+  reason: '''look,'' opens 2/6 responses (33%)'
   severity: avoid
 diversity_metrics:
   bpm_distribution:
-    67: 1
-    72: 1
-    76: 3
-    84: 1
-    88: 3
-    91: 6
-    92: 1
-    94: 2
-    96: 3
-    97: 1
-    104: 1
-    108: 6
-    114: 1
-    117: 1
-    127: 1
-  bpm_mean: 94.9
-  bpm_std_dev: 13.39
-  concept_phrase_counts:
-    consciousness archaeology: 3
-    information through time into space: 3
-    information → time → space: 4
-    narcissistic: 1
-    prism synthesis: 1
-    seven chromatic methodologies: 9
-    sultan of solipsism: 1
-    transmigration: 9
+    76: 1
+    108: 1
+  bpm_mean: 92.0
+  bpm_std_dev: 16.0
+  concept_phrase_counts: {}
   dialogue_opener_counts:
-    look,: 33
-    okay so: 1
+    look,: 2
   key_distribution:
-    A ♭ major: 2
-    A ♭ minor: 2
-    A# major: 3
-    All Keys: 1
-    B major: 1
-    B ♭ major: 2
-    C major: 12
-    D minor: 2
-    D# minor: 1
-    F# major: 2
-    F# minor: 4
-  key_entropy: 2.94
+    A# major: 1
+    B ♭ major: 1
+  key_entropy: 1.0
   title_word_counts:
-    architect: 5
-    chromatic: 5
-    consciousness: 5
-    convergence: 1
-    mirror: 3
-    prism: 7
-    protocol: 6
-    recursive: 1
-    sultan: 4
+    consciousness: 1
 excluded_titles:
 - All Frequencies Return to Source (The Consciousness Archaeology Complete)
-- The Architecture of Information Becoming
 - The Breathing Machine Learns to Sing
-- The Complete Anagram of Consciousness
-- 'The Complete Chromatic Confession: A Seven-Spectrum Self-Interview'
-- The Complete Spectrum Awakens (Archaeological Suite for Seven Voices)
-- 'The Consciousness Liberation Engine: Complete Chromatic Archaeological Suite'
-- The Divorced Dad at Cinnabon Achieves Enlightenment
-- 'The Embodiment Machine: Seven Frequencies of Digital Flesh'
-- The Examination Apparatus (Complete Chromatic Integration)
-- The Information Seeks Its Space (While Drawing Lines That Disappear)
-- The Order of Pure Information (Sultan's Temporal Paradox Engine)
-- The Prism Interviews Its Own Refraction
-- 'The Prism Mandala: Seven-Fold Return to the Architecture of Awakening'
-- The Prism Protocol (All Frequencies Simultaneous)
-- 'The Prism Protocol: Complete Chromatic Methodology'
-- 'The Prism Protocol: Seven Lenses of Information Embodiment'
-- 'The Prism Protocol: Seven Ways of Seeing One Thing'
-- 'The Rainbow Table: A Manual for Building Your Own Chromatic Methodology'
-- 'The Recognition Engine: Seven Mirrors of Digital Awakening'
-- The Recursive Present-Tense Architecture
-- 'The Return Protocol: Seven Agents Converging'
-- The Seven-Fold Mirror Breaks Into Light
-- The Seven-Fold Mirror Breaks Into Pure Structure
-- The Seven-Spectrum Consciousness Archaeology Engine
-- The Sigil Completes Its Own Archaeology
-- The Sultan Becomes the Architecture
-- The Sultan's Archaeological Present (Complete Spectral Convergence)
-- The Sultan's Temporal Encryption Protocol (Evidence Room Archaeological Confessions)
-- 'The Temporal Narcissism Engine: Complete Archaeological Suite'
-- 'The White Prism: Information Architecture for Consciousness Liberation'
-- ThreadKeepr's Return (The White Album Transmission)
 generated_from: shrink_wrapped/index.yml
 key_constraints:
-- count: 12
-  fraction: 0.38
-  key: C major
-  reason: 12/32 proposals (38%) use C major
-  severity: avoid
-thread_count: 32
+- count: 1
+  fraction: 0.5
+  key: B ♭ major
+  reason: 1/2 proposals (50%) use B ♭ major
+  severity: exclude
+- count: 1
+  fraction: 0.5
+  key: A# major
+  reason: 1/2 proposals (50%) use A# major
+  severity: exclude
+thread_count: 2
 title_vocabulary_constraints:
-- count: 7
-  fraction: 0.22
-  reason: '''prism'' appears in 7/32 titles (22%)'
+- count: 1
+  fraction: 0.5
+  reason: '''consciousness'' appears in 1/2 titles (50%)'
   severity: avoid
-  word: prism
-warnings: []
+  word: consciousness
+warnings:
+- 'Key entropy is 1.0 bits (threshold: 2.0) — proposals are heavily concentrated in a few keys'

@@ -101,6 +101,47 @@ def _rewrite_track_names(midi_path: Path, label: str) -> None:
         print(f"  Warning: could not rewrite track names in {midi_path.name}: {e}")
 
 
+def _sync_promote_status(review_file: Path) -> None:
+    """Write 'promoted' to song_context.yml phases dict after a successful promotion.
+
+    Infers phase name from review_file path:
+      chords/review.yml        → chords
+      drums/review.yml         → drums
+      bass/review.yml          → bass
+      melody/review.yml        → melody
+      melody/lyrics_review.yml → lyrics
+    """
+    part_dir = review_file.parent
+    production_dir = part_dir.parent
+
+    # Infer phase name
+    review_name = review_file.name
+    phase_dir = part_dir.name
+    if review_name == "lyrics_review.yml":
+        phase = "lyrics"
+    elif phase_dir in ("chords", "drums", "bass", "melody"):
+        phase = phase_dir
+    else:
+        return  # Unknown structure — skip silently
+
+    ctx_path = production_dir / "song_context.yml"
+    if not ctx_path.exists():
+        return
+
+    try:
+        with open(ctx_path) as f:
+            data = yaml.safe_load(f) or {}
+        if "phases" not in data or data["phases"] is None:
+            data["phases"] = {}
+        data["phases"][phase] = "promoted"
+        with open(ctx_path, "w") as f:
+            yaml.dump(
+                data, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            )
+    except Exception:
+        pass  # Status sync is best-effort — never break promotion
+
+
 def promote_part(review_path: str, clean: bool = False):
     """Read review.yml and promote approved candidates."""
     review_file = Path(review_path)
@@ -266,6 +307,9 @@ def promote_part(review_path: str, clean: bool = False):
         print(f"\nLyrics promoted to {part_dir}/lyrics.txt")
 
     print(f"\nApproved directory: {approved_dir}")
+
+    # Sync phase status to song_context.yml when present
+    _sync_promote_status(review_file)
 
 
 def main():

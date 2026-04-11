@@ -61,6 +61,7 @@ class BassPattern:
     description: str
     notes: list[tuple[float, BassChordTone, str]] = field(default_factory=list)
     note_durations: list[float] | None = None
+    tags: list[str] = field(default_factory=list)
 
     def bar_length_beats(self) -> float:
         """Bar length in quarter-note beats."""
@@ -870,6 +871,69 @@ TEMPLATES_4_4_REST_DOWNBEAT = [
 ]
 
 # ---------------------------------------------------------------------------
+# 4/4 Drone / Pedal / Minimal — hazy, sustained, lamentful
+# ---------------------------------------------------------------------------
+
+TEMPLATES_4_4_DRONE = [
+    BassPattern(
+        name="root_drone",
+        style=BassStyle.ROOT,
+        energy="low",
+        time_sig=(4, 4),
+        description="Single root note, whole-note duration. No movement — sustains across chord changes.",
+        notes=[(0, BassChordTone.ROOT, "normal")],
+        note_durations=[4.0],
+        tags=["drone", "minimal"],
+    ),
+    BassPattern(
+        name="slow_pedal",
+        style=BassStyle.PEDAL,
+        energy="low",
+        time_sig=(4, 4),
+        description="Root on beat 1, octave below on beat 3. Two notes per bar.",
+        notes=[
+            (0, BassChordTone.ROOT, "normal"),
+            (2, BassChordTone.OCTAVE_DOWN, "ghost"),
+        ],
+        note_durations=[2.0, 2.0],
+        tags=["pedal", "minimal"],
+    ),
+    BassPattern(
+        name="descending_sigh",
+        style=BassStyle.WALKING,
+        energy="low",
+        time_sig=(4, 4),
+        description="Root → 5th descent over the bar. Stepwise grief. Resolves back to root next bar.",
+        notes=[(0, BassChordTone.ROOT, "accent"), (2, BassChordTone.FIFTH, "normal")],
+        note_durations=[2.0, 2.0],
+        tags=["minimal", "drone"],
+    ),
+    BassPattern(
+        name="sustained_fifth",
+        style=BassStyle.PEDAL,
+        energy="low",
+        time_sig=(4, 4),
+        description="Held 5th drone across the bar with a slight velocity swell.",
+        notes=[(0, BassChordTone.FIFTH, "ghost"), (2, BassChordTone.FIFTH, "normal")],
+        note_durations=[2.0, 2.0],
+        tags=["drone", "pedal"],
+    ),
+    BassPattern(
+        name="minimal_walk",
+        style=BassStyle.WALKING,
+        energy="low",
+        time_sig=(4, 4),
+        description="Root + one passing tone approaching next chord. Contrast with busy walking patterns.",
+        notes=[
+            (0, BassChordTone.ROOT, "normal"),
+            (3, BassChordTone.PASSING_TONE, "ghost"),
+        ],
+        note_durations=[3.0, 1.0],
+        tags=["minimal", "walking"],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -888,4 +952,6 @@ ALL_TEMPLATES: list[BassPattern] = [
     *TEMPLATES_3_4,
     # 7/8
     *TEMPLATES_7_8,
+    # 4/4 Drone / Pedal / Minimal
+    *TEMPLATES_4_4_DRONE,
 ]

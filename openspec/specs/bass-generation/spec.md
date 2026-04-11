@@ -4,35 +4,26 @@
 TBD - created by archiving change add-bass-line-generation. Update Purpose after archive.
 ## Requirements
 ### Requirement: Bass Pattern Templates
+Each `BassPattern` in the template library SHALL carry an optional `tags: list[str]`
+field drawn from a controlled vocabulary: `drone`, `pedal`, `walking`, `arpeggiated`,
+`sustained`, `minimal`. Existing patterns without tags behave identically.
 
-The bass generator SHALL define pattern templates as structured data with tone-selection rules and rhythmic positions. Each template SHALL specify which chord tone to play at each beat position, allowing the pipeline to resolve templates to actual MIDI notes from any chord voicing.
+The library SHALL include the following additional drone/pedal templates:
+- `root_drone` — single root note, whole-note duration, no movement
+- `slow_pedal` — root on beat 1, octave below on beat 3
+- `descending_sigh` — root → major 7th → 5th over 4 bars, stepwise descent
+- `sustained_fifth` — held 5th drone across the bar, slight velocity swell
+- `minimal_walk` — root + one passing tone approaching the next chord
 
-#### Scenario: Template structure
+All new templates SHALL carry `drone`, `pedal`, or `minimal` tags as appropriate.
 
-- **WHEN** a bass pattern template is defined
-- **THEN** it SHALL include: name, style (root/walking/pedal/arpeggiated/octave/syncopated), energy level, time signature, description, and a notes list of (beat_position, tone_selection, velocity_level) tuples
-- **AND** beat positions SHALL be floats relative to bar start (0 = beat 1)
-- **AND** tone selections SHALL be one of: root, 5th, 3rd, octave_up, octave_down, chromatic_approach, passing_tone
-- **AND** velocity levels SHALL be one of: accent (100), normal (80), ghost (50)
+#### Scenario: Tag field present on all patterns
+- **WHEN** the bass pattern library is loaded
+- **THEN** every `BassPattern` has a `tags` attribute (empty list if none assigned)
 
-#### Scenario: 4/4 template availability
-
-- **WHEN** the song proposal has a 4/4 time signature
-- **THEN** the generator SHALL have templates across at least 4 styles (root, walking, arpeggiated, syncopated)
-- **AND** each style SHALL have at least one template at low, medium, or high energy
-- **AND** the total template count SHALL be at least 12
-
-#### Scenario: 7/8 template availability
-
-- **WHEN** the song proposal has a 7/8 time signature
-- **THEN** the generator SHALL have at least 3 templates using group-aligned beat positions
-- **AND** onset positions SHALL align with the 7 eighth-note subdivisions of the bar
-
-#### Scenario: Custom time signature fallback
-
-- **WHEN** the song proposal has a time signature without specific templates
-- **THEN** the generator SHALL fall back to a minimal root-on-beat-1 pattern
-- **AND** log a warning about the unsupported time signature
+#### Scenario: Drone/pedal templates available
+- **WHEN** the library is filtered for patterns tagged `drone` or `pedal`
+- **THEN** at least 4 patterns are returned
 
 ### Requirement: Tone Resolution
 
@@ -103,30 +94,21 @@ The bass pipeline SHALL write candidate MIDI files to the song's production bass
 - **AND** the directories SHALL be created if they do not exist
 
 ### Requirement: Composite Scoring
+The bass pipeline composite scoring SHALL incorporate style reference profile
+adjustments when `style_reference_profile` is present in `song_context.yml`.
 
-The bass pipeline SHALL score each candidate using theory metrics and Refractor, producing a single composite ranking per section.
+- High `mean_duration_beats` (> 1.5 beats) → boost pedal/drone bass templates
+- High `rest_ratio` (> 0.5) → boost minimal/drone templates; penalise walking
+- Low `harmonic_rhythm` (< 0.5 changes/bar) → boost pedal/drone templates
 
-#### Scenario: Theory scoring
+#### Scenario: Long note reference boosts pedal bass
+- **WHEN** `style_reference_profile.mean_duration_beats` is 2.3
+- **AND** a pedal and a walking bass are candidates
+- **THEN** the pedal pattern receives a higher score adjustment
 
-- **WHEN** a bass candidate is scored
-- **THEN** the pipeline SHALL compute a theory score as the mean of:
-  - root_adherence: fraction of strong-beat notes that are the chord root (0.0-1.0)
-  - kick_alignment: fraction of bass onsets coinciding with kick drum hits (0.0-1.0)
-  - voice_leading: smoothness of bass movement between chords (0.0-1.0, inverse of interval size)
-- **AND** if no drum data is available, kick_alignment SHALL be omitted from the mean
-
-#### Scenario: Chromatic scoring
-
-- **WHEN** a bass candidate is scored
-- **THEN** the pipeline SHALL convert the candidate to MIDI bytes and score with `Refractor.score()`
-- **AND** the concept embedding SHALL be computed once and reused across all candidates
-
-#### Scenario: Composite ranking
-
-- **WHEN** all candidates for a section are scored
-- **THEN** the pipeline SHALL compute a weighted composite score (default: 30% theory, 70% chromatic)
-- **AND** rank candidates by composite score descending per section
-- **AND** present top-k candidates per section in the review file
+#### Scenario: Missing profile — no adjustment
+- **WHEN** no `style_reference_profile` is present
+- **THEN** bass scoring proceeds unchanged
 
 ### Requirement: Review File Generation
 
@@ -168,4 +150,15 @@ with the bass velocity clamp (50–110) enforced after curve application.
 #### Scenario: Accent notes respect clamp ceiling
 - **WHEN** a dynamic curve would push an accent note above 110
 - **THEN** the velocity is clamped to 110
+
+### Requirement: Bass Pipeline Evolve Flag
+The bass pipeline CLI SHALL accept `--evolve`, `--generations` (int, default 8), and
+`--population` (int, default 30) flags. When `--evolve` is passed, evolved bass
+candidates SHALL be merged into the standard candidate pool before scoring. Evolved
+candidates SHALL have their `id` field begin with `evolved_`.
+
+#### Scenario: --evolve flag merges bass candidates
+- **GIVEN** the bass pipeline is run with `--evolve`
+- **WHEN** candidate generation completes
+- **THEN** the candidate pool contains both hand-coded and evolved patterns
 

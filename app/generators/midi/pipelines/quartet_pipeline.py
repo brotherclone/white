@@ -855,18 +855,18 @@ def generate_quartet(
                 pass
 
         target = get_chromatic_target(color)
-        chromatic_val = (
-            compute_chromatic_match(scorer_result, target) if scorer_result else 0.5
-        )
-        confidence = (
-            float(scorer_result.get("confidence", 0.5)) if scorer_result else 0.0
-        )
-        composite = round(
-            0.30 * 0.8 + 0.70 * chromatic_val, 3
-        )  # theory placeholder = 0.8
+        counterpoint_score = 0.8  # theory placeholder
+        if scorer_result is not None:
+            chromatic_val = compute_chromatic_match(scorer_result, target)
+            confidence = float(scorer_result.get("confidence", 0.5))
+            composite = round(0.30 * counterpoint_score + 0.70 * chromatic_val, 3)
+        else:
+            chromatic_val = None
+            confidence = 0.0
+            composite = round(counterpoint_score, 3)
 
         scores = {
-            "counterpoint": 0.8,
+            "counterpoint": counterpoint_score,
             "violin_ii_score": 0.8,
             "viola_score": 0.8,
             "cello_score": 0.8,
