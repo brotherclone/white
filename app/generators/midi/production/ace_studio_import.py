@@ -20,12 +20,15 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import logging
 import re
+import shutil
 import sys
 from pathlib import Path
 from typing import Optional
 
 import mido
+import yaml
 
 PROPOSAL_FILENAME = "vocal_alignment.lrc"
 
@@ -333,6 +336,87 @@ def load_ace_export(production_dir: Path) -> Optional[list[dict]]:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+# Render location / ingest
+# ---------------------------------------------------------------------------
+
+SONG_CONTEXT_FILENAME = "song_context.yml"
+log = logging.getLogger(__name__)
+
+
+def find_ace_render(production_dir: Path) -> Optional[Path]:
+    """Find the most recent ACE Studio WAV render in or near production_dir.
+
+    Search order:
+    1. production_dir/melody/ace_render.wav (already ingested)
+    2. production_dir/VocalSynthv*/*.wav
+    3. production_dir/*.wav matching VocalSynth pattern
+    Returns None if nothing found.
+    """
+    production_dir = Path(production_dir)
+
+    already = production_dir / "melody" / "ace_render.wav"
+    if already.exists():
+        return already
+
+    candidates: list[Path] = []
+
+    for folder in production_dir.glob("VocalSynthv*/"):
+        if folder.is_dir():
+            candidates.extend(wav for wav in folder.glob("*.wav") if wav.is_file())
+
+    candidates.extend(
+        wav for wav in production_dir.glob("VocalSynth*.wav") if wav.is_file()
+    )
+
+    if candidates:
+        return max(candidates, key=lambda wav: wav.stat().st_mtime)
+
+    return None
+
+
+def locate_and_ingest_render(production_dir: Path) -> Optional[Path]:
+    """Copy the ACE Studio render into the production directory and update song_context.yml.
+
+    Copies render to melody/ace_render.wav and writes the path to
+    song_context.yml under ace_studio.render_path.
+
+    Returns the destination path on success, None if no render found.
+    """
+    production_dir = Path(production_dir)
+    render = find_ace_render(production_dir)
+    if render is None:
+        log.warning("No ACE Studio WAV render found in %s", production_dir)
+        return None
+
+    dest = production_dir / "melody" / "ace_render.wav"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+
+    if render != dest:
+        shutil.copy2(render, dest)
+        log.info("Render copied: %s → %s", render.name, dest)
+    else:
+        log.info("Render already at destination: %s", dest)
+
+    # Update song_context.yml
+    ctx_path = production_dir / SONG_CONTEXT_FILENAME
+    if ctx_path.exists():
+        ctx = yaml.safe_load(ctx_path.read_text(encoding="utf-8")) or {}
+        ace_block = ctx.get("ace_studio", {})
+        ace_block["render_path"] = str(dest)
+        ctx["ace_studio"] = ace_block
+        ctx_path.write_text(
+            yaml.dump(
+                ctx, default_flow_style=False, sort_keys=False, allow_unicode=True
+            ),
+            encoding="utf-8",
+        )
+
+    return dest
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
 
 
 def main() -> None:
@@ -345,9 +429,24 @@ def main() -> None:
         default=None,
         help="Output path for the LRC file (default: <production-dir>/vocal_alignment.lrc)",
     )
+    parser.add_argument(
+        "--locate-render",
+        action="store_true",
+        help="Find, copy and register the ACE Studio WAV render (melody/ace_render.wav)",
+    )
     args = parser.parse_args()
 
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     prod = Path(args.production_dir)
+
+    if args.locate_render:
+        dest = locate_and_ingest_render(prod)
+        if dest is None:
+            print("ERROR: No ACE Studio WAV render found.")
+            sys.exit(1)
+        print(f"Render ingested: {dest}")
+        sys.exit(0)
+
     midi_path = find_ace_export(prod)
     if midi_path is None:
         print(f"ERROR: No ACE Studio export MIDI found in {prod}")

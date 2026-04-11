@@ -4,39 +4,27 @@
 TBD - created by archiving change add-drum-pattern-generation. Update Purpose after archive.
 ## Requirements
 ### Requirement: Drum Pattern Templates
+Each `DrumPattern` in the template library SHALL carry an optional `tags: list[str]`
+field drawn from a controlled vocabulary: `sparse`, `dense`, `half_time`, `brushed`,
+`motorik`, `ambient`, `ghost_only`, `electronic`. Existing patterns without tags
+behave identically to current behaviour.
 
-The drum generator SHALL define pattern templates as structured data with multi-voice support (kick, snare, hi-hat, toms, cymbals). Each template SHALL specify per-voice onset positions and velocity levels (accent, normal, ghost) relative to the bar.
+The library SHALL include the following additional sparse/atmospheric templates:
+- `half_time_sparse` — kick on beat 1, snare on beat 3, open hat on the off-beat
+- `ghost_verse` — ghost snare only, no kick, whisper hats
+- `brushed_folk` — brush swells on 2 and 4, light kick, no hi-hat grid
+- `ambient_pulse` — single low kick every 2 bars, crash swell on bar 4
+- `kosmische_slow` — motorik feel at half tempo
 
-#### Scenario: Template structure
+All new templates SHALL carry `sparse` and/or `ambient` tags.
 
-- **WHEN** a drum pattern template is defined
-- **THEN** it SHALL include: name, genre family, energy level, time signature, description, and a voices dict mapping voice names to lists of (beat_position, velocity_level) tuples
-- **AND** beat positions SHALL be floats relative to the bar (0 = beat 1)
-- **AND** velocity levels SHALL be one of: accent (120), normal (90), ghost (45)
+#### Scenario: Tag field present on all patterns
+- **WHEN** the pattern library is loaded
+- **THEN** every `DrumPattern` has a `tags` attribute (empty list if none assigned)
 
-#### Scenario: GM percussion MIDI mapping
-
-- **WHEN** drum MIDI is generated from a template
-- **THEN** voice names SHALL map to General MIDI channel 10 percussion note numbers (kick=36, snare=38, hh_closed=42, hh_open=46, etc.)
-- **AND** all drum events SHALL be written to MIDI channel 10 (channel index 9)
-
-#### Scenario: 4/4 template availability
-
-- **WHEN** the song proposal has a 4/4 time signature
-- **THEN** the generator SHALL have templates across at least 3 genre families
-- **AND** each genre family SHALL have at least low, medium, and high energy templates
-
-#### Scenario: 7/8 template availability
-
-- **WHEN** the song proposal has a 7/8 time signature
-- **THEN** the generator SHALL have templates using asymmetric groupings (e.g., 3+2+2, 2+2+3)
-- **AND** onset positions SHALL align with the 7 eighth-note subdivisions of the bar
-
-#### Scenario: Custom time signature fallback
-
-- **WHEN** the song proposal has a time signature without specific templates
-- **THEN** the generator SHALL fall back to a minimal kick-on-1 pattern subdivided to match the bar length
-- **AND** log a warning about the unsupported time signature
+#### Scenario: Sparse templates available
+- **WHEN** the library is filtered for patterns tagged `sparse`
+- **THEN** at least 5 patterns are returned
 
 ### Requirement: Genre Family Mapping
 
@@ -101,26 +89,23 @@ The drum generator SHALL write candidate MIDI files to the song's production dru
 - **AND** the directory SHALL be created if it does not exist
 
 ### Requirement: Composite Scoring
+The drum pipeline composite scoring SHALL incorporate style reference profile
+adjustments when `style_reference_profile` is present in `song_context.yml`.
 
-The drum pipeline SHALL score each candidate using energy appropriateness and Refractor, producing a single composite ranking per section.
+- Low `note_density` (< 2.0 notes/bar) → boost sparse/ambient drum patterns
+- High `velocity_variance` (> 20) → boost patterns with ghost notes
+- Low `note_density` (< 1.5 notes/bar) → penalise dense/busy patterns
 
-#### Scenario: Energy appropriateness scoring
+These SHALL be applied as score adjustments after arc and aesthetic hint adjustments.
 
-- **WHEN** a drum candidate is scored
-- **THEN** the pipeline SHALL compute an energy appropriateness score: 1.0 for exact energy match, 0.5 for one level away, 0.0 for two levels away
+#### Scenario: Low density reference boosts sparse drum patterns
+- **WHEN** `style_reference_profile.note_density` is 1.8
+- **AND** a sparse and a dense pattern are candidates
+- **THEN** the sparse pattern receives a higher score adjustment than the dense pattern
 
-#### Scenario: Chromatic scoring
-
-- **WHEN** a drum candidate is scored
-- **THEN** the pipeline SHALL convert the candidate to MIDI bytes and score with `Refractor.score()`
-- **AND** the concept embedding SHALL be computed once and reused across all candidates
-
-#### Scenario: Composite ranking
-
-- **WHEN** all candidates for a section are scored
-- **THEN** the pipeline SHALL compute a weighted composite score (default: 30% energy appropriateness, 70% chromatic)
-- **AND** rank candidates by composite score descending per section
-- **AND** present top-k candidates per section in the review file
+#### Scenario: Missing profile — no adjustment
+- **WHEN** no `style_reference_profile` is present in song_context
+- **THEN** drum scoring proceeds unchanged (existing behaviour)
 
 ### Requirement: Review File Generation
 
@@ -163,4 +148,36 @@ section (scaling all voices uniformly), with the drum velocity clamp (45–127) 
 - **WHEN** any dynamic curve is applied
 - **THEN** ghost notes (originally at velocity 45) are scaled proportionally but
   never rise above 65 (one-third of the dynamic range)
+
+### Requirement: Aesthetic Tag-Weighted Selection
+Pipeline phases SHALL read an optional `aesthetic_hints` dict from `song_context.yml`.
+When present, phases SHALL apply a score bonus of +0.1 to candidates whose pattern
+tags match the hints (keys: `density` — `sparse` | `moderate` | `dense`; `texture` —
+`hazy` | `clean` | `rhythmic`). A mis-matched density tag SHALL apply a penalty of
+−0.05. The Refractor chromatic score remains dominant; tag weighting is a soft prior.
+
+#### Scenario: Sparse density hint boosts sparse-tagged patterns
+- **WHEN** `aesthetic_hints.density == "sparse"` and a candidate uses a `sparse`-tagged pattern
+- **THEN** the candidate's composite score is increased by 0.1 relative to an untagged candidate
+
+#### Scenario: No aesthetic_hints — behaviour unchanged
+- **WHEN** `aesthetic_hints` is absent from song context
+- **THEN** selection behaviour is identical to the pre-tags baseline
+
+### Requirement: Drum Pipeline Evolve Flag
+The drum pipeline CLI SHALL accept `--evolve`, `--generations` (int, default 8), and
+`--population` (int, default 30) flags. When `--evolve` is passed, evolved drum
+candidates SHALL be merged into the standard candidate pool before scoring. Evolved
+candidates SHALL be written to `candidates/` with an `evolved_` filename prefix and
+their `id` field SHALL begin with `evolved_`.
+
+#### Scenario: --evolve flag merges candidates
+- **GIVEN** the drum pipeline is run with `--evolve`
+- **WHEN** candidate generation completes
+- **THEN** the candidate pool contains both hand-coded and evolved patterns
+
+#### Scenario: Evolved candidates use evolved_ prefix
+- **GIVEN** `--evolve` is passed
+- **WHEN** MIDI files are written
+- **THEN** at least one filename begins with `evolved_`
 

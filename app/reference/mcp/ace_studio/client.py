@@ -233,6 +233,27 @@ class AceStudioClient:
             return result.get("tracks", [])
         return result
 
+    def find_available_track(self) -> int:
+        """Return the index of the first track that has no clips.
+
+        Falls back to 0 with a logged warning when all tracks are occupied.
+        """
+        import logging
+
+        tracks = self.list_tracks()
+        if not tracks:
+            return 0
+        for idx, track in enumerate(tracks):
+            clips = (
+                track.get("clips") or track.get("clipCount") or track.get("clip_count")
+            )
+            if not clips:
+                return idx
+        logging.getLogger(__name__).warning(
+            "All %d ACE Studio track(s) have clips — defaulting to track 0", len(tracks)
+        )
+        return 0
+
     def find_singer(self, keyword: str, language: str = "English") -> list[dict]:
         """Search available sound sources by name keyword; returns list of singer dicts."""
         result = self._call(
@@ -310,6 +331,46 @@ class AceStudioClient:
         if offset is not None:
             kwargs["offset"] = offset
         return self._call("add_notes_in_editor", **kwargs)
+
+    def add_section_clips(
+        self,
+        sections: list[dict],
+        track_index: int,
+        language: str = "ENG",
+    ) -> list[dict]:
+        """Add one clip per section, each with notes and lyrics pre-loaded.
+
+        Each section dict:
+            name        — section label used as clip name
+            start_tick  — absolute start tick in ACE_TPB space
+            dur_ticks   — clip duration in ticks
+            notes       — list of {"pos": int, "pitch": int, "dur": int}
+                          (pos relative to clip start)
+            lyrics      — lyric sentence string for this section
+        Returns list of result dicts from add_clip / add_notes_with_lyrics.
+        """
+        results = []
+        for sec in sections:
+            name = sec.get("name", "")
+            start = sec["start_tick"]
+            dur = sec["dur_ticks"]
+            notes = sec.get("notes", [])
+            lyrics = sec.get("lyrics", "")
+
+            clip_result = self.add_clip(
+                track_index=track_index,
+                pos=start,
+                dur=dur,
+                name=name or None,
+            )
+            notes_result = {}
+            if notes and lyrics:
+                self.open_editor()
+                notes_result = self.add_notes_with_lyrics(
+                    notes, lyrics, language=language
+                )
+            results.append({"clip": clip_result, "notes": notes_result})
+        return results
 
     def get_clip_lyrics(self, track_index: int, clip_index: int) -> dict:
         """Return sentence-level lyrics for a Sing clip."""

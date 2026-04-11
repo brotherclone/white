@@ -87,3 +87,12 @@ include it in the returned dict as a list of strings (empty list if absent).
 - **AND** a clear error is raised for any path that does not exist or has no
   `chords/review.yml`
 
+### Requirement: Phase Status Sync in promote_part
+`promote_part.py` SHALL write `promoted` status back to `song_context.yml` after
+a successful promotion, so status stays in sync even when promote is called
+directly (without using the orchestrator).
+
+#### Scenario: Promote writes status to song_context
+- **WHEN** `promote_part` successfully promotes a candidate
+- **THEN** `song_context.yml` phases dict for that phase is set to `promoted`
+

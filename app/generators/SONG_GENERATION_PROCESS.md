@@ -209,6 +209,13 @@ Run this any time the Logic arrangement diverges from the generated plan. The `-
 
 Generates 3 lyric drafts via Claude API, scores each with Refractor (chromatic alignment). Writes `melody/lyrics_review.yml` + candidate `.txt` files.
 
+**Lyric repeat modes**: Sections that share a melody loop label are grouped automatically by `lyric_repeat_type`:
+- `exact` — lyrics written once and reused verbatim (chorus, refrain, hook). Only one `[label]` block appears in the output file; the arrangement drives repetition.
+- `variation` — each instance gets its own lines but shares rhyme scheme, meter, and core imagery (verse 2 vs. verse 1). Each block is suffixed `[label_2]`, `[label_3]`, …
+- `fresh` — each instance is written independently (bridge, outro, climax). Default.
+
+Auto-detection uses the section label: `chorus/refrain/hook` → `exact`; `verse/pre_chorus` → `variation`; everything else → `fresh`. Override per section in `production_plan.yml` under `lyric_repeat_type`.
+
 **Human step**: Read candidates, set `status: approved` on chosen draft in `lyrics_review.yml`, then promote.
 
 ```bash
