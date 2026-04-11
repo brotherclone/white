@@ -1,0 +1,740 @@
+production_dir: shrink_wrapped/all-frequencies-return-to-source-the-consciousness-archaeology-complete/production/chromatic_convergence_synthesis_v1
+pipeline: drum-generation
+bpm: 76
+time_sig: 4/4
+color: White
+genre_families:
+- electronic
+generated: '2026-04-09T11:46:27.206587+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- franklin
+- van_dyke
+- pensive_patty
+- taste_the_rainbow
+- main
+- sunday_in_the_snark
+candidates:
+- id: drum_franklin_01
+  midi_file: candidates/drum_franklin_01.mid
+  rank: 1
+  section: franklin
+  next_section: null
+  chord_source: chord_001
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4224
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4741
+        present: 0.2179
+        future: 0.308
+      spatial:
+        thing: 0.475
+        place: 0.307
+        person: 0.218
+      ontological:
+        imagined: 0.3344
+        forgotten: 0.2954
+        known: 0.3702
+      confidence: 0.0492
+      match: 0.1749
+  label: drums_franklin_pulse
+  status: approved
+  notes: ''
+- id: drum_franklin_02
+  midi_file: candidates/drum_franklin_02.mid
+  rank: 2
+  section: franklin
+  next_section: null
+  chord_source: chord_001
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.4223
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4734
+        present: 0.2181
+        future: 0.3084
+      spatial:
+        thing: 0.4743
+        place: 0.3075
+        person: 0.2182
+      ontological:
+        imagined: 0.3338
+        forgotten: 0.2959
+        known: 0.3703
+      confidence: 0.0479
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_franklin_03
+  midi_file: candidates/drum_franklin_03.mid
+  rank: 3
+  section: franklin
+  next_section: null
+  chord_source: chord_001
+  genre_family: electronic
+  pattern_name: electronic_four_on_floor
+  energy: high
+  scores:
+    composite: 0.2737
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2169
+        future: 0.306
+      spatial:
+        thing: 0.478
+        place: 0.305
+        person: 0.217
+      ontological:
+        imagined: 0.3373
+        forgotten: 0.2932
+        known: 0.3695
+      confidence: 0.0604
+      match: 0.1767
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_franklin_04
+  midi_file: candidates/drum_franklin_04.mid
+  rank: 4
+  section: franklin
+  next_section: null
+  chord_source: chord_001
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.272
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4724
+        present: 0.2186
+        future: 0.309
+      spatial:
+        thing: 0.4733
+        place: 0.308
+        person: 0.2187
+      ontological:
+        imagined: 0.3329
+        forgotten: 0.2966
+        known: 0.3705
+      confidence: 0.0456
+      match: 0.1743
+  label: drum_franklin_placeholder
+  status: approved
+  notes: ''
+- id: drum_van_dyke_01
+  midi_file: candidates/drum_van_dyke_01.mid
+  rank: 5
+  section: van_dyke
+  next_section: null
+  chord_source: chord_002
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4224
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4741
+        present: 0.2179
+        future: 0.308
+      spatial:
+        thing: 0.475
+        place: 0.307
+        person: 0.218
+      ontological:
+        imagined: 0.3344
+        forgotten: 0.2954
+        known: 0.3702
+      confidence: 0.0492
+      match: 0.1749
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_van_dyke_02
+  midi_file: candidates/drum_van_dyke_02.mid
+  rank: 6
+  section: van_dyke
+  next_section: null
+  chord_source: chord_002
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.4223
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4734
+        present: 0.2181
+        future: 0.3084
+      spatial:
+        thing: 0.4743
+        place: 0.3075
+        person: 0.2182
+      ontological:
+        imagined: 0.3338
+        forgotten: 0.2959
+        known: 0.3703
+      confidence: 0.0479
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_van_dyke_03
+  midi_file: candidates/drum_van_dyke_03.mid
+  rank: 7
+  section: van_dyke
+  next_section: null
+  chord_source: chord_002
+  genre_family: electronic
+  pattern_name: electronic_four_on_floor
+  energy: high
+  scores:
+    composite: 0.2737
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2169
+        future: 0.306
+      spatial:
+        thing: 0.478
+        place: 0.305
+        person: 0.217
+      ontological:
+        imagined: 0.3373
+        forgotten: 0.2932
+        known: 0.3695
+      confidence: 0.0604
+      match: 0.1767
+  label: drums_van_dyke
+  status: approved
+  notes: ''
+- id: drum_van_dyke_04
+  midi_file: candidates/drum_van_dyke_04.mid
+  rank: 8
+  section: van_dyke
+  next_section: null
+  chord_source: chord_002
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.272
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4724
+        present: 0.2186
+        future: 0.309
+      spatial:
+        thing: 0.4733
+        place: 0.308
+        person: 0.2187
+      ontological:
+        imagined: 0.3329
+        forgotten: 0.2966
+        known: 0.3705
+      confidence: 0.0456
+      match: 0.1743
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_pensive_patty_01
+  midi_file: candidates/drum_pensive_patty_01.mid
+  rank: 9
+  section: pensive_patty
+  next_section: null
+  chord_source: chord_004
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4224
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4741
+        present: 0.2179
+        future: 0.308
+      spatial:
+        thing: 0.475
+        place: 0.307
+        person: 0.218
+      ontological:
+        imagined: 0.3344
+        forgotten: 0.2954
+        known: 0.3702
+      confidence: 0.0492
+      match: 0.1749
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_pensive_patty_02
+  midi_file: candidates/drum_pensive_patty_02.mid
+  rank: 10
+  section: pensive_patty
+  next_section: null
+  chord_source: chord_004
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.4223
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4734
+        present: 0.2181
+        future: 0.3084
+      spatial:
+        thing: 0.4743
+        place: 0.3075
+        person: 0.2182
+      ontological:
+        imagined: 0.3338
+        forgotten: 0.2959
+        known: 0.3703
+      confidence: 0.0479
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_pensive_patty_03
+  midi_file: candidates/drum_pensive_patty_03.mid
+  rank: 11
+  section: pensive_patty
+  next_section: null
+  chord_source: chord_004
+  genre_family: electronic
+  pattern_name: electronic_four_on_floor
+  energy: high
+  scores:
+    composite: 0.2737
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2169
+        future: 0.306
+      spatial:
+        thing: 0.478
+        place: 0.305
+        person: 0.217
+      ontological:
+        imagined: 0.3373
+        forgotten: 0.2932
+        known: 0.3695
+      confidence: 0.0604
+      match: 0.1767
+  label: drum_pensive_patty
+  status: approved
+  notes: ''
+- id: drum_pensive_patty_04
+  midi_file: candidates/drum_pensive_patty_04.mid
+  rank: 12
+  section: pensive_patty
+  next_section: null
+  chord_source: chord_004
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.272
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4724
+        present: 0.2186
+        future: 0.309
+      spatial:
+        thing: 0.4733
+        place: 0.308
+        person: 0.2187
+      ontological:
+        imagined: 0.3329
+        forgotten: 0.2966
+        known: 0.3705
+      confidence: 0.0456
+      match: 0.1743
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_taste_the_rainbow_01
+  midi_file: candidates/drum_taste_the_rainbow_01.mid
+  rank: 13
+  section: taste_the_rainbow
+  next_section: null
+  chord_source: chord_005
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4224
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4741
+        present: 0.2179
+        future: 0.308
+      spatial:
+        thing: 0.475
+        place: 0.307
+        person: 0.218
+      ontological:
+        imagined: 0.3344
+        forgotten: 0.2954
+        known: 0.3702
+      confidence: 0.0492
+      match: 0.1749
+  label: drum_taste_the_rainbow
+  status: approved
+  notes: ''
+- id: drum_taste_the_rainbow_02
+  midi_file: candidates/drum_taste_the_rainbow_02.mid
+  rank: 14
+  section: taste_the_rainbow
+  next_section: null
+  chord_source: chord_005
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.4223
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4734
+        present: 0.2181
+        future: 0.3084
+      spatial:
+        thing: 0.4743
+        place: 0.3075
+        person: 0.2182
+      ontological:
+        imagined: 0.3338
+        forgotten: 0.2959
+        known: 0.3703
+      confidence: 0.0479
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_taste_the_rainbow_03
+  midi_file: candidates/drum_taste_the_rainbow_03.mid
+  rank: 15
+  section: taste_the_rainbow
+  next_section: null
+  chord_source: chord_005
+  genre_family: electronic
+  pattern_name: electronic_four_on_floor
+  energy: high
+  scores:
+    composite: 0.2737
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2169
+        future: 0.306
+      spatial:
+        thing: 0.478
+        place: 0.305
+        person: 0.217
+      ontological:
+        imagined: 0.3373
+        forgotten: 0.2932
+        known: 0.3695
+      confidence: 0.0604
+      match: 0.1767
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_taste_the_rainbow_04
+  midi_file: candidates/drum_taste_the_rainbow_04.mid
+  rank: 16
+  section: taste_the_rainbow
+  next_section: null
+  chord_source: chord_005
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.272
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4724
+        present: 0.2186
+        future: 0.309
+      spatial:
+        thing: 0.4733
+        place: 0.308
+        person: 0.2187
+      ontological:
+        imagined: 0.3329
+        forgotten: 0.2966
+        known: 0.3705
+      confidence: 0.0456
+      match: 0.1743
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_main_01
+  midi_file: candidates/drum_main_01.mid
+  rank: 17
+  section: main
+  next_section: null
+  chord_source: chord_006
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4224
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4741
+        present: 0.2179
+        future: 0.308
+      spatial:
+        thing: 0.475
+        place: 0.307
+        person: 0.218
+      ontological:
+        imagined: 0.3344
+        forgotten: 0.2954
+        known: 0.3702
+      confidence: 0.0492
+      match: 0.1749
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_main_02
+  midi_file: candidates/drum_main_02.mid
+  rank: 18
+  section: main
+  next_section: null
+  chord_source: chord_006
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.4223
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4734
+        present: 0.2181
+        future: 0.3084
+      spatial:
+        thing: 0.4743
+        place: 0.3075
+        person: 0.2182
+      ontological:
+        imagined: 0.3338
+        forgotten: 0.2959
+        known: 0.3703
+      confidence: 0.0479
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_main_03
+  midi_file: candidates/drum_main_03.mid
+  rank: 19
+  section: main
+  next_section: null
+  chord_source: chord_006
+  genre_family: electronic
+  pattern_name: electronic_four_on_floor
+  energy: high
+  scores:
+    composite: 0.2737
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2169
+        future: 0.306
+      spatial:
+        thing: 0.478
+        place: 0.305
+        person: 0.217
+      ontological:
+        imagined: 0.3373
+        forgotten: 0.2932
+        known: 0.3695
+      confidence: 0.0604
+      match: 0.1767
+  label: drum_main_disco
+  status: approved
+  notes: ''
+- id: drum_main_04
+  midi_file: candidates/drum_main_04.mid
+  rank: 20
+  section: main
+  next_section: null
+  chord_source: chord_006
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.272
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4724
+        present: 0.2186
+        future: 0.309
+      spatial:
+        thing: 0.4733
+        place: 0.308
+        person: 0.2187
+      ontological:
+        imagined: 0.3329
+        forgotten: 0.2966
+        known: 0.3705
+      confidence: 0.0456
+      match: 0.1743
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_sunday_in_the_snark_01
+  midi_file: candidates/drum_sunday_in_the_snark_01.mid
+  rank: 21
+  section: sunday_in_the_snark
+  next_section: null
+  chord_source: chord_010
+  genre_family: electronic
+  pattern_name: electronic_pulse
+  energy: medium
+  scores:
+    composite: 0.4224
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4741
+        present: 0.2179
+        future: 0.308
+      spatial:
+        thing: 0.475
+        place: 0.307
+        person: 0.218
+      ontological:
+        imagined: 0.3344
+        forgotten: 0.2954
+        known: 0.3702
+      confidence: 0.0492
+      match: 0.1749
+  label: drum_sunday_in_the_snark
+  status: approved
+  notes: ''
+- id: drum_sunday_in_the_snark_02
+  midi_file: candidates/drum_sunday_in_the_snark_02.mid
+  rank: 22
+  section: sunday_in_the_snark
+  next_section: null
+  chord_source: chord_010
+  genre_family: electronic
+  pattern_name: electronic_syncopated
+  energy: medium
+  scores:
+    composite: 0.4223
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4734
+        present: 0.2181
+        future: 0.3084
+      spatial:
+        thing: 0.4743
+        place: 0.3075
+        person: 0.2182
+      ontological:
+        imagined: 0.3338
+        forgotten: 0.2959
+        known: 0.3703
+      confidence: 0.0479
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_sunday_in_the_snark_03
+  midi_file: candidates/drum_sunday_in_the_snark_03.mid
+  rank: 23
+  section: sunday_in_the_snark
+  next_section: null
+  chord_source: chord_010
+  genre_family: electronic
+  pattern_name: electronic_four_on_floor
+  energy: high
+  scores:
+    composite: 0.2737
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2169
+        future: 0.306
+      spatial:
+        thing: 0.478
+        place: 0.305
+        person: 0.217
+      ontological:
+        imagined: 0.3373
+        forgotten: 0.2932
+        known: 0.3695
+      confidence: 0.0604
+      match: 0.1767
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_sunday_in_the_snark_04
+  midi_file: candidates/drum_sunday_in_the_snark_04.mid
+  rank: 24
+  section: sunday_in_the_snark
+  next_section: null
+  chord_source: chord_010
+  genre_family: electronic
+  pattern_name: electronic_minimal
+  energy: low
+  scores:
+    composite: 0.272
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4724
+        present: 0.2186
+        future: 0.309
+      spatial:
+        thing: 0.4733
+        place: 0.308
+        person: 0.2187
+      ontological:
+        imagined: 0.3329
+        forgotten: 0.2966
+        known: 0.3705
+      confidence: 0.0456
+      match: 0.1743
+  label: null
+  status: rejected
+  notes: ''

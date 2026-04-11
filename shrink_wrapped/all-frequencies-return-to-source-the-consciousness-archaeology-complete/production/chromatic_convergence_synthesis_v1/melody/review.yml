@@ -1,0 +1,1039 @@
+production_dir: shrink_wrapped/all-frequencies-return-to-source-the-consciousness-archaeology-complete/production/chromatic_convergence_synthesis_v1
+pipeline: melody-generation
+bpm: 76
+time_sig: 4/4
+color: White
+singer: Remez
+generated: '2026-04-09T11:59:42.760721+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+sections_found:
+- franklin
+- van_dyke
+- pensive_patty
+- taste_the_rainbow
+- main
+- sunday_in_the_snark
+candidates:
+- id: melody_franklin_01
+  midi_file: candidates/melody_franklin_01.mid
+  rank: 1
+  section: franklin
+  chord_source: chord_001
+  contour: conversational
+  pattern_name: conv_syncopated_med
+  energy: medium
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.4001
+    theory:
+      singability: 0.8494
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9278
+    chromatic:
+      temporal:
+        past: 0.4775
+        present: 0.2144
+        future: 0.3081
+      spatial:
+        thing: 0.4783
+        place: 0.3072
+        person: 0.2145
+      ontological:
+        imagined: 0.3321
+        forgotten: 0.2959
+        known: 0.3719
+      confidence: 0.0492
+      match: 0.1749
+  label: melody_franklin
+  status: approved
+  notes: ''
+- id: melody_franklin_02
+  midi_file: candidates/melody_franklin_02.mid
+  rank: 2
+  section: franklin
+  chord_source: chord_001
+  contour: conversational
+  pattern_name: conv_aside_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3996
+    theory:
+      singability: 0.8494
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9236
+    chromatic:
+      temporal:
+        past: 0.4765
+        present: 0.215
+        future: 0.3085
+      spatial:
+        thing: 0.4773
+        place: 0.3075
+        person: 0.2152
+      ontological:
+        imagined: 0.332
+        forgotten: 0.2963
+        known: 0.3717
+      confidence: 0.0483
+      match: 0.1747
+  label: melody_franklin_ablibby
+  status: approved
+  notes: ''
+- id: melody_franklin_03
+  midi_file: candidates/melody_franklin_03.mid
+  rank: 3
+  section: franklin
+  chord_source: chord_001
+  contour: dotted
+  pattern_name: dotted_inquiry_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.399
+    theory:
+      singability: 0.8533
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9132
+    chromatic:
+      temporal:
+        past: 0.4767
+        present: 0.2149
+        future: 0.3084
+      spatial:
+        thing: 0.4775
+        place: 0.3075
+        person: 0.215
+      ontological:
+        imagined: 0.3322
+        forgotten: 0.2962
+        known: 0.3716
+      confidence: 0.0485
+      match: 0.1747
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_franklin_04
+  midi_file: candidates/melody_franklin_04.mid
+  rank: 4
+  section: franklin
+  chord_source: chord_001
+  contour: haiku
+  pattern_name: haiku_leap_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3988
+    theory:
+      singability: 0.8493
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9167
+    chromatic:
+      temporal:
+        past: 0.4758
+        present: 0.2154
+        future: 0.3088
+      spatial:
+        thing: 0.4766
+        place: 0.3079
+        person: 0.2156
+      ontological:
+        imagined: 0.3321
+        forgotten: 0.2965
+        known: 0.3714
+      confidence: 0.0475
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_franklin_05
+  midi_file: candidates/melody_franklin_05.mid
+  rank: 5
+  section: franklin
+  chord_source: chord_001
+  contour: call_and_rest
+  pattern_name: call_rest_drive_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3932
+    theory:
+      singability: 0.8665
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8403
+    chromatic:
+      temporal:
+        past: 0.4782
+        present: 0.2139
+        future: 0.3079
+      spatial:
+        thing: 0.479
+        place: 0.3069
+        person: 0.2141
+      ontological:
+        imagined: 0.3317
+        forgotten: 0.296
+        known: 0.3723
+      confidence: 0.0505
+      match: 0.1751
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_van_dyke_01
+  midi_file: candidates/melody_van_dyke_01.mid
+  rank: 6
+  section: van_dyke
+  chord_source: chord_002
+  contour: call_and_rest
+  pattern_name: call_rest_drive_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3933
+    theory:
+      singability: 0.8682
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8403
+    chromatic:
+      temporal:
+        past: 0.4773
+        present: 0.2145
+        future: 0.3083
+      spatial:
+        thing: 0.4781
+        place: 0.3073
+        person: 0.2146
+      ontological:
+        imagined: 0.3319
+        forgotten: 0.2963
+        known: 0.3718
+      confidence: 0.0494
+      match: 0.1749
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_van_dyke_02
+  midi_file: candidates/melody_van_dyke_02.mid
+  rank: 7
+  section: van_dyke
+  chord_source: chord_002
+  contour: conversational
+  pattern_name: conv_animated_high
+  energy: high
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.3926
+    theory:
+      singability: 0.8534
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8472
+    chromatic:
+      temporal:
+        past: 0.4786
+        present: 0.2135
+        future: 0.3079
+      spatial:
+        thing: 0.4794
+        place: 0.3069
+        person: 0.2137
+      ontological:
+        imagined: 0.3323
+        forgotten: 0.2958
+        known: 0.3719
+      confidence: 0.0507
+      match: 0.1751
+  label: melody_van_dyke_conversational
+  status: approved
+  notes: ''
+- id: melody_van_dyke_03
+  midi_file: candidates/melody_van_dyke_03.mid
+  rank: 8
+  section: van_dyke
+  chord_source: chord_002
+  contour: haiku
+  pattern_name: haiku_intense_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3918
+    theory:
+      singability: 0.8493
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8444
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2146
+        future: 0.3083
+      spatial:
+        thing: 0.4779
+        place: 0.3074
+        person: 0.2147
+      ontological:
+        imagined: 0.332
+        forgotten: 0.2962
+        known: 0.3718
+      confidence: 0.049
+      match: 0.1748
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_van_dyke_04
+  midi_file: candidates/melody_van_dyke_04.mid
+  rank: 9
+  section: van_dyke
+  chord_source: chord_002
+  contour: dotted
+  pattern_name: dotted_stride_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.391
+    theory:
+      singability: 0.8573
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8278
+    chromatic:
+      temporal:
+        past: 0.4775
+        present: 0.2141
+        future: 0.3085
+      spatial:
+        thing: 0.4783
+        place: 0.3075
+        person: 0.2142
+      ontological:
+        imagined: 0.3324
+        forgotten: 0.2961
+        known: 0.3714
+      confidence: 0.05
+      match: 0.175
+  label: melody_van_dyke
+  status: approved
+  notes: ''
+- id: melody_van_dyke_05
+  midi_file: candidates/melody_van_dyke_05.mid
+  rank: 10
+  section: van_dyke
+  chord_source: chord_002
+  contour: declarative
+  pattern_name: decl_proclamation_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3906
+    theory:
+      singability: 0.8534
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8299
+    chromatic:
+      temporal:
+        past: 0.4759
+        present: 0.2152
+        future: 0.3089
+      spatial:
+        thing: 0.4768
+        place: 0.3079
+        person: 0.2153
+      ontological:
+        imagined: 0.3322
+        forgotten: 0.2964
+        known: 0.3714
+      confidence: 0.0479
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_pensive_patty_01
+  midi_file: candidates/melody_pensive_patty_01.mid
+  rank: 11
+  section: pensive_patty
+  chord_source: chord_004
+  contour: haiku
+  pattern_name: haiku_leap_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4159
+    theory:
+      singability: 0.9809
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9583
+    chromatic:
+      temporal:
+        past: 0.4743
+        present: 0.2166
+        future: 0.3091
+      spatial:
+        thing: 0.4751
+        place: 0.3082
+        person: 0.2167
+      ontological:
+        imagined: 0.3315
+        forgotten: 0.297
+        known: 0.3715
+      confidence: 0.0459
+      match: 0.1743
+  label: melody_pensive_patty_main
+  status: approved
+  notes: ''
+- id: melody_pensive_patty_02
+  midi_file: candidates/melody_pensive_patty_02.mid
+  rank: 12
+  section: pensive_patty
+  chord_source: chord_004
+  contour: conversational
+  pattern_name: conv_aside_med
+  energy: medium
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.4061
+    theory:
+      singability: 0.8728
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9653
+    chromatic:
+      temporal:
+        past: 0.4765
+        present: 0.215
+        future: 0.3085
+      spatial:
+        thing: 0.4773
+        place: 0.3075
+        person: 0.2151
+      ontological:
+        imagined: 0.3318
+        forgotten: 0.2964
+        known: 0.3718
+      confidence: 0.0482
+      match: 0.1747
+  label: melody_pensive_patty
+  status: approved
+  notes: ''
+- id: melody_pensive_patty_03
+  midi_file: candidates/melody_pensive_patty_03.mid
+  rank: 13
+  section: pensive_patty
+  chord_source: chord_004
+  contour: conversational
+  pattern_name: conv_syncopated_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4026
+    theory:
+      singability: 0.8333
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9694
+    chromatic:
+      temporal:
+        past: 0.4766
+        present: 0.215
+        future: 0.3084
+      spatial:
+        thing: 0.4774
+        place: 0.3075
+        person: 0.2151
+      ontological:
+        imagined: 0.3322
+        forgotten: 0.2962
+        known: 0.3716
+      confidence: 0.0484
+      match: 0.1747
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_pensive_patty_04
+  midi_file: candidates/melody_pensive_patty_04.mid
+  rank: 14
+  section: pensive_patty
+  chord_source: chord_004
+  contour: incantatory
+  pattern_name: incant_pulse_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3958
+    theory:
+      singability: 0.8355
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8986
+    chromatic:
+      temporal:
+        past: 0.4773
+        present: 0.2144
+        future: 0.3083
+      spatial:
+        thing: 0.4781
+        place: 0.3073
+        person: 0.2146
+      ontological:
+        imagined: 0.3321
+        forgotten: 0.2961
+        known: 0.3718
+      confidence: 0.0491
+      match: 0.1749
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_pensive_patty_05
+  midi_file: candidates/melody_pensive_patty_05.mid
+  rank: 15
+  section: pensive_patty
+  chord_source: chord_004
+  contour: dotted
+  pattern_name: dotted_surge_high
+  energy: high
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.3935
+    theory:
+      singability: 0.8654
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8444
+    chromatic:
+      temporal:
+        past: 0.4777
+        present: 0.2141
+        future: 0.3081
+      spatial:
+        thing: 0.4785
+        place: 0.3072
+        person: 0.2143
+      ontological:
+        imagined: 0.332
+        forgotten: 0.296
+        known: 0.372
+      confidence: 0.0498
+      match: 0.175
+  label: melody_pensive_patty_dotty
+  status: approved
+  notes: ''
+- id: melody_taste_the_rainbow_01
+  midi_file: candidates/melody_taste_the_rainbow_01.mid
+  rank: 16
+  section: taste_the_rainbow
+  chord_source: chord_005
+  contour: incantatory
+  pattern_name: incant_neighbor_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4031
+    theory:
+      singability: 0.8429
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9653
+    chromatic:
+      temporal:
+        past: 0.4766
+        present: 0.215
+        future: 0.3085
+      spatial:
+        thing: 0.4774
+        place: 0.3075
+        person: 0.2151
+      ontological:
+        imagined: 0.3316
+        forgotten: 0.2964
+        known: 0.372
+      confidence: 0.0481
+      match: 0.1747
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_taste_the_rainbow_02
+  midi_file: candidates/melody_taste_the_rainbow_02.mid
+  rank: 17
+  section: taste_the_rainbow
+  chord_source: chord_005
+  contour: dotted
+  pattern_name: dotted_lilt_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4025
+    theory:
+      singability: 0.8586
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9444
+    chromatic:
+      temporal:
+        past: 0.4763
+        present: 0.2151
+        future: 0.3086
+      spatial:
+        thing: 0.4771
+        place: 0.3077
+        person: 0.2152
+      ontological:
+        imagined: 0.3318
+        forgotten: 0.2964
+        known: 0.3718
+      confidence: 0.0477
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_taste_the_rainbow_03
+  midi_file: candidates/melody_taste_the_rainbow_03.mid
+  rank: 18
+  section: taste_the_rainbow
+  chord_source: chord_005
+  contour: haiku
+  pattern_name: haiku_intense_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.401
+    theory:
+      singability: 0.8584
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9278
+    chromatic:
+      temporal:
+        past: 0.4775
+        present: 0.2143
+        future: 0.3082
+      spatial:
+        thing: 0.4783
+        place: 0.3072
+        person: 0.2145
+      ontological:
+        imagined: 0.3315
+        forgotten: 0.2962
+        known: 0.3723
+      confidence: 0.0492
+      match: 0.1749
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_taste_the_rainbow_04
+  midi_file: candidates/melody_taste_the_rainbow_04.mid
+  rank: 19
+  section: taste_the_rainbow
+  chord_source: chord_005
+  contour: declarative
+  pattern_name: decl_cadence_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4008
+    theory:
+      singability: 0.841
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9444
+    chromatic:
+      temporal:
+        past: 0.476
+        present: 0.2153
+        future: 0.3087
+      spatial:
+        thing: 0.4768
+        place: 0.3077
+        person: 0.2154
+      ontological:
+        imagined: 0.3322
+        forgotten: 0.2964
+        known: 0.3714
+      confidence: 0.0476
+      match: 0.1746
+  label: melody_taste_the_rainbow
+  status: approved
+  notes: ''
+- id: melody_taste_the_rainbow_05
+  midi_file: candidates/melody_taste_the_rainbow_05.mid
+  rank: 20
+  section: taste_the_rainbow
+  chord_source: chord_005
+  contour: conversational
+  pattern_name: conv_murmur_low
+  energy: low
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.4007
+    theory:
+      singability: 0.839
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9444
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2145
+        future: 0.3084
+      spatial:
+        thing: 0.4779
+        place: 0.3075
+        person: 0.2146
+      ontological:
+        imagined: 0.332
+        forgotten: 0.2961
+        known: 0.3719
+      confidence: 0.0486
+      match: 0.1748
+  label: melody_taste_rainbow_bg
+  status: approved
+  notes: ''
+- id: melody_main_01
+  midi_file: candidates/melody_main_01.mid
+  rank: 21
+  section: main
+  chord_source: chord_006
+  contour: haiku
+  pattern_name: haiku_leap_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4121
+    theory:
+      singability: 0.9826
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9167
+    chromatic:
+      temporal:
+        past: 0.4756
+        present: 0.2157
+        future: 0.3087
+      spatial:
+        thing: 0.4764
+        place: 0.3078
+        person: 0.2158
+      ontological:
+        imagined: 0.3315
+        forgotten: 0.2967
+        known: 0.3719
+      confidence: 0.0471
+      match: 0.1745
+  label: melody_main
+  status: approved
+  notes: ''
+- id: melody_main_02
+  midi_file: candidates/melody_main_02.mid
+  rank: 22
+  section: main
+  chord_source: chord_006
+  contour: incantatory
+  pattern_name: incant_pulse_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3999
+    theory:
+      singability: 0.8511
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9236
+    chromatic:
+      temporal:
+        past: 0.4773
+        present: 0.2145
+        future: 0.3082
+      spatial:
+        thing: 0.4781
+        place: 0.3073
+        person: 0.2146
+      ontological:
+        imagined: 0.3317
+        forgotten: 0.2962
+        known: 0.3721
+      confidence: 0.0491
+      match: 0.1748
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_main_03
+  midi_file: candidates/melody_main_03.mid
+  rank: 23
+  section: main
+  chord_source: chord_006
+  contour: conversational
+  pattern_name: conv_syncopated_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3996
+    theory:
+      singability: 0.8463
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9278
+    chromatic:
+      temporal:
+        past: 0.4764
+        present: 0.2152
+        future: 0.3084
+      spatial:
+        thing: 0.4772
+        place: 0.3074
+        person: 0.2154
+      ontological:
+        imagined: 0.331
+        forgotten: 0.2966
+        known: 0.3724
+      confidence: 0.0477
+      match: 0.1746
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_main_04
+  midi_file: candidates/melody_main_04.mid
+  rank: 24
+  section: main
+  chord_source: chord_006
+  contour: conversational
+  pattern_name: conv_aside_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3991
+    theory:
+      singability: 0.8455
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9236
+    chromatic:
+      temporal:
+        past: 0.4762
+        present: 0.2153
+        future: 0.3085
+      spatial:
+        thing: 0.477
+        place: 0.3076
+        person: 0.2155
+      ontological:
+        imagined: 0.3311
+        forgotten: 0.2967
+        known: 0.3722
+      confidence: 0.0476
+      match: 0.1746
+  label: melody_main_banging
+  status: approved
+  notes: ''
+- id: melody_main_05
+  midi_file: candidates/melody_main_05.mid
+  rank: 25
+  section: main
+  chord_source: chord_006
+  contour: dotted
+  pattern_name: dotted_inquiry_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3991
+    theory:
+      singability: 0.8559
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9132
+    chromatic:
+      temporal:
+        past: 0.4757
+        present: 0.2155
+        future: 0.3087
+      spatial:
+        thing: 0.4765
+        place: 0.3078
+        person: 0.2157
+      ontological:
+        imagined: 0.3313
+        forgotten: 0.2967
+        known: 0.372
+      confidence: 0.0472
+      match: 0.1745
+  label: melody_main_inquiry
+  status: approved
+  notes: ''
+- id: melody_sunday_in_the_snark_01
+  midi_file: candidates/melody_sunday_in_the_snark_01.mid
+  rank: 26
+  section: sunday_in_the_snark
+  chord_source: chord_010
+  contour: dotted
+  pattern_name: dotted_lilt_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4126
+    theory:
+      singability: 0.9729
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9306
+    chromatic:
+      temporal:
+        past: 0.4766
+        present: 0.2148
+        future: 0.3085
+      spatial:
+        thing: 0.4774
+        place: 0.3076
+        person: 0.215
+      ontological:
+        imagined: 0.3323
+        forgotten: 0.2961
+        known: 0.3716
+      confidence: 0.0483
+      match: 0.1747
+  label: melody_sunday_in_the_snark
+  status: approved
+  notes: ''
+- id: melody_sunday_in_the_snark_02
+  midi_file: candidates/melody_sunday_in_the_snark_02.mid
+  rank: 27
+  section: sunday_in_the_snark
+  chord_source: chord_010
+  contour: call_and_rest
+  pattern_name: call_rest_drive_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4063
+    theory:
+      singability: 0.8713
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9653
+    chromatic:
+      temporal:
+        past: 0.4784
+        present: 0.2137
+        future: 0.3079
+      spatial:
+        thing: 0.4792
+        place: 0.307
+        person: 0.2139
+      ontological:
+        imagined: 0.3325
+        forgotten: 0.2959
+        known: 0.3717
+      confidence: 0.0512
+      match: 0.1752
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_sunday_in_the_snark_03
+  midi_file: candidates/melody_sunday_in_the_snark_03.mid
+  rank: 28
+  section: sunday_in_the_snark
+  chord_source: chord_010
+  contour: conversational
+  pattern_name: conv_animated_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4047
+    theory:
+      singability: 0.8492
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9722
+    chromatic:
+      temporal:
+        past: 0.4788
+        present: 0.2134
+        future: 0.3077
+      spatial:
+        thing: 0.4796
+        place: 0.3068
+        person: 0.2136
+      ontological:
+        imagined: 0.3323
+        forgotten: 0.2956
+        known: 0.372
+      confidence: 0.0508
+      match: 0.1751
+  label: melody_sunday_in_the_snark_alternate
+  status: approved
+  notes: ''
+- id: melody_sunday_in_the_snark_04
+  midi_file: candidates/melody_sunday_in_the_snark_04.mid
+  rank: 29
+  section: sunday_in_the_snark
+  chord_source: chord_010
+  contour: haiku
+  pattern_name: haiku_intense_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4039
+    theory:
+      singability: 0.8452
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9694
+    chromatic:
+      temporal:
+        past: 0.4779
+        present: 0.2141
+        future: 0.308
+      spatial:
+        thing: 0.4787
+        place: 0.307
+        person: 0.2143
+      ontological:
+        imagined: 0.3321
+        forgotten: 0.2959
+        known: 0.372
+      confidence: 0.0499
+      match: 0.175
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_sunday_in_the_snark_05
+  midi_file: candidates/melody_sunday_in_the_snark_05.mid
+  rank: 30
+  section: sunday_in_the_snark
+  chord_source: chord_010
+  contour: dotted
+  pattern_name: dotted_stride_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4026
+    theory:
+      singability: 0.8483
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9528
+    chromatic:
+      temporal:
+        past: 0.4771
+        present: 0.2144
+        future: 0.3084
+      spatial:
+        thing: 0.4779
+        place: 0.3075
+        person: 0.2146
+      ontological:
+        imagined: 0.3324
+        forgotten: 0.2962
+        known: 0.3714
+      confidence: 0.0496
+      match: 0.1749
+  label: null
+  status: rejected
+  notes: ''

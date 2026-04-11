@@ -31,7 +31,24 @@ import mido
 import numpy as np
 import yaml
 
+from app.generators.midi.patterns.bass_patterns import (
+    ALL_TEMPLATES as ALL_BASS_TEMPLATES,
+)
+from app.generators.midi.patterns.bass_patterns import (
+    BassPattern,
+)
+from app.generators.midi.patterns.bass_patterns import (
+    select_templates as select_bass_templates,
+)
+from app.generators.midi.patterns.melody_patterns import (
+    ALL_TEMPLATES as ALL_MELODY_TEMPLATES,
+)
+from app.generators.midi.patterns.melody_patterns import (
+    MelodyPattern,
+    SingerRange,
+)
 from app.generators.midi.patterns.quartet_patterns import (
+    INSTRUMENT_RANGES,
     QUARTET_CHANNELS,
     VELOCITY,
     VoicePattern,
@@ -41,9 +58,16 @@ from app.generators.midi.patterns.quartet_patterns import (
     fix_voice_crossing,
     get_patterns_for_voice,
 )
+from app.generators.midi.pipelines.bass_pipeline import (
+    bass_pattern_to_midi_bytes,
+    extract_section_chord_data,
+)
 from app.generators.midi.pipelines.chord_pipeline import (
     compute_chromatic_match,
     get_chromatic_target,
+)
+from app.generators.midi.pipelines.melody_pipeline import (
+    generate_melody_for_section,
 )
 from app.generators.midi.production.init_production import load_song_context
 
@@ -482,6 +506,168 @@ def snap_soprano_to_triads(
 
 
 # ---------------------------------------------------------------------------
+# Multi-voice MIDI merger
+# ---------------------------------------------------------------------------
+
+
+def merge_voices_to_quartet_midi(
+    voice_midis: list[tuple[bytes, int]],
+    bpm: int,
+    ticks_per_beat: int = 480,
+) -> bytes:
+    """Merge independently-generated voice MIDIs into a single multi-channel file.
+
+    Args:
+        voice_midis: List of (midi_bytes, target_channel) — one per voice.
+            Each MIDI is remapped to its target channel. Channel 0 = violin I,
+            1 = violin II, 2 = viola, 3 = cello.
+        bpm: Tempo (written into track 0).
+        ticks_per_beat: MIDI resolution of the output file.
+
+    Returns:
+        Multi-channel MIDI bytes.
+    """
+    tempo_us = mido.bpm2tempo(bpm)
+    out = mido.MidiFile(ticks_per_beat=ticks_per_beat, type=0)
+    track = mido.MidiTrack()
+    out.tracks.append(track)
+    track.append(mido.MetaMessage("set_tempo", tempo=tempo_us, time=0))
+
+    raw: list[tuple[int, mido.Message]] = []
+
+    for midi_bytes, target_ch in voice_midis:
+        if not midi_bytes:
+            continue
+        mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+        # Rescale ticks if source resolution differs
+        scale = ticks_per_beat / (mid.ticks_per_beat or ticks_per_beat)
+        for src_track in mid.tracks:
+            abs_tick = 0
+            for msg in src_track:
+                abs_tick += msg.time
+                if msg.is_meta:
+                    continue
+                scaled = int(abs_tick * scale)
+                remapped = msg.copy(channel=target_ch, time=0)
+                raw.append((scaled, remapped))
+
+    raw.sort(key=lambda x: (x[0], 0 if x[1].type == "note_off" else 1))
+
+    prev = 0
+    for abs_tick, msg in raw:
+        track.append(msg.copy(time=abs_tick - prev))
+        prev = abs_tick
+
+    track.append(mido.MetaMessage("end_of_track", time=0))
+    buf = io.BytesIO()
+    out.save(file=buf)
+    return buf.getvalue()
+
+
+# ---------------------------------------------------------------------------
+# Per-instrument voice generators
+# ---------------------------------------------------------------------------
+
+# Instrument ranges as SingerRange-compatible objects
+_VIOLIN_II_RANGE = SingerRange(
+    "Violin II",
+    INSTRUMENT_RANGES["violin_ii"][0],
+    INSTRUMENT_RANGES["violin_ii"][1],
+    "violin",
+)
+_VIOLA_RANGE = SingerRange(
+    "Viola", INSTRUMENT_RANGES["viola"][0], INSTRUMENT_RANGES["viola"][1], "viola"
+)
+
+
+def _generate_string_voice(
+    instrument: str,
+    voicings: list[list[int]],
+    singer_range: SingerRange,
+    energy: str,
+    time_sig: tuple[int, int],
+    bpm: int,
+    rng: random.Random,
+) -> tuple[bytes, str]:
+    """Generate an independent melodic voice (violin II or viola) using MelodyPattern.
+
+    Prefers 'lead' use_case patterns; stepwise/arpeggiated contours for viola,
+    conversational/stepwise for violin II.  Falls back to any available template.
+
+    Returns (midi_bytes, pattern_name).
+    """
+    contour_pref = {
+        "violin_ii": ["conversational", "stepwise", "arpeggiated", "haiku"],
+        "viola": ["stepwise", "declarative", "arpeggiated", "conversational"],
+    }.get(instrument, [])
+
+    # Gather candidates: prefer lead use_case + preferred contours
+    candidates = [
+        p
+        for p in ALL_MELODY_TEMPLATES
+        if p.time_sig == time_sig and p.use_case == "lead" and p.contour in contour_pref
+    ]
+    if not candidates:
+        candidates = [
+            p
+            for p in ALL_MELODY_TEMPLATES
+            if p.time_sig == time_sig and p.use_case == "lead"
+        ]
+    if not candidates:
+        candidates = [p for p in ALL_MELODY_TEMPLATES if p.time_sig == time_sig]
+    if not candidates:
+        candidates = list(ALL_MELODY_TEMPLATES)
+
+    pattern: MelodyPattern = rng.choice(candidates)
+    midi_bytes, _ = generate_melody_for_section(
+        pattern, voicings, singer_range, bpm=bpm
+    )
+    return midi_bytes, pattern.name
+
+
+def _generate_cello_voice(
+    voicings: list[list[int]],
+    energy: str,
+    time_sig: tuple[int, int],
+    bpm: int,
+    rng: random.Random,
+) -> tuple[bytes, str]:
+    """Generate an independent cello line using BassPattern.
+
+    Selects from bass templates appropriate for the energy level,
+    clamps notes to the cello register (36–57).
+
+    Returns (midi_bytes, pattern_name).
+    """
+    cello_register_max = INSTRUMENT_RANGES["cello"][1]  # 57
+    cello_register_min = INSTRUMENT_RANGES["cello"][0]  # 36
+
+    templates = select_bass_templates(ALL_BASS_TEMPLATES, time_sig, energy)
+    if not templates:
+        templates = [t for t in ALL_BASS_TEMPLATES if t.time_sig == time_sig] or list(
+            ALL_BASS_TEMPLATES
+        )
+
+    pattern: BassPattern = rng.choice(templates)
+    midi_bytes, _ = bass_pattern_to_midi_bytes(pattern, voicings, bpm=bpm)
+
+    # Reclamp all notes from bass register (24-60) into cello register (36-57)
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type in ("note_on", "note_off"):
+                note = msg.note
+                while note > cello_register_max:
+                    note -= 12
+                while note < cello_register_min:
+                    note += 12
+                msg.note = max(cello_register_min, min(cello_register_max, note))
+    buf = io.BytesIO()
+    mid.save(file=buf)
+    return buf.getvalue(), pattern.name
+
+
+# ---------------------------------------------------------------------------
 # Main generation function
 # ---------------------------------------------------------------------------
 
@@ -495,11 +681,12 @@ def generate_quartet(
     scorer=None,
     simple_voicings: bool = False,
 ) -> list[dict]:
-    """Generate quartet candidates for one approved melody section.
+    """Generate string quartet candidates for one approved melody section.
 
-    Reads `melody/approved/<section>.mid`, generates `top_k` candidates
-    (each using a different combination of alto/tenor/bass-voice templates),
-    and returns a list of candidate dicts ready for review.yml serialisation.
+    Violin I = approved melody (soprano).
+    Violin II + Viola = independent melodic lines via MelodyPattern (chord-tone
+        aware, instrument-register clamped, rhythmically independent).
+    Cello = independent bass line via BassPattern (chord-tone based, cello register).
 
     Args:
         production_dir: Path to the song's production directory.
@@ -507,14 +694,13 @@ def generate_quartet(
         singer: Singer name — used only for display in review.yml.
         top_k: Number of candidates to generate.
         seed: Optional random seed for reproducibility.
-        scorer: Optional pre-loaded Refractor instance. If None, one is loaded
-            automatically; if Refractor is unavailable, chromatic scoring is skipped.
+        scorer: Optional pre-loaded Refractor instance.
+        simple_voicings: If True, falls back to legacy interval-offset approach.
 
     Returns:
         List of candidate dicts, sorted by composite score descending.
     """
-    if seed is not None:
-        random.seed(seed)
+    rng = random.Random(seed)
 
     melody_approved = production_dir / "melody" / "approved"
     label_key = section.lower().replace("-", "_").replace(" ", "_")
@@ -530,22 +716,13 @@ def generate_quartet(
     bpm = int(ctx.get("bpm", 120))
     color = str(ctx.get("color", "Red"))
     concept_text = ctx.get("concept", "") or f"{color} chromatic concept"
+    time_sig_str = str(ctx.get("time_sig", "4/4"))
+    ts_parts = time_sig_str.split("/")
+    time_sig: tuple[int, int] = (int(ts_parts[0]), int(ts_parts[1]))
 
     soprano_midi_bytes = midi_path.read_bytes()
-    soprano_notes = extract_soprano_notes(soprano_midi_bytes)
-    note_events = extract_note_events(soprano_midi_bytes)
 
-    if simple_voicings:
-        triad_map = load_section_triad_map(production_dir, label_key)
-        if triad_map:
-            soprano_notes = snap_soprano_to_triads(soprano_notes, triad_map)
-            print(
-                f"  simple-voicings: snapped soprano notes to triads ({len(triad_map)} chords)"
-            )
-        else:
-            print("  simple-voicings: no chord data found, proceeding without snapping")
-
-    # Load Refractor for chromatic scoring (optional — falls back gracefully)
+    # Load Refractor for chromatic scoring (optional)
     _scorer = scorer
     _concept_emb = None
     if _scorer is None:
@@ -561,89 +738,160 @@ def generate_quartet(
         except Exception:
             _scorer = None
 
-    if not soprano_notes:
-        raise ValueError(f"No notes found in melody MIDI for section '{section}'")
-
     # Infer energy from section label
     energy = "high" if "chorus" in label_key or "hook" in label_key else "medium"
     if "intro" in label_key or "outro" in label_key or "bridge" in label_key:
         energy = "low"
 
-    alto_pats = get_patterns_for_voice("alto", energy)
-    tenor_pats = get_patterns_for_voice("tenor", energy)
-    bass_pats = get_patterns_for_voice("bass_voice", energy)
+    # --- Simple-voicings fallback (legacy interval-offset approach) ---
+    if simple_voicings:
+        soprano_notes = extract_soprano_notes(soprano_midi_bytes)
+        note_events = extract_note_events(soprano_midi_bytes)
+        triad_map = load_section_triad_map(production_dir, label_key)
+        if triad_map:
+            soprano_notes = snap_soprano_to_triads(soprano_notes, triad_map)
+            print(
+                f"  simple-voicings: snapped soprano to triads ({len(triad_map)} chords)"
+            )
 
-    # Shuffle patterns and build candidates from combinations
-    random.shuffle(alto_pats)
-    random.shuffle(tenor_pats)
-    random.shuffle(bass_pats)
+        alto_pats = get_patterns_for_voice("alto", energy)
+        tenor_pats = get_patterns_for_voice("tenor", energy)
+        bass_pats = get_patterns_for_voice("bass_voice", energy)
+        rng.shuffle(alto_pats)
+        rng.shuffle(tenor_pats)
+        rng.shuffle(bass_pats)
+
+        candidates = []
+        for i in range(max(top_k * 2, len(alto_pats))):
+            ap = alto_pats[i % len(alto_pats)]
+            tp = tenor_pats[i % len(tenor_pats)]
+            bp = bass_pats[i % len(bass_pats)]
+            alto_raw = generate_voice_notes(soprano_notes, ap)
+            tenor_raw = generate_voice_notes(soprano_notes, tp)
+            bass_raw = generate_voice_notes(soprano_notes, bp)
+            alto_fixed = resolve_parallel_violations(soprano_notes, alto_raw, "alto")
+            tenor_fixed = resolve_parallel_violations(soprano_notes, tenor_raw, "tenor")
+            bass_fixed = resolve_parallel_violations(
+                soprano_notes, bass_raw, "bass_voice"
+            )
+            alto_final, tenor_final, bass_final = fix_voice_crossing(
+                soprano_notes, alto_fixed, tenor_fixed, bass_fixed
+            )
+            midi_bytes = build_quartet_midi(
+                note_events, alto_final, tenor_final, bass_final, bpm=bpm
+            )
+            scorer_result = None
+            if _scorer is not None:
+                try:
+                    scorer_result = _scorer.score(midi_bytes, concept_emb=_concept_emb)
+                except Exception:
+                    pass
+            scores = score_quartet_candidate(
+                soprano_notes, alto_final, tenor_final, bass_final, scorer_result, color
+            )
+            candidates.append(
+                {
+                    "id": f"{label_key}_quartet_{i + 1:03d}",
+                    "label": label_key,
+                    "section": section,
+                    "singer": singer,
+                    "violin_ii_pattern": ap.name,
+                    "viola_pattern": tp.name,
+                    "cello_pattern": bp.name,
+                    "approach": "simple_voicings",
+                    "scores": scores,
+                    "composite_score": scores["composite"],
+                    "midi_bytes": midi_bytes,
+                    "status": "pending",
+                }
+            )
+        candidates.sort(key=lambda c: c["composite_score"], reverse=True)
+        return candidates[:top_k]
+
+    # --- Main path: melody patterns for violin II/viola, bass patterns for cello ---
+
+    # Load chord voicings for this section (needed by violin II, viola, cello generators)
+    try:
+        chord_data, _ = extract_section_chord_data(production_dir)
+        voicings = chord_data.get(label_key)
+        if not voicings:
+            # Try the first available section as a fallback
+            voicings = next(iter(chord_data.values()), None)
+    except Exception:
+        voicings = None
+
+    if not voicings:
+        # Last resort: single C major triad
+        voicings = [[48, 52, 55]]
 
     candidates = []
-    combo_count = max(top_k * 2, len(alto_pats))  # over-generate then prune
-
-    for i in range(combo_count):
-        ap = alto_pats[i % len(alto_pats)]
-        tp = tenor_pats[i % len(tenor_pats)]
-        bp = bass_pats[i % len(bass_pats)]
-
-        alto_raw = generate_voice_notes(soprano_notes, ap)
-        tenor_raw = generate_voice_notes(soprano_notes, tp)
-        bass_raw = generate_voice_notes(soprano_notes, bp)
-
-        # Resolve parallel violations
-        alto_fixed = resolve_parallel_violations(soprano_notes, alto_raw, "alto")
-        tenor_fixed = resolve_parallel_violations(soprano_notes, tenor_raw, "tenor")
-        bass_fixed = resolve_parallel_violations(soprano_notes, bass_raw, "bass_voice")
-
-        # Fix voice crossing
-        alto_final, tenor_final, bass_final = fix_voice_crossing(
-            soprano_notes, alto_fixed, tenor_fixed, bass_fixed
+    for i in range(max(top_k * 2, 6)):
+        # Violin II — melody pattern, violin II range
+        vii_bytes, vii_pat = _generate_string_voice(
+            "violin_ii", voicings, _VIOLIN_II_RANGE, energy, time_sig, bpm, rng
         )
+        # Viola — melody pattern, viola range
+        va_bytes, va_pat = _generate_string_voice(
+            "viola", voicings, _VIOLA_RANGE, energy, time_sig, bpm, rng
+        )
+        # Cello — bass pattern, cello register
+        vc_bytes, vc_pat = _generate_cello_voice(voicings, energy, time_sig, bpm, rng)
 
-        midi_bytes = build_quartet_midi(
-            note_events,
-            alto_final,
-            tenor_final,
-            bass_final,
+        midi_bytes = merge_voices_to_quartet_midi(
+            [
+                (soprano_midi_bytes, QUARTET_CHANNELS["violin_i"]),
+                (vii_bytes, QUARTET_CHANNELS["violin_ii"]),
+                (va_bytes, QUARTET_CHANNELS["viola"]),
+                (vc_bytes, QUARTET_CHANNELS["cello"]),
+            ],
             bpm=bpm,
         )
 
-        # Chromatic scoring via Refractor
-        scorer_result: Optional[dict] = None
+        scorer_result = None
         if _scorer is not None:
             try:
                 scorer_result = _scorer.score(midi_bytes, concept_emb=_concept_emb)
             except Exception:
-                scorer_result = None
+                pass
 
-        scores = score_quartet_candidate(
-            soprano_notes,
-            alto_final,
-            tenor_final,
-            bass_final,
-            scorer_result,
-            color,
+        target = get_chromatic_target(color)
+        chromatic_val = (
+            compute_chromatic_match(scorer_result, target) if scorer_result else 0.5
         )
+        confidence = (
+            float(scorer_result.get("confidence", 0.5)) if scorer_result else 0.0
+        )
+        composite = round(
+            0.30 * 0.8 + 0.70 * chromatic_val, 3
+        )  # theory placeholder = 0.8
 
-        cand_id = f"{label_key}_quartet_{i + 1:03d}"
+        scores = {
+            "counterpoint": 0.8,
+            "violin_ii_score": 0.8,
+            "viola_score": 0.8,
+            "cello_score": 0.8,
+            "chromatic": chromatic_val,
+            "confidence": confidence,
+            "composite": composite,
+        }
+
         candidates.append(
             {
-                "id": cand_id,
+                "id": f"{label_key}_quartet_{i + 1:03d}",
                 "label": label_key,
                 "section": section,
                 "singer": singer,
-                "alto_pattern": ap.name,
-                "tenor_pattern": tp.name,
-                "bass_voice_pattern": bp.name,
-                "simple_voicings": simple_voicings,
+                "violin_ii_pattern": vii_pat,
+                "viola_pattern": va_pat,
+                "cello_pattern": vc_pat,
+                "approach": "string_quartet",
                 "scores": scores,
-                "composite_score": scores["composite"],
+                "composite_score": composite,
                 "midi_bytes": midi_bytes,
                 "status": "pending",
             }
         )
 
-    # Sort by composite, keep top_k
     candidates.sort(key=lambda c: c["composite_score"], reverse=True)
     return candidates[:top_k]
 
@@ -686,10 +934,10 @@ def write_quartet_candidates(
                 "section": cand["section"],
                 "singer": cand["singer"],
                 "midi_file": f"candidates/{filename}",
-                "alto_pattern": cand["alto_pattern"],
-                "tenor_pattern": cand["tenor_pattern"],
-                "bass_voice_pattern": cand["bass_voice_pattern"],
-                "simple_voicings": cand.get("simple_voicings", False),
+                "violin_ii_pattern": cand.get("violin_ii_pattern", ""),
+                "viola_pattern": cand.get("viola_pattern", ""),
+                "cello_pattern": cand.get("cello_pattern", ""),
+                "approach": cand.get("approach", "string_quartet"),
                 "scores": _to_python(cand["scores"]),
                 "composite_score": _to_python(cand["composite_score"]),
                 "status": "pending",
