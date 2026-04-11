@@ -305,15 +305,9 @@ def save_plan(plan: ProductionPlan, production_dir: Path) -> Path:
                 "notes": s.notes,
                 **({"reason": s.reason} if s.reason else {}),
                 **(
-                    {
-                        "lyric_repeat_type": (
-                            s.lyric_repeat_type.value
-                            if isinstance(s.lyric_repeat_type, LyricRepeatType)
-                            else str(s.lyric_repeat_type)
-                        )
-                    }
-                    if s.lyric_repeat_type
-                    and s.lyric_repeat_type != LyricRepeatType.FRESH
+                    {"lyric_repeat_type": _lrt.value}
+                    if (_lrt := _normalize_repeat_type(s.lyric_repeat_type))
+                    != LyricRepeatType.FRESH
                     else {}
                 ),
                 **({"loops": s.loops} if s.loops else {}),

@@ -41,8 +41,8 @@ from app.structures.music.style_profile import StyleProfile
 
 log = logging.getLogger(__name__)
 
-# Default style_references directory (alongside the project root)
-DEFAULT_STYLE_REFS_DIR = Path(__file__).parents[4] / "style_references"
+# Default style_references directory at the project root
+DEFAULT_STYLE_REFS_DIR = Path(__file__).parents[3] / "style_references"
 
 
 # ---------------------------------------------------------------------------

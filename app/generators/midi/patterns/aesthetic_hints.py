@@ -60,8 +60,8 @@ def aesthetic_tag_adjustment(
 ) -> float:
     """Return a composite score adjustment for a pattern given aesthetic hints.
 
-    Returns a float in range [-0.05, +0.10]. Returns 0.0 when hints are absent
-    or the pattern has no relevant tags.
+    Returns a float in range [-0.05, +0.15] (density: up to +0.10; texture: up to +0.05).
+    Returns 0.0 when hints are absent or the pattern has no relevant tags.
     """
     if not aesthetic_hints or not pattern_tags:
         return 0.0

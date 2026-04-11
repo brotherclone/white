@@ -358,16 +358,18 @@ def find_ace_render(production_dir: Path) -> Optional[Path]:
     if already.exists():
         return already
 
-    for folder in sorted(production_dir.glob("VocalSynthv*/"), reverse=True):
-        if not folder.is_dir():
-            continue
-        wavs = list(folder.glob("*.wav"))
-        if wavs:
-            return wavs[0]
+    candidates: list[Path] = []
 
-    direct = sorted(production_dir.glob("VocalSynth*.wav"), reverse=True)
-    if direct:
-        return direct[0]
+    for folder in production_dir.glob("VocalSynthv*/"):
+        if folder.is_dir():
+            candidates.extend(wav for wav in folder.glob("*.wav") if wav.is_file())
+
+    candidates.extend(
+        wav for wav in production_dir.glob("VocalSynth*.wav") if wav.is_file()
+    )
+
+    if candidates:
+        return max(candidates, key=lambda wav: wav.stat().st_mtime)
 
     return None
 

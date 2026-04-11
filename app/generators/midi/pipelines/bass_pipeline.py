@@ -830,13 +830,12 @@ def run_bass_pipeline(
             )
             comp *= diversity_factor(cand["pattern_name"], _diversity_registry)
             _label_key = label.lower().replace("-", "_").replace(" ", "_")
-            _arc = _arc_by_label.get(_label_key, 0.0)
             _tmpl_tags = getattr(cand["template"], "tags", [])
-            tag_adj = (
-                aesthetic_tag_adjustment(_tmpl_tags, aesthetic_hints)
-                + arc_tag_adjustment(_arc, _tmpl_tags)
-                + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "bass")
-            )
+            tag_adj = aesthetic_tag_adjustment(
+                _tmpl_tags, aesthetic_hints
+            ) + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "bass")
+            if _label_key in _arc_by_label:
+                tag_adj += arc_tag_adjustment(_arc_by_label[_label_key], _tmpl_tags)
             if _narrative:
                 _nc = extract_constraints(label, _narrative)
                 tag_adj += _narr_adj(_nc, _tmpl_tags, "bass")

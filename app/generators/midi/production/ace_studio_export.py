@@ -185,20 +185,24 @@ def partition_notes_by_section(
     sections: list[dict],
     bpm: float,
     tpb: int = ACE_TPB,
+    time_signature: tuple[int, int] = (4, 4),
 ) -> list[dict]:
     """Split a flat note list into per-section chunks for section-aware export.
 
     Each section dict must have: name, bars, play_count (optional, default 1).
+    Section boundaries are derived from bars × time_signature, not from bpm.
     Returns list of section dicts enriched with:
         start_tick, dur_ticks, notes (pos relative to section start), lyrics.
     lyrics is populated later by the caller.
     """
+    numerator, denominator = time_signature
+    beats_per_bar = numerator * 4 / denominator
     result = []
     cursor = 0
     for sec in sections:
         bars = int(sec.get("bars", 4))
         play_count = int(sec.get("play_count", 1))
-        sec_ticks = bars * tpb * 4 * play_count
+        sec_ticks = int(bars * tpb * beats_per_bar * play_count)
         end_tick = cursor + sec_ticks
 
         sec_notes = [

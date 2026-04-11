@@ -50,7 +50,6 @@ _AMBIENT_CLUSTER: set[str] = {
     "portishead",
     "mazzy star",
     "cigarettes after sex",
-    "cigarettes after sex",
     "chelsea wolfe",
     "daughter",
 }
@@ -220,21 +219,33 @@ def _write_song_context(
     aesthetic_hints = _detect_aesthetic_hints(sounds_like)
 
     # Style reference profile — extract from local MIDI files if available
-    from app.generators.midi.style_reference import (
+    import logging as _logging
+
+    from app.generators.midi.style_reference import (  # circular import
         aggregate_profiles,
         load_or_extract_profile,
     )
 
     _style_profiles = []
+    _missing_style_refs = []
     for _artist in sounds_like:
         _prof = load_or_extract_profile(_artist)
         if _prof is not None:
             _style_profiles.append(_prof)
         else:
-            import logging as _logging
+            _missing_style_refs.append(_artist)
 
-            _logging.getLogger(__name__).debug(
-                "No style reference MIDI for %r — skipping", _artist
+    if _missing_style_refs:
+        _log = _logging.getLogger(__name__)
+        if _style_profiles:
+            _log.warning(
+                "No style reference MIDI for %s — proceeding with partial coverage",
+                ", ".join(repr(a) for a in _missing_style_refs),
+            )
+        else:
+            _log.debug(
+                "No style reference MIDI for any artist (%s) — skipping profile",
+                ", ".join(repr(a) for a in _missing_style_refs),
             )
     _style_ref_profile = aggregate_profiles(_style_profiles)
 

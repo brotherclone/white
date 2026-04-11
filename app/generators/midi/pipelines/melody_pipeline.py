@@ -822,13 +822,12 @@ def run_melody_pipeline(
                 _first_note, preceding_last_note, continuity_semitones
             )
             _label_key = label.lower().replace("-", "_").replace(" ", "_")
-            _arc = _arc_by_label.get(_label_key, 0.0)
             _tmpl_tags = getattr(cand["template"], "tags", [])
-            tag_adj = (
-                aesthetic_tag_adjustment(_tmpl_tags, aesthetic_hints)
-                + arc_tag_adjustment(_arc, _tmpl_tags)
-                + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "melody")
-            )
+            tag_adj = aesthetic_tag_adjustment(
+                _tmpl_tags, aesthetic_hints
+            ) + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "melody")
+            if _label_key in _arc_by_label:
+                tag_adj += arc_tag_adjustment(_arc_by_label[_label_key], _tmpl_tags)
             if _sec_nc:
                 tag_adj += _narr_adj(_sec_nc, _tmpl_tags, "melody")
             comp = round(comp + tag_adj, 4)
