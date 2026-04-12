@@ -383,5 +383,68 @@ def test_process_black_agent_work_sets_analysis_and_ready_for_red(
         assert result.transformation_traces[0].agent_name == "black"
 
 
+def _make_proposal(**kwargs) -> SongProposalIteration:
+    defaults = dict(
+        iteration_id="test_proposal_v1",
+        bpm=120,
+        key="C major",
+        rainbow_color="R",
+        title="Test Song",
+        mood=["melancholic"],
+        genres=["ambient"],
+        concept="A test concept that is long enough to pass the minimum length validator for the concept field.",
+    )
+    defaults.update(kwargs)
+    return SongProposalIteration(**defaults)
+
+
+def test_save_all_proposals_only_writes_final(white_agent, tmp_path, monkeypatch):
+    """Only is_final=True iterations produce standalone song_proposal_*.yml files."""
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+
+    intermediate = _make_proposal(iteration_id="intermediate_v1", is_final=False)
+    final = _make_proposal(iteration_id="final_v2", is_final=True)
+
+    state = MainAgentState(
+        thread_id="tid_final_test",
+        song_proposals=SongProposal(iterations=[intermediate, final]),
+    )
+    white_agent.save_all_proposals(state)
+
+    yml_dir = tmp_path / "tid_final_test" / "yml"
+    standalone = list(yml_dir.glob("song_proposal_*.yml"))
+    assert len(standalone) == 1
+    assert "final_v2" in standalone[0].name
+
+    all_bundle = yml_dir / "all_song_proposals_tid_final_test.yml"
+    assert all_bundle.exists()
+    import yaml as _yaml
+
+    with open(all_bundle) as f:
+        bundle = _yaml.safe_load(f)
+    assert len(bundle["iterations"]) == 2
+
+
+def test_save_all_proposals_single_iteration_implicit_final(
+    white_agent, tmp_path, monkeypatch
+):
+    """A single unmarked iteration is treated as implicitly final."""
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+
+    solo = _make_proposal(iteration_id="solo_v1", is_final=False)
+    state = MainAgentState(
+        thread_id="tid_solo_test",
+        song_proposals=SongProposal(iterations=[solo]),
+    )
+    white_agent.save_all_proposals(state)
+
+    yml_dir = tmp_path / "tid_solo_test" / "yml"
+    standalone = list(yml_dir.glob("song_proposal_*.yml"))
+    assert len(standalone) == 1
+    assert "solo_v1" in standalone[0].name
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
