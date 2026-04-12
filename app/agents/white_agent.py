@@ -3952,7 +3952,14 @@ The song should be buildable from these specifications.
                 raise Exception(error_msg)
             return
 
-        for i, iteration in enumerate(state.song_proposals.iterations):
+        # For agents that produce exactly one iteration, treat it as implicitly final
+        iterations = state.song_proposals.iterations
+        if len(iterations) == 1 and not iterations[0].is_final:
+            iterations[0].is_final = True
+
+        for i, iteration in enumerate(iterations):
+            if not iteration.is_final:
+                continue
             yaml_path = (
                 yaml_dir
                 / f"song_proposal_{iteration.rainbow_color}_{iteration.iteration_id}.yml"

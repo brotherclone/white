@@ -174,7 +174,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     )
                     character_one = PulsarPalaceCharacter(**data_one)
                     character_one.create_portrait()
-                    character_one.create_character_sheet()
+                    if os.getenv("WHITE_WITH_HTML", "false").lower() == "true":
+                        character_one.create_character_sheet()
                     state.characters.append(character_one)
                 with open(
                     f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_two_mock.yml",
@@ -187,7 +188,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     )
                     character_two = PulsarPalaceCharacter(**data_two)
                     character_two.create_portrait()
-                    character_two.create_character_sheet()
+                    if os.getenv("WHITE_WITH_HTML", "false").lower() == "true":
+                        character_two.create_character_sheet()
                     state.characters.append(character_two)
                 get_state_snapshot(
                     state, "generate_characters_exit", state.thread_id, "Lord Pulsimore"
@@ -205,7 +207,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     thread_id=state.thread_id, encounter_id=f"encounter_{i}"
                 )
                 char.create_portrait()
-                char.create_character_sheet()
+                if os.getenv("WHITE_WITH_HTML", "false").lower() == "true":
+                    char.create_character_sheet()
                 state.characters.append(char)
         get_state_snapshot(
             state, "generate_characters_exit", state.thread_id, "Lord Pulsimore"
@@ -476,6 +479,9 @@ Just: "Y"
 
     @staticmethod
     def render_game_run(state: YellowAgentState) -> YellowAgentState:
+        # render_game_run is the last node before END — mark the active proposal final
+        if state.counter_proposal:
+            state.counter_proposal.is_final = True
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
