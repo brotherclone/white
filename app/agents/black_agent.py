@@ -219,6 +219,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
         get_state_snapshot(
             state, "generate_sigil_enter", state.thread_id, "ThreadKeepr"
         )
+        # generate_sigil is the last node before END — mark the active proposal final
+        if state.counter_proposal:
+            state.counter_proposal.is_final = True
         logger.info("🜏 Generating sigil artifact")
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
