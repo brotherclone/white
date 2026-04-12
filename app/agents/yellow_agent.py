@@ -305,8 +305,13 @@ class YellowAgent(BaseRainbowAgent, ABC):
         if mock_mode:
             state.should_add_to_story = True
         else:
+            rooms_visited = state.current_room_index + 1
+            rooms_remaining = len(state.rooms) - rooms_visited
             prompt = f"""
-                       You are evaluating whether to continue adding another room to the Pulsar Palace game run.
+                       You are evaluating whether to continue the Pulsar Palace game run into the next room.
+
+                       Rooms visited so far: {rooms_visited}
+                       Rooms remaining in this run: {rooms_remaining}
 
                        Current run narrative:
                        {state.encounter_narrative_artifact.for_prompt()}
@@ -315,10 +320,10 @@ class YellowAgent(BaseRainbowAgent, ABC):
                        {state.counter_proposal}
 
                        Decide:
-                       - should_add_to_story: true if you want to generate another room and continue the story
-                       - done: true if you're satisfied and want to stop here
+                       - should_add_to_story: true if there are rooms remaining AND the story benefits from continuing
+                       - done: true if all rooms have been visited OR the narrative has reached a natural conclusion
 
-                       Usually you should set done=true after generating 2-3 rooms total.
+                       You MUST set should_add_to_story=true if rooms_remaining > 0 and the story is unresolved.
                        """
 
             claude = self._get_claude()
@@ -334,7 +339,10 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     state.should_add_to_story = False
             except Exception as e:
                 logger.error(f"Game evaluation failed: {e!s}")
-                state.should_add_to_story = False
+                # Continue if rooms remain rather than silently collapsing to one room
+                state.should_add_to_story = (
+                    state.current_room_index < len(state.rooms) - 1
+                )
         get_state_snapshot(
             state, "evaluate_song_proposal_exit", state.thread_id, "Lord Pulsimore"
         )
