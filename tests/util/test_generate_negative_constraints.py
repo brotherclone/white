@@ -11,6 +11,7 @@ from app.util.generate_negative_constraints import (
     analyze_keys,
     analyze_title_vocabulary,
     collect_titles,
+    enrich_threads_from_proposals,
     format_for_prompt,
     generate_constraints,
     normalize_key,
@@ -372,3 +373,62 @@ class TestWriteConstraints:
             loaded = yaml.safe_load(f)
         assert loaded["manual_overrides"]["force_key"] == "Eb major"
         assert loaded["thread_count"] == 10
+
+
+class TestEnrichThreadsFromProposals:
+    def _write_bundle(self, yml_dir: Path, iterations: list[dict]):
+        yml_dir.mkdir(parents=True, exist_ok=True)
+        with open(yml_dir / "all_song_proposals.yml", "w") as f:
+            yaml.dump({"iterations": iterations}, f)
+
+    def test_dominant_key_replaces_index_key(self, tmp_path):
+        """When all_song_proposals.yml exists, the most-common iteration key wins."""
+        thread_dir = tmp_path / "my-song"
+        self._write_bundle(
+            thread_dir / "yml",
+            [
+                {"key": "F# minor", "bpm": 91},
+                {"key": "F# minor", "bpm": 91},
+                {"key": "F# minor", "bpm": 91},
+                {"key": "B major", "bpm": 91},  # one outlier
+            ],
+        )
+        threads = [{"directory": "my-song", "key": "B major", "bpm": 120}]
+        enriched = enrich_threads_from_proposals(threads, tmp_path)
+        assert enriched[0]["key"] == "F# minor"
+        assert enriched[0]["bpm"] == 91
+
+    def test_falls_back_to_index_when_bundle_absent(self, tmp_path):
+        """Threads with no bundle file are returned unchanged."""
+        threads = [{"directory": "no-bundle-song", "key": "C major", "bpm": 100}]
+        enriched = enrich_threads_from_proposals(threads, tmp_path)
+        assert enriched[0]["key"] == "C major"
+        assert enriched[0]["bpm"] == 100
+
+    def test_generate_constraints_uses_iteration_keys(self, tmp_path):
+        """generate_constraints flags the iteration-dominant key, not the index key."""
+        thread_dir = tmp_path / "converged-song"
+        self._write_bundle(
+            thread_dir / "yml",
+            [{"key": "F# minor", "bpm": 76}] * 10,
+        )
+        index = tmp_path / "index.yml"
+        with open(index, "w") as f:
+            yaml.dump(
+                {
+                    "threads": [
+                        {
+                            "directory": "converged-song",
+                            "key": "B major",  # divergent final synthesis
+                            "bpm": 76,
+                            "title": "Test Song",
+                            "concept": "some concept",
+                        }
+                    ]
+                },
+                f,
+            )
+        constraints = generate_constraints(index)
+        key_names = [kc["key"] for kc in constraints["key_constraints"]]
+        assert "F# minor" in key_names
+        assert "B major" not in key_names

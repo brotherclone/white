@@ -116,6 +116,49 @@ def load_index(index_path: Path) -> list[dict]:
     return data.get("threads", [])
 
 
+def enrich_threads_from_proposals(
+    threads: list[dict], shrinkwrap_dir: Path
+) -> list[dict]:
+    """Replace each thread's key/BPM with the most-common values across its iterations.
+
+    The index.yml captures the final White-synthesis key/BPM, which can diverge
+    from what the chromatic agents actually converged on (e.g., 15 iterations in
+    F# minor → White synthesises into B♭ major). Reading all_song_proposals.yml
+    per thread gives a truer picture of agent convergence for constraint generation.
+
+    Threads whose bundle file is absent fall back to the index values unchanged.
+    """
+    enriched = []
+    for thread in threads:
+        dir_name = thread.get("directory", "")
+        bundle = shrinkwrap_dir / dir_name / "yml" / "all_song_proposals.yml"
+        if not bundle.exists():
+            enriched.append(thread)
+            continue
+        try:
+            with open(bundle) as f:
+                data = yaml.safe_load(f)
+            iterations = data.get("iterations", []) if isinstance(data, dict) else []
+            if not iterations:
+                enriched.append(thread)
+                continue
+            keys = [
+                normalize_key(it.get("key", "")) for it in iterations if it.get("key")
+            ]
+            bpms = [it.get("bpm") for it in iterations if it.get("bpm")]
+            dominant_key = (
+                Counter(keys).most_common(1)[0][0] if keys else thread.get("key")
+            )
+            dominant_bpm = (
+                Counter(bpms).most_common(1)[0][0] if bpms else thread.get("bpm")
+            )
+            enriched.append({**thread, "key": dominant_key, "bpm": dominant_bpm})
+        except Exception as e:
+            logger.warning(f"Could not enrich thread {dir_name} from proposals: {e}")
+            enriched.append(thread)
+    return enriched
+
+
 def analyze_keys(threads: list[dict]) -> dict:
     """Analyze key distribution and detect clusters."""
     total = len(threads)
@@ -356,11 +399,20 @@ def generate_constraints(
     if not threads:
         return {"error": "No threads found in index"}
 
-    key_analysis = analyze_keys(threads)
-    bpm_analysis = analyze_bpm(threads)
+    shrinkwrap_dir = index_path.parent if index_path else None
+
+    # Use iteration-dominant keys/BPMs so chromatic agent convergence is captured,
+    # not the final White synthesis which can differ substantially.
+    analysis_threads = (
+        enrich_threads_from_proposals(threads, shrinkwrap_dir)
+        if shrinkwrap_dir
+        else threads
+    )
+
+    key_analysis = analyze_keys(analysis_threads)
+    bpm_analysis = analyze_bpm(analysis_threads)
     concept_analysis = analyze_concepts(threads)
     title_vocab_analysis = analyze_title_vocabulary(threads)
-    shrinkwrap_dir = index_path.parent if index_path else None
     dialogue_analysis = analyze_dialogue_openers(threads, shrinkwrap_dir)
     titles = collect_titles(threads)
 

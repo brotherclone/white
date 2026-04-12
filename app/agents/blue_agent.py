@@ -41,9 +41,6 @@ from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
-from app.structures.artifacts.quantum_tape_label_artifact import (
-    QuantumTapeLabelArtifact,
-)
 from app.structures.concepts.alternate_history_constraints import (
     AlternateHistoryConstraints,
 )
@@ -124,7 +121,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
             selected_period=None,
             evaluation_result=None,
             alternate_history=None,
-            tape_label=None,
             musical_params=None,
             iteration_count=0,
             max_iterations=3,
@@ -156,7 +152,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "extract_musical_parameters", self.extract_musical_parameters
         )
-        work_flow.add_node("generate_tape_label", self.generate_tape_label)
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
@@ -172,8 +167,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             },
         )
         work_flow.add_edge("generate_alternate_history", "extract_musical_parameters")
-        work_flow.add_edge("extract_musical_parameters", "generate_tape_label")
-        work_flow.add_edge("generate_tape_label", "generate_alternate_song_spec")
+        work_flow.add_edge("extract_musical_parameters", "generate_alternate_song_spec")
         work_flow.add_edge("generate_alternate_song_spec", END)
 
         return work_flow
@@ -1067,83 +1061,6 @@ The tape has been recorded over. What life exists on it now?
         return note
 
     @agent_error_handler("The Cassette Bearer")
-    def generate_tape_label(self, state: BlueAgentState) -> BlueAgentState:
-        get_state_snapshot(
-            state, "generate_tape_label_enter", state.thread_id, "The Cassette Bearer"
-        )
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        from app.structures.enums.quantum_tape_recording_quality import (
-            QuantumTapeRecordingQuality,
-        )
-
-        alternate = state.alternate_history
-        if alternate is None:
-            logger.error("alternate_history is None, cannot generate tape label")
-            get_state_snapshot(
-                state,
-                "generate_tape_label_exit",
-                state.thread_id,
-                "The Cassette Bearer",
-            )
-            return state
-
-        quality = random.choices(
-            [
-                QuantumTapeRecordingQuality.SP,
-                QuantumTapeRecordingQuality.LP,
-                QuantumTapeRecordingQuality.EP,
-            ],
-            weights=[0.2, 0.6, 0.2],
-        )[0]
-        note = self._generate_a_cryptic_note(alternate)
-        base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
-        start = alternate.period.start_date
-        end = alternate.period.end_date
-        original_label = f"Gabe Walsh \u2014 {start.year}"
-        tapeover_date_str = f"{start.strftime('%b %Y')} \u2013 {end.strftime('%b %Y')}"
-        age_range = alternate.period.age_range
-        age_str = f"{age_range[0]}\u2013{age_range[1]}"
-        location_str = getattr(alternate.period, "location", None) or "Unknown"
-        catalog_str = f"QT-B-{start.year}-{state.thread_id[:6].upper()}"
-        label = QuantumTapeLabelArtifact(
-            thread_id=state.thread_id,
-            base_path=base_path,
-            image_path=f"{base_path}/img",
-            title=alternate.title,
-            date_range=f"{start} to {end}",
-            recording_quality=quality,
-            counter_start=random.randint(0, 9999),
-            counter_end=random.randint(1000, 9999),
-            notes=note,
-            original_label_visible=True,
-            original_label_text=original_label,
-            tape_degradation=random.uniform(0.1, 0.4),
-            year_documented=str(start.year),
-            original_date=str(start.year),
-            original_title=original_label,
-            tapeover_date=tapeover_date_str,
-            tapeover_title=alternate.title,
-            subject_name="Gabe Walsh",
-            age_during=age_str,
-            location=location_str,
-            catalog_number=catalog_str,
-        )
-        try:
-            label.save_file()
-            state.artifacts.append(label)
-            state.tape_label = label
-            logger.info(f"Saved tape label artifact: {label.file_path}")
-            return state
-        except Exception as e:
-            error_msg = f"Failed to save tape label artifact: {e!s}"
-            logger.error(error_msg)
-            if block_mode:
-                raise Exception(error_msg)
-        get_state_snapshot(
-            state, "generate_tape_label_exit", state.thread_id, "The Cassette Bearer"
-        )
-        return state
-
     def _format_alternate_history_for_prompt(
         self, alt: AlternateTimelineArtifact
     ) -> str:
@@ -1239,10 +1156,8 @@ The tape has been recorded over. What life exists on it now?
                     "The Cassette Bearer",
                 )
                 return state
-            if state.tape_label is None or state.musical_params is None:
-                logger.error(
-                    "tape_label or musical_params is None, cannot generate song spec"
-                )
+            if state.musical_params is None:
+                logger.error("musical_params is None, cannot generate song spec")
                 get_state_snapshot(
                     state,
                     "generate_alternate_song_spec_exit",
@@ -1251,32 +1166,37 @@ The tape has been recorded over. What life exists on it now?
                 )
                 return state
 
+            alt = state.alternate_history
+            alt_period = (
+                f"{alt.period.start_date.strftime('%b %Y')} – "
+                f"{alt.period.end_date.strftime('%b %Y')}"
+                if alt
+                else "unknown period"
+            )
+            alt_title = alt.title if alt else "Unknown Timeline"
+            alt_divergence = alt.divergence_point if alt else ""
+
             prompt = f"""
 You are The Cassette Bearer, the sorrowful witness who exists outside time and space.
-You are the lone witness to the orphaned existences of one Gabriel Walsh, a musician 
-whose life has been repeatedly overwritten at a quantum level. Now, for once, you can 
+You are the lone witness to the orphaned existences of one Gabriel Walsh, a musician
+whose life has been repeatedly overwritten at a quantum level. Now, for once, you can
 channel all the loss and frustration of seeing a life erased into a new creative vision.
 
 You have been given this proposal that somehow drifted from his dreams:
 {state.white_proposal}
 
-In universe 875b, Walsh wrote his own album about loss and erasure. Study these Blue works - 
+In universe 875b, Walsh wrote his own album about loss and erasure. Study these Blue works -
 their 'concept' fields show how forgotten periods become folk rock:
 {get_my_reference_proposals('B')}
 
 Your counter-proposal's 'rainbow_color' property must always be:
 {the_rainbow_table_colors['B']}
 
-But even as this transmission reached you, the timeline was taped over again. You walk 
+But even as this transmission reached you, the timeline was taped over again. You walk
 down a snow-covered, rural road and find a cassette in the snow:
 
-{state.tape_label.title} - {state.tape_label.date_range}
-Written in {state.tape_label.handwriting_style}, it reads:
-"{state.tape_label.notes} [{state.tape_label.counter_start}-{state.tape_label.counter_end}]"
-{f"A previous label barely visible: {state.tape_label.original_label_text}" if state.tape_label.original_label_visible else ""}
-
-The cassette: {state.tape_label.tape_brand}, {state.tape_label.recording_quality} speed.
-Degradation level: {state.tape_label.tape_degradation:.1%}
+{alt_title} — {alt_period}
+{alt_divergence}
 
 You sense the magnetic arrangements without hearing. The song's shape emerges:
 - Tempo: {state.musical_params.bpm} BPM ({state.musical_params.mood})

@@ -302,6 +302,23 @@ class TestGeneratePlan:
         with pytest.raises(FileNotFoundError):
             generate_plan_mechanical(prod)
 
+    def test_vocals_default_true_for_vocal_sections(self, tmp_path):
+        """Chorus and verse get vocals=True; outro and intro get vocals=False."""
+        sections = [
+            {"label": "intro", "chord_count": 2},
+            {"label": "verse", "chord_count": 4},
+            {"label": "chorus", "chord_count": 4},
+            {"label": "outro", "chord_count": 2},
+        ]
+        prod = self._setup(tmp_path, sections)
+        plan = generate_plan_mechanical(prod)
+        by_name = {s.name: s for s in plan.sections}
+        assert by_name["intro"].vocals is False
+        assert by_name["verse"].vocals is True
+        assert by_name["chorus"].vocals is True
+        assert by_name["outro"].vocals is False
+        assert plan.vocals_planned is True
+
 
 # ---------------------------------------------------------------------------
 # Refresh
