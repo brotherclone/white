@@ -248,7 +248,7 @@ class AceStudioClient:
                 track.get("clips") or track.get("clipCount") or track.get("clip_count")
             )
             if not clips:
-                return idx
+                return track.get("trackIndex", track.get("index", idx))
         logging.getLogger(__name__).warning(
             "All %d ACE Studio track(s) have clips — defaulting to track 0", len(tracks)
         )
@@ -364,10 +364,10 @@ class AceStudioClient:
                 name=name or None,
             )
             notes_result = {}
-            if notes and lyrics:
+            if notes:
                 self.open_editor()
                 notes_result = self.add_notes_with_lyrics(
-                    notes, lyrics, language=language
+                    notes, lyrics or "", language=language
                 )
             results.append({"clip": clip_result, "notes": notes_result})
         return results

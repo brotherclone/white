@@ -1,0 +1,360 @@
+production_dir: chain_artifacts/d48eee5f-7bb2-4e26-be81-e655e64d34d2/production/violet__neural_network_incarnation_v1
+pipeline: drum-generation
+bpm: 94
+time_sig: 7/8
+color: Violet
+genre_families:
+- ambient
+- electronic
+- experimental
+generated: '2026-04-11T19:36:16.580181+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- bridge
+- chorus
+- verse
+candidates:
+- id: drum_bridge_01
+  midi_file: candidates/drum_bridge_01.mid
+  rank: 1
+  section: bridge
+  next_section: null
+  chord_source: chord_003
+  genre_family: ambient
+  pattern_name: ambient_7_sparse
+  energy: low
+  scores:
+    composite: 0.4085
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4711
+        present: 0.2244
+        future: 0.3045
+      spatial:
+        thing: 0.4726
+        place: 0.3033
+        person: 0.2241
+      ontological:
+        imagined: 0.3267
+        forgotten: 0.2945
+        known: 0.3788
+      confidence: 0.1035
+      match: 0.155
+    tag_adjustment: 0.0
+  label: drums_ambient_sparse
+  status: approved
+  notes: ''
+- id: drum_bridge_02
+  midi_file: candidates/drum_bridge_02.mid
+  rank: 2
+  section: bridge
+  next_section: null
+  chord_source: chord_003
+  genre_family: electronic
+  pattern_name: electronic_7_223
+  energy: medium
+  scores:
+    composite: 0.2588
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.471
+        present: 0.2241
+        future: 0.3049
+      spatial:
+        thing: 0.4725
+        place: 0.3037
+        person: 0.2238
+      ontological:
+        imagined: 0.3264
+        forgotten: 0.2947
+        known: 0.3789
+      confidence: 0.1071
+      match: 0.1554
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_bridge_03
+  midi_file: candidates/drum_bridge_03.mid
+  rank: 3
+  section: bridge
+  next_section: null
+  chord_source: chord_003
+  genre_family: electronic
+  pattern_name: electronic_7_322
+  energy: medium
+  scores:
+    composite: 0.2587
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4711
+        present: 0.224
+        future: 0.305
+      spatial:
+        thing: 0.4725
+        place: 0.3038
+        person: 0.2237
+      ontological:
+        imagined: 0.3262
+        forgotten: 0.2948
+        known: 0.379
+      confidence: 0.1068
+      match: 0.1553
+    tag_adjustment: 0.0
+  label: drums_322
+  status: approved
+  notes: ''
+- id: drum_bridge_04
+  midi_file: candidates/drum_bridge_04.mid
+  rank: 4
+  section: bridge
+  next_section: null
+  chord_source: chord_003
+  genre_family: ambient
+  pattern_name: ambient_7_pulse
+  energy: medium
+  scores:
+    composite: 0.2581
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4706
+        present: 0.2244
+        future: 0.305
+      spatial:
+        thing: 0.4721
+        place: 0.3038
+        person: 0.2241
+      ontological:
+        imagined: 0.3257
+        forgotten: 0.2951
+        known: 0.3792
+      confidence: 0.101
+      match: 0.1545
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_chorus_01
+  midi_file: candidates/drum_chorus_01.mid
+  rank: 5
+  section: chorus
+  next_section: null
+  chord_source: chord_007
+  genre_family: electronic
+  pattern_name: electronic_7_322
+  energy: medium
+  scores:
+    composite: 0.2587
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4701
+        present: 0.2255
+        future: 0.3044
+      spatial:
+        thing: 0.4716
+        place: 0.3033
+        person: 0.2252
+      ontological:
+        imagined: 0.3259
+        forgotten: 0.295
+        known: 0.3791
+      confidence: 0.1042
+      match: 0.1553
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_chorus_02
+  midi_file: candidates/drum_chorus_02.mid
+  rank: 6
+  section: chorus
+  next_section: null
+  chord_source: chord_007
+  genre_family: electronic
+  pattern_name: electronic_7_223
+  energy: medium
+  scores:
+    composite: 0.2586
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.47
+        present: 0.2256
+        future: 0.3044
+      spatial:
+        thing: 0.4715
+        place: 0.3033
+        person: 0.2252
+      ontological:
+        imagined: 0.3259
+        forgotten: 0.295
+        known: 0.3791
+      confidence: 0.1036
+      match: 0.1552
+    tag_adjustment: 0.0
+  label: drums_223
+  status: approved
+  notes: ''
+- id: drum_chorus_03
+  midi_file: candidates/drum_chorus_03.mid
+  rank: 7
+  section: chorus
+  next_section: null
+  chord_source: chord_007
+  genre_family: ambient
+  pattern_name: ambient_7_pulse
+  energy: medium
+  scores:
+    composite: 0.2584
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4696
+        present: 0.2257
+        future: 0.3047
+      spatial:
+        thing: 0.4711
+        place: 0.3036
+        person: 0.2253
+      ontological:
+        imagined: 0.3262
+        forgotten: 0.2951
+        known: 0.3787
+      confidence: 0.101
+      match: 0.1549
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_verse_01
+  midi_file: candidates/drum_verse_01.mid
+  rank: 8
+  section: verse
+  next_section: null
+  chord_source: chord_008
+  genre_family: electronic
+  pattern_name: electronic_7_322
+  energy: medium
+  scores:
+    composite: 0.4093
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4724
+        present: 0.2237
+        future: 0.3039
+      spatial:
+        thing: 0.4739
+        place: 0.3027
+        person: 0.2234
+      ontological:
+        imagined: 0.3274
+        forgotten: 0.2937
+        known: 0.3789
+      confidence: 0.1122
+      match: 0.1561
+    tag_adjustment: 0.0
+  label: drums_electro
+  status: approved
+  notes: ''
+- id: drum_verse_02
+  midi_file: candidates/drum_verse_02.mid
+  rank: 9
+  section: verse
+  next_section: null
+  chord_source: chord_008
+  genre_family: electronic
+  pattern_name: electronic_7_223
+  energy: medium
+  scores:
+    composite: 0.4093
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4725
+        present: 0.2237
+        future: 0.3038
+      spatial:
+        thing: 0.474
+        place: 0.3026
+        person: 0.2234
+      ontological:
+        imagined: 0.3275
+        forgotten: 0.2936
+        known: 0.3789
+      confidence: 0.1122
+      match: 0.1561
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_verse_03
+  midi_file: candidates/drum_verse_03.mid
+  rank: 10
+  section: verse
+  next_section: null
+  chord_source: chord_008
+  genre_family: ambient
+  pattern_name: ambient_7_pulse
+  energy: medium
+  scores:
+    composite: 0.4084
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4711
+        present: 0.2244
+        future: 0.3045
+      spatial:
+        thing: 0.4725
+        place: 0.3034
+        person: 0.2241
+      ontological:
+        imagined: 0.3265
+        forgotten: 0.2946
+        known: 0.3789
+      confidence: 0.1024
+      match: 0.1548
+    tag_adjustment: 0.0
+  label: drums_break
+  status: approved
+  notes: ''
+- id: drum_verse_04
+  midi_file: candidates/drum_verse_04.mid
+  rank: 11
+  section: verse
+  next_section: null
+  chord_source: chord_008
+  genre_family: ambient
+  pattern_name: ambient_7_sparse
+  energy: low
+  scores:
+    composite: 0.2586
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4711
+        present: 0.2247
+        future: 0.3043
+      spatial:
+        thing: 0.4725
+        place: 0.3031
+        person: 0.2244
+      ontological:
+        imagined: 0.3273
+        forgotten: 0.2942
+        known: 0.3785
+      confidence: 0.1038
+      match: 0.1552
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''

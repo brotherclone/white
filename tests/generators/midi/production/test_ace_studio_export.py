@@ -177,7 +177,7 @@ class TestPartitionNotesBySection:
             {"pos": 480, "pitch": 62, "dur": 480},
         ]
         sections = [{"name": "verse", "bars": 4, "play_count": 1}]
-        result = partition_notes_by_section(notes, sections, bpm=120)
+        result = partition_notes_by_section(notes, sections)
         assert len(result) == 1
         assert result[0]["name"] == "verse"
         assert len(result[0]["notes"]) == 2
@@ -193,7 +193,7 @@ class TestPartitionNotesBySection:
             {"name": "verse", "bars": 2, "play_count": 1},
             {"name": "chorus", "bars": 2, "play_count": 1},
         ]
-        result = partition_notes_by_section(notes, sections, bpm=120, tpb=tpb)
+        result = partition_notes_by_section(notes, sections, tpb=tpb)
         assert result[0]["name"] == "verse"
         assert len(result[0]["notes"]) == 1
         assert result[0]["notes"][0]["pos"] == 0  # relative to section start

@@ -183,7 +183,6 @@ SONG_CONTEXT_FILENAME = "song_context.yml"
 def partition_notes_by_section(
     notes: list[dict],
     sections: list[dict],
-    bpm: float,
     tpb: int = ACE_TPB,
     time_signature: tuple[int, int] = (4, 4),
 ) -> list[dict]:
@@ -321,7 +320,9 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
 
     # Build per-section note lists and lyric strings
     if plan_sections:
-        section_chunks = partition_notes_by_section(notes, plan_sections, bpm)
+        section_chunks = partition_notes_by_section(
+            notes, plan_sections, time_signature=(num, den)
+        )
     else:
         # Fallback: single section spanning full duration
         section_chunks = [
