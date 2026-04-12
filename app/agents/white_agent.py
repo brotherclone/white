@@ -3952,10 +3952,17 @@ The song should be buildable from these specifications.
                 raise Exception(error_msg)
             return
 
-        # For agents that produce exactly one iteration, treat it as implicitly final
+        # For each color group, if no iteration is explicitly marked final,
+        # treat the last iteration in that group as final. This handles single-agent
+        # workflows and agents (Orange, Green, etc.) that never call is_final themselves.
         iterations = state.song_proposals.iterations
-        if len(iterations) == 1 and not iterations[0].is_final:
-            iterations[0].is_final = True
+        iterations_by_color: dict = {}
+        for idx, iteration in enumerate(iterations):
+            color = str(iteration.rainbow_color)
+            iterations_by_color.setdefault(color, []).append(idx)
+        for color_indexes in iterations_by_color.values():
+            if not any(iterations[idx].is_final for idx in color_indexes):
+                iterations[color_indexes[-1]].is_final = True
 
         for i, iteration in enumerate(iterations):
             if not iteration.is_final:

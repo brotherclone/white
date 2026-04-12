@@ -28,28 +28,22 @@ def test_yellow_agent_initialization():
 
 def test_generate_characters_skips_html_by_default(monkeypatch):
     """create_character_sheet is NOT called when WHITE_WITH_HTML is absent."""
-    monkeypatch.setenv("MOCK_MODE", "true")
+    monkeypatch.setenv("MOCK_MODE", "false")
     monkeypatch.delenv("WHITE_WITH_HTML", raising=False)
 
     mock_char = MagicMock()
-    mock_char.model_dump.return_value = {}
 
-    with (
-        patch(
-            "app.agents.yellow_agent.PulsarPalaceCharacter",
+    state = YellowAgentState(thread_id="test-thread-no-html")
+
+    with patch("app.agents.yellow_agent.roll_dice", return_value=[1]):
+        with patch(
+            "app.agents.yellow_agent.PulsarPalaceCharacter.create_random",
             return_value=mock_char,
-        ),
-        patch.object(YellowAgent, "__init__", return_value=None),
-    ):
-        state = YellowAgentState()
-
-        with patch("builtins.open", side_effect=FileNotFoundError("no mock file")):
-            try:
-                YellowAgent.generate_characters(state)
-            except Exception:
-                pass
+        ):
+            YellowAgent.generate_characters(state)
 
     mock_char.create_character_sheet.assert_not_called()
+    mock_char.create_portrait.assert_called_once()
 
 
 def test_generate_characters_calls_html_when_flag_set(monkeypatch):
