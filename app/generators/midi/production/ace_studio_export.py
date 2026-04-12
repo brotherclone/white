@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -173,6 +174,94 @@ def flatten_lyrics(lyrics_path: Path) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Section helpers
+# ---------------------------------------------------------------------------
+
+SONG_CONTEXT_FILENAME = "song_context.yml"
+
+
+def partition_notes_by_section(
+    notes: list[dict],
+    sections: list[dict],
+    tpb: int = ACE_TPB,
+    time_signature: tuple[int, int] = (4, 4),
+) -> list[dict]:
+    """Split a flat note list into per-section chunks for section-aware export.
+
+    Each section dict must have: name, bars, play_count (optional, default 1).
+    Section boundaries are derived from bars × time_signature, not from bpm.
+    Returns list of section dicts enriched with:
+        start_tick, dur_ticks, notes (pos relative to section start), lyrics.
+    lyrics is populated later by the caller.
+    """
+    numerator, denominator = time_signature
+    beats_per_bar = numerator * 4 / denominator
+    result = []
+    cursor = 0
+    for sec in sections:
+        bars = int(sec.get("bars", 4))
+        play_count = int(sec.get("play_count", 1))
+        sec_ticks = int(bars * tpb * beats_per_bar * play_count)
+        end_tick = cursor + sec_ticks
+
+        sec_notes = [
+            {
+                "pos": n["pos"] - cursor,
+                "pitch": n["pitch"],
+                "dur": n["dur"],
+            }
+            for n in notes
+            if cursor <= n["pos"] < end_tick
+        ]
+        result.append(
+            {
+                "name": sec.get("name", ""),
+                "start_tick": cursor,
+                "dur_ticks": sec_ticks,
+                "notes": sec_notes,
+                "lyrics": "",  # filled in by caller
+            }
+        )
+        cursor = end_tick
+    return result
+
+
+def _update_song_context_ace_block(
+    production_dir: Path,
+    project_name: str,
+    track_index: int,
+    singer: str,
+    sections_exported: list[str],
+) -> None:
+    """Write (or overwrite) the ace_studio block in song_context.yml."""
+    ctx_path = production_dir / SONG_CONTEXT_FILENAME
+    if not ctx_path.exists():
+        log.debug("song_context.yml not found — skipping ace_studio block write")
+        return
+
+    ctx = yaml.safe_load(ctx_path.read_text(encoding="utf-8")) or {}
+    if "ace_studio" in ctx:
+        prev = ctx["ace_studio"].get("exported_at", "unknown")
+        log.warning(
+            "Overwriting existing ace_studio association (previously exported at %s)",
+            prev,
+        )
+
+    ctx["ace_studio"] = {
+        "project_name": project_name,
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "track_index": track_index,
+        "singer": singer,
+        "sections_exported": sections_exported,
+        "render_path": None,
+    }
+    ctx_path.write_text(
+        yaml.dump(ctx, default_flow_style=False, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+
+# ---------------------------------------------------------------------------
 # Export
 # ---------------------------------------------------------------------------
 
@@ -226,21 +315,38 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
     total_ticks = max(n["pos"] + n["dur"] for n in notes)
     lyric_sentence = flatten_lyrics(lyrics_file)
 
+    # Load production plan sections for section-aware export
+    plan_sections = plan.get("sections", [])
+
+    # Build per-section note lists and lyric strings
+    if plan_sections:
+        section_chunks = partition_notes_by_section(
+            notes, plan_sections, time_signature=(num, den)
+        )
+    else:
+        # Fallback: single section spanning full duration
+        section_chunks = [
+            {
+                "name": title or "song",
+                "start_tick": 0,
+                "dur_ticks": max(n["pos"] + n["dur"] for n in notes),
+                "notes": notes,
+                "lyrics": "",
+            }
+        ]
+    # Attach the full lyric sentence to every section (ACE Studio distributes
+    # syllables per-clip automatically; we pass the full text each time).
+    for chunk in section_chunks:
+        chunk["lyrics"] = lyric_sentence
+
     # Connect and export
     try:
         with AceStudioClient() as ace:
             # 1 — Track selection first (ACE Studio invalidates track list after
             # project metadata changes, so we must read tracks before set_tempo)
-            tracks = ace.list_tracks()
-            if not tracks:
-                log.warning(
-                    "ACE Studio export skipped — project has no tracks. "
-                    "Add at least one track in ACE Studio before exporting."
-                )
-                return None
-            track_index = 0
+            track_index = ace.find_available_track()
 
-            # 2 — Project metadata (must come AFTER list_tracks; ACE Studio
+            # 2 — Project metadata (must come AFTER track selection; ACE Studio
             # returns an empty track list on subsequent calls after set_tempo)
             ace.set_tempo(bpm)
             ace.set_time_signature(num, den)
@@ -264,21 +370,19 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
                         ace_voice_name,
                     )
 
-            # 4 — Add clip spanning full assembled duration
-            ace.add_clip(
-                track_index=track_index,
-                pos=0,
-                dur=total_ticks,
-                name=title or None,
-            )
+            # 4 — Section-aware clip placement
+            ace.add_section_clips(section_chunks, track_index=track_index)
 
-            # 5 — Open editor and insert notes + lyrics
-            ace.open_editor()
-            ace.add_notes_with_lyrics(notes, lyric_sentence)
-
-            # 6 — Fetch project info for the return value
+            # 5 — Fetch project info for the return value
             project_info = ace.get_project_info()
             project_id: str = project_info.get("projectName") or title
+
+            sections_exported = [c["name"] for c in section_chunks]
+
+            # 6 — Write association block to song_context.yml
+            _update_song_context_ace_block(
+                prod, project_id, track_index, singer_name, sections_exported
+            )
 
             return {
                 "project_id": project_id,
@@ -289,6 +393,7 @@ def export_to_ace_studio(production_dir: str | Path) -> Optional[dict]:
                 "note_count": len(notes),
                 "total_ticks": total_ticks,
                 "title": title,
+                "sections": sections_exported,
             }
 
     except ConnectionError as exc:

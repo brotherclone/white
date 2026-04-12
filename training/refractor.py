@@ -419,6 +419,7 @@ class Refractor:
             audios=[waveform],
             sampling_rate=48000,
             return_tensors="pt",
+            padding=True,
         )
         with torch.no_grad():
             # get_audio_features handles pooling + projection internally.

@@ -100,6 +100,7 @@ class MelodyPattern:
     intervals: list[int] = field(default_factory=list)
     rhythm: list[float] = field(default_factory=list)
     durations: list[float] | None = None
+    tags: list[str] = field(default_factory=list)
 
     def bar_length_beats(self) -> float:
         num, den = self.time_sig
@@ -1557,6 +1558,74 @@ VOCAL_4_4_DOTTED = [
     ),
 ]
 
+# ---------------------------------------------------------------------------
+# Vocal 4/4 Lamentful / Sparse — maximum space, grief-adjacent phrasing
+# ---------------------------------------------------------------------------
+
+VOCAL_4_4_LAMENTFUL = [
+    MelodyPattern(
+        name="slow_descent",
+        contour="stepwise",
+        energy="low",
+        time_sig=(4, 4),
+        description="Stepwise downward motion, two held notes per bar with space between. Maximum lament.",
+        use_case="vocal",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.5],
+        durations=[1.5, 1.5],
+        tags=["lamentful", "sparse", "descent"],
+    ),
+    MelodyPattern(
+        name="breath_phrase",
+        contour="stepwise",
+        energy="low",
+        time_sig=(4, 4),
+        description="3-note burst then long rest then resolve. Mimics a drawn breath followed by exhale.",
+        use_case="vocal",
+        intervals=[0, -1, -2, 1],
+        rhythm=[0.0, 0.4, 0.8, 3.0],
+        durations=[0.4, 0.4, 1.5, 1.0],
+        tags=["lamentful", "sparse"],
+    ),
+    MelodyPattern(
+        name="pentatonic_lament",
+        contour="pentatonic",
+        energy="low",
+        time_sig=(4, 4),
+        description="Minor pentatonic — first note held, then two more with space. Grief in five tones.",
+        use_case="vocal",
+        intervals=[0, -3, -2],
+        rhythm=[0.0, 2.0, 3.0],
+        durations=[1.5, 0.5, 1.0],
+        tags=["lamentful", "sparse"],
+    ),
+    MelodyPattern(
+        name="floating_repeat",
+        contour="repeated",
+        energy="low",
+        time_sig=(4, 4),
+        description="Same motif at shifting rhythmic positions — drifting, disoriented.",
+        use_case="vocal",
+        intervals=[0, -2, 0],
+        rhythm=[0.0, 1.0, 2.5],
+        durations=[0.5, 1.5, 1.0],
+        tags=["sparse"],
+    ),
+    MelodyPattern(
+        name="single_line",
+        contour="stepwise",
+        energy="low",
+        time_sig=(4, 4),
+        description="Two long notes per bar with a breath gap. Barely a melody — the texture is the point.",
+        use_case="vocal",
+        intervals=[0, -1],
+        rhythm=[0.0, 3.0],
+        durations=[2.0, 1.0],
+        tags=["lamentful", "sparse"],
+    ),
+]
+
+
 ALL_TEMPLATES: list[MelodyPattern] = [
     # Existing templates reclassified as lead (instrument tracks)
     *_EXISTING_LEAD_TEMPLATES,
@@ -1573,4 +1642,6 @@ ALL_TEMPLATES: list[MelodyPattern] = [
     *VOCAL_3_4,
     *VOCAL_6_8,
     *VOCAL_7_8,
+    # 4/4 Lamentful / Sparse
+    *VOCAL_4_4_LAMENTFUL,
 ]

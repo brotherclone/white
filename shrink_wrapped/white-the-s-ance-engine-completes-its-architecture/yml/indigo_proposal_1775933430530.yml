@@ -1,0 +1,48 @@
+agent_name: indigo
+bpm: 72
+concept: 'This song operates as a three-layer financial confession where the surface
+  narrative of economic struggle masks a deeper excavation of emotional bankruptcy.
+  The title "Bad Credit" functions as perfect camouflage - listeners expect a straightforward
+  lament about debt, late payments, and systemic economic violence. The verses detail
+  maxed-out cards, declined transactions, and credit score shame with brutal specificity,
+  creating genuine empathy for financial precarity. But the encoding method reveals
+  itself through TEXT-based wordplay scattered throughout: lyrics that can be read
+  multiple ways, double meanings that shift with emphasis, and strategic line breaks
+  that create alternate readings. The chorus contains the phrase "every transaction
+  leaves a trace" - seemingly about financial surveillance, but actually describing
+  how emotional debits accumulate in relationships. The bridge features a spoken-word
+  section listing actual credit card numbers (censored for broadcast) that, when the
+  last four digits are converted to letters using phone keypad mapping, spell out
+  fragments of "DEBIT CARD." The revelation transforms the entire song: what seemed
+  like external economic critique becomes internal emotional archaeology. "Bad credit"
+  wasn''t about money - it was about the debit card of the heart, where every emotional
+  withdrawal leaves you overdrawn, where love operates on borrowed time, and where
+  the real bankruptcy is believing you''re worth less than your credit score suggests.
+  The 72 BPM matches resting heart rate during financial stress, while E♭ minor provides
+  the perfect melancholic foundation for both interpretations to coexist until the
+  moment of recognition.
+
+
+  **INFRANYM PROTOCOL:**
+
+  Secret: ''debit card'' encoded as ''bad credit''
+
+  Method: InfranymMedium.TEXT
+
+  Decoding: Text Infranym: acrostic_lyrics hiding ''debit card'' in verse
+
+  '
+genres:
+- Neo-soul
+- Ambient trap
+iteration_id: indigo_proposal_1775933430530
+iteration_number: 14
+key: E ♭ minor
+mood:
+- Deceptive melancholy
+- financial anxiety
+- hidden vulnerability
+rainbow_color: indigo
+tempo: Languid
+timestamp: 1775933430.530763
+title: Bad Credit

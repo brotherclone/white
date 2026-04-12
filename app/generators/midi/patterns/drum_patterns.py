@@ -71,6 +71,7 @@ class DrumPattern:
     time_sig: tuple[int, int]
     description: str
     voices: dict[str, list[tuple[float, str]]] = field(default_factory=dict)
+    tags: list[str] = field(default_factory=list)
 
     def bar_length_beats(self) -> float:
         """Bar length in quarter-note beats."""
@@ -1432,6 +1433,74 @@ TEMPLATES_4_4_BREAKBEAT = [
 
 
 # ---------------------------------------------------------------------------
+# 4/4 Sparse / Atmospheric — hazy, drone-adjacent, maximum space
+# ---------------------------------------------------------------------------
+
+TEMPLATES_4_4_SPARSE = [
+    DrumPattern(
+        name="half_time_sparse",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(4, 4),
+        description="Half-time feel — kick on 1, snare on 3, open hat on off-beat. One bar of space per two.",
+        voices={
+            "kick": [(0, "normal")],
+            "snare": [(2, "normal")],
+            "hh_open": [(1.5, "ghost")],
+        },
+        tags=["sparse", "half_time"],
+    ),
+    DrumPattern(
+        name="ghost_verse",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(4, 4),
+        description="Ghost snare only — no kick, whisper-quiet hats. Held breath.",
+        voices={
+            "snare": [(1, "ghost"), (3, "ghost")],
+            "hh_closed": [(0, "ghost"), (2, "ghost")],
+        },
+        tags=["sparse", "ghost_only"],
+    ),
+    DrumPattern(
+        name="brushed_folk",
+        genre_family="folk",
+        energy="low",
+        time_sig=(4, 4),
+        description="Brush swells on 2 and 4, light kick on 1, no hi-hat grid.",
+        voices={
+            "kick": [(0, "normal")],
+            "snare": [(1, "ghost"), (3, "ghost")],
+        },
+        tags=["sparse", "brushed"],
+    ),
+    DrumPattern(
+        name="ambient_pulse_slow",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(4, 4),
+        description="Single low kick on beat 1, ghost crash on beat 4 — minimal one-bar pulse for ambient intro/outro.",
+        voices={
+            "kick": [(0, "normal")],
+            "crash": [(3, "ghost")],
+        },
+        tags=["sparse", "ambient"],
+    ),
+    DrumPattern(
+        name="kosmische_slow",
+        genre_family="krautrock",
+        energy="low",
+        time_sig=(4, 4),
+        description="Motorik feel at half tempo — kick on 1 and 3, hats on beats only, lots of space.",
+        voices={
+            "kick": [(0, "normal"), (2, "normal")],
+            "hh_closed": [(0, "ghost"), (1, "ghost"), (2, "ghost"), (3, "ghost")],
+        },
+        tags=["sparse", "motorik"],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -1455,4 +1524,6 @@ ALL_TEMPLATES: list[DrumPattern] = [
     *TEMPLATES_3_4_EXPERIMENTAL,
     # 4/4 Breakbeat
     *TEMPLATES_4_4_BREAKBEAT,
+    # 4/4 Sparse / Atmospheric
+    *TEMPLATES_4_4_SPARSE,
 ]

@@ -8,10 +8,12 @@ from unittest.mock import MagicMock, patch
 
 import mido
 import pytest
+import yaml
 
 from app.generators.midi.production.ace_studio_export import (
     export_to_ace_studio,
     load_singer_registry,
+    partition_notes_by_section,
     resolve_ace_voice_name,
 )
 
@@ -123,7 +125,9 @@ def _mock_ace_client():
     client.__enter__ = MagicMock(return_value=client)
     client.__exit__ = MagicMock(return_value=False)
     client.list_tracks.return_value = [{"index": 0, "name": "Track 1"}]
+    client.find_available_track.return_value = 0
     client.find_singer.return_value = [{"id": 42, "name": "Elirah"}]
+    client.add_section_clips.return_value = []
     client.get_project_info.return_value = {"projectName": "Test Song"}
     return client
 
@@ -159,3 +163,100 @@ def test_export_unknown_singer_falls_back_to_white_name(tmp_path):
     assert result is not None
     mock_client.find_singer.assert_called_once_with("GhostSinger")
     assert result["ace_studio_voice"] == "GhostSinger"
+
+
+# ---------------------------------------------------------------------------
+# partition_notes_by_section
+# ---------------------------------------------------------------------------
+
+
+class TestPartitionNotesBySection:
+    def test_single_section_gets_all_notes(self):
+        notes = [
+            {"pos": 0, "pitch": 60, "dur": 480},
+            {"pos": 480, "pitch": 62, "dur": 480},
+        ]
+        sections = [{"name": "verse", "bars": 4, "play_count": 1}]
+        result = partition_notes_by_section(notes, sections)
+        assert len(result) == 1
+        assert result[0]["name"] == "verse"
+        assert len(result[0]["notes"]) == 2
+
+    def test_notes_split_across_sections(self):
+        tpb = 480
+        bar_ticks = tpb * 4
+        notes = [
+            {"pos": 0, "pitch": 60, "dur": 480},
+            {"pos": bar_ticks * 2, "pitch": 62, "dur": 480},  # in chorus
+        ]
+        sections = [
+            {"name": "verse", "bars": 2, "play_count": 1},
+            {"name": "chorus", "bars": 2, "play_count": 1},
+        ]
+        result = partition_notes_by_section(notes, sections, tpb=tpb)
+        assert result[0]["name"] == "verse"
+        assert len(result[0]["notes"]) == 1
+        assert result[0]["notes"][0]["pos"] == 0  # relative to section start
+
+        assert result[1]["name"] == "chorus"
+        assert len(result[1]["notes"]) == 1
+        assert (
+            result[1]["notes"][0]["pos"] == 0
+        )  # relative to section start (was bar_ticks*2)
+
+
+# ---------------------------------------------------------------------------
+# song_context ace_studio block
+# ---------------------------------------------------------------------------
+
+
+def _make_production_dir_with_context(tmp_path, singer="Shirley"):
+    prod = _make_production_dir(tmp_path, singer=singer)
+    # Add a song_context.yml
+    (prod / "song_context.yml").write_text(
+        yaml.dump({"title": "Test Song", "bpm": 120}), encoding="utf-8"
+    )
+    return prod
+
+
+def test_export_writes_ace_studio_block_to_song_context(tmp_path):
+    prod = _make_production_dir_with_context(tmp_path, singer="Shirley")
+    mock_client = _mock_ace_client()
+
+    with patch(
+        "app.generators.midi.production.ace_studio_export.AceStudioClient",
+        return_value=mock_client,
+    ):
+        result = export_to_ace_studio(prod)
+
+    assert result is not None
+    ctx = yaml.safe_load((prod / "song_context.yml").read_text(encoding="utf-8"))
+    assert "ace_studio" in ctx
+    assert ctx["ace_studio"]["track_index"] == 0
+    assert ctx["ace_studio"]["singer"] == "Shirley"
+    assert ctx["ace_studio"]["render_path"] is None
+
+
+def test_export_overwrites_existing_ace_studio_block(tmp_path, caplog):
+    import logging
+
+    prod = _make_production_dir_with_context(tmp_path, singer="Shirley")
+    # Pre-existing block
+    ctx = {
+        "title": "Test",
+        "ace_studio": {"exported_at": "2026-01-01T00:00:00Z", "singer": "Gabriel"},
+    }
+    (prod / "song_context.yml").write_text(yaml.dump(ctx), encoding="utf-8")
+
+    mock_client = _mock_ace_client()
+    with patch(
+        "app.generators.midi.production.ace_studio_export.AceStudioClient",
+        return_value=mock_client,
+    ):
+        with caplog.at_level(logging.WARNING):
+            result = export_to_ace_studio(prod)
+
+    assert result is not None
+    assert "2026-01-01" in caplog.text
+    new_ctx = yaml.safe_load((prod / "song_context.yml").read_text(encoding="utf-8"))
+    assert new_ctx["ace_studio"]["singer"] == "Shirley"

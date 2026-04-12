@@ -167,9 +167,9 @@ class TestGenerateQuartet:
         c = candidates[0]
         assert "id" in c
         assert "composite_score" in c
-        assert "alto_pattern" in c
-        assert "tenor_pattern" in c
-        assert "bass_voice_pattern" in c
+        assert "violin_ii_pattern" in c
+        assert "viola_pattern" in c
+        assert "cello_pattern" in c
         assert "midi_bytes" in c
         assert isinstance(c["midi_bytes"], bytes)
 
@@ -228,9 +228,9 @@ class TestWriteQuartetCandidates:
                 "label": section,
                 "section": section,
                 "singer": "gabriel",
-                "alto_pattern": "alto_thirds",
-                "tenor_pattern": "tenor_fifths",
-                "bass_voice_pattern": "bass_voice_pedal",
+                "violin_ii_pattern": "conversational",
+                "viola_pattern": "stepwise",
+                "cello_pattern": "root_pulse",
                 "scores": {"counterpoint": 0.9, "chromatic": 0.8, "composite": 0.83},
                 "composite_score": 0.83,
                 "midi_bytes": midi,

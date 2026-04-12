@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 import yaml
 
 from app.generators.midi.production.init_production import (
@@ -381,3 +382,212 @@ class TestLoadInitialProposalFallback:
     def test_returns_empty_when_neither_exists(self, tmp_path):
         result = load_initial_proposal(tmp_path)
         assert result == {}
+
+
+# ---------------------------------------------------------------------------
+# Aesthetic hints detection
+# ---------------------------------------------------------------------------
+
+
+class TestAestheticHints:
+    def test_ambient_cluster_detected(self, tmp_path):
+        from app.generators.midi.production.init_production import (
+            write_initial_proposal,
+        )
+
+        meta = {
+            "title": "Hazy Song",
+            "bpm": 80,
+            "time_sig": "4/4",
+            "key": "D minor",
+            "color": "Violet",
+            "concept": "A slow dissolution",
+            "singer": "katherine",
+            "song_slug": "hazy_song_v1",
+        }
+        write_initial_proposal(tmp_path, meta, ["Grouper", "Beach House", "Low"])
+        ctx = load_song_context(tmp_path)
+        assert "aesthetic_hints" in ctx
+        assert ctx["aesthetic_hints"]["density"] == "sparse"
+        assert ctx["aesthetic_hints"]["texture"] == "hazy"
+
+    def test_no_cluster_no_hints(self, tmp_path):
+        from app.generators.midi.production.init_production import (
+            write_initial_proposal,
+        )
+
+        meta = {
+            "title": "Rock Song",
+            "bpm": 140,
+            "time_sig": "4/4",
+            "key": "A major",
+            "color": "Red",
+            "concept": "Driving force",
+            "singer": "gabriel",
+            "song_slug": "rock_song_v1",
+        }
+        write_initial_proposal(tmp_path, meta, ["AC/DC", "Led Zeppelin"])
+        ctx = load_song_context(tmp_path)
+        assert "aesthetic_hints" not in ctx
+
+    def test_single_ambient_artist_no_hints(self, tmp_path):
+        from app.generators.midi.production.init_production import (
+            write_initial_proposal,
+        )
+
+        meta = {
+            "title": "Mild Song",
+            "bpm": 90,
+            "time_sig": "4/4",
+            "key": "E minor",
+            "color": "Blue",
+            "concept": "Mild drift",
+            "singer": "gabriel",
+            "song_slug": "mild_song_v1",
+        }
+        # Only one ambient cluster artist — threshold is 2
+        write_initial_proposal(tmp_path, meta, ["Grouper", "Radiohead"])
+        ctx = load_song_context(tmp_path)
+        assert "aesthetic_hints" not in ctx
+
+
+# ---------------------------------------------------------------------------
+# Pattern tag fields
+# ---------------------------------------------------------------------------
+
+
+class TestPatternTags:
+    def test_drum_patterns_have_tags_field(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        for p in ALL_TEMPLATES:
+            assert hasattr(p, "tags"), f"{p.name} missing tags"
+            assert isinstance(p.tags, list), f"{p.name}.tags not a list"
+
+    def test_bass_patterns_have_tags_field(self):
+        from app.generators.midi.patterns.bass_patterns import ALL_TEMPLATES
+
+        for p in ALL_TEMPLATES:
+            assert hasattr(p, "tags"), f"{p.name} missing tags"
+            assert isinstance(p.tags, list), f"{p.name}.tags not a list"
+
+    def test_melody_patterns_have_tags_field(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        for p in ALL_TEMPLATES:
+            assert hasattr(p, "tags"), f"{p.name} missing tags"
+            assert isinstance(p.tags, list), f"{p.name}.tags not a list"
+
+    def test_sparse_drum_templates_filterable(self):
+        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+
+        sparse = [p for p in ALL_TEMPLATES if "sparse" in p.tags]
+        assert len(sparse) >= 5, f"Expected ≥5 sparse drum templates, got {len(sparse)}"
+
+    def test_drone_bass_templates_filterable(self):
+        from app.generators.midi.patterns.bass_patterns import ALL_TEMPLATES
+
+        drone_pedal = [p for p in ALL_TEMPLATES if {"drone", "pedal"} & set(p.tags)]
+        assert (
+            len(drone_pedal) >= 4
+        ), f"Expected ≥4 drone/pedal bass templates, got {len(drone_pedal)}"
+
+    def test_lamentful_melody_templates_filterable(self):
+        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+
+        lamentful = [p for p in ALL_TEMPLATES if "lamentful" in p.tags]
+        assert (
+            len(lamentful) >= 4
+        ), f"Expected ≥4 lamentful melody templates, got {len(lamentful)}"
+
+
+# ---------------------------------------------------------------------------
+# Aesthetic tag adjustment
+# ---------------------------------------------------------------------------
+
+
+class TestAestheticTagAdjustment:
+    def test_sparse_hint_boosts_sparse_pattern(self):
+        from app.generators.midi.patterns.aesthetic_hints import (
+            aesthetic_tag_adjustment,
+        )
+
+        adj = aesthetic_tag_adjustment(["sparse", "ambient"], {"density": "sparse"})
+        assert adj == 0.10
+
+    def test_dense_hint_penalises_sparse_pattern(self):
+        from app.generators.midi.patterns.aesthetic_hints import (
+            aesthetic_tag_adjustment,
+        )
+
+        adj = aesthetic_tag_adjustment(["sparse"], {"density": "dense"})
+        assert adj == -0.05
+
+    def test_no_hints_returns_zero(self):
+        from app.generators.midi.patterns.aesthetic_hints import (
+            aesthetic_tag_adjustment,
+        )
+
+        assert aesthetic_tag_adjustment(["sparse"], None) == 0.0
+        assert aesthetic_tag_adjustment([], {"density": "sparse"}) == 0.0
+
+    def test_no_matching_tags_returns_zero(self):
+        from app.generators.midi.patterns.aesthetic_hints import (
+            aesthetic_tag_adjustment,
+        )
+
+        adj = aesthetic_tag_adjustment(["motorik"], {"density": "sparse"})
+        assert adj == 0.0
+
+
+class TestArcToEnergy:
+    def test_low_arc(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_to_energy
+
+        assert arc_to_energy(0.10) == "low"
+        assert arc_to_energy(0.0) == "low"
+        assert arc_to_energy(0.29) == "low"
+
+    def test_medium_arc(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_to_energy
+
+        assert arc_to_energy(0.30) == "medium"
+        assert arc_to_energy(0.50) == "medium"
+        assert arc_to_energy(0.65) == "medium"
+
+    def test_high_arc(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_to_energy
+
+        assert arc_to_energy(0.66) == "high"
+        assert arc_to_energy(0.85) == "high"
+        assert arc_to_energy(1.0) == "high"
+
+
+class TestArcTagAdjustment:
+    def test_low_arc_boosts_drone_pedal(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+
+        assert arc_tag_adjustment(0.10, ["drone"]) == pytest.approx(0.10)
+        assert arc_tag_adjustment(0.10, ["pedal"]) == pytest.approx(0.10)
+        assert arc_tag_adjustment(0.10, ["lamentful"]) == pytest.approx(0.10)
+
+    def test_high_arc_penalises_root_drone(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+
+        assert arc_tag_adjustment(0.80, ["root_drone"]) == pytest.approx(-0.05)
+
+    def test_high_arc_no_penalty_other_tags(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+
+        assert arc_tag_adjustment(0.80, ["walking"]) == pytest.approx(0.0)
+
+    def test_mid_arc_returns_zero(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+
+        assert arc_tag_adjustment(0.50, ["drone"]) == pytest.approx(0.0)
+        assert arc_tag_adjustment(0.50, ["root_drone"]) == pytest.approx(0.0)
+
+    def test_empty_tags_returns_zero(self):
+        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+
+        assert arc_tag_adjustment(0.10, []) == pytest.approx(0.0)

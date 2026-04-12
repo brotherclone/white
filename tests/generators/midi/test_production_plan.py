@@ -12,6 +12,7 @@ from app.generators.midi.production.production_plan import (
     PLAN_FILENAME,
     PlanSection,
     ProductionPlan,
+    _infer_arc_from_label,
     bootstrap_manifest,
     build_next_section_map,
     derive_bar_count,
@@ -843,3 +844,127 @@ class TestLyricRepeatTypeRoundTrip:
         assert by_name["chorus"].lyric_repeat_type == "exact"
         assert by_name["verse"].lyric_repeat_type == "variation"
         assert by_name["bridge"].lyric_repeat_type == "fresh"
+
+
+# ---------------------------------------------------------------------------
+# Arc tests
+# ---------------------------------------------------------------------------
+
+
+class TestInferArcFromLabel:
+    """_infer_arc_from_label maps canonical section labels to expected arc ranges."""
+
+    @pytest.mark.parametrize(
+        "label,expected",
+        [
+            ("intro", 0.15),
+            ("outro", 0.15),
+            ("bridge", 0.20),
+            ("verse", 0.35),
+            ("pre_chorus", 0.55),
+            ("chorus", 0.75),
+            ("refrain", 0.75),
+            ("hook", 0.75),
+            ("climax", 0.90),
+            ("peak", 0.90),
+            ("section_x", 0.40),  # unknown → default
+        ],
+    )
+    def test_canonical_labels(self, label, expected):
+        assert _infer_arc_from_label(label) == expected
+
+    def test_case_insensitive(self):
+        assert _infer_arc_from_label("CHORUS") == _infer_arc_from_label("chorus")
+
+    def test_hyphen_normalised(self):
+        assert _infer_arc_from_label("pre-chorus") == 0.55
+
+    def test_verse_2_variant(self):
+        assert _infer_arc_from_label("verse_2") == 0.35
+
+
+class TestArcRoundTrip:
+    """arc field survives save/load round-trip."""
+
+    def test_arc_written_and_loaded(self, tmp_path):
+        plan = ProductionPlan(
+            song_slug="t",
+            generated="",
+            bpm=120,
+            time_sig="4/4",
+            key="",
+            color="",
+            sections=[
+                PlanSection(name="verse", bars=4, arc=0.35),
+                PlanSection(name="chorus", bars=4, arc=0.75),
+            ],
+        )
+        save_plan(plan, tmp_path)
+        loaded = load_plan(tmp_path)
+        assert loaded.sections[0].arc == pytest.approx(0.35)
+        assert loaded.sections[1].arc == pytest.approx(0.75)
+
+    def test_arc_zero_not_written(self, tmp_path):
+        """arc=0.0 should be omitted from YAML (falsy guard)."""
+        plan = ProductionPlan(
+            song_slug="t",
+            generated="",
+            bpm=120,
+            time_sig="4/4",
+            key="",
+            color="",
+            sections=[PlanSection(name="intro", bars=2, arc=0.0)],
+        )
+        save_plan(plan, tmp_path)
+        import yaml as _yaml
+
+        with open(tmp_path / PLAN_FILENAME) as f:
+            raw = _yaml.safe_load(f)
+        assert "arc" not in raw["sections"][0]
+
+    def test_arc_missing_in_yaml_loads_as_zero(self, tmp_path):
+        """Plans written before arc field added load with arc=0.0."""
+        plan = ProductionPlan(
+            song_slug="t",
+            generated="",
+            bpm=120,
+            time_sig="4/4",
+            key="",
+            color="",
+            sections=[PlanSection(name="verse", bars=4, arc=0.0)],
+        )
+        save_plan(plan, tmp_path)
+        loaded = load_plan(tmp_path)
+        assert loaded.sections[0].arc == pytest.approx(0.0)
+
+
+class TestArcGenerateAndSync:
+    """generate_plan seeds arc; sync_plan_from_arrangement preserves human override."""
+
+    def test_generate_plan_mechanical_seeds_arc(self, tmp_path):
+        prod = tmp_path / "production" / "song"
+        prod.mkdir(parents=True)
+        _write_chord_review(
+            prod / "chords",
+            [
+                {"label": "intro", "chord_count": 4},
+                {"label": "chorus", "chord_count": 4},
+            ],
+        )
+        plan = generate_plan_mechanical(prod)
+        by_name = {s.name: s for s in plan.sections}
+        assert by_name["intro"].arc == pytest.approx(0.15)
+        assert by_name["chorus"].arc == pytest.approx(0.75)
+
+    def test_sync_preserves_human_arc_override(self, tmp_path):
+        """Human arc edits survive a plan refresh."""
+        prod = tmp_path / "production" / "song"
+        prod.mkdir(parents=True)
+        _write_chord_review(prod / "chords", [{"label": "verse", "chord_count": 4}])
+        plan = generate_plan_mechanical(prod)
+        # Human overrides arc
+        plan.sections[0].arc = 0.99
+        save_plan(plan, prod)
+
+        refreshed = refresh_plan(prod)
+        assert refreshed.sections[0].arc == pytest.approx(0.99)
