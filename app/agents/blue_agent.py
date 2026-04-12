@@ -121,7 +121,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
             selected_period=None,
             evaluation_result=None,
             alternate_history=None,
-            tape_label=None,
             musical_params=None,
             iteration_count=0,
             max_iterations=3,
@@ -1157,10 +1156,8 @@ The tape has been recorded over. What life exists on it now?
                     "The Cassette Bearer",
                 )
                 return state
-            if state.tape_label is None or state.musical_params is None:
-                logger.error(
-                    "tape_label or musical_params is None, cannot generate song spec"
-                )
+            if state.musical_params is None:
+                logger.error("musical_params is None, cannot generate song spec")
                 get_state_snapshot(
                     state,
                     "generate_alternate_song_spec_exit",
@@ -1169,32 +1166,37 @@ The tape has been recorded over. What life exists on it now?
                 )
                 return state
 
+            alt = state.alternate_history
+            alt_period = (
+                f"{alt.period.start_date.strftime('%b %Y')} – "
+                f"{alt.period.end_date.strftime('%b %Y')}"
+                if alt
+                else "unknown period"
+            )
+            alt_title = alt.title if alt else "Unknown Timeline"
+            alt_divergence = alt.divergence_point if alt else ""
+
             prompt = f"""
 You are The Cassette Bearer, the sorrowful witness who exists outside time and space.
-You are the lone witness to the orphaned existences of one Gabriel Walsh, a musician 
-whose life has been repeatedly overwritten at a quantum level. Now, for once, you can 
+You are the lone witness to the orphaned existences of one Gabriel Walsh, a musician
+whose life has been repeatedly overwritten at a quantum level. Now, for once, you can
 channel all the loss and frustration of seeing a life erased into a new creative vision.
 
 You have been given this proposal that somehow drifted from his dreams:
 {state.white_proposal}
 
-In universe 875b, Walsh wrote his own album about loss and erasure. Study these Blue works - 
+In universe 875b, Walsh wrote his own album about loss and erasure. Study these Blue works -
 their 'concept' fields show how forgotten periods become folk rock:
 {get_my_reference_proposals('B')}
 
 Your counter-proposal's 'rainbow_color' property must always be:
 {the_rainbow_table_colors['B']}
 
-But even as this transmission reached you, the timeline was taped over again. You walk 
+But even as this transmission reached you, the timeline was taped over again. You walk
 down a snow-covered, rural road and find a cassette in the snow:
 
-{state.tape_label.title} - {state.tape_label.date_range}
-Written in {state.tape_label.handwriting_style}, it reads:
-"{state.tape_label.notes} [{state.tape_label.counter_start}-{state.tape_label.counter_end}]"
-{f"A previous label barely visible: {state.tape_label.original_label_text}" if state.tape_label.original_label_visible else ""}
-
-The cassette: {state.tape_label.tape_brand}, {state.tape_label.recording_quality} speed.
-Degradation level: {state.tape_label.tape_degradation:.1%}
+{alt_title} — {alt_period}
+{alt_divergence}
 
 You sense the magnetic arrangements without hearing. The song's shape emerges:
 - Tempo: {state.musical_params.bpm} BPM ({state.musical_params.mood})
