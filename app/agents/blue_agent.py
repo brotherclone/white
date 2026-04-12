@@ -41,9 +41,6 @@ from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
 from app.structures.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
-from app.structures.artifacts.quantum_tape_label_artifact import (
-    QuantumTapeLabelArtifact,
-)
 from app.structures.concepts.alternate_history_constraints import (
     AlternateHistoryConstraints,
 )
@@ -156,7 +153,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "extract_musical_parameters", self.extract_musical_parameters
         )
-        work_flow.add_node("generate_tape_label", self.generate_tape_label)
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
@@ -172,8 +168,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             },
         )
         work_flow.add_edge("generate_alternate_history", "extract_musical_parameters")
-        work_flow.add_edge("extract_musical_parameters", "generate_tape_label")
-        work_flow.add_edge("generate_tape_label", "generate_alternate_song_spec")
+        work_flow.add_edge("extract_musical_parameters", "generate_alternate_song_spec")
         work_flow.add_edge("generate_alternate_song_spec", END)
 
         return work_flow
@@ -1067,83 +1062,6 @@ The tape has been recorded over. What life exists on it now?
         return note
 
     @agent_error_handler("The Cassette Bearer")
-    def generate_tape_label(self, state: BlueAgentState) -> BlueAgentState:
-        get_state_snapshot(
-            state, "generate_tape_label_enter", state.thread_id, "The Cassette Bearer"
-        )
-        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
-        from app.structures.enums.quantum_tape_recording_quality import (
-            QuantumTapeRecordingQuality,
-        )
-
-        alternate = state.alternate_history
-        if alternate is None:
-            logger.error("alternate_history is None, cannot generate tape label")
-            get_state_snapshot(
-                state,
-                "generate_tape_label_exit",
-                state.thread_id,
-                "The Cassette Bearer",
-            )
-            return state
-
-        quality = random.choices(
-            [
-                QuantumTapeRecordingQuality.SP,
-                QuantumTapeRecordingQuality.LP,
-                QuantumTapeRecordingQuality.EP,
-            ],
-            weights=[0.2, 0.6, 0.2],
-        )[0]
-        note = self._generate_a_cryptic_note(alternate)
-        base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
-        start = alternate.period.start_date
-        end = alternate.period.end_date
-        original_label = f"Gabe Walsh \u2014 {start.year}"
-        tapeover_date_str = f"{start.strftime('%b %Y')} \u2013 {end.strftime('%b %Y')}"
-        age_range = alternate.period.age_range
-        age_str = f"{age_range[0]}\u2013{age_range[1]}"
-        location_str = getattr(alternate.period, "location", None) or "Unknown"
-        catalog_str = f"QT-B-{start.year}-{state.thread_id[:6].upper()}"
-        label = QuantumTapeLabelArtifact(
-            thread_id=state.thread_id,
-            base_path=base_path,
-            image_path=f"{base_path}/img",
-            title=alternate.title,
-            date_range=f"{start} to {end}",
-            recording_quality=quality,
-            counter_start=random.randint(0, 9999),
-            counter_end=random.randint(1000, 9999),
-            notes=note,
-            original_label_visible=True,
-            original_label_text=original_label,
-            tape_degradation=random.uniform(0.1, 0.4),
-            year_documented=str(start.year),
-            original_date=str(start.year),
-            original_title=original_label,
-            tapeover_date=tapeover_date_str,
-            tapeover_title=alternate.title,
-            subject_name="Gabe Walsh",
-            age_during=age_str,
-            location=location_str,
-            catalog_number=catalog_str,
-        )
-        try:
-            label.save_file()
-            state.artifacts.append(label)
-            state.tape_label = label
-            logger.info(f"Saved tape label artifact: {label.file_path}")
-            return state
-        except Exception as e:
-            error_msg = f"Failed to save tape label artifact: {e!s}"
-            logger.error(error_msg)
-            if block_mode:
-                raise Exception(error_msg)
-        get_state_snapshot(
-            state, "generate_tape_label_exit", state.thread_id, "The Cassette Bearer"
-        )
-        return state
-
     def _format_alternate_history_for_prompt(
         self, alt: AlternateTimelineArtifact
     ) -> str:

@@ -6,9 +6,6 @@ from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from app.structures.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
-from app.structures.artifacts.quantum_tape_label_artifact import (
-    QuantumTapeLabelArtifact,
-)
 from app.structures.concepts.biographical_period import BiographicalPeriod
 from app.structures.concepts.biographical_timeline import BiographicalTimeline
 from app.structures.concepts.quantum_tape_musical_parameters import (
@@ -56,9 +53,6 @@ class BlueAgentState(BaseRainbowAgentState):
     alternate_history: Annotated[
         Optional[AlternateTimelineArtifact], lambda x, y: y or x
     ] = None
-    tape_label: Annotated[Optional[QuantumTapeLabelArtifact], lambda x, y: y or x] = (
-        None
-    )
     musical_params: Annotated[
         Optional[QuantumTapeMusicalParameters], lambda x, y: y or x
     ] = None
