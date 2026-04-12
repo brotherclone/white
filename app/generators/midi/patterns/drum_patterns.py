@@ -1479,7 +1479,7 @@ TEMPLATES_4_4_SPARSE = [
         genre_family="ambient",
         energy="low",
         time_sig=(4, 4),
-        description="Single low kick every 2 bars (kick on beat 1 only), crash swell on bar 4.",
+        description="Single low kick on beat 1, ghost crash on beat 4 — minimal one-bar pulse for ambient intro/outro.",
         voices={
             "kick": [(0, "normal")],
             "crash": [(3, "ghost")],

@@ -1,0 +1,24 @@
+temporal:
+  past: 0.4768580198287964
+  present: 0.21989519894123077
+  future: 0.30324673652648926
+spatial:
+  thing: 0.4782835841178894
+  place: 0.302162230014801
+  person: 0.21955424547195435
+ontological:
+  imagined: 0.31789302825927734
+  forgotten: 0.2962284982204437
+  known: 0.38587841391563416
+confidence: 0.1091
+chromatic_match: 0.1534
+drift:
+  temporal_delta: -0.5801
+  spatial_delta: -0.5804
+  ontological_delta: -0.4821
+  overall_drift: 0.5475
+metadata:
+  audio_file: /Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Listening/The
+    Network Dreams of Synapses.mp3
+  timestamp: '2026-04-12T12:50:52.399696+00:00'
+  onnx_path: /Volumes/LucidNonsense/White/training/data/refractor.onnx
