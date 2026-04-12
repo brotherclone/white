@@ -32,6 +32,85 @@ A Next.js 15 app (App Router, TypeScript, Tailwind CSS) SHALL live in `web/` and
 
 ## ADDED Requirements
 
+### Requirement: Evolve Candidates
+The UI SHALL allow the user to generate evolved pattern candidates for drums, bass, or melody phases by clicking an "Evolve" button in the phase toolbar. The button SHALL only appear when a phase that supports evolution (drums, bass, melody) is selected. Evolved candidates join the existing candidate list with an "evolved" badge and are reviewed through the same approve/reject flow.
+
+#### Scenario: Evolve button visible for supported phases
+- **WHEN** the phase filter is set to drums, bass, or melody
+- **THEN** an Evolve button appears in the toolbar alongside the Promote button
+
+#### Scenario: Evolve button absent for unsupported phases
+- **WHEN** the phase filter is set to chords, quartet, or "all"
+- **THEN** no Evolve button is shown
+
+#### Scenario: Evolve action
+- **WHEN** the Evolve button is clicked
+- **THEN** `POST /evolve` is called with `{production_dir, phase}`
+- **AND** a spinner shows while generation runs (evolution takes 10–30s)
+- **AND** on completion the candidate list refreshes and new evolved candidates appear with an "evolved" badge
+- **AND** a toast reports how many evolved candidates were added
+
+#### Scenario: Evolved badge
+- **WHEN** a candidate has `is_evolved: true` in the review
+- **THEN** an "evolved" badge is shown on that row so it's visually distinct from template candidates
+
+### Requirement: ACE Studio Integration
+The UI SHALL surface the ACE Studio vocal synthesis handoff as two action buttons in the melody phase toolbar: "Export to ACE Studio" (after melody is promoted) and "Import Render" (after export). Both SHALL call FastAPI endpoints that wrap the existing `ace_studio_export` and `ace_studio_import` logic.
+
+#### Scenario: Export button visible after melody promoted
+- **WHEN** the phase filter is set to melody AND melody phase status is "promoted"
+- **THEN** an "Export to ACE Studio" button appears in the toolbar
+
+#### Scenario: Export to ACE Studio
+- **WHEN** "Export to ACE Studio" is clicked
+- **THEN** `POST /ace/export` is called with `{production_dir}`
+- **AND** a spinner shows while the export runs
+- **AND** on success a toast shows the singer name and number of sections exported
+- **AND** the button changes to "Exported ✓" with the singer name
+
+#### Scenario: ACE Studio not running
+- **WHEN** `POST /ace/export` is called and ACE Studio is not reachable
+- **THEN** a 503 error toast is shown: "ACE Studio not running — launch it first"
+
+#### Scenario: Import render
+- **WHEN** "Import Render" is clicked
+- **THEN** `POST /ace/import` is called with `{production_dir}`
+- **AND** on success a toast confirms the WAV path ingested
+- **AND** the button changes to "Render imported ✓"
+
+### Requirement: Evolve Endpoint
+The FastAPI backend SHALL expose a `POST /evolve` endpoint that runs evolutionary pattern breeding for a given production directory and phase, returning the count of new evolved candidates generated.
+
+#### Scenario: Valid evolve request
+- **WHEN** `POST /evolve` is called with a valid `production_dir` and `phase` in `[drums, bass, melody]`
+- **THEN** the evolutionary pipeline runs and new candidates are written to the phase's candidates directory
+- **AND** `{"ok": true, "evolved_count": N}` is returned
+
+#### Scenario: Unsupported phase for evolution
+- **WHEN** `POST /evolve` is called with `phase` in `[chords, quartet]`
+- **THEN** a 400 response is returned
+
+### Requirement: ACE Studio Endpoints
+The FastAPI backend SHALL expose `POST /ace/export` and `POST /ace/import` endpoints wrapping the existing `ace_studio_export` and `ace_studio_import` logic.
+
+#### Scenario: Export succeeds
+- **WHEN** `POST /ace/export` is called with a valid `production_dir`
+- **AND** ACE Studio is running
+- **THEN** `{"ok": true, "singer": "...", "sections": [...]}` is returned
+
+#### Scenario: ACE Studio unreachable
+- **WHEN** `POST /ace/export` is called and the MCP server is not responding
+- **THEN** a 503 response is returned with message "ACE Studio not running"
+
+#### Scenario: Import succeeds
+- **WHEN** `POST /ace/import` is called with a valid `production_dir`
+- **AND** a WAV render exists in the expected location
+- **THEN** `{"ok": true, "render_path": "..."}` is returned
+
+#### Scenario: No render found
+- **WHEN** `POST /ace/import` is called and no VocalSynth WAV exists
+- **THEN** a 404 response is returned
+
 ### Requirement: Promote Endpoint
 The FastAPI backend SHALL expose a `POST /promote` endpoint that runs phase promotion for a given production directory and phase. The endpoint SHALL validate the phase value and return a structured result.
 
