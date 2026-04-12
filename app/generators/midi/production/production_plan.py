@@ -46,7 +46,7 @@ class PlanSection:
     name: str
     bars: int
     play_count: int = 1
-    vocals: bool = False
+    vocals: bool = True
     notes: str = ""
     reason: str = ""  # Claude's per-section compositional note
     lyric_repeat_type: str = "fresh"  # exact | variation | fresh
@@ -65,7 +65,7 @@ class ProductionPlan:
     color: str
     title: str = ""
     source_proposal: Optional[str] = None
-    vocals_planned: bool = False
+    vocals_planned: bool = True
     sounds_like: list = field(default_factory=list)
     genres: list = field(default_factory=list)
     mood: list = field(default_factory=list)
@@ -248,7 +248,7 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
                 name=s["name"],
                 bars=int(s["bars"]),
                 play_count=int(s.get("play_count", s.get("repeat", 1))),
-                vocals=bool(s.get("vocals", False)),
+                vocals=bool(s.get("vocals", True)),
                 notes=str(s.get("notes", "") or ""),
                 reason=str(s.get("reason", "") or ""),
                 lyric_repeat_type=_normalize_repeat_type(s.get("lyric_repeat_type")),
@@ -266,7 +266,7 @@ def load_plan(production_dir: Path) -> Optional[ProductionPlan]:
         color=str(data.get("color") or ctx.get("color") or ""),
         title=str(data.get("title", "")),
         source_proposal=data.get("source_proposal"),
-        vocals_planned=bool(data.get("vocals_planned", False)),
+        vocals_planned=bool(data.get("vocals_planned", True)),
         sounds_like=data.get("sounds_like") or ctx.get("sounds_like") or [],
         genres=data.get("genres") or [],
         mood=data.get("mood") or [],
@@ -514,15 +514,14 @@ def generate_plan_mechanical(
     if not unique_sections:
         raise ValueError("No approved chord sections found in chords/review.yml")
 
-    # Section names that conventionally carry lead vocals
-    _VOCAL_SECTIONS = {
-        "verse",
-        "chorus",
-        "hook",
-        "pre_chorus",
-        "post_chorus",
-        "refrain",
-        "bridge",
+    # Section labels that conventionally carry no lead vocals
+    _INSTRUMENTAL_SECTIONS = {
+        "intro",
+        "outro",
+        "instrumental",
+        "solo",
+        "interlude",
+        "break",
     }
 
     sections = []
@@ -536,8 +535,9 @@ def generate_plan_mechanical(
             hr_distribution=s.get("hr_distribution"),
         )
         label_key = s["label"].lower().replace("-", "_").replace(" ", "_")
-        vocals = any(
-            label_key == v or label_key.startswith(v + "_") for v in _VOCAL_SECTIONS
+        vocals = not any(
+            label_key == v or label_key.startswith(v + "_")
+            for v in _INSTRUMENTAL_SECTIONS
         )
         sec = PlanSection(
             name=s["label"],
