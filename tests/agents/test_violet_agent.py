@@ -1,14 +1,17 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
-from app.agents.violet_agent import VioletAgent
+from app.agents.violet_agent import DisruptionExchange, VioletAgent
 from app.structures.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
 )
 from app.structures.concepts.vanity_interview_question import VanityInterviewQuestion
 from app.structures.concepts.vanity_interview_response import VanityInterviewResponse
 from app.structures.concepts.vanity_persona import VanityPersona
+from app.structures.enums.disrupting_event_type import DisruptingEventType
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
@@ -96,6 +99,7 @@ class TestVioletAgentGraphCreation:
             "select_persona",
             "generate_questions",
             "simulated_interview",
+            "inject_disrupting_event",
             "synthesize_interview",
             "generate_alternate_song_spec",
         ]
@@ -507,3 +511,98 @@ class TestVioletAgentErrorHandling:
 
         with pytest.raises(Exception):
             violet_agent.generate_alternate_song_spec(violet_agent_state)
+
+
+class TestInjectDisruptingEvent:
+    """Tests for inject_disrupting_event node and _disruption_router."""
+
+    def test_inject_appends_exchange_and_sets_event_type(
+        self, violet_agent, violet_agent_state, monkeypatch
+    ):
+        """inject_disrupting_event appends sentinel Q99 and sets disrupting_event on state."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+
+        violet_agent_state.interviewer_persona = VanityPersona()
+        violet_agent_state.interview_questions = [
+            VanityInterviewQuestion(number=1, question="Test question?"),
+        ]
+        violet_agent_state.interview_responses = [
+            VanityInterviewResponse(question_number=1, response="Test answer."),
+        ]
+
+        mock_exchange = DisruptionExchange(
+            interviewer_line="The tape deck is running backwards.",
+            gabe_response="I know. I let it.",
+        )
+        mock_llm = MagicMock()
+        mock_llm.with_structured_output.return_value.invoke.return_value = mock_exchange
+
+        with patch.object(violet_agent, "llm", mock_llm):
+            result = violet_agent.inject_disrupting_event(violet_agent_state)
+
+        assert result.disrupting_event is not None
+        assert isinstance(result.disrupting_event, DisruptingEventType)
+        assert len(result.interview_questions) == 2
+        assert len(result.interview_responses) == 2
+        assert result.interview_questions[-1].number == 99
+        assert (
+            result.interview_questions[-1].question
+            == "The tape deck is running backwards."
+        )
+        assert result.interview_responses[-1].response == "I know. I let it."
+
+    def test_inject_skipped_in_mock_mode(
+        self, violet_agent, violet_agent_state, monkeypatch
+    ):
+        """inject_disrupting_event returns state unchanged when MOCK_MODE=true."""
+        monkeypatch.setenv("MOCK_MODE", "true")
+
+        violet_agent_state.interviewer_persona = VanityPersona()
+        violet_agent_state.interview_responses = [
+            VanityInterviewResponse(question_number=1, response="Test answer."),
+        ]
+
+        result = violet_agent.inject_disrupting_event(violet_agent_state)
+
+        assert result.disrupting_event is None
+        assert len(result.interview_responses) == 1
+
+    def test_disruption_router_returns_skip_at_zero_probability(self, monkeypatch):
+        """Router always returns 'skip' when VIOLET_DISRUPTION_PROBABILITY=0.0."""
+        monkeypatch.setenv("VIOLET_DISRUPTION_PROBABILITY", "0.0")
+        state = VioletAgentState(thread_id="test-thread")
+        result = VioletAgent._disruption_router(state)
+        assert result == "skip"
+
+    def test_disruption_router_returns_inject_at_full_probability(self, monkeypatch):
+        """Router always returns 'inject' when VIOLET_DISRUPTION_PROBABILITY=1.0."""
+        monkeypatch.setenv("VIOLET_DISRUPTION_PROBABILITY", "1.0")
+        state = VioletAgentState(thread_id="test-thread")
+        result = VioletAgent._disruption_router(state)
+        assert result == "inject"
+
+    def test_full_workflow_still_passes_in_mock_mode(self, violet_agent, mock_env_vars):
+        """Full workflow completes with disruption node present (MOCK_MODE skips injection)."""
+        proposals = SongProposal(
+            iterations=[
+                SongProposalIteration(
+                    iteration_id="white_001",
+                    bpm=120,
+                    tempo="4/4",
+                    key="C Major",
+                    rainbow_color="white",
+                    title="Initial Song",
+                    mood=["contemplative"],
+                    genres=["experimental"],
+                    concept="A test concept for disruption node integration, exploring dialectical tension through adversarial interview techniques and philosophical inquiry.",
+                )
+            ]
+        )
+        main_state = MainAgentState(
+            thread_id="mock_thread_001", song_proposals=proposals
+        )
+        result = violet_agent(main_state)
+
+        assert result is not None
+        assert isinstance(result, MainAgentState)
+        assert len(result.song_proposals.iterations) == 2
