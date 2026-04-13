@@ -11,6 +11,7 @@ from app.structures.concepts.vanity_interview_question import VanityInterviewQue
 from app.structures.concepts.vanity_interview_response import VanityInterviewResponse
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
+from app.structures.enums.disrupting_event_type import DISRUPTION_QUESTION_NUMBER
 
 load_dotenv()
 
@@ -39,6 +40,10 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
     was_human_interview: bool = Field(
         default=False, description="True if real Gabe answered (9% HitL)"
     )
+    disrupting_event_type: str | None = Field(
+        default=None,
+        description="Lynchian disruption type injected mid-interview, if any",
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -55,6 +60,7 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
             "questions": [q.model_dump(mode="json") for q in self.questions],
             "responses": [r.model_dump(mode="json") for r in self.responses],
             "was_human_interview": self.was_human_interview,
+            "disrupting_event_type": self.disrupting_event_type,
         }
 
     def save_file(self):
@@ -80,8 +86,14 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
             "",
         ]
         for q, r in zip(self.questions, self.responses):
-            report_lines.append(f"Q{q.number}: {q.question}")
-            report_lines.append(f"A{q.number}: {r.response}")
+            if q.number == DISRUPTION_QUESTION_NUMBER:
+                report_lines.append(
+                    f"[DISRUPTION — {self.disrupting_event_type}]: {q.question}"
+                )
+                report_lines.append(f"Walsh: {r.response}")
+            else:
+                report_lines.append(f"Q{q.number}: {q.question}")
+                report_lines.append(f"A{q.number}: {r.response}")
             report_lines.append("")
         return "\n".join(report_lines)
 
@@ -98,19 +110,39 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
             "---",
             "",
         ]
-        for q, r in zip(self.questions, self.responses):
-            lines.extend(
-                [
-                    f"## Question {q.number}",
-                    "",
-                    f"**{self.interviewer_name}:** {q.question}",
-                    "",
-                    f"**Walsh:** {r.response}",
-                    "",
-                    "---",
-                    "",
-                ]
-            )
+        pairs = list(zip(self.questions, self.responses))
+        for q, r in pairs:
+            if q.number == DISRUPTION_QUESTION_NUMBER:
+                event_label = (
+                    self.disrupting_event_type.replace("_", " ").title()
+                    if self.disrupting_event_type
+                    else "Disruption"
+                )
+                lines.extend(
+                    [
+                        f"## ⚡ {event_label}",
+                        "",
+                        f"**{self.interviewer_name}:** {q.question}",
+                        "",
+                        f"**Walsh:** {r.response}",
+                        "",
+                        "---",
+                        "",
+                    ]
+                )
+            else:
+                lines.extend(
+                    [
+                        f"## Question {q.number}",
+                        "",
+                        f"**{self.interviewer_name}:** {q.question}",
+                        "",
+                        f"**Walsh:** {r.response}",
+                        "",
+                        "---",
+                        "",
+                    ]
+                )
         return "\n".join(lines)
 
 
