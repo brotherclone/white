@@ -117,19 +117,19 @@ class TestWriteAndLoadInitialProposal:
         meta = self._make_meta()
         out = write_initial_proposal(tmp_path, meta, ["Sufjan Stevens", "Bon Iver"])
         assert out.exists()
-        assert out.name == "initial_proposal.yml"
+        assert out.name == "song_context.yml"
 
     def test_round_trip_sounds_like(self, tmp_path):
         meta = self._make_meta()
         sounds_like = ["Sufjan Stevens", "Bon Iver", "The National"]
         write_initial_proposal(tmp_path, meta, sounds_like)
-        loaded = load_initial_proposal(tmp_path)
+        loaded = load_song_context(tmp_path)
         assert loaded["sounds_like"] == sounds_like
 
     def test_round_trip_metadata_fields(self, tmp_path):
         meta = self._make_meta()
         write_initial_proposal(tmp_path, meta, [])
-        loaded = load_initial_proposal(tmp_path)
+        loaded = load_song_context(tmp_path)
         assert loaded["color"] == "Red"
         assert loaded["concept"] == "Memory and loss"
         assert loaded["singer"] == "Gabriel"
@@ -139,23 +139,23 @@ class TestWriteAndLoadInitialProposal:
 
     def test_proposed_by_is_claude(self, tmp_path):
         write_initial_proposal(tmp_path, self._make_meta(), [])
-        loaded = load_initial_proposal(tmp_path)
+        loaded = load_song_context(tmp_path)
         assert loaded["proposed_by"] == "claude"
 
     def test_generated_timestamp_present(self, tmp_path):
         write_initial_proposal(tmp_path, self._make_meta(), [])
-        loaded = load_initial_proposal(tmp_path)
+        loaded = load_song_context(tmp_path)
         assert "generated" in loaded
         assert loaded["generated"]
 
     def test_production_dir_created_if_missing(self, tmp_path):
         nested = tmp_path / "deep" / "nested"
         write_initial_proposal(nested, self._make_meta(), [])
-        assert (nested / "initial_proposal.yml").exists()
+        assert (nested / "song_context.yml").exists()
 
     def test_sounds_like_is_list_of_strings(self, tmp_path):
         write_initial_proposal(tmp_path, self._make_meta(), ["Artist A", "Artist B"])
-        loaded = load_initial_proposal(tmp_path)
+        loaded = load_song_context(tmp_path)
         assert isinstance(loaded["sounds_like"], list)
         for name in loaded["sounds_like"]:
             assert isinstance(name, str)
@@ -187,7 +187,7 @@ class TestInitProductionIntegration:
     def _make_claude_response(self) -> str:
         return "- Sufjan Stevens\n- Bon Iver\n- The National\n- Low\n"
 
-    def test_writes_initial_proposal_yml(self, tmp_path):
+    def test_writes_song_context_yml(self, tmp_path):
         proposal_path = _make_proposal_yml(tmp_path)
         prod_dir = tmp_path / "production" / "test_song"
 
@@ -200,6 +200,7 @@ class TestInitProductionIntegration:
                 song_proposal_path=proposal_path,
             )
 
+        assert out.name == "song_context.yml"
         assert out.exists()
         loaded = yaml.safe_load(out.read_text())
         assert "sounds_like" in loaded
@@ -227,7 +228,7 @@ class TestInitProductionIntegration:
         proposal_path = _make_proposal_yml(tmp_path)
         prod_dir = tmp_path / "production" / "test_song"
         prod_dir.mkdir(parents=True)
-        existing = prod_dir / "initial_proposal.yml"
+        existing = prod_dir / "song_context.yml"
         existing.write_text(yaml.dump({"sounds_like": ["Pre-existing Artist"]}))
 
         call_count = 0
@@ -255,7 +256,7 @@ class TestInitProductionIntegration:
         proposal_path = _make_proposal_yml(tmp_path)
         prod_dir = tmp_path / "production" / "test_song"
         prod_dir.mkdir(parents=True)
-        (prod_dir / "initial_proposal.yml").write_text(
+        (prod_dir / "song_context.yml").write_text(
             yaml.dump({"sounds_like": ["Old Artist"]})
         )
 
@@ -297,9 +298,8 @@ class TestSongContextYml:
             "mood": ["melancholic"],
         }
 
-    def test_song_context_written_alongside_initial_proposal(self, tmp_path):
+    def test_song_context_written(self, tmp_path):
         write_initial_proposal(tmp_path, self._make_meta(), ["Sufjan Stevens"])
-        assert (tmp_path / "initial_proposal.yml").exists()
         assert (tmp_path / "song_context.yml").exists()
 
     def test_song_context_round_trip(self, tmp_path):
@@ -367,7 +367,8 @@ class TestLoadInitialProposalFallback:
         assert result["sounds_like"] == ["Grouper", "The Caretaker"]
         assert result["color"] == "Violet"
 
-    def test_prefers_initial_proposal_when_both_exist(self, tmp_path):
+    def test_prefers_song_context_when_both_exist(self, tmp_path):
+        """song_context.yml takes precedence over initial_proposal.yml."""
         import yaml as _yaml
 
         (tmp_path / "initial_proposal.yml").write_text(
@@ -377,7 +378,8 @@ class TestLoadInitialProposalFallback:
             _yaml.dump({"sounds_like": ["From context"], "color": "Blue"})
         )
         result = load_initial_proposal(tmp_path)
-        assert result["sounds_like"] == ["From initial"]
+        assert result["sounds_like"] == ["From context"]
+        assert result["color"] == "Blue"
 
     def test_returns_empty_when_neither_exists(self, tmp_path):
         result = load_initial_proposal(tmp_path)

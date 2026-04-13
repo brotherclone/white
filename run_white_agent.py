@@ -97,6 +97,9 @@ def start_workflow(args):
     if getattr(args, "with_html", False):
         os.environ["WHITE_WITH_HTML"] = "true"
 
+    if not getattr(args, "no_browser", False):
+        os.environ["AUTO_BROWSER_LAUNCH"] = "true"
+
     logging.info("=" * 60)
     logging.info("🎵 STARTING WHITE AGENT WORKFLOW")
     logging.info("=" * 60)
@@ -201,6 +204,12 @@ def main():
         action="store_true",
         default=False,
         help="Generate HTML artifacts (character sheets, timeline pages). Off by default to save LLM and image generation cost.",
+    )
+    start_parser.add_argument(
+        "--no-browser",
+        action="store_true",
+        default=False,
+        help="Suppress automatic browser launch after chord generation completes.",
     )
 
     validate_parser = subparsers.add_parser(

@@ -56,6 +56,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def _is_white_proposal(iteration: "SongProposalIteration") -> bool:
+    """Return True when an iteration belongs to the White song."""
+    color = iteration.rainbow_color
+    if hasattr(color, "color_name"):
+        return color.color_name.lower() == "white"
+    return str(color).lower().startswith("white")
+
+
 class WhiteAgent(BaseModel):
     agents: Dict[str, Any] = {}
     settings: AgentSettings = AgentSettings()
@@ -83,6 +91,70 @@ class WhiteAgent(BaseModel):
     def _artifact_base_path() -> str:
         """Return the base path for artifacts from the environment variable."""
         return os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
+
+    def _launch_review_browser(self, production_dirs: list[Path]) -> None:
+        """Launch candidate server and Next.js if not running, then open the review UI.
+
+        All subprocess launches and the browser open are wrapped in a single try/except
+        so that a missing binary or headless environment never interrupts finalize_song_proposal.
+        """
+        import socket
+        import subprocess
+        import time
+        import urllib.parse
+        import webbrowser
+
+        def _is_port_open(port: int) -> bool:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(0.5)
+                return s.connect_ex(("localhost", port)) == 0
+
+        if not production_dirs:
+            logger.warning(
+                "Skipping review browser launch: no production directories provided."
+            )
+            return
+
+        first_dir = production_dirs[0]
+
+        try:
+            if not _is_port_open(8000):
+                logger.info("Launching candidate server on port 8000...")
+                subprocess.Popen(
+                    [
+                        "python",
+                        "-m",
+                        "app.tools.candidate_server",
+                        "--production-dir",
+                        str(first_dir),
+                    ],
+                    start_new_session=True,
+                )
+
+            if not _is_port_open(3000):
+                logger.info("Launching Next.js dev server on port 3000...")
+                web_dir = Path(__file__).parent.parent.parent / "web"
+                subprocess.Popen(
+                    ["npm", "run", "dev"],
+                    cwd=web_dir,
+                    start_new_session=True,
+                )
+
+            # Wait up to 5s for the FastAPI server to become ready
+            for _ in range(10):
+                if _is_port_open(8000):
+                    break
+                time.sleep(0.5)
+
+            encoded_dir = urllib.parse.quote(first_dir.as_posix(), safe="")
+            url = f"http://localhost:3000?production-dir={encoded_dir}&phase=chords"
+            logger.info(f"Opening review browser: {url}")
+            webbrowser.open(url)
+        except Exception as exc:
+            logger.warning(
+                "Review browser auto-launch failed; continuing without opening the UI: %s",
+                exc,
+            )
 
     def _invoke_chord_pipeline_safe(self, thread_dir: str, song_filename: str) -> None:
         """Safely invoke the chord pipeline in-process; never raises."""
@@ -2595,12 +2667,53 @@ Structure your synthesis as the final creative brief before manifestation.
                     "Chord auto-kickoff skipped: no song proposal iterations"
                 )
             else:
-                final = iterations[-1]
-                thread_dir = str(Path(self._artifact_base_path()) / state.thread_id)
-                song_filename = (
-                    f"song_proposal_{final.rainbow_color}_{final.iteration_id}.yml"
-                )
-                self._invoke_chord_pipeline_safe(thread_dir, song_filename)
+                final_iterations = [it for it in iterations if it.is_final]
+                if not final_iterations:
+                    logger.warning("Chord auto-kickoff skipped: no is_final iterations")
+                else:
+                    # Sort White last — it synthesises from the other songs
+                    final_iterations.sort(key=lambda it: _is_white_proposal(it))
+
+                    thread_dir = str(Path(self._artifact_base_path()) / state.thread_id)
+                    production_dirs: list[Path] = []
+
+                    from app.generators.midi.pipelines.chord_pipeline import (  # circular import
+                        song_slug,
+                    )
+                    from app.generators.midi.production.init_production import (  # circular import
+                        init_production as _run_init_production,
+                    )
+
+                    for final in final_iterations:
+                        song_filename = f"song_proposal_{final.rainbow_color}_{final.iteration_id}.yml"
+                        song_proposal_path = Path(thread_dir) / "yml" / song_filename
+                        prod_dir = (
+                            Path(thread_dir) / "production" / song_slug(song_filename)
+                        )
+
+                        try:
+                            _run_init_production(
+                                production_dir=prod_dir,
+                                song_proposal_path=song_proposal_path,
+                            )
+                        except Exception as e:
+                            logger.warning(
+                                f"init_production failed for {song_filename}: {e}"
+                            )
+
+                        self._invoke_chord_pipeline_safe(thread_dir, song_filename)
+                        production_dirs.append(prod_dir)
+
+                    if (
+                        os.getenv("AUTO_BROWSER_LAUNCH", "false").lower() == "true"
+                        and production_dirs
+                    ):
+                        non_white_dirs = [
+                            d
+                            for d, it in zip(production_dirs, final_iterations)
+                            if not _is_white_proposal(it)
+                        ] or production_dirs
+                        self._launch_review_browser(non_white_dirs)
 
         return state
 
