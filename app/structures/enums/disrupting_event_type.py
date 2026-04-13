@@ -1,5 +1,7 @@
 from enum import Enum
 
+DISRUPTION_QUESTION_NUMBER = 99
+
 
 class DisruptingEventType(str, Enum):
     STRANGER_ENTERS = "stranger_enters"

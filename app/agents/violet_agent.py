@@ -33,7 +33,10 @@ from app.structures.concepts.vanity_interview_response import (
     VanityInterviewResponse,
 )
 from app.structures.concepts.vanity_persona import VanityPersona
-from app.structures.enums.disrupting_event_type import DisruptingEventType
+from app.structures.enums.disrupting_event_type import (
+    DISRUPTION_QUESTION_NUMBER,
+    DisruptingEventType,
+)
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
@@ -152,7 +155,11 @@ class VioletAgent(BaseRainbowAgent, ABC):
     @staticmethod
     def _disruption_router(state: VioletAgentState) -> str:
         """Route to inject_disrupting_event with configurable probability, else skip."""
-        prob = float(os.getenv("VIOLET_DISRUPTION_PROBABILITY", "0.4"))
+        try:
+            prob = float(os.getenv("VIOLET_DISRUPTION_PROBABILITY", "0.4"))
+        except ValueError:
+            logger.warning("Invalid VIOLET_DISRUPTION_PROBABILITY; defaulting to 0.4")
+            prob = 0.4
         return "inject" if random.random() < prob else "skip"
 
     @staticmethod
@@ -530,7 +537,6 @@ Keep response 2-4 sentences. Output as JSON:
             return state
 
         event_type = random.choice(list(DisruptingEventType))
-        state.disrupting_event = event_type
         logger.info(f"⚡ Disrupting event: {event_type.value}")
 
         style_descriptions = {
@@ -579,10 +585,11 @@ Not horror — just wrong. The frame breaks, then continues."""
             exchange = structured_llm.invoke(prompt)
 
             sentinel_q = VanityInterviewQuestion(
-                number=99, question=exchange.interviewer_line
+                number=DISRUPTION_QUESTION_NUMBER, question=exchange.interviewer_line
             )
             disruption_r = VanityInterviewResponse(
-                question_number=99, response=exchange.gabe_response
+                question_number=DISRUPTION_QUESTION_NUMBER,
+                response=exchange.gabe_response,
             )
 
             state.interview_questions = list(state.interview_questions or []) + [
@@ -591,6 +598,7 @@ Not horror — just wrong. The frame breaks, then continues."""
             state.interview_responses = list(state.interview_responses or []) + [
                 disruption_r
             ]
+            state.disrupting_event = event_type
 
             logger.info(f"   Disruption appended: {exchange.interviewer_line[:60]}...")
         except Exception as e:

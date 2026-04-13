@@ -11,6 +11,7 @@ from app.structures.concepts.vanity_interview_question import VanityInterviewQue
 from app.structures.concepts.vanity_interview_response import VanityInterviewResponse
 from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
 from app.structures.enums.chain_artifact_type import ChainArtifactType
+from app.structures.enums.disrupting_event_type import DISRUPTION_QUESTION_NUMBER
 
 load_dotenv()
 
@@ -85,7 +86,7 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
             "",
         ]
         for q, r in zip(self.questions, self.responses):
-            if q.number == 99:
+            if q.number == DISRUPTION_QUESTION_NUMBER:
                 report_lines.append(
                     f"[DISRUPTION — {self.disrupting_event_type}]: {q.question}"
                 )
@@ -111,7 +112,7 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
         ]
         pairs = list(zip(self.questions, self.responses))
         for q, r in pairs:
-            if q.number == 99:
+            if q.number == DISRUPTION_QUESTION_NUMBER:
                 event_label = (
                     self.disrupting_event_type.replace("_", " ").title()
                     if self.disrupting_event_type
