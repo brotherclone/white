@@ -9,6 +9,7 @@ from app.structures.artifacts.circle_jerk_interview_artifact import (
 from app.structures.concepts.vanity_interview_question import VanityInterviewQuestion
 from app.structures.concepts.vanity_interview_response import VanityInterviewResponse
 from app.structures.concepts.vanity_persona import VanityPersona
+from app.structures.enums.disrupting_event_type import DisruptingEventType
 
 
 class VioletAgentState(BaseRainbowAgentState):
@@ -40,6 +41,10 @@ class VioletAgentState(BaseRainbowAgentState):
     circle_jerk_interview: Annotated[
         Optional[CircleJerkInterviewArtifact], lambda x, y: y or x
     ] = Field(default=None, description="Complete interview artifact with transcript")
+    disrupting_event: Optional[DisruptingEventType] = Field(
+        default=None,
+        description="Lynchian disruption type injected mid-interview, if any",
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
