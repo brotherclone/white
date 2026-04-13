@@ -1,10 +1,11 @@
 """Tests for WhiteAgent auto-chord-kickoff feature."""
 
 import logging
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from app.agents.states.white_agent_state import MainAgentState
-from app.agents.white_agent import WhiteAgent
+from app.agents.white_agent import WhiteAgent, _is_white_proposal
 from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 # ---------------------------------------------------------------------------
@@ -25,6 +26,7 @@ def _make_state(thread_id="test_thread_001", iterations=None):
                 mood=["energetic"],
                 genres=["rock"],
                 concept="This is a substantive philosophical exploration of the interplay between light and sound, examining how chromatic resonance manifests in creative work through rhythmic practice and harmonic representation.",
+                is_final=True,
             )
         ]
     return MainAgentState(
@@ -133,6 +135,7 @@ class TestFinalizeWithChordKickoff:
         with (
             patch.object(WhiteAgent, "save_all_proposals"),
             patch.object(WhiteAgent, "_invoke_chord_pipeline_safe") as mock_invoke,
+            patch("app.generators.midi.production.init_production.init_production"),
         ):
             agent.finalize_song_proposal(state)
 
@@ -198,6 +201,7 @@ class TestFinalizeWithChordKickoff:
                 "app.generators.midi.pipelines.chord_pipeline.run_chord_pipeline",
                 side_effect=RuntimeError("oops"),
             ),
+            patch("app.generators.midi.production.init_production.init_production"),
         ):
             result = agent.finalize_song_proposal(state)
 
@@ -245,3 +249,198 @@ class TestStartWorkflowFlag:
         with patch.object(WhiteAgent, "build_workflow", return_value=mock_workflow):
             agent.start_workflow(user_input=None, auto_chord_generation=True)
         assert agent._auto_chord_generation is True
+
+
+# ---------------------------------------------------------------------------
+# 4. Multi-final-iteration kickoff
+# ---------------------------------------------------------------------------
+
+
+def _make_iteration(color, iteration_id=None, is_final=True):
+    if iteration_id is None:
+        iteration_id = f"{color}_001"
+    return SongProposalIteration(
+        iteration_id=iteration_id,
+        bpm=120,
+        tempo="4/4",
+        key="C Major",
+        rainbow_color=color,
+        title=f"{color} Song",
+        mood=["contemplative"],
+        genres=["experimental"],
+        concept="A substantive philosophical concept exploring chromatic resonance and temporal displacement through iterative compositional cycles and harmonic convergence.",
+        is_final=is_final,
+    )
+
+
+class TestMultiFinalKickoff:
+
+    def _patched_finalize(self, agent, state, mock_invoke, mock_init):
+        with (
+            patch.object(WhiteAgent, "save_all_proposals"),
+            patch.object(WhiteAgent, "_invoke_chord_pipeline_safe", mock_invoke),
+            patch(
+                "app.generators.midi.production.init_production.init_production",
+                mock_init,
+            ),
+        ):
+            return agent.finalize_song_proposal(state)
+
+    def test_chord_pipeline_called_for_each_final_iteration(self, monkeypatch):
+        """init and chord gen run once per is_final=True iteration."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        agent = WhiteAgent()
+        agent._auto_chord_generation = True
+
+        state = _make_state(
+            iterations=[
+                _make_iteration("red", "red_001", is_final=True),
+                _make_iteration("white", "white_001", is_final=True),
+            ]
+        )
+
+        mock_invoke = MagicMock()
+        mock_init = MagicMock(return_value=Path("/tmp/song_context.yml"))
+
+        self._patched_finalize(agent, state, mock_invoke, mock_init)
+
+        assert mock_invoke.call_count == 2
+        assert mock_init.call_count == 2
+
+    def test_white_is_processed_last(self, monkeypatch):
+        """White iteration is always passed to chord pipeline last."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        agent = WhiteAgent()
+        agent._auto_chord_generation = True
+
+        state = _make_state(
+            iterations=[
+                _make_iteration("white", "white_001", is_final=True),
+                _make_iteration("red", "red_001", is_final=True),
+            ]
+        )
+
+        call_order = []
+        mock_invoke = MagicMock(side_effect=lambda td, fn: call_order.append(fn))
+        mock_init = MagicMock(return_value=Path("/tmp/song_context.yml"))
+
+        self._patched_finalize(agent, state, mock_invoke, mock_init)
+
+        assert len(call_order) == 2
+        assert "white" in call_order[-1].lower()
+
+    def test_non_final_iterations_skipped(self, monkeypatch):
+        """Iterations with is_final=False are not kicked off."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        agent = WhiteAgent()
+        agent._auto_chord_generation = True
+
+        state = _make_state(
+            iterations=[
+                _make_iteration("red", "red_001", is_final=False),
+                _make_iteration("red", "red_002", is_final=True),
+            ]
+        )
+
+        mock_invoke = MagicMock()
+        mock_init = MagicMock(return_value=Path("/tmp/song_context.yml"))
+
+        self._patched_finalize(agent, state, mock_invoke, mock_init)
+
+        assert mock_invoke.call_count == 1
+        assert "red_002" in mock_invoke.call_args.args[1]
+
+
+# ---------------------------------------------------------------------------
+# 5. _launch_review_browser
+# ---------------------------------------------------------------------------
+
+
+class TestLaunchReviewBrowser:
+
+    def test_no_subprocess_when_ports_open(self):
+        """When both ports are already listening, no Popen calls are made."""
+        agent = WhiteAgent()
+        dirs = [Path("/tmp/prod/red_001")]
+
+        with (
+            patch(
+                "app.agents.white_agent.WhiteAgent._launch_review_browser",
+                wraps=agent._launch_review_browser,
+            ),
+            patch("socket.socket") as mock_socket_cls,
+            patch("subprocess.Popen") as mock_popen,
+            patch("webbrowser.open") as mock_browser,
+            patch("time.sleep"),
+        ):
+            mock_sock = MagicMock()
+            mock_sock.__enter__ = lambda s: s
+            mock_sock.__exit__ = MagicMock(return_value=False)
+            mock_sock.connect_ex.return_value = 0  # both ports open
+            mock_socket_cls.return_value = mock_sock
+
+            agent._launch_review_browser(dirs)
+
+        mock_popen.assert_not_called()
+        mock_browser.assert_called_once()
+        url = mock_browser.call_args.args[0]
+        assert "production-dir=" in url
+        assert "phase=chords" in url
+
+    def test_subprocess_launched_when_port_8000_closed(self):
+        """candidate_server Popen is called when port 8000 is not listening."""
+        agent = WhiteAgent()
+        dirs = [Path("/tmp/prod/red_001")]
+
+        def port_side_effect(*args, **kwargs):
+            return 0  # always "open" for simplicity after first check
+
+        with (
+            patch("socket.socket") as mock_socket_cls,
+            patch("subprocess.Popen") as mock_popen,
+            patch("webbrowser.open"),
+            patch("time.sleep"),
+        ):
+            # First connect_ex call (port 8000 check) returns 1 (closed),
+            # subsequent calls return 0
+            mock_sock = MagicMock()
+            mock_sock.__enter__ = lambda s: s
+            mock_sock.__exit__ = MagicMock(return_value=False)
+            mock_sock.connect_ex.side_effect = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            mock_socket_cls.return_value = mock_sock
+
+            agent._launch_review_browser(dirs)
+
+        assert mock_popen.call_count >= 1
+        launched_cmds = [c.args[0] for c in mock_popen.call_args_list]
+        assert any("candidate_server" in str(cmd) for cmd in launched_cmds)
+
+
+# ---------------------------------------------------------------------------
+# 6. _is_white_proposal helper
+# ---------------------------------------------------------------------------
+
+
+class TestIsWhiteProposal:
+
+    def test_string_white(self):
+        it = _make_iteration("white", "white_001")
+        assert _is_white_proposal(it) is True
+
+    def test_string_red(self):
+        it = _make_iteration("red", "red_001")
+        assert _is_white_proposal(it) is False
+
+    def test_rainbow_table_color_white(self):
+        from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+
+        it = _make_iteration("white", "white_001")
+        it.rainbow_color = the_rainbow_table_colors["A"]
+        assert _is_white_proposal(it) is True
+
+    def test_rainbow_table_color_red(self):
+        from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+
+        it = _make_iteration("red", "red_001")
+        it.rainbow_color = the_rainbow_table_colors["R"]
+        assert _is_white_proposal(it) is False
