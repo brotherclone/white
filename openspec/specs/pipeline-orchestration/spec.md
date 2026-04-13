@@ -12,9 +12,15 @@ Every production directory SHALL contain a `song_context.yml` written by `init_p
 - **THEN** `song_context.yml` is written containing `title`, `color`, `concept`, `key`, `bpm`, `time_sig`, `singer`, `sounds_like`, `genres`, `mood`, `song_proposal`, `thread`, `proposed_by`, `generated`, and `phases` (all initially `pending`)
 - **AND** `initial_proposal.yml` is NOT written
 
-#### Scenario: existing dirs with initial_proposal.yml unaffected
-- **WHEN** a pipeline phase runs on a directory that already has `initial_proposal.yml`
-- **THEN** the phase reads from `song_context.yml` and ignores `initial_proposal.yml`
+#### Scenario: dirs with both files prefer song_context.yml
+- **WHEN** a pipeline phase runs on a directory that has both `song_context.yml` and `initial_proposal.yml`
+- **THEN** the phase reads canonical song metadata from `song_context.yml`
+- **AND** `initial_proposal.yml` does not override `song_context.yml`
+- **AND** no error is raised
+
+#### Scenario: legacy dirs with only initial_proposal.yml still work
+- **WHEN** a pipeline phase runs on a legacy directory that has `initial_proposal.yml` but no `song_context.yml`
+- **THEN** the phase falls back to `initial_proposal.yml` as the available song metadata source
 - **AND** no error is raised
 
 #### Scenario: all pipeline phases read concept from song_context.yml

@@ -282,18 +282,21 @@ def load_song_context(production_dir: Path) -> dict:
 
 
 def load_initial_proposal(production_dir: Path) -> dict:
-    """Load initial_proposal.yml from the production directory.
+    """Load song metadata from the production directory.
 
-    Falls back to song_context.yml if initial_proposal.yml is absent
-    (transparent backward compat for production dirs migrated to song_context.yml).
+    Prefers song_context.yml (the canonical source of truth). Falls back to
+    initial_proposal.yml only for legacy directories that predate this change.
 
     Returns {} if neither file exists.
     """
+    ctx = load_song_context(production_dir)
+    if ctx:
+        return ctx
+    # Fallback: legacy directory that only has initial_proposal.yml
     path = Path(production_dir) / INITIAL_PROPOSAL_FILENAME
     if path.exists():
         return yaml.safe_load(path.read_text()) or {}
-    # Fallback: song_context.yml contains a superset of initial_proposal.yml fields
-    return load_song_context(production_dir)
+    return {}
 
 
 # ---------------------------------------------------------------------------

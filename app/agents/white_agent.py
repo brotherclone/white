@@ -93,10 +93,15 @@ class WhiteAgent(BaseModel):
         return os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts")
 
     def _launch_review_browser(self, production_dirs: list[Path]) -> None:
-        """Launch candidate server and Next.js if not running, then open the review UI."""
+        """Launch candidate server and Next.js if not running, then open the review UI.
+
+        All subprocess launches and the browser open are wrapped in a single try/except
+        so that a missing binary or headless environment never interrupts finalize_song_proposal.
+        """
         import socket
         import subprocess
         import time
+        import urllib.parse
         import webbrowser
 
         def _is_port_open(port: int) -> bool:
@@ -104,39 +109,52 @@ class WhiteAgent(BaseModel):
                 s.settimeout(0.5)
                 return s.connect_ex(("localhost", port)) == 0
 
+        if not production_dirs:
+            logger.warning(
+                "Skipping review browser launch: no production directories provided."
+            )
+            return
+
         first_dir = production_dirs[0]
 
-        if not _is_port_open(8000):
-            logger.info("Launching candidate server on port 8000...")
-            subprocess.Popen(
-                [
-                    "python",
-                    "-m",
-                    "app.tools.candidate_server",
-                    "--production-dir",
-                    str(first_dir),
-                ],
-                start_new_session=True,
+        try:
+            if not _is_port_open(8000):
+                logger.info("Launching candidate server on port 8000...")
+                subprocess.Popen(
+                    [
+                        "python",
+                        "-m",
+                        "app.tools.candidate_server",
+                        "--production-dir",
+                        str(first_dir),
+                    ],
+                    start_new_session=True,
+                )
+
+            if not _is_port_open(3000):
+                logger.info("Launching Next.js dev server on port 3000...")
+                web_dir = Path(__file__).parent.parent.parent / "web"
+                subprocess.Popen(
+                    ["npm", "run", "dev"],
+                    cwd=web_dir,
+                    start_new_session=True,
+                )
+
+            # Wait up to 5s for the FastAPI server to become ready
+            for _ in range(10):
+                if _is_port_open(8000):
+                    break
+                time.sleep(0.5)
+
+            encoded_dir = urllib.parse.quote(first_dir.as_posix(), safe="")
+            url = f"http://localhost:3000?production-dir={encoded_dir}&phase=chords"
+            logger.info(f"Opening review browser: {url}")
+            webbrowser.open(url)
+        except Exception as exc:
+            logger.warning(
+                "Review browser auto-launch failed; continuing without opening the UI: %s",
+                exc,
             )
-
-        if not _is_port_open(3000):
-            logger.info("Launching Next.js dev server on port 3000...")
-            web_dir = Path(__file__).parent.parent.parent / "web"
-            subprocess.Popen(
-                ["npm", "run", "dev"],
-                cwd=web_dir,
-                start_new_session=True,
-            )
-
-        # Wait up to 5s for the FastAPI server to become ready
-        for _ in range(10):
-            if _is_port_open(8000):
-                break
-            time.sleep(0.5)
-
-        url = f"http://localhost:3000?production-dir={first_dir}&phase=chords"
-        logger.info(f"Opening review browser: {url}")
-        webbrowser.open(url)
 
     def _invoke_chord_pipeline_safe(self, thread_dir: str, song_filename: str) -> None:
         """Safely invoke the chord pipeline in-process; never raises."""

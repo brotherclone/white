@@ -387,6 +387,67 @@ class TestLaunchReviewBrowser:
         assert "production-dir=" in url
         assert "phase=chords" in url
 
+    def test_url_encodes_production_dir(self):
+        """The production-dir query param is URL-encoded (spaces/slashes safe)."""
+        agent = WhiteAgent()
+        dirs = [Path("/tmp/prod/my song")]
+
+        with (
+            patch("socket.socket") as mock_socket_cls,
+            patch("subprocess.Popen"),
+            patch("webbrowser.open") as mock_browser,
+            patch("time.sleep"),
+        ):
+            mock_sock = MagicMock()
+            mock_sock.__enter__ = lambda s: s
+            mock_sock.__exit__ = MagicMock(return_value=False)
+            mock_sock.connect_ex.return_value = 0
+            mock_socket_cls.return_value = mock_sock
+
+            agent._launch_review_browser(dirs)
+
+        url = mock_browser.call_args.args[0]
+        assert "my%20song" in url
+
+    def test_empty_dirs_skips_launch(self, caplog):
+        """An empty dirs list logs a warning and returns without calling Popen."""
+        agent = WhiteAgent()
+        with (
+            patch("subprocess.Popen") as mock_popen,
+            patch("webbrowser.open") as mock_browser,
+            caplog.at_level(logging.WARNING),
+        ):
+            agent._launch_review_browser([])
+
+        mock_popen.assert_not_called()
+        mock_browser.assert_not_called()
+        assert any(
+            "no production directories" in r.message.lower() for r in caplog.records
+        )
+
+    def test_swallows_launch_exception(self, caplog):
+        """If Popen raises, a warning is logged and no exception propagates."""
+        agent = WhiteAgent()
+        dirs = [Path("/tmp/prod/red_001")]
+
+        with (
+            patch("socket.socket") as mock_socket_cls,
+            patch(
+                "subprocess.Popen", side_effect=FileNotFoundError("python not found")
+            ),
+            patch("webbrowser.open"),
+            caplog.at_level(logging.WARNING),
+        ):
+            mock_sock = MagicMock()
+            mock_sock.__enter__ = lambda s: s
+            mock_sock.__exit__ = MagicMock(return_value=False)
+            mock_sock.connect_ex.return_value = 1  # port closed → triggers Popen
+            mock_socket_cls.return_value = mock_sock
+
+            agent._launch_review_browser(dirs)  # must not raise
+
+        assert any("auto-launch failed" in r.message.lower() for r in caplog.records)
+
     def test_subprocess_launched_when_port_8000_closed(self):
         """candidate_server Popen is called when port 8000 is not listening."""
         agent = WhiteAgent()

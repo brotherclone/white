@@ -367,7 +367,8 @@ class TestLoadInitialProposalFallback:
         assert result["sounds_like"] == ["Grouper", "The Caretaker"]
         assert result["color"] == "Violet"
 
-    def test_prefers_initial_proposal_when_both_exist(self, tmp_path):
+    def test_prefers_song_context_when_both_exist(self, tmp_path):
+        """song_context.yml takes precedence over initial_proposal.yml."""
         import yaml as _yaml
 
         (tmp_path / "initial_proposal.yml").write_text(
@@ -377,7 +378,8 @@ class TestLoadInitialProposalFallback:
             _yaml.dump({"sounds_like": ["From context"], "color": "Blue"})
         )
         result = load_initial_proposal(tmp_path)
-        assert result["sounds_like"] == ["From initial"]
+        assert result["sounds_like"] == ["From context"]
+        assert result["color"] == "Blue"
 
     def test_returns_empty_when_neither_exists(self, tmp_path):
         result = load_initial_proposal(tmp_path)
