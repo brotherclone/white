@@ -53,8 +53,16 @@
 - [ ] 5.3 If overall accuracy drops below 70%: retrain CDM
       (`python training/extract_cdm_embeddings.py` + `modal run modal_train_refractor_cdm.py`)
 
-## 6. Cleanup
+## 6. Re-score affected artifacts
 
-- [ ] 6.1 Run full test suite; confirm 0 new regressions
-- [ ] 6.2 Note in commit message that existing `mix_score.yml` / `review.yml` artifacts
-      for non-Red/non-White songs should be re-scored
+- [ ] 6.1 Identify any approved/promoted `review.yml` files for non-Red/non-White songs
+      (chord, drum, bass, melody) — these have stale `chromatic_match` scores
+- [ ] 6.2 Re-run scoring for any song that has been through the full production pipeline;
+      check whether previously approved candidates still rank at the top with correct targets
+- [ ] 6.3 For the base Refractor ONNX (`refractor.onnx`): **no retraining required** —
+      `modal_midi_fusion.py` trains from per-segment mode labels in the HF dataset, never
+      from `CHROMATIC_TARGETS`; the weights are correct as-is
+
+## 7. Cleanup
+
+- [ ] 7.1 Run full test suite; confirm 0 new regressions
