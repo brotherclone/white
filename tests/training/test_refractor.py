@@ -64,6 +64,8 @@ class TestScorerWithMockedONNX:
 
         s = Refractor.__new__(Refractor)
         s._session = _make_mock_session()
+        s._cdm_session = None  # CDM disabled in unit tests
+        s._cdm_onnx_path = None
         s._deberta_tokenizer = None
         s._deberta_model = None
         s._clap_processor = None
