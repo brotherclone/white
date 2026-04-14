@@ -220,23 +220,31 @@ def train(
         colors[val_mask],
     )
 
-    # Build soft label arrays
-    def make_labels(color_arr):
-        T = np.zeros((len(color_arr), 3), dtype=np.float32)
-        S = np.zeros((len(color_arr), 3), dtype=np.float32)
-        Ont = np.zeros((len(color_arr), 3), dtype=np.float32)
-        for i, c in enumerate(color_arr):
-            t, s, o = _color_targets(c)
-            T[i] = t
-            S[i] = s
-            Ont[i] = o
-        return T, S, Ont
+    # ------------------------------------------------------------------
+    # Color → integer label encoding
+    # Using the canonical full color order so the ONNX output is self-describing
+    # ------------------------------------------------------------------
+    color_to_idx = {c: i for i, c in enumerate(_COLOR_ORDER)}
+    num_classes = len(_COLOR_ORDER)
 
-    T_train, S_train, O_train = make_labels(colors_train)
-    T_val, S_val, O_val = make_labels(colors_val)
+    def to_labels(color_arr):
+        return np.array([color_to_idx[c] for c in color_arr], dtype=np.int64)
+
+    y_train = to_labels(colors_train)
+
+    # Class weights: inverse-frequency, normalised so mean weight = 1.0
+    class_counts = np.bincount(
+        [color_to_idx[c] for c in colors], minlength=num_classes
+    ).astype(np.float32)
+    class_weights = np.where(class_counts > 0, 1.0 / np.maximum(class_counts, 1), 0.0)
+    if class_weights.sum() > 0:
+        class_weights = class_weights / class_weights.mean()
 
     # ------------------------------------------------------------------
-    # Model
+    # Model — single color-classification head (CrossEntropy)
+    # Avoids the Yellow == Green soft-label collision that plagued the
+    # original 3-head MSE approach (identical CHROMATIC_TARGETS for both).
+    # At inference, the predicted color is mapped back to CHROMATIC_TARGETS.
     # ------------------------------------------------------------------
     input_dim = 512 + (768 if use_concept else 0)
 
@@ -251,25 +259,26 @@ def train(
                 nn.ReLU(),
                 nn.Dropout(0.3),
             )
-            self.t_head = nn.Linear(128, 3)
-            self.s_head = nn.Linear(128, 3)
-            self.o_head = nn.Linear(128, 3)
+            self.color_head = nn.Linear(128, num_classes)
 
         def forward(self, x):
-            h = self.shared(x)
-            return (
-                torch.softmax(self.t_head(h), dim=-1),
-                torch.softmax(self.s_head(h), dim=-1),
-                torch.softmax(self.o_head(h), dim=-1),
-            )
+            # Returns logits for CrossEntropyLoss during training;
+            # wrap in softmax at export time.
+            return self.color_head(self.shared(x))
 
     torch.manual_seed(seed)
     model = CDMModel()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    mse = nn.MSELoss()
+    criterion = nn.CrossEntropyLoss(weight=torch.FloatTensor(class_weights.tolist()))
 
     def to_tensor(arr):
         return torch.FloatTensor(arr.tolist())
+
+    def build_x(clap_batch, concept_batch):
+        x = to_tensor(clap_batch)
+        if use_concept:
+            x = torch.cat([x, to_tensor(concept_batch)], dim=-1)
+        return x
 
     # ------------------------------------------------------------------
     # Training loop
@@ -279,25 +288,18 @@ def train(
 
     for epoch in range(1, epochs + 1):
         model.train()
-        # Shuffle training data each epoch (random-chunk augmentation)
         idx = np.random.permutation(len(clap_train))
-        clap_s, concept_s = clap_train[idx], concept_train[idx]
-        T_s, S_s, O_s = T_train[idx], S_train[idx], O_train[idx]
+        clap_s, concept_s, y_s = clap_train[idx], concept_train[idx], y_train[idx]
 
         train_loss = 0.0
         n_batches = 0
         for start in range(0, len(clap_s), batch_size):
             end = start + batch_size
-            x_clap = to_tensor(clap_s[start:end])
-            x_concept = to_tensor(concept_s[start:end])
-            x = torch.cat([x_clap, x_concept], dim=-1) if use_concept else x_clap
+            x = build_x(clap_s[start:end], concept_s[start:end])
+            y_batch = torch.LongTensor(y_s[start:end].tolist())
 
-            t_pred, s_pred, o_pred = model(x)
-            loss = (
-                mse(t_pred, to_tensor(T_s[start:end]))
-                + mse(s_pred, to_tensor(S_s[start:end]))
-                + mse(o_pred, to_tensor(O_s[start:end]))
-            )
+            logits = model(x)
+            loss = criterion(logits, y_batch)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -307,20 +309,14 @@ def train(
         # Val accuracy
         model.eval()
         with torch.no_grad():
-            x_clap_v = to_tensor(clap_val)
-            x_concept_v = to_tensor(concept_val)
-            x_v = (
-                torch.cat([x_clap_v, x_concept_v], dim=-1) if use_concept else x_clap_v
-            )
-            t_v, s_v, o_v = model(x_v)
+            x_v = build_x(clap_val, concept_val)
+            logits_v = model(x_v)
+            probs_v = torch.softmax(logits_v, dim=-1).numpy()
 
-        t_np = t_v.numpy()
-        s_np = s_v.numpy()
-        o_np = o_v.numpy()
-
+        pred_idx = probs_v.argmax(axis=-1)
         per_color_correct: dict[str, list] = {c: [] for c in unique_colors}
         for i, true_c in enumerate(colors_val):
-            pred_c = _top1_color(t_np[i], s_np[i], o_np[i])
+            pred_c = _COLOR_ORDER[pred_idx[i]]
             per_color_correct[true_c].append(pred_c == true_c)
 
         color_accs = {
@@ -350,17 +346,13 @@ def train(
     print(f"\nBest mean color accuracy: {best_mean_acc:.1%}")
     print("\nPer-color val accuracy (best checkpoint):")
     with torch.no_grad():
-        x_v = (
-            torch.cat([to_tensor(clap_val), to_tensor(concept_val)], dim=-1)
-            if use_concept
-            else to_tensor(clap_val)
-        )
-        t_v, s_v, o_v = model(x_v)
-    t_np, s_np, o_np = t_v.numpy(), s_v.numpy(), o_v.numpy()
+        x_v = build_x(clap_val, concept_val)
+        probs_v = torch.softmax(model(x_v), dim=-1).numpy()
 
+    pred_idx = probs_v.argmax(axis=-1)
     per_color_correct = {c: [] for c in unique_colors}
     for i, true_c in enumerate(colors_val):
-        pred_c = _top1_color(t_np[i], s_np[i], o_np[i])
+        pred_c = _COLOR_ORDER[pred_idx[i]]
         per_color_correct[true_c].append(pred_c == true_c)
 
     total_correct = 0
@@ -379,32 +371,31 @@ def train(
         )
 
     # ------------------------------------------------------------------
-    # ONNX export
+    # ONNX export — wraps model in softmax so output is color_probs (batch, 9)
+    # _score_cdm in refractor.py reads argmax → CHROMATIC_TARGETS lookup
     # ------------------------------------------------------------------
-    dummy_clap = torch.zeros(1, 512)
-    dummy_concept = torch.zeros(1, 768)
 
-    if use_concept:
-        dummy_in = torch.cat([dummy_clap, dummy_concept], dim=-1)
-        input_names = ["input"]
-    else:
-        dummy_in = dummy_clap
-        input_names = ["input"]
+    class _CDMExportWrapper(nn.Module):
+        def __init__(self, m):
+            super().__init__()
+            self.m = m
 
+        def forward(self, x):
+            return torch.softmax(self.m(x), dim=-1)
+
+    export_model = _CDMExportWrapper(model)
+    export_model.eval()
+
+    dummy_in = torch.zeros(1, input_dim)
     buf = io.BytesIO()
     with torch.no_grad():
         torch.onnx.export(
-            model,
+            export_model,
             dummy_in,
             buf,
-            input_names=input_names,
-            output_names=["temporal", "spatial", "ontological"],
-            dynamic_axes={
-                "input": {0: "batch"},
-                "temporal": {0: "batch"},
-                "spatial": {0: "batch"},
-                "ontological": {0: "batch"},
-            },
+            input_names=["input"],
+            output_names=["color_probs"],
+            dynamic_axes={"input": {0: "batch"}, "color_probs": {0: "batch"}},
             opset_version=14,
         )
     onnx_bytes = buf.getvalue()

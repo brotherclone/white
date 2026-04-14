@@ -45,6 +45,68 @@ TEMPORAL_MODES = ["Past", "Present", "Future"]
 SPATIAL_MODES = ["Thing", "Place", "Person"]
 ONTOLOGICAL_MODES = ["Imagined", "Forgotten", "Known"]
 
+# Canonical color order for the CDM classification head (matches modal_train_refractor_cdm.py)
+_CDM_COLOR_ORDER = [
+    "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Blue",
+    "Indigo",
+    "Violet",
+    "White",
+    "Black",
+]
+
+# CHROMATIC_TARGETS for CDM inference: color → (temporal, spatial, ontological) distributions
+_CDM_CHROMATIC_TARGETS = {
+    "Red": {
+        "temporal": [0.8, 0.1, 0.1],
+        "spatial": [0.8, 0.1, 0.1],
+        "ontological": [0.1, 0.1, 0.8],
+    },
+    "Orange": {
+        "temporal": [0.1, 0.8, 0.1],
+        "spatial": [0.8, 0.1, 0.1],
+        "ontological": [0.1, 0.1, 0.8],
+    },
+    "Yellow": {
+        "temporal": [0.1, 0.8, 0.1],
+        "spatial": [0.1, 0.8, 0.1],
+        "ontological": [0.1, 0.1, 0.8],
+    },
+    "Green": {
+        "temporal": [0.1, 0.8, 0.1],
+        "spatial": [0.1, 0.8, 0.1],
+        "ontological": [0.1, 0.1, 0.8],
+    },
+    "Blue": {
+        "temporal": [0.1, 0.1, 0.8],
+        "spatial": [0.1, 0.8, 0.1],
+        "ontological": [0.1, 0.8, 0.1],
+    },
+    "Indigo": {
+        "temporal": [0.1, 0.1, 0.8],
+        "spatial": [0.1, 0.1, 0.8],
+        "ontological": [0.1, 0.8, 0.1],
+    },
+    "Violet": {
+        "temporal": [0.1, 0.1, 0.8],
+        "spatial": [0.1, 0.1, 0.8],
+        "ontological": [0.8, 0.1, 0.1],
+    },
+    "White": {
+        "temporal": [0.33, 0.34, 0.33],
+        "spatial": [0.33, 0.34, 0.33],
+        "ontological": [0.33, 0.34, 0.33],
+    },
+    "Black": {
+        "temporal": [0.1, 0.8, 0.1],
+        "spatial": [0.8, 0.1, 0.1],
+        "ontological": [0.8, 0.1, 0.1],
+    },
+}
+
 
 class Refractor:
     """Scores audio/MIDI candidates against chromatic concepts.
@@ -433,11 +495,12 @@ class Refractor:
     ) -> dict:
         """Score a single audio embedding via the Refractor CDM head.
 
-        Called by score() when _cdm_session is loaded and audio_emb is the
-        only modality (no MIDI). Returns the same dict shape as score_batch().
+        The CDM ONNX model outputs color_probs (batch, 9) — a softmax over the
+        canonical _CDM_COLOR_ORDER. The top predicted color is mapped to its
+        CHROMATIC_TARGETS distributions, which are returned in the same dict
+        shape as score_batch().
 
-        Confidence is the mean of the three head peak probabilities — a
-        natural measure of how decisive the model is about the color.
+        Confidence = max color probability (how decisive the model is).
         """
         # CDM ONNX input: concatenated [clap_emb, concept_emb] = (1, 1280)
         x = (
@@ -446,23 +509,26 @@ class Refractor:
             .astype(np.float32)
         )
         outputs = self._cdm_session.run(None, {"input": x})
-        temporal_arr, spatial_arr, ontological_arr = outputs  # each (1, 3)
+        color_probs = outputs[0][0]  # (9,) float32
 
+        best_idx = int(np.argmax(color_probs))
+        best_color = _CDM_COLOR_ORDER[best_idx]
+        confidence = float(color_probs[best_idx])
+
+        targets = _CDM_CHROMATIC_TARGETS.get(
+            best_color, _CDM_CHROMATIC_TARGETS["White"]
+        )
         temporal = {
-            m.lower(): float(temporal_arr[0, j]) for j, m in enumerate(TEMPORAL_MODES)
+            m.lower(): float(targets["temporal"][j])
+            for j, m in enumerate(TEMPORAL_MODES)
         }
         spatial = {
-            m.lower(): float(spatial_arr[0, j]) for j, m in enumerate(SPATIAL_MODES)
+            m.lower(): float(targets["spatial"][j]) for j, m in enumerate(SPATIAL_MODES)
         }
         ontological = {
-            m.lower(): float(ontological_arr[0, j])
+            m.lower(): float(targets["ontological"][j])
             for j, m in enumerate(ONTOLOGICAL_MODES)
         }
-
-        # Confidence = mean peak probability across the three heads
-        confidence = float(
-            (max(temporal_arr[0]) + max(spatial_arr[0]) + max(ontological_arr[0])) / 3.0
-        )
 
         return {
             "temporal": temporal,
