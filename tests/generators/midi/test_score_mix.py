@@ -6,10 +6,13 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import numpy as np
+import pytest
 import yaml
 
 from app.generators.midi.production.score_mix import (
+    aggregate_chunk_scores,
     chromatic_drift_report,
+    chunk_audio,
     score_mix,
     write_mix_score,
 )
@@ -334,3 +337,198 @@ class TestScoreMixIntegration:
         assert "spatial_delta" in drift
         assert "ontological_delta" in drift
         assert "overall_drift" in drift
+
+    def test_score_mix_produces_chunk_count(self, tmp_path):
+        prod = self._make_production_dir(tmp_path)
+        audio = self._make_audio_file(tmp_path)
+        scorer = self._make_mock_scorer()
+
+        score_result, _ = score_mix(audio, prod, _scorer=scorer)
+
+        assert "chunk_count" in score_result
+        assert score_result["chunk_count"] >= 1
+
+    def test_score_mix_calls_scorer_per_chunk(self, tmp_path):
+        """scorer.score should be called once per chunk (at least once)."""
+        prod = self._make_production_dir(tmp_path)
+        audio = self._make_audio_file(tmp_path)
+        scorer = self._make_mock_scorer()
+
+        score_result, _ = score_mix(audio, prod, _scorer=scorer)
+
+        assert scorer.score.call_count == score_result["chunk_count"]
+
+    def test_write_mix_score_includes_chunk_count(self, tmp_path):
+        prod = self._make_production_dir(tmp_path)
+        audio = self._make_audio_file(tmp_path)
+        scorer = self._make_mock_scorer()
+
+        score_result, drift = score_mix(audio, prod, _scorer=scorer)
+        out = write_mix_score(score_result, drift, prod / "melody", audio_path=audio)
+
+        with open(out) as f:
+            loaded = yaml.safe_load(f)
+
+        assert "chunk_count" in loaded
+        assert loaded["chunk_count"] >= 1
+        assert "chunk_stride_s" in loaded
+
+    def test_write_mix_score_includes_refractor_cdm_metadata(self, tmp_path):
+        melody_dir = tmp_path / "melody"
+        result = _make_score_result()
+        result["chunk_count"] = 3
+        drift = {
+            "temporal_delta": 0.0,
+            "spatial_delta": 0.0,
+            "ontological_delta": 0.0,
+            "overall_drift": 0.0,
+        }
+
+        write_mix_score(
+            result, drift, melody_dir, cdm_onnx_path="/path/to/refractor_cdm.onnx"
+        )
+
+        with open(melody_dir / "mix_score.yml") as f:
+            loaded = yaml.safe_load(f)
+
+        assert loaded["metadata"]["refractor_cdm"] == "/path/to/refractor_cdm.onnx"
+
+    def test_write_mix_score_cdm_none_when_disabled(self, tmp_path):
+        melody_dir = tmp_path / "melody"
+        result = _make_score_result()
+        result["chunk_count"] = 1
+        drift = {}
+
+        write_mix_score(result, drift, melody_dir, cdm_onnx_path=None)
+
+        with open(melody_dir / "mix_score.yml") as f:
+            loaded = yaml.safe_load(f)
+
+        assert loaded["metadata"]["refractor_cdm"] is None
+
+
+# ---------------------------------------------------------------------------
+# chunk_audio unit tests
+# ---------------------------------------------------------------------------
+
+
+class TestChunkAudio:
+
+    def test_single_chunk_for_short_audio(self):
+        # 10s at 48000 Hz — shorter than 30s window
+        sr = 48000
+        waveform = np.zeros(sr * 10, dtype=np.float32)
+        chunks = chunk_audio(waveform, sr)
+        assert len(chunks) == 1
+
+    def test_short_chunk_padded_to_chunk_length(self):
+        sr = 48000
+        waveform = np.zeros(sr * 10, dtype=np.float32)
+        chunks = chunk_audio(waveform, sr, chunk_size_s=30.0)
+        assert len(chunks[0]) == sr * 30
+
+    def test_correct_count_for_60s_audio(self):
+        # 60s audio, 30s chunks, 5s stride → starts at 0, 5, 10, ..., 55 → 12 chunks
+        sr = 48000
+        waveform = np.zeros(sr * 60, dtype=np.float32)
+        chunks = chunk_audio(waveform, sr, chunk_size_s=30.0, stride_s=5.0)
+        assert len(chunks) == 12
+
+    def test_all_chunks_same_length(self):
+        sr = 48000
+        waveform = np.random.randn(sr * 90).astype(np.float32)
+        chunks = chunk_audio(waveform, sr, chunk_size_s=30.0, stride_s=10.0)
+        lengths = {len(c) for c in chunks}
+        assert len(lengths) == 1
+
+    def test_resamples_from_44100(self):
+        sr = 44100
+        duration_s = 10
+        waveform = np.zeros(sr * duration_s, dtype=np.float32)
+        chunks = chunk_audio(waveform, sr, chunk_size_s=30.0)
+        # After resample to 48000, still shorter than chunk_size → 1 chunk of 30*48000
+        assert len(chunks) == 1
+        assert len(chunks[0]) == 48000 * 30
+
+    def test_empty_waveform_returns_one_padded_chunk(self):
+        sr = 48000
+        waveform = np.zeros(0, dtype=np.float32)
+        chunks = chunk_audio(waveform, sr)
+        assert len(chunks) == 1
+        assert len(chunks[0]) == int(30.0 * 48000)
+
+    def test_custom_params(self):
+        sr = 48000
+        waveform = np.zeros(sr * 20, dtype=np.float32)
+        chunks = chunk_audio(waveform, sr, chunk_size_s=10.0, stride_s=5.0)
+        # 20s audio, 10s chunks, 5s stride → starts at 0, 5, 10, 15 → 4 chunks
+        assert len(chunks) == 4
+
+    def test_returns_float32(self):
+        sr = 48000
+        waveform = np.random.randn(sr * 60).astype(np.float64)  # float64 input
+        chunks = chunk_audio(waveform, sr)
+        assert all(c.dtype == np.float32 for c in chunks)
+
+
+# ---------------------------------------------------------------------------
+# aggregate_chunk_scores unit tests
+# ---------------------------------------------------------------------------
+
+
+def _chunk_result(confidence: float, temporal_past: float = 0.33) -> dict:
+    rem = (1.0 - temporal_past) / 2.0
+    return {
+        "temporal": {"past": temporal_past, "present": rem, "future": rem},
+        "spatial": {"thing": 0.33, "place": 0.33, "person": 0.34},
+        "ontological": {"imagined": 0.33, "forgotten": 0.33, "known": 0.34},
+        "confidence": confidence,
+    }
+
+
+class TestAggregateChunkScores:
+
+    def test_single_chunk_passthrough(self):
+        r = _chunk_result(0.8, temporal_past=0.9)
+        agg = aggregate_chunk_scores([r])
+        assert abs(agg["temporal"]["past"] - 0.9) < 1e-6
+        assert agg["confidence"] == pytest.approx(0.8)
+        assert agg["chunk_count"] == 1
+
+    def test_confidence_is_mean_of_chunks(self):
+        results = [_chunk_result(0.4), _chunk_result(0.8), _chunk_result(0.6)]
+        agg = aggregate_chunk_scores(results)
+        assert agg["confidence"] == pytest.approx((0.4 + 0.8 + 0.6) / 3, rel=1e-5)
+
+    def test_higher_confidence_dominates(self):
+        low = _chunk_result(0.1, temporal_past=0.1)
+        high = _chunk_result(0.9, temporal_past=0.9)
+        agg = aggregate_chunk_scores([low, high])
+        # High-confidence chunk (0.9) should dominate
+        assert agg["temporal"]["past"] > 0.7
+
+    def test_zero_confidence_fallback_uniform_mean(self):
+        r1 = _chunk_result(0.0, temporal_past=0.9)
+        r2 = _chunk_result(0.0, temporal_past=0.1)
+        agg = aggregate_chunk_scores([r1, r2])
+        assert abs(agg["temporal"]["past"] - 0.5) < 1e-5
+
+    def test_all_keys_present(self):
+        agg = aggregate_chunk_scores([_chunk_result(0.5)])
+        assert "temporal" in agg
+        assert "spatial" in agg
+        assert "ontological" in agg
+        assert "confidence" in agg
+        assert "chunk_count" in agg
+
+    def test_raises_on_empty(self):
+        with pytest.raises(ValueError):
+            aggregate_chunk_scores([])
+
+    def test_exact_weighted_math(self):
+        r1 = _chunk_result(0.2, temporal_past=0.8)
+        r2 = _chunk_result(0.8, temporal_past=0.2)
+        agg = aggregate_chunk_scores([r1, r2])
+        # weights: 0.2/(0.2+0.8)=0.2, 0.8/(0.2+0.8)=0.8
+        expected_past = 0.2 * 0.8 + 0.8 * 0.2
+        assert abs(agg["temporal"]["past"] - expected_past) < 1e-5

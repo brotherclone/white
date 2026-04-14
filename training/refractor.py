@@ -54,12 +54,21 @@ class Refractor:
     primary evolutionary use case), CLAP never loads.
     """
 
-    def __init__(self, onnx_path: Optional[str] = None):
+    def __init__(
+        self,
+        onnx_path: Optional[str] = None,
+        cdm_onnx_path: Optional[str] = None,
+    ):
         """Initialize the scorer with an ONNX model.
 
         Args:
             onnx_path: Path to refractor.onnx. Defaults to
                 training/data/refractor.onnx relative to this file.
+            cdm_onnx_path: Optional path to refractor_cdm.onnx. When provided,
+                audio-only score() calls are routed through the CDM calibration
+                head instead of the base model. Pass an empty string to disable
+                auto-detection. Defaults to auto-detecting
+                training/data/refractor_cdm.onnx if it exists.
         """
         import onnxruntime as ort
 
@@ -74,6 +83,26 @@ class Refractor:
             providers=["CPUExecutionProvider"],
         )
         logger.info("ONNX session loaded: %s", onnx_path)
+
+        # Refractor CDM — optional calibration head for full-mix audio scoring
+        self._cdm_session = None
+        self._cdm_onnx_path: Optional[str] = None
+
+        if cdm_onnx_path is None:
+            # Auto-detect
+            default_cdm = Path(__file__).parent / "data" / "refractor_cdm.onnx"
+            if default_cdm.exists():
+                cdm_onnx_path = str(default_cdm)
+        elif cdm_onnx_path == "":
+            cdm_onnx_path = None  # Explicitly disabled
+
+        if cdm_onnx_path and Path(cdm_onnx_path).exists():
+            self._cdm_session = ort.InferenceSession(
+                cdm_onnx_path,
+                providers=["CPUExecutionProvider"],
+            )
+            self._cdm_onnx_path = cdm_onnx_path
+            logger.info("Refractor CDM session loaded: %s", cdm_onnx_path)
 
         # Lazy-loaded encoders
         self._deberta_tokenizer = None
@@ -207,6 +236,21 @@ class Refractor:
                 "confidence": 0.89,
             }
         """
+        # --- Refractor CDM routing ---
+        # When the CDM is loaded and this is an audio-only call (no MIDI),
+        # route through the calibration head for full-mix scoring.
+        if (
+            self._cdm_session is not None
+            and midi_bytes is None
+            and audio_waveform is None
+            and audio_emb is not None
+        ):
+            if concept_emb is None:
+                if concept_text is None:
+                    raise ValueError("Either concept_text or concept_emb is required")
+                concept_emb = self.prepare_concept(concept_text)
+            return self._score_cdm(audio_emb, concept_emb)
+
         # Build single-item batch
         candidate = {"midi_bytes": midi_bytes}
         if audio_waveform is not None:
@@ -382,6 +426,53 @@ class Refractor:
 
         return results
 
+    def _score_cdm(
+        self,
+        audio_emb: np.ndarray,
+        concept_emb: np.ndarray,
+    ) -> dict:
+        """Score a single audio embedding via the Refractor CDM head.
+
+        Called by score() when _cdm_session is loaded and audio_emb is the
+        only modality (no MIDI). Returns the same dict shape as score_batch().
+
+        Confidence is the mean of the three head peak probabilities — a
+        natural measure of how decisive the model is about the color.
+        """
+        # CDM ONNX input: concatenated [clap_emb, concept_emb] = (1, 1280)
+        x = (
+            np.concatenate([audio_emb, concept_emb], axis=-1)
+            .reshape(1, -1)
+            .astype(np.float32)
+        )
+        outputs = self._cdm_session.run(None, {"input": x})
+        temporal_arr, spatial_arr, ontological_arr = outputs  # each (1, 3)
+
+        temporal = {
+            m.lower(): float(temporal_arr[0, j]) for j, m in enumerate(TEMPORAL_MODES)
+        }
+        spatial = {
+            m.lower(): float(spatial_arr[0, j]) for j, m in enumerate(SPATIAL_MODES)
+        }
+        ontological = {
+            m.lower(): float(ontological_arr[0, j])
+            for j, m in enumerate(ONTOLOGICAL_MODES)
+        }
+
+        # Confidence = mean peak probability across the three heads
+        confidence = float(
+            (max(temporal_arr[0]) + max(spatial_arr[0]) + max(ontological_arr[0])) / 3.0
+        )
+
+        return {
+            "temporal": temporal,
+            "spatial": spatial,
+            "ontological": ontological,
+            "confidence": confidence,
+            "candidate": {},
+            "rank": 0,
+        }
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -415,12 +506,20 @@ class Refractor:
 
             waveform = librosa.resample(waveform, orig_sr=sr, target_sr=48000)
 
-        inputs = self._clap_processor(
+        raw = self._clap_processor(
             audios=[waveform],
             sampling_rate=48000,
-            return_tensors="pt",
+            return_tensors=None,
             padding=True,
         )
+        # torch.tensor() cannot infer dtype from NumPy 2.x arrays — convert via
+        # tolist() first to avoid "Could not infer dtype of numpy.float32" errors.
+        inputs = {
+            "input_features": torch.FloatTensor(
+                np.array(raw["input_features"], dtype=np.float32).tolist()
+            ),
+            "is_longer": torch.BoolTensor(raw["is_longer"]),
+        }
         with torch.no_grad():
             # get_audio_features handles pooling + projection internally.
             # For long files CLAP windows the audio; mean-pool across windows.

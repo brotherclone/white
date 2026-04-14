@@ -5,6 +5,9 @@ Score a rendered audio bounce against the song's chromatic target.
 Uses Refractor in audio-only mode (no MIDI, null concept embedding) to classify
 the mix's perceived chromatic color, then computes drift vs. the target.
 
+Audio is split into overlapping 30s chunks; per-chunk scores are aggregated
+with confidence-weighted mean pooling.
+
 Writes melody/mix_score.yml with scores, chromatic match, and drift report.
 
 Usage:
@@ -36,19 +39,129 @@ _DIMS = [
 
 
 # ---------------------------------------------------------------------------
+# Chunked audio helpers
+# ---------------------------------------------------------------------------
+
+
+def chunk_audio(
+    waveform: np.ndarray,
+    sr: int,
+    chunk_size_s: float = 30.0,
+    stride_s: float = 5.0,
+) -> list[np.ndarray]:
+    """Split a waveform into overlapping fixed-length windows at 48 kHz.
+
+    The waveform is first resampled to 48 kHz (CLAP native rate).  If the
+    audio is shorter than one chunk window, a single zero-padded chunk is
+    returned.
+
+    Args:
+        waveform: 1-D float32 audio array at any sample rate.
+        sr: Sample rate of ``waveform``.
+        chunk_size_s: Window length in seconds (default 30 s).
+        stride_s: Hop between windows in seconds (default 5 s).
+
+    Returns:
+        List of float32 numpy arrays, each exactly ``chunk_size_s * 48000``
+        samples long.
+    """
+    import librosa
+
+    TARGET_SR = 48000
+    if sr != TARGET_SR:
+        waveform = librosa.resample(waveform, orig_sr=sr, target_sr=TARGET_SR)
+
+    chunk_len = int(chunk_size_s * TARGET_SR)
+    stride_len = int(stride_s * TARGET_SR)
+    total_len = len(waveform)
+
+    # Short audio: pad and return a single chunk
+    if total_len <= chunk_len:
+        chunk = np.zeros(chunk_len, dtype=np.float32)
+        chunk[:total_len] = waveform[:total_len]
+        return [chunk]
+
+    chunks = []
+    start = 0
+    while start < total_len:
+        end = start + chunk_len
+        segment = waveform[start:end]
+        if len(segment) < chunk_len:
+            padded = np.zeros(chunk_len, dtype=np.float32)
+            padded[: len(segment)] = segment
+            segment = padded
+        chunks.append(segment.astype(np.float32))
+        start += stride_len
+
+    return chunks
+
+
+def aggregate_chunk_scores(results: list[dict]) -> dict:
+    """Aggregate per-chunk Refractor scores via confidence-weighted mean.
+
+    If all chunks have zero confidence, falls back to a uniform (unweighted)
+    mean.  The aggregated confidence is the arithmetic mean of per-chunk
+    confidences.
+
+    Args:
+        results: Non-empty list of Refractor score dicts, each containing
+            ``temporal``, ``spatial``, ``ontological`` (mode-keyed probability
+            dicts) and ``confidence`` (float).
+
+    Returns:
+        Single aggregated score dict with the same shape as an individual
+        result, plus ``chunk_count`` (int).
+
+    Raises:
+        ValueError: If ``results`` is empty.
+    """
+    if not results:
+        raise ValueError("results must be non-empty")
+
+    weights = np.array([r["confidence"] for r in results], dtype=np.float64)
+    total_w = weights.sum()
+    if total_w == 0.0:
+        weights = np.ones(len(results), dtype=np.float64)
+        total_w = float(len(results))
+    weights = weights / total_w
+
+    agg: dict = {}
+    for dim, modes in _DIMS:
+        agg[dim] = {}
+        for mode in modes:
+            agg[dim][mode] = float(
+                sum(w * r[dim][mode] for w, r in zip(weights, results))
+            )
+
+    agg["confidence"] = float(np.mean([r["confidence"] for r in results]))
+    agg["chunk_count"] = len(results)
+    return agg
+
+
+# ---------------------------------------------------------------------------
 # Audio encoding
 # ---------------------------------------------------------------------------
 
 
-def encode_audio_file(path: str | Path, scorer=None) -> np.ndarray:
-    """Encode an audio file (WAV, AIFF, or MP3) to a 512-dim CLAP embedding.
+def encode_audio_file(
+    path: str | Path,
+    scorer=None,
+    chunk_size_s: float = 30.0,
+    chunk_stride_s: float = 5.0,
+) -> list[np.ndarray]:
+    """Encode an audio file (WAV, AIFF, or MP3) to per-chunk CLAP embeddings.
+
+    The file is chunked into overlapping 30 s windows (by default); each chunk
+    is encoded to a 512-dim CLAP embedding.
 
     Args:
         path: Path to the audio file.
-        scorer: Optional Refractor instance to reuse. Creates one if not provided.
+        scorer: Optional Refractor instance to reuse.
+        chunk_size_s: Chunk window length in seconds.
+        chunk_stride_s: Hop between chunks in seconds.
 
     Returns:
-        512-dim float32 numpy array.
+        List of 512-dim float32 numpy arrays (one per chunk).
 
     Raises:
         FileNotFoundError: If the file does not exist.
@@ -76,7 +189,10 @@ def encode_audio_file(path: str | Path, scorer=None) -> np.ndarray:
 
         scorer = Refractor()
 
-    return scorer.prepare_audio(waveform, sr=int(sr))
+    chunks = chunk_audio(
+        waveform, int(sr), chunk_size_s=chunk_size_s, stride_s=chunk_stride_s
+    )
+    return [scorer.prepare_audio(c, sr=48000) for c in chunks]
 
 
 # ---------------------------------------------------------------------------
@@ -133,6 +249,9 @@ def write_mix_score(
     melody_dir: str | Path,
     audio_path: Optional[str | Path] = None,
     onnx_path: Optional[str] = None,
+    cdm_onnx_path: Optional[str] = None,
+    chunk_size_s: float = 30.0,
+    chunk_stride_s: float = 5.0,
 ) -> Path:
     """Write mix_score.yml to the song's melody directory.
 
@@ -159,11 +278,14 @@ def write_mix_score(
         "ontological": score_result["ontological"],
         "confidence": round(float(score_result["confidence"]), 4),
         "chromatic_match": round(float(score_result["chromatic_match"]), 4),
+        "chunk_count": score_result.get("chunk_count", 1),
+        "chunk_stride_s": chunk_stride_s,
         "drift": drift,
         "metadata": {
             "audio_file": str(audio_path) if audio_path else None,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "onnx_path": onnx_path,
+            "refractor_cdm": cdm_onnx_path,
         },
     }
 
@@ -185,24 +307,31 @@ def score_mix(
     audio_path: str | Path,
     production_dir: str | Path,
     onnx_path: Optional[str] = None,
+    cdm_onnx_path: Optional[str] = None,
+    chunk_size_s: float = 30.0,
+    chunk_stride_s: float = 5.0,
     _scorer=None,
 ) -> tuple[dict, dict]:
     """Score a rendered audio bounce against the song's chromatic target.
 
-    Encodes the audio with CLAP, runs Refractor in audio-only mode (no MIDI,
-    null concept embedding), computes chromatic_match and per-dimension drift.
+    Encodes the audio in overlapping 30 s chunks with CLAP, runs Refractor in
+    audio-only mode for each chunk, aggregates with confidence-weighted mean,
+    then computes chromatic_match and per-dimension drift.
 
     Args:
         audio_path: Path to the rendered audio file (WAV, AIFF, or MP3).
         production_dir: Song production directory (must contain chords/review.yml).
         onnx_path: Optional override for Refractor ONNX path.
+        cdm_onnx_path: Optional CDM ONNX path. None = auto-detect; "" = disable.
+        chunk_size_s: Audio chunk window length in seconds (default 30).
+        chunk_stride_s: Hop between chunks in seconds (default 5).
         _scorer: Injected Refractor instance (for testing).
 
     Returns:
         Tuple of (score_result, drift_report).
         score_result contains temporal/spatial/ontological dicts, confidence,
-        and chromatic_match. drift_report contains per-dimension deltas and
-        overall_drift.
+        chromatic_match, and chunk_count. drift_report contains per-dimension
+        deltas and overall_drift.
     """
     from app.generators.midi.pipelines.chord_pipeline import (
         compute_chromatic_match,
@@ -222,10 +351,7 @@ def score_mix(
     if _scorer is None:
         from training.refractor import Refractor
 
-        _scorer = Refractor(onnx_path=onnx_path)
-
-    # Encode audio
-    audio_emb = encode_audio_file(audio_path, scorer=_scorer)
+        _scorer = Refractor(onnx_path=onnx_path, cdm_onnx_path=cdm_onnx_path)
 
     # Encode concept — always present in training, never dropped; zero embedding is OOD
     concept_text = meta.get("concept", "")
@@ -235,7 +361,21 @@ def score_mix(
         else np.zeros(768, dtype=np.float32)
     )
 
-    score_result = _scorer.score(audio_emb=audio_emb, concept_emb=concept_emb)
+    # Encode audio into per-chunk CLAP embeddings
+    chunk_embs = encode_audio_file(
+        audio_path,
+        scorer=_scorer,
+        chunk_size_s=chunk_size_s,
+        chunk_stride_s=chunk_stride_s,
+    )
+
+    # Score each chunk
+    chunk_results = [
+        _scorer.score(audio_emb=emb, concept_emb=concept_emb) for emb in chunk_embs
+    ]
+
+    # Aggregate
+    score_result = aggregate_chunk_scores(chunk_results)
 
     # Chromatic match and drift
     score_result["chromatic_match"] = round(
@@ -264,6 +404,23 @@ def main() -> None:
     parser.add_argument(
         "--onnx-path", default=None, help="Override Refractor ONNX path"
     )
+    parser.add_argument(
+        "--cdm-onnx-path",
+        default=None,
+        help="Refractor CDM ONNX path. Defaults to auto-detect training/data/refractor_cdm.onnx; pass '' to disable.",
+    )
+    parser.add_argument(
+        "--chunk-size",
+        type=float,
+        default=30.0,
+        help="Audio chunk window length in seconds (default: 30)",
+    )
+    parser.add_argument(
+        "--chunk-stride",
+        type=float,
+        default=5.0,
+        help="Hop between chunk windows in seconds (default: 5)",
+    )
     args = parser.parse_args()
 
     prod = Path(args.production_dir)
@@ -279,15 +436,32 @@ def main() -> None:
     print(f"Scoring mix: {mix_file.name}")
     print(f"Production:  {prod.name}")
 
-    score_result, drift = score_mix(mix_file, prod, onnx_path=args.onnx_path)
+    cdm_path = args.cdm_onnx_path  # None = auto-detect, "" = disabled
+
+    score_result, drift = score_mix(
+        mix_file,
+        prod,
+        onnx_path=args.onnx_path,
+        cdm_onnx_path=cdm_path,
+        chunk_size_s=args.chunk_size,
+        chunk_stride_s=args.chunk_stride,
+    )
 
     melody_dir = prod / "melody"
     out_path = write_mix_score(
-        score_result, drift, melody_dir, audio_path=mix_file, onnx_path=args.onnx_path
+        score_result,
+        drift,
+        melody_dir,
+        audio_path=mix_file,
+        onnx_path=args.onnx_path,
+        cdm_onnx_path=cdm_path,
+        chunk_size_s=args.chunk_size,
+        chunk_stride_s=args.chunk_stride,
     )
 
     # Human-readable summary
     print()
+    print(f"Chunks scored: {score_result.get('chunk_count', 1)}")
     print("Chromatic scores:")
     for dim in ("temporal", "spatial", "ontological"):
         dist = score_result[dim]
