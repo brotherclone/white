@@ -157,15 +157,10 @@ def _stratified_split(song_ids, colors, val_frac=0.2, seed=42):
 
 @app.function(
     image=image,
-    mounts=[
-        modal.Mount.from_local_file(
-            str(EMBEDDINGS_PATH),
-            remote_path="/embeddings/refractor_cdm_embeddings.npz",
-        )
-    ],
     timeout=1800,
 )
 def train(
+    embeddings_bytes: bytes,
     epochs: int = 150,
     lr: float = 1e-3,
     batch_size: int = 64,
@@ -183,7 +178,7 @@ def train(
     # ------------------------------------------------------------------
     # Load embeddings
     # ------------------------------------------------------------------
-    data = np.load("/embeddings/refractor_cdm_embeddings.npz", allow_pickle=False)
+    data = np.load(io.BytesIO(embeddings_bytes), allow_pickle=False)
     clap_embs = data["clap_embs"].astype(np.float32)  # (N, 512)
     concept_embs = data["concept_embs"].astype(np.float32)  # (N, 768)
     colors = data["colors"]  # (N,) str
@@ -432,11 +427,14 @@ def main(
         sys.exit(1)
 
     use_concept = not no_concept
+    embeddings_bytes = EMBEDDINGS_PATH.read_bytes()
     print(
-        f"Launching Modal training  epochs={epochs}  lr={lr}  use_concept={use_concept}"
+        f"Uploading embeddings ({len(embeddings_bytes) / 1e6:.1f} MB) …  "
+        f"epochs={epochs}  lr={lr}  use_concept={use_concept}"
     )
 
     onnx_bytes = train.remote(
+        embeddings_bytes=embeddings_bytes,
         epochs=epochs,
         lr=lr,
         batch_size=batch_size,
