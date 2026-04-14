@@ -33,12 +33,13 @@ import modal
 
 app = modal.App("white-refractor-cdm")
 
-# Tiny image — only needs torch + numpy + scikit-learn
+# torch.onnx.export requires onnxscript in recent torch builds
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "torch",
     "numpy",
     "scikit-learn",
     "tqdm",
+    "onnxscript",
 )
 
 # Local embeddings file mounted into the container
@@ -161,7 +162,7 @@ def _stratified_split(song_ids, colors, val_frac=0.2, seed=42):
 )
 def train(
     embeddings_bytes: bytes,
-    epochs: int = 150,
+    epochs: int = 300,
     lr: float = 1e-3,
     batch_size: int = 64,
     use_concept: bool = True,
@@ -413,7 +414,7 @@ def train(
 
 @app.local_entrypoint()
 def main(
-    epochs: int = 150,
+    epochs: int = 300,
     lr: float = 1e-3,
     batch_size: int = 64,
     no_concept: bool = False,
