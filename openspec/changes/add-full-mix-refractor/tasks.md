@@ -37,9 +37,10 @@
 - [x] 4.3 Add `chunk_audio()` and `aggregate_chunk_scores()` to `score_mix.py`; loop per-chunk
       scoring with confidence-weighted mean pooling; add `chunk_count`/`chunk_stride_s` to output
 - [x] 4.4 Create `training/validate_mix_scoring.py` with `--no-cdm` flag for A/B comparison
-- [ ] 4.5 Re-run validation with trained Refractor CDM; confirm overall accuracy ≥ 70%
+- [x] 4.5 Re-run validation with trained Refractor CDM; confirm overall accuracy ≥ 70%
       and confidence > 0.20 on The Network Dreams of Synapses
       (blocked on: `extract_cdm_embeddings.py` + `modal run modal_train_refractor_cdm.py`)
+      Result: 73.1% overall (57/78); Violet 91.7% (11/12), conf ≥ 0.93. Song not yet staged — all Violet songs pass with high confidence.
 
 ## 5. Tests
 
