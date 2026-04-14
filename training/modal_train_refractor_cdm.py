@@ -163,7 +163,7 @@ def _stratified_split(song_ids, colors, val_frac=0.2, seed=42):
 def train(
     embeddings_bytes: bytes,
     epochs: int = 300,
-    lr: float = 1e-3,
+    lr: float = 3e-4,
     batch_size: int = 64,
     use_concept: bool = True,
     dry_run: bool = False,
@@ -268,8 +268,12 @@ def train(
 
     torch.manual_seed(seed)
     model = CDMModel()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    criterion = nn.CrossEntropyLoss(weight=torch.FloatTensor(class_weights.tolist()))
+    # weight_decay for L2 regularisation — prevents loss collapsing to near-zero
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-3)
+    # label_smoothing prevents over-confident predictions and improves generalisation
+    criterion = nn.CrossEntropyLoss(
+        weight=torch.FloatTensor(class_weights.tolist()), label_smoothing=0.1
+    )
 
     def to_tensor(arr):
         return torch.FloatTensor(arr.tolist())
@@ -406,7 +410,7 @@ def train(
 @app.local_entrypoint()
 def main(
     epochs: int = 300,
-    lr: float = 1e-3,
+    lr: float = 3e-4,
     batch_size: int = 64,
     no_concept: bool = False,
     dry_run: bool = False,
