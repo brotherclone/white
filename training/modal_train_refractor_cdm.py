@@ -170,6 +170,9 @@ def train(
     seed: int = 42,
 ) -> bytes:
     """Train the Refractor CDM MLP and return the ONNX bytes."""
+    if epochs < 1:
+        raise ValueError(f"epochs must be >= 1, got {epochs}")
+
     import io
 
     import numpy as np
@@ -290,9 +293,11 @@ def train(
     best_mean_acc = -1.0
     best_state = None
 
+    rng = np.random.default_rng(seed)
+
     for epoch in range(1, epochs + 1):
         model.train()
-        idx = np.random.permutation(len(clap_train))
+        idx = rng.permutation(len(clap_train))
         clap_s, concept_s, y_s = clap_train[idx], concept_train[idx], y_train[idx]
 
         train_loss = 0.0

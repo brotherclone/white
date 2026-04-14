@@ -65,6 +65,11 @@ def chunk_audio(
         List of float32 numpy arrays, each exactly ``chunk_size_s * 48000``
         samples long.
     """
+    if chunk_size_s <= 0:
+        raise ValueError(f"chunk_size_s must be > 0, got {chunk_size_s}")
+    if stride_s <= 0:
+        raise ValueError(f"stride_s must be > 0, got {stride_s}")
+
     import librosa
 
     TARGET_SR = 48000
@@ -279,6 +284,7 @@ def write_mix_score(
         "confidence": round(float(score_result["confidence"]), 4),
         "chromatic_match": round(float(score_result["chromatic_match"]), 4),
         "chunk_count": score_result.get("chunk_count", 1),
+        "chunk_size_s": chunk_size_s,
         "chunk_stride_s": chunk_stride_s,
         "drift": drift,
         "metadata": {

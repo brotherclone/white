@@ -575,16 +575,12 @@ class Refractor:
         raw = self._clap_processor(
             audios=[waveform],
             sampling_rate=48000,
-            return_tensors=None,
+            return_tensors="pt",
             padding=True,
         )
-        # torch.tensor() cannot infer dtype from NumPy 2.x arrays — convert via
-        # tolist() first to avoid "Could not infer dtype of numpy.float32" errors.
         inputs = {
-            "input_features": torch.FloatTensor(
-                np.array(raw["input_features"], dtype=np.float32).tolist()
-            ),
-            "is_longer": torch.BoolTensor(raw["is_longer"]),
+            "input_features": raw["input_features"].float(),
+            "is_longer": raw["is_longer"],
         }
         with torch.no_grad():
             # get_audio_features handles pooling + projection internally.

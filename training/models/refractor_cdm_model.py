@@ -97,38 +97,37 @@ def export_onnx(
     """
     import torch
 
-    model.eval()
-    clap_dummy = torch.zeros(1, 512, dtype=torch.float32)
+    class _OnnxExportWrapper(torch.nn.Module):
+        """Accept a single concatenated input tensor for ONNX export."""
 
-    if use_concept:
-        concept_dummy = torch.zeros(1, 768, dtype=torch.float32)
-        input_names = ["clap_emb", "concept_emb"]
-        dynamic_axes = {
-            "clap_emb": {0: "batch"},
-            "concept_emb": {0: "batch"},
-            "temporal": {0: "batch"},
-            "spatial": {0: "batch"},
-            "ontological": {0: "batch"},
-        }
-        dummy_inputs = (clap_dummy, concept_dummy)
-    else:
-        input_names = ["clap_emb"]
-        dynamic_axes = {
-            "clap_emb": {0: "batch"},
-            "temporal": {0: "batch"},
-            "spatial": {0: "batch"},
-            "ontological": {0: "batch"},
-        }
-        dummy_inputs = (clap_dummy,)
+        def __init__(self, base: "RefractorCDMModel", with_concept: bool) -> None:
+            super().__init__()
+            self.base = base
+            self.with_concept = with_concept
+
+        def forward(self, x: "torch.Tensor"):
+            if self.with_concept:
+                return self.base(x[:, :512], x[:, 512:])
+            return self.base(x)
+
+    model.eval()
+    input_dim = 512 + (768 if use_concept else 0)
+    dummy_input = torch.zeros(1, input_dim, dtype=torch.float32)
+    export_model = _OnnxExportWrapper(model, use_concept)
 
     with torch.no_grad():
         torch.onnx.export(
-            model,
-            dummy_inputs,
+            export_model,
+            (dummy_input,),
             path,
-            input_names=input_names,
+            input_names=["input"],
             output_names=["temporal", "spatial", "ontological"],
-            dynamic_axes=dynamic_axes,
+            dynamic_axes={
+                "input": {0: "batch"},
+                "temporal": {0: "batch"},
+                "spatial": {0: "batch"},
+                "ontological": {0: "batch"},
+            },
             opset_version=14,
         )
     print(f"Exported RefractorCDM ONNX → {path}")
