@@ -29,7 +29,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+# Ensure repo root is on sys.path so app.structures is importable
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import modal
+
+from app.structures.concepts.chromatic_targets import CHROMATIC_TARGETS
 
 app = modal.App("white-refractor-cdm")
 
@@ -58,55 +63,6 @@ _COLOR_ORDER = [
     "White",
     "Black",
 ]
-
-# CHROMATIC_TARGETS — [Past/Present/Future], [Thing/Place/Person], [Imagined/Forgotten/Known]
-CHROMATIC_TARGETS = {
-    "Red": {
-        "temporal": [0.8, 0.1, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Orange": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Yellow": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Green": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Blue": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Indigo": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Violet": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-    "White": {
-        "temporal": [0.33, 0.34, 0.33],
-        "spatial": [0.33, 0.34, 0.33],
-        "ontological": [0.33, 0.34, 0.33],
-    },
-    "Black": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-}
 
 
 def _color_targets(color: str) -> tuple[list, list, list]:

@@ -1,48 +1,51 @@
 ## 1. Canonical module
 
-- [ ] 1.1 Create `app/structures/concepts/chromatic_targets.py`:
+- [x] 1.1 Create `app/structures/concepts/chromatic_targets.py`:
       derive `CHROMATIC_TARGETS` at import time from `the_rainbow_table_colors`;
       export `TEMPORAL_MODES`, `SPATIAL_MODES`, `ONTOLOGICAL_MODES` tuples
-- [ ] 1.2 Derivation logic (see design.md):
+- [x] 1.2 Derivation logic (see design.md):
       single ontological mode → 0.8 at index, 0.1 elsewhere;
       two modes (Indigo) → 0.4 each, 0.1 for third;
       `None` → uniform `[1/3, 1/3, 1/3]`
-- [ ] 1.3 Verify computed vectors match the table in proposal.md for all 9 colors
+- [x] 1.3 Verify computed vectors match the table in proposal.md for all 9 colors
 
 ## 2. Deep audit & update — generation pipeline
 
-- [ ] 2.1 `app/generators/midi/pipelines/chord_pipeline.py`: replace hardcoded
+- [x] 2.1 `app/generators/midi/pipelines/chord_pipeline.py`: replace hardcoded
       `CHROMATIC_TARGETS` with import from `chromatic_targets.py`; confirm
       `compute_chromatic_match` uses mode labels that match `TEMPORAL_MODES` etc.
-- [ ] 2.2 Grep entire `app/generators/midi/` for any other hardcoded color target dicts
-      or inline `[0.8, 0.1, 0.1]`-style vectors — update any found
-- [ ] 2.3 Verify `bass_pipeline.py`, `drum_pipeline.py`, `melody_pipeline.py` all
-      source `CHROMATIC_TARGETS` from one place (currently via chord_pipeline import
-      or direct copy — confirm and fix)
+- [x] 2.2 Grep entire `app/generators/midi/` for any other hardcoded color target dicts
+      or inline `[0.8, 0.1, 0.1]`-style vectors — none found; all other pipelines
+      (bass, drum, melody, lyric, quartet) import via `chord_pipeline`
+- [x] 2.3 Verify `bass_pipeline.py`, `drum_pipeline.py`, `melody_pipeline.py` all
+      source `CHROMATIC_TARGETS` from one place — confirmed, all import
+      `compute_chromatic_match` / `get_chromatic_target` from `chord_pipeline`
 
 ## 3. Deep audit & update — training / scoring
 
-- [ ] 3.1 `training/refractor.py`: replace `_CDM_CHROMATIC_TARGETS` with alias import;
+- [x] 3.1 `training/refractor.py`: replace `_CDM_CHROMATIC_TARGETS` with alias import;
       move `TEMPORAL_MODES`, `SPATIAL_MODES`, `ONTOLOGICAL_MODES` constants to
       `chromatic_targets.py` and re-import in `refractor.py`
-- [ ] 3.2 `training/validate_mix_scoring.py`: replace hardcoded `CHROMATIC_TARGETS`;
-      confirm `_top1_color()` mode label ordering matches `TEMPORAL_MODES` etc.
-- [ ] 3.3 `training/modal_train_refractor_cdm.py`: replace hardcoded `CHROMATIC_TARGETS`
-- [ ] 3.4 `app/generators/midi/production/score_mix.py`: audit `compute_chromatic_match`
-      and `write_mix_score` — confirm they use the dict keys from `TEMPORAL_MODES` etc.
-      and not any hardcoded strings
+- [x] 3.2 `training/validate_mix_scoring.py`: replace hardcoded `CHROMATIC_TARGETS`;
+      `_top1_color()` mode label ordering matches `TEMPORAL_MODES` etc.
+- [x] 3.3 `training/modal_train_refractor_cdm.py`: replace hardcoded `CHROMATIC_TARGETS`
+- [x] 3.4 `app/generators/midi/production/score_mix.py`: audited — uses inline `_DIMS`
+      list for mode strings and imports `compute_chromatic_match`/`get_chromatic_target`
+      from `chord_pipeline`; no hardcoded target vectors
 
 ## 4. Tests
 
-- [ ] 4.1 Create `tests/structures/test_chromatic_targets.py`:
-      - each color's derived vectors sum to 1.0 (±1e-6)
+- [x] 4.1 Create `tests/structures/concepts/test_chromatic_targets.py`:
+      - each color's derived vectors sum to 1.0 (±1e-6), except Indigo ontological = 0.9
       - each vector has exactly 3 elements, all in [0, 1]
       - Red, White, Black match known-correct values (regression guard)
       - Indigo ontological = [0.1, 0.4, 0.4] (two-mode case)
       - no two non-transmigrational colors share identical target triples
         (catches the Yellow==Green collision that originally masked the CDM bug)
-- [ ] 4.2 Add import-level smoke test: `from app.structures.concepts.chromatic_targets
+      - explicit correct-value tests for all 7 previously-wrong colors
+- [x] 4.2 Import-level smoke test: `from app.structures.concepts.chromatic_targets
       import CHROMATIC_TARGETS` succeeds without torch/onnx (pure Python dep only)
+- [x] Updated `tests/generators/midi/test_chord_pipeline.py` to assert correct values
 
 ## 5. CDM re-validation
 
@@ -65,4 +68,5 @@
 
 ## 7. Cleanup
 
-- [ ] 7.1 Run full test suite; confirm 0 new regressions
+- [x] 7.1 Run full test suite; confirmed 0 new regressions (4 pre-existing
+      `test_scoring_functions.py` failures unrelated to this change)

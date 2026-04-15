@@ -30,6 +30,15 @@ from typing import Optional
 
 import numpy as np
 
+from app.structures.concepts.chromatic_targets import (
+    CHROMATIC_TARGETS as _CDM_CHROMATIC_TARGETS,
+)
+from app.structures.concepts.chromatic_targets import (
+    ONTOLOGICAL_MODES,
+    SPATIAL_MODES,
+    TEMPORAL_MODES,
+)
+
 _spec = _ilu.spec_from_file_location(
     "piano_roll_encoder",
     str(Path(__file__).parent / "models" / "piano_roll_encoder.py"),
@@ -40,10 +49,6 @@ midi_bytes_to_piano_roll = _pre.midi_bytes_to_piano_roll
 
 logger = logging.getLogger(__name__)
 
-# Mode labels matching the training data order
-TEMPORAL_MODES = ["Past", "Present", "Future"]
-SPATIAL_MODES = ["Thing", "Place", "Person"]
-ONTOLOGICAL_MODES = ["Imagined", "Forgotten", "Known"]
 
 # Canonical color order for the CDM classification head (matches modal_train_refractor_cdm.py)
 _CDM_COLOR_ORDER = [
@@ -57,55 +62,6 @@ _CDM_COLOR_ORDER = [
     "White",
     "Black",
 ]
-
-# CHROMATIC_TARGETS for CDM inference: color → (temporal, spatial, ontological) distributions
-_CDM_CHROMATIC_TARGETS = {
-    "Red": {
-        "temporal": [0.8, 0.1, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Orange": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Yellow": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Green": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Blue": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Indigo": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Violet": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-    "White": {
-        "temporal": [0.33, 0.34, 0.33],
-        "spatial": [0.33, 0.34, 0.33],
-        "ontological": [0.33, 0.34, 0.33],
-    },
-    "Black": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-}
 
 
 class Refractor:
@@ -535,6 +491,7 @@ class Refractor:
             "spatial": spatial,
             "ontological": ontological,
             "confidence": confidence,
+            "predicted_color": best_color,  # direct CDM argmax — bypass distribution round-trip
             "candidate": {},
             "rank": 0,
         }

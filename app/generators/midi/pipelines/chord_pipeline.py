@@ -34,6 +34,12 @@ from app.generators.midi.patterns.strum_patterns import (
     strum_to_midi_bytes,
 )
 from app.generators.midi.production.init_production import load_initial_proposal
+from app.structures.concepts.chromatic_targets import (
+    CHROMATIC_TARGETS,
+    ONTOLOGICAL_MODES,
+    SPATIAL_MODES,
+    TEMPORAL_MODES,
+)
 from app.structures.music.core.enharmonic import normalize_to_flat
 from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 
@@ -51,66 +57,6 @@ def _to_python(obj):
     if isinstance(obj, np.ndarray):
         return obj.tolist()
     return obj
-
-
-# ---------------------------------------------------------------------------
-# Chromatic target mapping (color → mode distributions)
-# ---------------------------------------------------------------------------
-
-# Target distributions: [Past, Present, Future] / [Thing, Place, Person] / [Imagined, Forgotten, Known]
-# Primary mode gets 0.8, others split 0.1 each.
-CHROMATIC_TARGETS = {
-    "Red": {
-        "temporal": [0.8, 0.1, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Orange": {
-        "temporal": [0.8, 0.1, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-    "Yellow": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Green": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Blue": {
-        "temporal": [0.8, 0.1, 0.1],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Indigo": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Violet": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-    # Black and White use uniform — scorer confidence still provides signal
-    "Black": {
-        "temporal": [1 / 3, 1 / 3, 1 / 3],
-        "spatial": [1 / 3, 1 / 3, 1 / 3],
-        "ontological": [1 / 3, 1 / 3, 1 / 3],
-    },
-    "White": {
-        "temporal": [1 / 3, 1 / 3, 1 / 3],
-        "spatial": [1 / 3, 1 / 3, 1 / 3],
-        "ontological": [1 / 3, 1 / 3, 1 / 3],
-    },
-}
-
-TEMPORAL_MODES = ["past", "present", "future"]
-SPATIAL_MODES = ["thing", "place", "person"]
-ONTOLOGICAL_MODES = ["imagined", "forgotten", "known"]
 
 
 def get_chromatic_target(color_name: str) -> dict:
