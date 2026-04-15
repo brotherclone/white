@@ -32,8 +32,12 @@ import sys
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import numpy as np
 import yaml
+
+from app.structures.concepts.chromatic_targets import CHROMATIC_TARGETS
 
 _COLOR_MAP = {
     "R": "Red",
@@ -59,57 +63,20 @@ _COLOR_ORDER = [
     "Black",
 ]
 
-CHROMATIC_TARGETS = {
-    "Red": {
-        "temporal": [0.8, 0.1, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Orange": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Yellow": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Green": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.1, 0.8],
-    },
-    "Blue": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.8, 0.1],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Indigo": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.1, 0.8, 0.1],
-    },
-    "Violet": {
-        "temporal": [0.1, 0.1, 0.8],
-        "spatial": [0.1, 0.1, 0.8],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-    "White": {
-        "temporal": [0.33, 0.34, 0.33],
-        "spatial": [0.33, 0.34, 0.33],
-        "ontological": [0.33, 0.34, 0.33],
-    },
-    "Black": {
-        "temporal": [0.1, 0.8, 0.1],
-        "spatial": [0.8, 0.1, 0.1],
-        "ontological": [0.8, 0.1, 0.1],
-    },
-}
-
 
 def _top1_color(score_result: dict) -> str:
-    """Return the color whose CHROMATIC_TARGETS best matches the predicted distributions."""
+    """Return the predicted color from a Refractor score result.
+
+    When the CDM path was used, ``score_result`` carries ``predicted_color``
+    directly (the CDM argmax) — use it to avoid the dot-product round-trip,
+    which breaks for Indigo (soft-label ontological) and White/Black (identical
+    uniform targets).
+
+    Falls back to nearest-neighbor dot-product search for base-model results.
+    """
+    if "predicted_color" in score_result:
+        return score_result["predicted_color"]
+
     t = [score_result["temporal"].get(m, 0.0) for m in ("past", "present", "future")]
     s = [score_result["spatial"].get(m, 0.0) for m in ("thing", "place", "person")]
     o = [
@@ -200,7 +167,20 @@ def validate(
                 for emb in chunk_embs
             ]
             result = aggregate_chunk_scores(chunk_results)
-            pred_color = _top1_color(result)
+
+            # When CDM was used, each chunk carries predicted_color directly.
+            # Majority-vote across chunks to get the song-level prediction;
+            # this bypasses the broken distribution round-trip in _top1_color
+            # (Indigo soft-label and White/Black uniform-target tie).
+            chunk_colors = [
+                r["predicted_color"] for r in chunk_results if "predicted_color" in r
+            ]
+            if chunk_colors:
+                from collections import Counter
+
+                pred_color = Counter(chunk_colors).most_common(1)[0][0]
+            else:
+                pred_color = _top1_color(result)
             correct = pred_color == color
 
             per_song.append(

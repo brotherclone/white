@@ -22,14 +22,22 @@ The system SHALL score a rendered audio bounce against the song's chromatic targ
 Refractor in audio-only mode (no MIDI, no concept text), returning temporal, spatial, and
 ontological probability distributions plus a scalar confidence value.
 
+`CHROMATIC_TARGETS` used by `compute_chromatic_match()` and `write_mix_score()` SHALL be
+imported from `app.structures.concepts.chromatic_targets` — not hardcoded inline.
+
 #### Scenario: Audio-only Refractor inference
 - **WHEN** only an audio embedding is provided (no MIDI, no concept embedding)
 - **THEN** Refractor returns a valid score dict with temporal/spatial/ontological dicts and
   a confidence in [0, 1]
 
 #### Scenario: Chromatic match computed
-- **WHEN** the Refractor result and the color's CHROMATIC_TARGETS entry are available
+- **WHEN** the Refractor result and the color's `CHROMATIC_TARGETS` entry are available
 - **THEN** `compute_chromatic_match()` returns a scalar in [0, 1] representing alignment
+
+#### Scenario: Targets sourced from canonical module
+- **WHEN** `score_mix.py` computes chromatic match for any color
+- **THEN** the probability vectors used match those exported by `chromatic_targets.py`
+  for that color — no inline override is present in `score_mix.py`
 
 ---
 
@@ -37,16 +45,16 @@ ontological probability distributions plus a scalar confidence value.
 The system SHALL compute a drift report comparing the mix's predicted chromatic distribution
 against the song's target distribution, reporting per-dimension signed deltas.
 
+The target distributions used for drift SHALL be sourced from `chromatic_targets.py`.
+
 #### Scenario: Drift computed for all three dimensions
-- **WHEN** a Refractor result and a CHROMATIC_TARGETS target are provided
+- **WHEN** a Refractor result and a `CHROMATIC_TARGETS` target are provided
 - **THEN** the drift report contains temporal_delta, spatial_delta, ontological_delta, and
   an overall_drift scalar (mean absolute delta across dimensions)
 
 #### Scenario: On-target mix
 - **WHEN** predicted distributions closely match the target
 - **THEN** overall_drift is near 0.0 and all dimension deltas are small
-
----
 
 ### Requirement: Mix Score File
 The system SHALL write `melody/mix_score.yml` containing the Refractor score, chromatic
