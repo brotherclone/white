@@ -58,3 +58,5 @@ chain_artifacts/**/debug/*.json
 **/autosave/
 **/VocalSynth/
 app/reference/mcp/ace_studio/tool_manifest.json
+# Claude Code runtime artifacts
+.claude/scheduled_tasks.lock

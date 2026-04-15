@@ -25,7 +25,7 @@ class TestChromaticTargetMapping:
         from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("Green")
-        assert target["temporal"] == [0.1, 0.8, 0.1]  # Present
+        assert target["temporal"] == [0.1, 0.1, 0.8]  # Future
         assert target["spatial"] == [0.1, 0.8, 0.1]  # Place
         assert target["ontological"] == [0.1, 0.8, 0.1]  # Forgotten
 
@@ -33,8 +33,11 @@ class TestChromaticTargetMapping:
         from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("Indigo")
-        assert target["temporal"] == [0.1, 0.1, 0.8]  # Future
-        assert target["ontological"] == [0.1, 0.8, 0.1]  # Forgotten
+        # Indigo has no temporal/spatial mode → uniform
+        assert abs(target["temporal"][0] - 1 / 3) < 0.01
+        assert abs(target["spatial"][0] - 1 / 3) < 0.01
+        # Indigo ontological: Known+Forgotten → [0.1, 0.4, 0.4] (imagined, forgotten, known)
+        assert target["ontological"] == [0.1, 0.4, 0.4]
 
     def test_black_uniform(self):
         from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
@@ -70,9 +73,11 @@ class TestChromaticTargetMapping:
 
         for color, target in CHROMATIC_TARGETS.items():
             for dim in ["temporal", "spatial", "ontological"]:
+                # Indigo ontological is [0.1, 0.4, 0.4] = 0.9 by design (two-mode soft-label)
+                expected = 0.9 if (color == "Indigo" and dim == "ontological") else 1.0
                 assert (
-                    abs(sum(target[dim]) - 1.0) < 0.01
-                ), f"{color} {dim} doesn't sum to 1"
+                    abs(sum(target[dim]) - expected) < 0.01
+                ), f"{color} {dim} doesn't sum to {expected}"
 
 
 # ---------------------------------------------------------------------------
