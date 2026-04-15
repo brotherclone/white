@@ -17,18 +17,21 @@ from app.structures.concepts.chromatic_targets import (
 
 
 def test_import_no_heavy_deps():
-    """chromatic_targets must import without torch or onnxruntime."""
+    """chromatic_targets must not newly import torch or onnxruntime."""
     import importlib
     import sys
 
-    # Remove cached module to force a fresh import check
-    for key in list(sys.modules.keys()):
-        if "chromatic_targets" in key:
-            del sys.modules[key]
+    # Remove only the module under test to force a fresh import
+    module_name = "app.structures.concepts.chromatic_targets"
+    sys.modules.pop(module_name, None)
 
-    mod = importlib.import_module("app.structures.concepts.chromatic_targets")
+    before = set(sys.modules)
+    mod = importlib.import_module(module_name)
+    newly_imported = set(sys.modules) - before
+
     assert hasattr(mod, "CHROMATIC_TARGETS")
-    assert "torch" not in sys.modules or True  # torch may be present from other tests
+    assert "torch" not in newly_imported
+    assert "onnxruntime" not in newly_imported
 
 
 # ---------------------------------------------------------------------------

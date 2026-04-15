@@ -61,8 +61,8 @@ def _build_chromatic_targets() -> dict[str, dict[str, list[float]]]:
     targets: dict[str, dict[str, list[float]]] = {}
     for color in the_rainbow_table_colors.values():
         targets[color.color_name] = {
-            "temporal": _TEMPORAL_MAP.get(color.temporal_mode, list(_UNIFORM)),
-            "spatial": _SPATIAL_MAP.get(color.objectional_mode, list(_UNIFORM)),
+            "temporal": list(_TEMPORAL_MAP.get(color.temporal_mode, _UNIFORM)),
+            "spatial": list(_SPATIAL_MAP.get(color.objectional_mode, _UNIFORM)),
             "ontological": _ontological_vector(color.ontological_mode),
         }
     return targets

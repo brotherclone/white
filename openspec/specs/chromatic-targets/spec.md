@@ -15,9 +15,11 @@ as tuples of mode label strings in the canonical vector ordering used throughout
 - `SPATIAL_MODES = ("thing", "place", "person")`
 - `ONTOLOGICAL_MODES = ("imagined", "forgotten", "known")`
 
-#### Scenario: Vectors sum to 1.0
+#### Scenario: Vectors sum to their canonical totals
 - **WHEN** `CHROMATIC_TARGETS` is imported
-- **THEN** each of the three vectors for every color sums to 1.0 (±1e-6)
+- **THEN** each vector for every color sums to 1.0 (±1e-6),
+  except `CHROMATIC_TARGETS["Indigo"]["ontological"]`, which sums to 0.9 (±1e-6)
+  (two-mode soft-label: KNOWN and FORGOTTEN each 0.4, IMAGINED 0.1)
 
 #### Scenario: Correct values for canonical colors
 - **WHEN** the module is imported
@@ -30,9 +32,10 @@ as tuples of mode label strings in the canonical vector ordering used throughout
 - **THEN** `CHROMATIC_TARGETS["Indigo"]["ontological"]` equals `[0.1, 0.4, 0.4]`
   (split evenly between KNOWN and FORGOTTEN, IMAGINED suppressed to 0.1)
 
-#### Scenario: No duplicate full-target triples among chromatic colors
-- **WHEN** comparing all nine colors' combined (temporal, spatial, ontological) tuples
-- **THEN** no two colors share an identical triple
+#### Scenario: No duplicate full-target triples among non-uniform chromatic colors
+- **WHEN** comparing combined (temporal, spatial, ontological) tuples for colors
+  that are not fully uniform (i.e. excluding White and Black, which are both uniform by design)
+- **THEN** no two non-uniform colors share an identical triple
   (Yellow and Green MUST differ — this was the root cause of the CDM collapse)
 
 #### Scenario: Pure Python import, no ML dependencies
