@@ -63,6 +63,9 @@ After deployment, create separate PR to:
 - Use `openspec archive <change-id> --skip-specs --yes` for tooling-only changes (always pass the change ID explicitly)
 - Run `openspec validate --strict` to confirm the archived change passes checks
 
+**Archive AFTER PR review comments are resolved, not before.**
+PR review can surface spec/code mismatches (wrong field names, wrong semantics) that require spec edits. Archiving before review is settled means the archived spec may not reflect what was actually built. The correct order is: implement → PR open → address all review comments → archive → merge.
+
 ## Before Any Task
 
 **Context Checklist:**

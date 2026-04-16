@@ -10,6 +10,7 @@ Usage:
 """
 
 import argparse
+import subprocess
 import sys
 import webbrowser
 from dataclasses import asdict
@@ -30,6 +31,15 @@ from app.tools.candidate_browser import (
     set_use_case,
 )
 
+VALID_PHASES = {"chords", "drums", "bass", "melody", "quartet"}
+EVOLVABLE_PHASES = {"drums", "bass", "melody"}
+
+_EVOLVE_PIPELINE = {
+    "drums": "app.generators.midi.pipelines.drum_pipeline",
+    "bass": "app.generators.midi.pipelines.bass_pipeline",
+    "melody": "app.generators.midi.pipelines.melody_pipeline",
+}
+
 # ---------------------------------------------------------------------------
 # App factory (production_dir injected at startup)
 # ---------------------------------------------------------------------------
@@ -46,7 +56,7 @@ def create_app(production_dir: Path) -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-        allow_methods=["GET", "POST", "PATCH"],
+        allow_methods=["GET", "POST", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
 
@@ -130,6 +140,128 @@ def create_app(production_dir: Path) -> FastAPI:
     @app.get("/production-dir")
     def get_production_dir():
         return {"production_dir": str(_production_dir)}
+
+    # ------------------------------------------------------------------
+    # Promote
+    # ------------------------------------------------------------------
+
+    class PromoteBody(BaseModel):
+        phase: str
+
+    @app.post("/promote")
+    def promote(body: PromoteBody):
+        if body.phase not in VALID_PHASES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid phase '{body.phase}'. Must be one of: {sorted(VALID_PHASES)}",
+            )
+        review_path = _production_dir / body.phase / "review.yml"
+        if not review_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No review.yml found for phase '{body.phase}'",
+            )
+        # Snapshot approved/ count before promotion to compute the delta
+        approved_dir = _production_dir / body.phase / "approved"
+        count_before = (
+            len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
+        )
+
+        from app.generators.midi.production.pipeline_runner import cmd_promote
+
+        result = cmd_promote(_production_dir, body.phase, yes=True)
+        if result != 0:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Promotion could not be completed for phase '{body.phase}' — ensure review.yml contains approved candidates",
+            )
+        count_after = (
+            len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
+        )
+        return {"ok": True, "promoted_count": max(0, count_after - count_before)}
+
+    # ------------------------------------------------------------------
+    # Evolve
+    # ------------------------------------------------------------------
+
+    class EvolveBody(BaseModel):
+        phase: str
+
+    @app.post("/evolve")
+    def evolve(body: EvolveBody):
+        if body.phase not in EVOLVABLE_PHASES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Phase '{body.phase}' does not support evolution. Must be one of: {sorted(EVOLVABLE_PHASES)}",
+            )
+        module = _EVOLVE_PIPELINE[body.phase]
+        cmd = [
+            sys.executable,
+            "-m",
+            module,
+            "--production-dir",
+            str(_production_dir),
+            "--evolve",
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise HTTPException(
+                status_code=500,
+                detail=result.stderr.strip()
+                or f"Evolution failed for phase '{body.phase}'",
+            )
+        # Count evolved candidates written (those with evolved_ prefix)
+        candidates_dir = _production_dir / body.phase / "candidates"
+        evolved_count = (
+            len(list(candidates_dir.glob("evolved_*.mid")))
+            if candidates_dir.exists()
+            else 0
+        )
+        return {"ok": True, "evolved_count": evolved_count}
+
+    # ------------------------------------------------------------------
+    # ACE Studio
+    # ------------------------------------------------------------------
+
+    @app.post("/ace/export")
+    def ace_export():
+        try:
+            from app.generators.midi.production.ace_studio_export import (
+                export_to_ace_studio,
+            )
+
+            result = export_to_ace_studio(_production_dir)
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
+        # export_to_ace_studio catches ConnectionError internally and returns None
+        if result is None:
+            raise HTTPException(
+                status_code=503,
+                detail="ACE Studio not running",
+            )
+        return {
+            "ok": True,
+            "singer": result.get("singer"),
+            "sections": result.get("sections", []),
+            "project_id": result.get("project_id"),
+            "note_count": result.get("note_count"),
+        }
+
+    @app.post("/ace/import")
+    def ace_import():
+        try:
+            from app.generators.midi.production.ace_studio_import import (
+                locate_and_ingest_render,
+            )
+
+            dest = locate_and_ingest_render(_production_dir)
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
+        if dest is None:
+            raise HTTPException(
+                status_code=404, detail="No ACE Studio WAV render found"
+            )
+        return {"ok": True, "render_path": str(dest)}
 
     return app
 
