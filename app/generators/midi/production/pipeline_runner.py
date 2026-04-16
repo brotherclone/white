@@ -41,9 +41,17 @@ from app.generators.midi.production.init_production import load_song_context
 # Phase definitions
 # ---------------------------------------------------------------------------
 
-PHASE_ORDER = ["init_production", "chords", "drums", "bass", "melody", "lyrics"]
+PHASE_ORDER = [
+    "init_production",
+    "chords",
+    "drums",
+    "bass",
+    "melody",
+    "lyrics",
+    "decisions",
+]
 
-# Review file relative to production_dir — None means no review gate (init_production)
+# Review file relative to production_dir — None means no review gate
 PHASE_REVIEW_FILES: dict[str, Optional[str]] = {
     "init_production": None,
     "chords": "chords/review.yml",
@@ -51,6 +59,7 @@ PHASE_REVIEW_FILES: dict[str, Optional[str]] = {
     "bass": "bass/review.yml",
     "melody": "melody/review.yml",
     "lyrics": "melody/lyrics_review.yml",
+    "decisions": None,
 }
 
 # Phase icons for status display
@@ -110,6 +119,12 @@ def _build_phase_command(phase: str, production_dir: Path, ctx: dict) -> list[st
     if phase == "lyrics":
         return base + [
             "app.generators.midi.pipelines.lyric_pipeline",
+            "--production-dir",
+            prod,
+        ]
+    if phase == "decisions":
+        return base + [
+            "app.generators.midi.production.production_decisions",
             "--production-dir",
             prod,
         ]
@@ -187,6 +202,10 @@ def cmd_status(production_dir: Path) -> None:
         icon = _status_icon(status)
         print(f"  {phase:<20s} {icon}  {status}")
 
+    decisions_exists = (production_dir / "production_decisions.yml").exists()
+    decisions_flag = "✅  exists" if decisions_exists else "—   not generated"
+    print(f"\n  {'production_decisions.yml':<28s} {decisions_flag}")
+
     next_phase = get_next_runnable_phase(statuses)
     print()
     if next_phase is None:
@@ -239,11 +258,14 @@ def cmd_run(production_dir: Path) -> int:
         )
         return result.returncode
 
-    write_phase_status(production_dir, next_phase, "generated")
     review_file = PHASE_REVIEW_FILES.get(next_phase)
-    print(f"\n✓ Phase {next_phase} complete. Status: generated.")
-
-    if review_file:
+    if review_file is None:
+        # No review gate — auto-promote so downstream phases can proceed.
+        write_phase_status(production_dir, next_phase, "promoted")
+        print(f"\n✓ Phase {next_phase} complete. Auto-promoted (no review gate).")
+    else:
+        write_phase_status(production_dir, next_phase, "generated")
+        print(f"\n✓ Phase {next_phase} complete. Status: generated.")
         review_path = production_dir / review_file
         print(f"\nReview candidates in: {review_path}")
         print("Then promote with:")
