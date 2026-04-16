@@ -38,9 +38,10 @@ mood:
 - anticipatory
 - electric
 phases:
-  chords: pending
-  drums: pending
-  bass: pending
-  melody: pending
-  lyrics: pending
-  composition_proposal: pending
+  init_production: promoted
+  chords: promoted
+  drums: promoted
+  bass: promoted
+  melody: promoted
+  lyrics: promoted
+  decisions: pending
