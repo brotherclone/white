@@ -18,7 +18,12 @@ Close out a White production session cleanly.
    - Ask the user for the path to the audio bounce if not obvious (or if `$ARGUMENTS` contains a path, use it).
    - Run: `wscore --mix-file <audio-path> --production-dir <production-dir>`
 
-3. **Shrinkwrap** the thread
+3. **Capture production decisions**
+   - Run: `python -m app.generators.midi.production.production_decisions --production-dir <production-dir>`
+   - This writes `production_decisions.yml` to the production directory root.
+   - Skip gracefully if the song is incomplete (partially produced songs still get a partial record).
+
+4. **Shrinkwrap** the thread
    - Run: `wshrink --thread <uuid>`
    - If the thread already exists in `shrink_wrapped/` and there are new files, delete the stale copy first (`rm -rf shrink_wrapped/<thread-name>/`) then re-run.
 
