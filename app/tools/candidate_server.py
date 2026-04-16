@@ -155,20 +155,30 @@ def create_app(production_dir: Path) -> FastAPI:
                 status_code=400,
                 detail=f"Invalid phase '{body.phase}'. Must be one of: {sorted(VALID_PHASES)}",
             )
+        review_path = _production_dir / body.phase / "review.yml"
+        if not review_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No review.yml found for phase '{body.phase}'",
+            )
+        # Snapshot approved/ count before promotion to compute the delta
+        approved_dir = _production_dir / body.phase / "approved"
+        count_before = (
+            len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
+        )
+
         from app.generators.midi.production.pipeline_runner import cmd_promote
 
         result = cmd_promote(_production_dir, body.phase, yes=True)
         if result != 0:
             raise HTTPException(
-                status_code=500,
-                detail=f"Promotion failed for phase '{body.phase}' — check review.yml for approved candidates",
+                status_code=409,
+                detail=f"Promotion could not be completed for phase '{body.phase}' — ensure review.yml contains approved candidates",
             )
-        # Count how many files ended up in approved/
-        approved_dir = _production_dir / body.phase / "approved"
-        promoted_count = (
+        count_after = (
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
-        return {"ok": True, "promoted_count": promoted_count}
+        return {"ok": True, "promoted_count": max(0, count_after - count_before)}
 
     # ------------------------------------------------------------------
     # Evolve
@@ -221,16 +231,13 @@ def create_app(production_dir: Path) -> FastAPI:
             )
 
             result = export_to_ace_studio(_production_dir)
-        except ConnectionError as exc:
-            raise HTTPException(
-                status_code=503, detail=f"ACE Studio not running: {exc}"
-            )
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc))
+        # export_to_ace_studio catches ConnectionError internally and returns None
         if result is None:
             raise HTTPException(
-                status_code=500,
-                detail="ACE Studio export returned no result — check server logs",
+                status_code=503,
+                detail="ACE Studio not running",
             )
         return {
             "ok": True,

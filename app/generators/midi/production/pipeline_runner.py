@@ -60,6 +60,9 @@ PHASE_REVIEW_FILES: dict[str, Optional[str]] = {
     "melody": "melody/review.yml",
     "lyrics": "melody/lyrics_review.yml",
     "decisions": None,
+    # quartet is not in PHASE_ORDER (it's a parallel phase) but is a valid
+    # promote target exposed via the candidate review UI
+    "quartet": "quartet/review.yml",
 }
 
 # Phase icons for status display

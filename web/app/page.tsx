@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, aceExport, aceImport } from "@/lib/api";
 import { Candidate, CandidateStatus } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
@@ -24,6 +24,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [promoting, setPromoting] = useState(false);
   const [evolving, setEvolving] = useState(false);
   const [aceBusy, setAceBusy] = useState(false);
@@ -109,12 +110,16 @@ export default function Home() {
   }, [all, focused]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const showToast = (msg: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast(msg);
-    setTimeout(() => setToast(null), 4000);
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
   };
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
 
   const handlePromote = async () => {
     if (!phaseFilter) return;
+    setError(null);
     setPromoting(true);
     try {
       const res = await promotePhase(phaseFilter);
@@ -129,6 +134,7 @@ export default function Home() {
 
   const handleEvolve = async () => {
     if (!phaseFilter) return;
+    setError(null);
     setEvolving(true);
     try {
       const res = await evolvePhase(phaseFilter);
@@ -142,6 +148,7 @@ export default function Home() {
   };
 
   const handleAceExport = async () => {
+    setError(null);
     setAceBusy(true);
     try {
       const res = await aceExport();
@@ -155,6 +162,7 @@ export default function Home() {
   };
 
   const handleAceImport = async () => {
+    setError(null);
     setAceBusy(true);
     try {
       const res = await aceImport();

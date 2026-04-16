@@ -219,36 +219,51 @@ class TestProductionDir:
 
 class TestPromote:
     def test_valid_phase_returns_ok(self, client, prod_dir):
+        # Pre-existing file in approved/ should NOT be counted (before/after delta)
         approved_dir = prod_dir / "chords" / "approved"
         approved_dir.mkdir(parents=True, exist_ok=True)
-        (approved_dir / "chord_002.mid").write_bytes(b"MThd")
+        (approved_dir / "old.mid").write_bytes(b"MThd")  # already there
+
+        def _promote_side_effect(prod, phase, yes=False):
+            # Simulate writing one new file during promotion
+            (approved_dir / "chord_002.mid").write_bytes(b"MThd")
+            return 0
 
         with patch(
-            "app.generators.midi.production.pipeline_runner.cmd_promote", return_value=0
+            "app.generators.midi.production.pipeline_runner.cmd_promote",
+            side_effect=_promote_side_effect,
         ):
             resp = client.post("/promote", json={"phase": "chords"})
 
         assert resp.status_code == 200
         data = resp.json()
         assert data["ok"] is True
-        assert "promoted_count" in data
+        assert data["promoted_count"] == 1  # delta, not total
 
     def test_invalid_phase_returns_400(self, client):
         resp = client.post("/promote", json={"phase": "violins"})
         assert resp.status_code == 400
         assert "violins" in resp.json()["detail"]
 
-    def test_promotion_failure_returns_500(self, client):
+    def test_missing_review_yml_returns_404(self, client, prod_dir):
+        # drums has no review.yml in the prod_dir fixture
+        resp = client.post("/promote", json={"phase": "drums"})
+        assert resp.status_code == 404
+
+    def test_promotion_failure_returns_409(self, client, prod_dir):
+        # review.yml exists (chords is set up in fixture) but promotion fails
         with patch(
             "app.generators.midi.production.pipeline_runner.cmd_promote", return_value=1
         ):
             resp = client.post("/promote", json={"phase": "chords"})
-        assert resp.status_code == 500
+        assert resp.status_code == 409
 
     def test_all_valid_phases_accepted(self, client, prod_dir):
         for phase in ("chords", "drums", "bass", "melody", "quartet"):
-            approved_dir = prod_dir / phase / "approved"
-            approved_dir.mkdir(parents=True, exist_ok=True)
+            # Create review.yml so the 404 guard passes
+            review_dir = prod_dir / phase
+            review_dir.mkdir(parents=True, exist_ok=True)
+            (review_dir / "review.yml").write_text("candidates: []")
             with patch(
                 "app.generators.midi.production.pipeline_runner.cmd_promote",
                 return_value=0,
@@ -336,9 +351,10 @@ class TestEvolve:
 
 class TestAceExport:
     def test_ace_not_running_returns_503(self, client):
+        # export_to_ace_studio catches ConnectionError internally and returns None
         with patch(
             "app.generators.midi.production.ace_studio_export.export_to_ace_studio",
-            side_effect=ConnectionError("ACE Studio not reachable"),
+            return_value=None,
         ):
             resp = client.post("/ace/export")
         assert resp.status_code == 503
