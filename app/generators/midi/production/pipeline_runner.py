@@ -258,11 +258,14 @@ def cmd_run(production_dir: Path) -> int:
         )
         return result.returncode
 
-    write_phase_status(production_dir, next_phase, "generated")
     review_file = PHASE_REVIEW_FILES.get(next_phase)
-    print(f"\n✓ Phase {next_phase} complete. Status: generated.")
-
-    if review_file:
+    if review_file is None:
+        # No review gate — auto-promote so downstream phases can proceed.
+        write_phase_status(production_dir, next_phase, "promoted")
+        print(f"\n✓ Phase {next_phase} complete. Auto-promoted (no review gate).")
+    else:
+        write_phase_status(production_dir, next_phase, "generated")
+        print(f"\n✓ Phase {next_phase} complete. Status: generated.")
         review_path = production_dir / review_file
         print(f"\nReview candidates in: {review_path}")
         print("Then promote with:")

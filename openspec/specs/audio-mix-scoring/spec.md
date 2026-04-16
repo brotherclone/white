@@ -117,24 +117,24 @@ The system SHALL generate a `production_decisions.yml` file in a song's producti
 
 The file SHALL contain:
 - **identity**: thread, color, title, key, bpm, time_sig, singer (from `song_context.yml`)
-- **phase_decisions**: for each completed phase (chords, drums, bass, melody) — candidates_generated, approved_count, approved_labels, mean_chromatic_score, mean_theory_score
-- **arrangement**: sections (name, bars, play_count, vocals), total_bars, total_plays, section_count (from `arrangement.txt`)
-- **mix_scores**: temporal, spatial, ontological, confidence, chromatic_match (from `melody/mix_score.yml`, omitted if absent)
-- **vocal_drift**: overall_pitch_match, overall_rhythm_drift, total_lyric_edits (from `drift_report.yml`, omitted if absent)
+- **phase_decisions**: entries for the standard phases (chords, drums, bass, melody); each completed phase contains candidates_generated, approved_count, approved_labels, mean_chromatic_score, mean_theory_score; incomplete or missing phases are emitted with `null` values
+- **arrangement_summary**: sections (name, bars, play_count, vocals), total_bars, total_plays, section_count (from `arrangement.txt`); `null` if arrangement.txt is absent
+- **mix_scores**: per dimension (temporal, spatial, ontological), an object of the form `{scores: <dict>, mode: <winner>}`, plus top-level confidence and chromatic_match (from `melody/mix_score.yml`); emitted as `null` if absent
+- **vocal_drift**: overall_pitch_match, overall_rhythm_drift, total_lyric_edits (from `drift_report.yml`); emitted as `null` if absent
 
 #### Scenario: Complete production dir produces full decisions file
 - **WHEN** `production_decisions.py` is run on a directory with all phases completed
 - **THEN** `production_decisions.yml` is written containing all sections
-- **AND** phase_decisions contains one entry per completed phase with candidate counts and scores
+- **AND** phase_decisions contains entries for chords, drums, bass, and melody with candidate counts and scores
 
 #### Scenario: Partial production dir produces partial file
 - **WHEN** some phases are incomplete or review.yml files are absent
 - **THEN** `production_decisions.yml` is still written with available data
-- **AND** missing phase entries are omitted without error
+- **AND** phase_decisions still contains the standard phase entries, using `null` values for incomplete or missing phases, without error
 
-#### Scenario: Mix scores and drift omitted when absent
+#### Scenario: Mix scores and drift are null when absent
 - **WHEN** `melody/mix_score.yml` or `drift_report.yml` do not exist
-- **THEN** the corresponding sections are omitted from `production_decisions.yml`
+- **THEN** the corresponding sections are emitted as `null` in `production_decisions.yml`
 - **AND** no error is raised
 
 #### Scenario: Pipeline runner shows decisions status

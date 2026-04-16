@@ -26,7 +26,7 @@ from app.generators.midi.production.ace_studio_import import (
     parse_ace_export,
 )
 from app.generators.midi.production.assembly_manifest import (
-    _is_bar_beat_format,
+    is_bar_beat_format,
     parse_arrangement,
 )
 from app.generators.midi.production.production_plan import load_plan
@@ -74,7 +74,7 @@ def _parse_arrangement_sections(
     """
     text = arrangement_path.read_text()
 
-    if not _is_bar_beat_format(text):
+    if not is_bar_beat_format(text):
         # SMPTE path: _parse_timecode gives absolute song seconds.
         sections: list[tuple[str, float, float]] = []
         for line in text.splitlines():

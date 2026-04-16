@@ -136,7 +136,7 @@ def _bars_beats_to_seconds(
     return (total_beats + frac_beats) * (60.0 / bpm)
 
 
-def _is_bar_beat_format(text: str) -> bool:
+def is_bar_beat_format(text: str) -> bool:
     """Return True if text looks like Logic's bar/beat position format.
 
     Timecode lines start with a token containing colons (``01:00:00:00.00``).
@@ -263,7 +263,7 @@ def parse_arrangement(
     The first position encountered is used as the base offset so that clip
     starts are relative to the song start.
     """
-    if _is_bar_beat_format(text):
+    if is_bar_beat_format(text):
         return parse_arrangement_bars_beats(text, bpm=bpm, beats_per_bar=beats_per_bar)
     clips: list[Clip] = []
     base_offset: Optional[float] = None

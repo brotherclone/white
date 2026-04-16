@@ -20,7 +20,7 @@ from typing import Optional
 
 import yaml
 
-from app.generators.midi.production.assembly_manifest import _is_bar_beat_format
+from app.generators.midi.production.assembly_manifest import is_bar_beat_format
 from app.generators.midi.production.init_production import load_song_context
 
 DECISIONS_FILENAME = "production_decisions.yml"
@@ -236,7 +236,7 @@ def _load_arrangement_summary(production_dir: Path) -> Optional[dict]:
 
     text = arrangement_path.read_text()
 
-    if _is_bar_beat_format(text):
+    if is_bar_beat_format(text):
         return _summarise_bar_beat(text)
 
     # SMPTE path: need BPM and time_sig
