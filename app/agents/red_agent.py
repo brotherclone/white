@@ -539,6 +539,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             )
             state.should_create_book = False
             state.should_respond_with_reaction_book = False
+            if state.counter_proposal:
+                state.counter_proposal.is_final = True
             return state
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -590,6 +592,10 @@ class RedAgent(BaseRainbowAgent, ABC):
                 logger.error(f"Book evaluation failed: {e!s}")
                 state.should_create_book = False
                 state.should_respond_with_reaction_book = False
+        # Mark the counter_proposal final whenever we route to "done"
+        if not state.should_create_book and not state.should_respond_with_reaction_book:
+            if state.counter_proposal:
+                state.counter_proposal.is_final = True
         get_state_snapshot(
             state,
             "evaluate_books_versus_proposals_exit",

@@ -5,6 +5,7 @@ Dialectical pressure-testing through adversarial interviews
 
 import logging
 import os
+import random
 import time
 from abc import ABC
 from pathlib import Path
@@ -14,6 +15,7 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
+from pydantic import BaseModel, Field
 
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
@@ -31,9 +33,21 @@ from app.structures.concepts.vanity_interview_response import (
     VanityInterviewResponse,
 )
 from app.structures.concepts.vanity_persona import VanityPersona
+from app.structures.enums.disrupting_event_type import (
+    DISRUPTION_QUESTION_NUMBER,
+    DisruptingEventType,
+)
 from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
+
+
+class DisruptionExchange(BaseModel):
+    interviewer_line: str = Field(
+        description="The disruptive line spoken by the interviewer"
+    )
+    gabe_response: str = Field(description="Gabe's response to the disruption")
+
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -119,18 +133,34 @@ class VioletAgent(BaseRainbowAgent, ABC):
         workflow.add_node("select_persona", self.select_persona)
         workflow.add_node("generate_questions", self.generate_questions)
         workflow.add_node("simulated_interview", self.simulated_interview)
+        workflow.add_node("inject_disrupting_event", self.inject_disrupting_event)
         workflow.add_node("synthesize_interview", self.synthesize_interview)
         workflow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
-        # Add edges - direct flow without HitL branching
+        # Add edges
         workflow.add_edge(START, "select_persona")
         workflow.add_edge("select_persona", "generate_questions")
         workflow.add_edge("generate_questions", "simulated_interview")
-        workflow.add_edge("simulated_interview", "synthesize_interview")
+        workflow.add_conditional_edges(
+            "simulated_interview",
+            VioletAgent._disruption_router,
+            {"inject": "inject_disrupting_event", "skip": "synthesize_interview"},
+        )
+        workflow.add_edge("inject_disrupting_event", "synthesize_interview")
         workflow.add_edge("synthesize_interview", "generate_alternate_song_spec")
         workflow.add_edge("generate_alternate_song_spec", END)
         return workflow
+
+    @staticmethod
+    def _disruption_router(state: VioletAgentState) -> str:
+        """Route to inject_disrupting_event with configurable probability, else skip."""
+        try:
+            prob = float(os.getenv("VIOLET_DISRUPTION_PROBABILITY", "0.4"))
+        except ValueError:
+            logger.warning("Invalid VIOLET_DISRUPTION_PROBABILITY; defaulting to 0.4")
+            prob = 0.4
+        return "inject" if random.random() < prob else "skip"
 
     @staticmethod
     def _load_corpus(corpus_dir: Path) -> str:
@@ -499,6 +529,83 @@ Keep response 2-4 sentences. Output as JSON:
         )
         return state
 
+    @agent_error_handler("The Sultan of Solipsism")
+    def inject_disrupting_event(self, state: VioletAgentState) -> VioletAgentState:
+        """Inject a Lynchian disruption into the interview transcript (40% probability)."""
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            return state
+
+        event_type = random.choice(list(DisruptingEventType))
+        logger.info(f"⚡ Disrupting event: {event_type.value}")
+
+        style_descriptions = {
+            DisruptingEventType.STRANGER_ENTERS: (
+                "A stranger enters the room without explanation and says something "
+                "that doesn't quite belong."
+            ),
+            DisruptingEventType.EQUIPMENT_FAILURE: (
+                "The recording equipment glitches — static, a loop, silence — "
+                "and the conversation stumbles through it."
+            ),
+            DisruptingEventType.MEMORY_INTRUSION: (
+                "A memory from the wrong timeline intrudes — someone references "
+                "something that hasn't happened yet, or happened somewhere else."
+            ),
+            DisruptingEventType.TEMPORAL_BLEED: (
+                "Time glitches. The interview feels like it's already happened, "
+                "or is happening again. A line is repeated that was never said."
+            ),
+            DisruptingEventType.TRANSMISSION_INTERFERENCE: (
+                "Another broadcast bleeds through — words, a phrase, a fragment "
+                "of something unrelated."
+            ),
+            DisruptingEventType.IDENTITY_COLLAPSE: (
+                "One participant momentarily forgets who they are. "
+                "The wrong name. The wrong role. A beat of unrecognized self."
+            ),
+        }
+
+        persona = state.interviewer_persona
+        prompt = f"""You are generating a single surreal disruption in a music interview.
+
+DISRUPTION TYPE: {event_type.value}
+STYLE: {style_descriptions[event_type]}
+
+CONTEXT:
+- Interviewer: {persona.first_name} {persona.last_name} from {persona.publication}
+- Interviewee: Gabe Walsh, experimental musician
+
+Generate ONE disruptive exchange: a single interviewer line and a single Gabe response.
+Keep it brief (1-2 sentences each). Be Lynchian: specific, concrete details that feel wrong.
+Not horror — just wrong. The frame breaks, then continues."""
+
+        try:
+            structured_llm = self.llm.with_structured_output(DisruptionExchange)
+            exchange = structured_llm.invoke(prompt)
+
+            sentinel_q = VanityInterviewQuestion(
+                number=DISRUPTION_QUESTION_NUMBER, question=exchange.interviewer_line
+            )
+            disruption_r = VanityInterviewResponse(
+                question_number=DISRUPTION_QUESTION_NUMBER,
+                response=exchange.gabe_response,
+            )
+
+            state.interview_questions = list(state.interview_questions or []) + [
+                sentinel_q
+            ]
+            state.interview_responses = list(state.interview_responses or []) + [
+                disruption_r
+            ]
+            state.disrupting_event = event_type
+
+            logger.info(f"   Disruption appended: {exchange.interviewer_line[:60]}...")
+        except Exception as e:
+            logger.error(f"Disruption generation failed: {e}")
+
+        return state
+
     @staticmethod
     @agent_error_handler("The Sultan of Solipsism")
     def synthesize_interview(state: VioletAgentState) -> VioletAgentState:
@@ -523,6 +630,9 @@ Keep response 2-4 sentences. Output as JSON:
             questions=state.interview_questions,
             responses=state.interview_responses,
             was_human_interview=False,  # Always simulated (HitL removed)
+            disrupting_event_type=(
+                state.disrupting_event.value if state.disrupting_event else None
+            ),
             create_dirs=True,
         )
         try:

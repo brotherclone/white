@@ -30,6 +30,15 @@ from typing import Optional
 
 import numpy as np
 
+from app.structures.concepts.chromatic_targets import (
+    CHROMATIC_TARGETS as _CDM_CHROMATIC_TARGETS,
+)
+from app.structures.concepts.chromatic_targets import (
+    ONTOLOGICAL_MODES,
+    SPATIAL_MODES,
+    TEMPORAL_MODES,
+)
+
 _spec = _ilu.spec_from_file_location(
     "piano_roll_encoder",
     str(Path(__file__).parent / "models" / "piano_roll_encoder.py"),
@@ -40,10 +49,19 @@ midi_bytes_to_piano_roll = _pre.midi_bytes_to_piano_roll
 
 logger = logging.getLogger(__name__)
 
-# Mode labels matching the training data order
-TEMPORAL_MODES = ["Past", "Present", "Future"]
-SPATIAL_MODES = ["Thing", "Place", "Person"]
-ONTOLOGICAL_MODES = ["Imagined", "Forgotten", "Known"]
+
+# Canonical color order for the CDM classification head (matches modal_train_refractor_cdm.py)
+_CDM_COLOR_ORDER = [
+    "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Blue",
+    "Indigo",
+    "Violet",
+    "White",
+    "Black",
+]
 
 
 class Refractor:
@@ -54,12 +72,21 @@ class Refractor:
     primary evolutionary use case), CLAP never loads.
     """
 
-    def __init__(self, onnx_path: Optional[str] = None):
+    def __init__(
+        self,
+        onnx_path: Optional[str] = None,
+        cdm_onnx_path: Optional[str] = None,
+    ):
         """Initialize the scorer with an ONNX model.
 
         Args:
             onnx_path: Path to refractor.onnx. Defaults to
                 training/data/refractor.onnx relative to this file.
+            cdm_onnx_path: Optional path to refractor_cdm.onnx. When provided,
+                audio-only score() calls are routed through the CDM calibration
+                head instead of the base model. Pass an empty string to disable
+                auto-detection. Defaults to auto-detecting
+                training/data/refractor_cdm.onnx if it exists.
         """
         import onnxruntime as ort
 
@@ -74,6 +101,26 @@ class Refractor:
             providers=["CPUExecutionProvider"],
         )
         logger.info("ONNX session loaded: %s", onnx_path)
+
+        # Refractor CDM — optional calibration head for full-mix audio scoring
+        self._cdm_session = None
+        self._cdm_onnx_path: Optional[str] = None
+
+        if cdm_onnx_path is None:
+            # Auto-detect
+            default_cdm = Path(__file__).parent / "data" / "refractor_cdm.onnx"
+            if default_cdm.exists():
+                cdm_onnx_path = str(default_cdm)
+        elif cdm_onnx_path == "":
+            cdm_onnx_path = None  # Explicitly disabled
+
+        if cdm_onnx_path and Path(cdm_onnx_path).exists():
+            self._cdm_session = ort.InferenceSession(
+                cdm_onnx_path,
+                providers=["CPUExecutionProvider"],
+            )
+            self._cdm_onnx_path = cdm_onnx_path
+            logger.info("Refractor CDM session loaded: %s", cdm_onnx_path)
 
         # Lazy-loaded encoders
         self._deberta_tokenizer = None
@@ -207,6 +254,21 @@ class Refractor:
                 "confidence": 0.89,
             }
         """
+        # --- Refractor CDM routing ---
+        # When the CDM is loaded and this is an audio-only call (no MIDI),
+        # route through the calibration head for full-mix scoring.
+        if (
+            self._cdm_session is not None
+            and midi_bytes is None
+            and audio_waveform is None
+            and audio_emb is not None
+        ):
+            if concept_emb is None:
+                if concept_text is None:
+                    raise ValueError("Either concept_text or concept_emb is required")
+                concept_emb = self.prepare_concept(concept_text)
+            return self._score_cdm(audio_emb, concept_emb)
+
         # Build single-item batch
         candidate = {"midi_bytes": midi_bytes}
         if audio_waveform is not None:
@@ -382,6 +444,58 @@ class Refractor:
 
         return results
 
+    def _score_cdm(
+        self,
+        audio_emb: np.ndarray,
+        concept_emb: np.ndarray,
+    ) -> dict:
+        """Score a single audio embedding via the Refractor CDM head.
+
+        The CDM ONNX model outputs color_probs (batch, 9) — a softmax over the
+        canonical _CDM_COLOR_ORDER. The top predicted color is mapped to its
+        CHROMATIC_TARGETS distributions, which are returned in the same dict
+        shape as score_batch().
+
+        Confidence = max color probability (how decisive the model is).
+        """
+        # CDM ONNX input: concatenated [clap_emb, concept_emb] = (1, 1280)
+        x = (
+            np.concatenate([audio_emb, concept_emb], axis=-1)
+            .reshape(1, -1)
+            .astype(np.float32)
+        )
+        outputs = self._cdm_session.run(None, {"input": x})
+        color_probs = outputs[0][0]  # (9,) float32
+
+        best_idx = int(np.argmax(color_probs))
+        best_color = _CDM_COLOR_ORDER[best_idx]
+        confidence = float(color_probs[best_idx])
+
+        targets = _CDM_CHROMATIC_TARGETS.get(
+            best_color, _CDM_CHROMATIC_TARGETS["White"]
+        )
+        temporal = {
+            m.lower(): float(targets["temporal"][j])
+            for j, m in enumerate(TEMPORAL_MODES)
+        }
+        spatial = {
+            m.lower(): float(targets["spatial"][j]) for j, m in enumerate(SPATIAL_MODES)
+        }
+        ontological = {
+            m.lower(): float(targets["ontological"][j])
+            for j, m in enumerate(ONTOLOGICAL_MODES)
+        }
+
+        return {
+            "temporal": temporal,
+            "spatial": spatial,
+            "ontological": ontological,
+            "confidence": confidence,
+            "predicted_color": best_color,  # direct CDM argmax — bypass distribution round-trip
+            "candidate": {},
+            "rank": 0,
+        }
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -415,12 +529,16 @@ class Refractor:
 
             waveform = librosa.resample(waveform, orig_sr=sr, target_sr=48000)
 
-        inputs = self._clap_processor(
+        raw = self._clap_processor(
             audios=[waveform],
             sampling_rate=48000,
             return_tensors="pt",
             padding=True,
         )
+        inputs = {
+            "input_features": raw["input_features"].float(),
+            "is_longer": raw["is_longer"],
+        }
         with torch.no_grad():
             # get_audio_features handles pooling + projection internally.
             # For long files CLAP windows the audio; mean-pool across windows.

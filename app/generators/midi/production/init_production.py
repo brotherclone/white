@@ -156,51 +156,17 @@ def write_initial_proposal(
     meta: dict,
     sounds_like: list[str],
 ) -> Path:
-    """Write initial_proposal.yml and song_context.yml to the production directory.
+    """Write song_context.yml to the production directory.
 
-    Writes both files so that all pipeline phases can read canonical song metadata
-    from song_context.yml while backward compat with initial_proposal.yml is preserved.
+    The function name is preserved for call-site compatibility; initial_proposal.yml
+    is no longer written. All pipeline phases read from song_context.yml which is a
+    strict superset of the old initial_proposal.yml fields.
 
-    Fields written: sounds_like, color, concept, singer, key, bpm, time_sig,
-    title, song_slug, song_proposal, thread, genres, mood, schema_version,
-    generated timestamp, proposed_by, phases.
-
-    .. deprecated::
-        initial_proposal.yml is superseded by song_context.yml and will be removed
-        in a future release. New code should call load_song_context() instead of
-        load_initial_proposal().
+    Returns the path to song_context.yml.
     """
     production_dir = Path(production_dir)
     production_dir.mkdir(parents=True, exist_ok=True)
-
-    now = datetime.now(timezone.utc).isoformat()
-
-    # --- initial_proposal.yml (legacy) ---
-    legacy_data = {
-        "proposed_by": "claude",
-        "generated": now,
-        "sounds_like": sounds_like,
-        "color": meta.get("color", ""),
-        "concept": meta.get("concept", ""),
-        "singer": meta.get("singer", ""),
-        "key": meta.get("key", ""),
-        "bpm": meta.get("bpm"),
-        "time_sig": meta.get("time_sig", "4/4"),
-    }
-    legacy_path = production_dir / INITIAL_PROPOSAL_FILENAME
-    with open(legacy_path, "w") as f:
-        yaml.dump(
-            legacy_data,
-            f,
-            default_flow_style=False,
-            sort_keys=False,
-            allow_unicode=True,
-        )
-
-    # --- song_context.yml (canonical) ---
-    _write_song_context(production_dir, meta, sounds_like, now)
-
-    return legacy_path
+    return _write_song_context(production_dir, meta, sounds_like)
 
 
 def _write_song_context(
@@ -316,18 +282,21 @@ def load_song_context(production_dir: Path) -> dict:
 
 
 def load_initial_proposal(production_dir: Path) -> dict:
-    """Load initial_proposal.yml from the production directory.
+    """Load song metadata from the production directory.
 
-    Falls back to song_context.yml if initial_proposal.yml is absent
-    (transparent backward compat for production dirs migrated to song_context.yml).
+    Prefers song_context.yml (the canonical source of truth). Falls back to
+    initial_proposal.yml only for legacy directories that predate this change.
 
     Returns {} if neither file exists.
     """
+    ctx = load_song_context(production_dir)
+    if ctx:
+        return ctx
+    # Fallback: legacy directory that only has initial_proposal.yml
     path = Path(production_dir) / INITIAL_PROPOSAL_FILENAME
     if path.exists():
         return yaml.safe_load(path.read_text()) or {}
-    # Fallback: song_context.yml contains a superset of initial_proposal.yml fields
-    return load_song_context(production_dir)
+    return {}
 
 
 # ---------------------------------------------------------------------------
@@ -358,18 +327,18 @@ def init_production(
     model: str = "claude-sonnet-4-6",
     force: bool = False,
 ) -> Path:
-    """Generate initial_proposal.yml for a production directory.
+    """Initialise a production directory by writing song_context.yml.
 
-    If initial_proposal.yml already exists and force=False, prints a note and
-    returns the existing file path without regenerating.
+    If song_context.yml already exists and force=False, returns the existing
+    path without regenerating.
 
-    Returns the path to initial_proposal.yml.
+    Returns the path to song_context.yml.
     """
     production_dir = Path(production_dir)
-    out_path = production_dir / INITIAL_PROPOSAL_FILENAME
+    out_path = production_dir / SONG_CONTEXT_FILENAME
 
     if out_path.exists() and not force:
-        print(f"initial_proposal.yml already exists at {out_path}")
+        print(f"song_context.yml already exists at {out_path}")
         print("Use --force to regenerate.")
         return out_path
 
@@ -407,9 +376,9 @@ def init_production(
     for name in sounds_like:
         print(f"  - {name}")
 
-    out_path = write_initial_proposal(production_dir, meta, sounds_like)
-    print(f"\nWritten: {out_path}")
-    return out_path
+    ctx_path = write_initial_proposal(production_dir, meta, sounds_like)
+    print(f"\nWritten: {ctx_path}")
+    return ctx_path
 
 
 # ---------------------------------------------------------------------------

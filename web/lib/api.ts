@@ -44,3 +44,47 @@ export async function setLabel(id: string, label: string) {
 export function midiUrl(id: string) {
   return `${BASE}/midi/${encodeURIComponent(id)}`;
 }
+
+export async function promotePhase(phase: string): Promise<{ ok: boolean; promoted_count: number }> {
+  const res = await fetch(`${BASE}/promote`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phase }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Promote failed");
+  }
+  return res.json();
+}
+
+export async function evolvePhase(phase: string): Promise<{ ok: boolean; evolved_count: number }> {
+  const res = await fetch(`${BASE}/evolve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phase }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Evolve failed");
+  }
+  return res.json();
+}
+
+export async function aceExport(): Promise<{ ok: boolean; singer: string | null; sections: string[] }> {
+  const res = await fetch(`${BASE}/ace/export`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "ACE export failed");
+  }
+  return res.json();
+}
+
+export async function aceImport(): Promise<{ ok: boolean; render_path: string }> {
+  const res = await fetch(`${BASE}/ace/import`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "ACE import failed");
+  }
+  return res.json();
+}

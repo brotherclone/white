@@ -1,6 +1,7 @@
 """Tests for app/tools/candidate_server.py — API endpoints via TestClient."""
 
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -209,3 +210,196 @@ class TestProductionDir:
         resp = client.get("/production-dir")
         assert resp.status_code == 200
         assert str(prod_dir) in resp.json()["production_dir"]
+
+
+# ---------------------------------------------------------------------------
+# POST /promote
+# ---------------------------------------------------------------------------
+
+
+class TestPromote:
+    def test_valid_phase_returns_ok(self, client, prod_dir):
+        # Pre-existing file in approved/ should NOT be counted (before/after delta)
+        approved_dir = prod_dir / "chords" / "approved"
+        approved_dir.mkdir(parents=True, exist_ok=True)
+        (approved_dir / "old.mid").write_bytes(b"MThd")  # already there
+
+        def _promote_side_effect(prod, phase, yes=False):
+            # Simulate writing one new file during promotion
+            (approved_dir / "chord_002.mid").write_bytes(b"MThd")
+            return 0
+
+        with patch(
+            "app.generators.midi.production.pipeline_runner.cmd_promote",
+            side_effect=_promote_side_effect,
+        ):
+            resp = client.post("/promote", json={"phase": "chords"})
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert data["promoted_count"] == 1  # delta, not total
+
+    def test_invalid_phase_returns_400(self, client):
+        resp = client.post("/promote", json={"phase": "violins"})
+        assert resp.status_code == 400
+        assert "violins" in resp.json()["detail"]
+
+    def test_missing_review_yml_returns_404(self, client, prod_dir):
+        # drums has no review.yml in the prod_dir fixture
+        resp = client.post("/promote", json={"phase": "drums"})
+        assert resp.status_code == 404
+
+    def test_promotion_failure_returns_409(self, client, prod_dir):
+        # review.yml exists (chords is set up in fixture) but promotion fails
+        with patch(
+            "app.generators.midi.production.pipeline_runner.cmd_promote", return_value=1
+        ):
+            resp = client.post("/promote", json={"phase": "chords"})
+        assert resp.status_code == 409
+
+    def test_all_valid_phases_accepted(self, client, prod_dir):
+        for phase in ("chords", "drums", "bass", "melody", "quartet"):
+            # Create review.yml so the 404 guard passes
+            review_dir = prod_dir / phase
+            review_dir.mkdir(parents=True, exist_ok=True)
+            (review_dir / "review.yml").write_text("candidates: []")
+            with patch(
+                "app.generators.midi.production.pipeline_runner.cmd_promote",
+                return_value=0,
+            ):
+                resp = client.post("/promote", json={"phase": phase})
+            assert resp.status_code == 200, f"Phase {phase} should be accepted"
+
+
+# ---------------------------------------------------------------------------
+# POST /evolve
+# ---------------------------------------------------------------------------
+
+
+class TestEvolve:
+    def _mock_run_ok(self, prod_dir: Path, phase: str, evolved_count: int = 3):
+        """Return a mock subprocess.run that creates evolved_ MIDI files."""
+
+        def _side_effect(cmd, **kwargs):
+            candidates_dir = prod_dir / phase / "candidates"
+            candidates_dir.mkdir(parents=True, exist_ok=True)
+            for i in range(evolved_count):
+                (candidates_dir / f"evolved_{phase}_{i:03d}.mid").write_bytes(b"MThd")
+            result = MagicMock()
+            result.returncode = 0
+            result.stderr = ""
+            return result
+
+        return _side_effect
+
+    def test_drums_returns_ok(self, client, prod_dir):
+        with patch(
+            "app.tools.candidate_server.subprocess.run",
+            side_effect=self._mock_run_ok(prod_dir, "drums", 3),
+        ):
+            resp = client.post("/evolve", json={"phase": "drums"})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert data["evolved_count"] == 3
+
+    def test_bass_returns_ok(self, client, prod_dir):
+        with patch(
+            "app.tools.candidate_server.subprocess.run",
+            side_effect=self._mock_run_ok(prod_dir, "bass", 2),
+        ):
+            resp = client.post("/evolve", json={"phase": "bass"})
+        assert resp.status_code == 200
+        assert resp.json()["evolved_count"] == 2
+
+    def test_melody_returns_ok(self, client, prod_dir):
+        with patch(
+            "app.tools.candidate_server.subprocess.run",
+            side_effect=self._mock_run_ok(prod_dir, "melody", 5),
+        ):
+            resp = client.post("/evolve", json={"phase": "melody"})
+        assert resp.status_code == 200
+
+    def test_chords_returns_400(self, client):
+        resp = client.post("/evolve", json={"phase": "chords"})
+        assert resp.status_code == 400
+        assert "chords" in resp.json()["detail"]
+
+    def test_quartet_returns_400(self, client):
+        resp = client.post("/evolve", json={"phase": "quartet"})
+        assert resp.status_code == 400
+
+    def test_invalid_phase_returns_400(self, client):
+        resp = client.post("/evolve", json={"phase": "strings"})
+        assert resp.status_code == 400
+
+    def test_subprocess_failure_returns_500(self, client):
+        fail = MagicMock()
+        fail.returncode = 1
+        fail.stderr = "ONNX model not found"
+        with patch("app.tools.candidate_server.subprocess.run", return_value=fail):
+            resp = client.post("/evolve", json={"phase": "drums"})
+        assert resp.status_code == 500
+        assert "ONNX" in resp.json()["detail"]
+
+
+# ---------------------------------------------------------------------------
+# POST /ace/export
+# ---------------------------------------------------------------------------
+
+
+class TestAceExport:
+    def test_ace_not_running_returns_503(self, client):
+        # export_to_ace_studio catches ConnectionError internally and returns None
+        with patch(
+            "app.generators.midi.production.ace_studio_export.export_to_ace_studio",
+            return_value=None,
+        ):
+            resp = client.post("/ace/export")
+        assert resp.status_code == 503
+        assert "ACE Studio not running" in resp.json()["detail"]
+
+    def test_successful_export_returns_ok(self, client):
+        mock_result = {
+            "project_id": "proj_001",
+            "track_index": 0,
+            "singer": "gabriel",
+            "note_count": 48,
+            "sections": ["verse", "chorus"],
+        }
+        with patch(
+            "app.generators.midi.production.ace_studio_export.export_to_ace_studio",
+            return_value=mock_result,
+        ):
+            resp = client.post("/ace/export")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert data["singer"] == "gabriel"
+        assert data["sections"] == ["verse", "chorus"]
+
+
+# ---------------------------------------------------------------------------
+# POST /ace/import
+# ---------------------------------------------------------------------------
+
+
+class TestAceImport:
+    def test_no_render_returns_404(self, client):
+        with patch(
+            "app.generators.midi.production.ace_studio_import.locate_and_ingest_render",
+            return_value=None,
+        ):
+            resp = client.post("/ace/import")
+        assert resp.status_code == 404
+
+    def test_successful_import_returns_render_path(self, client, prod_dir):
+        render_path = prod_dir / "vocals.wav"
+        with patch(
+            "app.generators.midi.production.ace_studio_import.locate_and_ingest_render",
+            return_value=render_path,
+        ):
+            resp = client.post("/ace/import")
+        assert resp.status_code == 200
+        assert "vocals.wav" in resp.json()["render_path"]

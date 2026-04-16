@@ -97,6 +97,10 @@ class SongProposalIteration(BaseModel):
     timestamp: float | None = Field(
         default=None, description="Unix timestamp when this iteration was created"
     )
+    is_final: bool = Field(
+        default=False,
+        description="True when this is the resolved proposal from the agent — the one surfaced for human review. Internal intermediate iterations remain False.",
+    )
 
     def __init__(self, **data):
         super().__init__(**data)
