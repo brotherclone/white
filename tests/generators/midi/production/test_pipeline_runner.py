@@ -133,7 +133,15 @@ class TestGetNextRunnablePhase:
 
         statuses = {
             p: "promoted"
-            for p in ["init_production", "chords", "drums", "bass", "melody", "lyrics"]
+            for p in [
+                "init_production",
+                "chords",
+                "drums",
+                "bass",
+                "melody",
+                "lyrics",
+                "decisions",
+            ]
         }
         assert get_next_runnable_phase(statuses) is None
 

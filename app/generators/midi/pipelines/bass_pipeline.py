@@ -610,8 +610,6 @@ def run_bass_pipeline(
                 _ps.arc
             )
 
-    # Load composition narrative for texture/lead_voice constraints
-    from app.generators.midi.production.composition_narrative import load_narrative
     from app.structures.music.narrative_constraints import (
         extract_constraints,
     )
@@ -619,7 +617,7 @@ def run_bass_pipeline(
         narrative_tag_adjustment as _narr_adj,
     )
 
-    _narrative = load_narrative(prod_path)
+    _narrative = None
 
     target = get_chromatic_target(song_info["color_name"])
 

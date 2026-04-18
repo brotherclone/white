@@ -50,7 +50,8 @@ class TestExtractMood:
         assert "mysterious" in moods
 
     def test_party_and_dance_adds_playful(self):
-        room = _make_room(description="A dance floor.")
+        # Use a neutral atmosphere to avoid keyword matches that fill up the 5-item cap
+        room = _make_room(description="A dance floor.", atmosphere="neutral - plain")
         moods = self.extractor._extract_mood(
             room, "the party starts and everyone dance"
         )

@@ -70,21 +70,3 @@ export async function evolvePhase(phase: string): Promise<{ ok: boolean; evolved
   }
   return res.json();
 }
-
-export async function aceExport(): Promise<{ ok: boolean; singer: string | null; sections: string[] }> {
-  const res = await fetch(`${BASE}/ace/export`, { method: "POST" });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { detail?: string }).detail ?? "ACE export failed");
-  }
-  return res.json();
-}
-
-export async function aceImport(): Promise<{ ok: boolean; render_path: string }> {
-  const res = await fetch(`${BASE}/ace/import`, { method: "POST" });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { detail?: string }).detail ?? "ACE import failed");
-  }
-  return res.json();
-}

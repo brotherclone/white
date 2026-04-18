@@ -20,7 +20,6 @@ from typing import Optional
 
 import yaml
 
-from app.generators.midi.production.assembly_manifest import is_bar_beat_format
 from app.generators.midi.production.init_production import load_song_context
 
 DECISIONS_FILENAME = "production_decisions.yml"
@@ -164,65 +163,19 @@ def _summarise_bar_beat(text: str) -> dict:
     }
 
 
-def _summarise_smpte(text: str, bpm: float, beats_per_bar: float) -> dict:
-    """Parse a SMPTE timecode arrangement.txt for section structure.
-
-    Track 1 clips define sections; bar count is derived from clip duration
-    using bpm and beats_per_bar.  Track 4 presence signals vocals.
-    """
-    from app.generators.midi.production.drift_report import parse_timecode
-
-    track1: list[tuple[str, float, float]] = []  # (label, start_sec, end_sec)
-    track4_names: set[str] = set()
-
+def _is_bar_beat_format(text: str) -> bool:
+    """Return True if arrangement.txt uses bar/beat position format (e.g. '1 1 1 1\\tname\\t...')."""
     for line in text.splitlines():
-        parts = line.split()
-        if len(parts) < 4:
+        stripped = line.strip()
+        if not stripped:
             continue
-        try:
-            start_tc, label, track_num, end_tc = (
-                parts[0],
-                parts[1],
-                int(parts[2]),
-                parts[3],
-            )
-        except (ValueError, IndexError):
-            continue
-        if track_num == 1:
-            track1.append((label, parse_timecode(start_tc), parse_timecode(end_tc)))
-        elif track_num == 4:
-            track4_names.add(label)
-
-    seconds_per_bar = (beats_per_bar / bpm) * 60.0
-
-    play_count: dict[str, int] = {}
-    section_bars: dict[str, int] = {}
-    for name, start_sec, end_sec in track1:
-        play_count[name] = play_count.get(name, 0) + 1
-        dur = end_sec - start_sec
-        section_bars[name] = round(dur / seconds_per_bar) if seconds_per_bar > 0 else 0
-
-    sections = []
-    for label in play_count:
-        has_vocals = any(label in t4 for t4 in track4_names)
-        sections.append(
-            {
-                "name": label,
-                "bars": section_bars[label],
-                "play_count": play_count[label],
-                "vocals": has_vocals,
-            }
-        )
-
-    total_bars = sum(s["bars"] * s["play_count"] for s in sections)
-    total_plays = sum(s["play_count"] for s in sections)
-
-    return {
-        "sections": sections,
-        "total_bars": total_bars,
-        "total_plays": total_plays,
-        "section_count": len(sections),
-    }
+        fields = stripped.split("\t")
+        if len(fields) >= 3:
+            pos_parts = fields[0].split()
+            if len(pos_parts) == 4 and all(p.isdigit() for p in pos_parts):
+                return True
+        return False
+    return False
 
 
 def _load_arrangement_summary(production_dir: Path) -> Optional[dict]:
@@ -235,24 +188,7 @@ def _load_arrangement_summary(production_dir: Path) -> Optional[dict]:
         return None
 
     text = arrangement_path.read_text()
-
-    if is_bar_beat_format(text):
-        return _summarise_bar_beat(text)
-
-    # SMPTE path: need BPM and time_sig
-    bpm = 120.0
-    beats_per_bar = 4.0
-    ctx = load_song_context(production_dir)
-    if ctx.get("bpm"):
-        bpm = float(ctx["bpm"])
-    if ctx.get("time_sig"):
-        ts_parts = ctx["time_sig"].split("/")
-        try:
-            beats_per_bar = int(ts_parts[0]) * (4.0 / int(ts_parts[1]))
-        except (ValueError, IndexError):
-            pass
-
-    return _summarise_smpte(text, bpm, beats_per_bar)
+    return _summarise_bar_beat(text)
 
 
 # ---------------------------------------------------------------------------
