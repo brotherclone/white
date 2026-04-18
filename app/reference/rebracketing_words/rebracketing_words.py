@@ -92,7 +92,6 @@ LIMINAL_MARKERS = [
     "neither",
     "nor",
     "both",
-    "and",
     "not quite",
     "sort of",
     "kind of",

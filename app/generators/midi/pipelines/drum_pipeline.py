@@ -426,11 +426,9 @@ def run_drum_pipeline(
                 _ps.arc
             )
 
-    # Load composition narrative for rhythm_character constraints
-    from app.generators.midi.production.composition_narrative import load_narrative
     from app.structures.music.narrative_constraints import extract_constraints
 
-    _narrative = load_narrative(prod_path)
+    _narrative = None
 
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []  # (filename, midi_bytes)
@@ -633,7 +631,12 @@ def run_drum_pipeline(
     review_path = drums_dir / "review.yml"
     with open(review_path, "w") as f:
         yaml.dump(
-            review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            width=float("inf"),
         )
 
     # --- 8. Summary ---

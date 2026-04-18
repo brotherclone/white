@@ -31,7 +31,7 @@ from app.tools.candidate_browser import (
     set_use_case,
 )
 
-VALID_PHASES = {"chords", "drums", "bass", "melody", "quartet"}
+VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
 EVOLVABLE_PHASES = {"drums", "bass", "melody"}
 
 _EVOLVE_PIPELINE = {
@@ -218,50 +218,6 @@ def create_app(production_dir: Path) -> FastAPI:
             else 0
         )
         return {"ok": True, "evolved_count": evolved_count}
-
-    # ------------------------------------------------------------------
-    # ACE Studio
-    # ------------------------------------------------------------------
-
-    @app.post("/ace/export")
-    def ace_export():
-        try:
-            from app.generators.midi.production.ace_studio_export import (
-                export_to_ace_studio,
-            )
-
-            result = export_to_ace_studio(_production_dir)
-        except Exception as exc:
-            raise HTTPException(status_code=500, detail=str(exc))
-        # export_to_ace_studio catches ConnectionError internally and returns None
-        if result is None:
-            raise HTTPException(
-                status_code=503,
-                detail="ACE Studio not running",
-            )
-        return {
-            "ok": True,
-            "singer": result.get("singer"),
-            "sections": result.get("sections", []),
-            "project_id": result.get("project_id"),
-            "note_count": result.get("note_count"),
-        }
-
-    @app.post("/ace/import")
-    def ace_import():
-        try:
-            from app.generators.midi.production.ace_studio_import import (
-                locate_and_ingest_render,
-            )
-
-            dest = locate_and_ingest_render(_production_dir)
-        except Exception as exc:
-            raise HTTPException(status_code=500, detail=str(exc))
-        if dest is None:
-            raise HTTPException(
-                status_code=404, detail="No ACE Studio WAV render found"
-            )
-        return {"ok": True, "render_path": str(dest)}
 
     return app
 

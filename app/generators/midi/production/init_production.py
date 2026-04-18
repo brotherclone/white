@@ -304,6 +304,15 @@ def load_initial_proposal(production_dir: Path) -> dict:
 # ---------------------------------------------------------------------------
 
 
+_FALLBACK_SOUNDS_LIKE = [
+    "boards of canada",
+    "arca",
+    "autechre",
+    "burial",
+    "four tet",
+]
+
+
 def _call_claude(prompt: str, model: str) -> str:
     from anthropic import Anthropic
 
@@ -313,6 +322,15 @@ def _call_claude(prompt: str, model: str) -> str:
         max_tokens=512,
         messages=[{"role": "user", "content": prompt}],
     )
+    if not response.content:
+        if response.stop_reason == "refusal":
+            print(
+                "  Claude declined the sounds_like prompt (refusal) — using fallback artists."
+            )
+            return "\n".join(f"- {a}" for a in _FALLBACK_SOUNDS_LIKE)
+        raise ValueError(
+            f"Claude returned empty content (stop_reason={response.stop_reason!r})"
+        )
     return response.content[0].text
 
 
@@ -395,8 +413,11 @@ def main() -> None:
     )
     parser.add_argument(
         "--production-dir",
-        required=True,
-        help="Song production directory (will be created if missing)",
+        default=None,
+        help=(
+            "Song production directory (will be created if missing). "
+            "Defaults to <thread>/production/<slug> derived from --song-proposal."
+        ),
     )
     parser.add_argument(
         "--song-proposal",
@@ -416,9 +437,21 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    song_proposal_path = Path(args.song_proposal)
+    if args.production_dir is None:
+        from app.generators.midi.pipelines.chord_pipeline import (
+            song_slug,
+        )  # circular import
+
+        slug = song_slug(song_proposal_path.name)
+        production_dir = song_proposal_path.parent.parent / "production" / slug
+        print(f"Derived production dir: {production_dir}")
+    else:
+        production_dir = Path(args.production_dir)
+
     init_production(
-        production_dir=Path(args.production_dir),
-        song_proposal_path=Path(args.song_proposal),
+        production_dir=production_dir,
+        song_proposal_path=song_proposal_path,
         model=args.model,
         force=args.force,
     )

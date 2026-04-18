@@ -74,10 +74,13 @@ _STATUS_ICONS = {
 }
 
 
-def _build_phase_command(phase: str, production_dir: Path, ctx: dict) -> list[str]:
+def _build_phase_command(
+    phase: str, production_dir: Path, ctx: dict, song_proposal: str = ""
+) -> list[str]:
     """Build the subprocess argv for a generation phase."""
     prod = str(production_dir)
-    proposal = ctx.get("song_proposal", "")
+    # song_proposal arg takes precedence over whatever is stored in context
+    proposal = song_proposal or ctx.get("song_proposal", "")
     singer = ctx.get("singer", "gabriel")
 
     base = [sys.executable, "-m"]
@@ -236,7 +239,7 @@ def cmd_next(production_dir: Path) -> None:
     print(" ".join(cmd))
 
 
-def cmd_run(production_dir: Path) -> int:
+def cmd_run(production_dir: Path, song_proposal: str = "") -> int:
     """Run the next pending phase, update status, then stop before promoting."""
     ctx = load_song_context(production_dir)
     statuses = read_phase_statuses(production_dir)
@@ -249,10 +252,17 @@ def cmd_run(production_dir: Path) -> int:
     print(f"\n→ Running phase: {next_phase}")
     write_phase_status(production_dir, next_phase, "in_progress")
 
-    cmd = _build_phase_command(next_phase, production_dir, ctx)
+    cmd = _build_phase_command(
+        next_phase, production_dir, ctx, song_proposal=song_proposal
+    )
     print(f"  Command: {' '.join(cmd)}\n")
 
-    result = subprocess.run(cmd)
+    try:
+        result = subprocess.run(cmd)
+    except KeyboardInterrupt:
+        write_phase_status(production_dir, next_phase, "pending")
+        print(f"\n✗ Phase {next_phase} interrupted. Status reset to pending.")
+        return 1
 
     if result.returncode != 0:
         write_phase_status(production_dir, next_phase, "pending")
@@ -372,59 +382,6 @@ def cmd_batch(thread_dir: Path, phase: str) -> int:
     return 0 if failed == 0 else 1
 
 
-def cmd_ace(production_dir: Path, ace_subcommand: str) -> int:
-    """ACE Studio integration subcommands: export, status, import."""
-    if ace_subcommand == "export":
-        from app.generators.midi.production.ace_studio_export import (
-            export_to_ace_studio,
-        )
-
-        result = export_to_ace_studio(production_dir)
-        if result is None:
-            print("ACE Studio export skipped — check warnings above.")
-            return 1
-        print("ACE Studio export complete:")
-        print(f"  Project : {result['project_id']}")
-        print(f"  Track   : {result['track_index']}")
-        print(f"  Singer  : {result.get('singer') or '(not loaded)'}")
-        print(f"  Notes   : {result['note_count']}")
-        if result.get("sections"):
-            print(f"  Sections: {', '.join(result['sections'])}")
-        return 0
-
-    elif ace_subcommand == "status":
-        from app.generators.midi.production.init_production import load_song_context
-
-        ctx = load_song_context(production_dir)
-        ace = ctx.get("ace_studio")
-        if not ace:
-            print("No ACE Studio association recorded for this song.")
-            return 0
-        print("ACE Studio association:")
-        print(f"  Project    : {ace.get('project_name', '—')}")
-        print(f"  Exported at: {ace.get('exported_at', '—')}")
-        print(f"  Track      : {ace.get('track_index', '—')}")
-        print(f"  Singer     : {ace.get('singer', '—')}")
-        print(f"  Sections   : {', '.join(ace.get('sections_exported', []))}")
-        print(f"  Render path: {ace.get('render_path') or '(not imported)'}")
-        return 0
-
-    elif ace_subcommand == "import":
-        from app.generators.midi.production.ace_studio_import import (
-            locate_and_ingest_render,
-        )
-
-        dest = locate_and_ingest_render(production_dir)
-        if dest is None:
-            print("No ACE Studio WAV render found.")
-            return 1
-        print(f"Render ingested: {dest}")
-        return 0
-
-    print(f"Unknown ace subcommand: {ace_subcommand}")
-    return 1
-
-
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -448,6 +405,11 @@ def _build_parser() -> argparse.ArgumentParser:
     # run
     r = sub.add_parser("run", help="Run the next pending phase")
     r.add_argument("--production-dir", required=True, type=Path)
+    r.add_argument(
+        "--song-proposal",
+        default="",
+        help="Path to song proposal YAML (required for init_production phase)",
+    )
 
     # promote
     pr = sub.add_parser("promote", help="Promote approved candidates")
@@ -459,17 +421,6 @@ def _build_parser() -> argparse.ArgumentParser:
     b = sub.add_parser("batch", help="Run a phase for all pending songs in a thread")
     b.add_argument("--thread", required=True, type=Path)
     b.add_argument("--phase", required=True, choices=list(PHASE_REVIEW_FILES.keys()))
-
-    # ace
-    ace = sub.add_parser(
-        "ace", help="ACE Studio integration (export / status / import)"
-    )
-    ace.add_argument("--production-dir", required=True, type=Path)
-    ace.add_argument(
-        "ace_subcommand",
-        choices=["export", "status", "import"],
-        help="export — push to ACE Studio; status — show association; import — ingest render",
-    )
 
     return p
 
@@ -483,13 +434,11 @@ def main(argv=None) -> None:
     elif args.subcommand == "next":
         cmd_next(args.production_dir)
     elif args.subcommand == "run":
-        sys.exit(cmd_run(args.production_dir))
+        sys.exit(cmd_run(args.production_dir, song_proposal=args.song_proposal))
     elif args.subcommand == "promote":
         sys.exit(cmd_promote(args.production_dir, args.phase, yes=args.yes))
     elif args.subcommand == "batch":
         sys.exit(cmd_batch(args.thread, args.phase))
-    elif args.subcommand == "ace":
-        sys.exit(cmd_ace(args.production_dir, args.ace_subcommand))
 
 
 if __name__ == "__main__":

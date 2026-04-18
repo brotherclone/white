@@ -36,7 +36,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 CATALOG_DEFAULT_PATH = (
-    Path(__file__).parent.parent / "app" / "reference" / "music" / "artist_catalog.yml"
+    Path(__file__).parent.parent / "reference" / "music" / "artist_catalog.yml"
 )
 TRAINING_PARQUET_PATH = (
     Path(__file__).parent.parent.parent
@@ -199,6 +199,15 @@ def collect_sounds_like(
                 name = str(artist).strip()
                 if name and name not in seen:
                     seen[name] = None  # production plans don't carry discogs_id
+
+        # Also scan song_context.yml — sounds_like lives here before production_plan is generated
+        for ctx_path in sorted((thread_path / "production").glob("*/song_context.yml")):
+            with open(ctx_path) as f:
+                ctx_data = yaml.safe_load(f) or {}
+            for artist in ctx_data.get("sounds_like") or []:
+                name = str(artist).strip()
+                if name and name not in seen:
+                    seen[name] = None
 
     if from_training_data:
         try:

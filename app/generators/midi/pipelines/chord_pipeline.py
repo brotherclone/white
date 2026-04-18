@@ -397,9 +397,9 @@ def song_slug(song_filename: str) -> str:
     name = Path(song_filename).stem
     # Remove the song_proposal_ prefix
     name = re.sub(r"^song_proposal_", "", name)
-    # Remove hex color codes
-    name = re.sub(r"\(0x[0-9a-fA-F]+\)", "", name)
-    # Clean up
+    # Remove hex color codes (with surrounding whitespace)
+    name = re.sub(r"\s*\(0x[0-9a-fA-F]+\)\s*", "", name)
+    # Clean up — collapse any run of non-word chars to a single underscore
     name = re.sub(r"[^\w]+", "_", name).strip("_").lower()
     return name
 
@@ -677,7 +677,12 @@ def run_chord_pipeline(
         review_path = output_dir / "review.yml"
         with open(review_path, "w") as f:
             yaml.dump(
-                review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+                review,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
             )
 
         print(f"Review file: {review_path}")
@@ -833,7 +838,12 @@ def run_chord_pipeline(
     review_path = output_dir / "review.yml"
     with open(review_path, "w") as f:
         yaml.dump(
-            review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            width=float("inf"),
         )
 
     print(f"Review file: {review_path}")
@@ -876,9 +886,15 @@ def main():
         )
     )
     parser.add_argument(
-        "--thread", required=True, help="shrink_wrapped thread directory"
+        "--production-dir",
+        default=None,
+        help="Production directory (e.g. shrink_wrapped/.../production/song_slug). "
+        "Derives --thread and --song automatically; takes precedence over both.",
     )
-    parser.add_argument("--song", required=True, help="Song proposal YAML filename")
+    parser.add_argument(
+        "--thread", default=None, help="shrink_wrapped thread directory"
+    )
+    parser.add_argument("--song", default=None, help="Song proposal YAML filename")
     parser.add_argument(
         "--seed", type=int, default=42, help="Random seed (default: 42)"
     )
@@ -933,6 +949,18 @@ def main():
 
     args = parser.parse_args()
 
+    # Resolve --production-dir → --thread / --song
+    thread_val = args.thread
+    song_val = args.song
+    if args.production_dir:
+        prod_path = Path(args.production_dir)
+        thread_val = str(prod_path.parent.parent)
+        song_val = prod_path.name + ".yml"
+    elif not thread_val or not song_val:
+        parser.error(
+            "Either --production-dir or both --thread and --song are required."
+        )
+
     strum_filter = (
         [p.strip() for p in args.strum_patterns.split(",") if p.strip()]
         if args.strum_patterns
@@ -940,8 +968,8 @@ def main():
     )
 
     run_chord_pipeline(
-        thread_dir=args.thread,
-        song_filename=args.song,
+        thread_dir=thread_val,
+        song_filename=song_val,
         seed=args.seed,
         num_candidates=args.num_candidates,
         top_k=args.top_k,
