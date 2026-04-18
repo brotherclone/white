@@ -74,10 +74,13 @@ _STATUS_ICONS = {
 }
 
 
-def _build_phase_command(phase: str, production_dir: Path, ctx: dict) -> list[str]:
+def _build_phase_command(
+    phase: str, production_dir: Path, ctx: dict, song_proposal: str = ""
+) -> list[str]:
     """Build the subprocess argv for a generation phase."""
     prod = str(production_dir)
-    proposal = ctx.get("song_proposal", "")
+    # song_proposal arg takes precedence over whatever is stored in context
+    proposal = song_proposal or ctx.get("song_proposal", "")
     singer = ctx.get("singer", "gabriel")
 
     base = [sys.executable, "-m"]
@@ -236,7 +239,7 @@ def cmd_next(production_dir: Path) -> None:
     print(" ".join(cmd))
 
 
-def cmd_run(production_dir: Path) -> int:
+def cmd_run(production_dir: Path, song_proposal: str = "") -> int:
     """Run the next pending phase, update status, then stop before promoting."""
     ctx = load_song_context(production_dir)
     statuses = read_phase_statuses(production_dir)
@@ -249,10 +252,17 @@ def cmd_run(production_dir: Path) -> int:
     print(f"\n→ Running phase: {next_phase}")
     write_phase_status(production_dir, next_phase, "in_progress")
 
-    cmd = _build_phase_command(next_phase, production_dir, ctx)
+    cmd = _build_phase_command(
+        next_phase, production_dir, ctx, song_proposal=song_proposal
+    )
     print(f"  Command: {' '.join(cmd)}\n")
 
-    result = subprocess.run(cmd)
+    try:
+        result = subprocess.run(cmd)
+    except KeyboardInterrupt:
+        write_phase_status(production_dir, next_phase, "pending")
+        print(f"\n✗ Phase {next_phase} interrupted. Status reset to pending.")
+        return 1
 
     if result.returncode != 0:
         write_phase_status(production_dir, next_phase, "pending")
@@ -448,6 +458,11 @@ def _build_parser() -> argparse.ArgumentParser:
     # run
     r = sub.add_parser("run", help="Run the next pending phase")
     r.add_argument("--production-dir", required=True, type=Path)
+    r.add_argument(
+        "--song-proposal",
+        default="",
+        help="Path to song proposal YAML (required for init_production phase)",
+    )
 
     # promote
     pr = sub.add_parser("promote", help="Promote approved candidates")
@@ -483,7 +498,7 @@ def main(argv=None) -> None:
     elif args.subcommand == "next":
         cmd_next(args.production_dir)
     elif args.subcommand == "run":
-        sys.exit(cmd_run(args.production_dir))
+        sys.exit(cmd_run(args.production_dir, song_proposal=args.song_proposal))
     elif args.subcommand == "promote":
         sys.exit(cmd_promote(args.production_dir, args.phase, yes=args.yes))
     elif args.subcommand == "batch":

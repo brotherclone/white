@@ -31,7 +31,7 @@ from app.tools.candidate_browser import (
     set_use_case,
 )
 
-VALID_PHASES = {"chords", "drums", "bass", "melody", "quartet"}
+VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
 EVOLVABLE_PHASES = {"drums", "bass", "melody"}
 
 _EVOLVE_PIPELINE = {

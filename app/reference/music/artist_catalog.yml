@@ -3204,3 +3204,73 @@ The National:
   chromatic_score: null
   discogs_id: null
   notes: ""
+
+boards of canada:
+  slug: boards_of_canada
+  status: draft
+  description: |
+    Boards of Canada craft densely layered electronic music built from warm, degraded analogue textures — tape hiss, detuned synthesisers, dusty samples, and softly decayed timbres that evoke aged film stock and half-remembered childhood. Production feels deliberately eroded, as though sounds have been buried underground and partially excavated. Low-frequency drones anchor hypnotic rhythmic patterns, while melodic fragments drift in and out of audibility. The work is primarily instrumental, though occasional vocal fragments — heavily processed, pitched, or obscured — surface as textural elements rather than lyrical carriers. Thematically, imagery clusters around nostalgia, nature, hidden knowledge, and temporal dislocation — a sense of something lost or just beyond reach. The emotional register is simultaneously comforting and unsettling: pastoral warmth undercut by unease, meditative calm shadowed by melancholy, innocence tinged with something faintly ominous.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""
+
+arca:
+  slug: arca
+  status: draft
+  description: |
+    Arca's sonic world is built on fractured, mutating textures — hyper-compressed percussion, smeared bass frequencies, and synthetic flesh that feels simultaneously organic and alien. Production density shifts violently between cavernous negative space and overwhelming tactile noise, with meticulous layering of glitched, warped timbres that resist conventional rhythmic grids. Vocals are integrated as another textural element — stretched, pitch-shifted, and processed beyond naturalism — making the work essentially hybrid rather than purely instrumental. Thematically, the work circles transformation, bodily dissolution, identity as fluid and unstable, eros entangled with violence, and the posthuman body. Imagery tends toward visceral abstraction — flesh, machinery, rupture, metamorphosis. The emotional register is intensely psychological: simultaneously erotic and anxious, tender and confrontational, euphoric and dysphoric. There is a consistent atmosphere of threshold states — between genders, between human and machine, between pleasure and pain.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""
+
+autechre:
+  slug: autechre
+  status: draft
+  description: |
+    Autechre is primarily instrumental, eschewing vocals almost entirely in favour of pure sound design. Their sonic texture is dense, mechanical, and deeply synthetic — built from heavily processed rhythmic fragments, glitched percussion grids, and evolving modular or algorithmic timbres that resist conventional groove while maintaining internal logic. Production character is cold, precise, and spatially complex, with sounds occupying unusual frequency relationships and stereo positions. Low-end weight alternates with brittle, granular upper-register detail. Thematically, there is no lyrical content; instead, compositional themes suggest industrial abstraction, machine cognition, and the aesthetic of systems operating beyond human intention. The emotional register is detached yet immersive — not hostile, but clinical and alien, occasionally giving way to passages of unexpected warmth buried within layered synthesis. Psychological colour tends toward introspection, spatial disorientation, and a kind of meditative tension sustained across long formal structures.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""
+
+burial:
+  slug: burial
+  status: draft
+  description: |
+    Burial crafts music primarily through dense, textural layering — cracked vinyl hiss, pitched-down vocal fragments, sub-bass rumble, and stuttering percussion that mimics broken drum machines. The production aesthetic embraces lo-fi warmth against cold, cavernous space, creating an urban nocturnal atmosphere. Vocals appear as processed, ghostly samples — half-buried, genderless, emotionally raw — rather than conventional songwriting, placing the work closer to instrumental ambient music despite their presence. Thematically, the work orbits late-night solitude, longing, grief, and the melancholic romanticism of city darkness — rain-soaked streets, distant crowds, emotional isolation within proximity to others. Textures shift slowly, structures dissolve rather than resolve. The emotional register is consistently elegiac and introspective, carrying an ache that feels both personal and strangely collective — private emotion rendered through decayed, anonymous sonic materials.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""
+
+four tet:
+  slug: four_tet
+  status: draft
+  description: |
+    Four Tet operates primarily as an instrumental project, weaving intricate electronic compositions from densely layered acoustic and digital sources. His production style blends organic textures — chopped vocal fragments, plucked strings, field recordings, crackling vinyl warmth — against precisely sequenced percussion and shimmering synthesizer pads. Density fluctuates deliberately, shifting between sparse, breath-like passages and richly saturated sonic fields. The studio approach favours meticulous sample manipulation, where source material becomes unrecognisable yet retains an inherent human warmth. Thematically, the work gravitates toward interiority, cyclical patterns, and a kind of meditative attention — evoking domestic quietude, nocturnal spaces, and natural rhythms. Emotionally, the register is gently melancholic yet quietly euphoric, occupying a psychological space between introspection and release. A sense of nostalgia coexists with forward motion, producing music that feels simultaneously familiar and abstracted.
+  style_tags: []
+  # chromatic_hint:
+  #   temporal: past | present | future
+  #   spatial: thing | place | person
+  #   ontological: imagined | forgotten | known
+  chromatic_score: null
+  discogs_id: null
+  notes: ""

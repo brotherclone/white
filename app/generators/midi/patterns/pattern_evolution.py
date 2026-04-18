@@ -448,7 +448,14 @@ def breed_drum_patterns(
     # Final scoring and selection
     midi_list = [_drum_to_midi(p) for p in population]
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [p for _, p in sorted(zip(fitness, population), reverse=True)]
+    sorted_pop = [
+        p
+        for _, _, p in sorted(
+            zip(fitness, range(len(population)), population),
+            key=lambda x: x[0],
+            reverse=True,
+        )
+    ]
     return sorted_pop[:top_n]
 
 
@@ -508,7 +515,14 @@ def breed_bass_patterns(
         except Exception:
             midi_list.append(b"")
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [p for _, p in sorted(zip(fitness, population), reverse=True)]
+    sorted_pop = [
+        p
+        for _, _, p in sorted(
+            zip(fitness, range(len(population)), population),
+            key=lambda x: x[0],
+            reverse=True,
+        )
+    ]
     return sorted_pop[:top_n]
 
 
@@ -568,5 +582,12 @@ def breed_melody_patterns(
         except Exception:
             midi_list.append(b"")
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [p for _, p in sorted(zip(fitness, population), reverse=True)]
+    sorted_pop = [
+        p
+        for _, _, p in sorted(
+            zip(fitness, range(len(population)), population),
+            key=lambda x: x[0],
+            reverse=True,
+        )
+    ]
     return sorted_pop[:top_n]

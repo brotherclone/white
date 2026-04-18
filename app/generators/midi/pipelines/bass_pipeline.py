@@ -906,7 +906,12 @@ def run_bass_pipeline(
     review_path = bass_dir / "review.yml"
     with open(review_path, "w") as f:
         yaml.dump(
-            review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            width=float("inf"),
         )
 
     # --- 10. Summary ---

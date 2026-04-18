@@ -8,7 +8,7 @@ import ScorePanel from "@/components/ScorePanel";
 import StatusBadge from "@/components/StatusBadge";
 import MidiPlayer from "@/components/MidiPlayer";
 
-const PHASES = ["chords", "drums", "bass", "melody", "quartet"];
+const PHASES = ["chords", "drums", "bass", "melody", "lyrics", "quartet"];
 
 type SortKey = "phase" | "section" | "id" | "template" | "composite_score" | "status" | "rank";
 

@@ -633,7 +633,12 @@ def run_drum_pipeline(
     review_path = drums_dir / "review.yml"
     with open(review_path, "w") as f:
         yaml.dump(
-            review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            width=float("inf"),
         )
 
     # --- 8. Summary ---
