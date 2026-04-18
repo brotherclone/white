@@ -2,68 +2,54 @@ bpm_constraints:
 - bpm_range: 63-73
   center: 70
   count: 2
-  fraction: 0.67
-  reason: 2/3 proposals cluster around 70 BPM
+  fraction: 0.5
+  reason: 2/4 proposals cluster around 70 BPM
   severity: avoid
-- bpm_range: 82-92
-  center: 87
-  count: 1
-  fraction: 0.33
-  reason: 1/3 proposals cluster around 87 BPM
-  severity: avoid
-concept_constraints:
-- count: 1
-  fraction: 0.33
-  phrase: transmigration
-  reason: '''transmigration'' appears in 1/3 concepts (33%)'
-  severity: avoid
-- count: 1
-  fraction: 0.33
-  phrase: prism synthesis
-  reason: '''prism synthesis'' appears in 1/3 concepts (33%)'
-  severity: avoid
+concept_constraints: []
 dialogue_opener_constraints: []
 diversity_metrics:
   bpm_distribution:
     68: 1
     72: 1
     87: 1
-  bpm_mean: 75.7
-  bpm_std_dev: 8.18
+    108: 1
+  bpm_mean: 83.8
+  bpm_std_dev: 15.69
   concept_phrase_counts:
     prism synthesis: 1
     transmigration: 1
   dialogue_opener_counts:
     look,: 2
   key_distribution:
+    A# major: 1
     F# minor: 3
-  key_entropy: 0.0
+  key_entropy: 0.81
   title_word_counts:
     architect: 1
     consciousness: 1
 excluded_titles:
 - All Frequencies Return to Source (The Consciousness Archaeology Complete)
 - The Breathing Machine Learns to Sing
+- The Specimen Teaches the Cassette How to Grow
 - The Séance Engine Completes Its Architecture
 generated_from: shrink_wrapped/index.yml
 key_constraints:
 - count: 3
-  fraction: 1.0
+  fraction: 0.75
   key: F# minor
-  reason: 3/3 proposals (100%) use F# minor
+  reason: 3/4 proposals (75%) use F# minor
   severity: exclude
-thread_count: 3
+thread_count: 4
 title_vocabulary_constraints:
 - count: 1
-  fraction: 0.33
-  reason: '''architect'' appears in 1/3 titles (33%)'
+  fraction: 0.25
+  reason: '''architect'' appears in 1/4 titles (25%)'
   severity: avoid
   word: architect
 - count: 1
-  fraction: 0.33
-  reason: '''consciousness'' appears in 1/3 titles (33%)'
+  fraction: 0.25
+  reason: '''consciousness'' appears in 1/4 titles (25%)'
   severity: avoid
   word: consciousness
 warnings:
-- 'Key entropy is 0.0 bits (threshold: 2.0) — proposals are heavily concentrated in a few keys'
-- 'BPM std dev is 8.18 (threshold: 10) — proposals cluster around 75.7 BPM'
+- 'Key entropy is 0.81 bits (threshold: 2.0) — proposals are heavily concentrated in a few keys'

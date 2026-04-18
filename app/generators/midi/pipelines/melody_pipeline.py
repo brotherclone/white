@@ -902,6 +902,7 @@ def run_melody_pipeline(
             default_flow_style=False,
             sort_keys=False,
             allow_unicode=True,
+            width=float("inf"),
         )
 
     # --- 10. Summary ---

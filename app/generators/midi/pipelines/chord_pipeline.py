@@ -397,9 +397,9 @@ def song_slug(song_filename: str) -> str:
     name = Path(song_filename).stem
     # Remove the song_proposal_ prefix
     name = re.sub(r"^song_proposal_", "", name)
-    # Remove hex color codes
-    name = re.sub(r"\(0x[0-9a-fA-F]+\)", "", name)
-    # Clean up
+    # Remove hex color codes (with surrounding whitespace)
+    name = re.sub(r"\s*\(0x[0-9a-fA-F]+\)\s*", "", name)
+    # Clean up — collapse any run of non-word chars to a single underscore
     name = re.sub(r"[^\w]+", "_", name).strip("_").lower()
     return name
 
@@ -677,7 +677,12 @@ def run_chord_pipeline(
         review_path = output_dir / "review.yml"
         with open(review_path, "w") as f:
             yaml.dump(
-                review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+                review,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
             )
 
         print(f"Review file: {review_path}")
@@ -833,7 +838,12 @@ def run_chord_pipeline(
     review_path = output_dir / "review.yml"
     with open(review_path, "w") as f:
         yaml.dump(
-            review, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            width=float("inf"),
         )
 
     print(f"Review file: {review_path}")

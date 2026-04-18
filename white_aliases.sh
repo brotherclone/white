@@ -3,6 +3,7 @@
 #   source /Volumes/LucidNonsense/White/white_aliases.sh
 #
 # ── Standard pipeline ──────────────────────────────────────────────────────
+#   wpipe run --production-dir <path> --song-proposal <path>   (first run only)
 #   wpipe status  --production-dir <path>
 #   wpipe run     --production-dir <path>
 #   wpipe next    --production-dir <path>
@@ -23,6 +24,11 @@
 #   wpipe ace import --production-dir <path>   ingest WAV render ← ACE Studio
 #   (ACE Studio 2.0 must be running at localhost:21572)
 #
+# ── Review UI ──────────────────────────────────────────────────────────────
+#   wui --production-dir <path>   launch candidate server + Next.js UI
+#   wui-api --production-dir <path>   backend only (port 8000)
+#   wui-web                           Next.js frontend only (port 3000)
+#
 # ── Other ──────────────────────────────────────────────────────────────────
 #   wnc          generate negative constraints
 #   wopenspec    openspec CLI wrapper
@@ -30,6 +36,27 @@
 
 WHITE=/Volumes/LucidNonsense/White
 
+function winit()   { (cd "$WHITE" && python -m app.generators.midi.production.init_production "$@") }
+function wreset()  { (cd "$WHITE" && python -c "
+from app.generators.midi.production.pipeline_runner import write_phase_status
+from pathlib import Path
+import sys, argparse
+p = argparse.ArgumentParser(); p.add_argument('--production-dir',required=True); p.add_argument('--phase',required=True)
+a = p.parse_args()
+write_phase_status(Path(a.production_dir), a.phase, 'pending')
+print(f'Reset {a.phase} -> pending')
+" "$@") }
+function wui-api() { (cd "$WHITE" && python -m app.tools.candidate_server "$@") }
+function wui-web() { (cd "$WHITE/web" && nvm use 20 && npm run dev) }
+function wui() {
+  local prod_dir=""
+  for arg in "$@"; do
+    if [[ -n "$prod_dir_next" ]]; then prod_dir="$arg"; prod_dir_next=""; fi
+    [[ "$arg" == "--production-dir" ]] && prod_dir_next=1
+  done
+  (cd "$WHITE" && python -m app.tools.candidate_server --production-dir "$prod_dir" &)
+  (cd "$WHITE/web" && nvm use 20 && npm run dev)
+}
 function wpipe()   { (cd "$WHITE" && python -m app.generators.midi.production.pipeline_runner "$@") }
 function wscore()  { (cd "$WHITE" && python -m app.generators.midi.production.score_mix "$@") }
 function wshrink() { (cd "$WHITE" && python -m app.util.shrinkwrap_chain_artifacts "$@") }
