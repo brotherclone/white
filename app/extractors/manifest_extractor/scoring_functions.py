@@ -52,8 +52,8 @@ def score_temporal_complexity(text: str) -> float:
     total_matches = word_matches + (pattern_matches * 2)  # Weight patterns higher
     density = calculate_density(total_matches, text)
 
-    # Normalize to 0-1 (10+ matches per 100 words = 1.0)
-    return min(density / 10.0, 1.0)
+    # Normalize to 0-1 (100+ matches per 100 words = 1.0)
+    return min(density / 100.0, 1.0)
 
 
 def score_ontological_uncertainty(text: str) -> float:
@@ -92,8 +92,8 @@ def score_memory_discrepancy(text: str) -> float:
     match_count = count_word_matches(DISCREPANCY_WORDS, text)
     density = calculate_density(match_count, text)
 
-    # Normalize (5+ matches per 100 words = 1.0)
-    return min(density / 5.0, 1.0)
+    # Normalize (15+ matches per 100 words = 1.0)
+    return min(density / 15.0, 1.0)
 
 
 def score_boundary_fluidity(text: str) -> float:
@@ -106,8 +106,8 @@ def score_boundary_fluidity(text: str) -> float:
     match_count = count_word_matches(FLUIDITY_WORDS, text)
     density = calculate_density(match_count, text)
 
-    # Normalize (3+ matches per 100 words = 1.0)
-    return min(density / 3.0, 1.0)
+    # Normalize (30+ matches per 100 words = 1.0)
+    return min(density / 30.0, 1.0)
 
 
 def score_rebracketing_coverage(text: str) -> float:

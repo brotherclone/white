@@ -53,6 +53,7 @@ class BlueAgentState(BaseRainbowAgentState):
     alternate_history: Annotated[
         Optional[AlternateTimelineArtifact], lambda x, y: y or x
     ] = None
+    tape_label: Annotated[Optional[str], lambda x, y: y or x] = None
     musical_params: Annotated[
         Optional[QuantumTapeMusicalParameters], lambda x, y: y or x
     ] = None

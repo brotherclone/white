@@ -212,10 +212,10 @@ class TestScoreBoundaryFluidity:
         assert score_boundary_fluidity(dense) > score_boundary_fluidity(sparse)
 
     def test_normalisation_threshold(self):
-        # 3 matches per 100 words → score = 1.0
-        # Build text with exactly 3 fluidity words in 100 words
-        filler = ["word"] * 97
-        words = ["maybe", "perhaps", "could"] + filler
+        # 30 matches per 100 words → score = 1.0
+        # Build text with exactly 30 fluidity words in 100 words
+        filler = ["word"] * 70
+        words = ["maybe"] * 30 + filler
         text = " ".join(words)
         score = score_boundary_fluidity(text)
         assert score == pytest.approx(1.0)
