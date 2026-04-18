@@ -51,8 +51,18 @@ from app.generators.midi.production.production_plan import (  # noqa: E402
     _infer_repeat_type,
     _normalize_repeat_type,
 )
-from app.generators.midi.production.song_evaluator import _count_syllables  # noqa: E402
 from app.structures.enums.lyric_repeat_type import LyricRepeatType
+
+
+def _count_syllables(text: str) -> int:
+    """Estimate syllable count — at least one syllable per word."""
+    if not text:
+        return 0
+    total = 0
+    for word in text.split():
+        total += max(1, len(re.findall(r"[aeiouAEIOU]+", word)))
+    return total
+
 
 load_dotenv()
 

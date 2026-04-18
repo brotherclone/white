@@ -2,30 +2,24 @@
 # White project shell aliases — source this from ~/.zshrc:
 #   source /Volumes/LucidNonsense/White/white_aliases.sh
 #
-# ── Standard pipeline ──────────────────────────────────────────────────────
-#   wpipe run --production-dir <path> --song-proposal <path>   (first run only)
-#   wpipe status  --production-dir <path>
-#   wpipe run     --production-dir <path>
-#   wpipe next    --production-dir <path>
-#   wpipe promote --production-dir <path>
-#   wscore --mix-file <audio> --production-dir <path>
-#   wshrink / wshrink --thread <uuid> / wshrink --dry-run
+# ── Song generation ────────────────────────────────────────────────────────
 #   wstart / wstart --with-html / wstart --no-browser
+#   wshrink / wshrink --thread <uuid> / wshrink --dry-run
+#
+# ── Production pipeline ────────────────────────────────────────────────────
+#   winit  --song-proposal <path>               (auto-derives production dir)
+#   wpipe run    --production-dir <path>        (first run: add --song-proposal)
+#   wpipe status --production-dir <path>
+#   wpipe promote --production-dir <path> --phase <phase>
+#   wreset --production-dir <path> --phase <phase>
 #
 # ── Evolutionary pattern breeding ──────────────────────────────────────────
-#   wevolve drums   --production-dir <path>              (8 generations, pop 30)
-#   wevolve bass    --production-dir <path> --generations 16
+#   wevolve drums   --production-dir <path>
+#   wevolve bass    --production-dir <path>
 #   wevolve melody  --production-dir <path>
-#   Evolved candidates appear in review.yml alongside normal ones (is_evolved: true)
-#
-# ── ACE Studio vocal synthesis ─────────────────────────────────────────────
-#   wpipe ace export --production-dir <path>   push MIDI+lyrics → ACE Studio
-#   wpipe ace status --production-dir <path>   check association
-#   wpipe ace import --production-dir <path>   ingest WAV render ← ACE Studio
-#   (ACE Studio 2.0 must be running at localhost:21572)
 #
 # ── Review UI ──────────────────────────────────────────────────────────────
-#   wui --production-dir <path>   launch candidate server + Next.js UI
+#   wui --production-dir <path>   launch API server + Next.js UI
 #   wui-api --production-dir <path>   backend only (port 8000)
 #   wui-web                           Next.js frontend only (port 3000)
 #
@@ -58,7 +52,6 @@ function wui() {
   (cd "$WHITE/web" && nvm use 20 && npm run dev)
 }
 function wpipe()   { (cd "$WHITE" && python -m app.generators.midi.production.pipeline_runner "$@") }
-function wscore()  { (cd "$WHITE" && python -m app.generators.midi.production.score_mix "$@") }
 function wshrink() { (cd "$WHITE" && python -m app.util.shrinkwrap_chain_artifacts "$@") }
 function wstart()  { (cd "$WHITE" && python -m run_white_agent start "$@") }
 function wnc()     { (cd "$WHITE" && python -m app.util.generate_negative_constraints "$@") }

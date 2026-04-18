@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, aceExport, aceImport } from "@/lib/api";
+import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase } from "@/lib/api";
 import { Candidate, CandidateStatus } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
@@ -27,8 +27,6 @@ export default function Home() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [promoting, setPromoting] = useState(false);
   const [evolving, setEvolving] = useState(false);
-  const [aceBusy, setAceBusy] = useState(false);
-  const [aceExported, setAceExported] = useState(false);
 
   const load = useCallback(async (phase?: string) => {
     setLoading(true);
@@ -147,36 +145,8 @@ export default function Home() {
     }
   };
 
-  const handleAceExport = async () => {
-    setError(null);
-    setAceBusy(true);
-    try {
-      const res = await aceExport();
-      setAceExported(true);
-      showToast(`Exported to ACE Studio — singer: ${res.singer ?? "unknown"}, sections: ${res.sections.join(", ") || "none"}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "ACE export failed");
-    } finally {
-      setAceBusy(false);
-    }
-  };
-
-  const handleAceImport = async () => {
-    setError(null);
-    setAceBusy(true);
-    try {
-      const res = await aceImport();
-      showToast(`Render ingested: ${res.render_path}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "ACE import failed");
-    } finally {
-      setAceBusy(false);
-    }
-  };
-
   const canPromote = !!phaseFilter && phaseFilter !== "all";
   const canEvolve = ["drums", "bass", "melody"].includes(phaseFilter);
-  const showAce = phaseFilter === "melody";
 
   const SortIcon = ({ k }: { k: SortKey }) =>
     sortKey === k ? <span className="ml-1 text-zinc-400">{sortAsc ? "↑" : "↓"}</span> : null;
@@ -234,29 +204,6 @@ export default function Home() {
             >
               {evolving ? "Evolving…" : "Evolve"}
             </button>
-          )}
-          {/* ACE Studio */}
-          {showAce && (
-            <>
-              <button
-                onClick={handleAceExport}
-                disabled={aceBusy}
-                title="Export melody to ACE Studio"
-                className="px-3 py-1 text-sm rounded font-medium transition-colors bg-sky-700 hover:bg-sky-600 text-white disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {aceBusy && !aceExported ? "Exporting…" : "ACE Export"}
-              </button>
-              {aceExported && (
-                <button
-                  onClick={handleAceImport}
-                  disabled={aceBusy}
-                  title="Import ACE Studio WAV render"
-                  className="px-3 py-1 text-sm rounded font-medium transition-colors bg-sky-800 hover:bg-sky-700 text-white disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  {aceBusy ? "Importing…" : "ACE Import"}
-                </button>
-              )}
-            </>
           )}
         </div>
       </div>
