@@ -407,7 +407,9 @@ _SKIP_PROPOSALS = {"evp.yml", "all_song_proposals.yml"}
 _PROPOSAL_REQUIRED_KEYS = {"bpm", "key", "rainbow_color"}
 
 
-def scaffold_song_productions(thread_dest_dir: Path, yml_dir: Path) -> list[str]:
+def scaffold_song_productions(
+    thread_dest_dir: Path, yml_dir: Path, force: bool = False
+) -> list[str]:
     """Create production/<slug>/manifest_bootstrap.yml for each song proposal in yml_dir.
 
     A YAML file is treated as a song proposal if it contains bpm, key, and rainbow_color.
@@ -436,16 +438,18 @@ def scaffold_song_productions(thread_dest_dir: Path, yml_dir: Path) -> list[str]
         slug = yml_path.stem
         prod_dir = thread_dest_dir / "production" / slug
         manifest_path = prod_dir / "manifest_bootstrap.yml"
-        if manifest_path.exists():
+        if manifest_path.exists() and not force:
             created.append(slug)
             continue
 
         prod_dir.mkdir(parents=True, exist_ok=True)
+        rc = proposal.get("rainbow_color")
+        rainbow_color = rc.get("color_name") if isinstance(rc, dict) else rc
         bootstrap = {
             "title": proposal.get("title") or slug,
             "key": proposal.get("key"),
             "bpm": proposal.get("bpm"),
-            "rainbow_color": proposal.get("rainbow_color"),
+            "rainbow_color": rainbow_color,
             "singer": proposal.get("singer") or None,
         }
         with open(manifest_path, "w") as f:
@@ -727,6 +731,11 @@ def main():
         action="store_true",
         help="Only scaffold production dirs in existing output dirs, then exit (backfill mode)",
     )
+    parser.add_argument(
+        "--force-scaffold",
+        action="store_true",
+        help="Overwrite existing manifest_bootstrap.yml files during scaffolding",
+    )
 
     args = parser.parse_args()
 
@@ -744,7 +753,9 @@ def main():
             yml_dir = thread_dir / "yml"
             if not yml_dir.exists():
                 continue
-            slugs = scaffold_song_productions(thread_dir, yml_dir)
+            slugs = scaffold_song_productions(
+                thread_dir, yml_dir, force=args.force_scaffold
+            )
             if slugs:
                 print(f"  {thread_dir.name}: {slugs}")
                 total += len(slugs)
