@@ -760,6 +760,27 @@ class TestScaffoldSongProductions:
         assert data["rainbow_color"] == "Red"
         assert data["title"] == "coral_fever_requiem_v1"
 
+    def test_rainbow_color_dict_normalized_to_color_name(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        data = {
+            "title": "test",
+            "bpm": 120,
+            "key": "C major",
+            "rainbow_color": {"color_name": "Violet", "hex_value": 123},
+        }
+        import yaml as _yaml
+
+        with open(yml_dir / "dict_color_song_v1.yml", "w") as f:
+            _yaml.dump(data, f)
+
+        scaffold_song_productions(tmp_path, yml_dir)
+        manifest = (
+            tmp_path / "production" / "dict_color_song_v1" / "manifest_bootstrap.yml"
+        )
+        loaded = _yaml.safe_load(manifest.read_text())
+        assert loaded["rainbow_color"] == "Violet"
+
     def test_skips_evp_yml(self, tmp_path):
         yml_dir = tmp_path / "yml"
         yml_dir.mkdir()
@@ -798,8 +819,9 @@ class TestScaffoldSongProductions:
         manifest = tmp_path / "production" / "my_song_v1" / "manifest_bootstrap.yml"
         manifest.write_text("title: overwritten\n")
 
-        scaffold_song_productions(tmp_path, yml_dir)
+        second_run = scaffold_song_productions(tmp_path, yml_dir)
         assert manifest.read_text() == "title: overwritten\n"
+        assert second_run == []  # nothing newly created
 
     def test_singer_field_included_when_present(self, tmp_path):
         yml_dir = tmp_path / "yml"

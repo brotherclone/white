@@ -439,7 +439,6 @@ def scaffold_song_productions(
         prod_dir = thread_dest_dir / "production" / slug
         manifest_path = prod_dir / "manifest_bootstrap.yml"
         if manifest_path.exists() and not force:
-            created.append(slug)
             continue
 
         prod_dir.mkdir(parents=True, exist_ok=True)
@@ -504,11 +503,19 @@ def shrinkwrap_thread(
         if scaffold:
             yml_dir = thread_dir / "yml"
             if yml_dir.exists():
-                proposals = [
-                    p.stem
-                    for p in sorted(yml_dir.glob("*.yml"))
-                    if p.name not in _SKIP_PROPOSALS
-                ]
+                proposals = []
+                for p in sorted(yml_dir.glob("*.yml")):
+                    if p.name in _SKIP_PROPOSALS:
+                        continue
+                    try:
+                        with open(p) as _f:
+                            _data = yaml.safe_load(_f)
+                        if isinstance(_data, dict) and _PROPOSAL_REQUIRED_KEYS.issubset(
+                            _data
+                        ):
+                            proposals.append(p.stem)
+                    except Exception:
+                        pass
                 if proposals:
                     print(f"    production dirs to scaffold: {proposals}")
         existing_names.add(new_name)

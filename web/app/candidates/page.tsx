@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong } from "@/lib/api";
 import { Candidate, CandidateStatus, SongEntry } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
@@ -14,6 +15,7 @@ const PHASES = ["chords", "drums", "bass", "melody", "lyrics", "quartet"];
 type SortKey = "phase" | "section" | "id" | "template" | "composite_score" | "status" | "rank";
 
 export default function CandidatesPage() {
+  const router = useRouter();
   const [all, setAll] = useState<Candidate[]>([]);
   const [phaseFilter, setPhaseFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | CandidateStatus>("");
@@ -31,7 +33,7 @@ export default function CandidatesPage() {
   const [activeSong, setActiveSong] = useState<SongEntry | null>(null);
 
   useEffect(() => {
-    fetchActiveSong().then(({ active }) => setActiveSong(active));
+    fetchActiveSong().then(({ active }) => setActiveSong(active)).catch(() => {});
   }, []);
 
   const load = useCallback(async (phase?: string) => {
@@ -40,12 +42,17 @@ export default function CandidatesPage() {
     try {
       const data = await fetchCandidates(phase || undefined);
       setAll(data);
-    } catch {
-      setError("Could not reach API — is the server running on localhost:8000?");
+    } catch (e: unknown) {
+      const status = (e as { status?: number }).status;
+      if (status === 503) {
+        router.replace("/");
+      } else {
+        setError("Could not reach API — is the server running on localhost:8000?");
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => { load(phaseFilter); }, [phaseFilter, load]);
 

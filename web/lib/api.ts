@@ -5,7 +5,7 @@ export async function fetchCandidates(phase?: string, section?: string) {
   if (phase) params.set("phase", phase);
   if (section) params.set("section", section);
   const res = await fetch(`${BASE}/candidates?${params}`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch candidates");
+  if (!res.ok) throw Object.assign(new Error("Failed to fetch candidates"), { status: res.status });
   return res.json();
 }
 

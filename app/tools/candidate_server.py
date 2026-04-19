@@ -236,7 +236,8 @@ def create_app(
 
     @app.get("/production-dir")
     def get_production_dir():
-        return {"production_dir": str(_production_dir)}
+        prod = _require_production_dir()
+        return {"production_dir": str(prod)}
 
     # ------------------------------------------------------------------
     # Promote

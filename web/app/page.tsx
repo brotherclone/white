@@ -6,16 +6,16 @@ import { fetchSongs, activateSong } from "@/lib/api";
 import { SongEntry } from "@/lib/types";
 
 const COLOR_MAP: Record<string, string> = {
-  red: "#dc2626",
-  orange: "#ea580c",
-  yellow: "#ca8a04",
-  green: "#16a34a",
-  blue: "#2563eb",
-  indigo: "#4f46e5",
-  violet: "#7c3aed",
-  coral: "#f97316",
-  black: "#3f3f46",
-  white: "#a1a1aa",
+  red: "#dc2626",    r: "#dc2626",
+  orange: "#ea580c", o: "#ea580c",
+  yellow: "#ca8a04", y: "#ca8a04",
+  green: "#16a34a",  g: "#16a34a",
+  blue: "#2563eb",   b: "#2563eb",
+  indigo: "#4f46e5", i: "#4f46e5",
+  violet: "#7c3aed", v: "#7c3aed",
+  coral: "#f97316",  c: "#f97316",
+  black: "#3f3f46",  k: "#3f3f46",
+  white: "#a1a1aa",  w: "#a1a1aa",
 };
 
 function colorDot(name: string | null) {
