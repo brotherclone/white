@@ -403,12 +403,70 @@ def copy_thread_files(
     }
 
 
+_SKIP_PROPOSALS = {"evp.yml", "all_song_proposals.yml"}
+_PROPOSAL_REQUIRED_KEYS = {"bpm", "key", "rainbow_color"}
+
+
+def scaffold_song_productions(
+    thread_dest_dir: Path, yml_dir: Path, force: bool = False
+) -> list[str]:
+    """Create production/<slug>/manifest_bootstrap.yml for each song proposal in yml_dir.
+
+    A YAML file is treated as a song proposal if it contains bpm, key, and rainbow_color.
+    Known non-proposal files (evp.yml, all_song_proposals.yml) are always skipped.
+    Existing manifest_bootstrap.yml files are never overwritten (idempotent).
+
+    Returns list of production slugs created (or already existing).
+    """
+    if not yml_dir.exists():
+        return []
+
+    created = []
+    for yml_path in sorted(yml_dir.glob("*.yml")):
+        if yml_path.name in _SKIP_PROPOSALS:
+            continue
+        try:
+            with open(yml_path) as f:
+                proposal = yaml.safe_load(f)
+        except Exception:
+            continue
+        if not isinstance(proposal, dict):
+            continue
+        if not _PROPOSAL_REQUIRED_KEYS.issubset(proposal):
+            continue
+
+        slug = yml_path.stem
+        prod_dir = thread_dest_dir / "production" / slug
+        manifest_path = prod_dir / "manifest_bootstrap.yml"
+        if manifest_path.exists() and not force:
+            continue
+
+        prod_dir.mkdir(parents=True, exist_ok=True)
+        rc = proposal.get("rainbow_color")
+        rainbow_color = rc.get("color_name") if isinstance(rc, dict) else rc
+        bootstrap = {
+            "title": proposal.get("title") or slug,
+            "key": proposal.get("key"),
+            "bpm": proposal.get("bpm"),
+            "rainbow_color": rainbow_color,
+            "singer": proposal.get("singer") or None,
+        }
+        with open(manifest_path, "w") as f:
+            yaml.dump(
+                bootstrap, f, allow_unicode=True, sort_keys=False, width=float("inf")
+            )
+        created.append(slug)
+
+    return created
+
+
 def shrinkwrap_thread(
     thread_dir: Path,
     output_dir: Path,
     existing_names: set[str],
     dry_run: bool = False,
     archive: bool = False,
+    scaffold: bool = True,
 ) -> Optional[dict]:
     """Shrink-wrap a single thread into the output directory.
 
@@ -442,6 +500,24 @@ def shrinkwrap_thread(
             print(
                 f"    debug files to {'archive' if archive else 'skip'}: {len(debug_files)}"
             )
+        if scaffold:
+            yml_dir = thread_dir / "yml"
+            if yml_dir.exists():
+                proposals = []
+                for p in sorted(yml_dir.glob("*.yml")):
+                    if p.name in _SKIP_PROPOSALS:
+                        continue
+                    try:
+                        with open(p) as _f:
+                            _data = yaml.safe_load(_f)
+                        if isinstance(_data, dict) and _PROPOSAL_REQUIRED_KEYS.issubset(
+                            _data
+                        ):
+                            proposals.append(p.stem)
+                    except Exception:
+                        pass
+                if proposals:
+                    print(f"    production dirs to scaffold: {proposals}")
         existing_names.add(new_name)
         return metadata
 
@@ -459,6 +535,12 @@ def shrinkwrap_thread(
 
     # Write manifest
     write_manifest(dest_dir, metadata)
+
+    # Scaffold production directories from song proposals
+    if scaffold:
+        slugs = scaffold_song_productions(dest_dir, dest_dir / "yml")
+        if slugs:
+            logger.info(f"  scaffolded production dirs: {slugs}")
 
     existing_names.add(new_name)
     return metadata
@@ -521,6 +603,7 @@ def shrinkwrap(
     dry_run: bool = False,
     archive: bool = False,
     thread_filter: Optional[str] = None,
+    scaffold: bool = True,
 ) -> dict:
     """Shrink-wrap all (or one) thread(s) into the output directory.
 
@@ -577,6 +660,7 @@ def shrinkwrap(
             existing_names,
             dry_run=dry_run,
             archive=archive,
+            scaffold=scaffold,
         )
 
         if metadata:
@@ -644,6 +728,21 @@ def main():
     )
     parser.add_argument("--thread", type=str, help="Process a single thread by UUID")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
+    parser.add_argument(
+        "--no-scaffold",
+        action="store_true",
+        help="Skip scaffolding production directories from song proposals",
+    )
+    parser.add_argument(
+        "--scaffold-only",
+        action="store_true",
+        help="Only scaffold production dirs in existing output dirs, then exit (backfill mode)",
+    )
+    parser.add_argument(
+        "--force-scaffold",
+        action="store_true",
+        help="Overwrite existing manifest_bootstrap.yml files during scaffolding",
+    )
 
     args = parser.parse_args()
 
@@ -651,6 +750,24 @@ def main():
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(levelname)s: %(message)s",
     )
+
+    if args.scaffold_only:
+        output_dir = args.output_dir
+        total = 0
+        for thread_dir in sorted(output_dir.iterdir()):
+            if not thread_dir.is_dir() or thread_dir.name.startswith("."):
+                continue
+            yml_dir = thread_dir / "yml"
+            if not yml_dir.exists():
+                continue
+            slugs = scaffold_song_productions(
+                thread_dir, yml_dir, force=args.force_scaffold
+            )
+            if slugs:
+                print(f"  {thread_dir.name}: {slugs}")
+                total += len(slugs)
+        print(f"\nDone: {total} production dirs scaffolded")
+        return
 
     if args.dry_run:
         print("DRY RUN — no files will be written\n")
@@ -661,6 +778,7 @@ def main():
         dry_run=args.dry_run,
         archive=args.archive,
         thread_filter=args.thread,
+        scaffold=not args.no_scaffold,
     )
 
     print(f"\nDone: {result['processed']} processed, {result['failed']} failed")

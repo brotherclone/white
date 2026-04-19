@@ -15,6 +15,7 @@ from app.util.shrinkwrap_chain_artifacts import (
     parse_thread,
     resolve_collision,
     rewrite_file_name_field,
+    scaffold_song_productions,
     shrinkwrap,
     shrinkwrap_thread,
     slugify,
@@ -720,3 +721,145 @@ class TestCleanFilenameIntegration:
         out_html = output / "white-collision-song" / "html"
         assert (out_html / "character_sheet.html").exists()
         assert (out_html / "character_sheet_2.html").exists()
+
+
+# ---------------------------------------------------------------------------
+# scaffold_song_productions
+# ---------------------------------------------------------------------------
+
+
+def _write_proposal(yml_dir: Path, name: str, extra: dict | None = None) -> Path:
+    data = {"title": name, "bpm": 120, "key": "C major", "rainbow_color": "Red"}
+    if extra:
+        data.update(extra)
+    path = yml_dir / f"{name}.yml"
+    with open(path, "w") as f:
+        yaml.dump(data, f)
+    return path
+
+
+class TestScaffoldSongProductions:
+    def test_creates_production_dir_and_manifest(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(yml_dir, "coral_fever_requiem_v1")
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+
+        assert slugs == ["coral_fever_requiem_v1"]
+        manifest = (
+            tmp_path
+            / "production"
+            / "coral_fever_requiem_v1"
+            / "manifest_bootstrap.yml"
+        )
+        assert manifest.exists()
+        data = yaml.safe_load(manifest.read_text())
+        assert data["bpm"] == 120
+        assert data["key"] == "C major"
+        assert data["rainbow_color"] == "Red"
+        assert data["title"] == "coral_fever_requiem_v1"
+
+    def test_rainbow_color_dict_normalized_to_color_name(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        data = {
+            "title": "test",
+            "bpm": 120,
+            "key": "C major",
+            "rainbow_color": {"color_name": "Violet", "hex_value": 123},
+        }
+        import yaml as _yaml
+
+        with open(yml_dir / "dict_color_song_v1.yml", "w") as f:
+            _yaml.dump(data, f)
+
+        scaffold_song_productions(tmp_path, yml_dir)
+        manifest = (
+            tmp_path / "production" / "dict_color_song_v1" / "manifest_bootstrap.yml"
+        )
+        loaded = _yaml.safe_load(manifest.read_text())
+        assert loaded["rainbow_color"] == "Violet"
+
+    def test_skips_evp_yml(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        evp = yml_dir / "evp.yml"
+        evp.write_text("bpm: 120\nkey: C major\nrainbow_color: Red\n")
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == []
+        assert not (tmp_path / "production" / "evp").exists()
+
+    def test_skips_all_song_proposals_yml(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        asp = yml_dir / "all_song_proposals.yml"
+        asp.write_text("bpm: 120\nkey: C major\nrainbow_color: Red\n")
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == []
+
+    def test_skips_file_missing_required_keys(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        (yml_dir / "no_bpm.yml").write_text("key: C major\nrainbow_color: Red\n")
+        (yml_dir / "no_key.yml").write_text("bpm: 120\nrainbow_color: Red\n")
+        (yml_dir / "no_color.yml").write_text("bpm: 120\nkey: C major\n")
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == []
+
+    def test_idempotent_does_not_overwrite(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(yml_dir, "my_song_v1")
+        scaffold_song_productions(tmp_path, yml_dir)
+
+        manifest = tmp_path / "production" / "my_song_v1" / "manifest_bootstrap.yml"
+        manifest.write_text("title: overwritten\n")
+
+        second_run = scaffold_song_productions(tmp_path, yml_dir)
+        assert manifest.read_text() == "title: overwritten\n"
+        assert second_run == []  # nothing newly created
+
+    def test_singer_field_included_when_present(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(yml_dir, "song_with_singer", extra={"singer": "Shirley"})
+
+        scaffold_song_productions(tmp_path, yml_dir)
+        manifest = (
+            tmp_path / "production" / "song_with_singer" / "manifest_bootstrap.yml"
+        )
+        data = yaml.safe_load(manifest.read_text())
+        assert data["singer"] == "Shirley"
+
+    def test_singer_null_when_absent(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(yml_dir, "no_singer_song")
+
+        scaffold_song_productions(tmp_path, yml_dir)
+        manifest = tmp_path / "production" / "no_singer_song" / "manifest_bootstrap.yml"
+        data = yaml.safe_load(manifest.read_text())
+        assert data["singer"] is None
+
+    def test_missing_yml_dir_returns_empty(self, tmp_path):
+        slugs = scaffold_song_productions(tmp_path, tmp_path / "yml")
+        assert slugs == []
+
+    def test_multiple_proposals_all_scaffolded(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(yml_dir, "song_a_v1")
+        _write_proposal(yml_dir, "song_b_v1")
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert sorted(slugs) == ["song_a_v1", "song_b_v1"]
+        assert (
+            tmp_path / "production" / "song_a_v1" / "manifest_bootstrap.yml"
+        ).exists()
+        assert (
+            tmp_path / "production" / "song_b_v1" / "manifest_bootstrap.yml"
+        ).exists()
