@@ -16,20 +16,20 @@
 - [x] 1.8 Update startup print to show `Serving album from: <shrink_wrapped_dir>` when in album mode
 
 ## 2. Frontend — song index page
-- [ ] 2.1 Create `web/app/page.tsx` as the song index — fetches `GET /songs` on mount; shows a loading state and a "No songs found" empty state
-- [ ] 2.2 Render one card per song showing: title, thread slug (dimmed), key, BPM, color badge, singer (if present)
-- [ ] 2.3 On card click: call `POST /songs/activate` then `router.push("/candidates")`; show a spinner on the clicked card while activating
-- [ ] 2.4 If `GET /songs` returns 503 (server in single-song mode), render a redirect notice and navigate immediately to `/candidates`
-- [ ] 2.5 Style cards: dark background matching existing zinc palette, color badge uses the song's `rainbow_color` value
+- [x] 2.1 Create `web/app/page.tsx` as the song index — fetches `GET /songs` on mount; shows a loading state and a "No songs found" empty state
+- [x] 2.2 Render one card per song showing: title, thread slug (dimmed), key, BPM, color badge, singer (if present)
+- [x] 2.3 On card click: call `POST /songs/activate` then `router.push("/candidates")`; show a spinner on the clicked card while activating
+- [x] 2.4 If `GET /songs` returns 503 (server in single-song mode), render a redirect notice and navigate immediately to `/candidates`
+- [x] 2.5 Style cards: dark background matching existing zinc palette, color badge uses the song's `rainbow_color` value
 
 ## 3. Frontend — candidate browser breadcrumb
-- [ ] 3.1 Move existing `web/app/page.tsx` to `web/app/candidates/page.tsx`
-- [ ] 3.2 Add `GET /songs/active` call on mount in the candidate page to retrieve the active song title
-- [ ] 3.3 Render breadcrumb above the "Candidate Browser" heading: `← Songs  /  <song title>` — "← Songs" is a `<Link href="/">` component; hidden when active song title is unavailable (single-song mode)
-- [ ] 3.4 Update `web/lib/api.ts` with `fetchSongs()` and `activateSong(id)` helpers
-- [ ] 3.5 Update `web/app/layout.tsx` if needed (no new dependencies expected)
+- [x] 3.1 Move existing `web/app/page.tsx` to `web/app/candidates/page.tsx`
+- [x] 3.2 Add `GET /songs/active` call on mount in the candidate page to retrieve the active song title
+- [x] 3.3 Render breadcrumb above the "Candidate Browser" heading: `← Songs  /  <song title>` — "← Songs" is a `<Link href="/">` component; hidden when active song title is unavailable (single-song mode)
+- [x] 3.4 Update `web/lib/api.ts` with `fetchSongs()` and `activateSong(id)` helpers
+- [x] 3.5 Update `web/app/layout.tsx` if needed (no new dependencies expected)
 
 ## 4. Validation
-- [ ] 4.1 Manual smoke test: `python -m app.tools.candidate_server --shrink-wrapped-dir shrink_wrapped/` → browser opens `/`, shows song cards; click a card → `/candidates` shows that song's candidates with breadcrumb
-- [ ] 4.2 Legacy smoke test: `python -m app.tools.candidate_server --production-dir <path>` → browser opens `/candidates` directly, no breadcrumb shown
-- [ ] 4.3 Verify TypeScript build passes: `cd web && npm run build`
+- [x] 4.1 Manual smoke test: `python -m app.tools.candidate_server --shrink-wrapped-dir shrink_wrapped/` → browser opens `/`, shows song cards; click a card → `/candidates` shows that song's candidates with breadcrumb
+- [x] 4.2 Legacy smoke test: `python -m app.tools.candidate_server --production-dir <path>` → browser opens `/candidates` directly, no breadcrumb shown
+- [x] 4.3 Verify TypeScript build passes: `cd web && npm run build`

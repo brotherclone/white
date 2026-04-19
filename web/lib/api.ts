@@ -70,3 +70,26 @@ export async function evolvePhase(phase: string): Promise<{ ok: boolean; evolved
   }
   return res.json();
 }
+
+export async function fetchSongs(): Promise<import("./types").SongEntry[]> {
+  const res = await fetch(`${BASE}/songs`, { cache: "no-store" });
+  if (res.status === 503) throw Object.assign(new Error("single-song-mode"), { status: 503 });
+  if (!res.ok) throw new Error("Failed to fetch songs");
+  return res.json();
+}
+
+export async function activateSong(id: string): Promise<{ ok: boolean; production_dir: string }> {
+  const res = await fetch(`${BASE}/songs/activate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+  if (!res.ok) throw new Error("Activate failed");
+  return res.json();
+}
+
+export async function fetchActiveSong(): Promise<{ active: import("./types").SongEntry | null }> {
+  const res = await fetch(`${BASE}/songs/active`, { cache: "no-store" });
+  if (!res.ok) return { active: null };
+  return res.json();
+}
