@@ -6,14 +6,14 @@
 - [x] 0.4 Unit tests: `tests/util/test_shrinkwrap_scaffold.py` — test proposal detection (skips evp.yml, all_song_proposals.yml, files missing bpm/key/rainbow_color), correct directory naming, idempotency (no overwrite if manifest_bootstrap.yml exists), dry-run output.
 
 ## 1. Backend — new launch mode and song-list scanning
-- [ ] 1.1 Add `--shrink-wrapped-dir` argument to `candidate_server.py`; make `--production-dir` optional (required only when `--shrink-wrapped-dir` is absent)
-- [ ] 1.2 Add `_shrink_wrapped_dir: Path | None` module-level variable alongside `_production_dir`
-- [ ] 1.3 Implement `scan_songs(shrink_wrapped_dir)` helper: walks `*/production/*/manifest_bootstrap.yml`, reads title/key/bpm/color/singer, returns list of `SongEntry` dicts with `id` (`{thread_slug}__{production_slug}`), `thread_slug`, `production_slug`, `production_path`, and manifest fields
-- [ ] 1.4 Add `GET /songs` endpoint — calls `scan_songs` and returns the list; returns 503 if server was not launched in album mode
-- [ ] 1.5 Add `POST /songs/activate` endpoint (body: `{"id": "<thread_slug>__<production_slug>"}`) — resolves and validates the production path, sets `_production_dir`; returns `{"ok": true, "production_dir": "..."}`
-- [ ] 1.6 Add `GET /songs/active` endpoint — returns the active song entry or `{"active": null}` if none selected
-- [ ] 1.7 Guard all existing candidate endpoints: if `_production_dir` is None, return 503 with message `"No song selected — POST /songs/activate first"`
-- [ ] 1.8 Update startup print to show `Serving album from: <shrink_wrapped_dir>` when in album mode
+- [x] 1.1 Add `--shrink-wrapped-dir` argument to `candidate_server.py`; make `--production-dir` optional (required only when `--shrink-wrapped-dir` is absent)
+- [x] 1.2 Add `_shrink_wrapped_dir: Path | None` module-level variable alongside `_production_dir`
+- [x] 1.3 Implement `scan_songs(shrink_wrapped_dir)` helper: walks `*/production/*/manifest_bootstrap.yml`, reads title/key/bpm/color/singer, returns list of `SongEntry` dicts with `id` (`{thread_slug}__{production_slug}`), `thread_slug`, `production_slug`, `production_path`, and manifest fields
+- [x] 1.4 Add `GET /songs` endpoint — calls `scan_songs` and returns the list; returns 503 if server was not launched in album mode
+- [x] 1.5 Add `POST /songs/activate` endpoint (body: `{"id": "<thread_slug>__<production_slug>"}`) — resolves and validates the production path, sets `_production_dir`; returns `{"ok": true, "production_dir": "..."}`
+- [x] 1.6 Add `GET /songs/active` endpoint — returns the active song entry or `{"active": null}` if none selected
+- [x] 1.7 Guard all existing candidate endpoints: if `_production_dir` is None, return 503 with message `"No song selected — POST /songs/activate first"`
+- [x] 1.8 Update startup print to show `Serving album from: <shrink_wrapped_dir>` when in album mode
 
 ## 2. Frontend — song index page
 - [ ] 2.1 Create `web/app/page.tsx` as the song index — fetches `GET /songs` on mount; shows a loading state and a "No songs found" empty state

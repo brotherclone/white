@@ -7,7 +7,7 @@ import pytest
 import yaml
 from fastapi.testclient import TestClient
 
-from app.tools.candidate_server import create_app
+from app.tools.candidate_server import create_app, scan_songs
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -342,3 +342,201 @@ class TestEvolve:
             resp = client.post("/evolve", json={"phase": "drums"})
         assert resp.status_code == 500
         assert "ONNX" in resp.json()["detail"]
+
+
+# ---------------------------------------------------------------------------
+# Album mode helpers
+# ---------------------------------------------------------------------------
+
+
+def _make_shrink_wrapped(root: Path, songs: list[dict]) -> Path:
+    """Build a fake shrink_wrapped dir with manifest_bootstrap.yml files."""
+    for song in songs:
+        manifest_dir = (
+            root / song["thread_slug"] / "production" / song["production_slug"]
+        )
+        manifest_dir.mkdir(parents=True, exist_ok=True)
+        with open(manifest_dir / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump(
+                {
+                    "title": song.get("title", song["production_slug"]),
+                    "key": song.get("key", "C major"),
+                    "bpm": song.get("bpm", 120),
+                    "rainbow_color": song.get("rainbow_color", "Red"),
+                    "singer": song.get("singer"),
+                },
+                f,
+            )
+    return root
+
+
+@pytest.fixture
+def sw_dir(tmp_path):
+    return _make_shrink_wrapped(
+        tmp_path / "sw",
+        [
+            {
+                "thread_slug": "thread-alpha",
+                "production_slug": "song_a_v1",
+                "title": "Song Alpha",
+                "key": "A minor",
+                "bpm": 90,
+                "rainbow_color": "Red",
+                "singer": "Shirley",
+            },
+            {
+                "thread_slug": "thread-alpha",
+                "production_slug": "song_b_v1",
+                "title": "Song Beta",
+                "key": "C major",
+                "bpm": 110,
+                "rainbow_color": "Blue",
+                "singer": None,
+            },
+        ],
+    )
+
+
+@pytest.fixture
+def album_client(sw_dir):
+    app = create_app(shrink_wrapped_dir=sw_dir)
+    return TestClient(app)
+
+
+# ---------------------------------------------------------------------------
+# scan_songs
+# ---------------------------------------------------------------------------
+
+
+class TestScanSongs:
+    def test_returns_all_songs(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        assert len(songs) == 2
+
+    def test_song_has_required_fields(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        ids = {s["id"] for s in songs}
+        assert "thread-alpha__song_a_v1" in ids
+        assert "thread-alpha__song_b_v1" in ids
+
+    def test_song_fields_populated(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        assert alpha["title"] == "Song Alpha"
+        assert alpha["key"] == "A minor"
+        assert alpha["bpm"] == 90
+        assert alpha["rainbow_color"] == "Red"
+        assert alpha["singer"] == "Shirley"
+
+    def test_singer_null_when_absent(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        beta = next(s for s in songs if s["production_slug"] == "song_b_v1")
+        assert beta["singer"] is None
+
+    def test_empty_dir_returns_empty(self, tmp_path):
+        assert scan_songs(tmp_path / "empty") == []
+
+
+# ---------------------------------------------------------------------------
+# GET /songs
+# ---------------------------------------------------------------------------
+
+
+class TestGetSongs:
+    def test_album_mode_returns_song_list(self, album_client):
+        resp = album_client.get("/songs")
+        assert resp.status_code == 200
+        assert len(resp.json()) == 2
+
+    def test_single_song_mode_returns_503(self, client):
+        resp = client.get("/songs")
+        assert resp.status_code == 503
+
+    def test_song_entry_shape(self, album_client):
+        songs = album_client.get("/songs").json()
+        song = songs[0]
+        for field in (
+            "id",
+            "thread_slug",
+            "production_slug",
+            "title",
+            "key",
+            "bpm",
+            "rainbow_color",
+        ):
+            assert field in song
+
+
+# ---------------------------------------------------------------------------
+# POST /songs/activate
+# ---------------------------------------------------------------------------
+
+
+class TestActivateSong:
+    def test_valid_id_activates_and_sets_production_dir(self, album_client, sw_dir):
+        resp = album_client.post(
+            "/songs/activate", json={"id": "thread-alpha__song_a_v1"}
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert "song_a_v1" in data["production_dir"]
+
+    def test_unknown_id_returns_404(self, album_client):
+        resp = album_client.post("/songs/activate", json={"id": "no__such"})
+        assert resp.status_code == 404
+
+    def test_single_song_mode_returns_503(self, client):
+        resp = client.post("/songs/activate", json={"id": "thread-alpha__song_a_v1"})
+        assert resp.status_code == 503
+
+    def test_candidates_accessible_after_activate(self, album_client, sw_dir):
+        # Before activation: /candidates returns 503
+        assert album_client.get("/candidates").status_code == 503
+        # After activation: /candidates is accessible (may return empty list)
+        album_client.post("/songs/activate", json={"id": "thread-alpha__song_a_v1"})
+        resp = album_client.get("/candidates")
+        assert resp.status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# GET /songs/active
+# ---------------------------------------------------------------------------
+
+
+class TestGetActiveSong:
+    def test_none_before_activation(self, album_client):
+        resp = album_client.get("/songs/active")
+        assert resp.status_code == 200
+        assert resp.json()["active"] is None
+
+    def test_returns_song_after_activation(self, album_client):
+        album_client.post("/songs/activate", json={"id": "thread-alpha__song_b_v1"})
+        resp = album_client.get("/songs/active")
+        assert resp.status_code == 200
+        active = resp.json()["active"]
+        assert active["production_slug"] == "song_b_v1"
+        assert active["title"] == "Song Beta"
+
+    def test_single_song_mode_returns_null_active(self, client):
+        resp = client.get("/songs/active")
+        assert resp.status_code == 200
+        assert resp.json()["active"] is None
+
+
+# ---------------------------------------------------------------------------
+# 503 guard on candidate endpoints before activation
+# ---------------------------------------------------------------------------
+
+
+class TestAlbumModeGuard:
+    def test_candidates_503_before_activate(self, album_client):
+        assert album_client.get("/candidates").status_code == 503
+
+    def test_promote_503_before_activate(self, album_client):
+        assert (
+            album_client.post("/promote", json={"phase": "chords"}).status_code == 503
+        )
+
+    def test_evolve_503_before_activate(self, album_client):
+        assert album_client.post("/evolve", json={"phase": "drums"}).status_code == 503
