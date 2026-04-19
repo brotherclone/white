@@ -1,5 +1,17 @@
 export type CandidateStatus = "pending" | "approved" | "accepted" | "rejected";
 
+export interface SongEntry {
+  id: string;
+  thread_slug: string;
+  production_slug: string;
+  production_path: string;
+  title: string;
+  key: string | null;
+  bpm: number | null;
+  rainbow_color: string | null;
+  singer: string | null;
+}
+
 export interface Scores {
   composite: number;
   theory?: Record<string, number>;

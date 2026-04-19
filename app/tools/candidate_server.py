@@ -4,9 +4,11 @@
 Serves candidates as JSON, handles approve/reject writes, and streams MIDI files.
 The Next.js frontend at localhost:3000 consumes this API.
 
-Usage:
+Usage (single-song mode):
     python -m app.tools.candidate_server --production-dir shrink_wrapped/<album>/production/<slug>
-    python -m app.tools.candidate_server --production-dir ... --port 8000 --no-open
+
+Usage (album mode):
+    python -m app.tools.candidate_server --shrink-wrapped-dir shrink_wrapped/
 """
 
 import argparse
@@ -17,6 +19,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 import uvicorn
+import yaml
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -41,15 +44,65 @@ _EVOLVE_PIPELINE = {
 }
 
 # ---------------------------------------------------------------------------
-# App factory (production_dir injected at startup)
+# Module-level state (mutated at startup and by /songs/activate)
 # ---------------------------------------------------------------------------
 
 _production_dir: Path | None = None
+_shrink_wrapped_dir: Path | None = None
+_active_song: dict | None = None
 
 
-def create_app(production_dir: Path) -> FastAPI:
-    global _production_dir
+# ---------------------------------------------------------------------------
+# Song scanning
+# ---------------------------------------------------------------------------
+
+
+def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
+    """Walk shrink_wrapped_dir for manifest_bootstrap.yml files and return song entries."""
+    songs = []
+    for manifest_path in sorted(
+        shrink_wrapped_dir.glob("*/production/*/manifest_bootstrap.yml")
+    ):
+        parts = manifest_path.parts
+        thread_slug = parts[-4]
+        production_slug = parts[-2]
+        try:
+            with open(manifest_path) as f:
+                data = yaml.safe_load(f)
+        except Exception:
+            continue
+        if not isinstance(data, dict):
+            continue
+        songs.append(
+            {
+                "id": f"{thread_slug}__{production_slug}",
+                "thread_slug": thread_slug,
+                "production_slug": production_slug,
+                "production_path": str(manifest_path.parent),
+                "title": data.get("title") or production_slug,
+                "key": data.get("key"),
+                "bpm": data.get("bpm"),
+                "rainbow_color": data.get("rainbow_color"),
+                "singer": data.get("singer"),
+            }
+        )
+    return songs
+
+
+# ---------------------------------------------------------------------------
+# App factory
+# ---------------------------------------------------------------------------
+
+
+def create_app(
+    production_dir: Path | None = None,
+    *,
+    shrink_wrapped_dir: Path | None = None,
+) -> FastAPI:
+    global _production_dir, _shrink_wrapped_dir, _active_song
     _production_dir = production_dir
+    _shrink_wrapped_dir = shrink_wrapped_dir
+    _active_song = None
 
     app = FastAPI(title="Candidate Browser API")
 
@@ -64,11 +117,19 @@ def create_app(production_dir: Path) -> FastAPI:
     # Helpers
     # ------------------------------------------------------------------
 
+    def _require_production_dir() -> Path:
+        if _production_dir is None:
+            raise HTTPException(
+                status_code=503,
+                detail="No song selected — POST /songs/activate first",
+            )
+        return _production_dir
+
     def _all_candidates(
         phase: str | None = None, section: str | None = None
     ) -> list[CandidateEntry]:
         return load_all_candidates(
-            _production_dir, phase_filter=phase, section_filter=section
+            _require_production_dir(), phase_filter=phase, section_filter=section
         )
 
     def _find(candidate_id: str, phase: str | None = None) -> CandidateEntry:
@@ -88,7 +149,43 @@ def create_app(production_dir: Path) -> FastAPI:
         return d
 
     # ------------------------------------------------------------------
-    # Routes
+    # Songs (album mode)
+    # ------------------------------------------------------------------
+
+    @app.get("/songs")
+    def list_songs():
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Server not in album mode — launch with --shrink-wrapped-dir",
+            )
+        return scan_songs(_shrink_wrapped_dir)
+
+    class ActivateBody(BaseModel):
+        id: str
+
+    @app.post("/songs/activate")
+    def activate_song(body: ActivateBody):
+        global _production_dir, _active_song
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Server not in album mode — launch with --shrink-wrapped-dir",
+            )
+        songs = scan_songs(_shrink_wrapped_dir)
+        match = next((s for s in songs if s["id"] == body.id), None)
+        if match is None:
+            raise HTTPException(status_code=404, detail=f"Song '{body.id}' not found")
+        _production_dir = Path(match["production_path"])
+        _active_song = match
+        return {"ok": True, "production_dir": str(_production_dir)}
+
+    @app.get("/songs/active")
+    def get_active_song():
+        return {"active": _active_song}
+
+    # ------------------------------------------------------------------
+    # Candidates
     # ------------------------------------------------------------------
 
     @app.get("/candidates")
@@ -139,7 +236,8 @@ def create_app(production_dir: Path) -> FastAPI:
 
     @app.get("/production-dir")
     def get_production_dir():
-        return {"production_dir": str(_production_dir)}
+        prod = _require_production_dir()
+        return {"production_dir": str(prod)}
 
     # ------------------------------------------------------------------
     # Promote
@@ -150,26 +248,26 @@ def create_app(production_dir: Path) -> FastAPI:
 
     @app.post("/promote")
     def promote(body: PromoteBody):
+        prod = _require_production_dir()
         if body.phase not in VALID_PHASES:
             raise HTTPException(
                 status_code=400,
                 detail=f"Invalid phase '{body.phase}'. Must be one of: {sorted(VALID_PHASES)}",
             )
-        review_path = _production_dir / body.phase / "review.yml"
+        review_path = prod / body.phase / "review.yml"
         if not review_path.exists():
             raise HTTPException(
                 status_code=404,
                 detail=f"No review.yml found for phase '{body.phase}'",
             )
-        # Snapshot approved/ count before promotion to compute the delta
-        approved_dir = _production_dir / body.phase / "approved"
+        approved_dir = prod / body.phase / "approved"
         count_before = (
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
 
         from app.generators.midi.production.pipeline_runner import cmd_promote
 
-        result = cmd_promote(_production_dir, body.phase, yes=True)
+        result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:
             raise HTTPException(
                 status_code=409,
@@ -189,6 +287,7 @@ def create_app(production_dir: Path) -> FastAPI:
 
     @app.post("/evolve")
     def evolve(body: EvolveBody):
+        prod = _require_production_dir()
         if body.phase not in EVOLVABLE_PHASES:
             raise HTTPException(
                 status_code=400,
@@ -200,7 +299,7 @@ def create_app(production_dir: Path) -> FastAPI:
             "-m",
             module,
             "--production-dir",
-            str(_production_dir),
+            str(prod),
             "--evolve",
         ]
         result = subprocess.run(cmd, capture_output=True, text=True)
@@ -210,8 +309,7 @@ def create_app(production_dir: Path) -> FastAPI:
                 detail=result.stderr.strip()
                 or f"Evolution failed for phase '{body.phase}'",
             )
-        # Count evolved candidates written (those with evolved_ prefix)
-        candidates_dir = _production_dir / body.phase / "candidates"
+        candidates_dir = prod / body.phase / "candidates"
         evolved_count = (
             len(list(candidates_dir.glob("evolved_*.mid")))
             if candidates_dir.exists()
@@ -229,20 +327,30 @@ def create_app(production_dir: Path) -> FastAPI:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Candidate browser API server")
-    parser.add_argument("--production-dir", type=Path, required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--production-dir", type=Path)
+    mode.add_argument("--shrink-wrapped-dir", type=Path)
     parser.add_argument("--port", type=int, default=8000)
-    parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind to")
-    parser.add_argument(
-        "--no-open", action="store_true", help="Don't open browser on start"
-    )
+    parser.add_argument("--host", type=str, default="127.0.0.1")
+    parser.add_argument("--no-open", action="store_true")
     args = parser.parse_args()
 
-    production_dir = args.production_dir.resolve()
-    if not production_dir.exists():
-        print(f"ERROR: {production_dir} does not exist", file=sys.stderr)
-        sys.exit(1)
-
-    app = create_app(production_dir)
+    if args.production_dir:
+        production_dir = args.production_dir.resolve()
+        if not production_dir.exists():
+            print(f"ERROR: {production_dir} does not exist", file=sys.stderr)
+            sys.exit(1)
+        app = create_app(production_dir)
+        label = f"Serving candidates from: {production_dir}"
+        open_path = "/candidates"
+    else:
+        shrink_wrapped_dir = args.shrink_wrapped_dir.resolve()
+        if not shrink_wrapped_dir.exists():
+            print(f"ERROR: {shrink_wrapped_dir} does not exist", file=sys.stderr)
+            sys.exit(1)
+        app = create_app(shrink_wrapped_dir=shrink_wrapped_dir)
+        label = f"Serving album from: {shrink_wrapped_dir}"
+        open_path = "/"
 
     if not args.no_open:
         import threading
@@ -251,11 +359,11 @@ def main() -> None:
             import time
 
             time.sleep(1.0)
-            webbrowser.open(f"http://localhost:{args.port}")
+            webbrowser.open(f"http://localhost:{args.port}{open_path}")
 
         threading.Thread(target=_open, daemon=True).start()
 
-    print(f"Serving candidates from: {production_dir}")
+    print(label)
     print(f"API: http://{args.host}:{args.port}")
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
 
