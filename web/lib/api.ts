@@ -93,3 +93,25 @@ export async function fetchActiveSong(): Promise<{ active: import("./types").Son
   if (!res.ok) return { active: null };
   return res.json();
 }
+
+export async function startGenerate(): Promise<{ status: string; started_at: string }> {
+  const res = await fetch(`${BASE}/generate`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Generate failed");
+  }
+  return res.json();
+}
+
+export interface GenerateStatus {
+  status: "idle" | "running" | "done" | "error";
+  started_at: string | null;
+  finished_at: string | null;
+  error: string | null;
+}
+
+export async function getGenerateStatus(): Promise<GenerateStatus> {
+  const res = await fetch(`${BASE}/generate/status`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch generate status");
+  return res.json();
+}

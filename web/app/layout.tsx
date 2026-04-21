@@ -1,32 +1,30 @@
+// web/app/layout.tsx
+//
+// Replace the existing layout. Removes Geist fonts, adds Typekit.
+
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Candidate Browser",
-  description: "White pipeline candidate review tool",
+  title: "white — candidate browser",
+  description: "The Earthly Frames · Rainbow Table IX · generation pipeline",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full antialiased">
+      <head>
+        <Script
+          src="https://use.typekit.net/nig1rii.js"
+          strategy="beforeInteractive"
+        />
+        <Script id="typekit-load" strategy="beforeInteractive">
+          {`try{Typekit.load({async:true});}catch(e){}`}
+        </Script>
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
