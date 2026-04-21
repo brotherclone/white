@@ -278,6 +278,20 @@ class WhiteAgent(BaseModel):
             final_state = MainAgentState(**result)
         else:
             final_state = result
+
+        # Shrinkwrap the newly created thread so the song index sees it immediately.
+        try:
+            post_result = shrinkwrap(
+                artifacts_dir,
+                output_dir,
+                thread_filter=thread_id,
+                scaffold=True,
+            )
+            if post_result.get("processed", 0) > 0:
+                logger.info(f"Post-run shrinkwrap scaffolded thread {thread_id}")
+        except Exception as e:
+            logger.warning(f"Post-run shrinkwrap failed: {e}")
+
         return final_state
 
     def build_workflow(self) -> CompiledStateGraph:

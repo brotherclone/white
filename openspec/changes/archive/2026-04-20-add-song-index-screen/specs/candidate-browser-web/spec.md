@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Shrinkwrap Production Scaffolding
 `app/util/shrinkwrap_chain_artifacts.py` SHALL scaffold a `production/<slug>/` directory for every song proposal found in a thread's `yml/` directory when shrinkwrapping. A file is treated as a song proposal if it contains all three of `bpm`, `key`, and `rainbow_color` fields. Known non-proposal files (`evp.yml`, `all_song_proposals.yml`) are always skipped.
@@ -21,6 +21,25 @@ The scaffolding SHALL be idempotent: if `manifest_bootstrap.yml` already exists 
 #### Scenario: Idempotent scaffolding
 - **WHEN** `shrinkwrap_thread()` runs a second time on the same thread
 - **THEN** existing `manifest_bootstrap.yml` files are not overwritten
+
+### Requirement: Song Index Breadcrumb
+The candidate browser at `/candidates` SHALL display a breadcrumb navigation element
+above the page heading when the active song title is available. The breadcrumb SHALL
+contain a "← Songs" link that navigates to `/`. The breadcrumb SHALL be hidden when the
+server is in single-song mode (i.e., `GET /songs/active` returns `{"active": null}` or
+a 503).
+
+#### Scenario: Breadcrumb shown in album mode
+- **WHEN** `/candidates` is loaded after a song has been activated
+- **THEN** a breadcrumb reads `← Songs  /  <song title>` above the "Candidate Browser" heading
+- **AND** clicking "← Songs" navigates back to `/`
+
+#### Scenario: Breadcrumb hidden in single-song mode
+- **WHEN** the server was launched with `--production-dir`
+- **AND** `/candidates` is loaded
+- **THEN** no breadcrumb is rendered
+
+## MODIFIED Requirements
 
 ### Requirement: FastAPI Backend
 `app/tools/candidate_server.py` SHALL expose a FastAPI application with the following
@@ -133,23 +152,6 @@ is disabled when no single phase is selected and enabled when exactly one phase 
 - **AND** the candidate list refreshes to reflect updated statuses
 - **AND** the button shows a spinner while the request is in-flight
 
-### Requirement: Song Index Breadcrumb
-The candidate browser at `/candidates` SHALL display a breadcrumb navigation element
-above the page heading when the active song title is available. The breadcrumb SHALL
-contain a "← Songs" link that navigates to `/`. The breadcrumb SHALL be hidden when the
-server is in single-song mode (i.e., `GET /songs/active` returns `{"active": null}` or
-a 503).
-
-#### Scenario: Breadcrumb shown in album mode
-- **WHEN** `/candidates` is loaded after a song has been activated
-- **THEN** a breadcrumb reads `← Songs  /  <song title>` above the "Candidate Browser" heading
-- **AND** clicking "← Songs" navigates back to `/`
-
-#### Scenario: Breadcrumb hidden in single-song mode
-- **WHEN** the server was launched with `--production-dir`
-- **AND** `/candidates` is loaded
-- **THEN** no breadcrumb is rendered
-
 ### Requirement: No Breaking Changes
 The existing terminal browser (`app/tools/candidate_browser.py`) SHALL remain unchanged.
 The server's data layer SHALL import `load_all_candidates`, `approve_candidate`, and
@@ -163,99 +165,3 @@ The server's data layer SHALL import `load_all_candidates`, `approve_candidate`,
 #### Scenario: Single-song launch unaffected
 - **WHEN** the server is launched with `--production-dir <path>`
 - **THEN** it behaves identically to before this change, including opening the browser at `/candidates`
-
-### Requirement: Evolve Candidates
-The UI SHALL allow the user to generate evolved pattern candidates for drums, bass, or melody phases by clicking an "Evolve" button in the phase toolbar. The button SHALL only appear when a phase that supports evolution (drums, bass, melody) is selected. Evolved candidates join the existing candidate list with an "evolved" badge and are reviewed through the same approve/reject flow.
-
-#### Scenario: Evolve button visible for supported phases
-- **WHEN** the phase filter is set to drums, bass, or melody
-- **THEN** an Evolve button appears in the toolbar alongside the Promote button
-
-#### Scenario: Evolve button absent for unsupported phases
-- **WHEN** the phase filter is set to chords, quartet, or "all"
-- **THEN** no Evolve button is shown
-
-#### Scenario: Evolve action
-- **WHEN** the Evolve button is clicked
-- **THEN** `POST /evolve` is called with `{production_dir, phase}`
-- **AND** a spinner shows while generation runs (evolution takes 10–30s)
-- **AND** on completion the candidate list refreshes and new evolved candidates appear with an "evolved" badge
-- **AND** a toast reports how many evolved candidates were added
-
-#### Scenario: Evolved badge
-- **WHEN** a candidate has `is_evolved: true` in the review
-- **THEN** an "evolved" badge is shown on that row so it's visually distinct from template candidates
-
-### Requirement: ACE Studio Integration
-The UI SHALL surface the ACE Studio vocal synthesis handoff as two action buttons in the melody phase toolbar: "Export to ACE Studio" (after melody is promoted) and "Import Render" (after export). Both SHALL call FastAPI endpoints that wrap the existing `ace_studio_export` and `ace_studio_import` logic.
-
-#### Scenario: Export button visible after melody promoted
-- **WHEN** the phase filter is set to melody AND melody phase status is "promoted"
-- **THEN** an "Export to ACE Studio" button appears in the toolbar
-
-#### Scenario: Export to ACE Studio
-- **WHEN** "Export to ACE Studio" is clicked
-- **THEN** `POST /ace/export` is called with `{production_dir}`
-- **AND** a spinner shows while the export runs
-- **AND** on success a toast shows the singer name and number of sections exported
-- **AND** the button changes to "Exported ✓" with the singer name
-
-#### Scenario: ACE Studio not running
-- **WHEN** `POST /ace/export` is called and ACE Studio is not reachable
-- **THEN** a 503 error toast is shown: "ACE Studio not running — launch it first"
-
-#### Scenario: Import render
-- **WHEN** "Import Render" is clicked
-- **THEN** `POST /ace/import` is called with `{production_dir}`
-- **AND** on success a toast confirms the WAV path ingested
-- **AND** the button changes to "Render imported ✓"
-
-### Requirement: Evolve Endpoint
-The FastAPI backend SHALL expose a `POST /evolve` endpoint that runs evolutionary pattern breeding for a given production directory and phase, returning the count of new evolved candidates generated.
-
-#### Scenario: Valid evolve request
-- **WHEN** `POST /evolve` is called with a valid `production_dir` and `phase` in `[drums, bass, melody]`
-- **THEN** the evolutionary pipeline runs and new candidates are written to the phase's candidates directory
-- **AND** `{"ok": true, "evolved_count": N}` is returned
-
-#### Scenario: Unsupported phase for evolution
-- **WHEN** `POST /evolve` is called with `phase` in `[chords, quartet]`
-- **THEN** a 400 response is returned
-
-### Requirement: ACE Studio Endpoints
-The FastAPI backend SHALL expose `POST /ace/export` and `POST /ace/import` endpoints wrapping the existing `ace_studio_export` and `ace_studio_import` logic.
-
-#### Scenario: Export succeeds
-- **WHEN** `POST /ace/export` is called with a valid `production_dir`
-- **AND** ACE Studio is running
-- **THEN** `{"ok": true, "singer": "...", "sections": [...]}` is returned
-
-#### Scenario: ACE Studio unreachable
-- **WHEN** `POST /ace/export` is called and the MCP server is not responding
-- **THEN** a 503 response is returned with message "ACE Studio not running"
-
-#### Scenario: Import succeeds
-- **WHEN** `POST /ace/import` is called with a valid `production_dir`
-- **AND** a WAV render exists in the expected location
-- **THEN** `{"ok": true, "render_path": "..."}` is returned
-
-#### Scenario: No render found
-- **WHEN** `POST /ace/import` is called and no VocalSynth WAV exists
-- **THEN** a 404 response is returned
-
-### Requirement: Promote Endpoint
-The FastAPI backend SHALL expose a `POST /promote` endpoint that runs phase promotion for a given production directory and phase. The endpoint SHALL validate the phase value and return a structured result.
-
-#### Scenario: Valid promote request
-- **WHEN** `POST /promote` is called with a valid `production_dir` and `phase`
-- **THEN** `pipeline_runner promote` runs for that phase
-- **AND** `{"ok": true, "promoted_count": N}` is returned
-
-#### Scenario: Invalid phase value
-- **WHEN** `POST /promote` is called with a `phase` not in `[chords, drums, bass, melody, quartet]`
-- **THEN** a 400 response is returned with a descriptive error
-
-#### Scenario: Promotion failure
-- **WHEN** `pipeline_runner promote` raises an exception
-- **THEN** a 500 response is returned with the error detail
-- **AND** no partial state is left (promote_part is atomic)
