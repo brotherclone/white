@@ -1,26 +1,89 @@
+/* web/app/globals.css
+ *
+ * The Earthly Frames — White Album (Rainbow Table IX)
+ * Design system: semplicitapro + anisette-std via Typekit nig1rii
+ * Base palette: white (#f6f6f6), black (#000), rainbow accents
+ *
+ * Load Typekit in layout.tsx:
+ *   <Script src="https://use.typekit.net/nig1rii.js" strategy="beforeInteractive" />
+ *   <Script id="typekit-load" strategy="beforeInteractive">{`try{Typekit.load({async:true});}catch(e){}`}</Script>
+ *
+ * Replace Geist imports in layout.tsx with the above.
+ */
+
 @import "tailwindcss";
 
+/* ── Earthly Frames tokens ─────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Rainbow palette */
+  --ef-black:   #000000;
+  --ef-red:     #AE0A33;
+  --ef-orange:  #EF7143;
+  --ef-yellow:  #ffff00;
+  --ef-green:   #abd96d;
+  --ef-blue:    #042a7b;
+  --ef-indigo:  #26294a;
+  --ef-violet:  #AD85D6;
+  --ef-white:   #f6f6f6;
+
+  /* Rainbow foregrounds */
+  --ef-black-fg:  #f6f6f6;
+  --ef-red-fg:    #FCFCFC;
+  --ef-orange-fg: #000000;
+  --ef-yellow-fg: #383838;
+  --ef-green-fg:  #383838;
+  --ef-blue-fg:   #ffff00;
+  --ef-indigo-fg: #F4A78A;
+  --ef-violet-fg: #000000;
+  --ef-white-fg:  #000000;
+
+  /* Grays */
+  --ef-gray:      #4b4b4b;
+  --ef-dark-gray: #383838;
+  --ef-light-gray:#cbcbcb;
+  --ef-muted:     #9b9b9b;
+
+  /* Fonts */
+  --ef-font-body:    semplicitapro, sans-serif;
+  --ef-font-display: anisette-std, sans-serif;
+
+  /* Transitions */
+  --ef-transition: 300ms ease-in-out;
+
+  /* App base (white album = white palette) */
+  --background: var(--ef-white);
+  --foreground: var(--ef-black);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ──────────────────────────────────────────────────────── */
+html, body {
+  height: 100%;
+  background-color: var(--ef-white);
+  /* Uncomment once texture files are in /public: */
+  /* background-image: url("/deLillo.png"); */
+  /* background-repeat: repeat; */
+  color: var(--ef-black);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--ef-font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Display headings ──────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6,
+.font-display {
+  font-family: var(--ef-font-display);
+  font-weight: 700;
+}
+
+/* ── Tailwind theme overrides ──────────────────────────────────── */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--ef-font-body);
+  --font-mono: var(--ef-font-body); /* replace Geist Mono with semplicitapro */
 }

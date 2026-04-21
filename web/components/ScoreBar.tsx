@@ -1,26 +1,29 @@
+// web/components/ScoreBar.tsx
 interface Props {
   value: number; // 0.0–1.0
-  width?: number; // bar character count (used as rem-based width)
+  trackWidth?: string; // CSS width, default "6rem"
 }
 
-export default function ScoreBar({ value, width = 10 }: Props) {
+export default function ScoreBar({ value, trackWidth = "6rem" }: Props) {
   const pct = Math.max(0, Math.min(1, value));
-  const color =
-    pct >= 0.5 ? "bg-green-500" : pct >= 0.3 ? "bg-yellow-500" : "bg-red-500";
-  const barWidth = `${Math.max(0, width) * 0.6}rem`;
+  // Brand palette: green (high) → orange (mid) → red (low)
+  const fillColor =
+    pct >= 0.5 ? "#abd96d" : pct >= 0.3 ? "#EF7143" : "#AE0A33";
 
   return (
     <div className="flex items-center gap-2">
       <div
-        className="h-2 bg-zinc-700 rounded-full overflow-hidden flex-shrink-0"
-        style={{ width: barWidth }}
+        className="h-[4px] bg-[#d8d8d8] overflow-hidden flex-shrink-0"
+        style={{ width: trackWidth }}
       >
         <div
-          className={`h-full rounded-full transition-all ${color}`}
-          style={{ width: `${pct * 100}%` }}
+          className="h-full transition-all duration-300"
+          style={{ width: `${pct * 100}%`, backgroundColor: fillColor }}
         />
       </div>
-      <span className="text-zinc-400 text-xs tabular-nums w-10">{value.toFixed(3)}</span>
+      <span className="text-[#4b4b4b] text-[0.72rem] tabular-nums min-w-[2.5rem]">
+        {value.toFixed(3)}
+      </span>
     </div>
   );
 }

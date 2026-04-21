@@ -14,8 +14,10 @@ Usage (album mode):
 import argparse
 import subprocess
 import sys
+import threading
 import webbrowser
 from dataclasses import asdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 import uvicorn
@@ -50,6 +52,14 @@ _EVOLVE_PIPELINE = {
 _production_dir: Path | None = None
 _shrink_wrapped_dir: Path | None = None
 _active_song: dict | None = None
+
+# Generate job state — one job at a time per server process
+_generate_job: dict = {
+    "status": "idle",
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
 
 
 # ---------------------------------------------------------------------------
@@ -316,6 +326,51 @@ def create_app(
             else 0
         )
         return {"ok": True, "evolved_count": evolved_count}
+
+    # ------------------------------------------------------------------
+    # Generate (agent workflow + shrinkwrap)
+    # ------------------------------------------------------------------
+
+    @app.post("/generate")
+    def start_generate():
+        global _generate_job
+        if _generate_job["status"] == "running":
+            raise HTTPException(
+                status_code=409, detail="A generate job is already running"
+            )
+        now = datetime.now(timezone.utc).isoformat()
+        _generate_job = {
+            "status": "running",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        def _run():
+            global _generate_job
+            try:
+                from app.agents.workflow.concept_workflow import (
+                    run_white_agent_workflow,
+                )
+                from app.util.shrinkwrap_chain_artifacts import shrinkwrap
+
+                run_white_agent_workflow()
+                if _shrink_wrapped_dir is not None:
+                    artifacts_dir = Path("chain_artifacts")
+                    shrinkwrap(artifacts_dir, _shrink_wrapped_dir, scaffold=True)
+                _generate_job["status"] = "done"
+            except Exception as exc:
+                _generate_job["status"] = "error"
+                _generate_job["error"] = str(exc)
+            finally:
+                _generate_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/generate/status")
+    def generate_status():
+        return _generate_job
 
     return app
 
