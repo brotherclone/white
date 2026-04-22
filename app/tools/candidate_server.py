@@ -94,6 +94,9 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "bpm": data.get("bpm"),
                 "rainbow_color": data.get("rainbow_color"),
                 "singer": data.get("singer"),
+                "has_decisions": (
+                    manifest_path.parent / "production_decisions.yml"
+                ).exists(),
             }
         )
     return songs
