@@ -1,0 +1,80 @@
+identity:
+  thread: ''
+  color: Violet
+  title: The Sultan Confesses Everything While Becoming Nothing
+  key: F# minor
+  bpm: 134
+  time_sig: 7/8
+  singer: ''
+phase_decisions:
+  chords:
+    candidates_generated: 10
+    approved_count: 5
+    approved_labels:
+    - verse
+    - bridge
+    - intro
+    - chorus
+    - jams
+    mean_chromatic_score: 0.138
+    mean_theory_score: 0.6008
+  drums:
+    candidates_generated: 10
+    approved_count: 5
+    approved_labels:
+    - verse
+    - bridge
+    - intro
+    - chorus
+    - jams
+    mean_chromatic_score: 0.1384
+    mean_theory_score: null
+  bass:
+    candidates_generated: 24
+    approved_count: 5
+    approved_labels:
+    - verse
+    - bridge
+    - intro
+    - chorus
+    - jams
+    mean_chromatic_score: 0.1383
+    mean_theory_score: null
+  melody:
+    candidates_generated: 21
+    approved_count: 5
+    approved_labels:
+    - verse
+    - bridge
+    - intro
+    - chorus
+    - jams
+    mean_chromatic_score: 0.1383
+    mean_theory_score: null
+arrangement_summary:
+  sections:
+  - name: intro
+    bars: 4
+    play_count: 3
+    vocals: false
+  - name: verse
+    bars: 5
+    play_count: 4
+    vocals: true
+  - name: chorus
+    bars: 6
+    play_count: 5
+    vocals: true
+  - name: bridge
+    bars: 7
+    play_count: 1
+    vocals: true
+  - name: jams
+    bars: 4
+    play_count: 5
+    vocals: false
+  total_bars: 89
+  total_plays: 18
+  section_count: 5
+mix_scores: null
+vocal_drift: null

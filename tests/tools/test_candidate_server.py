@@ -433,6 +433,19 @@ class TestScanSongs:
         beta = next(s for s in songs if s["production_slug"] == "song_b_v1")
         assert beta["singer"] is None
 
+    def test_has_decisions_false_when_file_absent(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        assert all(s["has_decisions"] is False for s in songs)
+
+    def test_has_decisions_true_when_file_present(self, sw_dir):
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        (prod_dir / "production_decisions.yml").write_text("identity: {}\n")
+        songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        beta = next(s for s in songs if s["production_slug"] == "song_b_v1")
+        assert alpha["has_decisions"] is True
+        assert beta["has_decisions"] is False
+
     def test_empty_dir_returns_empty(self, tmp_path):
         assert scan_songs(tmp_path / "empty") == []
 
@@ -463,6 +476,7 @@ class TestGetSongs:
             "key",
             "bpm",
             "rainbow_color",
+            "has_decisions",
         ):
             assert field in song
 

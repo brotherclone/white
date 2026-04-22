@@ -1,0 +1,541 @@
+production_dir: /Volumes/LucidNonsense/White/shrink_wrapped/all-frequencies-return-to-source-the-consciousness-archaeology-complete/production/municipal_nervous_system_v1
+pipeline: melody-generation
+bpm: 91
+time_sig: 7/8
+color: Yellow
+singer: Remez
+generated: '2026-04-22T11:19:15.646660+00:00'
+seed: 42
+scoring_weights:
+  theory: 0.3
+  chromatic: 0.7
+sections_found:
+- gamma
+- beta
+- alpha
+candidates:
+- id: melody_gamma_01
+  midi_file: candidates/melody_gamma_01.mid
+  rank: 1
+  section: gamma
+  chord_source: chord_004
+  contour: declarative
+  pattern_name: vocal_7_8_surge_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4219
+    theory:
+      singability: 0.8399
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8556
+    chromatic:
+      temporal:
+        past: 0.4008
+        present: 0.261
+        future: 0.3381
+      spatial:
+        thing: 0.4011
+        place: 0.3377
+        person: 0.2612
+      ontological:
+        imagined: 0.2828
+        forgotten: 0.3424
+        known: 0.3747
+      confidence: 0.0061
+      match: 0.1628
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_gamma_02
+  midi_file: candidates/melody_gamma_02.mid
+  rank: 2
+  section: gamma
+  chord_source: chord_004
+  contour: declarative
+  pattern_name: vocal_7_8_arc_med
+  energy: medium
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.4043
+    theory:
+      singability: 0.8553
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6806
+    chromatic:
+      temporal:
+        past: 0.4011
+        present: 0.261
+        future: 0.3379
+      spatial:
+        thing: 0.4014
+        place: 0.3375
+        person: 0.2611
+      ontological:
+        imagined: 0.2832
+        forgotten: 0.3421
+        known: 0.3747
+      confidence: 0.0062
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: melody_gamma
+  status: approved
+  notes: ''
+- id: melody_gamma_03
+  midi_file: candidates/melody_gamma_03.mid
+  rank: 3
+  section: gamma
+  chord_source: chord_004
+  contour: haiku
+  pattern_name: vocal_7_8_haiku_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3674
+    theory:
+      singability: 0.8492
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6852
+    chromatic:
+      temporal:
+        past: 0.4009
+        present: 0.2611
+        future: 0.3379
+      spatial:
+        thing: 0.4012
+        place: 0.3375
+        person: 0.2613
+      ontological:
+        imagined: 0.2834
+        forgotten: 0.3421
+        known: 0.3745
+      confidence: 0.0062
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_gamma_04
+  midi_file: candidates/melody_gamma_04.mid
+  rank: 4
+  section: gamma
+  chord_source: chord_004
+  contour: call_and_rest
+  pattern_name: vocal_7_8_step_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.2926
+    theory:
+      singability: 0.8357
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9259
+    chromatic:
+      temporal:
+        past: 0.4008
+        present: 0.2612
+        future: 0.338
+      spatial:
+        thing: 0.401
+        place: 0.3376
+        person: 0.2614
+      ontological:
+        imagined: 0.2833
+        forgotten: 0.3421
+        known: 0.3745
+      confidence: 0.0061
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_gamma_05
+  midi_file: candidates/melody_gamma_05.mid
+  rank: 5
+  section: gamma
+  chord_source: chord_004
+  contour: drone_and_step
+  pattern_name: vocal_7_8_hold_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.273
+    theory:
+      singability: 0.8327
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6667
+    chromatic:
+      temporal:
+        past: 0.401
+        present: 0.2609
+        future: 0.338
+      spatial:
+        thing: 0.4013
+        place: 0.3376
+        person: 0.2611
+      ontological:
+        imagined: 0.2833
+        forgotten: 0.342
+        known: 0.3746
+      confidence: 0.0061
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_beta_01
+  midi_file: candidates/melody_beta_01.mid
+  rank: 6
+  section: beta
+  chord_source: chord_009
+  contour: declarative
+  pattern_name: vocal_7_8_arc_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4345
+    theory:
+      singability: 0.8583
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9514
+    chromatic:
+      temporal:
+        past: 0.3993
+        present: 0.2625
+        future: 0.3381
+      spatial:
+        thing: 0.3996
+        place: 0.3377
+        person: 0.2627
+      ontological:
+        imagined: 0.2836
+        forgotten: 0.3424
+        known: 0.374
+      confidence: 0.006
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_beta_02
+  midi_file: candidates/melody_beta_02.mid
+  rank: 7
+  section: beta
+  chord_source: chord_009
+  contour: declarative
+  pattern_name: vocal_7_8_surge_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4345
+    theory:
+      singability: 0.8706
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9389
+    chromatic:
+      temporal:
+        past: 0.3992
+        present: 0.2628
+        future: 0.338
+      spatial:
+        thing: 0.3994
+        place: 0.3377
+        person: 0.2629
+      ontological:
+        imagined: 0.2837
+        forgotten: 0.3423
+        known: 0.374
+      confidence: 0.006
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_beta_03
+  midi_file: candidates/melody_beta_03.mid
+  rank: 8
+  section: beta
+  chord_source: chord_009
+  contour: haiku
+  pattern_name: vocal_7_8_haiku_low
+  energy: low
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.3937
+    theory:
+      singability: 0.8527
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9444
+    chromatic:
+      temporal:
+        past: 0.3994
+        present: 0.2625
+        future: 0.3381
+      spatial:
+        thing: 0.3996
+        place: 0.3377
+        person: 0.2626
+      ontological:
+        imagined: 0.2836
+        forgotten: 0.3423
+        known: 0.3741
+      confidence: 0.006
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: melody_beta
+  status: approved
+  notes: ''
+- id: melody_beta_04
+  midi_file: candidates/melody_beta_04.mid
+  rank: 9
+  section: beta
+  chord_source: chord_009
+  contour: drone_and_step
+  pattern_name: vocal_7_8_hold_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.296
+    theory:
+      singability: 0.834
+      chord_tone_alignment: 1.0
+      contour_quality: 0.9722
+    chromatic:
+      temporal:
+        past: 0.3999
+        present: 0.2618
+        future: 0.3383
+      spatial:
+        thing: 0.4002
+        place: 0.3379
+        person: 0.262
+      ontological:
+        imagined: 0.2835
+        forgotten: 0.3423
+        known: 0.3742
+      confidence: 0.006
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_beta_05
+  midi_file: candidates/melody_beta_05.mid
+  rank: 10
+  section: beta
+  chord_source: chord_009
+  contour: call_and_rest
+  pattern_name: vocal_7_8_step_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.2817
+    theory:
+      singability: 0.8655
+      chord_tone_alignment: 1.0
+      contour_quality: 0.75
+    chromatic:
+      temporal:
+        past: 0.3995
+        present: 0.2623
+        future: 0.3382
+      spatial:
+        thing: 0.3997
+        place: 0.3378
+        person: 0.2624
+      ontological:
+        imagined: 0.2835
+        forgotten: 0.3423
+        known: 0.3741
+      confidence: 0.006
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_alpha_01
+  midi_file: candidates/melody_alpha_01.mid
+  rank: 11
+  section: alpha
+  chord_source: chord_010
+  contour: declarative
+  pattern_name: vocal_7_8_surge_high
+  energy: high
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.4144
+    theory:
+      singability: 0.8273
+      chord_tone_alignment: 1.0
+      contour_quality: 0.8
+    chromatic:
+      temporal:
+        past: 0.4007
+        present: 0.2612
+        future: 0.3381
+      spatial:
+        thing: 0.401
+        place: 0.3377
+        person: 0.2614
+      ontological:
+        imagined: 0.2829
+        forgotten: 0.3425
+        known: 0.3746
+      confidence: 0.0062
+      match: 0.1628
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_alpha_02
+  midi_file: candidates/melody_alpha_02.mid
+  rank: 12
+  section: alpha
+  chord_source: chord_010
+  contour: declarative
+  pattern_name: vocal_7_8_arc_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.3954
+    theory:
+      singability: 0.8298
+      chord_tone_alignment: 1.0
+      contour_quality: 0.625
+    chromatic:
+      temporal:
+        past: 0.4008
+        present: 0.2613
+        future: 0.3379
+      spatial:
+        thing: 0.4011
+        place: 0.3375
+        person: 0.2614
+      ontological:
+        imagined: 0.2833
+        forgotten: 0.3422
+        known: 0.3745
+      confidence: 0.0062
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_alpha_03
+  midi_file: candidates/melody_alpha_03.mid
+  rank: 13
+  section: alpha
+  chord_source: chord_010
+  contour: haiku
+  pattern_name: vocal_7_8_haiku_low
+  energy: low
+  use_case: instrumental
+  singer: Remez
+  scores:
+    composite: 0.3582
+    theory:
+      singability: 0.8125
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6296
+    chromatic:
+      temporal:
+        past: 0.4008
+        present: 0.2613
+        future: 0.3379
+      spatial:
+        thing: 0.4011
+        place: 0.3375
+        person: 0.2615
+      ontological:
+        imagined: 0.2835
+        forgotten: 0.342
+        known: 0.3744
+      confidence: 0.0062
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: melody_alpha
+  status: approved
+  notes: ''
+- id: melody_alpha_04
+  midi_file: candidates/melody_alpha_04.mid
+  rank: 14
+  section: alpha
+  chord_source: chord_010
+  contour: call_and_rest
+  pattern_name: vocal_7_8_step_med
+  energy: medium
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.2744
+    theory:
+      singability: 0.8155
+      chord_tone_alignment: 1.0
+      contour_quality: 0.7037
+    chromatic:
+      temporal:
+        past: 0.4008
+        present: 0.2613
+        future: 0.3379
+      spatial:
+        thing: 0.4011
+        place: 0.3375
+        person: 0.2614
+      ontological:
+        imagined: 0.2835
+        forgotten: 0.342
+        known: 0.3744
+      confidence: 0.0062
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: melody_alpha_05
+  midi_file: candidates/melody_alpha_05.mid
+  rank: 15
+  section: alpha
+  chord_source: chord_010
+  contour: drone_and_step
+  pattern_name: vocal_7_8_hold_low
+  energy: low
+  use_case: vocal
+  singer: Remez
+  scores:
+    composite: 0.2659
+    theory:
+      singability: 0.7945
+      chord_tone_alignment: 1.0
+      contour_quality: 0.6111
+    chromatic:
+      temporal:
+        past: 0.4008
+        present: 0.2612
+        future: 0.338
+      spatial:
+        thing: 0.4011
+        place: 0.3376
+        person: 0.2613
+      ontological:
+        imagined: 0.2835
+        forgotten: 0.342
+        known: 0.3745
+      confidence: 0.0061
+      match: 0.1629
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
