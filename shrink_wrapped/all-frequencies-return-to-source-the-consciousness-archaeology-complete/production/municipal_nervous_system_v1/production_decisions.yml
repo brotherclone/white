@@ -1,0 +1,72 @@
+identity:
+  thread: ''
+  color: Yellow
+  title: 'Storm Drain Cartography: The Sussex County Biofeedback Codex'
+  key: F# minor
+  bpm: 91
+  time_sig: 7/8
+  singer: ''
+phase_decisions:
+  chords:
+    candidates_generated: 10
+    approved_count: 3
+    approved_labels:
+    - gamma
+    - beta
+    - alpha
+    mean_chromatic_score: 0.1629
+    mean_theory_score: 0.5958
+  drums:
+    candidates_generated: 15
+    approved_count: 6
+    approved_labels:
+    - drum_gamma
+    - drum_gamma_alternate
+    - drum_beta
+    - drum_beta_alternate
+    - drum_alpha
+    - drum_alpha_alternate
+    mean_chromatic_score: 0.163
+    mean_theory_score: null
+  bass:
+    candidates_generated: 15
+    approved_count: 8
+    approved_labels:
+    - bass_gamma
+    - bass_gamma_alt
+    - bass_gamma_bounce
+    - bass_beta
+    - bass_beta_alt
+    - bass_beta_alt_2
+    - bass_alpha_alt
+    - bass_alpha
+    mean_chromatic_score: 0.163
+    mean_theory_score: null
+  melody:
+    candidates_generated: 15
+    approved_count: 3
+    approved_labels:
+    - melody_gamma
+    - melody_beta
+    - melody_alpha
+    mean_chromatic_score: 0.1629
+    mean_theory_score: null
+arrangement_summary:
+  sections:
+  - name: gamma
+    bars: 6
+    play_count: 11
+    vocals: false
+  - name: beta
+    bars: 4
+    play_count: 3
+    vocals: false
+  - name: alpha
+    bars: 6
+    play_count: 1
+    vocals: false
+  total_bars: 84
+  total_plays: 15
+  section_count: 3
+mix_scores: null
+vocal_drift: null
