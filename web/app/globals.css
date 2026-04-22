@@ -57,7 +57,7 @@
 
 /* ── Base ──────────────────────────────────────────────────────── */
 html, body {
-  height: 100%;
+  min-height: 100%;
   /* Uncomment once texture files are in /public: */
   /* background-image: url("/deLillo.png"); */
   /* background-repeat: repeat; */
