@@ -10,6 +10,7 @@ export interface SongEntry {
   bpm: number | null;
   rainbow_color: string | null;
   singer: string | null;
+  has_decisions: boolean;
 }
 
 export interface Scores {
