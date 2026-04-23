@@ -647,6 +647,7 @@ def run_bass_pipeline(
 
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []
+    used_pattern_names: set[str] = set()
 
     for section in sections:
         section_key = section["_section_key"]
@@ -715,8 +716,9 @@ def run_bass_pipeline(
             )
             templates = [make_fallback_pattern(time_sig)]
 
+        templates = [t for t in templates if t.name not in used_pattern_names]
         print(
-            f"  Templates: {len(templates)} candidates (energy target: {target_energy})"
+            f"  Templates: {len(templates)} candidates (energy target: {target_energy}, {len(used_pattern_names)} excluded as cross-section repeats)"
         )
 
         # Evolutionary breeding (opt-in)
@@ -863,6 +865,7 @@ def run_bass_pipeline(
             item["id"] = f"{prefix}bass_{section_key}_{rank + 1:02d}"
             all_midi_outputs.append((f"{item['id']}.mid", item["midi_bytes"]))
 
+        used_pattern_names.update(item["pattern_name"] for item in top)
         ranked_by_section[section_key] = top
 
         # Print summary

@@ -432,6 +432,7 @@ def run_drum_pipeline(
 
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []  # (filename, midi_bytes)
+    used_pattern_names: set[str] = set()
 
     # Disambiguate duplicate section labels by appending occurrence count
     label_occurrence: dict[str, int] = {}
@@ -477,7 +478,10 @@ def run_drum_pipeline(
             print(f"  No templates for {time_sig} + {genre_families} — using fallback")
             templates = [make_fallback_pattern(time_sig)]
 
-        print(f"  Templates: {len(templates)} candidates")
+        templates = [t for t in templates if t.name not in used_pattern_names]
+        print(
+            f"  Templates: {len(templates)} candidates ({len(used_pattern_names)} excluded as cross-section repeats)"
+        )
 
         # Evolutionary breeding (opt-in)
         if evolve and templates:
@@ -584,6 +588,7 @@ def run_drum_pipeline(
             item["id"] = f"{prefix}drum_{section_key}_{rank + 1:02d}"
             all_midi_outputs.append((f"{item['id']}.mid", item["midi_bytes"]))
 
+        used_pattern_names.update(item["pattern_name"] for item in top)
         ranked_by_section[section_key] = top
 
         # Print summary

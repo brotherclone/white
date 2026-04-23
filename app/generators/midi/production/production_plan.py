@@ -904,6 +904,132 @@ def propose_arrangement(plan: ProductionPlan) -> ProductionPlan:
 
 
 # ---------------------------------------------------------------------------
+# Arrangement parsing (inlined from deleted assembly_manifest module)
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class _Clip:
+    start: float
+    name: str
+    track: int
+    length: float
+
+
+def _bars_beats_to_seconds(
+    bar: int, beat: int, subdiv: int, tick: int, bpm: float, beats_per_bar: int
+) -> float:
+    total_beats = (bar - 1) * beats_per_bar + (beat - 1)
+    frac_beats = (subdiv - 1) / 4.0 + (tick - 1) / (4.0 * 240.0)
+    return (total_beats + frac_beats) * (60.0 / bpm)
+
+
+def _is_bar_beat_format(text: str) -> bool:
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        first_token = stripped.split()[0] if stripped.split() else ""
+        return first_token.isdigit()
+    return False
+
+
+def _tc_to_seconds(tc: str) -> float:
+    parts = tc.strip().split(":")
+    try:
+        if len(parts) >= 3:
+            h, m, s = int(parts[0]), int(parts[1]), int(parts[2].split(".")[0])
+        elif len(parts) == 2:
+            h, m, s = 0, int(parts[0]), int(parts[1].split(".")[0])
+        else:
+            return 0.0
+    except ValueError:
+        return 0.0
+    return h * 3600.0 + m * 60.0 + s
+
+
+def _parse_bar_position(pos_str: str) -> tuple[int, int, int, int]:
+    parts = pos_str.strip().split()
+    return (
+        int(parts[0]) if len(parts) > 0 else 1,
+        int(parts[1]) if len(parts) > 1 else 1,
+        int(parts[2]) if len(parts) > 2 else 1,
+        int(parts[3]) if len(parts) > 3 else 1,
+    )
+
+
+def _parse_arrangement(
+    text: str, bpm: float = 120.0, beats_per_bar: int = 4
+) -> list[_Clip]:
+    if _is_bar_beat_format(text):
+        clips: list[_Clip] = []
+        base_offset: Optional[float] = None
+        for line in text.splitlines():
+            stripped = line.strip()
+            if not stripped:
+                continue
+            fields = [f.strip() for f in stripped.split("\t")]
+            if len(fields) < 4:
+                continue
+            try:
+                s_bar, s_beat, s_sub, s_tick = _parse_bar_position(fields[0])
+                e_bar, e_beat, e_sub, e_tick = _parse_bar_position(fields[3])
+                name = fields[1]
+                track = int(fields[2])
+            except (ValueError, IndexError):
+                continue
+            start_secs = _bars_beats_to_seconds(
+                s_bar, s_beat, s_sub, s_tick, bpm, beats_per_bar
+            )
+            end_secs = _bars_beats_to_seconds(
+                e_bar, e_beat, e_sub, e_tick, bpm, beats_per_bar
+            )
+            if base_offset is None:
+                base_offset = start_secs
+            clips.append(
+                _Clip(
+                    start=round(start_secs - base_offset, 3),
+                    name=name,
+                    track=track,
+                    length=round(end_secs - start_secs, 3),
+                )
+            )
+        return clips
+
+    # Timecode format
+    clips = []
+    base_offset = None
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split()
+        if len(parts) < 4:
+            continue
+        try:
+            start_secs = _tc_to_seconds(parts[0])
+            length_secs = _tc_to_seconds(parts[-1])
+            track = int(parts[-2])
+            name = " ".join(parts[1:-2])
+        except (ValueError, IndexError):
+            continue
+        if base_offset is None:
+            base_offset = start_secs
+        clip_length = round(
+            length_secs - start_secs if length_secs >= start_secs else length_secs, 3
+        )
+        clips.append(
+            _Clip(
+                start=round(start_secs - base_offset, 3),
+                name=name,
+                track=track,
+                length=clip_length,
+            )
+        )
+    return clips
+
+
+# ---------------------------------------------------------------------------
 # Sync plan from arrangement.txt
 # ---------------------------------------------------------------------------
 
@@ -915,22 +1041,15 @@ def parse_arrangement_sections(
 ) -> list[dict]:
     """Parse arrangement.txt and return per-instance section data.
 
-    Handles both Logic Pro export formats (bar/beat and SMPTE timecode) by
-    delegating to assembly_manifest.parse_arrangement for format detection.
-
+    Handles both Logic Pro export formats (bar/beat and SMPTE timecode).
     Track 1 = chord/section clip (defines section identity and bar count).
     Track 4 = melody/vocals clip (presence means vocals=True for that instance).
 
     Returns list of dicts ordered by start time:
         {bar_start, section_name, bars, has_vocals}
     """
-    # Lazy import to avoid circular dependency (assembly_manifest imports production_plan)
-    from app.generators.midi.production.assembly_manifest import (
-        parse_arrangement as _parse_clips,
-    )
-
     text = arrangement_path.read_text()
-    clips = _parse_clips(text, bpm=bpm, beats_per_bar=beats_per_bar)
+    clips = _parse_arrangement(text, bpm=bpm, beats_per_bar=beats_per_bar)
 
     secs_per_bar = (60.0 / bpm) * beats_per_bar
 

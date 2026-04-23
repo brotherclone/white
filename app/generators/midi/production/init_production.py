@@ -379,6 +379,29 @@ def init_production(
     print(f"Color:   {meta.get('color', '')}")
     print(f"Concept: {meta.get('concept', '')[:80]}")
 
+    # Duplicate title check — walk all song_context.yml files in shrink_wrapped/
+    _title = (meta.get("title") or "").strip().lower()
+    if _title:
+        _shrink_wrapped_root = production_dir.parent.parent.parent
+        for _ctx_path in _shrink_wrapped_root.rglob("song_context.yml"):
+            if _ctx_path.parent == production_dir:
+                continue
+            try:
+                _existing = yaml.safe_load(_ctx_path.read_text()) or {}
+            except Exception:
+                continue
+            _existing_title = (_existing.get("title") or "").strip().lower()
+            if _existing_title == _title:
+                print(
+                    f"\nERROR: A production for '{meta.get('title')}' already exists at:\n"
+                    f"  {_ctx_path.parent}\n"
+                    "Use --force to initialise anyway."
+                )
+                if not force:
+                    sys.exit(1)
+                print("  --force passed — continuing despite duplicate.")
+                break
+
     # Generate sounds_like via Claude
     print(f"\nAsking Claude ({model}) for reference artists...")
     prompt = _build_sounds_like_prompt(meta)
