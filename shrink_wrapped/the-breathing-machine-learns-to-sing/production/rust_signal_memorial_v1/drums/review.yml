@@ -1,0 +1,329 @@
+production_dir: /Volumes/LucidNonsense/White/shrink_wrapped/the-breathing-machine-learns-to-sing/production/rust_signal_memorial_v1
+pipeline: drum-generation
+bpm: 60
+time_sig: 3/4
+color: Blue
+genre_families:
+- ambient
+- experimental
+generated: '2026-04-22T20:52:51.812100+00:00'
+seed: 42
+scoring_weights:
+  energy: 0.3
+  chromatic: 0.7
+sections_found:
+- chorus
+- verse
+- bridge
+- jams
+candidates:
+- id: drum_chorus_01
+  midi_file: candidates/drum_chorus_01.mid
+  rank: 1
+  section: chorus
+  next_section: null
+  chord_source: chord_002
+  genre_family: experimental
+  pattern_name: experimental_3_4_polyrhythm
+  energy: high
+  scores:
+    composite: 0.4015
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4387
+        present: 0.2393
+        future: 0.322
+      spatial:
+        thing: 0.4392
+        place: 0.3214
+        person: 0.2394
+      ontological:
+        imagined: 0.2927
+        forgotten: 0.3215
+        known: 0.3858
+      confidence: 0.0114
+      match: 0.145
+    tag_adjustment: 0.0
+  label: chorus
+  status: approved
+  notes: ''
+- id: drum_chorus_02
+  midi_file: candidates/drum_chorus_02.mid
+  rank: 2
+  section: chorus
+  next_section: null
+  chord_source: chord_002
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.2515
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4388
+        present: 0.2392
+        future: 0.322
+      spatial:
+        thing: 0.4392
+        place: 0.3215
+        person: 0.2393
+      ontological:
+        imagined: 0.2926
+        forgotten: 0.3215
+        known: 0.3859
+      confidence: 0.0112
+      match: 0.1449
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_verse_01
+  midi_file: candidates/drum_verse_01.mid
+  rank: 3
+  section: verse
+  next_section: null
+  chord_source: chord_005
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.4014
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4398
+        present: 0.2386
+        future: 0.3216
+      spatial:
+        thing: 0.4403
+        place: 0.321
+        person: 0.2387
+      ontological:
+        imagined: 0.2929
+        forgotten: 0.3211
+        known: 0.386
+      confidence: 0.0118
+      match: 0.1448
+    tag_adjustment: 0.0
+  label: verse
+  status: approved
+  notes: ''
+- id: drum_verse_02
+  midi_file: candidates/drum_verse_02.mid
+  rank: 4
+  section: verse
+  next_section: null
+  chord_source: chord_005
+  genre_family: experimental
+  pattern_name: experimental_3_4_sparse
+  energy: low
+  scores:
+    composite: 0.2515
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4387
+        present: 0.2392
+        future: 0.322
+      spatial:
+        thing: 0.4392
+        place: 0.3215
+        person: 0.2393
+      ontological:
+        imagined: 0.2917
+        forgotten: 0.322
+        known: 0.3863
+      confidence: 0.0113
+      match: 0.145
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_verse_03
+  midi_file: candidates/drum_verse_03.mid
+  rank: 5
+  section: verse
+  next_section: null
+  chord_source: chord_005
+  genre_family: experimental
+  pattern_name: experimental_3_4_polyrhythm
+  energy: high
+  scores:
+    composite: 0.2515
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4397
+        present: 0.2389
+        future: 0.3214
+      spatial:
+        thing: 0.4401
+        place: 0.3209
+        person: 0.239
+      ontological:
+        imagined: 0.2929
+        forgotten: 0.3211
+        known: 0.3859
+      confidence: 0.0122
+      match: 0.145
+    tag_adjustment: 0.0
+  label: verse_alt
+  status: approved
+  notes: ''
+- id: drum_bridge_01
+  midi_file: candidates/drum_bridge_01.mid
+  rank: 6
+  section: bridge
+  next_section: null
+  chord_source: chord_009
+  genre_family: experimental
+  pattern_name: experimental_3_4_sparse
+  energy: low
+  scores:
+    composite: 0.4015
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4387
+        present: 0.2392
+        future: 0.322
+      spatial:
+        thing: 0.4392
+        place: 0.3215
+        person: 0.2393
+      ontological:
+        imagined: 0.2917
+        forgotten: 0.322
+        known: 0.3863
+      confidence: 0.0113
+      match: 0.145
+    tag_adjustment: 0.0
+  label: bridge
+  status: approved
+  notes: ''
+- id: drum_bridge_02
+  midi_file: candidates/drum_bridge_02.mid
+  rank: 7
+  section: bridge
+  next_section: null
+  chord_source: chord_009
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.2514
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4398
+        present: 0.2386
+        future: 0.3216
+      spatial:
+        thing: 0.4403
+        place: 0.321
+        person: 0.2387
+      ontological:
+        imagined: 0.2929
+        forgotten: 0.3211
+        known: 0.386
+      confidence: 0.0118
+      match: 0.1448
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_jams_01
+  midi_file: candidates/drum_jams_01.mid
+  rank: 8
+  section: jams
+  next_section: null
+  chord_source: chord_010
+  genre_family: experimental
+  pattern_name: experimental_3_4_industrial
+  energy: medium
+  scores:
+    composite: 0.4014
+    energy_appropriateness: 1.0
+    chromatic:
+      temporal:
+        past: 0.4398
+        present: 0.2386
+        future: 0.3216
+      spatial:
+        thing: 0.4403
+        place: 0.321
+        person: 0.2387
+      ontological:
+        imagined: 0.2929
+        forgotten: 0.3211
+        known: 0.386
+      confidence: 0.0118
+      match: 0.1448
+    tag_adjustment: 0.0
+  label: null
+  status: rejected
+  notes: ''
+- id: drum_jams_02
+  midi_file: candidates/drum_jams_02.mid
+  rank: 9
+  section: jams
+  next_section: null
+  chord_source: chord_010
+  genre_family: experimental
+  pattern_name: experimental_3_4_sparse
+  energy: low
+  scores:
+    composite: 0.2515
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4387
+        present: 0.2392
+        future: 0.322
+      spatial:
+        thing: 0.4392
+        place: 0.3215
+        person: 0.2393
+      ontological:
+        imagined: 0.2917
+        forgotten: 0.322
+        known: 0.3863
+      confidence: 0.0113
+      match: 0.145
+    tag_adjustment: 0.0
+  label: jams_alt
+  status: approved
+  notes: ''
+- id: drum_jams_03
+  midi_file: candidates/drum_jams_03.mid
+  rank: 10
+  section: jams
+  next_section: null
+  chord_source: chord_010
+  genre_family: experimental
+  pattern_name: experimental_3_4_polyrhythm
+  energy: high
+  scores:
+    composite: 0.2515
+    energy_appropriateness: 0.5
+    chromatic:
+      temporal:
+        past: 0.4397
+        present: 0.2389
+        future: 0.3214
+      spatial:
+        thing: 0.4401
+        place: 0.3209
+        person: 0.239
+      ontological:
+        imagined: 0.2929
+        forgotten: 0.3211
+        known: 0.3859
+      confidence: 0.0122
+      match: 0.145
+    tag_adjustment: 0.0
+  label: jams
+  status: approved
+  notes: ''
