@@ -16,28 +16,28 @@ from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 from pydantic import BaseModel, Field
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
+from white_core.artifacts.circle_jerk_interview_artifact import (
+    CircleJerkInterviewArtifact,
+)
+from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
+from white_core.concepts.vanity_interview_question import (
+    VanityInterviewQuestion,
+    VanityInterviewQuestionOutput,
+)
+from white_core.concepts.vanity_interview_response import (
+    VanityInterviewResponse,
+)
+from white_core.concepts.vanity_persona import VanityPersona
+from white_core.enums.disrupting_event_type import (
+    DISRUPTION_QUESTION_NUMBER,
+    DisruptingEventType,
+)
+from white_core.manifests.song_proposal import SongProposalIteration
 
 from app.agents.states.violet_agent_state import VioletAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.workflow.agent_error_handler import agent_error_handler
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.artifacts.circle_jerk_interview_artifact import (
-    CircleJerkInterviewArtifact,
-)
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.concepts.vanity_interview_question import (
-    VanityInterviewQuestion,
-    VanityInterviewQuestionOutput,
-)
-from app.structures.concepts.vanity_interview_response import (
-    VanityInterviewResponse,
-)
-from app.structures.concepts.vanity_persona import VanityPersona
-from app.structures.enums.disrupting_event_type import (
-    DISRUPTION_QUESTION_NUMBER,
-    DisruptingEventType,
-)
-from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 
@@ -64,13 +64,13 @@ class VioletAgent(BaseRainbowAgent, ABC):
 
     def __init__(self, **data):
         if "settings" not in data or data["settings"] is None:
-            from app.structures.agents.agent_settings import AgentSettings
+            from white_core.agents.agent_settings import AgentSettings
 
             data["settings"] = AgentSettings()
         super().__init__(**data)
 
         if self.settings is None:
-            from app.structures.agents.agent_settings import AgentSettings
+            from white_core.agents.agent_settings import AgentSettings
 
             self.settings = AgentSettings()
 

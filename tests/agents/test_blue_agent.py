@@ -1,6 +1,7 @@
+from white_core.manifests.song_proposal import SongProposalIteration
+
 from app.agents.blue_agent import BlueAgent
 from app.agents.states.blue_agent_state import BlueAgentState
-from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 def test_generate_alternate_song_spec_mock():

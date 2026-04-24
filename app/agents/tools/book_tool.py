@@ -2,6 +2,10 @@ import random
 from typing import Any, Optional
 
 from pydantic import BaseModel
+from white_core.artifacts.book_artifact import BookArtifact
+from white_core.enums.book_condition import BookCondition
+from white_core.enums.book_genre import BookGenre
+from white_core.enums.publisher_type import PublisherType
 
 from app.reference.books.book_authors import (
     BILDUNGSROMAN_FIRST_NAMES,
@@ -39,10 +43,6 @@ from app.reference.books.book_topics import (
     SCIFI_TOPICS,
     SEXPLOITATION_TOPICS,
 )
-from app.structures.artifacts.book_artifact import BookArtifact
-from app.structures.enums.book_condition import BookCondition
-from app.structures.enums.book_genre import BookGenre
-from app.structures.enums.publisher_type import PublisherType
 from app.util.string_utils import truncate_word_safe
 
 GENRE_WEIGHTS = {

@@ -7,6 +7,9 @@ Returns ConceptExtractionResult with no redundancy.
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from white_core.concepts.methodology_feature import MethodologyFeature
+from white_core.concepts.rainbow_table_color import get_rainbow_table_color
+from white_core.concepts.rebracketing_analysis import RebracketingAnalysis
 
 from app.extractors.manifest_extractor.concept_extraction_result import (
     ConceptExtractionResult,
@@ -24,9 +27,6 @@ from app.extractors.manifest_extractor.scoring_functions import (
     score_rebracketing_intensity,
     score_temporal_complexity,
 )
-from app.structures.concepts.methodology_feature import MethodologyFeature
-from app.structures.concepts.rainbow_table_color import get_rainbow_table_color
-from app.structures.concepts.rebracketing_analysis import RebracketingAnalysis
 
 
 class ConceptExtractor(BaseModel):

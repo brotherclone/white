@@ -6,9 +6,9 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+from white_core.manifests.manifest_song_structure import ManifestSongStructure
+from white_core.music.core.duration import Duration
 
-from app.structures.manifests.manifest_song_structure import ManifestSongStructure
-from app.structures.music.core.duration import Duration
 from app.util.timestamp_audio_extractor import (
     adjust_segment_to_structure,
     create_segment_specs_from_structure,

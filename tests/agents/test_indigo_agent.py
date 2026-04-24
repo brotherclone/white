@@ -1,6 +1,7 @@
+from white_core.manifests.song_proposal import SongProposalIteration
+
 from app.agents.indigo_agent import IndigoAgent
 from app.agents.states.indigo_agent_state import IndigoAgentState
-from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 def test_generate_alternate_song_spec_mock():

@@ -5,6 +5,8 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import numpy as np
+from white_core.enums.bass_chord_tone import BassChordTone
+from white_core.enums.bass_style import BassStyle
 
 from app.generators.midi.patterns.bass_patterns import BassPattern
 from app.generators.midi.patterns.drum_patterns import DrumPattern
@@ -23,8 +25,6 @@ from app.generators.midi.patterns.pattern_evolution import (
     breed_drum_patterns,
     breed_melody_patterns,
 )
-from app.structures.enums.bass_chord_tone import BassChordTone
-from app.structures.enums.bass_style import BassStyle
 
 # ---------------------------------------------------------------------------
 # Fixtures

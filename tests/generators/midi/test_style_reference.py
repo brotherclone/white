@@ -7,6 +7,7 @@ from pathlib import Path
 import mido
 import pytest
 import yaml
+from white_core.music.style_profile import StyleProfile
 
 from app.generators.midi.patterns.aesthetic_hints import style_profile_tag_adjustment
 from app.generators.midi.style_reference import (
@@ -15,7 +16,6 @@ from app.generators.midi.style_reference import (
     extract_style_profile,
     load_or_extract_profile,
 )
-from app.structures.music.style_profile import StyleProfile
 
 # ---------------------------------------------------------------------------
 # artist_slug

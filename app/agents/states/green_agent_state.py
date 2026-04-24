@@ -1,18 +1,17 @@
 from typing import Annotated, Optional
 
 from pydantic import Field
-
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
-from app.structures.artifacts.last_human_artifact import LastHumanArtifact
-from app.structures.artifacts.last_human_species_extinction_narative_artifact import (
+from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
+from white_core.artifacts.last_human_artifact import LastHumanArtifact
+from white_core.artifacts.last_human_species_extinction_narative_artifact import (
     LastHumanSpeciesExtinctionNarrativeArtifact,
 )
-from app.structures.artifacts.rescue_decision_artifact import RescueDecisionArtifact
-from app.structures.artifacts.species_extinction_artifact import (
+from white_core.artifacts.rescue_decision_artifact import RescueDecisionArtifact
+from white_core.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )
-from app.structures.concepts.last_human_species_extinction_parallel_moment import (
+from white_core.concepts.last_human_species_extinction_parallel_moment import (
     LastHumanSpeciesExtinctionParallelMoment,
 )
 

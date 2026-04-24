@@ -11,6 +11,35 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
+from white_core.agents.agent_settings import AgentSettings
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
+from white_core.artifacts.alternate_timeline_artifact import (
+    AlternateTimelineArtifact,
+)
+from white_core.concepts.alternate_history_constraints import (
+    AlternateHistoryConstraints,
+)
+from white_core.concepts.biographical_metrics import BiographicalMetrics
+from white_core.concepts.biographical_period import BiographicalPeriod
+from white_core.concepts.quantum_tape_instrumentation import (
+    QuantumTapeInstrumentationConfig,
+)
+from white_core.concepts.quantum_tape_musical_parameters import (
+    QuantumTapeMusicalParameters,
+)
+from white_core.concepts.quantum_tape_production_aesthetic import (
+    QuantumTapeProductionAesthetic,
+)
+from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
+from white_core.concepts.timeline_breakage_checks import TimelineBreakageChecks
+from white_core.concepts.timeline_breakage_evaluation_results import (
+    TimelineEvaluationResult,
+)
+from white_core.enums.quantum_tape_emotional_tone import QuantumTapeEmotionalTone
+from white_core.enums.quantum_tape_lyrical_theme import QuantumTapeLyricalTheme
+from white_core.manifests.song_proposal import SongProposalIteration
+from white_core.music.core.key_signature import KeySignature, Mode, ModeName
+from white_core.music.core.notes import Note
 
 from app.agents.states.blue_agent_state import BlueAgentState
 from app.agents.states.white_agent_state import MainAgentState
@@ -36,35 +65,6 @@ from app.reference.rebracketing_words.fantasy_genre_words import FANTASY_GENRE_W
 from app.reference.rebracketing_words.wish_fulfillment_words import (
     WISH_FULFILLMENT_WORDS,
 )
-from app.structures.agents.agent_settings import AgentSettings
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.artifacts.alternate_timeline_artifact import (
-    AlternateTimelineArtifact,
-)
-from app.structures.concepts.alternate_history_constraints import (
-    AlternateHistoryConstraints,
-)
-from app.structures.concepts.biographical_metrics import BiographicalMetrics
-from app.structures.concepts.biographical_period import BiographicalPeriod
-from app.structures.concepts.quantum_tape_instrumentation import (
-    QuantumTapeInstrumentationConfig,
-)
-from app.structures.concepts.quantum_tape_musical_parameters import (
-    QuantumTapeMusicalParameters,
-)
-from app.structures.concepts.quantum_tape_production_aesthetic import (
-    QuantumTapeProductionAesthetic,
-)
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.concepts.timeline_breakage_checks import TimelineBreakageChecks
-from app.structures.concepts.timeline_breakage_evaluation_results import (
-    TimelineEvaluationResult,
-)
-from app.structures.enums.quantum_tape_emotional_tone import QuantumTapeEmotionalTone
-from app.structures.enums.quantum_tape_lyrical_theme import QuantumTapeLyricalTheme
-from app.structures.manifests.song_proposal import SongProposalIteration
-from app.structures.music.core.key_signature import KeySignature, Mode, ModeName
-from app.structures.music.core.notes import Note
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.list_utils import pick_by_fraction
 from app.util.manifest_loader import (
@@ -641,7 +641,7 @@ The tape has been recorded over. What life exists on it now?
                 timeline.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                 timeline.thread_id = state.thread_id
                 # Force correct file type (class default is YML)
-                from app.structures.enums.chain_artifact_file_type import (
+                from white_core.enums.chain_artifact_file_type import (
                     ChainArtifactFileType,
                 )
 

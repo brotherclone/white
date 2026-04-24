@@ -1,7 +1,8 @@
 import random
 
+from white_core.enums.gnosis_method import GnosisMethod
+
 from app.agents.tools.magick_tools import SigilTools
-from app.structures.enums.gnosis_method import GnosisMethod
 
 
 def test_paranoia_level_in_range():

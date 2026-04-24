@@ -1,11 +1,12 @@
 import importlib
 from unittest.mock import patch
 
+from white_core.artifacts.evp_artifact import EVPArtifact
+from white_core.artifacts.sigil_artifact import SigilArtifact
+from white_core.manifests.song_proposal import SongProposalIteration
+
 from app.agents.black_agent import BlackAgent
 from app.agents.states.black_agent_state import BlackAgentState
-from app.structures.artifacts.evp_artifact import EVPArtifact
-from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 def test_generate_alternate_song_spec_mock():

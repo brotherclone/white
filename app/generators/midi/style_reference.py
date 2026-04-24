@@ -36,8 +36,7 @@ from typing import Optional
 
 import mido
 import yaml
-
-from app.structures.music.style_profile import StyleProfile
+from white_core.music.style_profile import StyleProfile
 
 log = logging.getLogger(__name__)
 

@@ -29,11 +29,10 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
-
-from app.structures.concepts.chromatic_targets import (
+from white_core.concepts.chromatic_targets import (
     CHROMATIC_TARGETS as _CDM_CHROMATIC_TARGETS,
 )
-from app.structures.concepts.chromatic_targets import (
+from white_core.concepts.chromatic_targets import (
     ONTOLOGICAL_MODES,
     SPATIAL_MODES,
     TEMPORAL_MODES,

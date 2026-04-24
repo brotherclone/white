@@ -75,7 +75,7 @@ class TestEdgeCases:
 
     def test_method_field_set(self):
         enc = _make("A")
-        from app.structures.enums.infranym_method import InfranymMethod
+        from white_core.enums.infranym_method import InfranymMethod
 
         assert enc.method == InfranymMethod.NOTE_CIPHER
 

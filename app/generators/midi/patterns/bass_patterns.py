@@ -9,8 +9,8 @@ so the pipeline resolves them to actual MIDI notes from any chord voicing.
 
 from dataclasses import dataclass, field
 
-from app.structures.enums.bass_chord_tone import BassChordTone
-from app.structures.enums.bass_style import BassStyle
+from white_core.enums.bass_chord_tone import BassChordTone
+from white_core.enums.bass_style import BassStyle
 
 # ---------------------------------------------------------------------------
 # Constants

@@ -3,11 +3,10 @@ import os
 import random
 
 from dotenv import load_dotenv
-
-from app.structures.artifacts.species_extinction_artifact import (
+from white_core.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )
-from app.structures.concepts.population_data import PopulationData
+from white_core.concepts.population_data import PopulationData
 
 load_dotenv()
 

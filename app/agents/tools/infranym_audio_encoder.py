@@ -25,10 +25,9 @@ import numpy as np
 import pyttsx3
 from pydub import AudioSegment
 from pydub.effects import high_pass_filter, low_pass_filter
-
-from app.structures.artifacts.infranym_voice_composition import InfranymVoiceComposition
-from app.structures.artifacts.infranym_voice_layer import InfranymVoiceLayer
-from app.structures.enums.infranym_voice_profile import InfranymVoiceProfile
+from white_core.artifacts.infranym_voice_composition import InfranymVoiceComposition
+from white_core.artifacts.infranym_voice_layer import InfranymVoiceLayer
+from white_core.enums.infranym_voice_profile import InfranymVoiceProfile
 
 logger = logging.getLogger(__name__)
 

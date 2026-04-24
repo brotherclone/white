@@ -29,8 +29,7 @@ from typing import Optional
 
 import mido
 import yaml
-
-from app.structures.enums.lyric_repeat_type import LyricRepeatType
+from white_core.enums.lyric_repeat_type import LyricRepeatType
 
 PLAN_FILENAME = "production_plan.yml"
 MANIFEST_BOOTSTRAP_FILENAME = "manifest_bootstrap.yml"

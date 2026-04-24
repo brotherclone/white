@@ -88,7 +88,7 @@ class TestFields:
         assert enc.carrier_note == 48
 
     def test_method_field_set(self):
-        from app.structures.enums.infranym_method import InfranymMethod
+        from white_core.enums.infranym_method import InfranymMethod
 
         enc = _make("A")
         assert enc.method == InfranymMethod.MORSE_DURATION

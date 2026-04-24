@@ -10,6 +10,18 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables import RunnableConfig
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
+from white_core.agents.agent_settings import AgentSettings
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
+from white_core.artifacts.audio_artifact_file import AudioChainArtifactFile
+from white_core.artifacts.evp_artifact import EVPArtifact
+from white_core.artifacts.sigil_artifact import SigilArtifact
+from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
+from white_core.concepts.yes_or_no import YesOrNo
+from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
+from white_core.enums.chain_artifact_type import ChainArtifactType
+from white_core.enums.sigil_state import SigilState
+from white_core.enums.sigil_type import SigilType
+from white_core.manifests.song_proposal import SongProposalIteration
 
 from app.agents.states.black_agent_state import BlackAgentState
 from app.agents.states.white_agent_state import MainAgentState
@@ -21,18 +33,6 @@ from app.agents.tools.audio_tools import (
 from app.agents.tools.magick_tools import SigilTools
 from app.agents.tools.speech_tools import transcription_from_speech_to_text
 from app.agents.workflow.agent_error_handler import agent_error_handler
-from app.structures.agents.agent_settings import AgentSettings
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
-from app.structures.artifacts.evp_artifact import EVPArtifact
-from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.concepts.yes_or_no import YesOrNo
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.structures.enums.chain_artifact_type import ChainArtifactType
-from app.structures.enums.sigil_state import SigilState
-from app.structures.enums.sigil_type import SigilType
-from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 

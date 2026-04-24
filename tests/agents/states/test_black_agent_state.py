@@ -1,15 +1,16 @@
 from pathlib import Path
 
+from white_core.artifacts.audio_artifact_file import AudioChainArtifactFile
+from white_core.artifacts.evp_artifact import EVPArtifact
+from white_core.artifacts.sigil_artifact import SigilArtifact
+from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
+from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
+from white_core.enums.chain_artifact_type import ChainArtifactType
+from white_core.enums.sigil_state import SigilState
+from white_core.enums.sigil_type import SigilType
+from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
+
 from app.agents.states.black_agent_state import BlackAgentState
-from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
-from app.structures.artifacts.evp_artifact import EVPArtifact
-from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.structures.enums.chain_artifact_type import ChainArtifactType
-from app.structures.enums.sigil_state import SigilState
-from app.structures.enums.sigil_type import SigilType
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 def test_black_agent_state_defaults():

@@ -1,17 +1,16 @@
 from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import Field
-
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.artifacts.alternate_timeline_artifact import (
+from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from white_core.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
-from app.structures.concepts.biographical_period import BiographicalPeriod
-from app.structures.concepts.biographical_timeline import BiographicalTimeline
-from app.structures.concepts.quantum_tape_musical_parameters import (
+from white_core.concepts.biographical_period import BiographicalPeriod
+from white_core.concepts.biographical_timeline import BiographicalTimeline
+from white_core.concepts.quantum_tape_musical_parameters import (
     QuantumTapeMusicalParameters,
 )
-from app.structures.concepts.timeline_breakage_evaluation_results import (
+from white_core.concepts.timeline_breakage_evaluation_results import (
     TimelineEvaluationResult,
 )
 

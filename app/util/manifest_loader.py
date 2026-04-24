@@ -4,9 +4,8 @@ from typing import Any, List, Sequence
 
 import yaml
 from dotenv import load_dotenv
-
-from app.structures.manifests.manifest import Manifest
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
+from white_core.manifests.manifest import Manifest
+from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
 
 load_dotenv()
 

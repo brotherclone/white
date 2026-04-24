@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.artifacts.book_artifact import BookArtifact
+from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from white_core.artifacts.book_artifact import BookArtifact
 
 
 class RedAgentState(BaseRainbowAgentState):

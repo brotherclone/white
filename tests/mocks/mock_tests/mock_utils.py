@@ -8,9 +8,9 @@ text pages.
 from enum import Enum
 from typing import Any, Dict, Type
 
-from app.structures.concepts.rainbow_table_color import RainbowTableColor
-from app.structures.enums.book_condition import BookCondition
-from app.structures.enums.publisher_type import PublisherType
+from white_core.concepts.rainbow_table_color import RainbowTableColor
+from white_core.enums.book_condition import BookCondition
+from white_core.enums.publisher_type import PublisherType
 
 
 def normalize_enum_field(d: Dict[str, Any], key: str, enum_cls: Type[Enum]) -> None:
@@ -103,8 +103,8 @@ def normalize_book_data_dict_only(bd: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(bd, dict):
         return bd
     try:
-        from app.structures.enums.book_condition import BookCondition
-        from app.structures.enums.publisher_type import PublisherType
+        from white_core.enums.book_condition import BookCondition
+        from white_core.enums.publisher_type import PublisherType
     except ValueError:
         print("Failed to import enums; skipping bookdata enum normalization")
         return bd
@@ -171,7 +171,7 @@ def normalize_newspaper_fixture(d: dict) -> dict:
     if isinstance(page, dict):
         page = normalize_text_page_defaults(page)
         try:
-            from app.structures.artifacts.text_artifact_file import (
+            from white_core.artifacts.text_artifact_file import (
                 TextChainArtifactFile,
             )
 

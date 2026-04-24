@@ -36,8 +36,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import numpy as np
 import yaml
-
-from app.structures.concepts.chromatic_targets import CHROMATIC_TARGETS
+from white_core.concepts.chromatic_targets import CHROMATIC_TARGETS
 
 _COLOR_MAP = {
     "R": "Red",

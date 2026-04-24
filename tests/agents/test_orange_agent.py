@@ -7,12 +7,12 @@ These tests use proper mocking of the OrangeAgent instance.
 from unittest.mock import MagicMock, patch
 
 import yaml
+from white_core.artifacts.newspaper_artifact import NewspaperArtifact
+from white_core.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
+from white_core.manifests.song_proposal import SongProposalIteration
 
 from app.agents.orange_agent import OrangeAgent
 from app.agents.states.orange_agent_state import OrangeAgentState
-from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
-from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
-from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 def create_mock_agent():

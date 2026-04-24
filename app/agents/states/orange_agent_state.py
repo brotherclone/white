@@ -1,10 +1,10 @@
 from typing import Annotated, Any, List, Optional
 
 from pydantic import Field
+from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from white_core.artifacts.newspaper_artifact import NewspaperArtifact
+from white_core.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
 
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
-from app.structures.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
 from app.util.agent_state_utils import safe_add
 
 

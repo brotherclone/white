@@ -1,15 +1,14 @@
 from typing import Annotated, List, Optional
 
 from pydantic import Field
-
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.artifacts.circle_jerk_interview_artifact import (
+from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from white_core.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
 )
-from app.structures.concepts.vanity_interview_question import VanityInterviewQuestion
-from app.structures.concepts.vanity_interview_response import VanityInterviewResponse
-from app.structures.concepts.vanity_persona import VanityPersona
-from app.structures.enums.disrupting_event_type import DisruptingEventType
+from white_core.concepts.vanity_interview_question import VanityInterviewQuestion
+from white_core.concepts.vanity_interview_response import VanityInterviewResponse
+from white_core.concepts.vanity_persona import VanityPersona
+from white_core.enums.disrupting_event_type import DisruptingEventType
 
 
 class VioletAgentState(BaseRainbowAgentState):

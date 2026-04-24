@@ -1,5 +1,5 @@
-from app.structures.agents.agent_settings import AgentSettings
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
+from white_core.agents.agent_settings import AgentSettings
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 
 
 class DummyClaude:
@@ -20,7 +20,7 @@ class ConcreteAgent(BaseRainbowAgent):
 
 def test_get_claude_uses_settings(monkeypatch):
     # monkeypatch the ChatAnthropic used in the module to our DummyClaude
-    import app.structures.agents.base_rainbow_agent as bra
+    import white_core.agents.base_rainbow_agent as bra
 
     monkeypatch.setattr(bra, "ChatAnthropic", DummyClaude)
 
@@ -48,8 +48,8 @@ def test_get_claude_uses_settings(monkeypatch):
 
 
 def test_manifest_fallback_data_getitem_and_get():
-    from app.structures.manifests.manifest import Manifest
-    from app.structures.music.core.duration import Duration
+    from white_core.manifests.manifest import Manifest
+    from white_core.music.core.duration import Duration
 
     m = Manifest(
         bpm=100,

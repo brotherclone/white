@@ -1,8 +1,9 @@
 from unittest.mock import MagicMock, patch
 
+from white_core.manifests.song_proposal import SongProposalIteration
+
 from app.agents.states.yellow_agent_state import YellowAgentState
 from app.agents.yellow_agent import YellowAgent
-from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 def test_generate_alternate_song_spec_mock(monkeypatch):

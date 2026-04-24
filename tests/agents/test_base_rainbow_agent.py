@@ -2,9 +2,8 @@ from abc import ABC
 from types import SimpleNamespace
 
 import pytest
-
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
-from app.structures.artifacts.base_artifact import ChainArtifact
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
+from white_core.artifacts.base_artifact import ChainArtifact
 
 GRAPH_SENTINEL = object()
 
@@ -63,7 +62,7 @@ def test__get_claude_uses_settings(monkeypatch):
             captured.update(kwargs)
 
     monkeypatch.setattr(
-        "app.structures.agents.base_rainbow_agent.ChatAnthropic", FakeChatAnthropic
+        "white_core.agents.base_rainbow_agent.ChatAnthropic", FakeChatAnthropic
     )
 
     agent = ConcreteAgent.model_construct(settings=settings)

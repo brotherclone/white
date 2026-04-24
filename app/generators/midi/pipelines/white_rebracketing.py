@@ -27,8 +27,7 @@ from pathlib import Path
 
 import mido
 import yaml
-
-from app.structures.music.core.enharmonic import flat_to_sharp
+from white_core.music.core.enharmonic import flat_to_sharp
 
 # ---------------------------------------------------------------------------
 # Root → semitone offset (chromatic scale, C = 0)

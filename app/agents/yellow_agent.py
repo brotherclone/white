@@ -9,23 +9,23 @@ from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
 from pydantic import Field
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
+from white_core.artifacts.pulsar_palace_encounter_artifact import (
+    PulsarPalaceEncounterArtifact,
+)
+from white_core.concepts.game_evaluation import GameEvaluationDecision
+from white_core.concepts.pulsar_palace_character import PulsarPalaceCharacter
+from white_core.concepts.pulsar_palace_room import PulsarPalaceRoom
+from white_core.generators.character_action_generator import (
+    CharacterActionGenerator,
+)
+from white_core.generators.markov_room_generator import MarkovRoomGenerator
+from white_core.generators.music_extractor import MusicExtractor
+from white_core.manifests.song_proposal import SongProposalIteration
 
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.states.yellow_agent_state import YellowAgentState
 from app.agents.workflow.agent_error_handler import agent_error_handler
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.artifacts.pulsar_palace_encounter_artifact import (
-    PulsarPalaceEncounterArtifact,
-)
-from app.structures.concepts.game_evaluation import GameEvaluationDecision
-from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
-from app.structures.concepts.pulsar_palace_room import PulsarPalaceRoom
-from app.structures.generators.character_action_generator import (
-    CharacterActionGenerator,
-)
-from app.structures.generators.markov_room_generator import MarkovRoomGenerator
-from app.structures.generators.music_extractor import MusicExtractor
-from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 
@@ -58,12 +58,12 @@ class YellowAgent(BaseRainbowAgent, ABC):
     def __init__(self, **data):
         # Ensure settings are initialized if not provided
         if "settings" not in data or data["settings"] is None:
-            from app.structures.agents.agent_settings import AgentSettings
+            from white_core.agents.agent_settings import AgentSettings
 
             data["settings"] = AgentSettings()
         super().__init__(**data)
         if self.settings is None:
-            from app.structures.agents.agent_settings import AgentSettings
+            from white_core.agents.agent_settings import AgentSettings
 
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(

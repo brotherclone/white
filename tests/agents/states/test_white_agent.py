@@ -1,14 +1,14 @@
 import pytest
+from white_core.artifacts.artifact_relationship import ArtifactRelationship
+from white_core.concepts.facet_evolution import FacetEvolution
+from white_core.concepts.transformation_trace import TransformationTrace
+from white_core.enums.white_facet import WhiteFacet
+from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
 
 from app.agents.states.white_agent_state import (
     MainAgentState,
     merge_document_syntheses,
 )
-from app.structures.artifacts.artifact_relationship import ArtifactRelationship
-from app.structures.concepts.facet_evolution import FacetEvolution
-from app.structures.concepts.transformation_trace import TransformationTrace
-from app.structures.enums.white_facet import WhiteFacet
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 def test_main_agent_state_initialization():

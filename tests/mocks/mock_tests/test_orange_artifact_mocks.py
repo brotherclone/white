@@ -1,8 +1,7 @@
 from pathlib import Path
 
 import yaml
-
-from app.structures.artifacts.newspaper_artifact import NewspaperArtifact
+from white_core.artifacts.newspaper_artifact import NewspaperArtifact
 
 
 def test_newspaper_mocks():

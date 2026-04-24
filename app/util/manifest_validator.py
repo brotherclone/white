@@ -661,7 +661,7 @@ def validate_field_values(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         errors.append("rainbow_color is missing")
     else:
         try:
-            from app.structures.concepts.rainbow_table_color import (
+            from white_core.concepts.rainbow_table_color import (
                 the_rainbow_table_colors,
             )
 
@@ -905,7 +905,7 @@ def validate_player_names(yaml_data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         return True, errors
 
     try:
-        from app.structures.enums.player import RainbowPlayer
+        from white_core.enums.player import RainbowPlayer
 
         valid_names = {member.name for member in RainbowPlayer}
         valid_values = {member.value for member in RainbowPlayer}

@@ -24,6 +24,7 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+from white_core.enums.bass_style import BassStyle
 
 from app.generators.midi.patterns.aesthetic_hints import (
     aesthetic_tag_adjustment,
@@ -54,7 +55,6 @@ from app.generators.midi.pipelines.chord_pipeline import (
     load_song_proposal,
 )
 from app.generators.midi.production.init_production import load_song_context
-from app.structures.enums.bass_style import BassStyle
 from app.util.diversity_tracker import (
     diversity_factor,
     find_album_dir,
@@ -610,10 +610,10 @@ def run_bass_pipeline(
                 _ps.arc
             )
 
-    from app.structures.music.narrative_constraints import (
+    from white_core.music.narrative_constraints import (
         extract_constraints,
     )
-    from app.structures.music.narrative_constraints import (
+    from white_core.music.narrative_constraints import (
         narrative_tag_adjustment as _narr_adj,
     )
 

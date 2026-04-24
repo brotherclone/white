@@ -148,7 +148,7 @@ def test_next_state_return_type():
 
 def test_orange_agent_state_defaults():
     """Test that OrangeAgentState inherits from BaseRainbowAgentState."""
-    from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
+    from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
     cls = _get_class_or_skip()
     try:

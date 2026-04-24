@@ -8,17 +8,17 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
+from white_core.agents.agent_settings import AgentSettings
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
+from white_core.artifacts.book_artifact import BookArtifact, BookPageCollection
+from white_core.concepts.book_evaluation import BookEvaluationDecision
+from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
+from white_core.manifests.song_proposal import SongProposalIteration
 
 from app.agents.states.red_agent_state import RedAgentState
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.tools.book_tool import BookMaker
 from app.agents.workflow.agent_error_handler import agent_error_handler
-from app.structures.agents.agent_settings import AgentSettings
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.artifacts.book_artifact import BookArtifact, BookPageCollection
-from app.structures.concepts.book_evaluation import BookEvaluationDecision
-from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
-from app.structures.manifests.song_proposal import SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.manifest_loader import get_my_reference_proposals
 

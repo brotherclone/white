@@ -36,6 +36,7 @@ from typing import Optional
 import mido
 import yaml
 from dotenv import load_dotenv
+from white_core.enums.lyric_repeat_type import LyricRepeatType
 
 from app.generators.artist_catalog import load_artist_context  # noqa: E402
 from app.generators.midi.pipelines.chord_pipeline import (  # noqa: E402
@@ -51,7 +52,6 @@ from app.generators.midi.production.production_plan import (  # noqa: E402
     _infer_repeat_type,
     _normalize_repeat_type,
 )
-from app.structures.enums.lyric_repeat_type import LyricRepeatType
 
 
 def _count_syllables(text: str) -> int:

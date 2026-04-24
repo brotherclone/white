@@ -598,10 +598,10 @@ def run_melody_pipeline(
                 _ps.arc
             )
 
-    from app.structures.music.narrative_constraints import (
+    from white_core.music.narrative_constraints import (
         extract_constraints,
     )
-    from app.structures.music.narrative_constraints import (
+    from white_core.music.narrative_constraints import (
         narrative_tag_adjustment as _narr_adj,
     )
 

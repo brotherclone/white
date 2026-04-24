@@ -1172,8 +1172,9 @@ class TestBuildPromptRepeatTypes:
         }
 
     def test_exact_repeat_section_skipped(self):
+        from white_core.enums.lyric_repeat_type import LyricRepeatType
+
         from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
-        from app.structures.enums.lyric_repeat_type import LyricRepeatType
 
         sections = [
             self._sec("chorus", repeat_type="exact"),
@@ -1231,8 +1232,9 @@ class TestBuildPromptRepeatTypes:
 
 class TestComputeFittingExactRepeat:
     def test_exact_repeat_copies_from_source(self, tmp_path):
+        from white_core.enums.lyric_repeat_type import LyricRepeatType
+
         from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
-        from app.structures.enums.lyric_repeat_type import LyricRepeatType
 
         # First instance is 'chorus', second is 'chorus_2' (exact_repeat)
         # Use the enum directly — the pipeline stores LyricRepeatType.EXACT_REPEAT,

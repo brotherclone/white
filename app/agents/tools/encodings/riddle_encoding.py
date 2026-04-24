@@ -1,9 +1,8 @@
 from typing import List, Optional
 
 from pydantic import Field
-
-from app.structures.concepts.infranym_text_encoding import InfranymTextEncoding
-from app.structures.enums.infranym_method import InfranymMethod
+from white_core.concepts.infranym_text_encoding import InfranymTextEncoding
+from white_core.enums.infranym_method import InfranymMethod
 
 
 class RiddleEncoding(InfranymTextEncoding):

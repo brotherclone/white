@@ -1,5 +1,6 @@
+from white_core.enums.white_facet import WhiteFacet
+
 from app.agents.prompts.white_facet_prompts import FACET_SYSTEM_PROMPTS
-from app.structures.enums.white_facet import WhiteFacet
 
 
 def test_all_facets_present():

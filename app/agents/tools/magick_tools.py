@@ -3,8 +3,8 @@ import random
 import re
 from typing import Dict, List, Tuple
 
-from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.enums.gnosis_method import GnosisMethod
+from white_core.artifacts.sigil_artifact import SigilArtifact
+from white_core.enums.gnosis_method import GnosisMethod
 
 
 class SigilTools:

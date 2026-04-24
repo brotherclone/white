@@ -22,6 +22,11 @@ from langgraph.constants import START
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from pydantic import BaseModel, PrivateAttr
+from white_core.agents.agent_settings import AgentSettings
+from white_core.concepts.white_facet_system import WhiteFacetSystem
+from white_core.enums.chain_artifact_type import ChainArtifactType
+from white_core.enums.synthesis_prompt_template import SynthesisPromptTemplate
+from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
 
 from app.agents.black_agent import BlackAgent
 from app.agents.blue_agent import BlueAgent
@@ -39,11 +44,6 @@ from app.agents.tools.text_tools import save_markdown
 from app.agents.violet_agent import VioletAgent
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.agents.yellow_agent import YellowAgent
-from app.structures.agents.agent_settings import AgentSettings
-from app.structures.concepts.white_facet_system import WhiteFacetSystem
-from app.structures.enums.chain_artifact_type import ChainArtifactType
-from app.structures.enums.synthesis_prompt_template import SynthesisPromptTemplate
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 from app.util.agent_state_utils import get_state_snapshot
 from app.util.generate_negative_constraints import (
     format_for_prompt,

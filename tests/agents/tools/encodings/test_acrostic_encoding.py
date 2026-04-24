@@ -32,7 +32,7 @@ class TestValidAcrostic:
         assert enc.reveal_pattern == "first_letter"
 
     def test_method_field_set(self):
-        from app.structures.enums.infranym_method import InfranymMethod
+        from white_core.enums.infranym_method import InfranymMethod
 
         enc = _make("AB", ["Alpha", "Bravo"])
         assert enc.method == InfranymMethod.ACROSTIC_LYRICS

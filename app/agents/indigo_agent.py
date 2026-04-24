@@ -12,6 +12,21 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.output_parsers import StrOutputParser
 from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
+from white_core.agents.agent_settings import AgentSettings
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
+from white_core.artifacts.infranym_audio_artifact import InfranymAudioArtifact
+from white_core.artifacts.infranym_encoded_image_artifact import (
+    InfranymEncodedImageArtifact,
+)
+from white_core.artifacts.infranym_text_artifact import InfranymTextArtifact
+from white_core.artifacts.infranym_text_render_artifact import (
+    InfranymTextRenderArtifact,
+)
+from white_core.enums.image_text_style import ImageTextStyle
+from white_core.enums.infranym_medium import InfranymMedium
+from white_core.manifests.song_proposal import SongProposalIteration
+from white_core.music.core.key_signature import KeySignature
+from white_core.music.core.notes import Note
 
 from app.agents.states.indigo_agent_state import IndigoAgentState
 from app.agents.states.white_agent_state import MainAgentState
@@ -27,21 +42,6 @@ from app.agents.tools.infranym_text_tools import (
 )
 from app.agents.workflow.agent_error_handler import agent_error_handler
 from app.reference.gaming.anagram_pairs import ANAGRAM_PAIRS
-from app.structures.agents.agent_settings import AgentSettings
-from app.structures.agents.base_rainbow_agent import BaseRainbowAgent
-from app.structures.artifacts.infranym_audio_artifact import InfranymAudioArtifact
-from app.structures.artifacts.infranym_encoded_image_artifact import (
-    InfranymEncodedImageArtifact,
-)
-from app.structures.artifacts.infranym_text_artifact import InfranymTextArtifact
-from app.structures.artifacts.infranym_text_render_artifact import (
-    InfranymTextRenderArtifact,
-)
-from app.structures.enums.image_text_style import ImageTextStyle
-from app.structures.enums.infranym_medium import InfranymMedium
-from app.structures.manifests.song_proposal import SongProposalIteration
-from app.structures.music.core.key_signature import KeySignature
-from app.structures.music.core.notes import Note
 from app.util.agent_state_utils import get_state_snapshot
 
 load_dotenv()

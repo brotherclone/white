@@ -2,8 +2,7 @@ import os
 from pathlib import Path
 
 import yaml
-
-from app.structures.manifests.song_proposal import SongProposalIteration
+from white_core.manifests.song_proposal import SongProposalIteration
 
 MOCK_DIR = Path(os.getenv("AGENT_MOCK_DATA_PATH", "tests/mocks"))
 

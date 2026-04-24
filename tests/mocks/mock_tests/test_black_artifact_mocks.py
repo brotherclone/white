@@ -3,11 +3,10 @@ from pathlib import Path
 import yaml
 from hypothesis import given
 from hypothesis import strategies as st
-
-from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
-from app.structures.artifacts.evp_artifact import EVPArtifact
-from app.structures.artifacts.sigil_artifact import SigilArtifact
-from app.structures.concepts.rainbow_table_color import RainbowColorModes
+from white_core.artifacts.audio_artifact_file import AudioChainArtifactFile
+from white_core.artifacts.evp_artifact import EVPArtifact
+from white_core.artifacts.sigil_artifact import SigilArtifact
+from white_core.concepts.rainbow_table_color import RainbowColorModes
 
 
 def test_evp_artifact_mock():

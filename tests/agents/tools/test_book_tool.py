@@ -1,10 +1,11 @@
 import random
 
+from white_core.artifacts.book_artifact import BookArtifact
+from white_core.enums.book_condition import BookCondition
+from white_core.enums.book_genre import BookGenre
+from white_core.enums.publisher_type import PublisherType
+
 from app.agents.tools.book_tool import BookMaker
-from app.structures.artifacts.book_artifact import BookArtifact
-from app.structures.enums.book_condition import BookCondition
-from app.structures.enums.book_genre import BookGenre
-from app.structures.enums.publisher_type import PublisherType
 
 
 def test_select_genre_uses_choices(monkeypatch):

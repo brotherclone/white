@@ -22,6 +22,7 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+from white_core.music.narrative_constraints import narrative_tag_adjustment
 
 from app.generators.midi.patterns.aesthetic_hints import (
     aesthetic_tag_adjustment,
@@ -47,7 +48,6 @@ from app.generators.midi.pipelines.chord_pipeline import (
     load_song_proposal,
 )
 from app.generators.midi.production.init_production import load_song_context
-from app.structures.music.narrative_constraints import narrative_tag_adjustment
 from app.util.phrase_dynamics import (
     DynamicCurve,
     apply_dynamics_curve,
@@ -426,7 +426,7 @@ def run_drum_pipeline(
                 _ps.arc
             )
 
-    from app.structures.music.narrative_constraints import extract_constraints
+    from white_core.music.narrative_constraints import extract_constraints
 
     _narrative = None
 

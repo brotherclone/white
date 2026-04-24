@@ -1,14 +1,13 @@
 from pathlib import Path
 
 import yaml
-
-from app.structures.artifacts.pulsar_palace_character_sheet import (
+from white_core.artifacts.pulsar_palace_character_sheet import (
     PulsarPalaceCharacterSheet,
 )
-from app.structures.artifacts.pulsar_palace_encounter_artifact import (
+from white_core.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
 )
-from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
+from white_core.concepts.pulsar_palace_character import PulsarPalaceCharacter
 
 
 def test_character_sheets_mocks():

@@ -13,8 +13,7 @@ from pathlib import Path
 
 import mido
 import yaml
-
-from app.structures.enums.arp_direction import ArpDirection
+from white_core.enums.arp_direction import ArpDirection
 
 
 @dataclass

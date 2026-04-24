@@ -2,9 +2,10 @@ import os
 import random
 from typing import List
 
+from white_core.artifacts.infranym_midi_artifact import InfranymMidiArtifact
+
 from app.agents.tools.encodings.morse_duration_encoding import MorseDurationEncoding
 from app.agents.tools.encodings.note_cipher_encoding import NoteCipherEncoding
-from app.structures.artifacts.infranym_midi_artifact import InfranymMidiArtifact
 
 
 def generate_note_cipher(

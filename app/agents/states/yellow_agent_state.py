@@ -1,13 +1,12 @@
 from typing import Annotated, List, Optional
 
 from pydantic import Field
-
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
-from app.structures.artifacts.pulsar_palace_encounter_artifact import (
+from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from white_core.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
 )
-from app.structures.concepts.pulsar_palace_character import PulsarPalaceCharacter
-from app.structures.concepts.pulsar_palace_room import PulsarPalaceRoom
+from white_core.concepts.pulsar_palace_character import PulsarPalaceCharacter
+from white_core.concepts.pulsar_palace_room import PulsarPalaceRoom
 
 
 class YellowAgentState(BaseRainbowAgentState):
@@ -53,10 +52,10 @@ class YellowAgentState(BaseRainbowAgentState):
         # Rebuild model to resolve forward references if needed
         if not hasattr(self.__class__, "_rebuilt"):
             # Import at runtime to ensure all forward references are resolved
-            from app.structures.artifacts.pulsar_palace_character_sheet import (
+            from white_core.artifacts.pulsar_palace_character_sheet import (
                 PulsarPalaceCharacterSheet as _PulsarPalaceCharacterSheet,
             )
-            from app.structures.concepts.pulsar_palace_character import (
+            from white_core.concepts.pulsar_palace_character import (
                 PulsarPalaceCharacter as _PulsarPalaceCharacter,
             )
 

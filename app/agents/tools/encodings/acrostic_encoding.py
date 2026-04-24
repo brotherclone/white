@@ -1,9 +1,8 @@
 from typing import List
 
 from pydantic import Field, field_validator
-
-from app.structures.concepts.infranym_text_encoding import InfranymTextEncoding
-from app.structures.enums.infranym_method import InfranymMethod
+from white_core.concepts.infranym_text_encoding import InfranymTextEncoding
+from white_core.enums.infranym_method import InfranymMethod
 
 
 class AcrosticEncoding(InfranymTextEncoding):

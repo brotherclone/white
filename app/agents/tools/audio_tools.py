@@ -12,13 +12,12 @@ from dotenv import load_dotenv
 from scipy import signal
 from scipy.fft import fft, fftfreq, ifft
 from scipy.signal import resample_poly
-
-from app.structures.artifacts.audio_artifact_file import AudioChainArtifactFile
-from app.structures.concepts.rainbow_table_color import (
+from white_core.artifacts.audio_artifact_file import AudioChainArtifactFile
+from white_core.concepts.rainbow_table_color import (
     the_rainbow_table_colors,
 )
-from app.structures.enums.chain_artifact_file_type import ChainArtifactFileType
-from app.structures.enums.noise_type import NoiseType
+from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
+from white_core.enums.noise_type import NoiseType
 
 load_dotenv()
 warnings.filterwarnings("ignore")

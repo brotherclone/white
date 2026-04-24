@@ -4,9 +4,10 @@ import logging
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
+
 from app.agents.states.white_agent_state import MainAgentState
 from app.agents.white_agent import WhiteAgent, _is_white_proposal
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -493,14 +494,14 @@ class TestIsWhiteProposal:
         assert _is_white_proposal(it) is False
 
     def test_rainbow_table_color_white(self):
-        from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+        from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
 
         it = _make_iteration("white", "white_001")
         it.rainbow_color = the_rainbow_table_colors["A"]
         assert _is_white_proposal(it) is True
 
     def test_rainbow_table_color_red(self):
-        from app.structures.concepts.rainbow_table_color import the_rainbow_table_colors
+        from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
 
         it = _make_iteration("red", "red_001")
         it.rainbow_color = the_rainbow_table_colors["R"]

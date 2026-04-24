@@ -3,10 +3,10 @@ import os
 
 import numpy as np
 import soundfile as sf
+from white_core.enums.noise_type import NoiseType
 
 from app.agents.tools import audio_tools
 from app.agents.tools.audio_tools import find_wav_files_prioritized
-from app.structures.enums.noise_type import NoiseType
 
 
 def _sine_pcm_bytes(duration_s=0.1, freq=440.0, sr=22050, amplitude=0.5):

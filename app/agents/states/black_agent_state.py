@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.structures.agents.base_rainbow_agent_state import BaseRainbowAgentState
+from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
 
 
 class BlackAgentState(BaseRainbowAgentState):

@@ -5,15 +5,15 @@ import os
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
+from white_core.artifacts.species_extinction_artifact import (
+    SpeciesExtinctionArtifact,
+)
+from white_core.enums.extinction_cause import ExtinctionCause
 
 from app.agents.tools.extinction_tools import (
     load_green_corpus,
     parse_species_entry,
 )
-from app.structures.artifacts.species_extinction_artifact import (
-    SpeciesExtinctionArtifact,
-)
-from app.structures.enums.extinction_cause import ExtinctionCause
 
 
 @pytest.fixture

@@ -149,7 +149,7 @@ def test_next_state_return_type():
 def test_violet_agent_state_has_required_fields():
     """Test that VioletAgentState has all required fields for the violet workflow."""
     # Import the VanityPersona to create test instances
-    from app.structures.concepts.vanity_persona import VanityPersona
+    from white_core.concepts.vanity_persona import VanityPersona
 
     cls = _get_class_or_skip()
 
@@ -175,7 +175,7 @@ def test_violet_agent_state_has_required_fields():
 
 def test_violet_agent_state_field_defaults():
     """Test that VioletAgentState fields have correct defaults."""
-    from app.structures.concepts.vanity_persona import VanityPersona
+    from white_core.concepts.vanity_persona import VanityPersona
 
     cls = _get_class_or_skip()
 

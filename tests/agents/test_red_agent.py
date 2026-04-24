@@ -2,10 +2,10 @@ import importlib
 
 import pytest
 import yaml
+from white_core.manifests.song_proposal import SongProposalIteration
 
 from app.agents.red_agent import RedAgent
 from app.agents.states.red_agent_state import RedAgentState
-from app.structures.manifests.song_proposal import SongProposalIteration
 
 MODULE_PATH = "app.agents.red_agent"
 

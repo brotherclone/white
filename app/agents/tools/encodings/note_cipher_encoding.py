@@ -1,10 +1,10 @@
 from typing import List, Optional
 
 from pydantic import Field
+from white_core.concepts.infranym_midi_encoding import InfranymMidiEncoding
+from white_core.enums.infranym_method import InfranymMethod
 
 from app.reference.encodings.letter_to_midi import LETTER_TO_MIDI_MAP
-from app.structures.concepts.infranym_midi_encoding import InfranymMidiEncoding
-from app.structures.enums.infranym_method import InfranymMethod
 
 
 class NoteCipherEncoding(InfranymMidiEncoding):

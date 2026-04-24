@@ -21,6 +21,7 @@ from typing import Any
 
 import mido
 import numpy as np
+from white_core.enums.bass_chord_tone import BassChordTone
 
 from app.generators.midi.patterns.bass_patterns import (
     BassPattern,
@@ -32,7 +33,6 @@ from app.generators.midi.patterns.drum_patterns import (
     DrumPattern,
 )
 from app.generators.midi.patterns.melody_patterns import MelodyPattern
-from app.structures.enums.bass_chord_tone import BassChordTone
 
 # ---------------------------------------------------------------------------
 # Constants

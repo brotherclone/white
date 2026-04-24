@@ -1,6 +1,9 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from white_core.agents.agent_settings import AgentSettings
+from white_core.enums.white_facet import WhiteFacet
+from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
 
 from app.agents.states.white_agent_state import (
     FacetEvolution,
@@ -8,9 +11,6 @@ from app.agents.states.white_agent_state import (
     TransformationTrace,
 )
 from app.agents.white_agent import WhiteAgent
-from app.structures.agents.agent_settings import AgentSettings
-from app.structures.enums.white_facet import WhiteFacet
-from app.structures.manifests.song_proposal import SongProposal, SongProposalIteration
 
 
 @pytest.fixture

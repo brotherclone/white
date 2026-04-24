@@ -1,28 +1,28 @@
 import pytest
+from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
+from white_core.artifacts.last_human_artifact import LastHumanArtifact
+from white_core.artifacts.last_human_species_extinction_narative_artifact import (
+    LastHumanSpeciesExtinctionNarrativeArtifact,
+)
+from white_core.artifacts.rescue_decision_artifact import RescueDecisionArtifact
+from white_core.artifacts.species_extinction_artifact import (
+    SpeciesExtinctionArtifact,
+)
+from white_core.concepts.last_human_species_extinction_parallel_moment import (
+    LastHumanSpeciesExtinctionParallelMoment,
+)
+from white_core.enums.extinction_cause import ExtinctionCause
+from white_core.enums.last_human_documentation_type import (
+    LastHumanDocumentationType,
+)
+from white_core.enums.last_human_vulnerability_type import (
+    LastHumanVulnerabilityType,
+)
+from white_core.manifests.song_proposal import SongProposalIteration
 
 from app.agents.green_agent import GreenAgent
 from app.agents.states.green_agent_state import GreenAgentState
 from app.agents.states.white_agent_state import MainAgentState
-from app.structures.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
-from app.structures.artifacts.last_human_artifact import LastHumanArtifact
-from app.structures.artifacts.last_human_species_extinction_narative_artifact import (
-    LastHumanSpeciesExtinctionNarrativeArtifact,
-)
-from app.structures.artifacts.rescue_decision_artifact import RescueDecisionArtifact
-from app.structures.artifacts.species_extinction_artifact import (
-    SpeciesExtinctionArtifact,
-)
-from app.structures.concepts.last_human_species_extinction_parallel_moment import (
-    LastHumanSpeciesExtinctionParallelMoment,
-)
-from app.structures.enums.extinction_cause import ExtinctionCause
-from app.structures.enums.last_human_documentation_type import (
-    LastHumanDocumentationType,
-)
-from app.structures.enums.last_human_vulnerability_type import (
-    LastHumanVulnerabilityType,
-)
-from app.structures.manifests.song_proposal import SongProposalIteration
 
 
 @pytest.fixture
@@ -306,7 +306,7 @@ class TestGreenAgentFullWorkflow:
     def test_full_workflow_mock_mode(self, green_agent, mock_env_vars):
         """Test the full green agent workflow in mock mode."""
         # Create initial state with song proposals
-        from app.structures.manifests.song_proposal import SongProposal
+        from white_core.manifests.song_proposal import SongProposal
 
         proposals = SongProposal(
             iterations=[
@@ -337,7 +337,7 @@ class TestGreenAgentFullWorkflow:
 
     def test_workflow_adds_counter_proposal(self, green_agent, mock_env_vars):
         """Test that the workflow adds a counter proposal to the song proposals."""
-        from app.structures.manifests.song_proposal import SongProposal
+        from white_core.manifests.song_proposal import SongProposal
 
         proposals = SongProposal(
             iterations=[
