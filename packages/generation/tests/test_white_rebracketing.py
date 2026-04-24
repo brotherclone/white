@@ -9,8 +9,7 @@ from pathlib import Path
 import mido
 import pytest
 import yaml
-
-from app.generators.midi.pipelines.white_rebracketing import (
+from white_generation.pipelines.white_rebracketing import (
     _root_to_semitone,
     build_bar_pool,
     concatenate_bars,

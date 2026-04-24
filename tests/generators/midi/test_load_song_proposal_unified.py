@@ -218,7 +218,7 @@ class TestChordPipelineCaller:
         thread_dir = tmp_path / "thread"
         self._make_proposal(thread_dir, "song.yml")
 
-        from app.generators.midi.pipelines.chord_pipeline import load_song_proposal
+        from white_generation.pipelines.chord_pipeline import load_song_proposal
 
         result = load_song_proposal(thread_dir, "song.yml")
         assert "color_name" in result
@@ -229,7 +229,7 @@ class TestChordPipelineCaller:
         thread_dir = tmp_path / "thread"
         self._make_proposal(thread_dir, "song.yml")
 
-        from app.generators.midi.pipelines.chord_pipeline import load_song_proposal
+        from white_generation.pipelines.chord_pipeline import load_song_proposal
 
         result = load_song_proposal(thread_dir, "song.yml")
         assert isinstance(result["time_sig"], tuple)
@@ -239,7 +239,7 @@ class TestChordPipelineCaller:
         thread_dir = tmp_path / "thread"
         self._make_proposal(thread_dir, "song.yml")
 
-        from app.generators.midi.pipelines.chord_pipeline import load_song_proposal
+        from white_generation.pipelines.chord_pipeline import load_song_proposal
 
         result = load_song_proposal(thread_dir, "song.yml")
         assert result["key_root"] == "Gb"  # F# normalised to flat spelling for chord DB
@@ -249,13 +249,13 @@ class TestChordPipelineCaller:
         thread_dir = tmp_path / "thread"
         self._make_proposal(thread_dir, "song.yml")
 
-        from app.generators.midi.pipelines.chord_pipeline import load_song_proposal
+        from white_generation.pipelines.chord_pipeline import load_song_proposal
 
         result = load_song_proposal(thread_dir, "song.yml")
         assert isinstance(result["bpm"], int)
 
     def test_file_not_found_raises(self, tmp_path):
-        from app.generators.midi.pipelines.chord_pipeline import load_song_proposal
+        from white_generation.pipelines.chord_pipeline import load_song_proposal
 
         with pytest.raises(FileNotFoundError):
             load_song_proposal(tmp_path, "missing.yml")
@@ -283,7 +283,7 @@ class TestLyricPipelineCaller:
     def test_returns_required_fields(self, tmp_path):
         _, prod_dir = self._setup(tmp_path)
 
-        from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
+        from white_generation.pipelines.lyric_pipeline import _find_and_load_proposal
 
         result = _find_and_load_proposal(prod_dir)
         for field in (
@@ -303,7 +303,7 @@ class TestLyricPipelineCaller:
     def test_time_sig_is_string(self, tmp_path):
         _, prod_dir = self._setup(tmp_path)
 
-        from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
+        from white_generation.pipelines.lyric_pipeline import _find_and_load_proposal
 
         result = _find_and_load_proposal(prod_dir)
         assert isinstance(result["time_sig"], str)
@@ -312,7 +312,7 @@ class TestLyricPipelineCaller:
     def test_color_present(self, tmp_path):
         _, prod_dir = self._setup(tmp_path)
 
-        from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
+        from white_generation.pipelines.lyric_pipeline import _find_and_load_proposal
 
         result = _find_and_load_proposal(prod_dir)
         assert result["color"] == "Violet"
@@ -338,13 +338,13 @@ class TestLyricPipelineCaller:
             ["Brian Eno"],
         )
 
-        from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
+        from white_generation.pipelines.lyric_pipeline import _find_and_load_proposal
 
         result = _find_and_load_proposal(prod_dir)
         assert result["sounds_like"] == ["Brian Eno"]
 
     def test_returns_empty_when_no_chord_review(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
+        from white_generation.pipelines.lyric_pipeline import _find_and_load_proposal
 
         result = _find_and_load_proposal(tmp_path)
         assert result == {}
@@ -355,7 +355,7 @@ class TestLyricPipelineCaller:
         # chord review points to non-existent thread/file
         _write_chord_review(prod_dir / "chords", "/no/such/thread", "missing.yml")
 
-        from app.generators.midi.pipelines.lyric_pipeline import _find_and_load_proposal
+        from white_generation.pipelines.lyric_pipeline import _find_and_load_proposal
 
         result = _find_and_load_proposal(prod_dir)
         assert result == {}

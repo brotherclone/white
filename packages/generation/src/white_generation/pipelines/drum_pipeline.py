@@ -24,12 +24,19 @@ import numpy as np
 import yaml
 from white_core.music.narrative_constraints import narrative_tag_adjustment
 
-from app.generators.midi.patterns.aesthetic_hints import (
+from app.generators.midi.production.init_production import load_song_context
+from app.util.phrase_dynamics import (
+    DynamicCurve,
+    apply_dynamics_curve,
+    infer_curve,
+    parse_curve,
+)
+from white_generation.patterns.aesthetic_hints import (
     aesthetic_tag_adjustment,
     arc_to_energy,
     style_profile_tag_adjustment,
 )
-from app.generators.midi.patterns.drum_patterns import (
+from white_generation.patterns.drum_patterns import (
     ALL_TEMPLATES,
     DEFAULT_GENRE_FAMILY,
     DEFAULT_SECTION_ENERGY,
@@ -41,18 +48,11 @@ from app.generators.midi.patterns.drum_patterns import (
     map_genres_to_families,
     select_templates,
 )
-from app.generators.midi.pipelines.chord_pipeline import (
+from white_generation.pipelines.chord_pipeline import (
     _to_python,
     compute_chromatic_match,
     get_chromatic_target,
     load_song_proposal,
-)
-from app.generators.midi.production.init_production import load_song_context
-from app.util.phrase_dynamics import (
-    DynamicCurve,
-    apply_dynamics_curve,
-    infer_curve,
-    parse_curve,
 )
 
 # ---------------------------------------------------------------------------
@@ -485,7 +485,7 @@ def run_drum_pipeline(
 
         # Evolutionary breeding (opt-in)
         if evolve and templates:
-            from app.generators.midi.patterns.pattern_evolution import (
+            from white_generation.patterns.pattern_evolution import (
                 breed_drum_patterns,
             )
 

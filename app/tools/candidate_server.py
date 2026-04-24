@@ -40,9 +40,9 @@ VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
 EVOLVABLE_PHASES = {"drums", "bass", "melody"}
 
 _EVOLVE_PIPELINE = {
-    "drums": "app.generators.midi.pipelines.drum_pipeline",
-    "bass": "app.generators.midi.pipelines.bass_pipeline",
-    "melody": "app.generators.midi.pipelines.melody_pipeline",
+    "drums": "white_generation.pipelines.drum_pipeline",
+    "bass": "white_generation.pipelines.bass_pipeline",
+    "melody": "white_generation.pipelines.melody_pipeline",
 }
 
 # ---------------------------------------------------------------------------

@@ -17,7 +17,7 @@ class ChordProgressionGenerator:
 
     def __init__(
         self,
-        data_dir: str = "/Volumes/LucidNonsense/White/app/generators/midi/chord_generator/data",
+        data_dir: str = str(Path(__file__).parent / "data"),
     ):
         """Load the chord database and graphs."""
         data_dir = Path(data_dir)

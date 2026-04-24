@@ -33,15 +33,15 @@ from white_core.concepts.chromatic_targets import (
 from white_core.music.core.enharmonic import normalize_to_flat
 
 from app.generators.artist_catalog import load_artist_context
-from app.generators.midi.chord_generator.generator import ChordProgressionGenerator
-from app.generators.midi.patterns.harmonic_rhythm import enumerate_distributions
-from app.generators.midi.patterns.strum_patterns import (
+from app.generators.midi.production.init_production import load_initial_proposal
+from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
+from white_generation.chord_generator.generator import ChordProgressionGenerator
+from white_generation.patterns.harmonic_rhythm import enumerate_distributions
+from white_generation.patterns.strum_patterns import (
     StrumPattern,
     get_patterns_for_time_sig,
     strum_to_midi_bytes,
 )
-from app.generators.midi.production.init_production import load_initial_proposal
-from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 
 
 def _to_python(obj):
@@ -239,12 +239,12 @@ def generate_scratch_beat(
 
     Uses the lowest-energy template from the inferred genre family.
     """
-    from app.generators.midi.patterns.drum_patterns import (
+    from white_generation.patterns.drum_patterns import (
         ALL_TEMPLATES,
         DEFAULT_GENRE_FAMILY,
         select_templates,
     )
-    from app.generators.midi.pipelines.drum_pipeline import drum_pattern_to_midi_bytes
+    from white_generation.pipelines.drum_pipeline import drum_pattern_to_midi_bytes
 
     families = genre_families or [DEFAULT_GENRE_FAMILY]
     templates = select_templates(ALL_TEMPLATES, time_sig, families, "low")
@@ -436,7 +436,7 @@ def generate_white_candidates(
 
     from white_analysis.refractor import Refractor
 
-    from app.generators.midi.pipelines.white_rebracketing import concatenate_bars
+    from white_generation.pipelines.white_rebracketing import concatenate_bars
 
     rng = _random.Random(seed)
     tpb = 480
@@ -581,7 +581,7 @@ def run_chord_pipeline(
     print(f"         ontological={target['ontological']}")
 
     # Infer genre families for scratch beat generation
-    from app.generators.midi.patterns.drum_patterns import (
+    from white_generation.patterns.drum_patterns import (
         DEFAULT_GENRE_FAMILY,
         map_genres_to_families,
     )
@@ -610,7 +610,7 @@ def run_chord_pipeline(
 
     if is_white_mode(song_info):
         # White donor + cut-up mode
-        from app.generators.midi.pipelines.white_rebracketing import build_bar_pool
+        from white_generation.pipelines.white_rebracketing import build_bar_pool
 
         sub_dirs = [Path(p) for p in song_info.get("sub_proposals", [])]
         if not sub_dirs:

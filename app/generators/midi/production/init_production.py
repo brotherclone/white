@@ -187,7 +187,7 @@ def _write_song_context(
     # Style reference profile — extract from local MIDI files if available
     import logging as _logging
 
-    from app.generators.midi.style_reference import (  # circular import
+    from white_generation.style_reference import (  # circular import
         aggregate_profiles,
         load_or_extract_profile,
     )
@@ -462,7 +462,7 @@ def main() -> None:
 
     song_proposal_path = Path(args.song_proposal)
     if args.production_dir is None:
-        from app.generators.midi.pipelines.chord_pipeline import (
+        from white_generation.pipelines.chord_pipeline import (
             song_slug,
         )  # circular import
 

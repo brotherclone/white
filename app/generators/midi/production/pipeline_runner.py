@@ -95,7 +95,7 @@ def _build_phase_command(
         return cmd
     if phase == "chords":
         cmd = base + [
-            "app.generators.midi.pipelines.chord_pipeline",
+            "white_generation.pipelines.chord_pipeline",
             "--production-dir",
             prod,
         ]
@@ -104,19 +104,19 @@ def _build_phase_command(
         return cmd
     if phase == "drums":
         return base + [
-            "app.generators.midi.pipelines.drum_pipeline",
+            "white_generation.pipelines.drum_pipeline",
             "--production-dir",
             prod,
         ]
     if phase == "bass":
         return base + [
-            "app.generators.midi.pipelines.bass_pipeline",
+            "white_generation.pipelines.bass_pipeline",
             "--production-dir",
             prod,
         ]
     if phase == "melody":
         return base + [
-            "app.generators.midi.pipelines.melody_pipeline",
+            "white_generation.pipelines.melody_pipeline",
             "--production-dir",
             prod,
             "--singer",
@@ -124,7 +124,7 @@ def _build_phase_command(
         ]
     if phase == "lyrics":
         return base + [
-            "app.generators.midi.pipelines.lyric_pipeline",
+            "white_generation.pipelines.lyric_pipeline",
             "--production-dir",
             prod,
         ]

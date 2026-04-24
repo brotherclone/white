@@ -460,34 +460,34 @@ class TestAestheticHints:
 
 class TestPatternTags:
     def test_drum_patterns_have_tags_field(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         for p in ALL_TEMPLATES:
             assert hasattr(p, "tags"), f"{p.name} missing tags"
             assert isinstance(p.tags, list), f"{p.name}.tags not a list"
 
     def test_bass_patterns_have_tags_field(self):
-        from app.generators.midi.patterns.bass_patterns import ALL_TEMPLATES
+        from white_generation.patterns.bass_patterns import ALL_TEMPLATES
 
         for p in ALL_TEMPLATES:
             assert hasattr(p, "tags"), f"{p.name} missing tags"
             assert isinstance(p.tags, list), f"{p.name}.tags not a list"
 
     def test_melody_patterns_have_tags_field(self):
-        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+        from white_generation.patterns.melody_patterns import ALL_TEMPLATES
 
         for p in ALL_TEMPLATES:
             assert hasattr(p, "tags"), f"{p.name} missing tags"
             assert isinstance(p.tags, list), f"{p.name}.tags not a list"
 
     def test_sparse_drum_templates_filterable(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         sparse = [p for p in ALL_TEMPLATES if "sparse" in p.tags]
         assert len(sparse) >= 5, f"Expected ≥5 sparse drum templates, got {len(sparse)}"
 
     def test_drone_bass_templates_filterable(self):
-        from app.generators.midi.patterns.bass_patterns import ALL_TEMPLATES
+        from white_generation.patterns.bass_patterns import ALL_TEMPLATES
 
         drone_pedal = [p for p in ALL_TEMPLATES if {"drone", "pedal"} & set(p.tags)]
         assert (
@@ -495,7 +495,7 @@ class TestPatternTags:
         ), f"Expected ≥4 drone/pedal bass templates, got {len(drone_pedal)}"
 
     def test_lamentful_melody_templates_filterable(self):
-        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES
+        from white_generation.patterns.melody_patterns import ALL_TEMPLATES
 
         lamentful = [p for p in ALL_TEMPLATES if "lamentful" in p.tags]
         assert (
@@ -510,7 +510,7 @@ class TestPatternTags:
 
 class TestAestheticTagAdjustment:
     def test_sparse_hint_boosts_sparse_pattern(self):
-        from app.generators.midi.patterns.aesthetic_hints import (
+        from white_generation.patterns.aesthetic_hints import (
             aesthetic_tag_adjustment,
         )
 
@@ -518,7 +518,7 @@ class TestAestheticTagAdjustment:
         assert adj == 0.10
 
     def test_dense_hint_penalises_sparse_pattern(self):
-        from app.generators.midi.patterns.aesthetic_hints import (
+        from white_generation.patterns.aesthetic_hints import (
             aesthetic_tag_adjustment,
         )
 
@@ -526,7 +526,7 @@ class TestAestheticTagAdjustment:
         assert adj == -0.05
 
     def test_no_hints_returns_zero(self):
-        from app.generators.midi.patterns.aesthetic_hints import (
+        from white_generation.patterns.aesthetic_hints import (
             aesthetic_tag_adjustment,
         )
 
@@ -534,7 +534,7 @@ class TestAestheticTagAdjustment:
         assert aesthetic_tag_adjustment([], {"density": "sparse"}) == 0.0
 
     def test_no_matching_tags_returns_zero(self):
-        from app.generators.midi.patterns.aesthetic_hints import (
+        from white_generation.patterns.aesthetic_hints import (
             aesthetic_tag_adjustment,
         )
 
@@ -544,21 +544,21 @@ class TestAestheticTagAdjustment:
 
 class TestArcToEnergy:
     def test_low_arc(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_to_energy
+        from white_generation.patterns.aesthetic_hints import arc_to_energy
 
         assert arc_to_energy(0.10) == "low"
         assert arc_to_energy(0.0) == "low"
         assert arc_to_energy(0.29) == "low"
 
     def test_medium_arc(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_to_energy
+        from white_generation.patterns.aesthetic_hints import arc_to_energy
 
         assert arc_to_energy(0.30) == "medium"
         assert arc_to_energy(0.50) == "medium"
         assert arc_to_energy(0.65) == "medium"
 
     def test_high_arc(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_to_energy
+        from white_generation.patterns.aesthetic_hints import arc_to_energy
 
         assert arc_to_energy(0.66) == "high"
         assert arc_to_energy(0.85) == "high"
@@ -567,29 +567,29 @@ class TestArcToEnergy:
 
 class TestArcTagAdjustment:
     def test_low_arc_boosts_drone_pedal(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+        from white_generation.patterns.aesthetic_hints import arc_tag_adjustment
 
         assert arc_tag_adjustment(0.10, ["drone"]) == pytest.approx(0.10)
         assert arc_tag_adjustment(0.10, ["pedal"]) == pytest.approx(0.10)
         assert arc_tag_adjustment(0.10, ["lamentful"]) == pytest.approx(0.10)
 
     def test_high_arc_penalises_root_drone(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+        from white_generation.patterns.aesthetic_hints import arc_tag_adjustment
 
         assert arc_tag_adjustment(0.80, ["root_drone"]) == pytest.approx(-0.05)
 
     def test_high_arc_no_penalty_other_tags(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+        from white_generation.patterns.aesthetic_hints import arc_tag_adjustment
 
         assert arc_tag_adjustment(0.80, ["walking"]) == pytest.approx(0.0)
 
     def test_mid_arc_returns_zero(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+        from white_generation.patterns.aesthetic_hints import arc_tag_adjustment
 
         assert arc_tag_adjustment(0.50, ["drone"]) == pytest.approx(0.0)
         assert arc_tag_adjustment(0.50, ["root_drone"]) == pytest.approx(0.0)
 
     def test_empty_tags_returns_zero(self):
-        from app.generators.midi.patterns.aesthetic_hints import arc_tag_adjustment
+        from white_generation.patterns.aesthetic_hints import arc_tag_adjustment
 
         assert arc_tag_adjustment(0.10, []) == pytest.approx(0.0)

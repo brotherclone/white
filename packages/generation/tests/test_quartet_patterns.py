@@ -1,6 +1,6 @@
 """Tests for quartet_patterns — voice ranges, parallel detection, scoring."""
 
-from app.generators.midi.patterns.quartet_patterns import (
+from white_generation.patterns.quartet_patterns import (
     ALL_VOICE_PATTERNS,
     VOICE_RANGES,
     VoicePattern,
@@ -10,7 +10,7 @@ from app.generators.midi.patterns.quartet_patterns import (
     fix_voice_crossing,
     get_patterns_for_voice,
 )
-from app.generators.midi.pipelines.quartet_pipeline import (
+from white_generation.pipelines.quartet_pipeline import (
     generate_voice_notes,
     resolve_parallel_violations,
 )
@@ -145,7 +145,7 @@ class TestGenerateVoiceNotes:
 
     def test_leap_cap_applied(self):
         """Consecutive generated notes should not jump more than MAX_OFFSET_CHANGE."""
-        from app.generators.midi.pipelines.quartet_pipeline import MAX_OFFSET_CHANGE
+        from white_generation.pipelines.quartet_pipeline import MAX_OFFSET_CHANGE
 
         pattern = VoicePattern("test", "tenor", [-7, -20, -7, -20])  # large swings
         soprano = [60, 60, 60, 60]

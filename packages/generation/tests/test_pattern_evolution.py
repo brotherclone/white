@@ -7,11 +7,10 @@ from unittest.mock import patch
 import numpy as np
 from white_core.enums.bass_chord_tone import BassChordTone
 from white_core.enums.bass_style import BassStyle
-
-from app.generators.midi.patterns.bass_patterns import BassPattern
-from app.generators.midi.patterns.drum_patterns import DrumPattern
-from app.generators.midi.patterns.melody_patterns import MelodyPattern
-from app.generators.midi.patterns.pattern_evolution import (
+from white_generation.patterns.bass_patterns import BassPattern
+from white_generation.patterns.drum_patterns import DrumPattern
+from white_generation.patterns.melody_patterns import MelodyPattern
+from white_generation.patterns.pattern_evolution import (
     _crossover_bass,
     _crossover_drums,
     _crossover_melody,
@@ -194,7 +193,7 @@ class TestDrumMutation:
     def test_mutation_preserves_structure(self):
         p = _make_drum()
         with patch(
-            "app.generators.midi.patterns.pattern_evolution.random.random",
+            "white_generation.patterns.pattern_evolution.random.random",
             return_value=0.0,
         ):
             result = _mutate_drum(p)
@@ -237,7 +236,7 @@ class TestBassMutation:
 
     def test_mutation_stays_in_chord_tones(self):
         with patch(
-            "app.generators.midi.patterns.pattern_evolution.random.random",
+            "white_generation.patterns.pattern_evolution.random.random",
             return_value=0.0,
         ):
             result = _mutate_bass(_make_bass())
@@ -282,7 +281,7 @@ class TestMelodyMutation:
 
     def test_rhythm_stays_ordered(self):
         with patch(
-            "app.generators.midi.patterns.pattern_evolution.random.random",
+            "white_generation.patterns.pattern_evolution.random.random",
             return_value=0.0,
         ):
             with patch("random.random", return_value=0.0):
@@ -296,7 +295,7 @@ class TestMelodyMutation:
 
 
 @patch(
-    "app.generators.midi.patterns.pattern_evolution._score_population",
+    "white_generation.patterns.pattern_evolution._score_population",
     side_effect=_fake_score_population,
 )
 class TestBreedDrumPatterns:
@@ -331,7 +330,7 @@ class TestBreedDrumPatterns:
 
 
 @patch(
-    "app.generators.midi.patterns.pattern_evolution._score_population",
+    "white_generation.patterns.pattern_evolution._score_population",
     side_effect=_fake_score_population,
 )
 class TestBreedBassPatterns:
@@ -358,7 +357,7 @@ class TestBreedBassPatterns:
 
 
 @patch(
-    "app.generators.midi.patterns.pattern_evolution._score_population",
+    "white_generation.patterns.pattern_evolution._score_population",
     side_effect=_fake_score_population,
 )
 class TestBreedMelodyPatterns:

@@ -14,7 +14,7 @@ import yaml
 class TestDrumPatternTemplates:
 
     def test_all_templates_have_required_fields(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         for t in ALL_TEMPLATES:
             assert t.name, "Template missing name"
@@ -29,7 +29,7 @@ class TestDrumPatternTemplates:
             assert len(t.voices) > 0, f"{t.name}: no voices defined"
 
     def test_all_templates_have_valid_velocity_levels(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES, VELOCITY
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES, VELOCITY
 
         valid_levels = set(VELOCITY.keys())
         for t in ALL_TEMPLATES:
@@ -40,7 +40,7 @@ class TestDrumPatternTemplates:
                     ), f"{t.name}/{voice_name}: invalid velocity '{vel_level}'"
 
     def test_all_templates_beat_positions_within_bar(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         for t in ALL_TEMPLATES:
             bar_length = t.bar_length_beats()
@@ -51,7 +51,7 @@ class TestDrumPatternTemplates:
                     ), f"{t.name}/{voice_name}: beat {beat_pos} outside bar length {bar_length}"
 
     def test_all_templates_use_valid_gm_voices(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             ALL_TEMPLATES,
             GM_PERCUSSION,
         )
@@ -64,7 +64,7 @@ class TestDrumPatternTemplates:
                 ), f"{t.name}: unknown voice '{voice_name}'"
 
     def test_unique_template_names(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         names = [t.name for t in ALL_TEMPLATES]
         assert len(names) == len(
@@ -72,14 +72,14 @@ class TestDrumPatternTemplates:
         ), f"Duplicate template names: {[n for n in names if names.count(n) > 1]}"
 
     def test_4_4_templates_exist_for_core_families(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         families_4_4 = {t.genre_family for t in ALL_TEMPLATES if t.time_sig == (4, 4)}
         for expected in ["ambient", "electronic", "krautrock", "rock"]:
             assert expected in families_4_4, f"No 4/4 templates for {expected}"
 
     def test_each_family_has_low_medium_high(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         # Check 4/4 core families
         for family in ["ambient", "electronic", "krautrock", "rock"]:
@@ -92,13 +92,13 @@ class TestDrumPatternTemplates:
                 assert level in energies, f"{family} 4/4 missing energy={level}"
 
     def test_7_8_templates_exist(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         templates_7_8 = [t for t in ALL_TEMPLATES if t.time_sig == (7, 8)]
         assert len(templates_7_8) >= 4, f"Only {len(templates_7_8)} 7/8 templates"
 
     def test_motorik_pattern_has_kick_every_beat(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         motorik = [t for t in ALL_TEMPLATES if t.name == "motorik"]
         assert len(motorik) == 1
@@ -110,7 +110,7 @@ class TestDrumPatternTemplates:
         assert 2 in snare_beats, "Motorik snare should be on beat 3"
 
     def test_bar_length_beats(self):
-        from app.generators.midi.patterns.drum_patterns import DrumPattern
+        from white_generation.patterns.drum_patterns import DrumPattern
 
         p_4_4 = DrumPattern(
             name="t", genre_family="t", energy="low", time_sig=(4, 4), description="t"
@@ -128,7 +128,7 @@ class TestDrumPatternTemplates:
         assert p_3_4.bar_length_beats() == 3.0
 
     def test_fallback_pattern(self):
-        from app.generators.midi.patterns.drum_patterns import make_fallback_pattern
+        from white_generation.patterns.drum_patterns import make_fallback_pattern
 
         fb = make_fallback_pattern((5, 4))
         assert fb.time_sig == (5, 4)
@@ -146,30 +146,30 @@ class TestDrumPatternTemplates:
 class TestBreakbeatFamily:
 
     def test_breakbeat_family_in_genre_keywords(self):
-        from app.generators.midi.patterns.drum_patterns import GENRE_FAMILY_KEYWORDS
+        from white_generation.patterns.drum_patterns import GENRE_FAMILY_KEYWORDS
 
         assert "breakbeat" in GENRE_FAMILY_KEYWORDS
 
     def test_hip_hop_maps_to_breakbeat(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["hip-hop", "art-pop"])
         assert "breakbeat" in result
 
     def test_funk_maps_to_breakbeat(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["neo-soul", "funk"])
         assert "breakbeat" in result
 
     def test_unrelated_tag_does_not_map_to_breakbeat(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["ambient", "drone"])
         assert "breakbeat" not in result
 
     def test_new_gm_voices_present(self):
-        from app.generators.midi.patterns.drum_patterns import GM_PERCUSSION
+        from white_generation.patterns.drum_patterns import GM_PERCUSSION
 
         assert GM_PERCUSSION["tambourine"] == 54
         assert GM_PERCUSSION["cowbell"] == 56
@@ -177,7 +177,7 @@ class TestBreakbeatFamily:
         assert GM_PERCUSSION["conga_low"] == 64
 
     def test_breakbeat_has_all_energy_levels(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         energies = {
             t.energy
@@ -188,7 +188,7 @@ class TestBreakbeatFamily:
             assert level in energies, f"breakbeat missing energy={level}"
 
     def test_nine_classic_breaks_present(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         names = {t.name for t in ALL_TEMPLATES}
         classic_breaks = [
@@ -208,7 +208,7 @@ class TestBreakbeatFamily:
             assert t.energy == "medium", f"{name} should be medium energy"
 
     def test_funky_drummer_has_ghost_notes(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         funky = next(t for t in ALL_TEMPLATES if t.name == "funky_drummer")
         all_hits = [
@@ -217,19 +217,19 @@ class TestBreakbeatFamily:
         assert "ghost" in all_hits, "funky_drummer must have ghost velocity hits"
 
     def test_papa_was_too_has_tambourine(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         papa = next(t for t in ALL_TEMPLATES if t.name == "papa_was_too")
         assert "tambourine" in papa.voices
 
     def test_ashleys_roachclip_has_congas(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         ashley = next(t for t in ALL_TEMPLATES if t.name == "ashleys_roachclip")
         assert "conga_high" in ashley.voices or "conga_low" in ashley.voices
 
     def test_all_breakbeat_positions_are_16th_grid(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         breakbeats = [t for t in ALL_TEMPLATES if t.genre_family == "breakbeat"]
         for t in breakbeats:
@@ -243,7 +243,7 @@ class TestBreakbeatFamily:
                     ), f"{t.name}/{voice_name}: pos {pos} not on 16th grid"
 
     def test_minimum_15_breakbeat_templates(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
 
         count = len([t for t in ALL_TEMPLATES if t.genre_family == "breakbeat"])
         assert count >= 15, f"Only {count} breakbeat templates (need >= 15)"
@@ -257,44 +257,44 @@ class TestBreakbeatFamily:
 class TestGenreMapping:
 
     def test_ambient_match(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["ambient", "drone"])
         assert "ambient" in result
 
     def test_glitch_ambient_matches_both(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["glitch ambient"])
         assert "ambient" in result
         assert "electronic" in result  # "glitch" is an electronic keyword
 
     def test_krautrock_match(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["krautrock", "motorik"])
         assert "krautrock" in result
 
     def test_post_classical_matches_classical(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["post-classical"])
         assert "classical" in result
 
     def test_no_match_returns_empty(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["reggaeton", "cumbia"])
         assert result == []
 
     def test_empty_tags_returns_empty(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families([])
         assert result == []
 
     def test_case_insensitive(self):
-        from app.generators.midi.patterns.drum_patterns import map_genres_to_families
+        from white_generation.patterns.drum_patterns import map_genres_to_families
 
         result = map_genres_to_families(["AMBIENT", "Electronic"])
         assert "ambient" in result
@@ -309,21 +309,21 @@ class TestGenreMapping:
 class TestEnergyScoring:
 
     def test_exact_match(self):
-        from app.generators.midi.patterns.drum_patterns import energy_appropriateness
+        from white_generation.patterns.drum_patterns import energy_appropriateness
 
         assert energy_appropriateness("medium", "medium") == 1.0
         assert energy_appropriateness("low", "low") == 1.0
         assert energy_appropriateness("high", "high") == 1.0
 
     def test_one_level_away(self):
-        from app.generators.midi.patterns.drum_patterns import energy_appropriateness
+        from white_generation.patterns.drum_patterns import energy_appropriateness
 
         assert energy_appropriateness("low", "medium") == 0.5
         assert energy_appropriateness("medium", "high") == 0.5
         assert energy_appropriateness("high", "medium") == 0.5
 
     def test_two_levels_away(self):
-        from app.generators.midi.patterns.drum_patterns import energy_appropriateness
+        from white_generation.patterns.drum_patterns import energy_appropriateness
 
         assert energy_appropriateness("low", "high") == 0.0
         assert energy_appropriateness("high", "low") == 0.0
@@ -337,7 +337,7 @@ class TestEnergyScoring:
 class TestTemplateSelection:
 
     def test_filters_by_time_sig(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             ALL_TEMPLATES,
             select_templates,
         )
@@ -347,7 +347,7 @@ class TestTemplateSelection:
             assert t.time_sig == (7, 8)
 
     def test_filters_by_genre_family(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             ALL_TEMPLATES,
             select_templates,
         )
@@ -357,7 +357,7 @@ class TestTemplateSelection:
             assert t.genre_family == "krautrock"
 
     def test_includes_adjacent_energy(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             ALL_TEMPLATES,
             select_templates,
         )
@@ -369,7 +369,7 @@ class TestTemplateSelection:
         assert "low" in energies or "high" in energies
 
     def test_exact_energy_first(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             ALL_TEMPLATES,
             select_templates,
         )
@@ -377,14 +377,14 @@ class TestTemplateSelection:
         result = select_templates(ALL_TEMPLATES, (4, 4), ["rock"], "medium")
         if len(result) >= 2:
             # First result should be exact match or at least not worse than second
-            from app.generators.midi.patterns.drum_patterns import energy_distance
+            from white_generation.patterns.drum_patterns import energy_distance
 
             d0 = energy_distance(result[0].energy, "medium")
             d1 = energy_distance(result[1].energy, "medium")
             assert d0 <= d1
 
     def test_no_match_returns_empty(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             ALL_TEMPLATES,
             select_templates,
         )
@@ -393,7 +393,7 @@ class TestTemplateSelection:
         assert result == []
 
     def test_multiple_families(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             ALL_TEMPLATES,
             select_templates,
         )
@@ -414,8 +414,8 @@ class TestTemplateSelection:
 class TestDrumMidiGeneration:
 
     def test_generates_valid_midi(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
-        from app.generators.midi.pipelines.drum_pipeline import (
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.pipelines.drum_pipeline import (
             drum_pattern_to_midi_bytes,
         )
 
@@ -428,8 +428,8 @@ class TestDrumMidiGeneration:
         assert len(mid.tracks) >= 1
 
     def test_uses_channel_10(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
-        from app.generators.midi.pipelines.drum_pipeline import (
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.pipelines.drum_pipeline import (
             DRUM_CHANNEL,
             drum_pattern_to_midi_bytes,
         )
@@ -445,11 +445,11 @@ class TestDrumMidiGeneration:
                 ), f"Expected channel {DRUM_CHANNEL}, got {msg.channel}"
 
     def test_uses_correct_gm_notes(self):
-        from app.generators.midi.patterns.drum_patterns import (
+        from white_generation.patterns.drum_patterns import (
             GM_PERCUSSION,
             DrumPattern,
         )
-        from app.generators.midi.pipelines.drum_pipeline import (
+        from white_generation.pipelines.drum_pipeline import (
             drum_pattern_to_midi_bytes,
         )
 
@@ -476,8 +476,8 @@ class TestDrumMidiGeneration:
         assert GM_PERCUSSION["snare"] in note_ons
 
     def test_velocity_values(self):
-        from app.generators.midi.patterns.drum_patterns import VELOCITY, DrumPattern
-        from app.generators.midi.pipelines.drum_pipeline import (
+        from white_generation.patterns.drum_patterns import VELOCITY, DrumPattern
+        from white_generation.pipelines.drum_pipeline import (
             drum_pattern_to_midi_bytes,
         )
 
@@ -504,8 +504,8 @@ class TestDrumMidiGeneration:
         assert VELOCITY["ghost"] in velocities
 
     def test_bar_repetition(self):
-        from app.generators.midi.patterns.drum_patterns import DrumPattern
-        from app.generators.midi.pipelines.drum_pipeline import (
+        from white_generation.patterns.drum_patterns import DrumPattern
+        from white_generation.pipelines.drum_pipeline import (
             drum_pattern_to_midi_bytes,
         )
 
@@ -535,8 +535,8 @@ class TestDrumMidiGeneration:
         assert len(notes_4) == 4 * len(notes_1)
 
     def test_correct_tempo(self):
-        from app.generators.midi.patterns.drum_patterns import ALL_TEMPLATES
-        from app.generators.midi.pipelines.drum_pipeline import (
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
+        from white_generation.pipelines.drum_pipeline import (
             drum_pattern_to_midi_bytes,
         )
 
@@ -566,7 +566,7 @@ class TestSectionReader:
         return tmp_path
 
     def test_reads_approved_sections(self, tmp_path):
-        from app.generators.midi.pipelines.drum_pipeline import read_approved_sections
+        from white_generation.pipelines.drum_pipeline import read_approved_sections
 
         prod_dir = self._make_review_dir(
             tmp_path,
@@ -597,7 +597,7 @@ class TestSectionReader:
         assert sections[1]["label"] == "chorus"
 
     def test_bar_count_from_chord_count(self, tmp_path):
-        from app.generators.midi.pipelines.drum_pipeline import read_approved_sections
+        from white_generation.pipelines.drum_pipeline import read_approved_sections
 
         prod_dir = self._make_review_dir(
             tmp_path,
@@ -614,7 +614,7 @@ class TestSectionReader:
         assert sections[0]["bar_count"] == 3
 
     def test_rejects_no_approved(self, tmp_path):
-        from app.generators.midi.pipelines.drum_pipeline import read_approved_sections
+        from white_generation.pipelines.drum_pipeline import read_approved_sections
 
         prod_dir = self._make_review_dir(
             tmp_path,
@@ -626,7 +626,7 @@ class TestSectionReader:
         assert sections == []
 
     def test_skips_unlabeled_approved(self, tmp_path):
-        from app.generators.midi.pipelines.drum_pipeline import read_approved_sections
+        from white_generation.pipelines.drum_pipeline import read_approved_sections
 
         prod_dir = self._make_review_dir(
             tmp_path,
@@ -643,7 +643,7 @@ class TestSectionReader:
         assert sections == []
 
     def test_missing_review_raises(self, tmp_path):
-        from app.generators.midi.pipelines.drum_pipeline import read_approved_sections
+        from white_generation.pipelines.drum_pipeline import read_approved_sections
 
         with pytest.raises(FileNotFoundError):
             read_approved_sections(tmp_path)
@@ -657,7 +657,7 @@ class TestSectionReader:
 class TestDrumCompositeScore:
 
     def test_perfect_scores(self):
-        from app.generators.midi.pipelines.drum_pipeline import drum_composite_score
+        from white_generation.pipelines.drum_pipeline import drum_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.8, "present": 0.1, "future": 0.1},
@@ -671,7 +671,7 @@ class TestDrumCompositeScore:
         assert "chromatic" in breakdown
 
     def test_weights_applied(self):
-        from app.generators.midi.pipelines.drum_pipeline import drum_composite_score
+        from white_generation.pipelines.drum_pipeline import drum_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.5, "present": 0.3, "future": 0.2},
@@ -787,7 +787,7 @@ class TestDrumPipelineIntegration:
         )
 
         # Run the pipeline
-        from app.generators.midi.pipelines.drum_pipeline import run_drum_pipeline
+        from white_generation.pipelines.drum_pipeline import run_drum_pipeline
 
         result = run_drum_pipeline(
             production_dir=str(tmp_path),

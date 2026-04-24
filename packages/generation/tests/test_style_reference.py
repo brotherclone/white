@@ -8,9 +8,8 @@ import mido
 import pytest
 import yaml
 from white_core.music.style_profile import StyleProfile
-
-from app.generators.midi.patterns.aesthetic_hints import style_profile_tag_adjustment
-from app.generators.midi.style_reference import (
+from white_generation.patterns.aesthetic_hints import style_profile_tag_adjustment
+from white_generation.style_reference import (
     aggregate_profiles,
     artist_slug,
     extract_style_profile,

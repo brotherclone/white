@@ -158,7 +158,7 @@ class WhiteAgent(BaseModel):
 
     def _invoke_chord_pipeline_safe(self, thread_dir: str, song_filename: str) -> None:
         """Safely invoke the chord pipeline in-process; never raises."""
-        from app.generators.midi.pipelines.chord_pipeline import run_chord_pipeline
+        from white_generation.pipelines.chord_pipeline import run_chord_pipeline
 
         try:
             run_chord_pipeline(
@@ -2691,9 +2691,10 @@ Structure your synthesis as the final creative brief before manifestation.
                     thread_dir = str(Path(self._artifact_base_path()) / state.thread_id)
                     production_dirs: list[Path] = []
 
-                    from app.generators.midi.pipelines.chord_pipeline import (  # circular import
+                    from white_generation.pipelines.chord_pipeline import (  # circular import
                         song_slug,
                     )
+
                     from app.generators.midi.production.init_production import (  # circular import
                         init_production as _run_init_production,
                     )

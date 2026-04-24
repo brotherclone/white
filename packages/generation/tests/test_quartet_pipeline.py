@@ -53,7 +53,7 @@ def _write_melody_approved(prod_dir: Path, section: str, notes: list[int]) -> Pa
 
 class TestExtractSopranoNotes:
     def test_extracts_correct_notes(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import extract_soprano_notes
+        from white_generation.pipelines.quartet_pipeline import extract_soprano_notes
 
         notes = [60, 62, 64, 65]
         midi_bytes = _make_melody_midi(notes)
@@ -61,7 +61,7 @@ class TestExtractSopranoNotes:
         assert result == notes
 
     def test_empty_midi_returns_empty(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import extract_soprano_notes
+        from white_generation.pipelines.quartet_pipeline import extract_soprano_notes
 
         mid = mido.MidiFile(ticks_per_beat=480)
         track = mido.MidiTrack()
@@ -82,7 +82,7 @@ class TestBuildQuartetMidi:
         return [(i * tpb, pitch, tpb) for i, pitch in enumerate(notes)]
 
     def test_four_channels_present(self):
-        from app.generators.midi.pipelines.quartet_pipeline import build_quartet_midi
+        from white_generation.pipelines.quartet_pipeline import build_quartet_midi
 
         soprano = [60, 62, 64, 65]
         events = self._note_events(soprano)
@@ -102,7 +102,7 @@ class TestBuildQuartetMidi:
         assert {0, 1, 2, 3}.issubset(channels_used)
 
     def test_output_is_valid_midi(self):
-        from app.generators.midi.pipelines.quartet_pipeline import build_quartet_midi
+        from white_generation.pipelines.quartet_pipeline import build_quartet_midi
 
         events = self._note_events([60, 62, 64])
         midi_bytes = build_quartet_midi(
@@ -141,7 +141,7 @@ def _make_mock_scorer():
 
 class TestGenerateQuartet:
     def test_returns_top_k_candidates(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import generate_quartet
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
 
         prod = tmp_path / "production" / "test_song"
         prod.mkdir(parents=True)
@@ -154,7 +154,7 @@ class TestGenerateQuartet:
         assert len(candidates) == 2
 
     def test_candidates_have_required_fields(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import generate_quartet
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
 
         prod = tmp_path / "production" / "test_song"
         prod.mkdir(parents=True)
@@ -174,7 +174,7 @@ class TestGenerateQuartet:
         assert isinstance(c["midi_bytes"], bytes)
 
     def test_candidates_sorted_by_score_descending(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import generate_quartet
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
 
         prod = tmp_path / "production" / "test_song"
         prod.mkdir(parents=True)
@@ -188,7 +188,7 @@ class TestGenerateQuartet:
         assert scores == sorted(scores, reverse=True)
 
     def test_missing_midi_raises(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import generate_quartet
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
 
         prod = tmp_path / "production" / "test_song"
         prod.mkdir(parents=True)
@@ -200,7 +200,7 @@ class TestGenerateQuartet:
 
     def test_no_scorer_composite_equals_counterpoint(self, tmp_path):
         """When Refractor is unavailable, composite score equals counterpoint (no 0.5 bias)."""
-        from app.generators.midi.pipelines.quartet_pipeline import generate_quartet
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
 
         prod = tmp_path / "production" / "test_song"
         prod.mkdir(parents=True)
@@ -240,7 +240,7 @@ class TestWriteQuartetCandidates:
         ]
 
     def test_midi_files_written(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import (
+        from white_generation.pipelines.quartet_pipeline import (
             write_quartet_candidates,
         )
 
@@ -255,7 +255,7 @@ class TestWriteQuartetCandidates:
         assert len(mid_files) == 2
 
     def test_review_yml_written(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import (
+        from white_generation.pipelines.quartet_pipeline import (
             write_quartet_candidates,
         )
 
@@ -274,7 +274,7 @@ class TestWriteQuartetCandidates:
         assert data["candidates"][0]["status"] == "pending"
 
     def test_appending_second_section_merges(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import (
+        from white_generation.pipelines.quartet_pipeline import (
             write_quartet_candidates,
         )
 
@@ -293,7 +293,7 @@ class TestWriteQuartetCandidates:
         assert "chorus" in labels
 
     def test_regenerating_section_replaces_old_entries(self, tmp_path):
-        from app.generators.midi.pipelines.quartet_pipeline import (
+        from white_generation.pipelines.quartet_pipeline import (
             write_quartet_candidates,
         )
 
@@ -312,7 +312,7 @@ class TestWriteQuartetCandidates:
 
     def test_review_uses_midi_file_key(self, tmp_path):
         """review.yml entries use 'midi_file' so promote_part.py recognises them."""
-        from app.generators.midi.pipelines.quartet_pipeline import (
+        from white_generation.pipelines.quartet_pipeline import (
             write_quartet_candidates,
         )
 
@@ -332,7 +332,7 @@ class TestWriteQuartetCandidates:
 
     def test_stale_midi_files_cleaned_on_regenerate(self, tmp_path):
         """Old MIDI files for a section are removed before writing new candidates."""
-        from app.generators.midi.pipelines.quartet_pipeline import (
+        from white_generation.pipelines.quartet_pipeline import (
             write_quartet_candidates,
         )
 

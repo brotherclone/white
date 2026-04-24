@@ -64,7 +64,7 @@ def make_meta(
 
 class TestCountNotes:
     def test_count_notes(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import _count_notes
+        from white_generation.pipelines.lyric_pipeline import _count_notes
 
         midi_path = tmp_path / "test.mid"
         midi_path.write_bytes(make_midi_bytes(note_count=8))
@@ -72,7 +72,7 @@ class TestCountNotes:
 
     def test_count_notes_zero_velocity_excluded(self, tmp_path):
         """note_off encoded as note_on velocity=0 should not be counted."""
-        from app.generators.midi.pipelines.lyric_pipeline import _count_notes
+        from white_generation.pipelines.lyric_pipeline import _count_notes
 
         mid = mido.MidiFile(ticks_per_beat=480)
         track = mido.MidiTrack()
@@ -87,7 +87,7 @@ class TestCountNotes:
         assert _count_notes(path) == 1
 
     def test_count_notes_missing_file(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import _count_notes
+        from white_generation.pipelines.lyric_pipeline import _count_notes
 
         assert _count_notes(tmp_path / "nonexistent.mid") == 0
 
@@ -99,26 +99,26 @@ class TestCountNotes:
 
 class TestFittingVerdict:
     def test_spacious(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
+        from white_generation.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(0.50) == "spacious"
         assert _fitting_verdict(0.74) == "spacious"
 
     def test_paste_ready(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
+        from white_generation.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(0.75) == "paste-ready"
         assert _fitting_verdict(1.00) == "paste-ready"
         assert _fitting_verdict(1.10) == "paste-ready"
 
     def test_tight_but_workable(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
+        from white_generation.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(1.11) == "tight but workable"
         assert _fitting_verdict(1.30) == "tight but workable"
 
     def test_splits_needed(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _fitting_verdict
+        from white_generation.pipelines.lyric_pipeline import _fitting_verdict
 
         assert _fitting_verdict(1.31) == "splits needed"
         assert _fitting_verdict(2.00) == "splits needed"
@@ -132,7 +132,7 @@ class TestFittingVerdict:
 class TestComputeFitting:
     def test_ratio_calculation(self):
         """Given known syllables/notes, verify ratio and verdict."""
-        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+        from white_generation.pipelines.lyric_pipeline import _compute_fitting
 
         # "Hello world" = 3 syllables, "beautiful morning" = 5 syllables → 8 total
         text = "[verse]\nHello world\nbeautiful morning\n"
@@ -145,7 +145,7 @@ class TestComputeFitting:
 
     def test_overall_verdict_worst_wins(self):
         """If one section is 'tight but workable', overall should reflect that."""
-        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+        from white_generation.pipelines.lyric_pipeline import _compute_fitting
 
         # verse: 8 syllables / 10 notes = 0.8 → paste-ready
         # chorus: lots of syllables for few notes → splits needed
@@ -161,7 +161,7 @@ class TestComputeFitting:
 
     def test_overall_spacious_treated_as_paste_ready(self):
         """A spacious verdict alone should yield 'paste-ready' overall (not 'spacious')."""
-        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+        from white_generation.pipelines.lyric_pipeline import _compute_fitting
 
         text = "[verse]\nHi\n"  # 1 syllable
         vocal_sections = [{"name": "verse", "total_notes": 10}]  # ratio = 0.1
@@ -171,7 +171,7 @@ class TestComputeFitting:
 
     def test_strips_comment_lines(self):
         """Lines starting with # should not contribute syllables."""
-        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+        from white_generation.pipelines.lyric_pipeline import _compute_fitting
 
         text = "[verse]\n# stage direction\nHello world\n"
         vocal_sections = [{"name": "verse", "total_notes": 3}]
@@ -181,7 +181,7 @@ class TestComputeFitting:
 
     def test_zero_notes_ratio_defaults_to_one(self):
         """Section with 0 notes should default to ratio=1.0."""
-        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+        from white_generation.pipelines.lyric_pipeline import _compute_fitting
 
         text = "[verse]\nHello\n"
         vocal_sections = [{"name": "verse", "total_notes": 0}]
@@ -196,7 +196,7 @@ class TestComputeFitting:
 
 class TestParseSections:
     def test_basic_parsing(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
+        from white_generation.pipelines.lyric_pipeline import _parse_sections
 
         text = "[verse]\nline one\nline two\n[chorus]\nchorus line\n"
         result = _parse_sections(text)
@@ -205,7 +205,7 @@ class TestParseSections:
         assert "chorus" in result
 
     def test_strips_comment_lines(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
+        from white_generation.pipelines.lyric_pipeline import _parse_sections
 
         text = "[verse]\n# a comment\nreal line\n"
         result = _parse_sections(text)
@@ -213,13 +213,13 @@ class TestParseSections:
         assert "# a comment" not in result["verse"]
 
     def test_empty_if_no_headers(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
+        from white_generation.pipelines.lyric_pipeline import _parse_sections
 
         result = _parse_sections("just some text without headers")
         assert result == {}
 
     def test_section_name_lowercased(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _parse_sections
+        from white_generation.pipelines.lyric_pipeline import _parse_sections
 
         text = "[Verse]\nsome line\n"
         result = _parse_sections(text)
@@ -250,13 +250,13 @@ class TestSyllableTargets:
 
 class TestNextCandidateId:
     def test_empty_review(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _next_candidate_id
+        from white_generation.pipelines.lyric_pipeline import _next_candidate_id
 
         review = {"candidates": []}
         assert _next_candidate_id(review) == "lyrics_01"
 
     def test_with_existing_candidates(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _next_candidate_id
+        from white_generation.pipelines.lyric_pipeline import _next_candidate_id
 
         review = {
             "candidates": [
@@ -269,7 +269,7 @@ class TestNextCandidateId:
 
     def test_gaps_still_increment_from_max(self):
         """Gaps in numbering should not affect the next ID (uses max)."""
-        from app.generators.midi.pipelines.lyric_pipeline import _next_candidate_id
+        from white_generation.pipelines.lyric_pipeline import _next_candidate_id
 
         review = {"candidates": [{"id": "lyrics_01"}, {"id": "lyrics_05"}]}
         assert _next_candidate_id(review) == "lyrics_06"
@@ -282,7 +282,7 @@ class TestNextCandidateId:
 
 class TestLoadOrInitReview:
     def test_creates_fresh_when_missing(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import _load_or_init_review
+        from white_generation.pipelines.lyric_pipeline import _load_or_init_review
 
         meta = make_meta()
         review = _load_or_init_review(tmp_path, meta, model="claude-sonnet-4-6", seed=7)
@@ -292,7 +292,7 @@ class TestLoadOrInitReview:
         assert review["candidates"] == []
 
     def test_loads_existing_file(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             _load_or_init_review,
         )
@@ -313,7 +313,7 @@ class TestLoadOrInitReview:
 
     def test_review_append_preserves_existing(self, tmp_path):
         """Existing approved entry must not be touched after a second run."""
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             _load_or_init_review,
             _next_candidate_id,
@@ -343,7 +343,7 @@ class TestLoadOrInitReview:
 
 class TestBuildPrompt:
     def test_has_concept(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         meta = make_meta(concept="machines learning to breathe")
         vocal_sections = [
@@ -360,7 +360,7 @@ class TestBuildPrompt:
         assert "machines learning to breathe" in prompt
 
     def test_has_syllable_targets(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         meta = make_meta()
         vocal_sections = [
@@ -378,7 +378,7 @@ class TestBuildPrompt:
         assert "54" in prompt
 
     def test_has_section_headers(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         meta = make_meta()
         vocal_sections = [
@@ -410,7 +410,7 @@ class TestBuildPrompt:
 
 class TestSyncLyricCandidates:
     def test_adds_untracked_stub(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             sync_lyric_candidates,
         )
@@ -433,7 +433,7 @@ class TestSyncLyricCandidates:
         assert "lyrics_04" in ids
 
     def test_skips_already_tracked(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             sync_lyric_candidates,
         )
@@ -461,7 +461,7 @@ class TestSyncLyricCandidates:
         assert added == 0
 
     def test_no_review_returns_zero(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import sync_lyric_candidates
+        from white_generation.pipelines.lyric_pipeline import sync_lyric_candidates
 
         melody_dir = tmp_path / "melody"
         melody_dir.mkdir()
@@ -682,8 +682,7 @@ class TestRunPipelineIntegration:
     def test_run_pipeline_writes_candidate_files(self, tmp_path):
         """Pipeline should write N .txt files in melody/candidates/."""
         import numpy as np
-
-        from app.generators.midi.pipelines.lyric_pipeline import run_lyric_pipeline
+        from white_generation.pipelines.lyric_pipeline import run_lyric_pipeline
 
         prod_dir = _make_production_dir(tmp_path)
 
@@ -723,8 +722,7 @@ class TestRunPipelineIntegration:
     def test_run_pipeline_writes_review_yml(self, tmp_path):
         """Pipeline should write lyrics_review.yml with one candidate entry."""
         import numpy as np
-
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             run_lyric_pipeline,
         )
@@ -771,7 +769,7 @@ class TestRunPipelineIntegration:
 
     def test_run_pipeline_appends_not_overwrites(self, tmp_path):
         """Second run should append new entries; first entry must be preserved."""
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             run_lyric_pipeline,
         )
@@ -840,7 +838,7 @@ class TestRunPipelineIntegration:
 
 class TestCollectSubLyrics:
     def test_finds_approved_from_review(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+        from white_generation.pipelines.lyric_pipeline import collect_sub_lyrics
 
         prod = tmp_path / "prod_red"
         cands = prod / "melody" / "candidates"
@@ -868,7 +866,7 @@ class TestCollectSubLyrics:
         assert "Red verse one" in results[0]["lyrics_text"]
 
     def test_fallback_to_all_txt_when_no_review(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+        from white_generation.pipelines.lyric_pipeline import collect_sub_lyrics
 
         prod = tmp_path / "prod_blue"
         cands = prod / "melody" / "candidates"
@@ -880,7 +878,7 @@ class TestCollectSubLyrics:
         assert len(results) == 2
 
     def test_empty_when_no_melody_candidates(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+        from white_generation.pipelines.lyric_pipeline import collect_sub_lyrics
 
         prod = tmp_path / "prod_empty"
         prod.mkdir()
@@ -888,7 +886,7 @@ class TestCollectSubLyrics:
         assert results == []
 
     def test_skips_empty_txt(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import collect_sub_lyrics
+        from white_generation.pipelines.lyric_pipeline import collect_sub_lyrics
 
         prod = tmp_path / "prod_empty_txt"
         cands = prod / "melody" / "candidates"
@@ -926,7 +924,7 @@ class TestBuildWhiteCutupPrompt:
         return {"verse": (12, 17)}
 
     def test_source_lyrics_section_present(self):
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             _build_white_cutup_prompt,
         )
 
@@ -948,7 +946,7 @@ class TestBuildWhiteCutupPrompt:
         assert "[verse]" in prompt
 
     def test_fallback_prompt_when_no_sub_lyrics(self):
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             _build_white_cutup_prompt,
         )
 
@@ -961,7 +959,7 @@ class TestBuildWhiteCutupPrompt:
 
     def test_non_white_pipeline_unchanged(self, tmp_path):
         """Non-White color songs use the standard _build_prompt, not the cut-up variant."""
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         meta = {
             "title": "Blue Song",
@@ -1022,7 +1020,7 @@ class TestReadVocalSectionsRepeatType:
         return melody_dir
 
     def test_chorus_x3_produces_exact_then_exact_repeat(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )
 
@@ -1044,7 +1042,7 @@ class TestReadVocalSectionsRepeatType:
         assert sections[2]["lyric_repeat_type"] == "exact_repeat"
 
     def test_verse_x2_produces_two_variation_entries(self, tmp_path):
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )
 
@@ -1066,8 +1064,7 @@ class TestReadVocalSectionsRepeatType:
     def test_plan_override_takes_priority(self, tmp_path):
         """lyric_repeat_type in production_plan.yml overrides label inference."""
         import yaml
-
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )
 
@@ -1091,8 +1088,7 @@ class TestReadVocalSectionsRepeatType:
     def test_plan_override_typo_normalised_to_fresh(self, tmp_path):
         """A typo like 'Exact' in production_plan.yml is normalised to 'fresh', not 'exact'."""
         import yaml
-
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )
 
@@ -1118,8 +1114,7 @@ class TestReadVocalSectionsRepeatType:
     def test_plan_override_invalid_falls_back_to_inferred(self, tmp_path):
         """An unrecognised repeat type in production_plan.yml falls back to label inference."""
         import yaml
-
-        from app.generators.midi.pipelines.lyric_pipeline import (
+        from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )
 
@@ -1173,8 +1168,7 @@ class TestBuildPromptRepeatTypes:
 
     def test_exact_repeat_section_skipped(self):
         from white_core.enums.lyric_repeat_type import LyricRepeatType
-
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         sections = [
             self._sec("chorus", repeat_type="exact"),
@@ -1195,14 +1189,14 @@ class TestBuildPromptRepeatTypes:
         assert "[chorus_3]" not in prompt
 
     def test_exact_annotation_present(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         sections = [self._sec("chorus", repeat_type="exact")]
         prompt = _build_prompt(self._meta(), sections, {})
         assert "repeats verbatim" in prompt
 
     def test_variation_annotation_on_second_instance(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         sections = [
             self._sec("verse", repeat_type="variation"),
@@ -1214,7 +1208,7 @@ class TestBuildPromptRepeatTypes:
         assert "Variation 2 of verse" in prompt
 
     def test_fresh_sections_unchanged(self):
-        from app.generators.midi.pipelines.lyric_pipeline import _build_prompt
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
 
         sections = [self._sec("bridge", repeat_type="fresh")]
         prompt = _build_prompt(self._meta(), sections, {})
@@ -1233,8 +1227,7 @@ class TestBuildPromptRepeatTypes:
 class TestComputeFittingExactRepeat:
     def test_exact_repeat_copies_from_source(self, tmp_path):
         from white_core.enums.lyric_repeat_type import LyricRepeatType
-
-        from app.generators.midi.pipelines.lyric_pipeline import _compute_fitting
+        from white_generation.pipelines.lyric_pipeline import _compute_fitting
 
         # First instance is 'chorus', second is 'chorus_2' (exact_repeat)
         # Use the enum directly — the pipeline stores LyricRepeatType.EXACT_REPEAT,

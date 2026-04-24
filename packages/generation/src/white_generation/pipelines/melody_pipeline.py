@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-Bass line generation pipeline for the Music Production Pipeline.
+Melody generation pipeline for the Music Production Pipeline.
 
-Reads approved chords, harmonic rhythm, and drum patterns. Generates bass line
-candidates from templates, scores with theory + Refractor composite,
-writes top candidates as MIDI files with a review YAML.
+Reads approved chords, harmonic rhythm, and song proposal metadata. Generates
+melody candidates from contour templates within singer vocal range constraints,
+scores with theory + Refractor composite, writes top candidates as MIDI
+files with a review YAML.
 
-Pipeline position: chords → drums → harmonic rhythm → strums → BASS → melody
+Pipeline position: chords → drums → harmonic rhythm → strums → bass → MELODY
 
 Usage:
-    python -m app.generators.midi.pipelines.bass_pipeline \
+    python -m app.generators.midi.pipelines.melody_pipeline \
         --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
-        --seed 42 --top-k 5
+        --singer gabriel --seed 42 --top-k 5
 """
 
 import argparse
@@ -24,36 +25,7 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
-from white_core.enums.bass_style import BassStyle
 
-from app.generators.midi.patterns.aesthetic_hints import (
-    aesthetic_tag_adjustment,
-    arc_tag_adjustment,
-    style_profile_tag_adjustment,
-)
-from app.generators.midi.patterns.bass_patterns import (
-    ALL_TEMPLATES,
-    BASS_CHANNEL,
-    VELOCITY,
-    BassPattern,
-    bass_theory_score,
-    extract_root,
-    kick_alignment,
-    make_fallback_pattern,
-    resolve_tone,
-    root_adherence,
-    select_templates,
-    voice_leading_score,
-)
-from app.generators.midi.patterns.strum_patterns import (
-    read_approved_harmonic_rhythm,
-)
-from app.generators.midi.pipelines.chord_pipeline import (
-    _to_python,
-    compute_chromatic_match,
-    get_chromatic_target,
-    load_song_proposal,
-)
 from app.generators.midi.production.init_production import load_song_context
 from app.util.diversity_tracker import (
     diversity_factor,
@@ -66,141 +38,103 @@ from app.util.phrase_dynamics import (
     infer_curve,
     parse_curve,
 )
+from white_generation.patterns.aesthetic_hints import (
+    aesthetic_tag_adjustment,
+    arc_tag_adjustment,
+    style_profile_tag_adjustment,
+)
+from white_generation.patterns.melody_patterns import (
+    ALL_TEMPLATES,
+    MELODY_CHANNEL,
+    SINGERS,
+    VELOCITY,
+    MelodyPattern,
+    SingerRange,
+    chord_tone_alignment,
+    contour_quality,
+    infer_singer,
+    make_fallback_pattern,
+    melody_theory_score,
+    resolve_melody_notes,
+    select_templates,
+    singability_score,
+)
+from white_generation.patterns.strum_patterns import (
+    read_approved_harmonic_rhythm,
+)
+from white_generation.pipelines.chord_pipeline import (
+    _to_python,
+    compute_chromatic_match,
+    get_chromatic_target,
+    load_song_proposal,
+)
 
 # ---------------------------------------------------------------------------
-# Kick onset extraction from drum MIDI
+# Melodic continuity helpers
 # ---------------------------------------------------------------------------
 
-KICK_NOTE = 36  # GM percussion kick drum
+
+def last_note_of_midi(midi_bytes: bytes) -> Optional[int]:
+    """Return MIDI pitch of the last note-on event, or None if no notes found."""
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    last_pitch = None
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type == "note_on" and msg.velocity > 0:
+                last_pitch = msg.note
+    return last_pitch
 
 
-def extract_kick_onsets(
-    drum_midi_path: str,
-    ticks_per_beat: int = 480,
-) -> list[float]:
-    """Extract kick drum onset positions (in beats) from an approved drum MIDI.
+def first_note_of_candidate(candidate: dict) -> Optional[int]:
+    """Return MIDI pitch of the first note-on event in candidate's MIDI bytes."""
+    midi_bytes = candidate.get("midi_bytes")
+    if not midi_bytes:
+        return None
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    for track in mid.tracks:
+        for msg in track:
+            if msg.type == "note_on" and msg.velocity > 0:
+                return msg.note
+    return None
 
-    Returns list of beat positions where kick hits occur within one bar.
+
+def continuity_penalty(
+    first_note: Optional[int],
+    last_note: Optional[int],
+    max_semitones: int = 4,
+) -> float:
+    """Return 0.85 if interval exceeds max_semitones, else 1.0.
+
+    Returns 1.0 (no penalty) when either note is None.
     """
-    mid = mido.MidiFile(str(drum_midi_path))
-    tpb = mid.ticks_per_beat or ticks_per_beat
-
-    onsets = []
-    abs_tick = 0
-    for msg in mid.tracks[0]:
-        abs_tick += msg.time
-        if msg.type == "note_on" and msg.velocity > 0 and msg.note == KICK_NOTE:
-            beat_pos = abs_tick / tpb
-            onsets.append(beat_pos)
-
-    return onsets
+    if first_note is None or last_note is None:
+        return 1.0
+    return 0.85 if abs(first_note - last_note) > max_semitones else 1.0
 
 
-def read_approved_kick_onsets(
-    production_dir: Path,
-) -> dict[str, list[float]]:
-    """Read approved drum MIDI files and extract kick onsets per section.
+# ---------------------------------------------------------------------------
+# Read approved sections and chord data (reuse from bass pipeline pattern)
+# ---------------------------------------------------------------------------
 
-    Returns dict mapping section label → list of kick beat positions.
-    """
-    drums_dir = production_dir / "drums"
-    approved_dir = drums_dir / "approved"
-    review_path = drums_dir / "review.yml"
 
-    if not approved_dir.exists() or not review_path.exists():
-        return {}
-
-    with open(review_path) as f:
-        drum_review = yaml.safe_load(f)
-
-    section_kicks: dict[str, list[float]] = {}
-
-    for candidate in drum_review.get("candidates", []):
+def read_approved_sections(chord_review: dict) -> list[dict]:
+    """Extract approved sections from chord review YAML."""
+    sections = []
+    for candidate in chord_review.get("candidates", []):
         status = str(candidate.get("status", "")).lower()
         if status not in ("approved", "accepted"):
             continue
-        section = candidate.get("section", "")
-        label = candidate.get("label", "")
-        if not section and not label:
+        label = candidate.get("label")
+        if not label:
             continue
-
-        section_key = (section or label).lower().replace("-", "_").replace(" ", "_")
-
-        # Only use first approved drum per section
-        if section_key in section_kicks:
-            continue
-
-        # Find the approved MIDI file
-        midi_file = None
-        if label:
-            candidate_path = approved_dir / f"{label}.mid"
-            if candidate_path.exists():
-                midi_file = str(candidate_path)
-        if midi_file is None:
-            for f in sorted(approved_dir.glob("*.mid")):
-                if f.stem.lower().startswith(section_key):
-                    midi_file = str(f)
-                    break
-
-        if midi_file is not None:
-            section_kicks[section_key] = extract_kick_onsets(midi_file)
-
-    return section_kicks
-
-
-# ---------------------------------------------------------------------------
-# Chord root extraction
-# ---------------------------------------------------------------------------
-
-# ToDo: Most likely duplicate work should use the core note objects
-
-_NOTE_PC = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
-
-
-def _note_name_to_midi(note_str: str) -> int:
-    """Convert a note name like 'G2', 'D#4', 'Bb3' to a MIDI note number."""
-    s = note_str.strip()
-    # Split trailing digit(s) as octave
-    i = len(s) - 1
-    while i >= 0 and s[i].isdigit():
-        i -= 1
-    pitch_part = s[: i + 1]
-    octave = int(s[i + 1 :])
-    pc = pitch_part[0].upper()
-    acc = pitch_part[1:] if len(pitch_part) > 1 else ""
-    midi = (octave + 1) * 12 + _NOTE_PC[pc]
-    if acc in ("#", "♯"):
-        midi += 1
-    elif acc in ("b", "♭"):
-        midi -= 1
-    return midi
-
-
-def _voicings_from_midi(
-    midi_path: Path, time_sig_numerator: int = 4
-) -> list[list[int]]:
-    """Extract one chord voicing per bar from a MIDI file.
-
-    Groups all note-on events within each bar into a single voicing so the
-    resulting voicing count matches the block's bar length rather than the
-    number of individual note onsets (which is the case for cut-up chords).
-    """
-    mid = mido.MidiFile(str(midi_path))
-    tpb = mid.ticks_per_beat
-    ticks_per_bar = tpb * time_sig_numerator
-
-    bar_notes: dict[int, list[int]] = {}
-    for track in mid.tracks:
-        tick = 0
-        for msg in track:
-            tick += msg.time
-            if msg.type == "note_on" and msg.velocity > 0:
-                bar = tick // ticks_per_bar
-                bar_notes.setdefault(bar, []).append(msg.note)
-
-    if not bar_notes:
-        return []
-    return [sorted(set(notes)) for _, notes in sorted(bar_notes.items()) if notes]
+        sections.append(
+            {
+                "label": label.lower().replace("-", "_").replace(" ", "_"),
+                "label_display": label,
+                "chord_id": candidate.get("id", "unknown"),
+            }
+        )
+    return sections
 
 
 def extract_section_chord_data(
@@ -211,80 +145,34 @@ def extract_section_chord_data(
     Voicings are read directly from the chord review.yml ``chords`` field so
     the count always matches ``hr_distribution`` — regardless of how many strum
     events were baked into the MIDI file.
-
-    Returns:
-        chord_data: dict mapping section label → list of voicings (note lists)
-        chord_review: the parsed chord review.yml dict
     """
-    chord_review_path = production_dir / "chords" / "review.yml"
-    if not chord_review_path.exists():
-        raise FileNotFoundError(f"Chord review not found: {chord_review_path}")
+    from white_generation.pipelines.bass_pipeline import (
+        extract_section_chord_data as _bass_extract,
+    )
 
-    with open(chord_review_path) as f:
-        chord_review = yaml.safe_load(f)
-
-    chord_data: dict[str, list[list[int]]] = {}
-    for candidate in chord_review.get("candidates", []):
-        status = str(candidate.get("status", "")).lower()
-        if status not in ("approved", "accepted"):
-            continue
-        label = candidate.get("label")
-        if not label:
-            continue
-        key = str(label).lower().replace("-", "_").replace(" ", "_")
-        if key in chord_data:
-            continue
-        voicings = []
-        for chord in candidate.get("chords", []):
-            midi_notes = []
-            for n in chord.get("notes", []):
-                try:
-                    midi_notes.append(_note_name_to_midi(str(n)))
-                except (ValueError, KeyError):
-                    pass
-            if midi_notes:
-                voicings.append(sorted(midi_notes))
-
-        # Fallback: parse voicings from approved MIDI when chords: [] (e.g. cut-up productions)
-        if not voicings:
-            approved_midi = production_dir / "chords" / "approved" / f"{key}.mid"
-            if approved_midi.exists():
-                voicings = _voicings_from_midi(approved_midi)
-
-        if voicings:
-            chord_data[key] = voicings
-
-    if not chord_data:
-        raise FileNotFoundError("No approved chord voicings found in chords/review.yml")
-
-    return chord_data, chord_review
+    return _bass_extract(production_dir)
 
 
 # ---------------------------------------------------------------------------
-# Bass MIDI generation
+# Melody MIDI generation
 # ---------------------------------------------------------------------------
 
 
-def bass_pattern_to_midi_bytes(
-    pattern: BassPattern,
-    voicings: list[list[int]],
+def melody_notes_to_midi_bytes(
+    resolved_notes: list[tuple[float, int, float]],
     bpm: int = 120,
     ticks_per_beat: int = 480,
-    durations: list[float] | None = None,
     curve: DynamicCurve = DynamicCurve.FLAT,
-) -> tuple[bytes, list[tuple[float, int]]]:
-    """Generate bass MIDI bytes from a pattern and chord voicings.
+) -> bytes:
+    """Convert resolved melody notes to MIDI bytes.
 
     Args:
-        pattern: The bass pattern template.
-        voicings: List of chord voicings (one per chord in the section).
+        resolved_notes: List of (onset_beat, midi_note, duration_beats).
         bpm: Beats per minute.
         ticks_per_beat: MIDI resolution.
-        durations: Optional per-chord durations in bars (from harmonic rhythm).
 
     Returns:
-        Tuple of (midi_bytes, resolved_notes) where resolved_notes is
-        [(beat_position_absolute, midi_note), ...] for scoring.
+        MIDI file as bytes.
     """
     mid = mido.MidiFile(ticks_per_beat=ticks_per_beat)
     track = mido.MidiTrack()
@@ -293,82 +181,31 @@ def bass_pattern_to_midi_bytes(
     tempo = mido.bpm2tempo(bpm)
     track.append(mido.MetaMessage("set_tempo", tempo=tempo, time=0))
 
-    bar_beats = pattern.bar_length_beats()
-    bar_ticks = int(bar_beats * ticks_per_beat)
-
-    all_events = []  # (abs_tick, note, velocity, is_on)
-    resolved_notes = []  # (abs_beat_position, midi_note) for scoring
-
-    tonic_voicing = voicings[0] if voicings else []
-    current_offset_ticks = 0
-    for chord_idx, voicing in enumerate(voicings):
-        # Pedal-style patterns lock to the tonic (first chord) regardless of changes
-        if pattern.style == BassStyle.PEDAL:
-            voicing = tonic_voicing
-        if durations is not None:
-            chord_dur_beats = durations[chord_idx] * bar_beats
-        else:
-            chord_dur_beats = bar_beats
-
-        chord_dur_ticks = int(chord_dur_beats * ticks_per_beat)
-
-        # Determine next voicing for approach/passing tones
-        next_voicing = (
-            voicings[chord_idx + 1] if chord_idx + 1 < len(voicings) else None
-        )
-
-        # Apply pattern, repeating if chord duration > 1 bar
-        pattern_offset_ticks = 0
-        while pattern_offset_ticks < chord_dur_ticks:
-            for i, (beat_pos, tone_sel, vel_level) in enumerate(pattern.notes):
-                note = resolve_tone(tone_sel, voicing, next_voicing)
-                velocity = VELOCITY.get(vel_level, 80)
-
-                onset_ticks = pattern_offset_ticks + int(beat_pos * ticks_per_beat)
-                abs_ticks = current_offset_ticks + onset_ticks
-
-                # Don't exceed chord boundary
-                if onset_ticks >= chord_dur_ticks:
-                    break
-
-                # Determine note duration
-                if pattern.note_durations and i < len(pattern.note_durations):
-                    dur_ticks = int(pattern.note_durations[i] * ticks_per_beat)
-                elif i + 1 < len(pattern.notes):
-                    next_onset = int(pattern.notes[i + 1][0] * ticks_per_beat)
-                    dur_ticks = pattern_offset_ticks + next_onset - onset_ticks
-                else:
-                    dur_ticks = chord_dur_ticks - onset_ticks
-
-                # Clamp duration to not exceed chord boundary
-                max_dur = current_offset_ticks + chord_dur_ticks - abs_ticks
-                dur_ticks = min(dur_ticks, max_dur)
-
-                if dur_ticks > 0:
-                    all_events.append((abs_ticks, note, velocity, True))
-                    all_events.append((abs_ticks + dur_ticks, note, 0, False))
-
-                    abs_beat = (current_offset_ticks + onset_ticks) / ticks_per_beat
-                    resolved_notes.append((abs_beat, note))
-
-            pattern_offset_ticks += bar_ticks
-
-        current_offset_ticks += chord_dur_ticks
+    # Build events
+    events = []
+    for onset, note, dur in resolved_notes:
+        on_tick = int(onset * ticks_per_beat)
+        off_tick = int((onset + dur) * ticks_per_beat)
+        velocity = VELOCITY["normal"]
+        events.append((on_tick, note, velocity, True))
+        events.append((off_tick, note, 0, False))
 
     # Apply phrase-level dynamics before sort
-    all_events = apply_dynamics_curve(all_events, curve, min_vel=50, max_vel=110)
+    events = apply_dynamics_curve(events, curve, min_vel=60, max_vel=127)
 
-    # Sort: by tick, note-offs before note-ons at same tick
-    all_events.sort(key=lambda e: (e[0], not e[3], e[1]))
+    events.sort(key=lambda e: (e[0], not e[3], e[1]))
 
-    # Convert to delta times
     prev_tick = 0
-    for abs_tick, note, velocity, is_on in all_events:
+    for abs_tick, note, velocity, is_on in events:
         delta = abs_tick - prev_tick
         msg_type = "note_on" if is_on else "note_off"
         track.append(
             mido.Message(
-                msg_type, note=note, velocity=velocity, time=delta, channel=BASS_CHANNEL
+                msg_type,
+                note=note,
+                velocity=velocity,
+                time=delta,
+                channel=MELODY_CHANNEL,
             )
         )
         prev_tick = abs_tick
@@ -377,7 +214,62 @@ def bass_pattern_to_midi_bytes(
 
     buf = io.BytesIO()
     mid.save(file=buf)
-    return buf.getvalue(), resolved_notes
+    return buf.getvalue()
+
+
+def generate_melody_for_section(
+    pattern: MelodyPattern,
+    voicings: list[list[int]],
+    singer: SingerRange,
+    bpm: int = 120,
+    durations: list[float] | None = None,
+    curve: DynamicCurve = DynamicCurve.FLAT,
+) -> tuple[bytes, list[tuple[float, int, float]]]:
+    """Generate melody MIDI for an entire section from a pattern and chord voicings.
+
+    Applies the pattern to each chord in the section, accumulating the melody
+    over the full duration.
+
+    Returns:
+        Tuple of (midi_bytes, all_resolved_notes).
+    """
+    bar_beats = pattern.bar_length_beats()
+    all_notes: list[tuple[float, int, float]] = []
+    offset_beats = 0.0
+
+    for chord_idx, voicing in enumerate(voicings):
+        if durations is not None and chord_idx < len(durations):
+            chord_dur_beats = durations[chord_idx] * bar_beats
+        else:
+            chord_dur_beats = bar_beats
+
+        next_voicing = (
+            voicings[chord_idx + 1] if chord_idx + 1 < len(voicings) else None
+        )
+
+        # Resolve the pattern for this chord
+        notes = resolve_melody_notes(pattern, voicing, singer, next_voicing)
+
+        # Repeat pattern if chord duration > 1 bar
+        pattern_dur = bar_beats
+        repeat_offset = 0.0
+        while repeat_offset < chord_dur_beats:
+            for onset, note, dur in notes:
+                abs_onset = offset_beats + repeat_offset + onset
+                # Don't exceed chord boundary
+                if repeat_offset + onset >= chord_dur_beats:
+                    break
+                # Clamp duration to chord boundary
+                max_dur = (offset_beats + chord_dur_beats) - abs_onset
+                clamped_dur = min(dur, max_dur)
+                if clamped_dur > 0:
+                    all_notes.append((abs_onset, note, clamped_dur))
+            repeat_offset += pattern_dur
+
+        offset_beats += chord_dur_beats
+
+    midi_bytes = melody_notes_to_midi_bytes(all_notes, bpm=bpm, curve=curve)
+    return midi_bytes, all_notes
 
 
 # ---------------------------------------------------------------------------
@@ -385,7 +277,7 @@ def bass_pattern_to_midi_bytes(
 # ---------------------------------------------------------------------------
 
 
-def bass_composite_score(
+def melody_composite_score(
     theory: float,
     chromatic_match: float,
     scorer_result: dict,
@@ -393,7 +285,7 @@ def bass_composite_score(
     theory_weight: float = 0.3,
     chromatic_weight: float = 0.7,
 ) -> tuple[float, dict]:
-    """Compute weighted composite score for a bass candidate."""
+    """Compute weighted composite score for a melody candidate."""
     composite = theory_weight * theory + chromatic_weight * chromatic_match
     breakdown = {
         "composite": round(composite, 4),
@@ -416,15 +308,16 @@ def bass_composite_score(
 # ---------------------------------------------------------------------------
 
 
-def generate_bass_review_yaml(
+def generate_melody_review_yaml(
     production_dir: str,
     sections: list[dict],
     ranked_by_section: dict[str, list[dict]],
     seed: int,
     scoring_weights: dict,
     song_info: dict,
+    singer_name: str,
 ) -> dict:
-    """Generate the review YAML structure for bass candidates."""
+    """Generate the review YAML structure for melody candidates."""
     all_candidates = []
     global_rank = 0
     for section in sections:
@@ -438,11 +331,12 @@ def generate_bass_review_yaml(
                     "rank": global_rank,
                     "section": section["label_display"],
                     "chord_source": section.get("chord_id", ""),
-                    "style": item["style"],
+                    "contour": item["contour"],
                     "pattern_name": item["pattern_name"],
                     "energy": item["energy"],
+                    "use_case": item.get("use_case", "vocal"),
+                    "singer": singer_name,
                     "scores": _to_python(item["breakdown"]),
-                    # Human annotation fields
                     "label": None,
                     "status": "pending",
                     "notes": "",
@@ -451,10 +345,11 @@ def generate_bass_review_yaml(
 
     return {
         "production_dir": str(production_dir),
-        "pipeline": "bass-generation",
+        "pipeline": "melody-generation",
         "bpm": song_info.get("bpm", 120),
         "time_sig": f"{song_info['time_sig'][0]}/{song_info['time_sig'][1]}",
         "color": song_info.get("color_name", ""),
+        "singer": singer_name,
         "generated": datetime.now(timezone.utc).isoformat(),
         "seed": seed,
         "scoring_weights": scoring_weights,
@@ -464,59 +359,124 @@ def generate_bass_review_yaml(
 
 
 # ---------------------------------------------------------------------------
-# Read approved sections from chord review
+# Candidate sync (manual MIDI injection / rollback support)
 # ---------------------------------------------------------------------------
 
 
-def read_approved_sections(chord_review: dict) -> list[dict]:
-    """Extract approved sections from chord review YAML.
+def sync_melody_candidates(melody_dir: Path) -> int:
+    """Scan candidates/ for .mid files not tracked in review.yml and add stubs.
 
-    Returns list of dicts: [{label, label_display, chord_id}, ...]
+    Safe to run after dropping in a manually edited or hand-composed MIDI.
+    Does NOT wipe existing candidates or regenerate anything.
+
+    Returns the number of new entries added.
     """
-    sections = []
-    for candidate in chord_review.get("candidates", []):
-        status = str(candidate.get("status", "")).lower()
-        if status not in ("approved", "accepted"):
-            continue
-        label = candidate.get("label")
-        if not label:
-            continue
-        sections.append(
-            {
-                "label": label.lower().replace("-", "_").replace(" ", "_"),
-                "label_display": label,
-                "chord_id": candidate.get("id", "unknown"),
-            }
+    review_path = melody_dir / "review.yml"
+    candidates_dir = melody_dir / "candidates"
+
+    if not review_path.exists():
+        print(f"ERROR: No review.yml found at {review_path}")
+        print("Run the melody pipeline first to create a review.yml base.")
+        return 0
+
+    with open(review_path) as f:
+        review = yaml.safe_load(f) or {}
+
+    existing_files = {
+        Path(c["midi_file"]).name
+        for c in review.get("candidates", [])
+        if c.get("midi_file")
+    }
+    existing_ids = {c["id"] for c in review.get("candidates", []) if c.get("id")}
+
+    if not candidates_dir.exists():
+        print(f"No candidates/ directory at {candidates_dir}")
+        return 0
+
+    new_files = sorted(
+        f
+        for f in candidates_dir.glob("*.mid")
+        if f.name not in existing_files and not f.name.endswith("_scratch.mid")
+    )
+
+    if not new_files:
+        print("All candidate files are already tracked in review.yml")
+        return 0
+
+    singer = review.get("singer", "")
+    added = 0
+    for midi_file in new_files:
+        stub_id = midi_file.stem
+        if stub_id in existing_ids:
+            i = 2
+            while f"{stub_id}_{i}" in existing_ids:
+                i += 1
+            stub_id = f"{stub_id}_{i}"
+
+        stub = {
+            "id": stub_id,
+            "midi_file": f"candidates/{midi_file.name}",
+            "rank": None,
+            "section": "manual",
+            "chord_source": "manual",
+            "contour": "manual",
+            "pattern_name": "manual",
+            "energy": "unknown",
+            "singer": singer,
+            "scores": None,
+            "label": None,
+            "status": "pending",
+            "notes": "manually added — set label and status: approved to promote",
+        }
+        review.setdefault("candidates", []).append(stub)
+        existing_ids.add(stub_id)
+        print(f"  + {midi_file.name}  →  id: {stub_id}")
+        added += 1
+
+    with open(review_path, "w") as f:
+        yaml.dump(
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
         )
-    return sections
+
+    print(f"\nAdded {added} entries to review.yml")
+    print(f"Edit {review_path}")
+    print("Set label: <name> and status: approved, then run promote_part")
+    return added
 
 
 # ---------------------------------------------------------------------------
 # Main pipeline
 # ---------------------------------------------------------------------------
 
+DEFAULT_ENERGY = {
+    "intro": "low",
+    "verse": "medium",
+    "chorus": "high",
+    "bridge": "low",
+    "outro": "medium",
+}
 
-def run_bass_pipeline(
+
+def run_melody_pipeline(
     production_dir: str,
     thread_dir: Optional[str] = None,
     song_filename: Optional[str] = None,
+    singer_name: Optional[str] = None,
     seed: int = 42,
     top_k: int = 5,
     theory_weight: float = 0.3,
     chromatic_weight: float = 0.7,
     onnx_path: Optional[str] = None,
+    use_case: str = "vocal",
     evolve: bool = False,
     evolve_generations: int = 8,
     evolve_population: int = 30,
 ):
-    """Run the bass generation pipeline end-to-end.
-
-    1. Read approved chords, harmonic rhythm, drums
-    2. Generate bass candidates from templates
-    3. Score with theory + Refractor
-    4. Write top-k per section as MIDI files
-    5. Write review.yml
-    """
+    """Run the melody generation pipeline end-to-end."""
     np.random.seed(seed)
 
     prod_path = Path(production_dir)
@@ -526,7 +486,7 @@ def run_bass_pipeline(
 
     # --- 1. Read approved chords ---
     print("=" * 60)
-    print("BASS LINE GENERATION PIPELINE")
+    print("MELODY GENERATION PIPELINE")
     print("=" * 60)
 
     chord_data, chord_review = extract_section_chord_data(prod_path)
@@ -569,19 +529,47 @@ def run_bass_pipeline(
     print(f"Time:  {time_sig[0]}/{time_sig[1]}")
     print(f"Color: {song_info['color_name']}")
 
-    # --- 3. Read harmonic rhythm ---
+    # Melodic continuity config
+    continuity_semitones: int = int(song_info.get("melodic_continuity_semitones", 4))
+
+    # --- 3. Determine singer ---
+    if singer_name:
+        singer_key = singer_name.lower().strip()
+        if singer_key not in SINGERS:
+            print(
+                f"ERROR: Unknown singer '{singer_name}'. Available: {', '.join(SINGERS.keys())}"
+            )
+            sys.exit(1)
+        singer = SINGERS[singer_key]
+    else:
+        # Try to get singer from song proposal
+        proposal_singer = song_info.get("singer", "")
+        if proposal_singer and proposal_singer.lower() in SINGERS:
+            singer = SINGERS[proposal_singer.lower()]
+        else:
+            # Infer from key
+            key_str = song_info.get("key", "")
+            if key_str:
+                from white_generation.pipelines.chord_pipeline import (
+                    parse_key_string,
+                )
+
+                key_info = parse_key_string(key_str)
+                tonic_midi = key_info.get("tonic_midi", 60)
+            else:
+                tonic_midi = 60
+            singer = infer_singer(tonic_midi)
+
+    print(
+        f"Singer: {singer.name} ({singer.voice_type}, MIDI {singer.low}-{singer.high})"
+    )
+
+    # --- 4. Read harmonic rhythm ---
     hr_durations = read_approved_harmonic_rhythm(prod_path)
     if hr_durations:
         print(f"Harmonic rhythm loaded for: {', '.join(hr_durations.keys())}")
     else:
         print("  No approved harmonic rhythm — using 1 bar per chord")
-
-    # --- 4. Read approved drum kick onsets ---
-    kick_onsets = read_approved_kick_onsets(prod_path)
-    if kick_onsets:
-        print(f"Kick onsets loaded for: {', '.join(kick_onsets.keys())}")
-    else:
-        print("  No approved drums — kick alignment scoring disabled")
 
     # --- 5. Load Refractor ---
     print("\nLoading Refractor...")
@@ -647,29 +635,36 @@ def run_bass_pipeline(
 
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []
-    used_pattern_names: set[str] = set()
 
-    for section in sections:
+    for section_idx, section in enumerate(sections):
         section_key = section["_section_key"]
         label = section["label"]
         label_display = section["label_display"]
 
         voicings = chord_data.get(label, [])
         if not voicings:
-            # Try section_key
             voicings = chord_data.get(section_key, [])
         if not voicings:
-            # Try any key starting with label
             for k, v in chord_data.items():
                 if k.lower().startswith(label):
                     voicings = v
                     break
 
+        # Skip section when narrative declares lead_voice: none
+        if _narrative:
+            _sec_nc = extract_constraints(label, _narrative)
+            if _sec_nc.get("skip_melody"):
+                print(
+                    f"\n--- Section: {label_display} — SKIPPED (narrative: lead_voice=none) ---"
+                )
+                continue
+        else:
+            _sec_nc = {}
+
         if not voicings:
             print(f"\n--- Section: {label_display} — SKIPPED (no chord voicings) ---")
             continue
 
-        # Section durations from harmonic rhythm
         section_durations = hr_durations.get(label, None)
         if section_durations and len(section_durations) != len(voicings):
             print(
@@ -677,29 +672,10 @@ def run_bass_pipeline(
             )
             section_durations = None
 
-        # Section kick onsets
-        section_kicks = kick_onsets.get(label, None)
-        if section_kicks is None:
-            section_kicks = kick_onsets.get(section_key, None)
-        if section_kicks is None:
-            for dk, dv in kick_onsets.items():
-                if dk.startswith(label):
-                    section_kicks = dv
-                    break
-
         print(
             f"\n--- Section: {label_display} [{section_key}] ({len(voicings)} chords) ---"
         )
 
-        # Select templates
-        # Use section energy mapping similar to drums
-        DEFAULT_ENERGY = {
-            "intro": "low",
-            "verse": "medium",
-            "chorus": "high",
-            "bridge": "low",
-            "outro": "medium",
-        }
         target_energy = DEFAULT_ENERGY.get(label, "medium")
 
         # Determine dynamic curve for this section
@@ -707,35 +683,38 @@ def run_bass_pipeline(
         raw_curve = _dynamics_map.get(label) or _dynamics_map.get(section_key)
         section_curve = parse_curve(raw_curve) if raw_curve else infer_curve(label)
 
-        templates = select_templates(ALL_TEMPLATES, time_sig, target_energy)
+        # "instrumental" is the user-facing alias; template library uses "lead"
+        template_use_case = "lead" if use_case == "instrumental" else use_case
+        templates = select_templates(
+            ALL_TEMPLATES, time_sig, target_energy, use_case=template_use_case
+        )
         if not templates:
             print(
-                f"\n  ⚠️  WARNING: No bass templates exist for {time_sig[0]}/{time_sig[1]} time. "
-                f"Add templates to bass_patterns.py for this time signature. "
-                f"Falling back to root-on-1 only — results will be musically flat.\n"
+                f"\n  ⚠️  WARNING: No melody templates exist for {time_sig[0]}/{time_sig[1]} time. "
+                f"Add templates to melody_patterns.py for this time signature. "
+                f"Falling back to repeated root — results will be musically flat.\n"
             )
             templates = [make_fallback_pattern(time_sig)]
 
-        templates = [t for t in templates if t.name not in used_pattern_names]
         print(
-            f"  Templates: {len(templates)} candidates (energy target: {target_energy}, {len(used_pattern_names)} excluded as cross-section repeats)"
+            f"  Templates: {len(templates)} candidates (energy target: {target_energy})"
         )
 
         # Evolutionary breeding (opt-in)
         if evolve and templates:
-            from app.generators.midi.patterns.pattern_evolution import (
-                breed_bass_patterns,
+            from white_generation.patterns.pattern_evolution import (
+                breed_melody_patterns,
             )
 
             chord_progression = (
-                [{"root": extract_root(v), "notes": v} for v in voicings]
+                [{"root": v[0] if v else 60, "notes": v} for v in voicings]
                 if voicings
-                else [{"root": 36, "notes": [36]}]
+                else [{"root": 60, "notes": [60]}]
             )
             print(
                 f"  Breeding evolved candidates ({evolve_generations} generations, population {evolve_population})..."
             )
-            evolved = breed_bass_patterns(
+            evolved = breed_melody_patterns(
                 concept_emb,
                 chord_progression=chord_progression,
                 seed_patterns=templates,
@@ -746,45 +725,34 @@ def run_bass_pipeline(
             templates = templates + evolved
             print(f"  Templates after breeding: {len(templates)} candidates")
 
-        # Generate MIDI and compute theory scores for each template
+        # Extract chord tones for scoring
+        chord_tones_pc = set()
+        for voicing in voicings:
+            for n in voicing:
+                chord_tones_pc.add(n % 12)
+
         candidates = []
         for tmpl in templates:
-            midi_bytes, resolved_notes = bass_pattern_to_midi_bytes(
+            midi_bytes, resolved_notes = generate_melody_for_section(
                 tmpl,
                 voicings,
+                singer,
                 bpm=bpm,
                 durations=section_durations,
                 curve=section_curve,
             )
 
             # Theory scoring
-            chord_root = extract_root(voicings[0]) if voicings else 36
-            ra = root_adherence(resolved_notes, chord_root, time_sig)
-            ka = (
-                kick_alignment(
-                    [pos for pos, _ in resolved_notes],
-                    section_kicks,
-                )
-                if section_kicks
-                else None
-            )
+            sing = singability_score(resolved_notes, singer, time_sig)
+            ct = chord_tone_alignment(resolved_notes, chord_tones_pc, time_sig)
+            cq = contour_quality(resolved_notes)
+            theory = melody_theory_score(sing, ct, cq)
 
-            # Voice leading: intervals between last note of each chord and first of next
-            vl_intervals = []
-            if len(voicings) > 1:
-                for ci in range(len(voicings) - 1):
-                    r1 = extract_root(voicings[ci])
-                    r2 = extract_root(voicings[ci + 1])
-                    vl_intervals.append(abs(r2 - r1))
-            vl = voice_leading_score(vl_intervals)
-
-            theory = bass_theory_score(ra, ka, vl)
             theory_breakdown = {
-                "root_adherence": ra,
-                "voice_leading": vl,
+                "singability": sing,
+                "chord_tone_alignment": ct,
+                "contour_quality": cq,
             }
-            if ka is not None:
-                theory_breakdown["kick_alignment"] = ka
 
             is_evolved = "evolved" in getattr(tmpl, "tags", [])
             candidates.append(
@@ -795,11 +763,27 @@ def run_bass_pipeline(
                     "theory": theory,
                     "theory_breakdown": theory_breakdown,
                     "pattern_name": tmpl.name,
-                    "style": tmpl.style.value,
+                    "contour": tmpl.contour,
                     "energy": tmpl.energy,
+                    "use_case": tmpl.use_case,
                     "is_evolved": is_evolved,
                 }
             )
+
+        # Preceding approved section's last note (for continuity penalty).
+        # Scan backward to find the nearest prior section that has an approved MIDI —
+        # skipping any gaps where the human hasn't approved yet.
+        preceding_last_note: Optional[int] = None
+        for prev_idx in range(section_idx - 1, -1, -1):
+            prev_label = sections[prev_idx]["label"]
+            approved_midi = prod_path / "melody" / "approved" / f"{prev_label}.mid"
+            if approved_midi.exists():
+                preceding_last_note = last_note_of_midi(approved_midi.read_bytes())
+                if preceding_last_note is not None:
+                    print(
+                        f"  Continuity anchor: {prev_label} last note = {preceding_last_note} (max leap {continuity_semitones} st)"
+                    )
+                break
 
         # Score with Refractor
         print(f"  Scoring {len(candidates)} candidates...")
@@ -820,7 +804,7 @@ def run_bass_pipeline(
                 continue
 
             chromatic_match = compute_chromatic_match(scorer_result, target)
-            comp, breakdown = bass_composite_score(
+            comp, breakdown = melody_composite_score(
                 cand["theory"],
                 chromatic_match,
                 scorer_result,
@@ -829,16 +813,21 @@ def run_bass_pipeline(
                 chromatic_weight,
             )
             comp *= diversity_factor(cand["pattern_name"], _diversity_registry)
+            # Derive first note from in-memory resolved_notes (avoids reparsing MIDI)
+            _rn = cand.get("resolved_notes") or []
+            _first_note = _rn[0][1] if _rn else None
+            comp *= continuity_penalty(
+                _first_note, preceding_last_note, continuity_semitones
+            )
             _label_key = label.lower().replace("-", "_").replace(" ", "_")
             _tmpl_tags = getattr(cand["template"], "tags", [])
             tag_adj = aesthetic_tag_adjustment(
                 _tmpl_tags, aesthetic_hints
-            ) + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "bass")
+            ) + style_profile_tag_adjustment(_style_profile, _tmpl_tags, "melody")
             if _label_key in _arc_by_label:
                 tag_adj += arc_tag_adjustment(_arc_by_label[_label_key], _tmpl_tags)
-            if _narrative:
-                _nc = extract_constraints(label, _narrative)
-                tag_adj += _narr_adj(_nc, _tmpl_tags, "bass")
+            if _sec_nc:
+                tag_adj += _narr_adj(_sec_nc, _tmpl_tags, "melody")
             comp = round(comp + tag_adj, 4)
             breakdown["tag_adjustment"] = tag_adj
             breakdown["composite"] = comp
@@ -848,27 +837,25 @@ def run_bass_pipeline(
                     "breakdown": breakdown,
                     "midi_bytes": cand["midi_bytes"],
                     "pattern_name": cand["pattern_name"],
-                    "style": cand["style"],
+                    "contour": cand["contour"],
                     "energy": cand["energy"],
+                    "use_case": cand["use_case"],
                     "description": cand["template"].description,
                     "is_evolved": cand.get("is_evolved", False),
                 }
             )
 
-        # Rank and take top-k
         scored.sort(key=lambda x: x["composite"], reverse=True)
         top = scored[:top_k]
 
         for rank, item in enumerate(top):
             item["rank"] = rank + 1
             prefix = "evolved_" if item.get("is_evolved") else ""
-            item["id"] = f"{prefix}bass_{section_key}_{rank + 1:02d}"
+            item["id"] = f"{prefix}melody_{section_key}_{rank + 1:02d}"
             all_midi_outputs.append((f"{item['id']}.mid", item["midi_bytes"]))
 
-        used_pattern_names.update(item["pattern_name"] for item in top)
         ranked_by_section[section_key] = top
 
-        # Print summary
         for item in top:
             theory_str = " ".join(
                 f"{k}={v:.2f}" for k, v in item["breakdown"]["theory"].items()
@@ -881,9 +868,9 @@ def run_bass_pipeline(
             )
 
     # --- 8. Write MIDI files ---
-    bass_dir = prod_path / "bass"
-    candidates_dir = bass_dir / "candidates"
-    approved_dir = bass_dir / "approved"
+    melody_dir = prod_path / "melody"
+    candidates_dir = melody_dir / "candidates"
+    approved_dir = melody_dir / "approved"
     if candidates_dir.exists():
         for old_file in candidates_dir.glob("*.mid"):
             old_file.unlink()
@@ -896,15 +883,16 @@ def run_bass_pipeline(
         path.write_bytes(midi_bytes)
 
     # --- 9. Write review YAML ---
-    review = generate_bass_review_yaml(
+    review = generate_melody_review_yaml(
         production_dir,
         sections,
         ranked_by_section,
         seed,
         {"theory": theory_weight, "chromatic": chromatic_weight},
         song_info,
+        singer.name,
     )
-    review_path = bass_dir / "review.yml"
+    review_path = melody_dir / "review.yml"
     with open(review_path, "w") as f:
         yaml.dump(
             review,
@@ -918,8 +906,9 @@ def run_bass_pipeline(
     # --- 10. Summary ---
     total = sum(len(v) for v in ranked_by_section.values())
     print(f"\n{'=' * 60}")
-    print("BASS GENERATION COMPLETE")
+    print("MELODY GENERATION COMPLETE")
     print(f"{'=' * 60}")
+    print(f"Singer:     {singer.name} ({singer.voice_type})")
     print(f"Sections:   {len(sections)}")
     print(f"Candidates: {total}")
     print(f"Review:     {review_path}")
@@ -938,7 +927,7 @@ def run_bass_pipeline(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Bass line generation pipeline — generate, score, and review bass lines"
+        description="Melody generation pipeline — generate, score, and review melodies",
     )
     parser.add_argument(
         "--production-dir",
@@ -946,17 +935,33 @@ def main():
         help="Song production directory (must contain chords/approved/)",
     )
     parser.add_argument(
+        "--sync-candidates",
+        action="store_true",
+        help=(
+            "Scan candidates/ for .mid files not in review.yml and add stub entries. "
+            "Does not regenerate or wipe anything. Use after dropping in manual MIDIs."
+        ),
+    )
+    parser.add_argument(
         "--thread",
         default=None,
-        help="shrink_wrapped thread directory (optional, auto-detected from chord review)",
+        help="shrink_wrapped thread directory (optional)",
     )
     parser.add_argument(
         "--song",
         default=None,
-        help="Song proposal YAML filename (optional, auto-detected from chord review)",
+        help="Song proposal YAML filename (optional)",
     )
     parser.add_argument(
-        "--seed", type=int, default=42, help="Random seed (default: 42)"
+        "--singer",
+        default=None,
+        help=f"Singer name: {', '.join(SINGERS.keys())} (optional, inferred from key)",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed (default: 42)",
     )
     parser.add_argument(
         "--top-k",
@@ -982,9 +987,15 @@ def main():
         help="Path to refractor.onnx (default: training/data/refractor.onnx)",
     )
     parser.add_argument(
+        "--use-case",
+        default="vocal",
+        choices=["vocal", "instrumental", "lead"],
+        help="Melody use case — filters template pool (default: vocal)",
+    )
+    parser.add_argument(
         "--evolve",
         action="store_true",
-        help="Breed evolved bass pattern candidates via evolutionary algorithm",
+        help="Breed evolved melody pattern candidates via evolutionary algorithm",
     )
     parser.add_argument(
         "--generations",
@@ -1001,15 +1012,22 @@ def main():
 
     args = parser.parse_args()
 
-    run_bass_pipeline(
+    if args.sync_candidates:
+        melody_dir = Path(args.production_dir) / "melody"
+        sync_melody_candidates(melody_dir)
+        return
+
+    run_melody_pipeline(
         production_dir=args.production_dir,
         thread_dir=args.thread,
         song_filename=args.song,
+        singer_name=args.singer,
         seed=args.seed,
         top_k=args.top_k,
         theory_weight=args.theory_weight,
         chromatic_weight=args.chromatic_weight,
         onnx_path=args.onnx_path,
+        use_case=args.use_case,
         evolve=args.evolve,
         evolve_generations=args.generations,
         evolve_population=args.population,

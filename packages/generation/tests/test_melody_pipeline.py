@@ -75,7 +75,7 @@ def production_dir(tmp_path):
 class TestSectionReading:
 
     def test_read_approved_sections(self, production_dir):
-        from app.generators.midi.pipelines.melody_pipeline import read_approved_sections
+        from white_generation.pipelines.melody_pipeline import read_approved_sections
 
         with open(production_dir / "chords" / "review.yml") as f:
             chord_review = yaml.safe_load(f)
@@ -86,7 +86,7 @@ class TestSectionReading:
         assert sections[0]["chord_id"] == "chord_verse_01"
 
     def test_read_approved_sections_skips_pending(self):
-        from app.generators.midi.pipelines.melody_pipeline import read_approved_sections
+        from white_generation.pipelines.melody_pipeline import read_approved_sections
 
         review = {
             "candidates": [
@@ -107,7 +107,7 @@ class TestSectionReading:
 class TestMelodyMidiGeneration:
 
     def test_melody_notes_to_midi_bytes(self):
-        from app.generators.midi.pipelines.melody_pipeline import (
+        from white_generation.pipelines.melody_pipeline import (
             melody_notes_to_midi_bytes,
         )
 
@@ -122,8 +122,8 @@ class TestMelodyMidiGeneration:
         assert len(mid.tracks) == 1
 
     def test_generate_melody_for_section(self):
-        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES, SINGERS
-        from app.generators.midi.pipelines.melody_pipeline import (
+        from white_generation.patterns.melody_patterns import ALL_TEMPLATES, SINGERS
+        from white_generation.pipelines.melody_pipeline import (
             generate_melody_for_section,
         )
 
@@ -145,8 +145,8 @@ class TestMelodyMidiGeneration:
             assert singer.low <= note <= singer.high
 
     def test_generate_melody_with_durations(self):
-        from app.generators.midi.patterns.melody_patterns import ALL_TEMPLATES, SINGERS
-        from app.generators.midi.pipelines.melody_pipeline import (
+        from white_generation.patterns.melody_patterns import ALL_TEMPLATES, SINGERS
+        from white_generation.pipelines.melody_pipeline import (
             generate_melody_for_section,
         )
 
@@ -172,7 +172,7 @@ class TestMelodyMidiGeneration:
 class TestCompositeScoring:
 
     def test_melody_composite_score(self):
-        from app.generators.midi.pipelines.melody_pipeline import melody_composite_score
+        from white_generation.pipelines.melody_pipeline import melody_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.8, "present": 0.1, "future": 0.1},
@@ -200,7 +200,7 @@ class TestCompositeScoring:
         assert "chromatic" in breakdown
 
     def test_custom_weights(self):
-        from app.generators.midi.pipelines.melody_pipeline import melody_composite_score
+        from white_generation.pipelines.melody_pipeline import melody_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.5, "present": 0.25, "future": 0.25},
@@ -228,7 +228,7 @@ class TestCompositeScoring:
 class TestReviewYaml:
 
     def test_generate_melody_review_yaml(self):
-        from app.generators.midi.pipelines.melody_pipeline import (
+        from white_generation.pipelines.melody_pipeline import (
             generate_melody_review_yaml,
         )
 
@@ -300,7 +300,7 @@ class TestSyncMelodyCandidates:
         return melody_dir, candidates_dir
 
     def test_adds_untracked_midi(self, tmp_path):
-        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
+        from white_generation.pipelines.melody_pipeline import sync_melody_candidates
 
         melody_dir, candidates_dir = self._make_review(tmp_path)
         (candidates_dir / "my_verse.mid").write_bytes(b"MIDI")
@@ -316,7 +316,7 @@ class TestSyncMelodyCandidates:
         assert review["candidates"][0]["section"] == "manual"
 
     def test_skips_already_tracked(self, tmp_path):
-        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
+        from white_generation.pipelines.melody_pipeline import sync_melody_candidates
 
         existing = [
             {
@@ -336,7 +336,7 @@ class TestSyncMelodyCandidates:
         assert len(review["candidates"]) == 1  # no new entry
 
     def test_skips_scratch_files(self, tmp_path):
-        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
+        from white_generation.pipelines.melody_pipeline import sync_melody_candidates
 
         melody_dir, candidates_dir = self._make_review(tmp_path)
         (candidates_dir / "drums_scratch.mid").write_bytes(b"MIDI")
@@ -346,7 +346,7 @@ class TestSyncMelodyCandidates:
         assert added == 0
 
     def test_deduplicates_id_collision(self, tmp_path):
-        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
+        from white_generation.pipelines.melody_pipeline import sync_melody_candidates
 
         existing = [
             {"id": "my_verse", "midi_file": "candidates/other.mid", "status": "pending"}
@@ -365,7 +365,7 @@ class TestSyncMelodyCandidates:
         assert "my_verse_2" in new_ids
 
     def test_no_review_yml_returns_zero(self, tmp_path):
-        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
+        from white_generation.pipelines.melody_pipeline import sync_melody_candidates
 
         melody_dir = tmp_path / "melody"
         melody_dir.mkdir()
@@ -374,7 +374,7 @@ class TestSyncMelodyCandidates:
         assert added == 0
 
     def test_preserves_existing_entries(self, tmp_path):
-        from app.generators.midi.pipelines.melody_pipeline import sync_melody_candidates
+        from white_generation.pipelines.melody_pipeline import sync_melody_candidates
 
         existing = [
             {
@@ -433,7 +433,7 @@ class TestMelodyPipelineIntegration:
         mock_scorer.score_batch = mock_score_batch
 
         with patch("white_analysis.refractor.Refractor", return_value=mock_scorer):
-            from app.generators.midi.pipelines.melody_pipeline import (
+            from white_generation.pipelines.melody_pipeline import (
                 run_melody_pipeline,
             )
 
@@ -491,19 +491,19 @@ def make_melody_midi(notes: list[int], ticks_per_beat: int = 480) -> bytes:
 class TestMelodicContinuityHelpers:
 
     def test_last_note_of_midi_returns_last_pitch(self):
-        from app.generators.midi.pipelines.melody_pipeline import last_note_of_midi
+        from white_generation.pipelines.melody_pipeline import last_note_of_midi
 
         midi_bytes = make_melody_midi([60, 62, 64, 65])
         assert last_note_of_midi(midi_bytes) == 65
 
     def test_last_note_of_midi_single_note(self):
-        from app.generators.midi.pipelines.melody_pipeline import last_note_of_midi
+        from white_generation.pipelines.melody_pipeline import last_note_of_midi
 
         midi_bytes = make_melody_midi([60])
         assert last_note_of_midi(midi_bytes) == 60
 
     def test_last_note_of_midi_no_notes_returns_none(self):
-        from app.generators.midi.pipelines.melody_pipeline import last_note_of_midi
+        from white_generation.pipelines.melody_pipeline import last_note_of_midi
 
         mid = mido.MidiFile()
         track = mido.MidiTrack()
@@ -514,7 +514,7 @@ class TestMelodicContinuityHelpers:
         assert last_note_of_midi(buf.getvalue()) is None
 
     def test_first_note_of_candidate_returns_first_pitch(self):
-        from app.generators.midi.pipelines.melody_pipeline import (
+        from white_generation.pipelines.melody_pipeline import (
             first_note_of_candidate,
         )
 
@@ -522,7 +522,7 @@ class TestMelodicContinuityHelpers:
         assert first_note_of_candidate({"midi_bytes": midi_bytes}) == 60
 
     def test_first_note_of_candidate_no_midi_bytes_returns_none(self):
-        from app.generators.midi.pipelines.melody_pipeline import (
+        from white_generation.pipelines.melody_pipeline import (
             first_note_of_candidate,
         )
 
@@ -530,33 +530,33 @@ class TestMelodicContinuityHelpers:
         assert first_note_of_candidate({"midi_bytes": None}) is None
 
     def test_continuity_penalty_within_range_is_1(self):
-        from app.generators.midi.pipelines.melody_pipeline import continuity_penalty
+        from white_generation.pipelines.melody_pipeline import continuity_penalty
 
         assert continuity_penalty(60, 63, max_semitones=4) == 1.0
         assert continuity_penalty(60, 64, max_semitones=4) == 1.0  # exactly at limit
 
     def test_continuity_penalty_over_range_is_085(self):
-        from app.generators.midi.pipelines.melody_pipeline import continuity_penalty
+        from white_generation.pipelines.melody_pipeline import continuity_penalty
 
         assert continuity_penalty(60, 65, max_semitones=4) == pytest.approx(0.85)
         assert continuity_penalty(60, 72, max_semitones=4) == pytest.approx(0.85)
 
     def test_continuity_penalty_none_note_is_1(self):
-        from app.generators.midi.pipelines.melody_pipeline import continuity_penalty
+        from white_generation.pipelines.melody_pipeline import continuity_penalty
 
         assert continuity_penalty(None, 60) == 1.0
         assert continuity_penalty(60, None) == 1.0
         assert continuity_penalty(None, None) == 1.0
 
     def test_continuity_penalty_custom_max_semitones(self):
-        from app.generators.midi.pipelines.melody_pipeline import continuity_penalty
+        from white_generation.pipelines.melody_pipeline import continuity_penalty
 
         # 7 semitones: fine with max=7, penalised with max=6
         assert continuity_penalty(60, 67, max_semitones=7) == 1.0
         assert continuity_penalty(60, 67, max_semitones=6) == pytest.approx(0.85)
 
     def test_continuity_penalty_descending_interval(self):
-        from app.generators.midi.pipelines.melody_pipeline import continuity_penalty
+        from white_generation.pipelines.melody_pipeline import continuity_penalty
 
         # Direction doesn't matter — abs interval is used
         assert continuity_penalty(63, 60, max_semitones=4) == 1.0  # 3 st down: fine
@@ -570,7 +570,7 @@ class TestMelodicContinuityIntegration:
 
     def test_within_range_candidate_scores_higher(self, production_dir, tmp_path):
         """Candidate whose first note is within range outscores one that leaps."""
-        from app.generators.midi.pipelines.melody_pipeline import (
+        from white_generation.pipelines.melody_pipeline import (
             continuity_penalty,
             first_note_of_candidate,
             last_note_of_midi,
@@ -646,7 +646,7 @@ class TestMelodicContinuityIntegration:
         mock_scorer.score_batch = mock_score_batch
 
         with patch("white_analysis.refractor.Refractor", return_value=mock_scorer):
-            from app.generators.midi.pipelines.melody_pipeline import (
+            from white_generation.pipelines.melody_pipeline import (
                 run_melody_pipeline,
             )
 

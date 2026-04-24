@@ -14,7 +14,7 @@ import yaml
 class TestChromaticTargetMapping:
 
     def test_red_target(self):
-        from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
+        from white_generation.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("Red")
         assert target["temporal"] == [0.8, 0.1, 0.1]  # Past
@@ -22,7 +22,7 @@ class TestChromaticTargetMapping:
         assert target["ontological"] == [0.1, 0.1, 0.8]  # Known
 
     def test_green_target(self):
-        from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
+        from white_generation.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("Green")
         assert target["temporal"] == [0.1, 0.1, 0.8]  # Future
@@ -30,7 +30,7 @@ class TestChromaticTargetMapping:
         assert target["ontological"] == [0.1, 0.8, 0.1]  # Forgotten
 
     def test_indigo_target(self):
-        from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
+        from white_generation.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("Indigo")
         # Indigo has no temporal/spatial mode → uniform
@@ -40,28 +40,28 @@ class TestChromaticTargetMapping:
         assert target["ontological"] == [0.1, 0.4, 0.4]
 
     def test_black_uniform(self):
-        from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
+        from white_generation.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("Black")
         for dim in ["temporal", "spatial", "ontological"]:
             assert abs(sum(target[dim]) - 1.0) < 0.01
 
     def test_white_uniform(self):
-        from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
+        from white_generation.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("White")
         for dim in ["temporal", "spatial", "ontological"]:
             assert abs(target[dim][0] - target[dim][1]) < 0.01
 
     def test_unknown_color_falls_back(self):
-        from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
+        from white_generation.pipelines.chord_pipeline import get_chromatic_target
 
         target = get_chromatic_target("Magenta")
         # Should return uniform (White) as fallback
         assert abs(target["temporal"][0] - 1 / 3) < 0.01
 
     def test_case_insensitive(self):
-        from app.generators.midi.pipelines.chord_pipeline import get_chromatic_target
+        from white_generation.pipelines.chord_pipeline import get_chromatic_target
 
         t1 = get_chromatic_target("red")
         t2 = get_chromatic_target("RED")
@@ -69,7 +69,7 @@ class TestChromaticTargetMapping:
         assert t1 == t2 == t3
 
     def test_all_targets_sum_to_one(self):
-        from app.generators.midi.pipelines.chord_pipeline import CHROMATIC_TARGETS
+        from white_generation.pipelines.chord_pipeline import CHROMATIC_TARGETS
 
         for color, target in CHROMATIC_TARGETS.items():
             for dim in ["temporal", "spatial", "ontological"]:
@@ -88,7 +88,7 @@ class TestChromaticTargetMapping:
 class TestKeyParsing:
 
     def test_standard_key(self):
-        from app.generators.midi.pipelines.chord_pipeline import parse_key_string
+        from white_generation.pipelines.chord_pipeline import parse_key_string
 
         assert parse_key_string("C major") == ("C", "Major")
         assert parse_key_string("F# minor") == (
@@ -98,13 +98,13 @@ class TestKeyParsing:
         assert parse_key_string("Bb major") == ("Bb", "Major")
 
     def test_unicode_accidentals(self):
-        from app.generators.midi.pipelines.chord_pipeline import parse_key_string
+        from white_generation.pipelines.chord_pipeline import parse_key_string
 
         assert parse_key_string("A♭ major") == ("Ab", "Major")
         assert parse_key_string("B♭ major") == ("Bb", "Major")
 
     def test_defaults(self):
-        from app.generators.midi.pipelines.chord_pipeline import parse_key_string
+        from white_generation.pipelines.chord_pipeline import parse_key_string
 
         assert parse_key_string("C") == ("C", "Major")
 
@@ -117,7 +117,7 @@ class TestKeyParsing:
 class TestCompositeScoring:
 
     def test_basic_composite(self):
-        from app.generators.midi.pipelines.chord_pipeline import composite_score
+        from white_generation.pipelines.chord_pipeline import composite_score
 
         comp, breakdown = composite_score(
             theory_score=0.8,
@@ -141,7 +141,7 @@ class TestCompositeScoring:
         assert abs(comp - expected) < 0.001
 
     def test_weights_affect_ranking(self):
-        from app.generators.midi.pipelines.chord_pipeline import composite_score
+        from white_generation.pipelines.chord_pipeline import composite_score
 
         scorer_result = {
             "temporal": {"past": 0.5, "present": 0.3, "future": 0.2},
@@ -169,7 +169,7 @@ class TestCompositeScoring:
         assert comp_theory > comp_chroma
 
     def test_chromatic_match_calculation(self):
-        from app.generators.midi.pipelines.chord_pipeline import compute_chromatic_match
+        from white_generation.pipelines.chord_pipeline import compute_chromatic_match
 
         # Perfect match for Red
         target = {
@@ -188,7 +188,7 @@ class TestCompositeScoring:
         assert match > 0.6
 
     def test_chromatic_match_poor(self):
-        from app.generators.midi.pipelines.chord_pipeline import compute_chromatic_match
+        from white_generation.pipelines.chord_pipeline import compute_chromatic_match
 
         # Mismatch: target is Red (Past/Thing/Known) but prediction is opposite
         target = {
@@ -239,7 +239,7 @@ class TestChordPipelineIntegration:
 
     def test_full_pipeline(self, tmp_path):
         """Run the full pipeline on a real song proposal with output to temp dir."""
-        from app.generators.midi.pipelines.chord_pipeline import (
+        from white_generation.pipelines.chord_pipeline import (
             run_chord_pipeline,
         )
 
@@ -269,7 +269,7 @@ class TestChordPipelineIntegration:
         assert len(results) == 3
 
         # Check MIDI files exist
-        from app.generators.midi.pipelines.chord_pipeline import song_slug
+        from white_generation.pipelines.chord_pipeline import song_slug
 
         slug = song_slug(song_file)
         chords_dir = thread_copy / "production" / slug / "chords"

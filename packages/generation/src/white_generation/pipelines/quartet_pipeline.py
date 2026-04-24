@@ -31,23 +31,24 @@ import mido
 import numpy as np
 import yaml
 
-from app.generators.midi.patterns.bass_patterns import (
+from app.generators.midi.production.init_production import load_song_context
+from white_generation.patterns.bass_patterns import (
     ALL_TEMPLATES as ALL_BASS_TEMPLATES,
 )
-from app.generators.midi.patterns.bass_patterns import (
+from white_generation.patterns.bass_patterns import (
     BassPattern,
 )
-from app.generators.midi.patterns.bass_patterns import (
+from white_generation.patterns.bass_patterns import (
     select_templates as select_bass_templates,
 )
-from app.generators.midi.patterns.melody_patterns import (
+from white_generation.patterns.melody_patterns import (
     ALL_TEMPLATES as ALL_MELODY_TEMPLATES,
 )
-from app.generators.midi.patterns.melody_patterns import (
+from white_generation.patterns.melody_patterns import (
     MelodyPattern,
     SingerRange,
 )
-from app.generators.midi.patterns.quartet_patterns import (
+from white_generation.patterns.quartet_patterns import (
     INSTRUMENT_RANGES,
     QUARTET_CHANNELS,
     VELOCITY,
@@ -58,18 +59,17 @@ from app.generators.midi.patterns.quartet_patterns import (
     fix_voice_crossing,
     get_patterns_for_voice,
 )
-from app.generators.midi.pipelines.bass_pipeline import (
+from white_generation.pipelines.bass_pipeline import (
     bass_pattern_to_midi_bytes,
     extract_section_chord_data,
 )
-from app.generators.midi.pipelines.chord_pipeline import (
+from white_generation.pipelines.chord_pipeline import (
     compute_chromatic_match,
     get_chromatic_target,
 )
-from app.generators.midi.pipelines.melody_pipeline import (
+from white_generation.pipelines.melody_pipeline import (
     generate_melody_for_section,
 )
-from app.generators.midi.production.init_production import load_song_context
 
 QUARTET_DIR_NAME = "quartet"
 REVIEW_FILENAME = "review.yml"

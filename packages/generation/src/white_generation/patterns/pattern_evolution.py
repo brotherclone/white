@@ -23,16 +23,16 @@ import mido
 import numpy as np
 from white_core.enums.bass_chord_tone import BassChordTone
 
-from app.generators.midi.patterns.bass_patterns import (
+from white_generation.patterns.bass_patterns import (
     BassPattern,
     clamp_to_bass_register,
     resolve_tone,
 )
-from app.generators.midi.patterns.drum_patterns import (
+from white_generation.patterns.drum_patterns import (
     VELOCITY,
     DrumPattern,
 )
-from app.generators.midi.patterns.melody_patterns import MelodyPattern
+from white_generation.patterns.melody_patterns import MelodyPattern
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -58,7 +58,7 @@ _SCORE_BAR_COUNT = 2
 def _drum_to_midi(pattern: DrumPattern) -> bytes:
     """Minimal drum MIDI for fitness scoring."""
     # circular import: drum_pipeline imports from pattern_evolution via evolve flag
-    from app.generators.midi.pipelines.drum_pipeline import (
+    from white_generation.pipelines.drum_pipeline import (
         drum_pattern_to_midi_bytes,
     )  # circular import
 

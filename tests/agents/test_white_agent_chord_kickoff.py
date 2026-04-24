@@ -57,7 +57,7 @@ class TestInvokeChordPipelineSafe:
     def test_swallows_system_exit(self, caplog):
         agent = WhiteAgent()
         with patch(
-            "app.generators.midi.pipelines.chord_pipeline.run_chord_pipeline",
+            "white_generation.pipelines.chord_pipeline.run_chord_pipeline",
             side_effect=SystemExit(1),
         ):
             with caplog.at_level(logging.WARNING):
@@ -72,7 +72,7 @@ class TestInvokeChordPipelineSafe:
     def test_swallows_generic_exception(self, caplog):
         agent = WhiteAgent()
         with patch(
-            "app.generators.midi.pipelines.chord_pipeline.run_chord_pipeline",
+            "white_generation.pipelines.chord_pipeline.run_chord_pipeline",
             side_effect=RuntimeError("boom"),
         ):
             with caplog.at_level(logging.WARNING):
@@ -87,7 +87,7 @@ class TestInvokeChordPipelineSafe:
     def test_success_logs_info(self, caplog):
         agent = WhiteAgent()
         with patch(
-            "app.generators.midi.pipelines.chord_pipeline.run_chord_pipeline",
+            "white_generation.pipelines.chord_pipeline.run_chord_pipeline",
             return_value=None,
         ):
             with caplog.at_level(logging.INFO):
@@ -102,7 +102,7 @@ class TestInvokeChordPipelineSafe:
     def test_passes_correct_args(self):
         agent = WhiteAgent()
         with patch(
-            "app.generators.midi.pipelines.chord_pipeline.run_chord_pipeline",
+            "white_generation.pipelines.chord_pipeline.run_chord_pipeline",
         ) as mock_run:
             agent._invoke_chord_pipeline_safe("/my/thread", "song_red_abc.yml")
 
@@ -199,7 +199,7 @@ class TestFinalizeWithChordKickoff:
         with (
             patch.object(WhiteAgent, "save_all_proposals"),
             patch(
-                "app.generators.midi.pipelines.chord_pipeline.run_chord_pipeline",
+                "white_generation.pipelines.chord_pipeline.run_chord_pipeline",
                 side_effect=RuntimeError("oops"),
             ),
             patch("app.generators.midi.production.init_production.init_production"),

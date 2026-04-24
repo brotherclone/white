@@ -51,7 +51,7 @@
 - [x] 3.10 Delete moved source from `app/` and `staged_raw_material/` (Python files only)
 - [x] 3.11 Open PR: `feat: migrate extraction package (white_extraction)`
 
-## 4. Package: analysis (`training/refractor.py` + scorer → `white_analysis`) ✅ DONE (commit TBD)
+## 4. Package: analysis (`training/refractor.py` + scorer → `white_analysis`) ✅ DONE (commit 3de9172)
 
 - [x] 4.1 Scaffold `packages/analysis/pyproject.toml` (deps: `white-core`, `white-training`,
       `white-extraction`) + `src/white_analysis/`
@@ -62,18 +62,18 @@
 - [x] 4.6 Delete moved source
 - [ ] 4.7 Open PR: `feat: migrate analysis package (white_analysis)`
 
-## 5. Package: generation (patterns + pipelines → `white_generation`)
+## 5. Package: generation (patterns + pipelines → `white_generation`) ✅ DONE (commit TBD)
 
-- [ ] 5.1 Scaffold `packages/generation/pyproject.toml` (deps: `white-core`, `white-analysis`)
+- [x] 5.1 Scaffold `packages/generation/pyproject.toml` (deps: `white-core`, `white-analysis`)
       + `src/white_generation/`
-- [ ] 5.2 Move `app/generators/midi/patterns/` → `packages/generation/src/white_generation/patterns/`
-- [ ] 5.3 Move `app/generators/midi/pipelines/` → `packages/generation/src/white_generation/pipelines/`
-- [ ] 5.4 Move `app/generators/midi/chord_generator/` (incl. data/) → `packages/generation/src/white_generation/chord_generator/`
-- [ ] 5.5 Move `app/generators/midi/style_reference.py` → `packages/generation/src/white_generation/`
-- [ ] 5.6 Update all `from app.generators.midi...` imports to `from white_generation...`
-- [ ] 5.7 Move `tests/generators/midi/` (pattern + pipeline tests, not production tests) → `packages/generation/tests/`
-- [ ] 5.8 Run `uv sync` + full pytest; fix failures
-- [ ] 5.9 Delete moved source from `app/`
+- [x] 5.2 Move `app/generators/midi/patterns/` → `packages/generation/src/white_generation/patterns/`
+- [x] 5.3 Move `app/generators/midi/pipelines/` → `packages/generation/src/white_generation/pipelines/`
+- [x] 5.4 Move `app/generators/midi/chord_generator/` (incl. data/) → `packages/generation/src/white_generation/chord_generator/`
+- [x] 5.5 Move `app/generators/midi/style_reference.py` → `packages/generation/src/white_generation/`
+- [x] 5.6 Update all `from app.generators.midi...` imports to `from white_generation...`
+- [x] 5.7 Move `tests/generators/midi/` (pattern + pipeline tests, not production tests) → `packages/generation/tests/`
+- [x] 5.8 Run `uv sync` + full pytest; fix failures
+- [x] 5.9 Delete moved source from `app/`
 - [ ] 5.10 Open PR: `feat: migrate generation package (white_generation)`
 
 ## 6. Package: composition (production orchestration → `white_composition`) ⚠️ MOST CAREFUL

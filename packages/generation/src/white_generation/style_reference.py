@@ -14,7 +14,7 @@ Local directory layout (relative to project root or configurable):
             profile.yml
 
 Usage:
-    from app.generators.midi.style_reference import (
+    from white_generation.style_reference import (
         load_or_extract_profile,
         aggregate_profiles,
     )

@@ -169,7 +169,7 @@ def setup_production_dir(
 class TestChordRootExtraction:
 
     def test_extract_section_chord_data(self, tmp_path):
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.pipelines.bass_pipeline import (
             extract_section_chord_data,
         )
 
@@ -181,7 +181,7 @@ class TestChordRootExtraction:
         assert isinstance(review, dict)
 
     def test_extract_section_chord_data_missing_dir(self, tmp_path):
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.pipelines.bass_pipeline import (
             extract_section_chord_data,
         )
 
@@ -197,7 +197,7 @@ class TestChordRootExtraction:
 class TestKickOnsetExtraction:
 
     def test_extract_kick_onsets(self, tmp_path):
-        from app.generators.midi.pipelines.bass_pipeline import extract_kick_onsets
+        from white_generation.pipelines.bass_pipeline import extract_kick_onsets
 
         kick_path = tmp_path / "kick.mid"
         kick_path.write_bytes(make_drum_midi([0.0, 1.0, 2.0, 3.0]))
@@ -206,7 +206,7 @@ class TestKickOnsetExtraction:
         assert onsets[0] == pytest.approx(0.0)
 
     def test_read_approved_kick_onsets(self, tmp_path):
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.pipelines.bass_pipeline import (
             read_approved_kick_onsets,
         )
 
@@ -216,7 +216,7 @@ class TestKickOnsetExtraction:
         assert len(kicks["verse"]) == 2
 
     def test_read_approved_kick_onsets_no_drums(self, tmp_path):
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.pipelines.bass_pipeline import (
             read_approved_kick_onsets,
         )
 
@@ -233,8 +233,8 @@ class TestKickOnsetExtraction:
 class TestBassMidiGeneration:
 
     def test_basic_midi_generation(self):
-        from app.generators.midi.patterns.bass_patterns import TEMPLATES_4_4_ROOT
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.patterns.bass_patterns import TEMPLATES_4_4_ROOT
+        from white_generation.pipelines.bass_pipeline import (
             bass_pattern_to_midi_bytes,
         )
 
@@ -257,8 +257,8 @@ class TestBassMidiGeneration:
             assert 24 <= msg.note <= 60
 
     def test_midi_with_multiple_chords(self):
-        from app.generators.midi.patterns.bass_patterns import TEMPLATES_4_4_WALKING
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.patterns.bass_patterns import TEMPLATES_4_4_WALKING
+        from white_generation.pipelines.bass_pipeline import (
             bass_pattern_to_midi_bytes,
         )
 
@@ -275,8 +275,8 @@ class TestBassMidiGeneration:
         assert len(notes) == 8
 
     def test_midi_with_harmonic_rhythm(self):
-        from app.generators.midi.patterns.bass_patterns import TEMPLATES_4_4_ROOT
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.patterns.bass_patterns import TEMPLATES_4_4_ROOT
+        from white_generation.pipelines.bass_pipeline import (
             bass_pattern_to_midi_bytes,
         )
 
@@ -296,8 +296,8 @@ class TestBassMidiGeneration:
         assert len(notes) == 6
 
     def test_all_notes_in_bass_register(self):
-        from app.generators.midi.patterns.bass_patterns import ALL_TEMPLATES
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.patterns.bass_patterns import ALL_TEMPLATES
+        from white_generation.pipelines.bass_pipeline import (
             bass_pattern_to_midi_bytes,
         )
 
@@ -322,7 +322,7 @@ class TestBassMidiGeneration:
 class TestCompositeScoring:
 
     def test_bass_composite_score(self):
-        from app.generators.midi.pipelines.bass_pipeline import bass_composite_score
+        from white_generation.pipelines.bass_pipeline import bass_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.8, "present": 0.1, "future": 0.1},
@@ -350,7 +350,7 @@ class TestCompositeScoring:
         assert breakdown["theory"]["root_adherence"] == 1.0
 
     def test_composite_weights(self):
-        from app.generators.midi.pipelines.bass_pipeline import bass_composite_score
+        from white_generation.pipelines.bass_pipeline import bass_composite_score
 
         scorer_result = {
             "temporal": {"past": 0.5, "present": 0.3, "future": 0.2},
@@ -378,7 +378,7 @@ class TestCompositeScoring:
 class TestReviewYaml:
 
     def test_generate_review_yaml(self):
-        from app.generators.midi.pipelines.bass_pipeline import (
+        from white_generation.pipelines.bass_pipeline import (
             generate_bass_review_yaml,
         )
 
@@ -426,7 +426,7 @@ class TestReviewYaml:
 class TestReadApprovedSections:
 
     def test_reads_approved_sections(self):
-        from app.generators.midi.pipelines.bass_pipeline import read_approved_sections
+        from white_generation.pipelines.bass_pipeline import read_approved_sections
 
         review = {
             "candidates": [
@@ -443,7 +443,7 @@ class TestReadApprovedSections:
         assert "bridge" in labels
 
     def test_skips_non_approved(self):
-        from app.generators.midi.pipelines.bass_pipeline import read_approved_sections
+        from white_generation.pipelines.bass_pipeline import read_approved_sections
 
         review = {
             "candidates": [
@@ -499,7 +499,7 @@ class TestIntegration:
             MockScorer,
         )
 
-        from app.generators.midi.pipelines.bass_pipeline import run_bass_pipeline
+        from white_generation.pipelines.bass_pipeline import run_bass_pipeline
 
         result = run_bass_pipeline(
             production_dir=str(prod_dir),
@@ -584,7 +584,7 @@ class TestIntegration:
             MockScorer,
         )
 
-        from app.generators.midi.pipelines.bass_pipeline import run_bass_pipeline
+        from white_generation.pipelines.bass_pipeline import run_bass_pipeline
 
         result = run_bass_pipeline(
             production_dir=str(prod_dir),
@@ -634,7 +634,7 @@ class TestIntegration:
             MockScorer,
         )
 
-        from app.generators.midi.pipelines.bass_pipeline import run_bass_pipeline
+        from white_generation.pipelines.bass_pipeline import run_bass_pipeline
 
         result = run_bass_pipeline(
             production_dir=str(prod_dir),
