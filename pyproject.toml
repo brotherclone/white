@@ -2,7 +2,7 @@
 members = ["packages/*"]
 
 [tool.setuptools]
-packages = ["app", "staged_raw_material"]
+packages = ["app"]
 
 [project]
 name = "white"

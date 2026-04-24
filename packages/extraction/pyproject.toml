@@ -1,0 +1,25 @@
+[project]
+name = "white-extraction"
+version = "0.1.0"
+description = "Audio/MIDI extraction pipeline and training data utilities for the White project"
+requires-python = ">=3.12"
+dependencies = [
+    "white-core>=0.1.0",
+    "numpy>=1.24.0",
+    "polars>=0.20.0",
+    "pyyaml>=6.0.0",
+    "python-dotenv>=1.0.0",
+    "mido>=1.3.0",
+    "soundfile>=0.12.0",
+    "discogs-client>=2.3.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/white_extraction"]
+
+[tool.uv.sources]
+white-core = { workspace = true }
