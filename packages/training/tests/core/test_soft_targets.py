@@ -14,7 +14,7 @@ class TestSoftTargetGenerator:
 
     def setup_method(self):
         """Setup test fixtures."""
-        from core.soft_targets import SoftTargetGenerator
+        from white_training.core.soft_targets import SoftTargetGenerator
 
         self.generator = SoftTargetGenerator(
             label_smoothing=0.1,
@@ -25,7 +25,7 @@ class TestSoftTargetGenerator:
 
     def test_one_hot_encoding(self):
         """Test one-hot encoding."""
-        from core.soft_targets import SoftTargetGenerator
+        from white_training.core.soft_targets import SoftTargetGenerator
 
         gen = SoftTargetGenerator(label_smoothing=0.0)
 
@@ -40,7 +40,7 @@ class TestSoftTargetGenerator:
 
     def test_label_smoothing(self):
         """Test label smoothing."""
-        from core.soft_targets import SoftTargetGenerator
+        from white_training.core.soft_targets import SoftTargetGenerator
 
         gen = SoftTargetGenerator(label_smoothing=0.1)
 
@@ -151,7 +151,7 @@ class TestSoftTargetGenerator:
 
     def test_temporal_context_smoothing(self):
         """Test temporal context smoothing."""
-        from core.soft_targets import SoftTargetGenerator
+        from white_training.core.soft_targets import SoftTargetGenerator
 
         gen = SoftTargetGenerator(
             label_smoothing=0.0,
@@ -175,7 +175,7 @@ class TestSoftTargetGenerator:
 
     def test_track_boundary_respect(self):
         """Test that context smoothing respects track boundaries."""
-        from core.soft_targets import SoftTargetGenerator
+        from white_training.core.soft_targets import SoftTargetGenerator
 
         gen = SoftTargetGenerator(
             label_smoothing=0.0,
@@ -192,7 +192,7 @@ class TestSoftTargetGenerator:
 
     def test_confidence_for_black_album(self):
         """Test that Black Album has low confidence."""
-        from core.soft_targets import SoftTargetGenerator
+        from white_training.core.soft_targets import SoftTargetGenerator
 
         gen = SoftTargetGenerator(black_album_confidence=0.0)
 
@@ -213,7 +213,7 @@ class TestSoftTargets:
 
     def test_validation_passes(self):
         """Test validation with valid targets."""
-        from core.soft_targets import SoftTargets
+        from white_training.core.soft_targets import SoftTargets
 
         targets = SoftTargets(
             temporal=np.array([[0.9, 0.05, 0.05], [0.33, 0.34, 0.33]]),
@@ -227,7 +227,7 @@ class TestSoftTargets:
 
     def test_validation_fails_bad_sum(self):
         """Test validation fails when distributions don't sum to 1."""
-        from core.soft_targets import SoftTargets
+        from white_training.core.soft_targets import SoftTargets
 
         targets = SoftTargets(
             temporal=np.array([[0.9, 0.05, 0.1]]),  # Sums to 1.05
@@ -242,7 +242,7 @@ class TestSoftTargets:
 
     def test_validation_fails_negative(self):
         """Test validation fails with negative values."""
-        from core.soft_targets import SoftTargets
+        from white_training.core.soft_targets import SoftTargets
 
         targets = SoftTargets(
             temporal=np.array([[1.1, -0.05, -0.05]]),  # Negative values
@@ -256,7 +256,7 @@ class TestSoftTargets:
 
     def test_to_tensors(self):
         """Test conversion to PyTorch tensors."""
-        from core.soft_targets import SoftTargets
+        from white_training.core.soft_targets import SoftTargets
 
         targets = SoftTargets(
             temporal=np.array([[0.9, 0.05, 0.05]]),
@@ -277,7 +277,7 @@ class TestTargetConsistencyValidator:
 
     def test_consistent_label_target(self):
         """Test validation of consistent label-target pair."""
-        from core.soft_targets import TargetConsistencyValidator
+        from white_training.core.soft_targets import TargetConsistencyValidator
 
         ok, msg = TargetConsistencyValidator.check_label_target_alignment(
             discrete_label="past",
@@ -289,7 +289,7 @@ class TestTargetConsistencyValidator:
 
     def test_inconsistent_label_target(self):
         """Test detection of inconsistent label-target pair."""
-        from core.soft_targets import TargetConsistencyValidator
+        from white_training.core.soft_targets import TargetConsistencyValidator
 
         ok, msg = TargetConsistencyValidator.check_label_target_alignment(
             discrete_label="past",
@@ -302,7 +302,7 @@ class TestTargetConsistencyValidator:
 
     def test_black_album_validation(self):
         """Test validation of Black Album labels."""
-        from core.soft_targets import TargetConsistencyValidator
+        from white_training.core.soft_targets import TargetConsistencyValidator
 
         ok, msg = TargetConsistencyValidator.check_label_target_alignment(
             discrete_label="none",
@@ -315,7 +315,10 @@ class TestTargetConsistencyValidator:
 
     def test_dataset_validation(self):
         """Test full dataset validation."""
-        from core.soft_targets import SoftTargets, TargetConsistencyValidator
+        from white_training.core.soft_targets import (
+            SoftTargets,
+            TargetConsistencyValidator,
+        )
 
         targets = SoftTargets(
             temporal=np.array(
@@ -346,7 +349,9 @@ class TestGenerateFromDataFrame:
     def test_basic_dataframe_generation(self):
         """Test generation from pandas DataFrame."""
         import pandas as pd
-        from core.soft_targets import generate_soft_targets_from_dataframe
+        from white_training.core.soft_targets import (
+            generate_soft_targets_from_dataframe,
+        )
 
         df = pd.DataFrame(
             {
@@ -366,7 +371,9 @@ class TestGenerateFromDataFrame:
     def test_missing_values_handling(self):
         """Test handling of missing values."""
         import pandas as pd
-        from core.soft_targets import generate_soft_targets_from_dataframe
+        from white_training.core.soft_targets import (
+            generate_soft_targets_from_dataframe,
+        )
 
         df = pd.DataFrame(
             {

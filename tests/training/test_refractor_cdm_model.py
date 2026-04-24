@@ -39,7 +39,10 @@ def _load_model(**kwargs):
     spec = importlib.util.spec_from_file_location(
         "refractor_cdm_model",
         Path(__file__).parent.parent.parent
+        / "packages"
         / "training"
+        / "src"
+        / "white_training"
         / "models"
         / "refractor_cdm_model.py",
     )
@@ -55,7 +58,10 @@ def _load_export_onnx():
     spec = importlib.util.spec_from_file_location(
         "refractor_cdm_model",
         Path(__file__).parent.parent.parent
+        / "packages"
         / "training"
+        / "src"
+        / "white_training"
         / "models"
         / "refractor_cdm_model.py",
     )

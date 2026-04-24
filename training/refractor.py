@@ -40,7 +40,15 @@ from white_core.concepts.chromatic_targets import (
 
 _spec = _ilu.spec_from_file_location(
     "piano_roll_encoder",
-    str(Path(__file__).parent / "models" / "piano_roll_encoder.py"),
+    str(
+        Path(__file__).parent.parent
+        / "packages"
+        / "training"
+        / "src"
+        / "white_training"
+        / "models"
+        / "piano_roll_encoder.py"
+    ),
 )
 _pre = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_pre)

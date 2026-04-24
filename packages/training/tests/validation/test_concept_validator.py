@@ -15,7 +15,7 @@ class TestValidationStatus:
 
     def test_status_values(self):
         """Test that all expected status values exist."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         assert ValidationStatus.ACCEPT.value == "accept"
         assert ValidationStatus.ACCEPT_HYBRID.value == "accept_hybrid"
@@ -28,7 +28,10 @@ class TestValidationResult:
 
     def test_is_accepted_true_for_accept(self):
         """Test is_accepted returns True for ACCEPT."""
-        from validation.concept_validator import ValidationResult, ValidationStatus
+        from white_training.validation.concept_validator import (
+            ValidationResult,
+            ValidationStatus,
+        )
 
         result = ValidationResult(
             concept_text="test",
@@ -45,7 +48,10 @@ class TestValidationResult:
 
     def test_is_accepted_true_for_hybrid(self):
         """Test is_accepted returns True for ACCEPT_HYBRID."""
-        from validation.concept_validator import ValidationResult, ValidationStatus
+        from white_training.validation.concept_validator import (
+            ValidationResult,
+            ValidationStatus,
+        )
 
         result = ValidationResult(
             concept_text="test",
@@ -62,7 +68,10 @@ class TestValidationResult:
 
     def test_is_accepted_true_for_black(self):
         """Test is_accepted returns True for ACCEPT_BLACK."""
-        from validation.concept_validator import ValidationResult, ValidationStatus
+        from white_training.validation.concept_validator import (
+            ValidationResult,
+            ValidationStatus,
+        )
 
         result = ValidationResult(
             concept_text="test",
@@ -79,7 +88,10 @@ class TestValidationResult:
 
     def test_is_accepted_false_for_reject(self):
         """Test is_accepted returns False for REJECT."""
-        from validation.concept_validator import ValidationResult, ValidationStatus
+        from white_training.validation.concept_validator import (
+            ValidationResult,
+            ValidationStatus,
+        )
 
         result = ValidationResult(
             concept_text="test",
@@ -97,7 +109,7 @@ class TestValidationResult:
 
     def test_to_dict(self):
         """Test serialization to dictionary."""
-        from validation.concept_validator import (
+        from white_training.validation.concept_validator import (
             ValidationResult,
             ValidationStatus,
             ValidationSuggestion,
@@ -140,7 +152,7 @@ class TestValidationCache:
 
     def test_cache_get_miss(self):
         """Test cache miss returns None."""
-        from validation.concept_validator import ValidationCache
+        from white_training.validation.concept_validator import ValidationCache
 
         cache = ValidationCache(ttl_seconds=60)
         result = cache.get("test text", "v1.0")
@@ -148,7 +160,7 @@ class TestValidationCache:
 
     def test_cache_set_and_get(self):
         """Test cache set and get."""
-        from validation.concept_validator import (
+        from white_training.validation.concept_validator import (
             ValidationCache,
             ValidationResult,
             ValidationStatus,
@@ -176,7 +188,7 @@ class TestValidationCache:
 
     def test_cache_expiration(self):
         """Test cache entry expiration."""
-        from validation.concept_validator import (
+        from white_training.validation.concept_validator import (
             ValidationCache,
             ValidationResult,
             ValidationStatus,
@@ -208,7 +220,7 @@ class TestValidationCache:
 
     def test_cache_lru_eviction(self):
         """Test LRU eviction when cache is full."""
-        from validation.concept_validator import (
+        from white_training.validation.concept_validator import (
             ValidationCache,
             ValidationResult,
             ValidationStatus,
@@ -250,7 +262,7 @@ class TestValidationCache:
 
     def test_cache_clear(self):
         """Test cache clear."""
-        from validation.concept_validator import (
+        from white_training.validation.concept_validator import (
             ValidationCache,
             ValidationResult,
             ValidationStatus,
@@ -281,7 +293,7 @@ class TestConceptValidator:
 
     def setup_method(self):
         """Setup test validator."""
-        from validation.concept_validator import ConceptValidator
+        from white_training.validation.concept_validator import ConceptValidator
 
         self.validator = ConceptValidator(
             model_path=None,  # Use mock predictions
@@ -290,7 +302,7 @@ class TestConceptValidator:
 
     def test_validate_concept_returns_result(self):
         """Test validation returns a ValidationResult."""
-        from validation.concept_validator import ValidationResult
+        from white_training.validation.concept_validator import ValidationResult
 
         result = self.validator.validate_concept("A memory from childhood")
 
@@ -387,7 +399,7 @@ class TestConceptValidator:
 
     def test_caching_enabled(self):
         """Test caching when enabled."""
-        from validation.concept_validator import ConceptValidator
+        from white_training.validation.concept_validator import ConceptValidator
 
         cached_validator = ConceptValidator(
             model_path=None,
@@ -407,7 +419,7 @@ class TestConceptValidator:
 
     def test_singleton_instance(self):
         """Test singleton pattern."""
-        from validation.concept_validator import ConceptValidator
+        from white_training.validation.concept_validator import ConceptValidator
 
         # Reset singleton
         ConceptValidator._instance = None
@@ -426,7 +438,7 @@ class TestHybridStateDetection:
 
     def setup_method(self):
         """Setup test validator."""
-        from validation.concept_validator import ConceptValidator
+        from white_training.validation.concept_validator import ConceptValidator
 
         self.validator = ConceptValidator(
             model_path=None,
@@ -481,7 +493,7 @@ class TestValidationStatusDetermination:
 
     def setup_method(self):
         """Setup test validator."""
-        from validation.concept_validator import ConceptValidator
+        from white_training.validation.concept_validator import ConceptValidator
 
         self.validator = ConceptValidator(
             model_path=None,
@@ -491,7 +503,7 @@ class TestValidationStatusDetermination:
 
     def test_accept_high_confidence_dominant(self):
         """Test ACCEPT for high confidence with dominant modes."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         status, reason = self.validator._determine_validation_status(
             confidence=0.85,
@@ -506,7 +518,7 @@ class TestValidationStatusDetermination:
 
     def test_accept_hybrid_for_liminal(self):
         """Test ACCEPT_HYBRID for liminal but coherent."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         status, reason = self.validator._determine_validation_status(
             confidence=0.6,
@@ -521,7 +533,7 @@ class TestValidationStatusDetermination:
 
     def test_accept_black_for_all_diffuse(self):
         """Test ACCEPT_BLACK for all diffuse with low confidence."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         status, reason = self.validator._determine_validation_status(
             confidence=0.2,
@@ -536,7 +548,7 @@ class TestValidationStatusDetermination:
 
     def test_reject_too_diffuse(self):
         """Test REJECT for too diffuse."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         status, reason = self.validator._determine_validation_status(
             confidence=0.6,
@@ -551,7 +563,7 @@ class TestValidationStatusDetermination:
 
     def test_reject_low_confidence(self):
         """Test REJECT for low confidence."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         status, reason = self.validator._determine_validation_status(
             confidence=0.3,
@@ -570,7 +582,7 @@ class TestSuggestionGeneration:
 
     def setup_method(self):
         """Setup test validator."""
-        from validation.concept_validator import ConceptValidator
+        from white_training.validation.concept_validator import ConceptValidator
 
         self.validator = ConceptValidator(
             model_path=None,
@@ -581,7 +593,7 @@ class TestSuggestionGeneration:
 
     def test_low_confidence_suggestion(self):
         """Test suggestion for low confidence rejection."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         prediction = {
             "temporal_scores": np.array([0.8, 0.1, 0.1]),
@@ -603,7 +615,7 @@ class TestSuggestionGeneration:
 
     def test_diffuse_ontology_suggestion(self):
         """Test suggestion for diffuse ontology rejection."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         prediction = {
             "temporal_scores": np.array([0.4, 0.3, 0.3]),
@@ -629,7 +641,7 @@ class TestSuggestionGeneration:
 
     def test_no_suggestions_for_accept(self):
         """Test no suggestions generated for accepted concepts."""
-        from validation.concept_validator import ValidationStatus
+        from white_training.validation.concept_validator import ValidationStatus
 
         prediction = {
             "temporal_scores": np.array([0.8, 0.1, 0.1]),

@@ -12,21 +12,26 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 import yaml
-from core.multiclass_metrics import MultiClassMetrics, MultiLabelMetrics, top_k_accuracy
-from core.multiclass_pipeline import build_multiclass_dataloaders
-
-# Local imports
-from core.pipeline import build_dataloaders
-from models.classifier import BinaryClassifier, RainbowModel
-from models.multiclass_classifier import (
-    MultiClassRainbowModel,
-    MultiClassRebracketingClassifier,
-)
-from models.text_encoder import TextEncoder
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from tqdm import tqdm
 from transformers import AutoTokenizer
+
+from white_training.core.multiclass_metrics import (
+    MultiClassMetrics,
+    MultiLabelMetrics,
+    top_k_accuracy,
+)
+from white_training.core.multiclass_pipeline import build_multiclass_dataloaders
+
+# Local imports
+from white_training.core.pipeline import build_dataloaders
+from white_training.models.classifier import BinaryClassifier, RainbowModel
+from white_training.models.multiclass_classifier import (
+    MultiClassRainbowModel,
+    MultiClassRebracketingClassifier,
+)
+from white_training.models.text_encoder import TextEncoder
 
 try:
     import wandb

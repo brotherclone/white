@@ -43,7 +43,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Import embedding encoder for inference
-from core.embedding_loader import DeBERTaEmbeddingEncoder
+from white_training.core.embedding_loader import DeBERTaEmbeddingEncoder
 
 # ============================================================================
 # VALIDATION RESULT TYPES (Same as before, but standalone)

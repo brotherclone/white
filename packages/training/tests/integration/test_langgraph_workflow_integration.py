@@ -9,30 +9,16 @@ These tests verify that:
 4. Batch validation works within workflow context
 """
 
-import sys
 from dataclasses import dataclass, field
 from typing import List, Literal, Optional
-from unittest.mock import MagicMock
 
 import pytest
 from langgraph.graph import END, StateGraph
-from validation.concept_validator import (
+from white_training.validation.concept_validator import (
     ConceptValidator,
     ValidationResult,
     ValidationStatus,
 )
-
-# Mock torch before importing validation components (for Intel Mac without torch)
-sys.modules["torch"] = MagicMock()
-
-# Import validation components
-sys.path.insert(
-    0,
-    str(__file__).replace(
-        "/tests/integration/test_langgraph_workflow_integration.py", ""
-    ),
-)
-
 
 # ============================================================================
 # Test State for LangGraph Workflow

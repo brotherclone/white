@@ -22,7 +22,10 @@ def _importer():
         "build_sounds_like_embeddings",
         str(
             Path(__file__).parent.parent.parent
+            / "packages"
             / "training"
+            / "src"
+            / "white_training"
             / "build_sounds_like_embeddings.py"
         ),
     )

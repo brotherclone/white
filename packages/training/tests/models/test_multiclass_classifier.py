@@ -6,7 +6,7 @@ Tests model architecture, forward pass, predictions, and class weight computatio
 
 import pytest
 import torch
-from models.multiclass_classifier import (
+from white_training.models.multiclass_classifier import (
     MultiClassRainbowModel,
     MultiClassRebracketingClassifier,
 )
@@ -186,7 +186,7 @@ class TestMultiClassRainbowModel:
 
     def test_model_initialization(self):
         """Test model initialization."""
-        from models.text_encoder import TextEncoder
+        from white_training.models.text_encoder import TextEncoder
 
         text_encoder = TextEncoder(
             model_name="microsoft/deberta-v3-base",
@@ -208,7 +208,7 @@ class TestMultiClassRainbowModel:
 
     def test_forward_pass(self):
         """Test complete forward pass."""
-        from models.text_encoder import TextEncoder
+        from white_training.models.text_encoder import TextEncoder
 
         text_encoder = TextEncoder(
             model_name="microsoft/deberta-v3-base",
@@ -235,7 +235,7 @@ class TestMultiClassRainbowModel:
 
     def test_predict(self):
         """Test prediction method."""
-        from models.text_encoder import TextEncoder
+        from white_training.models.text_encoder import TextEncoder
 
         text_encoder = TextEncoder(
             model_name="microsoft/deberta-v3-base",

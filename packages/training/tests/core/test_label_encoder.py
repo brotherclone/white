@@ -8,7 +8,7 @@ and edge cases.
 import numpy as np
 import pytest
 import torch
-from core.multiclass_pipeline import LabelEncoder
+from white_training.core.multiclass_pipeline import LabelEncoder
 
 
 class TestLabelEncoder:

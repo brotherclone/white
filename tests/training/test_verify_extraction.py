@@ -9,8 +9,7 @@ import numpy as np
 import polars as pl
 import pyarrow as pa
 import pyarrow.parquet as pq
-
-from training.verify_extraction import (
+from white_training.verify_extraction import (
     extract_segments,
     format_coverage_report,
     format_fidelity_report,

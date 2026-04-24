@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
-from training.core.soft_targets import SoftTargets
+from white_training.core.soft_targets import SoftTargets
 
 try:
     import matplotlib.pyplot as plt

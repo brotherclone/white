@@ -20,7 +20,7 @@ class TestRegressionHead:
 
     def test_initialization(self):
         """Test regression head initialization."""
-        from models.regression_head import RegressionHead
+        from white_training.models.regression_head import RegressionHead
 
         head = RegressionHead(
             input_dim=self.input_dim,
@@ -36,7 +36,7 @@ class TestRegressionHead:
 
     def test_forward_pass_bounded(self):
         """Test forward pass with sigmoid activation."""
-        from models.regression_head import RegressionHead
+        from white_training.models.regression_head import RegressionHead
 
         head = RegressionHead(
             input_dim=self.input_dim,
@@ -54,7 +54,7 @@ class TestRegressionHead:
 
     def test_forward_pass_unbounded(self):
         """Test forward pass without activation."""
-        from models.regression_head import RegressionHead
+        from white_training.models.regression_head import RegressionHead
 
         head = RegressionHead(
             input_dim=self.input_dim,
@@ -72,7 +72,7 @@ class TestRegressionHead:
 
     def test_uncertainty_estimation(self):
         """Test uncertainty prediction."""
-        from models.regression_head import RegressionHead
+        from white_training.models.regression_head import RegressionHead
 
         head = RegressionHead(
             input_dim=self.input_dim,
@@ -92,7 +92,7 @@ class TestRegressionHead:
 
     def test_predict_method(self):
         """Test predict convenience method."""
-        from models.regression_head import RegressionHead
+        from white_training.models.regression_head import RegressionHead
 
         head = RegressionHead(
             input_dim=self.input_dim,
@@ -115,7 +115,7 @@ class TestRegressionHead:
 
     def test_gradient_flow(self):
         """Test gradient flow through regression head."""
-        from models.regression_head import RegressionHead
+        from white_training.models.regression_head import RegressionHead
 
         head = RegressionHead(
             input_dim=self.input_dim,
@@ -143,7 +143,7 @@ class TestMultiTargetRegressionHead:
 
     def test_multi_target_initialization(self):
         """Test multi-target head initialization."""
-        from models.regression_head import MultiTargetRegressionHead
+        from white_training.models.regression_head import MultiTargetRegressionHead
 
         head = MultiTargetRegressionHead(
             input_dim=self.input_dim,
@@ -161,7 +161,7 @@ class TestMultiTargetRegressionHead:
 
     def test_multi_target_forward(self):
         """Test multi-target forward pass."""
-        from models.regression_head import MultiTargetRegressionHead
+        from white_training.models.regression_head import MultiTargetRegressionHead
 
         head = MultiTargetRegressionHead(
             input_dim=self.input_dim,
@@ -203,7 +203,9 @@ class TestRainbowTableRegressionHead:
 
     def test_initialization(self):
         """Test Rainbow Table head initialization."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -215,7 +217,9 @@ class TestRainbowTableRegressionHead:
 
     def test_forward_pass_shapes(self):
         """Test output shapes."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -232,7 +236,9 @@ class TestRainbowTableRegressionHead:
 
     def test_softmax_constraint(self):
         """Test that dimension scores sum to 1."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -261,7 +267,9 @@ class TestRainbowTableRegressionHead:
 
     def test_confidence_bounded(self):
         """Test confidence is bounded [0, 1]."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -276,7 +284,9 @@ class TestRainbowTableRegressionHead:
 
     def test_mode_prediction(self):
         """Test mode prediction from scores."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -304,7 +314,9 @@ class TestRainbowTableRegressionHead:
 
     def test_album_prediction(self):
         """Test album prediction from scores."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -333,7 +345,9 @@ class TestRainbowTableRegressionHead:
 
     def test_combined_mode_string(self):
         """Test combined mode string generation."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -353,7 +367,9 @@ class TestRainbowTableRegressionHead:
 
     def test_with_uncertainty(self):
         """Test uncertainty estimation."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -373,7 +389,9 @@ class TestRainbowTableRegressionHead:
 
     def test_temperature_scaling(self):
         """Test temperature parameter for softmax."""
-        from models.rainbow_table_regression_head import RainbowTableRegressionHead
+        from white_training.models.rainbow_table_regression_head import (
+            RainbowTableRegressionHead,
+        )
 
         head = RainbowTableRegressionHead(
             input_dim=self.input_dim,
@@ -399,7 +417,9 @@ class TestHybridStateDetector:
 
     def setup_method(self):
         """Setup test fixtures."""
-        from models.rainbow_table_regression_head import HybridStateDetector
+        from white_training.models.rainbow_table_regression_head import (
+            HybridStateDetector,
+        )
 
         self.detector = HybridStateDetector(
             dominant_threshold=0.6,
@@ -409,7 +429,7 @@ class TestHybridStateDetector:
 
     def test_dominant_detection(self):
         """Test detection of dominant state."""
-        from models.rainbow_table_regression_head import TEMPORAL_MODES
+        from white_training.models.rainbow_table_regression_head import TEMPORAL_MODES
 
         # Clear dominant: past=0.9
         scores = torch.tensor([[0.9, 0.05, 0.05]])
@@ -420,7 +440,7 @@ class TestHybridStateDetector:
 
     def test_hybrid_detection(self):
         """Test detection of hybrid state."""
-        from models.rainbow_table_regression_head import TEMPORAL_MODES
+        from white_training.models.rainbow_table_regression_head import TEMPORAL_MODES
 
         # Hybrid: past=0.45, present=0.45, future=0.1
         scores = torch.tensor([[0.45, 0.45, 0.1]])
@@ -430,7 +450,7 @@ class TestHybridStateDetector:
 
     def test_diffuse_detection(self):
         """Test detection of diffuse state."""
-        from models.rainbow_table_regression_head import TEMPORAL_MODES
+        from white_training.models.rainbow_table_regression_head import TEMPORAL_MODES
 
         # Diffuse: roughly uniform
         scores = torch.tensor([[0.34, 0.33, 0.33]])
@@ -440,7 +460,7 @@ class TestHybridStateDetector:
 
     def test_full_state_analysis(self):
         """Test full ontological state analysis."""
-        from models.rainbow_table_regression_head import (
+        from white_training.models.rainbow_table_regression_head import (
             OntologicalScores,
         )
 
@@ -465,7 +485,9 @@ class TestTransmigrationCalculator:
 
     def test_dimension_distance(self):
         """Test distance computation between score vectors."""
-        from models.rainbow_table_regression_head import TransmigrationCalculator
+        from white_training.models.rainbow_table_regression_head import (
+            TransmigrationCalculator,
+        )
 
         source = torch.tensor([[1.0, 0.0, 0.0]])
         target = torch.tensor([[0.0, 1.0, 0.0]])
@@ -477,7 +499,7 @@ class TestTransmigrationCalculator:
 
     def test_total_distance(self):
         """Test total transmigration distance."""
-        from models.rainbow_table_regression_head import (
+        from white_training.models.rainbow_table_regression_head import (
             OntologicalScores,
             TransmigrationCalculator,
         )
@@ -503,7 +525,7 @@ class TestTransmigrationCalculator:
 
     def test_distances_to_all_albums(self):
         """Test computing distances to all albums."""
-        from models.rainbow_table_regression_head import (
+        from white_training.models.rainbow_table_regression_head import (
             OntologicalScores,
             TransmigrationCalculator,
         )
@@ -531,7 +553,9 @@ class TestOntologicalScoresDataclass:
 
     def test_to_dict(self):
         """Test conversion to dictionary."""
-        from models.rainbow_table_regression_head import OntologicalScores
+        from white_training.models.rainbow_table_regression_head import (
+            OntologicalScores,
+        )
 
         scores = OntologicalScores(
             temporal_scores=torch.tensor([[0.5, 0.3, 0.2]]),
@@ -549,7 +573,9 @@ class TestOntologicalScoresDataclass:
 
     def test_detach(self):
         """Test detach method."""
-        from models.rainbow_table_regression_head import OntologicalScores
+        from white_training.models.rainbow_table_regression_head import (
+            OntologicalScores,
+        )
 
         scores = OntologicalScores(
             temporal_scores=torch.tensor([[0.5, 0.3, 0.2]], requires_grad=True),

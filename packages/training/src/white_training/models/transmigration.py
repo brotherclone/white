@@ -13,7 +13,8 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
-from models.rainbow_table_regression_head import (
+
+from white_training.models.rainbow_table_regression_head import (
     ALBUM_MAPPING,
     ONTOLOGICAL_MODES,
     SPATIAL_MODES,

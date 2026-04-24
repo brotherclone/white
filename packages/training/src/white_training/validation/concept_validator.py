@@ -15,8 +15,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import torch
 import yaml
-from models.multitask_model import MultiTaskRainbowModel
-from models.text_encoder import TextEncoder
+
+from white_training.models.multitask_model import MultiTaskRainbowModel
+from white_training.models.text_encoder import TextEncoder
 
 # Type hints for optional dependencies
 try:

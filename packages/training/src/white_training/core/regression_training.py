@@ -13,12 +13,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import wandb
-
-# Import embedding loader
-from core.embedding_loader import PrecomputedEmbeddingLoader, find_embedding_file
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_absolute_error
 from torch.utils.data import DataLoader, Dataset
+
+# Import embedding loader
+from white_training.core.embedding_loader import (
+    PrecomputedEmbeddingLoader,
+    find_embedding_file,
+)
 
 # ============================================================================
 # CONFIGURATION

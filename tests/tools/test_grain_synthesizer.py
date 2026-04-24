@@ -8,8 +8,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import soundfile as sf
-
-from training.tools.grain_synthesizer import (
+from white_training.tools.grain_synthesizer import (
     _to_stereo,
     extract_grain,
     hann_crossfade,
