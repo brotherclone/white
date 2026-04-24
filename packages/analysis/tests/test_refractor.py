@@ -60,7 +60,7 @@ class TestScorerWithMockedONNX:
 
     @pytest.fixture
     def scorer(self):
-        from training.refractor import Refractor
+        from white_analysis.refractor import Refractor
 
         s = Refractor.__new__(Refractor)
         s._session = _make_mock_session()
@@ -268,7 +268,7 @@ class TestScorerIntegration:
 
     @pytest.fixture
     def scorer(self):
-        from training.refractor import Refractor
+        from white_analysis.refractor import Refractor
 
         return Refractor(onnx_path=str(_onnx_path))
 

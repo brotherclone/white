@@ -432,7 +432,7 @@ class TestMelodyPipelineIntegration:
 
         mock_scorer.score_batch = mock_score_batch
 
-        with patch("training.refractor.Refractor", return_value=mock_scorer):
+        with patch("white_analysis.refractor.Refractor", return_value=mock_scorer):
             from app.generators.midi.pipelines.melody_pipeline import (
                 run_melody_pipeline,
             )
@@ -645,7 +645,7 @@ class TestMelodicContinuityIntegration:
 
         mock_scorer.score_batch = mock_score_batch
 
-        with patch("training.refractor.Refractor", return_value=mock_scorer):
+        with patch("white_analysis.refractor.Refractor", return_value=mock_scorer):
             from app.generators.midi.pipelines.melody_pipeline import (
                 run_melody_pipeline,
             )

@@ -163,7 +163,7 @@ def _score_population(
     concept_emb: np.ndarray,
 ) -> list[float]:
     """Score a list of MIDI byte blobs with the Refractor. Returns fitness values."""
-    from training.refractor import Refractor
+    from white_analysis.refractor import Refractor
 
     scorer = Refractor()
     candidates = [{"midi_bytes": mb} for mb in midi_list]

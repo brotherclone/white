@@ -351,7 +351,7 @@ class TestScoreChromatic:
             }
         ]
 
-        with patch("training.refractor.Refractor", return_value=mock_scorer):
+        with patch("white_analysis.refractor.Refractor", return_value=mock_scorer):
             score_chromatic(catalog_path)
 
         captured = capsys.readouterr()

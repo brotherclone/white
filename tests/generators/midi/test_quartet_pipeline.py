@@ -207,7 +207,7 @@ class TestGenerateQuartet:
         _write_song_context(prod)
         _write_melody_approved(prod, "verse", [60, 62, 64, 65])
 
-        with patch.dict("sys.modules", {"training.refractor": None}):
+        with patch.dict("sys.modules", {"white_analysis.refractor": None}):
             candidates = generate_quartet(prod, "verse", top_k=1, seed=0, scorer=None)
         c = candidates[0]
         assert c["composite_score"] == c["scores"]["counterpoint"]

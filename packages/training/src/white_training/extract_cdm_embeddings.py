@@ -57,8 +57,9 @@ def extract(
     """
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
+    from white_analysis.refractor import Refractor
+
     from app.generators.midi.production.score_mix import chunk_audio
-    from training.refractor import Refractor
 
     scorer = Refractor()
 

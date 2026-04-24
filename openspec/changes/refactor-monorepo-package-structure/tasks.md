@@ -32,34 +32,34 @@
 - [x] 2.6 Delete moved source files from `training/` (data/docs/notebooks stay)
 - [x] 2.7 Open PR: `feat: migrate training package (white_training)`
 
-## 3. Package: extraction (`app/extractors/` + audio utils → `white_extraction`)
+## 3. Package: extraction (`app/extractors/` + audio utils → `white_extraction`) ✅ DONE (commit 9bcbda3)
 
-- [ ] 3.1 Scaffold `packages/extraction/pyproject.toml` (deps: `white-core`) + `src/white_extraction/`
-- [ ] 3.2 Move `app/extractors/` → `packages/extraction/src/white_extraction/extractors/`
-- [ ] 3.3 Move audio/MIDI utilities from `app/util/` (timestamp_audio_extractor,
+- [x] 3.1 Scaffold `packages/extraction/pyproject.toml` (deps: `white-core`) + `src/white_extraction/`
+- [x] 3.2 Move `app/extractors/` → `packages/extraction/src/white_extraction/extractors/`
+- [x] 3.3 Move audio/MIDI utilities from `app/util/` (timestamp_audio_extractor,
       midi_segment_utils, etc.) → `packages/extraction/src/white_extraction/util/`
-- [ ] 3.4 Move `app/util/generate_negative_constraints.py` with extraction (training-data util)
-- [ ] 3.5 Move `staged_raw_material/__init__.py` and `cleanup_evp_intermediates.py` →
+- [x] 3.4 Move `app/util/generate_negative_constraints.py` with extraction (training-data util)
+- [x] 3.5 Move `staged_raw_material/__init__.py` and `cleanup_evp_intermediates.py` →
       `packages/extraction/src/white_extraction/staged_raw_material/`; decide whether audio
       data dirs (`01_01/` etc.) stay at root or move to `packages/extraction/data/staged_raw_material/`
-- [ ] 3.6 Remove `staged_raw_material` from root `pyproject.toml` `[tool.setuptools]` (workspace
+- [x] 3.6 Remove `staged_raw_material` from root `pyproject.toml` `[tool.setuptools]` (workspace
       manifest replaces it)
-- [ ] 3.7 Update all `from app.extractors...`, relevant `from app.util...`, and
+- [x] 3.7 Update all `from app.extractors...`, relevant `from app.util...`, and
       `from staged_raw_material...` imports
-- [ ] 3.8 Move `tests/extractors/` and relevant `tests/util/` → `packages/extraction/tests/`
-- [ ] 3.9 Run `uv sync` + full pytest; fix failures
-- [ ] 3.10 Delete moved source from `app/` and `staged_raw_material/` (Python files only)
-- [ ] 3.11 Open PR: `feat: migrate extraction package (white_extraction)`
+- [x] 3.8 Move `tests/extractors/` and relevant `tests/util/` → `packages/extraction/tests/`
+- [x] 3.9 Run `uv sync` + full pytest; fix failures
+- [x] 3.10 Delete moved source from `app/` and `staged_raw_material/` (Python files only)
+- [x] 3.11 Open PR: `feat: migrate extraction package (white_extraction)`
 
-## 4. Package: analysis (`training/refractor.py` + scorer → `white_analysis`)
+## 4. Package: analysis (`training/refractor.py` + scorer → `white_analysis`) ✅ DONE (commit TBD)
 
-- [ ] 4.1 Scaffold `packages/analysis/pyproject.toml` (deps: `white-core`, `white-training`,
+- [x] 4.1 Scaffold `packages/analysis/pyproject.toml` (deps: `white-core`, `white-training`,
       `white-extraction`) + `src/white_analysis/`
-- [ ] 4.2 Move `training/refractor.py` → `packages/analysis/src/white_analysis/refractor.py`
-- [ ] 4.3 Update all `from training.refractor...` imports to `from white_analysis...`
-- [ ] 4.4 Move relevant tests → `packages/analysis/tests/`
-- [ ] 4.5 Run `uv sync` + full pytest; fix failures
-- [ ] 4.6 Delete moved source
+- [x] 4.2 Move `training/refractor.py` → `packages/analysis/src/white_analysis/refractor.py`
+- [x] 4.3 Update all `from training.refractor...` imports to `from white_analysis...`
+- [x] 4.4 Move relevant tests → `packages/analysis/tests/`
+- [x] 4.5 Run `uv sync` + full pytest; fix failures
+- [x] 4.6 Delete moved source
 - [ ] 4.7 Open PR: `feat: migrate analysis package (white_analysis)`
 
 ## 5. Package: generation (patterns + pipelines → `white_generation`)

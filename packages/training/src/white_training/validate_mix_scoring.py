@@ -107,11 +107,12 @@ def validate(
     """Score all labeled _main.wav files and write a per-song YAML report."""
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
+    from white_analysis.refractor import Refractor
+
     from app.generators.midi.production.score_mix import (
         aggregate_chunk_scores,
         chunk_audio,
     )
-    from training.refractor import Refractor
 
     scorer = Refractor(onnx_path=onnx_path, cdm_onnx_path=cdm_onnx_path)
     using_cdm = scorer._cdm_session is not None

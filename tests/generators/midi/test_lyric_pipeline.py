@@ -707,7 +707,7 @@ class TestRunPipelineIntegration:
 
         with (
             patch("anthropic.Anthropic", return_value=mock_client),
-            patch("training.refractor.Refractor", return_value=mock_scorer),
+            patch("white_analysis.refractor.Refractor", return_value=mock_scorer),
         ):
             run_lyric_pipeline(
                 production_dir=str(prod_dir),
@@ -751,7 +751,7 @@ class TestRunPipelineIntegration:
 
         with (
             patch("anthropic.Anthropic", return_value=mock_client),
-            patch("training.refractor.Refractor", return_value=mock_scorer),
+            patch("white_analysis.refractor.Refractor", return_value=mock_scorer),
         ):
             run_lyric_pipeline(
                 production_dir=str(prod_dir),
@@ -802,7 +802,7 @@ class TestRunPipelineIntegration:
             with (
                 patch("anthropic.Anthropic", return_value=mock_client),
                 patch(
-                    "training.refractor.Refractor",
+                    "white_analysis.refractor.Refractor",
                     return_value=mock_scorer,
                 ),
             ):

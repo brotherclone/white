@@ -434,8 +434,9 @@ def generate_white_candidates(
     """
     import random as _random
 
+    from white_analysis.refractor import Refractor
+
     from app.generators.midi.pipelines.white_rebracketing import concatenate_bars
-    from training.refractor import Refractor
 
     rng = _random.Random(seed)
     tpb = 480
@@ -716,7 +717,7 @@ def run_chord_pipeline(
     # --- 3. Score with Refractor ---
     print("\nScoring with Refractor...")
 
-    from training.refractor import Refractor
+    from white_analysis.refractor import Refractor
 
     scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 

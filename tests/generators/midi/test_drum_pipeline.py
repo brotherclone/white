@@ -782,7 +782,7 @@ class TestDrumPipelineIntegration:
 
         # Monkeypatch the scorer at the source module (imported lazily inside run_drum_pipeline)
         monkeypatch.setattr(
-            "training.refractor.Refractor",
+            "white_analysis.refractor.Refractor",
             MockScorer,
         )
 

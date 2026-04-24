@@ -495,7 +495,7 @@ class TestIntegration:
                 ]
 
         monkeypatch.setattr(
-            "training.refractor.Refractor",
+            "white_analysis.refractor.Refractor",
             MockScorer,
         )
 
@@ -580,7 +580,7 @@ class TestIntegration:
                 ]
 
         monkeypatch.setattr(
-            "training.refractor.Refractor",
+            "white_analysis.refractor.Refractor",
             MockScorer,
         )
 
@@ -630,7 +630,7 @@ class TestIntegration:
                 ]
 
         monkeypatch.setattr(
-            "training.refractor.Refractor",
+            "white_analysis.refractor.Refractor",
             MockScorer,
         )
 

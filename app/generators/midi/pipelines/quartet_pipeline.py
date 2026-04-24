@@ -727,7 +727,7 @@ def generate_quartet(
     _concept_emb = None
     if _scorer is None:
         try:
-            from training.refractor import Refractor
+            from white_analysis.refractor import Refractor
 
             _scorer = Refractor()
         except Exception:

@@ -21,9 +21,6 @@ Usage:
     # → sorted list with scores + original candidate data
 """
 
-# Import midi_bytes_to_piano_roll without triggering training.models.__init__
-# (which eagerly imports torch-dependent classifiers)
-import importlib.util as _ilu  # noqa: E402
 import logging
 from pathlib import Path
 from typing import Optional
@@ -37,22 +34,10 @@ from white_core.concepts.chromatic_targets import (
     SPATIAL_MODES,
     TEMPORAL_MODES,
 )
+from white_training.models.piano_roll_encoder import midi_bytes_to_piano_roll
 
-_spec = _ilu.spec_from_file_location(
-    "piano_roll_encoder",
-    str(
-        Path(__file__).parent.parent
-        / "packages"
-        / "training"
-        / "src"
-        / "white_training"
-        / "models"
-        / "piano_roll_encoder.py"
-    ),
-)
-_pre = _ilu.module_from_spec(_spec)
-_spec.loader.exec_module(_pre)
-midi_bytes_to_piano_roll = _pre.midi_bytes_to_piano_roll
+# Model data lives in training/data/ at repo root (not moved with this package)
+_TRAINING_DATA = Path(__file__).parent.parent.parent.parent.parent / "training" / "data"
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +83,7 @@ class Refractor:
         import onnxruntime as ort
 
         if onnx_path is None:
-            onnx_path = str(Path(__file__).parent / "data" / "refractor.onnx")
+            onnx_path = str(_TRAINING_DATA / "refractor.onnx")
 
         if not Path(onnx_path).exists():
             raise FileNotFoundError(f"ONNX model not found: {onnx_path}")
@@ -115,7 +100,7 @@ class Refractor:
 
         if cdm_onnx_path is None:
             # Auto-detect
-            default_cdm = Path(__file__).parent / "data" / "refractor_cdm.onnx"
+            default_cdm = _TRAINING_DATA / "refractor_cdm.onnx"
             if default_cdm.exists():
                 cdm_onnx_path = str(default_cdm)
         elif cdm_onnx_path == "":

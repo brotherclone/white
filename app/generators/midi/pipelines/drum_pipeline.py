@@ -398,7 +398,7 @@ def run_drum_pipeline(
 
     # Load Refractor
     print("\nLoading Refractor...")
-    from training.refractor import Refractor
+    from white_analysis.refractor import Refractor
 
     scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
 

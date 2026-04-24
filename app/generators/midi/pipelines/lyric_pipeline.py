@@ -1426,7 +1426,7 @@ def run_lyric_pipeline(
     if not skip_scoring:
         print("\nLoading Refractor...")
         try:
-            from training.refractor import Refractor
+            from white_analysis.refractor import Refractor
 
             scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
             concept_text = (

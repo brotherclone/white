@@ -334,7 +334,7 @@ def score_chromatic(
         return
 
     try:
-        from training.refractor import Refractor
+        from white_analysis.refractor import Refractor
     except Exception as exc:
         print(f"ERROR: Failed to import Refractor: {exc}")
         print(
