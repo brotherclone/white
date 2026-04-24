@@ -1,36 +1,36 @@
-## 0. Root Scaffold (prerequisite for all packages)
+## 0. Root Scaffold (prerequisite for all packages) ✅ DONE (commit 7107d0f)
 
-- [ ] 0.1 Investigate `sitecustomize.py` — determine if it can be removed or must stay
-- [ ] 0.2 Convert root `pyproject.toml` to UV workspace manifest (add `[tool.uv.workspace]`,
+- [x] 0.1 Investigate `sitecustomize.py` — determine if it can be removed or must stay
+- [x] 0.2 Convert root `pyproject.toml` to UV workspace manifest (add `[tool.uv.workspace]`,
       move shared dev deps to workspace level, remove `[tool.setuptools]` packages list)
-- [ ] 0.3 Create `packages/` directory; confirm `uv sync` still resolves cleanly
-- [ ] 0.4 Update root `pytest.ini` to discover both `packages/*/tests/` and `tests/integration/`
-- [ ] 0.5 Move existing cross-package tests from `tests/` into `tests/integration/` as appropriate;
+- [x] 0.3 Create `packages/` directory; confirm `uv sync` still resolves cleanly
+- [x] 0.4 Update root `pytest.ini` to discover both `packages/*/tests/` and `tests/integration/`
+- [x] 0.5 Move existing cross-package tests from `tests/` into `tests/integration/` as appropriate;
       delete remaining root test files that will migrate with their package
-- [ ] 0.6 Verify full test suite passes from root after workspace conversion
+- [x] 0.6 Verify full test suite passes from root after workspace conversion
 
-## 1. Package: core (`app/structures/` → `white_core`)
+## 1. Package: core (`app/structures/` → `white_core`) ✅ DONE (commit 7107d0f)
 
-- [ ] 1.1 Scaffold `packages/core/pyproject.toml` + `src/white_core/__init__.py`
-- [ ] 1.2 Move `app/structures/` → `packages/core/src/white_core/`
-- [ ] 1.3 Update all `from app.structures...` imports across repo to `from white_core...`
-- [ ] 1.4 Move `tests/structures/` → `packages/core/tests/`
-- [ ] 1.5 Run `uv sync` + full pytest; fix failures
-- [ ] 1.6 Delete `app/structures/`
-- [ ] 1.7 Open PR: `feat: migrate core package (white_core)`
+- [x] 1.1 Scaffold `packages/core/pyproject.toml` + `src/white_core/__init__.py`
+- [x] 1.2 Move `app/structures/` → `packages/core/src/white_core/`
+- [x] 1.3 Update all `from app.structures...` imports across repo to `from white_core...`
+- [x] 1.4 Move `tests/structures/` → `packages/core/tests/`
+- [x] 1.5 Run `uv sync` + full pytest; fix failures
+- [x] 1.6 Delete `app/structures/`
+- [x] 1.7 Open PR: `feat: migrate core package (white_core)`
 
-## 2. Package: training (`training/` → `white_training`)
+## 2. Package: training (`training/` → `white_training`) ✅ DONE (commit ed2cf94)
 
-- [ ] 2.1 Scaffold `packages/training/pyproject.toml` (declares `white-core = {workspace=true}`)
+- [x] 2.1 Scaffold `packages/training/pyproject.toml` (declares `white-core = {workspace=true}`)
       + `src/white_training/__init__.py`
-- [ ] 2.2 Move `training/*.py`, `training/models/`, `training/core/`, `training/validation/`,
+- [x] 2.2 Move `training/*.py`, `training/models/`, `training/core/`, `training/validation/`,
       `training/visualization/`, `training/tools/` into `packages/training/src/white_training/`
       (leave `training/data/`, `training/notebooks/`, `training/docs/` in place — data assets)
-- [ ] 2.3 Update `from training...` imports to `from white_training...`
-- [ ] 2.4 Move `training/tests/` → `packages/training/tests/`
-- [ ] 2.5 Run `uv sync` + full pytest; fix failures
-- [ ] 2.6 Delete moved source files from `training/` (data/docs/notebooks stay)
-- [ ] 2.7 Open PR: `feat: migrate training package (white_training)`
+- [x] 2.3 Update `from training...` imports to `from white_training...`
+- [x] 2.4 Move `training/tests/` → `packages/training/tests/`
+- [x] 2.5 Run `uv sync` + full pytest; fix failures
+- [x] 2.6 Delete moved source files from `training/` (data/docs/notebooks stay)
+- [x] 2.7 Open PR: `feat: migrate training package (white_training)`
 
 ## 3. Package: extraction (`app/extractors/` + audio utils → `white_extraction`)
 
