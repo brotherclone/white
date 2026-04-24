@@ -1,0 +1,80 @@
+identity:
+  thread: ''
+  color: Blue
+  title: The Iron Oxidation Frequency (Memorial for Abundance Machinery)
+  key: G minor
+  bpm: 60
+  time_sig: 3/4
+  singer: ''
+phase_decisions:
+  chords:
+    candidates_generated: 10
+    approved_count: 4
+    approved_labels:
+    - chorus
+    - verse
+    - bridge
+    - jams
+    mean_chromatic_score: 0.1455
+    mean_theory_score: 0.5927
+  drums:
+    candidates_generated: 10
+    approved_count: 6
+    approved_labels:
+    - chorus
+    - verse
+    - verse_alt
+    - bridge
+    - jams_alt
+    - jams
+    mean_chromatic_score: 0.145
+    mean_theory_score: null
+  bass:
+    candidates_generated: 20
+    approved_count: 7
+    approved_labels:
+    - chorus
+    - chorus_alt
+    - verse
+    - verse_alt
+    - bridge
+    - jams
+    - jams_alt
+    mean_chromatic_score: 0.1449
+    mean_theory_score: null
+  melody:
+    candidates_generated: 17
+    approved_count: 7
+    approved_labels:
+    - chorus
+    - chorus_alt
+    - verse
+    - verse_alt
+    - bridge
+    - jams
+    - jams_alt
+    mean_chromatic_score: 0.1451
+    mean_theory_score: null
+arrangement_summary:
+  sections:
+  - name: jams
+    bars: 7
+    play_count: 4
+    vocals: false
+  - name: verse
+    bars: 7
+    play_count: 4
+    vocals: true
+  - name: chorus
+    bars: 5
+    play_count: 6
+    vocals: true
+  - name: bridge
+    bars: 7
+    play_count: 1
+    vocals: false
+  total_bars: 93
+  total_plays: 15
+  section_count: 4
+mix_scores: null
+vocal_drift: null
