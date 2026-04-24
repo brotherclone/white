@@ -62,7 +62,7 @@
 - [x] 4.6 Delete moved source
 - [ ] 4.7 Open PR: `feat: migrate analysis package (white_analysis)`
 
-## 5. Package: generation (patterns + pipelines → `white_generation`) ✅ DONE (commit TBD)
+## 5. Package: generation (patterns + pipelines → `white_generation`) ✅ DONE (commit 78f7a11)
 
 - [x] 5.1 Scaffold `packages/generation/pyproject.toml` (deps: `white-core`, `white-analysis`)
       + `src/white_generation/`
