@@ -67,12 +67,12 @@
 After each phase:
 ```bash
 pytest tests/ -v
-python run_white_agent.py start --mode single_agent --agent violet
-python run_white_agent.py start --mode single_agent --agent black
+python run_ideation.py start --mode single_agent --agent violet
+python run_ideation.py start --mode single_agent --agent black
 ```
 
 Full validation:
 ```bash
-python run_white_agent.py start --mode full_spectrum
+python run_ideation.py start --mode full_spectrum
 # Should complete without any pauses or prompts
 ```

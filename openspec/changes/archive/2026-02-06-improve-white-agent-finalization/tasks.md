@@ -39,7 +39,7 @@
 
 ```bash
 # Run full spectrum and compare outputs
-MOCK_MODE=false python run_white_agent.py start --mode full_spectrum
+MOCK_MODE=false python run_ideation.py start --mode full_spectrum
 
 # Check that artifacts appear in synthesis
 grep -r "extinction\|timeline\|newspaper" chain_artifacts/*/md/*chromatic_synthesis*

@@ -21,7 +21,7 @@ async def discogs_earthly_frames_retriever_service() -> Any:
     load_dotenv()
     discogs = discogs_client.Client(
         USER_AGENT,
-        user_token=os.environ["USER_ACCESS_TOKEN"],
+        user_token=os.environ["DISCOGS_USER_ACCESS_TOKEN"],
     )
     return discogs
 

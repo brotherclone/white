@@ -16,10 +16,15 @@ Features:
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sys
 from pathlib import Path
 from typing import List
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def find_mock_dirs(base_dir: Path) -> List[Path]:
@@ -94,9 +99,14 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
 def main(argv: List[str] | None = None) -> int:
     args = parse_args(argv)
 
-    # resolve repo root relative to this file: packages/api/src/white_api -> packages/api/src -> packages/api -> packages -> repo root
-    repo_root = Path(__file__).resolve().parents[4]
-    base_dir = args.base or (repo_root / "chain_artifacts")
+    env_base = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+    if args.base:
+        base_dir = args.base
+    elif env_base:
+        base_dir = Path(env_base)
+    else:
+        print("No --base provided and AGENT_WORK_PRODUCT_BASE_PATH is not set in .env")
+        return 1
 
     if not base_dir.exists():
         print(f"Base directory does not exist: {base_dir}")

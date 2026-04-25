@@ -3,6 +3,7 @@ from pathlib import Path
 import yaml
 from hypothesis import given
 from hypothesis import strategies as st
+
 from white_core.artifacts.audio_artifact_file import AudioChainArtifactFile
 from white_core.artifacts.evp_artifact import EVPArtifact
 from white_core.artifacts.sigil_artifact import SigilArtifact
@@ -31,7 +32,7 @@ def test_evp_artifact_mock():
     # Only mosaic is set now - no segments or blended
     evp.audio_mosiac = AudioChainArtifactFile(
         thread_id="test_thread_id",
-        base_path="/Volumes/LucidNonsense/White/chain_artifacts/",
+        base_path="/chain_artifacts/",
         artifact_name="evp_mosaic",
         sample_rate=44100,
         duration=8.0,

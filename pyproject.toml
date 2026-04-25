@@ -80,6 +80,6 @@ known-first-party = [
 ]
 # Inline imports inside functions are allowed only to break circular imports.
 # All other imports must appear at the top of the file in three blocks:
-#   1. stdlib  (import os / from pathlib import Path)
-#   2. third-party  (import yaml / from langchain import ...)
-#   3. first-party  (from app import ... / from training import ...)
+#   1. stdlib (import os / from pathlib import Path)
+#   2. third-party (import YAML / from langchain import ...)
+#   3. first-party (from app import ... / from training import ...)

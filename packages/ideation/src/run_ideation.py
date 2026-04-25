@@ -32,19 +32,19 @@ This script provides convenient commands to start the White Agent workflow.
 
 Usage:
     # Start a new workflow (full spectrum)
-    python run_white_agent.py start
+    python run_ideation.py start
 
     # Test a single agent in isolation
-    python run_white_agent.py start --mode single_agent --agent orange --concept "Library ghosts"
+    python run_ideation.py start --mode single_agent --agent orange --concept "Library ghosts"
 
     # Run up through a specific agent
-    python run_white_agent.py start --mode stop_after --stop-after yellow --concept "Static children"
+    python run_ideation.py start --mode stop_after --stop-after yellow --concept "Static children"
 
     # Custom agent combination
-    python run_white_agent.py start --mode custom --agents orange,indigo --concept "Hidden frequencies"
+    python run_ideation.py start --mode custom --agents orange,indigo --concept "Hidden frequencies"
 
     # Validate state and artifacts
-    python run_white_agent.py validate
+    python run_ideation.py validate
 """
 
 

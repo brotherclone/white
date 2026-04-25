@@ -109,7 +109,7 @@ if __name__ == "__main__":
         glyph_components=["hi"],
         activation_state="charging",
         charging_instructions="hi",
-        base_path="/Volumes/LucidNonsense/White/chain_artifacts/",
+        base_path="/chain_artifacts/",
     )
 
     sigil.save_file()

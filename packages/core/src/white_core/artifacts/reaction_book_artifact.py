@@ -154,7 +154,7 @@ if __name__ == "__main__":
         title="The Ham Shell",
         subtitle="A Tale of Ham and Spam",
         author="",
-        base_path="/Volumes/LucidNonsense/White/chain_artifacts/",
+        base_path="/chain_artifacts/",
         publisher="The Ham Shell Press",
         publisher_type="Samizdat dead drop",
         edition="1st",

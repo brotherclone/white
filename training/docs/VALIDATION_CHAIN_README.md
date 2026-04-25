@@ -38,7 +38,7 @@ Later, optionally:
 
 ```bash
 # In your main White Album directory
-python run_white_agent.py
+python run_ideation.py
 
 # Concepts saved to /chain_artifacts/<thread-id>/
 ```
