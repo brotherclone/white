@@ -67,7 +67,7 @@ def load_results(path: str) -> list[dict]:
 def compute_corpus_baseline(top_n: int = 20) -> dict[str, float]:
     """Compute mean chromatic_match for top-N retrieved segments per color."""
     try:
-        from app.generators.midi.production.retrieve_samples import (
+        from white_composition.retrieve_samples import (
             load_clap_index,
             retrieve_by_color,
         )

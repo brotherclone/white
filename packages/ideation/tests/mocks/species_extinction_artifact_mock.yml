@@ -1,0 +1,10 @@
+thread_id: 'mock_thread_001'
+artifact_name: 'species_extinction_mock'
+scientific_name: 'Mockus Mockulias'
+common_name: 'Mock'
+taxonomic_group: 'Mockery'
+iucn_status: 'extinct'
+extinction_year: 2020
+habitat: 'mock habitat'
+primary_cause: 'combined_factors'
+ecosystem_role: 'mocker'

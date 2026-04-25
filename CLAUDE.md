@@ -30,8 +30,8 @@ from pathlib import Path
 
 import yaml        # 2. third-party
 
-from app.generators.midi import x   # 3. first-party (app / training / tests)
-from training.refractor import y
+from white_core.manifests.manifest import Manifest   # 3. first-party (white_* packages)
+from white_generation.pipelines.chord_pipeline import run_chord_pipeline
 ```
 
 - **Never put imports inside functions or methods**, except to break a genuine circular-import cycle. In that case add a `# circular import` comment so the reason is explicit.
@@ -39,7 +39,7 @@ from training.refractor import y
 
 ## Prefer Pydantic for structured data
 
-When a function returns a dict or JSON payload that has a defined shape — API responses, pipeline outputs, review entries, anything that flows between components — prefer a Pydantic model over a raw `dict`. Pydantic models live in `app/structures/` (not `models/`, which is reserved for ML model definitions) and give both humans and Claude a self-documenting schema with validation and metadata.
+When a function returns a dict or JSON payload that has a defined shape — API responses, pipeline outputs, review entries, anything that flows between components — prefer a Pydantic model over a raw `dict`. Pydantic models live in `white_core/` (not `models/`, which is reserved for ML model definitions) and give both humans and Claude a self-documenting schema with validation and metadata.
 
 This is a heuristic, not a hard rule. A one-off helper that returns two values doesn't need a model. But if the same shape appears in multiple places, or if it crosses a boundary (API response, YAML round-trip, pipeline stage handoff), a `structures/` Pydantic class is the right move.
 
@@ -58,4 +58,4 @@ class LyricRepeatType(str, Enum):
     FRESH = "fresh"
 ```
 
-Enums live in `app/structures/enums/`. Use `str, Enum` (string-valued) so they serialise cleanly to/from YAML and JSON without extra conversion. When loading from external input (YAML, API), normalise to the enum early and let it be an enum everywhere inside the code.
+Enums live in `white_core/enums/`. Use `str, Enum` (string-valued) so they serialise cleanly to/from YAML and JSON without extra conversion. When loading from external input (YAML, API), normalise to the enum early and let it be an enum everywhere inside the code.

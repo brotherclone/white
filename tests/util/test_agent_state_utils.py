@@ -1,6 +1,6 @@
 """Tests for agent state utilities."""
 
-from app.util.agent_state_utils import safe_add
+from white_ideation.agents.agent_state_utils import safe_add
 
 
 def test_safe_add_both_none():

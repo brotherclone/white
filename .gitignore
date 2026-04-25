@@ -43,13 +43,13 @@ htmlcov/
 *.db
 *.parquet
 *.sqlite
-/chords/
+/packages/generation/chords/
 /claude_working_area/
 /app/reference/news_articles/clippings/
 /checkpoints
 /claude_desktop_config.json
 chain_arifacts_incompletes/
-chain_artifacts/
+packages/ideation/chain_artifacts/
 chain_artifacts/**/debug/*.json
 **/transformation_traces.md
 *.logicx

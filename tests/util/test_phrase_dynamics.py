@@ -1,6 +1,6 @@
 """Tests for app/util/phrase_dynamics.py"""
 
-from app.util.phrase_dynamics import (
+from white_generation.util.phrase_dynamics import (
     DynamicCurve,
     apply_dynamics_curve,
     infer_curve,

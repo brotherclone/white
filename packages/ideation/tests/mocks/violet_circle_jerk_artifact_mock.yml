@@ -1,0 +1,21 @@
+thread_id: "mock_thread_001"
+artifact_name: "jessica_malkmus_interview"
+interviewer_name: "Jessica Malkmus"
+publication: "The Quietus"
+interviewer_type: "HOSTILE_SKEPTICAL"
+stance: "This is pretentious nonsense"
+was_human_interview: false
+questions:
+  - number: 1
+    question: "So this whole 'rebracketing' thing - isn't that just fancy talk for editing?"
+  - number: 2
+    question: "Why does everything need seven layers of meaning? Can't you just make something straightforward?"
+  - number: 3
+    question: "If this is about 'INFORMATION → TIME → SPACE' - can you explain that in plain English? Because it sounds like gibberish."
+responses:
+  - question_number: 1
+    response: "Rebracketing specifically manipulates temporal and ontological boundaries - not just editing content within existing boundaries. It's about redrawing the boundaries themselves."
+  - question_number: 2
+    response: "The layers aren't arbitrary decoration. Each layer represents a different mode of information transmission. Some ideas genuinely require structural complexity to exist at all."
+  - question_number: 3
+    response: "INFORMATION seeks physical manifestation through temporal processes. It's literally about how abstract concepts (info) become concrete reality (space) through creative work (time). The AI collaboration is the process itself."
