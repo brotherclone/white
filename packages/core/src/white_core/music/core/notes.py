@@ -1,0 +1,72 @@
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
+from white_core.music.core.enharmonic import flat_to_sharp, normalize_to_flat
+
+
+class Note(BaseModel):
+
+    pitch_name: str
+    pitch_alias: Optional[List[str]] = Field(
+        default=None, description="Alternative names for the pitch."
+    )
+    accidental: Optional[str] = Field(
+        default=None, description="Accidental of the note (e.g., sharp, flat)."
+    )
+    frequency: Optional[int] = Field(default=None, description="Frequency in Hz.")
+    octave: int | None = None
+    midi_note: Optional[int] = Field(default=None, description="MIDI note number.")
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if self.pitch_name not in ["C", "D", "E", "F", "G", "A", "B"]:
+            raise ValueError(
+                "Pitch name must be one of the following: C, D, E, F, G, A, B"
+            )
+
+
+tempered_notes = {
+    "C": Note(pitch_name="C", pitch_alias=[], accidental=None, frequency=261, octave=4),
+    "C#": Note(
+        pitch_name="C", pitch_alias=["D♭"], accidental="sharp", frequency=277, octave=4
+    ),
+    "D": Note(pitch_name="D", pitch_alias=[], accidental=None, frequency=293, octave=4),
+    "D#": Note(
+        pitch_name="D", pitch_alias=["E♭"], accidental="sharp", frequency=311, octave=4
+    ),
+    "E": Note(pitch_name="E", pitch_alias=[], accidental=None, frequency=329, octave=4),
+    "F": Note(pitch_name="F", pitch_alias=[], accidental=None, frequency=349, octave=4),
+    "F#": Note(
+        pitch_name="F", pitch_alias=["G♭"], accidental="sharp", frequency=370, octave=4
+    ),
+    "G": Note(pitch_name="G", pitch_alias=[], accidental=None, frequency=392, octave=4),
+    "G#": Note(
+        pitch_name="G", pitch_alias=["A♭"], accidental="sharp", frequency=415, octave=4
+    ),
+    "A": Note(pitch_name="A", pitch_alias=[], accidental=None, frequency=440, octave=4),
+    "A#": Note(
+        pitch_name="A", pitch_alias=["B♭"], accidental="sharp", frequency=466, octave=4
+    ),
+    "B": Note(pitch_name="B", pitch_alias=[], accidental=None, frequency=493, octave=4),
+}
+
+# Re-export for callers that import these from notes
+__all__ = [
+    "Note",
+    "tempered_notes",
+    "flat_to_sharp",
+    "normalize_to_flat",
+    "get_tempered_note",
+]
+
+
+def get_tempered_note(note_str: str) -> Note:
+    # Normalize flat notation to sharp notation
+    if note_str in flat_to_sharp:
+        note_str = flat_to_sharp[note_str]
+
+    if note_str in tempered_notes:
+        return tempered_notes[note_str]
+    else:
+        raise ValueError(f"Note {note_str} is not a valid tempered note.")

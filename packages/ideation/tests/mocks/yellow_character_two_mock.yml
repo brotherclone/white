@@ -1,0 +1,19 @@
+thread_id: "mock_thread_001"
+encounter_id: "mock_encounter_001"
+background:
+  rollId: 1
+  place: New Mock City
+  time: 2121
+  image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+disposition:
+  rollId: 1
+  disposition: Mocky
+  image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+profession:
+  rollId: 1
+  profession: Mocktor
+  image_path: /Volumes/LucidNonsense/White/tests/mocks/mock.png
+on_max: 10
+off_max: 10
+on_current: 10
+off_current: 10

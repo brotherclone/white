@@ -63,7 +63,7 @@
 After Phase 3:
 ```bash
 # Run with mock mode
-MOCK_MODE=true python run_white_agent.py start --mode single_agent --agent black
+MOCK_MODE=true python run_ideation.py start --mode single_agent --agent black
 
 # Check artifact directory
 ls -la chain_artifacts/*/audio/
@@ -82,5 +82,5 @@ python scripts/cleanup_evp_intermediates.py
 Full validation:
 ```bash
 pytest tests/ -v -k evp
-python run_white_agent.py start --mode single_agent --agent black
+python run_ideation.py start --mode single_agent --agent black
 ```

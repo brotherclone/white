@@ -1,8 +1,7 @@
 from datetime import date, datetime
 
 import pytest
-
-from app.util.string_utils import (
+from white_core.util.string_utils import (
     format_date,
     resolve_name,
     sanitize_for_filename,

@@ -1,0 +1,29 @@
+[project]
+name = "white-api"
+version = "0.1.0"
+description = "Candidate browser server and song dashboard for White project"
+requires-python = ">=3.12"
+dependencies = [
+    "white-core>=0.1.0",
+    "white-composition>=0.1.0",
+    "white-generation>=0.1.0",
+    "white-ideation>=0.1.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0.0",
+    "rich>=13.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/white_api"]
+
+[tool.uv.sources]
+white-core = { workspace = true }
+white-composition = { workspace = true }
+white-generation = { workspace = true }
+white-ideation = { workspace = true }

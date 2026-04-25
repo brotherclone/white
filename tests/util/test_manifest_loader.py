@@ -2,8 +2,7 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 import yaml
-
-from app.util.manifest_loader import (
+from white_extraction.util.manifest_loader import (
     get_my_reference_proposals,
     get_sounds_like_by_color,
     load_manifest,
@@ -15,7 +14,7 @@ def test_load_manifest_success():
     yaml_content = "title: Test Song\nartist: Test Artist"
     with (
         patch("builtins.open", mock_open(read_data=yaml_content)) as mock_file,
-        patch("app.util.manifest_loader.Manifest") as mock_manifest,
+        patch("white_extraction.util.manifest_loader.Manifest") as mock_manifest,
     ):
         mock_manifest.return_value = "manifest_obj"
         result = load_manifest("dummy_path.yml")
@@ -33,7 +32,7 @@ def test_load_manifest_file_not_found():
 def test_load_manifest_invalid_yaml():
     with (
         patch("builtins.open", mock_open(read_data=": invalid yaml")),
-        patch("app.util.manifest_loader.Manifest"),
+        patch("white_extraction.util.manifest_loader.Manifest"),
     ):
         with pytest.raises(yaml.YAMLError):
             load_manifest("bad.yml")
@@ -44,7 +43,7 @@ def test_load_manifest_invalid_data():
     with (
         patch("builtins.open", mock_open(read_data=yaml_content)),
         patch(
-            "app.util.manifest_loader.Manifest",
+            "white_extraction.util.manifest_loader.Manifest",
             side_effect=Exception("validation error"),
         ),
     ):
@@ -116,7 +115,7 @@ class TestSampleReferenceArtists:
 
 class TestGetMyReferenceProposals:
     @patch("os.walk")
-    @patch("app.util.manifest_loader.load_manifest")
+    @patch("white_extraction.util.manifest_loader.load_manifest")
     @patch("os.getenv")
     def test_get_my_reference_proposals_no_matches(
         self, mock_getenv, mock_load_manifest, mock_walk
@@ -135,9 +134,9 @@ class TestGetMyReferenceProposals:
         assert len(result.iterations) == 0
 
     @patch("os.walk")
-    @patch("app.util.manifest_loader.load_manifest")
+    @patch("white_extraction.util.manifest_loader.load_manifest")
     @patch("os.getenv")
-    @patch("app.util.manifest_loader.SongProposalIteration")
+    @patch("white_extraction.util.manifest_loader.SongProposalIteration")
     def test_get_my_reference_proposals_with_matches(
         self, mock_iteration_class, mock_getenv, mock_load_manifest, mock_walk
     ):
@@ -175,9 +174,9 @@ class TestGetMyReferenceProposals:
         assert result.iterations[0].bpm == 120
 
     @patch("os.walk")
-    @patch("app.util.manifest_loader.load_manifest")
+    @patch("white_extraction.util.manifest_loader.load_manifest")
     @patch("os.getenv")
-    @patch("app.util.manifest_loader.SongProposalIteration")
+    @patch("white_extraction.util.manifest_loader.SongProposalIteration")
     def test_get_my_reference_proposals_with_exception(
         self, mock_iteration_class, mock_getenv, mock_load_manifest, mock_walk
     ):
@@ -227,7 +226,7 @@ class TestGetMyReferenceProposals:
 
 class TestGetSoundsLikeByColor:
     @patch("os.walk")
-    @patch("app.util.manifest_loader.load_manifest")
+    @patch("white_extraction.util.manifest_loader.load_manifest")
     @patch("os.getenv")
     def test_get_sounds_like_by_color_no_matches(
         self, mock_getenv, mock_load_manifest, mock_walk
@@ -245,7 +244,7 @@ class TestGetSoundsLikeByColor:
         assert result == []
 
     @patch("os.walk")
-    @patch("app.util.manifest_loader.load_manifest")
+    @patch("white_extraction.util.manifest_loader.load_manifest")
     @patch("os.getenv")
     def test_get_sounds_like_by_color_with_matches(
         self, mock_getenv, mock_load_manifest, mock_walk
@@ -272,7 +271,7 @@ class TestGetSoundsLikeByColor:
         assert "Artist B" in result
 
     @patch("os.walk")
-    @patch("app.util.manifest_loader.load_manifest")
+    @patch("white_extraction.util.manifest_loader.load_manifest")
     @patch("os.getenv")
     def test_get_sounds_like_by_color_with_exception(
         self, mock_getenv, mock_load_manifest, mock_walk
@@ -298,7 +297,7 @@ class TestGetSoundsLikeByColor:
         assert result[0] == "Artist A"
 
     @patch("os.walk")
-    @patch("app.util.manifest_loader.load_manifest")
+    @patch("white_extraction.util.manifest_loader.load_manifest")
     @patch("os.getenv")
     def test_get_sounds_like_by_color_multiple_manifests(
         self, mock_getenv, mock_load_manifest, mock_walk

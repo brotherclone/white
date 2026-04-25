@@ -22,7 +22,10 @@ def _importer():
         "build_sounds_like_embeddings",
         str(
             Path(__file__).parent.parent.parent
+            / "packages"
             / "training"
+            / "src"
+            / "white_training"
             / "build_sounds_like_embeddings.py"
         ),
     )
@@ -394,7 +397,7 @@ def test_scorer_sounds_like_texts_path(tmp_path):
     pytest.importorskip("onnxruntime")
 
     # We can't easily build a real ONNX; just test prepare_sounds_like directly
-    from training.refractor import Refractor
+    from white_analysis.refractor import Refractor
 
     scorer = MagicMock(spec=Refractor)
     scorer._deberta_model = None
@@ -417,7 +420,7 @@ def test_scorer_sounds_like_texts_path(tmp_path):
 
 def test_scorer_backward_compat_no_sounds_like():
     """score() with no sounds_like args still works (null path)."""
-    from training.refractor import Refractor
+    from white_analysis.refractor import Refractor
 
     scorer = MagicMock(spec=Refractor)
     scorer._session = MagicMock()

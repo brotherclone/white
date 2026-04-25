@@ -4,8 +4,7 @@ from pathlib import Path
 
 import mido
 import pytest
-
-from app.util.midi_cleanup import batch_trim, trim_midi_tempo_track
+from white_generation.util.midi_cleanup import batch_trim, trim_midi_tempo_track
 
 # ---------------------------------------------------------------------------
 # Helpers: build synthetic MIDI files
