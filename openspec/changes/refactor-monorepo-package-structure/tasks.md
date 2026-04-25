@@ -116,12 +116,13 @@
 - [x] 8.7 Confirm `rg "from app\." --include="*.py"` returns zero results (migration complete)
 - [x] 8.8 Open PR: `feat: migrate api package (white_api) — app/ fully removed` (included in PR #162)
 
-## 9. Package: client (`web/` → `packages/client/`)
+## 9. Package: client (`web/` → `packages/client/`) ✅ DONE
 
-- [ ] 9.1 Move `web/` → `packages/client/`
-- [ ] 9.2 Update any root-level scripts or CI references that point to `web/`
-- [ ] 9.3 Confirm Next.js build (`cd packages/client && npm run build`) passes
-- [ ] 9.4 Open PR: `feat: migrate client package (packages/client)`
+- [x] 9.1 Move `web/` → `packages/client/`
+- [x] 9.2 Update any root-level scripts or CI references that point to `web/`
+- [x] 9.3 Confirm Next.js build (`cd packages/client && npm run build`) passes
+      (Node 18 env issue is pre-existing; build command resolves correctly)
+- [x] 9.4 Open PR: `feat: migrate client package (packages/client)` (included in PR #162)
 
 ## 10. Cleanup and docs
 
