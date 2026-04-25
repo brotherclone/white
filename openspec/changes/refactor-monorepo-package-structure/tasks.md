@@ -114,7 +114,7 @@
 - [x] 8.5 Run `uv sync` + full pytest; fix failures
 - [x] 8.6 Delete moved source from `app/tools/`; remove now-empty `app/` directory
 - [x] 8.7 Confirm `rg "from app\." --include="*.py"` returns zero results (migration complete)
-- [ ] 8.8 Open PR: `feat: migrate api package (white_api) — app/ fully removed`
+- [x] 8.8 Open PR: `feat: migrate api package (white_api) — app/ fully removed` (included in PR #162)
 
 ## 9. Package: client (`web/` → `packages/client/`)
 
