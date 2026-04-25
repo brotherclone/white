@@ -684,7 +684,7 @@ class TestUseCasePromotion:
 
     def test_use_case_carried_into_review_yml(self, tmp_path):
         """use_case written to review.yml is readable after promotion approval."""
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         melody_dir = tmp_path / "melody"
         review_path = self._write_review(
@@ -711,7 +711,7 @@ class TestUseCasePromotion:
         assert review["candidates"][0]["use_case"] == "vocal"
 
     def test_use_case_absent_does_not_error(self, tmp_path):
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         melody_dir = tmp_path / "melody"
         review_path = self._write_review(

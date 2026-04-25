@@ -294,7 +294,7 @@ class TestChordPipelineIntegration:
 class TestPromotePart:
 
     def test_promote_approved(self, tmp_path):
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         # Set up directory structure
         chords_dir = tmp_path / "chords"
@@ -348,7 +348,7 @@ class TestPromotePart:
         assert not (approved_dir / "unlabeled.mid").exists()  # rejected, not promoted
 
     def test_promote_duplicate_label_fails(self, tmp_path, capsys):
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         chords_dir = tmp_path / "chords"
         candidates_dir = chords_dir / "candidates"
@@ -391,7 +391,7 @@ class TestPromotePart:
         assert not any(approved_dir.glob("*.mid"))
 
     def test_promote_excludes_scratch_files(self, tmp_path):
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         chords_dir = tmp_path / "chords"
         candidates_dir = chords_dir / "candidates"
@@ -425,7 +425,7 @@ class TestPromotePart:
         assert not (approved_dir / "chord_001_scratch.mid").exists()
 
     def test_promote_no_approved(self, tmp_path, capsys):
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         chords_dir = tmp_path / "chords"
         chords_dir.mkdir()

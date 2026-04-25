@@ -490,7 +490,7 @@ class TestPromotePartTxt:
 
     def test_promote_txt_happy_path(self, tmp_path):
         """Approved .txt candidate gets copied to melody/lyrics.txt."""
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         part_dir, review_path = self._make_review(
             tmp_path,
@@ -510,7 +510,7 @@ class TestPromotePartTxt:
 
     def test_promote_txt_conflict_fails(self, tmp_path):
         """Two approved .txt candidates → error, no copy performed."""
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         part_dir, review_path = self._make_review(
             tmp_path,
@@ -536,7 +536,7 @@ class TestPromotePartTxt:
 
     def test_promote_midi_unchanged(self, tmp_path):
         """Existing MIDI promotion logic still works alongside .txt support."""
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         part_dir = tmp_path / "melody"
         cand_dir = part_dir / "candidates"
@@ -566,7 +566,7 @@ class TestPromotePartTxt:
 
     def test_promote_clean_removes_lyrics_txt(self, tmp_path):
         """--clean should unlink lyrics.txt if it exists."""
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         part_dir = tmp_path / "melody"
         (part_dir / "approved").mkdir(parents=True)
@@ -584,7 +584,7 @@ class TestPromotePartTxt:
 
     def test_promote_txt_writes_draft(self, tmp_path):
         """Approved .txt promotion also writes lyrics_draft.txt alongside lyrics.txt."""
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         part_dir, review_path = self._make_review(
             tmp_path,
@@ -604,7 +604,7 @@ class TestPromotePartTxt:
 
     def test_promote_clean_removes_draft(self, tmp_path):
         """--clean unlinks lyrics_draft.txt if it exists."""
-        from app.generators.midi.production.promote_part import promote_part
+        from white_composition.promote_part import promote_part
 
         part_dir = tmp_path / "melody"
         (part_dir / "approved").mkdir(parents=True)

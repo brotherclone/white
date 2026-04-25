@@ -25,8 +25,8 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+from white_composition.init_production import load_song_context
 
-from app.generators.midi.production.init_production import load_song_context
 from app.util.diversity_tracker import (
     diversity_factor,
     find_album_dir,
@@ -588,7 +588,7 @@ def run_melody_pipeline(
     _style_profile = _ctx.get("style_reference_profile") or {}
 
     # Load production plan for arc-aware tag adjustments
-    from app.generators.midi.production.production_plan import load_plan
+    from white_composition.production_plan import load_plan
 
     _prod_plan = load_plan(prod_path)
     _arc_by_label: dict[str, float] = {}

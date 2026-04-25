@@ -45,7 +45,7 @@ def test_generate_starts_successfully(album_client):
     with (
         patch("app.agents.workflow.concept_workflow.run_white_agent_workflow"),
         patch(
-            "app.util.shrinkwrap_chain_artifacts.shrinkwrap",
+            "white_composition.shrinkwrap_chain_artifacts.shrinkwrap",
             return_value={"processed": 1},
         ),
     ):

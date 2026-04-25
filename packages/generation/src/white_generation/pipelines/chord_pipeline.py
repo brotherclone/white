@@ -24,6 +24,7 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+from white_composition.init_production import load_initial_proposal
 from white_core.concepts.chromatic_targets import (
     CHROMATIC_TARGETS,
     ONTOLOGICAL_MODES,
@@ -33,7 +34,6 @@ from white_core.concepts.chromatic_targets import (
 from white_core.music.core.enharmonic import normalize_to_flat
 
 from app.generators.artist_catalog import load_artist_context
-from app.generators.midi.production.init_production import load_initial_proposal
 from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 from white_generation.chord_generator.generator import ChordProgressionGenerator
 from white_generation.patterns.harmonic_rhythm import enumerate_distributions
@@ -114,7 +114,7 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
     Delegates to load_song_proposal_unified for all parsing; remaps fields
     to the chord_pipeline convention (color_name, time_sig as tuple).
     """
-    from app.generators.midi.production.production_plan import (
+    from white_composition.production_plan import (
         load_song_proposal_unified,
     )
 

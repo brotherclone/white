@@ -136,7 +136,7 @@ class TestFinalizeWithChordKickoff:
         with (
             patch.object(WhiteAgent, "save_all_proposals"),
             patch.object(WhiteAgent, "_invoke_chord_pipeline_safe") as mock_invoke,
-            patch("app.generators.midi.production.init_production.init_production"),
+            patch("white_composition.init_production.init_production"),
         ):
             agent.finalize_song_proposal(state)
 
@@ -202,7 +202,7 @@ class TestFinalizeWithChordKickoff:
                 "white_generation.pipelines.chord_pipeline.run_chord_pipeline",
                 side_effect=RuntimeError("oops"),
             ),
-            patch("app.generators.midi.production.init_production.init_production"),
+            patch("white_composition.init_production.init_production"),
         ):
             result = agent.finalize_song_proposal(state)
 
@@ -281,7 +281,7 @@ class TestMultiFinalKickoff:
             patch.object(WhiteAgent, "save_all_proposals"),
             patch.object(WhiteAgent, "_invoke_chord_pipeline_safe", mock_invoke),
             patch(
-                "app.generators.midi.production.init_production.init_production",
+                "white_composition.init_production.init_production",
                 mock_init,
             ),
         ):

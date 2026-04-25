@@ -1,0 +1,244 @@
+artifact_id: 9b49ef69-f0fb-44e6-ac5e-9f5febcf70b0
+artifact_name: the_wisconsin_year
+base_path: /Volumes/LucidNonsense/White/chain_artifacts
+chain_artifact_file_type: yml
+chain_artifact_type: alternate_timeline
+divergence_magnitude: 0.7
+divergence_point:
+  what_changed: Instead of staying home during the family crisis, Gabriel's parents
+    sent him to live with his father's brother Frank in rural Wisconsin for the entire
+    year
+  when: January 1989
+  why_plausible: Family often send troubled teenagers to relatives during difficult
+    periods, and the timing coincides with his parents' marital problems and his father's
+    alcoholism revelation
+emotional_tone: melancholy
+file_name: the_wisconsin_year.yml
+following_events:
+- Returned home with new musical skills and emotional stability
+- Parents had worked through some issues during his absence
+- Started high school with more confidence and practical skills
+- Maintained correspondence with Wisconsin family
+- Applied outdoor and musical skills to new environment
+key_differences:
+- Lived in rural Wisconsin instead of suburban environment
+- Learned traditional Polish-American crafts and music
+- Developed outdoor skills like ice fishing and woodcarving
+- Attended Lakeland Union High School instead of original school
+- Formed connection to accordion music instead of early guitar
+- Experienced stable family environment during parents' crisis
+mood_description: A sense of suspended time in the Wisconsin woods, where the rhythm
+  of seasons and the patience required for ice fishing created space for healing.
+  The melancholy comes not from trauma but from the bittersweet recognition that this
+  simpler life, this connection to craft and tradition, was always temporary - a parenthesis
+  in a more complicated story.
+narrative: 'The phone call came on a Tuesday morning in January, while frost still
+  covered the kitchen windows. Gabriel''s mother, her voice tight with exhaustion,
+  had made the decision: he would spend the year with Uncle Frank in Wisconsin. "Just
+  until things settle down here," she said, but they both knew it meant until his
+  father figured out how to stop drinking and she figured out whether to stay married.
+
+
+  The Greyhound bus to Minocqua took fourteen hours, with stops in Milwaukee and Wausau.
+  Gabriel pressed his face to the cold window, watching farmland give way to forests
+  of bare oak and maple, then finally the dark spires of pine that meant the Northwoods.
+  Uncle Frank met him at the station in a rust-colored Chevy pickup that smelled of
+  cigarettes and fish bait.
+
+
+  The cabin on Kawaguesaga Lake was smaller than Gabriel had imagined from childhood
+  visits - two bedrooms, a main room with knotty pine walls, and a kitchen where Aunt
+  Margie kept a constant pot of coffee brewing on the gas stove. His room had been
+  Frank''s workshop, hastily cleared of fishing tackle and wood scraps, but the smell
+  of sawdust and WD-40 lingered in the floorboards.
+
+
+  School at Lakeland Union High was different - smaller classes, kids who knew each
+  other since kindergarten, teachers who remembered their parents. Gabriel was "the
+  kid from Illinois," which carried a certain exotic weight among teenagers who''d
+  never lived more than twenty miles from where they were born. Jenny Novak, whose
+  father ran the bait shop on Highway 51, took pity on him during lunch periods, teaching
+  him the social geography of small-town Wisconsin.
+
+
+  But the real education happened before dawn and after school. Uncle Frank, who''d
+  worked thirty years at the paper mill in Rhinelander before retiring, treated ice
+  fishing like a science. They''d check the tip-ups at first light, drilling holes
+  with the manual auger, testing ice thickness with a spud bar. Gabriel learned to
+  read the subtle signs - how fish moved in relation to barometric pressure, why certain
+  spots on the lake held walleye while others were empty water.
+
+
+  In March, when the ice began to honeycomb and Frank declared the fishing season
+  over, Gabriel started working at Hermann Schultz''s music shop on Oneida Street.
+  Hermann, a seventy-year-old German immigrant, had been repairing accordions since
+  the 1940s, serving the Polish and German families who''d settled the area to work
+  the lumber camps. His shop smelled of leather and metal polish, with dozens of accordions
+  hanging from the ceiling like sleeping bats.
+
+
+  Hermann''s hands, gnarled with arthritis, could still coax music from the most damaged
+  instruments. He taught Gabriel to replace reeds, patch bellows, adjust the button
+  mechanisms that controlled the flow of air. "Music is breathing made audible," Hermann
+  would say in his thick accent, demonstrating how to test each note for clarity and
+  pitch.
+
+
+  By summer, Gabriel could repair simple problems and had learned to play basic polkas
+  on Hermann''s old Hohner button accordion. The music was nothing like the rock and
+  roll he''d been listening to - it was older, more communal, designed for dancing
+  rather than listening. When Hermann asked if he wanted to perform with the Northwoods
+  Polka Band at the county fair, Gabriel surprised himself by saying yes.
+
+
+  The performance was on a Saturday evening in August, on a makeshift stage set up
+  between the 4-H barn and the corn dog stand. Gabriel wore borrowed lederhosen that
+  Hermann''s grandson had outgrown, feeling ridiculous and authentic at the same time.
+  They played "Beer Barrel Polka," "Pennsylvania Polka," and "Too Fat Polka" for an
+  audience of maybe sixty people, mostly older couples who danced on the sawdust-covered
+  ground in front of the stage.
+
+
+  Watching those couples - married forty, fifty years, moving together with the unconscious
+  rhythm of long partnership - Gabriel felt something shift inside him. This was what
+  his parents had lost, this easy intimacy, this shared language of movement and music.
+  He played the accordion with more feeling than he''d ever brought to anything, the
+  bellows breathing in and out like lungs, like the lake in winter expanding and contracting
+  with the cold.
+
+
+  When September came and it was time to return to Illinois, Gabriel had filled three
+  notebooks with observations about ice conditions, weather patterns, and fish behavior.
+  He''d carved six fishing decoys, learned to play twenty-three polka tunes, and could
+  repair most common accordion problems. More importantly, he''d spent a year in a
+  house where adults didn''t scream at each other, where problems were solved with
+  patience rather than alcohol, where music was something you made with your hands
+  rather than something that happened to you through speakers.
+
+
+  The bus ride home felt like traveling backward through time. His parents met him
+  at the station, looking older but somehow more solid, as if they''d used his absence
+  to remember why they''d chosen each other in the first place. His father had been
+  sober for six months. His mother had started working part-time at the library. They''d
+  painted the kitchen yellow.
+
+
+  That night, unpacking his few belongings, Gabriel found the small button accordion
+  Hermann had given him as a going-away present. He sat on his bed and played "Beautiful
+  Brown Eyes" softly, so as not to wake his parents, the melody drifting through the
+  suburban house like something from another century, another life entirely.'
+period:
+  age_range:
+  - 14
+  - 14
+  creative_output:
+  - Learned traditional Polish polkas on button accordion
+  - Carved ice fishing decoys from basswood
+  - Kept detailed fishing journal with weather patterns
+  description: A year in rural Wisconsin learning ice fishing and accordion repair
+  detail_level: high
+  duration_months: 11
+  emotional_tone: bittersweet
+  end_date: '1989-12-31'
+  is_forgotten: false
+  key_relationships:
+  - Uncle Frank Kowalski - ice fishing mentor
+  - Aunt Margie Kowalski - cooking teacher
+  - Hermann Schultz - accordion repair master
+  - Jenny Novak - local friend and fishing partner
+  known_events:
+  - approximate_date: null
+    category: relocation
+    date: '1989-01-15'
+    description: Moved in with Uncle Frank and Aunt Margie Kowalski on Kawaguesaga
+      Lake
+    emotional_weight: 0.7
+    tags: []
+    year: null
+  - approximate_date: February 1989
+    category: achievement
+    date: null
+    description: First successful ice fishing trip, caught a 12-inch walleye through
+      18 inches of ice
+    emotional_weight: 0.6
+    tags: []
+    year: null
+  - approximate_date: null
+    category: work
+    date: '1989-03-01'
+    description: Started working at Schultz's Music & Repair Shop on Oneida Street
+    emotional_weight: 0.5
+    tags: []
+    year: null
+  - approximate_date: Spring 1989
+    category: skill
+    date: null
+    description: Learned to repair button accordions from Hermann Schultz
+    emotional_weight: 0.8
+    tags: []
+    year: null
+  - approximate_date: null
+    category: performance
+    date: '1989-08-12'
+    description: Performed polka at the Oneida County Fair with the Northwoods Polka
+      Band
+    emotional_weight: 0.9
+    tags: []
+    year: null
+  location: Minocqua, Wisconsin
+  primary_activity: Living with extended family, learning traditional crafts
+  start_date: '1989-01-01'
+  trauma_level: low
+plausibility_score: 0.85
+preceding_events:
+- Parents' marriage deteriorating after France trip incident
+- Father's alcoholism confession creates family trauma
+- Gabriel showing signs of regression and emotional distress
+- Family decides intervention needed for Gabriel's wellbeing
+rainbow_color_mnemonic_character_value: T
+specific_details:
+- category: location
+  detail: Uncle Frank's cabin at 1847 Kawaguesaga Lake Road, with knotty pine walls
+    and a wood-burning stove that smelled of birch smoke
+  sensory_elements:
+  - crackling fire sounds
+  - pine resin smell
+  - cold morning air
+- category: daily_routine
+  detail: Woke at 5:30 AM to help Frank check ice fishing tip-ups before school, eating
+    Aunt Margie's pierogi with sour cream for breakfast
+  sensory_elements:
+  - frost on windows
+  - hot coffee steam
+  - crunching snow underfoot
+- category: career
+  detail: Worked afternoons at Hermann Schultz's shop on 318 Oneida Street, learning
+    to replace accordion reeds and adjust button mechanisms
+  sensory_elements:
+  - leather bellows smell
+  - metal filing sounds
+  - old wood polish scent
+- category: relationship
+  detail: Befriended Jenny Novak from Arbor Vitae, who taught him to identify fish
+    species and read ice conditions on Minocqua Lake
+  sensory_elements:
+  - ice creaking sounds
+  - fish scale texture
+  - cold wind on face
+- category: creative
+  detail: Carved his first ice fishing decoy using basswood from Frank's woodpile,
+    painted it to resemble a perch with orange fins
+  sensory_elements:
+  - wood shaving curls
+  - sharp knife blade
+  - paint fumes
+- category: outcome
+  detail: Performed 'Beer Barrel Polka' at the Oneida County Fair on August 12th with
+    Hermann's Northwoods Polka Band, wearing a borrowed lederhosen
+  sensory_elements:
+  - accordion wheeze
+  - crowd applause
+  - sawdust under feet
+specificity_score: 0.9
+thread_id: 2505eb5b-a8a8-4375-a3d1-10c67f7a98a5
+title: The Wisconsin Year

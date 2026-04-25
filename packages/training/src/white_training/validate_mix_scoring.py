@@ -108,8 +108,7 @@ def validate(
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
     from white_analysis.refractor import Refractor
-
-    from app.generators.midi.production.score_mix import (
+    from white_composition.score_mix import (
         aggregate_chunk_scores,
         chunk_audio,
     )

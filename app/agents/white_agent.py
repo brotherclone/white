@@ -22,6 +22,7 @@ from langgraph.constants import START
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from pydantic import BaseModel, PrivateAttr
+from white_composition.shrinkwrap_chain_artifacts import shrinkwrap
 from white_core.agents.agent_settings import AgentSettings
 from white_core.concepts.white_facet_system import WhiteFacetSystem
 from white_core.enums.chain_artifact_type import ChainArtifactType
@@ -49,7 +50,6 @@ from app.util.generate_negative_constraints import (
     format_for_prompt,
     generate_constraints,
 )
-from app.util.shrinkwrap_chain_artifacts import shrinkwrap
 
 logging.basicConfig(level=logging.INFO)
 
@@ -2691,12 +2691,11 @@ Structure your synthesis as the final creative brief before manifestation.
                     thread_dir = str(Path(self._artifact_base_path()) / state.thread_id)
                     production_dirs: list[Path] = []
 
+                    from white_composition.init_production import (  # circular import
+                        init_production as _run_init_production,
+                    )
                     from white_generation.pipelines.chord_pipeline import (  # circular import
                         song_slug,
-                    )
-
-                    from app.generators.midi.production.init_production import (  # circular import
-                        init_production as _run_init_production,
                     )
 
                     for final in final_iterations:

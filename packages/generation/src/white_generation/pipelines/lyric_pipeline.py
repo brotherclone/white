@@ -36,17 +36,17 @@ from typing import Optional
 import mido
 import yaml
 from dotenv import load_dotenv
-from white_core.enums.lyric_repeat_type import LyricRepeatType
-
-from app.generators.artist_catalog import load_artist_context  # noqa: E402
-from app.generators.midi.production.init_production import (
+from white_composition.init_production import (
     load_initial_proposal,
     load_song_context,
 )  # noqa: E402
-from app.generators.midi.production.production_plan import (  # noqa: E402
+from white_composition.production_plan import (  # noqa: E402
     _infer_repeat_type,
     _normalize_repeat_type,
 )
+from white_core.enums.lyric_repeat_type import LyricRepeatType
+
+from app.generators.artist_catalog import load_artist_context  # noqa: E402
 from white_generation.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
     compute_chromatic_match,
@@ -263,7 +263,7 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
         thread_path / song_proposal_file,
     ]:
         if candidate.exists():
-            from app.generators.midi.production.production_plan import (
+            from white_composition.production_plan import (
                 load_song_proposal_unified,
             )
 

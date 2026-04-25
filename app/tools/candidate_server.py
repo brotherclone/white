@@ -278,7 +278,7 @@ def create_app(
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
 
-        from app.generators.midi.production.pipeline_runner import cmd_promote
+        from white_composition.pipeline_runner import cmd_promote
 
         result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:
@@ -352,10 +352,11 @@ def create_app(
         def _run():
             global _generate_job
             try:
+                from white_composition.shrinkwrap_chain_artifacts import shrinkwrap
+
                 from app.agents.workflow.concept_workflow import (
                     run_white_agent_workflow,
                 )
-                from app.util.shrinkwrap_chain_artifacts import shrinkwrap
 
                 run_white_agent_workflow()
                 if _shrink_wrapped_dir is not None:

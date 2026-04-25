@@ -47,7 +47,7 @@ def load_grain_pool(
         segment_id, source_audio_file, start_seconds, end_seconds, match, song_slug
     Only segments with a reachable source_audio_file are included.
     """
-    from app.generators.midi.production.retrieve_samples import (
+    from white_composition.retrieve_samples import (
         load_clap_index,
         retrieve_by_color,
     )

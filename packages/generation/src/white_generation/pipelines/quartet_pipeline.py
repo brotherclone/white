@@ -30,8 +30,8 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+from white_composition.init_production import load_song_context
 
-from app.generators.midi.production.init_production import load_song_context
 from white_generation.patterns.bass_patterns import (
     ALL_TEMPLATES as ALL_BASS_TEMPLATES,
 )

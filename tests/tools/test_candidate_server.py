@@ -230,7 +230,7 @@ class TestPromote:
             return 0
 
         with patch(
-            "app.generators.midi.production.pipeline_runner.cmd_promote",
+            "white_composition.pipeline_runner.cmd_promote",
             side_effect=_promote_side_effect,
         ):
             resp = client.post("/promote", json={"phase": "chords"})
@@ -252,9 +252,7 @@ class TestPromote:
 
     def test_promotion_failure_returns_409(self, client, prod_dir):
         # review.yml exists (chords is set up in fixture) but promotion fails
-        with patch(
-            "app.generators.midi.production.pipeline_runner.cmd_promote", return_value=1
-        ):
+        with patch("white_composition.pipeline_runner.cmd_promote", return_value=1):
             resp = client.post("/promote", json={"phase": "chords"})
         assert resp.status_code == 409
 
@@ -265,7 +263,7 @@ class TestPromote:
             review_dir.mkdir(parents=True, exist_ok=True)
             (review_dir / "review.yml").write_text("candidates: []")
             with patch(
-                "app.generators.midi.production.pipeline_runner.cmd_promote",
+                "white_composition.pipeline_runner.cmd_promote",
                 return_value=0,
             ):
                 resp = client.post("/promote", json={"phase": phase})

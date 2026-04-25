@@ -22,9 +22,9 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+from white_composition.init_production import load_song_context
 from white_core.music.narrative_constraints import narrative_tag_adjustment
 
-from app.generators.midi.production.init_production import load_song_context
 from app.util.phrase_dynamics import (
     DynamicCurve,
     apply_dynamics_curve,
@@ -413,7 +413,7 @@ def run_drum_pipeline(
     _style_profile = _ctx.get("style_reference_profile") or {}
 
     # Load production plan for arc-aware energy targeting
-    from app.generators.midi.production.production_plan import (
+    from white_composition.production_plan import (
         build_next_section_map,
         load_plan,
     )
