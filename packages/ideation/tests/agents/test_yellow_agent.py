@@ -26,34 +26,13 @@ def test_yellow_agent_initialization():
     assert agent.max_rooms == 4
 
 
-def test_generate_characters_skips_html_by_default(monkeypatch):
-    """create_character_sheet is NOT called when WHITE_WITH_HTML is absent."""
+def test_generate_characters_always_calls_character_sheet(monkeypatch):
+    """create_character_sheet is always called (character sheets are now Markdown)."""
     monkeypatch.setenv("MOCK_MODE", "false")
-    monkeypatch.delenv("WHITE_WITH_HTML", raising=False)
 
     mock_char = MagicMock()
 
-    state = YellowAgentState(thread_id="test-thread-no-html")
-
-    with patch("white_ideation.agents.yellow_agent.roll_dice", return_value=[1]):
-        with patch(
-            "white_ideation.agents.yellow_agent.PulsarPalaceCharacter.create_random",
-            return_value=mock_char,
-        ):
-            YellowAgent.generate_characters(state)
-
-    mock_char.create_character_sheet.assert_not_called()
-    mock_char.create_portrait.assert_called_once()
-
-
-def test_generate_characters_calls_html_when_flag_set(monkeypatch):
-    """create_character_sheet IS called when WHITE_WITH_HTML=true."""
-    monkeypatch.setenv("MOCK_MODE", "false")
-    monkeypatch.setenv("WHITE_WITH_HTML", "true")
-
-    mock_char = MagicMock()
-
-    state = YellowAgentState(thread_id="test-thread-html")
+    state = YellowAgentState(thread_id="test-thread")
 
     with patch("white_ideation.agents.yellow_agent.roll_dice", return_value=[1]):
         with patch(
@@ -63,3 +42,4 @@ def test_generate_characters_calls_html_when_flag_set(monkeypatch):
             YellowAgent.generate_characters(state)
 
     mock_char.create_character_sheet.assert_called_once()
+    mock_char.create_portrait.assert_called_once()

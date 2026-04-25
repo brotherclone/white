@@ -1,15 +1,14 @@
 import enum
 
 import pytest
+
 from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
 
 EXPECTED = {
     "AUDIO": "wav",
     "PNG": "png",
     "MARKDOWN": "md",
-    "JSON": "json",
     "YML": "yml",
-    "HTML": "html",
     "MIDI": "midi",
     "TXT": "txt",
 }
@@ -37,9 +36,7 @@ def test_members_are_str_and_enum_and_compare_to_value():
         ("wav", ChainArtifactFileType.AUDIO),
         ("png", ChainArtifactFileType.PNG),
         ("md", ChainArtifactFileType.MARKDOWN),
-        ("json", ChainArtifactFileType.JSON),
         ("yml", ChainArtifactFileType.YML),
-        ("html", ChainArtifactFileType.HTML),
         ("midi", ChainArtifactFileType.MIDI),
     ],
 )
@@ -50,9 +47,7 @@ def test_lookup_by_value(value, member):
 def test_lookup_by_name():
     assert ChainArtifactFileType["MARKDOWN"] is ChainArtifactFileType.MARKDOWN
     assert ChainArtifactFileType["PNG"] is ChainArtifactFileType.PNG
-    assert ChainArtifactFileType["JSON"] is ChainArtifactFileType.JSON
     assert ChainArtifactFileType["YML"] is ChainArtifactFileType.YML
-    assert ChainArtifactFileType["HTML"] is ChainArtifactFileType.HTML
 
 
 def test_invalid_value_raises_value_error():
@@ -67,9 +62,7 @@ def test_values_are_unique():
 
 def test_enum_members_are_enum_instances():
     assert isinstance(ChainArtifactFileType.AUDIO, enum.Enum)
-    assert isinstance(ChainArtifactFileType.JSON, enum.Enum)
     assert isinstance(ChainArtifactFileType.PNG, enum.Enum)
     assert isinstance(ChainArtifactFileType.YML, enum.Enum)
     assert isinstance(ChainArtifactFileType.MARKDOWN, enum.Enum)
-    assert isinstance(ChainArtifactFileType.HTML, enum.Enum)
     assert isinstance(ChainArtifactFileType.MIDI, enum.Enum)

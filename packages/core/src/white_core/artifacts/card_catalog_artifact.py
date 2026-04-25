@@ -9,8 +9,8 @@ import yaml
 from dotenv import load_dotenv
 from pydantic import Field, field_validator
 
+from white_core.artifacts.base_artifact import ChainArtifact
 from white_core.artifacts.book_artifact import BookArtifact
-from white_core.artifacts.html_artifact_file import HtmlChainArtifactFile
 from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
 from white_core.enums.chain_artifact_type import ChainArtifactType
 
@@ -19,44 +19,18 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
-class CardCatalogArtifact(HtmlChainArtifactFile, ABC):
-    """
-    Card Catalog artifact for documenting forbidden/dangerous books.
-
-    Template Variables:
-        - danger_level: 1-5 (displayed in rotated corner)
-        - acquisition_date: Date acquired
-        - title: Book title
-        - subtitle: Book subtitle
-        - author: Author name
-        - author_credentials: Optional author credentials
-        - year: Publication year
-        - publisher: Publisher name
-        - publisher_type: Type of publisher
-        - edition: Edition info
-        - pages: Number of pages
-        - isbn: Optional ISBN
-        - language: Language
-        - translated_from: Optional original language
-        - condition: Physical condition
-        - abstract: Book abstract/description
-        - notable_quote: Optional notable quote
-        - suppression_history: Optional suppression info
-        - tags: List of tags
-        - acquisition_notes: How it was acquired
-        - catalog_number: Catalog reference number
-    """
+class CardCatalogArtifact(ChainArtifact, ABC):
+    """Card Catalog artifact for documenting forbidden/dangerous books."""
 
     chain_artifact_type: ChainArtifactType = Field(
         default=ChainArtifactType.CARD_CATALOG,
         description="Type: Card Catalog Entry",
     )
     chain_artifact_file_type: ChainArtifactFileType = Field(
-        default=ChainArtifactFileType.HTML, description="File type: HTML"
+        default=ChainArtifactFileType.YML, description="File type: YML"
     )
     artifact_name: str = Field(default="card_catalog", description="Artifact name")
 
-    # Card Catalog specific fields
     danger_level: int = Field(default=1, description="Danger level 1-5", ge=1, le=5)
     acquisition_date: str = Field(description="Date acquired")
     title: str = Field(description="Book title")
@@ -96,74 +70,7 @@ class CardCatalogArtifact(HtmlChainArtifactFile, ABC):
             return v
         return str(v)
 
-    def __init__(self, **data):
-        super().__init__(**data)
-
     def save_file(self):
-        """Render and save the HTML file."""
-        tags_html = "".join(f'<span class="tag">{tag}</span>' for tag in self.tags)
-        optional_rows = ""
-        if self.subtitle:
-            optional_rows += f"<tr><th>Subtitle</th><td>{self.subtitle}</td></tr>\n"
-        if self.author_credentials:
-            optional_rows += f"<tr><th>Author Credentials</th><td>{self.author_credentials}</td></tr>\n"
-        if self.isbn:
-            optional_rows += f"<tr><th>ISBN</th><td>{self.isbn}</td></tr>\n"
-        if self.translated_from:
-            optional_rows += (
-                f"<tr><th>Translated From</th><td>{self.translated_from}</td></tr>\n"
-            )
-        if self.notable_quote:
-            optional_rows += f"<tr><th>Notable Quote</th><td><em>{self.notable_quote}</em></td></tr>\n"
-        if self.suppression_history:
-            optional_rows += f"<tr><th>Suppression History</th><td>{self.suppression_history}</td></tr>\n"
-        if self.acquisition_notes:
-            optional_rows += f"<tr><th>Acquisition Notes</th><td>{self.acquisition_notes}</td></tr>\n"
-
-        html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>{self.title}</title>
-  <style>
-    body {{ font-family: Georgia, serif; background: #1a1209; color: #e8d9b0; margin: 0; padding: 2rem; }}
-    .card {{ max-width: 700px; margin: 0 auto; border: 2px solid #8b6914; padding: 1.5rem 2rem; background: #110e06; }}
-    h1 {{ font-size: 1.5rem; margin: 0 0 0.25rem; }}
-    .subtitle {{ color: #a08040; font-style: italic; margin-bottom: 1rem; }}
-    table {{ width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }}
-    th {{ text-align: left; width: 35%; color: #8b6914; font-weight: normal; padding: 0.3rem 0; }}
-    td {{ padding: 0.3rem 0; }}
-    .abstract {{ margin: 1rem 0; line-height: 1.6; }}
-    .tags {{ margin-top: 1rem; }}
-    .tag {{ display: inline-block; background: #2a1f06; border: 1px solid #8b6914; border-radius: 3px;
-             padding: 0.1rem 0.4rem; margin: 0.15rem; font-size: 0.8rem; }}
-    .danger {{ float: right; font-size: 2rem; color: #cc3300; }}
-    .catalog-number {{ margin-top: 1rem; text-align: right; font-size: 0.75rem; color: #8b6914; letter-spacing: 0.1em; }}
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="danger">{"⚠" * self.danger_level}</div>
-    <h1>{self.title}</h1>
-    <div class="subtitle">{self.subtitle}</div>
-    <table>
-      <tr><th>Author</th><td>{self.author}</td></tr>
-      <tr><th>Year</th><td>{self.year}</td></tr>
-      <tr><th>Publisher</th><td>{self.publisher} ({self.publisher_type})</td></tr>
-      <tr><th>Edition</th><td>{self.edition}</td></tr>
-      <tr><th>Pages</th><td>{self.pages}</td></tr>
-      <tr><th>Language</th><td>{self.language}</td></tr>
-      <tr><th>Condition</th><td>{self.condition}</td></tr>
-      <tr><th>Acquired</th><td>{self.acquisition_date}</td></tr>
-      {optional_rows}
-    </table>
-    <div class="abstract">{self.abstract}</div>
-    <div class="tags">{tags_html}</div>
-    <div class="catalog-number">{self.catalog_number}</div>
-  </div>
-</body>
-</html>"""
-
         try:
             file_path = Path(self.file_path)
             file_path.mkdir(parents=True, exist_ok=True)
@@ -183,16 +90,19 @@ class CardCatalogArtifact(HtmlChainArtifactFile, ABC):
 
         output_file = file_path / self.file_name
         with open(output_file, "w", encoding="utf-8") as f:
-            f.write(html_content)
-
+            yaml.safe_dump(
+                self.model_dump(mode="json"),
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
         logger.info(f"Wrote artifact to `{output_file}`")
 
     def flatten(self):
-        """Flatten the artifact for easier processing."""
-        return self.model_dump()
+        return self.model_dump(mode="json")
 
     def for_prompt(self) -> str:
-        """Plain text representation for prompts."""
         return f"""Card Catalog Entry: {self.catalog_number}
 Title: {self.title}
 Author: {self.author}
@@ -216,11 +126,6 @@ if __name__ == "__main__":
     book_data.pop("file_name", None)
     book_data.pop("file_path", None)
 
-    c = CardCatalogArtifact(
-        **book_data,
-        base_path=base_path,
-        image_path=f"{base_path}/img",
-        chain_artifact_file_type=ChainArtifactFileType.HTML,
-    )
+    c = CardCatalogArtifact(**book_data, base_path=base_path)
     print(c.for_prompt())
     c.save_file()

@@ -376,6 +376,5 @@ class PulsarPalaceCharacter(BaseModel):
             thread_id=self.thread_id,
             sheet_content=self,
             base_path=base_path,
-            image_path=f"{base_path}/img",
         )
         self.character_sheet.save_file()
