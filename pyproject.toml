@@ -1,9 +1,6 @@
 [tool.uv.workspace]
 members = ["packages/*"]
 
-[tool.setuptools]
-packages = ["app"]
-
 [project]
 name = "white"
 version = "0.1.0"
@@ -76,7 +73,11 @@ extend-select = ["I"]
 per-file-ignores = { "tests/generators/midi/test_chord_pipeline.py" = ["F401"] }
 
 [tool.ruff.lint.isort]
-known-first-party = ["app", "training", "tests", "core", "models", "validation", "visualization"]
+known-first-party = [
+    "white_core", "white_training", "white_extraction", "white_analysis",
+    "white_generation", "white_composition", "white_ideation", "white_api",
+    "tests",
+]
 # Inline imports inside functions are allowed only to break circular imports.
 # All other imports must appear at the top of the file in three blocks:
 #   1. stdlib  (import os / from pathlib import Path)
