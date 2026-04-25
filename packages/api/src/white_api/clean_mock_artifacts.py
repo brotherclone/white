@@ -94,8 +94,8 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
 def main(argv: List[str] | None = None) -> int:
     args = parse_args(argv)
 
-    # resolve repo root relative to this file: ../../ (app/util -> app -> repo root)
-    repo_root = Path(__file__).resolve().parents[2]
+    # resolve repo root relative to this file: packages/api/src/white_api -> packages/api/src -> packages/api -> packages -> repo root
+    repo_root = Path(__file__).resolve().parents[4]
     base_dir = args.base or (repo_root / "chain_artifacts")
 
     if not base_dir.exists():

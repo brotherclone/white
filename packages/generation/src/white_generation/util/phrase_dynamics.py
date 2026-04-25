@@ -16,7 +16,7 @@ throughout the curve.  ``min_vel`` and ``max_vel`` are applied as hard clamps
 
 Usage::
 
-    from app.util.phrase_dynamics import DynamicCurve, apply_dynamics_curve, infer_curve
+    from white_generation.util.phrase_dynamics import DynamicCurve, apply_dynamics_curve, infer_curve
 
     events = [(tick, note, velocity, is_on), ...]
     curve = infer_curve(section_label)

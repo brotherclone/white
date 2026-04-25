@@ -27,17 +27,6 @@ import yaml
 from white_composition.init_production import load_song_context
 from white_core.enums.bass_style import BassStyle
 
-from app.util.diversity_tracker import (
-    diversity_factor,
-    find_album_dir,
-    load_registry,
-)
-from app.util.phrase_dynamics import (
-    DynamicCurve,
-    apply_dynamics_curve,
-    infer_curve,
-    parse_curve,
-)
 from white_generation.patterns.aesthetic_hints import (
     aesthetic_tag_adjustment,
     arc_tag_adjustment,
@@ -65,6 +54,17 @@ from white_generation.pipelines.chord_pipeline import (
     compute_chromatic_match,
     get_chromatic_target,
     load_song_proposal,
+)
+from white_generation.util.diversity_tracker import (
+    diversity_factor,
+    find_album_dir,
+    load_registry,
+)
+from white_generation.util.phrase_dynamics import (
+    DynamicCurve,
+    apply_dynamics_curve,
+    infer_curve,
+    parse_curve,
 )
 
 # ---------------------------------------------------------------------------

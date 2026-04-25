@@ -3,8 +3,7 @@
 from pathlib import Path
 
 import yaml
-
-from app.tools.candidate_browser import (
+from white_api.candidate_browser import (
     CandidateEntry,
     approve_candidate,
     load_all_candidates,

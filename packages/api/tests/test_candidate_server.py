@@ -6,8 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 from fastapi.testclient import TestClient
-
-from app.tools.candidate_server import create_app, scan_songs
+from white_api.candidate_server import create_app, scan_songs
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -293,7 +292,7 @@ class TestEvolve:
 
     def test_drums_returns_ok(self, client, prod_dir):
         with patch(
-            "app.tools.candidate_server.subprocess.run",
+            "white_api.candidate_server.subprocess.run",
             side_effect=self._mock_run_ok(prod_dir, "drums", 3),
         ):
             resp = client.post("/evolve", json={"phase": "drums"})
@@ -304,7 +303,7 @@ class TestEvolve:
 
     def test_bass_returns_ok(self, client, prod_dir):
         with patch(
-            "app.tools.candidate_server.subprocess.run",
+            "white_api.candidate_server.subprocess.run",
             side_effect=self._mock_run_ok(prod_dir, "bass", 2),
         ):
             resp = client.post("/evolve", json={"phase": "bass"})
@@ -313,7 +312,7 @@ class TestEvolve:
 
     def test_melody_returns_ok(self, client, prod_dir):
         with patch(
-            "app.tools.candidate_server.subprocess.run",
+            "white_api.candidate_server.subprocess.run",
             side_effect=self._mock_run_ok(prod_dir, "melody", 5),
         ):
             resp = client.post("/evolve", json={"phase": "melody"})
@@ -336,7 +335,7 @@ class TestEvolve:
         fail = MagicMock()
         fail.returncode = 1
         fail.stderr = "ONNX model not found"
-        with patch("app.tools.candidate_server.subprocess.run", return_value=fail):
+        with patch("white_api.candidate_server.subprocess.run", return_value=fail):
             resp = client.post("/evolve", json={"phase": "drums"})
         assert resp.status_code == 500
         assert "ONNX" in resp.json()["detail"]

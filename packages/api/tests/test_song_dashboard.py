@@ -3,8 +3,7 @@
 from pathlib import Path
 
 import yaml
-
-from app.tools.song_dashboard import (
+from white_api.song_dashboard import (
     STATUS_APPROVED,
     STATUS_NO_CANDIDATES,
     STATUS_NOT_STARTED,
@@ -252,7 +251,7 @@ class TestColorRank:
 
 class TestBuildTable:
     def _make_status(self, color="red", slug="red__test_v1"):
-        from app.tools.song_dashboard import (
+        from white_api.song_dashboard import (
             STATUS_APPROVED,
             STATUS_NOT_STARTED,
             SongStatus,

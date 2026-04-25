@@ -25,12 +25,6 @@ import yaml
 from white_composition.init_production import load_song_context
 from white_core.music.narrative_constraints import narrative_tag_adjustment
 
-from app.util.phrase_dynamics import (
-    DynamicCurve,
-    apply_dynamics_curve,
-    infer_curve,
-    parse_curve,
-)
 from white_generation.patterns.aesthetic_hints import (
     aesthetic_tag_adjustment,
     arc_to_energy,
@@ -53,6 +47,12 @@ from white_generation.pipelines.chord_pipeline import (
     compute_chromatic_match,
     get_chromatic_target,
     load_song_proposal,
+)
+from white_generation.util.phrase_dynamics import (
+    DynamicCurve,
+    apply_dynamics_curve,
+    infer_curve,
+    parse_curve,
 )
 
 # ---------------------------------------------------------------------------

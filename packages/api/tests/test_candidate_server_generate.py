@@ -4,10 +4,9 @@ import threading
 from unittest.mock import patch
 
 import pytest
+import white_api.candidate_server as server_module
 from fastapi.testclient import TestClient
-
-import app.tools.candidate_server as server_module
-from app.tools.candidate_server import create_app
+from white_api.candidate_server import create_app
 
 
 @pytest.fixture(autouse=True)

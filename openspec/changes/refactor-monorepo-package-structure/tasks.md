@@ -103,17 +103,17 @@
 - [x] 7.8 Delete moved source from `app/`
 - [ ] 7.9 Open PR: `feat: migrate ideation package (white_ideation)`
 
-## 8. Package: api (candidate server → `white_api`)
+## 8. Package: api (candidate server → `white_api`) ✅ DONE
 
-- [ ] 8.1 Scaffold `packages/api/pyproject.toml` (deps: `white-core`, `white-composition`,
+- [x] 8.1 Scaffold `packages/api/pyproject.toml` (deps: `white-core`, `white-composition`,
       `white-generation`) + `src/white_api/`
-- [ ] 8.2 Move `app/tools/candidate_server.py`, `candidate_browser.py`, `song_dashboard.py`
+- [x] 8.2 Move `app/tools/candidate_server.py`, `candidate_browser.py`, `song_dashboard.py`
       → `packages/api/src/white_api/`
-- [ ] 8.3 Update all imports
-- [ ] 8.4 Move `tests/tools/` → `packages/api/tests/`
-- [ ] 8.5 Run `uv sync` + full pytest; fix failures
-- [ ] 8.6 Delete moved source from `app/tools/`; remove now-empty `app/` directory
-- [ ] 8.7 Confirm `rg "from app\." --include="*.py"` returns zero results (migration complete)
+- [x] 8.3 Update all imports
+- [x] 8.4 Move `tests/tools/` → `packages/api/tests/`
+- [x] 8.5 Run `uv sync` + full pytest; fix failures
+- [x] 8.6 Delete moved source from `app/tools/`; remove now-empty `app/` directory
+- [x] 8.7 Confirm `rg "from app\." --include="*.py"` returns zero results (migration complete)
 - [ ] 8.8 Open PR: `feat: migrate api package (white_api) — app/ fully removed`
 
 ## 9. Package: client (`web/` → `packages/client/`)

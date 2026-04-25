@@ -46,7 +46,7 @@ from white_composition.production_plan import (  # noqa: E402
 )
 from white_core.enums.lyric_repeat_type import LyricRepeatType
 
-from app.generators.artist_catalog import load_artist_context  # noqa: E402
+from white_generation.artist_catalog import load_artist_context  # noqa: E402
 from white_generation.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
     compute_chromatic_match,

@@ -27,7 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from app.tools.candidate_browser import (
+from white_api.candidate_browser import (
     CandidateEntry,
     approve_candidate,
     load_all_candidates,

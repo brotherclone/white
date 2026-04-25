@@ -50,7 +50,7 @@ def _make_thread(tmp_path, songs: list[dict]) -> Path:
 
 class TestParseSoundsLikeString:
     def test_with_discogs_ids(self):
-        from app.generators.artist_catalog import parse_sounds_like_string
+        from white_generation.artist_catalog import parse_sounds_like_string
 
         result = parse_sounds_like_string(
             "Bear in Heaven, discogs_id: 123, Seefeel, discogs_id: 456"
@@ -58,13 +58,13 @@ class TestParseSoundsLikeString:
         assert result == [("Bear in Heaven", 123), ("Seefeel", 456)]
 
     def test_without_discogs_ids(self):
-        from app.generators.artist_catalog import parse_sounds_like_string
+        from white_generation.artist_catalog import parse_sounds_like_string
 
         result = parse_sounds_like_string("Boards of Canada, Aphex Twin")
         assert ("Boards of Canada", None) in result or len(result) >= 1
 
     def test_partial_discogs(self):
-        from app.generators.artist_catalog import parse_sounds_like_string
+        from white_generation.artist_catalog import parse_sounds_like_string
 
         result = parse_sounds_like_string("Artist A, discogs_id: 99, Artist B")
         assert result[0] == ("Artist A", 99)
@@ -79,7 +79,7 @@ class TestParseSoundsLikeString:
 
 class TestCollectSoundsLike:
     def test_deduplicates_across_plans(self, tmp_path):
-        from app.generators.artist_catalog import collect_sounds_like
+        from white_generation.artist_catalog import collect_sounds_like
 
         thread = _make_thread(
             tmp_path,
@@ -95,7 +95,7 @@ class TestCollectSoundsLike:
         assert "Autechre" in names
 
     def test_empty_thread(self, tmp_path):
-        from app.generators.artist_catalog import collect_sounds_like
+        from white_generation.artist_catalog import collect_sounds_like
 
         thread = _make_thread(tmp_path, [{"slug": "no_sounds", "sounds_like": []}])
         result = collect_sounds_like(thread_dir=thread)
@@ -109,7 +109,7 @@ class TestCollectSoundsLike:
 
 class TestGenerateDescriptionPromptConstraints:
     def test_prompt_excludes_biography(self):
-        from app.generators.artist_catalog import _GENERATE_PROMPT_TEMPLATE
+        from white_generation.artist_catalog import _GENERATE_PROMPT_TEMPLATE
 
         prompt = _GENERATE_PROMPT_TEMPLATE.format(artist_name="Test Artist")
         assert (
@@ -120,20 +120,20 @@ class TestGenerateDescriptionPromptConstraints:
         assert "Do NOT" in prompt or "do NOT" in prompt
 
     def test_prompt_includes_copyright_instruction(self):
-        from app.generators.artist_catalog import _GENERATE_PROMPT_TEMPLATE
+        from white_generation.artist_catalog import _GENERATE_PROMPT_TEMPLATE
 
         prompt = _GENERATE_PROMPT_TEMPLATE.format(artist_name="Test Artist")
         assert "copyright" in prompt.lower() or "copyrighted" in prompt.lower()
 
     def test_prompt_includes_artist_name(self):
-        from app.generators.artist_catalog import _GENERATE_PROMPT_TEMPLATE
+        from white_generation.artist_catalog import _GENERATE_PROMPT_TEMPLATE
 
         prompt = _GENERATE_PROMPT_TEMPLATE.format(artist_name="My Bloody Valentine")
         assert "My Bloody Valentine" in prompt
 
     def test_unknown_artist_sentinel(self):
         """generate_description returns None when Claude responds UNKNOWN_ARTIST."""
-        from app.generators.artist_catalog import generate_description
+        from white_generation.artist_catalog import generate_description
 
         mock_client = MagicMock()
         mock_client.messages.create.return_value.content = [
@@ -143,7 +143,7 @@ class TestGenerateDescriptionPromptConstraints:
         assert result is None
 
     def test_description_returned_on_success(self):
-        from app.generators.artist_catalog import generate_description
+        from white_generation.artist_catalog import generate_description
 
         mock_client = MagicMock()
         mock_client.messages.create.return_value.content = [
@@ -160,7 +160,7 @@ class TestGenerateDescriptionPromptConstraints:
 
 class TestGenerateMissingIdempotent:
     def test_no_api_calls_when_all_present(self, tmp_path):
-        from app.generators.artist_catalog import generate_missing
+        from white_generation.artist_catalog import generate_missing
 
         catalog_path = _write_catalog(
             tmp_path,
@@ -186,7 +186,7 @@ class TestGenerateMissingIdempotent:
         assert "Seefeel" in summary["already_present"]
 
     def test_generates_for_new_artists(self, tmp_path):
-        from app.generators.artist_catalog import generate_missing
+        from white_generation.artist_catalog import generate_missing
 
         catalog_path = _write_catalog(tmp_path, {})
         artists = [("New Artist", None)]
@@ -201,7 +201,7 @@ class TestGenerateMissingIdempotent:
 
         assert "New Artist" in summary["added"]
         # Verify entry was written to file
-        from app.generators.artist_catalog import load_catalog
+        from white_generation.artist_catalog import load_catalog
 
         catalog = load_catalog(catalog_path)
         assert "New Artist" in catalog
@@ -216,7 +216,7 @@ class TestGenerateMissingIdempotent:
 class TestLoadArtistContext:
     def test_reviewed_preferred_over_draft(self, tmp_path):
         """When both reviewed and draft exist (different artists), reviewed is used first."""
-        from app.generators.artist_catalog import load_artist_context
+        from white_generation.artist_catalog import load_artist_context
 
         catalog_path = _write_catalog(
             tmp_path,
@@ -250,7 +250,7 @@ class TestLoadArtistContext:
         assert "STYLE REFERENCES" in result
 
     def test_draft_note_printed(self, tmp_path, capsys):
-        from app.generators.artist_catalog import load_artist_context
+        from white_generation.artist_catalog import load_artist_context
 
         catalog_path = _write_catalog(
             tmp_path,
@@ -271,7 +271,7 @@ class TestLoadArtistContext:
         assert "consider reviewing" in captured.out
 
     def test_missing_artist_prints_note(self, tmp_path, capsys):
-        from app.generators.artist_catalog import load_artist_context
+        from white_generation.artist_catalog import load_artist_context
 
         catalog_path = _write_catalog(tmp_path, {})
         result = load_artist_context(["Unknown Band"], catalog_path=catalog_path)
@@ -281,14 +281,14 @@ class TestLoadArtistContext:
         assert "Unknown Band" in captured.out
 
     def test_empty_sounds_like(self, tmp_path):
-        from app.generators.artist_catalog import load_artist_context
+        from white_generation.artist_catalog import load_artist_context
 
         catalog_path = _write_catalog(tmp_path, {})
         result = load_artist_context([], catalog_path=catalog_path)
         assert result == ""
 
     def test_null_description_skipped(self, tmp_path):
-        from app.generators.artist_catalog import load_artist_context
+        from white_generation.artist_catalog import load_artist_context
 
         catalog_path = _write_catalog(
             tmp_path,
@@ -315,7 +315,7 @@ class TestLoadArtistContext:
 
 class TestScoreChromatic:
     def test_skips_null_description(self, tmp_path, capsys):
-        from app.generators.artist_catalog import score_chromatic
+        from white_generation.artist_catalog import score_chromatic
 
         catalog_path = _write_catalog(
             tmp_path,

@@ -33,8 +33,7 @@ from white_core.concepts.chromatic_targets import (
 )
 from white_core.music.core.enharmonic import normalize_to_flat
 
-from app.generators.artist_catalog import load_artist_context
-from app.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
+from white_generation.artist_catalog import load_artist_context
 from white_generation.chord_generator.generator import ChordProgressionGenerator
 from white_generation.patterns.harmonic_rhythm import enumerate_distributions
 from white_generation.patterns.strum_patterns import (
@@ -42,6 +41,7 @@ from white_generation.patterns.strum_patterns import (
     get_patterns_for_time_sig,
     strum_to_midi_bytes,
 )
+from white_generation.util.midi_cleanup import trim_midi_tempo_track as _trim_midi
 
 
 def _to_python(obj):

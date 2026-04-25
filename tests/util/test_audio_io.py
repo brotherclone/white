@@ -6,8 +6,7 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 import soundfile as sf
-
-from app.util.audio_io import load_audio
+from white_extraction.util.audio_io import load_audio
 
 
 @pytest.fixture
@@ -85,7 +84,7 @@ def test_load_audio_resample_without_librosa(sample_audio_mono):
     file_path, original_sr, original_samples = sample_audio_mono
     target_sr = 22050
 
-    with patch("app.util.audio_io.librosa", None):
+    with patch("white_extraction.util.audio_io.librosa", None):
         data, sr = load_audio(file_path, sr=target_sr)
 
     assert sr == target_sr
@@ -126,7 +125,7 @@ def test_load_audio_resample_zero_samples(tmp_path):
     sf.write(str(file_path), data, sample_rate)
 
     # Try to resample to very low sample rate without librosa
-    with patch("app.util.audio_io.librosa", None):
+    with patch("white_extraction.util.audio_io.librosa", None):
         result, sr = load_audio(str(file_path), sr=1)
 
     assert sr == 1
@@ -186,7 +185,7 @@ def test_load_audio_resample_upsampling(sample_audio_mono):
     file_path, original_sr, original_samples = sample_audio_mono
     target_sr = original_sr * 2  # Double the sample rate
 
-    with patch("app.util.audio_io.librosa", None):
+    with patch("white_extraction.util.audio_io.librosa", None):
         data, sr = load_audio(file_path, sr=target_sr)
 
     assert sr == target_sr

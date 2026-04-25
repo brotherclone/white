@@ -1,6 +1,5 @@
 import pytest
-
-from app.util.list_utils import (
+from white_ideation.agents.list_utils import (
     interpolate_numeric_list,
     pick_by_fraction,
     pick_by_fraction_centered,

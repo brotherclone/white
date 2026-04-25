@@ -16,8 +16,7 @@ from pathlib import Path
 
 import mido
 import yaml
-
-from app.util.diversity_tracker import (
+from white_generation.util.diversity_tracker import (
     find_album_dir,
     load_registry,
     record_use,
