@@ -154,9 +154,10 @@ class BookArtifact(ChainArtifact, ABC):
         return "\n".join(md_lines)
 
     def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
-        file = Path(self.file_path, self.file_name)
         with open(file, "w") as f:
             if self.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN:
                 f.write(self.to_markdown())

@@ -96,6 +96,9 @@ class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
         return profile
 
     def _generate_composition(self) -> InfranymVoiceComposition:
+        assert self.surface_layer is not None
+        assert self.reverse_layer is not None
+        assert self.submerged_layer is not None
         composition = InfranymVoiceComposition(
             title=f"{self.thread_id}_audio_infranym",
             tempo_bpm=self.bpm,
@@ -135,6 +138,7 @@ class InfranymAudioArtifact(AudioChainArtifactFile, ABC):
         return "\n".join(prompt_parts)
 
     def save_file(self):
+        assert self.composition is not None
         filename_stem = self.artifact_name
         self.encoder.encode_composition(
             self.composition, output_filename=filename_stem, export_layers=True

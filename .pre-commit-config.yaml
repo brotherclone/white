@@ -14,7 +14,7 @@ repos:
     hooks:
       - id: clean-mock-artifacts
         name: Clean mock artifacts
-        entry: python -m white_api.clean_mock_artifacts --yes
+        entry: uv run python -m white_api.clean_mock_artifacts --yes
         language: system
         pass_filenames: false
         always_run: true

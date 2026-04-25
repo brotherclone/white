@@ -69,7 +69,7 @@ class InfranymMidiArtifact(MidiArtifactFile, ABC):
         )
 
     def save_file(self):
-        """Generate and save MIDI file with encoded message"""
+        """Generate and save MIDI file with an encoded message"""
         output_path = self.get_artifact_path(with_file_name=True, create_dirs=True)
 
         # Create MIDI file
@@ -135,8 +135,9 @@ class InfranymMidiArtifact(MidiArtifactFile, ABC):
 
         return output_path
 
-    def _encode_note_cipher(self, track: MidiTrack, enc: NoteCipherEncoding):
-        """Write secret as note sequence (pitch = letter)"""
+    @staticmethod
+    def _encode_note_cipher(track: MidiTrack, enc: NoteCipherEncoding):
+        """Write secret as a note sequence (pitch = letter)"""
         velocities = enc.velocity_pattern or [64] * len(enc.note_sequence)
 
         # Ensure velocity list matches note count
@@ -157,7 +158,8 @@ class InfranymMidiArtifact(MidiArtifactFile, ABC):
 
             time_delta = 0  # Delta for next note_on
 
-    def _encode_morse_duration(self, track: MidiTrack, enc: MorseDurationEncoding):
+    @staticmethod
+    def _encode_morse_duration(track: MidiTrack, enc: MorseDurationEncoding):
         """Write secret as morse code rhythm"""
         time_delta = 0
 
@@ -204,7 +206,8 @@ class InfranymMidiArtifact(MidiArtifactFile, ABC):
                 # Word gap (longer silence)
                 time_delta = enc.word_gap
 
-    def _add_carrier_melody(self, track: MidiTrack, melody_notes: List[int]):
+    @staticmethod
+    def _add_carrier_melody(track: MidiTrack, melody_notes: List[int]):
         """Add a carrier melody to camouflage the encoded message"""
         time_delta = 0
         note_duration = 480  # Quarter note
@@ -238,6 +241,7 @@ if __name__ == "__main__":
     path1 = cipher_artifact.save_file()
     print(f"\n✅ Note cipher saved: {path1}")
     print(f"📄 Preview:\n{cipher_artifact.for_prompt()}")
+    assert isinstance(cipher_artifact.encoding, NoteCipherEncoding)
     print(f"🎵 Note sequence: {cipher_artifact.encoding.note_sequence}")
 
     # Test 2: Morse Duration
@@ -252,6 +256,7 @@ if __name__ == "__main__":
     path2 = morse_artifact.save_file()
     print(f"\n✅ Morse duration saved: {path2}")
     print(f"📄 Preview:\n{morse_artifact.for_prompt()}")
+    assert isinstance(morse_artifact.encoding, MorseDurationEncoding)
     print(f"📡 Morse pattern: {morse_artifact.encoding.morse_pattern}")
 
     # Test 3: With Carrier Melody
@@ -271,6 +276,7 @@ if __name__ == "__main__":
     path3 = cipher_with_carrier.save_file()
     print(f"\n✅ Cipher with carrier saved: {path3}")
     print(f"📄 Preview:\n{cipher_with_carrier.for_prompt()}")
+    assert isinstance(cipher_with_carrier.encoding, NoteCipherEncoding)
     print(f"🎵 Hidden: {cipher_with_carrier.encoding.note_sequence}")
     print(f"🎵 Carrier: {cipher_with_carrier.carrier_melody}")
 

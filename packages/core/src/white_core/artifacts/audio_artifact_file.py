@@ -34,12 +34,12 @@ class AudioChainArtifactFile(ChainArtifact, ABC):
         super().__init__(**data)
 
     def save_file(self):
-        # Use the computed file_path property from base class
-        # This already includes base_path/thread_id/wav
         file_path_obj = Path(self.file_path)
         file_path_obj.mkdir(parents=True, exist_ok=True)
+        if self.file_name is None:
+            self.get_file_name()
+        assert self.file_name is not None
         file_path = file_path_obj / self.file_name
-
         audio_array = np.frombuffer(self.audio_bytes, dtype=np.int16)
         wavfile.write(str(file_path), self.sample_rate, audio_array)
 
@@ -47,7 +47,6 @@ class AudioChainArtifactFile(ChainArtifact, ABC):
         parent_data = super().flatten()
         if parent_data is None:
             parent_data = {}
-
         return {
             **parent_data,
             "thread_id": self.thread_id,
@@ -72,7 +71,7 @@ if __name__ == "__main__":
 
     audio_artifact = AudioChainArtifactFile(
         thread_id="mock_thread_001_id",
-        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH"),
+        base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "/"),
         chain_artifact_type="unknown",
         chain_artifact_file_type="wav",
         sample_rate=44100,

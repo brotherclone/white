@@ -27,6 +27,9 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
         le=1000.0,
         default=1.0,
     )
+    image_bytes: Optional[bytes] = Field(
+        default=None, description="Raw image bytes to write to disk", exclude=True
+    )
 
     def __init__(self, **data):
         # Extract explicit_file_path before calling super().__init__
@@ -41,7 +44,7 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
 
     @property
     def file_path(self) -> str | Path:
-        """Return explicit file path if set, otherwise use computed path from base class"""
+        """Return an explicit file path if set, otherwise use a computed path from base class"""
         if self._explicit_file_path is not None:
             return self._explicit_file_path
         # Use parent's computed property
@@ -63,17 +66,17 @@ class ImageChainArtifactFile(ChainArtifact, ABC):
         }
 
     def save_file(self):
-        # Check if image_bytes exists (it's dynamically added, not a declared field)
-        if not hasattr(self, "image_bytes") or self.image_bytes is None:
+        if self.image_bytes is None:
             raise ValueError(
                 "Cannot save image file: image_bytes not set. "
                 "Set the image_bytes attribute before calling save_file()."
             )
 
-        # Use the computed file_path property from base class
-        # This already includes base_path/thread_id/png
         file_path_obj = Path(self.file_path)
         file_path_obj.mkdir(parents=True, exist_ok=True)
+
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file_path = file_path_obj / self.file_name
 
         with open(file_path, "wb") as f:

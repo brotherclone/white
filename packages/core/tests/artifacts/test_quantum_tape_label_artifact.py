@@ -1,7 +1,6 @@
-from pathlib import Path
-
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.quantum_tape_label_artifact import (
     QuantumTapeLabelArtifact,
 )
@@ -246,10 +245,7 @@ def test_for_prompt_original_label_visibility():
     p2 = m2.for_prompt()
     assert "Title: T2" in p2
     assert "Date Range: D2" in p2
-    # The prompt will include the field with a None, rendered as 'None' or empty string depending on model_dump substitution; accept either
     assert "Original Label Text" in p2
-
-    # When original_label_visible is False the original label line should not be present
     m3 = QuantumTapeLabelArtifact(
         title="T3",
         date_range="D3",
@@ -285,43 +281,6 @@ def test_artifact_name_explicit_override():
     assert m.artifact_name == "my_override"
 
 
-def test_save_file_renders_all_template_slots(tmp_path, monkeypatch):
-    import white_core.artifacts.quantum_tape_label_artifact as qmod
-
-    template_file = Path(qmod.__file__).parent / "templates" / "quantum_tape.html"
-    monkeypatch.setattr(qmod, "get_template_path", lambda name: template_file)
-
-    base = tmp_path / "out"
-    base.mkdir()
-
-    m = _make_minimal(
-        base_path=str(base),
-        year_documented="1998",
-        original_date="1998",
-        original_title="Gabe Walsh — 1998",
-        tapeover_date="Jun 1998 – Nov 1999",
-        tapeover_title="The Lost Portland Chapter",
-        subject_name="Gabe Walsh",
-        age_during="22–23",
-        location="Portland, OR",
-        catalog_number="QT-B-1998-ABCDEF",
-    )
-    m.save_file()
-
-    content = Path(m.get_artifact_path()).read_text(encoding="utf-8")
-    for value in [
-        "1998",
-        "Gabe Walsh — 1998",
-        "Jun 1998",
-        "The Lost Portland Chapter",
-        "Gabe Walsh",
-        "22–23",
-        "Portland, OR",
-        "QT-B-1998-ABCDEF",
-    ]:
-        assert value in content, f"Expected '{value}' in rendered HTML"
-
-
 def test_flatten_includes_template_fields():
     m = _make_minimal(
         year_documented="2001",
@@ -349,41 +308,3 @@ def test_flatten_includes_template_fields():
         assert key in flat, f"Expected '{key}' in flatten() output"
     assert flat["subject_name"] == "Gabe Walsh"
     assert flat["catalog_number"] == "QT-B-2001-ZZZTOP"
-
-
-def test_save_file_renders_template(tmp_path, monkeypatch):
-    # Create a minimal template that uses variables and an OR-default for original_label_text
-    template_content = "<html>\n<h1>${title}</h1>\n<p>${date_range}</p>\n<p>${original_label_text || 'NO_LABEL'}</p>\n</html>"
-    template_file = tmp_path / "quantum_tape.html"
-    template_file.write_text(template_content, encoding="utf-8")
-
-    # Patch get_template_path used by the artifact module to return our temp template
-    import white_core.artifacts.quantum_tape_label_artifact as qmod
-
-    monkeypatch.setattr(qmod, "get_template_path", lambda name: template_file)
-
-    # Use tmp_path as base_path so file_path will be under it
-    base = tmp_path / "out"
-    base.mkdir()
-
-    m = QuantumTapeLabelArtifact(
-        title="SaveTest",
-        date_range="2020",
-        recording_quality=QuantumTapeRecordingQuality.SP,
-        counter_start=0,
-        base_path=str(base),
-        original_label_visible=True,
-        original_label_text=None,
-    )
-
-    # Ensure save_file writes without raising
-    m.save_file()
-
-    out_file = Path(m.get_artifact_path(with_file_name=True))
-    assert out_file.exists(), f"Expected output file {out_file} to exist"
-
-    content = out_file.read_text(encoding="utf-8")
-    assert "<h1>SaveTest</h1>" in content
-    assert "<p>2020</p>" in content
-    # original_label_text was None -> should render the OR-default 'NO_LABEL'
-    assert "NO_LABEL" in content

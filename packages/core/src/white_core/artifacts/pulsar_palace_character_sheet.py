@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 
 load_dotenv()
 
+# ToDo - Needs to be refactored for Markdown
+
 
 class PulsarPalaceCharacterSheet(HtmlChainArtifactFile, ABC):
 
@@ -206,18 +208,18 @@ OFF: {char.off_current}/{char.off_max}"""
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "yellow_character_sheet_one_mock.yml",
         ),
         "r",
-    ) as f:
-        data = yaml.safe_load(f)
+    ) as a_file:
+        example_data = yaml.safe_load(a_file)
 
     base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-    data["base_path"] = base_path
-    data["image_path"] = f"{base_path}/img"
+    example_data["base_path"] = base_path
+    example_data["image_path"] = f"{base_path}/img"
 
-    sheet = PulsarPalaceCharacterSheet(**data)
+    sheet = PulsarPalaceCharacterSheet(**example_data)
     print(sheet)
     sheet.save_file()
     print(sheet.flatten())

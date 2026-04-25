@@ -1,6 +1,7 @@
 from typing import List
 
 from pydantic import Field, field_validator
+
 from white_core.concepts.infranym_text_encoding import InfranymTextEncoding
 from white_core.enums.infranym_method import InfranymMethod
 
@@ -29,7 +30,7 @@ class AcrosticEncoding(InfranymTextEncoding):
     @classmethod
     def validate_acrostic(cls, v, info):
         """Ensure lines match secret word length"""
-        secret = info.data.get("secret_word", "")
+        secret = info.example_data.get("secret_word", "")
         if len(v) != len(secret):
             raise ValueError(
                 f"Acrostic requires {len(secret)} lines for secret '{secret}', got {len(v)}"

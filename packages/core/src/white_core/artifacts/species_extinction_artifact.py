@@ -103,7 +103,7 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
             "primary_cause": self.primary_cause,
             "habitat": self.habitat,
             "population_trajectory": [
-                p.model_dump() for p in self.population_trajectory
+                a_population.model_dump() for a_population in self.population_trajectory
             ],
             "cascade_effects": self.cascade_effects,
             "anthropogenic_factors": self.anthropogenic_factors,
@@ -129,6 +129,8 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
         )
 
     def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         with open(file, "w") as f:
@@ -151,14 +153,14 @@ class SpeciesExtinctionArtifact(ChainArtifact, ABC):
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "species_extinction_artifact_mock.yml",
         ),
         "r",
-    ) as file:
-        data = yaml.safe_load(file)
-        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-        extinction_artifact = SpeciesExtinctionArtifact(**data)
+    ) as a_file:
+        example_data = yaml.safe_load(a_file)
+        example_data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        extinction_artifact = SpeciesExtinctionArtifact(**example_data)
         print(extinction_artifact)
         extinction_artifact.save_file()
         print(extinction_artifact.flatten())

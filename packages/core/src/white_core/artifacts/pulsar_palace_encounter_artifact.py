@@ -235,14 +235,14 @@ class PulsarPalaceEncounterArtifact(ChainArtifact, ABC):
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "yellow_encounter_narrative_artifact_mock.yml",
         ),
         "r",
-    ) as f:
-        data = yaml.safe_load(f)
-        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-        encounter_artifact = PulsarPalaceEncounterArtifact(**data)
+    ) as a_file:
+        example_data = yaml.safe_load(a_file)
+        example_data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        encounter_artifact = PulsarPalaceEncounterArtifact(**example_data)
         print(encounter_artifact)
         encounter_artifact.save_file()
         print(encounter_artifact.flatten())
