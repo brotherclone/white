@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.pulsar_palace_character_sheet import (
     PulsarPalaceCharacterSheet,
 )
@@ -9,9 +10,8 @@ from white_core.concepts.pulsar_palace_character import (
     PulsarPalaceCharacterDisposition,
     PulsarPalaceCharacterProfession,
 )
+from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
 from white_core.enums.chain_artifact_type import ChainArtifactType
-
-IMAGE_PATH = "img"
 
 
 def test_character_sheet_artifact():
@@ -34,28 +34,25 @@ def test_character_sheet_artifact():
     )
 
     character_sheet = PulsarPalaceCharacterSheet(
-        thread_id="test-thread", sheet_content=test_character, image_path=IMAGE_PATH
+        thread_id="test-thread", sheet_content=test_character
     )
     assert character_sheet.thread_id == "test-thread"
     assert character_sheet.chain_artifact_type == ChainArtifactType.CHARACTER_SHEET
+    assert character_sheet.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN
     assert isinstance(character_sheet.sheet_content, PulsarPalaceCharacter)
     assert character_sheet.sheet_content.thread_id == "test-thread"
     assert character_sheet.sheet_content.encounter_id == "test-encounter"
 
 
 def test_character_sheet_artifact_defaults():
-    # image_path is required by HtmlChainArtifactFile; but sheet_content is optional
-    character_sheet = PulsarPalaceCharacterSheet(
-        thread_id="test-thread", image_path=IMAGE_PATH
-    )
+    character_sheet = PulsarPalaceCharacterSheet(thread_id="test-thread")
     assert character_sheet.sheet_content is None
 
 
 def test_character_sheet_artifact_with_character():
-    # PulsarPalaceCharacter requires both thread_id and encounter_id
     character = PulsarPalaceCharacter(thread_id="test-thread", encounter_id="enc-1")
     character_sheet = PulsarPalaceCharacterSheet(
-        thread_id="test-thread", sheet_content=character, image_path=IMAGE_PATH
+        thread_id="test-thread", sheet_content=character
     )
     assert character_sheet.sheet_content == character
 
@@ -65,21 +62,21 @@ def test_character_sheet_artifact_type():
     assert default == ChainArtifactType.CHARACTER_SHEET
 
 
+def test_character_sheet_file_type():
+    default = PulsarPalaceCharacterSheet.model_fields[
+        "chain_artifact_file_type"
+    ].default
+    assert default == ChainArtifactFileType.MARKDOWN
+
+
 def test_missing_fields_raises_validation_error():
-    # image_path has a default value, so this should succeed
     sheet = PulsarPalaceCharacterSheet(thread_id="test-thread")
     assert sheet.thread_id == "test-thread"
-    assert sheet.image_path == ""  # default value
-    sheet = PulsarPalaceCharacterSheet(thread_id="test-thread")
-    assert sheet.thread_id == "test-thread"
-    assert sheet.image_path == ""  # default value
 
 
 def test_wrong_type_raises_validation_error():
     with pytest.raises(ValidationError):
-        PulsarPalaceCharacterSheet(
-            thread_id="test-thread", image_path=IMAGE_PATH, sheet_content=123
-        )
+        PulsarPalaceCharacterSheet(thread_id="test-thread", sheet_content=123)
 
 
 def test_flatten_and_for_prompt():
@@ -98,7 +95,7 @@ def test_flatten_and_for_prompt():
     )
 
     sheet = PulsarPalaceCharacterSheet(
-        thread_id="thread-x", sheet_content=test_character, image_path=IMAGE_PATH
+        thread_id="thread-x", sheet_content=test_character
     )
     flat = sheet.flatten()
     assert isinstance(flat, dict)
@@ -109,3 +106,26 @@ def test_flatten_and_for_prompt():
     assert "Character Sheet" in prompt_text
     assert "ON: 3/5" in prompt_text
     assert "OFF: 2/7" in prompt_text
+
+
+def test_to_markdown():
+    test_character = PulsarPalaceCharacter(
+        thread_id="thread-md",
+        encounter_id="enc-md",
+        background=PulsarPalaceCharacterBackground(
+            rollId=1, time=2042, place="Pulsar City"
+        ),
+        disposition=PulsarPalaceCharacterDisposition(rollId=1, disposition="Wary"),
+        profession=PulsarPalaceCharacterProfession(rollId=1, profession="Archivist"),
+        on_max=8,
+        on_current=6,
+        off_max=4,
+        off_current=4,
+    )
+    sheet = PulsarPalaceCharacterSheet(
+        thread_id="thread-md", sheet_content=test_character
+    )
+    md = sheet.to_markdown()
+    assert "# Wary Archivist" in md
+    assert "ON:" in md
+    assert "OFF:" in md

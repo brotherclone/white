@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -245,7 +247,10 @@ def test_for_prompt_original_label_visibility():
     p2 = m2.for_prompt()
     assert "Title: T2" in p2
     assert "Date Range: D2" in p2
+    # The prompt will include the field with a None, rendered as 'None' or empty string depending on model_dump substitution; accept either
     assert "Original Label Text" in p2
+
+    # When original_label_visible is False the original label line should not be present
     m3 = QuantumTapeLabelArtifact(
         title="T3",
         date_range="D3",
@@ -281,6 +286,33 @@ def test_artifact_name_explicit_override():
     assert m.artifact_name == "my_override"
 
 
+def test_save_file_writes_yml(tmp_path):
+    base = tmp_path / "out"
+    base.mkdir()
+
+    m = _make_minimal(
+        base_path=str(base),
+        year_documented="1998",
+        original_date="1998",
+        original_title="Gabe Walsh — 1998",
+        tapeover_date="Jun 1998 – Nov 1999",
+        tapeover_title="The Lost Portland Chapter",
+        subject_name="Gabe Walsh",
+        age_during="22–23",
+        location="Portland, OR",
+        catalog_number="QT-B-1998-ABCDEF",
+    )
+    m.save_file()
+
+    content = Path(m.get_artifact_path()).read_text(encoding="utf-8")
+    for value in [
+        "Gabe Walsh",
+        "Portland, OR",
+        "QT-B-1998-ABCDEF",
+    ]:
+        assert value in content, f"Expected '{value}' in saved YAML"
+
+
 def test_flatten_includes_template_fields():
     m = _make_minimal(
         year_documented="2001",
@@ -308,3 +340,28 @@ def test_flatten_includes_template_fields():
         assert key in flat, f"Expected '{key}' in flatten() output"
     assert flat["subject_name"] == "Gabe Walsh"
     assert flat["catalog_number"] == "QT-B-2001-ZZZTOP"
+
+
+def test_save_file_writes_valid_yaml(tmp_path):
+    base = tmp_path / "out"
+    base.mkdir()
+
+    m = QuantumTapeLabelArtifact(
+        title="SaveTest",
+        date_range="2020",
+        recording_quality=QuantumTapeRecordingQuality.SP,
+        counter_start=0,
+        base_path=str(base),
+        original_label_visible=True,
+        original_label_text=None,
+    )
+    m.save_file()
+
+    import yaml
+
+    out_file = Path(m.get_artifact_path(with_file_name=True))
+    assert out_file.exists()
+    data = yaml.safe_load(out_file.read_text(encoding="utf-8"))
+    assert data["title"] == "SaveTest"
+    assert data["date_range"] == "2020"
+    assert data["original_label_text"] is None

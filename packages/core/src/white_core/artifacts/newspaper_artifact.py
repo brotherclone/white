@@ -18,6 +18,7 @@ load_dotenv()
 class NewspaperArtifact(ChainArtifact, ABC):
 
     chain_artifact_type: ChainArtifactType = ChainArtifactType.NEWSPAPER_ARTICLE
+    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.MARKDOWN
     headline: Optional[str] = Field(
         default=None, description="Headline of the newspaper article."
     )
@@ -95,15 +96,7 @@ class NewspaperArtifact(ChainArtifact, ABC):
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         with open(file, "w") as f:
-            if self.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN:
-                f.write(self.to_markdown())
-            else:
-                yaml.dump(
-                    self.model_dump(mode="json"),
-                    f,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
+            f.write(self.to_markdown())
 
     def flatten(self):
         parent_data = super().flatten()

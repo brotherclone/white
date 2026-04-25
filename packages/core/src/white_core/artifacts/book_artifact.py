@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 
 from white_core.artifacts.base_artifact import ChainArtifact
 from white_core.enums.book_condition import BookCondition
-from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
 from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.publisher_type import PublisherType
 
@@ -83,91 +82,19 @@ class BookArtifact(ChainArtifact, ABC):
             data["artifact_name"] = "red_book_artifact"
         super().__init__(**data)
 
-    def to_markdown(self) -> str:
-        md_lines = [f"# {self.title}"]
-        if self.subtitle:
-            md_lines.append(f"## {self.subtitle}")
-        md_lines.append("")
-        author_line = f"**Author:** {self.author}"
-        if self.author_credentials:
-            author_line += f" ({self.author_credentials})"
-        md_lines.append(author_line)
-        md_lines.append("")
-        md_lines.append(f"**Year:** {self.year}")
-        md_lines.append(
-            f"**Publisher:** {self.publisher} ({self.publisher_type.value})"
-        )
-        md_lines.append(f"**Edition:** {self.edition}")
-        md_lines.append(f"**Pages:** {self.pages}")
-        if self.isbn:
-            md_lines.append(f"**ISBN:** {self.isbn}")
-        md_lines.append("")
-        md_lines.append(f"**Catalog Number:** {self.catalog_number}")
-        md_lines.append(f"**Condition:** {self.condition.value}")
-        md_lines.append(f"**Danger Level:** {self.danger_level}/5")
-        md_lines.append("")
-        if self.acquisition_date or self.acquisition_notes:
-            md_lines.append("## Acquisition")
-            if self.acquisition_date:
-                md_lines.append(f"**Date:** {self.acquisition_date}")
-            if self.acquisition_notes:
-                md_lines.append(f"**Notes:** {self.acquisition_notes}")
-            md_lines.append("")
-        md_lines.append(f"**Language:** {self.language}")
-        if self.translated_from:
-            md_lines.append(f"**Translated from:** {self.translated_from}")
-        if self.translator:
-            md_lines.append(f"**Translator:** {self.translator}")
-        md_lines.append("")
-        if self.abstract:
-            md_lines.append("## Abstract")
-            md_lines.append(self.abstract)
-            md_lines.append("")
-        if self.notable_quote:
-            md_lines.append("## Notable Quote")
-            md_lines.append(f"> {self.notable_quote}")
-            md_lines.append("")
-        if self.excerpts:
-            md_lines.append("## Excerpts")
-            for excerpt in self.excerpts:
-                md_lines.append(f"- {excerpt}")
-            md_lines.append("")
-        if self.suppression_history:
-            md_lines.append("## Suppression History")
-            md_lines.append(self.suppression_history)
-            md_lines.append("")
-        if self.related_works:
-            md_lines.append("## Related Works")
-            for work in self.related_works:
-                md_lines.append(f"- {work}")
-            md_lines.append("")
-        if self.tags:
-            md_lines.append(f"**Tags:** {', '.join(self.tags)}")
-            md_lines.append("")
-        md_lines.append("---")
-        md_lines.append("## Metadata")
-        md_lines.append(f"- **Artifact ID:** {self.artifact_id}")
-        md_lines.append(f"- **Thread ID:** {self.thread_id}")
-        md_lines.append(
-            f"- **Rainbow Color:** {self.rainbow_color_mnemonic_character_value}"
-        )
-        return "\n".join(md_lines)
-
     def save_file(self):
         if not self.file_name:
             raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         with open(file, "w") as f:
-            if self.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN:
-                f.write(self.to_markdown())
-            else:
-                yaml.safe_dump(
-                    self.model_dump(mode="json"),
-                    f,
-                    default_flow_style=False,
-                    allow_unicode=True,
-                )
+            yaml.safe_dump(
+                self.model_dump(mode="json"),
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
 
     def for_prompt(self) -> str:
         """Format book for LLM prompt inclusion - content-focused."""

@@ -9,6 +9,7 @@ from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
 from pydantic import Field
+
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
@@ -23,7 +24,6 @@ from white_core.generators.markov_room_generator import MarkovRoomGenerator
 from white_core.generators.music_extractor import MusicExtractor
 from white_core.manifests.song_proposal import SongProposalIteration
 from white_extraction.util.manifest_loader import get_my_reference_proposals
-
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.white_agent_state import MainAgentState
 from white_ideation.agents.states.yellow_agent_state import YellowAgentState
@@ -169,13 +169,9 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 ) as file_one:
                     data_one = yaml.safe_load(file_one)
                     data_one["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-                    data_one["image_path"] = (
-                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/img"
-                    )
                     character_one = PulsarPalaceCharacter(**data_one)
                     character_one.create_portrait()
-                    if os.getenv("WHITE_WITH_HTML", "false").lower() == "true":
-                        character_one.create_character_sheet()
+                    character_one.create_character_sheet()
                     state.characters.append(character_one)
                 with open(
                     f"{os.getenv('AGENT_MOCK_DATA_PATH')}/yellow_character_two_mock.yml",
@@ -183,13 +179,9 @@ class YellowAgent(BaseRainbowAgent, ABC):
                 ) as file_two:
                     data_two = yaml.safe_load(file_two)
                     data_two["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-                    data_two["image_path"] = (
-                        f"{os.getenv('AGENT_WORK_PRODUCT_BASE_PATH')}/img"
-                    )
                     character_two = PulsarPalaceCharacter(**data_two)
                     character_two.create_portrait()
-                    if os.getenv("WHITE_WITH_HTML", "false").lower() == "true":
-                        character_two.create_character_sheet()
+                    character_two.create_character_sheet()
                     state.characters.append(character_two)
                 get_state_snapshot(
                     state, "generate_characters_exit", state.thread_id, "Lord Pulsimore"
@@ -207,8 +199,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
                     thread_id=state.thread_id, encounter_id=f"encounter_{i}"
                 )
                 char.create_portrait()
-                if os.getenv("WHITE_WITH_HTML", "false").lower() == "true":
-                    char.create_character_sheet()
+                char.create_character_sheet()
                 state.characters.append(char)
         get_state_snapshot(
             state, "generate_characters_exit", state.thread_id, "Lord Pulsimore"

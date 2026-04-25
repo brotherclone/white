@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.newspaper_artifact import NewspaperArtifact
 from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
 from white_core.enums.chain_artifact_type import ChainArtifactType
@@ -15,8 +16,7 @@ def test_newspaper_artifact_defaults():
     assert artifact.location is None
     assert artifact.text is None
     assert artifact.tags is None
-    # defaults from base artifact
-    assert artifact.chain_artifact_file_type == ChainArtifactFileType.YML
+    assert artifact.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN
     assert artifact.file_name is not None
     assert artifact.file_path is not None
 

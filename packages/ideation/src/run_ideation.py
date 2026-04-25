@@ -94,9 +94,6 @@ def start_workflow(args):
         seen = set()
         enabled_agents = [x for x in enabled_agents if not (x in seen or seen.add(x))]
 
-    if getattr(args, "with_html", False):
-        os.environ["WHITE_WITH_HTML"] = "true"
-
     if not getattr(args, "no_browser", False):
         os.environ["AUTO_BROWSER_LAUNCH"] = "true"
 
@@ -198,12 +195,6 @@ def main():
     start_parser.add_argument(
         "--concept",
         help="Initial song concept (optional - White will use facet system if not provided)",
-    )
-    start_parser.add_argument(
-        "--with-html",
-        action="store_true",
-        default=False,
-        help="Generate HTML artifacts (character sheets, timeline pages). Off by default to save LLM and image generation cost.",
     )
     start_parser.add_argument(
         "--no-browser",
