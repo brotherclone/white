@@ -95,7 +95,7 @@ def sample_reference_artists(
 
 
 if __name__ == "__main__":
-    m = load_manifest("../../staged_raw_material/01_01/01_01.yml")
+    m = load_manifest("../../packages/extraction/staged_raw_material/01_01/01_01.yml")
     print(m)
     my_manifest = get_my_reference_proposals("Z")
     print(my_manifest)

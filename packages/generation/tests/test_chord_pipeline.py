@@ -225,9 +225,7 @@ except ImportError:
     _has_ort = False
 _has_onnx = _onnx_path.exists() and _has_ort
 
-_thread_dir = Path(
-    "/Volumes/LucidNonsense/White/shrink_wrapped/white-the-breathing-machine-learns-to-sing"
-)
+_thread_dir = Path("/shrink_wrapped/white-the-breathing-machine-learns-to-sing")
 _has_thread = _thread_dir.exists()
 
 
