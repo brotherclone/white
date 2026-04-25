@@ -76,31 +76,31 @@
 - [x] 5.9 Delete moved source from `app/`
 - [ ] 5.10 Open PR: `feat: migrate generation package (white_generation)`
 
-## 6. Package: composition (production orchestration → `white_composition`) ⚠️ MOST CAREFUL
+## 6. Package: composition (production orchestration → `white_composition`) ✅ DONE (commit 0a86d19)
 
-- [ ] 6.1 Scaffold `packages/composition/pyproject.toml` (deps: `white-core`, `white-generation`)
+- [x] 6.1 Scaffold `packages/composition/pyproject.toml` (deps: `white-core`, `white-generation`)
       + `src/white_composition/`
-- [ ] 6.2 Scaffold `packages/diary/pyproject.toml` + empty `src/white_diary/__init__.py` (greenfield)
-- [ ] 6.3 Scaffold `packages/production/pyproject.toml` + empty `src/white_production/__init__.py` (greenfield)
-- [ ] 6.4 Move `app/generators/midi/production/` → `packages/composition/src/white_composition/`
-- [ ] 6.5 Move `app/util/shrinkwrap_chain_artifacts.py` → `packages/composition/src/white_composition/`
-- [ ] 6.6 Update all imports; verify `pipeline_runner` CLI works end-to-end
-- [ ] 6.7 Move production-related tests → `packages/composition/tests/`
-- [ ] 6.8 Run `uv sync` + full pipeline smoke test + pytest; fix failures
-- [ ] 6.9 Delete moved source from `app/`
+- [x] 6.2 Scaffold `packages/diary/pyproject.toml` + empty `src/white_diary/__init__.py` (greenfield)
+- [x] 6.3 Scaffold `packages/production/pyproject.toml` + empty `src/white_production/__init__.py` (greenfield)
+- [x] 6.4 Move `app/generators/midi/production/` → `packages/composition/src/white_composition/`
+- [x] 6.5 Move `app/util/shrinkwrap_chain_artifacts.py` → `packages/composition/src/white_composition/`
+- [x] 6.6 Update all imports; verify `pipeline_runner` CLI works end-to-end
+- [x] 6.7 Move production-related tests → `packages/composition/tests/`
+- [x] 6.8 Run `uv sync` + full pipeline smoke test + pytest; fix failures
+- [x] 6.9 Delete moved source from `app/`
 - [ ] 6.10 Open PR: `feat: migrate composition package (white_composition) + diary/production scaffolds`
 
-## 7. Package: ideation (agents + reference → `white_ideation`)
+## 7. Package: ideation (agents + reference → `white_ideation`) ✅ DONE
 
-- [ ] 7.1 Scaffold `packages/ideation/pyproject.toml` (deps: `white-core`, `white-composition`,
+- [x] 7.1 Scaffold `packages/ideation/pyproject.toml` (deps: `white-core`, `white-composition`,
       `white-analysis`) + `src/white_ideation/`
-- [ ] 7.2 Move `app/agents/` → `packages/ideation/src/white_ideation/agents/`
-- [ ] 7.3 Move `app/reference/` → `packages/ideation/src/white_ideation/reference/`
-- [ ] 7.4 Update all `from app.agents...` and `from app.reference...` imports
-- [ ] 7.5 Move `tests/agents/` → `packages/ideation/tests/`
-- [ ] 7.6 Update `run_white_agent.py` entry point at root to use `from white_ideation...`
-- [ ] 7.7 Run `uv sync` + full pytest; fix failures
-- [ ] 7.8 Delete moved source from `app/`
+- [x] 7.2 Move `app/agents/` → `packages/ideation/src/white_ideation/agents/`
+- [x] 7.3 Move `app/reference/` → `packages/ideation/src/white_ideation/reference/`
+- [x] 7.4 Update all `from app.agents...` and `from app.reference...` imports
+- [x] 7.5 Move `tests/agents/` → `packages/ideation/tests/`
+- [x] 7.6 Update `run_white_agent.py` entry point at root to use `from white_ideation...`
+- [x] 7.7 Run `uv sync` + full pytest; fix failures
+- [x] 7.8 Delete moved source from `app/`
 - [ ] 7.9 Open PR: `feat: migrate ideation package (white_ideation)`
 
 ## 8. Package: api (candidate server → `white_api`)

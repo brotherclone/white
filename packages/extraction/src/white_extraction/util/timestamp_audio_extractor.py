@@ -19,7 +19,7 @@ from white_core.manifests.manifest import Manifest
 from white_core.manifests.manifest_song_structure import ManifestSongStructure
 from white_core.music.core.duration import Duration
 
-from app.util.audio_io import load_audio
+from white_extraction.util.audio_io import load_audio
 from white_extraction.util.lrc_utils import load_lrc
 
 logger = logging.getLogger(__name__)

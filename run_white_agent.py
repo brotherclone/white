@@ -4,9 +4,9 @@ import os
 import sys
 import warnings
 
-from app.agents.states.white_agent_state import MainAgentState
-from app.agents.white_agent import WhiteAgent
-from app.util.agent_state_utils import validate_state_structure
+from white_ideation.agents.agent_state_utils import validate_state_structure
+from white_ideation.agents.states.white_agent_state import MainAgentState
+from white_ideation.agents.white_agent import WhiteAgent
 
 # Configure logging early
 logging.basicConfig(

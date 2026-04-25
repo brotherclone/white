@@ -27,8 +27,8 @@ import polars as pl
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
-from app.util.audio_io import load_audio
-from app.util.manifest_loader import load_manifest
+from white_extraction.util.audio_io import load_audio
+from white_extraction.util.manifest_loader import load_manifest
 from white_extraction.util.midi_segment_utils import segment_midi_file
 from white_extraction.util.timestamp_audio_extractor import (
     create_segment_specs_from_lrc,

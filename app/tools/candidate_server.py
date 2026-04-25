@@ -353,8 +353,7 @@ def create_app(
             global _generate_job
             try:
                 from white_composition.shrinkwrap_chain_artifacts import shrinkwrap
-
-                from app.agents.workflow.concept_workflow import (
+                from white_ideation.agents.workflow.concept_workflow import (
                     run_white_agent_workflow,
                 )
 

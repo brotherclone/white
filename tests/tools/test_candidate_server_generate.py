@@ -43,7 +43,9 @@ def test_generate_status_idle(album_client):
 def test_generate_starts_successfully(album_client):
     # Patch the imports inside _run so no real agent executes
     with (
-        patch("app.agents.workflow.concept_workflow.run_white_agent_workflow"),
+        patch(
+            "white_ideation.agents.workflow.concept_workflow.run_white_agent_workflow"
+        ),
         patch(
             "white_composition.shrinkwrap_chain_artifacts.shrinkwrap",
             return_value={"processed": 1},

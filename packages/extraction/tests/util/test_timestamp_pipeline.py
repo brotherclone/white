@@ -170,7 +170,7 @@ class TestPipelineIntegration:
         """Test loading manifest from staged raw material."""
         manifest_path = Path("staged_raw_material/01_01/01_01.yml")
         if manifest_path.exists():
-            from app.util.manifest_loader import load_manifest
+            from white_extraction.util.manifest_loader import load_manifest
 
             manifest = load_manifest(str(manifest_path))
             assert manifest.manifest_id == "01_01"

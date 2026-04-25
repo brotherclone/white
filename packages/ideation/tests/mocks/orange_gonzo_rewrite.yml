@@ -1,0 +1,17 @@
+chain_artifact_type: "newspaper_article"
+chain_artifact_file_type: 'md'
+thread_id: 'mock_thread_001'
+base_path: "/Volumes/LucidNonsense/White/chain_artifacts/"
+headline: Local Band Vanishes After Practice Session in Vernon Woods
+date: "1987-10-15"
+source: Sussex County Independent
+location: Vernon Township, NJ
+text: "GONZO! Four members of local rock band 'The Transmission' failed to return home 
+      after a late-night practice session in a cabin near Vernon Woods. Band members, 
+      all between ages 17-19, were last seen loading equipment into their van around 
+      11:30 PM Tuesday. Police found the cabin unlocked with instruments still set up, 
+      but no sign of the youths. Vernon Police Chief Thomas McCarthy said there were 
+      no signs of struggle, though neighbors reported hearing 'unusual electronic sounds' 
+      around midnight. The band had been experimenting with synthesizers and had spoken 
+      about recording 'alien frequencies' for their upcoming demo."
+tags: [rock_bands, unexplained, youth_crime]

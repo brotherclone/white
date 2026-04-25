@@ -21,7 +21,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from app.util.manifest_loader import load_manifest
+from white_extraction.util.manifest_loader import load_manifest
 from white_extraction.util.midi_segment_utils import segment_midi_with_audio
 from white_extraction.util.timestamp_audio_extractor import (
     create_segment_specs_from_lrc,

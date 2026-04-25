@@ -5,17 +5,20 @@ Each function does ONE thing: takes text, returns a score.
 All use proper word boundary matching from word_matching.py
 """
 
-from app.reference.rebracketing_words.discrepancy_words import DISCREPANCY_WORDS
-from app.reference.rebracketing_words.fluidity_words import FLUIDITY_WORDS
-from app.reference.rebracketing_words.rebracketing_words import (
+from white_ideation.reference.rebracketing_words.discrepancy_words import (
+    DISCREPANCY_WORDS,
+)
+from white_ideation.reference.rebracketing_words.fluidity_words import FLUIDITY_WORDS
+from white_ideation.reference.rebracketing_words.rebracketing_words import (
     ONTOLOGICAL_UNCERTAINTY,
     REALITY_CORRECTIONS,
     REBRACKETING_WORDS,
 )
-from app.reference.rebracketing_words.temporal_words import (
+from white_ideation.reference.rebracketing_words.temporal_words import (
     TEMPORAL_DEIXIS_PATTERNS,
     TEMPORAL_WORDS,
 )
+
 from white_extraction.extractors.manifest_extractor.word_matching import (
     calculate_coverage,
     calculate_density,
