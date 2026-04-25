@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
+
 from white_extraction.util.generate_negative_constraints import (
     generate_constraints,
     write_constraints,
@@ -714,8 +715,8 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("packages/generation/shrink_wrapped"),
-        help="Output directory for clean artifacts (default: packages/generation/shrink_wrapped/)",
+        default=Path("shrink_wrapped"),
+        help="Output directory for clean artifacts (default: shrink_wrapped/)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Preview changes without writing files"
