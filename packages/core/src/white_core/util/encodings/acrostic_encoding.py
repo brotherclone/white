@@ -30,7 +30,7 @@ class AcrosticEncoding(InfranymTextEncoding):
     @classmethod
     def validate_acrostic(cls, v, info):
         """Ensure lines match the secret word length"""
-        secret = info.example_data.get("secret_word", "")
+        secret = info.data.get("secret_word", "")
         if len(v) != len(secret):
             raise ValueError(
                 f"Acrostic requires {len(secret)} lines for secret '{secret}', got {len(v)}"
