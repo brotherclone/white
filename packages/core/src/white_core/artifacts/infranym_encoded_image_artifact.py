@@ -139,6 +139,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             # Try to extract from the text_render_path filename
             self.secret_word = self._extract_word_from_path(self.text_render_path)
 
+        assert self.secret_word is not None
         carrier_array = np.array(carrier_with_text)
         final_array = self.spread_spectrum_embed(
             carrier_array, key=self.secret_word, message=self.solution
@@ -161,7 +162,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
         img_array: np.ndarray, key: str, message: str
     ) -> np.ndarray:
         """
-        Hide message using secret word as a pseudorandom key.
+        Hide a message using a secret word as a pseudorandom key.
 
         Args:
             img_array: Image as numpy array
@@ -213,8 +214,8 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
                 logger.info(f"🩵 Layer 2 text image revealed: {reveal_path}")
 
             return text_img
-        except Exception as e:
-            logger.error(f"Error extracting Layer 2: {e}")
+        except Exception as ex:
+            logger.error(f"Error extracting Layer 2: {ex}")
             return None
 
     def solve_layer3(self, secret_word_key: Optional[str] = None) -> Optional[str]:
@@ -254,8 +255,8 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             logger.info(f" 🩵Layer 3 decrypted with key '{secret_word_key}'")
             return message
 
-        except Exception as e:
-            logger.error(f"Error solving Layer 3: {e}")
+        except Exception as ex:
+            logger.error(f"Error solving Layer 3: {ex}")
             return None
 
     @staticmethod

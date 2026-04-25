@@ -86,9 +86,8 @@ class ArbitrarysSurveyArtifact(ChainArtifact, ABC):
         }
 
     def save_file(self):
-        file = Path(self.file_path, self.file_name)
-        file.parent.mkdir(parents=True, exist_ok=True)
-        with open(file, "w") as f:
+        the_file = Path(self.get_artifact_path(with_file_name=True, create_dirs=True))
+        with open(the_file, "w") as f:
             yaml.dump(
                 self.model_dump(mode="json"),
                 f,
@@ -113,13 +112,13 @@ class ArbitrarysSurveyArtifact(ChainArtifact, ABC):
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "arbitrarys_survey_mock.yml",
         ),
         "r",
     ) as file:
         data = yaml.safe_load(file)
-        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "")
         survey = ArbitrarysSurveyArtifact(**data)
         print(survey)
         survey.save_file()

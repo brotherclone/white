@@ -51,7 +51,7 @@ class NewspaperArtifact(ChainArtifact, ABC):
         return self.text if self.text else ""
 
     def to_markdown(self) -> str:
-        """Convert newspaper artifact to formatted markdown."""
+        """Convert newspaper artifact to formatted Markdown."""
         md_lines = []
 
         # Headline
@@ -90,9 +90,10 @@ class NewspaperArtifact(ChainArtifact, ABC):
         return "\n".join(md_lines)
 
     def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
-        file = Path(self.file_path, self.file_name)
         with open(file, "w") as f:
             if self.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN:
                 f.write(self.to_markdown())
@@ -124,7 +125,7 @@ class NewspaperArtifact(ChainArtifact, ABC):
         }
 
     def for_prompt(self) -> str:
-        """Format for prompt - newspaper article with context."""
+        """Format for prompt newspaper article with context."""
         parts = []
         if self.headline:
             parts.append(self.headline)
@@ -148,11 +149,13 @@ class NewspaperArtifact(ChainArtifact, ABC):
 
 if __name__ == "__main__":
     with open(
-        os.path.join(os.getenv("AGENT_MOCK_DATA_PATH"), "orange_base_story_mock.yml"),
+        os.path.join(
+            os.getenv("AGENT_MOCK_DATA_PATH", ""), "orange_base_story_mock.yml"
+        ),
         "r",
-    ) as f:
-        data = yaml.safe_load(f)
-        newspaper_artifact = NewspaperArtifact(**data)
+    ) as a_file:
+        example_data = yaml.safe_load(a_file)
+        newspaper_artifact = NewspaperArtifact(**example_data)
     newspaper_artifact.save_file()
     print(newspaper_artifact.flatten())
     p = newspaper_artifact.for_prompt()

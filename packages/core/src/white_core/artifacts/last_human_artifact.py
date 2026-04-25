@@ -109,6 +109,8 @@ class LastHumanArtifact(ChainArtifact, ABC):
         )
 
     def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         with open(file, "w") as f:
@@ -150,7 +152,7 @@ class LastHumanArtifact(ChainArtifact, ABC):
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "last_human_artifact_mock.yml",
         ),
         "r",

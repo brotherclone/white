@@ -115,7 +115,9 @@ class InfranymTextRenderArtifact(ChainArtifact, ABC):
 
         elif style == ImageTextStyle.STATIC:
             # Noise background for EVP aesthetic
-            noise = np.random.randint(0, 50, (size[1], size[0], 3), dtype="uint8")
+            noise: np.ndarray = np.asarray(
+                np.random.randint(0, 50, (size[1], size[0], 3), dtype=np.uint8)
+            )
             img = Image.fromarray(noise)
             draw = ImageDraw.Draw(img)
             try:

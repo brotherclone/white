@@ -29,7 +29,7 @@ class AcrosticEncoding(InfranymTextEncoding):
     @field_validator("lines")
     @classmethod
     def validate_acrostic(cls, v, info):
-        """Ensure lines match secret word length"""
+        """Ensure lines match the secret word length"""
         secret = info.data.get("secret_word", "")
         if len(v) != len(secret):
             raise ValueError(

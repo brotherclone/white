@@ -115,11 +115,13 @@ class ChainArtifact(BaseModel, ABC):
         Returns:
             Path string
         """
-        path = (
-            os.path.join(self.file_path, self.file_name)
-            if with_file_name
-            else self.file_path
-        )
+        if with_file_name:
+            if self.file_name is None:
+                self.get_file_name()
+            assert self.file_name is not None
+            path: str = os.path.join(self.file_path, self.file_name)
+        else:
+            path = self.file_path
 
         if create_dirs:
             dir_path = os.path.dirname(path) if with_file_name else path

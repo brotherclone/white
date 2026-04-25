@@ -106,6 +106,8 @@ class AlternateTimelineArtifact(ChainArtifact, ABC):
         }
 
     def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
         with open(file, "w") as f:

@@ -189,15 +189,15 @@ class LastHumanSpeciesExtinctionNarrativeArtifact(ChainArtifact, ABC):
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "last_human_species_extinction_narrative.yml",
         ),
         "r",
-    ) as f:
-        data = yaml.safe_load(f)
-        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+    ) as file:
+        example_data = yaml.safe_load(file)
+        example_data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
         last_human_narrative_artifact = LastHumanSpeciesExtinctionNarrativeArtifact(
-            **data
+            **example_data
         )
         print(last_human_narrative_artifact)
         last_human_narrative_artifact.save_file()

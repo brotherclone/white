@@ -38,7 +38,7 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
         description="Three responses given"
     )
     was_human_interview: bool = Field(
-        default=False, description="True if real Gabe answered (9% HitL)"
+        default=False, description="True if real Gabe answered"
     )
     disrupting_event_type: str | None = Field(
         default=None,
@@ -64,16 +64,17 @@ class CircleJerkInterviewArtifact(ChainArtifact, ABC):
         }
 
     def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
-        file = Path(self.file_path, self.file_name)
-        with open(file, "w") as f:
+        with open(file, "w") as a_file:
             if self.chain_artifact_file_type == ChainArtifactFileType.MARKDOWN:
-                f.write(self.to_markdown())
+                a_file.write(self.to_markdown())
             else:
                 yaml.safe_dump(
                     self.model_dump(mode="json"),
-                    f,
+                    a_file,
                     default_flow_style=False,
                     allow_unicode=True,
                 )
@@ -150,9 +151,9 @@ if __name__ == "__main__":
     with open(
         f"{os.getenv('AGENT_MOCK_DATA_PATH')}/violet_circle_jerk_artifact_mock.yml", "r"
     ) as f:
-        data = yaml.safe_load(f)
-        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-        interview_artifact = CircleJerkInterviewArtifact(**data)
+        example_data = yaml.safe_load(f)
+        example_data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        interview_artifact = CircleJerkInterviewArtifact(**example_data)
         interview_artifact.save_file()
         print(interview_artifact.flatten())
         p = interview_artifact.for_prompt()

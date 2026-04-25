@@ -37,9 +37,10 @@ class SymbolicObjectArtifact(ChainArtifact, ABC):
         super().__init__(**data)
 
     def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file = Path(self.file_path, self.file_name)
         file.parent.mkdir(parents=True, exist_ok=True)
-        file = Path(self.file_path, self.file_name)
         with open(file, "w") as f:
             yaml.dump(
                 self.model_dump(mode="json"),
@@ -78,12 +79,12 @@ class SymbolicObjectArtifact(ChainArtifact, ABC):
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "orange_mock_object_selection.yml",
         ),
         "r",
-    ) as f:
-        data = yaml.safe_load(f)
-        symb_obj = SymbolicObjectArtifact(**data)
+    ) as a_file:
+        example_data = yaml.safe_load(a_file)
+        symb_obj = SymbolicObjectArtifact(**example_data)
         symb_obj.save_file()
         print(symb_obj.flatten())

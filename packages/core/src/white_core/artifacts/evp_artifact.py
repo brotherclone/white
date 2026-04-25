@@ -51,6 +51,8 @@ class EVPArtifact(ChainArtifact, ABC):
             )
         file_path_obj = Path(self.base_path) / "yml"
         file_path_obj.mkdir(parents=True, exist_ok=True)
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
         file_obj = file_path_obj / self.file_name
         data_to_save = {
             "transcript": self.transcript,
@@ -60,8 +62,10 @@ class EVPArtifact(ChainArtifact, ABC):
                 else None
             ),
         }
-        with open(file_obj, "w") as f:
-            yaml.dump(data_to_save, f, default_flow_style=False, allow_unicode=True)
+        with open(file_obj, "w") as a_file:
+            yaml.dump(
+                data_to_save, a_file, default_flow_style=False, allow_unicode=True
+            )
 
     def flatten(self):
         parent_data = super().flatten()
@@ -96,9 +100,9 @@ if __name__ == "__main__":
     with open(
         f"{os.getenv('AGENT_MOCK_DATA_PATH')}/black_evp_artifact_mock.yml", "r"
     ) as f:
-        data = yaml.safe_load(f)
-        data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-        evp_artifact = EVPArtifact(**data)
+        example_data = yaml.safe_load(f)
+        example_data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        evp_artifact = EVPArtifact(**example_data)
         evp_artifact.audio_mosiac = AudioChainArtifactFile(
             thread_id="test_thread_id",
             chain_artifact_type="unknown",

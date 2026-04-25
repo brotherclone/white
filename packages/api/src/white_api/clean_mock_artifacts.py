@@ -105,11 +105,10 @@ def main(argv: List[str] | None = None) -> int:
     elif env_base:
         base_dir = Path(env_base)
     else:
-        print("No --base provided and AGENT_WORK_PRODUCT_BASE_PATH is not set in .env")
-        return 1
+        return 0  # not configured in this environment — nothing to clean
 
     if not base_dir.exists():
-        print(f"Base directory does not exist: {base_dir}")
+        return 0  # dir absent is fine (clean checkout / different machine)
         return 1
 
     candidates = find_mock_dirs(base_dir)
