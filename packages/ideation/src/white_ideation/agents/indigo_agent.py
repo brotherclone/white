@@ -12,6 +12,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.output_parsers import StrOutputParser
 from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
+
 from white_core.agents.agent_settings import AgentSettings
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.artifacts.infranym_audio_artifact import InfranymAudioArtifact
@@ -27,7 +28,6 @@ from white_core.enums.infranym_medium import InfranymMedium
 from white_core.manifests.song_proposal import SongProposalIteration
 from white_core.music.core.key_signature import KeySignature
 from white_core.music.core.notes import Note
-
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.indigo_agent_state import IndigoAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -484,10 +484,22 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
 
         if medium is None:
             logger.error("infranym_medium is None, cannot implement infranym")
+            get_state_snapshot(
+                state,
+                "implement_infranym_method_exit",
+                state.thread_id,
+                "Decider Tangents",
+            )
             return state
 
         if secret is None:
             logger.error("secret_name is None, cannot implement infranym")
+            get_state_snapshot(
+                state,
+                "implement_infranym_method_exit",
+                state.thread_id,
+                "Decider Tangents",
+            )
             return state
 
         logger.info(f"🎨 Implementing {medium.value} infranym for '{secret}'")
@@ -496,6 +508,12 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
             # Text needs LLM generation for some methods, so we route to text nodes
             # The actual artifact creation happens in assemble_text_artifact
             logger.info("📝 Routing to text generation nodes...")
+            get_state_snapshot(
+                state,
+                "implement_infranym_method_exit",
+                state.thread_id,
+                "Decider Tangents",
+            )
             return state
 
         elif medium == InfranymMedium.AUDIO:
@@ -594,6 +612,12 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
         else:
             logger.warning(f"Unknown infranym medium: {medium}")
 
+        get_state_snapshot(
+            state,
+            "implement_infranym_method_exit",
+            state.thread_id,
+            "Decider Tangents",
+        )
         return state
 
     # ========================================================================
@@ -955,7 +979,17 @@ Concept: [full concept explanation]
 
             except Exception as e:
                 logger.error(f"❌ Error generating proposal: {e}")
+                surface_slug = (
+                    re.sub(
+                        r"[^a-z0-9]+", "_", (state.surface_name or "fallback").lower()
+                    )
+                    .strip("_")[:30]
+                    .strip("_")
+                    or "fallback"
+                )
                 state.counter_proposal = SongProposalIteration(
+                    iteration_id=f"indigo_{surface_slug}_v1",
+                    rainbow_color="indigo",
                     title=state.surface_name,
                     key=previous_iteration.key,
                     bpm=previous_iteration.bpm,
@@ -1074,13 +1108,15 @@ def _parse_proposal_response(response: str) -> SongProposalIteration:
 
         numeric_part = re.sub(r"[^\d]", "", str(raw_bpm))
         bpm = int(numeric_part) if numeric_part else 120
-    import time
-
-    timestamp = int(time.time() * 1000)
+    title = data.get("title", "Untitled")
+    title_slug = (
+        re.sub(r"[^a-z0-9]+", "_", title.lower()).strip("_")[:30].strip("_")
+        or "proposal"
+    )
     return SongProposalIteration(
-        iteration_id=f"indigo_proposal_{timestamp}",
+        iteration_id=f"indigo_{title_slug}_v1",
         rainbow_color="indigo",
-        title=data.get("title", "Untitled"),
+        title=title,
         key=data.get("key", "C major"),
         bpm=bpm,
         tempo=data.get("tempo", "Moderate"),

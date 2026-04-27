@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
+
 from white_core.agents.agent_settings import AgentSettings
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
@@ -25,7 +26,6 @@ from white_core.concepts.last_human_species_extinction_parallel_moment import (
 )
 from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
 from white_core.manifests.song_proposal import SongProposalIteration
-
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.green_agent_state import GreenAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -388,6 +388,12 @@ Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insi
                     state.current_narrative = current_narrative
                     current_narrative.save_file()
                     state.artifacts.append(current_narrative)
+                    get_state_snapshot(
+                        state,
+                        "write_last_human_extinction_narrative_exit",
+                        state.thread_id,
+                        "Sub-Arbitrary",
+                    )
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock narrative: {e!s}"
@@ -457,6 +463,12 @@ Parallel the timelines, mirror the losses, but never explain the connection - le
                     state.current_narrative = current_narrative
                     current_narrative.save_file()
                     state.artifacts.append(current_narrative)
+                    get_state_snapshot(
+                        state,
+                        "write_last_human_extinction_narrative_exit",
+                        state.thread_id,
+                        "Sub-Arbitrary",
+                    )
                     return state
                 elif isinstance(result, LastHumanSpeciesExtinctionNarrativeArtifact):
                     # Override any LLM-generated values with correct ones
@@ -466,6 +478,12 @@ Parallel the timelines, mirror the losses, but never explain the connection - le
                     state.current_narrative = result
                     result.save_file()
                     state.artifacts.append(result)
+                    get_state_snapshot(
+                        state,
+                        "write_last_human_extinction_narrative_exit",
+                        state.thread_id,
+                        "Sub-Arbitrary",
+                    )
                     return state
                 else:
                     error_msg = f"Expected LastHumanSpeciesExtinctionNarrativeArtifact, got {type(result)}"
@@ -597,12 +615,18 @@ Score each dimension (1-10) and provide brief reasoning. Then give an overall as
                     state.current_decision = rescue_decision
                     rescue_decision.save_file()
                     state.artifacts.append(rescue_decision)
+                    get_state_snapshot(
+                        state, "claudes_choice_exit", state.thread_id, "Sub-Arbitrary"
+                    )
                     return state
             except Exception as e:
                 error_msg = f"Failed to read mock rescue decision: {e!s}"
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+            get_state_snapshot(
+                state, "claudes_choice_exit", state.thread_id, "Sub-Arbitrary"
+            )
             return state
         else:
             if (
@@ -676,6 +700,9 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
                 state.current_decision = current_decision
                 current_decision.save_file()
                 state.artifacts.append(current_decision)
+                get_state_snapshot(
+                    state, "claudes_choice_exit", state.thread_id, "Sub-Arbitrary"
+                )
                 return state
             elif isinstance(result, RescueDecisionArtifact):
                 # Override any LLM-generated values with correct ones
@@ -685,6 +712,9 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
                 state.current_decision = result
                 result.save_file()
                 state.artifacts.append(result)
+                get_state_snapshot(
+                    state, "claudes_choice_exit", state.thread_id, "Sub-Arbitrary"
+                )
                 return state
             else:
                 error_msg = f"Expected RescueDecisionArtifact, got {type(result)}"
@@ -734,6 +764,13 @@ can recover from this self-destructive spiral. Your sub-instance has been asked,
 
 The song proposal:
 {state.white_proposal}
+
+Your counter-proposal's 'rainbow_color' property must always be:
+{the_rainbow_table_colors['G']}
+
+Your counter-proposal's 'title' must be a vivid, descriptive phrase about extinction and loss (e.g. "The Last Migration", "Empty Fields at Dusk", "Witnesses to the Final Season") — never a date, timestamp, or generic placeholder.
+
+Your counter-proposal's 'iteration_id' must follow this exact format: green_<title_slug>_v1 where <title_slug> is the title lowercased with spaces and punctuation replaced by underscores, max 30 characters (e.g. "green_the_last_migration_v1").
 
 Some other examples from the archive in the 'green' category:
 {the_rainbow_table_colors['G']}
