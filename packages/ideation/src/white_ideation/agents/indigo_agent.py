@@ -869,7 +869,11 @@ Write ONLY the riddle (no answer, no explanation):
             concepts=state.concepts,
             usage_context=usage,
             bpm=state.white_proposal.bpm if state.white_proposal else 120,
-            key=state.white_proposal.key if state.white_proposal else None,
+            key=(
+                str(state.white_proposal.key)
+                if state.white_proposal and state.white_proposal.key
+                else None
+            ),
         )
         path = artifact.save_file()
         state.infranym_text = artifact
