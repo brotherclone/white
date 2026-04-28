@@ -31,6 +31,11 @@ class KeySignature(BaseModel):
     note: Note
     mode: Mode
 
+    def __str__(self) -> str:
+        _acc = {"sharp": "#", "flat": "b"}
+        acc = _acc.get(self.note.accidental or "", "")
+        return f"{self.note.pitch_name}{acc} {self.mode}"
+
     @model_validator(mode="before")
     @classmethod
     def parse_key_string(cls, data):

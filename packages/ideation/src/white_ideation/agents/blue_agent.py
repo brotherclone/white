@@ -739,12 +739,28 @@ The tape has been recorded over. What life exists on it now?
                 else:
                     bio_start_date = bio_period.start_date
                     bio_end_date = bio_period.end_date
-                if alt_period.start_date != bio_start_date:
+
+                def _year(d):
+                    if d is None:
+                        return None
+                    return d.year if hasattr(d, "year") else int(d)
+
+                alt_start_year = _year(alt_period.start_date)
+                alt_end_year = _year(alt_period.end_date)
+                bio_start_year = _year(bio_start_date)
+                bio_end_year = _year(bio_end_date)
+                if (
+                    None not in (alt_start_year, bio_start_year)
+                    and alt_start_year != bio_start_year
+                ):
                     issues.append(
                         f"Start date mismatch: alternate says {alt_period.start_date}, "
                         f"but biographical period is {bio_start_date}"
                     )
-                if alt_period.end_date != bio_end_date:
+                if (
+                    None not in (alt_end_year, bio_end_year)
+                    and alt_end_year != bio_end_year
+                ):
                     issues.append(
                         f"End date mismatch: alternate says {alt_period.end_date}, "
                         f"but biographical period is {bio_end_date}"
