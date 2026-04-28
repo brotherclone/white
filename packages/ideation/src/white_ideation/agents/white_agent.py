@@ -22,6 +22,7 @@ from langgraph.constants import START
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from pydantic import BaseModel, PrivateAttr
+
 from white_composition.shrinkwrap_chain_artifacts import shrinkwrap
 from white_core.agents.agent_settings import AgentSettings
 from white_core.concepts.white_facet_system import WhiteFacetSystem
@@ -32,7 +33,6 @@ from white_extraction.util.generate_negative_constraints import (
     format_for_prompt,
     generate_constraints,
 )
-
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.black_agent import BlackAgent
 from white_ideation.agents.blue_agent import BlueAgent
@@ -2667,6 +2667,12 @@ Structure your synthesis as the final creative brief before manifestation.
                 logger.info("✓ Meta-analysis saved")
 
             state.run_finished = True
+
+            sentinel = (
+                Path(self._artifact_base_path()) / state.thread_id / "run_success"
+            )
+            sentinel.touch()
+            logger.info(f"✓ run_success sentinel written to {sentinel}")
         except Exception as e:
             logger.error(f"Finalization failed: {e}", exc_info=True)
             raise

@@ -34,8 +34,14 @@ def make_thread(
     bpm: int = 120,
     key: str = "C major",
     iterations: int = 1,
+    complete: bool = True,
 ) -> Path:
-    """Create a minimal fake thread directory with song proposal YAML."""
+    """Create a minimal fake thread directory with song proposal YAML.
+
+    complete=True (default) writes a run_success sentinel so shrinkwrap
+    treats this thread as a finished run.  Pass complete=False to simulate
+    a crashed/incomplete thread.
+    """
     thread_dir = tmp_path / thread_id
     yml_dir = thread_dir / "yml"
     yml_dir.mkdir(parents=True)
@@ -63,6 +69,9 @@ def make_thread(
 
     with open(yml_dir / f"all_song_proposals_{thread_id}.yml", "w") as f:
         yaml.dump(proposal, f)
+
+    if complete:
+        (thread_dir / "run_success").touch()
 
     return thread_dir
 
@@ -949,3 +958,78 @@ class TestScaffoldSongProductions:
         assert (
             tmp_path / "production" / "song_b_v1" / "manifest_bootstrap.yml"
         ).exists()
+
+
+class TestShrinkwrapSentinel:
+    """Tests for run_success sentinel filtering in shrinkwrap()."""
+
+    def test_complete_thread_is_processed(self, tmp_path):
+        artifacts = tmp_path / "chain_artifacts"
+        make_thread(
+            artifacts,
+            "aaaaaaaa-1111-2222-3333-444444444444",
+            title="Good Song",
+            complete=True,
+        )
+
+        output = tmp_path / "out"
+        result = shrinkwrap(artifacts, output)
+
+        assert result["processed"] == 1
+        assert result["deleted"] == 0
+        assert (output / "white-good-song").is_dir()
+
+    def test_incomplete_thread_is_deleted(self, tmp_path):
+        artifacts = tmp_path / "chain_artifacts"
+        thread_dir = make_thread(
+            artifacts,
+            "bbbbbbbb-1111-2222-3333-444444444444",
+            title="Crashed Song",
+            complete=False,
+        )
+
+        output = tmp_path / "out"
+        result = shrinkwrap(artifacts, output)
+
+        assert result["processed"] == 0
+        assert result["deleted"] == 1
+        assert not thread_dir.exists()
+
+    def test_incomplete_thread_skipped_when_delete_disabled(self, tmp_path):
+        artifacts = tmp_path / "chain_artifacts"
+        thread_dir = make_thread(
+            artifacts,
+            "cccccccc-1111-2222-3333-444444444444",
+            title="Partial Song",
+            complete=False,
+        )
+
+        output = tmp_path / "out"
+        result = shrinkwrap(artifacts, output, delete_incomplete=False)
+
+        assert result["processed"] == 0
+        assert result["deleted"] == 0
+        assert thread_dir.exists()
+
+    def test_mixed_complete_and_incomplete(self, tmp_path):
+        artifacts = tmp_path / "chain_artifacts"
+        make_thread(
+            artifacts,
+            "aaaaaaaa-1111-2222-3333-444444444444",
+            title="Done",
+            complete=True,
+        )
+        incomplete = make_thread(
+            artifacts,
+            "bbbbbbbb-1111-2222-3333-444444444444",
+            title="Crashed",
+            complete=False,
+        )
+
+        output = tmp_path / "out"
+        result = shrinkwrap(artifacts, output)
+
+        assert result["processed"] == 1
+        assert result["deleted"] == 1
+        assert (output / "white-done").is_dir()
+        assert not incomplete.exists()

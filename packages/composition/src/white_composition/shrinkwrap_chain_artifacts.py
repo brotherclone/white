@@ -640,6 +640,7 @@ def shrinkwrap(
     archive: bool = False,
     thread_filter: Optional[str] = None,
     scaffold: bool = True,
+    delete_incomplete: bool = True,
 ) -> dict:
     """Shrink-wrap all (or one) thread(s) into the output directory.
 
@@ -649,13 +650,14 @@ def shrinkwrap(
         dry_run: Preview changes without writing.
         archive: Include debug files in .debug/ subdirectory.
         thread_filter: Process only this thread UUID.
+        delete_incomplete: Delete thread dirs that lack a run_success sentinel.
 
     Returns:
         Summary dict with counts and metadata list.
     """
     if not artifacts_dir.exists():
         logger.error(f"Artifacts directory not found: {artifacts_dir}")
-        return {"processed": 0, "skipped": 0, "failed": 0}
+        return {"processed": 0, "skipped": 0, "failed": 0, "deleted": 0}
 
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -668,6 +670,7 @@ def shrinkwrap(
     all_metadata = []
     processed = 0
     failed = 0
+    deleted = 0
 
     thread_dirs = sorted(artifacts_dir.iterdir())
     for thread_dir in thread_dirs:
@@ -676,6 +679,21 @@ def shrinkwrap(
         if not is_uuid(thread_dir.name):
             continue
         if thread_filter and thread_dir.name != thread_filter:
+            continue
+
+        # Skip (and optionally delete) threads that never completed successfully.
+        sentinel = thread_dir / "run_success"
+        if not sentinel.exists():
+            if dry_run:
+                print(f"  [incomplete] {thread_dir.name} — no run_success sentinel")
+            elif delete_incomplete:
+                logger.info(
+                    f"Deleting incomplete thread {thread_dir.name} (no run_success sentinel)"
+                )
+                shutil.rmtree(thread_dir)
+                deleted += 1
+            else:
+                logger.debug(f"Skipping incomplete thread {thread_dir.name}")
             continue
 
         # Skip if already in output
@@ -734,6 +752,7 @@ def shrinkwrap(
     return {
         "processed": processed,
         "failed": failed,
+        "deleted": deleted,
         "metadata": all_metadata,
     }
 
@@ -764,6 +783,11 @@ def main():
     )
     parser.add_argument("--thread", type=str, help="Process a single thread by UUID")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
+    parser.add_argument(
+        "--no-delete-incomplete",
+        action="store_true",
+        help="Skip deletion of incomplete (crashed/failed) thread directories",
+    )
     parser.add_argument(
         "--no-scaffold",
         action="store_true",
@@ -815,9 +839,13 @@ def main():
         archive=args.archive,
         thread_filter=args.thread,
         scaffold=not args.no_scaffold,
+        delete_incomplete=not args.no_delete_incomplete,
     )
 
-    print(f"\nDone: {result['processed']} processed, {result['failed']} failed")
+    print(
+        f"\nDone: {result['processed']} processed, {result['failed']} failed, "
+        f"{result.get('deleted', 0)} incomplete deleted"
+    )
 
 
 if __name__ == "__main__":
