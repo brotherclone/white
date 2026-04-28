@@ -11,11 +11,13 @@ from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
+
 from white_core.agents.agent_settings import AgentSettings
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )
+from white_core.artifacts.quantum_tape_label_artifact import QuantumTapeLabelArtifact
 from white_core.concepts.alternate_history_constraints import (
     AlternateHistoryConstraints,
 )
@@ -35,8 +37,10 @@ from white_core.concepts.timeline_breakage_checks import TimelineBreakageChecks
 from white_core.concepts.timeline_breakage_evaluation_results import (
     TimelineEvaluationResult,
 )
+from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.quantum_tape_emotional_tone import QuantumTapeEmotionalTone
 from white_core.enums.quantum_tape_lyrical_theme import QuantumTapeLyricalTheme
+from white_core.enums.quantum_tape_recording_quality import QuantumTapeRecordingQuality
 from white_core.manifests.song_proposal import SongProposalIteration
 from white_core.music.core.key_signature import KeySignature, Mode, ModeName
 from white_core.music.core.notes import Note
@@ -45,7 +49,6 @@ from white_extraction.util.manifest_loader import (
     get_sounds_like_by_color,
     sample_reference_artists,
 )
-
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.list_utils import pick_by_fraction
 from white_ideation.agents.states.blue_agent_state import BlueAgentState
@@ -156,6 +159,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
         work_flow.add_node(
             "extract_musical_parameters", self.extract_musical_parameters
         )
+        work_flow.add_node("generate_tape_label", self.generate_tape_label)
         work_flow.add_node(
             "generate_alternate_song_spec", self.generate_alternate_song_spec
         )
@@ -171,7 +175,8 @@ class BlueAgent(BaseRainbowAgent, ABC):
             },
         )
         work_flow.add_edge("generate_alternate_history", "extract_musical_parameters")
-        work_flow.add_edge("extract_musical_parameters", "generate_alternate_song_spec")
+        work_flow.add_edge("extract_musical_parameters", "generate_tape_label")
+        work_flow.add_edge("generate_tape_label", "generate_alternate_song_spec")
         work_flow.add_edge("generate_alternate_song_spec", END)
 
         return work_flow
@@ -1048,6 +1053,111 @@ The tape has been recorded over. What life exists on it now?
         get_state_snapshot(
             state,
             "extract_musical_parameters_exit",
+            state.thread_id,
+            "The Cassette Bearer",
+        )
+        return state
+
+    @agent_error_handler("The Cassette Bearer")
+    def generate_tape_label(self, state: BlueAgentState) -> BlueAgentState:
+        get_state_snapshot(
+            state, "generate_tape_label_enter", state.thread_id, "The Cassette Bearer"
+        )
+        mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
+        block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        if mock_mode:
+            try:
+                with open(
+                    f"{os.getenv('AGENT_MOCK_DATA_PATH')}/quantum_tape_label_mock.yml",
+                    "r",
+                ) as f:
+                    data = yaml.safe_load(f)
+                    data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    data["thread_id"] = state.thread_id
+                    data["chain_artifact_type"] = ChainArtifactType.QUANTUM_TAPE_LABEL
+                    label = QuantumTapeLabelArtifact(**data)
+                    label.save_file()
+                    state.artifacts.append(label)
+                    state.tape_label = label.title
+            except Exception as e:
+                error_msg = f"Failed to read mock tape label: {e!s}"
+                logger.error(error_msg)
+                if block_mode:
+                    raise Exception(error_msg)
+            get_state_snapshot(
+                state,
+                "generate_tape_label_exit",
+                state.thread_id,
+                "The Cassette Bearer",
+            )
+            return state
+
+        alternate = state.alternate_history
+        if alternate is None:
+            logger.error("alternate_history is None, cannot generate tape label")
+            get_state_snapshot(
+                state,
+                "generate_tape_label_exit",
+                state.thread_id,
+                "The Cassette Bearer",
+            )
+            return state
+
+        start = alternate.period.start_date
+        end = alternate.period.end_date
+        original_label = f"Gabe Walsh — {start.year}"
+        tapeover_date_str = f"{start.strftime('%b %Y')} – {end.strftime('%b %Y')}"
+        age_range = alternate.period.age_range
+        age_str = f"{age_range[0]}–{age_range[1]}"
+        location_str = getattr(alternate.period, "location", None) or "Unknown"
+        catalog_str = f"QT-B-{start.year}-{state.thread_id[:6].upper()}"
+        quality_map = {
+            QuantumTapeEmotionalTone.WISTFUL: QuantumTapeRecordingQuality.SP,
+            QuantumTapeEmotionalTone.MELANCHOLY: QuantumTapeRecordingQuality.LP,
+            QuantumTapeEmotionalTone.BITTERSWEET: QuantumTapeRecordingQuality.SP,
+            QuantumTapeEmotionalTone.NOSTALGIC: QuantumTapeRecordingQuality.EP,
+            QuantumTapeEmotionalTone.PEACEFUL: QuantumTapeRecordingQuality.LP,
+            QuantumTapeEmotionalTone.RESTLESS: QuantumTapeRecordingQuality.SP,
+        }
+        quality = quality_map.get(
+            alternate.emotional_tone, QuantumTapeRecordingQuality.SP
+        )
+        note = self._generate_a_cryptic_note(alternate)
+        base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+        try:
+            label = QuantumTapeLabelArtifact(
+                thread_id=state.thread_id,
+                base_path=base_path,
+                title=alternate.title,
+                date_range=f"{start} to {end}",
+                recording_quality=quality,
+                counter_start=random.randint(0, 9999),
+                counter_end=random.randint(1000, 9999),
+                notes=note,
+                original_label_visible=True,
+                original_label_text=original_label,
+                tape_degradation=random.uniform(0.1, 0.4),
+                year_documented=str(start.year),
+                original_date=str(start.year),
+                original_title=original_label,
+                tapeover_date=tapeover_date_str,
+                tapeover_title=alternate.title,
+                subject_name="Gabe Walsh",
+                age_during=age_str,
+                location=location_str,
+                catalog_number=catalog_str,
+            )
+            label.save_file()
+            state.artifacts.append(label)
+            state.tape_label = label.title
+        except Exception as e:
+            error_msg = f"Failed to generate tape label: {e!s}"
+            logger.error(error_msg)
+            if block_mode:
+                raise Exception(error_msg)
+        get_state_snapshot(
+            state,
+            "generate_tape_label_exit",
             state.thread_id,
             "The Cassette Bearer",
         )

@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from pydantic import Field
 
 from white_core.artifacts.base_artifact import ChainArtifact
+from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.quantum_tape_recording_quality import (
     QuantumTapeRecordingQuality,
 )
@@ -17,6 +18,8 @@ load_dotenv()
 
 class QuantumTapeLabelArtifact(ChainArtifact, ABC):
     """VHS/Cassette tape label metadata."""
+
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.QUANTUM_TAPE_LABEL
 
     title: str = Field(
         description="The title of the tape", examples=["Summer in Portland - 1998"]
