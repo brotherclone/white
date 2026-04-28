@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import yaml
+
 from white_composition.shrinkwrap_chain_artifacts import (
     clean_filename,
     copy_thread_files,
@@ -273,6 +274,92 @@ class TestParseThread:
             yaml.dump(proposal, f)
         result = parse_thread(thread_dir)
         assert result is None
+
+    def test_string_rainbow_color(self, tmp_path):
+        thread_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        thread_dir = tmp_path / thread_id
+        yml_dir = thread_dir / "yml"
+        yml_dir.mkdir(parents=True)
+        proposal = {
+            "iterations": [
+                {
+                    "title": "Flat Color Song",
+                    "bpm": 95,
+                    "key": "D minor",
+                    "rainbow_color": "White",
+                    "concept": "plain string color",
+                    "mood": [],
+                    "genres": [],
+                    "agent_name": "W",
+                }
+            ]
+        }
+        with open(yml_dir / f"all_song_proposals_{thread_id}.yml", "w") as f:
+            yaml.dump(proposal, f)
+        result = parse_thread(thread_dir)
+        assert result is not None
+        assert result["rainbow_color"] == "White"
+        assert result["mnemonic"] == "?"
+
+    def test_keysig_dict_key(self, tmp_path):
+        # KeySignature.model_dump(mode="json") shape stored in proposals
+        thread_id = "bbbbbbbb-cccc-dddd-eeee-ffffffffffff"
+        thread_dir = tmp_path / thread_id
+        yml_dir = thread_dir / "yml"
+        yml_dir.mkdir(parents=True)
+        proposal = {
+            "iterations": [
+                {
+                    "title": "Dict Key Song",
+                    "bpm": 110,
+                    "key": {
+                        "note": {"pitch_name": "F", "accidental": "sharp"},
+                        "mode": {"name": "minor", "intervals": [2, 1, 2, 2, 1, 2, 2]},
+                    },
+                    "rainbow_color": {
+                        "color_name": "Blue",
+                        "mnemonic_character_value": "B",
+                    },
+                    "concept": "test",
+                    "mood": [],
+                    "genres": [],
+                    "agent_name": "B",
+                }
+            ]
+        }
+        with open(yml_dir / f"all_song_proposals_{thread_id}.yml", "w") as f:
+            yaml.dump(proposal, f)
+        result = parse_thread(thread_dir)
+        assert result is not None
+        assert result["key"] == "F# minor"
+
+    def test_missing_key_fields_returns_unknown(self, tmp_path):
+        thread_id = "cccccccc-dddd-eeee-ffff-aaaaaaaaaaaa"
+        thread_dir = tmp_path / thread_id
+        yml_dir = thread_dir / "yml"
+        yml_dir.mkdir(parents=True)
+        proposal = {
+            "iterations": [
+                {
+                    "title": "No Key Song",
+                    "bpm": 100,
+                    "key": {},
+                    "rainbow_color": {
+                        "color_name": "Red",
+                        "mnemonic_character_value": "R",
+                    },
+                    "concept": "test",
+                    "mood": [],
+                    "genres": [],
+                    "agent_name": "R",
+                }
+            ]
+        }
+        with open(yml_dir / f"all_song_proposals_{thread_id}.yml", "w") as f:
+            yaml.dump(proposal, f)
+        result = parse_thread(thread_dir)
+        assert result is not None
+        assert result["key"] == "unknown"
 
 
 class TestGenerateDirectoryName:

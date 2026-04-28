@@ -181,6 +181,31 @@ def is_evp_intermediate(filename: str) -> bool:
     return False
 
 
+_ACCIDENTAL_MAP = {"sharp": "#", "flat": "b"}
+
+
+def _flatten_key_dict(d: dict) -> str:
+    """Flatten a KeySignature dict to a 'tonic mode' string.
+
+    Supports two shapes:
+      - KeySignature.model_dump(mode="json"):
+          {"note": {"pitch_name": "F", "accidental": "sharp"}, "mode": {"name": "minor"}}
+      - Legacy flat shape: {"tonic": "F#", "mode": "minor"}
+    """
+    if "note" in d:
+        note = d.get("note") or {}
+        pitch = note.get("pitch_name", "") if isinstance(note, dict) else ""
+        acc = note.get("accidental", "") if isinstance(note, dict) else ""
+        tonic = f"{pitch}{_ACCIDENTAL_MAP.get(acc, '')}" if pitch else ""
+    else:
+        tonic = d.get("tonic", "")
+
+    mode_val = d.get("mode", "")
+    mode_str = mode_val.get("name", "") if isinstance(mode_val, dict) else str(mode_val)
+
+    return f"{tonic} {mode_str}".strip() if tonic else "unknown"
+
+
 def parse_thread(thread_dir: Path) -> Optional[dict]:
     """Parse a thread directory and extract the final song proposal metadata.
 
@@ -222,11 +247,9 @@ def parse_thread(thread_dir: Path) -> Optional[dict]:
 
     raw_key = final.get("key")
     if isinstance(raw_key, dict):
-        tonic = raw_key.get("tonic", "")
-        mode = raw_key.get("mode", "")
-        key_str = f"{tonic} {mode}".strip() if tonic else None
+        key_str = _flatten_key_dict(raw_key)
     else:
-        key_str = raw_key
+        key_str = str(raw_key) if raw_key else "unknown"
 
     return {
         "thread_id": thread_id,
