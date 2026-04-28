@@ -213,17 +213,30 @@ def parse_thread(thread_dir: Path) -> Optional[dict]:
     final = iterations[-1]
 
     rainbow_color = final.get("rainbow_color", {})
-    color_name = rainbow_color.get("color_name", "unknown")
+    if isinstance(rainbow_color, dict):
+        color_name = rainbow_color.get("color_name", "unknown")
+        mnemonic = rainbow_color.get("mnemonic_character_value", "?")
+    else:
+        color_name = str(rainbow_color) if rainbow_color else "unknown"
+        mnemonic = "?"
+
+    raw_key = final.get("key")
+    if isinstance(raw_key, dict):
+        tonic = raw_key.get("tonic", "")
+        mode = raw_key.get("mode", "")
+        key_str = f"{tonic} {mode}".strip() if tonic else None
+    else:
+        key_str = raw_key
 
     return {
         "thread_id": thread_id,
         "title": final.get("title", "untitled"),
         "bpm": final.get("bpm"),
-        "key": final.get("key"),
+        "key": key_str,
         "tempo": final.get("tempo"),
         "concept": final.get("concept", ""),
         "rainbow_color": color_name,
-        "mnemonic": rainbow_color.get("mnemonic_character_value", "?"),
+        "mnemonic": mnemonic,
         "mood": final.get("mood", []),
         "genres": final.get("genres", []),
         "agent_name": final.get("agent_name", ""),

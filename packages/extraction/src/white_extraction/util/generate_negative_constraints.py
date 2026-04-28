@@ -79,7 +79,7 @@ DIALOGUE_OPENER_PHRASES = [
 DIALOGUE_OPENER_THRESHOLD = 0.30
 
 
-def normalize_key(raw_key: str) -> str:
+def normalize_key(raw_key) -> str:
     """Normalize key strings to standard form.
 
     Handles cases like:
@@ -87,9 +87,15 @@ def normalize_key(raw_key: str) -> str:
         "C hromatic Complete" -> "C major"  (known typo/variant)
         "A ll Keys (Chromatic Convergence)" -> "All Keys"
         "F# minor" -> "F# minor"
+        {"tonic": "F#", "mode": "minor"} -> "F# minor"  (KeySignature dict)
     """
     if not raw_key:
         return "unknown"
+
+    if isinstance(raw_key, dict):
+        tonic = raw_key.get("tonic", "")
+        mode = raw_key.get("mode", "")
+        raw_key = f"{tonic} {mode}".strip() if tonic else "unknown"
 
     text = raw_key.strip()
 
