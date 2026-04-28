@@ -645,19 +645,22 @@ def shrinkwrap(
     """Shrink-wrap all (or one) thread(s) into the output directory.
 
     Args:
-        artifacts_dir: Source chain_artifacts/ directory (not modified).
+        artifacts_dir: Source chain_artifacts/ directory. When delete_incomplete
+            is True, incomplete thread directories are deleted from this directory.
         output_dir: Destination directory for clean output.
         dry_run: Preview changes without writing.
         archive: Include debug files in .debug/ subdirectory.
         thread_filter: Process only this thread UUID.
-        delete_incomplete: Delete thread dirs that lack a run_success sentinel.
+        delete_incomplete: Delete thread dirs that lack a run_success sentinel
+            AND are unparseable. Legacy threads without a sentinel but with valid
+            proposals are processed normally.
 
     Returns:
         Summary dict with counts and metadata list.
     """
     if not artifacts_dir.exists():
         logger.error(f"Artifacts directory not found: {artifacts_dir}")
-        return {"processed": 0, "skipped": 0, "failed": 0, "deleted": 0}
+        return {"processed": 0, "failed": 0, "deleted": 0, "metadata": []}
 
     if not dry_run:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -681,23 +684,43 @@ def shrinkwrap(
         if thread_filter and thread_dir.name != thread_filter:
             continue
 
-        # Skip (and optionally delete) threads that never completed successfully.
+        # Threads without a run_success sentinel are either incomplete/crashed or
+        # legacy (pre-sentinel).  Parse first: a parseable thread is legacy and
+        # processed normally; an unparseable one is treated as incomplete.
         sentinel = thread_dir / "run_success"
+        metadata_check = None
         if not sentinel.exists():
-            if dry_run:
-                print(f"  [incomplete] {thread_dir.name} — no run_success sentinel")
-            elif delete_incomplete:
+            metadata_check = parse_thread(thread_dir)
+            if metadata_check:
                 logger.info(
-                    f"Deleting incomplete thread {thread_dir.name} (no run_success sentinel)"
+                    f"Processing legacy thread {thread_dir.name} (no run_success sentinel)"
                 )
-                shutil.rmtree(thread_dir)
-                deleted += 1
             else:
-                logger.debug(f"Skipping incomplete thread {thread_dir.name}")
-            continue
+                if dry_run:
+                    print(
+                        f"  [incomplete] {thread_dir.name} — no run_success sentinel and unparseable"
+                    )
+                elif delete_incomplete:
+                    logger.info(
+                        f"Deleting incomplete thread {thread_dir.name} "
+                        f"(no run_success sentinel and unparseable)"
+                    )
+                    try:
+                        shutil.rmtree(thread_dir)
+                        deleted += 1
+                    except OSError:
+                        logger.warning(
+                            f"Failed to delete incomplete thread {thread_dir.name}",
+                            exc_info=True,
+                        )
+                        failed += 1
+                else:
+                    logger.debug(f"Skipping incomplete thread {thread_dir.name}")
+                continue
 
         # Skip if already in output
-        metadata_check = parse_thread(thread_dir)
+        if metadata_check is None:
+            metadata_check = parse_thread(thread_dir)
         if metadata_check:
             candidate_name = generate_directory_name(metadata_check, set())
             if candidate_name in existing_names and not dry_run:

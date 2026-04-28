@@ -2671,8 +2671,15 @@ Structure your synthesis as the final creative brief before manifestation.
             sentinel = (
                 Path(self._artifact_base_path()) / state.thread_id / "run_success"
             )
-            sentinel.touch()
-            logger.info(f"✓ run_success sentinel written to {sentinel}")
+            try:
+                sentinel.parent.mkdir(parents=True, exist_ok=True)
+                sentinel.touch()
+                logger.info(f"✓ run_success sentinel written to {sentinel}")
+            except Exception as sentinel_error:
+                logger.error(
+                    f"Failed to write run_success sentinel to {sentinel}: {sentinel_error}",
+                    exc_info=True,
+                )
         except Exception as e:
             logger.error(f"Finalization failed: {e}", exc_info=True)
             raise
