@@ -21,10 +21,24 @@ if TYPE_CHECKING:
 
 load_dotenv()
 
-PULSAR_PALACE_IMAGE_BASE_PATH = os.getenv(
-    "PULSAR_PALACE_IMAGE_BASE_PATH",
-    "packages/ideation/src/white_ideation/reference/gaming/img",
-)
+
+def _default_pulsar_palace_image_path() -> str:
+    configured = os.getenv("PULSAR_PALACE_IMAGE_BASE_PATH")
+    if configured:
+        return configured
+    return str(
+        Path(__file__).resolve().parents[5]
+        / "packages"
+        / "ideation"
+        / "src"
+        / "white_ideation"
+        / "reference"
+        / "gaming"
+        / "img"
+    )
+
+
+PULSAR_PALACE_IMAGE_BASE_PATH = _default_pulsar_palace_image_path()
 
 PULSAR_PALACE_BACKGROUNDS = [
     {
