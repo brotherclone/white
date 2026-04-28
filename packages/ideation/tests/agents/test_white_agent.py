@@ -446,5 +446,23 @@ def test_save_all_proposals_single_iteration_implicit_final(
     assert "solo_v1" in standalone[0].name
 
 
+def test_finalize_writes_run_success_sentinel(monkeypatch, tmp_path, white_agent):
+    """finalize_song_proposal should write a run_success sentinel file."""
+    monkeypatch.setenv("MOCK_MODE", "true")
+    monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
+
+    with patch("white_ideation.agents.white_agent.WhiteAgent.save_all_proposals"):
+        state = MainAgentState(
+            thread_id="sentinel_test_thread",
+            song_proposals=SongProposal(iterations=[]),
+        )
+        white_agent.finalize_song_proposal(state)
+
+    sentinel = tmp_path / "sentinel_test_thread" / "run_success"
+    assert (
+        sentinel.exists()
+    ), "run_success sentinel should be written after successful finalization"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
