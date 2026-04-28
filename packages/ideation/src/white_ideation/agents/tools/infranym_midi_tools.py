@@ -3,7 +3,6 @@ import random
 from typing import List
 
 from white_core.artifacts.infranym_midi_artifact import InfranymMidiArtifact
-
 from white_ideation.agents.tools.encodings.morse_duration_encoding import (
     MorseDurationEncoding,
 )

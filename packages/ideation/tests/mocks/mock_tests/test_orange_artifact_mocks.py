@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import yaml
+
 from white_core.artifacts.newspaper_artifact import NewspaperArtifact
 
 

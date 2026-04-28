@@ -5,6 +5,7 @@ import os
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
+
 from white_core.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )

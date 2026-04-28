@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import polars as pl
+
 from white_ideation.reference.mcp.rows_bud.orange_corpus import OrangeMythosCorpus
 
 TEST_STORY = {

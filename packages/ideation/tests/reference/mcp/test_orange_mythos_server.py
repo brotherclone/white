@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import polars as pl
 import pytest
+
 from white_ideation.reference.mcp.rows_bud import orange_mythos_server as server
 
 

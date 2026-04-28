@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from scipy import signal
 from scipy.fft import fft, fftfreq, ifft
 from scipy.signal import resample_poly
+
 from white_core.artifacts.audio_artifact_file import AudioChainArtifactFile
 from white_core.concepts.rainbow_table_color import (
     the_rainbow_table_colors,

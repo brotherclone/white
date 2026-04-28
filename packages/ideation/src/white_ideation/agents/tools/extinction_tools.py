@@ -3,6 +3,7 @@ import os
 import random
 
 from dotenv import load_dotenv
+
 from white_core.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )

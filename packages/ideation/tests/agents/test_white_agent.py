@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from white_core.agents.agent_settings import AgentSettings
 from white_core.enums.white_facet import WhiteFacet
 from white_core.manifests.song_proposal import SongProposal, SongProposalIteration

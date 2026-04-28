@@ -2,6 +2,7 @@ from abc import ABC
 from types import SimpleNamespace
 
 import pytest
+
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent, skip_chance
 from white_core.artifacts.base_artifact import ChainArtifact
 

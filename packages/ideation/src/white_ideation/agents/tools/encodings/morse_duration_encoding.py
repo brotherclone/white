@@ -1,9 +1,9 @@
 import logging
 
 from pydantic import Field
+
 from white_core.concepts.infranym_midi_encoding import InfranymMidiEncoding
 from white_core.enums.infranym_method import InfranymMethod
-
 from white_ideation.reference.encodings.morse_code import MORSE_CODE
 
 logger = logging.getLogger(__name__)

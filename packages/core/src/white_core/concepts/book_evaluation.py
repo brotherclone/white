@@ -17,7 +17,7 @@ class BookEvaluationDecision(BaseModel):
         raise ValueError("Boolean value required")
 
     @model_validator(mode="after")
-    def at_least_one_decision(cls, model):
-        if not (model.new_book or model.reaction_book or model.done):
+    def at_least_one_decision(self):
+        if not (self.new_book or self.reaction_book or self.done):
             raise ValueError("At least one decision must be made")
-        return model
+        return self

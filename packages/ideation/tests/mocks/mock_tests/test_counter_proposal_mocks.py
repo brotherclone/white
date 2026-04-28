@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 from hypothesis import given
 from hypothesis import strategies as st
+
 from white_core.manifests.song_proposal import SongProposalIteration
 
 MOCK_DIR = Path(os.getenv("AGENT_MOCK_DATA_PATH", "tests/mocks"))

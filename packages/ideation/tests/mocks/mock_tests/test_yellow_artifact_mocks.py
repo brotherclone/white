@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import yaml
+
 from white_core.artifacts.pulsar_palace_character_sheet import (
     PulsarPalaceCharacterSheet,
 )

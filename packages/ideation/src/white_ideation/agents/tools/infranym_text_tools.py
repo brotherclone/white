@@ -1,8 +1,8 @@
 from typing import List
 
-from white_ideation.agents.tools.encodings.acrostic_encoding import AcrosticEncoding
-from white_ideation.agents.tools.encodings.anagram_encodings import AnagramEncoding
-from white_ideation.agents.tools.encodings.riddle_encoding import RiddleEncoding
+from white_core.util.encodings.acrostic_encoding import AcrosticEncoding
+from white_core.util.encodings.anagram_encodings import AnagramEncoding
+from white_core.util.encodings.riddle_encoding import RiddleEncoding
 
 
 def create_acrostic_encoding(

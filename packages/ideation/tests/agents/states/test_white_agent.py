@@ -1,4 +1,5 @@
 import pytest
+
 from white_core.artifacts.artifact_relationship import ArtifactRelationship
 from white_core.concepts.facet_evolution import FacetEvolution
 from white_core.concepts.transformation_trace import TransformationTrace

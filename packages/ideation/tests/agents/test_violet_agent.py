@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from white_core.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
 )

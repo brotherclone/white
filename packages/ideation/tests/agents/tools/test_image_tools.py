@@ -3,6 +3,7 @@ from typing import Any, Iterable, cast
 
 import pytest
 from PIL import Image
+
 from white_ideation.agents.tools.image_tools import (
     composite_character_portrait,
     composite_images,

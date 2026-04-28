@@ -169,7 +169,7 @@ class CharacterActionGenerator:
         ]
 
     def generate_action(self, character: PulsarPalaceCharacter) -> str:
-        """Generate a wild action based on character's traits"""
+        """Generate a wild action based on a character's traits"""
 
         disposition = character.disposition.disposition
         profession = character.profession.profession
