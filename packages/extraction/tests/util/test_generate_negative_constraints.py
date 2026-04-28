@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import yaml
+
 from white_extraction.util.generate_negative_constraints import (
     analyze_bpm,
     analyze_concepts,
@@ -72,6 +73,35 @@ class TestNormalizeKey:
 
     def test_empty(self):
         assert normalize_key("") == "unknown"
+
+    def test_keysig_dict_sharp(self):
+        # KeySignature.model_dump(mode="json") shape
+        d = {
+            "note": {"pitch_name": "F", "accidental": "sharp"},
+            "mode": {"name": "minor", "intervals": [2, 1, 2, 2, 1, 2, 2]},
+        }
+        assert normalize_key(d) == "F# minor"
+
+    def test_keysig_dict_no_accidental(self):
+        d = {
+            "note": {"pitch_name": "C", "accidental": None},
+            "mode": {"name": "major", "intervals": [2, 2, 1, 2, 2, 2, 1]},
+        }
+        assert normalize_key(d) == "C major"
+
+    def test_keysig_dict_flat(self):
+        d = {
+            "note": {"pitch_name": "B", "accidental": "flat"},
+            "mode": {"name": "minor", "intervals": [2, 1, 2, 2, 1, 2, 2]},
+        }
+        assert normalize_key(d) == "Bb minor"
+
+    def test_legacy_flat_dict(self):
+        # Legacy {tonic, mode} shape
+        assert normalize_key({"tonic": "F#", "mode": "minor"}) == "F# minor"
+
+    def test_empty_dict_returns_unknown(self):
+        assert normalize_key({}) == "unknown"
 
 
 class TestAnalyzeKeys:

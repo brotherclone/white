@@ -78,8 +78,32 @@ DIALOGUE_OPENER_PHRASES = [
 # Threshold: flag a dialogue opener if it appears in more than this fraction of responses
 DIALOGUE_OPENER_THRESHOLD = 0.30
 
+_ACCIDENTAL_MAP = {"sharp": "#", "flat": "b"}
 
-def normalize_key(raw_key: str) -> str:
+
+def _flatten_key_dict(d: dict) -> str:
+    """Flatten a KeySignature dict to a 'tonic mode' string.
+
+    Supports two shapes:
+      - KeySignature.model_dump(mode="json"):
+          {"note": {"pitch_name": "F", "accidental": "sharp"}, "mode": {"name": "minor"}}
+      - Legacy flat shape: {"tonic": "F#", "mode": "minor"}
+    """
+    if "note" in d:
+        note = d.get("note") or {}
+        pitch = note.get("pitch_name", "") if isinstance(note, dict) else ""
+        acc = note.get("accidental", "") if isinstance(note, dict) else ""
+        tonic = f"{pitch}{_ACCIDENTAL_MAP.get(acc, '')}" if pitch else ""
+    else:
+        tonic = d.get("tonic", "")
+
+    mode_val = d.get("mode", "")
+    mode_str = mode_val.get("name", "") if isinstance(mode_val, dict) else str(mode_val)
+
+    return f"{tonic} {mode_str}".strip() if tonic else "unknown"
+
+
+def normalize_key(raw_key: "str | dict") -> str:
     """Normalize key strings to standard form.
 
     Handles cases like:
@@ -87,9 +111,15 @@ def normalize_key(raw_key: str) -> str:
         "C hromatic Complete" -> "C major"  (known typo/variant)
         "A ll Keys (Chromatic Convergence)" -> "All Keys"
         "F# minor" -> "F# minor"
+        {"note": {"pitch_name": "F", "accidental": "sharp"}, "mode": {"name": "minor"}}
+            -> "F# minor"  (KeySignature.model_dump(mode="json") shape)
+        {"tonic": "F#", "mode": "minor"} -> "F# minor"  (legacy flat shape)
     """
     if not raw_key:
         return "unknown"
+
+    if isinstance(raw_key, dict):
+        raw_key = _flatten_key_dict(raw_key)
 
     text = raw_key.strip()
 
