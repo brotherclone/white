@@ -480,7 +480,11 @@ Respond with ONLY the surface name (proper capitalization, with spaces).
         medium = state.infranym_medium
         secret = state.secret_name
         bpm = state.white_proposal.bpm if state.white_proposal else 120
-        key = state.white_proposal.key if state.white_proposal else None
+        key = (
+            str(state.white_proposal.key)
+            if state.white_proposal and state.white_proposal.key
+            else None
+        )
 
         if medium is None:
             logger.error("infranym_medium is None, cannot implement infranym")
@@ -907,7 +911,7 @@ You are Decider Tangents, the Indigo Agent, creating a counter-proposal.
 **Previous Proposal:**
 Title: {previous_iteration.title}
 Concept: {previous_iteration.concept}
-Key: {previous_iteration.key}
+Key: {str(previous_iteration.key) if previous_iteration.key else 'unknown'}
 BPM: {previous_iteration.bpm}
 
 **Your Infranym System:**
