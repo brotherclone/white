@@ -990,7 +990,7 @@ Concept: [full concept explanation]
                 state.counter_proposal = SongProposalIteration(
                     iteration_id=f"indigo_{surface_slug}_v1",
                     rainbow_color="indigo",
-                    title=state.surface_name,
+                    title=state.surface_name or surface_slug.replace("_", " ").title(),
                     key=previous_iteration.key,
                     bpm=previous_iteration.bpm,
                     tempo=previous_iteration.tempo,

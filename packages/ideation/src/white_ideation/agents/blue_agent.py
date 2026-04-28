@@ -37,6 +37,7 @@ from white_core.concepts.timeline_breakage_checks import TimelineBreakageChecks
 from white_core.concepts.timeline_breakage_evaluation_results import (
     TimelineEvaluationResult,
 )
+from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.quantum_tape_emotional_tone import QuantumTapeEmotionalTone
 from white_core.enums.quantum_tape_lyrical_theme import QuantumTapeLyricalTheme
 from white_core.enums.quantum_tape_recording_quality import QuantumTapeRecordingQuality
@@ -1073,6 +1074,7 @@ The tape has been recorded over. What life exists on it now?
                     data = yaml.safe_load(f)
                     data["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                     data["thread_id"] = state.thread_id
+                    data["chain_artifact_type"] = ChainArtifactType.QUANTUM_TAPE_LABEL
                     label = QuantumTapeLabelArtifact(**data)
                     label.save_file()
                     state.artifacts.append(label)
