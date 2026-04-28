@@ -21,14 +21,12 @@ class GreenCorpusEntry(BaseModel):
     musical_hints: Dict[str, str] = Field(
         default_factory=dict, description="Suggested musical mappings"
     )
-
-    # Corpus management
     created_date: datetime = Field(default_factory=datetime.now)
     source_notes: str = Field(default="", description="Research sources")
 
     def to_artifact_dict(self) -> Dict:
         return {
-            "species": self.species.to_artifact_dict(),
+            "species": self.species.flatten(),
             "suggested_parallels": self.suggested_human_parallels,
             "musical_hints": self.musical_hints,
             "source_notes": self.source_notes,

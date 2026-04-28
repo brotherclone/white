@@ -11,18 +11,26 @@ from white_core.concepts.biographical_timeline_summary import (
 class BiographicalTimeline(BaseModel):
     """Complete biographical timeline."""
 
-    periods: List[BiographicalPeriod]
-
-    # Computed properties
-    total_span_years: Optional[int] = None
-    high_detail_periods: List[BiographicalPeriod] = Field(default_factory=list)
-    low_detail_periods: List[BiographicalPeriod] = Field(default_factory=list)
-    forgotten_periods: List[BiographicalPeriod] = Field(default_factory=list)
+    periods: List[BiographicalPeriod] = Field(
+        description="All periods in chronological order"
+    )
+    total_span_years: Optional[int] = Field(
+        default=None, description="Total years covered by the timeline"
+    )
+    high_detail_periods: List[BiographicalPeriod] = Field(
+        default_factory=list, description="Periods with high detail level"
+    )
+    low_detail_periods: List[BiographicalPeriod] = Field(
+        default_factory=list, description="Periods with low detail level"
+    )
+    forgotten_periods: List[BiographicalPeriod] = Field(
+        default_factory=list, description="Periods that are suitable for taping over"
+    )
 
     def get_surrounding_periods(
         self, target: BiographicalPeriod
     ) -> Dict[str, Optional[BiographicalPeriod]]:
-        """Get periods immediately before and after target."""
+        """Get periods immediately before and after the target."""
         idx = self.periods.index(target)
         return {
             "preceding": self.periods[idx - 1] if idx > 0 else None,
@@ -39,8 +47,18 @@ class BiographicalTimeline(BaseModel):
 class BiographicalTimelineLoadResult(BaseModel):
     """Result of loading biographical timeline."""
 
-    full_timeline: BiographicalTimeline
-    forgotten_periods: List[BiographicalPeriod]
-    high_detail_periods: List[BiographicalPeriod]
-    low_detail_periods: List[BiographicalPeriod]
-    summary: BiographicalTimelineSummary
+    full_timeline: BiographicalTimeline = Field(
+        description="The complete biographical timeline"
+    )
+    forgotten_periods: List[BiographicalPeriod] = Field(
+        description="Periods suitable for taping over"
+    )
+    high_detail_periods: List[BiographicalPeriod] = Field(
+        description="Periods with high detail level"
+    )
+    low_detail_periods: List[BiographicalPeriod] = Field(
+        description="Periods with low detail level"
+    )
+    summary: BiographicalTimelineSummary = Field(
+        description="Summary statistics for the timeline"
+    )

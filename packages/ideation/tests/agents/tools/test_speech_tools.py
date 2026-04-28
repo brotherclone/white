@@ -1,6 +1,7 @@
 import os
 
 import pytest
+
 from white_ideation.agents.tools.speech_tools import (
     evp_speech_to_text,
     transcription_from_speech_to_text,

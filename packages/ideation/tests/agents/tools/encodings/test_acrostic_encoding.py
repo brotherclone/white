@@ -1,7 +1,8 @@
 """Tests for AcrosticEncoding — first-letter acrostic validation."""
 
 import pytest
-from white_ideation.agents.tools.encodings.acrostic_encoding import AcrosticEncoding
+
+from white_core.util.encodings.acrostic_encoding import AcrosticEncoding
 
 
 def _make(secret, lines, surface_text="placeholder surface text"):

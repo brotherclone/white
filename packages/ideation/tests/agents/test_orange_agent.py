@@ -7,6 +7,7 @@ These tests use proper mocking of the OrangeAgent instance.
 from unittest.mock import MagicMock, patch
 
 import yaml
+
 from white_core.artifacts.newspaper_artifact import NewspaperArtifact
 from white_core.artifacts.symbolic_object_artifact import SymbolicObjectArtifact
 from white_core.manifests.song_proposal import SongProposalIteration

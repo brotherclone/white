@@ -21,7 +21,7 @@ class LastHumanSpeciesExtinctionParallelMoment(BaseModel):
 if __name__ == "__main__":
     with open(
         os.path.join(
-            os.getenv("AGENT_MOCK_DATA_PATH"),
+            os.getenv("AGENT_MOCK_DATA_PATH", ""),
             "last_human_parallel_moment_mock.yml",
         ),
         "r",

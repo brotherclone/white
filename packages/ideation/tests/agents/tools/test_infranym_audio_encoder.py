@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, mock_open, patch
 import numpy as np
 import pytest
 from pydub import AudioSegment
+
 from white_core.artifacts.infranym_voice_composition import InfranymVoiceComposition
 from white_core.artifacts.infranym_voice_layer import InfranymVoiceLayer
 from white_core.enums.infranym_voice_profile import InfranymVoiceProfile

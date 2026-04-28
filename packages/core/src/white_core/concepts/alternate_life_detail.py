@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AlternateLifeDetail(BaseModel):
@@ -8,6 +8,8 @@ class AlternateLifeDetail(BaseModel):
 
     category: Literal[
         "career", "relationship", "location", "creative", "daily_routine", "outcome"
-    ]
-    detail: str
-    sensory_elements: Optional[List[str]] = None  # Sights, sounds, textures
+    ] = Field(description="Category of the alternate life detail")
+    detail: str = Field(description="Specific concrete detail from alternate history")
+    sensory_elements: Optional[List[str]] = Field(
+        default=None, description="Sights, sounds, textures associated with this detail"
+    )

@@ -14,26 +14,52 @@ class BiographicalPeriod(BaseModel):
 
     model_config = {"arbitrary_types_allowed": True}
 
-    start_date: datetime.date
-    end_date: datetime.date
-    age_range: tuple[int, int]
-
-    # Content
-    description: str
-    known_events: List[BiographicalEvent] = Field(default_factory=list)
-    detail_level: BiographicalTimelineDetailLevel = Field(
-        default=BiographicalTimelineDetailLevel.MEDIUM
+    start_date: datetime.date = Field(
+        description="Start date of the period", examples=["1997-09-01"]
     )
-
-    # Context
-    location: Optional[str] = None
-    primary_activity: Optional[str] = None  # "college", "working at X", "traveling"
-    key_relationships: List[str] = Field(default_factory=list)
-    creative_output: List[str] = Field(default_factory=list)
-
-    # Metadata
-    emotional_tone: Optional[str] = None
-    trauma_level: Optional[Literal["none", "low", "medium", "high"]] = None
+    end_date: datetime.date = Field(
+        description="End date of the period", examples=["1999-06-30"]
+    )
+    age_range: tuple[int, int] = Field(
+        description="Subject's age at start and end of period", examples=[(21, 23)]
+    )
+    description: str = Field(
+        description="Narrative description of the period",
+        examples=["College years in Portland"],
+    )
+    known_events: List[BiographicalEvent] = Field(
+        default_factory=list, description="Documented events within this period"
+    )
+    detail_level: BiographicalTimelineDetailLevel = Field(
+        default=BiographicalTimelineDetailLevel.MEDIUM,
+        description="How much is known about this period",
+    )
+    location: Optional[str] = Field(
+        default=None,
+        description="Primary geographic location",
+        examples=["Portland, OR"],
+    )
+    primary_activity: Optional[str] = Field(
+        default=None,
+        description="Main occupation or activity",
+        examples=["college", "working at X", "traveling"],
+    )
+    key_relationships: List[str] = Field(
+        default_factory=list, description="Significant people during this period"
+    )
+    creative_output: List[str] = Field(
+        default_factory=list, description="Creative works produced during this period"
+    )
+    emotional_tone: Optional[str] = Field(
+        default=None,
+        description="Overall emotional character of the period",
+        examples=["restless", "melancholic", "hopeful"],
+    )
+    trauma_level: Optional[Literal["none", "low", "medium", "high"]] = Field(
+        default=None,
+        description="Degree of traumatic content in this period",
+        examples=["low"],
+    )
 
     @computed_field
     @property
@@ -61,8 +87,17 @@ class BiographicalPeriod(BaseModel):
 class PeriodSelectionResult(BaseModel):
     """Result of selecting a forgotten period."""
 
-    period: BiographicalPeriod
-    duration_months: int
-    actual_known_details: List[BiographicalEvent]
-    adjacent_context: Dict[str, Optional[BiographicalPeriod]]
-    selection_reason: str
+    period: BiographicalPeriod = Field(description="The selected biographical period")
+    duration_months: int = Field(
+        description="Duration of the period in months", examples=[18]
+    )
+    actual_known_details: List[BiographicalEvent] = Field(
+        description="Known events within the selected period"
+    )
+    adjacent_context: Dict[str, Optional[BiographicalPeriod]] = Field(
+        description="Periods immediately before and after the selection"
+    )
+    selection_reason: str = Field(
+        description="Why this period was chosen for taping over",
+        examples=["Low detail, minimal trauma, sufficient duration"],
+    )

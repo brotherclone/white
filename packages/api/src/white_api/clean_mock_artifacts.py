@@ -109,7 +109,6 @@ def main(argv: List[str] | None = None) -> int:
 
     if not base_dir.exists():
         return 0  # dir absent is fine (clean checkout / different machine)
-        return 1
 
     candidates = find_mock_dirs(base_dir)
     if not candidates:

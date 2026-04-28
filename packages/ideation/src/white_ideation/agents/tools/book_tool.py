@@ -2,12 +2,12 @@ import random
 from typing import Any, Optional
 
 from pydantic import BaseModel
+
 from white_core.artifacts.book_artifact import BookArtifact
 from white_core.enums.book_condition import BookCondition
 from white_core.enums.book_genre import BookGenre
 from white_core.enums.publisher_type import PublisherType
 from white_core.util.string_utils import truncate_word_safe
-
 from white_ideation.reference.books.book_authors import (
     BILDUNGSROMAN_FIRST_NAMES,
     BILDUNGSROMAN_LAST_NAMES,

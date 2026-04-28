@@ -3,7 +3,8 @@
 import re
 
 import pytest
-from white_ideation.agents.tools.encodings.anagram_encodings import AnagramEncoding
+
+from white_core.util.encodings.anagram_encodings import AnagramEncoding
 from white_ideation.reference.gaming.anagram_pairs import ANAGRAM_PAIRS
 
 

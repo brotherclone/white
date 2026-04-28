@@ -1,4 +1,5 @@
 import os
+import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
@@ -20,7 +21,24 @@ if TYPE_CHECKING:
 
 load_dotenv()
 
-PULSAR_PALACE_IMAGE_BASE_PATH = "/Volumes/LucidNonsense/White/app/reference/gaming/img"
+
+def _default_pulsar_palace_image_path() -> str:
+    configured = os.getenv("PULSAR_PALACE_IMAGE_BASE_PATH")
+    if configured:
+        return configured
+    return str(
+        Path(__file__).resolve().parents[5]
+        / "packages"
+        / "ideation"
+        / "src"
+        / "white_ideation"
+        / "reference"
+        / "gaming"
+        / "img"
+    )
+
+
+PULSAR_PALACE_IMAGE_BASE_PATH = _default_pulsar_palace_image_path()
 
 PULSAR_PALACE_BACKGROUNDS = [
     {
@@ -210,6 +228,10 @@ class PulsarPalaceCharacterProfession(BaseModel):
 
 class PulsarPalaceCharacter(BaseModel):
 
+    character_id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()),
+        description="The unique ID of this character",
+    )
     thread_id: str = Field(description="The ID of the thread this character belongs to")
     encounter_id: str = Field(
         description="The ID of the encounter this character belongs to"

@@ -1,21 +1,43 @@
 import json
 import logging
+import os
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 
+def _default_biographical_reference_path() -> str:
+    configured = os.getenv("BIOGRAPHICAL_REFERENCE_FILE")
+    if configured:
+        return configured
+    return str(
+        Path(__file__).resolve().parents[2]
+        / "reference"
+        / "biographical"
+        / "biographical_reference.yml"
+    )
+
+
 def load_biographical_data(
-    file_path: str = "/Volumes/LucidNonsense/White/app/reference/biographical/biographical_reference.yml",
+    file_path: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Load biographical timeline data from YAML file."""
+    if file_path is None:
+        file_path = _default_biographical_reference_path()
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             return yaml.safe_load(file)
     except FileNotFoundError:
-        logger.error(f"Biographical data file not found: {file_path}")
+        logger.error(
+            f"Biographical data file not found: {file_path} "
+            "(set BIOGRAPHICAL_REFERENCE_FILE in .env to override)"
+        )
         return {
             "years": {},
             "quantum_analysis_prompts": {},
@@ -224,8 +246,7 @@ def calculate_quantum_metrics(year_data: Dict) -> Dict[str, Any]:
     metrics = {
         "choice_point_density": len(choice_points),
         "influence_complexity": len(influences),
-        "narrative_malleability": len(choice_points)
-        * 0.2,  # How much revision potential
+        "narrative_malleability": min(len(choice_points) * 0.2, 1.0),
         "temporal_significance": (
             "high"
             if len(choice_points) > 3

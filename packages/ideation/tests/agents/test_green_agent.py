@@ -1,4 +1,5 @@
 import pytest
+
 from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
 from white_core.artifacts.last_human_artifact import LastHumanArtifact
 from white_core.artifacts.last_human_species_extinction_narative_artifact import (

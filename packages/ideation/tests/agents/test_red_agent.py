@@ -2,6 +2,7 @@ import importlib
 
 import pytest
 import yaml
+
 from white_core.manifests.song_proposal import SongProposalIteration
 from white_ideation.agents.red_agent import RedAgent
 from white_ideation.agents.states.red_agent_state import RedAgentState
