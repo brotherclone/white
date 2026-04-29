@@ -3,12 +3,8 @@ import random
 from typing import List
 
 from white_core.artifacts.infranym_midi_artifact import InfranymMidiArtifact
-from white_ideation.agents.tools.encodings.morse_duration_encoding import (
-    MorseDurationEncoding,
-)
-from white_ideation.agents.tools.encodings.note_cipher_encoding import (
-    NoteCipherEncoding,
-)
+from white_core.util.encodings.morse_duration_encoding import MorseDurationEncoding
+from white_core.util.encodings.note_cipher_encoding import NoteCipherEncoding
 
 
 def generate_note_cipher(
