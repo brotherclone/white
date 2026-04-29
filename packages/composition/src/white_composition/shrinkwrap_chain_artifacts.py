@@ -15,6 +15,7 @@ Usage:
 
 import argparse
 import logging
+import os
 import re
 import shutil
 import uuid
@@ -793,8 +794,8 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("shrink_wrapped"),
-        help="Output directory for clean artifacts (default: shrink_wrapped/)",
+        default=Path(os.getenv("SHRINKWRAP_OUTPUT_DIR", "shrink_wrapped")),
+        help="Output directory for clean artifacts (default: $SHRINKWRAP_OUTPUT_DIR or shrink_wrapped/)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Preview changes without writing files"
