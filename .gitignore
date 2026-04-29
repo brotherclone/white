@@ -51,6 +51,8 @@ htmlcov/
 chain_arifacts_incompletes/
 packages/ideation/chain_artifacts/
 chain_artifacts/**/debug/*.json
+shrink_wrapped/
+packages/generation/shrink_wrapped/
 **/transformation_traces.md
 *.logicx
 *.logicx/

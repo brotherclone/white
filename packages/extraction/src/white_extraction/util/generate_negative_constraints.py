@@ -13,6 +13,7 @@ Usage:
 import argparse
 import logging
 import math
+import os
 import re
 from collections import Counter
 from pathlib import Path
@@ -590,17 +591,18 @@ def main():
     parser = argparse.ArgumentParser(
         description="Generate negative constraints from prior chain results"
     )
+    _sw_dir = os.getenv("SHRINKWRAP_OUTPUT_DIR", "shrink_wrapped")
     parser.add_argument(
         "--index",
         type=Path,
-        default=Path("shrink_wrapped/index.yml"),
-        help="Path to shrink_wrapped index.yml (default: shrink_wrapped/index.yml)",
+        default=Path(_sw_dir) / "index.yml",
+        help="Path to shrink_wrapped index.yml (default: $SHRINKWRAP_OUTPUT_DIR/index.yml)",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("shrink_wrapped/negative_constraints.yml"),
-        help="Output path for constraints file (default: shrink_wrapped/negative_constraints.yml)",
+        default=Path(_sw_dir) / "negative_constraints.yml",
+        help="Output path for constraints file (default: $SHRINKWRAP_OUTPUT_DIR/negative_constraints.yml)",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Print constraints without writing"

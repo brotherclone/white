@@ -12,6 +12,7 @@ Usage:
 """
 
 import argparse
+import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -338,8 +339,8 @@ def main() -> None:
     parser.add_argument(
         "--root",
         type=Path,
-        default=Path("shrink_wrapped"),
-        help="Root directory containing album folders (default: shrink_wrapped/)",
+        default=Path(os.getenv("SHRINKWRAP_OUTPUT_DIR", "shrink_wrapped")),
+        help="Root directory containing album folders (default: $SHRINKWRAP_OUTPUT_DIR or shrink_wrapped/)",
     )
     parser.add_argument(
         "--color",

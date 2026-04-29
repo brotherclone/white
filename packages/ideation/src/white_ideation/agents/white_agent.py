@@ -227,10 +227,7 @@ class WhiteAgent(BaseModel):
 
         # Load negative constraints from shrink_wrapped corpus (all prior results)
         negative_constraints_text = None
-        shrinkwrap_index = Path("shrink_wrapped/index.yml")
-        constraints_path = (
-            shrinkwrap_index if shrinkwrap_index.exists() else output_dir / "index.yml"
-        )
+        constraints_path = output_dir / "index.yml"
         if constraints_path.exists():
             try:
                 constraints = generate_constraints(constraints_path)
