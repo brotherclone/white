@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from app.util.audio_file_name_utils import rename_mid_audio_extensions
+from white_extraction.util.audio_file_name_utils import rename_mid_audio_extensions
 
 
 def test_rename_mid_audio_extensions():

@@ -1,0 +1,119 @@
+from abc import ABC
+from pathlib import Path
+from typing import List, Optional
+
+import yaml
+from pydantic import Field
+
+from white_core.artifacts.base_artifact import ChainArtifact
+from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
+from white_core.enums.chain_artifact_type import ChainArtifactType
+from white_core.enums.sigil_state import SigilState
+from white_core.enums.sigil_type import SigilType
+
+
+class SigilArtifact(ChainArtifact, ABC):
+    """Record of a created sigil for the Black Agent's paranoid tracking"""
+
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.SIGIL
+    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
+    wish: Optional[str] = Field(default=None, description="Wish for the sigil.")
+    statement_of_intent: Optional[str] = Field(
+        default=None, description="Statement of intent for the sigil."
+    )
+    sigil_type: Optional[SigilType] = Field(
+        default=None, description="Type of the sigil."
+    )
+    glyph_description: Optional[str] = Field(
+        default=None, description="Description of the sigil's glyph."
+    )
+    glyph_components: List[str] = Field(default_factory=list)
+    activation_state: Optional[SigilState] = Field(
+        default=None, description="Activation state of the sigil."
+    )
+    charging_instructions: Optional[str] = Field(
+        default=None, description="Instructions for charging the sigil."
+    )
+
+    def __init__(self, **data):
+        super().__init__(**data)
+
+    def save_file(self):
+        if not self.file_name:
+            raise ValueError("file_name is not set; cannot save file.")
+        file = Path(self.file_path, self.file_name)
+        file.parent.mkdir(parents=True, exist_ok=True)
+        data_to_save = {
+            "wish": self.wish,
+            "statement_of_intent": self.statement_of_intent,
+            "sigil_type": self.sigil_type.value if self.sigil_type else None,
+            "glyph_description": self.glyph_description,
+            "glyph_components": self.glyph_components,
+            "activation_state": (
+                self.activation_state.value if self.activation_state else None
+            ),
+            "charging_instructions": self.charging_instructions,
+        }
+        with open(file, "w") as f:
+            yaml.dump(data_to_save, f, default_flow_style=False, allow_unicode=True)
+
+    def flatten(self):
+        parent_data = super().flatten()
+        if parent_data is None:
+            parent_data = {}
+        return {
+            **parent_data,
+            "thread_id": self.thread_id,
+            "file_name": self.file_name,
+            "file_path": self.file_path,
+            "chain_artifact_type": self.chain_artifact_type,
+            "wish": self.wish,
+            "statement_of_intent": self.statement_of_intent,
+            "sigil_type": self.sigil_type.value if self.sigil_type else None,
+            "glyph_description": self.glyph_description,
+            "glyph_components": self.glyph_components,
+            "activation_state": (
+                self.activation_state.value if self.activation_state else None
+            ),
+            "charging_instructions": self.charging_instructions,
+        }
+
+    def for_prompt(self):
+        prompt_parts = []
+        if self.wish:
+            prompt_parts.append(f"Wish: {self.wish}")
+        if self.statement_of_intent:
+            prompt_parts.append(f"Statement of Intent: {self.statement_of_intent}")
+        if self.sigil_type:
+            prompt_parts.append(f"Sigil Type: {self.sigil_type.value}")
+        if self.glyph_description:
+            prompt_parts.append(f"Glyph Description: {self.glyph_description}")
+        if self.glyph_components:
+            components = ", ".join(self.glyph_components)
+            prompt_parts.append(f"Glyph Components: {components}")
+        if self.activation_state:
+            prompt_parts.append(f"Activation State: {self.activation_state.value}")
+        if self.charging_instructions:
+            prompt_parts.append(f"Charging Instructions: {self.charging_instructions}")
+        return "\n".join(prompt_parts)
+
+
+if __name__ == "__main__":
+    sigil = SigilArtifact(
+        thread_id="test_thread_id",
+        chain_artifact_file_type="yml",
+        chain_artifact_type="sigil",
+        wish="hi",
+        statement_of_intent="hi",
+        sigil_type="pictorial",
+        glyph_description="hi",
+        glyph_components=["hi"],
+        activation_state="charging",
+        charging_instructions="hi",
+        base_path="/chain_artifacts/",
+    )
+
+    sigil.save_file()
+    print(sigil.flatten())
+    p = sigil.for_prompt()
+    print(p)

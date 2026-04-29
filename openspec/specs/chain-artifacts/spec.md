@@ -63,53 +63,26 @@ The system SHALL track diversity across all generated proposals and flag converg
 ### Requirement: Chain Artifact Shrink-Wrap
 The system SHALL provide a utility to clean up completed chain artifact threads by removing debug files, renaming directories to human-readable names, cleaning individual file names, and generating structured metadata summaries.
 
+`WhiteAgent.start_workflow()` SHALL call `shrinkwrap()` twice per run:
+1. **Pre-run** (existing): at the start, with no `thread_filter`, to pick up any threads from previous runs before loading negative constraints.
+2. **Post-run** (new): after `workflow.invoke()` returns, with `thread_filter=<new thread_id>` and `scaffold=True`, so the newly created thread is immediately cleaned, manifested, and its production directories scaffolded into `shrink_wrapped/`. Any exception SHALL be caught and logged as a warning — it MUST NOT propagate or abort the return of `start_workflow()`.
+
 #### Scenario: Thread discovery
-- **WHEN** the shrink-wrap utility scans `chain_artifacts/`
-- **THEN** it identifies all UUID-named thread directories containing `all_song_proposals_*.yml`
+- **WHEN** the shrinkwrap utility is pointed at a `chain_artifacts/` directory
+- **THEN** it SHALL discover all UUID-named subdirectories
+- **AND** process each as a separate thread
 
-#### Scenario: Directory renaming
-- **WHEN** a thread is shrink-wrapped
-- **THEN** the output directory is named `{color}-{slugified-title}` (e.g., `black-the-phantom-limb-protocol`) with no agent-name prefix
+#### Scenario: Post-run shrinkwrap scaffolds new thread
+- **WHEN** `start_workflow()` completes successfully
+- **THEN** `shrinkwrap()` is called with `thread_filter=<new thread_id>` and `scaffold=True`
+- **AND** the new thread's output directory is created under `shrink_wrapped/`
+- **AND** `manifest_bootstrap.yml` is written for each song proposal found in the thread's `yml/` directory
+- **AND** if shrinkwrap raises, `start_workflow()` logs a warning and returns normally
 
-#### Scenario: File name cleaning — UUID and color-char prefix
-- **WHEN** a file's name matches `<uuid>_<single-char>_<semantic-name>.<ext>`
-- **THEN** the output file is written as `<semantic-name>.<ext>`
-
-#### Scenario: File name cleaning — white_agent prefix
-- **WHEN** a file's name matches `white_agent_<thread-uuid>_<TYPE>.<ext>`
-- **THEN** the output file is written as `<type_lowercase>.<ext>` (e.g., `agent_voices.md`, `chromatic_synthesis.md`)
-
-#### Scenario: File name cleaning — all_song_proposals thread suffix
-- **WHEN** a file's name matches `all_song_proposals_<thread-uuid>.<ext>`
-- **THEN** the output file is written as `all_song_proposals.<ext>`
-
-#### Scenario: File name cleaning — song_proposal color prefix
-- **WHEN** a file's name matches `song_proposal_<Color...>_<name>.<ext>` or `song_proposal_<char>_<name>.<ext>`
-- **THEN** the output file is written as `<name>.<ext>` (e.g., `neural_network_incarnation_v2.yml`)
-
-#### Scenario: File name collision handling
-- **WHEN** two files in the same output subdirectory would produce the same clean name
-- **THEN** the second file is written as `<name>_2.<ext>`, the third as `<name>_3.<ext>`, and so on
-
-#### Scenario: In-file file_name field update
-- **WHEN** a copied file (YAML or Markdown front-matter) contains a `file_name:` field
-- **THEN** that field's value is rewritten to the clean output filename
-
-#### Scenario: Debug artifact removal
-- **WHEN** a thread is shrink-wrapped with default settings
-- **THEN** intermediate files (rebracketing analyses, transformation traces, facet evolution) are excluded from the output
-
-#### Scenario: Debug artifact archival
-- **WHEN** shrink-wrap is run with `--archive` flag
-- **THEN** debug artifacts are copied to a `.debug/` subdirectory instead of being excluded
-
-#### Scenario: Dry run
-- **WHEN** shrink-wrap is run with `--dry-run` flag
-- **THEN** it reports what would change without modifying any files
-
-#### Scenario: Summary manifest generation
-- **WHEN** a thread is shrink-wrapped
-- **THEN** a `manifest.yml` is generated containing: title, bpm, key, tempo, concept, rainbow_color, mood, genres, agent_name, original thread_id, and timestamp
+#### Scenario: Post-run shrinkwrap failure is non-fatal
+- **WHEN** the post-run `shrinkwrap()` call raises any exception
+- **THEN** `start_workflow()` logs a warning and returns the final agent state unchanged
+- **AND** no exception is propagated to the caller
 
 ### Requirement: Chain Artifact Index
 The system SHALL maintain a top-level index of all shrink-wrapped chain artifacts for programmatic access.

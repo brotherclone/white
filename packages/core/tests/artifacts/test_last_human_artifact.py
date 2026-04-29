@@ -1,0 +1,449 @@
+import pytest
+from pydantic import ValidationError
+from white_core.artifacts.base_artifact import ChainArtifact
+from white_core.artifacts.last_human_artifact import LastHumanArtifact
+from white_core.enums.last_human_documentation_type import (
+    LastHumanDocumentationType,
+)
+from white_core.enums.last_human_vulnerability_type import (
+    LastHumanVulnerabilityType,
+)
+
+
+class ConcreteLastHumanArtifact(LastHumanArtifact):
+    """Concrete implementation for testing"""
+
+    thread_id: str = "test-thread"
+
+    def save_file(self):
+        pass
+
+
+def test_inheritance():
+    assert issubclass(LastHumanArtifact, ChainArtifact)
+
+
+def test_last_human_artifact_required_fields():
+    """Test creating LastHumanArtifact with required fields only."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test-thread",
+        name="Maria Santos",
+        age=42,
+        location="Coastal Village, Philippines",
+        year_documented=2045,
+        parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+        vulnerability_details="Forced to leave ancestral fishing village due to sea level rise",
+        environmental_stressor="Rising sea levels flooding village",
+        documentation_type=LastHumanDocumentationType.DISPLACEMENT,
+        last_days_scenario="Packing final belongings as waters rise around home",
+    )
+
+    assert artifact.name == "Maria Santos"
+    assert artifact.age == 42
+    assert artifact.pronouns == "they/them"
+    assert artifact.location == "Coastal Village, Philippines"
+    assert artifact.year_documented == 2045
+    assert artifact.parallel_vulnerability == LastHumanVulnerabilityType.DISPLACEMENT
+    assert artifact.documentation_type == LastHumanDocumentationType.DISPLACEMENT
+    assert artifact.latitude is None
+    assert artifact.longitude is None
+    assert artifact.occupation is None
+    assert artifact.family_situation is None
+    assert artifact.daily_routine is None
+    assert artifact.adaptation_attempts == []
+    assert artifact.significant_object is None
+    assert artifact.final_thought is None
+
+
+def test_last_human_artifact_all_fields():
+    """Test creating LastHumanArtifact with all fields populated."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test-thread",
+        name="Ahmed Hassan",
+        age=58,
+        pronouns="he/him",
+        location="Nile Delta, Egypt",
+        latitude=31.0,
+        longitude=31.5,
+        year_documented=2050,
+        parallel_vulnerability=LastHumanVulnerabilityType.RESOURCE_COLLAPSE,
+        vulnerability_details="Agricultural collapse due to saltwater intrusion",
+        occupation="Farmer, fourth generation",
+        family_situation="Wife and three adult children, one grandchild",
+        daily_routine="Wake at dawn, tend fields that no longer grow, fetch water from distant well",
+        environmental_stressor="Saltwater intrusion destroying farmland",
+        adaptation_attempts=[
+            "Switched to salt-tolerant crops",
+            "Dug deeper wells",
+            "Tried aquaculture",
+        ],
+        documentation_type=LastHumanDocumentationType.RESILIENCE,
+        last_days_scenario="Teaching grandson traditional songs while watching dead fields",
+        significant_object="Family farming ledger, three generations of harvests",
+        final_thought="Will anyone remember the taste of our dates?",
+    )
+
+    assert artifact.name == "Ahmed Hassan"
+    assert artifact.age == 58
+    assert artifact.pronouns == "he/him"
+    assert artifact.latitude == 31.0
+    assert artifact.longitude == 31.5
+    assert artifact.occupation == "Farmer, fourth generation"
+    assert artifact.family_situation == "Wife and three adult children, one grandchild"
+    assert artifact.daily_routine is not None
+    assert len(artifact.adaptation_attempts) == 3
+    assert (
+        artifact.significant_object
+        == "Family farming ledger, three generations of harvests"
+    )
+    assert artifact.final_thought is not None
+
+
+def test_age_validation():
+    """Test age validation (0-120)."""
+    # Valid ages
+    artifact_young = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Child",
+        age=0,
+        location="Test",
+        year_documented=2040,
+        parallel_vulnerability=LastHumanVulnerabilityType.HEALTH_CASCADE,
+        vulnerability_details="Test",
+        environmental_stressor="Test",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Test",
+    )
+    assert artifact_young.age == 0
+
+    artifact_old = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Elder",
+        age=120,
+        location="Test",
+        year_documented=2040,
+        parallel_vulnerability=LastHumanVulnerabilityType.ISOLATION,
+        vulnerability_details="Test",
+        environmental_stressor="Test",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Test",
+    )
+    assert artifact_old.age == 120
+
+    # Invalid: negative
+    with pytest.raises(ValidationError):
+        ConcreteLastHumanArtifact(
+            thread_id="test",
+            name="Invalid",
+            age=-1,
+            location="Test",
+            year_documented=2040,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="Test",
+            environmental_stressor="Test",
+            documentation_type=LastHumanDocumentationType.DEATH,
+            last_days_scenario="Test",
+        )
+
+    # Invalid: too old
+    with pytest.raises(ValidationError):
+        ConcreteLastHumanArtifact(
+            thread_id="test",
+            name="Invalid",
+            age=121,
+            location="Test",
+            year_documented=2040,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="Test",
+            environmental_stressor="Test",
+            documentation_type=LastHumanDocumentationType.DEATH,
+            last_days_scenario="Test",
+        )
+
+
+def test_year_documented_validation():
+    """Test year_documented validation (1975 or 2028-2350)."""
+    # Valid years
+    artifact_1975 = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test 1975",
+        age=30,
+        location="Test",
+        year_documented=1975,
+        parallel_vulnerability=LastHumanVulnerabilityType.TOXIC_EXPOSURE,
+        vulnerability_details="Test",
+        environmental_stressor="Test",
+        documentation_type=LastHumanDocumentationType.DEATH,
+        last_days_scenario="Test",
+    )
+    assert artifact_1975.year_documented == 1975
+
+    artifact_2028 = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test 2028",
+        age=30,
+        location="Test",
+        year_documented=2028,
+        parallel_vulnerability=LastHumanVulnerabilityType.TOXIC_EXPOSURE,
+        vulnerability_details="Test",
+        environmental_stressor="Test",
+        documentation_type=LastHumanDocumentationType.DEATH,
+        last_days_scenario="Test",
+    )
+    assert artifact_2028.year_documented == 2028
+
+    # Invalid: too early (not 1975 and before 2028)
+    with pytest.raises(ValidationError):
+        ConcreteLastHumanArtifact(
+            thread_id="test",
+            name="Invalid",
+            age=30,
+            location="Test",
+            year_documented=2020,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="Test",
+            environmental_stressor="Test",
+            documentation_type=LastHumanDocumentationType.DEATH,
+            last_days_scenario="Test",
+        )
+
+    # Invalid: too late
+    with pytest.raises(ValidationError):
+        ConcreteLastHumanArtifact(
+            thread_id="test",
+            name="Invalid",
+            age=30,
+            location="Test",
+            year_documented=2351,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="Test",
+            environmental_stressor="Test",
+            documentation_type=LastHumanDocumentationType.DEATH,
+            last_days_scenario="Test",
+        )
+
+
+def test_flatten():
+    """Test to_artifact_dict method."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=35,
+        location="Test City, Test Country",
+        year_documented=2045,
+        parallel_vulnerability=LastHumanVulnerabilityType.CLIMATE_REFUGEE,
+        vulnerability_details="Climate-induced migration",
+        occupation="Teacher",
+        environmental_stressor="Prolonged drought",
+        documentation_type=LastHumanDocumentationType.DISPLACEMENT,
+        last_days_scenario="Final lesson to empty classroom",
+        significant_object="Chalkboard eraser",
+    )
+
+    artifact_dict = artifact.flatten()
+
+    assert artifact_dict["name"] == "Test Person"
+    assert artifact_dict["age"] == 35
+    assert artifact_dict["location"] == "Test City, Test Country"
+    assert artifact_dict["year"] == 2045
+    assert artifact_dict["vulnerability"] == "climate_refugee"
+    assert artifact_dict["vulnerability_details"] == "Climate-induced migration"
+    assert artifact_dict["occupation"] == "Teacher"
+    assert artifact_dict["environmental_stressor"] == "Prolonged drought"
+    assert artifact_dict["documentation_type"] == "displacement"
+    assert artifact_dict["scenario"] == "Final lesson to empty classroom"
+    assert artifact_dict["significant_object"] == "Chalkboard eraser"
+
+
+def test_summary_text():
+    """Test summary_text method."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Elena Rodriguez",
+        age=67,
+        location="Amazon Basin, Brazil",
+        year_documented=2055,
+        parallel_vulnerability=LastHumanVulnerabilityType.ECONOMIC_EXTINCTION,
+        vulnerability_details="Traditional way of life impossible after deforestation",
+        occupation="Indigenous healer",
+        environmental_stressor="Complete deforestation of ancestral territory",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Recording oral history for future generations",
+    )
+
+    summary = artifact.summary_text()
+
+    assert "Elena Rodriguez" in summary
+    assert "67" in summary
+    assert "Amazon Basin, Brazil" in summary
+    assert "2055" in summary
+    assert "Indigenous healer" in summary
+    assert "Traditional way of life impossible after deforestation" in summary
+    assert "Complete deforestation of ancestral territory" in summary
+
+
+def test_summary_text_without_occupation():
+    """Test summary_text when occupation is not provided."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Anonymous",
+        age=25,
+        location="Unnamed Village",
+        year_documented=2040,
+        parallel_vulnerability=LastHumanVulnerabilityType.ENTANGLEMENT,
+        vulnerability_details="Caught in systemic collapse",
+        environmental_stressor="Multiple cascading failures",
+        documentation_type=LastHumanDocumentationType.DEATH,
+        last_days_scenario="Final moments",
+    )
+
+    summary = artifact.summary_text()
+
+    assert "Anonymous" in summary
+    assert "Local resident" in summary
+
+
+def test_for_prompt():
+    """Test for_prompt method."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Liu Wei",
+        age=50,
+        location="Coastal City, China",
+        year_documented=2060,
+        parallel_vulnerability=LastHumanVulnerabilityType.HEALTH_CASCADE,
+        vulnerability_details="Widespread disease due to polluted water",
+        occupation="Fisherman",
+        environmental_stressor="Severe water pollution",
+        documentation_type=LastHumanDocumentationType.RESILIENCE,
+        last_days_scenario="Fishing in contaminated waters",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "Liu Wei" in prompt
+    assert "50" in prompt
+    assert "Coastal City, China" in prompt
+    assert "Fisherman" in prompt
+    assert "Widespread disease due to polluted water" in prompt
+    assert "Severe water pollution" in prompt
+    assert "Fishing in contaminated waters" in prompt
+
+
+def test_for_prompt_with_many_adaptation_attempts():
+    """Test for_prompt with more than 3 adaptation attempts."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=45,
+        location="Test Location",
+        year_documented=2050,
+        parallel_vulnerability=LastHumanVulnerabilityType.RESOURCE_COLLAPSE,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.RESILIENCE,
+        last_days_scenario="Test scenario",
+        adaptation_attempts=[
+            "First attempt",
+            "Second attempt",
+            "Third attempt",
+            "Fourth attempt",
+            "Fifth attempt",
+        ],
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "First attempt" in prompt
+    assert "Second attempt" in prompt
+    assert "Third attempt" in prompt
+    assert "(and 2 others)" in prompt
+    assert "Fourth attempt" not in prompt
+    assert "Fifth attempt" not in prompt
+
+
+def test_for_prompt_with_final_thought():
+    """Test for_prompt with final_thought included."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=55,
+        location="Test Location",
+        year_documented=2045,
+        parallel_vulnerability=LastHumanVulnerabilityType.ISOLATION,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Test scenario",
+        final_thought="What will become of us?",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "What will become of us?" in prompt
+    assert "Final thought:" in prompt
+
+
+def test_for_prompt_with_significant_object():
+    """Test for_prompt with significant_object included."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=40,
+        location="Test Location",
+        year_documented=2040,
+        parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.DEATH,
+        last_days_scenario="Test scenario",
+        significant_object="Old family photograph",
+    )
+
+    prompt = artifact.for_prompt()
+
+    assert "Old family photograph" in prompt
+    assert "Significant object:" in prompt
+
+
+def test_latitude_longitude():
+    """Test artifact with latitude and longitude values."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="Test Person",
+        age=35,
+        location="Test Location",
+        latitude=40.7128,
+        longitude=-74.0060,
+        year_documented=2045,
+        parallel_vulnerability=LastHumanVulnerabilityType.TOXIC_EXPOSURE,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.WITNESS,
+        last_days_scenario="Test scenario",
+    )
+
+    assert artifact.latitude == 40.7128
+    assert artifact.longitude == -74.0060
+
+
+def test_artifact_name_auto_generation():
+    """Test that artifact_name is auto-generated from name if not provided."""
+    artifact = ConcreteLastHumanArtifact(
+        thread_id="test",
+        name="María José García-López",
+        age=30,
+        location="Test Location",
+        year_documented=2040,
+        parallel_vulnerability=LastHumanVulnerabilityType.CLIMATE_REFUGEE,
+        vulnerability_details="Test details",
+        environmental_stressor="Test stressor",
+        documentation_type=LastHumanDocumentationType.DISPLACEMENT,
+        last_days_scenario="Test scenario",
+    )
+
+    # artifact_name should be sanitized version of name
+    assert artifact.artifact_name is not None
+    assert " " not in artifact.artifact_name  # No spaces
+    # Should contain sanitized version of the name
+    assert len(artifact.artifact_name) > 0

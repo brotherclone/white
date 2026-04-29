@@ -20,8 +20,9 @@ def patch_chat_anthropic(monkeypatch):
         def __init__(self, *args, **kwargs):
             pass
 
-    monkeypatch.setenv("MOCK_MODE", "true")
-    monkeypatch.setattr("app.agents.black_agent.ChatAnthropic", FakeChatAnthropic)
+    monkeypatch.setattr(
+        "white_ideation.agents.black_agent.ChatAnthropic", FakeChatAnthropic
+    )
     redirect_test_mocks_open(monkeypatch)
     yield
 

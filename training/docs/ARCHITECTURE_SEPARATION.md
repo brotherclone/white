@@ -138,7 +138,7 @@ def white_agent_node(state):
 
 ```bash
 # Just generate concepts
-python run_white_agent.py
+python run_ideation.py
 
 # Concepts flow through agents
 # No validation, no torch, no ML
