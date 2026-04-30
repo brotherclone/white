@@ -449,6 +449,25 @@ def create_app(
             ) from exc
         return {"ok": True, "version": version}
 
+    class VersionNotesBody(BaseModel):
+        version: int
+        notes: str
+
+    @app.patch("/composition/version/notes")
+    def update_notes(body: VersionNotesBody):
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import (
+            resolve_song_dir,
+            update_version_notes,
+        )
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            update_version_notes(song_dir, body.version, body.notes)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"ok": True}
+
     # ------------------------------------------------------------------
     # Candidates
     # ------------------------------------------------------------------

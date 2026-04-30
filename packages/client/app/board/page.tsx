@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { fetchSongs, fetchActiveSong, fetchComposition, advanceStage, addVersion } from "@/lib/api";
+import { fetchSongs, fetchActiveSong, fetchComposition, advanceStage, addVersion, updateVersionNotes } from "@/lib/api";
 import { CompositionEntry, MIX_STAGES, MixStage, SongEntry } from "@/lib/types";
 
 const STAGE_LABELS: Record<MixStage, string> = {
@@ -27,6 +27,7 @@ export default function BoardPage() {
   const [advancingTo, setAdvancingTo] = useState<MixStage | null>(null);
   const [addingVersion, setAddingVersion] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
   const refresh = useCallback(async () => {
     try {
@@ -74,6 +75,13 @@ export default function BoardPage() {
     } finally {
       setAddingVersion(false);
     }
+  };
+
+  const handleNotesChange = (version: number, notes: string) => {
+    if (notesSaveTimers.current[version]) clearTimeout(notesSaveTimers.current[version]);
+    notesSaveTimers.current[version] = setTimeout(() => {
+      updateVersionNotes(version, notes).catch(() => {});
+    }, 600);
   };
 
   const currentStageIdx = composition
@@ -180,36 +188,33 @@ export default function BoardPage() {
 
                   {/* Column body */}
                   <div className="flex-1 px-3 py-3 flex flex-col gap-2 min-h-32">
-                    {/* Version cards for current stage */}
-                    {isCurrent && composition.versions
+                    {/* Version cards — editable notes on all versions */}
+                    {(isCurrent || isPast) && composition.versions
                       .filter(v => v.stage === stage)
                       .map(v => (
                         <div
                           key={v.version}
-                          className="rounded bg-zinc-800 border border-zinc-700 px-2.5 py-2"
+                          className={`rounded border px-2.5 py-2 ${
+                            isCurrent
+                              ? "bg-zinc-800 border-zinc-700"
+                              : "bg-zinc-900 border-zinc-800 opacity-70"
+                          }`}
                         >
-                          <div className="flex items-center justify-between gap-1 mb-1">
-                            <span className="text-xs text-zinc-300 font-semibold">v{v.version}</span>
-                            <span className="text-[10px] text-zinc-500 font-sans">
+                          <div className="flex items-center justify-between gap-1 mb-1.5">
+                            <span className={`text-xs font-semibold ${isCurrent ? "text-zinc-300" : "text-zinc-500"}`}>
+                              v{v.version}
+                            </span>
+                            <span className="text-[10px] text-zinc-600 font-sans">
                               {new Date(v.created).toLocaleDateString()}
                             </span>
                           </div>
-                          {v.notes && (
-                            <p className="text-[10px] text-zinc-400 font-sans leading-snug">{v.notes}</p>
-                          )}
-                        </div>
-                      ))
-                    }
-
-                    {/* Past versions */}
-                    {isPast && composition.versions
-                      .filter(v => v.stage === stage)
-                      .map(v => (
-                        <div
-                          key={v.version}
-                          className="rounded bg-zinc-900 border border-zinc-800 px-2.5 py-2 opacity-60"
-                        >
-                          <span className="text-[10px] text-zinc-500 font-sans">v{v.version}</span>
+                          <input
+                            type="text"
+                            defaultValue={v.notes ?? ""}
+                            placeholder="add note…"
+                            onChange={e => handleNotesChange(v.version, e.target.value)}
+                            className="w-full bg-transparent text-[10px] font-sans text-zinc-400 placeholder-zinc-600 focus:outline-none focus:text-zinc-200 transition-colors"
+                          />
                         </div>
                       ))
                     }
@@ -241,10 +246,16 @@ export default function BoardPage() {
               <div className="flex flex-col gap-1.5">
                 {[...composition.versions].reverse().map(v => (
                   <div key={v.version} className="flex items-baseline gap-3 text-xs font-sans">
-                    <span className="text-zinc-400 w-8">v{v.version}</span>
-                    <span className="text-zinc-600 w-28">{new Date(v.created).toLocaleString()}</span>
-                    <span className="text-zinc-500 w-36">{STAGE_LABELS[v.stage as MixStage] ?? v.stage}</span>
-                    {v.notes && <span className="text-zinc-400">{v.notes}</span>}
+                    <span className="text-zinc-400 w-8 flex-shrink-0">v{v.version}</span>
+                    <span className="text-zinc-600 w-28 flex-shrink-0">{new Date(v.created).toLocaleString()}</span>
+                    <span className="text-zinc-500 w-36 flex-shrink-0">{STAGE_LABELS[v.stage as MixStage] ?? v.stage}</span>
+                    <input
+                      type="text"
+                      defaultValue={v.notes ?? ""}
+                      placeholder="—"
+                      onChange={e => handleNotesChange(v.version, e.target.value)}
+                      className="flex-1 bg-transparent text-zinc-400 placeholder-zinc-700 focus:outline-none focus:text-zinc-200 transition-colors"
+                    />
                   </div>
                 ))}
               </div>

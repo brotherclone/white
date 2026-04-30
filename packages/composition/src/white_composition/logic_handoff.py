@@ -97,7 +97,7 @@ def handoff(production_dir: Path) -> Path:
         ctx = load_song_context(production_dir)
         composition = {
             "song_title": ctx.get("title", production_dir.name),
-            "thread_slug": ctx.get("thread", ""),
+            "thread_slug": ctx.get("thread") or production_dir.parent.parent.name,
             "production_slug": production_dir.name,
             "logic_project_path": str(song_dir),
             "current_version": 1,
@@ -177,6 +177,29 @@ def add_version(logic_song_dir: Path) -> int:
             width=float("inf"),
         )
     return new_version
+
+
+def update_version_notes(logic_song_dir: Path, version: int, notes: str) -> None:
+    path = Path(logic_song_dir) / COMPOSITION_FILENAME
+    with open(path) as f:
+        data = yaml.safe_load(f) or {}
+    versions = data.get("versions") or []
+    for v in versions:
+        if v.get("version") == version:
+            v["notes"] = notes
+            break
+    else:
+        raise ValueError(f"Version {version} not found in composition.yml")
+    data["versions"] = versions
+    with open(path, "w") as f:
+        yaml.dump(
+            data,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            width=float("inf"),
+        )
 
 
 def resolve_song_dir(production_dir: Path) -> Path:

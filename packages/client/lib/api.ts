@@ -181,6 +181,19 @@ export async function advanceStage(stage: string): Promise<{ ok: boolean; stage:
   return res.json();
 }
 
+export async function updateVersionNotes(version: number, notes: string): Promise<{ ok: boolean }> {
+  const res = await fetch(`${BASE}/composition/version/notes`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ version, notes }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Notes update failed");
+  }
+  return res.json();
+}
+
 export async function addVersion(): Promise<{ ok: boolean; version: number }> {
   const res = await fetch(`${BASE}/composition/version`, { method: "POST" });
   if (!res.ok) {
