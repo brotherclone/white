@@ -36,6 +36,44 @@ candidate-browser UI even though they are not part of the active review workflow
   cards in a horizontal swimlane (one column per mix stage). Cards advance between
   columns to update the stage.
 
+## Future Work
+
+Ideas worth speccing as follow-on changes once this is running in production:
+
+### Multi-song Composition Board
+The board currently fetches composition for the active song only. A true kanban would
+show one card per song per stage across all handed-off songs — visible without switching
+active songs. Each card would need to call `GET /composition` with a song identifier
+rather than relying on the server's active-song context. Requires either a new
+`GET /composition/<song_id>` endpoint or embedding `logic_project_path` in the songs
+index so the board can resolve each song's composition independently.
+
+### thread_slug empty-string bug in composition.yml
+`composition.yml` is written with `ctx.get("thread", "")` which leaves `thread_slug`
+blank when the YAML field exists but is empty. Should use `ctx.get("thread") or
+production_dir.parent.parent.name` (same fix already applied to the path resolution).
+
+### Re-handoff as explicit MIDI sync
+Today re-running handoff skips the seed copy (correct) but also silently re-copies MIDI.
+A dedicated "Sync MIDI" action (separate from full handoff) would make it safe to call
+after evolving or re-promoting without the risk of accidentally re-scaffolding a folder.
+Could be a `POST /handoff/sync` that only runs step 2 (MIDI copy) with no folder/seed
+side effects.
+
+### Drift Report
+`composition.yml` knows when stages advance and which MIDI was handed off. A drift
+report comparing Claude's production plan (bar counts, section order, energy arc) to
+the actual Logic arrangement after mixing would close the creative feedback loop. The
+report could flag sections that were cut, reordered, or significantly lengthened, and
+feed that signal back into future generation weighting. Likely a CLI tool that reads
+`composition.yml` + `production_plan.yml` and writes `drift_report.yml` alongside them.
+
+### Version Notes
+The `notes` field on each composition version is always `""`. A small text input on the
+board card (blur-to-save, same pattern as the label field in the candidate browser)
+would let the mixer annotate each version checkpoint ("rough strings added", "vocal comp
+done") and make the version history actually useful as a production log.
+
 ## Impact
 
 - Affected specs: `candidate-browser-web`, new `logic-handoff`
