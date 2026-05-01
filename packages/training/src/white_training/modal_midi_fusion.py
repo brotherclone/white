@@ -968,7 +968,7 @@ def train_fusion(
                 "modality_dropout": modality_dropout,
                 "label_smoothing": label_smoothing,
                 "train_split": train_split,
-                "seed": seed,
+                "seed.logicx": seed,
                 "input_dims": {
                     "audio": 512,
                     "midi": 512,

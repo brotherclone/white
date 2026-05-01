@@ -82,12 +82,13 @@ def handoff(production_dir: Path) -> Path:
             for mid in approved.glob("*.mid"):
                 shutil.copy2(mid, phase_midi_dir / mid.name)
 
-    # 3. Move text files (arrangement, lyrics) into Logic song folder
-
+    # 3. Copy text files (arrangement, lyrics) into Logic song folder
+    # Copy rather than move so the production dir retains arrangement.txt
+    # for the lyric pipeline to read on subsequent runs.
     for pattern in TEXT_PATTERNS:
         for src in production_dir.glob(pattern):
             dest = song_dir / src.name
-            shutil.move(str(src), str(dest))
+            shutil.copy2(src, dest)
 
     # 4. Create composition.yml if absent
     comp_path = song_dir / COMPOSITION_FILENAME

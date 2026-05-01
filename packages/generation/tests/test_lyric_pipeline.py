@@ -288,7 +288,7 @@ class TestLoadOrInitReview:
         review = _load_or_init_review(tmp_path, meta, model="claude-sonnet-4-6", seed=7)
         assert review["pipeline"] == "lyric-generation"
         assert review["color"] == "Red"
-        assert review["seed"] == 7
+        assert review["seed.logicx"] == 7
         assert review["candidates"] == []
 
     def test_loads_existing_file(self, tmp_path):
@@ -682,6 +682,7 @@ class TestRunPipelineIntegration:
     def test_run_pipeline_writes_candidate_files(self, tmp_path):
         """Pipeline should write N .txt files in melody/candidates/."""
         import numpy as np
+
         from white_generation.pipelines.lyric_pipeline import run_lyric_pipeline
 
         prod_dir = _make_production_dir(tmp_path)
@@ -722,6 +723,7 @@ class TestRunPipelineIntegration:
     def test_run_pipeline_writes_review_yml(self, tmp_path):
         """Pipeline should write lyrics_review.yml with one candidate entry."""
         import numpy as np
+
         from white_generation.pipelines.lyric_pipeline import (
             LYRICS_REVIEW_FILENAME,
             run_lyric_pipeline,
@@ -1064,6 +1066,7 @@ class TestReadVocalSectionsRepeatType:
     def test_plan_override_takes_priority(self, tmp_path):
         """lyric_repeat_type in production_plan.yml overrides label inference."""
         import yaml
+
         from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )
@@ -1088,6 +1091,7 @@ class TestReadVocalSectionsRepeatType:
     def test_plan_override_typo_normalised_to_fresh(self, tmp_path):
         """A typo like 'Exact' in production_plan.yml is normalised to 'fresh', not 'exact'."""
         import yaml
+
         from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )
@@ -1114,6 +1118,7 @@ class TestReadVocalSectionsRepeatType:
     def test_plan_override_invalid_falls_back_to_inferred(self, tmp_path):
         """An unrecognised repeat type in production_plan.yml falls back to label inference."""
         import yaml
+
         from white_generation.pipelines.lyric_pipeline import (
             read_vocal_sections_from_arrangement,
         )

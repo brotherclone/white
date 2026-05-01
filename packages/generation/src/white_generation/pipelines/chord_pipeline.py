@@ -10,7 +10,7 @@ Usage:
     python -m app.generators.midi.pipelines.chord_pipeline \
         --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
         --song "song_proposal_Black (0x221f20)_sequential_dissolution_v2.yml" \
-        --seed 42 --num-candidates 200 --top-k 10
+        --seed.logicx 42 --num-candidates 200 --top-k 10
 """
 
 import argparse
@@ -24,6 +24,7 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+
 from white_composition.init_production import load_initial_proposal
 from white_core.concepts.chromatic_targets import (
     CHROMATIC_TARGETS,
@@ -32,7 +33,6 @@ from white_core.concepts.chromatic_targets import (
     TEMPORAL_MODES,
 )
 from white_core.music.core.enharmonic import normalize_to_flat
-
 from white_generation.artist_catalog import load_artist_context
 from white_generation.chord_generator.generator import ChordProgressionGenerator
 from white_generation.patterns.harmonic_rhythm import enumerate_distributions
@@ -377,7 +377,7 @@ def generate_review_yaml(
         "thread": song_info.get("thread_dir", ""),
         "song_proposal": song_info.get("song_filename", ""),
         "generated": datetime.now(timezone.utc).isoformat(),
-        "seed": seed,
+        "seed.logicx": seed,
         "scoring_weights": scoring_weights,
         "candidates": candidates,
     }
@@ -435,7 +435,6 @@ def generate_white_candidates(
     import random as _random
 
     from white_analysis.refractor import Refractor
-
     from white_generation.pipelines.white_rebracketing import concatenate_bars
 
     rng = _random.Random(seed)
@@ -633,7 +632,9 @@ def run_chord_pipeline(
         bar_pool = build_bar_pool(sub_dirs, white_key, song_info["bpm"])
         print(f"  Bar pool: {len(bar_pool)} bars from {len(sub_dirs)} sub-proposal(s)")
 
-        print(f"\nGenerating {num_candidates} cut-up candidates (seed={seed})...")
+        print(
+            f"\nGenerating {num_candidates} cut-up candidates (seed.logicx={seed})..."
+        )
         top_candidates = generate_white_candidates(
             song_info=song_info,
             bar_pool=bar_pool,
@@ -695,7 +696,7 @@ def run_chord_pipeline(
         return top_candidates
 
     # --- Non-White: Markov generation ---
-    print(f"\nGenerating {num_candidates} candidates (seed={seed})...")
+    print(f"\nGenerating {num_candidates} candidates (seed.logicx={seed})...")
     gen = ChordProgressionGenerator()
 
     raw_candidates = gen.generate_progression_brute_force(
@@ -897,7 +898,7 @@ def main():
     )
     parser.add_argument("--song", default=None, help="Song proposal YAML filename")
     parser.add_argument(
-        "--seed", type=int, default=42, help="Random seed (default: 42)"
+        "--seed.logicx", type=int, default=42, help="Random seed.logicx (default: 42)"
     )
     parser.add_argument(
         "--num-candidates",
