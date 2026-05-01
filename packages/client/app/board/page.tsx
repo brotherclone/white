@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { fetchSongs, fetchActiveSong, fetchComposition, advanceStage, addVersion, updateVersionNotes } from "@/lib/api";
-import { CompositionEntry, MIX_STAGES, MixStage, SongEntry } from "@/lib/types";
+import { fetchSongs, fetchActiveSong, fetchComposition, advanceStage, addVersion, updateVersionNotes, runNextPhase, getRunStatus } from "@/lib/api";
+import { CompositionEntry, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
 
 const STAGE_LABELS: Record<MixStage, string> = {
   structure:          "Structure",
@@ -26,8 +26,10 @@ export default function BoardPage() {
   const [songs, setSongs] = useState<SongEntry[]>([]);
   const [advancingTo, setAdvancingTo] = useState<MixStage | null>(null);
   const [addingVersion, setAddingVersion] = useState(false);
+  const [generatingLyrics, setGeneratingLyrics] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -75,6 +77,35 @@ export default function BoardPage() {
     } finally {
       setAddingVersion(false);
     }
+  };
+
+  useEffect(() => () => { if (lyricsPollRef.current) clearInterval(lyricsPollRef.current); }, []);
+
+  const handleGenerateLyrics = async () => {
+    setGeneratingLyrics(true);
+    setError(null);
+    try {
+      await runNextPhase();
+    } catch (e) {
+      setGeneratingLyrics(false);
+      setError(e instanceof Error ? e.message : "Lyrics generation failed");
+      return;
+    }
+    lyricsPollRef.current = setInterval(async () => {
+      try {
+        const job: RunJob = await getRunStatus();
+        if (job.status === "done") {
+          clearInterval(lyricsPollRef.current!);
+          lyricsPollRef.current = null;
+          setGeneratingLyrics(false);
+        } else if (job.status === "error") {
+          clearInterval(lyricsPollRef.current!);
+          lyricsPollRef.current = null;
+          setGeneratingLyrics(false);
+          setError(job.error ?? "Lyrics generation failed");
+        }
+      } catch { /* transient */ }
+    }, 3000);
   };
 
   const handleNotesChange = (version: number, notes: string) => {
@@ -219,6 +250,27 @@ export default function BoardPage() {
                       ))
                     }
                   </div>
+
+                  {/* Generate Lyrics button — lyrics column when it's current */}
+                  {isCurrent && stage === "lyrics" && (
+                    <div className="px-3 pb-3">
+                      <button
+                        onClick={handleGenerateLyrics}
+                        disabled={generatingLyrics}
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[10px] font-sans rounded bg-violet-900 border border-violet-700 text-violet-200 hover:bg-violet-800 hover:border-violet-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {generatingLyrics ? (
+                          <>
+                            <svg className="w-2.5 h-2.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                            </svg>
+                            Generating…
+                          </>
+                        ) : "Generate Lyrics"}
+                      </button>
+                    </div>
+                  )}
 
                   {/* Advance button — only show on the stage immediately after current */}
                   {isFuture && idx === currentStageIdx + 1 && (
