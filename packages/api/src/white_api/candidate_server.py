@@ -483,6 +483,8 @@ def create_app(
         """Return the worst-case fitting verdict across all sections and phrases."""
         worst_idx = len(_FITTING_VERDICT_ORDER)
         for section_data in fitting.values():
+            if not isinstance(section_data, dict):
+                continue
             for phrase in section_data.get("phrases", []):
                 v = phrase.get("verdict", "")
                 try:
@@ -634,18 +636,19 @@ def create_app(
                 status_code=400,
                 detail=f"Invalid phase '{body.phase}'. Must be one of: {sorted(VALID_PHASES)}",
             )
-        review_path = prod / body.phase / "review.yml"
+        from white_composition.pipeline_runner import PHASE_REVIEW_FILES, cmd_promote
+
+        review_file = PHASE_REVIEW_FILES.get(body.phase, f"{body.phase}/review.yml")
+        review_path = prod / review_file
         if not review_path.exists():
             raise HTTPException(
                 status_code=404,
-                detail=f"No review.yml found for phase '{body.phase}'",
+                detail=f"No review file found for phase '{body.phase}'",
             )
         approved_dir = prod / body.phase / "approved"
         count_before = (
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
-
-        from white_composition.pipeline_runner import cmd_promote
 
         result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:
