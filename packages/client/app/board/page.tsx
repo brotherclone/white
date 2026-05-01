@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { fetchSongs, fetchActiveSong, fetchComposition, advanceStage, addVersion, updateVersionNotes, runNextPhase, getRunStatus } from "@/lib/api";
-import { CompositionEntry, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
+import {
+  fetchSongs, fetchActiveSong, fetchComposition, advanceStage, addVersion,
+  updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
+} from "@/lib/api";
+import { CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
 
 const STAGE_LABELS: Record<MixStage, string> = {
   structure:          "Structure",
@@ -17,19 +20,113 @@ const STAGE_LABELS: Record<MixStage, string> = {
   final_mix:          "Final Mix",
 };
 
-type LoadState = "loading" | "no_active" | "not_initialized" | "ready" | "error";
+const VERDICT_COLORS: Record<string, string> = {
+  "splits needed":      "text-red-400 bg-red-900/30 border-red-800",
+  "tight but workable": "text-yellow-400 bg-yellow-900/30 border-yellow-800",
+  "paste-ready":        "text-green-400 bg-green-900/30 border-green-800",
+  "spacious":           "text-blue-400 bg-blue-900/30 border-blue-800",
+};
+
+function LyricModal({
+  candidate,
+  readOnly,
+  onClose,
+  onPromote,
+  promoting,
+}: {
+  candidate: LyricCandidate;
+  readOnly: boolean;
+  onClose: () => void;
+  onPromote: () => void;
+  promoting: boolean;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-lg mx-4 flex flex-col max-h-[80vh] shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 flex-shrink-0">
+          <span className="text-sm font-semibold text-white font-sans">
+            {readOnly ? "Lyrics — promoted" : `Lyrics — v${candidate.rank}`}
+          </span>
+          <button
+            onClick={onClose}
+            className="text-zinc-500 hover:text-zinc-200 text-lg leading-none transition-colors"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Metadata */}
+        <div className="flex items-center gap-2 px-5 py-2.5 border-b border-zinc-800/60 flex-shrink-0">
+          {candidate.match != null && (
+            <span className="text-[10px] font-sans text-zinc-400">
+              match <span className="text-zinc-200 font-semibold">{(candidate.match * 100).toFixed(0)}%</span>
+            </span>
+          )}
+          {candidate.fitting_verdict && (
+            <span className={`text-[10px] font-sans px-1.5 py-0.5 rounded border ${VERDICT_COLORS[candidate.fitting_verdict] ?? "text-zinc-400 bg-zinc-800 border-zinc-700"}`}>
+              {candidate.fitting_verdict}
+            </span>
+          )}
+        </div>
+
+        {/* Lyric text */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <pre className="text-xs text-zinc-300 font-mono whitespace-pre-wrap leading-relaxed">
+            {candidate.text}
+          </pre>
+        </div>
+
+        {/* Footer */}
+        {!readOnly && (
+          <div className="px-5 py-3.5 border-t border-zinc-800 flex-shrink-0">
+            <button
+              onClick={onPromote}
+              disabled={promoting}
+              className="w-full py-2 text-sm font-sans font-semibold rounded-lg bg-violet-700 hover:bg-violet-600 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {promoting ? "Promoting…" : "Promote"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+type LoadState = "loading" | "not_initialized" | "ready" | "error";
 
 export default function BoardPage() {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [activeSong, setActiveSong] = useState<SongEntry | null>(null);
   const [composition, setComposition] = useState<CompositionEntry | null>(null);
   const [songs, setSongs] = useState<SongEntry[]>([]);
+  const [lyricsData, setLyricsData] = useState<LyricsResponse | null>(null);
+  const [modal, setModal] = useState<{ candidate: LyricCandidate; readOnly: boolean } | null>(null);
+  const [promoting, setPromoting] = useState(false);
   const [advancingTo, setAdvancingTo] = useState<MixStage | null>(null);
   const [addingVersion, setAddingVersion] = useState(false);
   const [generatingLyrics, setGeneratingLyrics] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const refreshLyrics = useCallback(async () => {
+    try {
+      const data = await fetchLyrics();
+      setLyricsData(data);
+    } catch (e: unknown) {
+      if ((e as { status?: number }).status === 404) setLyricsData(null);
+      // 503 = no active song; other errors silently ignored
+    }
+  }, []);
 
   const refresh = useCallback(async () => {
     try {
@@ -47,11 +144,17 @@ export default function BoardPage() {
   }, []);
 
   useEffect(() => {
-    fetchSongs()
-      .then(setSongs)
-      .catch(() => {});
+    fetchSongs().then(setSongs).catch(() => {});
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (loadState === "ready") refreshLyrics();
+  }, [loadState, refreshLyrics]);
+
+  useEffect(() => () => {
+    if (lyricsPollRef.current) clearInterval(lyricsPollRef.current);
+  }, []);
 
   const handleAdvance = async (stage: MixStage) => {
     setAdvancingTo(stage);
@@ -79,8 +182,6 @@ export default function BoardPage() {
     }
   };
 
-  useEffect(() => () => { if (lyricsPollRef.current) clearInterval(lyricsPollRef.current); }, []);
-
   const handleGenerateLyrics = async () => {
     setGeneratingLyrics(true);
     setError(null);
@@ -98,6 +199,7 @@ export default function BoardPage() {
           clearInterval(lyricsPollRef.current!);
           lyricsPollRef.current = null;
           setGeneratingLyrics(false);
+          refreshLyrics();
         } else if (job.status === "error") {
           clearInterval(lyricsPollRef.current!);
           lyricsPollRef.current = null;
@@ -108,6 +210,22 @@ export default function BoardPage() {
     }, 3000);
   };
 
+  const handlePromoteLyric = async () => {
+    if (!modal) return;
+    setPromoting(true);
+    setError(null);
+    try {
+      await approveLyric(modal.candidate.id);
+      await promotePhase("lyrics");
+      setModal(null);
+      await refreshLyrics();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Promotion failed");
+    } finally {
+      setPromoting(false);
+    }
+  };
+
   const handleNotesChange = (version: number, notes: string) => {
     if (notesSaveTimers.current[version]) clearTimeout(notesSaveTimers.current[version]);
     notesSaveTimers.current[version] = setTimeout(() => {
@@ -115,12 +233,22 @@ export default function BoardPage() {
     }, 600);
   };
 
-  const currentStageIdx = composition
-    ? MIX_STAGES.indexOf(composition.current_stage)
-    : -1;
+  const currentStageIdx = composition ? MIX_STAGES.indexOf(composition.current_stage) : -1;
+  const promotedCandidate = lyricsData?.candidates.find(c => c.status === "promoted");
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-200 font-mono">
+      {/* Modal */}
+      {modal && (
+        <LyricModal
+          candidate={modal.candidate}
+          readOnly={modal.readOnly}
+          onClose={() => setModal(null)}
+          onPromote={handlePromoteLyric}
+          promoting={promoting}
+        />
+      )}
+
       {/* Header */}
       <div className="border-b border-zinc-800 px-6 py-4 flex items-center gap-4">
         <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans transition-colors">
@@ -160,7 +288,6 @@ export default function BoardPage() {
         </div>
       )}
 
-      {/* Loading / empty states */}
       {loadState === "loading" && (
         <div className="flex items-center justify-center h-64 text-zinc-500 text-sm font-sans">Loading…</div>
       )}
@@ -178,7 +305,6 @@ export default function BoardPage() {
         </div>
       )}
 
-      {/* Board */}
       {loadState === "ready" && composition && (
         <div className="overflow-x-auto px-6 py-6">
           <div className="flex gap-3 min-w-max">
@@ -186,6 +312,7 @@ export default function BoardPage() {
               const isCurrent = stage === composition.current_stage;
               const isPast = idx < currentStageIdx;
               const isFuture = idx > currentStageIdx;
+              const isLyrics = stage === "lyrics";
 
               return (
                 <div
@@ -206,9 +333,7 @@ export default function BoardPage() {
                           <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                         </svg>
                       )}
-                      {isCurrent && (
-                        <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
-                      )}
+                      {isCurrent && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
                       <span className={`text-xs font-sans font-semibold truncate ${
                         isCurrent ? "text-blue-300" : isPast ? "text-zinc-400" : "text-zinc-600"
                       }`}>
@@ -219,16 +344,14 @@ export default function BoardPage() {
 
                   {/* Column body */}
                   <div className="flex-1 px-3 py-3 flex flex-col gap-2 min-h-32">
-                    {/* Version cards — editable notes on all versions */}
+                    {/* Version cards */}
                     {(isCurrent || isPast) && composition.versions
                       .filter(v => v.stage === stage)
                       .map(v => (
                         <div
                           key={v.version}
                           className={`rounded border px-2.5 py-2 ${
-                            isCurrent
-                              ? "bg-zinc-800 border-zinc-700"
-                              : "bg-zinc-900 border-zinc-800 opacity-70"
+                            isCurrent ? "bg-zinc-800 border-zinc-700" : "bg-zinc-900 border-zinc-800 opacity-70"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-1 mb-1.5">
@@ -249,10 +372,36 @@ export default function BoardPage() {
                         </div>
                       ))
                     }
+
+                    {/* Lyrics version buttons */}
+                    {isCurrent && isLyrics && lyricsData?.status === "pending" && (
+                      <div className="flex gap-1 flex-wrap">
+                        {lyricsData.candidates.map(c => (
+                          <button
+                            key={c.id}
+                            onClick={() => setModal({ candidate: c, readOnly: false })}
+                            disabled={modal !== null}
+                            className="px-2 py-1 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-violet-900 hover:border-violet-700 hover:text-violet-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            v{c.rank}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* See Lyrics button after promotion */}
+                    {isLyrics && lyricsData?.status === "promoted" && promotedCandidate && (
+                      <button
+                        onClick={() => setModal({ candidate: promotedCandidate, readOnly: true })}
+                        className="w-full py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors"
+                      >
+                        See Lyrics
+                      </button>
+                    )}
                   </div>
 
-                  {/* Generate Lyrics button — lyrics column when it's current */}
-                  {isCurrent && stage === "lyrics" && (
+                  {/* Generate Lyrics button — only when no candidates yet */}
+                  {isCurrent && isLyrics && !lyricsData && (
                     <div className="px-3 pb-3">
                       <button
                         onClick={handleGenerateLyrics}
@@ -272,7 +421,7 @@ export default function BoardPage() {
                     </div>
                   )}
 
-                  {/* Advance button — only show on the stage immediately after current */}
+                  {/* Advance button */}
                   {isFuture && idx === currentStageIdx + 1 && (
                     <div className="px-3 pb-3">
                       <button

@@ -181,6 +181,22 @@ export async function advanceStage(stage: string): Promise<{ ok: boolean; stage:
   return res.json();
 }
 
+export async function fetchLyrics(): Promise<import("./types").LyricsResponse> {
+  const res = await fetch(`${BASE}/lyrics`, { cache: "no-store" });
+  if (res.status === 503) throw Object.assign(new Error("no-active-song"), { status: 503 });
+  if (!res.ok) throw Object.assign(new Error("Failed to fetch lyrics"), { status: res.status });
+  return res.json();
+}
+
+export async function approveLyric(id: string): Promise<{ ok: boolean }> {
+  const res = await fetch(`${BASE}/lyrics/${encodeURIComponent(id)}/approve`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Approve lyric failed");
+  }
+  return res.json();
+}
+
 export async function updateVersionNotes(version: number, notes: string): Promise<{ ok: boolean }> {
   const res = await fetch(`${BASE}/composition/version/notes`, {
     method: "PATCH",

@@ -63,6 +63,20 @@ export interface RunJob {
   error: string | null;
 }
 
+export interface LyricCandidate {
+  id: string;
+  rank: number;
+  status: "pending" | "approved" | "promoted";
+  text: string;
+  match: number | null;
+  fitting_verdict: string | null;
+}
+
+export interface LyricsResponse {
+  status: "pending" | "promoted";
+  candidates: LyricCandidate[];
+}
+
 export interface Scores {
   composite: number;
   theory?: Record<string, number>;

@@ -469,6 +469,102 @@ def create_app(
         return {"ok": True}
 
     # ------------------------------------------------------------------
+    # Lyrics review
+    # ------------------------------------------------------------------
+
+    _FITTING_VERDICT_ORDER = [
+        "splits needed",
+        "tight but workable",
+        "paste-ready",
+        "spacious",
+    ]
+
+    def _worst_fitting_verdict(fitting: dict) -> str | None:
+        """Return the worst-case fitting verdict across all sections and phrases."""
+        worst_idx = len(_FITTING_VERDICT_ORDER)
+        for section_data in fitting.values():
+            for phrase in section_data.get("phrases", []):
+                v = phrase.get("verdict", "")
+                try:
+                    idx = _FITTING_VERDICT_ORDER.index(v)
+                    worst_idx = min(worst_idx, idx)
+                except ValueError:
+                    pass
+        return (
+            _FITTING_VERDICT_ORDER[worst_idx]
+            if worst_idx < len(_FITTING_VERDICT_ORDER)
+            else None
+        )
+
+    @app.get("/lyrics")
+    def get_lyrics():
+        prod = _require_production_dir()
+        review_path = prod / "melody" / "lyrics_review.yml"
+        if not review_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="lyrics_review.yml not found — run lyric pipeline first",
+            )
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+        promoted = (prod / "melody" / "lyrics.txt").exists()
+        candidates_out = []
+        for c in review.get("candidates", []):
+            txt_path = prod / "melody" / c.get("file", "")
+            text = txt_path.read_text() if txt_path.exists() else ""
+            chromatic = c.get("chromatic") or {}
+            fitting_verdict = _worst_fitting_verdict(c.get("fitting") or {})
+            status = c.get("status", "pending")
+            if promoted and status == "approved":
+                status = "promoted"
+            candidates_out.append(
+                {
+                    "id": c["id"],
+                    "rank": c.get("rank", 0),
+                    "status": status,
+                    "text": text,
+                    "match": chromatic.get("match"),
+                    "fitting_verdict": fitting_verdict,
+                }
+            )
+        return {
+            "status": "promoted" if promoted else "pending",
+            "candidates": candidates_out,
+        }
+
+    @app.post("/lyrics/{lyric_id}/approve")
+    def approve_lyric(lyric_id: str):
+        prod = _require_production_dir()
+        review_path = prod / "melody" / "lyrics_review.yml"
+        if not review_path.exists():
+            raise HTTPException(status_code=404, detail="lyrics_review.yml not found")
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+        candidates = review.get("candidates", [])
+        found = False
+        for c in candidates:
+            if c["id"] == lyric_id:
+                c["status"] = "approved"
+                found = True
+            else:
+                c["status"] = "pending"
+        if not found:
+            raise HTTPException(
+                status_code=422, detail=f"Lyric candidate '{lyric_id}' not found"
+            )
+        review["candidates"] = candidates
+        with open(review_path, "w") as f:
+            yaml.dump(
+                review,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
+        return {"ok": True}
+
+    # ------------------------------------------------------------------
     # Candidates
     # ------------------------------------------------------------------
 
