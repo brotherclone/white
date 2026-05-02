@@ -74,6 +74,7 @@ export default function SongIndexPage() {
   useEffect(() => {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
+      if (handoffPollRef.current) clearInterval(handoffPollRef.current);
     };
   }, []);
 

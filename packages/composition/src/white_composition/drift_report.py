@@ -277,7 +277,7 @@ def compare_plans(
         DriftReport with all drift fields populated
     """
     num, den = _parse_time_sig(plan.time_sig or "4/4")
-    beats_per_bar = num * (4 // den)
+    beats_per_bar = int(round(num * 4.0 / den))
     actual_instances = parse_arrangement_sections(
         arrangement_path,
         bpm=float(plan.bpm or 120),

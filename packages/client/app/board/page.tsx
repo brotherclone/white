@@ -261,9 +261,10 @@ export default function BoardPage() {
         <div className="ml-auto flex items-center gap-3">
           {songs.length > 0 && (
             <select
-              className="text-xs font-sans bg-zinc-900 border border-zinc-700 rounded px-2 py-1.5 text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="text-xs font-sans bg-zinc-900 border border-zinc-700 rounded px-2 py-1.5 text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
               value={activeSong?.id ?? ""}
               onChange={() => {}}
+              disabled
             >
               {songs.map(s => (
                 <option key={s.id} value={s.id}>{s.title}</option>

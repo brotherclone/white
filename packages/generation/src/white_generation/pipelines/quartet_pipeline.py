@@ -990,7 +990,9 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--section", help="Section label to process (default: all approved)")
     p.add_argument("--singer", default="gabriel", help="Singer name (metadata only)")
     p.add_argument("--top-k", type=int, default=3, help="Candidates per section")
-    p.add_argument("--seed.logicx", type=int, default=None, help="Random seed.logicx")
+    p.add_argument(
+        "--seed.logicx", dest="seed", type=int, default=None, help="Random seed"
+    )
     p.add_argument(
         "--simple-voicings",
         action="store_true",

@@ -119,10 +119,10 @@ def test_empty_approved_phase_creates_empty_folder(production_dir: Path):
     assert list((song_dir / "MIDI" / "drums").glob("*.mid")) == []
 
 
-def test_arrangement_txt_moved(production_dir: Path):
+def test_arrangement_txt_copied(production_dir: Path):
     song_dir = handoff(production_dir)
     assert (song_dir / "arrangement.txt").exists()
-    assert not (production_dir / "arrangement.txt").exists()
+    assert (production_dir / "arrangement.txt").exists()
 
 
 def test_no_text_files_no_error(production_dir: Path):

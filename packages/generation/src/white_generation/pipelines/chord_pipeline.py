@@ -898,7 +898,11 @@ def main():
     )
     parser.add_argument("--song", default=None, help="Song proposal YAML filename")
     parser.add_argument(
-        "--seed.logicx", type=int, default=42, help="Random seed.logicx (default: 42)"
+        "--seed.logicx",
+        dest="seed",
+        type=int,
+        default=42,
+        help="Random seed (default: 42)",
     )
     parser.add_argument(
         "--num-candidates",

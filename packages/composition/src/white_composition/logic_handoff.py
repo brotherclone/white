@@ -10,7 +10,12 @@ import yaml
 
 COMPOSITION_FILENAME = "composition.yml"
 SEED_PATH = (
-    Path(__file__).parents[4] / "packages" / "composition" / "logic" / "seed.logicx"
+    Path(__file__).parents[4]
+    / "packages"
+    / "composition"
+    / "logic"
+    / "seed"
+    / "seed.logicx"
 )
 
 MIDI_PHASES = ["chords", "drums", "bass", "melody"]

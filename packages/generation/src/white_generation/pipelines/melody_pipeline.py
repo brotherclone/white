@@ -959,9 +959,10 @@ def main():
     )
     parser.add_argument(
         "--seed.logicx",
+        dest="seed",
         type=int,
         default=42,
-        help="Random seed.logicx (default: 42)",
+        help="Random seed (default: 42)",
     )
     parser.add_argument(
         "--top-k",
