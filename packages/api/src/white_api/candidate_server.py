@@ -78,6 +78,14 @@ _handoff_job: dict = {
     "error": None,
 }
 
+# Drift report job state
+_drift_job: dict = {
+    "status": "idle",
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
+
 
 # ---------------------------------------------------------------------------
 # Song scanning
@@ -408,6 +416,79 @@ def create_app(
     @app.get("/handoff/status")
     def handoff_status():
         return _handoff_job
+
+    # ------------------------------------------------------------------
+    # Plan Drift Report
+    # ------------------------------------------------------------------
+
+    class DriftReportBody(BaseModel):
+        use_claude: bool = True
+
+    @app.get("/drift-report")
+    def get_drift_report():
+        prod = _require_production_dir()
+        from white_composition.drift_report import load_report
+
+        report = load_report(prod)
+        if report is None:
+            raise HTTPException(
+                status_code=404,
+                detail="No plan_drift_report.yml found — POST /drift-report to generate",
+            )
+        return report.model_dump()
+
+    @app.post("/drift-report")
+    def start_drift_report(body: DriftReportBody = DriftReportBody()):
+        global _drift_job
+        if _drift_job["status"] == "running":
+            raise HTTPException(
+                status_code=409, detail="A drift report job is already running"
+            )
+        prod = _require_production_dir()
+        arr_path = prod / "arrangement.txt"
+        if not arr_path.exists():
+            raise HTTPException(
+                status_code=422,
+                detail="arrangement.txt not found in production directory",
+            )
+        from white_composition.production_plan import PLAN_FILENAME, load_plan
+
+        plan = load_plan(prod)
+        if plan is None:
+            raise HTTPException(
+                status_code=422,
+                detail=f"{PLAN_FILENAME} not found — generate a production plan first",
+            )
+        now = datetime.now(timezone.utc).isoformat()
+        _drift_job = {
+            "status": "running",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        use_claude = body.use_claude
+
+        def _run():
+            global _drift_job
+            try:
+                from white_composition.drift_report import compare_plans, write_report
+
+                report = compare_plans(plan, arr_path, use_claude=use_claude)
+                write_report(prod, report)
+                _drift_job["status"] = "done"
+            except Exception as exc:
+                _drift_job["status"] = "error"
+                _drift_job["error"] = str(exc)
+            finally:
+                _drift_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/drift-report/status")
+    def drift_report_status():
+        return _drift_job
 
     @app.get("/composition")
     def get_composition():
