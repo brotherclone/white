@@ -125,7 +125,7 @@ def generate_and_score(
 
     os.makedirs(SPIKE_DIR, exist_ok=True)
 
-    print(f"[{color} clip {clip_index}] seed={seed}")
+    print(f"[{color} clip {clip_index}] seed.logicx={seed}")
     print(f"  Prompt: {prompt[:80]}...")
 
     # Load pipeline (cached after first call in the container lifetime)
@@ -167,7 +167,7 @@ def generate_and_score(
         return {
             "color": color,
             "clip_index": clip_index,
-            "seed": seed,
+            "seed.logicx": seed,
             "prompt": prompt,
             "wav_file": wav_filename,
             "generation_time_s": generation_time_s,
@@ -342,7 +342,7 @@ def generate_and_score(
     result = {
         "color": color,
         "clip_index": clip_index,
-        "seed": seed,
+        "seed.logicx": seed,
         "prompt": prompt,
         "wav_file": wav_filename,
         "generation_time_s": generation_time_s,

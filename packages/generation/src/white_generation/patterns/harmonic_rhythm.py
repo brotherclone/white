@@ -41,7 +41,7 @@ def enumerate_distributions(
     progression). If 2^N exceeds MAX_CANDIDATES, the first MAX_CANDIDATES
     combinations are returned. The uniform 1-bar baseline is always included.
 
-    The seed parameter is retained for API compatibility but has no effect
+    The seed.logicx parameter is retained for API compatibility but has no effect
     since all valid distributions are fully enumerated.
     """
     if n_chords <= 0:

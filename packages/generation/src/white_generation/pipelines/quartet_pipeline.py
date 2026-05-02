@@ -30,8 +30,8 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
-from white_composition.init_production import load_song_context
 
+from white_composition.init_production import load_song_context
 from white_generation.patterns.bass_patterns import (
     ALL_TEMPLATES as ALL_BASS_TEMPLATES,
 )
@@ -693,7 +693,7 @@ def generate_quartet(
         section: Section label (e.g. 'chorus', 'verse').
         singer: Singer name — used only for display in review.yml.
         top_k: Number of candidates to generate.
-        seed: Optional random seed for reproducibility.
+        seed: Optional random seed.logicx for reproducibility.
         scorer: Optional pre-loaded Refractor instance.
         simple_voicings: If True, falls back to legacy interval-offset approach.
 
@@ -990,7 +990,9 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--section", help="Section label to process (default: all approved)")
     p.add_argument("--singer", default="gabriel", help="Singer name (metadata only)")
     p.add_argument("--top-k", type=int, default=3, help="Candidates per section")
-    p.add_argument("--seed", type=int, default=None, help="Random seed")
+    p.add_argument(
+        "--seed.logicx", dest="seed", type=int, default=None, help="Random seed"
+    )
     p.add_argument(
         "--simple-voicings",
         action="store_true",

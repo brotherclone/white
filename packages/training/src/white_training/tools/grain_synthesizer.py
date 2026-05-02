@@ -14,7 +14,7 @@ Usage:
         --color Red --duration 30 --output ./red_texture.wav
 
     python -m training.tools.grain_synthesizer \
-        --color Violet --duration 60 --top-n 30 --seed 7 --crossfade-ms 80
+        --color Violet --duration 60 --top-n 30 --seed.logicx 7 --crossfade-ms 80
 """
 
 from __future__ import annotations
@@ -213,7 +213,7 @@ def synthesize(
         output_path: Path for the output WAV (default: ./grain_output/<color>_texture.wav).
         clap_parquet: Override CLAP parquet path.
         meta_parquet: Override metadata parquet path.
-        seed: Random seed for reproducibility.
+        seed: Random seed.logicx for reproducibility.
         grain_dur_s: Duration of each grain in seconds.
         crossfade_ms: Crossfade length in milliseconds.
         grain_pool: Pre-loaded pool (skips retrieve_by_color; useful for testing).
@@ -339,7 +339,7 @@ def synthesize(
         "duration_s": round(actual_dur, 3),
         "grain_dur_s": grain_dur_s,
         "crossfade_ms": crossfade_ms,
-        "seed": seed,
+        "seed.logicx": seed,
         "pool_size": len(grain_pool),
         "grains": grains_used,
     }
@@ -379,7 +379,11 @@ def main() -> None:
         help="Output WAV path (default: ./grain_output/<color>_texture.wav)",
     )
     parser.add_argument(
-        "--seed", type=int, default=42, help="Random seed (default: 42)"
+        "--seed.logicx",
+        dest="seed",
+        type=int,
+        default=42,
+        help="Random seed (default: 42)",
     )
     parser.add_argument(
         "--grain-dur",

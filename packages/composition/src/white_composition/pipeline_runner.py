@@ -100,7 +100,7 @@ def _build_phase_command(
             prod,
         ]
         if proposal:
-            cmd += ["--song-proposal", proposal]
+            cmd += ["--song", proposal]
         return cmd
     if phase == "drums":
         return base + [

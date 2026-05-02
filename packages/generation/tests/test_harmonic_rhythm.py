@@ -4,6 +4,7 @@ import io
 
 import mido
 import pytest
+
 from white_generation.patterns.harmonic_rhythm import (
     GRID_UNIT,
     MAX_CANDIDATES,
@@ -73,7 +74,7 @@ class TestDistributionEnumeration:
         assert d1 == d2
 
     def test_seed_has_no_effect(self):
-        # All distributions are fully enumerated; seed is a no-op
+        # All distributions are fully enumerated; seed.logicx is a no-op
         d1 = enumerate_distributions(4, seed=1)
         d2 = enumerate_distributions(4, seed=999)
         assert d1 == d2
