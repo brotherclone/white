@@ -342,12 +342,14 @@ def generate_review_yaml(
     """Generate the review YAML structure."""
     candidates = []
     for item in ranked_candidates:
+        is_diatonic = item.get("source") == "diatonic"
         entry = {
             "id": item["id"],
             "midi_file": f"candidates/{item['id']}.mid",
             "scratch_midi": f"candidates/{item['id']}_scratch.mid",
-            "rank": item["rank"],
-            "scores": _to_python(item["breakdown"]),
+            "rank": None if is_diatonic else item["rank"],
+            "source": item.get("source", "markov"),
+            "scores": None if is_diatonic else _to_python(item["breakdown"]),
             "hr_distribution": _to_python(item.get("hr_distribution", [])),
             "strum_pattern": item.get("strum_pattern", "whole"),
             "progression": item["summary"],
@@ -362,7 +364,9 @@ def generate_review_yaml(
             # Human annotation fields
             "label": None,
             "status": "pending",
-            "notes": "",
+            "notes": (
+                "Diatonic workhorse — assign to verse sections" if is_diatonic else ""
+            ),
         }
         if item.get("bar_sources"):
             entry["bar_sources"] = item["bar_sources"]
@@ -384,6 +388,93 @@ def generate_review_yaml(
     if song_info.get("sub_proposals"):
         review["sub_proposals"] = song_info["sub_proposals"]
     return review
+
+
+# ---------------------------------------------------------------------------
+# Diatonic workhorse candidates
+# ---------------------------------------------------------------------------
+
+DIATONIC_PATTERNS: dict[str, dict[str, list[str]]] = {
+    "Major": {
+        "I_V_vi_IV": ["I", "V", "vi", "IV"],
+        "I_IV_V": ["I", "IV", "V"],
+        "I_vi_IV_V": ["I", "vi", "IV", "V"],
+        "ii_V_I": ["II", "V", "I"],
+    },
+    "Minor": {
+        "i_VII_VI_VII": ["i", "VII", "VI", "VII"],
+        "i_VI_III_VII": ["i", "VI", "III", "VII"],
+        "i_iv_v": ["i", "iv", "v"],
+        "i_VI_VII_i": ["i", "VI", "VII", "i"],
+    },
+}
+
+
+def build_diatonic_candidates(
+    key_root: str,
+    mode: str,
+    bpm: int,
+    time_sig: tuple[int, int],
+    gen: "ChordProgressionGenerator",
+    rng,
+    genre_families: list[str],
+) -> list[dict]:
+    """Build diatonic workhorse candidates from the chord bank.
+
+    One candidate per pattern. Patterns where any degree is missing from the
+    bank are skipped silently. Returns candidate dicts ready for MIDI export
+    and review.yml serialisation.
+    """
+    pattern_set = DIATONIC_PATTERNS.get(mode, {})
+    candidates = []
+
+    for pattern_name, degrees in pattern_set.items():
+        progression = []
+        for degree in degrees:
+            rows = gen.get_chord_by_function(key_root, mode, degree)
+            if rows.is_empty():
+                progression = []
+                break
+            row = rows.row(0, named=True)
+            progression.append(
+                {
+                    "chord_id": row["chord_id"],
+                    "chord_name": row["chord_name"],
+                    "function": row["function"],
+                    "note_names": row["note_names"],
+                    "midi_notes": list(row["midi_notes"]),
+                    "quality": row["quality"],
+                }
+            )
+        if not progression:
+            continue
+
+        n = len(progression)
+        hr_dist = sample_hr_distribution(n, rng)
+        strum_pat = sample_strum_pattern(time_sig, rng)
+        bar_count = int(sum(hr_dist))
+
+        midi_bytes = progression_to_primitive_midi_bytes(
+            progression, bpm, time_sig, hr_dist, strum_pat
+        )
+        scratch_bytes = generate_scratch_beat(bpm, bar_count, time_sig, genre_families)
+
+        candidates.append(
+            {
+                "id": f"diatonic_{pattern_name}",
+                "midi_bytes": midi_bytes,
+                "scratch_bytes": scratch_bytes,
+                "progression": progression,
+                "summary": " – ".join(
+                    f"{c['function']}({c['chord_name']})" for c in progression
+                ),
+                "hr_distribution": hr_dist,
+                "strum_pattern": strum_pat.name,
+                "source": "diatonic",
+            }
+        )
+
+    return candidates
 
 
 # ---------------------------------------------------------------------------
@@ -830,7 +921,28 @@ def run_chord_pipeline(
         item["hr_distribution"] = hr_dist
         item["strum_pattern"] = strum_pat.name
 
-    # --- 6. Write review YAML ---
+    # --- 6. Build and write diatonic workhorse candidates ---
+    diatonic = build_diatonic_candidates(
+        song_info["key_root"],
+        song_info["mode"],
+        song_info["bpm"],
+        time_sig,
+        gen,
+        rng,
+        genre_families,
+    )
+    if diatonic:
+        print(f"\nAdding {len(diatonic)} diatonic workhorse candidates...")
+        for item in diatonic:
+            write_midi_file(item["midi_bytes"], candidates_dir / f"{item['id']}.mid")
+            _trim_midi(candidates_dir / f"{item['id']}.mid")
+            write_midi_file(
+                item["scratch_bytes"], candidates_dir / f"{item['id']}_scratch.mid"
+            )
+            _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
+        top_candidates = top_candidates + diatonic
+
+    # --- 7. Write review YAML ---
     review = generate_review_yaml(
         song_info,
         top_candidates,
@@ -850,7 +962,7 @@ def run_chord_pipeline(
 
     print(f"Review file: {review_path}")
 
-    # --- 7. Summary ---
+    # --- 8. Summary ---
     print(f"\n{'=' * 60}")
     print(f"TOP {len(top_candidates)} CANDIDATES")
     print(f"{'=' * 60}")
