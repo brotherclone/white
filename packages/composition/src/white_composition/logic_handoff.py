@@ -14,7 +14,7 @@ SEED_PATH = (
 )
 
 MIDI_PHASES = ["chords", "drums", "bass", "melody"]
-TEXT_PATTERNS = ["arrangement.txt", "lyrics*.txt", "lyrics*.lrc", "*.lrc"]
+LYRICS_PATTERNS = ["lyrics*.txt", "lyrics*.lrc", "*.lrc"]
 
 
 class MixStage(str, Enum):
@@ -82,15 +82,19 @@ def handoff(production_dir: Path) -> Path:
             for mid in approved.glob("*.mid"):
                 shutil.copy2(mid, phase_midi_dir / mid.name)
 
-    # 3. Copy text files (arrangement, lyrics) into Logic song folder
-    # Copy rather than move so the production dir retains arrangement.txt
-    # for the lyric pipeline to read on subsequent runs.
-    for pattern in TEXT_PATTERNS:
+    # 3. Copy lyrics into Logic song folder (prod → Logic)
+    for pattern in LYRICS_PATTERNS:
         for src in production_dir.glob(pattern):
-            dest = song_dir / src.name
-            shutil.copy2(src, dest)
+            shutil.copy2(src, song_dir / src.name)
 
-    # 4. Create composition.yml if absent
+    # 4. Sync arrangement.txt back from Logic folder → production dir so that
+    # lyric gen and drift report can read it after the human has arranged in Logic.
+    logic_arrangement = song_dir / "arrangement.txt"
+    if logic_arrangement.exists():
+        shutil.copy2(logic_arrangement, production_dir / "arrangement.txt")
+        print(f"Synced arrangement.txt from Logic → {production_dir}")
+
+    # 5. Create composition.yml if absent
     comp_path = song_dir / COMPOSITION_FILENAME
     if not comp_path.exists():
         from white_composition.init_production import load_song_context
