@@ -1,0 +1,129 @@
+# lyrics-review-board Specification
+
+## Purpose
+TBD - created by archiving change lyrics-review-board. Update Purpose after archive.
+## Requirements
+### Requirement: Lyric Candidates API
+`candidate_server.py` SHALL expose two new endpoints for lyric candidate data:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/lyrics` | Return all lyric candidates from `melody/lyrics_review.yml` including candidate text |
+| POST | `/lyrics/<id>/approve` | Set `status: approved` on the named candidate in `lyrics_review.yml` |
+
+`GET /lyrics` SHALL return a JSON object:
+```json
+{
+  "status": "pending" | "promoted",
+  "candidates": [
+    {
+      "id": "lyrics_01",
+      "rank": 1,
+      "status": "pending" | "approved" | "promoted",
+      "text": "<full contents of candidates/lyrics_01.txt>",
+      "match": 0.19,
+      "fitting_verdict": "splits needed"
+    }
+  ]
+}
+```
+
+`status` at the top level SHALL be `"promoted"` if `melody/lyrics.txt` exists
+(promotion has run), otherwise `"pending"`.
+
+`fitting_verdict` SHALL be the worst-case verdict across all sections for that
+candidate (order: `splits needed` > `tight but workable` > `paste-ready` >
+`spacious`).
+
+Both endpoints SHALL return 503 if no song is active and 404/422 if
+`lyrics_review.yml` does not exist.
+
+#### Scenario: Candidates returned before promotion
+- **WHEN** `GET /lyrics` is called and `melody/lyrics.txt` does not exist
+- **THEN** `status` is `"pending"` and `candidates` contains one entry per
+  candidate in `lyrics_review.yml` with `text` populated from the `.txt` file
+
+#### Scenario: Candidates returned after promotion
+- **WHEN** `GET /lyrics` is called and `melody/lyrics.txt` exists
+- **THEN** `status` is `"promoted"` and the previously approved candidate's
+  `status` field is `"promoted"`
+
+#### Scenario: Approve candidate
+- **WHEN** `POST /lyrics/lyrics_02/approve` is called
+- **THEN** `lyrics_review.yml` is updated so `lyrics_02` has `status: approved`
+  and all other candidates have `status: pending`
+- **AND** `{"ok": true}` is returned
+
+#### Scenario: Missing review file
+- **WHEN** `GET /lyrics` is called and `lyrics_review.yml` does not exist
+- **THEN** a 404 is returned with `{"detail": "lyrics_review.yml not found — run lyric pipeline first"}`
+
+---
+
+### Requirement: Lyrics Column Version Buttons
+The lyrics stage column SHALL display a row of compact version buttons — one per
+candidate, labelled `v1`, `v2`, `v3` in rank order — when the board's active song
+is at the **lyrics** mix stage AND `GET /lyrics` returns `status: "pending"`.
+
+Each button SHALL be disabled while any modal is open.
+
+#### Scenario: Version buttons appear
+- **WHEN** `composition.current_stage === "lyrics"` and lyrics status is `"pending"`
+- **THEN** a row of `[v1] [v2] [v3]` buttons appears in the lyrics column body
+
+#### Scenario: Version buttons absent after promotion
+- **WHEN** lyrics status is `"promoted"`
+- **THEN** the version buttons are NOT shown; a single `[See Lyrics]` button
+  appears instead
+
+---
+
+### Requirement: Lyric Candidate Popup
+Clicking a version button SHALL open a modal overlay containing:
+
+1. A header: `Lyrics — v<rank>` with a `[×]` close button top-right
+2. The full lyric text rendered in a scrollable pre-formatted block
+   (monospace, preserving `[section]` headers and line breaks)
+3. A metadata row showing: chromatic `match` score and worst-case `fitting_verdict`
+4. A **Promote** button at the bottom
+
+Clicking **Promote** SHALL:
+1. Call `POST /lyrics/<id>/approve`
+2. Call `POST /promote` with `{ "phase": "lyrics" }`
+3. Close the modal
+4. Refresh the lyrics data so version buttons are replaced by `[See Lyrics]`
+
+The modal SHALL be dismissible via the `[×]` button or clicking the backdrop.
+
+#### Scenario: Open candidate popup
+- **WHEN** the user clicks `[v2]`
+- **THEN** a modal opens showing the full text of `lyrics_02.txt`
+- **AND** the header reads "Lyrics — v2"
+
+#### Scenario: Promote from popup
+- **WHEN** the user clicks Promote inside the v2 popup
+- **THEN** `POST /lyrics/lyrics_02/approve` is called, then `POST /promote {phase: "lyrics"}`
+- **AND** the modal closes
+- **AND** the version buttons are replaced by `[See Lyrics]`
+
+#### Scenario: Close without promoting
+- **WHEN** the user clicks `[×]` or the backdrop
+- **THEN** the modal closes with no changes to lyrics status
+
+---
+
+### Requirement: See Lyrics Button and Read-Only Popup
+After promotion, a single **[See Lyrics]** button SHALL appear in the lyrics
+column in place of the version buttons.
+
+Clicking it SHALL open the same modal layout but in read-only mode:
+- Header: `Lyrics — promoted`
+- Full promoted lyric text (from the approved candidate's `.txt` file)
+- Fitting verdict and match score
+- No Promote button
+
+#### Scenario: See Lyrics opens read-only modal
+- **WHEN** lyrics status is `"promoted"` and the user clicks `[See Lyrics]`
+- **THEN** the modal opens showing the approved lyric text without a Promote button
+- **AND** the header reads "Lyrics — promoted"
+

@@ -66,53 +66,30 @@ Exactly one of `--production-dir` or `--shrink-wrapped-dir` MUST be supplied; su
 - **THEN** a 503 response is returned with `{"detail": "No song selected — POST /songs/activate first"}`
 
 ### Requirement: Next.js Frontend
-A Next.js 15 app (App Router, TypeScript, Tailwind CSS) SHALL live in `web/` and
-consume the FastAPI backend at `http://localhost:8000`. The app SHALL include two
-primary routes: a song index at `/` and a candidate browser at `/candidates`.
+The candidate browser SHALL display only the generation phases relevant to the
+MIDI production pipeline. The `lyrics`, `decisions`, and `quartet` phases SHALL be
+removed from the phase filter dropdown and the pipeline status strip.
 
-The candidate browser SHALL include a Promote button in the phase filter toolbar that
-is disabled when no single phase is selected and enabled when exactly one phase is selected.
+The pipeline status strip SHALL show phases in this order:
+`chords → drums → bass → melody`
 
-#### Scenario: Song index loads
-- **WHEN** the app is opened and the server is in album mode
-- **THEN** the song index page at `/` is shown with a card for every song returned by `GET /songs`
+Backend support for `lyrics`, `decisions`, and `quartet` (API endpoints, pipeline runner)
+is preserved; only the web UI omits them.
 
-#### Scenario: Song card click
-- **WHEN** a song card is clicked
-- **THEN** `POST /songs/activate` is called with that song's `id`
-- **AND** on success the browser navigates to `/candidates`
-- **AND** a spinner is shown on the clicked card while the request is in-flight
+The `← Songs` breadcrumb on `/candidates` SHALL link to `/songs` (not `/`).
 
-#### Scenario: Single-song mode redirect
-- **WHEN** the app is opened and `GET /songs` returns 503 (single-song mode)
-- **THEN** the song index page immediately redirects to `/candidates` without showing an error
+#### Scenario: Phase filter shows generation phases only
+- **WHEN** the user opens the phase filter dropdown on `/candidates`
+- **THEN** the options are: All phases, chords, drums, bass, melody
+- **AND** lyrics, decisions, and quartet are not listed
 
-#### Scenario: Candidate table
-- **WHEN** `/candidates` loads
-- **THEN** all candidates are fetched from `/candidates` and displayed in a table with columns: phase, section, ID, template, composite score (bar), status, actions
+#### Scenario: Pipeline strip stops at melody
+- **WHEN** the pipeline status strip renders
+- **THEN** it shows status indicators for: chords, drums, bass, melody only
 
-#### Scenario: Approve and reject
-- **WHEN** the Approve or Reject button for a row is clicked
-- **THEN** a POST is sent to the backend and the row's status badge updates in place without a full page reload
-
-#### Scenario: MIDI playback
-- **WHEN** a row's Play button is clicked
-- **THEN** the candidate's MIDI plays inline; any previously playing candidate is stopped
-
-#### Scenario: Promote button disabled without phase filter
-- **WHEN** the phase filter is set to "all" or is unset
-- **THEN** the Promote button is disabled with tooltip "Select a phase to enable promote"
-
-#### Scenario: Promote button enabled with phase filter
-- **WHEN** a single phase (chords, drums, bass, melody, or quartet) is selected
-- **THEN** the Promote button is enabled
-
-#### Scenario: Promote action
-- **WHEN** the Promote button is clicked with a phase selected
-- **THEN** `POST /promote` is called with `{production_dir, phase}`
-- **AND** a success toast shows the number of files promoted
-- **AND** the candidate list refreshes to reflect updated statuses
-- **AND** the button shows a spinner while the request is in-flight
+#### Scenario: Songs breadcrumb links to /songs
+- **WHEN** the user is on `/candidates`
+- **THEN** the `← Songs` breadcrumb links to `/songs`, not `/`
 
 ### Requirement: No Breaking Changes
 The existing terminal browser (`app/tools/candidate_browser.py`) SHALL remain unchanged.
@@ -356,4 +333,21 @@ On error:
 #### Scenario: Generate button absent in single-song mode
 - **WHEN** the server was launched with `--production-dir`
 - **THEN** the Generate button is not rendered on the index page (the index redirects to /candidates anyway)
+
+### Requirement: Root Landing Page
+The application root (`/`) SHALL display a minimal landing page with two navigation
+links: **Generation** (→ `/songs`) and **Composition Board** (→ `/board`).
+
+The current songs index page SHALL move to `/songs`. All internal links that previously
+pointed to `/` as the songs list SHALL be updated to `/songs`.
+
+#### Scenario: Landing renders two links
+- **WHEN** the user navigates to `/`
+- **THEN** two clearly labelled links are rendered: "Generation" and "Composition Board"
+- **AND** clicking "Generation" navigates to `/songs`
+- **AND** clicking "Composition Board" navigates to `/board`
+
+#### Scenario: Songs index accessible at /songs
+- **WHEN** the user navigates to `/songs`
+- **THEN** the full song list renders identically to the previous `/` behaviour
 
