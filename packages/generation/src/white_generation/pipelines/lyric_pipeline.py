@@ -36,6 +36,7 @@ from typing import Optional
 import mido
 import yaml
 from dotenv import load_dotenv
+
 from white_composition.init_production import (
     load_initial_proposal,
     load_song_context,
@@ -45,7 +46,6 @@ from white_composition.production_plan import (  # noqa: E402
     _normalize_repeat_type,
 )
 from white_core.enums.lyric_repeat_type import LyricRepeatType
-
 from white_generation.artist_catalog import load_artist_context  # noqa: E402
 from white_generation.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
@@ -1161,7 +1161,7 @@ def _load_or_init_review(melody_dir: Path, meta: dict, model: str, seed: int) ->
         "time_sig": meta.get("time_sig"),
         "color": meta.get("color"),
         "generated": datetime.now(timezone.utc).isoformat(),
-        "seed": seed,
+        "seed.logicx": seed,
         "model": model,
         "scoring_weights": {"chromatic": 1.0},
         "candidates": [],
@@ -1264,6 +1264,7 @@ def run_lyric_pipeline(
     onnx_path: Optional[str] = None,
     skip_scoring: bool = False,
     melody_channel: int = MELODY_CHANNEL,
+    arrangement: Optional[str] = None,
 ) -> dict:
     """Run the lyric generation pipeline end-to-end.
 
@@ -1280,7 +1281,9 @@ def run_lyric_pipeline(
         sys.exit(1)
 
     melody_dir = prod_path / "melody"
-    arrangement_path = prod_path / "arrangement.txt"
+    arrangement_path = (
+        Path(arrangement) if arrangement else prod_path / "arrangement.txt"
+    )
 
     print("=" * 60)
     print("LYRIC GENERATION PIPELINE")
@@ -1598,6 +1601,11 @@ def main():
         default=MELODY_CHANNEL,
         help=f"Logic track number carrying melody/vocal clips (default: {MELODY_CHANNEL})",
     )
+    parser.add_argument(
+        "--arrangement",
+        default=None,
+        help="Path to arrangement.txt (default: <production-dir>/arrangement.txt)",
+    )
 
     args = parser.parse_args()
 
@@ -1614,6 +1622,7 @@ def main():
         onnx_path=args.onnx_path,
         skip_scoring=args.skip_scoring,
         melody_channel=args.melody_channel,
+        arrangement=args.arrangement,
     )
 
 

@@ -61,10 +61,63 @@ _generate_job: dict = {
     "error": None,
 }
 
+# Pipeline run job state — one phase run at a time
+_run_job: dict = {
+    "status": "idle",
+    "phase": None,
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
+
+# Logic handoff job state
+_handoff_job: dict = {
+    "status": "idle",
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
+
+# Drift report job state
+_drift_job: dict = {
+    "status": "idle",
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
+
 
 # ---------------------------------------------------------------------------
 # Song scanning
 # ---------------------------------------------------------------------------
+
+
+def _coerce_key_string(key) -> str | None:
+    """Normalise a key value that may be a string or a KeySignature dict."""
+    if key is None:
+        return None
+    if isinstance(key, str):
+        return key or None
+    if isinstance(key, dict):
+        note = key.get("note") or {}
+        mode = key.get("mode") or {}
+        pitch = note.get("pitch_name", "") if isinstance(note, dict) else ""
+        mode_name = mode.get("name", "") if isinstance(mode, dict) else ""
+        parts = [p for p in (pitch, mode_name) if p]
+        return " ".join(parts) or None
+    return str(key) or None
+
+
+def _find_proposal(manifest_path: Path) -> Path | None:
+    """Locate the song proposal yml for a production dir.
+
+    Convention: <thread>/yml/<production_slug>.yml
+    """
+    prod_dir = manifest_path.parent
+    production_slug = prod_dir.name
+    thread_dir = prod_dir.parent.parent
+    candidate = thread_dir / "yml" / f"{production_slug}.yml"
+    return candidate if candidate.exists() else None
 
 
 def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
@@ -83,20 +136,22 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
             continue
         if not isinstance(data, dict):
             continue
+        prod_dir = manifest_path.parent
+        proposal_path = _find_proposal(manifest_path)
         songs.append(
             {
                 "id": f"{thread_slug}__{production_slug}",
                 "thread_slug": thread_slug,
                 "production_slug": production_slug,
-                "production_path": str(manifest_path.parent),
+                "production_path": str(prod_dir),
                 "title": data.get("title") or production_slug,
-                "key": data.get("key"),
+                "key": _coerce_key_string(data.get("key")),
                 "bpm": data.get("bpm"),
                 "rainbow_color": data.get("rainbow_color"),
                 "singer": data.get("singer"),
-                "has_decisions": (
-                    manifest_path.parent / "production_decisions.yml"
-                ).exists(),
+                "has_decisions": (prod_dir / "production_decisions.yml").exists(),
+                "initialized": (prod_dir / "song_context.yml").exists(),
+                "proposal_path": str(proposal_path) if proposal_path else None,
             }
         )
     return songs
@@ -198,6 +253,401 @@ def create_app(
         return {"active": _active_song}
 
     # ------------------------------------------------------------------
+    # Pipeline — init, run, status
+    # ------------------------------------------------------------------
+
+    @app.post("/pipeline/init")
+    def pipeline_init():
+        """Run init_production for the active song if not already initialized."""
+        prod = _require_production_dir()
+        if (prod / "song_context.yml").exists():
+            from white_composition.pipeline_runner import (
+                read_phase_statuses,
+                write_phase_status,
+            )
+
+            statuses = read_phase_statuses(prod)
+            if statuses.get("init_production") == "pending":
+                write_phase_status(prod, "init_production", "promoted")
+            return {"ok": True, "skipped": True}
+        proposal_path = _active_song.get("proposal_path") if _active_song else None
+        if not proposal_path:
+            raise HTTPException(
+                status_code=422,
+                detail="No proposal yml found for this song — cannot initialize",
+            )
+        proposal = Path(proposal_path)
+        if not proposal.exists():
+            raise HTTPException(
+                status_code=422,
+                detail=f"Proposal file not found: {proposal_path}",
+            )
+        try:
+            from white_composition.init_production import init_production
+            from white_composition.pipeline_runner import write_phase_status
+
+            init_production(prod, proposal)
+            write_phase_status(prod, "init_production", "promoted")
+        except SystemExit as exc:
+            raise HTTPException(
+                status_code=500, detail=f"init_production failed: {exc}"
+            ) from exc
+        return {"ok": True, "skipped": False}
+
+    @app.post("/pipeline/run")
+    def pipeline_run():
+        """Run the next pending pipeline phase for the active song."""
+        global _run_job
+        if _run_job["status"] == "running":
+            raise HTTPException(status_code=409, detail="A phase is already running")
+        prod = _require_production_dir()
+        now = datetime.now(timezone.utc).isoformat()
+        _run_job = {
+            "status": "running",
+            "phase": None,
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        def _run():
+            global _run_job
+            try:
+                from white_composition.pipeline_runner import (
+                    cmd_run,
+                    get_next_runnable_phase,
+                    read_phase_statuses,
+                )
+
+                statuses = read_phase_statuses(prod)
+                next_phase = get_next_runnable_phase(statuses)
+                _run_job["phase"] = next_phase
+                if next_phase is None:
+                    _run_job["status"] = "done"
+                    return
+                from white_composition.pipeline_runner import (
+                    PHASE_REVIEW_FILES,
+                    write_phase_status,
+                )
+
+                proposal = (_active_song or {}).get("proposal_path") or ""
+                result = cmd_run(prod, song_proposal=proposal)
+                if result != 0:
+                    # cmd_run resets status to pending on non-zero exit.
+                    # If candidates were generated anyway, recover the correct status.
+                    review_file = PHASE_REVIEW_FILES.get(next_phase)
+                    if review_file and (prod / review_file).exists():
+                        write_phase_status(prod, next_phase, "generated")
+                        _run_job["status"] = "done"
+                    else:
+                        _run_job["status"] = "error"
+                        _run_job["error"] = (
+                            f"Phase '{next_phase}' exited with code {result}"
+                        )
+                else:
+                    _run_job["status"] = "done"
+            except Exception as exc:
+                _run_job["status"] = "error"
+                _run_job["error"] = str(exc)
+            finally:
+                _run_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/pipeline/run/status")
+    def pipeline_run_status():
+        return _run_job
+
+    @app.get("/pipeline/status")
+    def pipeline_status():
+        """Return phase statuses for the active song."""
+        prod = _require_production_dir()
+        from white_composition.pipeline_runner import (
+            PHASE_ORDER,
+            get_next_runnable_phase,
+            read_phase_statuses,
+        )
+
+        statuses = read_phase_statuses(prod)
+        return {
+            "initialized": (prod / "song_context.yml").exists(),
+            "phases": statuses,
+            "next_phase": get_next_runnable_phase(statuses),
+            "phase_order": PHASE_ORDER,
+        }
+
+    # ------------------------------------------------------------------
+    # Logic Handoff
+    # ------------------------------------------------------------------
+
+    @app.post("/handoff")
+    def start_handoff():
+        global _handoff_job
+        if _handoff_job["status"] == "running":
+            raise HTTPException(
+                status_code=409, detail="A handoff job is already running"
+            )
+        prod = _require_production_dir()
+        now = datetime.now(timezone.utc).isoformat()
+        _handoff_job = {
+            "status": "running",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        def _run():
+            global _handoff_job
+            try:
+                from white_composition.logic_handoff import handoff
+
+                handoff(prod)
+                _handoff_job["status"] = "done"
+            except Exception as exc:
+                _handoff_job["status"] = "error"
+                _handoff_job["error"] = str(exc)
+            finally:
+                _handoff_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/handoff/status")
+    def handoff_status():
+        return _handoff_job
+
+    # ------------------------------------------------------------------
+    # Plan Drift Report
+    # ------------------------------------------------------------------
+
+    class DriftReportBody(BaseModel):
+        use_claude: bool = True
+
+    @app.get("/drift-report")
+    def get_drift_report():
+        prod = _require_production_dir()
+        from white_composition.drift_report import load_report
+
+        report = load_report(prod)
+        if report is None:
+            raise HTTPException(
+                status_code=404,
+                detail="No plan_drift_report.yml found — POST /drift-report to generate",
+            )
+        return report.model_dump()
+
+    @app.post("/drift-report")
+    def start_drift_report(body: DriftReportBody = DriftReportBody()):
+        global _drift_job
+        if _drift_job["status"] == "running":
+            raise HTTPException(
+                status_code=409, detail="A drift report job is already running"
+            )
+        prod = _require_production_dir()
+        arr_path = prod / "arrangement.txt"
+        if not arr_path.exists():
+            raise HTTPException(
+                status_code=422,
+                detail="arrangement.txt not found in production directory",
+            )
+        from white_composition.production_plan import PLAN_FILENAME, load_plan
+
+        plan = load_plan(prod)
+        if plan is None:
+            raise HTTPException(
+                status_code=422,
+                detail=f"{PLAN_FILENAME} not found — generate a production plan first",
+            )
+        now = datetime.now(timezone.utc).isoformat()
+        _drift_job = {
+            "status": "running",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        use_claude = body.use_claude
+
+        def _run():
+            global _drift_job
+            try:
+                from white_composition.drift_report import compare_plans, write_report
+
+                report = compare_plans(plan, arr_path, use_claude=use_claude)
+                write_report(prod, report)
+                _drift_job["status"] = "done"
+            except Exception as exc:
+                _drift_job["status"] = "error"
+                _drift_job["error"] = str(exc)
+            finally:
+                _drift_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/drift-report/status")
+    def drift_report_status():
+        return _drift_job
+
+    @app.get("/composition")
+    def get_composition():
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import read_composition, resolve_song_dir
+
+        song_dir = resolve_song_dir(prod)
+        data = read_composition(song_dir)
+        if data is None:
+            return {"status": "not_initialized"}
+        return data
+
+    class StageBody(BaseModel):
+        stage: str
+
+    @app.patch("/composition/stage")
+    def update_stage(body: StageBody):
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import resolve_song_dir, write_stage
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            write_stage(song_dir, body.stage)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"ok": True, "stage": body.stage}
+
+    @app.post("/composition/version")
+    def new_version():
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import add_version, resolve_song_dir
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            version = add_version(song_dir)
+        except FileNotFoundError as exc:
+            raise HTTPException(
+                status_code=422, detail="composition.yml not found — run handoff first"
+            ) from exc
+        return {"ok": True, "version": version}
+
+    class VersionNotesBody(BaseModel):
+        version: int
+        notes: str
+
+    @app.patch("/composition/version/notes")
+    def update_notes(body: VersionNotesBody):
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import (
+            resolve_song_dir,
+            update_version_notes,
+        )
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            update_version_notes(song_dir, body.version, body.notes)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"ok": True}
+
+    # ------------------------------------------------------------------
+    # Lyrics review
+    # ------------------------------------------------------------------
+
+    _FITTING_VERDICT_ORDER = [
+        "splits needed",
+        "tight but workable",
+        "paste-ready",
+        "spacious",
+    ]
+
+    def _worst_fitting_verdict(fitting: dict) -> str | None:
+        """Return the worst-case fitting verdict across all sections and phrases."""
+        worst_idx = len(_FITTING_VERDICT_ORDER)
+        for section_data in fitting.values():
+            if not isinstance(section_data, dict):
+                continue
+            for phrase in section_data.get("phrases", []):
+                v = phrase.get("verdict", "")
+                try:
+                    idx = _FITTING_VERDICT_ORDER.index(v)
+                    worst_idx = min(worst_idx, idx)
+                except ValueError:
+                    pass
+        return (
+            _FITTING_VERDICT_ORDER[worst_idx]
+            if worst_idx < len(_FITTING_VERDICT_ORDER)
+            else None
+        )
+
+    @app.get("/lyrics")
+    def get_lyrics():
+        prod = _require_production_dir()
+        review_path = prod / "melody" / "lyrics_review.yml"
+        if not review_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="lyrics_review.yml not found — run lyric pipeline first",
+            )
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+        promoted = (prod / "melody" / "lyrics.txt").exists()
+        candidates_out = []
+        for c in review.get("candidates", []):
+            txt_path = prod / "melody" / c.get("file", "")
+            text = txt_path.read_text() if txt_path.exists() else ""
+            chromatic = c.get("chromatic") or {}
+            fitting_verdict = _worst_fitting_verdict(c.get("fitting") or {})
+            status = c.get("status", "pending")
+            if promoted and status == "approved":
+                status = "promoted"
+            candidates_out.append(
+                {
+                    "id": c["id"],
+                    "rank": c.get("rank", 0),
+                    "status": status,
+                    "text": text,
+                    "match": chromatic.get("match"),
+                    "fitting_verdict": fitting_verdict,
+                }
+            )
+        return {
+            "status": "promoted" if promoted else "pending",
+            "candidates": candidates_out,
+        }
+
+    @app.post("/lyrics/{lyric_id}/approve")
+    def approve_lyric(lyric_id: str):
+        prod = _require_production_dir()
+        review_path = prod / "melody" / "lyrics_review.yml"
+        if not review_path.exists():
+            raise HTTPException(status_code=404, detail="lyrics_review.yml not found")
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+        candidates = review.get("candidates", [])
+        found = False
+        for c in candidates:
+            if c["id"] == lyric_id:
+                c["status"] = "approved"
+                found = True
+            else:
+                c["status"] = "pending"
+        if not found:
+            raise HTTPException(
+                status_code=422, detail=f"Lyric candidate '{lyric_id}' not found"
+            )
+        review["candidates"] = candidates
+        with open(review_path, "w") as f:
+            yaml.dump(
+                review,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
+        return {"ok": True}
+
+    # ------------------------------------------------------------------
     # Candidates
     # ------------------------------------------------------------------
 
@@ -267,18 +717,19 @@ def create_app(
                 status_code=400,
                 detail=f"Invalid phase '{body.phase}'. Must be one of: {sorted(VALID_PHASES)}",
             )
-        review_path = prod / body.phase / "review.yml"
+        from white_composition.pipeline_runner import PHASE_REVIEW_FILES, cmd_promote
+
+        review_file = PHASE_REVIEW_FILES.get(body.phase, f"{body.phase}/review.yml")
+        review_path = prod / review_file
         if not review_path.exists():
             raise HTTPException(
                 status_code=404,
-                detail=f"No review.yml found for phase '{body.phase}'",
+                detail=f"No review file found for phase '{body.phase}'",
             )
         approved_dir = prod / body.phase / "approved"
         count_before = (
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
-
-        from white_composition.pipeline_runner import cmd_promote
 
         result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:

@@ -60,7 +60,7 @@
 - [x] 4.4 Move relevant tests → `packages/analysis/tests/`
 - [x] 4.5 Run `uv sync` + full pytest; fix failures
 - [x] 4.6 Delete moved source
-- [ ] 4.7 Open PR: `feat: migrate analysis package (white_analysis)`
+- [x] 4.7 Open PR: `feat: migrate analysis package (white_analysis)` (bundled in PR #162)
 
 ## 5. Package: generation (patterns + pipelines → `white_generation`) ✅ DONE (commit 78f7a11)
 
@@ -74,7 +74,7 @@
 - [x] 5.7 Move `tests/generators/midi/` (pattern + pipeline tests, not production tests) → `packages/generation/tests/`
 - [x] 5.8 Run `uv sync` + full pytest; fix failures
 - [x] 5.9 Delete moved source from `app/`
-- [ ] 5.10 Open PR: `feat: migrate generation package (white_generation)`
+- [x] 5.10 Open PR: `feat: migrate generation package (white_generation)` (bundled in PR #162)
 
 ## 6. Package: composition (production orchestration → `white_composition`) ✅ DONE (commit 0a86d19)
 
@@ -88,7 +88,7 @@
 - [x] 6.7 Move production-related tests → `packages/composition/tests/`
 - [x] 6.8 Run `uv sync` + full pipeline smoke test + pytest; fix failures
 - [x] 6.9 Delete moved source from `app/`
-- [ ] 6.10 Open PR: `feat: migrate composition package (white_composition) + diary/production scaffolds`
+- [x] 6.10 Open PR: `feat: migrate composition package (white_composition) + diary/production scaffolds` (bundled in PR #162)
 
 ## 7. Package: ideation (agents + reference → `white_ideation`) ✅ DONE
 
@@ -101,7 +101,7 @@
 - [x] 7.6 Update `run_white_agent.py` entry point at root to use `from white_ideation...`
 - [x] 7.7 Run `uv sync` + full pytest; fix failures
 - [x] 7.8 Delete moved source from `app/`
-- [ ] 7.9 Open PR: `feat: migrate ideation package (white_ideation)`
+- [x] 7.9 Open PR: `feat: migrate ideation package (white_ideation)` (bundled in PR #162)
 
 ## 8. Package: api (candidate server → `white_api`) ✅ DONE
 
@@ -126,9 +126,9 @@
 
 ## 10. Cleanup and docs
 
-- [ ] 10.1 Remove `white.egg-info/` (old editable install artifact)
-- [ ] 10.2 Update `CLAUDE.md` import block to show new `white_*` namespaces
-- [ ] 10.3 Update `openspec/project.md` with new tech stack and package structure
-- [ ] 10.4 Update `ruff` `known-first-party` list to `white_core`, `white_generation`, etc.
-- [ ] 10.5 Run `openspec validate refactor-monorepo-package-structure --strict`; archive change
+- [x] 10.1 Remove `white.egg-info/` (old editable install artifact)
+- [x] 10.2 Update `CLAUDE.md` import block to show new `white_*` namespaces
+- [x] 10.3 Update `openspec/project.md` with new tech stack and package structure
+- [x] 10.4 Update `ruff` `known-first-party` list to `white_core`, `white_generation`, etc.
+- [x] 10.5 Run `openspec validate refactor-monorepo-package-structure --strict`; archive change
 - [ ] 10.6 Open PR: `chore: post-migration cleanup and docs`

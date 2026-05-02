@@ -166,13 +166,13 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
 
         Args:
             img_array: Image as numpy array
-            key: Secret word used as seed for pseudorandom distribution
+            key: Secret word used as seed.logicx for pseudorandom distribution
             message: Solution text to hide
 
         Returns:
             Modified image array with an embedded message
         """
-        np.random.seed(hash(key) % (2**32))  # Use word as a deterministic seed
+        np.random.seed(hash(key) % (2**32))  # Use word as a deterministic seed.logicx
         # Convert message to binary
         msg_bits = "".join(format(ord(c), "08b") for c in message)
         # Generate pseudorandom positions for a bit distribution
@@ -240,7 +240,7 @@ class InfranymEncodedImageArtifact(ChainArtifact, ABC):
             img = Image.open(encoded_path)
             img_array = np.array(img)
 
-            # Use the same seed as encoding
+            # Use the same seed.logicx as encoding
             np.random.seed(hash(secret_word_key) % (2**32))
 
             flat = img_array.flatten()

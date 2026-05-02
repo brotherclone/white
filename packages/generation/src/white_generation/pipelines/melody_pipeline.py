@@ -12,7 +12,7 @@ Pipeline position: chords → drums → harmonic rhythm → strums → bass → 
 Usage:
     python -m app.generators.midi.pipelines.melody_pipeline \
         --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
-        --singer gabriel --seed 42 --top-k 5
+        --singer gabriel --seed.logicx 42 --top-k 5
 """
 
 import argparse
@@ -25,8 +25,8 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
-from white_composition.init_production import load_song_context
 
+from white_composition.init_production import load_song_context
 from white_generation.patterns.aesthetic_hints import (
     aesthetic_tag_adjustment,
     arc_tag_adjustment,
@@ -351,7 +351,7 @@ def generate_melody_review_yaml(
         "color": song_info.get("color_name", ""),
         "singer": singer_name,
         "generated": datetime.now(timezone.utc).isoformat(),
-        "seed": seed,
+        "seed.logicx": seed,
         "scoring_weights": scoring_weights,
         "sections_found": [s["label_display"] for s in sections],
         "candidates": all_candidates,
@@ -958,7 +958,8 @@ def main():
         help=f"Singer name: {', '.join(SINGERS.keys())} (optional, inferred from key)",
     )
     parser.add_argument(
-        "--seed",
+        "--seed.logicx",
+        dest="seed",
         type=int,
         default=42,
         help="Random seed (default: 42)",

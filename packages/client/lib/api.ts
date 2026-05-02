@@ -115,3 +115,106 @@ export async function getGenerateStatus(): Promise<GenerateStatus> {
   if (!res.ok) throw new Error("Failed to fetch generate status");
   return res.json();
 }
+
+export async function initSong(): Promise<{ ok: boolean; skipped: boolean }> {
+  const res = await fetch(`${BASE}/pipeline/init`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Init failed");
+  }
+  return res.json();
+}
+
+export async function runNextPhase(): Promise<{ status: string; started_at: string }> {
+  const res = await fetch(`${BASE}/pipeline/run`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Run failed");
+  }
+  return res.json();
+}
+
+export async function getRunStatus(): Promise<import("./types").RunJob> {
+  const res = await fetch(`${BASE}/pipeline/run/status`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch run status");
+  return res.json();
+}
+
+export async function fetchPipelineStatus(): Promise<import("./types").PipelineStatus> {
+  const res = await fetch(`${BASE}/pipeline/status`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch pipeline status");
+  return res.json();
+}
+
+export async function startHandoff(): Promise<{ status: string; started_at: string }> {
+  const res = await fetch(`${BASE}/handoff`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Handoff failed");
+  }
+  return res.json();
+}
+
+export async function getHandoffStatus(): Promise<import("./types").RunJob> {
+  const res = await fetch(`${BASE}/handoff/status`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch handoff status");
+  return res.json();
+}
+
+export async function fetchComposition(): Promise<import("./types").CompositionEntry | { status: "not_initialized" }> {
+  const res = await fetch(`${BASE}/composition`, { cache: "no-store" });
+  if (res.status === 503) return { status: "not_initialized" };
+  if (!res.ok) throw new Error("Failed to fetch composition");
+  return res.json();
+}
+
+export async function advanceStage(stage: string): Promise<{ ok: boolean; stage: string }> {
+  const res = await fetch(`${BASE}/composition/stage`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ stage }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Stage update failed");
+  }
+  return res.json();
+}
+
+export async function fetchLyrics(): Promise<import("./types").LyricsResponse> {
+  const res = await fetch(`${BASE}/lyrics`, { cache: "no-store" });
+  if (res.status === 503) throw Object.assign(new Error("no-active-song"), { status: 503 });
+  if (!res.ok) throw Object.assign(new Error("Failed to fetch lyrics"), { status: res.status });
+  return res.json();
+}
+
+export async function approveLyric(id: string): Promise<{ ok: boolean }> {
+  const res = await fetch(`${BASE}/lyrics/${encodeURIComponent(id)}/approve`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Approve lyric failed");
+  }
+  return res.json();
+}
+
+export async function updateVersionNotes(version: number, notes: string): Promise<{ ok: boolean }> {
+  const res = await fetch(`${BASE}/composition/version/notes`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ version, notes }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Notes update failed");
+  }
+  return res.json();
+}
+
+export async function addVersion(): Promise<{ ok: boolean; version: number }> {
+  const res = await fetch(`${BASE}/composition/version`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Add version failed");
+  }
+  return res.json();
+}

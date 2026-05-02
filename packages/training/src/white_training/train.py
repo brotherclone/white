@@ -777,7 +777,7 @@ def main():
         config = yaml.safe_load(f)
 
     # Set random seeds
-    seed = config["reproducibility"]["seed"]
+    seed = config["reproducibility"]["seed.logicx"]
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)

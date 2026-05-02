@@ -21,8 +21,8 @@ from typing import Any
 
 import mido
 import numpy as np
-from white_core.enums.bass_chord_tone import BassChordTone
 
+from white_core.enums.bass_chord_tone import BassChordTone
 from white_generation.patterns.bass_patterns import (
     BassPattern,
     clamp_to_bass_register,
@@ -420,7 +420,7 @@ def breed_drum_patterns(
     if not seed_patterns:
         return []
 
-    # Seed population: repeat/sample seed patterns to reach population_size
+    # Seed population: repeat/sample seed.logicx patterns to reach population_size
     rng = random.Random()
     population = list(seed_patterns)
     while len(population) < population_size:
