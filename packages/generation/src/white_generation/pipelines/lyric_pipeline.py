@@ -68,7 +68,16 @@ load_dotenv()
 
 LYRICS_REVIEW_FILENAME = "lyrics_review.yml"
 
-MELODY_CHANNEL = 4  # track 4 in arrangement.txt = melody = vocal
+MELODY_CHANNEL = 4  # fallback when auto-detection finds nothing
+
+
+def _detect_melody_channel(clips: list[dict], fallback: int = MELODY_CHANNEL) -> int:
+    """Return the track number that carries the most melody_ clips."""
+    counts: dict[int, int] = {}
+    for c in clips:
+        if c["clip_name"].startswith("melody_"):
+            counts[c["channel"]] = counts.get(c["channel"], 0) + 1
+    return max(counts, key=lambda ch: counts[ch]) if counts else fallback
 
 
 # ---------------------------------------------------------------------------
@@ -358,7 +367,8 @@ def read_vocal_sections_from_arrangement(
     # Collect melody-channel clips in arrangement order — one entry per instance.
     # Duplicate labels get _2, _3 suffixes; the prompt uses these suffixed names
     # as [headers] so Claude writes one block per arrangement instance.
-    melody_clips = [c for c in clips if c["channel"] == melody_channel]
+    resolved_channel = _detect_melody_channel(clips, fallback=melody_channel)
+    melody_clips = [c for c in clips if c["channel"] == resolved_channel]
     label_seen_count: dict[str, int] = {}
     # Track first-seen instance key for exact labels (for exact_repeat copying)
     exact_first_instance: dict[str, str] = {}
