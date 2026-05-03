@@ -84,13 +84,15 @@ def _load_review(review_yml: Path) -> list[CandidateEntry]:
 
     phase = review_yml.parent.name
     entries = []
-    for c in data.get("candidates", []):
+    for c in data.get("candidates", []) or []:
+        if not c:
+            continue
         midi_rel = c.get("midi_file", "")
         midi_path = _abs_midi(review_yml, midi_rel) if midi_rel else Path()
         template = (
             c.get("pattern_name")
             or c.get("template")
-            or c.get("progression", "")[:40]
+            or (c.get("progression") or "")[:40]
             or c.get("id", "")
         )
         entries.append(
@@ -101,12 +103,12 @@ def _load_review(review_yml: Path) -> list[CandidateEntry]:
                 midi_file=midi_path,
                 review_yml=review_yml,
                 status=str(c.get("status", "pending")).lower(),
-                rank=int(c.get("rank", 99)),
-                composite_score=float(c.get("scores", {}).get("composite", 0.0)),
+                rank=int(c.get("rank") or 99),
+                composite_score=float((c.get("scores") or {}).get("composite", 0.0)),
                 template=template,
                 label=str(c.get("label", "") or ""),
                 use_case=str(c.get("use_case", "") or ""),
-                scores=c.get("scores", {}),
+                scores=c.get("scores") or {},
             )
         )
     return entries
