@@ -967,12 +967,15 @@ def run_chord_pipeline(
     print(f"TOP {len(top_candidates)} CANDIDATES")
     print(f"{'=' * 60}")
     for item in top_candidates:
-        print(
-            f"\n  #{item['rank']} [{item['id']}] composite={item['breakdown']['composite']:.3f}"
-        )
-        print(
-            f"     theory={item['breakdown']['theory_total']:.3f}  chromatic={item['breakdown']['chromatic']['match']:.3f}  confidence={item['breakdown']['chromatic']['confidence']:.3f}"
-        )
+        if item.get("source") == "diatonic":
+            print(f"\n  [diatonic] [{item['id']}]")
+        else:
+            print(
+                f"\n  #{item['rank']} [{item['id']}] composite={item['breakdown']['composite']:.3f}"
+            )
+            print(
+                f"     theory={item['breakdown']['theory_total']:.3f}  chromatic={item['breakdown']['chromatic']['match']:.3f}  confidence={item['breakdown']['chromatic']['confidence']:.3f}"
+            )
         print(f"     {item['summary']}")
         print(
             f"     HR: {item.get('hr_distribution', [])}  strum: {item.get('strum_pattern', '?')}"
