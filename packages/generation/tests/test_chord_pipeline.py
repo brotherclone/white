@@ -450,3 +450,186 @@ class TestPromotePart:
 
         captured = capsys.readouterr()
         assert "No approved candidates" in captured.out
+
+
+# ---------------------------------------------------------------------------
+# Diatonic workhorse candidates
+# ---------------------------------------------------------------------------
+
+
+class TestDiatonicCandidates:
+
+    def _make_gen_mock(self, chords_by_function: dict):
+        """Return a mock ChordProgressionGenerator with controlled chord lookup."""
+        import polars as pl
+
+        class MockGen:
+            def get_chord_by_function(self, key_root, mode, function, category=None):
+                rows = chords_by_function.get(function, [])
+                if not rows:
+                    return pl.DataFrame(
+                        schema={
+                            "chord_id": pl.Utf8,
+                            "chord_name": pl.Utf8,
+                            "function": pl.Utf8,
+                            "note_names": pl.List(pl.Utf8),
+                            "midi_notes": pl.List(pl.Int64),
+                            "quality": pl.Utf8,
+                        }
+                    )
+                return pl.DataFrame(rows)
+
+        return MockGen()
+
+    def _make_rng(self):
+        import random
+
+        return random.Random(42)
+
+    def test_major_patterns_produced(self):
+        from white_generation.pipelines.chord_pipeline import (
+            DIATONIC_PATTERNS,
+            build_diatonic_candidates,
+        )
+
+        def _chord(fn):
+            return {
+                "chord_id": f"C_{fn}",
+                "chord_name": fn,
+                "function": fn,
+                "note_names": ["C4", "E4", "G4"],
+                "midi_notes": [60, 64, 67],
+                "quality": "major",
+            }
+
+        gen = self._make_gen_mock(
+            {fn: [_chord(fn)] for fn in ["I", "II", "IV", "V", "vi"]}
+        )
+        results = build_diatonic_candidates(
+            "C", "Major", 120, (4, 4), gen, self._make_rng(), ["rock"]
+        )
+
+        assert len(results) == len(DIATONIC_PATTERNS["Major"])
+        for r in results:
+            assert r["source"] == "diatonic"
+            assert r["id"].startswith("diatonic_")
+            assert (
+                r["scores"] if "scores" in r else True
+            )  # not in raw dict, handled in review gen
+
+    def test_minor_patterns_produced(self):
+        from white_generation.pipelines.chord_pipeline import (
+            DIATONIC_PATTERNS,
+            build_diatonic_candidates,
+        )
+
+        def _chord(fn):
+            return {
+                "chord_id": f"A_{fn}",
+                "chord_name": fn,
+                "function": fn,
+                "note_names": ["A3", "C4", "E4"],
+                "midi_notes": [57, 60, 64],
+                "quality": "minor",
+            }
+
+        gen = self._make_gen_mock(
+            {fn: [_chord(fn)] for fn in ["i", "III", "iv", "v", "VI", "VII"]}
+        )
+        results = build_diatonic_candidates(
+            "A", "Minor", 120, (4, 4), gen, self._make_rng(), ["rock"]
+        )
+
+        assert len(results) == len(DIATONIC_PATTERNS["Minor"])
+        for r in results:
+            assert r["source"] == "diatonic"
+
+    def test_missing_degree_skips_pattern(self):
+        from white_generation.pipelines.chord_pipeline import build_diatonic_candidates
+
+        # Only provide I — all major patterns need more degrees, so all skip
+        def _chord(fn):
+            return {
+                "chord_id": f"C_{fn}",
+                "chord_name": fn,
+                "function": fn,
+                "note_names": ["C4", "E4", "G4"],
+                "midi_notes": [60, 64, 67],
+                "quality": "major",
+            }
+
+        gen = self._make_gen_mock({"I": [_chord("I")]})
+        results = build_diatonic_candidates(
+            "C", "Major", 120, (4, 4), gen, self._make_rng(), ["rock"]
+        )
+
+        assert results == []
+
+    def test_generate_review_yaml_diatonic_fields(self):
+        from white_generation.pipelines.chord_pipeline import generate_review_yaml
+
+        diatonic_item = {
+            "id": "diatonic_I_V_vi_IV",
+            "source": "diatonic",
+            "rank": None,
+            "breakdown": None,
+            "hr_distribution": [1.0, 1.0, 1.0, 1.0],
+            "strum_pattern": "whole",
+            "summary": "I(C) – V(G) – vi(Am) – IV(F)",
+            "progression": [{"function": "I", "chord_name": "C", "note_names": ["C4"]}],
+        }
+        song_info = {
+            "key_root": "C",
+            "mode": "Major",
+            "bpm": 120,
+            "time_sig": (4, 4),
+            "color_name": "Blue",
+            "thread_dir": "",
+            "song_filename": "test.yml",
+        }
+        review = generate_review_yaml(
+            song_info, [diatonic_item], 42, {"theory": 0.3, "chromatic": 0.7}
+        )
+
+        candidate = review["candidates"][0]
+        assert candidate["source"] == "diatonic"
+        assert candidate["scores"] is None
+        assert candidate["rank"] is None
+        assert "verse" in candidate["notes"].lower()
+
+    def test_markov_candidate_gets_markov_source(self):
+        from white_generation.pipelines.chord_pipeline import generate_review_yaml
+
+        markov_item = {
+            "id": "chord_001",
+            "rank": 1,
+            "breakdown": {
+                "composite": 0.5,
+                "theory_total": 0.4,
+                "chromatic": {
+                    "match": 0.6,
+                    "confidence": 0.8,
+                    "temporal": {},
+                    "spatial": {},
+                    "ontological": {},
+                },
+            },
+            "hr_distribution": [1.0, 1.0],
+            "strum_pattern": "whole",
+            "summary": "I – IV",
+            "progression": [{"function": "I", "chord_name": "C", "note_names": ["C4"]}],
+        }
+        song_info = {
+            "key_root": "C",
+            "mode": "Major",
+            "bpm": 120,
+            "time_sig": (4, 4),
+            "color_name": "Blue",
+            "thread_dir": "",
+            "song_filename": "test.yml",
+        }
+        review = generate_review_yaml(
+            song_info, [markov_item], 42, {"theory": 0.3, "chromatic": 0.7}
+        )
+
+        assert review["candidates"][0]["source"] == "markov"

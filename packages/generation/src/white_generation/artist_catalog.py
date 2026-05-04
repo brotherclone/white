@@ -266,26 +266,30 @@ def _infer_style_tags(description: Optional[str]) -> list[str]:
 
 
 def generate_missing(
-    artists: list[tuple[str, int | None]],
+    artists: list[str] | list[tuple[str, int | None]],
     catalog_path: Path = CATALOG_DEFAULT_PATH,
-) -> dict:
+) -> list[str]:
     """Generate catalog entries for artists not yet in the catalog.
 
-    Returns summary: {added: [...], already_present: [...], unknown: [...]}.
+    Accepts either plain artist name strings or (name, discogs_id) tuples.
+    Returns list of newly added artist names.
     """
     from anthropic import Anthropic
 
+    normalized: list[tuple[str, int | None]] = [
+        (a, None) if isinstance(a, str) else a for a in artists
+    ]
+
     catalog = load_catalog(catalog_path)
 
-    to_add = [(name, did) for name, did in artists if name not in catalog]
+    to_add = [(name, did) for name, did in normalized if name not in catalog]
 
     if not to_add:
         print("All artists already in catalog — no API calls made.")
-        return {"added": [], "already_present": [n for n, _ in artists], "unknown": []}
+        return []
 
     client = Anthropic()
     added = []
-    unknown = []
 
     for artist_name, discogs_id in to_add:
         print(f"  Generating: {artist_name} ...", end=" ", flush=True)
@@ -294,7 +298,6 @@ def generate_missing(
         if description is None:
             notes = "Unknown artist — fill description manually"
             print("UNKNOWN")
-            unknown.append(artist_name)
         else:
             notes = ""
             print("ok")
@@ -307,15 +310,11 @@ def generate_missing(
             discogs_id,
             notes=notes,
         )
-        added.append(artist_name)
+        added.append(_artist_slug(artist_name))
 
-    already_present = [n for n, _ in artists if n not in [a for a in added]]
-    print(
-        f"\nAdded {len(added)} entries "
-        f"({len(unknown)} unknown), "
-        f"{len(already_present)} already present."
-    )
-    return {"added": added, "already_present": already_present, "unknown": unknown}
+    already_present_count = len(normalized) - len(to_add)
+    print(f"\nAdded {len(added)} entries, " f"{already_present_count} already present.")
+    return added
 
 
 # ---------------------------------------------------------------------------

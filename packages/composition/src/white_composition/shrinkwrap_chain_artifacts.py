@@ -487,6 +487,7 @@ def scaffold_song_productions(
             "bpm": proposal.get("bpm"),
             "rainbow_color": rainbow_color,
             "singer": proposal.get("singer") or None,
+            "sounds_like": proposal.get("sounds_like") or [],
         }
         with open(manifest_path, "w") as f:
             yaml.dump(
@@ -675,6 +676,7 @@ def shrinkwrap(
     processed = 0
     failed = 0
     deleted = 0
+    new_thread_dirs: list[Path] = []
 
     thread_dirs = sorted(artifacts_dir.iterdir())
     for thread_dir in thread_dirs:
@@ -744,6 +746,8 @@ def shrinkwrap(
         if metadata:
             all_metadata.append(metadata)
             processed += 1
+            if not dry_run and scaffold:
+                new_thread_dirs.append(output_dir / metadata["directory_name"])
         else:
             failed += 1
 
@@ -761,6 +765,31 @@ def shrinkwrap(
             print(
                 f"\n  + {len(orphaned)} existing directories with manifests (from previous runs)"
             )
+
+    if new_thread_dirs:
+        all_sounds_like: set[str] = set()
+        for tdir in new_thread_dirs:
+            for mb_path in sorted(
+                (tdir / "production").glob("*/manifest_bootstrap.yml")
+            ):
+                try:
+                    with open(mb_path) as f:
+                        mb = yaml.safe_load(f) or {}
+                    for artist in mb.get("sounds_like") or []:
+                        name = str(artist).strip()
+                        if name:
+                            all_sounds_like.add(name)
+                except Exception as exc:
+                    logger.debug(f"Could not read sounds_like from {mb_path}: {exc}")
+        if all_sounds_like:
+            try:
+                from white_generation.artist_catalog import (
+                    generate_missing as _catalog_generate_missing,
+                )
+
+                _catalog_generate_missing(sorted(all_sounds_like))
+            except Exception as exc:
+                logger.warning(f"Artist catalog update failed (non-fatal): {exc}")
 
     if all_metadata and not dry_run:
         index_path = write_index(output_dir, all_metadata)
