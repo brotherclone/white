@@ -179,11 +179,10 @@ class TestGenerateMissingIdempotent:
         artists = [("Seefeel", None)]
 
         with patch("anthropic.Anthropic") as mock_cls:
-            summary = generate_missing(artists, catalog_path)
+            added = generate_missing(artists, catalog_path)
 
         mock_cls.assert_not_called()
-        assert summary["added"] == []
-        assert "Seefeel" in summary["already_present"]
+        assert added == []
 
     def test_generates_for_new_artists(self, tmp_path):
         from white_generation.artist_catalog import generate_missing
@@ -197,15 +196,39 @@ class TestGenerateMissingIdempotent:
         ]
 
         with patch("anthropic.Anthropic", return_value=mock_client):
-            summary = generate_missing(artists, catalog_path)
+            added = generate_missing(artists, catalog_path)
 
-        assert "New Artist" in summary["added"]
+        assert "New Artist" in added
         # Verify entry was written to file
         from white_generation.artist_catalog import load_catalog
 
         catalog = load_catalog(catalog_path)
         assert "New Artist" in catalog
         assert catalog["New Artist"]["status"] == "draft"
+
+    def test_plain_string_list_no_api_call_when_all_present(self, tmp_path):
+        from white_generation.artist_catalog import generate_missing
+
+        catalog_path = _write_catalog(
+            tmp_path,
+            {
+                "Seefeel": {
+                    "slug": "seefeel",
+                    "status": "draft",
+                    "description": "Hazy textures.",
+                    "style_tags": [],
+                    "chromatic_score": None,
+                    "discogs_id": None,
+                    "notes": "",
+                }
+            },
+        )
+
+        with patch("anthropic.Anthropic") as mock_cls:
+            added = generate_missing(["Seefeel"], catalog_path)
+
+        mock_cls.assert_not_called()
+        assert added == []
 
 
 # ---------------------------------------------------------------------------
