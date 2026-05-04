@@ -15,7 +15,7 @@ and machine injection into generative prompts.
 - **THEN** it SHALL contain:
   - `slug`: snake_case identifier derived from the artist name
   - `status`: one of `draft` (generated, not yet reviewed) or `reviewed` (human-approved)
-  - `description`: 100–200 word prose covering sonic texture, lyrical/thematic tendencies,
+  - `description`: up to 150 word prose covering sonic texture, lyrical/thematic tendencies,
     production character, and emotional register — expressed in terms of style, not biography
   - `style_tags`: list of genre/aesthetic tags (e.g., `[shoegaze, noise-rock, dream-pop]`)
   - `chromatic_hint`: optional human-filled dict with `temporal`, `spatial`, `ontological`

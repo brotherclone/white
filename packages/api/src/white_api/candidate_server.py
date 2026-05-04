@@ -779,9 +779,12 @@ def create_app(
 
         entries = _load_review(review_yml) if review_yml.exists() else []
         matched = next((e for e in entries if e.candidate_id == entry_dict["id"]), None)
-        if matched:
-            return _serialise(matched)
-        return entry_dict
+        if matched is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Registered entry could not be reloaded from review.yml",
+            )
+        return _serialise(matched)
 
     # ------------------------------------------------------------------
     # Evolve

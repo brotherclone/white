@@ -11,6 +11,7 @@ Usage:
 """
 
 import argparse
+import re
 import shutil
 from pathlib import Path
 
@@ -159,27 +160,52 @@ def register_part(
     midi_path = Path(midi_path)
     production_dir = Path(production_dir)
 
+    if not re.match(r"^[a-z_]+$", phase):
+        raise ValueError(
+            f"Invalid phase name '{phase}': only lowercase letters and underscores are allowed"
+        )
+
     try:
         mido.MidiFile(filename=str(midi_path))
     except Exception as e:
         raise ValueError(f"Cannot read MIDI file '{midi_path.name}': {e}") from e
 
-    label_clean = label.replace("-", "_").replace(" ", "_").lower()
+    label_clean = re.sub(
+        r"[^a-z0-9_]", "", label.replace("-", "_").replace(" ", "_").lower()
+    )
+    if not label_clean:
+        raise ValueError(f"Label '{label}' yields an empty filename after sanitisation")
 
     phase_dir = production_dir / phase
     approved_dir = phase_dir / "approved"
     approved_dir.mkdir(parents=True, exist_ok=True)
 
+    dest = (approved_dir / f"{label_clean}.mid").resolve()
+    if not dest.is_relative_to(approved_dir.resolve()):
+        raise ValueError(
+            f"Resolved destination '{dest}' is outside the approved directory"
+        )
+
     review_path = phase_dir / "review.yml"
     if review_path.exists():
         with open(review_path) as f:
-            review = yaml.safe_load(f) or {}
+            raw = yaml.safe_load(f)
+        if raw is None:
+            review: dict = {"candidates": []}
+        elif not isinstance(raw, dict):
+            raise ValueError(
+                f"review.yml is malformed: expected a mapping, got {type(raw).__name__}"
+            )
+        else:
+            review = raw
     else:
         review = {"candidates": []}
 
     for c in review.get("candidates", []) or []:
-        existing_label = (
-            str(c.get("label", "") or "").replace("-", "_").replace(" ", "_").lower()
+        existing_label = re.sub(
+            r"[^a-z0-9_]",
+            "",
+            str(c.get("label", "") or "").replace("-", "_").replace(" ", "_").lower(),
         )
         if (
             existing_label == label_clean
@@ -189,7 +215,12 @@ def register_part(
                 f"Label '{label}' already exists as an approved entry in {review_path}"
             )
 
-    dest = approved_dir / f"{label_clean}.mid"
+    if dest.exists():
+        raise ValueError(
+            f"A MIDI file already exists at '{dest.name}' with no matching approved review.yml entry. "
+            "Remove the orphaned file or choose a different label."
+        )
+
     shutil.copy2(midi_path, dest)
     _rewrite_track_names(dest, label_clean)
 
