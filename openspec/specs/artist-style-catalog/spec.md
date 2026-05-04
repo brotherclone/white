@@ -39,6 +39,10 @@ The catalog CLI SHALL generate descriptions for artists not yet in the catalog, 
 Claude API with a prompt focused on aesthetic characterisation — no biographical details,
 no lyrics, no content reproduction.
 
+`generate_missing()` SHALL also accept an explicit `artists` list as a programmatic call
+path, in addition to the existing CLI modes. When called this way it MUST deduplicate the
+list against the existing catalog and generate descriptions only for uncatalogued entries.
+
 #### Scenario: Generate missing entries — production thread
 
 - **WHEN** `artist_catalog.py --thread <dir> --generate-missing` is run
@@ -62,6 +66,14 @@ no lyrics, no content reproduction.
 - **AND** proceeds to generate descriptions for uncatalogued artists as above
 - **AND** stores the `discogs_id` (if present) in the catalog entry for reference
 
+#### Scenario: Generate missing entries — explicit artist list
+
+- **WHEN** `generate_missing(artists=["Artist A", "Artist B"])` is called programmatically
+- **THEN** each artist not already in the catalog receives a generated description with
+  `status: draft`
+- **AND** artists already present in the catalog are skipped silently
+- **AND** the function returns a list of newly added artist slugs
+
 #### Scenario: Discogs ID preservation
 
 - **WHEN** a training-data artist entry has a Discogs ID
@@ -73,24 +85,7 @@ no lyrics, no content reproduction.
 - **WHEN** Claude is asked to describe an artist
 - **THEN** the prompt SHALL instruct Claude to: describe sonic texture and production
   character, describe lyrical and thematic tendencies (not reproduce lyrics), describe
-  emotional register, note if the artist is primarily instrumental, stay within 150 words,
-  avoid biography (no birth dates, label history, chart positions)
-- **AND** the prompt SHALL explicitly ask Claude NOT to reproduce any copyrighted text
-
-#### Scenario: Unknown artist
-
-- **WHEN** Claude cannot confidently describe an artist (e.g., very obscure)
-- **THEN** the entry is written with `description: null`, `status: draft`, and a
-  `notes` field pre-filled with "Unknown artist — fill description manually"
-- **AND** the tool prints a warning for each such entry
-
-#### Scenario: Idempotent re-run
-
-- **WHEN** `--generate-missing` is run and all catalog entries already exist
-- **THEN** no API calls are made
-- **AND** the catalog file is not modified
-
----
+  emotional register, note if the artist is primarily instrumental, stay within 150 words
 
 ### Requirement: Human Review Workflow
 

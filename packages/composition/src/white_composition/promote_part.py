@@ -16,6 +16,7 @@ from pathlib import Path
 
 import mido
 import yaml
+
 from white_generation.util.diversity_tracker import (
     find_album_dir,
     load_registry,
@@ -139,6 +140,86 @@ def _sync_promote_status(review_file: Path) -> None:
             )
     except Exception:
         pass  # Status sync is best-effort — never break promotion
+
+
+def register_part(
+    midi_path: str | Path,
+    phase: str,
+    section: str,
+    label: str,
+    production_dir: str | Path,
+) -> dict:
+    """Register an externally created MIDI file as an approved pipeline part.
+
+    Copies the MIDI to <production_dir>/<phase>/approved/<label>.mid and adds a
+    review.yml entry with generated=false, status=approved, scores=null, rank=null.
+
+    Raises ValueError if the MIDI cannot be parsed or the label is already approved.
+    """
+    midi_path = Path(midi_path)
+    production_dir = Path(production_dir)
+
+    try:
+        mido.MidiFile(filename=str(midi_path))
+    except Exception as e:
+        raise ValueError(f"Cannot read MIDI file '{midi_path.name}': {e}") from e
+
+    label_clean = label.replace("-", "_").replace(" ", "_").lower()
+
+    phase_dir = production_dir / phase
+    approved_dir = phase_dir / "approved"
+    approved_dir.mkdir(parents=True, exist_ok=True)
+
+    review_path = phase_dir / "review.yml"
+    if review_path.exists():
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+    else:
+        review = {"candidates": []}
+
+    for c in review.get("candidates", []) or []:
+        existing_label = (
+            str(c.get("label", "") or "").replace("-", "_").replace(" ", "_").lower()
+        )
+        if (
+            existing_label == label_clean
+            and str(c.get("status", "")).lower() == "approved"
+        ):
+            raise ValueError(
+                f"Label '{label}' already exists as an approved entry in {review_path}"
+            )
+
+    dest = approved_dir / f"{label_clean}.mid"
+    shutil.copy2(midi_path, dest)
+    _rewrite_track_names(dest, label_clean)
+
+    entry = {
+        "id": f"hand_{label_clean}",
+        "midi_file": f"approved/{label_clean}.mid",
+        "section": section,
+        "label": label_clean,
+        "status": "approved",
+        "generated": False,
+        "scores": None,
+        "rank": None,
+        "notes": "Non-generated part — imported by composer",
+    }
+
+    candidates = review.get("candidates") or []
+    candidates.append(entry)
+    review["candidates"] = candidates
+
+    with open(review_path, "w") as f:
+        yaml.dump(
+            review,
+            f,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            width=float("inf"),
+        )
+
+    return entry
 
 
 def promote_part(review_path: str, clean: bool = False):
