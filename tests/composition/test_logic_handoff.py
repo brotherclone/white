@@ -119,15 +119,25 @@ def test_empty_approved_phase_creates_empty_folder(production_dir: Path):
     assert list((song_dir / "MIDI" / "drums").glob("*.mid")) == []
 
 
-def test_arrangement_txt_copied(production_dir: Path):
+def test_arrangement_not_copied_to_logic(production_dir: Path):
+    # arrangement.txt flows Logic → production, never production → Logic
     song_dir = handoff(production_dir)
-    assert (song_dir / "arrangement.txt").exists()
-    assert (production_dir / "arrangement.txt").exists()
+    assert not (song_dir / "arrangement.txt").exists()
 
 
-def test_no_text_files_no_error(production_dir: Path):
-    (production_dir / "arrangement.txt").unlink()
+def test_arrangement_synced_from_logic(production_dir: Path):
+    # Second handoff after human exports arrangement.txt from Logic syncs it back
     song_dir = handoff(production_dir)
+    (song_dir / "arrangement.txt").write_text("Verse 8 bars\nChorus 8 bars")
+    handoff(production_dir)
+    assert (
+        production_dir / "arrangement.txt"
+    ).read_text() == "Verse 8 bars\nChorus 8 bars"
+
+
+def test_no_arrangement_in_logic_no_error(production_dir: Path):
+    song_dir = handoff(production_dir)
+    assert not (song_dir / "arrangement.txt").exists()
     assert song_dir.is_dir()
 
 

@@ -10,7 +10,7 @@ drive when `handoff(production_dir)` is called.
 The folder SHALL be created at:
 `$LOGIC_OUTPUT_DIR/<thread_slug>/<song_title>/`
 
-The seed Logic project at `packages/composition/logic/seed/seed.logicx` SHALL be
+The seed Logic project at `packages/composition/logic/seed.logicx` SHALL be
 copied (full directory copy) into that folder and renamed to `<song_title>.logicx`.
 
 If the destination folder already exists, the function SHALL skip the copy and log
