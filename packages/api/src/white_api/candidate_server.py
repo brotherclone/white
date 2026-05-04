@@ -12,8 +12,10 @@ Usage (album mode):
 """
 
 import argparse
+import os
 import subprocess
 import sys
+import tempfile
 import threading
 import webbrowser
 from dataclasses import asdict
@@ -22,7 +24,7 @@ from pathlib import Path
 
 import uvicorn
 import yaml
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -741,6 +743,48 @@ def create_app(
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
         return {"ok": True, "promoted_count": max(0, count_after - count_before)}
+
+    # ------------------------------------------------------------------
+    # Register non-generated part
+    # ------------------------------------------------------------------
+
+    @app.post("/production/register-part")
+    async def register_part_endpoint(
+        midi_file: UploadFile = File(...),
+        phase: str = Form(...),
+        section: str = Form(...),
+        label: str = Form(...),
+    ):
+        prod = _require_production_dir()
+        if phase not in VALID_PHASES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid phase '{phase}'. Must be one of: {sorted(VALID_PHASES)}",
+            )
+        content = await midi_file.read()
+        with tempfile.NamedTemporaryFile(suffix=".mid", delete=False) as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+        try:
+            from white_composition.promote_part import register_part
+
+            entry_dict = register_part(tmp_path, phase, section, label, prod)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        finally:
+            os.unlink(tmp_path)
+
+        review_yml = prod / phase / "review.yml"
+        from white_api.candidate_browser import _load_review
+
+        entries = _load_review(review_yml) if review_yml.exists() else []
+        matched = next((e for e in entries if e.candidate_id == entry_dict["id"]), None)
+        if matched is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Registered entry could not be reloaded from review.yml",
+            )
+        return _serialise(matched)
 
     # ------------------------------------------------------------------
     # Evolve

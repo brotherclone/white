@@ -68,6 +68,7 @@ class CandidateEntry:
     template: str
     label: str = ""
     use_case: str = ""
+    generated: bool = True
     scores: dict = field(default_factory=dict)
 
 
@@ -108,6 +109,7 @@ def _load_review(review_yml: Path) -> list[CandidateEntry]:
                 template=template,
                 label=str(c.get("label", "") or ""),
                 use_case=str(c.get("use_case", "") or ""),
+                generated=bool(c.get("generated", True)),
                 scores=c.get("scores") or {},
             )
         )
@@ -216,7 +218,11 @@ def build_candidate_table(
         sel_marker = "[bold cyan]▶[/bold cyan]" if is_sel else " "
         status_color = _STATUS_COLOR.get(e.status, "white")
         status_str = f"[{status_color}]{e.status}[/{status_color}]"
-        score_bar = _score_bar(e.composite_score)
+        score_bar = (
+            "[dim][H] hand-written[/dim]"
+            if not e.generated
+            else _score_bar(e.composite_score)
+        )
         id_str = f"[bold]{e.candidate_id}[/bold]" if is_sel else e.candidate_id
 
         table.add_row(
@@ -246,24 +252,27 @@ def build_detail_panel(entry: CandidateEntry | None) -> Panel:
         "",
     ]
 
-    scores = entry.scores
-    comp = scores.get("composite", 0.0)
-    lines.append(f"Composite   {_score_bar(comp)}")
+    if not entry.generated:
+        lines.append("[dim]Non-generated — no scores available[/dim]")
+    else:
+        scores = entry.scores
+        comp = scores.get("composite", 0.0)
+        lines.append(f"Composite   {_score_bar(comp)}")
 
-    theory_total = scores.get("theory_total")
-    if theory_total is not None:
-        lines.append(f"Theory      {_score_bar(float(theory_total))}")
-    elif isinstance(scores.get("theory"), dict):
-        theory_vals = list(scores["theory"].values())
-        if theory_vals:
-            mean_theory = sum(float(v) for v in theory_vals) / len(theory_vals)
-            lines.append(f"Theory      {_score_bar(mean_theory)}")
+        theory_total = scores.get("theory_total")
+        if theory_total is not None:
+            lines.append(f"Theory      {_score_bar(float(theory_total))}")
+        elif isinstance(scores.get("theory"), dict):
+            theory_vals = list(scores["theory"].values())
+            if theory_vals:
+                mean_theory = sum(float(v) for v in theory_vals) / len(theory_vals)
+                lines.append(f"Theory      {_score_bar(mean_theory)}")
 
-    chroma = scores.get("chromatic", {})
-    if isinstance(chroma, dict):
-        match = chroma.get("match")
-        if match is not None:
-            lines.append(f"Chromatic   {_score_bar(float(match))}")
+        chroma = scores.get("chromatic", {})
+        if isinstance(chroma, dict):
+            match = chroma.get("match")
+            if match is not None:
+                lines.append(f"Chromatic   {_score_bar(float(match))}")
 
     return Panel(
         "\n".join(lines), title="Score Breakdown", border_style="dim", height=8
