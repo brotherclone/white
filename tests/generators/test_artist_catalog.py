@@ -198,7 +198,7 @@ class TestGenerateMissingIdempotent:
         with patch("anthropic.Anthropic", return_value=mock_client):
             added = generate_missing(artists, catalog_path)
 
-        assert "New Artist" in added
+        assert "new_artist" in added
         # Verify entry was written to file
         from white_generation.artist_catalog import load_catalog
 

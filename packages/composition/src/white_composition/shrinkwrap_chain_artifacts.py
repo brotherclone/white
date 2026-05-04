@@ -779,8 +779,8 @@ def shrinkwrap(
                         name = str(artist).strip()
                         if name:
                             all_sounds_like.add(name)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.debug(f"Could not read sounds_like from {mb_path}: {exc}")
         if all_sounds_like:
             try:
                 from white_generation.artist_catalog import (

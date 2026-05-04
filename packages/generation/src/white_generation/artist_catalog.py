@@ -310,7 +310,7 @@ def generate_missing(
             discogs_id,
             notes=notes,
         )
-        added.append(artist_name)
+        added.append(_artist_slug(artist_name))
 
     already_present_count = len(normalized) - len(to_add)
     print(f"\nAdded {len(added)} entries, " f"{already_present_count} already present.")
