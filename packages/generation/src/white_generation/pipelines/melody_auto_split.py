@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Melody auto-split: subdivide notes so syllable count matches note count.
+"""Melody auto-split: subdivide notes to accommodate lyric syllable count.
 
-When a generated melody has more notes than a lyric line has syllables, ACE Studio
-requires manual note subdivision before syllables can be placed. This module
-produces a *_split.mid alongside the source MIDI — the source is never modified.
+When a melody has fewer notes than a lyric line has syllables (one note per word,
+but words have multiple syllables), ACE Studio requires manual note subdivision
+before syllables can be placed. This module increases note count by splitting:
+each note is assigned one word; if that word has N > 1 syllables and the note
+duration >= min_split_ticks, the note is subdivided into N equal sub-notes at the
+same pitch and velocity.
 
-Splitting is driven by pyphen hyphenation (en_US). Each note is assigned one word;
-if that word has N > 1 syllables and the note duration >= min_split_ticks, the note
-is split into N equal sub-notes at the same pitch and velocity.
+Outputs a *_split.mid alongside the source MIDI — the source is never modified.
 """
 
 import re
@@ -76,8 +77,12 @@ def split_note(note: Note, n: int, ticks_per_beat: int) -> list[Note]:
     """Divide note into n equal-duration sub-notes at the same pitch and velocity.
 
     The last sub-note absorbs the tick remainder from integer division.
+    n is capped to note.duration_ticks so sub-notes always have duration >= 1.
     ticks_per_beat is accepted for API symmetry but division is tick-based.
     """
+    if n <= 1:
+        return [note]
+    n = min(n, max(1, note.duration_ticks))
     if n <= 1:
         return [note]
     base = note.duration_ticks // n
@@ -103,11 +108,14 @@ def split_note(note: Note, n: int, ticks_per_beat: int) -> list[Note]:
 
 
 def _parse_midi_notes(midi_path: Path) -> tuple[list[Note], int]:
-    """Parse MIDI file into Note objects with absolute tick positions."""
+    """Parse MIDI file into Note objects with absolute tick positions.
+
+    Uses a per-(channel, pitch) stack so retriggered notes are handled correctly.
+    """
     mid = mido.MidiFile(str(midi_path))
     ticks_per_beat = mid.ticks_per_beat or 480
 
-    pending: dict[tuple[int, int], tuple[int, int]] = {}
+    pending: dict[tuple[int, int], list[tuple[int, int]]] = {}
     notes: list[Note] = []
 
     for track in mid.tracks:
@@ -115,13 +123,14 @@ def _parse_midi_notes(midi_path: Path) -> tuple[list[Note], int]:
         for msg in track:
             abs_tick += msg.time
             if msg.type == "note_on" and msg.velocity > 0:
-                pending[(msg.channel, msg.note)] = (abs_tick, msg.velocity)
+                key = (msg.channel, msg.note)
+                pending.setdefault(key, []).append((abs_tick, msg.velocity))
             elif msg.type == "note_off" or (
                 msg.type == "note_on" and msg.velocity == 0
             ):
                 key = (msg.channel, msg.note)
-                if key in pending:
-                    start, vel = pending.pop(key)
+                if pending.get(key):
+                    start, vel = pending[key].pop(0)
                     notes.append(
                         Note(
                             start_tick=start,
@@ -159,7 +168,7 @@ def _write_midi_notes(notes: list[Note], source_midi: Path, output_path: Path) -
             (note.start_tick + note.duration_ticks, note.pitch, 0, note.channel, False)
         )
 
-    events.sort(key=lambda e: (e[0], not e[4]))
+    events.sort(key=lambda e: (e[0], e[4]))
 
     prev_tick = 0
     for abs_tick, pitch, velocity, channel, is_on in events:
@@ -214,8 +223,9 @@ def auto_split_melody(
     text = lyrics_path.read_text(encoding="utf-8")
     sections = _parse_sections(text)
 
-    if section and section in sections:
-        raw_lines = sections[section].splitlines()
+    normalized_section = section.strip().lower().replace(" ", "_") if section else None
+    if normalized_section and normalized_section in sections:
+        raw_lines = sections[normalized_section].splitlines()
     else:
         raw_lines = []
         for block in sections.values():

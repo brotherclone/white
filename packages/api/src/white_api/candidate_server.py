@@ -27,7 +27,7 @@ import yaml
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from white_api.candidate_browser import (
     CandidateEntry,
@@ -792,7 +792,7 @@ def create_app(
 
     class AutoSplitMelodyBody(BaseModel):
         phase_label: str
-        min_split_beats: float = 1.0
+        min_split_beats: float = Field(default=1.0, gt=0)
 
     @app.post("/production/auto-split-melody")
     def auto_split_melody_endpoint(body: AutoSplitMelodyBody):
@@ -814,7 +814,7 @@ def create_app(
 
             src = _mido.MidiFile(str(midi_path))
             ticks_per_beat = src.ticks_per_beat or 480
-            min_split_ticks = int(body.min_split_beats * ticks_per_beat)
+            min_split_ticks = max(1, int(body.min_split_beats * ticks_per_beat))
 
             from white_generation.pipelines.melody_auto_split import auto_split_melody
 

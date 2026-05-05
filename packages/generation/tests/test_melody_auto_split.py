@@ -104,8 +104,6 @@ def test_syllabify_empty():
 # assign_syllables_to_notes
 # ---------------------------------------------------------------------------
 
-NOTE = Note(start_tick=0, pitch=60, velocity=80, duration_ticks=TICKS, channel=0)
-
 
 def _notes(n: int) -> list[Note]:
     return [
