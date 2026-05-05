@@ -27,7 +27,7 @@ import yaml
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from white_api.candidate_browser import (
     CandidateEntry,
@@ -785,6 +785,52 @@ def create_app(
                 detail="Registered entry could not be reloaded from review.yml",
             )
         return _serialise(matched)
+
+    # ------------------------------------------------------------------
+    # Melody auto-split
+    # ------------------------------------------------------------------
+
+    class AutoSplitMelodyBody(BaseModel):
+        phase_label: str
+        min_split_beats: float = Field(default=1.0, gt=0)
+
+    @app.post("/production/auto-split-melody")
+    def auto_split_melody_endpoint(body: AutoSplitMelodyBody):
+        prod = _require_production_dir()
+        midi_path = prod / "melody" / "approved" / f"{body.phase_label}.mid"
+        if not midi_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No approved melody MIDI for label '{body.phase_label}' at {midi_path}",
+            )
+        lyrics_path = prod / "melody" / "lyrics.txt"
+        if not lyrics_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No lyrics.txt found at {lyrics_path}",
+            )
+        try:
+            import mido as _mido
+
+            src = _mido.MidiFile(str(midi_path))
+            ticks_per_beat = src.ticks_per_beat or 480
+            min_split_ticks = max(1, int(body.min_split_beats * ticks_per_beat))
+
+            from white_generation.pipelines.melody_auto_split import auto_split_melody
+
+            output_path, alignment = auto_split_melody(
+                midi_path=midi_path,
+                lyrics_path=lyrics_path,
+                section=body.phase_label,
+                min_split_ticks=min_split_ticks,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+        return {
+            "ok": True,
+            "split_midi": str(output_path),
+            "alignment": alignment,
+        }
 
     # ------------------------------------------------------------------
     # Evolve
