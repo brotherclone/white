@@ -134,6 +134,14 @@ def _build_phase_command(
             "--production-dir",
             prod,
         ]
+    if phase == "quartet":
+        return base + [
+            "white_generation.pipelines.quartet_pipeline",
+            "--production-dir",
+            prod,
+            "--singer",
+            singer,
+        ]
     raise ValueError(f"Unknown phase: {phase}")
 
 

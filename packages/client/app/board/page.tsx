@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  fetchSongs, fetchActiveSong, fetchComposition, advanceStage, addVersion,
+  fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
   updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
 } from "@/lib/api";
 import { CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
@@ -263,8 +263,19 @@ export default function BoardPage() {
             <select
               className="text-xs font-sans bg-zinc-900 border border-zinc-700 rounded px-2 py-1.5 text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
               value={activeSong?.id ?? ""}
-              onChange={() => {}}
-              disabled
+              onChange={async (e) => {
+                const id = e.target.value;
+                if (!id || id === activeSong?.id) return;
+                setLoadState("loading");
+                try {
+                  await activateSong(id);
+                  await refresh();
+                  await refreshLyrics();
+                } catch {
+                  setLoadState("error");
+                }
+              }}
+              disabled={loadState === "loading"}
             >
               {songs.map(s => (
                 <option key={s.id} value={s.id}>{s.title}</option>
