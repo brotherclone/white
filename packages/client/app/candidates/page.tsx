@@ -380,6 +380,8 @@ export default function CandidatesPage() {
               <span className="text-xs font-sans text-emerald-400">✓ strings</span>
             ) : quartetStatus === "generated" ? (
               <span className="text-xs font-sans text-blue-400">● strings</span>
+            ) : quartetStatus === "in_progress" || runningQuartet ? (
+              <span className="text-xs font-sans text-yellow-400">⟳ strings…</span>
             ) : canRunQuartet ? (
               <button
                 onClick={handleRunQuartet}
@@ -387,8 +389,6 @@ export default function CandidatesPage() {
               >
                 Run Strings
               </button>
-            ) : runningQuartet ? (
-              <span className="text-xs font-sans text-yellow-400">⟳ strings…</span>
             ) : null
           )}
           {needsInit && (

@@ -380,13 +380,12 @@ def create_app(
         def _run():
             global _run_job
             try:
-                import subprocess
-
                 from white_composition.pipeline_runner import (
                     PHASE_REVIEW_FILES,
                     write_phase_status,
                 )
 
+                write_phase_status(prod, "quartet", "in_progress")
                 singer = (_active_song or {}).get("singer") or "gabriel"
                 cmd = [
                     sys.executable,
@@ -404,6 +403,7 @@ def create_app(
                         write_phase_status(prod, "quartet", "generated")
                         _run_job["status"] = "done"
                     else:
+                        write_phase_status(prod, "quartet", "pending")
                         _run_job["status"] = "error"
                         _run_job["error"] = (
                             f"quartet exited with code {result.returncode}"
