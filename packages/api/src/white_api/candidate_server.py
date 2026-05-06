@@ -361,6 +361,65 @@ def create_app(
     def pipeline_run_status():
         return _run_job
 
+    @app.post("/pipeline/run/quartet")
+    def pipeline_run_quartet():
+        """Run the quartet (strings) generation phase for the active song."""
+        global _run_job
+        if _run_job["status"] == "running":
+            raise HTTPException(status_code=409, detail="A phase is already running")
+        prod = _require_production_dir()
+        now = datetime.now(timezone.utc).isoformat()
+        _run_job = {
+            "status": "running",
+            "phase": "quartet",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        def _run():
+            global _run_job
+            try:
+                from white_composition.pipeline_runner import (
+                    PHASE_REVIEW_FILES,
+                    write_phase_status,
+                )
+
+                write_phase_status(prod, "quartet", "in_progress")
+                singer = (_active_song or {}).get("singer") or "gabriel"
+                cmd = [
+                    sys.executable,
+                    "-m",
+                    "white_generation.pipelines.quartet_pipeline",
+                    "--production-dir",
+                    str(prod),
+                    "--singer",
+                    singer,
+                ]
+                result = subprocess.run(cmd)
+                review_file = PHASE_REVIEW_FILES.get("quartet")
+                if result.returncode != 0:
+                    if review_file and (prod / review_file).exists():
+                        write_phase_status(prod, "quartet", "generated")
+                        _run_job["status"] = "done"
+                    else:
+                        write_phase_status(prod, "quartet", "pending")
+                        _run_job["status"] = "error"
+                        _run_job["error"] = (
+                            f"quartet exited with code {result.returncode}"
+                        )
+                else:
+                    write_phase_status(prod, "quartet", "generated")
+                    _run_job["status"] = "done"
+            except Exception as exc:
+                _run_job["status"] = "error"
+                _run_job["error"] = str(exc)
+            finally:
+                _run_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
     @app.get("/pipeline/status")
     def pipeline_status():
         """Return phase statuses for the active song."""

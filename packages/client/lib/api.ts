@@ -140,6 +140,15 @@ export async function getRunStatus(): Promise<import("./types").RunJob> {
   return res.json();
 }
 
+export async function runQuartetPhase(): Promise<{ status: string; started_at: string }> {
+  const res = await fetch(`${BASE}/pipeline/run/quartet`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Quartet run failed");
+  }
+  return res.json();
+}
+
 export async function fetchPipelineStatus(): Promise<import("./types").PipelineStatus> {
   const res = await fetch(`${BASE}/pipeline/status`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch pipeline status");
