@@ -3,14 +3,14 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong, initSong, runNextPhase, getRunStatus, fetchPipelineStatus, startHandoff, getHandoffStatus } from "@/lib/api";
+import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong, initSong, runNextPhase, runQuartetPhase, getRunStatus, fetchPipelineStatus, startHandoff, getHandoffStatus } from "@/lib/api";
 import { Candidate, CandidateStatus, PipelineStatus, RunJob, SongEntry } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
 import StatusBadge from "@/components/StatusBadge";
 import MidiPlayer from "@/components/MidiPlayer";
 
-const PHASES = ["chords", "drums", "bass", "melody"];
+const PHASES = ["chords", "drums", "bass", "melody", "quartet"];
 const PIPELINE_PHASES = ["chords", "drums", "bass", "melody"];
 
 type SortKey = "phase" | "section" | "id" | "template" | "composite_score" | "status" | "rank";
@@ -32,6 +32,7 @@ export default function CandidatesPage() {
   const [promoting, setPromoting] = useState(false);
   const [evolving, setEvolving] = useState(false);
   const [running, setRunning] = useState(false);
+  const [runningQuartet, setRunningQuartet] = useState(false);
   const [initializing, setInitializing] = useState(false);
   const [handoffing, setHandoffing] = useState(false);
   const [activeSong, setActiveSong] = useState<SongEntry | null>(null);
@@ -189,6 +190,37 @@ export default function CandidatesPage() {
     }, 3000);
   }, [phaseFilter, load, refreshPipeline]);
 
+  const handleRunQuartet = async () => {
+    setError(null);
+    setRunningQuartet(true);
+    try {
+      await runQuartetPhase();
+    } catch (e) {
+      setRunningQuartet(false);
+      setError(e instanceof Error ? e.message : "Strings run failed");
+      return;
+    }
+    runPollRef.current = setInterval(async () => {
+      try {
+        const job = await getRunStatus();
+        if (job.status === "done") {
+          clearInterval(runPollRef.current!);
+          runPollRef.current = null;
+          setRunningQuartet(false);
+          refreshPipeline();
+          load(phaseFilter);
+          showToast("Strings generation complete");
+        } else if (job.status === "error") {
+          clearInterval(runPollRef.current!);
+          runPollRef.current = null;
+          setRunningQuartet(false);
+          setError(job.error ?? "Strings generation failed");
+          refreshPipeline();
+        }
+      } catch { /* transient */ }
+    }, 3000);
+  };
+
   const handlePromote = async () => {
     if (!phaseFilter) return;
     setError(null);
@@ -253,6 +285,8 @@ export default function CandidatesPage() {
   const needsInit = pipeline?.next_phase === "init_production";
   const canRun = !running && !needsInit && pipeline?.next_phase != null;
   const melodyPromoted = pipeline?.phases?.["melody"] === "promoted";
+  const quartetStatus = pipeline?.phases?.["quartet"];
+  const canRunQuartet = melodyPromoted && !quartetStatus && !running && !runningQuartet;
 
   const SortIcon = ({ k }: { k: SortKey }) =>
     sortKey === k ? <span className="ml-1 text-zinc-400">{sortAsc ? "↑" : "↓"}</span> : null;
@@ -340,6 +374,23 @@ export default function CandidatesPage() {
               </span>
             );
           })}
+          {/* Quartet (strings) — parallel phase, shown when melody is promoted */}
+          {melodyPromoted && (
+            quartetStatus === "promoted" ? (
+              <span className="text-xs font-sans text-emerald-400">✓ strings</span>
+            ) : quartetStatus === "generated" ? (
+              <span className="text-xs font-sans text-blue-400">● strings</span>
+            ) : quartetStatus === "in_progress" || runningQuartet ? (
+              <span className="text-xs font-sans text-yellow-400">⟳ strings…</span>
+            ) : canRunQuartet ? (
+              <button
+                onClick={handleRunQuartet}
+                className="px-3 py-1 text-xs rounded font-medium transition-colors bg-zinc-700 hover:bg-zinc-600 text-zinc-200"
+              >
+                Run Strings
+              </button>
+            ) : null
+          )}
           {needsInit && (
             <button
               onClick={handleInit}
@@ -349,7 +400,7 @@ export default function CandidatesPage() {
               {initializing ? "Initializing…" : "Initialize"}
             </button>
           )}
-          {canRun && (
+          {canRun && pipeline.next_phase !== "lyrics" && (
             <button
               onClick={handleRun}
               disabled={running}
@@ -357,6 +408,14 @@ export default function CandidatesPage() {
             >
               {running ? `Running ${pipeline.next_phase}…` : `Run ${pipeline.next_phase}`}
             </button>
+          )}
+          {canRun && pipeline.next_phase === "lyrics" && (
+            <Link
+              href="/board"
+              className="ml-auto px-3 py-1 text-xs rounded font-medium transition-colors bg-violet-700 hover:bg-violet-600 text-white"
+            >
+              Composition Board →
+            </Link>
           )}
           {running && !canRun && (
             <span className="ml-auto text-xs text-yellow-400 font-sans">Running {pipeline.next_phase}…</span>
