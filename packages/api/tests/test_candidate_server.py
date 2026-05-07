@@ -444,6 +444,41 @@ class TestScanSongs:
         assert alpha["has_decisions"] is True
         assert beta["has_decisions"] is False
 
+    def test_stage_ideation_when_no_song_context(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        assert all(s["stage"] == "ideation" for s in songs)
+
+    def test_stage_generation_when_song_context_present(self, sw_dir):
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        (prod_dir / "song_context.yml").write_text("title: Song Alpha\n")
+        songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        assert alpha["stage"] == "generation"
+
+    def test_stage_composition_when_composition_yml_present(self, sw_dir, tmp_path):
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        (prod_dir / "song_context.yml").write_text(
+            "title: Song Alpha\nthread: thread-alpha\n"
+        )
+        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha"
+        logic_song_dir.mkdir(parents=True)
+        (logic_song_dir / "composition.yml").write_text("stage: structure\n")
+        with patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(tmp_path / "logic")}):
+            songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        assert alpha["stage"] == "composition"
+
+    def test_stage_composition_falls_back_without_logic_output_dir(self, sw_dir):
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        (prod_dir / "song_context.yml").write_text("title: Song Alpha\n")
+        env = {
+            k: v for k, v in __import__("os").environ.items() if k != "LOGIC_OUTPUT_DIR"
+        }
+        with patch.dict("os.environ", env, clear=True):
+            songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        assert alpha["stage"] == "generation"
+
     def test_empty_dir_returns_empty(self, tmp_path):
         assert scan_songs(tmp_path / "empty") == []
 
@@ -475,6 +510,7 @@ class TestGetSongs:
             "bpm",
             "rainbow_color",
             "has_decisions",
+            "stage",
         ):
             assert field in song
 

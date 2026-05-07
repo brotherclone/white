@@ -29,6 +29,7 @@ from typing import Optional
 
 import mido
 import yaml
+
 from white_core.enums.lyric_repeat_type import LyricRepeatType
 
 PLAN_FILENAME = "production_plan.yml"
@@ -344,12 +345,15 @@ def load_song_proposal(proposal_path: Path) -> dict:
     with open(proposal_path) as f:
         raw = yaml.safe_load(f)
 
-    # Time signature — stored as {numerator: N, denominator: D}
+    # Time signature — stored as {numerator: N, denominator: D}.
+    # Verbal markings (e.g. "Moderato") are ignored; fall back to 4/4.
     tempo = raw.get("tempo", {})
     if isinstance(tempo, dict):
         time_sig = f"{tempo.get('numerator', 4)}/{tempo.get('denominator', 4)}"
+    elif isinstance(tempo, str) and "/" in tempo:
+        time_sig = tempo
     else:
-        time_sig = str(tempo) if tempo else "4/4"
+        time_sig = "4/4"
 
     # Rainbow color name
     color = raw.get("rainbow_color", {})
@@ -392,12 +396,15 @@ def load_song_proposal_unified(
     with open(proposal_path) as f:
         raw = yaml.safe_load(f) or {}
 
-    # Time signature — handles {numerator: N, denominator: D} dict or "4/4" string
+    # Time signature — handles {numerator: N, denominator: D} dict or "4/4" string.
+    # "tempo" may also be a verbal marking (e.g. "Moderato"); treat those as absent.
     tempo = raw.get("tempo", {})
     if isinstance(tempo, dict):
         time_sig = f"{tempo.get('numerator', 4)}/{tempo.get('denominator', 4)}"
+    elif isinstance(tempo, str) and "/" in tempo:
+        time_sig = tempo
     else:
-        time_sig = str(tempo) if tempo else "4/4"
+        time_sig = "4/4"
 
     # Rainbow color
     color_raw = raw.get("rainbow_color", {})

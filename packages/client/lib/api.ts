@@ -227,3 +227,21 @@ export async function addVersion(): Promise<{ ok: boolean; version: number }> {
   }
   return res.json();
 }
+
+export async function syncArrangement(): Promise<{ ok: boolean; synced_from: string; synced_to: string }> {
+  const res = await fetch(`${BASE}/sync-arrangement`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Arrangement sync failed");
+  }
+  return res.json();
+}
+
+export async function autoSplitMelody(): Promise<{ ok: boolean; results: { label: string; split_midi: string }[] }> {
+  const res = await fetch(`${BASE}/production/auto-split-melody/all`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Auto-split failed");
+  }
+  return res.json();
+}

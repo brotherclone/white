@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
   updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
+  autoSplitMelody, syncArrangement,
 } from "@/lib/api";
 import { CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
 
@@ -114,6 +115,10 @@ export default function BoardPage() {
   const [advancingTo, setAdvancingTo] = useState<MixStage | null>(null);
   const [addingVersion, setAddingVersion] = useState(false);
   const [generatingLyrics, setGeneratingLyrics] = useState(false);
+  const [splitting, setSplitting] = useState(false);
+  const [splitResult, setSplitResult] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncDone, setSyncDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -226,6 +231,34 @@ export default function BoardPage() {
     }
   };
 
+  const handleSyncArrangement = async () => {
+    setSyncing(true);
+    setSyncDone(false);
+    setError(null);
+    try {
+      await syncArrangement();
+      setSyncDone(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Arrangement sync failed");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleAutoSplit = async () => {
+    setSplitting(true);
+    setSplitResult(null);
+    setError(null);
+    try {
+      const res = await autoSplitMelody();
+      setSplitResult(`Split ${res.results.length} section(s): ${res.results.map(r => r.label).join(", ")}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Auto-split failed");
+    } finally {
+      setSplitting(false);
+    }
+  };
+
   const handleNotesChange = (version: number, notes: string) => {
     if (notesSaveTimers.current[version]) clearTimeout(notesSaveTimers.current[version]);
     notesSaveTimers.current[version] = setTimeout(() => {
@@ -256,7 +289,9 @@ export default function BoardPage() {
         </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">Composition Board</h1>
         {activeSong && (
-          <span className="text-zinc-500 text-xs font-sans ml-2 truncate">{activeSong.title}</span>
+          <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans ml-2 truncate transition-colors" title="Switch song">
+            {activeSong.title}
+          </Link>
         )}
         <div className="ml-auto flex items-center gap-3">
           {songs.length > 0 && (
@@ -311,7 +346,7 @@ export default function BoardPage() {
       {loadState === "not_initialized" && (
         <div className="flex flex-col items-center justify-center h-64 gap-3 text-zinc-500 text-sm font-sans">
           <span>No composition initialized.</span>
-          <Link href="/songs" className="text-blue-400 hover:text-blue-300 transition-colors">
+          <Link href="/" className="text-blue-400 hover:text-blue-300 transition-colors">
             Go to Songs → Handoff to Logic
           </Link>
         </div>
@@ -325,6 +360,8 @@ export default function BoardPage() {
               const isPast = idx < currentStageIdx;
               const isFuture = idx > currentStageIdx;
               const isLyrics = stage === "lyrics";
+              const isRecording = stage === "recording";
+              const isStructure = stage === "structure";
 
               return (
                 <div
@@ -411,6 +448,37 @@ export default function BoardPage() {
                       </button>
                     )}
                   </div>
+
+                  {/* Sync arrangement.txt from Logic — structure stage */}
+                  {isCurrent && isStructure && (
+                    <div className="px-3 pb-1">
+                      <button
+                        onClick={handleSyncArrangement}
+                        disabled={syncing}
+                        title="Pull arrangement.txt from Logic project back into the production dir"
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {syncing ? "Syncing…" : syncDone ? "✓ Arrangement synced" : "Sync arrangement from Logic"}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Auto-split melody for ACE Studio — recording stage or approaching it */}
+                  {isRecording && (isCurrent || (isFuture && idx === currentStageIdx + 1)) && (
+                    <div className="px-3 pb-1">
+                      <button
+                        onClick={handleAutoSplit}
+                        disabled={splitting}
+                        title="Split approved melody MIDIs by syllable count for ACE Studio import"
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {splitting ? "Splitting…" : "Auto-split for ACE"}
+                      </button>
+                      {splitResult && (
+                        <p className="mt-1.5 text-[10px] font-sans text-emerald-400 text-center">{splitResult}</p>
+                      )}
+                    </div>
+                  )}
 
                   {/* Generate Lyrics button — only when no candidates yet */}
                   {isCurrent && isLyrics && !lyricsData && (

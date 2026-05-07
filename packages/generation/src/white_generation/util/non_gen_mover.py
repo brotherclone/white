@@ -4,8 +4,8 @@ from pathlib import Path
 
 from white_composition.promote_part import register_part
 
-MIDI_ROOT = "/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Tracks/violet-fallback-defensive-violet-response/The Cataloguer's Lament/MIDI"
-PRODUCTION_DIR = "/Volumes/LucidNonsense/White/packages/generation/shrink_wrapped/violet-fallback-defensive-violet-response/production/flesh_circuit_taxonomy_v2"
+MIDI_ROOT = "/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Tracks/violet-fallback-defensive-violet-response/True Lady/MIDI"
+PRODUCTION_DIR = "/Volumes/LucidNonsense/White/packages/generation/shrink_wrapped/violet-fallback-defensive-violet-response/production/indigo_proposal_1776373840913"
 PHASES = ["bass", "melody", "chords", "drums"]
 
 if __name__ == "__main__":
