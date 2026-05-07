@@ -123,6 +123,23 @@ def _find_proposal(manifest_path: Path) -> Path | None:
     return candidate if candidate.exists() else None
 
 
+def _compute_stage(prod_dir: Path) -> str:
+    if not (prod_dir / "song_context.yml").exists():
+        return "ideation"
+    try:
+        from white_composition.logic_handoff import (
+            COMPOSITION_FILENAME,
+            resolve_song_dir,
+        )
+
+        logic_dir = resolve_song_dir(prod_dir)
+        if (logic_dir / COMPOSITION_FILENAME).exists():
+            return "composition"
+    except Exception:
+        pass
+    return "generation"
+
+
 def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
     """Walk shrink_wrapped_dir for manifest_bootstrap.yml files and return song entries."""
     songs = []
@@ -154,6 +171,7 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "singer": data.get("singer"),
                 "has_decisions": (prod_dir / "production_decisions.yml").exists(),
                 "initialized": (prod_dir / "song_context.yml").exists(),
+                "stage": _compute_stage(prod_dir),
                 "proposal_path": str(proposal_path) if proposal_path else None,
             }
         )

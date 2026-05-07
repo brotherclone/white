@@ -289,7 +289,7 @@ export default function BoardPage() {
         </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">Composition Board</h1>
         {activeSong && (
-          <Link href="/songs" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans ml-2 truncate transition-colors" title="Switch song">
+          <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans ml-2 truncate transition-colors" title="Switch song">
             {activeSong.title}
           </Link>
         )}
@@ -346,7 +346,7 @@ export default function BoardPage() {
       {loadState === "not_initialized" && (
         <div className="flex flex-col items-center justify-center h-64 gap-3 text-zinc-500 text-sm font-sans">
           <span>No composition initialized.</span>
-          <Link href="/songs" className="text-blue-400 hover:text-blue-300 transition-colors">
+          <Link href="/" className="text-blue-400 hover:text-blue-300 transition-colors">
             Go to Songs → Handoff to Logic
           </Link>
         </div>

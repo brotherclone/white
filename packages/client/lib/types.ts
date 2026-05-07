@@ -12,6 +12,7 @@ export interface SongEntry {
   singer: string | null;
   has_decisions: boolean;
   initialized: boolean;
+  stage: "ideation" | "generation" | "composition";
   proposal_path: string | null;
 }
 
