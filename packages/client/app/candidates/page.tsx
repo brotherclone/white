@@ -305,7 +305,7 @@ export default function CandidatesPage() {
       {/* Breadcrumb */}
       {activeSong && (
         <div className="flex items-center gap-2 text-xs text-zinc-500 mb-3 font-sans">
-          <Link href="/songs" className="hover:text-zinc-300 transition-colors">← Songs</Link>
+          <Link href="/" className="hover:text-zinc-300 transition-colors">← Songs</Link>
           <span>/</span>
           <span className="text-zinc-300">{activeSong.title}</span>
         </div>

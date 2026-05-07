@@ -1,16 +1,23 @@
-# Configuration for non-generative MIDI processing
-
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 from white_composition.promote_part import register_part
 
-MIDI_ROOT = "/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Tracks/violet-fallback-defensive-violet-response/The Cataloguer's Lament/MIDI"
-PRODUCTION_DIR = "/Volumes/LucidNonsense/White/packages/generation/shrink_wrapped/violet-fallback-defensive-violet-response/production/flesh_circuit_taxonomy_v2"
-PHASES = ["bass", "melody", "chords", "drums"]
+load_dotenv()
+
+
+PHASES = ["bass", "melody", "chords", "drums", "quartet"]
 
 if __name__ == "__main__":
 
-    midi_root = Path(MIDI_ROOT)
+    midi_root = Path(
+        os.getenv(
+            "NON_GEN_MOVER_MIDI_ROOT",
+            "/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Tracks/",
+        )
+    )
     for phase in PHASES:
         phase_dir = midi_root / phase
         if not phase_dir.exists():
@@ -23,7 +30,10 @@ if __name__ == "__main__":
                     phase=phase,
                     section=label,
                     label=label,
-                    production_dir=PRODUCTION_DIR,
+                    production_dir=os.getenv(
+                        "NON_GEN_MOVER_PRODUCTION_DIR",
+                        "/Volumes/LucidNonsense/White/packages/generation/shrink_wrapped/",
+                    ),
                 )
                 print(f"  ✓  {phase}/{label}")
             except ValueError as e:
