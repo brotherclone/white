@@ -13,6 +13,7 @@ Usage (album mode):
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -478,6 +479,34 @@ def create_app(
     def handoff_status():
         return _handoff_job
 
+    @app.post("/sync-arrangement")
+    def sync_arrangement():
+        """Pull arrangement.txt from the Logic project folder back into the production dir."""
+        prod = _require_production_dir()
+        try:
+            from white_composition.logic_handoff import _song_dir
+
+            song_dir = _song_dir(prod)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
+            ) from exc
+
+        logic_arrangement = song_dir / "arrangement.txt"
+        if not logic_arrangement.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No arrangement.txt found in Logic project at {logic_arrangement} — arrange the song in Logic first",
+            )
+
+        dest = prod / "arrangement.txt"
+        shutil.copy2(logic_arrangement, dest)
+        return {
+            "ok": True,
+            "synced_from": str(logic_arrangement),
+            "synced_to": str(dest),
+        }
+
     # ------------------------------------------------------------------
     # Plan Drift Report
     # ------------------------------------------------------------------
@@ -889,6 +918,75 @@ def create_app(
             "ok": True,
             "split_midi": str(output_path),
             "alignment": alignment,
+        }
+
+    @app.post("/production/auto-split-melody/all")
+    def auto_split_melody_all_endpoint():
+        """Auto-split every approved melody MIDI in one call."""
+        prod = _require_production_dir()
+        approved_dir = prod / "melody" / "approved"
+        lyrics_path = prod / "melody" / "lyrics.txt"
+        if not approved_dir.exists():
+            raise HTTPException(
+                status_code=404, detail="No approved melody directory found"
+            )
+        if not lyrics_path.exists():
+            raise HTTPException(status_code=404, detail="No lyrics.txt found")
+
+        midi_files = sorted(approved_dir.glob("*.mid"))
+        if not midi_files:
+            raise HTTPException(
+                status_code=404, detail="No approved melody MIDIs found"
+            )
+
+        try:
+            import mido as _mido
+
+            from white_generation.pipelines.melody_auto_split import auto_split_melody
+
+            results = []
+            for midi_path in midi_files:
+                src = _mido.MidiFile(str(midi_path))
+                ticks_per_beat = src.ticks_per_beat or 480
+                min_split_ticks = ticks_per_beat  # 1 beat minimum
+                output_path, alignment = auto_split_melody(
+                    midi_path=midi_path,
+                    lyrics_path=lyrics_path,
+                    section=midi_path.stem,
+                    min_split_ticks=min_split_ticks,
+                )
+                results.append(
+                    {
+                        "label": midi_path.stem,
+                        "split_midi": str(output_path),
+                        "alignment": alignment,
+                    }
+                )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+        # Sync split MIDIs into the Logic MIDI folder if handoff already ran
+        logic_midi_dir: Path | None = None
+        try:
+            from white_composition.logic_handoff import _song_dir
+
+            song_dir = _song_dir(prod)
+            candidate = song_dir / "MIDI" / "melody"
+            if candidate.is_dir():
+                logic_midi_dir = candidate
+        except Exception:
+            pass
+
+        if logic_midi_dir:
+            for r in results:
+                split_path = Path(r["split_midi"])
+                if split_path.exists():
+                    shutil.copy2(split_path, logic_midi_dir / split_path.name)
+
+        return {
+            "ok": True,
+            "results": results,
+            "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
         }
 
     # ------------------------------------------------------------------
