@@ -502,9 +502,9 @@ def create_app(
         """Pull arrangement.txt from the Logic project folder back into the production dir."""
         prod = _require_production_dir()
         try:
-            from white_composition.logic_handoff import _song_dir
+            from white_composition.logic_handoff import resolve_song_dir
 
-            song_dir = _song_dir(prod)
+            song_dir = resolve_song_dir(prod)
         except Exception as exc:
             raise HTTPException(
                 status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
@@ -986,9 +986,9 @@ def create_app(
         # Sync split MIDIs into the Logic MIDI folder if handoff already ran
         logic_midi_dir: Path | None = None
         try:
-            from white_composition.logic_handoff import _song_dir
+            from white_composition.logic_handoff import resolve_song_dir
 
-            song_dir = _song_dir(prod)
+            song_dir = resolve_song_dir(prod)
             candidate = song_dir / "MIDI" / "melody"
             if candidate.is_dir():
                 logic_midi_dir = candidate

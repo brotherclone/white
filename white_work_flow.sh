@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Load .env if present
+# Load .env if present — set -a exports every assignment, set +a stops it
 if [ -f .env ]; then
-  while IFS= read -r line; do
-    [[ "$line" =~ ^[[:space:]]*# ]] && continue
-    [[ -z "${line// }" ]] && continue
-    export "$line"
-  done < <(grep -v '^#' .env | grep '=')
+  set -a
+  # shellcheck source=/dev/null
+  source .env
+  set +a
 fi
 
 if [ -z "${SHRINKWRAP_OUTPUT_DIR:-}" ]; then
@@ -15,13 +14,18 @@ if [ -z "${SHRINKWRAP_OUTPUT_DIR:-}" ]; then
   exit 1
 fi
 
+API_PID=""
+UI_PID=""
+
 cleanup() {
   echo ""
   echo "Stopping servers…"
-  kill "$API_PID" "$UI_PID" 2>/dev/null || true
-  wait "$API_PID" "$UI_PID" 2>/dev/null || true
+  [ -n "$API_PID" ] && kill "$API_PID" 2>/dev/null || true
+  [ -n "$UI_PID" ] && kill "$UI_PID" 2>/dev/null || true
+  [ -n "$API_PID" ] && wait "$API_PID" 2>/dev/null || true
+  [ -n "$UI_PID" ] && wait "$UI_PID" 2>/dev/null || true
 }
-trap cleanup SIGINT SIGTERM
+trap cleanup EXIT
 
 echo "Starting API server on :8000 …"
 python -m white_api.candidate_server \

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { startGenerate, getGenerateStatus } from "@/lib/api";
 
 type Toast = { kind: "success" | "error"; message: string };
@@ -10,6 +10,12 @@ export default function AgentRunPage() {
   const [generating, setGenerating] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
 
   const showToast = (kind: Toast["kind"], message: string) => {
     setToast({ kind, message });
