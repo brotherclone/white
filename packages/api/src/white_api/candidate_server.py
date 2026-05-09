@@ -140,6 +140,19 @@ def _compute_stage(prod_dir: Path) -> str:
     return "generation"
 
 
+def _has_mix_file(prod_dir: Path) -> bool:
+    ctx_path = prod_dir / "song_context.yml"
+    if not ctx_path.exists():
+        return False
+    try:
+        with open(ctx_path) as f:
+            ctx = yaml.safe_load(f) or {}
+        mix = ctx.get("mix_file")
+        return bool(mix and Path(mix).exists())
+    except Exception:
+        return False
+
+
 def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
     """Walk shrink_wrapped_dir for manifest_bootstrap.yml files and return song entries."""
     songs = []
@@ -167,10 +180,12 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "title": data.get("title") or production_slug,
                 "key": _coerce_key_string(data.get("key")),
                 "bpm": data.get("bpm"),
+                "time_sig": data.get("time_sig"),
                 "rainbow_color": data.get("rainbow_color"),
                 "singer": data.get("singer"),
                 "has_decisions": (prod_dir / "production_decisions.yml").exists(),
                 "initialized": (prod_dir / "song_context.yml").exists(),
+                "has_mix": _has_mix_file(prod_dir),
                 "stage": _compute_stage(prod_dir),
                 "proposal_path": str(proposal_path) if proposal_path else None,
             }
@@ -658,6 +673,73 @@ def create_app(
         return {"ok": True}
 
     # ------------------------------------------------------------------
+    # Mix file
+    # ------------------------------------------------------------------
+
+    @app.get("/production/mix/info")
+    def mix_info():
+        prod = _require_production_dir()
+        from white_composition.init_production import load_song_context
+
+        ctx = load_song_context(prod)
+        mix_file = ctx.get("mix_file") or None
+        return {
+            "has_mix": bool(mix_file and Path(mix_file).exists()),
+            "mix_file": mix_file,
+        }
+
+    class MixFileBody(BaseModel):
+        path: str
+
+    @app.post("/production/mix/set")
+    def set_mix_file(body: MixFileBody):
+        prod = _require_production_dir()
+        ctx_path = prod / "song_context.yml"
+        if not ctx_path.exists():
+            raise HTTPException(status_code=404, detail="song_context.yml not found")
+        with open(ctx_path) as f:
+            ctx = yaml.safe_load(f) or {}
+        ctx["mix_file"] = body.path
+        with open(ctx_path, "w") as f:
+            yaml.dump(
+                ctx,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
+        return {"ok": True, "mix_file": body.path}
+
+    @app.get("/production/mix")
+    def stream_mix():
+        from fastapi.responses import FileResponse
+
+        prod = _require_production_dir()
+        from white_composition.init_production import load_song_context
+
+        ctx = load_song_context(prod)
+        mix_file = ctx.get("mix_file")
+        if not mix_file:
+            raise HTTPException(
+                status_code=404, detail="No mix_file set in song_context.yml"
+            )
+        mix_path = Path(mix_file)
+        if not mix_path.exists():
+            raise HTTPException(
+                status_code=404, detail=f"Mix file not found: {mix_path}"
+            )
+        suffix = mix_path.suffix.lower()
+        media_type = {
+            ".mp3": "audio/mpeg",
+            ".wav": "audio/wav",
+            ".aiff": "audio/aiff",
+            ".aif": "audio/aiff",
+            ".m4a": "audio/mp4",
+        }.get(suffix, "audio/mpeg")
+        return FileResponse(str(mix_path), media_type=media_type)
+
+    # ------------------------------------------------------------------
     # Lyrics review
     # ------------------------------------------------------------------
 
@@ -940,7 +1022,7 @@ def create_app(
 
     @app.post("/production/auto-split-melody/all")
     def auto_split_melody_all_endpoint():
-        """Auto-split every approved melody MIDI in one call."""
+        """Auto-split every lyric section instance — one split MIDI per instance."""
         prod = _require_production_dir()
         approved_dir = prod / "melody" / "approved"
         lyrics_path = prod / "melody" / "lyrics.txt"
@@ -951,35 +1033,16 @@ def create_app(
         if not lyrics_path.exists():
             raise HTTPException(status_code=404, detail="No lyrics.txt found")
 
-        midi_files = sorted(approved_dir.glob("*.mid"))
-        if not midi_files:
-            raise HTTPException(
-                status_code=404, detail="No approved melody MIDIs found"
+        try:
+            from white_generation.pipelines.melody_auto_split import (
+                auto_split_all_instances,
             )
 
-        try:
-            import mido as _mido
-
-            from white_generation.pipelines.melody_auto_split import auto_split_melody
-
-            results = []
-            for midi_path in midi_files:
-                src = _mido.MidiFile(str(midi_path))
-                ticks_per_beat = src.ticks_per_beat or 480
-                min_split_ticks = ticks_per_beat  # 1 beat minimum
-                output_path, alignment = auto_split_melody(
-                    midi_path=midi_path,
-                    lyrics_path=lyrics_path,
-                    section=midi_path.stem,
-                    min_split_ticks=min_split_ticks,
-                )
-                results.append(
-                    {
-                        "label": midi_path.stem,
-                        "split_midi": str(output_path),
-                        "alignment": alignment,
-                    }
-                )
+            results = auto_split_all_instances(
+                lyrics_path=lyrics_path,
+                approved_dir=approved_dir,
+                min_split_ticks=480,
+            )
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -997,13 +1060,78 @@ def create_app(
 
         if logic_midi_dir:
             for r in results:
-                split_path = Path(r["split_midi"])
-                if split_path.exists():
-                    shutil.copy2(split_path, logic_midi_dir / split_path.name)
+                if not r.get("skipped"):
+                    split_path = Path(r["split_midi"])
+                    if split_path.exists():
+                        shutil.copy2(split_path, logic_midi_dir / split_path.name)
 
         return {
             "ok": True,
             "results": results,
+            "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
+        }
+
+    @app.post("/production/assemble-melody")
+    def assemble_melody_endpoint():
+        """Assemble all instance-split MIDIs into one full-length melody MIDI."""
+        prod = _require_production_dir()
+        arrangement_path = prod / "arrangement.txt"
+        approved_dir = prod / "melody" / "approved"
+
+        if not arrangement_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="No arrangement.txt — export from Logic first",
+            )
+        if not approved_dir.exists():
+            raise HTTPException(
+                status_code=404, detail="No approved melody directory found"
+            )
+
+        # Load BPM and time_sig from chord review
+        chord_review_path = prod / "chords" / "review.yml"
+        bpm = 120
+        time_sig = "4/4"
+        if chord_review_path.exists():
+            import yaml as _yaml
+
+            with open(chord_review_path) as f:
+                cr = _yaml.safe_load(f) or {}
+            bpm = int(cr.get("bpm", 120))
+            time_sig = str(cr.get("time_sig", "4/4"))
+
+        try:
+            from white_generation.pipelines.melody_auto_split import (
+                assemble_melody_midi,
+            )
+
+            output_path = assemble_melody_midi(
+                arrangement_path=arrangement_path,
+                approved_dir=approved_dir,
+                bpm=bpm,
+                time_sig_str=time_sig,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+        # Sync to Logic MIDI folder if handoff already ran
+        logic_midi_dir: Path | None = None
+        try:
+            from white_composition.logic_handoff import resolve_song_dir
+
+            song_dir = resolve_song_dir(prod)
+            candidate = song_dir / "MIDI" / "melody"
+            if candidate.is_dir():
+                logic_midi_dir = candidate
+        except Exception:
+            pass
+
+        if logic_midi_dir:
+            shutil.copy2(output_path, logic_midi_dir / output_path.name)
+
+        return {
+            "ok": True,
+            "assembled_midi": str(output_path),
             "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
         }
 

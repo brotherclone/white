@@ -8,10 +8,12 @@ export interface SongEntry {
   title: string;
   key: string | null;
   bpm: number | null;
+  time_sig: string | null;
   rainbow_color: string | null;
   singer: string | null;
   has_decisions: boolean;
   initialized: boolean;
+  has_mix: boolean;
   stage: "ideation" | "generation" | "composition";
   proposal_path: string | null;
 }

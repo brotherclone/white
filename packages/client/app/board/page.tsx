@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
   updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
-  autoSplitMelody, syncArrangement,
+  autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl,
 } from "@/lib/api";
 import { CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
 
@@ -117,6 +117,12 @@ export default function BoardPage() {
   const [generatingLyrics, setGeneratingLyrics] = useState(false);
   const [splitting, setSplitting] = useState(false);
   const [splitResult, setSplitResult] = useState<string | null>(null);
+  const [assembling, setAssembling] = useState(false);
+  const [assembleResult, setAssembleResult] = useState<string | null>(null);
+  const [mixFile, setMixFileState] = useState<string | null>(null);
+  const [mixPathInput, setMixPathInput] = useState("");
+  const [settingMix, setSettingMix] = useState(false);
+  const [showMixInput, setShowMixInput] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncDone, setSyncDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -135,13 +141,14 @@ export default function BoardPage() {
 
   const refresh = useCallback(async () => {
     try {
-      const [comp, active] = await Promise.all([fetchComposition(), fetchActiveSong()]);
+      const [comp, active, mixInfo] = await Promise.all([fetchComposition(), fetchActiveSong(), fetchMixInfo()]);
       if ("status" in comp && comp.status === "not_initialized") {
         setLoadState("not_initialized");
         return;
       }
       setComposition(comp as CompositionEntry);
       setActiveSong(active.active);
+      setMixFileState(mixInfo.has_mix ? mixInfo.mix_file : null);
       setLoadState("ready");
     } catch {
       setLoadState("error");
@@ -259,6 +266,36 @@ export default function BoardPage() {
     }
   };
 
+  const handleSetMix = async () => {
+    if (!mixPathInput.trim()) return;
+    setSettingMix(true);
+    setError(null);
+    try {
+      await setMixFile(mixPathInput.trim());
+      setMixFileState(mixPathInput.trim());
+      setMixPathInput("");
+      setShowMixInput(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to set mix file");
+    } finally {
+      setSettingMix(false);
+    }
+  };
+
+  const handleAssembleMelody = async () => {
+    setAssembling(true);
+    setAssembleResult(null);
+    setError(null);
+    try {
+      await assembleMelody();
+      setAssembleResult("assembled_melody.mid written");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Assemble failed");
+    } finally {
+      setAssembling(false);
+    }
+  };
+
   const handleNotesChange = (version: number, notes: string) => {
     if (notesSaveTimers.current[version]) clearTimeout(notesSaveTimers.current[version]);
     notesSaveTimers.current[version] = setTimeout(() => {
@@ -349,6 +386,54 @@ export default function BoardPage() {
           <Link href="/" className="text-blue-400 hover:text-blue-300 transition-colors">
             Go to Songs → Handoff to Logic
           </Link>
+        </div>
+      )}
+
+      {loadState === "ready" && composition && (
+        <div className="px-6 pt-4 pb-0">
+          {mixFile ? (
+            <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 mb-4">
+              <audio
+                key={mixFile}
+                controls
+                src={mixStreamUrl()}
+                className="h-8 flex-1 min-w-0"
+                style={{ colorScheme: "dark" }}
+              />
+              <button
+                onClick={() => { setShowMixInput(v => !v); setMixPathInput(mixFile ?? ""); }}
+                className="text-[10px] font-sans text-zinc-500 hover:text-zinc-300 whitespace-nowrap transition-colors"
+              >
+                change
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowMixInput(v => !v)}
+              className="mb-4 text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
+            >
+              + attach mix file
+            </button>
+          )}
+          {showMixInput && (
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={mixPathInput}
+                onChange={e => setMixPathInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleSetMix()}
+                placeholder="/path/to/bounce.mp3"
+                className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-xs font-mono text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+              />
+              <button
+                onClick={handleSetMix}
+                disabled={settingMix || !mixPathInput.trim()}
+                className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {settingMix ? "Saving…" : "Set"}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -463,9 +548,9 @@ export default function BoardPage() {
                     </div>
                   )}
 
-                  {/* Auto-split melody for ACE Studio — recording stage or approaching it */}
+                  {/* Auto-split + assemble melody — recording stage or approaching it */}
                   {isRecording && (isCurrent || (isFuture && idx === currentStageIdx + 1)) && (
-                    <div className="px-3 pb-1">
+                    <div className="px-3 pb-1 flex flex-col gap-1.5">
                       <button
                         onClick={handleAutoSplit}
                         disabled={splitting}
@@ -475,7 +560,18 @@ export default function BoardPage() {
                         {splitting ? "Splitting…" : "Auto-split for ACE"}
                       </button>
                       {splitResult && (
-                        <p className="mt-1.5 text-[10px] font-sans text-emerald-400 text-center">{splitResult}</p>
+                        <p className="text-[10px] font-sans text-emerald-400 text-center">{splitResult}</p>
+                      )}
+                      <button
+                        onClick={handleAssembleMelody}
+                        disabled={assembling}
+                        title="Assemble all split MIDIs into one full-length melody MIDI"
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {assembling ? "Assembling…" : "Assemble melody MIDI"}
+                      </button>
+                      {assembleResult && (
+                        <p className="text-[10px] font-sans text-emerald-400 text-center">{assembleResult}</p>
                       )}
                     </div>
                   )}

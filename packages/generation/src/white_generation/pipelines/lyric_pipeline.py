@@ -228,6 +228,7 @@ def parse_arrangement(arrangement_path: Path) -> list[dict]:
                 channel = int(parts[2])
                 duration_secs = _parse_timecode_secs(parts[3])
                 duration_bars = _parse_bar_beat_bars(parts[3])
+                start_bars = _parse_bar_beat_bars(parts[0])
                 clips.append(
                     {
                         "timecode_secs": timecode_secs,
@@ -235,6 +236,7 @@ def parse_arrangement(arrangement_path: Path) -> list[dict]:
                         "channel": channel,
                         "duration_secs": duration_secs,
                         "duration_bars": duration_bars,
+                        "start_bars": start_bars,
                     }
                 )
             except (ValueError, IndexError):
