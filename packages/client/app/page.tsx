@@ -193,8 +193,9 @@ export default function SongBrowserPage() {
             <div className="text-zinc-500 text-xs font-sans mb-2 truncate">{song.thread_slug}</div>
             <div className="flex gap-3 text-xs font-sans text-zinc-400 flex-wrap items-center">
               {song.key && <span>{song.key}</span>}
-              {song.bpm && <span>{song.bpm} BPM</span>}
+              {song.bpm && <span>{song.bpm}{song.time_sig ? ` BPM · ${song.time_sig}` : " BPM"}</span>}
               {song.singer && <span className="text-zinc-500">{song.singer}</span>}
+              {song.has_mix && <span title="Mix attached" className="text-zinc-400">♫</span>}
               <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded border ${
                 song.stage === "composition"
                   ? "bg-violet-900/40 text-violet-300 border-violet-700"

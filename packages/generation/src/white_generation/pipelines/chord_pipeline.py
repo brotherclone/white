@@ -431,7 +431,10 @@ def build_diatonic_candidates(
     for pattern_name, degrees in pattern_set.items():
         progression = []
         for degree in degrees:
-            rows = gen.get_chord_by_function(key_root, mode, degree)
+            rows = gen.get_chord_by_function(key_root, mode, degree, category="triad")
+            if rows.is_empty():
+                # fall back to any category if no triad exists for this degree
+                rows = gen.get_chord_by_function(key_root, mode, degree)
             if rows.is_empty():
                 progression = []
                 break
