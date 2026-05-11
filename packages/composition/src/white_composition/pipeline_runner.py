@@ -100,7 +100,7 @@ def _build_phase_command(
             prod,
         ]
         if proposal:
-            cmd += ["--song-proposal", proposal]
+            cmd += ["--song", proposal]
         return cmd
     if phase == "drums":
         return base + [
@@ -133,6 +133,14 @@ def _build_phase_command(
             "white_composition.production_decisions",
             "--production-dir",
             prod,
+        ]
+    if phase == "quartet":
+        return base + [
+            "white_generation.pipelines.quartet_pipeline",
+            "--production-dir",
+            prod,
+            "--singer",
+            singer,
         ]
     raise ValueError(f"Unknown phase: {phase}")
 

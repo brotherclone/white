@@ -36,6 +36,7 @@ from typing import Optional
 import mido
 import yaml
 from dotenv import load_dotenv
+
 from white_composition.init_production import (
     load_initial_proposal,
     load_song_context,
@@ -45,7 +46,6 @@ from white_composition.production_plan import (  # noqa: E402
     _normalize_repeat_type,
 )
 from white_core.enums.lyric_repeat_type import LyricRepeatType
-
 from white_generation.artist_catalog import load_artist_context  # noqa: E402
 from white_generation.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
@@ -68,7 +68,16 @@ load_dotenv()
 
 LYRICS_REVIEW_FILENAME = "lyrics_review.yml"
 
-MELODY_CHANNEL = 4  # track 4 in arrangement.txt = melody = vocal
+MELODY_CHANNEL = 4  # fallback when auto-detection finds nothing
+
+
+def _detect_melody_channel(clips: list[dict], fallback: int = MELODY_CHANNEL) -> int:
+    """Return the track number that carries the most melody_ clips."""
+    counts: dict[int, int] = {}
+    for c in clips:
+        if c["clip_name"].startswith("melody_"):
+            counts[c["channel"]] = counts.get(c["channel"], 0) + 1
+    return max(counts, key=lambda ch: counts[ch]) if counts else fallback
 
 
 # ---------------------------------------------------------------------------
@@ -219,6 +228,7 @@ def parse_arrangement(arrangement_path: Path) -> list[dict]:
                 channel = int(parts[2])
                 duration_secs = _parse_timecode_secs(parts[3])
                 duration_bars = _parse_bar_beat_bars(parts[3])
+                start_bars = _parse_bar_beat_bars(parts[0])
                 clips.append(
                     {
                         "timecode_secs": timecode_secs,
@@ -226,6 +236,7 @@ def parse_arrangement(arrangement_path: Path) -> list[dict]:
                         "channel": channel,
                         "duration_secs": duration_secs,
                         "duration_bars": duration_bars,
+                        "start_bars": start_bars,
                     }
                 )
             except (ValueError, IndexError):
@@ -358,7 +369,8 @@ def read_vocal_sections_from_arrangement(
     # Collect melody-channel clips in arrangement order — one entry per instance.
     # Duplicate labels get _2, _3 suffixes; the prompt uses these suffixed names
     # as [headers] so Claude writes one block per arrangement instance.
-    melody_clips = [c for c in clips if c["channel"] == melody_channel]
+    resolved_channel = _detect_melody_channel(clips, fallback=melody_channel)
+    melody_clips = [c for c in clips if c["channel"] == resolved_channel]
     label_seen_count: dict[str, int] = {}
     # Track first-seen instance key for exact labels (for exact_repeat copying)
     exact_first_instance: dict[str, str] = {}
@@ -1161,7 +1173,7 @@ def _load_or_init_review(melody_dir: Path, meta: dict, model: str, seed: int) ->
         "time_sig": meta.get("time_sig"),
         "color": meta.get("color"),
         "generated": datetime.now(timezone.utc).isoformat(),
-        "seed": seed,
+        "seed.logicx": seed,
         "model": model,
         "scoring_weights": {"chromatic": 1.0},
         "candidates": [],
@@ -1264,6 +1276,7 @@ def run_lyric_pipeline(
     onnx_path: Optional[str] = None,
     skip_scoring: bool = False,
     melody_channel: int = MELODY_CHANNEL,
+    arrangement: Optional[str] = None,
 ) -> dict:
     """Run the lyric generation pipeline end-to-end.
 
@@ -1280,7 +1293,9 @@ def run_lyric_pipeline(
         sys.exit(1)
 
     melody_dir = prod_path / "melody"
-    arrangement_path = prod_path / "arrangement.txt"
+    arrangement_path = (
+        Path(arrangement) if arrangement else prod_path / "arrangement.txt"
+    )
 
     print("=" * 60)
     print("LYRIC GENERATION PIPELINE")
@@ -1598,6 +1613,11 @@ def main():
         default=MELODY_CHANNEL,
         help=f"Logic track number carrying melody/vocal clips (default: {MELODY_CHANNEL})",
     )
+    parser.add_argument(
+        "--arrangement",
+        default=None,
+        help="Path to arrangement.txt (default: <production-dir>/arrangement.txt)",
+    )
 
     args = parser.parse_args()
 
@@ -1614,6 +1634,7 @@ def main():
         onnx_path=args.onnx_path,
         skip_scoring=args.skip_scoring,
         melody_channel=args.melody_channel,
+        arrangement=args.arrangement,
     )
 
 

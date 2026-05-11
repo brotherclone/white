@@ -3,14 +3,15 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong } from "@/lib/api";
-import { Candidate, CandidateStatus, SongEntry } from "@/lib/types";
+import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong, initSong, runNextPhase, runQuartetPhase, getRunStatus, fetchPipelineStatus, startHandoff, getHandoffStatus } from "@/lib/api";
+import { Candidate, CandidateStatus, PipelineStatus, RunJob, SongEntry } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
 import StatusBadge from "@/components/StatusBadge";
 import MidiPlayer from "@/components/MidiPlayer";
 
-const PHASES = ["chords", "drums", "bass", "melody", "lyrics", "quartet"];
+const PHASES = ["chords", "drums", "bass", "melody", "quartet"];
+const PIPELINE_PHASES = ["chords", "drums", "bass", "melody"];
 
 type SortKey = "phase" | "section" | "id" | "template" | "composite_score" | "status" | "rank";
 
@@ -30,10 +31,27 @@ export default function CandidatesPage() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [promoting, setPromoting] = useState(false);
   const [evolving, setEvolving] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [runningQuartet, setRunningQuartet] = useState(false);
+  const [initializing, setInitializing] = useState(false);
+  const [handoffing, setHandoffing] = useState(false);
   const [activeSong, setActiveSong] = useState<SongEntry | null>(null);
+  const [pipeline, setPipeline] = useState<PipelineStatus | null>(null);
+  const runPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const handoffPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const refreshPipeline = useCallback(() => {
+    fetchPipelineStatus().then(setPipeline).catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchActiveSong().then(({ active }) => setActiveSong(active)).catch(() => {});
+    refreshPipeline();
+  }, [refreshPipeline]);
+
+  useEffect(() => () => {
+    if (runPollRef.current) clearInterval(runPollRef.current);
+    if (handoffPollRef.current) clearInterval(handoffPollRef.current);
   }, []);
 
   const load = useCallback(async (phase?: string) => {
@@ -128,6 +146,81 @@ export default function CandidatesPage() {
 
   useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
 
+  const handleInit = async () => {
+    setError(null);
+    setInitializing(true);
+    try {
+      await initSong();
+      refreshPipeline();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Init failed");
+    } finally {
+      setInitializing(false);
+    }
+  };
+
+  const handleRun = useCallback(async () => {
+    setError(null);
+    setRunning(true);
+    try {
+      await runNextPhase();
+    } catch (e) {
+      setRunning(false);
+      setError(e instanceof Error ? e.message : "Run failed");
+      return;
+    }
+    runPollRef.current = setInterval(async () => {
+      try {
+        const job = await getRunStatus();
+        if (job.status === "done") {
+          clearInterval(runPollRef.current!);
+          runPollRef.current = null;
+          setRunning(false);
+          refreshPipeline();
+          load(phaseFilter);
+          showToast(`Phase "${job.phase}" complete`);
+        } else if (job.status === "error") {
+          clearInterval(runPollRef.current!);
+          runPollRef.current = null;
+          setRunning(false);
+          setError(job.error ?? "Phase run failed");
+          refreshPipeline();
+        }
+      } catch { /* transient */ }
+    }, 3000);
+  }, [phaseFilter, load, refreshPipeline]);
+
+  const handleRunQuartet = async () => {
+    setError(null);
+    setRunningQuartet(true);
+    try {
+      await runQuartetPhase();
+    } catch (e) {
+      setRunningQuartet(false);
+      setError(e instanceof Error ? e.message : "Strings run failed");
+      return;
+    }
+    runPollRef.current = setInterval(async () => {
+      try {
+        const job = await getRunStatus();
+        if (job.status === "done") {
+          clearInterval(runPollRef.current!);
+          runPollRef.current = null;
+          setRunningQuartet(false);
+          refreshPipeline();
+          load(phaseFilter);
+          showToast("Strings generation complete");
+        } else if (job.status === "error") {
+          clearInterval(runPollRef.current!);
+          runPollRef.current = null;
+          setRunningQuartet(false);
+          setError(job.error ?? "Strings generation failed");
+          refreshPipeline();
+        }
+      } catch { /* transient */ }
+    }, 3000);
+  };
+
   const handlePromote = async () => {
     if (!phaseFilter) return;
     setError(null);
@@ -136,6 +229,7 @@ export default function CandidatesPage() {
       const res = await promotePhase(phaseFilter);
       showToast(`Promoted ${res.promoted_count} file(s) for ${phaseFilter}`);
       load(phaseFilter);
+      refreshPipeline();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Promote failed");
     } finally {
@@ -158,8 +252,41 @@ export default function CandidatesPage() {
     }
   };
 
+  const handleHandoff = async () => {
+    setHandoffing(true);
+    setError(null);
+    try {
+      await startHandoff();
+    } catch (e) {
+      setHandoffing(false);
+      setError(e instanceof Error ? e.message : "Handoff failed");
+      return;
+    }
+    handoffPollRef.current = setInterval(async () => {
+      try {
+        const job: RunJob = await getHandoffStatus();
+        if (job.status === "done") {
+          clearInterval(handoffPollRef.current!);
+          handoffPollRef.current = null;
+          setHandoffing(false);
+          showToast(`Handoff complete — Logic project ready`);
+        } else if (job.status === "error") {
+          clearInterval(handoffPollRef.current!);
+          handoffPollRef.current = null;
+          setHandoffing(false);
+          setError(job.error ?? "Handoff failed");
+        }
+      } catch { /* transient */ }
+    }, 2000);
+  };
+
   const canPromote = !!phaseFilter && phaseFilter !== "all";
   const canEvolve = ["drums", "bass", "melody"].includes(phaseFilter);
+  const needsInit = pipeline?.next_phase === "init_production";
+  const canRun = !running && !needsInit && pipeline?.next_phase != null;
+  const melodyPromoted = pipeline?.phases?.["melody"] === "promoted";
+  const quartetStatus = pipeline?.phases?.["quartet"];
+  const canRunQuartet = melodyPromoted && !quartetStatus && !running && !runningQuartet;
 
   const SortIcon = ({ k }: { k: SortKey }) =>
     sortKey === k ? <span className="ml-1 text-zinc-400">{sortAsc ? "↑" : "↓"}</span> : null;
@@ -229,6 +356,89 @@ export default function CandidatesPage() {
           )}
         </div>
       </div>
+
+      {/* Pipeline status */}
+      {pipeline && (
+        <div className="flex items-center gap-3 mb-4 flex-wrap">
+          {pipeline.phase_order.filter(p => PIPELINE_PHASES.includes(p)).map(phase => {
+            const status = pipeline.phases[phase] ?? "pending";
+            const isNext = pipeline.next_phase === phase;
+            const color =
+              status === "promoted" ? "text-emerald-400" :
+              status === "generated" ? "text-blue-400" :
+              status === "in_progress" ? "text-yellow-400" :
+              isNext ? "text-zinc-300" : "text-zinc-600";
+            return (
+              <span key={phase} className={`text-xs font-sans ${color}`}>
+                {status === "promoted" ? "✓" : status === "generated" ? "●" : status === "in_progress" ? "⟳" : isNext ? "→" : "·"} {phase}
+              </span>
+            );
+          })}
+          {/* Quartet (strings) — parallel phase, shown when melody is promoted */}
+          {melodyPromoted && (
+            quartetStatus === "promoted" ? (
+              <span className="text-xs font-sans text-emerald-400">✓ strings</span>
+            ) : quartetStatus === "generated" ? (
+              <span className="text-xs font-sans text-blue-400">● strings</span>
+            ) : quartetStatus === "in_progress" || runningQuartet ? (
+              <span className="text-xs font-sans text-yellow-400">⟳ strings…</span>
+            ) : canRunQuartet ? (
+              <button
+                onClick={handleRunQuartet}
+                className="px-3 py-1 text-xs rounded font-medium transition-colors bg-zinc-700 hover:bg-zinc-600 text-zinc-200"
+              >
+                Run Strings
+              </button>
+            ) : null
+          )}
+          {needsInit && (
+            <button
+              onClick={handleInit}
+              disabled={initializing}
+              className="ml-auto px-3 py-1 text-xs rounded font-medium transition-colors bg-zinc-600 hover:bg-zinc-500 text-white disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              {initializing ? "Initializing…" : "Initialize"}
+            </button>
+          )}
+          {canRun && pipeline.next_phase !== "lyrics" && (
+            <button
+              onClick={handleRun}
+              disabled={running}
+              className="ml-auto px-3 py-1 text-xs rounded font-medium transition-colors bg-blue-700 hover:bg-blue-600 text-white disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              {running ? `Running ${pipeline.next_phase}…` : `Run ${pipeline.next_phase}`}
+            </button>
+          )}
+          {canRun && pipeline.next_phase === "lyrics" && (
+            <Link
+              href="/board"
+              className="ml-auto px-3 py-1 text-xs rounded font-medium transition-colors bg-violet-700 hover:bg-violet-600 text-white"
+            >
+              Composition Board →
+            </Link>
+          )}
+          {running && !canRun && (
+            <span className="ml-auto text-xs text-yellow-400 font-sans">Running {pipeline.next_phase}…</span>
+          )}
+          {melodyPromoted && (
+            <button
+              onClick={handleHandoff}
+              disabled={handoffing || running}
+              className="ml-auto flex items-center gap-1.5 px-3 py-1 text-xs rounded font-medium transition-colors bg-indigo-700 hover:bg-indigo-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {handoffing ? (
+                <>
+                  <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Handing off…
+                </>
+              ) : "Handoff to Logic"}
+            </button>
+          )}
+        </div>
+      )}
 
       {toast && (
         <div className="bg-emerald-900/50 border border-emerald-700 rounded p-3 mb-4 text-emerald-200 text-sm font-sans">{toast}</div>

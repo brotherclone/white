@@ -9,7 +9,7 @@ and writes top candidates as MIDI files with a review YAML.
 Usage:
     python -m app.generators.midi.pipelines.drum_pipeline \
         --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
-        --seed 42 --top-k 5
+        --seed.logicx 42 --top-k 5
 """
 
 import argparse
@@ -22,9 +22,9 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+
 from white_composition.init_production import load_song_context
 from white_core.music.narrative_constraints import narrative_tag_adjustment
-
 from white_generation.patterns.aesthetic_hints import (
     aesthetic_tag_adjustment,
     arc_to_energy,
@@ -139,7 +139,7 @@ def drum_pattern_to_midi_bytes(
                 continue
             for beat_pos, vel_level in hits:
                 velocity = VELOCITY.get(vel_level, 90)
-                abs_tick = bar_offset + int(beat_pos * ticks_per_beat)
+                abs_tick = bar_offset + round(beat_pos * ticks_per_beat)
                 # Short note duration for percussion (1/16 note)
                 note_dur = ticks_per_beat // 4
                 events.append((abs_tick, note, velocity, True))
@@ -263,7 +263,7 @@ def generate_drum_review_yaml(
         "color": song_info.get("color_name", ""),
         "genre_families": song_info.get("_genre_families", []),
         "generated": datetime.now(timezone.utc).isoformat(),
-        "seed": seed,
+        "seed.logicx": seed,
         "scoring_weights": scoring_weights,
         "sections_found": [s["label_display"] for s in sections],
         "candidates": all_candidates,
@@ -479,9 +479,20 @@ def run_drum_pipeline(
             templates = [make_fallback_pattern(time_sig)]
 
         templates = [t for t in templates if t.name not in used_pattern_names]
-        print(
-            f"  Templates: {len(templates)} candidates ({len(used_pattern_names)} excluded as cross-section repeats)"
-        )
+        if not templates:
+            # All available templates have been used in earlier sections — allow reuse.
+            templates = select_templates(
+                ALL_TEMPLATES, time_sig, genre_families, target_energy
+            )
+            if not templates:
+                templates = [make_fallback_pattern(time_sig)]
+            print(
+                f"  Templates: all unique patterns exhausted — reusing ({len(used_pattern_names)} prior sections)"
+            )
+        else:
+            print(
+                f"  Templates: {len(templates)} candidates ({len(used_pattern_names)} excluded as cross-section repeats)"
+            )
 
         # Evolutionary breeding (opt-in)
         if evolve and templates:
@@ -696,7 +707,11 @@ def main():
         help="Song proposal YAML filename (optional, auto-detected from chord review)",
     )
     parser.add_argument(
-        "--seed", type=int, default=42, help="Random seed (default: 42)"
+        "--seed.logicx",
+        dest="seed",
+        type=int,
+        default=42,
+        help="Random seed (default: 42)",
     )
     parser.add_argument(
         "--top-k",

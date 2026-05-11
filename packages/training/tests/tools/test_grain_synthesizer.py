@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import soundfile as sf
+
 from white_training.tools.grain_synthesizer import (
     _to_stereo,
     extract_grain,
@@ -210,7 +211,7 @@ class TestSynthesizeEndToEnd:
             gm = yaml.safe_load(f)
 
         assert gm["color"] == "Blue"
-        assert gm["seed"] == 1
+        assert gm["seed.logicx"] == 1
         assert isinstance(gm["grains"], list)
         assert len(gm["grains"]) > 0
         first = gm["grains"][0]

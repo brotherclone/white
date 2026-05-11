@@ -10,7 +10,7 @@ Usage:
     python -m app.generators.midi.pipelines.chord_pipeline \
         --thread shrink_wrapped/white-the-breathing-machine-learns-to-sing \
         --song "song_proposal_Black (0x221f20)_sequential_dissolution_v2.yml" \
-        --seed 42 --num-candidates 200 --top-k 10
+        --seed.logicx 42 --num-candidates 200 --top-k 10
 """
 
 import argparse
@@ -24,6 +24,7 @@ from typing import Optional
 import mido
 import numpy as np
 import yaml
+
 from white_composition.init_production import load_initial_proposal
 from white_core.concepts.chromatic_targets import (
     CHROMATIC_TARGETS,
@@ -32,7 +33,6 @@ from white_core.concepts.chromatic_targets import (
     TEMPORAL_MODES,
 )
 from white_core.music.core.enharmonic import normalize_to_flat
-
 from white_generation.artist_catalog import load_artist_context
 from white_generation.chord_generator.generator import ChordProgressionGenerator
 from white_generation.patterns.harmonic_rhythm import enumerate_distributions
@@ -342,12 +342,14 @@ def generate_review_yaml(
     """Generate the review YAML structure."""
     candidates = []
     for item in ranked_candidates:
+        is_diatonic = item.get("source") == "diatonic"
         entry = {
             "id": item["id"],
             "midi_file": f"candidates/{item['id']}.mid",
             "scratch_midi": f"candidates/{item['id']}_scratch.mid",
-            "rank": item["rank"],
-            "scores": _to_python(item["breakdown"]),
+            "rank": None if is_diatonic else item["rank"],
+            "source": item.get("source", "markov"),
+            "scores": None if is_diatonic else _to_python(item["breakdown"]),
             "hr_distribution": _to_python(item.get("hr_distribution", [])),
             "strum_pattern": item.get("strum_pattern", "whole"),
             "progression": item["summary"],
@@ -362,7 +364,9 @@ def generate_review_yaml(
             # Human annotation fields
             "label": None,
             "status": "pending",
-            "notes": "",
+            "notes": (
+                "Diatonic workhorse — assign to verse sections" if is_diatonic else ""
+            ),
         }
         if item.get("bar_sources"):
             entry["bar_sources"] = item["bar_sources"]
@@ -377,13 +381,103 @@ def generate_review_yaml(
         "thread": song_info.get("thread_dir", ""),
         "song_proposal": song_info.get("song_filename", ""),
         "generated": datetime.now(timezone.utc).isoformat(),
-        "seed": seed,
+        "seed.logicx": seed,
         "scoring_weights": scoring_weights,
         "candidates": candidates,
     }
     if song_info.get("sub_proposals"):
         review["sub_proposals"] = song_info["sub_proposals"]
     return review
+
+
+# ---------------------------------------------------------------------------
+# Diatonic workhorse candidates
+# ---------------------------------------------------------------------------
+
+DIATONIC_PATTERNS: dict[str, dict[str, list[str]]] = {
+    "Major": {
+        "I_V_vi_IV": ["I", "V", "vi", "IV"],
+        "I_IV_V": ["I", "IV", "V"],
+        "I_vi_IV_V": ["I", "vi", "IV", "V"],
+        "ii_V_I": ["II", "V", "I"],
+    },
+    "Minor": {
+        "i_VII_VI_VII": ["i", "VII", "VI", "VII"],
+        "i_VI_III_VII": ["i", "VI", "III", "VII"],
+        "i_iv_v": ["i", "iv", "v"],
+        "i_VI_VII_i": ["i", "VI", "VII", "i"],
+    },
+}
+
+
+def build_diatonic_candidates(
+    key_root: str,
+    mode: str,
+    bpm: int,
+    time_sig: tuple[int, int],
+    gen: "ChordProgressionGenerator",
+    rng,
+    genre_families: list[str],
+) -> list[dict]:
+    """Build diatonic workhorse candidates from the chord bank.
+
+    One candidate per pattern. Patterns where any degree is missing from the
+    bank are skipped silently. Returns candidate dicts ready for MIDI export
+    and review.yml serialisation.
+    """
+    pattern_set = DIATONIC_PATTERNS.get(mode, {})
+    candidates = []
+
+    for pattern_name, degrees in pattern_set.items():
+        progression = []
+        for degree in degrees:
+            rows = gen.get_chord_by_function(key_root, mode, degree, category="triad")
+            if rows.is_empty():
+                # fall back to any category if no triad exists for this degree
+                rows = gen.get_chord_by_function(key_root, mode, degree)
+            if rows.is_empty():
+                progression = []
+                break
+            row = rows.row(0, named=True)
+            progression.append(
+                {
+                    "chord_id": row["chord_id"],
+                    "chord_name": row["chord_name"],
+                    "function": row["function"],
+                    "note_names": row["note_names"],
+                    "midi_notes": list(row["midi_notes"]),
+                    "quality": row["quality"],
+                }
+            )
+        if not progression:
+            continue
+
+        n = len(progression)
+        hr_dist = sample_hr_distribution(n, rng)
+        strum_pat = sample_strum_pattern(time_sig, rng)
+        bar_count = int(sum(hr_dist))
+
+        midi_bytes = progression_to_primitive_midi_bytes(
+            progression, bpm, time_sig, hr_dist, strum_pat
+        )
+        scratch_bytes = generate_scratch_beat(bpm, bar_count, time_sig, genre_families)
+
+        candidates.append(
+            {
+                "id": f"diatonic_{pattern_name}",
+                "midi_bytes": midi_bytes,
+                "scratch_bytes": scratch_bytes,
+                "progression": progression,
+                "summary": " – ".join(
+                    f"{c['function']}({c['chord_name']})" for c in progression
+                ),
+                "hr_distribution": hr_dist,
+                "strum_pattern": strum_pat.name,
+                "source": "diatonic",
+            }
+        )
+
+    return candidates
 
 
 # ---------------------------------------------------------------------------
@@ -435,7 +529,6 @@ def generate_white_candidates(
     import random as _random
 
     from white_analysis.refractor import Refractor
-
     from white_generation.pipelines.white_rebracketing import concatenate_bars
 
     rng = _random.Random(seed)
@@ -633,7 +726,9 @@ def run_chord_pipeline(
         bar_pool = build_bar_pool(sub_dirs, white_key, song_info["bpm"])
         print(f"  Bar pool: {len(bar_pool)} bars from {len(sub_dirs)} sub-proposal(s)")
 
-        print(f"\nGenerating {num_candidates} cut-up candidates (seed={seed})...")
+        print(
+            f"\nGenerating {num_candidates} cut-up candidates (seed.logicx={seed})..."
+        )
         top_candidates = generate_white_candidates(
             song_info=song_info,
             bar_pool=bar_pool,
@@ -695,7 +790,7 @@ def run_chord_pipeline(
         return top_candidates
 
     # --- Non-White: Markov generation ---
-    print(f"\nGenerating {num_candidates} candidates (seed={seed})...")
+    print(f"\nGenerating {num_candidates} candidates (seed.logicx={seed})...")
     gen = ChordProgressionGenerator()
 
     raw_candidates = gen.generate_progression_brute_force(
@@ -829,7 +924,28 @@ def run_chord_pipeline(
         item["hr_distribution"] = hr_dist
         item["strum_pattern"] = strum_pat.name
 
-    # --- 6. Write review YAML ---
+    # --- 6. Build and write diatonic workhorse candidates ---
+    diatonic = build_diatonic_candidates(
+        song_info["key_root"],
+        song_info["mode"],
+        song_info["bpm"],
+        time_sig,
+        gen,
+        rng,
+        genre_families,
+    )
+    if diatonic:
+        print(f"\nAdding {len(diatonic)} diatonic workhorse candidates...")
+        for item in diatonic:
+            write_midi_file(item["midi_bytes"], candidates_dir / f"{item['id']}.mid")
+            _trim_midi(candidates_dir / f"{item['id']}.mid")
+            write_midi_file(
+                item["scratch_bytes"], candidates_dir / f"{item['id']}_scratch.mid"
+            )
+            _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
+        top_candidates = top_candidates + diatonic
+
+    # --- 7. Write review YAML ---
     review = generate_review_yaml(
         song_info,
         top_candidates,
@@ -849,17 +965,20 @@ def run_chord_pipeline(
 
     print(f"Review file: {review_path}")
 
-    # --- 7. Summary ---
+    # --- 8. Summary ---
     print(f"\n{'=' * 60}")
     print(f"TOP {len(top_candidates)} CANDIDATES")
     print(f"{'=' * 60}")
     for item in top_candidates:
-        print(
-            f"\n  #{item['rank']} [{item['id']}] composite={item['breakdown']['composite']:.3f}"
-        )
-        print(
-            f"     theory={item['breakdown']['theory_total']:.3f}  chromatic={item['breakdown']['chromatic']['match']:.3f}  confidence={item['breakdown']['chromatic']['confidence']:.3f}"
-        )
+        if item.get("source") == "diatonic":
+            print(f"\n  [diatonic] [{item['id']}]")
+        else:
+            print(
+                f"\n  #{item['rank']} [{item['id']}] composite={item['breakdown']['composite']:.3f}"
+            )
+            print(
+                f"     theory={item['breakdown']['theory_total']:.3f}  chromatic={item['breakdown']['chromatic']['match']:.3f}  confidence={item['breakdown']['chromatic']['confidence']:.3f}"
+            )
         print(f"     {item['summary']}")
         print(
             f"     HR: {item.get('hr_distribution', [])}  strum: {item.get('strum_pattern', '?')}"
@@ -897,7 +1016,11 @@ def main():
     )
     parser.add_argument("--song", default=None, help="Song proposal YAML filename")
     parser.add_argument(
-        "--seed", type=int, default=42, help="Random seed (default: 42)"
+        "--seed.logicx",
+        dest="seed",
+        type=int,
+        default=42,
+        help="Random seed (default: 42)",
     )
     parser.add_argument(
         "--num-candidates",

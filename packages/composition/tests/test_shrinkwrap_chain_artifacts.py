@@ -959,6 +959,30 @@ class TestScaffoldSongProductions:
             tmp_path / "production" / "song_b_v1" / "manifest_bootstrap.yml"
         ).exists()
 
+    def test_sounds_like_written_to_manifest(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(
+            yml_dir,
+            "song_with_refs",
+            extra={"sounds_like": ["Seefeel", "Boards of Canada"]},
+        )
+
+        scaffold_song_productions(tmp_path, yml_dir)
+        manifest = tmp_path / "production" / "song_with_refs" / "manifest_bootstrap.yml"
+        data = yaml.safe_load(manifest.read_text())
+        assert data["sounds_like"] == ["Seefeel", "Boards of Canada"]
+
+    def test_sounds_like_defaults_to_empty_list(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(yml_dir, "song_no_refs")
+
+        scaffold_song_productions(tmp_path, yml_dir)
+        manifest = tmp_path / "production" / "song_no_refs" / "manifest_bootstrap.yml"
+        data = yaml.safe_load(manifest.read_text())
+        assert data["sounds_like"] == []
+
 
 def make_crashed_thread(tmp_path: Path, thread_id: str) -> Path:
     """Create a thread dir with no valid proposal YAML — simulates a mid-run crash."""
@@ -1041,3 +1065,22 @@ class TestShrinkwrapSentinel:
         assert result["deleted"] == 1
         assert (output / "white-done").is_dir()
         assert not crashed.exists()
+
+
+class TestShrinkwrapCatalogHook:
+    def test_catalog_failure_does_not_propagate(self, tmp_path):
+        """A catalog update error must not abort shrinkwrap."""
+        from unittest.mock import patch
+
+        artifacts = tmp_path / "chain_artifacts"
+        output = tmp_path / "out"
+        thread_id = "aaaaaaaa-0000-0000-0000-000000000001"
+        make_thread(artifacts, thread_id, title="Done", color="White")
+
+        with patch(
+            "white_generation.artist_catalog.generate_missing",
+            side_effect=RuntimeError("catalog unavailable"),
+        ):
+            result = shrinkwrap(artifacts, output)
+
+        assert result["processed"] == 1

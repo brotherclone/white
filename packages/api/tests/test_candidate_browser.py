@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import yaml
+
 from white_api.candidate_browser import (
     CandidateEntry,
     approve_candidate,
@@ -232,3 +233,67 @@ class TestApproveCandidate:
         entry = self._make_entry(tmp_path, status="approved")
         approve_candidate(entry)  # should not raise
         assert entry.status == "approved"
+
+
+# ---------------------------------------------------------------------------
+# Non-generated entries (generated: false, null scores/rank)
+# ---------------------------------------------------------------------------
+
+
+class TestNonGeneratedEntries:
+    def _write_non_generated_review(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as f:
+            yaml.dump(
+                {
+                    "candidates": [
+                        {
+                            "id": "hand_chorus_v1",
+                            "midi_file": "approved/chorus_v1.mid",
+                            "section": "chorus",
+                            "label": "chorus_v1",
+                            "status": "approved",
+                            "generated": False,
+                            "scores": None,
+                            "rank": None,
+                            "notes": "Non-generated part",
+                        }
+                    ]
+                },
+                f,
+                allow_unicode=True,
+                sort_keys=False,
+            )
+
+    def test_null_scores_does_not_raise(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        self._write_non_generated_review(prod / "melody" / "review.yml")
+        entries = load_all_candidates(prod, phase_filter="melody")
+        assert len(entries) == 1
+
+    def test_null_rank_defaults_to_99(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        self._write_non_generated_review(prod / "melody" / "review.yml")
+        entries = load_all_candidates(prod, phase_filter="melody")
+        assert entries[0].rank == 99
+
+    def test_null_scores_composite_defaults_to_zero(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        self._write_non_generated_review(prod / "melody" / "review.yml")
+        entries = load_all_candidates(prod, phase_filter="melody")
+        assert entries[0].composite_score == 0.0
+
+    def test_generated_flag_false_for_non_generated(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        self._write_non_generated_review(prod / "melody" / "review.yml")
+        entries = load_all_candidates(prod, phase_filter="melody")
+        assert entries[0].generated is False
+
+    def test_generated_flag_true_by_default(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        _write_review(
+            prod / "chords" / "review.yml",
+            {"candidates": [_make_candidate("chord_001")]},
+        )
+        entries = load_all_candidates(prod, phase_filter="chords")
+        assert entries[0].generated is True

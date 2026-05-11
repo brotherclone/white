@@ -291,7 +291,7 @@ def build_multiclass_dataloaders(
         val_split: Fraction of data for validation
         batch_size: Batch size
         num_workers: Number of data loading workers
-        random_seed: Random seed for reproducibility
+        random_seed: Random seed.logicx for reproducibility
         require_concept: Filter rows without concept text
         min_concept_length: Minimum concept text length
         max_length: Maximum sequence length

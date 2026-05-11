@@ -59,6 +59,6 @@ packages/generation/shrink_wrapped/
 *.acep
 **/autosave/
 **/VocalSynth/
-app/reference/mcp/ace_studio/tool_manifest.json
 # Claude Code runtime artifacts
 .claude/scheduled_tasks.lock
+packages/composition/logic/

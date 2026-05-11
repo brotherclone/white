@@ -252,7 +252,7 @@ def write_report(summary: dict, baseline: dict, results: list[dict]) -> Path:
             "1. Add `training/tools/stable_audio_synthesizer.py` — wraps `StableAudioPipeline`,",
             "   accepts a color (or full song proposal) and returns a WAV + metadata",
             "2. Integrate with `retrieve_samples.py` pattern: color → prompt → audio → Refractor score",
-            "3. CLI: `--color`, `--duration`, `--seed`, `--production-dir` (reads from song_context.yml)",
+            "3. CLI: `--color`, `--duration`, `--seed.logicx`, `--production-dir` (reads from song_context.yml)",
             "4. Output alongside `grain_synthesizer.py` — two paths: corpus collage (granular) vs.",
             "   novel synthesis (Stable Audio). Human chooses which texture fits the song.",
             "5. Refractor scoring on generated output to confirm chromatic match before use",

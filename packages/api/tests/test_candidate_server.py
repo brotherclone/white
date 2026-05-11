@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 from fastapi.testclient import TestClient
+
 from white_api.candidate_server import create_app, scan_songs
 
 # ---------------------------------------------------------------------------
@@ -443,6 +444,41 @@ class TestScanSongs:
         assert alpha["has_decisions"] is True
         assert beta["has_decisions"] is False
 
+    def test_stage_ideation_when_no_song_context(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        assert all(s["stage"] == "ideation" for s in songs)
+
+    def test_stage_generation_when_song_context_present(self, sw_dir):
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        (prod_dir / "song_context.yml").write_text("title: Song Alpha\n")
+        songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        assert alpha["stage"] == "generation"
+
+    def test_stage_composition_when_composition_yml_present(self, sw_dir, tmp_path):
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        (prod_dir / "song_context.yml").write_text(
+            "title: Song Alpha\nthread: thread-alpha\n"
+        )
+        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha"
+        logic_song_dir.mkdir(parents=True)
+        (logic_song_dir / "composition.yml").write_text("stage: structure\n")
+        with patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(tmp_path / "logic")}):
+            songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        assert alpha["stage"] == "composition"
+
+    def test_stage_composition_falls_back_without_logic_output_dir(self, sw_dir):
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        (prod_dir / "song_context.yml").write_text("title: Song Alpha\n")
+        env = {
+            k: v for k, v in __import__("os").environ.items() if k != "LOGIC_OUTPUT_DIR"
+        }
+        with patch.dict("os.environ", env, clear=True):
+            songs = scan_songs(sw_dir)
+        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
+        assert alpha["stage"] == "generation"
+
     def test_empty_dir_returns_empty(self, tmp_path):
         assert scan_songs(tmp_path / "empty") == []
 
@@ -474,6 +510,7 @@ class TestGetSongs:
             "bpm",
             "rainbow_color",
             "has_decisions",
+            "stage",
         ):
             assert field in song
 
@@ -551,3 +588,155 @@ class TestAlbumModeGuard:
 
     def test_evolve_503_before_activate(self, album_client):
         assert album_client.post("/evolve", json={"phase": "drums"}).status_code == 503
+
+
+# ---------------------------------------------------------------------------
+# GET /drift-report  POST /drift-report  GET /drift-report/status
+# ---------------------------------------------------------------------------
+
+
+def _write_plan(prod_dir: Path) -> None:
+    """Write a minimal production_plan.yml for drift report tests."""
+    import yaml as _yaml
+
+    plan = {
+        "song_slug": "test_song",
+        "generated": "2026-01-01T00:00:00Z",
+        "title": "Test Song",
+        "bpm": 120,
+        "time_sig": "4/4",
+        "key": "C minor",
+        "color": "Black",
+        "sections": [
+            {"name": "verse", "bars": 8, "play_count": 1, "vocals": True},
+            {"name": "chorus", "bars": 8, "play_count": 1, "vocals": True},
+        ],
+    }
+    with open(prod_dir / "production_plan.yml", "w") as f:
+        _yaml.dump(plan, f)
+
+
+def _write_arrangement(prod_dir: Path) -> None:
+    """Write a minimal bar/beat arrangement.txt."""
+    lines = [
+        "1 1 1 1\tverse\t1\t9 1 1 1",
+        "9 1 1 1\tchorus\t1\t17 1 1 1",
+    ]
+    (prod_dir / "arrangement.txt").write_text("\n".join(lines) + "\n")
+
+
+class TestDriftReport:
+    def test_get_returns_404_when_absent(self, client):
+        resp = client.get("/drift-report")
+        assert resp.status_code == 404
+
+    def test_get_returns_report_when_present(self, client, prod_dir):
+
+        from white_composition.drift_report import (
+            BarDelta,
+            DriftReport,
+            DriftSummary,
+            write_report,
+        )
+
+        report = DriftReport(
+            generated="2026-01-01T00:00:00Z",
+            song_title="Test Song",
+            proposed_sections=["verse", "chorus"],
+            actual_sections=["verse", "chorus"],
+            drift=DriftSummary(removed=[], added=[], reordered=False),
+            bar_deltas={"chorus": BarDelta(proposed=8, actual=8, delta=0)},
+            energy_arc_correlation=0.9,
+            summary="High fidelity.",
+        )
+        write_report(prod_dir, report)
+
+        resp = client.get("/drift-report")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["song_title"] == "Test Song"
+        assert data["drift"]["reordered"] is False
+        assert data["energy_arc_correlation"] == pytest.approx(0.9)
+
+    def test_post_missing_arrangement_returns_422(self, client, prod_dir):
+        _write_plan(prod_dir)
+        resp = client.post("/drift-report", json={"use_claude": False})
+        assert resp.status_code == 422
+
+    def test_post_missing_plan_returns_422(self, client, prod_dir):
+        _write_arrangement(prod_dir)
+        resp = client.post("/drift-report", json={"use_claude": False})
+        assert resp.status_code == 422
+
+    def test_post_starts_job(self, client, prod_dir):
+        _write_plan(prod_dir)
+        _write_arrangement(prod_dir)
+
+        with (
+            patch("white_composition.drift_report.compare_plans") as mock_compare,
+            patch("white_composition.drift_report.write_report"),
+        ):
+            from white_composition.drift_report import DriftReport, DriftSummary
+
+            mock_compare.return_value = DriftReport(
+                generated="2026-01-01T00:00:00Z",
+                song_title="Test Song",
+                proposed_sections=["verse"],
+                actual_sections=["verse"],
+                drift=DriftSummary(removed=[], added=[], reordered=False),
+                bar_deltas={},
+                energy_arc_correlation=None,
+                summary="",
+            )
+            resp = client.post("/drift-report", json={"use_claude": False})
+
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "running"
+
+    def test_post_no_body_uses_defaults(self, client, prod_dir):
+        _write_plan(prod_dir)
+        _write_arrangement(prod_dir)
+
+        with (
+            patch("white_composition.drift_report.compare_plans") as mock_compare,
+            patch("white_composition.drift_report.write_report"),
+        ):
+            from white_composition.drift_report import DriftReport, DriftSummary
+
+            mock_compare.return_value = DriftReport(
+                generated="2026-01-01T00:00:00Z",
+                song_title="Test Song",
+                proposed_sections=[],
+                actual_sections=[],
+                drift=DriftSummary(removed=[], added=[], reordered=False),
+                bar_deltas={},
+                energy_arc_correlation=None,
+                summary="",
+            )
+            resp = client.post("/drift-report")
+
+        assert resp.status_code == 200
+
+    def test_get_status_returns_idle_initially(self, client):
+        resp = client.get("/drift-report/status")
+        assert resp.status_code == 200
+        assert resp.json()["status"] in ("idle", "done", "running", "error")
+
+    def test_post_duplicate_job_returns_409(self, client, prod_dir):
+        _write_plan(prod_dir)
+        _write_arrangement(prod_dir)
+
+        import white_api.candidate_server as srv
+
+        srv._drift_job["status"] = "running"
+        try:
+            resp = client.post("/drift-report", json={"use_claude": False})
+            assert resp.status_code == 409
+        finally:
+            srv._drift_job["status"] = "idle"
+
+    def test_no_production_dir_returns_503(self):
+        app = create_app()
+        tc = TestClient(app)
+        assert tc.get("/drift-report").status_code == 503
+        assert tc.post("/drift-report").status_code == 503

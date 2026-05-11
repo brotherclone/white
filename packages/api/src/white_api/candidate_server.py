@@ -12,8 +12,11 @@ Usage (album mode):
 """
 
 import argparse
+import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import webbrowser
 from dataclasses import asdict
@@ -22,10 +25,10 @@ from pathlib import Path
 
 import uvicorn
 import yaml
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from white_api.candidate_browser import (
     CandidateEntry,
@@ -61,10 +64,93 @@ _generate_job: dict = {
     "error": None,
 }
 
+# Pipeline run job state — one phase run at a time
+_run_job: dict = {
+    "status": "idle",
+    "phase": None,
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
+
+# Logic handoff job state
+_handoff_job: dict = {
+    "status": "idle",
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
+
+# Drift report job state
+_drift_job: dict = {
+    "status": "idle",
+    "started_at": None,
+    "finished_at": None,
+    "error": None,
+}
+
 
 # ---------------------------------------------------------------------------
 # Song scanning
 # ---------------------------------------------------------------------------
+
+
+def _coerce_key_string(key) -> str | None:
+    """Normalise a key value that may be a string or a KeySignature dict."""
+    if key is None:
+        return None
+    if isinstance(key, str):
+        return key or None
+    if isinstance(key, dict):
+        note = key.get("note") or {}
+        mode = key.get("mode") or {}
+        pitch = note.get("pitch_name", "") if isinstance(note, dict) else ""
+        mode_name = mode.get("name", "") if isinstance(mode, dict) else ""
+        parts = [p for p in (pitch, mode_name) if p]
+        return " ".join(parts) or None
+    return str(key) or None
+
+
+def _find_proposal(manifest_path: Path) -> Path | None:
+    """Locate the song proposal yml for a production dir.
+
+    Convention: <thread>/yml/<production_slug>.yml
+    """
+    prod_dir = manifest_path.parent
+    production_slug = prod_dir.name
+    thread_dir = prod_dir.parent.parent
+    candidate = thread_dir / "yml" / f"{production_slug}.yml"
+    return candidate if candidate.exists() else None
+
+
+def _compute_stage(prod_dir: Path) -> str:
+    if not (prod_dir / "song_context.yml").exists():
+        return "ideation"
+    try:
+        from white_composition.logic_handoff import (
+            COMPOSITION_FILENAME,
+            resolve_song_dir,
+        )
+
+        logic_dir = resolve_song_dir(prod_dir)
+        if (logic_dir / COMPOSITION_FILENAME).exists():
+            return "composition"
+    except Exception:
+        pass
+    return "generation"
+
+
+def _has_mix_file(prod_dir: Path) -> bool:
+    ctx_path = prod_dir / "song_context.yml"
+    if not ctx_path.exists():
+        return False
+    try:
+        with open(ctx_path) as f:
+            ctx = yaml.safe_load(f) or {}
+        mix = ctx.get("mix_file")
+        return bool(mix and Path(mix).exists())
+    except Exception:
+        return False
 
 
 def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
@@ -83,20 +169,25 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
             continue
         if not isinstance(data, dict):
             continue
+        prod_dir = manifest_path.parent
+        proposal_path = _find_proposal(manifest_path)
         songs.append(
             {
                 "id": f"{thread_slug}__{production_slug}",
                 "thread_slug": thread_slug,
                 "production_slug": production_slug,
-                "production_path": str(manifest_path.parent),
+                "production_path": str(prod_dir),
                 "title": data.get("title") or production_slug,
-                "key": data.get("key"),
+                "key": _coerce_key_string(data.get("key")),
                 "bpm": data.get("bpm"),
+                "time_sig": data.get("time_sig"),
                 "rainbow_color": data.get("rainbow_color"),
                 "singer": data.get("singer"),
-                "has_decisions": (
-                    manifest_path.parent / "production_decisions.yml"
-                ).exists(),
+                "has_decisions": (prod_dir / "production_decisions.yml").exists(),
+                "initialized": (prod_dir / "song_context.yml").exists(),
+                "has_mix": _has_mix_file(prod_dir),
+                "stage": _compute_stage(prod_dir),
+                "proposal_path": str(proposal_path) if proposal_path else None,
             }
         )
     return songs
@@ -198,6 +289,594 @@ def create_app(
         return {"active": _active_song}
 
     # ------------------------------------------------------------------
+    # Pipeline — init, run, status
+    # ------------------------------------------------------------------
+
+    @app.post("/pipeline/init")
+    def pipeline_init():
+        """Run init_production for the active song if not already initialized."""
+        prod = _require_production_dir()
+        if (prod / "song_context.yml").exists():
+            from white_composition.pipeline_runner import (
+                read_phase_statuses,
+                write_phase_status,
+            )
+
+            statuses = read_phase_statuses(prod)
+            if statuses.get("init_production") == "pending":
+                write_phase_status(prod, "init_production", "promoted")
+            return {"ok": True, "skipped": True}
+        proposal_path = _active_song.get("proposal_path") if _active_song else None
+        if not proposal_path:
+            raise HTTPException(
+                status_code=422,
+                detail="No proposal yml found for this song — cannot initialize",
+            )
+        proposal = Path(proposal_path)
+        if not proposal.exists():
+            raise HTTPException(
+                status_code=422,
+                detail=f"Proposal file not found: {proposal_path}",
+            )
+        try:
+            from white_composition.init_production import init_production
+            from white_composition.pipeline_runner import write_phase_status
+
+            init_production(prod, proposal)
+            write_phase_status(prod, "init_production", "promoted")
+        except (SystemExit, ValueError) as exc:
+            raise HTTPException(
+                status_code=500, detail=f"init_production failed: {exc}"
+            ) from exc
+        return {"ok": True, "skipped": False}
+
+    @app.post("/pipeline/run")
+    def pipeline_run():
+        """Run the next pending pipeline phase for the active song."""
+        global _run_job
+        if _run_job["status"] == "running":
+            raise HTTPException(status_code=409, detail="A phase is already running")
+        prod = _require_production_dir()
+        now = datetime.now(timezone.utc).isoformat()
+        _run_job = {
+            "status": "running",
+            "phase": None,
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        def _run():
+            global _run_job
+            try:
+                from white_composition.pipeline_runner import (
+                    cmd_run,
+                    get_next_runnable_phase,
+                    read_phase_statuses,
+                )
+
+                statuses = read_phase_statuses(prod)
+                next_phase = get_next_runnable_phase(statuses)
+                _run_job["phase"] = next_phase
+                if next_phase is None:
+                    _run_job["status"] = "done"
+                    return
+                from white_composition.pipeline_runner import (
+                    PHASE_REVIEW_FILES,
+                    write_phase_status,
+                )
+
+                proposal = (_active_song or {}).get("proposal_path") or ""
+                result = cmd_run(prod, song_proposal=proposal)
+                if result != 0:
+                    # cmd_run resets status to pending on non-zero exit.
+                    # If candidates were generated anyway, recover the correct status.
+                    review_file = PHASE_REVIEW_FILES.get(next_phase)
+                    if review_file and (prod / review_file).exists():
+                        write_phase_status(prod, next_phase, "generated")
+                        _run_job["status"] = "done"
+                    else:
+                        _run_job["status"] = "error"
+                        _run_job["error"] = (
+                            f"Phase '{next_phase}' exited with code {result}"
+                        )
+                else:
+                    _run_job["status"] = "done"
+            except Exception as exc:
+                _run_job["status"] = "error"
+                _run_job["error"] = str(exc)
+            finally:
+                _run_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/pipeline/run/status")
+    def pipeline_run_status():
+        return _run_job
+
+    @app.post("/pipeline/run/quartet")
+    def pipeline_run_quartet():
+        """Run the quartet (strings) generation phase for the active song."""
+        global _run_job
+        if _run_job["status"] == "running":
+            raise HTTPException(status_code=409, detail="A phase is already running")
+        prod = _require_production_dir()
+        now = datetime.now(timezone.utc).isoformat()
+        _run_job = {
+            "status": "running",
+            "phase": "quartet",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        def _run():
+            global _run_job
+            try:
+                from white_composition.pipeline_runner import (
+                    PHASE_REVIEW_FILES,
+                    write_phase_status,
+                )
+
+                write_phase_status(prod, "quartet", "in_progress")
+                singer = (_active_song or {}).get("singer") or "gabriel"
+                cmd = [
+                    sys.executable,
+                    "-m",
+                    "white_generation.pipelines.quartet_pipeline",
+                    "--production-dir",
+                    str(prod),
+                    "--singer",
+                    singer,
+                ]
+                result = subprocess.run(cmd)
+                review_file = PHASE_REVIEW_FILES.get("quartet")
+                if result.returncode != 0:
+                    if review_file and (prod / review_file).exists():
+                        write_phase_status(prod, "quartet", "generated")
+                        _run_job["status"] = "done"
+                    else:
+                        write_phase_status(prod, "quartet", "pending")
+                        _run_job["status"] = "error"
+                        _run_job["error"] = (
+                            f"quartet exited with code {result.returncode}"
+                        )
+                else:
+                    write_phase_status(prod, "quartet", "generated")
+                    _run_job["status"] = "done"
+            except Exception as exc:
+                _run_job["status"] = "error"
+                _run_job["error"] = str(exc)
+            finally:
+                _run_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/pipeline/status")
+    def pipeline_status():
+        """Return phase statuses for the active song."""
+        prod = _require_production_dir()
+        from white_composition.pipeline_runner import (
+            PHASE_ORDER,
+            get_next_runnable_phase,
+            read_phase_statuses,
+        )
+
+        statuses = read_phase_statuses(prod)
+        return {
+            "initialized": (prod / "song_context.yml").exists(),
+            "phases": statuses,
+            "next_phase": get_next_runnable_phase(statuses),
+            "phase_order": PHASE_ORDER,
+        }
+
+    # ------------------------------------------------------------------
+    # Logic Handoff
+    # ------------------------------------------------------------------
+
+    @app.post("/handoff")
+    def start_handoff():
+        global _handoff_job
+        if _handoff_job["status"] == "running":
+            raise HTTPException(
+                status_code=409, detail="A handoff job is already running"
+            )
+        prod = _require_production_dir()
+        now = datetime.now(timezone.utc).isoformat()
+        _handoff_job = {
+            "status": "running",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        def _run():
+            global _handoff_job
+            try:
+                from white_composition.logic_handoff import handoff
+
+                handoff(prod)
+                _handoff_job["status"] = "done"
+            except Exception as exc:
+                _handoff_job["status"] = "error"
+                _handoff_job["error"] = str(exc)
+            finally:
+                _handoff_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/handoff/status")
+    def handoff_status():
+        return _handoff_job
+
+    @app.post("/sync-arrangement")
+    def sync_arrangement():
+        """Pull arrangement.txt and MIDI files from Logic back into the production dir.
+
+        Copies arrangement.txt from the Logic project folder, then copies every
+        *.mid from Logic/MIDI/{phase}/ → production/{phase}/approved/ for all MIDI
+        phases.  This allows chord/drum/bass/melody files created or edited in Logic
+        to flow back into the pipeline.
+        """
+        prod = _require_production_dir()
+        try:
+            from white_composition.logic_handoff import (
+                resolve_song_dir,
+                sync_from_logic,
+            )
+
+            song_dir = resolve_song_dir(prod)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
+            ) from exc
+
+        logic_arrangement = song_dir / "arrangement.txt"
+        if not logic_arrangement.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No arrangement.txt found in Logic project at {logic_arrangement} — arrange the song in Logic first",
+            )
+
+        dest = prod / "arrangement.txt"
+        shutil.copy2(logic_arrangement, dest)
+
+        midi_synced = sync_from_logic(prod)
+
+        return {
+            "ok": True,
+            "synced_from": str(logic_arrangement),
+            "synced_to": str(dest),
+            "midi_synced": midi_synced,
+        }
+
+    # ------------------------------------------------------------------
+    # Plan Drift Report
+    # ------------------------------------------------------------------
+
+    class DriftReportBody(BaseModel):
+        use_claude: bool = True
+
+    @app.get("/drift-report")
+    def get_drift_report():
+        prod = _require_production_dir()
+        from white_composition.drift_report import load_report
+
+        report = load_report(prod)
+        if report is None:
+            raise HTTPException(
+                status_code=404,
+                detail="No plan_drift_report.yml found — POST /drift-report to generate",
+            )
+        return report.model_dump()
+
+    @app.post("/drift-report")
+    def start_drift_report(body: DriftReportBody = DriftReportBody()):
+        global _drift_job
+        if _drift_job["status"] == "running":
+            raise HTTPException(
+                status_code=409, detail="A drift report job is already running"
+            )
+        prod = _require_production_dir()
+        arr_path = prod / "arrangement.txt"
+        if not arr_path.exists():
+            raise HTTPException(
+                status_code=422,
+                detail="arrangement.txt not found in production directory",
+            )
+        from white_composition.production_plan import PLAN_FILENAME, load_plan
+
+        plan = load_plan(prod)
+        if plan is None:
+            raise HTTPException(
+                status_code=422,
+                detail=f"{PLAN_FILENAME} not found — generate a production plan first",
+            )
+        now = datetime.now(timezone.utc).isoformat()
+        _drift_job = {
+            "status": "running",
+            "started_at": now,
+            "finished_at": None,
+            "error": None,
+        }
+
+        use_claude = body.use_claude
+
+        def _run():
+            global _drift_job
+            try:
+                from white_composition.drift_report import compare_plans, write_report
+
+                report = compare_plans(plan, arr_path, use_claude=use_claude)
+                write_report(prod, report)
+                _drift_job["status"] = "done"
+            except Exception as exc:
+                _drift_job["status"] = "error"
+                _drift_job["error"] = str(exc)
+            finally:
+                _drift_job["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+        threading.Thread(target=_run, daemon=True).start()
+        return {"status": "running", "started_at": now}
+
+    @app.get("/drift-report/status")
+    def drift_report_status():
+        return _drift_job
+
+    @app.get("/composition")
+    def get_composition():
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import read_composition, resolve_song_dir
+
+        song_dir = resolve_song_dir(prod)
+        data = read_composition(song_dir)
+        if data is None:
+            return {"status": "not_initialized"}
+        return data
+
+    class StageBody(BaseModel):
+        stage: str
+
+    @app.patch("/composition/stage")
+    def update_stage(body: StageBody):
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import resolve_song_dir, write_stage
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            write_stage(song_dir, body.stage)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"ok": True, "stage": body.stage}
+
+    @app.post("/composition/version")
+    def new_version():
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import add_version, resolve_song_dir
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            version = add_version(song_dir)
+        except FileNotFoundError as exc:
+            raise HTTPException(
+                status_code=422, detail="composition.yml not found — run handoff first"
+            ) from exc
+        return {"ok": True, "version": version}
+
+    class VersionNotesBody(BaseModel):
+        version: int
+        notes: str
+
+    @app.patch("/composition/version/notes")
+    def update_notes(body: VersionNotesBody):
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import (
+            resolve_song_dir,
+            update_version_notes,
+        )
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            update_version_notes(song_dir, body.version, body.notes)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"ok": True}
+
+    # ------------------------------------------------------------------
+    # Mix file
+    # ------------------------------------------------------------------
+
+    @app.get("/production/mix/info")
+    def mix_info():
+        prod = _require_production_dir()
+        from white_composition.init_production import load_song_context
+
+        ctx = load_song_context(prod)
+        mix_file = ctx.get("mix_file") or None
+        return {
+            "has_mix": bool(mix_file and Path(mix_file).exists()),
+            "mix_file": mix_file,
+        }
+
+    class MixFileBody(BaseModel):
+        path: str
+
+    @app.post("/production/mix/set")
+    def set_mix_file(body: MixFileBody):
+        prod = _require_production_dir()
+        ctx_path = prod / "song_context.yml"
+        if not ctx_path.exists():
+            raise HTTPException(status_code=404, detail="song_context.yml not found")
+        with open(ctx_path) as f:
+            ctx = yaml.safe_load(f) or {}
+        ctx["mix_file"] = body.path
+        with open(ctx_path, "w") as f:
+            yaml.dump(
+                ctx,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
+        return {"ok": True, "mix_file": body.path}
+
+    @app.get("/production/mix")
+    def stream_mix():
+        from fastapi.responses import FileResponse
+
+        prod = _require_production_dir()
+        from white_composition.init_production import load_song_context
+
+        ctx = load_song_context(prod)
+        mix_file = ctx.get("mix_file")
+        if not mix_file:
+            raise HTTPException(
+                status_code=404, detail="No mix_file set in song_context.yml"
+            )
+        mix_path = Path(mix_file)
+        if not mix_path.exists():
+            raise HTTPException(
+                status_code=404, detail=f"Mix file not found: {mix_path}"
+            )
+        suffix = mix_path.suffix.lower()
+        media_type = {
+            ".mp3": "audio/mpeg",
+            ".wav": "audio/wav",
+            ".aiff": "audio/aiff",
+            ".aif": "audio/aiff",
+            ".m4a": "audio/mp4",
+        }.get(suffix, "audio/mpeg")
+        return FileResponse(str(mix_path), media_type=media_type)
+
+    # ------------------------------------------------------------------
+    # Lyrics review
+    # ------------------------------------------------------------------
+
+    _FITTING_VERDICT_ORDER = [
+        "splits needed",
+        "tight but workable",
+        "paste-ready",
+        "spacious",
+    ]
+
+    def _worst_fitting_verdict(fitting: dict) -> str | None:
+        """Return the worst-case fitting verdict across all sections and phrases."""
+        worst_idx = len(_FITTING_VERDICT_ORDER)
+        for section_data in fitting.values():
+            if not isinstance(section_data, dict):
+                continue
+            for phrase in section_data.get("phrases", []):
+                v = phrase.get("verdict", "")
+                try:
+                    idx = _FITTING_VERDICT_ORDER.index(v)
+                    worst_idx = min(worst_idx, idx)
+                except ValueError:
+                    pass
+        return (
+            _FITTING_VERDICT_ORDER[worst_idx]
+            if worst_idx < len(_FITTING_VERDICT_ORDER)
+            else None
+        )
+
+    @app.get("/lyrics")
+    def get_lyrics():
+        prod = _require_production_dir()
+        review_path = prod / "melody" / "lyrics_review.yml"
+        if not review_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="lyrics_review.yml not found — run lyric pipeline first",
+            )
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+        promoted = (prod / "melody" / "lyrics.txt").exists()
+        candidates_out = []
+        for c in review.get("candidates", []):
+            txt_path = prod / "melody" / c.get("file", "")
+            text = txt_path.read_text() if txt_path.exists() else ""
+            chromatic = c.get("chromatic") or {}
+            fitting_verdict = _worst_fitting_verdict(c.get("fitting") or {})
+            status = c.get("status", "pending")
+            if promoted and status == "approved":
+                status = "promoted"
+            candidates_out.append(
+                {
+                    "id": c["id"],
+                    "rank": c.get("rank", 0),
+                    "status": status,
+                    "text": text,
+                    "match": chromatic.get("match"),
+                    "fitting_verdict": fitting_verdict,
+                }
+            )
+        return {
+            "status": "promoted" if promoted else "pending",
+            "candidates": candidates_out,
+        }
+
+    @app.post("/lyrics/{lyric_id}/approve")
+    def approve_lyric(lyric_id: str):
+        prod = _require_production_dir()
+        review_path = prod / "melody" / "lyrics_review.yml"
+        if not review_path.exists():
+            raise HTTPException(status_code=404, detail="lyrics_review.yml not found")
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+        candidates = review.get("candidates", [])
+        found = False
+        for c in candidates:
+            if c["id"] == lyric_id:
+                c["status"] = "approved"
+                found = True
+            else:
+                c["status"] = "pending"
+        if not found:
+            raise HTTPException(
+                status_code=422, detail=f"Lyric candidate '{lyric_id}' not found"
+            )
+        review["candidates"] = candidates
+        with open(review_path, "w") as f:
+            yaml.dump(
+                review,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
+        return {"ok": True}
+
+    @app.post("/lyrics/reset")
+    def reset_lyrics():
+        """Reset the lyric phase to pending and wipe all lyric artefacts.
+
+        Use after the arrangement changes post-lyric-generation so the lyric
+        pipeline can be re-run cleanly against the updated arrangement.txt.
+        """
+        prod = _require_production_dir()
+        melody_dir = prod / "melody"
+        from white_composition.pipeline_runner import write_phase_status
+
+        removed = []
+        for name in ("lyrics.txt", "lyrics_draft.txt", "lyrics_review.yml"):
+            p = melody_dir / name
+            if p.exists():
+                p.unlink()
+                removed.append(name)
+        candidates_dir = melody_dir / "candidates"
+        if candidates_dir.exists():
+            for txt in candidates_dir.glob("lyrics_*.txt"):
+                txt.unlink()
+                removed.append(f"candidates/{txt.name}")
+
+        write_phase_status(prod, "lyrics", "pending")
+        return {"ok": True, "removed": removed}
+
+    # ------------------------------------------------------------------
     # Candidates
     # ------------------------------------------------------------------
 
@@ -267,18 +946,19 @@ def create_app(
                 status_code=400,
                 detail=f"Invalid phase '{body.phase}'. Must be one of: {sorted(VALID_PHASES)}",
             )
-        review_path = prod / body.phase / "review.yml"
+        from white_composition.pipeline_runner import PHASE_REVIEW_FILES, cmd_promote
+
+        review_file = PHASE_REVIEW_FILES.get(body.phase, f"{body.phase}/review.yml")
+        review_path = prod / review_file
         if not review_path.exists():
             raise HTTPException(
                 status_code=404,
-                detail=f"No review.yml found for phase '{body.phase}'",
+                detail=f"No review file found for phase '{body.phase}'",
             )
         approved_dir = prod / body.phase / "approved"
         count_before = (
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
-
-        from white_composition.pipeline_runner import cmd_promote
 
         result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:
@@ -290,6 +970,209 @@ def create_app(
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
         return {"ok": True, "promoted_count": max(0, count_after - count_before)}
+
+    # ------------------------------------------------------------------
+    # Register non-generated part
+    # ------------------------------------------------------------------
+
+    @app.post("/production/register-part")
+    async def register_part_endpoint(
+        midi_file: UploadFile = File(...),
+        phase: str = Form(...),
+        section: str = Form(...),
+        label: str = Form(...),
+    ):
+        prod = _require_production_dir()
+        if phase not in VALID_PHASES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid phase '{phase}'. Must be one of: {sorted(VALID_PHASES)}",
+            )
+        content = await midi_file.read()
+        with tempfile.NamedTemporaryFile(suffix=".mid", delete=False) as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+        try:
+            from white_composition.promote_part import register_part
+
+            entry_dict = register_part(tmp_path, phase, section, label, prod)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        finally:
+            os.unlink(tmp_path)
+
+        review_yml = prod / phase / "review.yml"
+        from white_api.candidate_browser import _load_review
+
+        entries = _load_review(review_yml) if review_yml.exists() else []
+        matched = next((e for e in entries if e.candidate_id == entry_dict["id"]), None)
+        if matched is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Registered entry could not be reloaded from review.yml",
+            )
+        return _serialise(matched)
+
+    # ------------------------------------------------------------------
+    # Melody auto-split
+    # ------------------------------------------------------------------
+
+    class AutoSplitMelodyBody(BaseModel):
+        phase_label: str
+        min_split_beats: float = Field(default=1.0, gt=0)
+
+    @app.post("/production/auto-split-melody")
+    def auto_split_melody_endpoint(body: AutoSplitMelodyBody):
+        prod = _require_production_dir()
+        midi_path = prod / "melody" / "approved" / f"{body.phase_label}.mid"
+        if not midi_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No approved melody MIDI for label '{body.phase_label}' at {midi_path}",
+            )
+        lyrics_path = prod / "melody" / "lyrics.txt"
+        if not lyrics_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail=f"No lyrics.txt found at {lyrics_path}",
+            )
+        try:
+            import mido as _mido
+
+            src = _mido.MidiFile(str(midi_path))
+            ticks_per_beat = src.ticks_per_beat or 480
+            min_split_ticks = max(1, int(body.min_split_beats * ticks_per_beat))
+
+            from white_generation.pipelines.melody_auto_split import auto_split_melody
+
+            output_path, alignment = auto_split_melody(
+                midi_path=midi_path,
+                lyrics_path=lyrics_path,
+                section=body.phase_label,
+                min_split_ticks=min_split_ticks,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+        return {
+            "ok": True,
+            "split_midi": str(output_path),
+            "alignment": alignment,
+        }
+
+    @app.post("/production/auto-split-melody/all")
+    def auto_split_melody_all_endpoint():
+        """Auto-split every lyric section instance — one split MIDI per instance."""
+        prod = _require_production_dir()
+        approved_dir = prod / "melody" / "approved"
+        lyrics_path = prod / "melody" / "lyrics.txt"
+        if not approved_dir.exists():
+            raise HTTPException(
+                status_code=404, detail="No approved melody directory found"
+            )
+        if not lyrics_path.exists():
+            raise HTTPException(status_code=404, detail="No lyrics.txt found")
+
+        try:
+            from white_generation.pipelines.melody_auto_split import (
+                auto_split_all_instances,
+            )
+
+            results = auto_split_all_instances(
+                lyrics_path=lyrics_path,
+                approved_dir=approved_dir,
+                min_split_ticks=480,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+        # Sync split MIDIs into the Logic MIDI folder if handoff already ran
+        logic_midi_dir: Path | None = None
+        try:
+            from white_composition.logic_handoff import resolve_song_dir
+
+            song_dir = resolve_song_dir(prod)
+            candidate = song_dir / "MIDI" / "melody"
+            if candidate.is_dir():
+                logic_midi_dir = candidate
+        except Exception:
+            pass
+
+        if logic_midi_dir:
+            for r in results:
+                if not r.get("skipped"):
+                    split_path = Path(r["split_midi"])
+                    if split_path.exists():
+                        shutil.copy2(split_path, logic_midi_dir / split_path.name)
+
+        return {
+            "ok": True,
+            "results": results,
+            "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
+        }
+
+    @app.post("/production/assemble-melody")
+    def assemble_melody_endpoint():
+        """Assemble all instance-split MIDIs into one full-length melody MIDI."""
+        prod = _require_production_dir()
+        arrangement_path = prod / "arrangement.txt"
+        approved_dir = prod / "melody" / "approved"
+
+        if not arrangement_path.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="No arrangement.txt — export from Logic first",
+            )
+        if not approved_dir.exists():
+            raise HTTPException(
+                status_code=404, detail="No approved melody directory found"
+            )
+
+        # Load BPM and time_sig from chord review
+        chord_review_path = prod / "chords" / "review.yml"
+        bpm = 120
+        time_sig = "4/4"
+        if chord_review_path.exists():
+            import yaml as _yaml
+
+            with open(chord_review_path) as f:
+                cr = _yaml.safe_load(f) or {}
+            bpm = int(cr.get("bpm", 120))
+            time_sig = str(cr.get("time_sig", "4/4"))
+
+        try:
+            from white_generation.pipelines.melody_auto_split import (
+                assemble_melody_midi,
+            )
+
+            output_path = assemble_melody_midi(
+                arrangement_path=arrangement_path,
+                approved_dir=approved_dir,
+                bpm=bpm,
+                time_sig_str=time_sig,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+        # Sync to Logic MIDI folder if handoff already ran
+        logic_midi_dir: Path | None = None
+        try:
+            from white_composition.logic_handoff import resolve_song_dir
+
+            song_dir = resolve_song_dir(prod)
+            candidate = song_dir / "MIDI" / "melody"
+            if candidate.is_dir():
+                logic_midi_dir = candidate
+        except Exception:
+            pass
+
+        if logic_midi_dir:
+            shutil.copy2(output_path, logic_midi_dir / output_path.name)
+
+        return {
+            "ok": True,
+            "assembled_midi": str(output_path),
+            "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
+        }
 
     # ------------------------------------------------------------------
     # Evolve
