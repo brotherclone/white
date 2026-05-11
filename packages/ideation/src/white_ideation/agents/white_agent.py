@@ -4101,6 +4101,28 @@ The song should be buildable from these specifications.
             if not any(iterations[idx].is_final for idx in color_indexes):
                 iterations[color_indexes[-1]].is_final = True
 
+        # Deduplicate titles within this run: if two final iterations share the same
+        # title, append the color name so init_production never sees a collision.
+        _title_buckets: dict[str, list] = {}
+        for it in iterations:
+            if not it.is_final:
+                continue
+            _title_buckets.setdefault(it.title.strip().lower(), []).append(it)
+        for _dupes in _title_buckets.values():
+            if len(_dupes) > 1:
+                for it in _dupes:
+                    rc = it.rainbow_color
+                    _label = (
+                        rc.color_name
+                        if hasattr(rc, "color_name")
+                        else str(rc).split("(")[0].strip()
+                    )
+                    it.title = f"{it.title} ({_label})"
+                logger.warning(
+                    "Duplicate title within run — appended color suffix: %s",
+                    [it.title for it in _dupes],
+                )
+
         for i, iteration in enumerate(iterations):
             if not iteration.is_final:
                 continue

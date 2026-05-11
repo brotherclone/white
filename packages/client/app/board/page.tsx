@@ -419,10 +419,10 @@ export default function BoardPage() {
             <div className="flex gap-2 mb-4">
               <input
                 type="text"
-                value={mixPathInput}
+                defaultValue={mixFile ?? "/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Listening/"}
                 onChange={e => setMixPathInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSetMix()}
-                placeholder="/path/to/bounce.mp3"
+                placeholder="/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Listening/"
                 className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-xs font-mono text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
               />
               <button
