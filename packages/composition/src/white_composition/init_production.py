@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -383,7 +384,10 @@ def init_production(
     # When a collision is found, auto-suffix with (v2), (v3), … rather than failing.
     _title = (meta.get("title") or "").strip().lower()
     if _title:
-        _shrink_wrapped_root = production_dir.parent.parent.parent
+        _env_root = os.environ.get("SHRINKWRAP_OUTPUT_DIR")
+        _shrink_wrapped_root = (
+            Path(_env_root) if _env_root else production_dir.parent.parent.parent
+        )
         _existing_titles: set[str] = set()
         for _ctx_path in _shrink_wrapped_root.rglob("song_context.yml"):
             if _ctx_path.parent == production_dir:

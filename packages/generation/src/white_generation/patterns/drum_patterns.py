@@ -1033,7 +1033,7 @@ TEMPLATES_4_4_EXPERIMENTAL = [
         time_sig=(4, 4),
         description="Polyrhythm — kick in triplet pattern against straight clap, cross-rhythm",
         voices={
-            "kick": [(0, "accent"), (1.33, "normal"), (2.67, "normal")],
+            "kick": [(0, "accent"), (4 / 3, "normal"), (8 / 3, "normal")],
             "clap": [(0, "normal"), (1, "normal"), (2, "normal"), (3, "normal")],
             "hh_closed": [
                 (0, "normal"),

@@ -414,7 +414,7 @@ def assemble_melody_midi(
             abs_src = 0
             for msg in track:
                 abs_src += msg.time
-                if msg.type == "note_on" and msg.velocity > 0:
+                if msg.type in ("note_on", "note_off"):
                     if clip_origin is None or abs_src < clip_origin:
                         clip_origin = abs_src
         if clip_origin is None:

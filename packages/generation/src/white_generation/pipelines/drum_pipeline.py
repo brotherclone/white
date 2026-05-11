@@ -139,7 +139,7 @@ def drum_pattern_to_midi_bytes(
                 continue
             for beat_pos, vel_level in hits:
                 velocity = VELOCITY.get(vel_level, 90)
-                abs_tick = bar_offset + int(beat_pos * ticks_per_beat)
+                abs_tick = bar_offset + round(beat_pos * ticks_per_beat)
                 # Short note duration for percussion (1/16 note)
                 note_dur = ticks_per_beat // 4
                 events.append((abs_tick, note, velocity, True))
