@@ -405,12 +405,27 @@ def assemble_melody_midi(
         src = mido.MidiFile(str(midi_path))
         scale = ticks_per_beat / (src.ticks_per_beat or 480)
 
+        # Find the earliest note_on tick so we can normalise the clip to start
+        # at tick 0.  Logic exports MIDIs with notes at their absolute timeline
+        # position, so without normalisation the assembler would double-count
+        # the bar offset.
+        clip_origin = None
+        for track in src.tracks:
+            abs_src = 0
+            for msg in track:
+                abs_src += msg.time
+                if msg.type == "note_on" and msg.velocity > 0:
+                    if clip_origin is None or abs_src < clip_origin:
+                        clip_origin = abs_src
+        if clip_origin is None:
+            clip_origin = 0
+
         for track in src.tracks:
             abs_src = 0
             for msg in track:
                 abs_src += msg.time
                 if msg.type in ("note_on", "note_off"):
-                    dest_tick = start_tick + round(abs_src * scale)
+                    dest_tick = start_tick + round((abs_src - clip_origin) * scale)
                     all_events.append((dest_tick, msg.copy(time=0)))
 
     if not all_events:

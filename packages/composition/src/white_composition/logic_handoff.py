@@ -207,6 +207,37 @@ def update_version_notes(logic_song_dir: Path, version: int, notes: str) -> None
         )
 
 
+def sync_from_logic(production_dir: Path) -> dict[str, list[str]]:
+    """Pull MIDI files from Logic's MIDI folders back to production approved dirs.
+
+    Copies every *.mid in Logic/MIDI/{phase}/ → production/{phase}/approved/ for
+    each phase in MIDI_PHASES.  Creates approved/ if absent.  Overwrites existing
+    files so user edits in Logic take precedence.
+
+    Returns a dict of phase → [filenames copied].
+    """
+    production_dir = Path(production_dir)
+    song_dir = _song_dir(production_dir)
+    midi_root = song_dir / "MIDI"
+    synced: dict[str, list[str]] = {}
+
+    for phase in MIDI_PHASES:
+        logic_phase_dir = midi_root / phase
+        if not logic_phase_dir.is_dir():
+            continue
+        mids = list(logic_phase_dir.glob("*.mid"))
+        if not mids:
+            continue
+        approved_dir = production_dir / phase / "approved"
+        approved_dir.mkdir(parents=True, exist_ok=True)
+        synced[phase] = []
+        for mid in mids:
+            shutil.copy2(mid, approved_dir / mid.name)
+            synced[phase].append(mid.name)
+
+    return synced
+
+
 def resolve_song_dir(production_dir: Path) -> Path:
     """Return the Logic song dir for a production dir without running handoff."""
     return _song_dir(Path(production_dir))

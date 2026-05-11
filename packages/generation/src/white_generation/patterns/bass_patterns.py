@@ -368,6 +368,29 @@ TEMPLATES_4_4_ROOT = [
         ],
         note_durations=[1.0, 1.0, 1.0, 1.0],
     ),
+    BassPattern(
+        name="root_dotted",
+        style=BassStyle.ROOT,
+        energy="low",
+        time_sig=(4, 4),
+        description="Root on 1 held, ghost re-attack on 2.5 — dotted-half feel",
+        notes=[(0, "root", "normal"), (2.5, "root", "ghost")],
+        note_durations=[2.5, 1.5],
+    ),
+    BassPattern(
+        name="root_quarter_ghost",
+        style=BassStyle.ROOT,
+        energy="medium",
+        time_sig=(4, 4),
+        description="Root accented on 1 and 3, ghost on 2 and 4 — heartbeat",
+        notes=[
+            (0, "root", "accent"),
+            (1, "root", "ghost"),
+            (2, "root", "normal"),
+            (3, "root", "ghost"),
+        ],
+        note_durations=[1.0, 1.0, 1.0, 1.0],
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -397,6 +420,15 @@ TEMPLATES_4_4_OCTAVE = [
             (3, "octave_up", "normal"),
         ],
         note_durations=[1.0, 1.0, 1.0, 1.0],
+    ),
+    BassPattern(
+        name="octave_drop",
+        style=BassStyle.OCTAVE,
+        energy="low",
+        time_sig=(4, 4),
+        description="Octave drop — octave on 1, fall to root on 3",
+        notes=[(0, "octave_up", "normal"), (2, "root", "ghost")],
+        note_durations=[2.0, 2.0],
     ),
     BassPattern(
         name="octave_eighth",
@@ -455,6 +487,29 @@ TEMPLATES_4_4_WALKING = [
         ],
         note_durations=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
     ),
+    BassPattern(
+        name="walking_low",
+        style=BassStyle.WALKING,
+        energy="low",
+        time_sig=(4, 4),
+        description="Sparse walk — root on 1, 5th on 3 only",
+        notes=[(0, "root", "accent"), (2, "5th", "normal")],
+        note_durations=[2.0, 2.0],
+    ),
+    BassPattern(
+        name="walking_chromatic",
+        style=BassStyle.WALKING,
+        energy="medium",
+        time_sig=(4, 4),
+        description="Chromatic walk — root, chromatic approach into 3rd, approach into 5th",
+        notes=[
+            (0, "root", "accent"),
+            (1, "chromatic_approach", "normal"),
+            (2, "3rd", "normal"),
+            (3, "chromatic_approach", "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0, 1.0],
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -498,6 +553,37 @@ TEMPLATES_4_4_ARP = [
         ],
         note_durations=[1.0, 1.0, 1.0, 1.0],
     ),
+    BassPattern(
+        name="arp_descend",
+        style=BassStyle.ARPEGGIATED,
+        energy="medium",
+        time_sig=(4, 4),
+        description="Descending arp — octave, 5th, 3rd, root",
+        notes=[
+            (0, "octave_up", "accent"),
+            (1, "5th", "normal"),
+            (2, "3rd", "normal"),
+            (3, "root", "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0, 1.0],
+    ),
+    BassPattern(
+        name="arp_broken",
+        style=BassStyle.ARPEGGIATED,
+        energy="high",
+        time_sig=(4, 4),
+        description="Broken arp — root, 5th, 3rd, octave with ghost passing tones",
+        notes=[
+            (0, "root", "accent"),
+            (0.5, "passing_tone", "ghost"),
+            (1, "5th", "normal"),
+            (1.5, "passing_tone", "ghost"),
+            (2, "3rd", "normal"),
+            (2.5, "passing_tone", "ghost"),
+            (3, "octave_up", "normal"),
+        ],
+        note_durations=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0],
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -528,6 +614,33 @@ TEMPLATES_4_4_PEDAL = [
         ],
         note_durations=[0.9, 0.9, 0.9, 0.9],  # slight gap for re-attack
     ),
+    BassPattern(
+        name="pedal_sparse",
+        style=BassStyle.PEDAL,
+        energy="low",
+        time_sig=(4, 4),
+        description="Sparse pedal — root on 1, ghost on 3",
+        notes=[(0, "root", "normal"), (2, "root", "ghost")],
+        note_durations=[2.0, 2.0],
+    ),
+    BassPattern(
+        name="pedal_eighth_drive",
+        style=BassStyle.PEDAL,
+        energy="high",
+        time_sig=(4, 4),
+        description="Eighth-note pedal — root pulsed on every eighth, driving",
+        notes=[
+            (0, "root", "accent"),
+            (0.5, "root", "ghost"),
+            (1, "root", "normal"),
+            (1.5, "root", "ghost"),
+            (2, "root", "accent"),
+            (2.5, "root", "ghost"),
+            (3, "root", "normal"),
+            (3.5, "root", "ghost"),
+        ],
+        note_durations=[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -557,6 +670,29 @@ TEMPLATES_4_4_SYNCOPATED = [
             (3.5, "root", "normal"),
         ],
         note_durations=[1.0, 1.0, 1.0, 0.5],
+    ),
+    BassPattern(
+        name="syncopated_ghost",
+        style=BassStyle.SYNCOPATED,
+        energy="low",
+        time_sig=(4, 4),
+        description="Ghost syncopation — root on 1, barely-there hit on 3.5",
+        notes=[(0, "root", "normal"), (3.5, "5th", "ghost")],
+        note_durations=[3.5, 0.5],
+    ),
+    BassPattern(
+        name="syncopated_cross",
+        style=BassStyle.SYNCOPATED,
+        energy="medium",
+        time_sig=(4, 4),
+        description="Cross-rhythm — root on 1, hits on 1.5, 2.5, and 3.5",
+        notes=[
+            (0, "root", "accent"),
+            (1.5, "5th", "ghost"),
+            (2.5, "root", "normal"),
+            (3.5, "3rd", "ghost"),
+        ],
+        note_durations=[1.5, 1.0, 1.0, 0.5],
     ),
 ]
 

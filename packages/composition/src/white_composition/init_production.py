@@ -379,10 +379,12 @@ def init_production(
     print(f"Color:   {meta.get('color', '')}")
     print(f"Concept: {meta.get('concept', '')[:80]}")
 
-    # Duplicate title check — walk all song_context.yml files in shrink_wrapped/
+    # Duplicate title check — walk all song_context.yml files under the corpus root.
+    # When a collision is found, auto-suffix with (v2), (v3), … rather than failing.
     _title = (meta.get("title") or "").strip().lower()
     if _title:
         _shrink_wrapped_root = production_dir.parent.parent.parent
+        _existing_titles: set[str] = set()
         for _ctx_path in _shrink_wrapped_root.rglob("song_context.yml"):
             if _ctx_path.parent == production_dir:
                 continue
@@ -390,17 +392,20 @@ def init_production(
                 _existing = yaml.safe_load(_ctx_path.read_text()) or {}
             except Exception:
                 continue
-            _existing_title = (_existing.get("title") or "").strip().lower()
-            if _existing_title == _title:
-                print(
-                    f"\nERROR: A production for '{meta.get('title')}' already exists at:\n"
-                    f"  {_ctx_path.parent}\n"
-                    "Use --force to initialise anyway."
-                )
-                if not force:
-                    sys.exit(1)
-                print("  --force passed — continuing despite duplicate.")
-                break
+            _et = (_existing.get("title") or "").strip().lower()
+            if _et:
+                _existing_titles.add(_et)
+
+        if _title in _existing_titles:
+            if force:
+                print("  --force passed — continuing despite duplicate title.")
+            else:
+                _base = (meta.get("title") or "").strip()
+                _n = 2
+                while f"{_base} (v{_n})".lower() in _existing_titles:
+                    _n += 1
+                meta["title"] = f"{_base} (v{_n})"
+                print(f"  Duplicate title — renamed to: {meta['title']}")
 
     # Generate sounds_like via Claude
     print(f"\nAsking Claude ({model}) for reference artists...")
