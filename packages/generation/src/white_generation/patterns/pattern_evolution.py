@@ -236,7 +236,7 @@ def _crossover_drums(parent_a: DrumPattern, parent_b: DrumPattern) -> DrumPatter
     tags = _merge_tags(parent_a.tags, parent_b.tags)
     return replace(
         parent_a,
-        name=f"evolved_{parent_a.name}x{parent_b.name}",
+        name=f"evolved_{_base_name(parent_a.name)}x{_base_name(parent_b.name)}",
         voices=child_voices,
         tags=tags,
     )
@@ -293,7 +293,7 @@ def _crossover_bass(parent_a: BassPattern, parent_b: BassPattern) -> BassPattern
     tags = _merge_tags(parent_a.tags, parent_b.tags)
     return replace(
         parent_a,
-        name=f"evolved_{parent_a.name}x{parent_b.name}",
+        name=f"evolved_{_base_name(parent_a.name)}x{_base_name(parent_b.name)}",
         notes=child_notes,
         note_durations=child_durs if child_durs else None,
         tags=tags,
@@ -352,7 +352,7 @@ def _crossover_melody(
     tags = _merge_tags(parent_a.tags, parent_b.tags)
     return replace(
         parent_a,
-        name=f"evolved_{parent_a.name}x{parent_b.name}",
+        name=f"evolved_{_base_name(parent_a.name)}x{_base_name(parent_b.name)}",
         intervals=child_ivs,
         rhythm=child_rhy,
         durations=child_durs if child_durs else None,
@@ -391,6 +391,13 @@ def _merge_tags(tags_a: list[str], tags_b: list[str]) -> list[str]:
     if _EVOLVED_TAG not in merged:
         merged.append(_EVOLVED_TAG)
     return merged
+
+
+def _base_name(name: str) -> str:
+    """Strip accumulated evolved_ prefixes so child names stay readable."""
+    while name.startswith("evolved_"):
+        name = name[len("evolved_") :]
+    return name
 
 
 # ---------------------------------------------------------------------------

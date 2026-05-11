@@ -324,7 +324,7 @@ def create_app(
 
             init_production(prod, proposal)
             write_phase_status(prod, "init_production", "promoted")
-        except SystemExit as exc:
+        except (SystemExit, ValueError) as exc:
             raise HTTPException(
                 status_code=500, detail=f"init_production failed: {exc}"
             ) from exc
@@ -514,10 +514,19 @@ def create_app(
 
     @app.post("/sync-arrangement")
     def sync_arrangement():
-        """Pull arrangement.txt from the Logic project folder back into the production dir."""
+        """Pull arrangement.txt and MIDI files from Logic back into the production dir.
+
+        Copies arrangement.txt from the Logic project folder, then copies every
+        *.mid from Logic/MIDI/{phase}/ → production/{phase}/approved/ for all MIDI
+        phases.  This allows chord/drum/bass/melody files created or edited in Logic
+        to flow back into the pipeline.
+        """
         prod = _require_production_dir()
         try:
-            from white_composition.logic_handoff import resolve_song_dir
+            from white_composition.logic_handoff import (
+                resolve_song_dir,
+                sync_from_logic,
+            )
 
             song_dir = resolve_song_dir(prod)
         except Exception as exc:
@@ -534,10 +543,14 @@ def create_app(
 
         dest = prod / "arrangement.txt"
         shutil.copy2(logic_arrangement, dest)
+
+        midi_synced = sync_from_logic(prod)
+
         return {
             "ok": True,
             "synced_from": str(logic_arrangement),
             "synced_to": str(dest),
+            "midi_synced": midi_synced,
         }
 
     # ------------------------------------------------------------------
@@ -836,6 +849,32 @@ def create_app(
                 width=float("inf"),
             )
         return {"ok": True}
+
+    @app.post("/lyrics/reset")
+    def reset_lyrics():
+        """Reset the lyric phase to pending and wipe all lyric artefacts.
+
+        Use after the arrangement changes post-lyric-generation so the lyric
+        pipeline can be re-run cleanly against the updated arrangement.txt.
+        """
+        prod = _require_production_dir()
+        melody_dir = prod / "melody"
+        from white_composition.pipeline_runner import write_phase_status
+
+        removed = []
+        for name in ("lyrics.txt", "lyrics_draft.txt", "lyrics_review.yml"):
+            p = melody_dir / name
+            if p.exists():
+                p.unlink()
+                removed.append(name)
+        candidates_dir = melody_dir / "candidates"
+        if candidates_dir.exists():
+            for txt in candidates_dir.glob("lyrics_*.txt"):
+                txt.unlink()
+                removed.append(f"candidates/{txt.name}")
+
+        write_phase_status(prod, "lyrics", "pending")
+        return {"ok": True, "removed": removed}
 
     # ------------------------------------------------------------------
     # Candidates

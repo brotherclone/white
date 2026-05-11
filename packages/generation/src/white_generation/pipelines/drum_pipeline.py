@@ -139,7 +139,7 @@ def drum_pattern_to_midi_bytes(
                 continue
             for beat_pos, vel_level in hits:
                 velocity = VELOCITY.get(vel_level, 90)
-                abs_tick = bar_offset + int(beat_pos * ticks_per_beat)
+                abs_tick = bar_offset + round(beat_pos * ticks_per_beat)
                 # Short note duration for percussion (1/16 note)
                 note_dur = ticks_per_beat // 4
                 events.append((abs_tick, note, velocity, True))
@@ -479,9 +479,20 @@ def run_drum_pipeline(
             templates = [make_fallback_pattern(time_sig)]
 
         templates = [t for t in templates if t.name not in used_pattern_names]
-        print(
-            f"  Templates: {len(templates)} candidates ({len(used_pattern_names)} excluded as cross-section repeats)"
-        )
+        if not templates:
+            # All available templates have been used in earlier sections — allow reuse.
+            templates = select_templates(
+                ALL_TEMPLATES, time_sig, genre_families, target_energy
+            )
+            if not templates:
+                templates = [make_fallback_pattern(time_sig)]
+            print(
+                f"  Templates: all unique patterns exhausted — reusing ({len(used_pattern_names)} prior sections)"
+            )
+        else:
+            print(
+                f"  Templates: {len(templates)} candidates ({len(used_pattern_names)} excluded as cross-section repeats)"
+            )
 
         # Evolutionary breeding (opt-in)
         if evolve and templates:
