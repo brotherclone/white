@@ -236,7 +236,7 @@ def _crossover_drums(parent_a: DrumPattern, parent_b: DrumPattern) -> DrumPatter
     tags = _merge_tags(parent_a.tags, parent_b.tags)
     return replace(
         parent_a,
-        name=f"evolved_{_base_name(parent_a.name)}x{_base_name(parent_b.name)}",
+        name=f"evolved_{_base_name(parent_a.name)}_x_{_base_name(parent_b.name)}",
         voices=child_voices,
         tags=tags,
     )
@@ -293,7 +293,7 @@ def _crossover_bass(parent_a: BassPattern, parent_b: BassPattern) -> BassPattern
     tags = _merge_tags(parent_a.tags, parent_b.tags)
     return replace(
         parent_a,
-        name=f"evolved_{_base_name(parent_a.name)}x{_base_name(parent_b.name)}",
+        name=f"evolved_{_base_name(parent_a.name)}_x_{_base_name(parent_b.name)}",
         notes=child_notes,
         note_durations=child_durs if child_durs else None,
         tags=tags,
@@ -352,7 +352,7 @@ def _crossover_melody(
     tags = _merge_tags(parent_a.tags, parent_b.tags)
     return replace(
         parent_a,
-        name=f"evolved_{_base_name(parent_a.name)}x{_base_name(parent_b.name)}",
+        name=f"evolved_{_base_name(parent_a.name)}_x_{_base_name(parent_b.name)}",
         intervals=child_ivs,
         rhythm=child_rhy,
         durations=child_durs if child_durs else None,
@@ -402,8 +402,10 @@ def _base_name(name: str) -> str:
     """
     while name.startswith("evolved_"):
         name = name[len("evolved_") :]
-    # Drop any xParentB lineage suffix appended by previous crossovers
-    return name.split("x")[0]
+    # Drop any _x_ParentB lineage suffix appended by previous crossovers.
+    # The separator is "_x_" (not bare "x") to avoid splitting names that
+    # legitimately contain the letter "x" (e.g. "experimental_ambient").
+    return name.partition("_x_")[0]
 
 
 # ---------------------------------------------------------------------------

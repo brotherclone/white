@@ -197,9 +197,16 @@ class TestDrumCrossover:
         assert _base_name("fallback_minimal") == "fallback_minimal"
         assert _base_name("evolved_fallback_minimal") == "fallback_minimal"
         assert (
-            _base_name("evolved_fallback_minimalxsparse_ambient") == "fallback_minimal"
+            _base_name("evolved_fallback_minimal_x_sparse_ambient")
+            == "fallback_minimal"
         )
         assert _base_name("evolved_evolved_motorik") == "motorik"
+        # Names containing "x" in the base name must not be truncated
+        assert _base_name("experimental_ambient") == "experimental_ambient"
+        assert (
+            _base_name("evolved_experimental_ambient_x_sparse_ambient")
+            == "experimental_ambient"
+        )
 
 
 class TestDrumMutation:
