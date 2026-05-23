@@ -2,6 +2,7 @@
 
 import pytest
 from pydantic import ValidationError
+
 from white_core.concepts.vanity_interview_question import (
     VanityInterviewQuestion,
     VanityInterviewQuestionOutput,

@@ -215,18 +215,6 @@ def select_templates(
     return [t for _, t in results]
 
 
-def make_fallback_pattern(time_sig: tuple[int, int]) -> BassPattern:
-    """Generate a minimal fallback pattern for unsupported time signatures."""
-    return BassPattern(
-        name="fallback_root",
-        style=BassStyle.ROOT,
-        energy="medium",
-        time_sig=time_sig,
-        description=f"Fallback — root on 1 for {time_sig[0]}/{time_sig[1]}",
-        notes=[(0, "root", "normal")],
-    )
-
-
 # ---------------------------------------------------------------------------
 # Theory scoring
 # ---------------------------------------------------------------------------
@@ -1070,6 +1058,214 @@ TEMPLATES_4_4_DRONE = [
 ]
 
 # ---------------------------------------------------------------------------
+# 6/8 Templates (Compound Duple)
+# ---------------------------------------------------------------------------
+# 6/8 = 3.0 quarter-note beats per bar (6 eighth notes).
+# Two compound beats: group 1 starts at 0.0, group 2 starts at 1.5.
+# Eighth-note grid: 0.0, 0.5, 1.0, 1.5, 2.0, 2.5
+
+TEMPLATES_6_8 = [
+    # --- Root ---
+    BassPattern(
+        name="six_eight_root_drone",
+        style=BassStyle.ROOT,
+        energy="low",
+        time_sig=(6, 8),
+        description="Root on beat 1, held full bar — pedal drone for compound duple",
+        notes=[(0.0, BassChordTone.ROOT, "normal")],
+        note_durations=[3.0],
+    ),
+    BassPattern(
+        name="six_eight_root_downbeat",
+        style=BassStyle.ROOT,
+        energy="low",
+        time_sig=(6, 8),
+        description="Root accent on group 1, ghost re-attack on group 2 — sparse rocking",
+        notes=[(0.0, BassChordTone.ROOT, "accent"), (1.5, BassChordTone.ROOT, "ghost")],
+        note_durations=[1.5, 1.5],
+    ),
+    BassPattern(
+        name="six_eight_root_groups",
+        style=BassStyle.ROOT,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Root on both compound beats 0 and 1.5 — grounding the compound bar",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.5, BassChordTone.ROOT, "normal"),
+        ],
+        note_durations=[1.5, 1.5],
+    ),
+    BassPattern(
+        name="six_eight_root_5th_groups",
+        style=BassStyle.ROOT,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Root on group 1, 5th on group 2 — two-note compound phrase",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.5, BassChordTone.FIFTH, "normal"),
+        ],
+        note_durations=[1.5, 1.5],
+    ),
+    BassPattern(
+        name="six_eight_root_pulse",
+        style=BassStyle.ROOT,
+        energy="high",
+        time_sig=(6, 8),
+        description="Root on beats 0, 1.0, 2.0 — triplet pulse within compound bar",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.0, BassChordTone.ROOT, "normal"),
+            (2.0, BassChordTone.ROOT, "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    # --- Pedal ---
+    BassPattern(
+        name="six_eight_pedal_held",
+        style=BassStyle.PEDAL,
+        energy="low",
+        time_sig=(6, 8),
+        description="Root on 0, ghost re-attack on 1.5 — sustained pedal with inner pulse",
+        notes=[(0.0, BassChordTone.ROOT, "normal"), (1.5, BassChordTone.ROOT, "ghost")],
+        note_durations=[1.5, 1.5],
+    ),
+    BassPattern(
+        name="six_eight_pedal_swell",
+        style=BassStyle.PEDAL,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Root on 0, 5th on 1.0, root on 2.0 — swell through inner eighth",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.0, BassChordTone.FIFTH, "ghost"),
+            (2.0, BassChordTone.ROOT, "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    # --- Arpeggiated ---
+    BassPattern(
+        name="six_eight_arp_root_5th",
+        style=BassStyle.ARPEGGIATED,
+        energy="low",
+        time_sig=(6, 8),
+        description="Root on group 1, 5th on group 2 — minimal compound arpeggio",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.5, BassChordTone.FIFTH, "ghost"),
+        ],
+        note_durations=[1.5, 1.5],
+    ),
+    BassPattern(
+        name="six_eight_arp_triad",
+        style=BassStyle.ARPEGGIATED,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Root-5th-3rd on eighth-beat triplet — compound arpeggiated",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.0, BassChordTone.FIFTH, "normal"),
+            (2.0, BassChordTone.THIRD, "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0],
+    ),
+    BassPattern(
+        name="six_eight_arp_rocking",
+        style=BassStyle.ARPEGGIATED,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Root-octave rocking across compound groups",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.5, BassChordTone.OCTAVE_UP, "normal"),
+        ],
+        note_durations=[1.5, 1.5],
+    ),
+    BassPattern(
+        name="six_eight_arp_dense",
+        style=BassStyle.ARPEGGIATED,
+        energy="high",
+        time_sig=(6, 8),
+        description="Four-note roll — root, 3rd on 0.5, 5th on 1.5, octave on 2.0",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (0.5, BassChordTone.THIRD, "ghost"),
+            (1.5, BassChordTone.FIFTH, "normal"),
+            (2.0, BassChordTone.OCTAVE_UP, "normal"),
+        ],
+        note_durations=[0.5, 1.0, 0.5, 1.0],
+    ),
+    # --- Walking ---
+    BassPattern(
+        name="six_eight_walking",
+        style=BassStyle.WALKING,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Root-3rd on group starts, approach on 2.5 — compound walking line",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.5, BassChordTone.THIRD, "normal"),
+            (2.5, BassChordTone.CHROMATIC_APPROACH, "normal"),
+        ],
+        note_durations=[1.5, 1.0, 0.5],
+    ),
+    BassPattern(
+        name="six_eight_walking_5th",
+        style=BassStyle.WALKING,
+        energy="high",
+        time_sig=(6, 8),
+        description="Root-passing-5th-approach — active compound walking line",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (0.5, BassChordTone.PASSING_TONE, "ghost"),
+            (1.5, BassChordTone.FIFTH, "normal"),
+            (2.5, BassChordTone.CHROMATIC_APPROACH, "normal"),
+        ],
+        note_durations=[0.5, 1.0, 1.0, 0.5],
+    ),
+    # --- Syncopated ---
+    BassPattern(
+        name="six_eight_synco_offbeat",
+        style=BassStyle.SYNCOPATED,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Root on 0, 5th enters on 2.0 — late-beat push before bar end",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (2.0, BassChordTone.FIFTH, "normal"),
+        ],
+        note_durations=[2.0, 1.0],
+    ),
+    BassPattern(
+        name="six_eight_synco_habanera",
+        style=BassStyle.SYNCOPATED,
+        energy="medium",
+        time_sig=(6, 8),
+        description="Compound habanera — root on 0, 5th on 1.0, ghost root on 2.5",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (1.0, BassChordTone.FIFTH, "normal"),
+            (2.5, BassChordTone.ROOT, "ghost"),
+        ],
+        note_durations=[1.0, 1.5, 0.5],
+    ),
+    BassPattern(
+        name="six_eight_synco_push",
+        style=BassStyle.SYNCOPATED,
+        energy="high",
+        time_sig=(6, 8),
+        description="Root on 0, pushed ghost on 0.5, re-entry on 2.0 — rhythmically restless",
+        notes=[
+            (0.0, BassChordTone.ROOT, "accent"),
+            (0.5, BassChordTone.ROOT, "ghost"),
+            (2.0, BassChordTone.FIFTH, "normal"),
+        ],
+        note_durations=[0.5, 1.5, 1.0],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -1086,6 +1282,8 @@ ALL_TEMPLATES: list[BassPattern] = [
     *TEMPLATES_4_4_REST_DOWNBEAT,
     # 3/4 (waltz)
     *TEMPLATES_3_4,
+    # 6/8 (compound duple)
+    *TEMPLATES_6_8,
     # 7/8
     *TEMPLATES_7_8,
     # 4/4 Drone / Pedal / Minimal

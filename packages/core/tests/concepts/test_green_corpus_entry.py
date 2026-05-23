@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,
 )

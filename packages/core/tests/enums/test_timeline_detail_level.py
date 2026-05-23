@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.biographical_timeline_detail_level import (
     BiographicalTimelineDetailLevel,
 )

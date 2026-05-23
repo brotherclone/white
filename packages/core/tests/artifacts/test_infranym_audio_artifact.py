@@ -9,6 +9,7 @@ import tempfile
 from unittest.mock import Mock
 
 import pytest
+
 from white_core.artifacts.infranym_audio_artifact import InfranymAudioArtifact
 from white_core.artifacts.infranym_voice_composition import InfranymVoiceComposition
 from white_core.artifacts.infranym_voice_layer import InfranymVoiceLayer

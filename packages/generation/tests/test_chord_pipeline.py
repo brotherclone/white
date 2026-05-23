@@ -108,6 +108,18 @@ class TestKeyParsing:
 
         assert parse_key_string("C") == ("C", "Major")
 
+    def test_modal_keys_map_to_major_or_minor(self):
+        from white_generation.pipelines.chord_pipeline import parse_key_string
+
+        assert parse_key_string("D dorian") == ("D", "Minor")
+        assert parse_key_string("E phrygian") == ("E", "Minor")
+        assert parse_key_string("A aeolian") == ("A", "Minor")
+        assert parse_key_string("B locrian") == ("B", "Minor")
+        assert parse_key_string("A harmonic_minor") == ("A", "Minor")
+        assert parse_key_string("D melodic_minor") == ("D", "Minor")
+        assert parse_key_string("G mixolydian") == ("G", "Major")
+        assert parse_key_string("F lydian") == ("F", "Major")
+
 
 # ---------------------------------------------------------------------------
 # 3.2: Composite scoring

@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from pydantic import ValidationError
+
 from white_core.music.rainbow_table.raindbow_audio_feature import (
     RainbowAudioFeature,
 )

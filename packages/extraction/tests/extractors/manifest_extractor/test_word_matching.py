@@ -3,6 +3,7 @@ Tests for word boundary matching utilities.
 """
 
 import pytest
+
 from white_extraction.extractors.manifest_extractor.word_matching import (
     calculate_coverage,
     calculate_density,

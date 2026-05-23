@@ -27,6 +27,7 @@ from pathlib import Path
 
 import mido
 import yaml
+
 from white_core.music.core.enharmonic import flat_to_sharp
 
 # ---------------------------------------------------------------------------

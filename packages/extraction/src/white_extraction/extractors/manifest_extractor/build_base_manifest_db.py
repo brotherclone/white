@@ -6,6 +6,7 @@ import polars as pl
 import yaml
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+
 from white_core.concepts.rainbow_table_color import (
     RainbowColorObjectionalMode,
     RainbowColorTemporalMode,
@@ -19,7 +20,6 @@ from white_core.manifests.manifest_track import ManifestTrack
 from white_core.music.core.key_signature import KeySignature
 from white_core.music.core.time_signature import TimeSignature
 from white_core.util.string_utils import format_date
-
 from white_extraction.extractors.manifest_extractor.concept_extraction_result import (
     ConceptExtractionResult,
 )

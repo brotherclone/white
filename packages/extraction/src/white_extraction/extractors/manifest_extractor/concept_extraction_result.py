@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from white_core.concepts.methodology_feature import MethodologyFeature
 from white_core.concepts.rebracketing_analysis import RebracketingAnalysis
 

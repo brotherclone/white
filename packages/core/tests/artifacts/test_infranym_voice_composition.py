@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.infranym_voice_composition import (
     InfranymVoiceComposition,
 )

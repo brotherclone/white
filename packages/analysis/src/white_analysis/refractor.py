@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+
 from white_core.concepts.chromatic_targets import (
     CHROMATIC_TARGETS as _CDM_CHROMATIC_TARGETS,
 )

@@ -8,6 +8,7 @@ and edge cases.
 import numpy as np
 import pytest
 import torch
+
 from white_training.core.multiclass_pipeline import LabelEncoder
 
 

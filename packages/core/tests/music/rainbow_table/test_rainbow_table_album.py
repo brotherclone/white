@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 from pydantic import ValidationError
+
 from white_core.music.rainbow_table.rainbow_table_album import RainbowTableAlbum
 
 

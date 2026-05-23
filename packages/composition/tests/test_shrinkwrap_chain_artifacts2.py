@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import pytest
+
 from white_composition import shrinkwrap_chain_artifacts as s
 
 

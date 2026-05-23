@@ -40,7 +40,6 @@ from white_generation.patterns.bass_patterns import (
     bass_theory_score,
     extract_root,
     kick_alignment,
-    make_fallback_pattern,
     resolve_tone,
     root_adherence,
     select_templates,
@@ -709,19 +708,20 @@ def run_bass_pipeline(
 
         templates = select_templates(ALL_TEMPLATES, time_sig, target_energy)
         if not templates:
-            print(
-                f"\n  ⚠️  WARNING: No bass templates exist for {time_sig[0]}/{time_sig[1]} time. "
-                f"Add templates to bass_patterns.py for this time signature. "
-                f"Falling back to root-on-1 only — results will be musically flat.\n"
+            raise ValueError(
+                f"No bass templates for {time_sig[0]}/{time_sig[1]} time. "
+                f"Add templates to bass_patterns.py."
             )
-            templates = [make_fallback_pattern(time_sig)]
 
         templates = [t for t in templates if t.name not in used_pattern_names]
         if not templates:
             # All available templates have been used in earlier sections — allow reuse.
             templates = select_templates(ALL_TEMPLATES, time_sig, target_energy)
             if not templates:
-                templates = [make_fallback_pattern(time_sig)]
+                raise ValueError(
+                    f"No bass templates for {time_sig[0]}/{time_sig[1]} time. "
+                    f"Add templates to bass_patterns.py."
+                )
             print(
                 f"  Templates: all unique patterns exhausted — reusing ({len(used_pattern_names)} prior sections)"
             )

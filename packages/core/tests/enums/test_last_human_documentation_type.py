@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.last_human_documentation_type import (
     LastHumanDocumentationType,
 )

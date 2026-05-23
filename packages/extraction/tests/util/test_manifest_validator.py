@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from white_extraction.util.manifest_validator import (
     validate_manifest_completeness,
     validate_yaml_file,

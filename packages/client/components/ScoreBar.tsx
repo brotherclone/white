@@ -1,10 +1,11 @@
 // web/components/ScoreBar.tsx
 interface Props {
-  value: number; // 0.0–1.0
+  value: number | undefined | null; // 0.0–1.0
   trackWidth?: string; // CSS width, default "6rem"
 }
 
 export default function ScoreBar({ value, trackWidth = "6rem" }: Props) {
+  if (value == null) return null;
   const pct = Math.max(0, Math.min(1, value));
   // Brand palette: green (high) → orange (mid) → red (low)
   const fillColor =

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+
 from white_core.concepts.rainbow_table_color import get_rainbow_table_color
 from white_core.manifests.manifest import Manifest
 from white_core.manifests.manifest_song_structure import ManifestSongStructure

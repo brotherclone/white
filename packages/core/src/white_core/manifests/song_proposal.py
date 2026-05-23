@@ -154,7 +154,10 @@ class SongProposalIteration(BaseModel):
     def normalize_key_flats(cls, v: str | KeySignature) -> str | KeySignature:
         """Convert flat note names (e.g. 'Bb') to enharmonic sharps (e.g. 'A#') and normalize mode tokens so KeySignature parsing accepts them."""
         if isinstance(v, KeySignature):
-            return v
+            # Serialize back to a clean string to prevent nested-dict YAML output
+            _acc_map = {"sharp": "#", "flat": "b"}
+            _acc = _acc_map.get(v.note.accidental, "") if v.note.accidental else ""
+            return f"{v.note.pitch_name}{_acc} {v.mode.name.value}"
         if not isinstance(v, str):
             return v
 
@@ -197,6 +200,8 @@ class SongProposalIteration(BaseModel):
                 "lydian": "lydian",
                 "mixolydian": "mixolydian",
                 "locrian": "locrian",
+                "harmonic_minor": "harmonic_minor",
+                "melodic_minor": "melodic_minor",
             }
             canonical = mode_map.get(first.lower(), first.lower())
             normalized = f"{note} {canonical}{(' ' + tail) if tail else ''}"

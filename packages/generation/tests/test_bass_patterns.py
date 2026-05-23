@@ -306,14 +306,15 @@ class TestTemplateSelection:
         result = select_templates(ALL_TEMPLATES, (5, 4), "medium")
         assert len(result) == 0
 
-    def test_fallback_pattern(self):
-        from white_generation.patterns.bass_patterns import make_fallback_pattern
+    def test_6_8_templates_exist(self):
+        from white_generation.patterns.bass_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
 
-        fb = make_fallback_pattern((5, 4))
-        assert fb.time_sig == (5, 4)
-        assert fb.style == "root"
-        assert len(fb.notes) == 1
-        assert fb.notes[0][1] == "root"
+        results = select_templates(ALL_TEMPLATES, (6, 8), "medium")
+        assert len(results) > 0
+        assert all(t.time_sig == (6, 8) for t in results)
 
     def test_exact_energy_first(self):
         from white_generation.patterns.bass_patterns import (

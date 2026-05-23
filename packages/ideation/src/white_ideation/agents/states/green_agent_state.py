@@ -1,6 +1,7 @@
 from typing import Annotated, Optional
 
 from pydantic import Field
+
 from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
 from white_core.artifacts.last_human_artifact import LastHumanArtifact

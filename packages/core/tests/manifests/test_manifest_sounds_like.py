@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.manifests.manifest_sounds_like import ManifestSoundsLike
 
 

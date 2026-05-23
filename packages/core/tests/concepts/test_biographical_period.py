@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from pydantic import ValidationError
+
 from white_core.concepts.biographical_event import BiographicalEvent
 from white_core.concepts.biographical_period import BiographicalPeriod
 from white_core.enums.biographical_timeline_detail_level import (

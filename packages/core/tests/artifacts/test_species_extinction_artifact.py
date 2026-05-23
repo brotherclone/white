@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.base_artifact import ChainArtifact
 from white_core.artifacts.species_extinction_artifact import (
     SpeciesExtinctionArtifact,

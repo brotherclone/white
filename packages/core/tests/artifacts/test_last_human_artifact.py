@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.base_artifact import ChainArtifact
 from white_core.artifacts.last_human_artifact import LastHumanArtifact
 from white_core.enums.last_human_documentation_type import (

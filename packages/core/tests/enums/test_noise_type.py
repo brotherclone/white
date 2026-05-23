@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.noise_type import NoiseType
 
 EXPECTED = {

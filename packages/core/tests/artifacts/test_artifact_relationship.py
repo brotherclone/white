@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from white_core.artifacts.artifact_relationship import ArtifactRelationship
 
 

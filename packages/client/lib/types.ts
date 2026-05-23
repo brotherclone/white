@@ -81,7 +81,7 @@ export interface LyricsResponse {
 }
 
 export interface Scores {
-  composite: number;
+  composite?: number;
   theory?: Record<string, number>;
   theory_total?: number;
   chromatic?: {

@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.image_text_style import ImageTextStyle
 
 EXPECTED = {

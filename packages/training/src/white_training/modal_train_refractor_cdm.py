@@ -33,6 +33,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import modal
+
 from white_core.concepts.chromatic_targets import CHROMATIC_TARGETS
 
 app = modal.App("white-refractor-cdm")

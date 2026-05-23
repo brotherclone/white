@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+
 from white_core.manifests.manifest_song_structure import ManifestSongStructure
 from white_core.music.core.duration import Duration
 from white_extraction.util.timestamp_audio_extractor import (

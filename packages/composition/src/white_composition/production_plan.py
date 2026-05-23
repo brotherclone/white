@@ -364,7 +364,7 @@ def load_song_proposal(proposal_path: Path) -> dict:
         "title": str(raw.get("title", "")),
         "bpm": int(raw.get("bpm", 120)),
         "time_sig": time_sig,
-        "key": str(raw.get("key", "")),
+        "key": _key_raw_to_string(raw.get("key", "")),
         "color": str(color),
         "genres": raw.get("genres") or [],
         "mood": raw.get("mood") or [],
@@ -414,7 +414,7 @@ def load_song_proposal_unified(
         color = str(color_raw or "")
 
     # Key — return both combined string and parsed components
-    key_str = str(raw.get("key", "C major"))
+    key_str = _key_raw_to_string(raw.get("key", "C major"))
     key_root, mode = _parse_key_components(key_str)
 
     # Concept — song proposal first; manifest.yml fallback if thread_dir provided
@@ -446,11 +446,59 @@ def load_song_proposal_unified(
     }
 
 
+_ALL_MODES = {
+    "major",
+    "minor",
+    "dorian",
+    "phrygian",
+    "lydian",
+    "mixolydian",
+    "aeolian",
+    "locrian",
+    "harmonic_minor",
+    "melodic_minor",
+}
+_MINOR_MODES = {
+    "minor",
+    "aeolian",
+    "dorian",
+    "phrygian",
+    "locrian",
+    "harmonic_minor",
+    "melodic_minor",
+}
+
+
+def _key_raw_to_string(key_raw) -> str:
+    """Normalize a raw key field (string or nested dict) to a clean key string.
+
+    Handles the nested-dict format produced when a KeySignature object is
+    serialized to YAML without first being converted to a string.
+    """
+    if isinstance(key_raw, dict):
+        note = key_raw.get("note", {})
+        mode = key_raw.get("mode", {})
+        pitch = note.get("pitch_name", "C") if isinstance(note, dict) else "C"
+        acc = note.get("accidental") if isinstance(note, dict) else None
+        mode_name = mode.get("name", "major") if isinstance(mode, dict) else "major"
+        acc_map = {"sharp": "#", "flat": "b"}
+        acc_str = acc_map.get(acc, "") if acc else ""
+        return f"{pitch}{acc_str} {mode_name}"
+    return str(key_raw or "C major")
+
+
 def _parse_key_components(key_str: str) -> tuple[str, str]:
-    """Parse a key string like 'F# minor' into (root, mode) components."""
-    parts = key_str.strip().rsplit(" ", 1)
-    if len(parts) == 2 and parts[1].lower() in ("minor", "major"):
-        return parts[0], parts[1].capitalize()
+    """Parse a key string like 'F# minor' or 'D dorian' into (root, mode).
+
+    Mode is returned as 'Major' or 'Minor' for chord-database compatibility.
+    """
+    tokens = key_str.strip().split()
+    if len(tokens) >= 2:
+        root = tokens[0]
+        mode = "_".join(tokens[1:]).lower()  # "harmonic minor" → "harmonic_minor"
+        if mode in _ALL_MODES:
+            quality = "Minor" if mode in _MINOR_MODES else "Major"
+            return root, quality
     return key_str, "Major"
 
 

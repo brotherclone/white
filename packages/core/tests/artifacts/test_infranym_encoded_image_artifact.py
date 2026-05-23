@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pytest
 from PIL import Image
+
 from white_core.artifacts.infranym_encoded_image_artifact import (
     InfranymEncodedImageArtifact,
 )

@@ -1,6 +1,7 @@
 from typing import Annotated, Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
+
 from white_core.agents.base_rainbow_agent_state import dedupe_artifacts
 from white_core.artifacts.artifact_relationship import ArtifactRelationship
 from white_core.concepts.facet_evolution import FacetEvolution

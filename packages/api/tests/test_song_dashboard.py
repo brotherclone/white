@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import yaml
+
 from white_api.song_dashboard import (
     STATUS_APPROVED,
     STATUS_NO_CANDIDATES,

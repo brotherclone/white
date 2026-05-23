@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.infranym_voice_profile import InfranymVoiceProfile
 
 EXPECTED = {

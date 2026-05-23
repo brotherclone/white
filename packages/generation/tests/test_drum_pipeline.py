@@ -127,15 +127,15 @@ class TestDrumPatternTemplates:
         )
         assert p_3_4.bar_length_beats() == 3.0
 
-    def test_fallback_pattern(self):
-        from white_generation.patterns.drum_patterns import make_fallback_pattern
+    def test_6_8_templates_exist(self):
+        from white_generation.patterns.drum_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
 
-        fb = make_fallback_pattern((5, 4))
-        assert fb.time_sig == (5, 4)
-        assert fb.genre_family == "fallback"
-        assert "kick" in fb.voices
-        assert len(fb.voices["kick"]) == 1
-        assert fb.voices["kick"][0][0] == 0
+        results = select_templates(ALL_TEMPLATES, (6, 8), ["ambient"], "medium")
+        assert len(results) > 0
+        assert all(t.time_sig == (6, 8) for t in results)
 
 
 # ---------------------------------------------------------------------------

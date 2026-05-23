@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.symbolic_object_category import SymbolicObjectCategory
 
 EXPECTED = {

@@ -1,6 +1,7 @@
 import os
 
 from PIL import Image
+
 from white_core.artifacts.infranym_text_render_artifact import (
     InfranymTextRenderArtifact,
 )

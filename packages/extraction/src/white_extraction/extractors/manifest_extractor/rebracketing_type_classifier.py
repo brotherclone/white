@@ -15,6 +15,9 @@ If tie or no matches, defaults to TEMPORAL.
 import random
 
 from white_core.enums.rebracketing_analysis_type import RebracketingAnalysisType
+from white_extraction.extractors.manifest_extractor.word_matching import (
+    count_word_matches,
+)
 from white_ideation.reference.rebracketing_words.causal_words import CAUSAL_WORDS
 from white_ideation.reference.rebracketing_words.experiential_words import (
     EXPERIENTIAL_WORDS,
@@ -23,10 +26,6 @@ from white_ideation.reference.rebracketing_words.perceptual_words import (
     PERCEPTUAL_WORDS,
 )
 from white_ideation.reference.rebracketing_words.spatial_words import SPATIAL_WORDS
-
-from white_extraction.extractors.manifest_extractor.word_matching import (
-    count_word_matches,
-)
 
 
 def classify_by_domain(text: str) -> RebracketingAnalysisType:

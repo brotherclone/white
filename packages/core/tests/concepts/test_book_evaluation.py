@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.concepts.book_evaluation import BookEvaluationDecision
 
 

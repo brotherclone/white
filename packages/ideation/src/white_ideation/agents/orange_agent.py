@@ -14,6 +14,7 @@ from langchain_core.messages import HumanMessage
 from langgraph.constants import START
 from langgraph.graph.state import StateGraph
 from pydantic import Field
+
 from white_core.agents.agent_settings import AgentSettings
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.artifacts.newspaper_artifact import NewspaperArtifact
@@ -23,7 +24,6 @@ from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
 from white_core.enums.symbolic_object_category import SymbolicObjectCategory
 from white_core.manifests.song_proposal import SongProposalIteration
 from white_extraction.util.manifest_loader import get_my_reference_proposals
-
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.orange_agent_state import OrangeAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState

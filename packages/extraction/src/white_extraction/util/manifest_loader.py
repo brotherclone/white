@@ -4,6 +4,7 @@ from typing import Any, List, Sequence
 
 import yaml
 from dotenv import load_dotenv
+
 from white_core.manifests.manifest import Manifest
 from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
 

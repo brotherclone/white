@@ -392,14 +392,15 @@ class TestTemplateSelection:
         results = select_templates(ALL_TEMPLATES, (5, 4), "medium")
         assert len(results) == 0
 
-    def test_fallback_pattern(self):
-        from white_generation.patterns.melody_patterns import make_fallback_pattern
+    def test_6_8_lead_templates_exist(self):
+        from white_generation.patterns.melody_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
 
-        fb = make_fallback_pattern((5, 4))
-        assert fb.time_sig == (5, 4)
-        assert fb.contour == "repeated"
-        assert len(fb.intervals) == 1
-        assert fb.intervals[0] == 0
+        results = select_templates(ALL_TEMPLATES, (6, 8), "medium", use_case="lead")
+        assert len(results) > 0
+        assert all(t.time_sig == (6, 8) for t in results)
 
 
 # ---------------------------------------------------------------------------

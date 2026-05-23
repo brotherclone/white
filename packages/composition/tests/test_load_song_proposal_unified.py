@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from white_composition.init_production import write_initial_proposal
 from white_composition.production_plan import load_song_proposal_unified
 

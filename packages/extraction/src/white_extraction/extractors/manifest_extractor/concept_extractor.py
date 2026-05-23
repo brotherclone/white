@@ -7,10 +7,10 @@ Returns ConceptExtractionResult with no redundancy.
 from typing import Optional
 
 from pydantic import BaseModel, Field
+
 from white_core.concepts.methodology_feature import MethodologyFeature
 from white_core.concepts.rainbow_table_color import get_rainbow_table_color
 from white_core.concepts.rebracketing_analysis import RebracketingAnalysis
-
 from white_extraction.extractors.manifest_extractor.concept_extraction_result import (
     ConceptExtractionResult,
 )
