@@ -492,10 +492,13 @@ def _parse_key_components(key_str: str) -> tuple[str, str]:
 
     Mode is returned as 'Major' or 'Minor' for chord-database compatibility.
     """
-    parts = key_str.strip().rsplit(" ", 1)
-    if len(parts) == 2 and parts[1].lower() in _ALL_MODES:
-        quality = "Minor" if parts[1].lower() in _MINOR_MODES else "Major"
-        return parts[0], quality
+    tokens = key_str.strip().split()
+    if len(tokens) >= 2:
+        root = tokens[0]
+        mode = "_".join(tokens[1:]).lower()  # "harmonic minor" → "harmonic_minor"
+        if mode in _ALL_MODES:
+            quality = "Minor" if mode in _MINOR_MODES else "Major"
+            return root, quality
     return key_str, "Major"
 
 

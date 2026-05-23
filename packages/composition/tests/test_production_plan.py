@@ -13,6 +13,7 @@ from white_composition.production_plan import (
     PlanSection,
     ProductionPlan,
     _infer_arc_from_label,
+    _parse_key_components,
     bootstrap_manifest,
     build_next_section_map,
     derive_bar_count,
@@ -985,3 +986,28 @@ class TestArcGenerateAndSync:
 
         refreshed = refresh_plan(prod)
         assert refreshed.sections[0].arc == pytest.approx(0.99)
+
+
+class TestParseKeyComponents:
+    def test_simple_minor(self):
+        assert _parse_key_components("F# minor") == ("F#", "Minor")
+
+    def test_simple_major(self):
+        assert _parse_key_components("D major") == ("D", "Major")
+
+    def test_modal(self):
+        # dorian is in _MINOR_MODES
+        assert _parse_key_components("D dorian") == ("D", "Minor")
+        # lydian is not in _MINOR_MODES
+        assert _parse_key_components("C lydian") == ("C", "Major")
+
+    def test_multi_word_harmonic_minor(self):
+        # rsplit-based split would give root="A harmonic", mode="minor" — wrong
+        assert _parse_key_components("A harmonic minor") == ("A", "Minor")
+
+    def test_multi_word_melodic_minor(self):
+        assert _parse_key_components("B melodic minor") == ("B", "Minor")
+
+    def test_unknown_mode_falls_back(self):
+        root, quality = _parse_key_components("C# mystery scale")
+        assert quality == "Major"
