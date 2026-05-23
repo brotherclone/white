@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.extinction_cause import ExtinctionCause
 
 EXPECTED = {

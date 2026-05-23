@@ -1,4 +1,5 @@
 import pytest
+
 from white_core.music.core.key_signature import (
     KeySignature,
     Mode,

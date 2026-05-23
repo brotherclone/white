@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.chain_artifact_type import ChainArtifactType
 
 EXPECTED = {

@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.rebracketing_analysis_type import RebracketingAnalysisType
 
 EXPECTED = {

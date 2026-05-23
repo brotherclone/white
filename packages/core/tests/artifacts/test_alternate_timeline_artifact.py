@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.alternate_timeline_artifact import (
     AlternateTimelineArtifact,
 )

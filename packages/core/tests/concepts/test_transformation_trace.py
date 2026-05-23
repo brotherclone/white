@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from white_core.concepts.transformation_trace import TransformationTrace
 
 

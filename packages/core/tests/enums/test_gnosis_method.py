@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.gnosis_method import GnosisMethod
 
 EXPECTED = {

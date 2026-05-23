@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.pulsar_palace_encounter_artifact import (
     PulsarPalaceEncounterArtifact,
 )

@@ -1,4 +1,5 @@
 import pytest
+
 from white_core.music.core.lyric import LyricFile, LyricPair
 
 

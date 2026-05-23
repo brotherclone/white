@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.music.core.notes import Note
 
 

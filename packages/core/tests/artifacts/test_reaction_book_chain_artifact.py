@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.reaction_book_artifact import (
     ReactionBookChainArtifact,
 )

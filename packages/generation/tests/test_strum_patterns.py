@@ -6,6 +6,7 @@ from pathlib import Path
 import mido
 import pytest
 import yaml
+
 from white_generation.patterns.strum_patterns import (
     PATTERNS_4_4,
     PATTERNS_7_8,

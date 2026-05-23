@@ -5,12 +5,14 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import numpy as np
+
 from white_core.enums.bass_chord_tone import BassChordTone
 from white_core.enums.bass_style import BassStyle
 from white_generation.patterns.bass_patterns import BassPattern
 from white_generation.patterns.drum_patterns import DrumPattern
 from white_generation.patterns.melody_patterns import MelodyPattern
 from white_generation.patterns.pattern_evolution import (
+    _base_name,
     _crossover_bass,
     _crossover_drums,
     _crossover_melody,
@@ -183,6 +185,21 @@ class TestDrumCrossover:
     def test_name_contains_parents(self):
         child = _crossover_drums(_make_drum("parent_a"), _make_drum("parent_b"))
         assert "parent_a" in child.name or "parent_b" in child.name
+
+    def test_name_does_not_grow_across_generations(self):
+        """Evolved name length must not explode exponentially over generations."""
+        child = _make_drum("fallback_minimal")
+        for _ in range(8):
+            child = _crossover_drums(child, child)
+        assert len(child.name) < 100, f"Name grew too long: {child.name!r}"
+
+    def test_base_name_strips_prefix_and_lineage(self):
+        assert _base_name("fallback_minimal") == "fallback_minimal"
+        assert _base_name("evolved_fallback_minimal") == "fallback_minimal"
+        assert (
+            _base_name("evolved_fallback_minimalxsparse_ambient") == "fallback_minimal"
+        )
+        assert _base_name("evolved_evolved_motorik") == "motorik"
 
 
 class TestDrumMutation:

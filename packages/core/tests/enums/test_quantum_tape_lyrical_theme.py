@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.quantum_tape_lyrical_theme import QuantumTapeLyricalTheme
 
 EXPECTED = {

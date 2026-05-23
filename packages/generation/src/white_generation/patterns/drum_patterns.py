@@ -1503,24 +1503,6 @@ TEMPLATES_7_8_ROCK = [
 # ---------------------------------------------------------------------------
 
 
-def make_fallback_pattern(time_sig: tuple[int, int]) -> DrumPattern:
-    """Generate a minimal fallback pattern for unsupported time signatures.
-
-    Kick on beat 1, that's it.
-    """
-    num, den = time_sig
-    return DrumPattern(
-        name="fallback_minimal",
-        genre_family="fallback",
-        energy="medium",
-        time_sig=time_sig,
-        description=f"Fallback minimal — kick on 1 for {num}/{den}",
-        voices={
-            "kick": [(0, "normal")],
-        },
-    )
-
-
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # 3/4 Americana
@@ -1618,6 +1600,115 @@ TEMPLATES_3_4_EXPERIMENTAL = [
             "snare": [(1, "ghost")],
             "clap": [(2, "accent")],
             "tom_high": [(0.5, "ghost"), (2.5, "ghost")],
+        },
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 3/4 Folk
+# ---------------------------------------------------------------------------
+# 3/4 = 3 quarter-note beats. Beat 1 is the strong downbeat; 2 and 3 are light.
+# Folk waltz feel: brushes, sparse kick, tasteful snare.
+
+TEMPLATES_3_4_FOLK = [
+    DrumPattern(
+        name="folk_3_4_brushes",
+        genre_family="folk",
+        energy="low",
+        time_sig=(3, 4),
+        description="Folk waltz brushes — ghost snare swishes on all three beats, kick on 1",
+        voices={
+            "kick": [(0, "normal")],
+            "snare": [(0, "ghost"), (1, "ghost"), (2, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="folk_3_4_waltz",
+        genre_family="folk",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Folk waltz — kick on 1, snare on 2 and 3, no hats",
+        voices={
+            "kick": [(0, "accent")],
+            "snare": [(1, "normal"), (2, "normal")],
+        },
+    ),
+    DrumPattern(
+        name="folk_3_4_stomp",
+        genre_family="folk",
+        energy="high",
+        time_sig=(3, 4),
+        description="Folk waltz stomp — accented kick on 1, snare accent on 2 and 3, tambourine eighths",
+        voices={
+            "kick": [(0, "accent")],
+            "snare": [(1, "accent"), (2, "accent")],
+            "tambourine": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1, "normal"),
+                (1.5, "ghost"),
+                (2, "normal"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# 3/4 Rock
+# ---------------------------------------------------------------------------
+# Rock waltz: stronger kick and snare than folk, hats more prominent.
+
+TEMPLATES_3_4_ROCK = [
+    DrumPattern(
+        name="rock_3_4_sparse",
+        genre_family="rock",
+        energy="low",
+        time_sig=(3, 4),
+        description="Rock waltz sparse — kick on 1, ghost snare on 2",
+        voices={
+            "kick": [(0, "normal")],
+            "snare": [(1, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="rock_3_4_waltz",
+        genre_family="rock",
+        energy="medium",
+        time_sig=(3, 4),
+        description="Rock waltz — kick on 1, snare on 2 and 3, closed hat on eighths",
+        voices={
+            "kick": [(0, "accent")],
+            "snare": [(1, "normal"), (2, "normal")],
+            "hh_closed": [
+                (0, "ghost"),
+                (0.5, "ghost"),
+                (1, "ghost"),
+                (1.5, "ghost"),
+                (2, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="rock_3_4_driving",
+        genre_family="rock",
+        energy="high",
+        time_sig=(3, 4),
+        description="Driving rock waltz — kick on 1 and 1.5, snare accent on 2 and 3, open hat on offbeats",
+        voices={
+            "kick": [(0, "accent"), (1.5, "normal")],
+            "snare": [(1, "accent"), (2, "accent")],
+            "hh_closed": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1, "normal"),
+                (1.5, "ghost"),
+                (2, "normal"),
+                (2.5, "ghost"),
+            ],
+            "hh_open": [(0.5, "normal"), (2.5, "normal")],
         },
     ),
 ]
@@ -2140,6 +2231,379 @@ TEMPLATES_4_4_SPARSE = [
 ]
 
 # ---------------------------------------------------------------------------
+# 6/8 patterns
+#
+# Beat positions are in quarter-note beats (bar = 3.0 beats total).
+# The six eighth-note positions are: 0.0  0.5  1.0  1.5  2.0  2.5
+# Compound feel: [0.0–1.0) = group 1 (strong), [1.5–2.5] = group 2 (secondary).
+# ---------------------------------------------------------------------------
+
+TEMPLATES_6_8_AMBIENT = [
+    DrumPattern(
+        name="ambient_6_8_breath",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(6, 8),
+        description="Two-beat breath — soft kick on compound beats 1 and 2, nothing else",
+        voices={
+            "kick": [(0.0, "normal"), (1.5, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_suspended",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(6, 8),
+        description="Suspended — kick on 1, ghost hats on triplet end-beats",
+        voices={
+            "kick": [(0.0, "ghost")],
+            "hh_closed": [(1.0, "ghost"), (2.5, "ghost")],
+        },
+        tags=["sparse", "hazy"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_heartbeat",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(6, 8),
+        description="Heartbeat — soft double kick at bar start, long silence",
+        voices={
+            "kick": [(0.0, "ghost"), (0.25, "ghost")],
+        },
+        tags=["sparse", "lamentful"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_ghost_stream",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(6, 8),
+        description="Ghost stream — continuous ghost hats on all six eighth notes, no kick",
+        voices={
+            "hh_closed": [
+                (0.0, "ghost"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+        tags=["sparse", "hazy"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_pulse",
+        genre_family="ambient",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Gentle pulse — kick on compound beats, ghost hats on off-eighths",
+        voices={
+            "kick": [(0.0, "normal"), (1.5, "ghost")],
+            "hh_closed": [
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_swell",
+        genre_family="ambient",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Swell — kick on 1, ghost hat stream across bar, open hat on final eighth",
+        voices={
+            "kick": [(0.0, "normal")],
+            "hh_closed": [
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+            ],
+            "hh_open": [(2.5, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_rimshot_drift",
+        genre_family="ambient",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Rimshot drift — ghost rimshots on weak eighths, kick on 1",
+        voices={
+            "kick": [(0.0, "normal")],
+            "rimshot": [(0.5, "ghost"), (1.0, "ghost"), (2.0, "ghost"), (2.5, "ghost")],
+        },
+        tags=["sparse", "hazy"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_ride_float",
+        genre_family="ambient",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Ride float — ghost ride on compound beats, kick on 1, pedal hat",
+        voices={
+            "kick": [(0.0, "ghost")],
+            "ride": [(0.0, "ghost"), (1.5, "ghost")],
+            "hh_pedal": [(1.5, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="ambient_6_8_build",
+        genre_family="ambient",
+        energy="high",
+        time_sig=(6, 8),
+        description="Ambient build — kick compound beats, rimshot on mid-triplet beats, open hats",
+        voices={
+            "kick": [(0.0, "accent"), (1.5, "normal")],
+            "rimshot": [(1.0, "normal"), (2.5, "normal")],
+            "hh_open": [(0.5, "ghost"), (2.0, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="ambient_6_8_crash_fade",
+        genre_family="ambient",
+        energy="high",
+        time_sig=(6, 8),
+        description="Crash fade — cymbal crash on 1, sparse rimshot on compound beat 2, ghost hats",
+        voices={
+            "kick": [(0.0, "accent")],
+            "crash": [(0.0, "normal")],
+            "rimshot": [(1.5, "ghost")],
+            "hh_closed": [
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+]
+
+TEMPLATES_6_8_FOLK = [
+    DrumPattern(
+        name="folk_6_8_lilt",
+        genre_family="folk",
+        energy="low",
+        time_sig=(6, 8),
+        description="Lilting 6/8 — kick on compound beats, ghost snare on triplet tail beats",
+        voices={
+            "kick": [(0.0, "normal"), (1.5, "ghost")],
+            "snare": [(1.0, "ghost"), (2.5, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="folk_6_8_brushed",
+        genre_family="folk",
+        energy="low",
+        time_sig=(6, 8),
+        description="Brushed 6/8 — ghost snare swishes on all six eighth notes, kick on 1",
+        voices={
+            "kick": [(0.0, "ghost")],
+            "snare": [
+                (0.0, "ghost"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="folk_6_8_jig",
+        genre_family="folk",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Jig feel — kick on compound beats, snare on triplet tails, hats on eighths",
+        voices={
+            "kick": [(0.0, "normal"), (1.5, "ghost")],
+            "snare": [(1.0, "normal"), (2.5, "normal")],
+            "hh_closed": [
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="folk_6_8_tambourine",
+        genre_family="folk",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Tambourine 6/8 — tambourine on all eighths, kick on compound beats",
+        voices={
+            "kick": [(0.0, "normal"), (1.5, "ghost")],
+            "tambourine": [
+                (0.0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "normal"),
+                (1.5, "ghost"),
+                (2.0, "normal"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="folk_6_8_stomp",
+        genre_family="folk",
+        energy="high",
+        time_sig=(6, 8),
+        description="Folk stomp — heavy kick on both compound beats, accent snare on triplet tails",
+        voices={
+            "kick": [(0.0, "accent"), (1.5, "normal")],
+            "snare": [(1.0, "accent"), (2.5, "accent")],
+            "hh_closed": [
+                (0.0, "ghost"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="folk_6_8_driving",
+        genre_family="folk",
+        energy="high",
+        time_sig=(6, 8),
+        description="Driving 6/8 — kick + snare on compound beats, tambourine fills all eighths",
+        voices={
+            "kick": [(0.0, "accent"), (1.5, "normal")],
+            "snare": [(1.0, "accent"), (2.5, "accent")],
+            "tambourine": [
+                (0.0, "normal"),
+                (0.5, "normal"),
+                (1.0, "normal"),
+                (1.5, "normal"),
+                (2.0, "normal"),
+                (2.5, "normal"),
+            ],
+        },
+    ),
+]
+
+TEMPLATES_6_8_EXPERIMENTAL = [
+    DrumPattern(
+        name="experimental_6_8_sparse",
+        genre_family="experimental",
+        energy="low",
+        time_sig=(6, 8),
+        description="Sparse event — kick on 1, open hat late in bar, long decay",
+        voices={
+            "kick": [(0.0, "ghost")],
+            "hh_open": [(2.0, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="experimental_6_8_displaced",
+        genre_family="experimental",
+        energy="low",
+        time_sig=(6, 8),
+        description="Displaced — kick off the compound beat at 0.5, hats on odd positions",
+        voices={
+            "kick": [(0.5, "ghost")],
+            "hh_closed": [(0.0, "ghost"), (1.5, "ghost")],
+        },
+        tags=["sparse", "hazy"],
+    ),
+    DrumPattern(
+        name="experimental_6_8_asymmetric",
+        genre_family="experimental",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Asymmetric — kick on 1 and displaced inner eighth, snare and hat off expected grid",
+        voices={
+            "kick": [(0.0, "normal"), (1.0, "ghost")],
+            "snare": [(2.0, "ghost")],
+            "hh_closed": [(0.5, "ghost"), (2.5, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="experimental_6_8_pulse",
+        genre_family="experimental",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Experimental pulse — clap on compound beats, ghost hats throughout",
+        voices={
+            "clap": [(0.0, "ghost"), (1.5, "ghost")],
+            "hh_closed": [
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+        tags=["hazy"],
+    ),
+]
+
+TEMPLATES_6_8_ELECTRONIC = [
+    DrumPattern(
+        name="electronic_6_8_minimal",
+        genre_family="electronic",
+        energy="low",
+        time_sig=(6, 8),
+        description="Minimal electronic 6/8 — kick on compound beats, closed hat on off-eighths",
+        voices={
+            "kick": [(0.0, "normal"), (1.5, "ghost")],
+            "hh_closed": [(0.5, "ghost"), (2.0, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="electronic_6_8_drift",
+        genre_family="electronic",
+        energy="low",
+        time_sig=(6, 8),
+        description="Electronic drift — ghost kick on 1, open hat decay mid-bar, no snare",
+        voices={
+            "kick": [(0.0, "ghost")],
+            "hh_open": [(1.0, "ghost")],
+            "hh_pedal": [(2.5, "ghost")],
+        },
+        tags=["sparse", "hazy"],
+    ),
+    DrumPattern(
+        name="electronic_6_8_compound",
+        genre_family="electronic",
+        energy="medium",
+        time_sig=(6, 8),
+        description="Electronic compound — kick compound beats, clap on triplet tails, hat stream",
+        voices={
+            "kick": [(0.0, "normal"), (1.5, "ghost")],
+            "clap": [(1.0, "ghost"), (2.5, "ghost")],
+            "hh_closed": [
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (2.0, "ghost"),
+                (2.5, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="electronic_6_8_pulse",
+        genre_family="electronic",
+        energy="medium",
+        time_sig=(6, 8),
+        description="IDM pulse — kick on all three inner beats, rimshot displaced, hats on off-sixteenths",
+        voices={
+            "kick": [(0.0, "normal"), (1.0, "ghost"), (2.0, "ghost")],
+            "rimshot": [(1.5, "ghost")],
+            "hh_closed": [(0.5, "ghost"), (2.5, "ghost")],
+        },
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -2153,6 +2617,11 @@ ALL_TEMPLATES: list[DrumPattern] = [
     *TEMPLATES_4_4_EXPERIMENTAL,
     *TEMPLATES_4_4_FOLK,
     *TEMPLATES_4_4_JAZZ,
+    # 6/8
+    *TEMPLATES_6_8_AMBIENT,
+    *TEMPLATES_6_8_FOLK,
+    *TEMPLATES_6_8_EXPERIMENTAL,
+    *TEMPLATES_6_8_ELECTRONIC,
     # 7/8
     *TEMPLATES_7_8_AMBIENT,
     *TEMPLATES_7_8_ELECTRONIC,
@@ -2161,6 +2630,8 @@ ALL_TEMPLATES: list[DrumPattern] = [
     # 3/4
     *TEMPLATES_3_4_AMERICANA,
     *TEMPLATES_3_4_EXPERIMENTAL,
+    *TEMPLATES_3_4_FOLK,
+    *TEMPLATES_3_4_ROCK,
     # 4/4 Breakbeat
     *TEMPLATES_4_4_BREAKBEAT,
     # 4/4 Sparse / Atmospheric

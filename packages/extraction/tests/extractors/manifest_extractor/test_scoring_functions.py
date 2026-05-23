@@ -10,6 +10,7 @@ calculator. Each class targets one function and tests:
 """
 
 import pytest
+
 from white_extraction.extractors.manifest_extractor.scoring_functions import (
     calculate_basic_text_features,
     check_has_rebracketing_markers,

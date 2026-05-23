@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.concepts.alternate_life_detail import AlternateLifeDetail
 
 

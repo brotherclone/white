@@ -1,5 +1,6 @@
 import pytest
 from pydantic import BaseModel, ValidationError
+
 from white_core.concepts.last_human_species_extinction_parallel_moment import (
     LastHumanSpeciesExtinctionParallelMoment,
 )

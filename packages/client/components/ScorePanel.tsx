@@ -28,7 +28,7 @@ export default function ScorePanel({ scores }: { scores: Scores }) {
 
   return (
     <div className="space-y-1.5 py-2">
-      <Row label="composite" value={scores.composite} />
+      {scores.composite != null && <Row label="composite" value={scores.composite} />}
       {theoryTotal !== null && <Row label="theory (mean)" value={theoryTotal} />}
       {Object.entries(theory).map(([k, v]) => (
         <Row key={k} label={`  ${k.replace(/_/g, " ")}`} value={v} />

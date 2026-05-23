@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.temporal_relatioship import TemporalRelationship
 
 EXPECTED = {

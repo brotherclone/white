@@ -1,4 +1,5 @@
 import pytest
+
 from white_core.manifests.manifest import Manifest
 from white_core.music.core.key_signature import KeySignature
 from white_core.music.core.time_signature import TimeSignature

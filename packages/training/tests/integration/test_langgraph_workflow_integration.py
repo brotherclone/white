@@ -14,6 +14,7 @@ from typing import List, Literal, Optional
 
 import pytest
 from langgraph.graph import END, StateGraph
+
 from white_training.validation.concept_validator import (
     ConceptValidator,
     ValidationResult,

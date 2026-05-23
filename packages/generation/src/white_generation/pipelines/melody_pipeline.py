@@ -42,7 +42,6 @@ from white_generation.patterns.melody_patterns import (
     chord_tone_alignment,
     contour_quality,
     infer_singer,
-    make_fallback_pattern,
     melody_theory_score,
     resolve_melody_notes,
     select_templates,
@@ -689,12 +688,10 @@ def run_melody_pipeline(
             ALL_TEMPLATES, time_sig, target_energy, use_case=template_use_case
         )
         if not templates:
-            print(
-                f"\n  ⚠️  WARNING: No melody templates exist for {time_sig[0]}/{time_sig[1]} time. "
-                f"Add templates to melody_patterns.py for this time signature. "
-                f"Falling back to repeated root — results will be musically flat.\n"
+            raise ValueError(
+                f"No melody templates for {time_sig[0]}/{time_sig[1]} time (use_case={template_use_case}). "
+                f"Add templates to melody_patterns.py."
             )
-            templates = [make_fallback_pattern(time_sig)]
 
         print(
             f"  Templates: {len(templates)} candidates (energy target: {target_energy})"

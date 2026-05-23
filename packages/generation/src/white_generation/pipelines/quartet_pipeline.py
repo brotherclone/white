@@ -644,8 +644,9 @@ def _generate_cello_voice(
 
     templates = select_bass_templates(ALL_BASS_TEMPLATES, time_sig, energy)
     if not templates:
-        templates = [t for t in ALL_BASS_TEMPLATES if t.time_sig == time_sig] or list(
-            ALL_BASS_TEMPLATES
+        raise ValueError(
+            f"No cello/bass templates for {time_sig[0]}/{time_sig[1]} time. "
+            f"Add templates to bass_patterns.py."
         )
 
     pattern: BassPattern = rng.choice(templates)

@@ -1,5 +1,6 @@
 import pytest
 from pydantic import BaseModel
+
 from white_core.concepts.vanity_persona import VanityPersona
 from white_core.enums.vanity_interviewer_type import VanityInterviewerType
 

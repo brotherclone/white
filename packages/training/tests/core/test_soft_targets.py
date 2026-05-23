@@ -349,6 +349,7 @@ class TestGenerateFromDataFrame:
     def test_basic_dataframe_generation(self):
         """Test generation from pandas DataFrame."""
         import pandas as pd
+
         from white_training.core.soft_targets import (
             generate_soft_targets_from_dataframe,
         )
@@ -371,6 +372,7 @@ class TestGenerateFromDataFrame:
     def test_missing_values_handling(self):
         """Test handling of missing values."""
         import pandas as pd
+
         from white_training.core.soft_targets import (
             generate_soft_targets_from_dataframe,
         )

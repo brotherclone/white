@@ -6,6 +6,7 @@ from pathlib import Path
 import mido
 import pytest
 import yaml
+
 from white_composition.production_plan import (
     MANIFEST_BOOTSTRAP_FILENAME,
     PLAN_FILENAME,

@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from white_core.enums.quantum_tape_emotional_tone import QuantumTapeEmotionalTone
 
 EXPECTED = {

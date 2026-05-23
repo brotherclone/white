@@ -394,10 +394,16 @@ def _merge_tags(tags_a: list[str], tags_b: list[str]) -> list[str]:
 
 
 def _base_name(name: str) -> str:
-    """Strip accumulated evolved_ prefixes so child names stay readable."""
+    """Extract the original template name, stripping evolved_ prefix and xlineage suffix.
+
+    After multi-generation crossover the name accumulates as
+    'evolved_<a>x<b>x<a>x<b>…'. We want only the first segment so names
+    stay readable across all generations.
+    """
     while name.startswith("evolved_"):
         name = name[len("evolved_") :]
-    return name
+    # Drop any xParentB lineage suffix appended by previous crossovers
+    return name.split("x")[0]
 
 
 # ---------------------------------------------------------------------------

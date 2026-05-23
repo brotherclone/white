@@ -1,4 +1,5 @@
 import pytest
+
 from white_core.music.core.duration import Duration
 from white_core.music.core.notes import Note, get_tempered_note
 

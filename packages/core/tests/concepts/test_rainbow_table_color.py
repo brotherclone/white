@@ -1,4 +1,5 @@
 import pytest
+
 from white_core.concepts.rainbow_table_color import (
     RainbowColorModes,
     RainbowTableColor,

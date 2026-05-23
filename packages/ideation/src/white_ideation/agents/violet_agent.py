@@ -16,6 +16,7 @@ from langchain_anthropic import ChatAnthropic
 from langgraph.constants import END, START
 from langgraph.graph import StateGraph
 from pydantic import BaseModel, Field
+
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
@@ -35,7 +36,6 @@ from white_core.enums.disrupting_event_type import (
 )
 from white_core.manifests.song_proposal import SongProposalIteration
 from white_extraction.util.manifest_loader import get_my_reference_proposals
-
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.violet_agent_state import VioletAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState

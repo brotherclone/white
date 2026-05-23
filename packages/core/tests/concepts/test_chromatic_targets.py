@@ -3,6 +3,7 @@
 import math
 
 import pytest
+
 from white_core.concepts.chromatic_targets import (
     CHROMATIC_TARGETS,
     ONTOLOGICAL_MODES,

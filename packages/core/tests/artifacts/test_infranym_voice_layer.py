@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.artifacts.infranym_voice_layer import InfranymVoiceLayer
 from white_core.enums.infranym_voice_profile import InfranymVoiceProfile
 

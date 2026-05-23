@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.manifests.manifest_song_structure import ManifestSongStructure
 from white_core.music.core.duration import Duration
 

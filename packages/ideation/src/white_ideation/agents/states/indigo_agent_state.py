@@ -2,6 +2,7 @@ from typing import Annotated, Any, Dict, List, Optional
 
 from langchain_anthropic import ChatAnthropic
 from pydantic import Field
+
 from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from white_core.artifacts.infranym_audio_artifact import InfranymAudioArtifact
 from white_core.artifacts.infranym_encoded_image_artifact import (
@@ -14,7 +15,6 @@ from white_core.artifacts.infranym_text_render_artifact import (
 )
 from white_core.enums.infranym_medium import InfranymMedium
 from white_core.enums.infranym_method import InfranymMethod
-
 from white_ideation.agents.agent_state_utils import safe_add
 
 

@@ -1,4 +1,5 @@
 import pytest
+
 from white_extraction.util.lrc_validator import LRCValidator
 
 

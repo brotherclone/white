@@ -297,21 +297,6 @@ def select_templates(
     return [t for _, t in results]
 
 
-def make_fallback_pattern(time_sig: tuple[int, int]) -> MelodyPattern:
-    """Generate a minimal fallback pattern for unsupported time signatures."""
-    logger.warning("No melody templates for %s/%s — using fallback", *time_sig)
-    return MelodyPattern(
-        name="fallback_repeated",
-        contour="repeated",
-        energy="medium",
-        use_case="vocal",
-        time_sig=time_sig,
-        description=f"Fallback — repeated root on beat 1 for {time_sig[0]}/{time_sig[1]}",
-        intervals=[0],
-        rhythm=[0.0],
-    )
-
-
 # ---------------------------------------------------------------------------
 # Theory scoring
 # ---------------------------------------------------------------------------
@@ -854,6 +839,75 @@ TEMPLATES_7_8 = [
 # New vocal templates are defined below.
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# 6/8 Lead (Instrument) Templates
+# ---------------------------------------------------------------------------
+# 6/8 = 3.0 quarter-note beats per bar. Strong compound beats at 0.0 and 1.5.
+# intervals[0] must be 0. Durations sum to approximately 3.0 beats.
+
+TEMPLATES_6_8_LEAD = [
+    MelodyPattern(
+        name="six_eight_step_low",
+        contour="stepwise",
+        energy="low",
+        time_sig=(6, 8),
+        description="6/8 held opener, single step down — sparse instrumental phrase",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.0],
+        durations=[2.0, 1.0],
+    ),
+    MelodyPattern(
+        name="six_eight_step_med",
+        contour="stepwise",
+        energy="medium",
+        time_sig=(6, 8),
+        description="6/8 compound stepwise — two-group motion with inner passing step",
+        intervals=[0, 2, -1],
+        rhythm=[0.0, 1.5, 2.5],
+        durations=[1.5, 1.0, 0.5],
+    ),
+    MelodyPattern(
+        name="six_eight_arp_low",
+        contour="arpeggiated",
+        energy="low",
+        time_sig=(6, 8),
+        description="6/8 open arpeggio — root held, 5th on group 2",
+        intervals=[0, 7],
+        rhythm=[0.0, 1.5],
+        durations=[1.5, 1.5],
+    ),
+    MelodyPattern(
+        name="six_eight_arp_med",
+        contour="arpeggiated",
+        energy="medium",
+        time_sig=(6, 8),
+        description="6/8 triad arpeggio across compound bar",
+        intervals=[0, 4, 3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[1.0, 1.0, 1.0],
+    ),
+    MelodyPattern(
+        name="six_eight_penta_med",
+        contour="pentatonic",
+        energy="medium",
+        time_sig=(6, 8),
+        description="6/8 pentatonic curl — up two, skip, resolve",
+        intervals=[0, 2, 3, -2],
+        rhythm=[0.0, 0.5, 1.5, 2.5],
+        durations=[0.5, 1.0, 1.0, 0.5],
+    ),
+    MelodyPattern(
+        name="six_eight_step_high",
+        contour="stepwise",
+        energy="high",
+        time_sig=(6, 8),
+        description="6/8 energetic stepwise run — four notes across the compound bar",
+        intervals=[0, 2, 2, -1],
+        rhythm=[0.0, 0.5, 1.5, 2.0],
+        durations=[0.5, 1.0, 0.5, 1.0],
+    ),
+]
+
 _EXISTING_LEAD_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_STEPWISE,
     *TEMPLATES_4_4_ARPEGGIATED,
@@ -863,6 +917,7 @@ _EXISTING_LEAD_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_SCALAR,
     *TEMPLATES_3_4,
     *TEMPLATES_7_8,
+    *TEMPLATES_6_8_LEAD,
 ]
 for _t in _EXISTING_LEAD_TEMPLATES:
     _t.use_case = "lead"

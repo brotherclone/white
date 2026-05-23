@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from white_core.manifests.song_proposal import SongProposalIteration
 
 
@@ -36,6 +37,32 @@ def test_normalize_flat_and_mode():
 
     it3 = SongProposalIteration(**valid_iteration_data(key="C mode: maj"))
     assert it3.key == "C major"
+
+
+def test_normalize_modal_key_strings():
+    it = SongProposalIteration(**valid_iteration_data(key="D dorian"))
+    assert it.key == "D dorian"
+
+    it2 = SongProposalIteration(**valid_iteration_data(key="E phrygian"))
+    assert it2.key == "E phrygian"
+
+    it3 = SongProposalIteration(**valid_iteration_data(key="G mixolydian"))
+    assert it3.key == "G mixolydian"
+
+
+def test_key_signature_object_serializes_to_string():
+    """KeySignature objects must round-trip to a clean string, not a nested dict."""
+    from white_core.music.core.key_signature import KeySignature
+
+    # "D dorian" has no accidental so the round-trip is lossless
+    ks = KeySignature.model_validate("D dorian")
+    it = SongProposalIteration(**valid_iteration_data(key=ks))
+    assert isinstance(it.key, str)
+    assert it.key == "D dorian"
+
+    dumped = it.model_dump(mode="json")
+    assert isinstance(dumped["key"], str)
+    assert dumped["key"] == "D dorian"
 
 
 def test_non_note_key_remains_unchanged():

@@ -7,6 +7,7 @@ from pathlib import Path
 import mido
 import pytest
 import yaml
+
 from white_core.music.style_profile import StyleProfile
 from white_generation.patterns.aesthetic_hints import style_profile_tag_adjustment
 from white_generation.style_reference import (

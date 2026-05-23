@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from white_core.concepts.facet_evolution import FacetEvolution
 from white_core.enums.white_facet import WhiteFacet
 

@@ -38,7 +38,6 @@ from white_generation.patterns.drum_patterns import (
     VELOCITY,
     DrumPattern,
     energy_appropriateness,
-    make_fallback_pattern,
     map_genres_to_families,
     select_templates,
 )
@@ -473,10 +472,11 @@ def run_drum_pipeline(
             ALL_TEMPLATES, time_sig, genre_families, target_energy
         )
 
-        # Add fallback if no templates found
         if not templates:
-            print(f"  No templates for {time_sig} + {genre_families} — using fallback")
-            templates = [make_fallback_pattern(time_sig)]
+            raise ValueError(
+                f"No drum templates for {time_sig[0]}/{time_sig[1]} + {genre_families}. "
+                f"Add templates to drum_patterns.py."
+            )
 
         templates = [t for t in templates if t.name not in used_pattern_names]
         if not templates:
@@ -485,7 +485,10 @@ def run_drum_pipeline(
                 ALL_TEMPLATES, time_sig, genre_families, target_energy
             )
             if not templates:
-                templates = [make_fallback_pattern(time_sig)]
+                raise ValueError(
+                    f"No drum templates for {time_sig[0]}/{time_sig[1]} + {genre_families}. "
+                    f"Add templates to drum_patterns.py."
+                )
             print(
                 f"  Templates: all unique patterns exhausted — reusing ({len(used_pattern_names)} prior sections)"
             )

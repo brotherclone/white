@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import pytest
 import yaml
+
 from white_composition.init_production import (
     _parse_sounds_like_response,
     init_production,

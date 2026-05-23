@@ -97,7 +97,17 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
     # Normalise enharmonic root to flat spelling used by the chord database
     root = normalize_to_flat(root)
 
-    if "minor" in mode_str or "min" in mode_str:
+    _minor_modes = {
+        "minor",
+        "min",
+        "aeolian",
+        "dorian",
+        "phrygian",
+        "locrian",
+        "harmonic_minor",
+        "melodic_minor",
+    }
+    if mode_str in _minor_modes or "minor" in mode_str:
         mode = "Minor"
     else:
         mode = "Major"

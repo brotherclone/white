@@ -1,6 +1,7 @@
 from typing import Annotated, List, Optional
 
 from pydantic import Field
+
 from white_core.agents.base_rainbow_agent_state import BaseRainbowAgentState
 from white_core.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,

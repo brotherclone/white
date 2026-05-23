@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+
 from white_composition.production_decisions import (
     DECISIONS_FILENAME,
     generate_decisions,
