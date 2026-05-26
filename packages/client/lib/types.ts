@@ -16,6 +16,15 @@ export interface SongEntry {
   has_mix: boolean;
   stage: "ideation" | "generation" | "composition";
   proposal_path: string | null;
+  concept: string | null;
+}
+
+export interface SampleEntry {
+  segment_id: string;
+  song_slug: string;
+  color: string;
+  match: number;
+  audio_url: string;
 }
 
 export interface PipelineStatus {

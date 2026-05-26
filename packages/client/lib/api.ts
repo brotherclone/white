@@ -276,3 +276,29 @@ export async function setMixFile(path: string): Promise<void> {
 export function mixStreamUrl(): string {
   return `${BASE}/production/mix`;
 }
+
+export async function fetchSamples(topN?: number): Promise<import("./types").SampleEntry[]> {
+  const params = topN != null ? `?top_n=${topN}` : "";
+  const res = await fetch(`${BASE}/samples${params}`, { cache: "no-store" });
+  if (res.status === 503) throw Object.assign(new Error("no-active-song"), { status: 503 });
+  if (!res.ok) throw new Error("Failed to fetch samples");
+  return res.json();
+}
+
+export function audioUrl(segmentId: string): string {
+  return `${BASE}/audio/${encodeURIComponent(segmentId)}`;
+}
+
+export async function exportSample(segmentId: string): Promise<{ ok: boolean; dest: string }> {
+  const res = await fetch(`${BASE}/samples/${encodeURIComponent(segmentId)}/export`, {
+    method: "POST",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw Object.assign(
+      new Error((err as { detail?: string }).detail ?? "Export failed"),
+      { status: res.status }
+    );
+  }
+  return res.json();
+}
