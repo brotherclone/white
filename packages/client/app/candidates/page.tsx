@@ -3,8 +3,8 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong, initSong, runNextPhase, runQuartetPhase, getRunStatus, fetchPipelineStatus, startHandoff, getHandoffStatus } from "@/lib/api";
-import { Candidate, CandidateStatus, PipelineStatus, RunJob, SongEntry } from "@/lib/types";
+import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong, initSong, runNextPhase, runQuartetPhase, getRunStatus, fetchPipelineStatus, startHandoff, getHandoffStatus, fetchSamples, exportSample, audioUrl } from "@/lib/api";
+import { Candidate, CandidateStatus, PipelineStatus, RunJob, SampleEntry, SongEntry } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
 import StatusBadge from "@/components/StatusBadge";
@@ -39,6 +39,11 @@ export default function CandidatesPage() {
   const [pipeline, setPipeline] = useState<PipelineStatus | null>(null);
   const runPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const handoffPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [conceptExpanded, setConceptExpanded] = useState(false);
+  const [samples, setSamples] = useState<SampleEntry[]>([]);
+  const [samplesExpanded, setSamplesExpanded] = useState(false);
+  const [exportedIds, setExportedIds] = useState<Set<string>>(new Set());
+  const [exportingId, setExportingId] = useState<string | null>(null);
 
   const refreshPipeline = useCallback(() => {
     fetchPipelineStatus().then(setPipeline).catch(() => {});
@@ -47,6 +52,7 @@ export default function CandidatesPage() {
   useEffect(() => {
     fetchActiveSong().then(({ active }) => setActiveSong(active)).catch(() => {});
     refreshPipeline();
+    fetchSamples().then(setSamples).catch(() => {});
   }, [refreshPipeline]);
 
   useEffect(() => () => {
@@ -280,13 +286,30 @@ export default function CandidatesPage() {
     }, 2000);
   };
 
+  const handleExport = async (segmentId: string) => {
+    setExportingId(segmentId);
+    try {
+      await exportSample(segmentId);
+      setExportedIds(prev => new Set(prev).add(segmentId));
+    } catch (e) {
+      const status = (e as { status?: number }).status;
+      showToast(
+        status === 503
+          ? "LOGIC_OUTPUT_DIR not set — add it to .env"
+          : e instanceof Error ? e.message : "Export failed"
+      );
+    } finally {
+      setExportingId(null);
+    }
+  };
+
   const canPromote = !!phaseFilter && phaseFilter !== "all";
   const canEvolve = ["drums", "bass", "melody"].includes(phaseFilter);
   const needsInit = pipeline?.next_phase === "init_production";
   const canRun = !running && !needsInit && pipeline?.next_phase != null;
   const melodyPromoted = pipeline?.phases?.["melody"] === "promoted";
   const quartetStatus = pipeline?.phases?.["quartet"];
-  const canRunQuartet = melodyPromoted && !quartetStatus && !running && !runningQuartet;
+  const canRunQuartet = melodyPromoted && (!quartetStatus || quartetStatus === "pending") && !running && !runningQuartet;
 
   const SortIcon = ({ k }: { k: SortKey }) =>
     sortKey === k ? <span className="ml-1 text-zinc-400">{sortAsc ? "↑" : "↓"}</span> : null;
@@ -308,6 +331,19 @@ export default function CandidatesPage() {
           <Link href="/" className="hover:text-zinc-300 transition-colors">← Songs</Link>
           <span>/</span>
           <span className="text-zinc-300">{activeSong.title}</span>
+        </div>
+      )}
+
+      {/* Concept block */}
+      {activeSong?.concept && (
+        <div className="mb-4 bg-zinc-900/60 border border-zinc-800 rounded p-3 font-sans text-sm text-zinc-400">
+          <div className={conceptExpanded ? "" : "line-clamp-3"}>{activeSong.concept}</div>
+          <button
+            onClick={() => setConceptExpanded(e => !e)}
+            className="mt-1 text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+          >
+            {conceptExpanded ? "Show less" : "Show more"}
+          </button>
         </div>
       )}
 
@@ -556,6 +592,70 @@ export default function CandidatesPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Samples panel */}
+      <div className="mt-4 border border-zinc-800 rounded-lg overflow-hidden">
+        <button
+          onClick={() => setSamplesExpanded(e => !e)}
+          className="w-full flex items-center justify-between px-4 py-2.5 bg-zinc-900 text-zinc-400 text-sm font-sans hover:bg-zinc-800 transition-colors"
+        >
+          <span className="font-medium text-zinc-300">Chromatic Samples</span>
+          <span className="text-xs text-zinc-600">{samplesExpanded ? "▲ collapse" : `▼ ${samples.length} samples`}</span>
+        </button>
+        {samplesExpanded && (
+          <div className="overflow-x-auto">
+            {samples.length === 0 ? (
+              <div className="px-4 py-6 text-center text-zinc-600 text-sm font-sans">
+                No samples loaded — activate a song with a rainbow color.
+              </div>
+            ) : (
+              <table className="w-full text-sm font-sans">
+                <thead className="bg-zinc-900/80 text-zinc-500 text-xs border-b border-zinc-800">
+                  <tr>
+                    <th className="px-3 py-2 text-left w-10">#</th>
+                    <th className="px-3 py-2 text-left">Segment</th>
+                    <th className="px-3 py-2 text-left">Song</th>
+                    <th className="px-3 py-2 text-left w-20">Color</th>
+                    <th className="px-3 py-2 text-left w-16">Match</th>
+                    <th className="px-3 py-2 text-left">Player</th>
+                    <th className="px-3 py-2 text-left w-28">Export</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {samples.map((s, i) => (
+                    <tr key={s.segment_id} className="border-b border-zinc-800/50 hover:bg-zinc-900/40">
+                      <td className="px-3 py-2 text-zinc-600">{i + 1}</td>
+                      <td className="px-3 py-2 text-zinc-300 font-mono text-xs max-w-xs truncate" title={s.segment_id}>{s.segment_id}</td>
+                      <td className="px-3 py-2 text-zinc-400 text-xs">{s.song_slug}</td>
+                      <td className="px-3 py-2">
+                        <span className="px-1.5 py-0.5 rounded text-xs bg-zinc-800 text-zinc-300">{s.color}</span>
+                      </td>
+                      <td className="px-3 py-2 text-zinc-400 text-xs">{s.match.toFixed(2)}</td>
+                      <td className="px-3 py-2">
+                        <audio
+                          src={audioUrl(s.segment_id)}
+                          controls
+                          className="h-7 w-48"
+                          preload="none"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <button
+                          onClick={() => handleExport(s.segment_id)}
+                          disabled={exportedIds.has(s.segment_id) || exportingId === s.segment_id}
+                          className="px-2 py-0.5 text-xs rounded font-medium transition-colors bg-zinc-700 hover:bg-zinc-600 text-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {exportedIds.has(s.segment_id) ? "Exported ✓" : exportingId === s.segment_id ? "…" : "Export"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="mt-3 text-xs text-zinc-600 flex gap-4 font-sans flex-wrap">
