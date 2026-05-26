@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong, initSong, runNextPhase, runQuartetPhase, getRunStatus, fetchPipelineStatus, startHandoff, getHandoffStatus, fetchSamples, exportSample } from "@/lib/api";
+import { fetchCandidates, approveCandidate, rejectCandidate, setLabel, setUseCase, midiUrl, promotePhase, evolvePhase, fetchActiveSong, initSong, runNextPhase, runQuartetPhase, getRunStatus, fetchPipelineStatus, startHandoff, getHandoffStatus, fetchSamples, exportSample, audioUrl } from "@/lib/api";
 import { Candidate, CandidateStatus, PipelineStatus, RunJob, SampleEntry, SongEntry } from "@/lib/types";
 import ScoreBar from "@/components/ScoreBar";
 import ScorePanel from "@/components/ScorePanel";
@@ -634,7 +634,7 @@ export default function CandidatesPage() {
                       <td className="px-3 py-2 text-zinc-400 text-xs">{s.match.toFixed(2)}</td>
                       <td className="px-3 py-2">
                         <audio
-                          src={s.audio_url}
+                          src={audioUrl(s.segment_id)}
                           controls
                           className="h-7 w-48"
                           preload="none"

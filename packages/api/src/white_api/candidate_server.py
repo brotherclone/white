@@ -18,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import urllib.parse
 import webbrowser
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -47,6 +48,14 @@ _EVOLVE_PIPELINE = {
     "bass": "white_generation.pipelines.bass_pipeline",
     "melody": "white_generation.pipelines.melody_pipeline",
 }
+
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Audio allowlist root — files served by /audio and /samples/export must live
+# under this directory.  Override in tests by monkeypatching this variable.
+# ---------------------------------------------------------------------------
+
+_AUDIO_ROOT: Path = Path(__file__).parents[4].resolve()
 
 # ---------------------------------------------------------------------------
 # Module-level state (mutated at startup and by /songs/activate)
@@ -160,8 +169,11 @@ def _read_concept(prod_dir: Path) -> str | None:
     try:
         with open(ctx_path) as f:
             ctx = yaml.safe_load(f) or {}
-        concept = ctx.get("concept")
-        return str(concept).strip() or None if concept else None
+        raw = ctx.get("concept")
+        if not raw:
+            return None
+        text = str(raw).strip()
+        return text or None
     except Exception:
         return None
 
@@ -553,6 +565,16 @@ def create_app(
             _clap_df = load_clap_index(str(_CLAP_PARQUET), str(_META_PARQUET))
         return _clap_df
 
+    def _check_audio_path(wav_path: Path) -> Path:
+        resolved = wav_path.resolve()
+        try:
+            resolved.relative_to(_AUDIO_ROOT)
+        except ValueError:
+            raise HTTPException(
+                status_code=403, detail="Audio file is outside allowed directory"
+            )
+        return resolved
+
     @app.get("/samples")
     def list_samples(top_n: int = 20):
         if _production_dir is None:
@@ -568,10 +590,11 @@ def create_app(
         df = _get_clap_df()
         results = retrieve_by_color(df, color, top_n=top_n)
         for r in results:
-            r["audio_url"] = f"/audio/{r['segment_id']}"
+            encoded = urllib.parse.quote(r["segment_id"], safe="")
+            r["audio_url"] = f"/audio/{encoded}"
         return results
 
-    @app.get("/audio/{segment_id}")
+    @app.get("/audio/{segment_id:path}")
     def stream_audio(segment_id: str):
         df = _get_clap_df()
         row = df[df["segment_id"] == segment_id]
@@ -579,7 +602,7 @@ def create_app(
             raise HTTPException(
                 status_code=404, detail=f"Segment '{segment_id}' not found"
             )
-        wav_path = Path(row.iloc[0]["source_audio_file"])
+        wav_path = _check_audio_path(Path(row.iloc[0]["source_audio_file"]))
         if not wav_path.exists():
             raise HTTPException(
                 status_code=404, detail=f"WAV file not found: {wav_path}"
@@ -600,7 +623,7 @@ def create_app(
             raise HTTPException(
                 status_code=404, detail=f"Segment '{segment_id}' not found"
             )
-        wav_path = Path(row.iloc[0]["source_audio_file"])
+        wav_path = _check_audio_path(Path(row.iloc[0]["source_audio_file"]))
         if not wav_path.exists():
             raise HTTPException(
                 status_code=404, detail=f"WAV file not found: {wav_path}"
@@ -610,10 +633,17 @@ def create_app(
                 status_code=503,
                 detail="No song selected — POST /songs/activate first",
             )
+        logic_root = Path(logic_output_dir).resolve()
         thread_slug = _active_song.get("thread_slug", "unknown")
         title = _active_song.get("title", "unknown")
-        safe_title = title.replace("/", "-").replace(":", "-")
-        dest_dir = Path(logic_output_dir) / thread_slug / safe_title / "Samples"
+        safe_title = title.replace("/", "-").replace(":", "-").replace("..", "")
+        dest_dir = (logic_root / thread_slug / safe_title / "Samples").resolve()
+        try:
+            dest_dir.relative_to(logic_root)
+        except ValueError:
+            raise HTTPException(
+                status_code=400, detail="Destination is outside LOGIC_OUTPUT_DIR"
+            )
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest = dest_dir / f"{segment_id}.wav"
         shutil.copy2(wav_path, dest)

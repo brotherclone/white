@@ -768,99 +768,214 @@ class TestDriftReport:
 # ---------------------------------------------------------------------------
 
 
+def _make_clap_df(tmp_path: Path, segment_id: str = "seg_001"):
+    """Return a minimal DataFrame that satisfies _get_clap_df() consumers."""
+    import pandas as pd
+
+    wav = tmp_path / f"{segment_id}.wav"
+    wav.write_bytes(b"RIFF")
+    return pd.DataFrame([{"segment_id": segment_id, "source_audio_file": str(wav)}])
+
+
 class TestSamplesEndpoints:
-    def _client_with_active_song(self, sw_dir, color="Red"):
-        from fastapi.testclient import TestClient
-
-        from white_api.candidate_server import create_app
-
+    def _active_client(self, sw_dir):
         app = create_app(shrink_wrapped_dir=sw_dir)
         tc = TestClient(app)
         tc.post("/songs/activate", json={"id": "thread-alpha__song_a_v1"})
         return tc
 
+    # -- /samples -----------------------------------------------------------
+
     def test_samples_503_with_no_active_song(self, sw_dir):
-        from fastapi.testclient import TestClient
-
-        from white_api.candidate_server import create_app
-
         app = create_app(shrink_wrapped_dir=sw_dir)
         tc = TestClient(app)
         resp = tc.get("/samples")
         assert resp.status_code == 503
 
-    def test_samples_returns_list(self, sw_dir):
-        tc = self._client_with_active_song(sw_dir)
-        sample_row = {
-            "segment_id": "01_01_seg_0001_track_01",
-            "source_audio_file": "/fake/seg.wav",
-            "match": 0.95,
-            "song_slug": "01_01",
-            "color": "Red",
-        }
-        with patch(
-            "white_composition.retrieve_samples.retrieve_by_color",
-            return_value=[sample_row],
-        ):
-            import pandas as pd
-
-            with patch(
-                "white_composition.retrieve_samples.load_clap_index",
-                return_value=pd.DataFrame([{"segment_id": "01_01_seg_0001_track_01"}]),
-            ):
-                resp = tc.get("/samples")
-        # Without actual parquet the endpoint may 500 — just check shape when mocked
-        assert resp.status_code in (200, 500)
-
-    def test_audio_404_when_segment_missing(self, client):
-        resp = client.get("/audio/nonexistent_segment")
-        assert resp.status_code in (404, 500)
-
-    def test_audio_404_when_wav_absent(self, sw_dir, tmp_path):
-        tc = self._client_with_active_song(sw_dir)
+    def test_samples_returns_200_with_entries(self, sw_dir, tmp_path):
         import pandas as pd
 
-        df = pd.DataFrame(
+        tc = self._active_client(sw_dir)
+        fake_results = [
+            {
+                "segment_id": "seg_001",
+                "source_audio_file": str(tmp_path / "seg_001.wav"),
+                "match": 0.95,
+                "song_slug": "01_01",
+                "color": "Red",
+                "start_seconds": 0.0,
+                "end_seconds": 3.0,
+            }
+        ]
+        fake_df = pd.DataFrame([{"segment_id": "seg_001"}])
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch(
+                "white_composition.retrieve_samples.retrieve_by_color",
+                return_value=fake_results,
+            ),
+        ):
+            resp = tc.get("/samples")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data) == 1
+        assert data[0]["segment_id"] == "seg_001"
+        assert "audio_url" in data[0]
+
+    def test_samples_audio_url_is_url_encoded(self, sw_dir, tmp_path):
+        import pandas as pd
+
+        tc = self._active_client(sw_dir)
+        fake_results = [
+            {
+                "segment_id": "seg with spaces",
+                "source_audio_file": str(tmp_path / "seg.wav"),
+                "match": 0.9,
+                "song_slug": "01_01",
+                "color": "Red",
+                "start_seconds": None,
+                "end_seconds": None,
+            }
+        ]
+        fake_df = pd.DataFrame([{"segment_id": "seg with spaces"}])
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch(
+                "white_composition.retrieve_samples.retrieve_by_color",
+                return_value=fake_results,
+            ),
+        ):
+            resp = tc.get("/samples")
+        assert resp.status_code == 200
+        assert resp.json()[0]["audio_url"] == "/audio/seg%20with%20spaces"
+
+    # -- /audio -------------------------------------------------------------
+
+    def test_audio_404_when_segment_missing(self, sw_dir, tmp_path):
+        import pandas as pd
+
+        tc = self._active_client(sw_dir)
+        fake_df = pd.DataFrame(
+            [{"segment_id": "other_seg", "source_audio_file": str(tmp_path / "x.wav")}]
+        )
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch("white_api.candidate_server._AUDIO_ROOT", tmp_path),
+        ):
+            resp = tc.get("/audio/nonexistent_segment")
+        assert resp.status_code == 404
+
+    def test_audio_404_when_wav_absent(self, sw_dir, tmp_path):
+        import pandas as pd
+
+        tc = self._active_client(sw_dir)
+        fake_df = pd.DataFrame(
             [
                 {
-                    "segment_id": "fake_seg",
+                    "segment_id": "seg_001",
                     "source_audio_file": str(tmp_path / "absent.wav"),
                 }
             ]
         )
-
-        def mock_get_df():
-            return df
-
-        with patch(
-            "white_composition.retrieve_samples.load_clap_index", return_value=df
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch("white_api.candidate_server._AUDIO_ROOT", tmp_path),
         ):
-            resp = tc.get("/audio/fake_seg")
-        assert resp.status_code in (404, 500)
+            resp = tc.get("/audio/seg_001")
+        assert resp.status_code == 404
+
+    def test_audio_200_when_wav_present(self, sw_dir, tmp_path):
+        import pandas as pd
+
+        tc = self._active_client(sw_dir)
+        wav = tmp_path / "seg_001.wav"
+        wav.write_bytes(b"RIFF")
+        fake_df = pd.DataFrame(
+            [{"segment_id": "seg_001", "source_audio_file": str(wav)}]
+        )
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch("white_api.candidate_server._AUDIO_ROOT", tmp_path),
+        ):
+            resp = tc.get("/audio/seg_001")
+        assert resp.status_code == 200
+        assert "wav" in resp.headers["content-type"]
+
+    # -- /samples/{id}/export -----------------------------------------------
 
     def test_export_503_when_no_logic_output_dir(self, sw_dir, tmp_path):
-        tc = self._client_with_active_song(sw_dir)
+        import pandas as pd
+
+        tc = self._active_client(sw_dir)
+        fake_df = pd.DataFrame(
+            [{"segment_id": "seg_001", "source_audio_file": str(tmp_path / "seg.wav")}]
+        )
         env = {
             k: v for k, v in __import__("os").environ.items() if k != "LOGIC_OUTPUT_DIR"
         }
-        with patch.dict("os.environ", env, clear=True):
-            resp = tc.post("/samples/any_segment/export")
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch.dict("os.environ", env, clear=True),
+        ):
+            resp = tc.post("/samples/seg_001/export")
         assert resp.status_code == 503
 
-    def test_export_copies_wav(self, sw_dir, tmp_path):
-        tc = self._client_with_active_song(sw_dir)
-        wav = tmp_path / "seg.wav"
-        wav.write_bytes(b"RIFF")
-        logic_dir = tmp_path / "logic"
-
+    def test_export_404_when_segment_missing(self, sw_dir, tmp_path):
         import pandas as pd
 
-        df = pd.DataFrame([{"segment_id": "seg_001", "source_audio_file": str(wav)}])
-
-        with patch(
-            "white_composition.retrieve_samples.load_clap_index", return_value=df
+        tc = self._active_client(sw_dir)
+        fake_df = pd.DataFrame(
+            [{"segment_id": "other", "source_audio_file": str(tmp_path / "x.wav")}]
+        )
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch("white_api.candidate_server._AUDIO_ROOT", tmp_path),
+            patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(tmp_path / "logic")}),
         ):
-            with patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(logic_dir)}):
-                resp = tc.post("/samples/seg_001/export")
+            resp = tc.post("/samples/nonexistent/export")
+        assert resp.status_code == 404
 
-        assert resp.status_code in (200, 500)
+    def test_export_copies_wav_and_returns_dest(self, sw_dir, tmp_path):
+        import pandas as pd
+
+        tc = self._active_client(sw_dir)
+        wav = tmp_path / "seg_001.wav"
+        wav.write_bytes(b"RIFF")
+        logic_dir = tmp_path / "logic"
+        fake_df = pd.DataFrame(
+            [{"segment_id": "seg_001", "source_audio_file": str(wav)}]
+        )
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch("white_api.candidate_server._AUDIO_ROOT", tmp_path),
+            patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(logic_dir)}),
+        ):
+            resp = tc.post("/samples/seg_001/export")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert Path(data["dest"]).exists()
