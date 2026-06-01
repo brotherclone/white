@@ -908,6 +908,79 @@ TEMPLATES_6_8_LEAD = [
     ),
 ]
 
+# ---------------------------------------------------------------------------
+# 5/4 Templates
+# ---------------------------------------------------------------------------
+# 5/4 = 5 quarter-note beats. Positions 0–4. Strong downbeat on 1; common
+# 3+2 grouping makes beat 4 (position 3) a secondary accent.
+
+TEMPLATES_5_4 = [
+    # --- Stepwise ---
+    MelodyPattern(
+        name="five_four_stepwise_sigh",
+        contour="stepwise",
+        energy="low",
+        time_sig=(5, 4),
+        description="Held note, gentle step down, long rest — elegiac 5/4 phrase",
+        intervals=[0, -2, -1, 0, 0],
+        rhythm=[0.0, 1.0, 2.0, 3.0, 4.0],
+        durations=[1.0, 1.0, 1.0, 0.5, 0.5],
+    ),
+    MelodyPattern(
+        name="five_four_stepwise_rise",
+        contour="stepwise",
+        energy="medium",
+        time_sig=(5, 4),
+        description="Ascending step across 5 beats — questioning phrase",
+        intervals=[0, 2, 1, 2, -1],
+        rhythm=[0.0, 1.0, 2.0, 3.0, 4.0],
+        durations=[1.0, 1.0, 1.0, 1.0, 1.0],
+    ),
+    # --- Arpeggiated ---
+    MelodyPattern(
+        name="five_four_arp_lift",
+        contour="arpeggiated",
+        energy="medium",
+        time_sig=(5, 4),
+        description="Triad arpeggio up and back over 5 beats",
+        intervals=[0, 4, 3, -3, -4],
+        rhythm=[0.0, 1.0, 2.0, 3.0, 4.0],
+        durations=[1.0, 1.0, 1.0, 1.0, 1.0],
+    ),
+    MelodyPattern(
+        name="five_four_arp_fall",
+        contour="arpeggiated",
+        energy="low",
+        time_sig=(5, 4),
+        description="Falling arpeggio — high note drifting down across 5 beats",
+        intervals=[0, -3, -4, -2, 0],
+        rhythm=[0.0, 1.0, 2.0, 3.0, 4.0],
+        durations=[1.0, 1.0, 1.0, 1.0, 1.0],
+    ),
+    # --- Pentatonic ---
+    MelodyPattern(
+        name="five_four_penta_run",
+        contour="pentatonic",
+        energy="high",
+        time_sig=(5, 4),
+        description="Pentatonic run across 5/4 bar with eighths",
+        intervals=[0, 2, 3, 2, -2, 3, -3, -2, 0],
+        rhythm=[0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 3.5, 4.0, 4.5],
+        durations=[0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5],
+    ),
+    # --- Repeated ---
+    MelodyPattern(
+        name="five_four_motif_rest",
+        contour="repeated",
+        energy="low",
+        time_sig=(5, 4),
+        description="Three-note motif, two beats rest — 5/4 breath",
+        intervals=[0, 2, -1, 0, 0],
+        rhythm=[0.0, 0.5, 1.0, 1.5, 3.0],
+        durations=[0.5, 0.5, 0.5, 1.5, 2.0],
+    ),
+]
+
 _EXISTING_LEAD_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_STEPWISE,
     *TEMPLATES_4_4_ARPEGGIATED,
@@ -916,6 +989,7 @@ _EXISTING_LEAD_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_PENTATONIC,
     *TEMPLATES_4_4_SCALAR,
     *TEMPLATES_3_4,
+    *TEMPLATES_5_4,
     *TEMPLATES_7_8,
     *TEMPLATES_6_8_LEAD,
 ]
@@ -1681,6 +1755,53 @@ VOCAL_4_4_LAMENTFUL = [
 ]
 
 
+VOCAL_5_4 = [
+    MelodyPattern(
+        name="vocal_5_4_held_sigh",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="low",
+        time_sig=(5, 4),
+        description="5/4 held sigh — long held note, rest, step down",
+        intervals=[0, -2],
+        rhythm=[0.0, 3.0],
+        durations=[2.0, 2.0],
+    ),
+    MelodyPattern(
+        name="vocal_5_4_phrase",
+        contour="declarative",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(5, 4),
+        description="5/4 phrase — held opener, breath, three-note resolution",
+        intervals=[0, 2, -1, -2],
+        rhythm=[0.0, 2.0, 3.0, 4.0],
+        durations=[1.5, 0.5, 0.5, 0.5],
+    ),
+    MelodyPattern(
+        name="vocal_5_4_surge",
+        contour="declarative",
+        use_case="vocal",
+        energy="high",
+        time_sig=(5, 4),
+        description="5/4 surge — held opener, breath, three-note ascending release",
+        intervals=[0, 2, 1, -2],
+        rhythm=[0.0, 2.5, 3.0, 4.0],
+        durations=[2.0, 0.5, 1.0, 0.5],
+    ),
+    MelodyPattern(
+        name="vocal_5_4_motif",
+        contour="haiku",
+        use_case="vocal",
+        energy="low",
+        time_sig=(5, 4),
+        description="5/4 haiku — short motif, breath, long held resolution",
+        intervals=[0, 2, -1],
+        rhythm=[0.0, 0.5, 1.5],
+        durations=[0.5, 0.5, 3.5],
+    ),
+]
+
 ALL_TEMPLATES: list[MelodyPattern] = [
     # Existing templates reclassified as lead (instrument tracks)
     *_EXISTING_LEAD_TEMPLATES,
@@ -1695,6 +1816,7 @@ ALL_TEMPLATES: list[MelodyPattern] = [
     *VOCAL_4_4_DOTTED,
     # New vocal templates for other time signatures
     *VOCAL_3_4,
+    *VOCAL_5_4,
     *VOCAL_6_8,
     *VOCAL_7_8,
     # 4/4 Lamentful / Sparse

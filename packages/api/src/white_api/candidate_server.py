@@ -18,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import urllib.parse
 import webbrowser
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -47,6 +48,14 @@ _EVOLVE_PIPELINE = {
     "bass": "white_generation.pipelines.bass_pipeline",
     "melody": "white_generation.pipelines.melody_pipeline",
 }
+
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Audio allowlist root — files served by /audio and /samples/export must live
+# under this directory.  Override in tests by monkeypatching this variable.
+# ---------------------------------------------------------------------------
+
+_AUDIO_ROOT: Path = Path(__file__).parents[4].resolve()
 
 # ---------------------------------------------------------------------------
 # Module-level state (mutated at startup and by /songs/activate)
@@ -153,6 +162,22 @@ def _has_mix_file(prod_dir: Path) -> bool:
         return False
 
 
+def _read_concept(prod_dir: Path) -> str | None:
+    ctx_path = prod_dir / "song_context.yml"
+    if not ctx_path.exists():
+        return None
+    try:
+        with open(ctx_path) as f:
+            ctx = yaml.safe_load(f) or {}
+        raw = ctx.get("concept")
+        if not raw:
+            return None
+        text = str(raw).strip()
+        return text or None
+    except Exception:
+        return None
+
+
 def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
     """Walk shrink_wrapped_dir for manifest_bootstrap.yml files and return song entries."""
     songs = []
@@ -188,6 +213,7 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "has_mix": _has_mix_file(prod_dir),
                 "stage": _compute_stage(prod_dir),
                 "proposal_path": str(proposal_path) if proposal_path else None,
+                "concept": _read_concept(prod_dir),
             }
         )
     return songs
@@ -511,6 +537,117 @@ def create_app(
     @app.get("/handoff/status")
     def handoff_status():
         return _handoff_job
+
+    # ------------------------------------------------------------------
+    # Chromatic sample retrieval
+    # ------------------------------------------------------------------
+
+    _CLAP_PARQUET = (
+        Path(__file__).parents[4]
+        / "training"
+        / "data"
+        / "training_data_clap_embeddings.parquet"
+    )
+    _META_PARQUET = (
+        Path(__file__).parents[4]
+        / "training"
+        / "data"
+        / "training_data_with_embeddings.parquet"
+    )
+
+    _clap_df: object = None  # lazy-loaded DataFrame
+
+    def _get_clap_df():
+        nonlocal _clap_df
+        if _clap_df is None:
+            from white_composition.retrieve_samples import load_clap_index
+
+            _clap_df = load_clap_index(str(_CLAP_PARQUET), str(_META_PARQUET))
+        return _clap_df
+
+    def _check_audio_path(wav_path: Path) -> Path:
+        resolved = wav_path.resolve()
+        try:
+            resolved.relative_to(_AUDIO_ROOT)
+        except ValueError:
+            raise HTTPException(
+                status_code=403, detail="Audio file is outside allowed directory"
+            )
+        return resolved
+
+    @app.get("/samples")
+    def list_samples(top_n: int = 20):
+        if _production_dir is None:
+            raise HTTPException(
+                status_code=503,
+                detail="No song selected — POST /songs/activate first",
+            )
+        color = (_active_song or {}).get("rainbow_color") or None
+        if not color:
+            return []
+        from white_composition.retrieve_samples import retrieve_by_color
+
+        df = _get_clap_df()
+        results = retrieve_by_color(df, color, top_n=top_n)
+        for r in results:
+            encoded = urllib.parse.quote(r["segment_id"], safe="")
+            r["audio_url"] = f"/audio/{encoded}"
+        return results
+
+    @app.get("/audio/{segment_id:path}")
+    def stream_audio(segment_id: str):
+        df = _get_clap_df()
+        row = df[df["segment_id"] == segment_id]
+        if row.empty:
+            raise HTTPException(
+                status_code=404, detail=f"Segment '{segment_id}' not found"
+            )
+        wav_path = _check_audio_path(Path(row.iloc[0]["source_audio_file"]))
+        if not wav_path.exists():
+            raise HTTPException(
+                status_code=404, detail=f"WAV file not found: {wav_path}"
+            )
+        return FileResponse(str(wav_path), media_type="audio/wav")
+
+    @app.post("/samples/{segment_id}/export")
+    def export_sample(segment_id: str):
+        logic_output_dir = os.environ.get("LOGIC_OUTPUT_DIR", "")
+        if not logic_output_dir:
+            raise HTTPException(
+                status_code=503,
+                detail="LOGIC_OUTPUT_DIR not set — add it to .env",
+            )
+        df = _get_clap_df()
+        row = df[df["segment_id"] == segment_id]
+        if row.empty:
+            raise HTTPException(
+                status_code=404, detail=f"Segment '{segment_id}' not found"
+            )
+        wav_path = _check_audio_path(Path(row.iloc[0]["source_audio_file"]))
+        if not wav_path.exists():
+            raise HTTPException(
+                status_code=404, detail=f"WAV file not found: {wav_path}"
+            )
+        if _active_song is None:
+            raise HTTPException(
+                status_code=503,
+                detail="No song selected — POST /songs/activate first",
+            )
+        logic_root = Path(logic_output_dir).resolve()
+        thread_slug = _active_song.get("thread_slug", "unknown")
+        title = _active_song.get("title", "unknown")
+        safe_title = title.replace("/", "-").replace(":", "-").replace("..", "")
+        dest_dir = (logic_root / thread_slug / safe_title / "Samples").resolve()
+        try:
+            dest_dir.relative_to(logic_root)
+        except ValueError:
+            raise HTTPException(
+                status_code=400, detail="Destination is outside LOGIC_OUTPUT_DIR"
+            )
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest = dest_dir / f"{segment_id}.wav"
+        shutil.copy2(wav_path, dest)
+        return {"ok": True, "dest": str(dest)}
 
     @app.post("/sync-arrangement")
     def sync_arrangement():

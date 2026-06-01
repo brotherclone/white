@@ -1714,6 +1714,214 @@ TEMPLATES_3_4_ROCK = [
 ]
 
 # ---------------------------------------------------------------------------
+# 5/4 Templates
+# ---------------------------------------------------------------------------
+# 5/4 = 5 quarter-note beats. Positions: 0 (beat 1) through 4 (beat 5).
+# Common groupings: 3+2 (strong on 1 and 4) or 2+3 (strong on 1 and 3).
+
+TEMPLATES_5_4_CLASSICAL = [
+    DrumPattern(
+        name="classical_5_4_sparse",
+        genre_family="classical",
+        energy="low",
+        time_sig=(5, 4),
+        description="Sparse 5/4 — timpani on 1, ghost tom on 4 (3+2 grouping)",
+        voices={
+            "tom_low": [(0, "normal"), (3, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="classical_5_4_march",
+        genre_family="classical",
+        energy="medium",
+        time_sig=(5, 4),
+        description="March 5/4 — timpani on 1 and 4, snare on 2 and 3",
+        voices={
+            "tom_low": [(0, "accent"), (3, "normal")],
+            "snare": [(1, "normal"), (2, "normal")],
+        },
+    ),
+    DrumPattern(
+        name="classical_5_4_full",
+        genre_family="classical",
+        energy="high",
+        time_sig=(5, 4),
+        description="Full orchestral 5/4 — crash on 1, timpani on 1/3/4, snare on 2 and 4",
+        voices={
+            "crash": [(0, "accent")],
+            "tom_low": [(0, "accent"), (2, "normal"), (3, "normal")],
+            "snare": [(1, "accent"), (3, "accent")],
+        },
+    ),
+]
+
+TEMPLATES_5_4_ELECTRONIC = [
+    DrumPattern(
+        name="electronic_5_4_minimal",
+        genre_family="electronic",
+        energy="low",
+        time_sig=(5, 4),
+        description="Minimal 5/4 — kick on 1, ghost hat on 3",
+        voices={
+            "kick": [(0, "normal")],
+            "hh_closed": [(2, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="electronic_5_4_groove",
+        genre_family="electronic",
+        energy="medium",
+        time_sig=(5, 4),
+        description="Electronic 5/4 groove — kick on 1 and 4, snare on 2 and 3, hats on quarters",
+        voices={
+            "kick": [(0, "accent"), (3, "normal")],
+            "snare": [(1, "normal"), (2, "normal")],
+            "hh_closed": [
+                (0, "ghost"),
+                (1, "ghost"),
+                (2, "ghost"),
+                (3, "ghost"),
+                (4, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="electronic_5_4_driving",
+        genre_family="electronic",
+        energy="high",
+        time_sig=(5, 4),
+        description="Driving 5/4 — kick on 1/2/4, snare on 3, eighths on hats",
+        voices={
+            "kick": [(0, "accent"), (1, "normal"), (3, "accent")],
+            "snare": [(2, "accent"), (4, "normal")],
+            "hh_closed": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1, "normal"),
+                (1.5, "ghost"),
+                (2, "normal"),
+                (2.5, "ghost"),
+                (3, "normal"),
+                (3.5, "ghost"),
+                (4, "normal"),
+                (4.5, "ghost"),
+            ],
+        },
+    ),
+]
+
+TEMPLATES_5_4_FOLK = [
+    DrumPattern(
+        name="folk_5_4_brushes",
+        genre_family="folk",
+        energy="low",
+        time_sig=(5, 4),
+        description="Folk 5/4 brushes — ghost snare on all five beats, kick on 1",
+        voices={
+            "kick": [(0, "normal")],
+            "snare": [
+                (0, "ghost"),
+                (1, "ghost"),
+                (2, "ghost"),
+                (3, "ghost"),
+                (4, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="folk_5_4_simple",
+        genre_family="folk",
+        energy="medium",
+        time_sig=(5, 4),
+        description="Simple folk 5/4 — kick on 1 and 4, snare on 2 and 3, no hats",
+        voices={
+            "kick": [(0, "accent"), (3, "normal")],
+            "snare": [(1, "normal"), (2, "normal")],
+        },
+    ),
+    DrumPattern(
+        name="folk_5_4_stomp",
+        genre_family="folk",
+        energy="high",
+        time_sig=(5, 4),
+        description="Folk 5/4 stomp — kick on 1, snare on 3 and 4, tambourine eighths",
+        voices={
+            "kick": [(0, "accent")],
+            "snare": [(2, "accent"), (3, "normal")],
+            "tambourine": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1, "normal"),
+                (1.5, "ghost"),
+                (2, "normal"),
+                (2.5, "ghost"),
+                (3, "normal"),
+                (3.5, "ghost"),
+                (4, "normal"),
+                (4.5, "ghost"),
+            ],
+        },
+    ),
+]
+
+TEMPLATES_5_4_ROCK = [
+    DrumPattern(
+        name="rock_5_4_sparse",
+        genre_family="rock",
+        energy="low",
+        time_sig=(5, 4),
+        description="Rock 5/4 sparse — kick on 1, ghost snare on 3",
+        voices={
+            "kick": [(0, "normal")],
+            "snare": [(2, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="rock_5_4_groove",
+        genre_family="rock",
+        energy="medium",
+        time_sig=(5, 4),
+        description="Rock 5/4 groove (3+2) — kick on 1 and 4, snare on 2 and 3, hats on quarters",
+        voices={
+            "kick": [(0, "accent"), (3, "normal")],
+            "snare": [(1, "accent"), (2, "normal")],
+            "hh_closed": [
+                (0, "ghost"),
+                (1, "ghost"),
+                (2, "ghost"),
+                (3, "ghost"),
+                (4, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="rock_5_4_driving",
+        genre_family="rock",
+        energy="high",
+        time_sig=(5, 4),
+        description="Driving rock 5/4 — kick on 1/2/4, snare on 3 and 4, open hat on offbeats",
+        voices={
+            "kick": [(0, "accent"), (1, "normal"), (3, "accent")],
+            "snare": [(2, "accent"), (3, "normal")],
+            "hh_closed": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1, "normal"),
+                (1.5, "ghost"),
+                (2, "normal"),
+                (2.5, "ghost"),
+                (3, "normal"),
+                (3.5, "ghost"),
+                (4, "normal"),
+                (4.5, "ghost"),
+            ],
+            "hh_open": [(0.5, "normal"), (2.5, "normal"), (4.5, "normal")],
+        },
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # 4/4 Breakbeat (classic breaks + energy variants)
 # ---------------------------------------------------------------------------
 # Grid mapping: 16th-note positions in quarter-beat floats
@@ -2632,6 +2840,11 @@ ALL_TEMPLATES: list[DrumPattern] = [
     *TEMPLATES_3_4_EXPERIMENTAL,
     *TEMPLATES_3_4_FOLK,
     *TEMPLATES_3_4_ROCK,
+    # 5/4
+    *TEMPLATES_5_4_CLASSICAL,
+    *TEMPLATES_5_4_ELECTRONIC,
+    *TEMPLATES_5_4_FOLK,
+    *TEMPLATES_5_4_ROCK,
     # 4/4 Breakbeat
     *TEMPLATES_4_4_BREAKBEAT,
     # 4/4 Sparse / Atmospheric

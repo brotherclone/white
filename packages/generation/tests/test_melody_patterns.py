@@ -389,7 +389,7 @@ class TestTemplateSelection:
             select_templates,
         )
 
-        results = select_templates(ALL_TEMPLATES, (5, 4), "medium")
+        results = select_templates(ALL_TEMPLATES, (11, 8), "medium")
         assert len(results) == 0
 
     def test_6_8_lead_templates_exist(self):

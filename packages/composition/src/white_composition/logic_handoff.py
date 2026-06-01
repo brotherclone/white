@@ -13,7 +13,7 @@ SEED_PATH = (
     Path(__file__).parents[4] / "packages" / "composition" / "logic" / "seed.logicx"
 )
 
-MIDI_PHASES = ["chords", "drums", "bass", "melody"]
+MIDI_PHASES = ["chords", "drums", "bass", "melody", "quartet"]
 LYRICS_PATTERNS = ["lyrics*.txt", "lyrics*.lrc", "*.lrc"]
 
 
@@ -86,6 +86,14 @@ def handoff(production_dir: Path) -> Path:
     for pattern in LYRICS_PATTERNS:
         for src in production_dir.glob(pattern):
             shutil.copy2(src, song_dir / src.name)
+
+    # 3b. Copy any pre-exported samples into Logic Samples/ folder
+    samples_src = production_dir / "samples"
+    if samples_src.is_dir():
+        samples_dest = song_dir / "Samples"
+        samples_dest.mkdir(exist_ok=True)
+        for wav in samples_src.glob("*.wav"):
+            shutil.copy2(wav, samples_dest / wav.name)
 
     # 4. Sync arrangement.txt back from Logic folder → production dir so that
     # lyric gen and drift report can read it after the human has arranged in Logic.
