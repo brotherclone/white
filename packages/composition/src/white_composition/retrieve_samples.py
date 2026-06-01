@@ -105,9 +105,16 @@ def retrieve_by_color(df: pd.DataFrame, color: str, top_n: int = 20) -> list[dic
         song_slug, color, start_seconds, end_seconds.
     """
     top_n = max(1, int(top_n))
+    color_lower = color.lower()
 
-    mask = df["rainbow_color"].str.lower() == color.lower()
-    subset = df[mask]
+    if color_lower == "black":
+        return []
+
+    if color_lower == "white":
+        subset = df
+    else:
+        subset = df[df["rainbow_color"].str.lower() == color_lower]
+
     if subset.empty:
         return []
 
