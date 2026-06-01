@@ -222,8 +222,16 @@ def sample_hr_distribution(n_chords: int, rng) -> list[float]:
 def sample_strum_pattern(
     time_sig: tuple[int, int], rng, filter_names: list[str] | None = None
 ) -> StrumPattern:
-    """Pick a random strum pattern for the given time signature."""
+    """Pick a random strum pattern for the given time signature.
+
+    Arp patterns are excluded by default. Pass filter_names containing an arp
+    pattern name (e.g. ["arp_up"]) to opt in explicitly.
+    """
     patterns = get_patterns_for_time_sig(time_sig, filter_names)
+    if filter_names is None:
+        patterns = [p for p in patterns if not p.is_arpeggio]
+    if not patterns:
+        patterns = get_patterns_for_time_sig(time_sig)
     return rng.choice(patterns)
 
 
@@ -547,6 +555,9 @@ def generate_white_candidates(
     if not bar_pool:
         raise ValueError("generate_white_candidates: bar_pool is empty")
 
+    ts = song_info.get("time_sig", (4, 4))
+    beats_per_bar = ts[0] * (4.0 / ts[1])
+
     scorer = Refractor(onnx_path=onnx_path) if onnx_path else Refractor()
     target = get_chromatic_target(song_info["color_name"])
 
@@ -561,7 +572,9 @@ def generate_white_candidates(
     for _ in range(num_candidates):
         drawn = rng.choices(bar_pool, k=progression_length)
         rng.shuffle(drawn)
-        midi_bytes = concatenate_bars([b["midi_bytes"] for b in drawn], tpb, bpm)
+        midi_bytes = concatenate_bars(
+            [b["midi_bytes"] for b in drawn], tpb, bpm, beats_per_bar=beats_per_bar
+        )
         raw_candidates.append(
             {
                 "midi_bytes": midi_bytes,
@@ -733,7 +746,11 @@ def run_chord_pipeline(
                 )
                 sys.exit(1)
 
-        bar_pool = build_bar_pool(sub_dirs, white_key, song_info["bpm"])
+        ts = tuple(song_info.get("time_sig", (4, 4)))
+        target_beats_per_bar = ts[0] * (4.0 / ts[1])
+        bar_pool = build_bar_pool(
+            sub_dirs, white_key, song_info["bpm"], beats_per_bar=target_beats_per_bar
+        )
         print(f"  Bar pool: {len(bar_pool)} bars from {len(sub_dirs)} sub-proposal(s)")
 
         print(

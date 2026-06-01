@@ -13,7 +13,7 @@ SEED_PATH = (
     Path(__file__).parents[4] / "packages" / "composition" / "logic" / "seed.logicx"
 )
 
-MIDI_PHASES = ["chords", "drums", "bass", "melody"]
+MIDI_PHASES = ["chords", "drums", "bass", "melody", "quartet"]
 LYRICS_PATTERNS = ["lyrics*.txt", "lyrics*.lrc", "*.lrc"]
 
 
