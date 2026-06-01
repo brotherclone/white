@@ -850,6 +850,104 @@ TEMPLATES_3_4 = [
 ]
 
 # ---------------------------------------------------------------------------
+# 5/4 Templates
+# ---------------------------------------------------------------------------
+# 5/4 = 5 quarter-note beats. Positions 0–4. Common grouping: 3+2 (strong on 1 and 4).
+
+TEMPLATES_5_4 = [
+    # --- Root ---
+    BassPattern(
+        name="five_four_root_sparse",
+        style=BassStyle.ROOT,
+        energy="low",
+        time_sig=(5, 4),
+        description="Root on 1, held entire bar — sparse anchor",
+        notes=[(0, "root", "normal")],
+        note_durations=[5.0],
+    ),
+    BassPattern(
+        name="five_four_root_3_2",
+        style=BassStyle.ROOT,
+        energy="medium",
+        time_sig=(5, 4),
+        description="Root on 1 and 4 — 3+2 grouping feel",
+        notes=[(0, "root", "accent"), (3, "root", "normal")],
+        note_durations=[3.0, 2.0],
+    ),
+    BassPattern(
+        name="five_four_root_pulse",
+        style=BassStyle.ROOT,
+        energy="high",
+        time_sig=(5, 4),
+        description="Root on every beat — driving quarter-note pulse",
+        notes=[
+            (0, "root", "accent"),
+            (1, "root", "normal"),
+            (2, "root", "normal"),
+            (3, "root", "normal"),
+            (4, "root", "normal"),
+        ],
+        note_durations=[1.0, 1.0, 1.0, 1.0, 1.0],
+    ),
+    # --- Pedal ---
+    BassPattern(
+        name="five_four_pedal",
+        style=BassStyle.PEDAL,
+        energy="low",
+        time_sig=(5, 4),
+        description="Root pedal held whole bar",
+        notes=[(0, "root", "normal")],
+        note_durations=[5.0],
+    ),
+    # --- Walking ---
+    BassPattern(
+        name="five_four_walking",
+        style=BassStyle.WALKING,
+        energy="medium",
+        time_sig=(5, 4),
+        description="Walking 5/4 — root, step, 5th, step, approach",
+        notes=[
+            (0, "root", "accent"),
+            (1, "passing_tone", "normal"),
+            (2, "5th", "normal"),
+            (3, "passing_tone", "normal"),
+            (4, "chromatic_approach", "ghost"),
+        ],
+        note_durations=[1.0, 1.0, 1.0, 1.0, 1.0],
+    ),
+    # --- Arpeggiated ---
+    BassPattern(
+        name="five_four_arp",
+        style=BassStyle.ARPEGGIATED,
+        energy="medium",
+        time_sig=(5, 4),
+        description="Triad arpeggio — root, 3rd, 5th, 3rd, root",
+        notes=[
+            (0, "root", "accent"),
+            (1, "3rd", "normal"),
+            (2, "5th", "normal"),
+            (3, "3rd", "normal"),
+            (4, "root", "ghost"),
+        ],
+        note_durations=[1.0, 1.0, 1.0, 1.0, 1.0],
+    ),
+    # --- Syncopated ---
+    BassPattern(
+        name="five_four_synco",
+        style=BassStyle.SYNCOPATED,
+        energy="high",
+        time_sig=(5, 4),
+        description="Syncopated 5/4 — root on 1, 5th on 2.5, root on 4",
+        notes=[
+            (0, "root", "accent"),
+            (2.5, "5th", "normal"),
+            (3, "root", "normal"),
+        ],
+        note_durations=[2.5, 0.5, 2.0],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # 7/8 Templates
 # ---------------------------------------------------------------------------
 # 7/8 = 3.5 quarter-note beats. Group positions: 0, 1.5, 2.5 (3+2+2 grouping)
@@ -1282,6 +1380,8 @@ ALL_TEMPLATES: list[BassPattern] = [
     *TEMPLATES_4_4_REST_DOWNBEAT,
     # 3/4 (waltz)
     *TEMPLATES_3_4,
+    # 5/4
+    *TEMPLATES_5_4,
     # 6/8 (compound duple)
     *TEMPLATES_6_8,
     # 7/8

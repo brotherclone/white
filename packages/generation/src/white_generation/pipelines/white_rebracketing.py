@@ -16,7 +16,7 @@ Public API
     set_midi_bpm(midi_bytes, bpm) -> bytes
     extract_bars(midi_bytes, ticks_per_beat, beats_per_bar) -> list[bytes]
     concatenate_bars(bars, ticks_per_beat, bpm) -> bytes
-    build_bar_pool(sub_proposal_dirs, white_key, white_bpm) -> list[dict]
+    build_bar_pool(sub_proposal_dirs, white_key, white_bpm, beats_per_bar) -> list[dict]
 """
 
 from __future__ import annotations
@@ -150,7 +150,7 @@ def set_midi_bpm(midi_bytes: bytes, bpm: int) -> bytes:
 def extract_bars(
     midi_bytes: bytes,
     ticks_per_beat: int,
-    beats_per_bar: int,
+    beats_per_bar: float,
 ) -> list[bytes]:
     """Slice a MIDI file into individual bar chunks.
 
@@ -160,7 +160,7 @@ def extract_bars(
 
     Returns a list of MIDI byte strings, one per bar.
     """
-    bar_ticks = ticks_per_beat * beats_per_bar
+    bar_ticks = int(ticks_per_beat * beats_per_bar)
     mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
 
     # Convert all tracks to absolute tick events, merge into one stream
@@ -229,11 +229,16 @@ def concatenate_bars(
     bars: list[bytes],
     ticks_per_beat: int,
     bpm: int,
+    beats_per_bar: float = 4.0,
 ) -> bytes:
     """Join a list of bar MIDI byte strings into a single MIDI file.
 
     The output file has a single track with a tempo message followed by all
     bar events in order.  Tick offsets are adjusted so bars flow continuously.
+
+    beats_per_bar controls exactly how far the tick cursor advances per bar —
+    use this to match the target time signature rather than inferring from event
+    content (which breaks for sparse or empty bars).
     """
     if not bars:
         raise ValueError("concatenate_bars: bars list is empty")
@@ -242,10 +247,11 @@ def concatenate_bars(
     merged_track = mido.MidiTrack()
     merged_track.append(mido.MetaMessage("set_tempo", tempo=tempo_us, time=0))
 
+    bar_step = int(beats_per_bar * ticks_per_beat)
     tick_cursor = 0
+    prev_abs_global = 0  # persists across bars to encode gaps correctly
     for bar_bytes in bars:
         bar_mid = mido.MidiFile(file=io.BytesIO(bar_bytes))
-        # Convert to absolute ticks within the bar
         abs_events: list[tuple[int, mido.Message]] = []
         for track in bar_mid.tracks:
             abs_tick = 0
@@ -256,17 +262,13 @@ def concatenate_bars(
 
         abs_events.sort(key=lambda x: x[0])
 
-        prev_abs_global = tick_cursor
         for abs_tick, msg in abs_events:
             global_tick = tick_cursor + abs_tick
             delta = global_tick - prev_abs_global
             merged_track.append(msg.copy(time=delta))
             prev_abs_global = global_tick
 
-        # Advance cursor by one bar's worth of ticks (infer from ticks_per_beat)
-        if bar_mid.tracks:
-            bar_len = sum(msg.time for track in bar_mid.tracks for msg in track)
-            tick_cursor += bar_len if bar_len > 0 else ticks_per_beat * 4
+        tick_cursor += bar_step
 
     merged_track.append(mido.MetaMessage("end_of_track", time=0))
 
@@ -286,6 +288,7 @@ def build_bar_pool(
     sub_proposal_dirs: list[Path],
     white_key: str,
     white_bpm: int,
+    beats_per_bar: float = 4.0,
 ) -> list[dict]:
     """Build a pool of transposed, BPM-normalised bars from sub-proposal dirs.
 
@@ -349,7 +352,6 @@ def build_bar_pool(
 
             mid = mido.MidiFile(file=io.BytesIO(rescaled))
             tpb = mid.ticks_per_beat or 480
-            beats_per_bar = _beats_per_bar_from_review(review)
 
             bars = extract_bars(rescaled, tpb, beats_per_bar)
             for bar_idx, bar_bytes in enumerate(bars):
@@ -365,11 +367,3 @@ def build_bar_pool(
                 )
 
     return pool
-
-
-def _beats_per_bar_from_review(review: dict) -> int:
-    """Derive beats_per_bar from a chord review.yml dict."""
-    # chords/review.yml doesn't store time_sig directly; default to 4
-    # (all current color songs are 4/4 or 7/8 — the White song proposal
-    #  can supply this explicitly via the pipeline caller)
-    return 4
