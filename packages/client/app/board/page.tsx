@@ -123,6 +123,7 @@ export default function BoardPage() {
   const [mixPathInput, setMixPathInput] = useState("");
   const [settingMix, setSettingMix] = useState(false);
   const [showMixInput, setShowMixInput] = useState(false);
+  const [conceptExpanded, setConceptExpanded] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncDone, setSyncDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -391,6 +392,17 @@ export default function BoardPage() {
 
       {loadState === "ready" && composition && (
         <div className="px-6 pt-4 pb-0">
+          {activeSong?.concept && (
+            <div className="mb-4 bg-zinc-900/60 border border-zinc-800 rounded p-3 font-sans text-sm text-zinc-400">
+              <div className={conceptExpanded ? "" : "line-clamp-3"}>{activeSong.concept}</div>
+              <button
+                onClick={() => setConceptExpanded(e => !e)}
+                className="mt-1 text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
+                {conceptExpanded ? "Show less" : "Show more"}
+              </button>
+            </div>
+          )}
           {mixFile ? (
             <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 mb-4">
               <audio

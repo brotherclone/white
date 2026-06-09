@@ -169,23 +169,25 @@ def _score_population(
     candidates = [{"midi_bytes": mb} for mb in midi_list]
     results = scorer.score_batch(candidates, concept_emb=concept_emb)
 
-    # Map results back by position
+    # Map results back by position.
+    # Refractor returns temporal/spatial/ontological as dicts of mode probabilities,
+    # not as scalars — there is no "scores" wrapper key.  Fitness = mean max-prob
+    # across dimensions, scaled by confidence.
     scored: dict[int, float] = {}
     for r in results:
         midi_key = id(r["candidate"]["midi_bytes"])
         for i, c in enumerate(candidates):
             if id(c["midi_bytes"]) == midi_key:
-                # Use mean of all dimension scores as fitness
-                s = r.get("scores", {})
-                fitness = float(
-                    np.mean(
-                        [
-                            s.get("temporal", 0.0),
-                            s.get("spatial", 0.0),
-                            s.get("ontological", 0.0),
-                        ]
-                    )
-                )
+                temporal = r.get("temporal", {})
+                spatial = r.get("spatial", {})
+                ontological = r.get("ontological", {})
+                dim_scores = [
+                    max(temporal.values()) if temporal else 0.0,
+                    max(spatial.values()) if spatial else 0.0,
+                    max(ontological.values()) if ontological else 0.0,
+                ]
+                confidence = r.get("confidence", 0.5)
+                fitness = float(np.mean(dim_scores)) * (0.5 + 0.5 * confidence)
                 scored[i] = fitness
                 break
 

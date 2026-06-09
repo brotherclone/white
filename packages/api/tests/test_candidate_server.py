@@ -460,7 +460,7 @@ class TestScanSongs:
         (prod_dir / "song_context.yml").write_text(
             "title: Song Alpha\nthread: thread-alpha\n"
         )
-        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha"
+        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha (song_a_v1)"
         logic_song_dir.mkdir(parents=True)
         (logic_song_dir / "composition.yml").write_text("stage: structure\n")
         with patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(tmp_path / "logic")}):
