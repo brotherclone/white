@@ -288,5 +288,5 @@ class TestBuildTable:
     def test_table_has_correct_column_count(self):
         table = build_table([self._make_status()])
         assert (
-            len(table.columns) == 13
-        )  # Production Run + Color + Singer + Key + BPM + 5 phases + Bars + Plan + Lyr
+            len(table.columns) == 14
+        )  # Production Run + Color + Singer + Key + BPM + 5 phases + Bars + Plan + Lyr + Dec
