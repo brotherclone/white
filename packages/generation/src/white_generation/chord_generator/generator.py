@@ -61,14 +61,33 @@ class ChordProgressionGenerator:
         return self.chords_df.filter(query)
 
     def sample_chord_by_function(
-        self, key_root: str, mode: str, function: str, category: Optional[str] = None
+        self,
+        key_root: str,
+        mode: str,
+        function: str,
+        category: Optional[str] = None,
+        triad_bias: float = 0.6,
     ) -> Optional[Dict]:
-        """Sample a random chord by function."""
-        candidates = self.get_chord_by_function(key_root, mode, function, category)
+        """Sample a random chord by function.
 
+        When no category is requested, prefers triads over extensions at the
+        ratio given by triad_bias (default 60/40).  This prevents the uniform
+        draw from producing almost exclusively add9/maj7 chords given that the
+        database is ~84% extended chords.
+        """
+        candidates = self.get_chord_by_function(key_root, mode, function, category)
         if len(candidates) == 0:
             return None
 
+        # Unbiased sampling when caller explicitly requests a category
+        if category:
+            return candidates.sample(1).to_dicts()[0]
+
+        triads = candidates.filter(pl.col("category") == "triad")
+        others = candidates.filter(pl.col("category") != "triad")
+
+        if len(triads) > 0 and len(others) > 0 and random.random() < triad_bias:
+            return triads.sample(1).to_dicts()[0]
         return candidates.sample(1).to_dicts()[0]
 
     def sample_next_chord_from_graph(

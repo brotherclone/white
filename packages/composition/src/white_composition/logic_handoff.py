@@ -54,7 +54,8 @@ def _song_dir(production_dir: Path) -> Path:
     thread_slug = ctx.get("thread") or production_dir.parent.parent.name
     title = ctx.get("title") or production_dir.name
     safe_title = title.replace("/", "-").replace(":", "-")
-    return _logic_output_dir() / thread_slug / safe_title
+    production_slug = production_dir.name
+    return _logic_output_dir() / thread_slug / f"{safe_title} ({production_slug})"
 
 
 def handoff(production_dir: Path) -> Path:

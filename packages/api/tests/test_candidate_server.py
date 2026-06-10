@@ -1,5 +1,7 @@
 """Tests for app/tools/candidate_server.py — API endpoints via TestClient."""
 
+import io
+import wave
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -12,6 +14,17 @@ from white_api.candidate_server import create_app, scan_songs
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
+
+def _minimal_wav_bytes() -> bytes:
+    """Return a valid one-frame silent WAV so wave.open() succeeds in tests."""
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(44100)
+        w.writeframes(b"\x00\x00")
+    return buf.getvalue()
 
 
 def _write_review(path: Path, data: dict) -> None:
@@ -460,7 +473,7 @@ class TestScanSongs:
         (prod_dir / "song_context.yml").write_text(
             "title: Song Alpha\nthread: thread-alpha\n"
         )
-        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha"
+        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha (song_a_v1)"
         logic_song_dir.mkdir(parents=True)
         (logic_song_dir / "composition.yml").write_text("stage: structure\n")
         with patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(tmp_path / "logic")}):
@@ -901,7 +914,7 @@ class TestSamplesEndpoints:
 
         tc = self._active_client(sw_dir)
         wav = tmp_path / "seg_001.wav"
-        wav.write_bytes(b"RIFF")
+        wav.write_bytes(_minimal_wav_bytes())
         fake_df = pd.DataFrame(
             [{"segment_id": "seg_001", "source_audio_file": str(wav)}]
         )

@@ -217,8 +217,8 @@ def compute_statistics(chords_df: pl.DataFrame, progressions_df: pl.DataFrame) -
 
 
 def main(
-    chords_dir: str = "/Volumes/LucidNonsense/White/chords",
-    output_dir: str = "/Volumes/LucidNonsense/White/app/generators/midi/prototype/data",
+    chords_dir: str = str(Path(__file__).parent.parent.parent.parent / "chords"),
+    output_dir: str = str(Path(__file__).parent / "data"),
 ):
     """
     Main pipeline to build the chord database.
