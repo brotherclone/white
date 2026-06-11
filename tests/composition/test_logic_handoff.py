@@ -74,7 +74,7 @@ def test_scaffold_creates_folder_and_logicx(
     song_dir = handoff(production_dir)
 
     assert song_dir.is_dir()
-    logicx = song_dir / "My Test Song.logicx"
+    logicx = song_dir / f"{song_dir.name}.logicx"
     assert logicx.is_dir(), "seed.logicx.logicx should be copied and renamed"
     assert (logicx / "projectData").exists()
 

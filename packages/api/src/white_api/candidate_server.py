@@ -12,13 +12,16 @@ Usage (album mode):
 """
 
 import argparse
+import io
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 import threading
 import urllib.parse
+import wave
 import webbrowser
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -26,9 +29,9 @@ from pathlib import Path
 
 import uvicorn
 import yaml
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
 from white_api.candidate_browser import (
@@ -56,6 +59,33 @@ _EVOLVE_PIPELINE = {
 # ---------------------------------------------------------------------------
 
 _AUDIO_ROOT: Path = Path(__file__).parents[4].resolve()
+
+# Parquet was built with an old absolute path for staged_raw_material.
+# Remap to wherever it actually lives now.
+_STAGED_RAW_MATERIAL_ROOT: Path = (
+    _AUDIO_ROOT / "packages" / "extraction" / "staged_raw_material"
+)
+_STAGED_RAW_MATERIAL_ANCHOR = "staged_raw_material"
+
+
+def _resolve_audio_path(raw: str | Path) -> Path:
+    """Translate a parquet-baked path to the current filesystem location.
+
+    Finds 'staged_raw_material' in the path parts and rewrites everything
+    before it to the current location, avoiding symlink-expansion mismatches.
+    """
+    p = Path(raw)
+    if p.exists():
+        return p
+    parts = p.parts
+    try:
+        idx = parts.index(_STAGED_RAW_MATERIAL_ANCHOR)
+    except ValueError:
+        return p
+    rel = Path(*parts[idx + 1 :])
+    candidate = _STAGED_RAW_MATERIAL_ROOT / rel
+    return candidate if candidate.exists() else p
+
 
 # ---------------------------------------------------------------------------
 # Module-level state (mutated at startup and by /songs/activate)
@@ -565,6 +595,44 @@ def create_app(
             _clap_df = load_clap_index(str(_CLAP_PARQUET), str(_META_PARQUET))
         return _clap_df
 
+    def _slice_wav_segment(
+        wav_path: Path,
+        start_sec: float | None,
+        end_sec: float | None,
+    ) -> bytes:
+        """Extract [start_sec, end_sec] from a WAV and return as WAV bytes."""
+        import math
+
+        # pandas/pyarrow represents missing floats as NaN, not None
+        if start_sec is not None and (
+            not isinstance(start_sec, float) or math.isnan(start_sec)
+        ):
+            start_sec = None
+        if end_sec is not None and (
+            not isinstance(end_sec, float) or math.isnan(end_sec)
+        ):
+            end_sec = None
+        with wave.open(str(wav_path), "rb") as src:
+            framerate = src.getframerate()
+            total_frames = src.getnframes()
+            n_channels = src.getnchannels()
+            sampwidth = src.getsampwidth()
+            start_frame = int(start_sec * framerate) if start_sec is not None else 0
+            end_frame = (
+                int(end_sec * framerate) if end_sec is not None else total_frames
+            )
+            start_frame = max(0, min(start_frame, total_frames))
+            end_frame = max(start_frame, min(end_frame, total_frames))
+            src.setpos(start_frame)
+            frames = src.readframes(end_frame - start_frame)
+        buf = io.BytesIO()
+        with wave.open(buf, "wb") as dst:
+            dst.setnchannels(n_channels)
+            dst.setsampwidth(sampwidth)
+            dst.setframerate(framerate)
+            dst.writeframes(frames)
+        return buf.getvalue()
+
     def _check_audio_path(wav_path: Path) -> Path:
         resolved = wav_path.resolve()
         try:
@@ -595,19 +663,54 @@ def create_app(
         return results
 
     @app.get("/audio/{segment_id:path}")
-    def stream_audio(segment_id: str):
+    def stream_audio(segment_id: str, request: Request):
         df = _get_clap_df()
         row = df[df["segment_id"] == segment_id]
         if row.empty:
             raise HTTPException(
                 status_code=404, detail=f"Segment '{segment_id}' not found"
             )
-        wav_path = _check_audio_path(Path(row.iloc[0]["source_audio_file"]))
+        rec = row.iloc[0]
+        wav_path = _check_audio_path(_resolve_audio_path(rec["source_audio_file"]))
         if not wav_path.exists():
             raise HTTPException(
                 status_code=404, detail=f"WAV file not found: {wav_path}"
             )
-        return FileResponse(str(wav_path), media_type="audio/wav")
+        audio_bytes = _slice_wav_segment(
+            wav_path,
+            rec.get("start_seconds"),
+            rec.get("end_seconds"),
+        )
+        total = len(audio_bytes)
+        range_header = request.headers.get("range")
+        if range_header:
+            m = re.match(r"bytes=(\d*)-(\d*)", range_header)
+            if m:
+                start, end = 0, total - 1
+                s, e = m.groups()
+                if s:
+                    start = int(s)
+                if e:
+                    end = min(int(e), total - 1)
+                chunk = audio_bytes[start : end + 1]
+                return Response(
+                    content=chunk,
+                    status_code=206,
+                    media_type="audio/wav",
+                    headers={
+                        "Content-Range": f"bytes {start}-{end}/{total}",
+                        "Content-Length": str(len(chunk)),
+                        "Accept-Ranges": "bytes",
+                    },
+                )
+        return Response(
+            content=audio_bytes,
+            media_type="audio/wav",
+            headers={
+                "Content-Length": str(total),
+                "Accept-Ranges": "bytes",
+            },
+        )
 
     @app.post("/samples/{segment_id}/export")
     def export_sample(segment_id: str):
@@ -623,7 +726,9 @@ def create_app(
             raise HTTPException(
                 status_code=404, detail=f"Segment '{segment_id}' not found"
             )
-        wav_path = _check_audio_path(Path(row.iloc[0]["source_audio_file"]))
+        wav_path = _check_audio_path(
+            _resolve_audio_path(row.iloc[0]["source_audio_file"])
+        )
         if not wav_path.exists():
             raise HTTPException(
                 status_code=404, detail=f"WAV file not found: {wav_path}"
@@ -636,8 +741,12 @@ def create_app(
         logic_root = Path(logic_output_dir).resolve()
         thread_slug = _active_song.get("thread_slug", "unknown")
         title = _active_song.get("title", "unknown")
+        production_slug = _active_song.get("production_slug", "")
         safe_title = title.replace("/", "-").replace(":", "-").replace("..", "")
-        dest_dir = (logic_root / thread_slug / safe_title / "Samples").resolve()
+        song_folder = (
+            f"{safe_title} ({production_slug})" if production_slug else safe_title
+        )
+        dest_dir = (logic_root / thread_slug / song_folder / "Samples").resolve()
         try:
             dest_dir.relative_to(logic_root)
         except ValueError:
@@ -1315,6 +1424,61 @@ def create_app(
     # Evolve
     # ------------------------------------------------------------------
 
+    def _snapshot_decided(review_path: Path) -> tuple[list[dict], dict[str, bytes]]:
+        """Return (decided_candidates, {midi_rel: bytes}) for approved/rejected entries."""
+        if not review_path.exists():
+            return [], {}
+        with open(review_path) as f:
+            data = yaml.safe_load(f) or {}
+        decided = [
+            c
+            for c in (data.get("candidates") or [])
+            if str(c.get("status", "pending")).lower() in ("approved", "rejected")
+        ]
+        midi_bytes: dict[str, bytes] = {}
+        for c in decided:
+            rel = c.get("midi_file", "")
+            if rel:
+                p = review_path.parent / rel
+                if p.exists():
+                    midi_bytes[rel] = p.read_bytes()
+        return decided, midi_bytes
+
+    def _merge_decided(
+        review_path: Path, decided: list[dict], midi_bytes: dict[str, bytes]
+    ) -> int:
+        """Re-inject decided candidates into a freshly written review.yml.
+
+        Restores any MIDI files that the pipeline wiped, then inserts the
+        decided entries before the new pending ones so they appear at the top.
+        Returns the number of re-injected entries.
+        """
+        if not decided:
+            return 0
+        # Restore MIDI files the pipeline may have deleted or overwritten
+        for rel, data in midi_bytes.items():
+            dest = review_path.parent / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(data)
+        # Load new review.yml written by the pipeline
+        with open(review_path) as f:
+            review = yaml.safe_load(f) or {}
+        new_candidates = review.get("candidates") or []
+        # Drop any new pending that share an id with a decided entry
+        decided_ids = {c["id"] for c in decided}
+        new_candidates = [c for c in new_candidates if c.get("id") not in decided_ids]
+        review["candidates"] = decided + new_candidates
+        with open(review_path, "w") as f:
+            yaml.dump(
+                review,
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
+        return len(decided)
+
     class EvolveBody(BaseModel):
         phase: str
 
@@ -1326,6 +1490,13 @@ def create_app(
                 status_code=400,
                 detail=f"Phase '{body.phase}' does not support evolution. Must be one of: {sorted(EVOLVABLE_PHASES)}",
             )
+        from white_composition.pipeline_runner import PHASE_REVIEW_FILES
+
+        review_path = prod / (
+            PHASE_REVIEW_FILES.get(body.phase) or f"{body.phase}/review.yml"
+        )
+        decided, saved_midi = _snapshot_decided(review_path)
+
         module = _EVOLVE_PIPELINE[body.phase]
         cmd = [
             sys.executable,
@@ -1342,13 +1513,14 @@ def create_app(
                 detail=result.stderr.strip()
                 or f"Evolution failed for phase '{body.phase}'",
             )
+        restored = _merge_decided(review_path, decided, saved_midi)
         candidates_dir = prod / body.phase / "candidates"
         evolved_count = (
             len(list(candidates_dir.glob("evolved_*.mid")))
             if candidates_dir.exists()
             else 0
         )
-        return {"ok": True, "evolved_count": evolved_count}
+        return {"ok": True, "evolved_count": evolved_count, "restored_count": restored}
 
     # ------------------------------------------------------------------
     # Generate (agent workflow + shrinkwrap)

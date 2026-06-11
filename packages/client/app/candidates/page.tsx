@@ -598,7 +598,9 @@ export default function CandidatesPage() {
       <div className="mt-4 border border-zinc-800 rounded-lg overflow-hidden">
         <button
           onClick={() => setSamplesExpanded(e => !e)}
-          className="w-full flex items-center justify-between px-4 py-2.5 bg-zinc-900 text-zinc-400 text-sm font-sans hover:bg-zinc-800 transition-colors"
+          disabled={activeSong?.stage !== "composition"}
+          className="w-full flex items-center justify-between px-4 py-2.5 bg-zinc-900 text-zinc-400 text-sm font-sans hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900"
+          title={activeSong?.stage !== "composition" ? "Handoff to Logic first — samples export into the Logic project folder" : undefined}
         >
           <span className="font-medium text-zinc-300">Chromatic Samples</span>
           <span className="text-xs text-zinc-600">{samplesExpanded ? "▲ collapse" : `▼ ${samples.length} samples`}</span>

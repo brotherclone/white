@@ -365,9 +365,11 @@ def generate_review_yaml(
             "id": item["id"],
             "midi_file": f"candidates/{item['id']}.mid",
             "scratch_midi": f"candidates/{item['id']}_scratch.mid",
-            "rank": None if is_diatonic else item["rank"],
+            "rank": item.get("rank"),
             "source": item.get("source", "markov"),
-            "scores": None if is_diatonic else _to_python(item["breakdown"]),
+            "scores": (
+                _to_python(item.get("breakdown")) if item.get("breakdown") else None
+            ),
             "hr_distribution": _to_python(item.get("hr_distribution", [])),
             "strum_pattern": item.get("strum_pattern", "whole"),
             "progression": item["summary"],
@@ -383,7 +385,9 @@ def generate_review_yaml(
             "label": None,
             "status": "pending",
             "notes": (
-                "Diatonic workhorse — assign to verse sections" if is_diatonic else ""
+                "Diatonic workhorse — clean triads, assign to verse/chorus"
+                if is_diatonic
+                else ""
             ),
         }
         if item.get("bar_sources"):
@@ -909,49 +913,9 @@ def run_chord_pipeline(
             }
         )
 
-    # Rank by composite score
-    scored.sort(key=lambda x: x["composite"], reverse=True)
-    top_candidates = scored[:top_k]
-
-    # Assign IDs and ranks
-    for rank, item in enumerate(top_candidates):
-        item["rank"] = rank + 1
-        item["id"] = f"chord_{rank + 1:03d}"
-
-    # --- 5. Write MIDI files (with HR + strum baked in) + scratch beats ---
-    slug = song_slug(song_filename)
-    output_dir = thread_path / "production" / slug / "chords"
-    candidates_dir = output_dir / "candidates"
-    approved_dir = output_dir / "approved"
-    candidates_dir.mkdir(parents=True, exist_ok=True)
-    approved_dir.mkdir(parents=True, exist_ok=True)
-
+    # --- 5. Build and score diatonic candidates alongside Markov ---
+    # Build diatonic BEFORE sorting so they can compete for rank positions.
     time_sig = tuple(song_info["time_sig"])
-    print(
-        f"\nWriting {len(top_candidates)} chord primitives + scratch beats to {candidates_dir}/"
-    )
-    for item in top_candidates:
-        n_chords = len(item["progression"])
-        hr_dist = sample_hr_distribution(n_chords, rng)
-        strum_pat = sample_strum_pattern(time_sig, rng, filter_names=strum_patterns)
-        bar_count = int(sum(hr_dist))
-
-        primitive_bytes = progression_to_primitive_midi_bytes(
-            item["progression"], song_info["bpm"], time_sig, hr_dist, strum_pat
-        )
-        scratch_bytes = generate_scratch_beat(
-            song_info["bpm"], bar_count, time_sig, genre_families
-        )
-
-        write_midi_file(primitive_bytes, candidates_dir / f"{item['id']}.mid")
-        _trim_midi(candidates_dir / f"{item['id']}.mid")
-        write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
-        _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
-
-        item["hr_distribution"] = hr_dist
-        item["strum_pattern"] = strum_pat.name
-
-    # --- 6. Build and write diatonic workhorse candidates ---
     diatonic = build_diatonic_candidates(
         song_info["key_root"],
         song_info["mode"],
@@ -961,16 +925,118 @@ def run_chord_pipeline(
         rng,
         genre_families,
     )
+
     if diatonic:
-        print(f"\nAdding {len(diatonic)} diatonic workhorse candidates...")
-        for item in diatonic:
+        print(f"\nScoring {len(diatonic)} diatonic candidates with Refractor...")
+        # Use simple MIDI (no HR/strum) for scoring consistency with Markov candidates
+        diatonic_score_inputs = [
+            {
+                "midi_bytes": progression_to_midi_bytes(
+                    d["progression"], bpm=song_info["bpm"]
+                )
+            }
+            for d in diatonic
+        ]
+        diatonic_results = scorer.score_batch(
+            diatonic_score_inputs, concept_emb=concept_emb
+        )
+        diatonic_by_midi = {
+            id(r["candidate"]["midi_bytes"]): r for r in diatonic_results
+        }
+
+        for i, d in enumerate(diatonic):
+            sr = diatonic_by_midi.get(id(diatonic_score_inputs[i]["midi_bytes"]))
+            if sr is None:
+                continue
+            theory_score, theory_breakdown = gen.score_progression(
+                d["progression"], song_info["key_root"], song_info["mode"]
+            )
+            chromatic_match = compute_chromatic_match(sr, target)
+            comp, breakdown = composite_score(
+                theory_score,
+                theory_breakdown,
+                chromatic_match,
+                sr,
+                theory_weight,
+                chromatic_weight,
+            )
+            scored.append(
+                {
+                    "composite": comp,
+                    "breakdown": breakdown,
+                    "progression": d["progression"],
+                    "midi_bytes": d["midi_bytes"],  # already HR+strum baked
+                    "scratch_bytes": d["scratch_bytes"],
+                    "summary": d["summary"],
+                    "hr_distribution": d["hr_distribution"],
+                    "strum_pattern": d["strum_pattern"],
+                    "source": "diatonic",
+                    "id": d["id"],
+                }
+            )
+
+    # Merge, re-sort, and select final pool.
+    # Markov candidates are capped at top_k; diatonic always included in full.
+    # Final list is sorted by composite so ranks truly reflect scores.
+    scored.sort(key=lambda x: x["composite"], reverse=True)
+    diatonic_ids = {d["id"] for d in diatonic}
+    markov_candidates = [c for c in scored if c.get("id") not in diatonic_ids][:top_k]
+    diatonic_candidates = [c for c in scored if c.get("id") in diatonic_ids]
+    top_candidates = sorted(
+        markov_candidates + diatonic_candidates,
+        key=lambda x: x["composite"],
+        reverse=True,
+    )
+
+    # Assign global ranks in composite order; Markov IDs are sequential among Markov entries.
+    markov_counter = 0
+    for rank, item in enumerate(top_candidates, 1):
+        item["rank"] = rank
+        if item.get("source") != "diatonic":
+            markov_counter += 1
+            item["id"] = f"chord_{markov_counter:03d}"
+
+    # --- 6. Write MIDI files for all candidates ---
+    slug = song_slug(song_filename)
+    output_dir = thread_path / "production" / slug / "chords"
+    candidates_dir = output_dir / "candidates"
+    approved_dir = output_dir / "approved"
+    candidates_dir.mkdir(parents=True, exist_ok=True)
+    approved_dir.mkdir(parents=True, exist_ok=True)
+
+    print(
+        f"\nWriting {len(top_candidates)} chord primitives + scratch beats to {candidates_dir}/"
+    )
+    for item in top_candidates:
+        is_diatonic = item.get("source") == "diatonic"
+        if is_diatonic:
+            # midi_bytes already has HR+strum baked from build_diatonic_candidates
             write_midi_file(item["midi_bytes"], candidates_dir / f"{item['id']}.mid")
             _trim_midi(candidates_dir / f"{item['id']}.mid")
             write_midi_file(
                 item["scratch_bytes"], candidates_dir / f"{item['id']}_scratch.mid"
             )
             _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
-        top_candidates = top_candidates + diatonic
+        else:
+            n_chords = len(item["progression"])
+            hr_dist = sample_hr_distribution(n_chords, rng)
+            strum_pat = sample_strum_pattern(time_sig, rng, filter_names=strum_patterns)
+            bar_count = int(sum(hr_dist))
+
+            primitive_bytes = progression_to_primitive_midi_bytes(
+                item["progression"], song_info["bpm"], time_sig, hr_dist, strum_pat
+            )
+            scratch_bytes = generate_scratch_beat(
+                song_info["bpm"], bar_count, time_sig, genre_families
+            )
+
+            write_midi_file(primitive_bytes, candidates_dir / f"{item['id']}.mid")
+            _trim_midi(candidates_dir / f"{item['id']}.mid")
+            write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
+            _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
+
+            item["hr_distribution"] = hr_dist
+            item["strum_pattern"] = strum_pat.name
 
     # --- 7. Write review YAML ---
     review = generate_review_yaml(

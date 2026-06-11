@@ -102,8 +102,16 @@ def parse_chord_metadata(path: Path) -> Dict:
         # Might be a progression or other format
         chord_name = filename
 
+    # The directory label uses the major key as the primary root (e.g.
+    # "C Major - A Minor").  For minor-mode chords, the correct key_root is
+    # the relative-minor root, not the major one.
+    effective_key_root = key_root
+    if mode_in_key == "Minor" and relative_key and relative_key != "Unknown":
+        minor_root = relative_key.split()[0]
+        effective_key_root = minor_root
+
     return {
-        "key_root": key_root,
+        "key_root": effective_key_root,
         "key_quality": key_quality,
         "relative_key": relative_key,
         "mode_in_key": mode_in_key,
@@ -164,52 +172,58 @@ def extract_chord_from_midi(midi_file: Path) -> Optional[Dict]:
 
 def infer_chord_quality(intervals: List[int]) -> str:
     """
-    Infer chord quality from intervals.
-    This is a simplified heuristic - could be expanded.
+    Infer chord quality from intervals, handling octave doublings in voicings.
+
+    Raw intervals from multi-octave MIDI voicings (e.g. [0,7,12,16]) contain
+    duplicated pitch classes once octave-reduced.  Reducing to mod-12 before
+    matching means C3-G3-C4-E4 correctly identifies as "major" rather than
+    "unknown".  More specific (complex) chords are checked first so that, for
+    example, an add9 [0,2,4,7] is not misidentified as sus2 [0,2,7].
     """
-    intervals_set = set(intervals)
+    # Reduce to pitch classes to collapse octave doublings
+    pc = set(i % 12 for i in intervals)
 
-    # Triads
-    if intervals_set == {0, 4, 7}:
-        return "major"
-    elif intervals_set == {0, 3, 7}:
-        return "minor"
-    elif intervals_set == {0, 3, 6}:
-        return "diminished"
-    elif intervals_set == {0, 4, 8}:
-        return "augmented"
-
-    # Seventh chords
-    elif {0, 4, 7, 11} <= intervals_set:
-        return "maj7"
-    elif {0, 3, 7, 10} <= intervals_set:
-        return "min7"
-    elif {0, 4, 7, 10} <= intervals_set:
-        return "dom7"
-    elif {0, 3, 6, 10} <= intervals_set:
-        return "min7b5"
-    elif {0, 3, 6, 9} <= intervals_set:
-        return "dim7"
-
-    # Extended chords (simplified)
-    elif {0, 4, 7, 11, 14} <= intervals_set:
+    # Ninth chords (most specific — check before 7ths to avoid partial matches)
+    if {0, 2, 4, 7, 11} <= pc:
         return "maj9"
-    elif {0, 3, 7, 10, 14} <= intervals_set:
+    if {0, 2, 3, 7, 10} <= pc:
         return "min9"
-    elif {0, 4, 7, 10, 14} <= intervals_set:
+    if {0, 2, 4, 7, 10} <= pc:
         return "dom9"
 
-    # Suspended
-    elif {0, 5, 7} <= intervals_set:
-        return "sus4"
-    elif {0, 2, 7} <= intervals_set:
-        return "sus2"
+    # Seventh chords
+    if {0, 4, 7, 11} <= pc:
+        return "maj7"
+    if {0, 3, 7, 10} <= pc:
+        return "min7"
+    if {0, 4, 7, 10} <= pc:
+        return "dom7"
+    if {0, 3, 6, 10} <= pc:
+        return "min7b5"
+    if {0, 3, 6, 9} <= pc:
+        return "dim7"
 
-    # Add chords
-    elif {0, 4, 7, 14} <= intervals_set:
+    # Add chords (before triads+sus — {0,2,4,7} contains {0,2,7} as subset)
+    if {0, 2, 4, 7} <= pc:
         return "add9"
-    elif {0, 4, 7, 9} <= intervals_set:
+    if {0, 4, 7, 9} <= pc:
         return "add6"
+
+    # Triads (exact pitch-class match after extended chords are ruled out)
+    if pc == {0, 4, 7}:
+        return "major"
+    if pc == {0, 3, 7}:
+        return "minor"
+    if pc == {0, 3, 6}:
+        return "diminished"
+    if pc == {0, 4, 8}:
+        return "augmented"
+
+    # Suspended
+    if {0, 5, 7} <= pc:
+        return "sus4"
+    if {0, 2, 7} <= pc:
+        return "sus2"
 
     return "unknown"
 

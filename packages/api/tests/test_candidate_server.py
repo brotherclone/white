@@ -1,5 +1,7 @@
 """Tests for app/tools/candidate_server.py — API endpoints via TestClient."""
 
+import io
+import wave
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -12,6 +14,17 @@ from white_api.candidate_server import create_app, scan_songs
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
+
+def _minimal_wav_bytes() -> bytes:
+    """Return a valid one-frame silent WAV so wave.open() succeeds in tests."""
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(44100)
+        w.writeframes(b"\x00\x00")
+    return buf.getvalue()
 
 
 def _write_review(path: Path, data: dict) -> None:
@@ -341,6 +354,77 @@ class TestEvolve:
         assert resp.status_code == 500
         assert "ONNX" in resp.json()["detail"]
 
+    def test_decided_candidates_preserved_across_evolve(self, client, prod_dir):
+        """Approved/rejected MIDI bytes survive a pipeline rewrite of candidates/."""
+        import yaml
+
+        candidates_dir = prod_dir / "drums" / "candidates"
+        candidates_dir.mkdir(parents=True, exist_ok=True)
+        approved_midi = b"APPROVED_MIDI_BYTES"
+        (candidates_dir / "drums_001.mid").write_bytes(approved_midi)
+
+        review_path = prod_dir / "drums" / "review.yml"
+        review_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(review_path, "w") as f:
+            yaml.dump(
+                {
+                    "candidates": [
+                        {
+                            "id": "drums_001",
+                            "midi_file": "candidates/drums_001.mid",
+                            "status": "approved",
+                            "label": "verse",
+                        }
+                    ]
+                },
+                f,
+            )
+
+        def _wipe_and_rewrite(cmd, **kwargs):
+            # Simulate pipeline wiping candidates/ and writing a new MIDI with same name
+            (candidates_dir / "drums_001.mid").write_bytes(b"NEW_REGENERATED_MIDI")
+            with open(review_path, "w") as f:
+                yaml.dump(
+                    {
+                        "candidates": [
+                            {
+                                "id": "evolved_drums_001",
+                                "midi_file": "candidates/evolved_drums_001.mid",
+                                "status": "pending",
+                                "label": None,
+                            },
+                            {
+                                "id": "drums_001",
+                                "midi_file": "candidates/drums_001.mid",
+                                "status": "pending",
+                                "label": None,
+                            },
+                        ]
+                    },
+                    f,
+                )
+            result = MagicMock()
+            result.returncode = 0
+            result.stderr = ""
+            return result
+
+        with patch(
+            "white_api.candidate_server.subprocess.run", side_effect=_wipe_and_rewrite
+        ):
+            resp = client.post("/evolve", json={"phase": "drums"})
+
+        assert resp.status_code == 200
+        # Original approved MIDI bytes must be restored
+        assert (candidates_dir / "drums_001.mid").read_bytes() == approved_midi
+        # Approved entry must appear in review.yml with status intact
+        with open(review_path) as f:
+            review = yaml.safe_load(f)
+        approved = next(
+            (c for c in review["candidates"] if c["id"] == "drums_001"), None
+        )
+        assert approved is not None
+        assert approved["status"] == "approved"
+
 
 # ---------------------------------------------------------------------------
 # Album mode helpers
@@ -460,7 +544,7 @@ class TestScanSongs:
         (prod_dir / "song_context.yml").write_text(
             "title: Song Alpha\nthread: thread-alpha\n"
         )
-        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha"
+        logic_song_dir = tmp_path / "logic" / "thread-alpha" / "Song Alpha (song_a_v1)"
         logic_song_dir.mkdir(parents=True)
         (logic_song_dir / "composition.yml").write_text("stage: structure\n")
         with patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(tmp_path / "logic")}):
@@ -901,7 +985,7 @@ class TestSamplesEndpoints:
 
         tc = self._active_client(sw_dir)
         wav = tmp_path / "seg_001.wav"
-        wav.write_bytes(b"RIFF")
+        wav.write_bytes(_minimal_wav_bytes())
         fake_df = pd.DataFrame(
             [{"segment_id": "seg_001", "source_audio_file": str(wav)}]
         )
