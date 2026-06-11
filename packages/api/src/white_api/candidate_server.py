@@ -1455,20 +1455,28 @@ def create_app(
         """
         if not decided:
             return 0
+
         # Restore MIDI files the pipeline may have deleted or overwritten
         for rel, data in midi_bytes.items():
             dest = review_path.parent / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(data)
-        # Load new review.yml written by the pipeline
-        with open(review_path) as f:
-            review = yaml.safe_load(f) or {}
+        # Load the review.yml the pipeline wrote (or start from scratch if it
+        # failed before writing — preserve decided candidates either way).
+        if review_path.exists():
+            with open(review_path) as f:
+                review = yaml.safe_load(f) or {}
+        else:
+            review = {}
         new_candidates = review.get("candidates") or []
         # Drop any new pending that share an id with a decided entry
         decided_ids = {c["id"] for c in decided}
         new_candidates = [c for c in new_candidates if c.get("id") not in decided_ids]
         review["candidates"] = decided + new_candidates
-        with open(review_path, "w") as f:
+        # Atomic write so a mid-dump crash can't leave review.yml empty.
+        review_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = review_path.with_suffix(".yml.tmp")
+        with open(tmp, "w") as f:
             yaml.dump(
                 review,
                 f,
@@ -1477,6 +1485,7 @@ def create_app(
                 allow_unicode=True,
                 width=float("inf"),
             )
+        tmp.replace(review_path)
         return len(decided)
 
     class EvolveBody(BaseModel):
@@ -1497,6 +1506,8 @@ def create_app(
         )
         decided, saved_midi = _snapshot_decided(review_path)
 
+        import secrets
+
         module = _EVOLVE_PIPELINE[body.phase]
         cmd = [
             sys.executable,
@@ -1506,7 +1517,12 @@ def create_app(
             str(prod),
             "--evolve",
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        # Unique 6-hex token injected as EVOLVE_RUN_ID so evolved candidate IDs
+        # (e.g. evolved_a3f2b1_drum_verse_01) never collide with those from a
+        # previous run — preventing _merge_decided from filtering out new evolved
+        # candidates because their IDs matched older decided ones.
+        evolve_env = {**os.environ, "EVOLVE_RUN_ID": secrets.token_hex(3)}
+        result = subprocess.run(cmd, capture_output=True, text=True, env=evolve_env)
         if result.returncode != 0:
             raise HTTPException(
                 status_code=500,

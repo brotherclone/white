@@ -88,31 +88,39 @@ def _load_review(review_yml: Path) -> list[CandidateEntry]:
     for c in data.get("candidates", []) or []:
         if not c:
             continue
-        midi_rel = c.get("midi_file", "")
-        midi_path = _abs_midi(review_yml, midi_rel) if midi_rel else Path()
-        template = (
-            c.get("pattern_name")
-            or c.get("template")
-            or (c.get("progression") or "")[:40]
-            or c.get("id", "")
-        )
-        entries.append(
-            CandidateEntry(
-                phase=phase,
-                section=c.get("section", ""),
-                candidate_id=c.get("id", ""),
-                midi_file=midi_path,
-                review_yml=review_yml,
-                status=str(c.get("status", "pending")).lower(),
-                rank=int(c.get("rank") or 99),
-                composite_score=float((c.get("scores") or {}).get("composite", 0.0)),
-                template=template,
-                label=str(c.get("label", "") or ""),
-                use_case=str(c.get("use_case", "") or ""),
-                generated=bool(c.get("generated", True)),
-                scores=c.get("scores") or {},
+        try:
+            midi_rel = c.get("midi_file", "")
+            midi_path = _abs_midi(review_yml, midi_rel) if midi_rel else Path()
+            template = (
+                c.get("pattern_name")
+                or c.get("template")
+                or (c.get("progression") or "")[:40]
+                or c.get("id", "")
             )
-        )
+            rank_raw = c.get("rank")
+            rank = int(rank_raw) if rank_raw is not None else 99
+            scores = c.get("scores") or {}
+            composite_raw = scores.get("composite", 0.0)
+            composite = float(composite_raw) if composite_raw is not None else 0.0
+            entries.append(
+                CandidateEntry(
+                    phase=phase,
+                    section=c.get("section", ""),
+                    candidate_id=c.get("id", ""),
+                    midi_file=midi_path,
+                    review_yml=review_yml,
+                    status=str(c.get("status", "pending")).lower(),
+                    rank=rank,
+                    composite_score=composite,
+                    template=template,
+                    label=str(c.get("label", "") or ""),
+                    use_case=str(c.get("use_case", "") or ""),
+                    generated=bool(c.get("generated", True)),
+                    scores=scores,
+                )
+            )
+        except Exception:
+            continue  # skip malformed candidates rather than dropping the whole phase
     return entries
 
 
@@ -138,14 +146,25 @@ def load_all_candidates(
 
 
 def _update_review_yml(review_yml: Path, candidate_id: str, **fields) -> None:
+
     with open(review_yml) as f:
         data = yaml.safe_load(f) or {}
     for c in data.get("candidates", []):
         if c.get("id") == candidate_id:
             c.update(fields)
             break
-    with open(review_yml, "w") as f:
-        yaml.dump(data, f, allow_unicode=True, sort_keys=False)
+    # Atomic write: dump to a temp file then rename so a mid-write crash
+    # never leaves review.yml empty or truncated.
+    tmp = review_yml.with_suffix(".yml.tmp")
+    with open(tmp, "w") as f:
+        yaml.dump(
+            data,
+            f,
+            allow_unicode=True,
+            sort_keys=False,
+            width=float("inf"),
+        )
+    tmp.replace(review_yml)
 
 
 def approve_candidate(entry: CandidateEntry) -> None:
