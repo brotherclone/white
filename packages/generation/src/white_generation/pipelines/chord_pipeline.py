@@ -976,32 +976,25 @@ def run_chord_pipeline(
             )
 
     # Merge, re-sort, and select final pool.
-    # Markov top_k compete with diatonic — best candidates rank first regardless of source.
-    # All diatonic candidates are always included (they're few and human-curated patterns).
+    # Markov candidates are capped at top_k; diatonic always included in full.
+    # Final list is sorted by composite so ranks truly reflect scores.
     scored.sort(key=lambda x: x["composite"], reverse=True)
     diatonic_ids = {d["id"] for d in diatonic}
-    top_markov = [c for c in scored[:top_k] if c.get("id") not in diatonic_ids]
-    top_diatonic = [c for c in scored[:top_k] if c.get("id") in diatonic_ids]
-    extra_diatonic = [c for c in scored[top_k:] if c.get("id") in diatonic_ids]
-    top_candidates = top_markov + top_diatonic + extra_diatonic
+    markov_candidates = [c for c in scored if c.get("id") not in diatonic_ids][:top_k]
+    diatonic_candidates = [c for c in scored if c.get("id") in diatonic_ids]
+    top_candidates = sorted(
+        markov_candidates + diatonic_candidates,
+        key=lambda x: x["composite"],
+        reverse=True,
+    )
 
-    # Assign ranks and IDs (all candidates get a rank now)
-    markov_rank = 0
-    for item in top_candidates:
-        is_diatonic = item.get("source") == "diatonic"
-        if not is_diatonic:
-            markov_rank += 1
-            item["rank"] = markov_rank
-            item["id"] = f"chord_{markov_rank:03d}"
-        else:
-            item["rank"] = item.get("rank")  # rank from merged sort position
-
-    # Assign global ranks to diatonic items (rank after Markov top_k for review ordering)
-    global_rank = markov_rank
-    for item in top_candidates:
-        if item.get("source") == "diatonic" and item.get("rank") is None:
-            global_rank += 1
-            item["rank"] = global_rank
+    # Assign global ranks in composite order; Markov IDs are sequential among Markov entries.
+    markov_counter = 0
+    for rank, item in enumerate(top_candidates, 1):
+        item["rank"] = rank
+        if item.get("source") != "diatonic":
+            markov_counter += 1
+            item["id"] = f"chord_{markov_counter:03d}"
 
     # --- 6. Write MIDI files for all candidates ---
     slug = song_slug(song_filename)

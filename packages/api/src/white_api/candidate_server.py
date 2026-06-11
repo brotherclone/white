@@ -601,6 +601,17 @@ def create_app(
         end_sec: float | None,
     ) -> bytes:
         """Extract [start_sec, end_sec] from a WAV and return as WAV bytes."""
+        import math
+
+        # pandas/pyarrow represents missing floats as NaN, not None
+        if start_sec is not None and (
+            not isinstance(start_sec, float) or math.isnan(start_sec)
+        ):
+            start_sec = None
+        if end_sec is not None and (
+            not isinstance(end_sec, float) or math.isnan(end_sec)
+        ):
+            end_sec = None
         with wave.open(str(wav_path), "rb") as src:
             framerate = src.getframerate()
             total_frames = src.getnframes()
@@ -674,24 +685,24 @@ def create_app(
         range_header = request.headers.get("range")
         if range_header:
             m = re.match(r"bytes=(\d*)-(\d*)", range_header)
-            start, end = 0, total - 1
             if m:
+                start, end = 0, total - 1
                 s, e = m.groups()
                 if s:
                     start = int(s)
                 if e:
                     end = min(int(e), total - 1)
-            chunk = audio_bytes[start : end + 1]
-            return Response(
-                content=chunk,
-                status_code=206,
-                media_type="audio/wav",
-                headers={
-                    "Content-Range": f"bytes {start}-{end}/{total}",
-                    "Content-Length": str(len(chunk)),
-                    "Accept-Ranges": "bytes",
-                },
-            )
+                chunk = audio_bytes[start : end + 1]
+                return Response(
+                    content=chunk,
+                    status_code=206,
+                    media_type="audio/wav",
+                    headers={
+                        "Content-Range": f"bytes {start}-{end}/{total}",
+                        "Content-Length": str(len(chunk)),
+                        "Accept-Ranges": "bytes",
+                    },
+                )
         return Response(
             content=audio_bytes,
             media_type="audio/wav",
@@ -1444,12 +1455,11 @@ def create_app(
         """
         if not decided:
             return 0
-        # Restore MIDI files the pipeline may have deleted
+        # Restore MIDI files the pipeline may have deleted or overwritten
         for rel, data in midi_bytes.items():
             dest = review_path.parent / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
-            if not dest.exists():
-                dest.write_bytes(data)
+            dest.write_bytes(data)
         # Load new review.yml written by the pipeline
         with open(review_path) as f:
             review = yaml.safe_load(f) or {}
