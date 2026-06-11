@@ -645,3 +645,433 @@ class TestDiatonicCandidates:
         )
 
         assert review["candidates"][0]["source"] == "markov"
+
+
+# ---------------------------------------------------------------------------
+# MusicConstraints model
+# ---------------------------------------------------------------------------
+
+
+class TestMusicConstraints:
+
+    def test_defaults_are_none(self):
+        from white_core.music.music_constraints import MusicConstraints
+
+        mc = MusicConstraints()
+        assert mc.harmonic_sequence is None
+        assert mc.performance_notes is None
+
+    def test_full_construction(self):
+        from white_core.music.music_constraints import MusicConstraints
+
+        mc = MusicConstraints(
+            harmonic_sequence="i iv i",
+            performance_notes="Resolves on beat 2.5",
+        )
+        assert mc.harmonic_sequence == "i iv i"
+        assert mc.performance_notes == "Resolves on beat 2.5"
+
+    def test_extra_fields_ignored(self):
+        from white_core.music.music_constraints import MusicConstraints
+
+        mc = MusicConstraints(harmonic_sequence="I", unknown_field="should_be_ignored")
+        assert mc.harmonic_sequence == "I"
+        assert not hasattr(mc, "unknown_field")
+
+    def test_single_token(self):
+        from white_core.music.music_constraints import MusicConstraints
+
+        mc = MusicConstraints(harmonic_sequence="i")
+        assert mc.harmonic_sequence == "i"
+
+
+# ---------------------------------------------------------------------------
+# load_song_proposal_unified — musical_constraints parsing
+# ---------------------------------------------------------------------------
+
+
+class TestProposalMusicalConstraintsParsing:
+
+    def _write_proposal(self, path, extra=None):
+        import yaml
+
+        proposal = {
+            "title": "Test",
+            "bpm": 120,
+            "tempo": {"numerator": 4, "denominator": 4},
+            "key": "C major",
+            "rainbow_color": {"color_name": "Violet"},
+            "concept": "Test concept",
+        }
+        if extra:
+            proposal.update(extra)
+        path.write_text(yaml.dump(proposal, allow_unicode=True))
+        return path
+
+    def test_no_constraints_returns_none(self, tmp_path):
+        from white_composition.production_plan import load_song_proposal_unified
+
+        p = self._write_proposal(tmp_path / "song.yml")
+        result = load_song_proposal_unified(p)
+        assert result["musical_constraints"] is None
+
+    def test_full_constraints_parsed(self, tmp_path):
+        from white_composition.production_plan import load_song_proposal_unified
+
+        p = self._write_proposal(
+            tmp_path / "song.yml",
+            extra={
+                "musical_constraints": {
+                    "harmonic_sequence": "i IV i",
+                    "performance_notes": "Resolves early",
+                }
+            },
+        )
+        result = load_song_proposal_unified(p)
+        mc = result["musical_constraints"]
+        assert mc is not None
+        assert mc.harmonic_sequence == "i IV i"
+        assert mc.performance_notes == "Resolves early"
+
+    def test_partial_constraints_harmonic_only(self, tmp_path):
+        from white_composition.production_plan import load_song_proposal_unified
+
+        p = self._write_proposal(
+            tmp_path / "song.yml",
+            extra={"musical_constraints": {"harmonic_sequence": "i"}},
+        )
+        result = load_song_proposal_unified(p)
+        mc = result["musical_constraints"]
+        assert mc.harmonic_sequence == "i"
+        assert mc.performance_notes is None
+
+    def test_non_dict_constraints_ignored(self, tmp_path):
+        from white_composition.production_plan import load_song_proposal_unified
+
+        p = self._write_proposal(
+            tmp_path / "song.yml",
+            extra={"musical_constraints": "i IV i"},  # string, not dict
+        )
+        result = load_song_proposal_unified(p)
+        assert result["musical_constraints"] is None
+
+
+# ---------------------------------------------------------------------------
+# build_constrained_candidates
+# ---------------------------------------------------------------------------
+
+
+class TestBuildConstrainedCandidates:
+
+    def _chord(self, fn, midi_notes=(60, 64, 67)):
+        return {
+            "chord_id": f"C_{fn}",
+            "chord_name": fn,
+            "function": fn,
+            "note_names": ["C4", "E4", "G4"],
+            "midi_notes": list(midi_notes),
+            "quality": "major",
+        }
+
+    def _make_gen(self, chords_by_function):
+        import polars as pl
+
+        _schema = {
+            "chord_id": pl.Utf8,
+            "chord_name": pl.Utf8,
+            "function": pl.Utf8,
+            "note_names": pl.List(pl.Utf8),
+            "midi_notes": pl.List(pl.Int64),
+            "quality": pl.Utf8,
+        }
+
+        class MockGen:
+            def get_chord_by_function(self, key_root, mode, function, category=None):
+                rows = chords_by_function.get(function, [])
+                if not rows:
+                    return pl.DataFrame(schema=_schema)
+                return pl.DataFrame(rows)
+
+            def score_progression(self, progression, key_root, mode, weights=None):
+                return 0.5, {
+                    "melody": 0.5,
+                    "voice_leading": 0.5,
+                    "variety": 0.5,
+                    "graph_probability": 0.5,
+                }
+
+        return MockGen()
+
+    def _make_scorer(self):
+        class MockScorer:
+            def score_batch(self, candidates, concept_emb=None):
+                return [
+                    {
+                        "candidate": c,
+                        "temporal": {"past": 0.4, "present": 0.3, "future": 0.3},
+                        "spatial": {"thing": 0.4, "place": 0.3, "person": 0.3},
+                        "ontological": {
+                            "imagined": 0.3,
+                            "forgotten": 0.4,
+                            "known": 0.3,
+                        },
+                        "confidence": 0.5,
+                    }
+                    for c in candidates
+                ]
+
+        return MockScorer()
+
+    def test_three_chord_sequence_produces_candidates(self):
+        import random
+
+        import numpy as np
+
+        from white_generation.pipelines.chord_pipeline import (
+            build_constrained_candidates,
+        )
+
+        gen = self._make_gen(
+            {
+                "i": [self._chord("i")],
+                "iv": [self._chord("iv", (53, 57, 60))],
+                "I": [self._chord("I")],
+            }
+        )
+        scorer = self._make_scorer()
+        target = {
+            "temporal": [1 / 3, 1 / 3, 1 / 3],
+            "spatial": [1 / 3, 1 / 3, 1 / 3],
+            "ontological": [1 / 3, 1 / 3, 1 / 3],
+        }
+
+        results = build_constrained_candidates(
+            harmonic_sequence="i iv i",
+            key_root="A",
+            mode="Minor",
+            bpm=120,
+            time_sig=(4, 4),
+            gen=gen,
+            rng=random.Random(42),
+            genre_families=["rock"],
+            num_candidates=5,
+            scorer=scorer,
+            concept_emb=np.zeros(768),
+            target=target,
+            theory_weight=0.3,
+            chromatic_weight=0.7,
+        )
+
+        assert len(results) == 5
+        for r in results:
+            assert r["source"] == "constrained"
+            assert r["harmonic_sequence"] == "i iv i"
+            assert len(r["progression"]) == 3
+
+    def test_single_chord_sequence(self):
+        import random
+
+        import numpy as np
+
+        from white_generation.pipelines.chord_pipeline import (
+            build_constrained_candidates,
+        )
+
+        gen = self._make_gen({"i": [self._chord("i", (57, 60, 64))]})
+        scorer = self._make_scorer()
+        target = {
+            "temporal": [1 / 3, 1 / 3, 1 / 3],
+            "spatial": [1 / 3, 1 / 3, 1 / 3],
+            "ontological": [1 / 3, 1 / 3, 1 / 3],
+        }
+
+        results = build_constrained_candidates(
+            harmonic_sequence="i",
+            key_root="A",
+            mode="Minor",
+            bpm=120,
+            time_sig=(4, 4),
+            gen=gen,
+            rng=random.Random(42),
+            genre_families=["rock"],
+            num_candidates=3,
+            scorer=scorer,
+            concept_emb=np.zeros(768),
+            target=target,
+            theory_weight=0.3,
+            chromatic_weight=0.7,
+        )
+
+        assert len(results) == 3
+        for r in results:
+            assert len(r["progression"]) == 1
+            assert r["progression"][0]["function"] == "i"
+
+    def test_unknown_token_skipped_gracefully(self):
+        import random
+
+        import numpy as np
+
+        from white_generation.pipelines.chord_pipeline import (
+            build_constrained_candidates,
+        )
+
+        # Only provide 'i'; 'bVII' is unknown
+        gen = self._make_gen({"i": [self._chord("i")]})
+        scorer = self._make_scorer()
+        target = {
+            "temporal": [1 / 3, 1 / 3, 1 / 3],
+            "spatial": [1 / 3, 1 / 3, 1 / 3],
+            "ontological": [1 / 3, 1 / 3, 1 / 3],
+        }
+
+        results = build_constrained_candidates(
+            harmonic_sequence="i bVII i",
+            key_root="A",
+            mode="Minor",
+            bpm=120,
+            time_sig=(4, 4),
+            gen=gen,
+            rng=random.Random(42),
+            genre_families=["rock"],
+            num_candidates=3,
+            scorer=scorer,
+            concept_emb=np.zeros(768),
+            target=target,
+            theory_weight=0.3,
+            chromatic_weight=0.7,
+        )
+
+        # bVII skipped; only 2 valid pools (i + i) → produces candidates
+        assert len(results) == 3
+        for r in results:
+            assert len(r["progression"]) == 2
+
+    def test_all_unknown_tokens_returns_empty(self):
+        import random
+
+        import numpy as np
+
+        from white_generation.pipelines.chord_pipeline import (
+            build_constrained_candidates,
+        )
+
+        gen = self._make_gen({})  # nothing in the bank
+        scorer = self._make_scorer()
+        target = {
+            "temporal": [1 / 3, 1 / 3, 1 / 3],
+            "spatial": [1 / 3, 1 / 3, 1 / 3],
+            "ontological": [1 / 3, 1 / 3, 1 / 3],
+        }
+
+        results = build_constrained_candidates(
+            harmonic_sequence="bII bVII",
+            key_root="C",
+            mode="Major",
+            bpm=120,
+            time_sig=(4, 4),
+            gen=gen,
+            rng=random.Random(42),
+            genre_families=["rock"],
+            num_candidates=5,
+            scorer=scorer,
+            concept_emb=np.zeros(768),
+            target=target,
+            theory_weight=0.3,
+            chromatic_weight=0.7,
+        )
+
+        assert results == []
+
+    def test_results_sorted_by_composite_descending(self):
+        import random
+
+        import numpy as np
+
+        from white_generation.pipelines.chord_pipeline import (
+            build_constrained_candidates,
+        )
+
+        gen = self._make_gen(
+            {"I": [self._chord("I")], "IV": [self._chord("IV", (65, 69, 72))]}
+        )
+        scorer = self._make_scorer()
+        target = {
+            "temporal": [1 / 3, 1 / 3, 1 / 3],
+            "spatial": [1 / 3, 1 / 3, 1 / 3],
+            "ontological": [1 / 3, 1 / 3, 1 / 3],
+        }
+
+        results = build_constrained_candidates(
+            harmonic_sequence="I IV I",
+            key_root="C",
+            mode="Major",
+            bpm=120,
+            time_sig=(4, 4),
+            gen=gen,
+            rng=random.Random(42),
+            genre_families=["rock"],
+            num_candidates=4,
+            scorer=scorer,
+            concept_emb=np.zeros(768),
+            target=target,
+            theory_weight=0.3,
+            chromatic_weight=0.7,
+        )
+
+        composites = [r["composite"] for r in results]
+        assert composites == sorted(composites, reverse=True)
+
+
+# ---------------------------------------------------------------------------
+# generate_review_yaml — constrained source labelling
+# ---------------------------------------------------------------------------
+
+
+class TestReviewYamlConstrainedLabelling:
+
+    def test_constrained_candidate_fields(self):
+        from white_generation.pipelines.chord_pipeline import generate_review_yaml
+
+        constrained_item = {
+            "id": "chord_001",
+            "rank": 1,
+            "source": "constrained",
+            "harmonic_sequence": "i IV i",
+            "breakdown": {
+                "composite": 0.6,
+                "theory_total": 0.5,
+                "chromatic": {
+                    "match": 0.65,
+                    "confidence": 0.7,
+                    "temporal": {},
+                    "spatial": {},
+                    "ontological": {},
+                },
+            },
+            "hr_distribution": [1.0, 1.0, 1.0],
+            "strum_pattern": "whole",
+            "summary": "i(Am) – IV(D) – i(Am)",
+            "progression": [
+                {"function": "i", "chord_name": "Am", "note_names": ["A3", "C4", "E4"]},
+            ],
+        }
+        song_info = {
+            "key_root": "A",
+            "mode": "Minor",
+            "bpm": 120,
+            "time_sig": (4, 4),
+            "color_name": "Violet",
+            "thread_dir": "",
+            "song_filename": "test.yml",
+        }
+        review = generate_review_yaml(
+            song_info, [constrained_item], 42, {"theory": 0.3, "chromatic": 0.7}
+        )
+
+        c = review["candidates"][0]
+        assert c["source"] == "constrained"
+        assert c["harmonic_sequence"] == "i IV i"
+        assert "Constrained" in c["notes"]
+        assert "i IV i" in c["notes"]
+        assert c["scores"] is not None

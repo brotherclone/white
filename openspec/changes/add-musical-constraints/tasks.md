@@ -2,21 +2,21 @@
 
 ## Implementation Order
 
-- [ ] **1. `MusicConstraints` model** (`white_core`)
+- [x] **1. `MusicConstraints` model** (`white_core`)
   - Add `packages/core/src/white_core/structures/music_constraints.py`
   - Pydantic `BaseModel` with `harmonic_sequence: str | None = None` and
     `performance_notes: str | None = None`
   - Export from `white_core.structures.__init__`
   - Unit test: valid construction, null defaults, extra fields ignored
 
-- [ ] **2. Proposal parser update** (`white_composition`)
+- [x] **2. Proposal parser update** (`white_composition`)
   - In `load_song_proposal_unified` (`production_plan.py`), read
     `raw.get("musical_constraints")`, construct `MusicConstraints(**block)` when
     present, add `"musical_constraints": mc_or_none` to the returned dict
   - Guard: if `musical_constraints` in YAML is not a dict, log a warning and set `None`
   - Tests: proposal with full block, proposal without block, proposal with partial block
 
-- [ ] **3. `build_constrained_candidates`** (`white_generation`)
+- [x] **3. `build_constrained_candidates`** (`white_generation`)
   - New function in `chord_pipeline.py` alongside `build_diatonic_candidates`
   - Signature: `build_constrained_candidates(harmonic_sequence, key_root, mode, bpm, time_sig, gen, rng, genre_families, num_candidates, scorer, concept_emb, target, theory_weight, chromatic_weight) → list[dict]`
   - Parse tokens, look up chords per token, produce `num_candidates` voicing
@@ -27,7 +27,7 @@
   - Tests: three-chord sequence, single-chord sequence, unknown token graceful skip,
     no-op when `harmonic_sequence=None`
 
-- [ ] **4. Wire into `run_chord_pipeline`** (`white_generation`)
+- [x] **4. Wire into `run_chord_pipeline`** (`white_generation`)
   - After loading `song_info`, extract `constraints = song_info.get("musical_constraints")`
   - If `constraints` and `constraints.harmonic_sequence`, call
     `build_constrained_candidates(...)` and prepend results to the scored pool before
@@ -36,12 +36,12 @@
     to the `review` dict before writing `review.yml`
   - No change to Markov or diatonic paths
 
-- [ ] **5. `review.yml` labelling**
+- [x] **5. `review.yml` labelling**
   - In `generate_review_yaml`, handle `source: "constrained"` alongside `"markov"` and
     `"diatonic"` — add `harmonic_sequence` field to constrained entries, friendly
     `notes` string: `"Constrained — sequence from proposal: <sequence>"`
 
-- [ ] **6. Tests**
+- [x] **6. Tests**
   - `test_chord_pipeline.py`: integration test with a mock song proposal containing
     `harmonic_sequence: "i iv i"` — assert at least one constrained candidate in
     output with correct source and sequence fields
