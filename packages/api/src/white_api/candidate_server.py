@@ -883,6 +883,110 @@ def create_app(
             return {"status": "not_initialized"}
         return data
 
+    class BpmBody(BaseModel):
+        bpm: int
+
+    @app.post("/production/set-bpm")
+    def set_bpm(body: BpmBody):
+        """Change BPM for the active production.
+
+        Updates song_context.yml, all phase review.yml files, retimes every
+        approved MIDI, and regenerates assembled_melody.mid if present.
+        """
+        import mido as _mido
+        import yaml as _yaml
+
+        prod = _require_production_dir()
+        new_bpm = body.bpm
+        if new_bpm < 20 or new_bpm > 400:
+            raise HTTPException(
+                status_code=422, detail="BPM must be between 20 and 400"
+            )
+
+        new_tempo = _mido.bpm2tempo(new_bpm)
+        updated_files: list[str] = []
+
+        # 1. song_context.yml
+        ctx_path = prod / "song_context.yml"
+        if ctx_path.exists():
+            with open(ctx_path) as f:
+                ctx = _yaml.safe_load(f) or {}
+            ctx["bpm"] = new_bpm
+            with open(ctx_path, "w") as f:
+                _yaml.dump(
+                    ctx, f, allow_unicode=True, sort_keys=False, width=float("inf")
+                )
+            updated_files.append("song_context.yml")
+
+        # 2. All phase review.yml files
+        for review_path in prod.glob("*/review.yml"):
+            with open(review_path) as f:
+                rv = _yaml.safe_load(f) or {}
+            if "bpm" in rv:
+                rv["bpm"] = new_bpm
+                tmp = review_path.with_suffix(".yml.tmp")
+                with open(tmp, "w") as f:
+                    _yaml.dump(
+                        rv, f, allow_unicode=True, sort_keys=False, width=float("inf")
+                    )
+                tmp.replace(review_path)
+                updated_files.append(str(review_path.relative_to(prod)))
+
+        # 3. Retime all approved MIDI files
+        for mid_path in prod.glob("*/approved/*.mid"):
+            try:
+                mid = _mido.MidiFile(str(mid_path))
+                changed = False
+                for track in mid.tracks:
+                    for msg in track:
+                        if msg.type == "set_tempo":
+                            msg.tempo = new_tempo
+                            changed = True
+                if changed:
+                    mid.save(str(mid_path))
+                    updated_files.append(str(mid_path.relative_to(prod)))
+            except Exception:
+                pass
+
+        # 4. Regenerate assembled_melody.mid if it exists
+        assembled = prod / "melody" / "assembled_melody.mid"
+        arrangement = prod / "arrangement.txt"
+        approved_dir = prod / "melody" / "approved"
+        if assembled.exists() and arrangement.exists() and approved_dir.exists():
+            try:
+                from white_generation.pipelines.melody_auto_split import (
+                    assemble_melody_midi,
+                )
+
+                ctx_path2 = prod / "song_context.yml"
+                ts = "4/4"
+                if ctx_path2.exists():
+                    with open(ctx_path2) as f:
+                        ts = str((_yaml.safe_load(f) or {}).get("time_sig", "4/4"))
+                out = assemble_melody_midi(
+                    arrangement_path=arrangement,
+                    approved_dir=approved_dir,
+                    bpm=new_bpm,
+                    time_sig_str=ts,
+                    output_path=assembled,
+                )
+                updated_files.append(str(out.relative_to(prod)))
+
+                # Sync to Logic MIDI folder if handoff ran
+                try:
+                    from white_composition.logic_handoff import resolve_song_dir
+
+                    logic_midi_dir = resolve_song_dir(prod) / "MIDI" / "melody"
+                    if logic_midi_dir.is_dir():
+                        shutil.copy2(out, logic_midi_dir / out.name)
+                        updated_files.append(f"Logic/{out.name}")
+                except Exception:
+                    pass
+            except Exception:
+                pass  # assembled_melody regen is best-effort
+
+        return {"ok": True, "bpm": new_bpm, "updated": updated_files}
+
     class StageBody(BaseModel):
         stage: str
 

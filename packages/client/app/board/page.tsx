@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
   updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
-  autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl,
+  autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl, setBpm,
 } from "@/lib/api";
 import { CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
 
@@ -126,6 +126,9 @@ export default function BoardPage() {
   const [conceptExpanded, setConceptExpanded] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncDone, setSyncDone] = useState(false);
+  const [editingBpm, setEditingBpm] = useState(false);
+  const [bpmInput, setBpmInput] = useState("");
+  const [settingBpm, setSettingBpm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -283,6 +286,22 @@ export default function BoardPage() {
     }
   };
 
+  const handleSetBpm = async () => {
+    const bpm = parseInt(bpmInput, 10);
+    if (isNaN(bpm) || bpm < 20 || bpm > 400) return;
+    setSettingBpm(true);
+    setError(null);
+    try {
+      await setBpm(bpm);
+      await refresh();
+      setEditingBpm(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "BPM update failed");
+    } finally {
+      setSettingBpm(false);
+    }
+  };
+
   const handleAssembleMelody = async () => {
     setAssembling(true);
     setAssembleResult(null);
@@ -403,6 +422,48 @@ export default function BoardPage() {
               </button>
             </div>
           )}
+          {/* BPM display + edit */}
+          {activeSong?.bpm != null && (
+            <div className="flex items-center gap-2 mb-3">
+              {editingBpm ? (
+                <>
+                  <input
+                    type="number"
+                    value={bpmInput}
+                    onChange={e => setBpmInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") handleSetBpm(); if (e.key === "Escape") setEditingBpm(false); }}
+                    autoFocus
+                    className="w-20 bg-zinc-900 border border-zinc-600 rounded px-2 py-0.5 text-xs font-mono text-zinc-200 focus:outline-none focus:border-blue-500"
+                    min={20} max={400}
+                  />
+                  <button
+                    onClick={handleSetBpm}
+                    disabled={settingBpm}
+                    className="px-2 py-0.5 text-[10px] font-sans rounded bg-blue-800 border border-blue-600 text-blue-200 hover:bg-blue-700 disabled:opacity-40 transition-colors"
+                  >
+                    {settingBpm ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    onClick={() => setEditingBpm(false)}
+                    className="text-[10px] font-sans text-zinc-500 hover:text-zinc-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="text-[10px] font-mono text-zinc-500">{activeSong.bpm} BPM</span>
+                  <button
+                    onClick={() => { setBpmInput(String(activeSong.bpm)); setEditingBpm(true); }}
+                    className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
+                  >
+                    change
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
           {mixFile ? (
             <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 mb-4">
               <audio
@@ -457,7 +518,7 @@ export default function BoardPage() {
               const isPast = idx < currentStageIdx;
               const isFuture = idx > currentStageIdx;
               const isLyrics = stage === "lyrics";
-              const isRecording = stage === "recording";
+              const isVocalPlaceholders = stage === "vocal_placeholders";
               const isStructure = stage === "structure";
 
               return (
@@ -560,8 +621,8 @@ export default function BoardPage() {
                     </div>
                   )}
 
-                  {/* Auto-split + assemble melody — recording stage or approaching it */}
-                  {isRecording && (isCurrent || (isFuture && idx === currentStageIdx + 1)) && (
+                  {/* Auto-split + assemble melody — vocal placeholders stage or approaching it */}
+                  {isVocalPlaceholders && (isCurrent || (isFuture && idx === currentStageIdx + 1)) && (
                     <div className="px-3 pb-1 flex flex-col gap-1.5">
                       <button
                         onClick={handleAutoSplit}

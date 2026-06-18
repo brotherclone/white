@@ -255,6 +255,19 @@ export async function assembleMelody(): Promise<{ ok: boolean; assembled_midi: s
   return res.json();
 }
 
+export async function setBpm(bpm: number): Promise<{ ok: boolean; bpm: number; updated: string[] }> {
+  const res = await fetch(`${BASE}/production/set-bpm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ bpm }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "BPM update failed");
+  }
+  return res.json();
+}
+
 export async function fetchMixInfo(): Promise<{ has_mix: boolean; mix_file: string | null }> {
   const res = await fetch(`${BASE}/production/mix/info`);
   if (!res.ok) return { has_mix: false, mix_file: null };

@@ -37,8 +37,8 @@ export interface PipelineStatus {
 export type MixStage =
   | "structure"
   | "lyrics"
-  | "recording"
   | "vocal_placeholders"
+  | "recording"
   | "augmentation"
   | "cleaning"
   | "rough_mix"
@@ -46,7 +46,7 @@ export type MixStage =
   | "final_mix";
 
 export const MIX_STAGES: MixStage[] = [
-  "structure", "lyrics", "recording", "vocal_placeholders",
+  "structure", "lyrics", "vocal_placeholders", "recording",
   "augmentation", "cleaning", "rough_mix", "mix_candidate", "final_mix",
 ];
 
