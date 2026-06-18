@@ -601,6 +601,22 @@ def create_app(
         end_sec: float | None,
     ) -> bytes:
         """Extract [start_sec, end_sec] from a WAV and return as WAV bytes."""
+        import math
+
+        # pandas/pyarrow represents missing floats as NaN, not None;
+        # use math.isnan directly so numpy.float64 values are handled correctly
+        if start_sec is not None:
+            try:
+                if math.isnan(start_sec):
+                    start_sec = None
+            except (TypeError, ValueError):
+                start_sec = None
+        if end_sec is not None:
+            try:
+                if math.isnan(end_sec):
+                    end_sec = None
+            except (TypeError, ValueError):
+                end_sec = None
         with wave.open(str(wav_path), "rb") as src:
             framerate = src.getframerate()
             total_frames = src.getnframes()
@@ -674,24 +690,24 @@ def create_app(
         range_header = request.headers.get("range")
         if range_header:
             m = re.match(r"bytes=(\d*)-(\d*)", range_header)
-            start, end = 0, total - 1
             if m:
+                start, end = 0, total - 1
                 s, e = m.groups()
                 if s:
                     start = int(s)
                 if e:
                     end = min(int(e), total - 1)
-            chunk = audio_bytes[start : end + 1]
-            return Response(
-                content=chunk,
-                status_code=206,
-                media_type="audio/wav",
-                headers={
-                    "Content-Range": f"bytes {start}-{end}/{total}",
-                    "Content-Length": str(len(chunk)),
-                    "Accept-Ranges": "bytes",
-                },
-            )
+                chunk = audio_bytes[start : end + 1]
+                return Response(
+                    content=chunk,
+                    status_code=206,
+                    media_type="audio/wav",
+                    headers={
+                        "Content-Range": f"bytes {start}-{end}/{total}",
+                        "Content-Length": str(len(chunk)),
+                        "Accept-Ranges": "bytes",
+                    },
+                )
         return Response(
             content=audio_bytes,
             media_type="audio/wav",
@@ -871,6 +887,110 @@ def create_app(
         if data is None:
             return {"status": "not_initialized"}
         return data
+
+    class BpmBody(BaseModel):
+        bpm: int
+
+    @app.post("/production/set-bpm")
+    def set_bpm(body: BpmBody):
+        """Change BPM for the active production.
+
+        Updates song_context.yml, all phase review.yml files, retimes every
+        approved MIDI, and regenerates assembled_melody.mid if present.
+        """
+        import mido as _mido
+        import yaml as _yaml
+
+        prod = _require_production_dir()
+        new_bpm = body.bpm
+        if new_bpm < 20 or new_bpm > 400:
+            raise HTTPException(
+                status_code=422, detail="BPM must be between 20 and 400"
+            )
+
+        new_tempo = _mido.bpm2tempo(new_bpm)
+        updated_files: list[str] = []
+
+        # 1. song_context.yml
+        ctx_path = prod / "song_context.yml"
+        if ctx_path.exists():
+            with open(ctx_path) as f:
+                ctx = _yaml.safe_load(f) or {}
+            ctx["bpm"] = new_bpm
+            with open(ctx_path, "w") as f:
+                _yaml.dump(
+                    ctx, f, allow_unicode=True, sort_keys=False, width=float("inf")
+                )
+            updated_files.append("song_context.yml")
+
+        # 2. All phase review.yml files
+        for review_path in prod.glob("*/review.yml"):
+            with open(review_path) as f:
+                rv = _yaml.safe_load(f) or {}
+            if "bpm" in rv:
+                rv["bpm"] = new_bpm
+                tmp = review_path.with_suffix(".yml.tmp")
+                with open(tmp, "w") as f:
+                    _yaml.dump(
+                        rv, f, allow_unicode=True, sort_keys=False, width=float("inf")
+                    )
+                tmp.replace(review_path)
+                updated_files.append(str(review_path.relative_to(prod)))
+
+        # 3. Retime all approved MIDI files
+        for mid_path in prod.glob("*/approved/*.mid"):
+            try:
+                mid = _mido.MidiFile(str(mid_path))
+                changed = False
+                for track in mid.tracks:
+                    for msg in track:
+                        if msg.type == "set_tempo":
+                            msg.tempo = new_tempo
+                            changed = True
+                if changed:
+                    mid.save(str(mid_path))
+                    updated_files.append(str(mid_path.relative_to(prod)))
+            except Exception:
+                pass
+
+        # 4. Regenerate assembled_melody.mid if it exists
+        assembled = prod / "melody" / "assembled_melody.mid"
+        arrangement = prod / "arrangement.txt"
+        approved_dir = prod / "melody" / "approved"
+        if assembled.exists() and arrangement.exists() and approved_dir.exists():
+            try:
+                from white_generation.pipelines.melody_auto_split import (
+                    assemble_melody_midi,
+                )
+
+                ctx_path2 = prod / "song_context.yml"
+                ts = "4/4"
+                if ctx_path2.exists():
+                    with open(ctx_path2) as f:
+                        ts = str((_yaml.safe_load(f) or {}).get("time_sig", "4/4"))
+                out = assemble_melody_midi(
+                    arrangement_path=arrangement,
+                    approved_dir=approved_dir,
+                    bpm=new_bpm,
+                    time_sig_str=ts,
+                    output_path=assembled,
+                )
+                updated_files.append(str(out.relative_to(prod)))
+
+                # Sync to Logic MIDI folder if handoff ran
+                try:
+                    from white_composition.logic_handoff import resolve_song_dir
+
+                    logic_midi_dir = resolve_song_dir(prod) / "MIDI" / "melody"
+                    if logic_midi_dir.is_dir():
+                        shutil.copy2(out, logic_midi_dir / out.name)
+                        updated_files.append(f"Logic/{out.name}")
+                except Exception:
+                    pass
+            except Exception:
+                pass  # assembled_melody regen is best-effort
+
+        return {"ok": True, "bpm": new_bpm, "updated": updated_files}
 
     class StageBody(BaseModel):
         stage: str
@@ -1444,21 +1564,28 @@ def create_app(
         """
         if not decided:
             return 0
-        # Restore MIDI files the pipeline may have deleted
+
+        # Restore MIDI files the pipeline may have deleted or overwritten
         for rel, data in midi_bytes.items():
             dest = review_path.parent / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
-            if not dest.exists():
-                dest.write_bytes(data)
-        # Load new review.yml written by the pipeline
-        with open(review_path) as f:
-            review = yaml.safe_load(f) or {}
+            dest.write_bytes(data)
+        # Load the review.yml the pipeline wrote (or start from scratch if it
+        # failed before writing — preserve decided candidates either way).
+        if review_path.exists():
+            with open(review_path) as f:
+                review = yaml.safe_load(f) or {}
+        else:
+            review = {}
         new_candidates = review.get("candidates") or []
         # Drop any new pending that share an id with a decided entry
         decided_ids = {c["id"] for c in decided}
         new_candidates = [c for c in new_candidates if c.get("id") not in decided_ids]
         review["candidates"] = decided + new_candidates
-        with open(review_path, "w") as f:
+        # Atomic write so a mid-dump crash can't leave review.yml empty.
+        review_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = review_path.with_suffix(".yml.tmp")
+        with open(tmp, "w") as f:
             yaml.dump(
                 review,
                 f,
@@ -1467,6 +1594,7 @@ def create_app(
                 allow_unicode=True,
                 width=float("inf"),
             )
+        tmp.replace(review_path)
         return len(decided)
 
     class EvolveBody(BaseModel):
@@ -1487,6 +1615,8 @@ def create_app(
         )
         decided, saved_midi = _snapshot_decided(review_path)
 
+        import secrets
+
         module = _EVOLVE_PIPELINE[body.phase]
         cmd = [
             sys.executable,
@@ -1496,7 +1626,12 @@ def create_app(
             str(prod),
             "--evolve",
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        # Unique 6-hex token injected as EVOLVE_RUN_ID so evolved candidate IDs
+        # (e.g. evolved_a3f2b1_drum_verse_01) never collide with those from a
+        # previous run — preventing _merge_decided from filtering out new evolved
+        # candidates because their IDs matched older decided ones.
+        evolve_env = {**os.environ, "EVOLVE_RUN_ID": secrets.token_hex(3)}
+        result = subprocess.run(cmd, capture_output=True, text=True, env=evolve_env)
         if result.returncode != 0:
             raise HTTPException(
                 status_code=500,

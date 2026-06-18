@@ -31,6 +31,7 @@ import mido
 import yaml
 
 from white_core.enums.lyric_repeat_type import LyricRepeatType
+from white_core.music.music_constraints import MusicConstraints
 
 PLAN_FILENAME = "production_plan.yml"
 MANIFEST_BOOTSTRAP_FILENAME = "manifest_bootstrap.yml"
@@ -426,6 +427,29 @@ def load_song_proposal_unified(
                 manifest = yaml.safe_load(f) or {}
             concept = str(manifest.get("concept", ""))
 
+    # Optional musical constraints block
+    mc_raw = raw.get("musical_constraints")
+    if isinstance(mc_raw, dict):
+        try:
+            musical_constraints = MusicConstraints(**mc_raw)
+        except Exception:
+            import logging
+
+            logging.getLogger(__name__).warning(
+                "musical_constraints block is invalid and will be ignored: %r", mc_raw
+            )
+            musical_constraints = None
+    elif mc_raw is not None:
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "musical_constraints must be a mapping, got %s — ignoring",
+            type(mc_raw).__name__,
+        )
+        musical_constraints = None
+    else:
+        musical_constraints = None
+
     return {
         "title": str(raw.get("title", "")),
         "bpm": int(raw.get("bpm", 120)),
@@ -443,6 +467,7 @@ def load_song_proposal_unified(
         "thread_dir": str(thread_dir) if thread_dir else "",
         "song_filename": proposal_path.name,
         "raw_proposal": raw,
+        "musical_constraints": musical_constraints,
     }
 
 
