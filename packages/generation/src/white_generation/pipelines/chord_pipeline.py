@@ -150,6 +150,7 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
         "song_filename": song_filename,
         "thread_dir": str(thread_dir),
         "raw_proposal": unified["raw_proposal"],
+        "musical_constraints": unified.get("musical_constraints"),
     }
 
 
