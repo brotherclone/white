@@ -20,8 +20,8 @@ LYRICS_PATTERNS = ["lyrics*.txt", "lyrics*.lrc", "*.lrc"]
 class MixStage(str, Enum):
     STRUCTURE = "structure"
     LYRICS = "lyrics"
-    RECORDING = "recording"
     VOCAL_PLACEHOLDERS = "vocal_placeholders"
+    RECORDING = "recording"
     AUGMENTATION = "augmentation"
     CLEANING = "cleaning"
     ROUGH_MIX = "rough_mix"
