@@ -603,15 +603,20 @@ def create_app(
         """Extract [start_sec, end_sec] from a WAV and return as WAV bytes."""
         import math
 
-        # pandas/pyarrow represents missing floats as NaN, not None
-        if start_sec is not None and (
-            not isinstance(start_sec, float) or math.isnan(start_sec)
-        ):
-            start_sec = None
-        if end_sec is not None and (
-            not isinstance(end_sec, float) or math.isnan(end_sec)
-        ):
-            end_sec = None
+        # pandas/pyarrow represents missing floats as NaN, not None;
+        # use math.isnan directly so numpy.float64 values are handled correctly
+        if start_sec is not None:
+            try:
+                if math.isnan(start_sec):
+                    start_sec = None
+            except (TypeError, ValueError):
+                start_sec = None
+        if end_sec is not None:
+            try:
+                if math.isnan(end_sec):
+                    end_sec = None
+            except (TypeError, ValueError):
+                end_sec = None
         with wave.open(str(wav_path), "rb") as src:
             framerate = src.getframerate()
             total_frames = src.getnframes()

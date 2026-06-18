@@ -540,7 +540,8 @@ def build_constrained_candidates(
 
     Returns scored candidates sorted by composite score with
     ``source: "constrained"`` and ``harmonic_sequence`` echoed on each entry.
-    Returns ``[]`` if any token resolves to no chords after the fallback.
+    Tokens that resolve to no chords are skipped with a warning; returns ``[]``
+    only when no tokens resolve to usable chords.
     """
     tokens = harmonic_sequence.split()
     if not tokens:
