@@ -72,10 +72,17 @@ MELODY_CHANNEL = 4  # fallback when auto-detection finds nothing
 
 
 def _detect_melody_channel(clips: list[dict], fallback: int = MELODY_CHANNEL) -> int:
-    """Return the track number that carries the most melody_ clips."""
+    """Return the track number that carries vocal melody clips.
+
+    Counts only non-instrumental melody_ clips (i.e. excludes anything ending
+    in _inst).  This prevents melody_hook_inst on the lead channel from being
+    chosen over the vocal channel when all named melody_ clips happen to be
+    instrumental.  Falls back to MELODY_CHANNEL when no qualifying clips exist.
+    """
     counts: dict[int, int] = {}
     for c in clips:
-        if c["clip_name"].startswith("melody_"):
+        name = c["clip_name"]
+        if name.startswith("melody_") and not name.endswith("_inst"):
             counts[c["channel"]] = counts.get(c["channel"], 0) + 1
     return max(counts, key=lambda ch: counts[ch]) if counts else fallback
 
