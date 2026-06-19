@@ -164,6 +164,19 @@ def _find_proposal(manifest_path: Path) -> Path | None:
     return candidate if candidate.exists() else None
 
 
+_MIX_STAGE_TO_SONG_STAGE: dict[str, str] = {
+    "structure": "composition",
+    "lyrics": "composition",
+    "vocal_placeholders": "composition",
+    "recording": "production",
+    "augmentation": "production",
+    "cleaning": "production",
+    "rough_mix": "mixing",
+    "mix_candidate": "mixing",
+    "final_mix": "complete",
+}
+
+
 def _compute_stage(prod_dir: Path) -> str:
     if not (prod_dir / "song_context.yml").exists():
         return "ideation"
@@ -174,8 +187,12 @@ def _compute_stage(prod_dir: Path) -> str:
         )
 
         logic_dir = resolve_song_dir(prod_dir)
-        if (logic_dir / COMPOSITION_FILENAME).exists():
-            return "composition"
+        comp_path = logic_dir / COMPOSITION_FILENAME
+        if comp_path.exists():
+            with open(comp_path) as f:
+                comp = yaml.safe_load(f) or {}
+            mix_stage = comp.get("current_stage", "structure")
+            return _MIX_STAGE_TO_SONG_STAGE.get(mix_stage, "composition")
     except Exception:
         pass
     return "generation"
