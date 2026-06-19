@@ -17,6 +17,11 @@ const ALL_ROLES: CollaboratorRole[] = [
 const ALL_PLATFORMS: CollaboratorPlatform[] = ["direct", "airgigs", "soundbetter", "other"];
 const ALL_PRO: PROAffiliation[] = ["none", "ascap", "bmi", "sesac", "socan", "prs", "other"];
 
+const ROSE_BG: React.CSSProperties = {
+  backgroundImage: "url('/rose.png')",
+  backgroundRepeat: "repeat",
+};
+
 function emptyCollaborator(): Collaborator {
   return {
     id: "", name: "", roles: [], email: null, photo_url: null,
@@ -32,20 +37,28 @@ function isCurrentlyUnavailable(c: Collaborator): boolean {
   );
 }
 
-function cls(...parts: (string | false | undefined)[]) {
-  return parts.filter(Boolean).join(" ");
+function StarIcon() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor" aria-hidden>
+      <polygon points="4.5,0 5.53,3.23 9,3.23 6.24,5.23 7.27,8.47 4.5,6.47 1.73,8.47 2.76,5.23 0,3.23 3.47,3.23" />
+    </svg>
+  );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] font-sans text-zinc-500 uppercase tracking-wide">{label}</label>
+      <label className="text-[10px] font-sans text-[#9b9b9b] uppercase tracking-wide">{label}</label>
       {children}
     </div>
   );
 }
 
-const inputCls = "w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500";
+const inputCls =
+  "w-full bg-[#000] border border-[#333] px-2.5 py-1.5 text-xs font-sans text-[#f6f6f6] placeholder-[#4b4b4b] focus:outline-none focus:border-[#EF7143] transition-colors";
+
+const selectCls =
+  "bg-[#000] border border-[#333] px-2 py-1.5 text-xs font-sans text-[#f6f6f6] outline-none appearance-none focus:border-[#EF7143] transition-colors";
 
 export default function CollaboratorsPage() {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
@@ -105,7 +118,6 @@ export default function CollaboratorsPage() {
         showToast(`${draft.name} saved`);
       }
       await load();
-      const updated = collaborators.find(c => c.id === draft.id) ?? draft;
       setSelected({ ...draft });
       setIsNew(false);
     } catch (e) {
@@ -137,27 +149,38 @@ export default function CollaboratorsPage() {
   const showForm = isNew || selected !== null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-200 font-mono flex flex-col">
-      {/* Header */}
-      <div className="border-b border-zinc-800 px-6 py-4 flex items-center gap-4 flex-shrink-0">
-        <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans transition-colors">
+    <div className="min-h-screen bg-[#000] text-[#f6f6f6] font-sans flex flex-col">
+      {/* Header — rose.png chrome */}
+      <div
+        className="border-b border-[#222] px-6 py-4 flex items-center gap-4 flex-shrink-0 bg-[#000]"
+        style={ROSE_BG}
+      >
+        <Link
+          href="/"
+          className="text-[#cbcbcb] hover:text-[#EF7143] text-xs font-sans transition-colors"
+          style={{ transitionDuration: "300ms" }}
+        >
           ← home
         </Link>
-        <h1 className="text-lg font-bold text-white tracking-tight">Collaborator Manager</h1>
+        <h1 className="text-lg font-display font-bold text-[#f6f6f6] flex items-center gap-2">
+          <StarIcon />
+          collaborator manager
+        </h1>
         <button
           onClick={openNew}
-          className="ml-auto px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+          className="ml-auto px-3 py-1.5 text-xs font-sans bg-[#000] border border-[#333] text-[#cbcbcb] hover:text-[#f6f6f6] transition-colors"
+          style={{ transitionDuration: "300ms" }}
         >
-          + New Collaborator
+          + new collaborator
         </button>
       </div>
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar list */}
-        <div className="w-64 flex-shrink-0 border-r border-zinc-800 overflow-y-auto">
+        <div className="w-64 flex-shrink-0 border-r border-[#222] overflow-y-auto bg-[#000]">
           {collaborators.length === 0 ? (
-            <div className="px-4 py-8 text-center text-zinc-600 text-xs font-sans">
-              No collaborators yet.<br />Click &ldquo;+ New Collaborator&rdquo; to add one.
+            <div className="px-4 py-8 text-center text-[#4b4b4b] text-xs font-sans font-light">
+              No collaborators yet.<br />Click &ldquo;+ new collaborator&rdquo; to add one.
             </div>
           ) : (
             collaborators.map(c => {
@@ -167,31 +190,46 @@ export default function CollaboratorsPage() {
                 <button
                   key={c.id}
                   onClick={() => openEdit(c)}
-                  className={cls(
-                    "w-full text-left px-4 py-3 border-b border-zinc-800/60 transition-colors",
+                  className="w-full text-left px-4 py-3 border-b border-[#1a1a1a] transition-colors"
+                  style={
                     isSelected
-                      ? "bg-zinc-800 border-l-2 border-l-blue-500"
-                      : "hover:bg-zinc-900"
-                  )}
+                      ? { background: "#0a0a0a", boxShadow: "inset 3px 0 0 #abd96d" }
+                      : undefined
+                  }
+                  onMouseEnter={e => {
+                    if (!isSelected) (e.currentTarget as HTMLElement).style.background = "#0a0a0a";
+                  }}
+                  onMouseLeave={e => {
+                    if (!isSelected) (e.currentTarget as HTMLElement).style.background = "";
+                  }}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     {c.photo_url ? (
-                      <img src={c.photo_url} alt={c.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                      <img src={c.photo_url} alt={c.name} className="w-7 h-7 object-cover flex-shrink-0 border border-[#333]" />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center flex-shrink-0">
-                        <span className="text-[10px] font-sans font-semibold text-zinc-400">
+                      <div className="w-7 h-7 bg-[#1a1a1a] border border-[#333] flex items-center justify-center flex-shrink-0">
+                        <span className="text-[10px] font-display font-bold text-[#9b9b9b]">
                           {c.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <span className="text-xs font-sans font-medium text-zinc-200 truncate">{c.name}</span>
+                    <span className="text-xs font-sans font-medium text-[#cbcbcb] truncate">{c.name}</span>
                     {unavailable && (
-                      <span className="ml-auto w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0" title="Currently unavailable" />
+                      <span
+                        className="ml-auto w-2 h-2 flex-shrink-0"
+                        title="Currently unavailable"
+                        style={{ background: "#EF7143" }}
+                      />
                     )}
                   </div>
                   <div className="flex gap-1 flex-wrap pl-9">
                     {c.roles.slice(0, 3).map(r => (
-                      <span key={r} className="text-[9px] font-sans px-1 py-0.5 rounded bg-zinc-700 text-zinc-400">{r}</span>
+                      <span
+                        key={r}
+                        className="text-[9px] font-sans px-1 py-0.5 bg-[#1a1a1a] border border-[#333] text-[#9b9b9b]"
+                      >
+                        {r}
+                      </span>
                     ))}
                   </div>
                 </button>
@@ -202,14 +240,17 @@ export default function CollaboratorsPage() {
 
         {/* Form panel */}
         {showForm ? (
-          <div className="flex-1 overflow-y-auto px-6 py-5">
+          <div className="flex-1 overflow-y-auto px-6 py-5 bg-[#000]">
             <div className="max-w-xl">
-              <h2 className="text-sm font-semibold text-white font-sans mb-4">
-                {isNew ? "New Collaborator" : `Edit — ${selected?.name}`}
+              <h2 className="text-sm font-display font-bold text-[#f6f6f6] mb-4">
+                {isNew ? "new collaborator" : `edit — ${selected?.name}`}
               </h2>
 
               {error && (
-                <div className="mb-4 bg-red-900/40 border border-red-700 rounded p-2.5 text-xs font-sans text-red-300">
+                <div
+                  className="mb-4 p-2.5 text-xs font-sans"
+                  style={{ background: "#AE0A33", color: "#FCFCFC" }}
+                >
                   {error}
                 </div>
               )}
@@ -224,7 +265,7 @@ export default function CollaboratorsPage() {
                       onChange={e => set("id", e.target.value.toLowerCase().replace(/\s+/g, "-"))}
                       placeholder="kate-koherence"
                       disabled={!isNew}
-                      className={cls(inputCls, !isNew && "opacity-40 cursor-not-allowed")}
+                      className={inputCls + (!isNew ? " opacity-40 cursor-not-allowed" : "")}
                     />
                   </Field>
                   <Field label="Display name">
@@ -245,12 +286,12 @@ export default function CollaboratorsPage() {
                             : [...draft.roles, r];
                           set("roles", roles);
                         }}
-                        className={cls(
-                          "px-2.5 py-1 text-[10px] font-sans rounded border capitalize transition-colors",
+                        className="px-2.5 py-1 text-[10px] font-sans border capitalize transition-colors"
+                        style={
                           draft.roles.includes(r)
-                            ? "bg-blue-800 border-blue-600 text-blue-100"
-                            : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
-                        )}
+                            ? { background: "#abd96d", borderColor: "#abd96d", color: "#383838" }
+                            : { background: "#000", borderColor: "#333", color: "#9b9b9b" }
+                        }
                       >
                         {r}
                       </button>
@@ -278,7 +319,7 @@ export default function CollaboratorsPage() {
                     <select
                       value={draft.pro_affiliation}
                       onChange={e => set("pro_affiliation", e.target.value as PROAffiliation)}
-                      className={inputCls}
+                      className={selectCls + " w-full"}
                     >
                       {ALL_PRO.map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
                     </select>
@@ -300,7 +341,7 @@ export default function CollaboratorsPage() {
                             ps[i] = { ...ps[i], platform: e.target.value as CollaboratorPlatform };
                             set("platforms", ps);
                           }}
-                          className="bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                          className={selectCls}
                         >
                           {ALL_PLATFORMS.map(pl => <option key={pl} value={pl}>{pl}</option>)}
                         </select>
@@ -313,7 +354,7 @@ export default function CollaboratorsPage() {
                             set("platforms", ps);
                           }}
                           placeholder="https://…"
-                          className={cls(inputCls, "flex-1")}
+                          className={inputCls + " flex-1"}
                         />
                         <input
                           type="text"
@@ -324,12 +365,12 @@ export default function CollaboratorsPage() {
                             set("platforms", ps);
                           }}
                           placeholder="@username"
-                          className="w-28 bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                          className="w-28 bg-[#000] border border-[#333] px-2 py-1.5 text-xs font-sans text-[#f6f6f6] focus:outline-none focus:border-[#EF7143] transition-colors"
                         />
                         <button
                           type="button"
                           onClick={() => set("platforms", draft.platforms.filter((_, j) => j !== i))}
-                          className="text-zinc-600 hover:text-red-400 text-sm leading-none flex-shrink-0 transition-colors"
+                          className="text-[#4b4b4b] hover:text-[#AE0A33] text-sm leading-none flex-shrink-0 transition-colors"
                         >
                           ×
                         </button>
@@ -338,9 +379,9 @@ export default function CollaboratorsPage() {
                     <button
                       type="button"
                       onClick={() => set("platforms", [...draft.platforms, { platform: "direct", url: "", username: null }])}
-                      className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors self-start"
+                      className="text-[10px] font-sans text-[#4b4b4b] hover:text-[#9b9b9b] transition-colors self-start"
                     >
-                      + Add platform
+                      + add platform
                     </button>
                   </div>
                 </Field>
@@ -359,7 +400,7 @@ export default function CollaboratorsPage() {
                             set("socials", Object.fromEntries(entries));
                           }}
                           placeholder="instagram"
-                          className="w-28 bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                          className="w-28 bg-[#000] border border-[#333] px-2 py-1.5 text-xs font-sans text-[#f6f6f6] focus:outline-none focus:border-[#EF7143] transition-colors"
                         />
                         <input
                           type="url"
@@ -370,7 +411,7 @@ export default function CollaboratorsPage() {
                             set("socials", s);
                           }}
                           placeholder="https://…"
-                          className={cls(inputCls, "flex-1")}
+                          className={inputCls + " flex-1"}
                         />
                         <button
                           type="button"
@@ -379,7 +420,7 @@ export default function CollaboratorsPage() {
                             delete s[platform];
                             set("socials", s);
                           }}
-                          className="text-zinc-600 hover:text-red-400 text-sm leading-none flex-shrink-0 transition-colors"
+                          className="text-[#4b4b4b] hover:text-[#AE0A33] text-sm leading-none flex-shrink-0 transition-colors"
                         >
                           ×
                         </button>
@@ -388,9 +429,9 @@ export default function CollaboratorsPage() {
                     <button
                       type="button"
                       onClick={() => set("socials", { ...draft.socials, "": "" })}
-                      className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors self-start"
+                      className="text-[10px] font-sans text-[#4b4b4b] hover:text-[#9b9b9b] transition-colors self-start"
                     >
-                      + Add social
+                      + add social
                     </button>
                   </div>
                 </Field>
@@ -408,9 +449,9 @@ export default function CollaboratorsPage() {
                             ws[i] = { ...ws[i], unavailable_from: e.target.value };
                             set("availability_windows", ws);
                           }}
-                          className="bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                          className="bg-[#000] border border-[#333] px-2 py-1.5 text-xs font-sans text-[#f6f6f6] focus:outline-none focus:border-[#EF7143] transition-colors"
                         />
-                        <span className="text-zinc-600 text-xs">→</span>
+                        <span className="text-[#4b4b4b] text-xs">→</span>
                         <input
                           type="date"
                           value={w.unavailable_until}
@@ -419,7 +460,7 @@ export default function CollaboratorsPage() {
                             ws[i] = { ...ws[i], unavailable_until: e.target.value };
                             set("availability_windows", ws);
                           }}
-                          className="bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                          className="bg-[#000] border border-[#333] px-2 py-1.5 text-xs font-sans text-[#f6f6f6] focus:outline-none focus:border-[#EF7143] transition-colors"
                         />
                         <input
                           type="text"
@@ -430,12 +471,12 @@ export default function CollaboratorsPage() {
                             set("availability_windows", ws);
                           }}
                           placeholder="reason (optional)"
-                          className="flex-1 min-w-32 bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                          className="flex-1 min-w-32 bg-[#000] border border-[#333] px-2 py-1.5 text-xs font-sans text-[#f6f6f6] focus:outline-none focus:border-[#EF7143] transition-colors"
                         />
                         <button
                           type="button"
                           onClick={() => set("availability_windows", draft.availability_windows.filter((_, j) => j !== i))}
-                          className="text-zinc-600 hover:text-red-400 text-sm leading-none flex-shrink-0 transition-colors"
+                          className="text-[#4b4b4b] hover:text-[#AE0A33] text-sm leading-none flex-shrink-0 transition-colors"
                         >
                           ×
                         </button>
@@ -447,9 +488,9 @@ export default function CollaboratorsPage() {
                         ...draft.availability_windows,
                         { unavailable_from: "", unavailable_until: "", reason: null },
                       ])}
-                      className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors self-start"
+                      className="text-[10px] font-sans text-[#4b4b4b] hover:text-[#9b9b9b] transition-colors self-start"
                     >
-                      + Add window
+                      + add window
                     </button>
                   </div>
                 </Field>
@@ -461,44 +502,44 @@ export default function CollaboratorsPage() {
                     onChange={e => set("notes", e.target.value)}
                     rows={3}
                     placeholder="Preferences, contract details, anything…"
-                    className={cls(inputCls, "resize-none")}
+                    className={inputCls + " resize-none"}
                   />
                 </Field>
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-zinc-800">
+              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-[#222]">
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 py-2 text-xs font-sans font-semibold rounded bg-blue-800 border border-blue-700 text-blue-100 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 py-2 text-xs font-sans font-bold bg-[#abd96d] text-[#383838] hover:bg-[#9ecf5a] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
-                  {saving ? "Saving…" : isNew ? "Create" : "Save"}
+                  {saving ? "saving…" : isNew ? "create" : "save"}
                 </button>
                 {!isNew && selected && (
                   confirmDelete ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-sans text-zinc-400">Delete?</span>
+                      <span className="text-[10px] font-sans text-[#9b9b9b]">Delete?</span>
                       <button
                         onClick={handleDelete}
                         disabled={deleting}
-                        className="px-3 py-2 text-[10px] font-sans rounded bg-red-900 border border-red-700 text-red-200 hover:bg-red-800 disabled:opacity-40 transition-colors"
+                        className="px-3 py-2 text-[10px] font-sans bg-[#AE0A33] text-[#FCFCFC] hover:opacity-80 disabled:opacity-40 transition-opacity"
                       >
-                        {deleting ? "…" : "Yes, delete"}
+                        {deleting ? "…" : "yes, delete"}
                       </button>
                       <button
                         onClick={() => setConfirmDelete(false)}
-                        className="px-3 py-2 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors"
+                        className="px-3 py-2 text-[10px] font-sans bg-[#000] border border-[#333] text-[#9b9b9b] hover:text-[#f6f6f6] transition-colors"
                       >
-                        Cancel
+                        cancel
                       </button>
                     </div>
                   ) : (
                     <button
                       onClick={() => setConfirmDelete(true)}
-                      className="px-3 py-2 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-500 hover:bg-red-900/40 hover:border-red-800 hover:text-red-300 transition-colors"
+                      className="px-3 py-2 text-[10px] font-sans bg-[#000] border border-[#333] text-[#4b4b4b] hover:border-[#AE0A33] hover:text-[#AE0A33] transition-colors"
                     >
-                      Delete
+                      delete
                     </button>
                   )
                 )}
@@ -506,15 +547,18 @@ export default function CollaboratorsPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-zinc-600 text-sm font-sans">
-            Select a collaborator or create a new one
+          <div className="flex-1 flex items-center justify-center text-[#4b4b4b] text-sm font-sans font-light bg-[#000]">
+            select a collaborator or create a new one
           </div>
         )}
       </div>
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-lg text-sm font-sans shadow-xl bg-zinc-800 border border-zinc-600 text-zinc-100">
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 text-sm font-sans bg-[#000] border border-[#333] text-[#f6f6f6]"
+          style={{ boxShadow: "6px 5px 9px rgba(0,0,0,0.35)" }}
+        >
           {toast}
         </div>
       )}

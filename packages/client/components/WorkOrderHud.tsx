@@ -2,22 +2,23 @@
 
 import { Collaborator, WorkOrder, WorkOrderStatus } from "@/lib/types";
 
-const STATUS_STYLES: Record<WorkOrderStatus, string> = {
-  draft:              "bg-zinc-700 text-zinc-300 border-zinc-600",
-  sent:               "bg-blue-900/50 text-blue-300 border-blue-700",
-  in_progress:        "bg-yellow-900/40 text-yellow-300 border-yellow-700",
-  delivered:          "bg-violet-900/40 text-violet-300 border-violet-700",
-  accepted:           "bg-green-900/40 text-green-300 border-green-700",
-  revision_requested: "bg-orange-900/40 text-orange-300 border-orange-700",
+// Rainbow palette — no cobalt blue anywhere
+const STATUS_STYLES: Record<WorkOrderStatus, React.CSSProperties> = {
+  draft:              { background: "#000",     color: "#cbcbcb", border: "1px solid #4b4b4b" },
+  sent:               { background: "#042a7b",  color: "#ffff00", border: "1px solid #042a7b" },
+  in_progress:        { background: "#EF7143",  color: "#000",    border: "1px solid #EF7143" },
+  delivered:          { background: "#AD85D6",  color: "#000",    border: "1px solid #AD85D6" },
+  accepted:           { background: "#abd96d",  color: "#383838", border: "1px solid #abd96d" },
+  revision_requested: { background: "#AE0A33",  color: "#FCFCFC", border: "1px solid #AE0A33" },
 };
 
 const STATUS_LABELS: Record<WorkOrderStatus, string> = {
-  draft:              "Draft",
-  sent:               "Sent",
-  in_progress:        "In Progress",
-  delivered:          "Delivered",
-  accepted:           "Accepted",
-  revision_requested: "Revision",
+  draft:              "draft",
+  sent:               "sent",
+  in_progress:        "in progress",
+  delivered:          "delivered",
+  accepted:           "accepted",
+  revision_requested: "revision",
 };
 
 function isOverdue(dateStr: string): boolean {
@@ -38,12 +39,13 @@ export default function WorkOrderHud({ workOrder, collaborator, onOpen }: WorkOr
   if (!workOrder) {
     return (
       <div className="px-3 pb-2 flex flex-col gap-1.5">
-        <p className="text-[10px] font-sans text-zinc-600">No work order</p>
+        <p className="text-[10px] font-sans font-light text-[#4b4b4b]">No work order</p>
         <button
           onClick={onOpen}
-          className="w-full py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 transition-colors"
+          className="w-full py-1.5 text-[10px] font-sans bg-[#000] border border-[#333] text-[#9b9b9b] hover:text-[#f6f6f6] transition-colors"
+          style={{ transitionDuration: "300ms", transitionTimingFunction: "ease-in-out" }}
         >
-          Create Work Order
+          create work order
         </button>
       </div>
     );
@@ -55,11 +57,12 @@ export default function WorkOrderHud({ workOrder, collaborator, onOpen }: WorkOr
     <div className="px-3 pb-2 flex flex-col gap-1.5">
       {/* Collaborator name + status badge */}
       <div className="flex items-center justify-between gap-1">
-        <span className="text-[10px] font-sans text-zinc-300 truncate">
+        <span className="text-[10px] font-sans text-[#cbcbcb] truncate">
           {collaborator?.name ?? workOrder.collaborator_id}
         </span>
         <span
-          className={`text-[9px] font-sans px-1.5 py-0.5 rounded border flex-shrink-0 ${STATUS_STYLES[workOrder.status]}`}
+          className="text-[9px] font-sans px-1.5 py-0.5 flex-shrink-0"
+          style={STATUS_STYLES[workOrder.status]}
         >
           {STATUS_LABELS[workOrder.status]}
         </span>
@@ -67,9 +70,9 @@ export default function WorkOrderHud({ workOrder, collaborator, onOpen }: WorkOr
 
       {/* Budget line */}
       {(workOrder.budget_agreed != null || workOrder.budget_paid != null) && (
-        <p className="text-[9px] font-sans text-zinc-500">
+        <p className="text-[9px] font-sans text-[#4b4b4b]">
           {workOrder.budget_agreed != null && (
-            <span className="text-zinc-400">${workOrder.budget_agreed.toFixed(0)} agreed</span>
+            <span className="text-[#9b9b9b]">${workOrder.budget_agreed.toFixed(0)} agreed</span>
           )}
           {workOrder.budget_paid != null && workOrder.budget_paid > 0 && (
             <span> / ${workOrder.budget_paid.toFixed(0)} paid</span>
@@ -77,18 +80,19 @@ export default function WorkOrderHud({ workOrder, collaborator, onOpen }: WorkOr
         </p>
       )}
 
-      {/* Calendar chip */}
+      {/* Calendar chip — square, rainbow-colored */}
       {workOrder.follow_up_date && (
         <div
-          className={`flex items-center gap-1 text-[9px] font-sans px-1.5 py-0.5 rounded ${
+          className="flex items-center gap-1 text-[9px] font-sans px-1.5 py-0.5"
+          style={
             overdue
-              ? "bg-orange-900/30 text-orange-400 border border-orange-800"
-              : "bg-blue-900/30 text-blue-400 border border-blue-800"
-          }`}
+              ? { background: "#AE0A33", color: "#FCFCFC" }
+              : { background: "#042a7b", color: "#ffff00" }
+          }
         >
           <span>📅</span>
           <span>
-            {overdue ? "Overdue " : "Follow up "}
+            {overdue ? "overdue " : "follow up "}
             {formatDate(workOrder.follow_up_date)}
             {workOrder.follow_up_reason && ` — ${workOrder.follow_up_reason}`}
           </span>
@@ -98,9 +102,10 @@ export default function WorkOrderHud({ workOrder, collaborator, onOpen }: WorkOr
       {/* Open button */}
       <button
         onClick={onOpen}
-        className="w-full py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors"
+        className="w-full py-1.5 text-[10px] font-sans bg-[#000] border border-[#333] text-[#9b9b9b] hover:text-[#f6f6f6] transition-colors"
+        style={{ transitionDuration: "300ms", transitionTimingFunction: "ease-in-out" }}
       >
-        View Work Order
+        view work order
       </button>
     </div>
   );

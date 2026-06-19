@@ -177,11 +177,13 @@ export default function SongBrowserPage() {
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {songs.map(song => (
-          <button
+          <div
             key={song.id}
-            onClick={() => handleSelect(song)}
-            disabled={activatingId !== null}
-            className="text-left bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-600"
+            onClick={() => activatingId === null && handleSelect(song)}
+            role="button"
+            tabIndex={activatingId !== null ? -1 : 0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (activatingId === null) handleSelect(song); } }}
+            className={`text-left bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 ${activatingId !== null ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
               <span className="text-white font-semibold text-sm leading-snug">{song.title}</span>
@@ -235,7 +237,7 @@ export default function SongBrowserPage() {
                 </button>
               </div>
             )}
-          </button>
+          </div>
         ))}
       </div>
     </div>

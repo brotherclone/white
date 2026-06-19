@@ -37,6 +37,19 @@ interface WorkOrderDrawerProps {
   onSaved: (wo: WorkOrder) => void;
 }
 
+const ROSE_BG: React.CSSProperties = {
+  backgroundImage: "url('/rose.png')",
+  backgroundRepeat: "repeat",
+};
+
+function StarIcon() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor" aria-hidden>
+      <polygon points="4.5,0 5.53,3.23 9,3.23 6.24,5.23 7.27,8.47 4.5,6.47 1.73,8.47 2.76,5.23 0,3.23 3.47,3.23" />
+    </svg>
+  );
+}
+
 export default function WorkOrderDrawer({
   workOrder: initialWorkOrder,
   collaborator: initialCollaborator,
@@ -53,7 +66,6 @@ export default function WorkOrderDrawer({
   const [toast, setToast] = useState<Toast | null>(null);
   const [dirty, setDirty] = useState(false);
 
-  // For generate when no work order
   const [selectedCollabId, setSelectedCollabId] = useState(initialCollaborator?.id ?? "");
   const [selectedRole, setSelectedRole] = useState<CollaboratorRole>(
     initialWorkOrder?.role ?? "vocalist"
@@ -127,47 +139,62 @@ export default function WorkOrderDrawer({
   }
 
   const tabs: { id: DrawerTab; label: string }[] = [
-    { id: "brief", label: "Brief" },
-    { id: "collaborator", label: "Collaborator" },
-    { id: "budget", label: "Budget" },
-    { id: "calendar", label: "Calendar" },
+    { id: "brief", label: "brief" },
+    { id: "collaborator", label: "collaborator" },
+    { id: "budget", label: "budget" },
+    { id: "calendar", label: "calendar" },
   ];
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/50"
-        onClick={onClose}
-      />
+      {/* Backdrop — brand black, no bluish tint */}
+      <div className="fixed inset-0 z-40 bg-black/70" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-zinc-900 border-l border-zinc-800 flex flex-col shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 flex-shrink-0">
-          <h2 className="text-sm font-semibold text-white font-sans">
-            {wo ? "Work Order" : "Create Work Order"}
+      <div
+        className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-[#000] border-l border-[#222] flex flex-col"
+        style={{ boxShadow: "-6px 0 24px rgba(0,0,0,0.6)" }}
+      >
+        {/* Header — rose.png chrome surface */}
+        <div
+          className="flex items-center justify-between px-5 py-4 border-b border-[#222] flex-shrink-0 bg-[#000]"
+          style={ROSE_BG}
+        >
+          <h2 className="text-sm font-display font-bold text-[#f6f6f6] flex items-center gap-2">
+            <StarIcon />
+            {wo ? "work order" : "create work order"}
           </h2>
           <button
             onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-200 text-lg leading-none transition-colors"
+            className="text-[#cbcbcb] hover:text-[#EF7143] text-lg leading-none transition-colors"
+            style={{ transitionDuration: "300ms", transitionTimingFunction: "ease-in-out" }}
             aria-label="Close"
           >
             ×
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-zinc-800 flex-shrink-0">
+        {/* Tab bar — rose.png chrome surface */}
+        <div
+          className="flex border-b border-[#222] flex-shrink-0 bg-[#000]"
+          style={ROSE_BG}
+        >
           {tabs.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-4 py-2.5 text-[11px] font-sans font-medium transition-colors ${
-                tab === t.id
-                  ? "text-blue-300 border-b-2 border-blue-500"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
+              className="px-4 py-2.5 text-[11px] font-sans font-medium"
+              style={{
+                color: tab === t.id ? "#f6f6f6" : "#9b9b9b",
+                boxShadow: tab === t.id ? "inset 0 -2px 0 #f6f6f6" : "none",
+                transition: "color 300ms ease-in-out",
+              }}
+              onMouseEnter={e => {
+                if (tab !== t.id) (e.currentTarget as HTMLElement).style.color = "#abd96d";
+              }}
+              onMouseLeave={e => {
+                if (tab !== t.id) (e.currentTarget as HTMLElement).style.color = "#9b9b9b";
+              }}
             >
               {t.label}
             </button>
@@ -175,18 +202,22 @@ export default function WorkOrderDrawer({
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="flex-1 overflow-y-auto px-5 py-4 bg-[#000]">
           {/* Generate panel — only when no work order yet */}
           {!wo && (
-            <div className="flex flex-col gap-3 mb-6 p-4 rounded-lg bg-zinc-800 border border-zinc-700">
-              <p className="text-[11px] font-sans text-zinc-400">
+            <div
+              className="flex flex-col gap-3 mb-6 p-4 bg-[#0a0a0a] border border-[#222]"
+              style={{ boxShadow: "6px 5px 9px rgba(0,0,0,0.25)" }}
+            >
+              <p className="text-[0.8rem] font-sans font-light text-[#cbcbcb]">
                 Generate a work order pre-filled from the pipeline data.
               </p>
               <div className="flex flex-col gap-2">
                 <select
                   value={selectedCollabId}
                   onChange={e => setSelectedCollabId(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                  className="w-full border border-[#333] bg-[#000] px-2 py-1.5 text-[0.85rem] text-[#f6f6f6] outline-none appearance-none focus:border-[#EF7143] transition-colors"
+                  style={{ fontFamily: "semplicitapro, sans-serif" }}
                 >
                   <option value="">Select collaborator…</option>
                   {collaborators.map(c => (
@@ -197,14 +228,16 @@ export default function WorkOrderDrawer({
                   <select
                     value={selectedRole}
                     onChange={e => setSelectedRole(e.target.value as CollaboratorRole)}
-                    className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                    className="flex-1 border border-[#333] bg-[#000] px-2 py-1.5 text-[0.85rem] text-[#f6f6f6] outline-none appearance-none focus:border-[#EF7143] transition-colors"
+                    style={{ fontFamily: "semplicitapro, sans-serif" }}
                   >
                     {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                   <select
                     value={selectedPlatform}
                     onChange={e => setSelectedPlatform(e.target.value as CollaboratorPlatform)}
-                    className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                    className="flex-1 border border-[#333] bg-[#000] px-2 py-1.5 text-[0.85rem] text-[#f6f6f6] outline-none appearance-none focus:border-[#EF7143] transition-colors"
+                    style={{ fontFamily: "semplicitapro, sans-serif" }}
                   >
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
@@ -212,9 +245,9 @@ export default function WorkOrderDrawer({
                 <button
                   onClick={handleGenerate}
                   disabled={generating || !selectedCollabId}
-                  className="w-full py-1.5 text-[11px] font-sans rounded bg-blue-800 border border-blue-600 text-blue-200 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="w-full py-1.5 text-[11px] font-sans font-bold bg-[#abd96d] text-[#383838] hover:bg-[#9ecf5a] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
-                  {generating ? "Generating…" : "Generate"}
+                  {generating ? "generating…" : "generate"}
                 </button>
               </div>
             </div>
@@ -234,22 +267,25 @@ export default function WorkOrderDrawer({
           {wo && tab === "calendar" && <CalendarTab wo={wo} onChange={updateField} />}
         </div>
 
-        {/* Footer actions */}
+        {/* Footer — rose.png chrome surface */}
         {wo && (
-          <div className="flex items-center gap-2 px-5 py-4 border-t border-zinc-800 flex-shrink-0">
+          <div
+            className="flex items-center gap-2 px-5 py-4 border-t border-[#222] flex-shrink-0 bg-[#000]"
+            style={ROSE_BG}
+          >
             <button
               onClick={handleSave}
               disabled={saving || !dirty}
-              className="flex-1 py-2 text-[11px] font-sans font-semibold rounded bg-blue-800 border border-blue-700 text-blue-100 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 py-2 text-[11px] font-sans font-bold bg-[#abd96d] text-[#383838] hover:bg-[#9ecf5a] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              {saving ? "Saving…" : dirty ? "Save" : "Saved"}
+              {saving ? "saving…" : dirty ? "save" : "saved"}
             </button>
             <button
               onClick={handleDraftEmail}
               disabled={drafting}
-              className="flex-1 py-2 text-[11px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 py-2 text-[11px] font-sans bg-[#000] border border-[#333] text-[#cbcbcb] hover:text-[#f6f6f6] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              {drafting ? "Drafting…" : "Draft Email"}
+              {drafting ? "drafting…" : "draft email"}
             </button>
           </div>
         )}
@@ -258,11 +294,12 @@ export default function WorkOrderDrawer({
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-lg text-sm font-sans shadow-xl ${
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 text-sm font-sans shadow-xl ${
             toast.type === "error"
-              ? "bg-red-900 border border-red-700 text-red-200"
-              : "bg-zinc-800 border border-zinc-600 text-zinc-100"
+              ? "bg-[#AE0A33] text-[#FCFCFC]"
+              : "bg-[#000] border border-[#333] text-[#f6f6f6]"
           }`}
+          style={{ boxShadow: "6px 5px 9px rgba(0,0,0,0.35)" }}
         >
           {toast.message}
         </div>
@@ -272,17 +309,20 @@ export default function WorkOrderDrawer({
 }
 
 // ---------------------------------------------------------------------------
-// Tab sub-components
+// Shared primitives
 // ---------------------------------------------------------------------------
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] font-sans text-zinc-500 uppercase tracking-wide">{label}</label>
+      <label className="text-[10px] font-sans text-[#9b9b9b] uppercase tracking-wide">{label}</label>
       {children}
     </div>
   );
 }
+
+const inputCls =
+  "w-full bg-[#000] border border-[#333] px-2.5 py-1.5 text-xs font-sans text-[#f6f6f6] placeholder-[#4b4b4b] focus:outline-none focus:border-[#EF7143] transition-colors resize-none";
 
 function TextInput({
   value,
@@ -295,13 +335,16 @@ function TextInput({
   placeholder?: string;
   multiline?: boolean;
 }) {
-  const cls = "w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none";
   return multiline ? (
-    <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className={cls} rows={3} />
+    <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className={inputCls} rows={3} />
   ) : (
-    <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className={cls} />
+    <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className={inputCls} />
   );
 }
+
+// ---------------------------------------------------------------------------
+// Tab sub-components
+// ---------------------------------------------------------------------------
 
 function BriefTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends keyof WorkOrder>(k: K, v: WorkOrder[K]) => void }) {
   return (
@@ -315,7 +358,7 @@ function BriefTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends keyof 
             type="number"
             value={wo.bpm ?? ""}
             onChange={e => onChange("bpm", e.target.value ? Number(e.target.value) : null)}
-            className="w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+            className={inputCls}
           />
         </Field>
         <Field label="Time sig">
@@ -344,7 +387,7 @@ function BriefTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends keyof 
           type="date"
           value={wo.deadline ?? ""}
           onChange={e => onChange("deadline", e.target.value || null)}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+          className={inputCls}
         />
       </Field>
     </div>
@@ -374,20 +417,25 @@ function CollaboratorTab({
             const found = collaborators.find(c => c.id === e.target.value) ?? null;
             onCollaboratorChange(found);
           }}
-          className="w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+          className="w-full border border-[#333] bg-[#000] px-2.5 py-1.5 text-xs text-[#f6f6f6] outline-none appearance-none focus:border-[#EF7143] transition-colors"
+          style={{ fontFamily: "semplicitapro, sans-serif" }}
         >
           {collaborators.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </Field>
 
       {collaborator && (
-        <div className="p-3 rounded-lg bg-zinc-800 border border-zinc-700">
+        <div
+          className="p-3 bg-[#000] border border-[#222]"
+          style={{ boxShadow: "6px 5px 9px rgba(0,0,0,0.25)" }}
+        >
           <CollaboratorProfileCard collaborator={collaborator} />
           <Link
-            href={`/collaborators`}
-            className="mt-2 flex items-center gap-1 text-[10px] font-sans text-zinc-500 hover:text-blue-400 transition-colors"
+            href="/collaborators"
+            className="mt-2 flex items-center gap-1 text-[10px] font-sans text-[#9b9b9b] hover:text-[#EF7143] transition-colors"
+            style={{ transitionDuration: "300ms" }}
           >
-            <span>Edit profile</span>
+            <span>edit profile</span>
             <span>→</span>
           </Link>
         </div>
@@ -397,7 +445,7 @@ function CollaboratorTab({
         <div className="grid grid-cols-3 gap-2">
           {(["mechanical_pct", "performance_pct", "sync_pct"] as const).map(field => (
             <div key={field} className="flex flex-col gap-1">
-              <span className="text-[9px] font-sans text-zinc-600 uppercase">
+              <span className="text-[9px] font-sans text-[#9b9b9b] uppercase">
                 {field.replace("_pct", "").replace("_", " ")}
               </span>
               <input
@@ -417,7 +465,7 @@ function CollaboratorTab({
                   };
                   onChange("royalty_split", { ...split, [field]: Number(e.target.value) });
                 }}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+                className={inputCls}
               />
             </div>
           ))}
@@ -439,7 +487,7 @@ function BudgetTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends keyof
             min={0}
             value={wo.budget_agreed ?? ""}
             onChange={e => onChange("budget_agreed", e.target.value ? Number(e.target.value) : null)}
-            className="w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+            className={inputCls}
           />
         </Field>
         <Field label="Paid ($)">
@@ -448,7 +496,7 @@ function BudgetTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends keyof
             min={0}
             value={wo.budget_paid ?? ""}
             onChange={e => onChange("budget_paid", e.target.value ? Number(e.target.value) : null)}
-            className="w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+            className={inputCls}
           />
         </Field>
       </div>
@@ -461,11 +509,12 @@ function BudgetTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends keyof
             <button
               key={s}
               onClick={() => onChange("budget_status", s)}
-              className={`px-2.5 py-1 text-[10px] font-sans rounded border transition-colors capitalize ${
+              className="px-2.5 py-1 text-[10px] font-sans border transition-colors"
+              style={
                 wo.budget_status === s
-                  ? "bg-blue-800 border-blue-600 text-blue-100"
-                  : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
-              }`}
+                  ? { background: "#abd96d", borderColor: "#abd96d", color: "#383838" }
+                  : { background: "#000", borderColor: "#333", color: "#9b9b9b" }
+              }
             >
               {s}
             </button>
@@ -480,7 +529,7 @@ function CalendarTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends key
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-sans font-semibold text-zinc-400">Follow-up reminder</p>
+        <p className="text-[11px] font-sans font-semibold text-[#9b9b9b]">follow-up reminder</p>
         <Field label="Reason">
           <TextInput
             value={wo.follow_up_reason}
@@ -493,29 +542,29 @@ function CalendarTab({ wo, onChange }: { wo: WorkOrder; onChange: <K extends key
             type="date"
             value={wo.follow_up_date ?? ""}
             onChange={e => onChange("follow_up_date", e.target.value || null)}
-            className="w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+            className={inputCls}
           />
         </Field>
-        <p className="text-[10px] font-sans text-zinc-600">
+        <p className="text-[10px] font-sans text-[#4b4b4b]">
           Save the work order after setting a date to enable Set Reminder via GCal.
         </p>
       </div>
 
-      <div className="border-t border-zinc-800 pt-4 flex flex-col gap-3">
-        <p className="text-[11px] font-sans font-semibold text-zinc-400">Deadline</p>
+      <div className="border-t border-[#222] pt-4 flex flex-col gap-3">
+        <p className="text-[11px] font-sans font-semibold text-[#9b9b9b]">deadline</p>
         <Field label="Deadline date">
           <input
             type="date"
             value={wo.deadline ?? ""}
             onChange={e => onChange("deadline", e.target.value || null)}
-            className="w-full bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 focus:outline-none focus:border-zinc-500"
+            className={inputCls}
           />
         </Field>
       </div>
 
       {wo.calendar_event_id && (
-        <p className="text-[10px] font-sans text-zinc-500">
-          GCal event: <span className="text-zinc-400 font-mono">{wo.calendar_event_id}</span>
+        <p className="text-[10px] font-sans text-[#4b4b4b]">
+          GCal event: <span className="text-[#9b9b9b]">{wo.calendar_event_id}</span>
         </p>
       )}
     </div>

@@ -48,41 +48,39 @@ export default function CollaboratorProfileCard({ collaborator: c }: Collaborato
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Avatar + name */}
+      {/* Avatar + name — square per brand (no rounded-full) */}
       <div className="flex items-center gap-3">
         {c.photo_url ? (
           <img
             src={c.photo_url}
             alt={c.name}
-            className="w-10 h-10 rounded-full object-cover border border-zinc-700"
+            className="w-10 h-10 object-cover border border-[#333] flex-shrink-0"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-zinc-700 border border-zinc-600 flex items-center justify-center text-sm font-semibold text-zinc-300">
+          <div className="w-10 h-10 bg-[#1a1a1a] border border-[#333] flex items-center justify-center text-sm font-display font-bold text-[#9b9b9b] flex-shrink-0">
             {c.name.charAt(0).toUpperCase()}
           </div>
         )}
         <div>
-          <p className="text-sm font-semibold text-zinc-100">{c.name}</p>
-          <p className="text-[10px] font-sans text-zinc-500">
-            {c.roles.join(", ")}
-          </p>
+          <p className="text-sm font-display font-bold text-[#f6f6f6]">{c.name}</p>
+          <p className="text-[10px] font-sans text-[#9b9b9b]">{c.roles.join(", ")}</p>
         </div>
       </div>
 
-      {/* Availability warnings */}
+      {/* Availability warnings — orange = current, yellow = upcoming */}
       {currentUnavail && (
-        <div className="px-3 py-2 rounded bg-yellow-900/30 border border-yellow-700 text-[10px] font-sans text-yellow-300">
-          Currently unavailable: {currentUnavail}
+        <div className="px-3 py-2 text-[10px] font-sans" style={{ background: "#EF7143", color: "#000" }}>
+          currently unavailable: {currentUnavail}
         </div>
       )}
       {upcoming && !currentUnavail && (
-        <div className="px-3 py-2 rounded bg-amber-900/30 border border-amber-700 text-[10px] font-sans text-amber-300">
-          Upcoming unavailability: {formatDateRange(upcoming.unavailable_from, upcoming.unavailable_until)}
+        <div className="px-3 py-2 text-[10px] font-sans" style={{ background: "#ffff00", color: "#383838" }}>
+          upcoming: {formatDateRange(upcoming.unavailable_from, upcoming.unavailable_until)}
           {upcoming.reason && ` — ${upcoming.reason}`}
         </div>
       )}
 
-      {/* Platform links */}
+      {/* Platform links — square, hairline border */}
       {c.platforms.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {c.platforms.map((p, i) => (
@@ -91,7 +89,8 @@ export default function CollaboratorProfileCard({ collaborator: c }: Collaborato
               href={p.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-2 py-1 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors"
+              className="px-2 py-1 text-[10px] font-sans bg-[#000] border border-[#333] text-[#cbcbcb] hover:text-[#f6f6f6] transition-colors"
+              style={{ transitionDuration: "300ms" }}
             >
               {PLATFORM_LABELS[p.platform] ?? p.platform}
             </a>
@@ -101,9 +100,10 @@ export default function CollaboratorProfileCard({ collaborator: c }: Collaborato
               href={c.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-2 py-1 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors"
+              className="px-2 py-1 text-[10px] font-sans bg-[#000] border border-[#333] text-[#cbcbcb] hover:text-[#f6f6f6] transition-colors"
+              style={{ transitionDuration: "300ms" }}
             >
-              Site
+              site
             </a>
           )}
         </div>
@@ -118,7 +118,8 @@ export default function CollaboratorProfileCard({ collaborator: c }: Collaborato
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-2 py-1 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 transition-colors capitalize"
+              className="px-2 py-1 text-[10px] font-sans bg-[#000] border border-[#333] text-[#9b9b9b] hover:text-[#f6f6f6] transition-colors capitalize"
+              style={{ transitionDuration: "300ms" }}
             >
               {platform}
             </a>
@@ -128,15 +129,15 @@ export default function CollaboratorProfileCard({ collaborator: c }: Collaborato
 
       {/* PRO */}
       {c.pro_affiliation !== "none" && (
-        <p className="text-[10px] font-sans text-zinc-500">
-          PRO: <span className="text-zinc-300 uppercase">{c.pro_affiliation}</span>
-          {c.pro_number && <span className="text-zinc-500"> #{c.pro_number}</span>}
+        <p className="text-[10px] font-sans text-[#9b9b9b]">
+          PRO: <span className="text-[#cbcbcb] uppercase">{c.pro_affiliation}</span>
+          {c.pro_number && <span className="text-[#4b4b4b]"> #{c.pro_number}</span>}
         </p>
       )}
 
       {/* Notes */}
       {c.notes && (
-        <p className="text-[10px] font-sans text-zinc-500 italic">{c.notes}</p>
+        <p className="text-[10px] font-sans text-[#4b4b4b] italic">{c.notes}</p>
       )}
     </div>
   );
