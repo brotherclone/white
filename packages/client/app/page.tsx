@@ -38,6 +38,7 @@ const STAGE_LABELS: Record<SongEntry["stage"], string> = {
 };
 
 type Toast = { kind: "success" | "error"; message: string };
+type StageFilter = SongEntry["stage"] | "all";
 
 export default function SongBrowserPage() {
   const router = useRouter();
@@ -47,6 +48,7 @@ export default function SongBrowserPage() {
   const [error, setError] = useState<string | null>(null);
   const [handoffingId, setHandoffingId] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
+  const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const handoffPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const showToast = (kind: Toast["kind"], message: string) => {
@@ -149,7 +151,30 @@ export default function SongBrowserPage() {
           )}
         </div>
       </div>
-      <p className="text-zinc-500 text-xs font-sans mb-4">Select a song to continue</p>
+      <p className="text-zinc-500 text-xs font-sans mb-3">Select a song to continue</p>
+
+      {/* Stage filter */}
+      {!error && songs.length > 0 && (
+        <div className="flex gap-1.5 flex-wrap mb-4">
+          {(["all", ...Object.keys(STAGE_LABELS)] as StageFilter[]).map(s => {
+            const count = s === "all" ? songs.length : songs.filter(x => x.stage === s).length;
+            const active = stageFilter === s;
+            return (
+              <button
+                key={s}
+                onClick={() => setStageFilter(s)}
+                className={`px-2.5 py-1 text-[10px] font-sans border transition-colors ${
+                  active
+                    ? "bg-zinc-200 text-zinc-900 border-zinc-200"
+                    : "bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
+                }`}
+              >
+                {s === "all" ? "all" : STAGE_LABELS[s as SongEntry["stage"]].toLowerCase()} <span className={active ? "text-zinc-600" : "text-zinc-600"}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {toast && (
         <div
@@ -176,7 +201,7 @@ export default function SongBrowserPage() {
       )}
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {songs.map(song => (
+        {songs.filter(s => stageFilter === "all" || s.stage === stageFilter).map(song => (
           <div
             key={song.id}
             onClick={() => activatingId === null && handleSelect(song)}
