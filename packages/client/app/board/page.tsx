@@ -6,8 +6,11 @@ import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
   updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
   autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl, setBpm,
+  fetchWorkOrders, fetchCollaborators,
 } from "@/lib/api";
-import { CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
+import { Collaborator, CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry, WorkOrder } from "@/lib/types";
+import WorkOrderHud from "@/components/WorkOrderHud";
+import WorkOrderDrawer from "@/components/WorkOrderDrawer";
 
 const STAGE_LABELS: Record<MixStage, string> = {
   structure:          "Structure",
@@ -130,6 +133,9 @@ export default function BoardPage() {
   const [bpmInput, setBpmInput] = useState("");
   const [settingBpm, setSettingBpm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [workOrderDrawerOpen, setWorkOrderDrawerOpen] = useState(false);
   const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -154,6 +160,9 @@ export default function BoardPage() {
       setActiveSong(active.active);
       setMixFileState(mixInfo.has_mix ? mixInfo.mix_file : null);
       setLoadState("ready");
+      // Load work orders + collaborators in the background (non-blocking)
+      fetchWorkOrders().then(setWorkOrders).catch(() => {});
+      fetchCollaborators().then(setCollaborators).catch(() => {});
     } catch {
       setLoadState("error");
     }
@@ -520,6 +529,7 @@ export default function BoardPage() {
               const isLyrics = stage === "lyrics";
               const isVocalPlaceholders = stage === "vocal_placeholders";
               const isStructure = stage === "structure";
+              const isRecording = stage === "recording";
 
               return (
                 <div
@@ -606,6 +616,19 @@ export default function BoardPage() {
                       </button>
                     )}
                   </div>
+
+                  {/* Work order HUD — recording stage */}
+                  {isRecording && (isCurrent || isPast) && (
+                    <WorkOrderHud
+                      workOrder={workOrders[0] ?? null}
+                      collaborator={
+                        workOrders[0]
+                          ? collaborators.find(c => c.id === workOrders[0].collaborator_id) ?? null
+                          : null
+                      }
+                      onOpen={() => setWorkOrderDrawerOpen(true)}
+                    />
+                  )}
 
                   {/* Sync arrangement.txt from Logic — structure stage */}
                   {isCurrent && isStructure && (
@@ -712,6 +735,27 @@ export default function BoardPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Work order drawer */}
+      {workOrderDrawerOpen && (
+        <WorkOrderDrawer
+          workOrder={workOrders[0] ?? null}
+          collaborator={
+            workOrders[0]
+              ? collaborators.find(c => c.id === workOrders[0].collaborator_id) ?? null
+              : null
+          }
+          onClose={() => setWorkOrderDrawerOpen(false)}
+          onSaved={saved => {
+            setWorkOrders(prev => {
+              const idx = prev.findIndex(w => w.collaborator_id === saved.collaborator_id);
+              return idx >= 0
+                ? prev.map((w, i) => (i === idx ? saved : w))
+                : [...prev, saved];
+            });
+          }}
+        />
       )}
     </div>
   );

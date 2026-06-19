@@ -116,3 +116,88 @@ export interface Candidate {
   use_case: string;
   scores: Scores;
 }
+
+// ---------------------------------------------------------------------------
+// Collaborator registry
+// ---------------------------------------------------------------------------
+
+export type CollaboratorRole =
+  | "vocalist" | "drummer" | "guitarist" | "bassist"
+  | "keys" | "strings" | "brass" | "mixing" | "mastering" | "other";
+
+export type CollaboratorPlatform = "airgigs" | "soundbetter" | "direct" | "other";
+
+export type PROAffiliation = "ascap" | "bmi" | "sesac" | "socan" | "prs" | "other" | "none";
+
+export interface AvailabilityWindow {
+  unavailable_from: string;  // ISO date "YYYY-MM-DD"
+  unavailable_until: string;
+  reason?: string | null;
+}
+
+export interface PlatformProfile {
+  platform: CollaboratorPlatform;
+  url: string;
+  username?: string | null;
+}
+
+export interface Collaborator {
+  id: string;
+  name: string;
+  roles: CollaboratorRole[];
+  email?: string | null;
+  photo_url?: string | null;
+  platforms: PlatformProfile[];
+  website?: string | null;
+  socials: Record<string, string>;
+  pro_affiliation: PROAffiliation;
+  pro_number?: string | null;
+  availability_windows: AvailabilityWindow[];
+  notes: string;
+}
+
+// ---------------------------------------------------------------------------
+// Work orders
+// ---------------------------------------------------------------------------
+
+export type WorkOrderStatus =
+  | "draft" | "sent" | "in_progress" | "delivered" | "accepted" | "revision_requested";
+
+export type BudgetStatus = "pending" | "agreed" | "invoiced" | "paid";
+
+export interface RoyaltySplit {
+  collaborator_id: string;
+  song_slug: string;
+  mechanical_pct: number;
+  performance_pct: number;
+  sync_pct: number;
+  notes: string;
+}
+
+export interface WorkOrder {
+  id: string;
+  song_slug: string;
+  collaborator_id: string;
+  role: CollaboratorRole;
+  platform: CollaboratorPlatform;
+  status: WorkOrderStatus;
+  key: string;
+  bpm?: number | null;
+  time_signature: string;
+  sections: string[];
+  creative_direction: string;
+  part_notes: string;
+  artifact_types: string[];
+  deliverable_format: string;
+  deadline?: string | null;
+  follow_up_date?: string | null;
+  follow_up_reason: string;
+  budget_agreed?: number | null;
+  budget_paid?: number | null;
+  budget_currency: string;
+  budget_status: BudgetStatus;
+  calendar_event_id?: string | null;
+  royalty_split?: RoyaltySplit | null;
+  created_at: string;
+  updated_at: string;
+}

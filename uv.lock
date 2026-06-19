@@ -7491,6 +7491,7 @@ dependencies = [
     { name = "white-core" },
     { name = "white-generation" },
     { name = "white-ideation" },
+    { name = "white-production" },
 ]
 
 [package.metadata]
@@ -7504,6 +7505,7 @@ requires-dist = [
     { name = "white-core", editable = "packages/core" },
     { name = "white-generation", editable = "packages/generation" },
     { name = "white-ideation", editable = "packages/ideation" },
+    { name = "white-production", editable = "packages/production" },
 ]
 
 [[package]]

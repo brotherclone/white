@@ -42,6 +42,8 @@ from white_api.candidate_browser import (
     set_label,
     set_use_case,
 )
+from white_api.routes.collaborators import make_collaborators_router
+from white_api.routes.work_orders import make_work_orders_router
 
 VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
 EVOLVABLE_PHASES = {"drums", "bass", "melody"}
@@ -258,6 +260,7 @@ def create_app(
     production_dir: Path | None = None,
     *,
     shrink_wrapped_dir: Path | None = None,
+    registry_dir: Path | None = None,
 ) -> FastAPI:
     global _production_dir, _shrink_wrapped_dir, _active_song
     _production_dir = production_dir
@@ -269,7 +272,7 @@ def create_app(
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-        allow_methods=["GET", "POST", "PATCH", "DELETE"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
 
@@ -284,6 +287,23 @@ def create_app(
                 detail="No song selected — POST /songs/activate first",
             )
         return _production_dir
+
+    # ------------------------------------------------------------------
+    # Collaborator + work-order routers
+    # ------------------------------------------------------------------
+
+    app.include_router(
+        make_collaborators_router(
+            lambda: _shrink_wrapped_dir, registry_dir=registry_dir
+        )
+    )
+    app.include_router(
+        make_work_orders_router(
+            _require_production_dir,
+            lambda: _shrink_wrapped_dir,
+            registry_dir=registry_dir,
+        )
+    )
 
     def _all_candidates(
         phase: str | None = None, section: str | None = None

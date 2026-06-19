@@ -63,7 +63,7 @@ def _load_phase_decisions(production_dir: Path, phase: str) -> Optional[dict]:
     with open(review_path) as f:
         data = yaml.safe_load(f) or {}
 
-    candidates = data.get("candidates") or []
+    candidates = [c for c in (data.get("candidates") or []) if c is not None]
     approved = [
         c
         for c in candidates
@@ -73,12 +73,12 @@ def _load_phase_decisions(production_dir: Path, phase: str) -> Optional[dict]:
     chromatic_scores = [
         c["scores"]["chromatic"]["match"]
         for c in approved
-        if c.get("scores", {}).get("chromatic", {}).get("match") is not None
+        if (c.get("scores") or {}).get("chromatic", {}).get("match") is not None
     ]
     theory_scores = [
         c["scores"]["theory_total"]
         for c in approved
-        if c.get("scores", {}).get("theory_total") is not None
+        if (c.get("scores") or {}).get("theory_total") is not None
     ]
 
     mean_chromatic = (
