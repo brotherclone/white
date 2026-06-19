@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import date, datetime, timezone
+from datetime import date, timedelta
 from typing import Literal
 
 from white_core.music.core.work_order import WorkOrder
@@ -11,10 +11,9 @@ log = logging.getLogger(__name__)
 EventType = Literal["followup", "deadline"]
 
 
-def _date_to_rfc3339(d: date) -> str:
-    """Midnight UTC on the given date as RFC 3339 string."""
-    dt = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
-    return dt.isoformat().replace("+00:00", "Z")
+def _date_to_iso(d: date) -> str:
+    """ISO-8601 date string (YYYY-MM-DD) for GCal all-day events."""
+    return d.isoformat()
 
 
 def build_followup_event_payload(work_order: WorkOrder, song_title: str) -> dict:
@@ -24,12 +23,14 @@ def build_followup_event_payload(work_order: WorkOrder, song_title: str) -> dict
             "work_order.follow_up_date is required to build a follow-up event"
         )
     reason = work_order.follow_up_reason or "Follow up"
-    date_str = _date_to_rfc3339(work_order.follow_up_date)
+    date_str = _date_to_iso(work_order.follow_up_date)
+
+    end_str = _date_to_iso(work_order.follow_up_date + timedelta(days=1))
     return {
         "summary": f"Follow up: {work_order.collaborator_id} — {song_title}",
         "description": f"{reason}\nWork order: {work_order.id}",
-        "start": {"dateTime": date_str, "timeZone": "UTC"},
-        "end": {"dateTime": date_str, "timeZone": "UTC"},
+        "start": {"date": date_str},
+        "end": {"date": end_str},
         "reminders": {"useDefault": True},
     }
 
@@ -38,15 +39,17 @@ def build_deadline_event_payload(work_order: WorkOrder, song_title: str) -> dict
     """Return a GCal-compatible event dict for a delivery deadline."""
     if not work_order.deadline:
         raise ValueError("work_order.deadline is required to build a deadline event")
-    date_str = _date_to_rfc3339(work_order.deadline)
+    date_str = _date_to_iso(work_order.deadline)
+
+    end_str = _date_to_iso(work_order.deadline + timedelta(days=1))
     return {
         "summary": f"Deadline: {work_order.collaborator_id} — {song_title}",
         "description": (
             f"Delivery deadline for {work_order.role.value} on '{song_title}'.\n"
             f"Work order: {work_order.id}"
         ),
-        "start": {"dateTime": date_str, "timeZone": "UTC"},
-        "end": {"dateTime": date_str, "timeZone": "UTC"},
+        "start": {"date": date_str},
+        "end": {"date": end_str},
         "reminders": {"useDefault": True},
     }
 

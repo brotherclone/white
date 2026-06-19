@@ -22,11 +22,12 @@ const STATUS_LABELS: Record<WorkOrderStatus, string> = {
 };
 
 function isOverdue(dateStr: string): boolean {
-  return new Date(dateStr) < new Date(new Date().toDateString());
+  return dateStr < new Date().toISOString().slice(0, 10);
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 interface WorkOrderHudProps {

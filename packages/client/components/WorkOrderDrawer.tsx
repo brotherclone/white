@@ -125,7 +125,7 @@ export default function WorkOrderDrawer({
     setDrafting(true);
     try {
       await draftWorkOrderEmail(wo.collaborator_id);
-      showToast(`Gmail draft created for ${collaborator?.name ?? wo.collaborator_id}`);
+      showToast(`Draft email ready — open Gmail to review and send`);
     } catch (err) {
       const msg = String(err);
       if (msg.toLowerCase().includes("no email")) {
@@ -315,7 +315,7 @@ export default function WorkOrderDrawer({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] font-sans text-[#9b9b9b] uppercase tracking-wide">{label}</label>
+      <label className="text-[10px] font-sans text-[#9b9b9b] lowercase tracking-wide">{label}</label>
       {children}
     </div>
   );
@@ -413,11 +413,13 @@ function CollaboratorTab({
         <select
           value={wo.collaborator_id}
           onChange={e => {
+            if (wo.id) return; // immutable once saved — create a new work order to reassign
             onChange("collaborator_id", e.target.value);
             const found = collaborators.find(c => c.id === e.target.value) ?? null;
             onCollaboratorChange(found);
           }}
-          className="w-full border border-[#333] bg-[#000] px-2.5 py-1.5 text-xs text-[#f6f6f6] outline-none appearance-none focus:border-[#EF7143] transition-colors"
+          disabled={!!wo.id}
+          className="w-full border border-[#333] bg-[#000] px-2.5 py-1.5 text-xs text-[#f6f6f6] outline-none appearance-none focus:border-[#EF7143] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           style={{ fontFamily: "semplicitapro, sans-serif" }}
         >
           {collaborators.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}

@@ -183,7 +183,7 @@ export default function SongBrowserPage() {
             role="button"
             tabIndex={activatingId !== null ? -1 : 0}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (activatingId === null) handleSelect(song); } }}
-            className={`text-left bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 ${activatingId !== null ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+            className={`text-left bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors focus:outline-none focus:ring-2 focus:ring-[#EF7143] ${activatingId !== null ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
               <span className="text-white font-semibold text-sm leading-snug">{song.title}</span>
