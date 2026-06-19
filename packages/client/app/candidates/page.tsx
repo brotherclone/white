@@ -598,9 +598,7 @@ export default function CandidatesPage() {
       <div className="mt-4 border border-zinc-800 rounded-lg overflow-hidden">
         <button
           onClick={() => setSamplesExpanded(e => !e)}
-          disabled={activeSong?.stage !== "composition"}
-          className="w-full flex items-center justify-between px-4 py-2.5 bg-zinc-900 text-zinc-400 text-sm font-sans hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900"
-          title={activeSong?.stage !== "composition" ? "Handoff to Logic first — samples export into the Logic project folder" : undefined}
+          className="w-full flex items-center justify-between px-4 py-2.5 bg-zinc-900 text-zinc-400 text-sm font-sans hover:bg-zinc-800 transition-colors"
         >
           <span className="font-medium text-zinc-300">Chromatic Samples</span>
           <span className="text-xs text-zinc-600">{samplesExpanded ? "▲ collapse" : `▼ ${samples.length} samples`}</span>
@@ -645,7 +643,8 @@ export default function CandidatesPage() {
                       <td className="px-3 py-2">
                         <button
                           onClick={() => handleExport(s.segment_id)}
-                          disabled={exportedIds.has(s.segment_id) || exportingId === s.segment_id}
+                          disabled={exportedIds.has(s.segment_id) || exportingId === s.segment_id || activeSong?.stage !== "composition"}
+                          title={activeSong?.stage !== "composition" ? "Handoff to Logic first — exports into the Logic project folder" : undefined}
                           className="px-2 py-0.5 text-xs rounded font-medium transition-colors bg-zinc-700 hover:bg-zinc-600 text-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {exportedIds.has(s.segment_id) ? "Exported ✓" : exportingId === s.segment_id ? "…" : "Export"}

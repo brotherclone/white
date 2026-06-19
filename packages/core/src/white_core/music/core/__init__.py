@@ -1,2 +1,14 @@
-# This file marks the tests directory as a package.
-# This directory contains all unit tests for utility modules.
+from white_core.music.core.collaborator import (
+    AvailabilityWindow,
+    Collaborator,
+    PlatformProfile,
+)
+from white_core.music.core.work_order import RoyaltySplit, WorkOrder
+
+__all__ = [
+    "AvailabilityWindow",
+    "Collaborator",
+    "PlatformProfile",
+    "RoyaltySplit",
+    "WorkOrder",
+]

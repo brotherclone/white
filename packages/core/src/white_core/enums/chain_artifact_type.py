@@ -28,4 +28,7 @@ class ChainArtifactType(str, Enum):
     INFRANYM_TEXT_RENDER = "infranym_text_render"
     CIRCLE_JERK_INTERVIEW = "circle_jerk_interview"
     CARD_CATALOG = "card_catalog"
+    CHROMATIC_BRIEF = "chromatic_brief"
+    PRODUCTION_PLAN_ARTIFACT = "production_plan_artifact"
+    MELODY_MIDI_STEM = "melody_midi_stem"
     UNKNOWN = "unknown"

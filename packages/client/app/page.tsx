@@ -132,14 +132,22 @@ export default function SongBrowserPage() {
     <div className="min-h-screen bg-zinc-950 text-zinc-200 p-6 font-mono">
       <div className="flex items-start justify-between gap-4 mb-1">
         <h1 className="text-xl font-bold text-white tracking-tight">Songs</h1>
-        {!error && (
+        <div className="flex items-center gap-2">
           <Link
-            href="/agent"
+            href="/collaborators"
             className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
           >
-            Run Agent
+            Collaborators
           </Link>
-        )}
+          {!error && (
+            <Link
+              href="/agent"
+              className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+            >
+              Run Agent
+            </Link>
+          )}
+        </div>
       </div>
       <p className="text-zinc-500 text-xs font-sans mb-4">Select a song to continue</p>
 
@@ -169,11 +177,13 @@ export default function SongBrowserPage() {
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {songs.map(song => (
-          <button
+          <div
             key={song.id}
-            onClick={() => handleSelect(song)}
-            disabled={activatingId !== null}
-            className="text-left bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-600"
+            onClick={() => activatingId === null && handleSelect(song)}
+            role="button"
+            tabIndex={activatingId !== null ? -1 : 0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (activatingId === null) handleSelect(song); } }}
+            className={`text-left bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors focus:outline-none focus:ring-2 focus:ring-[#EF7143] ${activatingId !== null ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
               <span className="text-white font-semibold text-sm leading-snug">{song.title}</span>
@@ -227,7 +237,7 @@ export default function SongBrowserPage() {
                 </button>
               </div>
             )}
-          </button>
+          </div>
         ))}
       </div>
     </div>
