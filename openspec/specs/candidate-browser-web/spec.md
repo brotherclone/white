@@ -66,9 +66,9 @@ Exactly one of `--production-dir` or `--shrink-wrapped-dir` MUST be supplied; su
 - **THEN** a 503 response is returned with `{"detail": "No song selected — POST /songs/activate first"}`
 
 ### Requirement: Next.js Frontend
-The candidate browser SHALL display only the generation phases relevant to the
-MIDI production pipeline. The `lyrics`, `decisions`, and `quartet` phases SHALL be
-removed from the phase filter dropdown and the pipeline status strip.
+The candidate browser SHALL display only the generation phases relevant to the MIDI
+production pipeline. The `lyrics`, `decisions`, and `quartet` phases SHALL be removed
+from the phase filter dropdown and the pipeline status strip.
 
 The pipeline status strip SHALL show phases in this order:
 `chords → drums → bass → melody`
@@ -76,7 +76,7 @@ The pipeline status strip SHALL show phases in this order:
 Backend support for `lyrics`, `decisions`, and `quartet` (API endpoints, pipeline runner)
 is preserved; only the web UI omits them.
 
-The `← Songs` breadcrumb on `/candidates` SHALL link to `/songs` (not `/`).
+The `← Songs` breadcrumb on `/candidates` SHALL link to `/`.
 
 #### Scenario: Phase filter shows generation phases only
 - **WHEN** the user opens the phase filter dropdown on `/candidates`
@@ -87,9 +87,9 @@ The `← Songs` breadcrumb on `/candidates` SHALL link to `/songs` (not `/`).
 - **WHEN** the pipeline status strip renders
 - **THEN** it shows status indicators for: chords, drums, bass, melody only
 
-#### Scenario: Songs breadcrumb links to /songs
+#### Scenario: Songs breadcrumb links to /
 - **WHEN** the user is on `/candidates`
-- **THEN** the `← Songs` breadcrumb links to `/songs`, not `/`
+- **THEN** the `← Songs` breadcrumb links to `/`, not `/songs`
 
 ### Requirement: No Breaking Changes
 The existing terminal browser (`app/tools/candidate_browser.py`) SHALL remain unchanged.
@@ -298,58 +298,34 @@ any new songs written to `shrink_wrapped/` without a server restart.
 - **THEN** `{"status": "idle", "started_at": null, "finished_at": null, "error": null}` is returned
 
 ### Requirement: Generate Button on Song Index
-The song index page (`/`) SHALL display a "Generate New Song" button in the page header.
-The button SHALL trigger the agent workflow via `POST /generate` and poll
-`GET /generate/status` every 5 seconds until the job reaches `done` or `error`.
+The generate workflow SHALL NOT appear on the song index page (`/`). It is hosted
+exclusively on the Agent Run Screen at `/agent`. The song index page header SHALL
+contain only the "Run Agent" navigation link described in the Root Landing Page
+requirement.
 
-While the job is running:
-- The button is replaced by a spinner and "Generating…" label
-- The button is disabled and cannot be clicked again
+#### Scenario: No generate button on song browser
+- **WHEN** the user is on `/`
+- **THEN** no "Generate New Song" button or spinner is rendered on that page
 
-On success:
-- `GET /songs` is re-fetched
-- A toast shows how many new songs appeared (e.g. "1 new song generated")
-- If no new songs appeared, a neutral toast confirms completion
-
-On error:
-- An error toast shows the message from the status response
-
-#### Scenario: Generate button starts a job
-- **WHEN** the Generate button is clicked on the song index
-- **THEN** `POST /generate` is called
-- **AND** the button changes to a spinner with "Generating…" label
-- **AND** polling of `GET /generate/status` begins every 5 seconds
-
-#### Scenario: Song list refreshes on completion
-- **WHEN** `GET /generate/status` returns `{"status": "done"}`
-- **THEN** the song list is re-fetched from `GET /songs`
-- **AND** a success toast is shown indicating how many new songs appeared
-
-#### Scenario: Error toast on failure
-- **WHEN** `GET /generate/status` returns `{"status": "error"}`
-- **THEN** an error toast is shown with the error message
-- **AND** the Generate button is restored to its default state
-
-#### Scenario: Generate button absent in single-song mode
-- **WHEN** the server was launched with `--production-dir`
-- **THEN** the Generate button is not rendered on the index page (the index redirects to /candidates anyway)
+#### Scenario: Run Agent link navigates to /agent
+- **WHEN** the user clicks "Run Agent" in the song browser header
+- **THEN** they are navigated to `/agent`
 
 ### Requirement: Root Landing Page
-The application root (`/`) SHALL display a minimal landing page with two navigation
-links: **Generation** (→ `/songs`) and **Composition Board** (→ `/board`).
+The application root (`/`) SHALL display the song browser — the full list of songs found
+in the shrink_wrapped directory, previously served at `/songs`. The `/songs` route SHALL
+redirect to `/`. No separate two-link landing page is rendered.
 
-The current songs index page SHALL move to `/songs`. All internal links that previously
-pointed to `/` as the songs list SHALL be updated to `/songs`.
+A "Run Agent" link in the page header SHALL navigate to `/agent`.
 
-#### Scenario: Landing renders two links
+#### Scenario: Song browser at root
 - **WHEN** the user navigates to `/`
-- **THEN** two clearly labelled links are rendered: "Generation" and "Composition Board"
-- **AND** clicking "Generation" navigates to `/songs`
-- **AND** clicking "Composition Board" navigates to `/board`
+- **THEN** the full song list renders
+- **AND** a "Run Agent" link is visible in the page header
 
-#### Scenario: Songs index accessible at /songs
+#### Scenario: /songs redirects to /
 - **WHEN** the user navigates to `/songs`
-- **THEN** the full song list renders identically to the previous `/` behaviour
+- **THEN** they are redirected to `/`
 
 ### Requirement: Plan Drift Report API
 
@@ -409,3 +385,213 @@ The background job state follows the same shape as `/handoff/status`:
 - **THEN** the current job state is returned with `status`, `started_at`, `finished_at`,
   and `error` fields
 
+
+### Requirement: Song Stage Routing
+Each song card SHALL display a stage badge indicating the song's current production
+stage. The badge SHALL replace the former "not initialized" label. Valid stage labels
+and their routing behaviour are:
+
+| Stage label | `stage` value | Click behaviour |
+|---|---|---|
+| Ideation | `ideation` | Activate → init → `/candidates` |
+| Generation | `generation` | Activate → `/candidates` |
+| Composition | `composition` | Activate → `/board` |
+
+#### Scenario: Ideation song selected
+- **WHEN** the user clicks a song card with `stage: "ideation"`
+- **THEN** `POST /songs/activate` and `POST /songs/init` are called in sequence
+- **AND** the user is navigated to `/candidates`
+
+#### Scenario: Generation song selected
+- **WHEN** the user clicks a song card with `stage: "generation"`
+- **THEN** `POST /songs/activate` is called
+- **AND** the user is navigated to `/candidates`
+
+#### Scenario: Composition song selected
+- **WHEN** the user clicks a song card with `stage: "composition"`
+- **THEN** `POST /songs/activate` is called
+- **AND** the user is navigated to `/board`
+
+#### Scenario: Stage badge on card
+- **WHEN** a song card renders
+- **THEN** exactly one of the labels "Ideation", "Generation", or "Composition" is
+  visible on the card
+
+### Requirement: Agent Run Screen
+A page at `/agent` SHALL host the agent workflow (LangChain song generation). The page
+SHALL display a "Generate New Song" button that triggers `POST /generate` and polls
+`GET /generate/status` every five seconds until the job reaches `done` or `error`.
+
+While a job is running, a spinner and "Generating…" label SHALL replace the button,
+and the button SHALL be non-interactive.
+
+A `← Songs` navigation link SHALL appear at the top of the page and navigate to `/`.
+
+#### Scenario: Generate button starts workflow
+- **WHEN** the user clicks "Generate New Song" on `/agent`
+- **THEN** `POST /generate` is called
+- **AND** the button shows "Generating…" with a spinner
+- **AND** polling of `GET /generate/status` begins every five seconds
+
+#### Scenario: Success toast on completion
+- **WHEN** `GET /generate/status` returns `{"status": "done"}`
+- **THEN** a success toast is shown
+- **AND** the button is restored to its default state
+
+#### Scenario: Error toast on failure
+- **WHEN** `GET /generate/status` returns `{"status": "error"}`
+- **THEN** an error toast is shown containing the error message
+- **AND** the button is restored to its default state
+
+#### Scenario: Navigation back to songs
+- **WHEN** the user clicks `← Songs` on `/agent`
+- **THEN** they are navigated to `/`
+
+### Requirement: Song Stage Field
+`scan_songs` in `candidate_server.py` SHALL include a `stage` field on every returned
+song entry. The value SHALL be one of: `"ideation"`, `"generation"`, `"composition"`.
+
+Computation rules (evaluated in order):
+1. **`ideation`** — `song_context.yml` is absent from the production dir
+2. **`composition`** — `LOGIC_OUTPUT_DIR` env var is set AND `composition.yml` exists
+   in the Logic output dir for this song (path resolved via `_song_dir` from
+   `white_composition.logic_handoff`); if `LOGIC_OUTPUT_DIR` is unset, the import
+   raises, or the file is absent, this rule is skipped
+3. **`generation`** — all other cases
+
+The TypeScript `SongEntry` type SHALL include `stage: "ideation" | "generation" | "composition"`.
+
+#### Scenario: Ideation stage
+- **WHEN** a production dir lacks `song_context.yml`
+- **THEN** `scan_songs` returns `stage: "ideation"` for that entry
+
+#### Scenario: Generation stage
+- **WHEN** a production dir has `song_context.yml` and no `composition.yml` in the
+  Logic dir (or LOGIC_OUTPUT_DIR is unset)
+- **THEN** `scan_songs` returns `stage: "generation"`
+
+#### Scenario: Composition stage
+- **WHEN** `LOGIC_OUTPUT_DIR` is set and `composition.yml` exists in the Logic song dir
+- **THEN** `scan_songs` returns `stage: "composition"`
+
+### Requirement: Unified Dev Launch
+A shell script `dev.sh` at the repository root SHALL start both the FastAPI server
+(album mode, port 8000) and the Next.js dev server (port 3000) with a single command.
+Both processes SHALL run concurrently; a `SIGINT` (Ctrl+C) sent to the script SHALL
+terminate both.
+
+The script SHALL read `SHRINK_WRAPPED_DIR` from the environment or from a `.env` file
+at the repo root, and pass the value to the FastAPI server as `--shrink-wrapped-dir`.
+
+#### Scenario: Single command launch
+- **WHEN** `./dev.sh` is run with `SHRINK_WRAPPED_DIR` set in the environment or `.env`
+- **THEN** the FastAPI server starts on port 8000 and the Next.js dev server starts on
+  port 3000 within a few seconds
+
+#### Scenario: Ctrl-C stops both servers
+- **WHEN** the user sends SIGINT to the `dev.sh` process
+- **THEN** both the FastAPI and Next.js processes are terminated
+
+#### Scenario: Missing SHRINK_WRAPPED_DIR
+- **WHEN** `./dev.sh` is run and `SHRINK_WRAPPED_DIR` is not set
+- **THEN** an error message is printed to stderr and the script exits non-zero
+
+### Requirement: Song Concept Field
+The song entry returned by `GET /songs` and `GET /songs/active` SHALL include a
+`concept` field. The value SHALL be read from `song_context.yml` in the production
+directory if that file exists and contains a non-empty `concept` key; otherwise the
+field SHALL be `null`.
+
+#### Scenario: Concept present in song_context.yml
+- **WHEN** `GET /songs` is called and a production directory has a `song_context.yml`
+  with a non-empty `concept` field
+- **THEN** the song entry for that production includes `"concept": "<text>"`
+
+#### Scenario: Concept absent
+- **WHEN** `song_context.yml` is absent or `concept` is empty/missing
+- **THEN** the song entry includes `"concept": null`
+
+### Requirement: Concept Display in Candidate Browser
+The `/candidates` page SHALL render a concept block between the breadcrumb and the phase
+toolbar when `activeSong.concept` is non-null and non-empty.
+
+The block SHALL default to a 3-line clamp with a "Show more" / "Show less" toggle.
+
+#### Scenario: Concept block visible
+- **WHEN** `/candidates` is loaded and the active song has a non-null concept
+- **THEN** the concept text is displayed above the toolbar, clamped to 3 lines by default
+
+#### Scenario: Toggle expands concept
+- **WHEN** the user clicks "Show more"
+- **THEN** the full concept text is revealed and the toggle label changes to "Show less"
+
+#### Scenario: Concept block hidden when absent
+- **WHEN** `activeSong.concept` is null
+- **THEN** no concept block is rendered
+
+### Requirement: Samples Retrieval Endpoints
+The FastAPI backend SHALL expose three endpoints for chromatic sample retrieval and export:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/samples` | Return top-N CLAP-scored segments for the active song's color |
+| GET | `/audio/{segment_id}` | Stream the pre-extracted WAV for a segment |
+| POST | `/samples/{segment_id}/export` | Copy the segment WAV to the Logic Samples folder |
+
+`GET /samples` SHALL accept an optional `?top_n=N` query parameter (default 20). It SHALL
+call `white_composition.retrieve_samples.retrieve_by_color` using the active song's
+`rainbow_color` field and return a JSON array of objects with fields:
+`segment_id`, `song_slug`, `color`, `match` (float 0–1), `audio_url`.
+
+`GET /audio/{segment_id}` SHALL return 404 if the WAV is not present on disk.
+
+`POST /samples/{segment_id}/export` SHALL copy the WAV to
+`$LOGIC_OUTPUT_DIR/<thread_slug>/<song_title>/Samples/<segment_id>.wav`; returns 503 if
+`LOGIC_OUTPUT_DIR` is not set, 404 if WAV absent.
+
+#### Scenario: Samples list for active song
+- **WHEN** `GET /samples` is called with an active song whose color is Orange
+- **THEN** a JSON array is returned with up to 20 objects sorted descending by `match`
+
+#### Scenario: Export to Logic
+- **WHEN** `POST /samples/{segment_id}/export` is called with a valid segment
+- **THEN** the WAV is copied to `$LOGIC_OUTPUT_DIR/<thread_slug>/<title>/Samples/<segment_id>.wav`
+- **AND** `{"ok": true, "dest": "<path>"}` is returned
+
+### Requirement: Sample Browser Panel
+The `/candidates` page SHALL display a collapsible **Chromatic Samples** panel below the
+candidate table. The panel SHALL always be expandable (regardless of pipeline stage). Each
+row SHALL show: rank, segment_id, song slug, color chip, match score, inline `<audio>`
+player, and an **Export** button.
+
+The Export button SHALL be disabled (with tooltip) when the active song's stage is not
+`"composition"` — exporting requires a Logic project folder to exist.
+
+#### Scenario: Panel always expandable
+- **WHEN** the user clicks the Chromatic Samples header at any pipeline stage
+- **THEN** the panel expands and shows available samples
+
+#### Scenario: Export requires composition stage
+- **WHEN** the active song's stage is not `"composition"`
+- **THEN** the Export button is disabled with tooltip "Handoff to Logic first"
+
+#### Scenario: Export marks row as exported
+- **WHEN** Export is clicked and the server returns 200
+- **THEN** the button changes to "Exported ✓" and is disabled for the session
+
+### Requirement: Quartet Button Alongside Handoff
+The **Generate Quartet** button SHALL appear in the pipeline status strip alongside the
+"Handoff to Logic" button whenever melody is promoted and the quartet phase has not yet
+been generated.
+
+The button SHALL be shown when `quartetStatus` is absent (`undefined`), `null`, or
+`"pending"`. It SHALL be hidden once quartet reaches `"in_progress"`, `"generated"`, or
+`"promoted"`.
+
+#### Scenario: Button shown when melody promoted and quartet not started
+- **WHEN** melody phase is promoted AND quartet status is absent or "pending"
+- **THEN** a "Generate Quartet" button appears in the pipeline strip
+
+#### Scenario: Button hidden after generation
+- **WHEN** quartet status is "generated" or "promoted"
+- **THEN** no Generate Quartet button is shown
