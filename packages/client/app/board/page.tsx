@@ -530,12 +530,15 @@ export default function BoardPage() {
               const isVocalPlaceholders = stage === "vocal_placeholders";
               const isStructure = stage === "structure";
               const isRecording = stage === "recording";
+              const isFinalMix = stage === "final_mix";
 
               return (
                 <div
                   key={stage}
                   className={`flex flex-col w-52 rounded-lg border transition-colors ${
-                    isCurrent
+                    isFinalMix && (isCurrent || isPast)
+                      ? "border-green-700 bg-zinc-900"
+                      : isCurrent
                       ? "border-blue-600 bg-zinc-900"
                       : isPast
                       ? "border-zinc-700 bg-zinc-900/50"
@@ -543,16 +546,28 @@ export default function BoardPage() {
                   }`}
                 >
                   {/* Column header */}
-                  <div className={`px-3 py-2.5 border-b ${isCurrent ? "border-blue-600/50" : "border-zinc-800"}`}>
+                  <div className={`px-3 py-2.5 border-b ${
+                    isFinalMix && (isCurrent || isPast) ? "border-green-700/50"
+                    : isCurrent ? "border-blue-600/50"
+                    : "border-zinc-800"
+                  }`}>
                     <div className="flex items-center gap-2">
-                      {isPast && (
+                      {isPast && !isFinalMix && (
                         <svg className="w-3 h-3 text-green-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                         </svg>
                       )}
-                      {isCurrent && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+                      {isFinalMix && (isCurrent || isPast) && (
+                        <svg className="w-3 h-3 text-green-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      {isCurrent && !isFinalMix && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
                       <span className={`text-xs font-sans font-semibold truncate ${
-                        isCurrent ? "text-blue-300" : isPast ? "text-zinc-400" : "text-zinc-600"
+                        isFinalMix && (isCurrent || isPast) ? "text-green-400"
+                        : isCurrent ? "text-blue-300"
+                        : isPast ? "text-zinc-400"
+                        : "text-zinc-600"
                       }`}>
                         {STAGE_LABELS[stage]}
                       </span>
@@ -693,8 +708,8 @@ export default function BoardPage() {
                     </div>
                   )}
 
-                  {/* Advance button */}
-                  {isFuture && idx === currentStageIdx + 1 && (
+                  {/* Advance button — not shown at final_mix (no next stage) */}
+                  {isFuture && idx === currentStageIdx + 1 && !isFinalMix && (
                     <div className="px-3 pb-3">
                       <button
                         onClick={() => handleAdvance(stage)}
@@ -703,6 +718,39 @@ export default function BoardPage() {
                       >
                         {advancingTo === stage ? "Moving…" : `Move to ${STAGE_LABELS[stage]}`}
                       </button>
+                    </div>
+                  )}
+
+                  {/* Completion panel — final mix only */}
+                  {isFinalMix && (isCurrent || isPast) && (
+                    <div className="px-3 pb-3 flex flex-col gap-2">
+                      <div className="flex items-center gap-1.5 px-2 py-1.5 text-[10px] font-sans rounded border border-green-700/50 bg-green-900/20 text-green-400">
+                        <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                        </svg>
+                        song complete
+                      </div>
+                      {isCurrent && (
+                        <>
+                          <button
+                            onClick={() => {
+                              if (composition?.logic_project_path) {
+                                navigator.clipboard.writeText(composition.logic_project_path);
+                              }
+                            }}
+                            disabled={!composition?.logic_project_path}
+                            className="w-full py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          >
+                            copy project path
+                          </button>
+                          <button
+                            onClick={() => window.open("https://music.apple.com/", "_blank")}
+                            className="w-full py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-200 transition-colors"
+                          >
+                            open distributor
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

@@ -32,9 +32,21 @@ function colorDot(name: string | null) {
 }
 
 const STAGE_LABELS: Record<SongEntry["stage"], string> = {
-  ideation: "Ideation",
-  generation: "Generation",
+  ideation:    "Ideation",
+  generation:  "Generation",
   composition: "Composition",
+  production:  "Production",
+  mixing:      "Mixing",
+  complete:    "Complete",
+};
+
+const STAGE_BADGE_CLS: Record<SongEntry["stage"], string> = {
+  ideation:    "bg-zinc-800 text-zinc-500 border-zinc-700",
+  generation:  "bg-blue-900/40 text-blue-300 border-blue-800",
+  composition: "bg-violet-900/40 text-violet-300 border-violet-700",
+  production:  "bg-orange-900/40 text-orange-300 border-orange-800",
+  mixing:      "bg-cyan-900/40 text-cyan-300 border-cyan-800",
+  complete:    "bg-green-900/40 text-green-300 border-green-700",
 };
 
 type Toast = { kind: "success" | "error"; message: string };
@@ -82,7 +94,7 @@ export default function SongBrowserPage() {
       if (song.stage === "ideation" && song.proposal_path) {
         await initSong();
       }
-      if (song.stage === "composition") {
+      if (["composition", "production", "mixing", "complete"].includes(song.stage)) {
         router.push("/board");
       } else {
         router.push("/candidates");
@@ -231,13 +243,7 @@ export default function SongBrowserPage() {
               {song.bpm && <span>{song.bpm}{song.time_sig ? ` BPM · ${song.time_sig}` : " BPM"}</span>}
               {song.singer && <span className="text-zinc-500">{song.singer}</span>}
               {song.has_mix && <span title="Mix attached" className="text-zinc-400">♫</span>}
-              <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded border ${
-                song.stage === "composition"
-                  ? "bg-violet-900/40 text-violet-300 border-violet-700"
-                  : song.stage === "generation"
-                  ? "bg-blue-900/40 text-blue-300 border-blue-800"
-                  : "bg-zinc-800 text-zinc-500 border-zinc-700"
-              }`}>
+              <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded border ${STAGE_BADGE_CLS[song.stage]}`}>
                 {activatingId === song.id && song.stage === "ideation"
                   ? "initializing…"
                   : STAGE_LABELS[song.stage]}

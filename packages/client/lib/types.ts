@@ -14,7 +14,7 @@ export interface SongEntry {
   has_decisions: boolean;
   initialized: boolean;
   has_mix: boolean;
-  stage: "ideation" | "generation" | "composition";
+  stage: "ideation" | "generation" | "composition" | "production" | "mixing" | "complete";
   proposal_path: string | null;
   concept: string | null;
 }
