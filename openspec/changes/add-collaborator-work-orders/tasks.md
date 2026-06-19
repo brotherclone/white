@@ -58,9 +58,9 @@
 
 ## 7. packages/client — Collaborator Manager UI
 
-- [ ] 7.1 `/collaborators` page (or modal reachable from WorkOrderDrawer "Edit Collaborator" link)
-- [ ] 7.2 List view: all collaborators with name, roles, availability status
-- [ ] 7.3 Create/Edit form: id, name, roles (multi-select), email, photo_url, platforms, website,
+- [x] 7.1 `/collaborators` page (or modal reachable from WorkOrderDrawer "Edit Collaborator" link)
+- [x] 7.2 List view: all collaborators with name, roles, availability status
+- [x] 7.3 Create/Edit form: id, name, roles (multi-select), email, photo_url, platforms, website,
        socials, pro_affiliation, pro_number, availability_windows, notes
-- [ ] 7.4 Delete with confirmation (warns if active work orders exist — API already enforces)
-- [ ] 7.5 Link from WorkOrderDrawer Collaborator tab → Collaborator Manager (open/edit profile)
+- [x] 7.4 Delete with confirmation (warns if active work orders exist — API already enforces)
+- [x] 7.5 Link from WorkOrderDrawer Collaborator tab → Collaborator Manager (open/edit profile)

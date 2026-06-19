@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Collaborator,
   CollaboratorPlatform,
@@ -382,6 +383,13 @@ function CollaboratorTab({
       {collaborator && (
         <div className="p-3 rounded-lg bg-zinc-800 border border-zinc-700">
           <CollaboratorProfileCard collaborator={collaborator} />
+          <Link
+            href={`/collaborators`}
+            className="mt-2 flex items-center gap-1 text-[10px] font-sans text-zinc-500 hover:text-blue-400 transition-colors"
+          >
+            <span>Edit profile</span>
+            <span>→</span>
+          </Link>
         </div>
       )}
 

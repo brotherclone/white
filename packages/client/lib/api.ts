@@ -279,6 +279,14 @@ export async function createCollaborator(c: import("./types").Collaborator): Pro
   return res.json();
 }
 
+export async function deleteCollaborator(id: string): Promise<void> {
+  const res = await fetch(`${BASE}/collaborators/${encodeURIComponent(id)}`, { method: "DELETE" });
+  if (!res.ok && res.status !== 204) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Delete collaborator failed");
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Work orders
 // ---------------------------------------------------------------------------

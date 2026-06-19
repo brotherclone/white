@@ -132,14 +132,22 @@ export default function SongBrowserPage() {
     <div className="min-h-screen bg-zinc-950 text-zinc-200 p-6 font-mono">
       <div className="flex items-start justify-between gap-4 mb-1">
         <h1 className="text-xl font-bold text-white tracking-tight">Songs</h1>
-        {!error && (
+        <div className="flex items-center gap-2">
           <Link
-            href="/agent"
+            href="/collaborators"
             className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
           >
-            Run Agent
+            Collaborators
           </Link>
-        )}
+          {!error && (
+            <Link
+              href="/agent"
+              className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+            >
+              Run Agent
+            </Link>
+          )}
+        </div>
       </div>
       <p className="text-zinc-500 text-xs font-sans mb-4">Select a song to continue</p>
 
