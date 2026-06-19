@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchSongs, activateSong, initSong, startHandoff, getHandoffStatus } from "@/lib/api";
 import { SongEntry } from "@/lib/types";
@@ -49,6 +49,8 @@ const STAGE_BADGE_CLS: Record<SongEntry["stage"], string> = {
   complete:    "bg-green-900/40 text-green-300 border-green-700",
 };
 
+const ALL_SONG_STAGES = Object.keys(STAGE_LABELS) as SongEntry["stage"][];
+
 type Toast = { kind: "success" | "error"; message: string };
 type StageFilter = SongEntry["stage"] | "all";
 
@@ -62,6 +64,14 @@ export default function SongBrowserPage() {
   const [toast, setToast] = useState<Toast | null>(null);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const handoffPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const countsByStage = useMemo(
+    () => songs.reduce<Partial<Record<SongEntry["stage"], number>>>((acc, s) => {
+      acc[s.stage] = (acc[s.stage] ?? 0) + 1;
+      return acc;
+    }, {}),
+    [songs],
+  );
 
   const showToast = (kind: Toast["kind"], message: string) => {
     setToast({ kind, message });
@@ -168,12 +178,14 @@ export default function SongBrowserPage() {
       {/* Stage filter */}
       {!error && songs.length > 0 && (
         <div className="flex gap-1.5 flex-wrap mb-4">
-          {(["all", ...Object.keys(STAGE_LABELS)] as StageFilter[]).map(s => {
-            const count = s === "all" ? songs.length : songs.filter(x => x.stage === s).length;
+          {(["all", ...ALL_SONG_STAGES] as StageFilter[]).map(s => {
+            const count = s === "all" ? songs.length : (countsByStage[s] ?? 0);
             const active = stageFilter === s;
             return (
               <button
                 key={s}
+                type="button"
+                aria-pressed={active}
                 onClick={() => setStageFilter(s)}
                 className={`px-2.5 py-1 text-[10px] font-sans border transition-colors ${
                   active
@@ -181,7 +193,7 @@ export default function SongBrowserPage() {
                     : "bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
                 }`}
               >
-                {s === "all" ? "all" : STAGE_LABELS[s as SongEntry["stage"]].toLowerCase()} <span className={active ? "text-zinc-600" : "text-zinc-600"}>{count}</span>
+                {s === "all" ? "all" : STAGE_LABELS[s].toLowerCase()} <span className="text-zinc-600">{count}</span>
               </button>
             );
           })}
