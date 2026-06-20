@@ -16,7 +16,11 @@ def write_entry(entry: DiaryEntry, diary_dir: Path) -> None:
     path = _entry_path(entry.id, diary_dir)
     with open(path, "w", encoding="utf-8") as fh:
         yaml.dump(
-            entry.model_dump(mode="json"), fh, allow_unicode=True, width=float("inf")
+            entry.model_dump(mode="json"),
+            fh,
+            allow_unicode=True,
+            sort_keys=False,
+            width=float("inf"),
         )
 
 

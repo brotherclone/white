@@ -449,7 +449,7 @@ export default function BoardPage() {
       {diaryModal && composition && (
         <DiaryModal
           songSlug={composition.production_slug}
-          defaultPhase={diaryModal.stage}
+          defaultPhase={STAGE_LABELS[diaryModal.stage]}
           onClose={() => setDiaryModal(null)}
         />
       )}

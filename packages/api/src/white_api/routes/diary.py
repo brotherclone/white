@@ -1,9 +1,23 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from white_diary import DiaryEntry, delete_entry, list_entries, load_entry, write_entry
+
+_SAFE_SLUG = re.compile(r"^[a-zA-Z0-9_\-]+$")
+_SAFE_UUID = re.compile(r"^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+
+
+def _check_slug(slug: str, label: str) -> None:
+    if not _SAFE_SLUG.match(slug):
+        raise HTTPException(status_code=400, detail=f"Invalid {label}")
+
+
+def _check_entry_id(entry_id: str) -> None:
+    if not _SAFE_UUID.match(entry_id):
+        raise HTTPException(status_code=400, detail="Invalid entry_id")
 
 
 def make_diary_router(entries_dir: Path) -> APIRouter:
@@ -16,6 +30,7 @@ def make_diary_router(entries_dir: Path) -> APIRouter:
     router = APIRouter(prefix="/diary", tags=["diary"])
 
     def _song_dir(song_slug: str) -> Path:
+        _check_slug(song_slug, "song_slug")
         return entries_dir / song_slug
 
     @router.get("/{song_slug}")
@@ -24,6 +39,7 @@ def make_diary_router(entries_dir: Path) -> APIRouter:
 
     @router.get("/{song_slug}/{entry_id}")
     def get_entry(song_slug: str, entry_id: str) -> dict:
+        _check_entry_id(entry_id)
         try:
             return load_entry(entry_id, _song_dir(song_slug)).model_dump(mode="json")
         except FileNotFoundError:
@@ -39,6 +55,7 @@ def make_diary_router(entries_dir: Path) -> APIRouter:
 
     @router.put("/{song_slug}/{entry_id}")
     def update_entry(song_slug: str, entry_id: str, body: DiaryEntry) -> dict:
+        _check_entry_id(entry_id)
         song_dir = _song_dir(song_slug)
         try:
             load_entry(entry_id, song_dir)
@@ -53,6 +70,7 @@ def make_diary_router(entries_dir: Path) -> APIRouter:
 
     @router.delete("/{song_slug}/{entry_id}", status_code=204)
     def remove_entry(song_slug: str, entry_id: str) -> None:
+        _check_entry_id(entry_id)
         try:
             delete_entry(entry_id, _song_dir(song_slug))
         except FileNotFoundError:

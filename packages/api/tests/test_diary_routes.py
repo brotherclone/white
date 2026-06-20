@@ -104,7 +104,7 @@ def test_get_entry(tmp_path):
 
 def test_get_missing_entry_returns_404(tmp_path):
     client = _client(tmp_path)
-    resp = client.get("/diary/my-song/nonexistent-id")
+    resp = client.get("/diary/my-song/00000000-0000-0000-0000-000000000000")
     assert resp.status_code == 404
 
 
@@ -129,7 +129,9 @@ def test_put_replaces_entry(tmp_path):
 
 def test_put_missing_entry_returns_404(tmp_path):
     client = _client(tmp_path)
-    resp = client.put("/diary/my-song/no-such-id", json=_payload())
+    resp = client.put(
+        "/diary/my-song/00000000-0000-0000-0000-000000000000", json=_payload()
+    )
     assert resp.status_code == 404
 
 
@@ -159,5 +161,5 @@ def test_delete_then_get_returns_404(tmp_path):
 
 def test_delete_missing_entry_returns_404(tmp_path):
     client = _client(tmp_path)
-    resp = client.delete("/diary/my-song/no-such-id")
+    resp = client.delete("/diary/my-song/00000000-0000-0000-0000-000000000000")
     assert resp.status_code == 404
