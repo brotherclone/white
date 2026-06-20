@@ -8,6 +8,7 @@ dependencies = [
     "white-composition>=0.1.0",
     "white-generation>=0.1.0",
     "white-ideation>=0.1.0",
+    "white-diary>=0.1.0",
     "white-production>=0.1.0",
     "fastapi>=0.100.0",
     "uvicorn>=0.23.0",
@@ -28,4 +29,5 @@ white-core = { workspace = true }
 white-composition = { workspace = true }
 white-generation = { workspace = true }
 white-ideation = { workspace = true }
+white-diary = { workspace = true }
 white-production = { workspace = true }
