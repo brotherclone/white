@@ -238,6 +238,32 @@ export async function syncArrangement(): Promise<{ ok: boolean; synced_from: str
 }
 
 // ---------------------------------------------------------------------------
+// Diary
+// ---------------------------------------------------------------------------
+
+export async function fetchDiaryEntries(songSlug: string): Promise<import("./types").DiaryEntry[]> {
+  const res = await fetch(`${BASE}/diary/${encodeURIComponent(songSlug)}`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch diary entries");
+  return res.json();
+}
+
+export async function createDiaryEntry(
+  songSlug: string,
+  entry: Omit<import("./types").DiaryEntry, "id" | "created_at">,
+): Promise<import("./types").DiaryEntry> {
+  const res = await fetch(`${BASE}/diary/${encodeURIComponent(songSlug)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Create diary entry failed");
+  }
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
 // Collaborator registry
 // ---------------------------------------------------------------------------
 
