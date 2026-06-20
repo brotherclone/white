@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
-  updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
+  runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
   autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl, setBpm,
-  fetchWorkOrders, fetchCollaborators,
+  fetchWorkOrders, fetchCollaborators, createDiaryEntry,
 } from "@/lib/api";
 import { Collaborator, CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry, WorkOrder } from "@/lib/types";
 import WorkOrderHud from "@/components/WorkOrderHud";
@@ -105,6 +105,121 @@ function LyricModal({
   );
 }
 
+function DiaryModal({
+  songSlug,
+  defaultPhase,
+  onClose,
+}: {
+  songSlug: string;
+  defaultPhase: string;
+  onClose: () => void;
+}) {
+  const [author, setAuthor] = useState("");
+  const [phase, setPhase] = useState(defaultPhase);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      await createDiaryEntry(songSlug, {
+        song_slug: songSlug,
+        author,
+        phase: phase || null,
+        title: title || null,
+        body,
+        tags: [],
+        metadata: {},
+      });
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-lg mx-4 flex flex-col shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 flex-shrink-0">
+          <span className="text-sm font-semibold text-white font-sans">New diary entry</span>
+          <button
+            onClick={onClose}
+            className="text-zinc-500 hover:text-zinc-200 text-lg leading-none transition-colors"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 px-5 py-4">
+          <div className="flex gap-3">
+            <label className="flex flex-col gap-1 flex-1">
+              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Author</span>
+              <input
+                type="text"
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+                required
+                placeholder="gabriel"
+                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+            </label>
+            <label className="flex flex-col gap-1 flex-1">
+              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Phase</span>
+              <input
+                type="text"
+                value={phase}
+                onChange={e => setPhase(e.target.value)}
+                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+            </label>
+          </div>
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Title</span>
+            <input
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="optional headline"
+              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Body</span>
+            <textarea
+              value={body}
+              onChange={e => setBody(e.target.value)}
+              required
+              rows={4}
+              placeholder="what happened?"
+              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none transition-colors"
+            />
+          </label>
+          {error && <p className="text-[10px] font-sans text-red-400">{error}</p>}
+          <button
+            type="submit"
+            disabled={saving}
+            className="w-full py-2 text-sm font-sans font-semibold rounded-lg bg-violet-700 hover:bg-violet-600 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {saving ? "Saving…" : "Save entry"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 type LoadState = "loading" | "not_initialized" | "ready" | "error";
 
 export default function BoardPage() {
@@ -136,7 +251,7 @@ export default function BoardPage() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [workOrderDrawerOpen, setWorkOrderDrawerOpen] = useState(false);
-  const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const [diaryModal, setDiaryModal] = useState<{ stage: MixStage } | null>(null);
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refreshLyrics = useCallback(async () => {
@@ -325,19 +440,21 @@ export default function BoardPage() {
     }
   };
 
-  const handleNotesChange = (version: number, notes: string) => {
-    if (notesSaveTimers.current[version]) clearTimeout(notesSaveTimers.current[version]);
-    notesSaveTimers.current[version] = setTimeout(() => {
-      updateVersionNotes(version, notes).catch(() => {});
-    }, 600);
-  };
-
   const currentStageIdx = composition ? MIX_STAGES.indexOf(composition.current_stage) : -1;
   const promotedCandidate = lyricsData?.candidates.find(c => c.status === "promoted");
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-200 font-mono">
-      {/* Modal */}
+      {/* Diary modal */}
+      {diaryModal && composition && (
+        <DiaryModal
+          songSlug={composition.production_slug}
+          defaultPhase={diaryModal.stage}
+          onClose={() => setDiaryModal(null)}
+        />
+      )}
+
+      {/* Lyric modal */}
       {modal && (
         <LyricModal
           candidate={modal.candidate}
@@ -594,13 +711,12 @@ export default function BoardPage() {
                               {new Date(v.created).toLocaleDateString()}
                             </span>
                           </div>
-                          <input
-                            type="text"
-                            defaultValue={v.notes ?? ""}
-                            placeholder="add note…"
-                            onChange={e => handleNotesChange(v.version, e.target.value)}
-                            className="w-full bg-transparent text-[10px] font-sans text-zinc-400 placeholder-zinc-600 focus:outline-none focus:text-zinc-200 transition-colors"
-                          />
+                          <button
+                            onClick={() => setDiaryModal({ stage })}
+                            className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
+                          >
+                            + diary entry
+                          </button>
                         </div>
                       ))
                     }
@@ -758,30 +874,6 @@ export default function BoardPage() {
             })}
           </div>
 
-          {/* Version history */}
-          {composition.versions.length > 0 && (
-            <div className="mt-8 border-t border-zinc-800 pt-6">
-              <h2 className="text-xs font-sans font-semibold text-zinc-500 uppercase tracking-wider mb-3">
-                Version History
-              </h2>
-              <div className="flex flex-col gap-1.5">
-                {[...composition.versions].reverse().map(v => (
-                  <div key={v.version} className="flex items-baseline gap-3 text-xs font-sans">
-                    <span className="text-zinc-400 w-8 flex-shrink-0">v{v.version}</span>
-                    <span className="text-zinc-600 w-28 flex-shrink-0">{new Date(v.created).toLocaleString()}</span>
-                    <span className="text-zinc-500 w-36 flex-shrink-0">{STAGE_LABELS[v.stage as MixStage] ?? v.stage}</span>
-                    <input
-                      type="text"
-                      defaultValue={v.notes ?? ""}
-                      placeholder="—"
-                      onChange={e => handleNotesChange(v.version, e.target.value)}
-                      className="flex-1 bg-transparent text-zinc-400 placeholder-zinc-700 focus:outline-none focus:text-zinc-200 transition-colors"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 

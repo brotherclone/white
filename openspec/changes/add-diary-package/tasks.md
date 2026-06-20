@@ -34,5 +34,7 @@
 - [x] 5.1 `pytest packages/diary` — all store tests pass (8/8)
 - [x] 5.2 `pytest packages/api/tests/test_diary_routes.py` — all route tests pass (13/13)
 - [x] 5.3 `pytest` from repo root — baseline failure count unchanged (10 pre-existing, 0 new)
-- [x] 5.4 Fix sequencing: diary storage moved to `<shrink_wrapped_dir>/diary/<song_slug>/`
+- [x] 5.4 Fix sequencing: diary storage moved to `packages/diary/src/entries/<song_slug>/`
       (independent of production dir — writable from ideation phase). All 21 tests green.
+- [x] 5.5 Board UI: DiaryModal added; version card note input replaced with `+ diary entry` button;
+      Version History section removed. TypeScript clean.

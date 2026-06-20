@@ -118,6 +118,22 @@ export interface Candidate {
 }
 
 // ---------------------------------------------------------------------------
+// Diary
+// ---------------------------------------------------------------------------
+
+export interface DiaryEntry {
+  id: string;
+  song_slug: string;
+  phase: string | null;
+  author: string;
+  created_at: string;
+  title: string | null;
+  body: string;
+  tags: string[];
+  metadata: Record<string, unknown>;
+}
+
+// ---------------------------------------------------------------------------
 // Collaborator registry
 // ---------------------------------------------------------------------------
 
