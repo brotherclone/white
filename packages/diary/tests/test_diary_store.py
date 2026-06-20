@@ -22,11 +22,12 @@ def test_write_and_load_round_trip(tmp_path):
     assert loaded == entry
 
 
-def test_write_creates_diary_dir(tmp_path):
+def test_write_creates_dir_if_absent(tmp_path):
+    diary_dir = tmp_path / "diary" / "my-song"
     entry = _entry(tmp_path)
-    assert not (tmp_path / "diary").exists()
-    write_entry(entry, tmp_path)
-    assert (tmp_path / "diary" / f"{entry.id}.yml").exists()
+    assert not diary_dir.exists()
+    write_entry(entry, diary_dir)
+    assert (diary_dir / f"{entry.id}.yml").exists()
 
 
 def test_load_missing_raises(tmp_path):
@@ -50,8 +51,8 @@ def test_list_sorted_ascending(tmp_path):
     assert [r.body for r in result] == ["first", "second", "third"]
 
 
-def test_list_empty_when_no_diary_dir(tmp_path):
-    assert list_entries(tmp_path) == []
+def test_list_empty_when_dir_absent(tmp_path):
+    assert list_entries(tmp_path / "diary" / "nonexistent-song") == []
 
 
 def test_delete_removes_entry(tmp_path):

@@ -33,6 +33,7 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
+from white_diary import ENTRIES_DIR
 
 from white_api.candidate_browser import (
     CandidateEntry,
@@ -322,7 +323,7 @@ def create_app(
             registry_dir=registry_dir,
         )
     )
-    app.include_router(make_diary_router(lambda: _shrink_wrapped_dir))
+    app.include_router(make_diary_router(ENTRIES_DIR))
 
     def _all_candidates(
         phase: str | None = None, section: str | None = None

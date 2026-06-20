@@ -14,9 +14,12 @@ inside running Python processes (no HTTP dependency) and readable by the Next.js
 
 ## Decisions
 
-**Filesystem YAML storage** — one `.yml` file per entry at
-`<production_dir>/diary/<entry_id>.yml`. Consistent with all other pipeline artifacts
-(`review.yml`, `production_plan.yml`). No database.
+**Filesystem YAML storage** — one `.yml` file per entry under `packages/diary/src/entries/`.
+No database.
+
+**`white_diary.ENTRIES_DIR`** — a `Path` constant exported from the package, derived from
+`__file__` so it resolves correctly regardless of working directory. All callers (pipeline
+hooks, API routes, agents) use this as the entries root. No env var or config required.
 
 **Open `author: str`, free `phase: str | None`** — the set of authors and phases is
 open-ended (future color agents, new pipeline phases). Enum would require migration when
@@ -41,14 +44,20 @@ and `find_files_in_lucid_nonsense` without a new server.
 
 ## Directory layout
 ```
-<shrink_wrapped_dir>/
-  <thread_slug>/
-    production/
-      <song_slug>/
-        diary/
-          <uuid>.yml   ← one DiaryEntry per file
+packages/diary/src/
+  entries/
+    <song_slug>/
+      <uuid>.yml    ← writable at any lifecycle stage, by any author
+  white_diary/
+    __init__.py     ← exports ENTRIES_DIR, DiaryEntry, store functions
+    diary_entry.py
+    store.py
 ```
 
-The HTTP router resolves `song_slug → production_dir` by globbing
-`shrink_wrapped_dir/*/production/<song_slug>` — the same pattern used by the candidate
-server for other per-song lookups.
+The diary root is `white_diary.ENTRIES_DIR` — fully independent of `shrink_wrapped_dir`,
+production directories, and pipeline state. ThreadKeepr can write an entry (e.g. an EVP
+transcription) before a song has ever been initialized as a production project.
+
+`make_diary_router(ENTRIES_DIR)` is the canonical registration in `candidate_server.py`.
+POST never returns 404 — the per-song subdirectory is created on first write.
+GET/PUT/DELETE on a missing `entry_id` return 404.

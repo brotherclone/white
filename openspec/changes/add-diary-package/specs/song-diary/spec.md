@@ -28,22 +28,21 @@ fields:
 
 ### Requirement: Diary Store
 The `white_diary` package SHALL expose four functions importable directly without any
-web-framework dependency:
+web-framework dependency. Each function takes a `diary_dir: Path` — the per-song
+directory under the diary root (e.g. `<shrink_wrapped_dir>/diary/<song_slug>/`).
 
-- `write_entry(entry: DiaryEntry, production_dir: Path) -> None`
-  — writes or overwrites `<production_dir>/diary/<entry.id>.yml`; creates the
-  `diary/` subdirectory if absent
-- `load_entry(entry_id: str, production_dir: Path) -> DiaryEntry`
+- `write_entry(entry: DiaryEntry, diary_dir: Path) -> None`
+  — writes or overwrites `<diary_dir>/<entry.id>.yml`; creates the directory if absent
+- `load_entry(entry_id: str, diary_dir: Path) -> DiaryEntry`
   — reads and deserialises the entry; raises `FileNotFoundError` if absent
-- `list_entries(production_dir: Path) -> list[DiaryEntry]`
-  — returns all entries in the diary directory sorted by `created_at` ascending;
-  returns `[]` if the directory does not exist
-- `delete_entry(entry_id: str, production_dir: Path) -> None`
+- `list_entries(diary_dir: Path) -> list[DiaryEntry]`
+  — returns all entries sorted by `created_at` ascending; returns `[]` if directory absent
+- `delete_entry(entry_id: str, diary_dir: Path) -> None`
   — removes the file; raises `FileNotFoundError` if absent
 
 #### Scenario: Write and load round-trip
-- **WHEN** `write_entry(entry, production_dir)` is called
-- **AND** `load_entry(entry.id, production_dir)` is called
+- **WHEN** `write_entry(entry, diary_dir)` is called
+- **AND** `load_entry(entry.id, diary_dir)` is called
 - **THEN** the loaded entry is equal to the original
 
 #### Scenario: List sorted ascending
@@ -51,11 +50,11 @@ web-framework dependency:
 - **THEN** `list_entries` returns them ordered earliest-first
 
 #### Scenario: List on missing diary dir
-- **WHEN** `list_entries` is called for a `production_dir` that has no `diary/` subdirectory
+- **WHEN** `list_entries` is called for a path that does not exist
 - **THEN** an empty list is returned (no exception)
 
 #### Scenario: Delete removes entry
-- **WHEN** `delete_entry(entry.id, production_dir)` is called for an existing entry
+- **WHEN** `delete_entry(entry.id, diary_dir)` is called for an existing entry
 - **THEN** a subsequent `load_entry` for the same id raises `FileNotFoundError`
 
 #### Scenario: Load missing entry
@@ -75,20 +74,27 @@ following endpoints:
 | PUT | `/diary/{song_slug}/{entry_id}` | 200 | Replace an existing entry |
 | DELETE | `/diary/{song_slug}/{entry_id}` | 204 | Remove an entry |
 
-The router SHALL be constructed via `make_diary_router(get_shrink_wrapped_dir)` and
-registered in `candidate_server.py`.
+The router SHALL be constructed via `make_diary_router(entries_dir: Path)` and
+registered in `candidate_server.py` as `make_diary_router(ENTRIES_DIR)` where
+`ENTRIES_DIR` is imported from `white_diary`.
 
-GET, PUT, and DELETE for a non-existent `entry_id` SHALL return 404.
-POST or GET to a `song_slug` whose production directory cannot be resolved SHALL return 404.
+Per-song entries SHALL live at `<entries_dir>/<song_slug>/` and the subdirectory SHALL
+be created on first write. No production directory or shrink-wrapped dir is required.
+POST to any `song_slug` SHALL always succeed.
+GET/PUT/DELETE for a non-existent `entry_id` SHALL return 404.
 
 #### Scenario: Create and retrieve
-- **WHEN** a POST to `/diary/my-song` is made with `author`, `body`, and `song_slug`
+- **WHEN** a POST to `/diary/new-song` is made before any production dir exists for that slug
 - **THEN** a 201 is returned containing the entry with a server-generated `id`
-- **AND** a subsequent GET `/diary/my-song/{id}` returns 200 with the same body
+- **AND** a subsequent GET `/diary/new-song/{id}` returns 200 with the same body
 
 #### Scenario: List returns entries in order
 - **WHEN** GET `/diary/my-song` is called after two entries have been created
 - **THEN** a 200 is returned with both entries in ascending `created_at` order
+
+#### Scenario: List for song with no entries returns empty list
+- **WHEN** GET `/diary/brand-new-song` is called and no entries exist yet
+- **THEN** a 200 is returned with an empty list
 
 #### Scenario: Get missing entry returns 404
 - **WHEN** GET `/diary/my-song/nonexistent-id` is called
@@ -98,7 +104,3 @@ POST or GET to a `song_slug` whose production directory cannot be resolved SHALL
 - **WHEN** DELETE `/diary/my-song/{entry_id}` is called for an existing entry
 - **THEN** a 204 is returned
 - **AND** a subsequent GET `/diary/my-song/{entry_id}` returns 404
-
-#### Scenario: Post to unknown song returns 404
-- **WHEN** POST `/diary/no-such-song` is called and no production directory exists for that slug
-- **THEN** a 404 is returned

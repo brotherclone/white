@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from white_api.candidate_server import create_app
+from white_api.routes.diary import make_diary_router
 
 
-def _client(tmp_path: Path, song_slug: str = "my-song") -> tuple[TestClient, Path]:
-    """Create a TestClient with a shrink_wrapped_dir layout and one production dir."""
-    prod_dir = tmp_path / "thread-1" / "production" / song_slug
-    prod_dir.mkdir(parents=True)
-    app = create_app(shrink_wrapped_dir=tmp_path)
-    return TestClient(app), prod_dir
+def _client(tmp_path: Path) -> TestClient:
+    """Create a TestClient wired to a temporary entries directory."""
+    app = FastAPI()
+    app.include_router(make_diary_router(tmp_path))
+    return TestClient(app)
 
 
 def _payload(**kwargs) -> dict:
@@ -27,7 +27,7 @@ def _payload(**kwargs) -> dict:
 
 
 def test_create_returns_201_with_generated_id(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     resp = client.post("/diary/my-song", json=_payload())
     assert resp.status_code == 201
     data = resp.json()
@@ -37,16 +37,20 @@ def test_create_returns_201_with_generated_id(tmp_path):
 
 
 def test_create_sets_song_slug_from_url(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     resp = client.post("/diary/my-song", json=_payload(song_slug="ignored"))
     assert resp.status_code == 201
     assert resp.json()["song_slug"] == "my-song"
 
 
-def test_create_unknown_song_returns_404(tmp_path):
-    client, _ = _client(tmp_path)
-    resp = client.post("/diary/no-such-song", json=_payload(song_slug="no-such-song"))
-    assert resp.status_code == 404
+def test_create_before_production_dir_exists(tmp_path):
+    # Diary is independent of production — any song slug works immediately
+    client = _client(tmp_path)
+    resp = client.post(
+        "/diary/brand-new-song", json=_payload(song_slug="brand-new-song")
+    )
+    assert resp.status_code == 201
+    assert resp.json()["song_slug"] == "brand-new-song"
 
 
 # ---------------------------------------------------------------------------
@@ -55,8 +59,7 @@ def test_create_unknown_song_returns_404(tmp_path):
 
 
 def test_list_returns_entries_in_created_at_order(tmp_path):
-
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
 
     early = _payload(body="first", created_at="2026-01-01T10:00:00+00:00")
     late = _payload(body="second", created_at="2026-01-01T12:00:00+00:00")
@@ -71,16 +74,17 @@ def test_list_returns_entries_in_created_at_order(tmp_path):
 
 
 def test_list_empty_returns_empty_list(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     resp = client.get("/diary/my-song")
     assert resp.status_code == 200
     assert resp.json() == []
 
 
-def test_list_unknown_song_returns_404(tmp_path):
-    client, _ = _client(tmp_path)
-    resp = client.get("/diary/no-such-song")
-    assert resp.status_code == 404
+def test_list_song_with_no_entries_returns_empty(tmp_path):
+    client = _client(tmp_path)
+    resp = client.get("/diary/brand-new-song")
+    assert resp.status_code == 200
+    assert resp.json() == []
 
 
 # ---------------------------------------------------------------------------
@@ -89,7 +93,7 @@ def test_list_unknown_song_returns_404(tmp_path):
 
 
 def test_get_entry(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     created = client.post("/diary/my-song", json=_payload()).json()
     entry_id = created["id"]
 
@@ -99,7 +103,7 @@ def test_get_entry(tmp_path):
 
 
 def test_get_missing_entry_returns_404(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     resp = client.get("/diary/my-song/nonexistent-id")
     assert resp.status_code == 404
 
@@ -110,7 +114,7 @@ def test_get_missing_entry_returns_404(tmp_path):
 
 
 def test_put_replaces_entry(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     created = client.post("/diary/my-song", json=_payload(body="original")).json()
     entry_id = created["id"]
 
@@ -124,7 +128,7 @@ def test_put_replaces_entry(tmp_path):
 
 
 def test_put_missing_entry_returns_404(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     resp = client.put("/diary/my-song/no-such-id", json=_payload())
     assert resp.status_code == 404
 
@@ -135,7 +139,7 @@ def test_put_missing_entry_returns_404(tmp_path):
 
 
 def test_delete_returns_204(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     created = client.post("/diary/my-song", json=_payload()).json()
     entry_id = created["id"]
 
@@ -144,7 +148,7 @@ def test_delete_returns_204(tmp_path):
 
 
 def test_delete_then_get_returns_404(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     created = client.post("/diary/my-song", json=_payload()).json()
     entry_id = created["id"]
 
@@ -154,6 +158,6 @@ def test_delete_then_get_returns_404(tmp_path):
 
 
 def test_delete_missing_entry_returns_404(tmp_path):
-    client, _ = _client(tmp_path)
+    client = _client(tmp_path)
     resp = client.delete("/diary/my-song/no-such-id")
     assert resp.status_code == 404
