@@ -91,7 +91,7 @@ class LabelEncoder:
         if multi_label:
             # Multi-label: decode binary vector
             if isinstance(index, torch.Tensor):
-                index = index.cpu().numpy()
+                index = index.tolist()
 
             labels = []
             for i, val in enumerate(index):

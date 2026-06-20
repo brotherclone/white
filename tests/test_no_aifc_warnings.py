@@ -13,7 +13,7 @@ def test_run_entrypoint_no_aifc_warnings():
     env.update({"PYTHONPATH": str(project_root)})
 
     proc = subprocess.run(
-        [sys.executable, "run_ideation.py", "--help"],
+        [sys.executable, "packages/ideation/src/run_ideation.py", "--help"],
         cwd=project_root,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

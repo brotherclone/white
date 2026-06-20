@@ -445,7 +445,7 @@ class TestHybridStateDetection:
             enable_cache=False,
             dominant_threshold=0.6,
             hybrid_threshold=0.15,
-            diffuse_threshold=0.2,
+            diffuse_threshold=0.15,
         )
 
     def test_dominant_state_detection(self):
