@@ -207,7 +207,7 @@ class ConceptValidator:
         confidence_threshold: float = 0.7,
         dominant_threshold: float = 0.6,
         hybrid_threshold: float = 0.15,
-        diffuse_threshold: float = 0.2,
+        diffuse_threshold: float = 0.15,
         uncertainty_threshold: float = 0.8,
         # Cache settings
         enable_cache: bool = True,
@@ -369,13 +369,12 @@ class ConceptValidator:
         # Simple hash-based mock for consistent results
         text_hash = hash(text) % 1000 / 1000
 
+        spatial_raw = np.array([0.6 + 0.2 * text_hash, 0.3 - 0.1 * text_hash, 0.1])
         return {
             "temporal_scores": np.array(
                 [0.7 + 0.1 * text_hash, 0.2 - 0.05 * text_hash, 0.1 - 0.05 * text_hash]
             ),
-            "spatial_scores": np.array(
-                [0.6 + 0.2 * text_hash, 0.3 - 0.1 * text_hash, 0.1]
-            ),
+            "spatial_scores": spatial_raw / spatial_raw.sum(),
             "ontological_scores": np.array([0.8, 0.15, 0.05]),
             "chromatic_confidence": 0.85,
         }
