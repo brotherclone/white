@@ -95,7 +95,7 @@ export default function SongBrowserPage() {
 
   const handleSelect = async (song: SongEntry) => {
     if (song.stage === "invalid") {
-      showToast("error", `"${song.title}" has an invalid manifest — run migration to fix.`);
+      showToast("error", "Song metadata is invalid — run migration to repair");
       return;
     }
     setActivatingId(song.id);
@@ -149,7 +149,7 @@ export default function SongBrowserPage() {
       {/* Stage filter */}
       {!error && songs.length > 0 && (
         <div className="flex gap-1.5 flex-wrap mb-4">
-          {(["all", ...ALL_SONG_STAGES, "stub"] as StageFilter[]).map(s => {
+          {(["all", ...ALL_SONG_STAGES.filter(s => s !== "invalid"), "stub", "invalid"] as StageFilter[]).map(s => {
             const count = s === "all" ? songs.length : s === "stub" ? stubCount : (countsByStage[s as SongEntry["stage"]] ?? 0);
             const active = stageFilter === s;
             return (

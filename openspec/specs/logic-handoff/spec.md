@@ -214,12 +214,12 @@ The function SHALL raise `ValueError` when `target` is not strictly earlier than
 
 Stages not in the map (`rough_mix`, `mix_candidate`, `final_mix`) produce no file deletions.
 
-The returned dict has the shape `{ "destructive": bool, "files_to_delete": list[str] }` where `files_to_delete` contains the resolved absolute paths of matching files that actually exist.
+The returned dict has the shape `{ "destructive": bool, "files_to_delete": list[str] }` where `files_to_delete` contains paths **relative to `logic_song_dir`** for matching files that actually exist. Relative paths avoid leaking local filesystem structure to callers.
 
 #### Scenario: Destructive regression identifies files
 - **WHEN** `regression_info(song_dir, "vocal_placeholders", "lyrics")` is called
 - **AND** `song_dir/MIDI/melody/vocal_placeholder_verse.mid` exists
-- **THEN** returns `{ "destructive": True, "files_to_delete": ["<song_dir>/MIDI/melody/vocal_placeholder_verse.mid"] }`
+- **THEN** returns `{ "destructive": True, "files_to_delete": ["MIDI/melody/vocal_placeholder_verse.mid"] }`
 
 #### Scenario: Non-destructive regression
 - **WHEN** `regression_info(song_dir, "mix_candidate", "rough_mix")` is called

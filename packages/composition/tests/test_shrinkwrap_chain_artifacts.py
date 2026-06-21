@@ -1261,6 +1261,13 @@ class TestSynthesizeBootstrapStub:
         assert data["rainbow_color"] is None
         assert data["title"] == "Unrecognised Slug Format"
 
+    def test_no_double_underscore_strips_version_suffix(self, tmp_path):
+        prod = tmp_path / "legacy_song_v1"
+        prod.mkdir()
+        data = _synthesize_bootstrap_stub(prod)
+        assert data["rainbow_color"] is None
+        assert data["title"] == "Legacy Song"
+
     def test_writes_file_to_disk(self, tmp_path):
         prod = tmp_path / "red__burning_coast_v1"
         prod.mkdir()

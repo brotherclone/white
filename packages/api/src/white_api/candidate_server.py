@@ -1148,8 +1148,11 @@ def create_app(
                         _shutil.rmtree(p)
                     else:
                         p.unlink()
-                except OSError:
-                    pass
+                except OSError as exc:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Could not delete {rel}: {exc}",
+                    ) from exc
 
         try:
             write_stage(song_dir, body.target_stage)

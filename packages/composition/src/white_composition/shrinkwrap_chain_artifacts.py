@@ -633,13 +633,15 @@ def _synthesize_thread_manifest_stub(thread_dir: Path, thread_id: str | None) ->
 
 
 _BOOTSTRAP_SLUG_RE = re.compile(r"^(.+?)__(.+?)(?:_v\d+)?$")
+_VERSION_SUFFIX_RE = re.compile(r"_v\d+$")
 
 
 def _synthesize_bootstrap_stub(prod_dir: Path) -> dict:
     """Write a stub manifest_bootstrap.yml for a Class B production dir.
 
     Parses {color}__{title_slug}_v{n} convention from the dir name.
-    Falls back to using the full slug as title if no double-underscore found.
+    Falls back to using the full slug (minus _vN suffix) as title if no
+    double-underscore found.
     """
     slug = prod_dir.name
     m = _BOOTSTRAP_SLUG_RE.match(slug)
@@ -648,7 +650,7 @@ def _synthesize_bootstrap_stub(prod_dir: Path) -> dict:
         title = _unslugify(m.group(2))
     else:
         rainbow_color = None
-        title = _unslugify(slug)
+        title = _unslugify(_VERSION_SUFFIX_RE.sub("", slug))
 
     bootstrap = {
         "schema_version": SHRINKWRAP_SCHEMA_VERSION,
@@ -788,8 +790,12 @@ def migrate_manifests(output_dir: Path, dry_run: bool = False) -> dict:
             # Try scaffold from yml/ dir first
             yml_dir = thread_dir / "yml"
             if yml_dir.exists():
-                slugs = scaffold_song_productions(thread_dir, yml_dir)
-                if prod_dir.name in slugs:
+                proposal_file = yml_dir / f"{prod_dir.name}.yml"
+                would_scaffold = proposal_file.exists()
+                if not dry_run:
+                    slugs = scaffold_song_productions(thread_dir, yml_dir)
+                    would_scaffold = prod_dir.name in slugs
+                if would_scaffold:
                     summary["bootstrap_stubs_written"] += 1
                     if dry_run:
                         print(f"  [scaffold]  {bootstrap_path}")
