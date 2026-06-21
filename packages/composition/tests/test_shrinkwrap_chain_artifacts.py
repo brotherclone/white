@@ -5,6 +5,8 @@ from pathlib import Path
 import yaml
 
 from white_composition.shrinkwrap_chain_artifacts import (
+    SHRINKWRAP_SCHEMA_VERSION,
+    _synthesize_bootstrap_stub,
     clean_filename,
     copy_thread_files,
     find_debug_files,
@@ -12,6 +14,7 @@ from white_composition.shrinkwrap_chain_artifacts import (
     is_debug_file,
     is_evp_intermediate,
     is_uuid,
+    migrate_manifests,
     parse_thread,
     resolve_collision,
     rewrite_file_name_field,
@@ -497,6 +500,8 @@ class TestWriteManifest:
         assert loaded["title"] == "Test"
         assert loaded["bpm"] == 120
         assert loaded["iteration_count"] == 5
+        assert loaded["schema_version"] == SHRINKWRAP_SCHEMA_VERSION
+        assert list(loaded.keys())[0] == "schema_version"
 
 
 class TestWriteIndex:
@@ -854,6 +859,7 @@ class TestScaffoldSongProductions:
         assert data["key"] == "C major"
         assert data["rainbow_color"] == "Red"
         assert data["title"] == "coral_fever_requiem_v1"
+        assert data["schema_version"] == SHRINKWRAP_SCHEMA_VERSION
 
     def test_rainbow_color_dict_normalized_to_color_name(self, tmp_path):
         yml_dir = tmp_path / "yml"
@@ -1084,3 +1090,189 @@ class TestShrinkwrapCatalogHook:
             result = shrinkwrap(artifacts, output)
 
         assert result["processed"] == 1
+
+
+# ---------------------------------------------------------------------------
+# Task 8.3: migrate_manifests — Pass 1 backfill
+# ---------------------------------------------------------------------------
+
+
+class TestMigrateManifestsBackfill:
+    def _write_legacy_manifest(self, path: Path, extra: dict | None = None) -> None:
+        data = {"title": "Old Song", "bpm": 120}
+        if extra:
+            data.update(extra)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as f:
+            yaml.dump(data, f, sort_keys=False)
+
+    def test_backfills_thread_manifest(self, tmp_path):
+        mpath = tmp_path / "white-song" / "manifest.yml"
+        self._write_legacy_manifest(mpath)
+
+        summary = migrate_manifests(tmp_path)
+        assert summary["manifest_backfilled"] == 1
+
+        loaded = yaml.safe_load(mpath.read_text())
+        assert loaded["schema_version"] == SHRINKWRAP_SCHEMA_VERSION
+        assert list(loaded.keys())[0] == "schema_version"
+
+    def test_backfills_bootstrap(self, tmp_path):
+        bpath = (
+            tmp_path
+            / "white-song"
+            / "production"
+            / "my_song_v1"
+            / "manifest_bootstrap.yml"
+        )
+        self._write_legacy_manifest(bpath, {"rainbow_color": "White", "key": "C major"})
+
+        summary = migrate_manifests(tmp_path)
+        assert summary["bootstrap_backfilled"] == 1
+        loaded = yaml.safe_load(bpath.read_text())
+        assert loaded["schema_version"] == SHRINKWRAP_SCHEMA_VERSION
+
+    def test_backfills_index(self, tmp_path):
+        index_path = tmp_path / "index.yml"
+        with open(index_path, "w") as f:
+            yaml.dump({"thread_count": 0, "threads": []}, f)
+
+        summary = migrate_manifests(tmp_path)
+        assert summary["index_backfilled"] == 1
+        loaded = yaml.safe_load(index_path.read_text())
+        assert loaded["schema_version"] == SHRINKWRAP_SCHEMA_VERSION
+
+    def test_idempotent_already_versioned(self, tmp_path):
+        mpath = tmp_path / "white-song" / "manifest.yml"
+        self._write_legacy_manifest(
+            mpath, {"schema_version": SHRINKWRAP_SCHEMA_VERSION}
+        )
+
+        summary = migrate_manifests(tmp_path)
+        assert summary["manifest_backfilled"] == 0
+
+    def test_dry_run_does_not_write(self, tmp_path):
+        mpath = tmp_path / "white-song" / "manifest.yml"
+        self._write_legacy_manifest(mpath)
+        original = mpath.read_text()
+
+        summary = migrate_manifests(tmp_path, dry_run=True)
+        assert summary["manifest_backfilled"] == 1
+        assert mpath.read_text() == original  # file unchanged in dry-run
+
+
+# ---------------------------------------------------------------------------
+# Task 8.4: migrate_manifests — Pass 2 stub synthesis (Class B threads)
+# ---------------------------------------------------------------------------
+
+
+class TestMigrateManifestsStubs:
+    def test_synthesizes_thread_stub_when_manifest_missing(self, tmp_path):
+        thread_dir = tmp_path / "white-ancient-thing"
+        prod = thread_dir / "production" / "white__ancient_thing_v1"
+        prod.mkdir(parents=True)
+        # Write a bootstrap so Pass 2 doesn't need to stub it too
+        with open(prod / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump(
+                {
+                    "schema_version": SHRINKWRAP_SCHEMA_VERSION,
+                    "title": "T",
+                    "rainbow_color": "White",
+                },
+                f,
+            )
+
+        summary = migrate_manifests(tmp_path)
+        assert summary["thread_stubs_written"] == 1
+        manifest = thread_dir / "manifest.yml"
+        assert manifest.exists()
+        data = yaml.safe_load(manifest.read_text())
+        assert data["schema_version"] == SHRINKWRAP_SCHEMA_VERSION
+        assert data["stub"] is True
+
+    def test_synthesizes_bootstrap_stub_from_slug(self, tmp_path):
+        thread_dir = tmp_path / "white-some-thread"
+        thread_dir.mkdir()
+        with open(thread_dir / "manifest.yml", "w") as f:
+            yaml.dump({"schema_version": SHRINKWRAP_SCHEMA_VERSION, "title": "T"}, f)
+        prod = thread_dir / "production" / "black__sequential_dissolution_v2"
+        prod.mkdir(parents=True)
+
+        summary = migrate_manifests(tmp_path)
+        assert summary["bootstrap_stubs_written"] == 1
+        bpath = prod / "manifest_bootstrap.yml"
+        assert bpath.exists()
+        data = yaml.safe_load(bpath.read_text())
+        assert data["rainbow_color"] == "Black"
+        assert data["title"] == "Sequential Dissolution"
+        assert data["stub"] is True
+
+    def test_no_double_underscore_fallback(self, tmp_path):
+        thread_dir = tmp_path / "white-some-thread"
+        thread_dir.mkdir()
+        with open(thread_dir / "manifest.yml", "w") as f:
+            yaml.dump({"schema_version": SHRINKWRAP_SCHEMA_VERSION, "title": "T"}, f)
+        prod = thread_dir / "production" / "legacy_song_with_no_separator"
+        prod.mkdir(parents=True)
+
+        migrate_manifests(tmp_path)
+        data = yaml.safe_load((prod / "manifest_bootstrap.yml").read_text())
+        assert data["rainbow_color"] is None
+        assert data["title"] == "Legacy Song With No Separator"
+
+    def test_dry_run_does_not_write_stubs(self, tmp_path):
+        thread_dir = tmp_path / "white-some-thread"
+        prod = thread_dir / "production" / "my_song_v1"
+        prod.mkdir(parents=True)
+
+        summary = migrate_manifests(tmp_path, dry_run=True)
+        assert summary["thread_stubs_written"] == 1
+        assert summary["bootstrap_stubs_written"] == 1
+        assert not (thread_dir / "manifest.yml").exists()
+        assert not (prod / "manifest_bootstrap.yml").exists()
+
+
+# ---------------------------------------------------------------------------
+# Task 8.5: _synthesize_bootstrap_stub slug parsing
+# ---------------------------------------------------------------------------
+
+
+class TestSynthesizeBootstrapStub:
+    def test_color_and_title_parsed_from_double_underscore_slug(self, tmp_path):
+        prod = tmp_path / "black__sequential_dissolution_v2"
+        prod.mkdir()
+        data = _synthesize_bootstrap_stub(prod)
+        assert data["rainbow_color"] == "Black"
+        assert data["title"] == "Sequential Dissolution"
+        assert data["stub"] is True
+        assert data["schema_version"] == SHRINKWRAP_SCHEMA_VERSION
+
+    def test_no_version_suffix(self, tmp_path):
+        prod = tmp_path / "violet__electric_garden"
+        prod.mkdir()
+        data = _synthesize_bootstrap_stub(prod)
+        assert data["rainbow_color"] == "Violet"
+        assert data["title"] == "Electric Garden"
+
+    def test_no_double_underscore_fallback(self, tmp_path):
+        prod = tmp_path / "unrecognised_slug_format"
+        prod.mkdir()
+        data = _synthesize_bootstrap_stub(prod)
+        assert data["rainbow_color"] is None
+        assert data["title"] == "Unrecognised Slug Format"
+
+    def test_no_double_underscore_strips_version_suffix(self, tmp_path):
+        prod = tmp_path / "legacy_song_v1"
+        prod.mkdir()
+        data = _synthesize_bootstrap_stub(prod)
+        assert data["rainbow_color"] is None
+        assert data["title"] == "Legacy Song"
+
+    def test_writes_file_to_disk(self, tmp_path):
+        prod = tmp_path / "red__burning_coast_v1"
+        prod.mkdir()
+        _synthesize_bootstrap_stub(prod)
+        assert (prod / "manifest_bootstrap.yml").exists()
+        on_disk = yaml.safe_load((prod / "manifest_bootstrap.yml").read_text())
+        assert on_disk["rainbow_color"] == "Red"
+        assert on_disk["title"] == "Burning Coast"

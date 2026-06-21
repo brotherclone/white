@@ -952,6 +952,14 @@ def run_chord_pipeline(
     print(f"\nGenerating {num_candidates} candidates (seed.logicx={seed})...")
     gen = ChordProgressionGenerator()
 
+    resolved_key = gen.resolve_key(song_info["key_root"], song_info["mode"])
+    if resolved_key != song_info["key_root"]:
+        print(
+            f"  Enharmonic: {song_info['key_root']} → {resolved_key} "
+            f"(no {song_info['mode']} chords for {song_info['key_root']})"
+        )
+        song_info["key_root"] = resolved_key
+
     raw_candidates = gen.generate_progression_brute_force(
         key_root=song_info["key_root"],
         mode=song_info["mode"],

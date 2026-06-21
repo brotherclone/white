@@ -26,6 +26,8 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
+from white_composition.shrinkwrap_chain_artifacts import SHRINKWRAP_SCHEMA_VERSION
+
 load_dotenv()
 
 INITIAL_PROPOSAL_FILENAME = "initial_proposal.yml"
@@ -217,7 +219,7 @@ def _write_song_context(
     _style_ref_profile = aggregate_profiles(_style_profiles)
 
     context_data = {
-        "schema_version": "1",
+        "schema_version": SHRINKWRAP_SCHEMA_VERSION,
         "generated": generated,
         "proposed_by": "claude",
         # Identity

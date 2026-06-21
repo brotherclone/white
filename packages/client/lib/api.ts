@@ -177,6 +177,23 @@ export async function fetchComposition(): Promise<import("./types").CompositionE
   return res.json();
 }
 
+export async function regressStage(
+  targetStage: string,
+  confirmed: boolean,
+  diaryEntry: string | null,
+): Promise<import("./types").RegressionInfo | { ok: boolean; stage: string }> {
+  const res = await fetch(`${BASE}/composition/regress`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ target_stage: targetStage, confirmed, diary_entry: diaryEntry }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Regress failed");
+  }
+  return res.json();
+}
+
 export async function advanceStage(stage: string): Promise<{ ok: boolean; stage: string }> {
   const res = await fetch(`${BASE}/composition/stage`, {
     method: "PATCH",
