@@ -16,6 +16,7 @@ Usage:
 
 import argparse
 import io
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -870,7 +871,11 @@ def run_bass_pipeline(
 
         for rank, item in enumerate(top):
             item["rank"] = rank + 1
-            prefix = "evolved_" if item.get("is_evolved") else ""
+            if item.get("is_evolved"):
+                run_id = os.environ.get("EVOLVE_RUN_ID", "")
+                prefix = f"evolved_{run_id}_" if run_id else "evolved_"
+            else:
+                prefix = ""
             item["id"] = f"{prefix}bass_{section_key}_{rank + 1:02d}"
             all_midi_outputs.append((f"{item['id']}.mid", item["midi_bytes"]))
 

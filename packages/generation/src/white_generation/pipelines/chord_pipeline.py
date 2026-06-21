@@ -150,6 +150,7 @@ def load_song_proposal(thread_dir: Path, song_filename: str) -> dict:
         "song_filename": song_filename,
         "thread_dir": str(thread_dir),
         "raw_proposal": unified["raw_proposal"],
+        "musical_constraints": unified.get("musical_constraints"),
     }
 
 
@@ -360,14 +361,24 @@ def generate_review_yaml(
     """Generate the review YAML structure."""
     candidates = []
     for item in ranked_candidates:
-        is_diatonic = item.get("source") == "diatonic"
+        source = item.get("source", "markov")
+        is_diatonic = source == "diatonic"
+        is_constrained = source == "constrained"
+        if is_diatonic:
+            notes = "Diatonic workhorse — clean triads, assign to verse/chorus"
+        elif is_constrained:
+            notes = f"Constrained — sequence from proposal: {item.get('harmonic_sequence', '')}"
+        else:
+            notes = ""
         entry = {
             "id": item["id"],
             "midi_file": f"candidates/{item['id']}.mid",
             "scratch_midi": f"candidates/{item['id']}_scratch.mid",
-            "rank": None if is_diatonic else item["rank"],
-            "source": item.get("source", "markov"),
-            "scores": None if is_diatonic else _to_python(item["breakdown"]),
+            "rank": item.get("rank"),
+            "source": source,
+            "scores": (
+                _to_python(item.get("breakdown")) if item.get("breakdown") else None
+            ),
             "hr_distribution": _to_python(item.get("hr_distribution", [])),
             "strum_pattern": item.get("strum_pattern", "whole"),
             "progression": item["summary"],
@@ -382,10 +393,10 @@ def generate_review_yaml(
             # Human annotation fields
             "label": None,
             "status": "pending",
-            "notes": (
-                "Diatonic workhorse — assign to verse sections" if is_diatonic else ""
-            ),
+            "notes": notes,
         }
+        if is_constrained and item.get("harmonic_sequence"):
+            entry["harmonic_sequence"] = item["harmonic_sequence"]
         if item.get("bar_sources"):
             entry["bar_sources"] = item["bar_sources"]
         candidates.append(entry)
@@ -496,6 +507,127 @@ def build_diatonic_candidates(
         )
 
     return candidates
+
+
+# ---------------------------------------------------------------------------
+# Constrained candidates — harmonic_sequence from proposal
+# ---------------------------------------------------------------------------
+
+
+def build_constrained_candidates(
+    harmonic_sequence: str,
+    key_root: str,
+    mode: str,
+    bpm: int,
+    time_sig: tuple[int, int],
+    gen: "ChordProgressionGenerator",
+    rng,
+    genre_families: list[str],
+    num_candidates: int,
+    scorer,
+    concept_emb,
+    target: dict,
+    theory_weight: float,
+    chromatic_weight: float,
+) -> list[dict]:
+    """Build and score candidates from a fixed harmonic sequence.
+
+    Parses ``harmonic_sequence`` (e.g. ``"i iv i"``) into Roman numeral tokens,
+    resolves each to its chord pool, and generates ``num_candidates`` voicing
+    combinations by sampling one chord per position per candidate.  Each
+    combination is scored through the same theory+Refractor composite pipeline
+    used for Markov candidates.
+
+    Returns scored candidates sorted by composite score with
+    ``source: "constrained"`` and ``harmonic_sequence`` echoed on each entry.
+    Tokens that resolve to no chords are skipped with a warning; returns ``[]``
+    only when no tokens resolve to usable chords.
+    """
+    tokens = harmonic_sequence.split()
+    if not tokens:
+        return []
+
+    # Resolve each token to its chord pool (prefer triads; fall back to any)
+    chord_pools: list[list[dict]] = []
+    for token in tokens:
+        rows = gen.get_chord_by_function(key_root, mode, token, category="triad")
+        if rows.is_empty():
+            rows = gen.get_chord_by_function(key_root, mode, token)
+        if rows.is_empty():
+            print(
+                f"  Warning: constrained token '{token}' has no chords in "
+                f"{key_root} {mode} — skipping token"
+            )
+            continue
+        chord_pools.append(rows.to_dicts())
+
+    if not chord_pools:
+        print("  Warning: constrained sequence resolved to no usable chords — skipping")
+        return []
+
+    # Generate voicing combinations
+    raw_candidates = []
+    for _ in range(num_candidates):
+        progression = []
+        for pool in chord_pools:
+            chord = rng.choice(pool)
+            progression.append(
+                {
+                    "chord_id": chord["chord_id"],
+                    "chord_name": chord["chord_name"],
+                    "function": chord["function"],
+                    "note_names": chord["note_names"],
+                    "midi_notes": list(chord["midi_notes"]),
+                    "quality": chord["quality"],
+                }
+            )
+        theory_score, theory_breakdown = gen.score_progression(
+            progression, key_root, mode
+        )
+        midi_bytes = progression_to_midi_bytes(progression, bpm=bpm)
+        raw_candidates.append(
+            {
+                "midi_bytes": midi_bytes,
+                "theory_score": theory_score,
+                "theory_breakdown": theory_breakdown,
+                "progression": progression,
+            }
+        )
+
+    # Batch score with Refractor
+    scorer_inputs = [{"midi_bytes": c["midi_bytes"]} for c in raw_candidates]
+    scorer_results = scorer.score_batch(scorer_inputs, concept_emb=concept_emb)
+    scorer_by_midi = {id(r["candidate"]["midi_bytes"]): r for r in scorer_results}
+
+    scored = []
+    for i, cand in enumerate(raw_candidates):
+        midi_key = id(scorer_inputs[i]["midi_bytes"])
+        scorer_result = scorer_by_midi.get(midi_key)
+        if scorer_result is None:
+            continue
+        chromatic_match = compute_chromatic_match(scorer_result, target)
+        comp, breakdown = composite_score(
+            cand["theory_score"],
+            cand["theory_breakdown"],
+            chromatic_match,
+            scorer_result,
+            theory_weight,
+            chromatic_weight,
+        )
+        scored.append(
+            {
+                "composite": comp,
+                "breakdown": breakdown,
+                "progression": cand["progression"],
+                "midi_bytes": cand["midi_bytes"],
+                "summary": progression_summary(cand["progression"]),
+                "source": "constrained",
+                "harmonic_sequence": harmonic_sequence,
+            }
+        )
+
+    scored.sort(key=lambda x: x["composite"], reverse=True)
+    return scored
 
 
 # ---------------------------------------------------------------------------
@@ -909,49 +1041,9 @@ def run_chord_pipeline(
             }
         )
 
-    # Rank by composite score
-    scored.sort(key=lambda x: x["composite"], reverse=True)
-    top_candidates = scored[:top_k]
-
-    # Assign IDs and ranks
-    for rank, item in enumerate(top_candidates):
-        item["rank"] = rank + 1
-        item["id"] = f"chord_{rank + 1:03d}"
-
-    # --- 5. Write MIDI files (with HR + strum baked in) + scratch beats ---
-    slug = song_slug(song_filename)
-    output_dir = thread_path / "production" / slug / "chords"
-    candidates_dir = output_dir / "candidates"
-    approved_dir = output_dir / "approved"
-    candidates_dir.mkdir(parents=True, exist_ok=True)
-    approved_dir.mkdir(parents=True, exist_ok=True)
-
+    # --- 5. Build and score diatonic candidates alongside Markov ---
+    # Build diatonic BEFORE sorting so they can compete for rank positions.
     time_sig = tuple(song_info["time_sig"])
-    print(
-        f"\nWriting {len(top_candidates)} chord primitives + scratch beats to {candidates_dir}/"
-    )
-    for item in top_candidates:
-        n_chords = len(item["progression"])
-        hr_dist = sample_hr_distribution(n_chords, rng)
-        strum_pat = sample_strum_pattern(time_sig, rng, filter_names=strum_patterns)
-        bar_count = int(sum(hr_dist))
-
-        primitive_bytes = progression_to_primitive_midi_bytes(
-            item["progression"], song_info["bpm"], time_sig, hr_dist, strum_pat
-        )
-        scratch_bytes = generate_scratch_beat(
-            song_info["bpm"], bar_count, time_sig, genre_families
-        )
-
-        write_midi_file(primitive_bytes, candidates_dir / f"{item['id']}.mid")
-        _trim_midi(candidates_dir / f"{item['id']}.mid")
-        write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
-        _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
-
-        item["hr_distribution"] = hr_dist
-        item["strum_pattern"] = strum_pat.name
-
-    # --- 6. Build and write diatonic workhorse candidates ---
     diatonic = build_diatonic_candidates(
         song_info["key_root"],
         song_info["mode"],
@@ -961,16 +1053,163 @@ def run_chord_pipeline(
         rng,
         genre_families,
     )
+
     if diatonic:
-        print(f"\nAdding {len(diatonic)} diatonic workhorse candidates...")
-        for item in diatonic:
+        print(f"\nScoring {len(diatonic)} diatonic candidates with Refractor...")
+        # Use simple MIDI (no HR/strum) for scoring consistency with Markov candidates
+        diatonic_score_inputs = [
+            {
+                "midi_bytes": progression_to_midi_bytes(
+                    d["progression"], bpm=song_info["bpm"]
+                )
+            }
+            for d in diatonic
+        ]
+        diatonic_results = scorer.score_batch(
+            diatonic_score_inputs, concept_emb=concept_emb
+        )
+        diatonic_by_midi = {
+            id(r["candidate"]["midi_bytes"]): r for r in diatonic_results
+        }
+
+        for i, d in enumerate(diatonic):
+            sr = diatonic_by_midi.get(id(diatonic_score_inputs[i]["midi_bytes"]))
+            if sr is None:
+                continue
+            theory_score, theory_breakdown = gen.score_progression(
+                d["progression"], song_info["key_root"], song_info["mode"]
+            )
+            chromatic_match = compute_chromatic_match(sr, target)
+            comp, breakdown = composite_score(
+                theory_score,
+                theory_breakdown,
+                chromatic_match,
+                sr,
+                theory_weight,
+                chromatic_weight,
+            )
+            scored.append(
+                {
+                    "composite": comp,
+                    "breakdown": breakdown,
+                    "progression": d["progression"],
+                    "midi_bytes": d["midi_bytes"],  # already HR+strum baked
+                    "scratch_bytes": d["scratch_bytes"],
+                    "summary": d["summary"],
+                    "hr_distribution": d["hr_distribution"],
+                    "strum_pattern": d["strum_pattern"],
+                    "source": "diatonic",
+                    "id": d["id"],
+                }
+            )
+
+    # --- 5b. Build and score constrained candidates (harmonic_sequence from proposal) ---
+    constraints = song_info.get("musical_constraints")
+    _harmonic_sequence = (
+        getattr(constraints, "harmonic_sequence", None) if constraints else None
+    )
+    if _harmonic_sequence:
+        print(
+            f"\nBuilding constrained candidates for sequence: '{_harmonic_sequence}'..."
+        )
+        constrained = build_constrained_candidates(
+            harmonic_sequence=_harmonic_sequence,
+            key_root=song_info["key_root"],
+            mode=song_info["mode"],
+            bpm=song_info["bpm"],
+            time_sig=time_sig,
+            gen=gen,
+            rng=rng,
+            genre_families=genre_families,
+            num_candidates=num_candidates,
+            scorer=scorer,
+            concept_emb=concept_emb,
+            target=target,
+            theory_weight=theory_weight,
+            chromatic_weight=chromatic_weight,
+        )
+        if constrained:
+            print(f"  {len(constrained)} constrained candidates generated")
+            scored.extend(constrained)
+
+    # Merge, re-sort, and select final pool.
+    # Markov candidates are capped at top_k; diatonic always included in full.
+    # Constrained candidates are always included (like diatonic — human-directed).
+    # Final list is sorted by composite so ranks truly reflect scores.
+    scored.sort(key=lambda x: x["composite"], reverse=True)
+    diatonic_ids = {d["id"] for d in diatonic}
+    # Constrained and diatonic candidates are always included in full;
+    # Markov candidates are capped at top_k.
+    _always_include = {"diatonic", "constrained"}
+    markov_in_scored = [
+        c
+        for c in scored
+        if c.get("source") not in _always_include and c.get("id") not in diatonic_ids
+    ][:top_k]
+    special_candidates = [
+        c
+        for c in scored
+        if c.get("source") in _always_include or c.get("id") in diatonic_ids
+    ]
+    top_candidates = sorted(
+        markov_in_scored + special_candidates,
+        key=lambda x: x["composite"],
+        reverse=True,
+    )
+
+    # Assign global ranks in composite order; Markov/constrained IDs are sequential
+    # among non-diatonic entries; diatonic entries keep their pattern-based IDs.
+    markov_counter = 0
+    for rank, item in enumerate(top_candidates, 1):
+        item["rank"] = rank
+        if item.get("source") != "diatonic" and not item.get("id"):
+            markov_counter += 1
+            item["id"] = f"chord_{markov_counter:03d}"
+        elif item.get("source") not in _always_include:
+            markov_counter += 1
+            item["id"] = f"chord_{markov_counter:03d}"
+
+    # --- 6. Write MIDI files for all candidates ---
+    slug = song_slug(song_filename)
+    output_dir = thread_path / "production" / slug / "chords"
+    candidates_dir = output_dir / "candidates"
+    approved_dir = output_dir / "approved"
+    candidates_dir.mkdir(parents=True, exist_ok=True)
+    approved_dir.mkdir(parents=True, exist_ok=True)
+
+    print(
+        f"\nWriting {len(top_candidates)} chord primitives + scratch beats to {candidates_dir}/"
+    )
+    for item in top_candidates:
+        is_diatonic = item.get("source") == "diatonic"
+        if is_diatonic:
+            # midi_bytes already has HR+strum baked from build_diatonic_candidates
             write_midi_file(item["midi_bytes"], candidates_dir / f"{item['id']}.mid")
             _trim_midi(candidates_dir / f"{item['id']}.mid")
             write_midi_file(
                 item["scratch_bytes"], candidates_dir / f"{item['id']}_scratch.mid"
             )
             _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
-        top_candidates = top_candidates + diatonic
+        else:
+            n_chords = len(item["progression"])
+            hr_dist = sample_hr_distribution(n_chords, rng)
+            strum_pat = sample_strum_pattern(time_sig, rng, filter_names=strum_patterns)
+            bar_count = int(sum(hr_dist))
+
+            primitive_bytes = progression_to_primitive_midi_bytes(
+                item["progression"], song_info["bpm"], time_sig, hr_dist, strum_pat
+            )
+            scratch_bytes = generate_scratch_beat(
+                song_info["bpm"], bar_count, time_sig, genre_families
+            )
+
+            write_midi_file(primitive_bytes, candidates_dir / f"{item['id']}.mid")
+            _trim_midi(candidates_dir / f"{item['id']}.mid")
+            write_midi_file(scratch_bytes, candidates_dir / f"{item['id']}_scratch.mid")
+            _trim_midi(candidates_dir / f"{item['id']}_scratch.mid")
+
+            item["hr_distribution"] = hr_dist
+            item["strum_pattern"] = strum_pat.name
 
     # --- 7. Write review YAML ---
     review = generate_review_yaml(
@@ -979,6 +1218,12 @@ def run_chord_pipeline(
         seed,
         {"theory": theory_weight, "chromatic": chromatic_weight},
     )
+    # Surface performance_notes for the human reviewer (no pipeline effect)
+    _perf_notes = (
+        getattr(constraints, "performance_notes", None) if constraints else None
+    )
+    if _perf_notes:
+        review["performance_notes"] = _perf_notes
     review_path = output_dir / "review.yml"
     with open(review_path, "w") as f:
         yaml.dump(

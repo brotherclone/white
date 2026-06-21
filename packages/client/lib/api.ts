@@ -237,6 +237,147 @@ export async function syncArrangement(): Promise<{ ok: boolean; synced_from: str
   return res.json();
 }
 
+// ---------------------------------------------------------------------------
+// Diary
+// ---------------------------------------------------------------------------
+
+export async function fetchDiaryEntries(songSlug: string): Promise<import("./types").DiaryEntry[]> {
+  const res = await fetch(`${BASE}/diary/${encodeURIComponent(songSlug)}`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch diary entries");
+  return res.json();
+}
+
+export async function createDiaryEntry(
+  songSlug: string,
+  entry: Omit<import("./types").DiaryEntry, "id" | "created_at">,
+): Promise<import("./types").DiaryEntry> {
+  const res = await fetch(`${BASE}/diary/${encodeURIComponent(songSlug)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Create diary entry failed");
+  }
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Collaborator registry
+// ---------------------------------------------------------------------------
+
+export async function fetchCollaborators(): Promise<import("./types").Collaborator[]> {
+  const res = await fetch(`${BASE}/collaborators`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch collaborators");
+  return res.json();
+}
+
+export async function fetchCollaborator(id: string): Promise<import("./types").Collaborator> {
+  const res = await fetch(`${BASE}/collaborators/${encodeURIComponent(id)}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Collaborator '${id}' not found`);
+  return res.json();
+}
+
+export async function saveCollaborator(c: import("./types").Collaborator): Promise<import("./types").Collaborator> {
+  const res = await fetch(`${BASE}/collaborators/${encodeURIComponent(c.id)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(c),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Save collaborator failed");
+  }
+  return res.json();
+}
+
+export async function createCollaborator(c: import("./types").Collaborator): Promise<import("./types").Collaborator> {
+  const res = await fetch(`${BASE}/collaborators`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(c),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Create collaborator failed");
+  }
+  return res.json();
+}
+
+export async function deleteCollaborator(id: string): Promise<void> {
+  const res = await fetch(`${BASE}/collaborators/${encodeURIComponent(id)}`, { method: "DELETE" });
+  if (!res.ok && res.status !== 204) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Delete collaborator failed");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Work orders
+// ---------------------------------------------------------------------------
+
+export async function fetchWorkOrders(): Promise<import("./types").WorkOrder[]> {
+  const res = await fetch(`${BASE}/production/work-orders`, { cache: "no-store" });
+  if (res.status === 503) return [];
+  if (!res.ok) throw new Error("Failed to fetch work orders");
+  return res.json();
+}
+
+export async function fetchWorkOrder(collaboratorId: string): Promise<import("./types").WorkOrder | null> {
+  const res = await fetch(`${BASE}/production/work-orders/${encodeURIComponent(collaboratorId)}`, { cache: "no-store" });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error("Failed to fetch work order");
+  return res.json();
+}
+
+export async function generateWorkOrder(
+  collaboratorId: string,
+  role: string,
+  platform = "direct",
+): Promise<import("./types").WorkOrder> {
+  const res = await fetch(`${BASE}/production/work-orders/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ collaborator_id: collaboratorId, role, platform }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Generate failed");
+  }
+  return res.json();
+}
+
+export async function updateWorkOrder(wo: import("./types").WorkOrder): Promise<import("./types").WorkOrder> {
+  const res = await fetch(`${BASE}/production/work-orders/${encodeURIComponent(wo.collaborator_id)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(wo),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Save work order failed");
+  }
+  return res.json();
+}
+
+export async function draftWorkOrderEmail(collaboratorId: string): Promise<{
+  to: string;
+  subject: string;
+  body: string;
+  status: string;
+  note: string;
+}> {
+  const res = await fetch(`${BASE}/production/work-orders/${encodeURIComponent(collaboratorId)}/draft-email`, {
+    method: "POST",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Draft email failed");
+  }
+  return res.json();
+}
+
 export async function autoSplitMelody(): Promise<{ ok: boolean; results: { label: string; split_midi: string }[] }> {
   const res = await fetch(`${BASE}/production/auto-split-melody/all`, { method: "POST" });
   if (!res.ok) {
@@ -251,6 +392,19 @@ export async function assembleMelody(): Promise<{ ok: boolean; assembled_midi: s
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error((err as { detail?: string }).detail ?? "Assemble failed");
+  }
+  return res.json();
+}
+
+export async function setBpm(bpm: number): Promise<{ ok: boolean; bpm: number; updated: string[] }> {
+  const res = await fetch(`${BASE}/production/set-bpm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ bpm }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "BPM update failed");
   }
   return res.json();
 }

@@ -30,6 +30,9 @@ EXPECTED = {
     "INFRANYM_TEXT_RENDER": "infranym_text_render",
     "INFRANYM_ENCODED_IMAGE": "infranym_encoded_image",
     "CIRCLE_JERK_INTERVIEW": "circle_jerk_interview",
+    "CHROMATIC_BRIEF": "chromatic_brief",
+    "PRODUCTION_PLAN_ARTIFACT": "production_plan_artifact",
+    "MELODY_MIDI_STEM": "melody_midi_stem",
     "UNKNOWN": "unknown",
 }
 

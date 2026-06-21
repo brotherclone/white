@@ -17,6 +17,8 @@ Usage:
 
 import argparse
 import io
+import os
+import random
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -477,6 +479,7 @@ def run_melody_pipeline(
 ):
     """Run the melody generation pipeline end-to-end."""
     np.random.seed(seed)
+    rng = random.Random(seed)
 
     prod_path = Path(production_dir)
     if not prod_path.exists():
@@ -634,6 +637,10 @@ def run_melody_pipeline(
 
     ranked_by_section: dict[str, list[dict]] = {}
     all_midi_outputs: list[tuple[str, bytes]] = []
+    # Track contour types selected (top-1) in previous sections this run.
+    # Used to apply an intra-song diversity penalty so every section doesn't
+    # pick the same template family.
+    _contours_used_this_run: list[str] = []
 
     for section_idx, section in enumerate(sections):
         section_key = section["_section_key"]
@@ -692,6 +699,10 @@ def run_melody_pipeline(
                 f"No melody templates for {time_sig[0]}/{time_sig[1]} time (use_case={template_use_case}). "
                 f"Add templates to melody_patterns.py."
             )
+
+        # Shuffle so that scoring tie-breaks produce different winners each section
+        # and across songs — consumes the seeded RNG so each section diverges.
+        rng.shuffle(templates)
 
         print(
             f"  Templates: {len(templates)} candidates (energy target: {target_energy})"
@@ -810,6 +821,10 @@ def run_melody_pipeline(
                 chromatic_weight,
             )
             comp *= diversity_factor(cand["pattern_name"], _diversity_registry)
+            # Intra-song diversity: penalise contour types already used this run
+            if cand["contour"] in _contours_used_this_run:
+                repeat_count = _contours_used_this_run.count(cand["contour"])
+                comp *= 0.8**repeat_count
             # Derive first note from in-memory resolved_notes (avoids reparsing MIDI)
             _rn = cand.get("resolved_notes") or []
             _first_note = _rn[0][1] if _rn else None
@@ -845,9 +860,17 @@ def run_melody_pipeline(
         scored.sort(key=lambda x: x["composite"], reverse=True)
         top = scored[:top_k]
 
+        # Record the winning contour so subsequent sections are penalised for reuse
+        if top:
+            _contours_used_this_run.append(top[0]["contour"])
+
         for rank, item in enumerate(top):
             item["rank"] = rank + 1
-            prefix = "evolved_" if item.get("is_evolved") else ""
+            if item.get("is_evolved"):
+                run_id = os.environ.get("EVOLVE_RUN_ID", "")
+                prefix = f"evolved_{run_id}_" if run_id else "evolved_"
+            else:
+                prefix = ""
             item["id"] = f"{prefix}melody_{section_key}_{rank + 1:02d}"
             all_midi_outputs.append((f"{item['id']}.mid", item["midi_bytes"]))
 

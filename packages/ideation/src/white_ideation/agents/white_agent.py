@@ -406,9 +406,8 @@ class WhiteAgent(BaseModel):
 
     def _get_claude_supervisor(self) -> ChatAnthropic:
         return ChatAnthropic(
-            model_name=self.settings.anthropic_model_name,
+            model_name="claude-fable-5",
             api_key=self.settings.anthropic_api_key,
-            temperature=self.settings.temperature,
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
             stop=self.settings.stop,

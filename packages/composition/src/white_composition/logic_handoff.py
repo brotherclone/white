@@ -20,8 +20,8 @@ LYRICS_PATTERNS = ["lyrics*.txt", "lyrics*.lrc", "*.lrc"]
 class MixStage(str, Enum):
     STRUCTURE = "structure"
     LYRICS = "lyrics"
-    RECORDING = "recording"
     VOCAL_PLACEHOLDERS = "vocal_placeholders"
+    RECORDING = "recording"
     AUGMENTATION = "augmentation"
     CLEANING = "cleaning"
     ROUGH_MIX = "rough_mix"
@@ -53,8 +53,9 @@ def _song_dir(production_dir: Path) -> Path:
     ctx = load_song_context(production_dir)
     thread_slug = ctx.get("thread") or production_dir.parent.parent.name
     title = ctx.get("title") or production_dir.name
-    safe_title = title.replace("/", "-").replace(":", "-")
-    return _logic_output_dir() / thread_slug / safe_title
+    safe_title = title.replace("/", "-").replace(":", "-").replace("..", "-")
+    production_slug = production_dir.name
+    return _logic_output_dir() / thread_slug / f"{safe_title} ({production_slug})"
 
 
 def handoff(production_dir: Path) -> Path:

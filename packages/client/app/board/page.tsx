@@ -4,10 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
-  updateVersionNotes, runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
-  autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl,
+  runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
+  autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl, setBpm,
+  fetchWorkOrders, fetchCollaborators, createDiaryEntry,
 } from "@/lib/api";
-import { CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry } from "@/lib/types";
+import { Collaborator, CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry, WorkOrder } from "@/lib/types";
+import WorkOrderHud from "@/components/WorkOrderHud";
+import WorkOrderDrawer from "@/components/WorkOrderDrawer";
 
 const STAGE_LABELS: Record<MixStage, string> = {
   structure:          "Structure",
@@ -102,6 +105,121 @@ function LyricModal({
   );
 }
 
+function DiaryModal({
+  songSlug,
+  defaultPhase,
+  onClose,
+}: {
+  songSlug: string;
+  defaultPhase: string;
+  onClose: () => void;
+}) {
+  const [author, setAuthor] = useState("");
+  const [phase, setPhase] = useState(defaultPhase);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      await createDiaryEntry(songSlug, {
+        song_slug: songSlug,
+        author,
+        phase: phase || null,
+        title: title || null,
+        body,
+        tags: [],
+        metadata: {},
+      });
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-lg mx-4 flex flex-col shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 flex-shrink-0">
+          <span className="text-sm font-semibold text-white font-sans">New diary entry</span>
+          <button
+            onClick={onClose}
+            className="text-zinc-500 hover:text-zinc-200 text-lg leading-none transition-colors"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 px-5 py-4">
+          <div className="flex gap-3">
+            <label className="flex flex-col gap-1 flex-1">
+              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Author</span>
+              <input
+                type="text"
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+                required
+                placeholder="gabriel"
+                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+            </label>
+            <label className="flex flex-col gap-1 flex-1">
+              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Phase</span>
+              <input
+                type="text"
+                value={phase}
+                onChange={e => setPhase(e.target.value)}
+                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+            </label>
+          </div>
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Title</span>
+            <input
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="optional headline"
+              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Body</span>
+            <textarea
+              value={body}
+              onChange={e => setBody(e.target.value)}
+              required
+              rows={4}
+              placeholder="what happened?"
+              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none transition-colors"
+            />
+          </label>
+          {error && <p className="text-[10px] font-sans text-red-400">{error}</p>}
+          <button
+            type="submit"
+            disabled={saving}
+            className="w-full py-2 text-sm font-sans font-semibold rounded-lg bg-violet-700 hover:bg-violet-600 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {saving ? "Saving…" : "Save entry"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 type LoadState = "loading" | "not_initialized" | "ready" | "error";
 
 export default function BoardPage() {
@@ -123,10 +241,17 @@ export default function BoardPage() {
   const [mixPathInput, setMixPathInput] = useState("");
   const [settingMix, setSettingMix] = useState(false);
   const [showMixInput, setShowMixInput] = useState(false);
+  const [conceptExpanded, setConceptExpanded] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncDone, setSyncDone] = useState(false);
+  const [editingBpm, setEditingBpm] = useState(false);
+  const [bpmInput, setBpmInput] = useState("");
+  const [settingBpm, setSettingBpm] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const notesSaveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [workOrderDrawerOpen, setWorkOrderDrawerOpen] = useState(false);
+  const [diaryModal, setDiaryModal] = useState<{ stage: MixStage } | null>(null);
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refreshLyrics = useCallback(async () => {
@@ -150,6 +275,9 @@ export default function BoardPage() {
       setActiveSong(active.active);
       setMixFileState(mixInfo.has_mix ? mixInfo.mix_file : null);
       setLoadState("ready");
+      // Load work orders + collaborators in the background (non-blocking)
+      fetchWorkOrders().then(setWorkOrders).catch(() => {});
+      fetchCollaborators().then(setCollaborators).catch(() => {});
     } catch {
       setLoadState("error");
     }
@@ -282,6 +410,22 @@ export default function BoardPage() {
     }
   };
 
+  const handleSetBpm = async () => {
+    const bpm = parseInt(bpmInput, 10);
+    if (isNaN(bpm) || bpm < 20 || bpm > 400) return;
+    setSettingBpm(true);
+    setError(null);
+    try {
+      await setBpm(bpm);
+      await refresh();
+      setEditingBpm(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "BPM update failed");
+    } finally {
+      setSettingBpm(false);
+    }
+  };
+
   const handleAssembleMelody = async () => {
     setAssembling(true);
     setAssembleResult(null);
@@ -296,19 +440,21 @@ export default function BoardPage() {
     }
   };
 
-  const handleNotesChange = (version: number, notes: string) => {
-    if (notesSaveTimers.current[version]) clearTimeout(notesSaveTimers.current[version]);
-    notesSaveTimers.current[version] = setTimeout(() => {
-      updateVersionNotes(version, notes).catch(() => {});
-    }, 600);
-  };
-
   const currentStageIdx = composition ? MIX_STAGES.indexOf(composition.current_stage) : -1;
   const promotedCandidate = lyricsData?.candidates.find(c => c.status === "promoted");
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-200 font-mono">
-      {/* Modal */}
+      {/* Diary modal */}
+      {diaryModal && composition && (
+        <DiaryModal
+          songSlug={composition.production_slug}
+          defaultPhase={STAGE_LABELS[diaryModal.stage]}
+          onClose={() => setDiaryModal(null)}
+        />
+      )}
+
+      {/* Lyric modal */}
       {modal && (
         <LyricModal
           candidate={modal.candidate}
@@ -391,6 +537,59 @@ export default function BoardPage() {
 
       {loadState === "ready" && composition && (
         <div className="px-6 pt-4 pb-0">
+          {activeSong?.concept && (
+            <div className="mb-4 bg-zinc-900/60 border border-zinc-800 rounded p-3 font-sans text-sm text-zinc-400">
+              <div className={conceptExpanded ? "" : "line-clamp-3"}>{activeSong.concept}</div>
+              <button
+                onClick={() => setConceptExpanded(e => !e)}
+                className="mt-1 text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
+                {conceptExpanded ? "Show less" : "Show more"}
+              </button>
+            </div>
+          )}
+          {/* BPM display + edit */}
+          {activeSong?.bpm != null && (
+            <div className="flex items-center gap-2 mb-3">
+              {editingBpm ? (
+                <>
+                  <input
+                    type="number"
+                    value={bpmInput}
+                    onChange={e => setBpmInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") handleSetBpm(); if (e.key === "Escape") setEditingBpm(false); }}
+                    autoFocus
+                    className="w-20 bg-zinc-900 border border-zinc-600 rounded px-2 py-0.5 text-xs font-mono text-zinc-200 focus:outline-none focus:border-blue-500"
+                    min={20} max={400}
+                  />
+                  <button
+                    onClick={handleSetBpm}
+                    disabled={settingBpm}
+                    className="px-2 py-0.5 text-[10px] font-sans rounded bg-blue-800 border border-blue-600 text-blue-200 hover:bg-blue-700 disabled:opacity-40 transition-colors"
+                  >
+                    {settingBpm ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    onClick={() => setEditingBpm(false)}
+                    className="text-[10px] font-sans text-zinc-500 hover:text-zinc-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="text-[10px] font-mono text-zinc-500">{activeSong.bpm} BPM</span>
+                  <button
+                    onClick={() => { setBpmInput(String(activeSong.bpm)); setEditingBpm(true); }}
+                    className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
+                  >
+                    change
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
           {mixFile ? (
             <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 mb-4">
               <audio
@@ -445,14 +644,18 @@ export default function BoardPage() {
               const isPast = idx < currentStageIdx;
               const isFuture = idx > currentStageIdx;
               const isLyrics = stage === "lyrics";
-              const isRecording = stage === "recording";
+              const isVocalPlaceholders = stage === "vocal_placeholders";
               const isStructure = stage === "structure";
+              const isRecording = stage === "recording";
+              const isFinalMix = stage === "final_mix";
 
               return (
                 <div
                   key={stage}
                   className={`flex flex-col w-52 rounded-lg border transition-colors ${
-                    isCurrent
+                    isFinalMix && (isCurrent || isPast)
+                      ? "border-green-700 bg-zinc-900"
+                      : isCurrent
                       ? "border-blue-600 bg-zinc-900"
                       : isPast
                       ? "border-zinc-700 bg-zinc-900/50"
@@ -460,16 +663,28 @@ export default function BoardPage() {
                   }`}
                 >
                   {/* Column header */}
-                  <div className={`px-3 py-2.5 border-b ${isCurrent ? "border-blue-600/50" : "border-zinc-800"}`}>
+                  <div className={`px-3 py-2.5 border-b ${
+                    isFinalMix && (isCurrent || isPast) ? "border-green-700/50"
+                    : isCurrent ? "border-blue-600/50"
+                    : "border-zinc-800"
+                  }`}>
                     <div className="flex items-center gap-2">
-                      {isPast && (
+                      {isPast && !isFinalMix && (
                         <svg className="w-3 h-3 text-green-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                         </svg>
                       )}
-                      {isCurrent && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+                      {isFinalMix && (isCurrent || isPast) && (
+                        <svg className="w-3 h-3 text-green-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      {isCurrent && !isFinalMix && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
                       <span className={`text-xs font-sans font-semibold truncate ${
-                        isCurrent ? "text-blue-300" : isPast ? "text-zinc-400" : "text-zinc-600"
+                        isFinalMix && (isCurrent || isPast) ? "text-green-400"
+                        : isCurrent ? "text-blue-300"
+                        : isPast ? "text-zinc-400"
+                        : "text-zinc-600"
                       }`}>
                         {STAGE_LABELS[stage]}
                       </span>
@@ -496,13 +711,12 @@ export default function BoardPage() {
                               {new Date(v.created).toLocaleDateString()}
                             </span>
                           </div>
-                          <input
-                            type="text"
-                            defaultValue={v.notes ?? ""}
-                            placeholder="add note…"
-                            onChange={e => handleNotesChange(v.version, e.target.value)}
-                            className="w-full bg-transparent text-[10px] font-sans text-zinc-400 placeholder-zinc-600 focus:outline-none focus:text-zinc-200 transition-colors"
-                          />
+                          <button
+                            onClick={() => setDiaryModal({ stage })}
+                            className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
+                          >
+                            + diary entry
+                          </button>
                         </div>
                       ))
                     }
@@ -534,6 +748,19 @@ export default function BoardPage() {
                     )}
                   </div>
 
+                  {/* Work order HUD — recording stage */}
+                  {isRecording && (isCurrent || isPast) && (
+                    <WorkOrderHud
+                      workOrder={workOrders[0] ?? null}
+                      collaborator={
+                        workOrders[0]
+                          ? collaborators.find(c => c.id === workOrders[0].collaborator_id) ?? null
+                          : null
+                      }
+                      onOpen={() => setWorkOrderDrawerOpen(true)}
+                    />
+                  )}
+
                   {/* Sync arrangement.txt from Logic — structure stage */}
                   {isCurrent && isStructure && (
                     <div className="px-3 pb-1">
@@ -548,8 +775,8 @@ export default function BoardPage() {
                     </div>
                   )}
 
-                  {/* Auto-split + assemble melody — recording stage or approaching it */}
-                  {isRecording && (isCurrent || (isFuture && idx === currentStageIdx + 1)) && (
+                  {/* Auto-split + assemble melody — vocal placeholders stage or approaching it */}
+                  {isVocalPlaceholders && (isCurrent || (isFuture && idx === currentStageIdx + 1)) && (
                     <div className="px-3 pb-1 flex flex-col gap-1.5">
                       <button
                         onClick={handleAutoSplit}
@@ -597,8 +824,8 @@ export default function BoardPage() {
                     </div>
                   )}
 
-                  {/* Advance button */}
-                  {isFuture && idx === currentStageIdx + 1 && (
+                  {/* Advance button — not shown at final_mix (no next stage) */}
+                  {isFuture && idx === currentStageIdx + 1 && !isFinalMix && (
                     <div className="px-3 pb-3">
                       <button
                         onClick={() => handleAdvance(stage)}
@@ -609,36 +836,66 @@ export default function BoardPage() {
                       </button>
                     </div>
                   )}
+
+                  {/* Completion panel — final mix only */}
+                  {isFinalMix && (isCurrent || isPast) && (
+                    <div className="px-3 pb-3 flex flex-col gap-2">
+                      <div className="flex items-center gap-1.5 px-2 py-1.5 text-[10px] font-sans rounded border border-green-700/50 bg-green-900/20 text-green-400">
+                        <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                        </svg>
+                        song complete
+                      </div>
+                      {isCurrent && (
+                        <>
+                          <button
+                            onClick={() => {
+                              if (composition?.logic_project_path) {
+                                navigator.clipboard.writeText(composition.logic_project_path);
+                              }
+                            }}
+                            disabled={!composition?.logic_project_path}
+                            className="w-full py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          >
+                            copy project path
+                          </button>
+                          <button
+                            onClick={() => window.open("https://music.apple.com/", "_blank")}
+                            className="w-full py-1.5 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-200 transition-colors"
+                          >
+                            open distributor
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
 
-          {/* Version history */}
-          {composition.versions.length > 0 && (
-            <div className="mt-8 border-t border-zinc-800 pt-6">
-              <h2 className="text-xs font-sans font-semibold text-zinc-500 uppercase tracking-wider mb-3">
-                Version History
-              </h2>
-              <div className="flex flex-col gap-1.5">
-                {[...composition.versions].reverse().map(v => (
-                  <div key={v.version} className="flex items-baseline gap-3 text-xs font-sans">
-                    <span className="text-zinc-400 w-8 flex-shrink-0">v{v.version}</span>
-                    <span className="text-zinc-600 w-28 flex-shrink-0">{new Date(v.created).toLocaleString()}</span>
-                    <span className="text-zinc-500 w-36 flex-shrink-0">{STAGE_LABELS[v.stage as MixStage] ?? v.stage}</span>
-                    <input
-                      type="text"
-                      defaultValue={v.notes ?? ""}
-                      placeholder="—"
-                      onChange={e => handleNotesChange(v.version, e.target.value)}
-                      className="flex-1 bg-transparent text-zinc-400 placeholder-zinc-700 focus:outline-none focus:text-zinc-200 transition-colors"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+      )}
+
+      {/* Work order drawer */}
+      {workOrderDrawerOpen && (
+        <WorkOrderDrawer
+          workOrder={workOrders[0] ?? null}
+          collaborator={
+            workOrders[0]
+              ? collaborators.find(c => c.id === workOrders[0].collaborator_id) ?? null
+              : null
+          }
+          onClose={() => setWorkOrderDrawerOpen(false)}
+          onSaved={saved => {
+            setWorkOrders(prev => {
+              const idx = prev.findIndex(w => w.collaborator_id === saved.collaborator_id);
+              return idx >= 0
+                ? prev.map((w, i) => (i === idx ? saved : w))
+                : [...prev, saved];
+            });
+          }}
+        />
       )}
     </div>
   );
