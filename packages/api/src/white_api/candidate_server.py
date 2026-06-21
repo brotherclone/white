@@ -179,7 +179,30 @@ _MIX_STAGE_TO_SONG_STAGE: dict[str, str] = {
 }
 
 
+_VALID_SCHEMA_PREFIXES = {"", "1", "1.", "2"}
+
+
+def _schema_is_valid(sv: str | None) -> bool:
+    if sv is None:
+        return True  # absent = legacy 1.x, tolerated
+    sv = str(sv)
+    return sv == "" or sv.startswith("1") or sv.startswith("2")
+
+
 def _compute_stage(prod_dir: Path) -> str:
+    bootstrap_path = prod_dir / "manifest_bootstrap.yml"
+    if bootstrap_path.exists():
+        try:
+            with open(bootstrap_path) as f:
+                mb = yaml.safe_load(f) or {}
+            sv = mb.get("schema_version")
+            if sv is not None and not _schema_is_valid(sv):
+                return "invalid"
+            if not mb.get("title") and not mb.get("rainbow_color"):
+                return "invalid"
+        except Exception:
+            return "invalid"
+
     if not (prod_dir / "song_context.yml").exists():
         return "ideation"
     try:
@@ -247,6 +270,8 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
             continue
         prod_dir = manifest_path.parent
         proposal_path = _find_proposal(manifest_path)
+        sv = data.get("schema_version")
+        schema_version = str(sv) if sv is not None else "1.x"
         songs.append(
             {
                 "id": f"{thread_slug}__{production_slug}",
@@ -259,7 +284,8 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "time_sig": data.get("time_sig"),
                 "rainbow_color": data.get("rainbow_color"),
                 "singer": data.get("singer"),
-                "has_decisions": (prod_dir / "production_decisions.yml").exists(),
+                "schema_version": schema_version,
+                "stub": bool(data.get("stub", False)),
                 "initialized": (prod_dir / "song_context.yml").exists(),
                 "has_mix": _has_mix_file(prod_dir),
                 "stage": _compute_stage(prod_dir),
@@ -1079,6 +1105,77 @@ def create_app(
         except (ValueError, FileNotFoundError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         return {"ok": True}
+
+    # ------------------------------------------------------------------
+    # Stage regression
+    # ------------------------------------------------------------------
+
+    class RegressBody(BaseModel):
+        target_stage: str
+        confirmed: bool = False
+        diary_entry: str | None = None
+
+    @app.post("/composition/regress")
+    def regress_stage(body: RegressBody):
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import (
+            regression_info,
+            resolve_song_dir,
+            write_stage,
+        )
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            from white_composition.logic_handoff import read_composition
+
+            comp = read_composition(song_dir) or {}
+            current = comp.get("current_stage", "structure")
+            info = regression_info(song_dir, current, body.target_stage)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+        if not body.confirmed:
+            return info
+
+        # Delete listed files
+        for rel in info.get("files_to_delete", []):
+            p = song_dir / rel
+            if p.exists():
+                try:
+                    if p.is_dir():
+                        import shutil as _shutil
+
+                        _shutil.rmtree(p)
+                    else:
+                        p.unlink()
+                except OSError as exc:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Could not delete {rel}: {exc}",
+                    ) from exc
+
+        try:
+            write_stage(song_dir, body.target_stage)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+        if body.diary_entry:
+            try:
+                from white_diary import write_entry
+
+                write_entry(
+                    song_slug=(_active_song or {}).get("production_slug", "unknown"),
+                    author="system",
+                    phase="regression",
+                    title=f"Regressed to {body.target_stage}",
+                    body=body.diary_entry,
+                    tags=["regression"],
+                    metadata={"from_stage": current, "to_stage": body.target_stage},
+                )
+            except Exception:
+                pass
+
+        return {"ok": True, "stage": body.target_stage}
 
     # ------------------------------------------------------------------
     # Mix file

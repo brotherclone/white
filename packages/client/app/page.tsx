@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchSongs, activateSong, initSong, startHandoff, getHandoffStatus } from "@/lib/api";
+import { fetchSongs, activateSong, initSong } from "@/lib/api";
 import { SongEntry } from "@/lib/types";
 
 const COLOR_MAP: Record<string, string> = {
@@ -38,6 +38,7 @@ const STAGE_LABELS: Record<SongEntry["stage"], string> = {
   production:  "Production",
   mixing:      "Mixing",
   complete:    "Complete",
+  invalid:     "Invalid",
 };
 
 const STAGE_BADGE_CLS: Record<SongEntry["stage"], string> = {
@@ -47,12 +48,13 @@ const STAGE_BADGE_CLS: Record<SongEntry["stage"], string> = {
   production:  "bg-orange-900/40 text-orange-300 border-orange-800",
   mixing:      "bg-cyan-900/40 text-cyan-300 border-cyan-800",
   complete:    "bg-green-900/40 text-green-300 border-green-700",
+  invalid:     "bg-red-900/40 text-red-300 border-red-800",
 };
 
 const ALL_SONG_STAGES = Object.keys(STAGE_LABELS) as SongEntry["stage"][];
 
 type Toast = { kind: "success" | "error"; message: string };
-type StageFilter = SongEntry["stage"] | "all";
+type StageFilter = SongEntry["stage"] | "all" | "stub";
 
 export default function SongBrowserPage() {
   const router = useRouter();
@@ -60,10 +62,8 @@ export default function SongBrowserPage() {
   const [loading, setLoading] = useState(true);
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [handoffingId, setHandoffingId] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
-  const handoffPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const countsByStage = useMemo(
     () => songs.reduce<Partial<Record<SongEntry["stage"], number>>>((acc, s) => {
@@ -72,6 +72,8 @@ export default function SongBrowserPage() {
     }, {}),
     [songs],
   );
+
+  const stubCount = useMemo(() => songs.filter(s => s.stub).length, [songs]);
 
   const showToast = (kind: Toast["kind"], message: string) => {
     setToast({ kind, message });
@@ -91,13 +93,11 @@ export default function SongBrowserPage() {
       .finally(() => setLoading(false));
   }, [router]);
 
-  useEffect(() => {
-    return () => {
-      if (handoffPollRef.current) clearInterval(handoffPollRef.current);
-    };
-  }, []);
-
   const handleSelect = async (song: SongEntry) => {
+    if (song.stage === "invalid") {
+      showToast("error", "Song metadata is invalid — run migration to repair");
+      return;
+    }
     setActivatingId(song.id);
     try {
       await activateSong(song.id);
@@ -113,35 +113,6 @@ export default function SongBrowserPage() {
       setError(`Could not activate "${song.title}"`);
       setActivatingId(null);
     }
-  };
-
-  const handleHandoff = async (e: React.MouseEvent, song: SongEntry) => {
-    e.stopPropagation();
-    setHandoffingId(song.id);
-    try {
-      await activateSong(song.id);
-      await startHandoff();
-    } catch (err) {
-      showToast("error", err instanceof Error ? err.message : "Handoff failed");
-      setHandoffingId(null);
-      return;
-    }
-    handoffPollRef.current = setInterval(async () => {
-      try {
-        const job = await getHandoffStatus();
-        if (job.status === "done") {
-          clearInterval(handoffPollRef.current!);
-          handoffPollRef.current = null;
-          setHandoffingId(null);
-          showToast("success", `Handoff complete for "${song.title}"`);
-        } else if (job.status === "error") {
-          clearInterval(handoffPollRef.current!);
-          handoffPollRef.current = null;
-          setHandoffingId(null);
-          showToast("error", job.error ?? "Handoff failed");
-        }
-      } catch { /* transient */ }
-    }, 2000);
   };
 
   if (loading) {
@@ -178,8 +149,8 @@ export default function SongBrowserPage() {
       {/* Stage filter */}
       {!error && songs.length > 0 && (
         <div className="flex gap-1.5 flex-wrap mb-4">
-          {(["all", ...ALL_SONG_STAGES] as StageFilter[]).map(s => {
-            const count = s === "all" ? songs.length : (countsByStage[s] ?? 0);
+          {(["all", ...ALL_SONG_STAGES.filter(s => s !== "invalid"), "stub", "invalid"] as StageFilter[]).map(s => {
+            const count = s === "all" ? songs.length : s === "stub" ? stubCount : (countsByStage[s as SongEntry["stage"]] ?? 0);
             const active = stageFilter === s;
             return (
               <button
@@ -193,7 +164,7 @@ export default function SongBrowserPage() {
                     : "bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
                 }`}
               >
-                {s === "all" ? "all" : STAGE_LABELS[s].toLowerCase()} <span className="text-zinc-600">{count}</span>
+                {s === "all" ? "all" : s === "stub" ? "stub" : STAGE_LABELS[s as SongEntry["stage"]].toLowerCase()} <span className="text-zinc-600">{count}</span>
               </button>
             );
           })}
@@ -225,24 +196,24 @@ export default function SongBrowserPage() {
       )}
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {songs.filter(s => stageFilter === "all" || s.stage === stageFilter).map(song => (
+        {songs.filter(s => stageFilter === "all" || (stageFilter === "stub" ? s.stub : s.stage === stageFilter)).map(song => (
           <div
             key={song.id}
             onClick={() => activatingId === null && handleSelect(song)}
             role="button"
             tabIndex={activatingId !== null ? -1 : 0}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (activatingId === null) handleSelect(song); } }}
-            className={`text-left bg-zinc-900 border border-zinc-800 rounded-lg p-4 hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors focus:outline-none focus:ring-2 focus:ring-[#EF7143] ${activatingId !== null ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+            className={`text-left bg-zinc-900 border rounded-lg p-4 transition-colors focus:outline-none focus:ring-2 focus:ring-[#EF7143] ${
+              song.stage === "invalid"
+                ? "border-red-900 hover:border-red-700 cursor-default"
+                : activatingId !== null
+                ? "border-zinc-800 opacity-50 cursor-not-allowed"
+                : "border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/80 cursor-pointer"
+            }`}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
               <span className="text-white font-semibold text-sm leading-snug">{song.title}</span>
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                {song.has_decisions && song.stage !== "composition" && (
-                  <svg className="w-3.5 h-3.5 text-green-500" viewBox="0 0 20 20" fill="currentColor" role="img" aria-label="Production decisions complete">
-                    <title>Production decisions complete</title>
-                    <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
-                  </svg>
-                )}
                 {activatingId === song.id
                   ? <span className="text-zinc-500 text-xs font-sans">activating…</span>
                   : colorDot(song.rainbow_color)
@@ -251,9 +222,14 @@ export default function SongBrowserPage() {
             </div>
             <div className="text-zinc-500 text-xs font-sans mb-2 truncate">{song.thread_slug}</div>
             <div className="flex gap-3 text-xs font-sans text-zinc-400 flex-wrap items-center">
-              {song.key && <span>{song.key}</span>}
-              {song.bpm && <span>{song.bpm}{song.time_sig ? ` BPM · ${song.time_sig}` : " BPM"}</span>}
-              {song.singer && <span className="text-zinc-500">{song.singer}</span>}
+              {song.stub
+                ? <span className="text-amber-500/80 italic">Incomplete metadata</span>
+                : <>
+                    {song.key && <span>{song.key}</span>}
+                    {song.bpm && <span>{song.bpm}{song.time_sig ? ` BPM · ${song.time_sig}` : " BPM"}</span>}
+                    {song.singer && <span className="text-zinc-500">{song.singer}</span>}
+                  </>
+              }
               {song.has_mix && <span title="Mix attached" className="text-zinc-400">♫</span>}
               <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded border ${STAGE_BADGE_CLS[song.stage]}`}>
                 {activatingId === song.id && song.stage === "ideation"
@@ -261,23 +237,16 @@ export default function SongBrowserPage() {
                   : STAGE_LABELS[song.stage]}
               </span>
             </div>
-            {song.has_decisions && song.stage !== "composition" && (
-              <div className="mt-2 flex justify-end">
-                <button
-                  onClick={(e) => handleHandoff(e, song)}
-                  disabled={handoffingId !== null || activatingId !== null}
-                  className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600 hover:text-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  {handoffingId === song.id ? (
-                    <>
-                      <svg className="w-2.5 h-2.5 animate-spin" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                      </svg>
-                      Handing off…
-                    </>
-                  ) : "Handoff to Logic"}
-                </button>
+            {(song.schema_version !== "2.0.0" || song.stub) && (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <span className="text-[9px] font-sans px-1 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-500">
+                  v{song.schema_version}
+                </span>
+                {song.stub && (
+                  <span className="text-[9px] font-sans px-1 py-0.5 rounded bg-amber-900/30 border border-amber-800 text-amber-400">
+                    stub
+                  </span>
+                )}
               </div>
             )}
           </div>
