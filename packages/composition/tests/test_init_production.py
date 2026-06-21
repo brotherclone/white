@@ -315,7 +315,7 @@ class TestSongContextYml:
         assert ctx["singer"] == "Gabriel"
         assert ctx["sounds_like"] == ["Sufjan Stevens", "Bon Iver"]
         assert ctx["genres"] == ["folk", "ambient"]
-        assert ctx["schema_version"] == "1"
+        assert ctx["schema_version"] == "2.0.0"
         assert ctx["proposed_by"] == "claude"
 
     def test_song_context_has_phases_block(self, tmp_path):

@@ -48,7 +48,6 @@ PHASE_ORDER = [
     "bass",
     "melody",
     "lyrics",
-    "decisions",
 ]
 
 # Review file relative to production_dir — None means no review gate
@@ -59,7 +58,6 @@ PHASE_REVIEW_FILES: dict[str, Optional[str]] = {
     "bass": "bass/review.yml",
     "melody": "melody/review.yml",
     "lyrics": "melody/lyrics_review.yml",
-    "decisions": None,
     # quartet is not in PHASE_ORDER (it's a parallel phase) but is a valid
     # promote target exposed via the candidate review UI
     "quartet": "quartet/review.yml",
@@ -125,12 +123,6 @@ def _build_phase_command(
     if phase == "lyrics":
         return base + [
             "white_generation.pipelines.lyric_pipeline",
-            "--production-dir",
-            prod,
-        ]
-    if phase == "decisions":
-        return base + [
-            "white_composition.production_decisions",
             "--production-dir",
             prod,
         ]
@@ -215,10 +207,6 @@ def cmd_status(production_dir: Path) -> None:
         status = statuses.get(phase, "pending")
         icon = _status_icon(status)
         print(f"  {phase:<20s} {icon}  {status}")
-
-    decisions_exists = (production_dir / "production_decisions.yml").exists()
-    decisions_flag = "✅  exists" if decisions_exists else "—   not generated"
-    print(f"\n  {'production_decisions.yml':<28s} {decisions_flag}")
 
     next_phase = get_next_runnable_phase(statuses)
     print()

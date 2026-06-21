@@ -6,9 +6,9 @@ import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
   runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
   autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl, setBpm,
-  fetchWorkOrders, fetchCollaborators, createDiaryEntry,
+  fetchWorkOrders, fetchCollaborators, createDiaryEntry, regressStage,
 } from "@/lib/api";
-import { Collaborator, CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RunJob, SongEntry, WorkOrder } from "@/lib/types";
+import { Collaborator, CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RegressionInfo, RunJob, SongEntry, WorkOrder } from "@/lib/types";
 import WorkOrderHud from "@/components/WorkOrderHud";
 import WorkOrderDrawer from "@/components/WorkOrderDrawer";
 
@@ -220,6 +220,85 @@ function DiaryModal({
   );
 }
 
+function RegressionModal({
+  targetStage,
+  info,
+  onClose,
+  onConfirm,
+  confirming,
+}: {
+  targetStage: MixStage;
+  info: RegressionInfo;
+  onClose: () => void;
+  onConfirm: (diaryEntry: string | null) => void;
+  confirming: boolean;
+}) {
+  const [diaryEntry, setDiaryEntry] = useState("");
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-lg mx-4 flex flex-col shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 flex-shrink-0">
+          <span className="text-sm font-semibold text-white font-sans">
+            Move back to {STAGE_LABELS[targetStage]}?
+          </span>
+          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-200 text-lg leading-none transition-colors" aria-label="Close">×</button>
+        </div>
+
+        <div className="flex flex-col gap-3 px-5 py-4">
+          {info.destructive && info.files_to_delete.length > 0 && (
+            <div className="rounded border border-red-800 bg-red-900/20 px-3 py-2">
+              <p className="text-xs font-sans text-red-300 mb-1.5 font-semibold">Files that will be deleted:</p>
+              <ul className="max-h-32 overflow-y-auto space-y-0.5">
+                {info.files_to_delete.map(f => (
+                  <li key={f} className="text-[10px] font-mono text-red-400">{f}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Reason (optional diary entry)</span>
+            <textarea
+              value={diaryEntry}
+              onChange={e => setDiaryEntry(e.target.value)}
+              rows={3}
+              placeholder="e.g. Had instrumental melodies on vocal track — need clean lyrics pass"
+              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none transition-colors"
+            />
+          </label>
+
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="flex-1 py-2 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onConfirm(diaryEntry.trim() || null)}
+              disabled={confirming}
+              className={`flex-1 py-2 text-xs font-sans font-semibold rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                info.destructive
+                  ? "bg-red-800 border-red-700 text-red-100 hover:bg-red-700"
+                  : "bg-zinc-700 border-zinc-600 text-zinc-100 hover:bg-zinc-600"
+              }`}
+            >
+              {confirming ? "Moving…" : "Confirm"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type LoadState = "loading" | "not_initialized" | "ready" | "error";
 
 export default function BoardPage() {
@@ -252,6 +331,8 @@ export default function BoardPage() {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [workOrderDrawerOpen, setWorkOrderDrawerOpen] = useState(false);
   const [diaryModal, setDiaryModal] = useState<{ stage: MixStage } | null>(null);
+  const [regressionModal, setRegressionModal] = useState<{ targetStage: MixStage; info: RegressionInfo } | null>(null);
+  const [confirmingRegress, setConfirmingRegress] = useState(false);
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refreshLyrics = useCallback(async () => {
@@ -319,6 +400,31 @@ export default function BoardPage() {
       setError(e instanceof Error ? e.message : "Add version failed");
     } finally {
       setAddingVersion(false);
+    }
+  };
+
+  const handleRegressClick = async (targetStage: MixStage) => {
+    setError(null);
+    try {
+      const result = await regressStage(targetStage, false, null) as RegressionInfo;
+      setRegressionModal({ targetStage, info: result });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Regression check failed");
+    }
+  };
+
+  const handleRegressConfirm = async (diaryEntry: string | null) => {
+    if (!regressionModal) return;
+    setConfirmingRegress(true);
+    setError(null);
+    try {
+      await regressStage(regressionModal.targetStage, true, diaryEntry);
+      setRegressionModal(null);
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Regression failed");
+    } finally {
+      setConfirmingRegress(false);
     }
   };
 
@@ -451,6 +557,17 @@ export default function BoardPage() {
           songSlug={composition.production_slug}
           defaultPhase={STAGE_LABELS[diaryModal.stage]}
           onClose={() => setDiaryModal(null)}
+        />
+      )}
+
+      {/* Regression modal */}
+      {regressionModal && (
+        <RegressionModal
+          targetStage={regressionModal.targetStage}
+          info={regressionModal.info}
+          onClose={() => setRegressionModal(null)}
+          onConfirm={handleRegressConfirm}
+          confirming={confirmingRegress}
         />
       )}
 
@@ -680,7 +797,7 @@ export default function BoardPage() {
                         </svg>
                       )}
                       {isCurrent && !isFinalMix && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
-                      <span className={`text-xs font-sans font-semibold truncate ${
+                      <span className={`text-xs font-sans font-semibold truncate flex-1 ${
                         isFinalMix && (isCurrent || isPast) ? "text-green-400"
                         : isCurrent ? "text-blue-300"
                         : isPast ? "text-zinc-400"
@@ -688,6 +805,19 @@ export default function BoardPage() {
                       }`}>
                         {STAGE_LABELS[stage]}
                       </span>
+                      {isCurrent && !isStructure && (
+                        <button
+                          onClick={() => {
+                            const prevStage = MIX_STAGES[idx - 1];
+                            if (prevStage) handleRegressClick(prevStage);
+                          }}
+                          title={`Move back to ${STAGE_LABELS[MIX_STAGES[idx - 1]]}`}
+                          className="text-[10px] font-sans text-zinc-600 hover:text-zinc-300 transition-colors flex-shrink-0"
+                          aria-label="Regress to previous stage"
+                        >
+                          ←
+                        </button>
+                      )}
                     </div>
                   </div>
 

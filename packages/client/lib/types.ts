@@ -11,12 +11,18 @@ export interface SongEntry {
   time_sig: string | null;
   rainbow_color: string | null;
   singer: string | null;
-  has_decisions: boolean;
+  schema_version: string;
+  stub: boolean;
   initialized: boolean;
   has_mix: boolean;
-  stage: "ideation" | "generation" | "composition" | "production" | "mixing" | "complete";
+  stage: "ideation" | "generation" | "composition" | "production" | "mixing" | "complete" | "invalid";
   proposal_path: string | null;
   concept: string | null;
+}
+
+export interface RegressionInfo {
+  destructive: boolean;
+  files_to_delete: string[];
 }
 
 export interface SampleEntry {

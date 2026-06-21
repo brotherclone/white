@@ -515,18 +515,17 @@ class TestScanSongs:
         beta = next(s for s in songs if s["production_slug"] == "song_b_v1")
         assert beta["singer"] is None
 
-    def test_has_decisions_false_when_file_absent(self, sw_dir):
+    def test_has_decisions_absent_from_song_entry(self, sw_dir):
         songs = scan_songs(sw_dir)
-        assert all(s["has_decisions"] is False for s in songs)
+        assert all("has_decisions" not in s for s in songs)
 
-    def test_has_decisions_true_when_file_present(self, sw_dir):
-        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
-        (prod_dir / "production_decisions.yml").write_text("identity: {}\n")
+    def test_schema_version_present_in_song_entry(self, sw_dir):
         songs = scan_songs(sw_dir)
-        alpha = next(s for s in songs if s["production_slug"] == "song_a_v1")
-        beta = next(s for s in songs if s["production_slug"] == "song_b_v1")
-        assert alpha["has_decisions"] is True
-        assert beta["has_decisions"] is False
+        assert all("schema_version" in s for s in songs)
+
+    def test_stub_field_present_in_song_entry(self, sw_dir):
+        songs = scan_songs(sw_dir)
+        assert all("stub" in s for s in songs)
 
     def test_stage_ideation_when_no_song_context(self, sw_dir):
         songs = scan_songs(sw_dir)
@@ -593,11 +592,13 @@ class TestGetSongs:
             "key",
             "bpm",
             "rainbow_color",
-            "has_decisions",
+            "schema_version",
+            "stub",
             "stage",
             "concept",
         ):
             assert field in song
+        assert "has_decisions" not in song
 
     def test_concept_null_when_no_song_context(self, album_client):
         songs = album_client.get("/songs").json()
@@ -1063,3 +1064,118 @@ class TestSamplesEndpoints:
         data = resp.json()
         assert data["ok"] is True
         assert Path(data["dest"]).exists()
+
+
+# ---------------------------------------------------------------------------
+# Task 8.6: scan_songs — schema_version and stub fields
+# ---------------------------------------------------------------------------
+
+
+def _make_sw_dir(
+    tmp_path: Path, thread_slug: str, prod_slug: str, bootstrap_data: dict
+) -> Path:
+    """Create a minimal shrink_wrapped directory structure for scan_songs tests."""
+    sw = tmp_path / "sw"
+    prod = sw / thread_slug / "production" / prod_slug
+    prod.mkdir(parents=True)
+    with open(prod / "manifest_bootstrap.yml", "w") as f:
+        yaml.dump(bootstrap_data, f, sort_keys=False, allow_unicode=True)
+    return sw
+
+
+class TestScanSongsSchemaVersion:
+    def test_legacy_bootstrap_gets_1x_schema_version(self, tmp_path):
+        sw = _make_sw_dir(
+            tmp_path,
+            "white-old-song",
+            "old_v1",
+            {"title": "Old", "rainbow_color": "White", "bpm": 120, "key": "C major"},
+        )
+        songs = scan_songs(sw)
+        assert len(songs) == 1
+        assert songs[0]["schema_version"] == "1.x"
+
+    def test_versioned_bootstrap_returns_that_version(self, tmp_path):
+        sw = _make_sw_dir(
+            tmp_path,
+            "white-new-song",
+            "new_v1",
+            {"schema_version": "2.0.0", "title": "New", "rainbow_color": "White"},
+        )
+        songs = scan_songs(sw)
+        assert songs[0]["schema_version"] == "2.0.0"
+
+    def test_stub_field_true_when_stub_present(self, tmp_path):
+        sw = _make_sw_dir(
+            tmp_path,
+            "white-stub-song",
+            "stub_v1",
+            {
+                "schema_version": "2.0.0",
+                "stub": True,
+                "title": "Stub",
+                "rainbow_color": "White",
+            },
+        )
+        songs = scan_songs(sw)
+        assert songs[0]["stub"] is True
+
+    def test_stub_field_false_by_default(self, tmp_path):
+        sw = _make_sw_dir(
+            tmp_path,
+            "white-normal-song",
+            "normal_v1",
+            {"schema_version": "2.0.0", "title": "Normal", "rainbow_color": "White"},
+        )
+        songs = scan_songs(sw)
+        assert songs[0]["stub"] is False
+
+    def test_has_decisions_absent_from_response(self, tmp_path):
+        sw = _make_sw_dir(
+            tmp_path,
+            "white-any-song",
+            "any_v1",
+            {"schema_version": "2.0.0", "title": "Any", "rainbow_color": "White"},
+        )
+        songs = scan_songs(sw)
+        assert "has_decisions" not in songs[0]
+
+
+# ---------------------------------------------------------------------------
+# Task 8.7: _compute_stage returns "invalid" for corrupt / bad schema manifests
+# ---------------------------------------------------------------------------
+
+from white_api.candidate_server import _compute_stage  # noqa: E402
+
+
+class TestComputeStageInvalid:
+    def test_corrupt_yaml_returns_invalid(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        prod.mkdir()
+        (prod / "manifest_bootstrap.yml").write_text(": this is: not valid yaml: [[[")
+        assert _compute_stage(prod) == "invalid"
+
+    def test_unrecognised_schema_version_returns_invalid(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        prod.mkdir()
+        with open(prod / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump(
+                {"schema_version": "99.0.0", "title": "Foo", "rainbow_color": "Red"}, f
+            )
+        assert _compute_stage(prod) == "invalid"
+
+    def test_missing_title_and_color_returns_invalid(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        prod.mkdir()
+        with open(prod / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump({"schema_version": "2.0.0"}, f)
+        assert _compute_stage(prod) == "invalid"
+
+    def test_valid_bootstrap_without_context_returns_ideation(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        prod.mkdir()
+        with open(prod / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump(
+                {"schema_version": "2.0.0", "title": "Foo", "rainbow_color": "Red"}, f
+            )
+        assert _compute_stage(prod) == "ideation"
