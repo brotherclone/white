@@ -39,6 +39,23 @@ class ChordProgressionGenerator:
             f"✓ Loaded graphs with {self.chord_graph.number_of_nodes()} chord nodes and {self.function_graph.number_of_nodes()} function nodes"
         )
 
+    def resolve_key(self, key_root: str, mode: str = "Major") -> str:
+        """Return the key_root that has chords for the given mode.
+
+        The database stores some pitch classes only under their sharp spelling
+        (e.g. F# Minor) and others only under their flat spelling (e.g. Gb Major).
+        When the requested key_root has no chords for ``mode``, the enharmonic
+        equivalent is tried automatically.
+        """
+        from white_core.music.core.enharmonic import flat_to_sharp, sharp_to_flat
+
+        if len(self.get_chords_in_key(key_root, mode)) > 0:
+            return key_root
+        alt = flat_to_sharp.get(key_root) or sharp_to_flat.get(key_root)
+        if alt and len(self.get_chords_in_key(alt, mode)) > 0:
+            return alt
+        return key_root
+
     def get_chords_in_key(self, key_root: str, mode: str = "Major") -> pl.DataFrame:
         """Get all chords in a specific key."""
         return self.chords_df.filter(
