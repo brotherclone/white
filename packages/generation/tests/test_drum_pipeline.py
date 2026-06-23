@@ -750,10 +750,6 @@ class TestDrumPipelineIntegration:
         with open(yml_dir / "test_song.yml", "w") as f:
             yaml.dump(song_proposal, f)
 
-        # Create mock manifest
-        with open(tmp_path / "manifest.yml", "w") as f:
-            yaml.dump({"concept": "Test concept for Red"}, f)
-
         # Mock Refractor
         import numpy as np
 

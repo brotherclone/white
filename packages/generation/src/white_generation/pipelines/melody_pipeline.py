@@ -11,7 +11,7 @@ Pipeline position: chords → drums → harmonic rhythm → strums → bass → 
 
 Usage:
     python -m app.generators.midi.pipelines.melody_pipeline \
-        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
+        --production-dir shrink_wrapped/.../production/the_archivists_rebellion \
         --singer gabriel --seed.logicx 42 --top-k 5
 """
 

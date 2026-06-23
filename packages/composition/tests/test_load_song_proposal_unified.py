@@ -144,11 +144,13 @@ class TestLoadSongProposalUnified:
         assert result["key_root"] == "D"
         assert result["mode"] == "Major"
 
-    def test_concept_fallback_from_manifest(self, tmp_path):
+    def test_concept_fallback_from_song_context(self, tmp_path):
         thread_dir = tmp_path / "thread"
-        thread_dir.mkdir()
-        manifest = {"concept": "Concept from manifest"}
-        (thread_dir / "manifest.yml").write_text(yaml.dump(manifest))
+        song_context_dir = thread_dir / "production" / "song"
+        song_context_dir.mkdir(parents=True)
+        (song_context_dir / "song_context.yml").write_text(
+            yaml.dump({"concept": "Concept from song_context"})
+        )
 
         proposal = {
             "title": "T",
@@ -164,13 +166,14 @@ class TestLoadSongProposalUnified:
         p.write_text(yaml.dump(proposal))
 
         result = load_song_proposal_unified(p, thread_dir=thread_dir)
-        assert result["concept"] == "Concept from manifest"
+        assert result["concept"] == "Concept from song_context"
 
-    def test_proposal_concept_wins_over_manifest(self, tmp_path):
+    def test_proposal_concept_wins_over_song_context(self, tmp_path):
         thread_dir = tmp_path / "thread"
-        thread_dir.mkdir()
-        (thread_dir / "manifest.yml").write_text(
-            yaml.dump({"concept": "Manifest concept"})
+        song_context_dir = thread_dir / "production" / "song"
+        song_context_dir.mkdir(parents=True)
+        (song_context_dir / "song_context.yml").write_text(
+            yaml.dump({"concept": "Context concept"})
         )
 
         p = _write_proposal(tmp_path / "song.yml", concept="Proposal concept")
