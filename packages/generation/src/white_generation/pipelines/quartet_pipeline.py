@@ -11,7 +11,7 @@ Pipeline position: chords → drums → bass → melody → QUARTET
 
 Usage:
     python -m app.generators.midi.pipelines.quartet_pipeline \\
-        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \\
+        --production-dir shrink_wrapped/.../production/the_archivists_rebellion \\
         --singer gabriel --top-k 3
 
     # Promote an approved quartet candidate

@@ -9,7 +9,7 @@ song manifest.
 Usage:
     # Generate initial plan from approved chords
     python -m app.generators.midi.production.production_plan \
-        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2
+        --production-dir shrink_wrapped/.../production/the_archivists_rebellion
 
     # Refresh bar counts from current approved loops (preserves human edits)
     python -m app.generators.midi.production.production_plan \
@@ -418,14 +418,19 @@ def load_song_proposal_unified(
     key_str = _key_raw_to_string(raw.get("key", "C major"))
     key_root, mode = _parse_key_components(key_str)
 
-    # Concept — song proposal first; manifest.yml fallback if thread_dir provided
+    # Concept — song proposal first; song_context.yml fallback if thread_dir provided
     concept = str(raw.get("concept", ""))
     if not concept and thread_dir:
-        manifest_path = Path(thread_dir) / "manifest.yml"
-        if manifest_path.exists():
-            with open(manifest_path) as f:
-                manifest = yaml.safe_load(f) or {}
-            concept = str(manifest.get("concept", ""))
+        song_context_path = (
+            Path(thread_dir)
+            / "production"
+            / Path(proposal_path).stem
+            / "song_context.yml"
+        )
+        if song_context_path.exists():
+            with open(song_context_path) as f:
+                ctx = yaml.safe_load(f) or {}
+            concept = str(ctx.get("concept", ""))
 
     # Optional musical constraints block
     mc_raw = raw.get("musical_constraints")

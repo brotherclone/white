@@ -482,12 +482,8 @@ class TestWriteManifest:
             "title": "Test",
             "bpm": 120,
             "key": "C major",
-            "tempo": {"numerator": 4, "denominator": 4},
-            "concept": "A concept",
             "rainbow_color": "White",
             "mnemonic": "W",
-            "mood": ["happy"],
-            "genres": ["pop"],
             "agent_name": "TestAgent",
             "iteration_count": 5,
             "thread_id": "abc-123",
@@ -1195,7 +1191,7 @@ class TestMigrateManifestsStubs:
         thread_dir.mkdir()
         with open(thread_dir / "manifest.yml", "w") as f:
             yaml.dump({"schema_version": SHRINKWRAP_SCHEMA_VERSION, "title": "T"}, f)
-        prod = thread_dir / "production" / "black__sequential_dissolution_v2"
+        prod = thread_dir / "production" / "the_archivists_rebellion"
         prod.mkdir(parents=True)
 
         summary = migrate_manifests(tmp_path)
@@ -1239,7 +1235,7 @@ class TestMigrateManifestsStubs:
 
 class TestSynthesizeBootstrapStub:
     def test_color_and_title_parsed_from_double_underscore_slug(self, tmp_path):
-        prod = tmp_path / "black__sequential_dissolution_v2"
+        prod = tmp_path / "the_archivists_rebellion"
         prod.mkdir()
         data = _synthesize_bootstrap_stub(prod)
         assert data["rainbow_color"] == "Black"

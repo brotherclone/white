@@ -10,7 +10,7 @@ Pipeline position: chords → drums → harmonic rhythm → strums → BASS → 
 
 Usage:
     python -m app.generators.midi.pipelines.bass_pipeline \
-        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
+        --production-dir shrink_wrapped/.../production/the_archivists_rebellion \
         --seed.logicx 42 --top-k 5
 """
 
