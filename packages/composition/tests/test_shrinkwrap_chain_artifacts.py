@@ -1191,7 +1191,7 @@ class TestMigrateManifestsStubs:
         thread_dir.mkdir()
         with open(thread_dir / "manifest.yml", "w") as f:
             yaml.dump({"schema_version": SHRINKWRAP_SCHEMA_VERSION, "title": "T"}, f)
-        prod = thread_dir / "production" / "the_archivists_rebellion"
+        prod = thread_dir / "production" / "black__sequential_dissolution"
         prod.mkdir(parents=True)
 
         summary = migrate_manifests(tmp_path)
@@ -1235,7 +1235,7 @@ class TestMigrateManifestsStubs:
 
 class TestSynthesizeBootstrapStub:
     def test_color_and_title_parsed_from_double_underscore_slug(self, tmp_path):
-        prod = tmp_path / "the_archivists_rebellion"
+        prod = tmp_path / "black__sequential_dissolution"
         prod.mkdir()
         data = _synthesize_bootstrap_stub(prod)
         assert data["rainbow_color"] == "Black"
