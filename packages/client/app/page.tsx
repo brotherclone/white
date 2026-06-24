@@ -31,6 +31,8 @@ function colorDot(name: string | null) {
   );
 }
 
+const LIFECYCLE_STAGES = new Set<SongEntry["stage"]>(["merged", "abandoned", "scrapped"]);
+
 const STAGE_LABELS: Record<SongEntry["stage"], string> = {
   ideation:    "Ideation",
   generation:  "Generation",
@@ -38,6 +40,9 @@ const STAGE_LABELS: Record<SongEntry["stage"], string> = {
   production:  "Production",
   mixing:      "Mixing",
   complete:    "Complete",
+  merged:      "Merged",
+  abandoned:   "Abandoned",
+  scrapped:    "Scrapped",
   invalid:     "Invalid",
 };
 
@@ -48,6 +53,9 @@ const STAGE_BADGE_CLS: Record<SongEntry["stage"], string> = {
   production:  "bg-orange-900/40 text-orange-300 border-orange-800",
   mixing:      "bg-cyan-900/40 text-cyan-300 border-cyan-800",
   complete:    "bg-green-900/40 text-green-300 border-green-700",
+  merged:      "bg-indigo-900/40 text-indigo-300 border-indigo-800",
+  abandoned:   "bg-zinc-800/60 text-zinc-500 border-zinc-700",
+  scrapped:    "bg-amber-900/30 text-amber-400 border-amber-800",
   invalid:     "bg-red-900/40 text-red-300 border-red-800",
 };
 
@@ -64,6 +72,8 @@ export default function SongBrowserPage() {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
+
+  const activeSongs = useMemo(() => songs.filter(s => !LIFECYCLE_STAGES.has(s.stage)), [songs]);
 
   const countsByStage = useMemo(
     () => songs.reduce<Partial<Record<SongEntry["stage"], number>>>((acc, s) => {
@@ -149,8 +159,8 @@ export default function SongBrowserPage() {
       {/* Stage filter */}
       {!error && songs.length > 0 && (
         <div className="flex gap-1.5 flex-wrap mb-4">
-          {(["all", ...ALL_SONG_STAGES.filter(s => s !== "invalid"), "stub", "invalid"] as StageFilter[]).map(s => {
-            const count = s === "all" ? songs.length : s === "stub" ? stubCount : (countsByStage[s as SongEntry["stage"]] ?? 0);
+          {(["all", ...ALL_SONG_STAGES.filter(s => s !== "invalid" && !LIFECYCLE_STAGES.has(s)), "stub", "merged", "abandoned", "scrapped", "invalid"] as StageFilter[]).map(s => {
+            const count = s === "all" ? activeSongs.length : s === "stub" ? stubCount : (countsByStage[s as SongEntry["stage"]] ?? 0);
             const active = stageFilter === s;
             return (
               <button
@@ -196,7 +206,11 @@ export default function SongBrowserPage() {
       )}
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {songs.filter(s => stageFilter === "all" || (stageFilter === "stub" ? s.stub : s.stage === stageFilter)).map(song => (
+        {songs.filter(s => {
+          if (stageFilter === "all") return !LIFECYCLE_STAGES.has(s.stage);
+          if (stageFilter === "stub") return s.stub;
+          return s.stage === stageFilter;
+        }).map(song => (
           <div
             key={song.id}
             onClick={() => activatingId === null && handleSelect(song)}
