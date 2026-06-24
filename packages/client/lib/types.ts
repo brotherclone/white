@@ -1,5 +1,7 @@
 export type CandidateStatus = "pending" | "approved" | "accepted" | "rejected";
 
+export type LifecycleStatus = "merged" | "abandoned" | "scrapped";
+
 export interface SongEntry {
   id: string;
   thread_slug: string;
@@ -15,9 +17,12 @@ export interface SongEntry {
   stub: boolean;
   initialized: boolean;
   has_mix: boolean;
-  stage: "ideation" | "generation" | "composition" | "production" | "mixing" | "complete" | "invalid";
+  stage: "ideation" | "generation" | "composition" | "production" | "mixing" | "complete" | "invalid" | LifecycleStatus;
   proposal_path: string | null;
   concept: string | null;
+  lifecycle_status: LifecycleStatus | null;
+  merged_with: string[];
+  uses_parts_from: string[];
 }
 
 export interface RegressionInfo {

@@ -1179,3 +1179,184 @@ class TestComputeStageInvalid:
                 {"schema_version": "2.0.0", "title": "Foo", "rainbow_color": "Red"}, f
             )
         assert _compute_stage(prod) == "ideation"
+
+
+# ---------------------------------------------------------------------------
+# Lifecycle statuses — _compute_stage + endpoints
+# ---------------------------------------------------------------------------
+
+
+def _make_lifecycle_sw(root: Path, songs: list[dict]) -> Path:
+    """Build shrink-wrapped dir entries with optional lifecycle_status."""
+    for song in songs:
+        d = root / song["thread_slug"] / "production" / song["production_slug"]
+        d.mkdir(parents=True, exist_ok=True)
+        payload: dict = {
+            "schema_version": "2.0.0",
+            "title": song.get("title", song["production_slug"]),
+            "rainbow_color": song.get("rainbow_color", "Red"),
+            "bpm": song.get("bpm", 120),
+            "key": song.get("key", "C major"),
+        }
+        if "lifecycle_status" in song:
+            payload["lifecycle_status"] = song["lifecycle_status"]
+        if "merged_with" in song:
+            payload["merged_with"] = song["merged_with"]
+        if "uses_parts_from" in song:
+            payload["uses_parts_from"] = song["uses_parts_from"]
+        with open(d / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump(
+                payload, f, allow_unicode=True, sort_keys=False, width=float("inf")
+            )
+    return root
+
+
+class TestComputeStageLifecycle:
+    def _make_prod(self, tmp_path: Path, status: str) -> Path:
+        prod = tmp_path / "song_v1"
+        prod.mkdir()
+        with open(prod / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump(
+                {
+                    "schema_version": "2.0.0",
+                    "title": "Foo",
+                    "rainbow_color": "Red",
+                    "lifecycle_status": status,
+                },
+                f,
+            )
+        return prod
+
+    def test_merged_bypasses_mix_stage(self, tmp_path):
+        assert _compute_stage(self._make_prod(tmp_path, "merged")) == "merged"
+
+    def test_abandoned_bypasses_mix_stage(self, tmp_path):
+        assert _compute_stage(self._make_prod(tmp_path, "abandoned")) == "abandoned"
+
+    def test_scrapped_bypasses_mix_stage(self, tmp_path):
+        assert _compute_stage(self._make_prod(tmp_path, "scrapped")) == "scrapped"
+
+    def test_null_lifecycle_falls_through_to_ideation(self, tmp_path):
+        prod = tmp_path / "song_v1"
+        prod.mkdir()
+        with open(prod / "manifest_bootstrap.yml", "w") as f:
+            yaml.dump(
+                {
+                    "schema_version": "2.0.0",
+                    "title": "Foo",
+                    "rainbow_color": "Red",
+                    "lifecycle_status": None,
+                },
+                f,
+            )
+        assert _compute_stage(prod) == "ideation"
+
+
+class TestLifecycleEndpoints:
+    @pytest.fixture
+    def lc_sw(self, tmp_path):
+        return _make_lifecycle_sw(
+            tmp_path / "sw",
+            [
+                {"thread_slug": "t1", "production_slug": "song_a", "title": "Song A"},
+                {"thread_slug": "t1", "production_slug": "song_b", "title": "Song B"},
+                {
+                    "thread_slug": "t1",
+                    "production_slug": "song_c",
+                    "title": "Song C",
+                    "lifecycle_status": "scrapped",
+                },
+            ],
+        )
+
+    @pytest.fixture
+    def lc_client(self, lc_sw):
+        return TestClient(create_app(shrink_wrapped_dir=lc_sw))
+
+    def _bootstrap(self, lc_sw: Path, slug: str) -> dict:
+        path = lc_sw / "t1" / "production" / slug / "manifest_bootstrap.yml"
+        with open(path) as f:
+            return yaml.safe_load(f)
+
+    def test_abandon_sets_status(self, lc_client, lc_sw):
+        resp = lc_client.post(
+            "/songs/t1__song_a/lifecycle", json={"status": "abandoned"}
+        )
+        assert resp.status_code == 200
+        assert resp.json() == {"ok": True, "status": "abandoned"}
+        assert self._bootstrap(lc_sw, "song_a")["lifecycle_status"] == "abandoned"
+
+    def test_scrap_sets_status(self, lc_client, lc_sw):
+        resp = lc_client.post(
+            "/songs/t1__song_a/lifecycle", json={"status": "scrapped"}
+        )
+        assert resp.status_code == 200
+        assert self._bootstrap(lc_sw, "song_a")["lifecycle_status"] == "scrapped"
+
+    def test_merge_bilateral(self, lc_client, lc_sw):
+        resp = lc_client.post(
+            "/songs/t1__song_a/lifecycle",
+            json={"status": "merged", "merged_with": ["t1__song_b"]},
+        )
+        assert resp.status_code == 200
+        a = self._bootstrap(lc_sw, "song_a")
+        b = self._bootstrap(lc_sw, "song_b")
+        assert a["lifecycle_status"] == "merged"
+        assert "t1__song_b" in a["merged_with"]
+        assert b["lifecycle_status"] == "merged"
+        assert "t1__song_a" in b["merged_with"]
+
+    def test_merge_unknown_partner_returns_404(self, lc_client, lc_sw):
+        resp = lc_client.post(
+            "/songs/t1__song_a/lifecycle",
+            json={"status": "merged", "merged_with": ["t1__no_such_song"]},
+        )
+        assert resp.status_code == 404
+        # Neither manifest should be modified
+        assert self._bootstrap(lc_sw, "song_a").get("lifecycle_status") is None
+
+    def test_merge_missing_merged_with_returns_422(self, lc_client):
+        resp = lc_client.post(
+            "/songs/t1__song_a/lifecycle",
+            json={"status": "merged", "merged_with": []},
+        )
+        assert resp.status_code == 422
+
+    def test_invalid_status_returns_422(self, lc_client):
+        resp = lc_client.post(
+            "/songs/t1__song_a/lifecycle", json={"status": "nonsense"}
+        )
+        assert resp.status_code == 422
+
+    def test_unknown_song_returns_404(self, lc_client):
+        resp = lc_client.post(
+            "/songs/t1__ghost/lifecycle", json={"status": "abandoned"}
+        )
+        assert resp.status_code == 404
+
+    def test_get_scrapped_returns_only_scrapped(self, lc_client):
+        resp = lc_client.get("/songs/scrapped")
+        assert resp.status_code == 200
+        songs = resp.json()
+        assert len(songs) == 1
+        assert songs[0]["id"] == "t1__song_c"
+        assert songs[0]["lifecycle_status"] == "scrapped"
+
+    def test_patch_uses_parts_from(self, lc_client, lc_sw):
+        resp = lc_client.patch(
+            "/songs/t1__song_a/uses-parts-from",
+            json={"uses_parts_from": ["t1__song_c"]},
+        )
+        assert resp.status_code == 200
+        assert resp.json() == {"ok": True}
+        data = self._bootstrap(lc_sw, "song_a")
+        assert data["uses_parts_from"] == ["t1__song_c"]
+
+    def test_scan_songs_surfaces_lifecycle_fields(self, lc_sw):
+        songs = scan_songs(lc_sw)
+        a = next(s for s in songs if s["production_slug"] == "song_a")
+        assert a["lifecycle_status"] is None
+        assert a["merged_with"] == []
+        assert a["uses_parts_from"] == []
+        c = next(s for s in songs if s["production_slug"] == "song_c")
+        assert c["lifecycle_status"] == "scrapped"

@@ -460,6 +460,49 @@ export function audioUrl(segmentId: string): string {
   return `${BASE}/audio/${encodeURIComponent(segmentId)}`;
 }
 
+// ---------------------------------------------------------------------------
+// Song lifecycle
+// ---------------------------------------------------------------------------
+
+export async function setLifecycleStatus(
+  songId: string,
+  status: import("./types").LifecycleStatus,
+  mergedWith?: string[],
+): Promise<{ ok: boolean; status: string }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/lifecycle`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status, merged_with: mergedWith ?? [] }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Lifecycle update failed");
+  }
+  return res.json();
+}
+
+export async function fetchScrappedSongs(): Promise<import("./types").SongEntry[]> {
+  const res = await fetch(`${BASE}/songs/scrapped`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch scrapped songs");
+  return res.json();
+}
+
+export async function setUsesPartsFrom(
+  songId: string,
+  usesPartsFrom: string[],
+): Promise<{ ok: boolean }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/uses-parts-from`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ uses_parts_from: usesPartsFrom }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Uses-parts-from update failed");
+  }
+  return res.json();
+}
+
 export async function exportSample(segmentId: string): Promise<{ ok: boolean; dest: string }> {
   const res = await fetch(`${BASE}/samples/${encodeURIComponent(segmentId)}/export`, {
     method: "POST",
