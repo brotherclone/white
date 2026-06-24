@@ -12,6 +12,7 @@ Usage (album mode):
 """
 
 import argparse
+import contextlib
 import io
 import os
 import re
@@ -431,22 +432,36 @@ def create_app(
         return entry, Path(entry["production_path"])
 
     def _patch_manifest(prod_dir: Path, updates: dict) -> None:
-        """Merge updates into manifest_bootstrap.yml in-place."""
+        """Merge updates into manifest_bootstrap.yml atomically."""
         bootstrap_path = prod_dir / "manifest_bootstrap.yml"
         data: dict = {}
         if bootstrap_path.exists():
             with open(bootstrap_path) as f:
-                data = yaml.safe_load(f) or {}
+                loaded = yaml.safe_load(f)
+            if isinstance(loaded, dict):
+                data = loaded
         data.update(updates)
-        with open(bootstrap_path, "w") as f:
-            yaml.dump(data, f, allow_unicode=True, sort_keys=False, width=float("inf"))
+        tmp_fd, tmp_path = tempfile.mkstemp(
+            dir=bootstrap_path.parent, suffix=".yml.tmp"
+        )
+        try:
+            with os.fdopen(tmp_fd, "w") as f:
+                yaml.dump(
+                    data, f, allow_unicode=True, sort_keys=False, width=float("inf")
+                )
+            os.replace(tmp_path, bootstrap_path)
+        except Exception:
+            with contextlib.suppress(OSError):
+                os.unlink(tmp_path)
+            raise
 
     class LifecycleBody(BaseModel):
         status: str
-        merged_with: list[str] = []
+        merged_with: list[str] = Field(default_factory=list)
 
     @app.post("/songs/{song_id}/lifecycle")
     def set_lifecycle(song_id: str, body: LifecycleBody):
+        global _active_song
         if body.status not in _LIFECYCLE_STATUSES:
             raise HTTPException(
                 status_code=422,
@@ -479,6 +494,18 @@ def create_app(
                 )
         else:
             _patch_manifest(prod_dir, {"lifecycle_status": body.status})
+        # Keep _active_song cache fresh if the patched song is currently active.
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
         return {"ok": True, "status": body.status}
 
     @app.get("/songs/scrapped")
@@ -496,8 +523,21 @@ def create_app(
 
     @app.patch("/songs/{song_id}/uses-parts-from")
     def set_uses_parts_from(song_id: str, body: UsesPartsFromBody):
+        global _active_song
         _entry, prod_dir = _resolve_song(song_id)
         _patch_manifest(prod_dir, {"uses_parts_from": body.uses_parts_from})
+        # Keep _active_song cache fresh if the patched song is currently active.
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
         return {"ok": True}
 
     # ------------------------------------------------------------------

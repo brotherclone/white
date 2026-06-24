@@ -589,10 +589,13 @@ export default function BoardPage() {
 
   const handleSavePartsFrom = async () => {
     if (!activeSong) return;
+    setLifecycleError(null);
     setSavingPartsFrom(true);
     try {
       await setUsesPartsFrom(activeSong.id, selectedPartsFrom);
       await refresh();
+    } catch {
+      setLifecycleError("Failed to save — please try again");
     } finally {
       setSavingPartsFrom(false);
     }
@@ -852,7 +855,7 @@ export default function BoardPage() {
                         Scrap
                       </button>
                       <button
-                        onClick={() => setMergeModal(true)}
+                        onClick={() => { setMergeTarget(""); setMergeModal(true); }}
                         className="px-3 py-1.5 text-xs font-sans rounded border border-indigo-800 bg-indigo-900/20 text-indigo-400 hover:bg-indigo-900/40 transition-colors"
                       >
                         Merge into suite…
@@ -967,6 +970,7 @@ export default function BoardPage() {
                   Both songs will be marked <strong className="text-indigo-400">merged</strong> and linked to each other. Order doesn&apos;t matter — the suite binds them equally.
                 </p>
                 <select
+                  aria-label="Select song to merge with"
                   value={mergeTarget}
                   onChange={e => setMergeTarget(e.target.value)}
                   className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-xs font-sans text-zinc-200 mb-4 focus:outline-none focus:border-indigo-500"
