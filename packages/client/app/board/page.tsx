@@ -7,8 +7,9 @@ import {
   runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
   autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl, setBpm,
   fetchWorkOrders, fetchCollaborators, createDiaryEntry, regressStage,
+  setLifecycleStatus, fetchScrappedSongs, setUsesPartsFrom,
 } from "@/lib/api";
-import { Collaborator, CompositionEntry, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RegressionInfo, RunJob, SongEntry, WorkOrder } from "@/lib/types";
+import { Collaborator, CompositionEntry, LifecycleStatus, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RegressionInfo, RunJob, SongEntry, WorkOrder } from "@/lib/types";
 import WorkOrderHud from "@/components/WorkOrderHud";
 import WorkOrderDrawer from "@/components/WorkOrderDrawer";
 
@@ -333,6 +334,18 @@ export default function BoardPage() {
   const [diaryModal, setDiaryModal] = useState<{ stage: MixStage } | null>(null);
   const [regressionModal, setRegressionModal] = useState<{ targetStage: MixStage; info: RegressionInfo } | null>(null);
   const [confirmingRegress, setConfirmingRegress] = useState(false);
+  // Lifecycle panel state
+  const [lifecyclePanelOpen, setLifecyclePanelOpen] = useState(false);
+  const [abandonModal, setAbandonModal] = useState(false);
+  const [scrapModal, setScrapModal] = useState(false);
+  const [mergeModal, setMergeModal] = useState(false);
+  const [mergeTarget, setMergeTarget] = useState<string>("");
+  const [lifecyclePending, setLifecyclePending] = useState(false);
+  const [lifecycleError, setLifecycleError] = useState<string | null>(null);
+  const [usesPartsExpanded, setUsesPartsExpanded] = useState(false);
+  const [scrappedSongs, setScrappedSongs] = useState<SongEntry[]>([]);
+  const [selectedPartsFrom, setSelectedPartsFrom] = useState<string[]>([]);
+  const [savingPartsFrom, setSavingPartsFrom] = useState(false);
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refreshLyrics = useCallback(async () => {
@@ -546,6 +559,48 @@ export default function BoardPage() {
     }
   };
 
+  const handleLifecycle = async (status: LifecycleStatus, mergedWith?: string[]) => {
+    if (!activeSong) return;
+    setLifecyclePending(true);
+    setLifecycleError(null);
+    try {
+      await setLifecycleStatus(activeSong.id, status, mergedWith);
+      await refresh();
+    } catch (e: unknown) {
+      setLifecycleError((e as Error).message ?? "Failed to update lifecycle status");
+    } finally {
+      setAbandonModal(false);
+      setScrapModal(false);
+      setMergeModal(false);
+      setLifecyclePending(false);
+    }
+  };
+
+  const handleOpenUsesPartsFrom = async () => {
+    setUsesPartsExpanded(true);
+    try {
+      const songs = await fetchScrappedSongs();
+      setScrappedSongs(songs);
+      setSelectedPartsFrom(activeSong?.uses_parts_from ?? []);  // uses_parts_from absent on legacy entries
+    } catch {
+      setScrappedSongs([]);
+    }
+  };
+
+  const handleSavePartsFrom = async () => {
+    if (!activeSong) return;
+    setLifecycleError(null);
+    setSavingPartsFrom(true);
+    try {
+      await setUsesPartsFrom(activeSong.id, selectedPartsFrom);
+      await refresh();
+    } catch {
+      setLifecycleError("Failed to save — please try again");
+    } finally {
+      setSavingPartsFrom(false);
+    }
+  };
+
   const currentStageIdx = composition ? MIX_STAGES.indexOf(composition.current_stage) : -1;
   const promotedCandidate = lyricsData?.candidates.find(c => c.status === "promoted");
 
@@ -748,6 +803,199 @@ export default function BoardPage() {
               >
                 {settingMix ? "Saving…" : "Set"}
               </button>
+            </div>
+          )}
+
+          {/* ── Song Lifecycle ─────────────────────────────────── */}
+          {activeSong && (
+            <div className="mb-4 border border-zinc-800 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setLifecyclePanelOpen(o => !o)}
+                className="w-full flex items-center justify-between px-4 py-2.5 bg-zinc-900 text-zinc-400 text-sm font-sans hover:bg-zinc-800 transition-colors"
+              >
+                <span className="font-medium text-zinc-300">Song Lifecycle</span>
+                <span className="text-xs text-zinc-600">{lifecyclePanelOpen ? "▲" : "▼"}</span>
+              </button>
+
+              {lifecyclePanelOpen && (
+                <div className="px-4 py-3 bg-zinc-950 space-y-3">
+                  {lifecycleError && (
+                    <div className="text-xs font-sans text-red-400 bg-red-900/20 border border-red-800 rounded px-2 py-1">
+                      {lifecycleError}
+                    </div>
+                  )}
+
+                  {/* Terminal state banner */}
+                  {activeSong.lifecycle_status ? (
+                    <div className={`rounded px-3 py-2 text-sm font-sans border ${
+                      activeSong.lifecycle_status === "merged"    ? "bg-indigo-900/30 border-indigo-800 text-indigo-300" :
+                      activeSong.lifecycle_status === "abandoned" ? "bg-zinc-800/60 border-zinc-700 text-zinc-400" :
+                                                                    "bg-amber-900/20 border-amber-800 text-amber-400"
+                    }`}>
+                      This song is marked as <strong>{activeSong.lifecycle_status}</strong>.
+                      {activeSong.lifecycle_status === "merged" && (activeSong.merged_with?.length ?? 0) > 0 && (
+                        <span className="block mt-0.5 text-xs opacity-70">
+                          Merged with: {activeSong.merged_with.join(", ")}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    /* Action buttons — only for active (non-terminal) songs */
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setAbandonModal(true)}
+                        className="px-3 py-1.5 text-xs font-sans rounded border border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200 transition-colors"
+                      >
+                        Abandon
+                      </button>
+                      <button
+                        onClick={() => setScrapModal(true)}
+                        className="px-3 py-1.5 text-xs font-sans rounded border border-amber-800 bg-amber-900/20 text-amber-400 hover:bg-amber-900/40 transition-colors"
+                      >
+                        Scrap
+                      </button>
+                      <button
+                        onClick={() => { setMergeTarget(""); setMergeModal(true); }}
+                        className="px-3 py-1.5 text-xs font-sans rounded border border-indigo-800 bg-indigo-900/20 text-indigo-400 hover:bg-indigo-900/40 transition-colors"
+                      >
+                        Merge into suite…
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Uses parts from */}
+                  <div className="border-t border-zinc-800 pt-3">
+                    <button
+                      onClick={() => usesPartsExpanded ? setUsesPartsExpanded(false) : handleOpenUsesPartsFrom()}
+                      className="text-xs font-sans text-zinc-500 hover:text-zinc-300 transition-colors"
+                    >
+                      {usesPartsExpanded ? "▲ Uses parts from" : "▼ Uses parts from"}
+                      {(activeSong.uses_parts_from?.length ?? 0) > 0 && (
+                        <span className="ml-1.5 text-zinc-600">({activeSong.uses_parts_from.length})</span>
+                      )}
+                    </button>
+                    {usesPartsExpanded && (
+                      <div className="mt-2 space-y-1.5">
+                        {scrappedSongs.length === 0 ? (
+                          <p className="text-xs font-sans text-zinc-600">No scrapped songs available.</p>
+                        ) : (
+                          scrappedSongs.map(s => (
+                            <label key={s.id} className="flex items-center gap-2 text-xs font-sans text-zinc-400 cursor-pointer hover:text-zinc-200">
+                              <input
+                                type="checkbox"
+                                checked={selectedPartsFrom.includes(s.id)}
+                                onChange={e => setSelectedPartsFrom(prev =>
+                                  e.target.checked ? [...prev, s.id] : prev.filter(id => id !== s.id)
+                                )}
+                                className="accent-amber-500"
+                              />
+                              <span>{s.title}</span>
+                              <span className="text-zinc-600 truncate">{s.id}</span>
+                            </label>
+                          ))
+                        )}
+                        {scrappedSongs.length > 0 && (
+                          <button
+                            onClick={handleSavePartsFrom}
+                            disabled={savingPartsFrom}
+                            className="mt-1 px-3 py-1 text-xs font-sans rounded border border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 transition-colors"
+                          >
+                            {savingPartsFrom ? "Saving…" : "Save"}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Abandon confirmation ────────────────────────────── */}
+          {abandonModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setAbandonModal(false)}>
+              <div className="bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-sm mx-4 p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <h2 className="text-base font-semibold text-white font-sans mb-2">Wait — don&apos;t give up!</h2>
+                <p className="text-sm font-sans text-zinc-400 mb-4">
+                  This song has been waiting patiently in the queue, dreaming of the day it becomes a banger.
+                  Are you <em>absolutely sure</em> you want to abandon it to the void? It will be hidden from the main list but never forgotten.
+                </p>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setAbandonModal(false)} className="px-3 py-1.5 text-xs font-sans rounded border border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors">
+                    Save the song!
+                  </button>
+                  <button
+                    onClick={() => handleLifecycle("abandoned")}
+                    disabled={lifecyclePending}
+                    className="px-3 py-1.5 text-xs font-sans rounded border border-zinc-600 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 disabled:opacity-40 transition-colors"
+                  >
+                    {lifecyclePending ? "Abandoning…" : "Yes, abandon it"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Scrap confirmation ──────────────────────────────── */}
+          {scrapModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setScrapModal(false)}>
+              <div className="bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-sm mx-4 p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <h2 className="text-base font-semibold text-white font-sans mb-2">Scrap this song?</h2>
+                <p className="text-sm font-sans text-zinc-400 mb-4">
+                  Scrapping marks this song as a donor — its parts, ideas, and textures can still be referenced by other productions via &ldquo;Uses parts from.&rdquo;
+                  It won&apos;t appear in the main list, but its contributions live on.
+                </p>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setScrapModal(false)} className="px-3 py-1.5 text-xs font-sans rounded border border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors">
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleLifecycle("scrapped")}
+                    disabled={lifecyclePending}
+                    className="px-3 py-1.5 text-xs font-sans rounded border border-amber-700 bg-amber-900/30 text-amber-300 hover:bg-amber-900/50 disabled:opacity-40 transition-colors"
+                  >
+                    {lifecyclePending ? "Scrapping…" : "Scrap it"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Merge picker ────────────────────────────────────── */}
+          {mergeModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setMergeModal(false)}>
+              <div className="bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-sm mx-4 p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <h2 className="text-base font-semibold text-white font-sans mb-1">Merge into suite</h2>
+                <p className="text-sm font-sans text-zinc-400 mb-3">
+                  Both songs will be marked <strong className="text-indigo-400">merged</strong> and linked to each other. Order doesn&apos;t matter — the suite binds them equally.
+                </p>
+                <select
+                  aria-label="Select song to merge with"
+                  value={mergeTarget}
+                  onChange={e => setMergeTarget(e.target.value)}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-xs font-sans text-zinc-200 mb-4 focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="">— pick a song —</option>
+                  {songs
+                    .filter(s => s.id !== activeSong?.id && !["merged","abandoned","scrapped"].includes(s.stage))
+                    .map(s => (
+                      <option key={s.id} value={s.id}>{s.title}</option>
+                    ))
+                  }
+                </select>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setMergeModal(false)} className="px-3 py-1.5 text-xs font-sans rounded border border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors">
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => mergeTarget && handleLifecycle("merged", [mergeTarget])}
+                    disabled={lifecyclePending || !mergeTarget}
+                    className="px-3 py-1.5 text-xs font-sans rounded border border-indigo-700 bg-indigo-900/30 text-indigo-300 hover:bg-indigo-900/50 disabled:opacity-40 transition-colors"
+                  >
+                    {lifecyclePending ? "Merging…" : "Merge"}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

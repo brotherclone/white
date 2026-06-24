@@ -12,6 +12,7 @@ Usage (album mode):
 """
 
 import argparse
+import contextlib
 import io
 import os
 import re
@@ -189,12 +190,18 @@ def _schema_is_valid(sv: str | None) -> bool:
     return sv == "" or sv.startswith("1") or sv.startswith("2")
 
 
+_LIFECYCLE_STATUSES = {"merged", "abandoned", "scrapped"}
+
+
 def _compute_stage(prod_dir: Path) -> str:
     bootstrap_path = prod_dir / "manifest_bootstrap.yml"
     if bootstrap_path.exists():
         try:
             with open(bootstrap_path) as f:
                 mb = yaml.safe_load(f) or {}
+            lc = mb.get("lifecycle_status")
+            if lc in _LIFECYCLE_STATUSES:
+                return lc
             sv = mb.get("schema_version")
             if sv is not None and not _schema_is_valid(sv):
                 return "invalid"
@@ -291,6 +298,10 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "stage": _compute_stage(prod_dir),
                 "proposal_path": str(proposal_path) if proposal_path else None,
                 "concept": _read_concept(prod_dir),
+                # lifecycle fields — absent in older manifests, default to None/[]
+                "lifecycle_status": data.get("lifecycle_status"),
+                "merged_with": data.get("merged_with") or [],
+                "uses_parts_from": data.get("uses_parts_from") or [],
             }
         )
     return songs
@@ -409,6 +420,125 @@ def create_app(
     @app.get("/songs/active")
     def get_active_song():
         return {"active": _active_song}
+
+    def _resolve_song(song_id: str) -> tuple[dict, Path]:
+        """Return (song_entry, prod_dir) for song_id, or raise 404."""
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(status_code=503, detail="Server not in album mode")
+        songs = scan_songs(_shrink_wrapped_dir)
+        entry = next((s for s in songs if s["id"] == song_id), None)
+        if entry is None:
+            raise HTTPException(status_code=404, detail=f"Song '{song_id}' not found")
+        return entry, Path(entry["production_path"])
+
+    def _patch_manifest(prod_dir: Path, updates: dict) -> None:
+        """Merge updates into manifest_bootstrap.yml atomically."""
+        bootstrap_path = prod_dir / "manifest_bootstrap.yml"
+        data: dict = {}
+        if bootstrap_path.exists():
+            with open(bootstrap_path) as f:
+                loaded = yaml.safe_load(f)
+            if isinstance(loaded, dict):
+                data = loaded
+        data.update(updates)
+        tmp_fd, tmp_path = tempfile.mkstemp(
+            dir=bootstrap_path.parent, suffix=".yml.tmp"
+        )
+        try:
+            with os.fdopen(tmp_fd, "w") as f:
+                yaml.dump(
+                    data, f, allow_unicode=True, sort_keys=False, width=float("inf")
+                )
+            os.replace(tmp_path, bootstrap_path)
+        except Exception:
+            with contextlib.suppress(OSError):
+                os.unlink(tmp_path)
+            raise
+
+    class LifecycleBody(BaseModel):
+        status: str
+        merged_with: list[str] = Field(default_factory=list)
+
+    @app.post("/songs/{song_id}/lifecycle")
+    def set_lifecycle(song_id: str, body: LifecycleBody):
+        global _active_song
+        if body.status not in _LIFECYCLE_STATUSES:
+            raise HTTPException(
+                status_code=422,
+                detail=f"status must be one of: {sorted(_LIFECYCLE_STATUSES)}",
+            )
+        _entry, prod_dir = _resolve_song(song_id)
+        if body.status == "merged":
+            if not body.merged_with:
+                raise HTTPException(
+                    status_code=422,
+                    detail="merged_with must contain at least one song ID",
+                )
+            # Resolve all partner IDs first so we 404 before writing anything.
+            partner_dirs: list[tuple[str, Path]] = []
+            for partner_id in body.merged_with:
+                _pe, partner_dir = _resolve_song(partner_id)
+                partner_dirs.append((partner_id, partner_dir))
+            # Bilateral write — active song points to partners, each partner points back.
+            _patch_manifest(
+                prod_dir,
+                {"lifecycle_status": "merged", "merged_with": body.merged_with},
+            )
+            for partner_id, partner_dir in partner_dirs:
+                partner_merged_with = [song_id] + [
+                    p for p in body.merged_with if p != partner_id
+                ]
+                _patch_manifest(
+                    partner_dir,
+                    {"lifecycle_status": "merged", "merged_with": partner_merged_with},
+                )
+        else:
+            _patch_manifest(prod_dir, {"lifecycle_status": body.status})
+        # Keep _active_song cache fresh if the patched song is currently active.
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
+        return {"ok": True, "status": body.status}
+
+    @app.get("/songs/scrapped")
+    def list_scrapped_songs():
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(status_code=503, detail="Server not in album mode")
+        return [
+            s
+            for s in scan_songs(_shrink_wrapped_dir)
+            if s.get("lifecycle_status") == "scrapped"
+        ]
+
+    class UsesPartsFromBody(BaseModel):
+        uses_parts_from: list[str]
+
+    @app.patch("/songs/{song_id}/uses-parts-from")
+    def set_uses_parts_from(song_id: str, body: UsesPartsFromBody):
+        global _active_song
+        _entry, prod_dir = _resolve_song(song_id)
+        _patch_manifest(prod_dir, {"uses_parts_from": body.uses_parts_from})
+        # Keep _active_song cache fresh if the patched song is currently active.
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
+        return {"ok": True}
 
     # ------------------------------------------------------------------
     # Pipeline — init, run, status
