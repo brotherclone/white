@@ -419,6 +419,8 @@ def create_app(
 
     @app.get("/songs/active")
     def get_active_song():
+        if _active_song and _production_dir:
+            _active_song["stage"] = _compute_stage(_production_dir)
         return {"active": _active_song}
 
     def _resolve_song(song_id: str) -> tuple[dict, Path]:
@@ -745,12 +747,25 @@ def create_app(
         }
 
         def _run():
-            global _handoff_job
+            global _handoff_job, _active_song
             try:
                 from white_composition.logic_handoff import handoff
 
                 handoff(prod)
                 _handoff_job["status"] = "done"
+                # Refresh _active_song so stage flips to "composition" immediately.
+                if _shrink_wrapped_dir and _active_song:
+                    song_id = _active_song.get("id")
+                    refreshed = next(
+                        (
+                            s
+                            for s in scan_songs(_shrink_wrapped_dir)
+                            if s["id"] == song_id
+                        ),
+                        None,
+                    )
+                    if refreshed:
+                        _active_song = refreshed
             except Exception as exc:
                 _handoff_job["status"] = "error"
                 _handoff_job["error"] = str(exc)
