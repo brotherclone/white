@@ -149,8 +149,10 @@ def _append_entry(
 
     tags_yaml = yaml.dump(style_tags, default_flow_style=True).strip()
 
-    # Safely quote artist name if it contains special chars
-    key = yaml.dump({artist_name: None}, default_flow_style=False).split(":")[0]
+    # Safely quote artist name if it contains special chars (e.g. "Songs: Ohia")
+    raw_dump = yaml.dump({artist_name: None}, default_flow_style=False)
+    # raw_dump looks like "'Songs: Ohia': null\n" — strip trailing ": null\n"
+    key = raw_dump.rstrip("\n").removesuffix(": null")
 
     discogs_str = str(discogs_id) if discogs_id is not None else "null"
 
@@ -352,7 +354,9 @@ def score_chromatic(
             skipped += 1
             continue
 
-        results = scorer.score_batch([{"lyric_text": description}])
+        results = scorer.score_batch(
+            [{"lyric_text": description}], concept_text=description
+        )
         result = results[0]
         entry["chromatic_score"] = {
             "temporal": {k: round(float(v), 4) for k, v in result["temporal"].items()},
