@@ -643,7 +643,7 @@ export default function BoardPage() {
           ← home
         </Link>
         <Link href="/candidates" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans transition-colors">
-          samples
+          candidate view
         </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">Composition Board</h1>
         {activeSong && (
