@@ -84,8 +84,9 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
     the spelling used in the chord database (e.g. A# → Bb, D# → Eb).
     """
     key_str = key_str.strip()
-    # Handle unicode symbols
+    # Handle unicode symbols and collapse "B ♭" / "B b" → "Bb" before splitting
     key_str = key_str.replace("♭", "b").replace("♯", "#")
+    key_str = re.sub(r"([A-Ga-g])\s+([b#])\s*", r"\1\2 ", key_str).strip()
 
     parts = key_str.split()
     if len(parts) < 2:

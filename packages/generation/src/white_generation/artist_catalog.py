@@ -35,9 +35,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-CATALOG_DEFAULT_PATH = (
-    Path(__file__).parent.parent / "reference" / "music" / "artist_catalog.yml"
-)
+try:
+    from importlib.resources import files as _pkg_files
+
+    CATALOG_DEFAULT_PATH = Path(
+        str(_pkg_files("white_ideation").joinpath("reference/music/artist_catalog.yml"))
+    )
+except Exception:
+    CATALOG_DEFAULT_PATH = (
+        Path(__file__).parent.parent / "reference" / "music" / "artist_catalog.yml"
+    )
 TRAINING_PARQUET_PATH = (
     Path(__file__).parent.parent.parent
     / "training"

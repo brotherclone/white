@@ -21,6 +21,7 @@ Usage:
 """
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -522,6 +523,10 @@ def _parse_key_components(key_str: str) -> tuple[str, str]:
 
     Mode is returned as 'Major' or 'Minor' for chord-database compatibility.
     """
+    # Normalise unicode accidentals and collapse "B ♭" → "Bb" before splitting
+    key_str = key_str.replace("♯", "#").replace("♭", "b")
+    # Collapse accidental written as separate token: "B b minor" → "Bb minor"
+    key_str = re.sub(r"([A-Ga-g])\s+([b#])\s+", r"\1\2 ", key_str)
     tokens = key_str.strip().split()
     if len(tokens) >= 2:
         root = tokens[0]
