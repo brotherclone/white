@@ -150,7 +150,12 @@ def _append_entry(
     tags_yaml = yaml.dump(style_tags, default_flow_style=True).strip()
 
     # Safely quote artist name if it contains special chars (e.g. "Songs: Ohia")
-    raw_dump = yaml.dump({artist_name: None}, default_flow_style=False)
+    raw_dump = yaml.dump(
+        {artist_name: None},
+        default_flow_style=False,
+        allow_unicode=True,
+        width=float("inf"),
+    )
     # raw_dump looks like "'Songs: Ohia': null\n" — strip trailing ": null\n"
     key = raw_dump.rstrip("\n").removesuffix(": null")
 
@@ -354,9 +359,8 @@ def score_chromatic(
             skipped += 1
             continue
 
-        results = scorer.score_batch(
-            [{"lyric_text": description}], concept_text=description
-        )
+        desc_emb = scorer.prepare_concept(description)
+        results = scorer.score_batch([{}], concept_emb=desc_emb, lyric_emb=desc_emb)
         result = results[0]
         entry["chromatic_score"] = {
             "temporal": {k: round(float(v), 4) for k, v in result["temporal"].items()},
