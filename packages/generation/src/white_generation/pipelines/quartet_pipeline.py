@@ -59,6 +59,7 @@ from white_generation.patterns.quartet_patterns import (
     fix_voice_crossing,
     get_patterns_for_voice,
 )
+from white_generation.patterns.strum_patterns import read_approved_harmonic_rhythm
 from white_generation.pipelines.bass_pipeline import (
     bass_pattern_to_midi_bytes,
     extract_section_chord_data,
@@ -66,6 +67,7 @@ from white_generation.pipelines.bass_pipeline import (
 from white_generation.pipelines.chord_pipeline import (
     compute_chromatic_match,
     get_chromatic_target,
+    parse_key_string,
 )
 from white_generation.pipelines.melody_pipeline import (
     generate_melody_for_section,
@@ -403,6 +405,73 @@ _NOTE_NAME_TO_PC: dict[str, int] = {
 }
 
 
+_MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11]
+_MINOR_SCALE_INTERVALS = [0, 2, 3, 5, 7, 8, 10]  # natural minor / aeolian
+
+
+def _compute_scale_pcs(key_str: str) -> set[int]:
+    """Return the 7 diatonic pitch classes for a key string like 'F# aeolian'.
+
+    Returns empty set when the key cannot be parsed — callers treat that as
+    "no scale filter".
+    """
+    if not key_str:
+        return set()
+    try:
+        root_name, mode = parse_key_string(key_str)
+        letter = root_name[0].upper()
+        root_pc = _NOTE_NAME_TO_PC.get(letter, 0)
+        for ch in root_name[1:]:
+            if ch == "#":
+                root_pc += 1
+            elif ch == "b":
+                root_pc -= 1
+        root_pc %= 12
+        intervals = (
+            _MAJOR_SCALE_INTERVALS if mode == "Major" else _MINOR_SCALE_INTERVALS
+        )
+        return {(root_pc + i) % 12 for i in intervals}
+    except Exception:
+        return set()
+
+
+def _snap_midi_to_scale(midi_bytes: bytes, scale_pcs: set[int]) -> bytes:
+    """Snap every note in a MIDI to the nearest diatonic pitch class.
+
+    When a note's pitch class is not in scale_pcs, it is moved the minimum
+    number of semitones needed to land on a scale tone.  Ties resolve by
+    preferring the lower semitone.  Notes at MIDI 0 are left untouched.
+    """
+    if not scale_pcs or not midi_bytes:
+        return midi_bytes
+
+    sorted_pcs = sorted(scale_pcs)
+
+    def _nearest(note: int) -> int:
+        pc = note % 12
+        if pc in scale_pcs:
+            return note
+        best_delta = 12
+        for s_pc in sorted_pcs:
+            delta = (s_pc - pc) % 12
+            if delta > 6:
+                delta -= 12
+            if abs(delta) < abs(best_delta):
+                best_delta = delta
+        return note + best_delta
+
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    for track in mid.tracks:
+        for i, msg in enumerate(track):
+            if msg.type in ("note_on", "note_off") and msg.note > 0:
+                snapped = _nearest(msg.note)
+                if snapped != msg.note:
+                    track[i] = msg.copy(note=snapped)
+    buf = io.BytesIO()
+    mid.save(file=buf)
+    return buf.getvalue()
+
+
 def _note_name_to_pc(name: str) -> int:
     """Convert a note name string like 'D#2' or 'Gb3' to a pitch class 0–11."""
     letter = name[0].upper()
@@ -588,6 +657,8 @@ def _generate_string_voice(
     time_sig: tuple[int, int],
     bpm: int,
     rng: random.Random,
+    durations: list[float] | None = None,
+    scale_pcs: set[int] | None = None,
 ) -> tuple[bytes, str]:
     """Generate an independent melodic voice (violin II or viola) using MelodyPattern.
 
@@ -620,8 +691,10 @@ def _generate_string_voice(
 
     pattern: MelodyPattern = rng.choice(candidates)
     midi_bytes, _ = generate_melody_for_section(
-        pattern, voicings, singer_range, bpm=bpm
+        pattern, voicings, singer_range, bpm=bpm, durations=durations
     )
+    if scale_pcs:
+        midi_bytes = _snap_midi_to_scale(midi_bytes, scale_pcs)
     return midi_bytes, pattern.name
 
 
@@ -631,6 +704,7 @@ def _generate_cello_voice(
     time_sig: tuple[int, int],
     bpm: int,
     rng: random.Random,
+    durations: list[float] | None = None,
 ) -> tuple[bytes, str]:
     """Generate an independent cello line using BassPattern.
 
@@ -650,7 +724,9 @@ def _generate_cello_voice(
         )
 
     pattern: BassPattern = rng.choice(templates)
-    midi_bytes, _ = bass_pattern_to_midi_bytes(pattern, voicings, bpm=bpm)
+    midi_bytes, _ = bass_pattern_to_midi_bytes(
+        pattern, voicings, bpm=bpm, durations=durations
+    )
 
     # Reclamp all notes from bass register (24-60) into cello register (36-57)
     mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
@@ -722,6 +798,13 @@ def generate_quartet(
     time_sig: tuple[int, int] = (int(ts_parts[0]), int(ts_parts[1]))
 
     soprano_midi_bytes = midi_path.read_bytes()
+
+    # Harmonic rhythm: per-chord bar durations so lower voices match the soprano length
+    _hr = read_approved_harmonic_rhythm(production_dir)
+    section_durations: list[float] | None = _hr.get(label_key)
+
+    # Diatonic scale pitch classes for out-of-key snapping on melodic voices
+    scale_pcs = _compute_scale_pcs(str(ctx.get("key", "")))
 
     # Load Refractor for chromatic scoring (optional)
     _scorer = scorer
@@ -829,14 +912,32 @@ def generate_quartet(
     for i in range(max(top_k * 2, 6)):
         # Violin II — melody pattern, violin II range
         vii_bytes, vii_pat = _generate_string_voice(
-            "violin_ii", voicings, _VIOLIN_II_RANGE, energy, time_sig, bpm, rng
+            "violin_ii",
+            voicings,
+            _VIOLIN_II_RANGE,
+            energy,
+            time_sig,
+            bpm,
+            rng,
+            durations=section_durations,
+            scale_pcs=scale_pcs,
         )
         # Viola — melody pattern, viola range
         va_bytes, va_pat = _generate_string_voice(
-            "viola", voicings, _VIOLA_RANGE, energy, time_sig, bpm, rng
+            "viola",
+            voicings,
+            _VIOLA_RANGE,
+            energy,
+            time_sig,
+            bpm,
+            rng,
+            durations=section_durations,
+            scale_pcs=scale_pcs,
         )
-        # Cello — bass pattern, cello register
-        vc_bytes, vc_pat = _generate_cello_voice(voicings, energy, time_sig, bpm, rng)
+        # Cello — bass pattern, cello register (chord-tone-based, no scale snap needed)
+        vc_bytes, vc_pat = _generate_cello_voice(
+            voicings, energy, time_sig, bpm, rng, durations=section_durations
+        )
 
         midi_bytes = merge_voices_to_quartet_midi(
             [
