@@ -344,9 +344,9 @@ def write_index(output_dir: Path, all_metadata: list[dict]) -> Path:
             "key": meta["key"],
             "rainbow_color": meta["rainbow_color"],
             "concept": (
-                meta["concept"][:200] + "..."
-                if len(meta.get("concept", "")) > 200
-                else meta.get("concept", "")
+                (meta.get("concept") or "")[:200] + "..."
+                if len(meta.get("concept") or "") > 200
+                else (meta.get("concept") or "")
             ),
             "iteration_count": meta["iteration_count"],
         }

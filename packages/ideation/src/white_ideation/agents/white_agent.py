@@ -415,6 +415,19 @@ class WhiteAgent(BaseModel):
         )
 
     @staticmethod
+    def _extract_text(content) -> str:
+        if isinstance(content, list):
+            return "".join(
+                (
+                    block.get("text", "")
+                    if isinstance(block, dict)
+                    else getattr(block, "text", str(block))
+                )
+                for block in content
+            )
+        return str(content) if content is not None else ""
+
+    @staticmethod
     def _normalize_song_proposal(proposal):
         """
         Ensures proposal is a SongProposal instance.
@@ -1300,7 +1313,7 @@ Focus on revealing the underlying ORDER, not explaining away the solipsism.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Violet rebracketing LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1374,7 +1387,7 @@ Focus on revealing the underlying ORDER, not solving the puzzles.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Indigo rebracketing LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1443,7 +1456,7 @@ Focus on revealing the underlying ORDER, not choosing between timelines.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Blue rebracketing LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1525,7 +1538,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
         try:
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            return response.content
+            return self._extract_text(response.content)
         except Exception as e:
             error_msg = f"Green rebracketing LLM call failed: {e!s}"
             logger.error(error_msg)
@@ -1589,7 +1602,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Yellow rebracketing LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1653,7 +1666,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Orange rebracketing LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1709,7 +1722,7 @@ Focus on revealing the underlying ORDER, not explaining away the complexity.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Red rebracketing LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1771,7 +1784,7 @@ Focus on revealing the underlying ORDER, not explaining away the paradox.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Black rebracketing LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1829,7 +1842,7 @@ Structure your synthesis as a clear creative brief.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Red synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1887,7 +1900,7 @@ Structure your synthesis as a clear creative brief.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Orange synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -1945,7 +1958,7 @@ Structure your synthesis as a clear creative brief.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Yellow synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -2003,7 +2016,7 @@ Structure your synthesis as a clear creative brief.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Green synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -2061,7 +2074,7 @@ Structure your synthesis as a clear creative brief.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Blue synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -2124,7 +2137,7 @@ Structure your synthesis as a clear creative brief for cryptographic methodology
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
                 error_msg = f"Indigo synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
@@ -2187,13 +2200,13 @@ Structure your synthesis as a clear creative brief for solipsistic methodology.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
-                error_msg = f"Indigo synthesis LLM call failed: {e!s}"
+                error_msg = f"Violet synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
-                return "LLM call failed - Indigo synthesis unavailable"
+                return "LLM call failed - Violet synthesis unavailable"
 
     def _synthesize_document_for_white(
         self, rebracketed_analysis, violet_proposal, artifacts
@@ -2254,13 +2267,13 @@ Structure your synthesis as the final creative brief before manifestation.
             try:
                 claude = self._get_claude_supervisor()
                 response = claude.invoke(prompt)
-                return response.content
+                return self._extract_text(response.content)
             except Exception as e:
-                error_msg = f"Indigo synthesis LLM call failed: {e!s}"
+                error_msg = f"White synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
-                return "LLM call failed - Indigo synthesis unavailable"
+                return "LLM call failed - White synthesis unavailable"
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:
@@ -2805,7 +2818,7 @@ Generate comprehensive meta-analysis revealing the ORDER beneath the rainbow.
         try:
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            return response.content
+            return self._extract_text(response.content)
         except Exception as e:
             logger.error(f"Meta-rebracketing LLM call failed: {e}")
             return f"Meta-rebracketing unavailable: {e}"
@@ -2893,7 +2906,7 @@ through sound into a REAL, COMPLETE song ready for human implementation.
         try:
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            return response.content
+            return self._extract_text(response.content)
         except Exception as e:
             logger.error(f"Chromatic synthesis LLM call failed: {e}")
             return f"Chromatic synthesis unavailable: {e}"
@@ -3010,7 +3023,7 @@ Keep it to 2-3 paragraphs maximum.
         try:
             claude = self._get_claude_supervisor()
             response = claude.invoke(prompt)
-            return response.content
+            return self._extract_text(response.content)
         except Exception as e:
             logger.error(f"Mini-synthesis for {agent_name} failed: {e}")
             # Fallback to content_excerpt

@@ -51,6 +51,19 @@ class BaseRainbowAgent(BaseModel, ABC):
             max_tokens=self.settings.max_tokens,
         )
 
+    @staticmethod
+    def _extract_text(content) -> str:
+        if isinstance(content, list):
+            return "".join(
+                (
+                    block.get("text", "")
+                    if isinstance(block, dict)
+                    else getattr(block, "text", str(block))
+                )
+                for block in content
+            )
+        return str(content) if content is not None else ""
+
 
 def skip_chance(chance, rng=None):
     rng = rng or __import__("random").random

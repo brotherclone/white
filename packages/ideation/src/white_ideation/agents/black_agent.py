@@ -276,7 +276,7 @@ Example: "I will weave hidden frequencies that awaken dormant resistance."
         try:
             claude = self._get_claude()
             wish_response = claude.invoke(prompt)
-            wish_text = wish_response.content
+            wish_text = self._extract_text(wish_response.content)
         except Exception as e:
             error_msg = f"LLM call for sigil wish generation failed: {e!s}"
             logger.error(error_msg)
