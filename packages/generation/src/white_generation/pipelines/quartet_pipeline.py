@@ -420,7 +420,9 @@ def _compute_scale_pcs(key_str: str) -> set[int]:
     try:
         root_name, mode = parse_key_string(key_str)
         letter = root_name[0].upper()
-        root_pc = _NOTE_NAME_TO_PC.get(letter, 0)
+        if letter not in _NOTE_NAME_TO_PC:
+            return set()
+        root_pc = _NOTE_NAME_TO_PC[letter]
         for ch in root_name[1:]:
             if ch == "#":
                 root_pc += 1
@@ -456,7 +458,9 @@ def _snap_midi_to_scale(midi_bytes: bytes, scale_pcs: set[int]) -> bytes:
             delta = (s_pc - pc) % 12
             if delta > 6:
                 delta -= 12
-            if abs(delta) < abs(best_delta):
+            if abs(delta) < abs(best_delta) or (
+                abs(delta) == abs(best_delta) and delta < best_delta
+            ):
                 best_delta = delta
         return note + best_delta
 
@@ -907,6 +911,11 @@ def generate_quartet(
     if not voicings:
         # Last resort: single C major triad
         voicings = [[48, 52, 55]]
+
+    if section_durations is not None and len(section_durations) < len(voicings):
+        section_durations = section_durations + [1.0] * (
+            len(voicings) - len(section_durations)
+        )
 
     candidates = []
     for i in range(max(top_k * 2, 6)):

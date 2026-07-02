@@ -177,7 +177,7 @@ def extract_bars(
     # Compute length from note events only — meta end_of_track can carry a huge
     # accumulated delta on type-1 files (e.g. 307200 ticks when notes end at 16800)
     # which would generate hundreds of empty bars and flood the bar pool.
-    non_meta_ticks = [t for t, msg in events if not msg.is_meta]
+    non_meta_ticks = [t for t, msg in events if msg.type in ("note_on", "note_off")]
     if not non_meta_ticks:
         return []
     total_ticks = max(non_meta_ticks)

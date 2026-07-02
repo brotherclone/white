@@ -228,7 +228,8 @@ def extract_section_chord_data(
     _ts_str = chord_review.get("time_sig", "4/4")
     try:
         _ts_parts = str(_ts_str).split("/")
-        _ts: tuple[int, int] = (int(_ts_parts[0]), int(_ts_parts[1]))
+        _num, _den = int(_ts_parts[0]), int(_ts_parts[1])
+        _ts: tuple[int, int] = (_num, _den) if _num > 0 and _den > 0 else (4, 4)
     except (ValueError, IndexError):
         _ts = (4, 4)
 
