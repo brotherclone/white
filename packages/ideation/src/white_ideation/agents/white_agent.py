@@ -425,7 +425,7 @@ class WhiteAgent(BaseModel):
                 )
                 for block in content
             )
-        return content or ""
+        return str(content) if content is not None else ""
 
     @staticmethod
     def _normalize_song_proposal(proposal):
@@ -2202,11 +2202,11 @@ Structure your synthesis as a clear creative brief for solipsistic methodology.
                 response = claude.invoke(prompt)
                 return self._extract_text(response.content)
             except Exception as e:
-                error_msg = f"Indigo synthesis LLM call failed: {e!s}"
+                error_msg = f"Violet synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
-                return "LLM call failed - Indigo synthesis unavailable"
+                return "LLM call failed - Violet synthesis unavailable"
 
     def _synthesize_document_for_white(
         self, rebracketed_analysis, violet_proposal, artifacts
@@ -2269,11 +2269,11 @@ Structure your synthesis as the final creative brief before manifestation.
                 response = claude.invoke(prompt)
                 return self._extract_text(response.content)
             except Exception as e:
-                error_msg = f"Indigo synthesis LLM call failed: {e!s}"
+                error_msg = f"White synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
-                return "LLM call failed - Indigo synthesis unavailable"
+                return "LLM call failed - White synthesis unavailable"
 
     @staticmethod
     def route_after_black(state: MainAgentState) -> str:

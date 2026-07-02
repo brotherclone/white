@@ -62,7 +62,7 @@ class BaseRainbowAgent(BaseModel, ABC):
                 )
                 for block in content
             )
-        return content or ""
+        return str(content) if content is not None else ""
 
 
 def skip_chance(chance, rng=None):
