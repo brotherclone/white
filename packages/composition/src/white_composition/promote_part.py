@@ -120,7 +120,7 @@ def _sync_promote_status(review_file: Path) -> None:
     phase_dir = part_dir.name
     if review_name == "lyrics_review.yml":
         phase = "lyrics"
-    elif phase_dir in ("chords", "drums", "bass", "melody"):
+    elif phase_dir in ("chords", "drums", "bass", "melody", "quartet"):
         phase = phase_dir
     else:
         return  # Unknown structure — skip silently

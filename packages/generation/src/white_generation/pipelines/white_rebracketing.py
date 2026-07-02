@@ -174,7 +174,13 @@ def extract_bars(
     if not events:
         return []
 
-    total_ticks = max(t for t, _ in events)
+    # Compute length from note events only — meta end_of_track can carry a huge
+    # accumulated delta on type-1 files (e.g. 307200 ticks when notes end at 16800)
+    # which would generate hundreds of empty bars and flood the bar pool.
+    non_meta_ticks = [t for t, msg in events if msg.type in ("note_on", "note_off")]
+    if not non_meta_ticks:
+        return []
+    total_ticks = max(non_meta_ticks)
     n_bars = max(1, (total_ticks + bar_ticks - 1) // bar_ticks)
 
     bars: list[bytes] = []
@@ -355,6 +361,15 @@ def build_bar_pool(
 
             bars = extract_bars(rescaled, tpb, beats_per_bar)
             for bar_idx, bar_bytes in enumerate(bars):
+                # Skip bars with no audible notes
+                bar_mid = mido.MidiFile(file=io.BytesIO(bar_bytes))
+                has_notes = any(
+                    msg.type == "note_on" and msg.velocity > 0
+                    for track in bar_mid.tracks
+                    for msg in track
+                )
+                if not has_notes:
+                    continue
                 pool.append(
                     {
                         "midi_bytes": bar_bytes,
