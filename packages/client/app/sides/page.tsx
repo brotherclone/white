@@ -126,7 +126,7 @@ function SideSongRow({
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className={`px-3 py-2 rounded border border-zinc-700 bg-zinc-900 text-xs font-sans flex items-center justify-between gap-2 cursor-grab hover:border-zinc-500 ${
+      className={`px-3 py-2 rounded border border-zinc-700 bg-zinc-900 text-xs font-sans text-zinc-200 flex items-center justify-between gap-2 cursor-grab hover:border-zinc-500 ${
         isDragging ? "opacity-40" : ""
       }`}
     >
