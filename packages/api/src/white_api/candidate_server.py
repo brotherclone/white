@@ -191,6 +191,7 @@ def _schema_is_valid(sv: str | None) -> bool:
 
 
 _LIFECYCLE_STATUSES = {"merged", "abandoned", "scrapped"}
+_LP_CONSIDERATION_STATUSES = {"not_considered", "candidate", "placed"}
 
 
 def _compute_stage(prod_dir: Path) -> str:
@@ -302,6 +303,7 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "lifecycle_status": data.get("lifecycle_status"),
                 "merged_with": data.get("merged_with") or [],
                 "uses_parts_from": data.get("uses_parts_from") or [],
+                "lp_consideration": data.get("lp_consideration") or "not_considered",
             }
         )
     return songs
@@ -457,6 +459,22 @@ def create_app(
                 os.unlink(tmp_path)
             raise
 
+    def _set_lp_consideration(song_id: str, prod_dir: Path, status: str) -> None:
+        """Patch lp_consideration and keep the active-song cache fresh if needed."""
+        global _active_song
+        _patch_manifest(prod_dir, {"lp_consideration": status})
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
+
     class LifecycleBody(BaseModel):
         status: str
         merged_with: list[str] = Field(default_factory=list)
@@ -508,6 +526,20 @@ def create_app(
             )
             if refreshed:
                 _active_song = refreshed
+        return {"ok": True, "status": body.status}
+
+    class LpConsiderationBody(BaseModel):
+        status: str
+
+    @app.post("/songs/{song_id}/lp-consideration")
+    def set_lp_consideration(song_id: str, body: LpConsiderationBody):
+        if body.status not in _LP_CONSIDERATION_STATUSES:
+            raise HTTPException(
+                status_code=422,
+                detail=f"status must be one of: {sorted(_LP_CONSIDERATION_STATUSES)}",
+            )
+        _entry, prod_dir = _resolve_song(song_id)
+        _set_lp_consideration(song_id, prod_dir, body.status)
         return {"ok": True, "status": body.status}
 
     @app.get("/songs/scrapped")
@@ -1470,6 +1502,9 @@ def create_app(
         doc = load_sides(album_dir)
         assign_song(doc, body.song_id, side, body.position, duration)
         save_sides(album_dir, doc)
+        _set_lp_consideration(
+            body.song_id, Path(song_entry["production_path"]), "placed"
+        )
         return {
             "ok": True,
             "side": side,
@@ -1499,6 +1534,10 @@ def create_app(
         except ValueError as e:
             raise HTTPException(status_code=404, detail=str(e))
         save_sides(album_dir, doc)
+        song_entry = _resolve_song_for_sides(body.song_id)
+        _set_lp_consideration(
+            body.song_id, Path(song_entry["production_path"]), "placed"
+        )
         return {
             "ok": True,
             "side": body.to_side,
@@ -1524,6 +1563,9 @@ def create_app(
             )
         remove_song(doc, song_id)
         save_sides(album_dir, doc)
+        song_entry = _resolve_song_for_sides(song_id)
+        next_status = "candidate" if song_entry["has_mix"] else "not_considered"
+        _set_lp_consideration(song_id, Path(song_entry["production_path"]), next_status)
         return {"ok": True}
 
     # ------------------------------------------------------------------

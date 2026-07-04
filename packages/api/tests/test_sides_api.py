@@ -157,3 +157,67 @@ class TestRemoveFromSide:
         song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=200.0)
         resp = client.delete(f"/sides/A/songs/{song_id}")
         assert resp.status_code == 404
+
+
+def _lp_consideration(client, song_id: str) -> str | None:
+    songs = client.get("/songs").json()
+    entry = next(s for s in songs if s["id"] == song_id)
+    return entry["lp_consideration"]
+
+
+class TestLpConsiderationDirectEndpoint:
+    def test_default_not_considered(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one")
+        assert _lp_consideration(client, song_id) == "not_considered"
+
+    def test_set_candidate(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one")
+        resp = client.post(
+            f"/songs/{song_id}/lp-consideration", json={"status": "candidate"}
+        )
+        assert resp.status_code == 200
+        assert resp.json() == {"ok": True, "status": "candidate"}
+        assert _lp_consideration(client, song_id) == "candidate"
+
+    def test_invalid_status_422(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one")
+        resp = client.post(
+            f"/songs/{song_id}/lp-consideration", json={"status": "bogus"}
+        )
+        assert resp.status_code == 422
+
+    def test_unknown_song_404(self, client):
+        resp = client.post(
+            "/songs/nope__nope/lp-consideration", json={"status": "candidate"}
+        )
+        assert resp.status_code == 404
+
+
+class TestLpConsiderationAutoTransitions:
+    def test_assign_sets_placed(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=200.0)
+        client.post("/sides/A/assign", json={"song_id": song_id, "position": 0})
+        assert _lp_consideration(client, song_id) == "placed"
+
+    def test_move_keeps_placed(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=200.0)
+        client.post("/sides/A/assign", json={"song_id": song_id, "position": 0})
+        client.post(
+            "/sides/A/move",
+            json={"song_id": song_id, "to_side": "C", "to_position": 0},
+        )
+        assert _lp_consideration(client, song_id) == "placed"
+
+    def test_remove_reverts_to_candidate_when_mix_still_exists(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=200.0)
+        client.post("/sides/A/assign", json={"song_id": song_id, "position": 0})
+        client.delete(f"/sides/A/songs/{song_id}")
+        assert _lp_consideration(client, song_id) == "candidate"
+
+    def test_remove_reverts_to_not_considered_when_mix_missing(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=200.0)
+        client.post("/sides/A/assign", json={"song_id": song_id, "position": 0})
+        # Simulate the mix file having been deleted/moved after assignment.
+        (sw_dir / "thread-a" / "production" / "song_one" / "mix.wav").unlink()
+        client.delete(f"/sides/A/songs/{song_id}")
+        assert _lp_consideration(client, song_id) == "not_considered"

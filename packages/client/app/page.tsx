@@ -72,6 +72,7 @@ export default function SongBrowserPage() {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
+  const [lpFilter, setLpFilter] = useState<"" | "candidate" | "placed">("");
 
   const activeSongs = useMemo(() => songs.filter(s => !LIFECYCLE_STAGES.has(s.stage)), [songs]);
 
@@ -139,6 +140,12 @@ export default function SongBrowserPage() {
         <h1 className="text-xl font-bold text-white tracking-tight">Songs</h1>
         <div className="flex items-center gap-2">
           <Link
+            href="/sides"
+            className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+          >
+            Sides
+          </Link>
+          <Link
             href="/collaborators"
             className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
           >
@@ -181,6 +188,32 @@ export default function SongBrowserPage() {
         </div>
       )}
 
+      {/* LP consideration filter */}
+      {!error && songs.length > 0 && (
+        <div className="flex gap-1.5 flex-wrap mb-4">
+          {(["candidate", "placed"] as const).map(lp => {
+            const count = songs.filter(s => s.lp_consideration === lp).length;
+            if (count === 0) return null;
+            const active = lpFilter === lp;
+            return (
+              <button
+                key={lp}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setLpFilter(active ? "" : lp)}
+                className={`px-2.5 py-1 text-[10px] font-sans border transition-colors ${
+                  active
+                    ? "bg-blue-200 text-blue-950 border-blue-200"
+                    : "bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
+                }`}
+              >
+                lp: {lp} <span className="text-zinc-600">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {toast && (
         <div
           className={`rounded p-3 mb-4 text-sm font-sans border ${
@@ -207,6 +240,7 @@ export default function SongBrowserPage() {
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {songs.filter(s => {
+          if (lpFilter && s.lp_consideration !== lpFilter) return false;
           if (stageFilter === "all") return !LIFECYCLE_STAGES.has(s.stage);
           if (stageFilter === "stub") return s.stub;
           return s.stage === stageFilter;
@@ -251,14 +285,21 @@ export default function SongBrowserPage() {
                   : STAGE_LABELS[song.stage]}
               </span>
             </div>
-            {(song.schema_version !== "2.0.0" || song.stub) && (
+            {(song.schema_version !== "2.0.0" || song.stub || song.lp_consideration !== "not_considered") && (
               <div className="mt-1.5 flex items-center gap-1.5">
-                <span className="text-[9px] font-sans px-1 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-500">
-                  v{song.schema_version}
-                </span>
+                {(song.schema_version !== "2.0.0" || song.stub) && (
+                  <span className="text-[9px] font-sans px-1 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-500">
+                    v{song.schema_version}
+                  </span>
+                )}
                 {song.stub && (
                   <span className="text-[9px] font-sans px-1 py-0.5 rounded bg-amber-900/30 border border-amber-800 text-amber-400">
                     stub
+                  </span>
+                )}
+                {song.lp_consideration !== "not_considered" && (
+                  <span className="text-[9px] font-sans px-1 py-0.5 rounded bg-blue-900/30 border border-blue-800 text-blue-400">
+                    lp: {song.lp_consideration}
                   </span>
                 )}
               </div>

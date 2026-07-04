@@ -558,6 +558,22 @@ export async function moveSongBetweenSides(
   return res.json();
 }
 
+export async function setLpConsideration(
+  songId: string,
+  status: import("./types").LpConsiderationStatus,
+): Promise<{ ok: boolean; status: string }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/lp-consideration`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "LP consideration update failed");
+  }
+  return res.json();
+}
+
 export async function removeSongFromSide(
   side: string,
   songId: string,
