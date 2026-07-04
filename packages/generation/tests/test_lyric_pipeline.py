@@ -802,6 +802,63 @@ class TestRunPipelineIntegration:
         assert len(txt_files) == 1
         assert txt_files[0].name == "lyrics_01.txt"
 
+    def test_negative_constraints_injected_into_prompt(self, tmp_path):
+        """When lyrics_negative_constraints.yml exists at the album root, its
+        avoidance block should reach the Claude prompt."""
+        import numpy as np
+        import yaml as _yaml
+
+        from white_generation.pipelines.lyric_pipeline import run_lyric_pipeline
+
+        album_dir = tmp_path
+        prod_dir = _make_production_dir(album_dir / "thread_one")
+        with open(album_dir / "lyrics_negative_constraints.yml", "w") as f:
+            _yaml.dump(
+                {
+                    "overused_words": [
+                        {
+                            "word": "blue",
+                            "reason": "'blue' appears in 3/4 songs' lyrics (75%)",
+                        }
+                    ]
+                },
+                f,
+            )
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text="[verse]\nHello world\n")]
+        mock_client.messages.create.return_value = mock_response
+
+        mock_scorer = MagicMock()
+        mock_scorer.prepare_concept.return_value = np.zeros(768, dtype=np.float32)
+        mock_scorer.score_batch.return_value = [
+            {
+                "temporal": {"past": 0.6, "present": 0.3, "future": 0.1},
+                "spatial": {"thing": 0.7, "place": 0.2, "person": 0.1},
+                "ontological": {"imagined": 0.1, "forgotten": 0.1, "known": 0.8},
+                "confidence": 0.042,
+                "rank": 0,
+                "candidate": {"lyric_text": "[verse]\nHello world\n"},
+            }
+        ]
+
+        with (
+            patch("anthropic.Anthropic", return_value=mock_client),
+            patch("white_analysis.refractor.Refractor", return_value=mock_scorer),
+        ):
+            run_lyric_pipeline(
+                production_dir=str(prod_dir),
+                num_candidates=1,
+                model="claude-sonnet-4-6",
+            )
+
+        sent_prompt = mock_client.messages.create.call_args.kwargs["messages"][0][
+            "content"
+        ]
+        assert "blue" in sent_prompt
+        assert "75%" in sent_prompt
+
     def test_run_pipeline_writes_review_yml(self, tmp_path):
         """Pipeline should write lyrics_review.yml with one candidate entry."""
         import numpy as np
