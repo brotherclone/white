@@ -14,7 +14,7 @@ from typing import Optional
 
 import soundfile as sf
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 SIDES_FILENAME = "sides.yml"
 SIDE_NAMES = ["A", "B", "C", "D"]
@@ -27,7 +27,7 @@ class SideSong(BaseModel):
 
 
 class Side(BaseModel):
-    songs: list[SideSong] = []
+    songs: list[SideSong] = Field(default_factory=list)
 
 
 class SidesDocument(BaseModel):
@@ -98,7 +98,7 @@ def save_sides(album_dir: Path, doc: SidesDocument) -> Path:
     return path
 
 
-def _find_song_side(doc: SidesDocument, song_id: str) -> Optional[str]:
+def find_song_side(doc: SidesDocument, song_id: str) -> Optional[str]:
     for name, side in doc.sides.items():
         if any(s.song_id == song_id for s in side.songs):
             return name
@@ -129,7 +129,7 @@ def move_song(
 
     Preserves the song's previously cached duration.
     """
-    current_side = _find_song_side(doc, song_id)
+    current_side = find_song_side(doc, song_id)
     if current_side is None:
         raise ValueError(f"Song '{song_id}' is not assigned to any side")
     existing = next(s for s in doc.sides[current_side].songs if s.song_id == song_id)

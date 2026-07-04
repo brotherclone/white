@@ -1520,6 +1520,7 @@ def create_app(
     def move_within_sides(side: str, body: SideMoveBody):
         from white_composition.lp_sides import (
             SIDE_NAMES,
+            find_song_side,
             load_sides,
             move_song,
             save_sides,
@@ -1529,6 +1530,15 @@ def create_app(
             raise HTTPException(status_code=404, detail="Unknown side")
         album_dir = _require_shrink_wrapped_dir()
         doc = load_sides(album_dir)
+        actual_side = find_song_side(doc, body.song_id)
+        if actual_side != side:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Song '{body.song_id}' is not on side '{side}' "
+                    f"(currently on {actual_side!r})"
+                ),
+            )
         try:
             move_song(doc, body.song_id, body.to_side, body.to_position)
         except ValueError as e:

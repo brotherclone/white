@@ -116,28 +116,37 @@ function SideSongRow({
   durationSeconds: number;
   onRemove: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef: setDragRef, isDragging } = useDraggable({
     id: `side:${side}:${songId}`,
     data: { songId, title, fromSide: side } satisfies DragPayload,
   });
+  // Also a drop target so releasing directly on this row inserts before it,
+  // instead of always falling back to appending at the end of the side.
+  const { setNodeRef: setDropRef, isOver } = useDroppable({ id: `side:${side}:${songId}` });
+  const setRefs = (node: HTMLDivElement | null) => {
+    setDragRef(node);
+    setDropRef(node);
+  };
 
   return (
     <div
-      ref={setNodeRef}
+      ref={setRefs}
       {...attributes}
       {...listeners}
-      className={`px-3 py-2 rounded border border-zinc-700 bg-zinc-900 text-xs font-sans text-zinc-200 flex items-center justify-between gap-2 cursor-grab hover:border-zinc-500 ${
-        isDragging ? "opacity-40" : ""
-      }`}
+      className={`px-3 py-2 rounded border bg-zinc-900 text-xs font-sans text-zinc-200 flex items-center justify-between gap-2 cursor-grab ${
+        isOver ? "border-blue-500" : "border-zinc-700 hover:border-zinc-500"
+      } ${isDragging ? "opacity-40" : ""}`}
     >
       <span className="truncate">{title}</span>
       <span className="flex items-center gap-2 shrink-0">
         <span className="text-zinc-500">{formatDuration(durationSeconds)}</span>
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
           }}
+          aria-label={`Remove ${title} from side ${side}`}
           className="text-zinc-600 hover:text-red-400 transition-colors"
           title="Remove from side"
         >

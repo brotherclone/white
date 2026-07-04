@@ -144,6 +144,20 @@ class TestMoveBetweenSides:
         )
         assert resp.status_code == 404
 
+    def test_move_wrong_source_side_404(self, sw_dir, client):
+        """The {side} path param must match where the song actually is."""
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=200.0)
+        client.post("/sides/A/assign", json={"song_id": song_id, "position": 0})
+        resp = client.post(
+            "/sides/B/move",
+            json={"song_id": song_id, "to_side": "C", "to_position": 0},
+        )
+        assert resp.status_code == 404
+        # Song must not have moved.
+        sides = client.get("/sides").json()["sides"]
+        assert sides["A"]["songs"][0]["song_id"] == song_id
+        assert sides["C"]["songs"] == []
+
 
 class TestRemoveFromSide:
     def test_remove_song(self, sw_dir, client):
