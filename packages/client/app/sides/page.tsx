@@ -14,9 +14,54 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { assignSongToSide, fetchSides, fetchSongs, moveSongBetweenSides, removeSongFromSide } from "@/lib/api";
-import { SideName, SidesResponse, SongEntry } from "@/lib/types";
+import { SideEntry, SideName, SideSong, SidesResponse, SongEntry } from "@/lib/types";
 
 const SIDE_NAMES: SideName[] = ["A", "B", "C", "D"];
+
+function sideEntryFromSongs(songs: SideSong[], limitSeconds: number): SideEntry {
+  const total = songs.reduce((sum, s) => sum + s.duration_seconds, 0);
+  return { songs, total_seconds: total, over_limit: total > limitSeconds };
+}
+
+/** Move songId to toSide/toPosition in a local copy of `sides`, recomputing totals. */
+function applyLocalPlacement(
+  sides: SidesResponse,
+  songId: string,
+  toSide: SideName,
+  toPosition: number,
+  knownDuration: number | null,
+): SidesResponse {
+  let duration = knownDuration;
+  const withoutSong: Record<SideName, SideSong[]> = {} as Record<SideName, SideSong[]>;
+  for (const name of SIDE_NAMES) {
+    const existing = sides.sides[name].songs.find((s) => s.song_id === songId);
+    if (existing && duration === null) duration = existing.duration_seconds;
+    withoutSong[name] = sides.sides[name].songs.filter((s) => s.song_id !== songId);
+  }
+
+  const targetSongs = [...withoutSong[toSide]];
+  const position = Math.max(0, Math.min(toPosition, targetSongs.length));
+  targetSongs.splice(position, 0, { song_id: songId, duration_seconds: duration ?? 0 });
+  withoutSong[toSide] = targetSongs;
+
+  const newSides = {} as Record<SideName, SideEntry>;
+  for (const name of SIDE_NAMES) {
+    newSides[name] = sideEntryFromSongs(withoutSong[name], sides.side_limit_seconds);
+  }
+  return { side_limit_seconds: sides.side_limit_seconds, sides: newSides };
+}
+
+/** Remove songId from `side` in a local copy of `sides`, recomputing totals. */
+function applyLocalRemoval(sides: SidesResponse, side: SideName, songId: string): SidesResponse {
+  const remaining = sides.sides[side].songs.filter((s) => s.song_id !== songId);
+  return {
+    ...sides,
+    sides: {
+      ...sides.sides,
+      [side]: sideEntryFromSongs(remaining, sides.side_limit_seconds),
+    },
+  };
+}
 
 function formatDuration(seconds: number): string {
   const total = Math.round(seconds);
@@ -208,23 +253,53 @@ export default function SidesPage() {
     }
     if (!toSide) return;
 
+    const previousSides = sides;
+    const knownDuration =
+      payload.fromSide !== null
+        ? (sides.sides[payload.fromSide].songs.find((s) => s.song_id === payload.songId)
+            ?.duration_seconds ?? null)
+        : null;
+
+    // Update the UI immediately so the item disappears from its source on release;
+    // reconcile with the server's authoritative (duration-accurate) response after.
+    setSides(applyLocalPlacement(sides, payload.songId, toSide, toPosition, knownDuration));
+
     try {
-      if (payload.fromSide === null) {
-        await assignSongToSide(toSide, payload.songId, toPosition);
-      } else {
-        await moveSongBetweenSides(payload.fromSide, payload.songId, toSide, toPosition);
-      }
-      refresh();
+      const response =
+        payload.fromSide === null
+          ? await assignSongToSide(toSide, payload.songId, toPosition)
+          : await moveSongBetweenSides(payload.fromSide, payload.songId, toSide, toPosition);
+      const resolvedSide = toSide;
+      setSides((current) =>
+        current
+          ? {
+              ...current,
+              sides: {
+                ...current.sides,
+                [resolvedSide]: sideEntryFromSongs(response.songs, current.side_limit_seconds),
+              },
+            }
+          : current,
+      );
+      setError(null);
+      fetchSongs().then(setSongs).catch(() => {});
     } catch (e) {
+      setSides(previousSides);
       setError(e instanceof Error ? e.message : "Drop failed");
     }
   };
 
   const handleRemove = async (side: SideName, songId: string) => {
+    if (!sides) return;
+    const previousSides = sides;
+    setSides(applyLocalRemoval(sides, side, songId));
+
     try {
       await removeSongFromSide(side, songId);
-      refresh();
+      setError(null);
+      fetchSongs().then(setSongs).catch(() => {});
     } catch (e) {
+      setSides(previousSides);
       setError(e instanceof Error ? e.message : "Remove failed");
     }
   };
