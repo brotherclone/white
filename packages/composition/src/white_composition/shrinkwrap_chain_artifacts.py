@@ -31,6 +31,8 @@ from white_extraction.util.generate_negative_constraints import (
 
 logger = logging.getLogger(__name__)
 
+SHRINKWRAP_SCHEMA_VERSION = "2.0.0"
+
 # Debug file patterns in md/ — these are intermediate White Agent outputs
 DEBUG_FILE_PATTERNS = [
     r"white_agent_.*_rebracketing_analysis\.(?:md|json)$",
@@ -303,15 +305,12 @@ def write_manifest(output_dir: Path, metadata: dict) -> Path:
     manifest_path = output_dir / "manifest.yml"
 
     manifest = {
+        "schema_version": SHRINKWRAP_SCHEMA_VERSION,
         "title": metadata["title"],
         "bpm": metadata["bpm"],
         "key": metadata["key"],
-        "tempo": metadata["tempo"],
-        "concept": metadata["concept"],
         "rainbow_color": metadata["rainbow_color"],
         "mnemonic": metadata["mnemonic"],
-        "mood": metadata["mood"],
-        "genres": metadata["genres"],
         "agent_name": metadata["agent_name"],
         "iteration_count": metadata["iteration_count"],
         "thread_id": metadata["thread_id"],
@@ -319,7 +318,14 @@ def write_manifest(output_dir: Path, metadata: dict) -> Path:
     }
 
     with open(manifest_path, "w") as f:
-        yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True, width=120)
+        yaml.dump(
+            manifest,
+            f,
+            default_flow_style=False,
+            allow_unicode=True,
+            sort_keys=False,
+            width=float("inf"),
+        )
 
     return manifest_path
 
@@ -338,21 +344,29 @@ def write_index(output_dir: Path, all_metadata: list[dict]) -> Path:
             "key": meta["key"],
             "rainbow_color": meta["rainbow_color"],
             "concept": (
-                meta["concept"][:200] + "..."
-                if len(meta.get("concept", "")) > 200
-                else meta.get("concept", "")
+                (meta.get("concept") or "")[:200] + "..."
+                if len(meta.get("concept") or "") > 200
+                else (meta.get("concept") or "")
             ),
             "iteration_count": meta["iteration_count"],
         }
         threads.append(entry)
 
     index = {
+        "schema_version": SHRINKWRAP_SCHEMA_VERSION,
         "thread_count": len(threads),
         "threads": threads,
     }
 
     with open(index_path, "w") as f:
-        yaml.dump(index, f, default_flow_style=False, allow_unicode=True, width=120)
+        yaml.dump(
+            index,
+            f,
+            default_flow_style=False,
+            allow_unicode=True,
+            sort_keys=False,
+            width=float("inf"),
+        )
 
     return index_path
 
@@ -482,6 +496,7 @@ def scaffold_song_productions(
         rc = proposal.get("rainbow_color")
         rainbow_color = rc.get("color_name") if isinstance(rc, dict) else rc
         bootstrap = {
+            "schema_version": SHRINKWRAP_SCHEMA_VERSION,
             "title": proposal.get("title") or slug,
             "key": proposal.get("key"),
             "bpm": proposal.get("bpm"),
@@ -582,6 +597,210 @@ def shrinkwrap_thread(
 
     existing_names.add(new_name)
     return metadata
+
+
+def _unslugify(slug: str) -> str:
+    """Convert a filesystem slug to a title-cased human readable string."""
+    return " ".join(
+        w.capitalize() for w in slug.replace("-", " ").replace("_", " ").split()
+    )
+
+
+def _synthesize_thread_manifest_stub(thread_dir: Path, thread_id: str | None) -> dict:
+    """Write a stub manifest.yml for a Class B thread that has no manifest."""
+    title = _unslugify(thread_dir.name)
+    manifest = {
+        "schema_version": SHRINKWRAP_SCHEMA_VERSION,
+        "stub": True,
+        "title": title,
+        "bpm": None,
+        "key": None,
+        "agent_name": None,
+        "timestamp": None,
+        "thread_id": thread_id,
+    }
+    manifest_path = thread_dir / "manifest.yml"
+    with open(manifest_path, "w") as f:
+        yaml.dump(manifest, f, allow_unicode=True, sort_keys=False, width=float("inf"))
+    return manifest
+
+
+_BOOTSTRAP_SLUG_RE = re.compile(r"^(.+?)__(.+?)(?:_v\d+)?$")
+_VERSION_SUFFIX_RE = re.compile(r"_v\d+$")
+
+
+def _synthesize_bootstrap_stub(prod_dir: Path) -> dict:
+    """Write a stub manifest_bootstrap.yml for a Class B production dir.
+
+    Parses {color}__{title_slug}_v{n} convention from the dir name.
+    Falls back to using the full slug (minus _vN suffix) as title if no
+    double-underscore found.
+    """
+    slug = prod_dir.name
+    m = _BOOTSTRAP_SLUG_RE.match(slug)
+    if m:
+        rainbow_color = _unslugify(m.group(1))
+        title = _unslugify(m.group(2))
+    else:
+        rainbow_color = None
+        title = _unslugify(_VERSION_SUFFIX_RE.sub("", slug))
+
+    bootstrap = {
+        "schema_version": SHRINKWRAP_SCHEMA_VERSION,
+        "stub": True,
+        "title": title,
+        "rainbow_color": rainbow_color,
+        "bpm": None,
+        "key": None,
+        "singer": None,
+    }
+    manifest_path = prod_dir / "manifest_bootstrap.yml"
+    with open(manifest_path, "w") as f:
+        yaml.dump(bootstrap, f, allow_unicode=True, sort_keys=False, width=float("inf"))
+    return bootstrap
+
+
+def migrate_manifests(output_dir: Path, dry_run: bool = False) -> dict:
+    """Backfill schema_version on legacy manifests and synthesize missing artifacts.
+
+    Pass 1 — schema_version backfill (Class A and B):
+      - thread manifest.yml files missing schema_version get "2.0.0" inserted
+      - production manifest_bootstrap.yml files get the same treatment
+      - output index.yml gets the same treatment
+      - song_context.yml files with version "1" are updated to "2.0.0"
+
+    Pass 2 — missing artifact synthesis (Class B threads only):
+      - Threads with production/ but no manifest.yml → stub manifest written
+      - Production dirs with no manifest_bootstrap.yml → scaffold from yml/ or stub
+
+    Returns a summary dict with counts of changes made/planned.
+    """
+    summary = {
+        "manifest_backfilled": 0,
+        "bootstrap_backfilled": 0,
+        "index_backfilled": 0,
+        "song_context_upgraded": 0,
+        "thread_stubs_written": 0,
+        "bootstrap_stubs_written": 0,
+    }
+
+    def _backfill_yaml(path: Path, key: str = "schema_version") -> bool:
+        """Insert schema_version as first key if absent. Returns True if changed."""
+        try:
+            with open(path) as f:
+                data = yaml.safe_load(f) or {}
+        except Exception:
+            return False
+        if data.get(key) == SHRINKWRAP_SCHEMA_VERSION:
+            return False
+        # For song_context.yml: upgrade "1" → "2.0.0"; skip if already 2.x
+        if path.name == "song_context.yml":
+            sv = str(data.get("schema_version", ""))
+            if sv.startswith("2"):
+                return False
+        if dry_run:
+            return True
+        # Rewrite with schema_version as first key
+        ordered = {"schema_version": SHRINKWRAP_SCHEMA_VERSION}
+        ordered.update({k: v for k, v in data.items() if k != "schema_version"})
+        with open(path, "w") as f:
+            yaml.dump(
+                ordered, f, allow_unicode=True, sort_keys=False, width=float("inf")
+            )
+        return True
+
+    # -- Pass 1: backfill --
+
+    # index.yml
+    index_path = output_dir / "index.yml"
+    if index_path.exists() and _backfill_yaml(index_path):
+        summary["index_backfilled"] += 1
+        if dry_run:
+            print(f"  [backfill] {index_path}")
+
+    # thread manifest.yml files
+    for manifest_path in sorted(output_dir.glob("*/manifest.yml")):
+        if _backfill_yaml(manifest_path):
+            summary["manifest_backfilled"] += 1
+            if dry_run:
+                print(f"  [backfill] {manifest_path}")
+
+    # production manifest_bootstrap.yml files
+    for bootstrap_path in sorted(
+        output_dir.glob("*/production/*/manifest_bootstrap.yml")
+    ):
+        if _backfill_yaml(bootstrap_path):
+            summary["bootstrap_backfilled"] += 1
+            if dry_run:
+                print(f"  [backfill] {bootstrap_path}")
+
+    # song_context.yml files
+    for ctx_path in sorted(output_dir.glob("*/production/*/song_context.yml")):
+        if _backfill_yaml(ctx_path):
+            summary["song_context_upgraded"] += 1
+            if dry_run:
+                print(f"  [upgrade]  {ctx_path}")
+
+    # -- Pass 2: missing artifact synthesis (Class B threads) --
+
+    for thread_dir in sorted(output_dir.iterdir()):
+        if not thread_dir.is_dir() or thread_dir.name.startswith("."):
+            continue
+        prod_root = thread_dir / "production"
+        if not prod_root.is_dir():
+            continue
+
+        # Synthesize missing thread manifest.yml
+        manifest_path = thread_dir / "manifest.yml"
+        if not manifest_path.exists():
+            # Try to read thread_id from index.yml if available
+            thread_id = None
+            try:
+                idx_data = (
+                    yaml.safe_load(index_path.read_text())
+                    if index_path.exists()
+                    else {}
+                )
+                for t in (idx_data or {}).get("threads", []):
+                    if t.get("directory") == thread_dir.name:
+                        thread_id = t.get("thread_id")
+                        break
+            except Exception:
+                pass
+            if dry_run:
+                print(f"  [stub manifest] {manifest_path}")
+            else:
+                _synthesize_thread_manifest_stub(thread_dir, thread_id)
+            summary["thread_stubs_written"] += 1
+
+        # Synthesize missing manifest_bootstrap.yml in each production sub-dir
+        for prod_dir in sorted(prod_root.iterdir()):
+            if not prod_dir.is_dir():
+                continue
+            bootstrap_path = prod_dir / "manifest_bootstrap.yml"
+            if bootstrap_path.exists():
+                continue
+            # Try scaffold from yml/ dir first
+            yml_dir = thread_dir / "yml"
+            if yml_dir.exists():
+                proposal_file = yml_dir / f"{prod_dir.name}.yml"
+                would_scaffold = proposal_file.exists()
+                if not dry_run:
+                    slugs = scaffold_song_productions(thread_dir, yml_dir)
+                    would_scaffold = prod_dir.name in slugs
+                if would_scaffold:
+                    summary["bootstrap_stubs_written"] += 1
+                    if dry_run:
+                        print(f"  [scaffold]  {bootstrap_path}")
+                    continue
+            # Fall back to stub
+            if dry_run:
+                print(f"  [stub bootstrap] {bootstrap_path}")
+            else:
+                _synthesize_bootstrap_stub(prod_dir)
+            summary["bootstrap_stubs_written"] += 1
+
+    return summary
 
 
 def load_orphaned_manifests(output_dir: Path, known_dirs: set[str]) -> list[dict]:
@@ -856,6 +1075,11 @@ def main():
         action="store_true",
         help="Overwrite existing manifest_bootstrap.yml files during scaffolding",
     )
+    parser.add_argument(
+        "--migrate",
+        action="store_true",
+        help="Backfill schema_version on legacy manifests and synthesize missing artifacts, then exit",
+    )
 
     args = parser.parse_args()
 
@@ -863,6 +1087,15 @@ def main():
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(levelname)s: %(message)s",
     )
+
+    if args.migrate:
+        if args.dry_run:
+            print("DRY RUN — migration preview (no files written)\n")
+        summary = migrate_manifests(args.output_dir, dry_run=args.dry_run)
+        print(f"\nMigration {'preview' if args.dry_run else 'complete'}:")
+        for k, v in summary.items():
+            print(f"  {k}: {v}")
+        return
 
     if args.scaffold_only:
         output_dir = args.output_dir

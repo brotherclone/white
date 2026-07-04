@@ -12,6 +12,7 @@ Usage (album mode):
 """
 
 import argparse
+import contextlib
 import io
 import os
 import re
@@ -179,7 +180,37 @@ _MIX_STAGE_TO_SONG_STAGE: dict[str, str] = {
 }
 
 
+_VALID_SCHEMA_PREFIXES = {"", "1", "1.", "2"}
+
+
+def _schema_is_valid(sv: str | None) -> bool:
+    if sv is None:
+        return True  # absent = legacy 1.x, tolerated
+    sv = str(sv)
+    return sv == "" or sv.startswith("1") or sv.startswith("2")
+
+
+_LIFECYCLE_STATUSES = {"merged", "abandoned", "scrapped"}
+_LP_CONSIDERATION_STATUSES = {"not_considered", "candidate", "placed"}
+
+
 def _compute_stage(prod_dir: Path) -> str:
+    bootstrap_path = prod_dir / "manifest_bootstrap.yml"
+    if bootstrap_path.exists():
+        try:
+            with open(bootstrap_path) as f:
+                mb = yaml.safe_load(f) or {}
+            lc = mb.get("lifecycle_status")
+            if lc in _LIFECYCLE_STATUSES:
+                return lc
+            sv = mb.get("schema_version")
+            if sv is not None and not _schema_is_valid(sv):
+                return "invalid"
+            if not mb.get("title") and not mb.get("rainbow_color"):
+                return "invalid"
+        except Exception:
+            return "invalid"
+
     if not (prod_dir / "song_context.yml").exists():
         return "ideation"
     try:
@@ -247,6 +278,8 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
             continue
         prod_dir = manifest_path.parent
         proposal_path = _find_proposal(manifest_path)
+        sv = data.get("schema_version")
+        schema_version = str(sv) if sv is not None else "1.x"
         songs.append(
             {
                 "id": f"{thread_slug}__{production_slug}",
@@ -259,12 +292,18 @@ def scan_songs(shrink_wrapped_dir: Path) -> list[dict]:
                 "time_sig": data.get("time_sig"),
                 "rainbow_color": data.get("rainbow_color"),
                 "singer": data.get("singer"),
-                "has_decisions": (prod_dir / "production_decisions.yml").exists(),
+                "schema_version": schema_version,
+                "stub": bool(data.get("stub", False)),
                 "initialized": (prod_dir / "song_context.yml").exists(),
                 "has_mix": _has_mix_file(prod_dir),
                 "stage": _compute_stage(prod_dir),
                 "proposal_path": str(proposal_path) if proposal_path else None,
                 "concept": _read_concept(prod_dir),
+                # lifecycle fields — absent in older manifests, default to None/[]
+                "lifecycle_status": data.get("lifecycle_status"),
+                "merged_with": data.get("merged_with") or [],
+                "uses_parts_from": data.get("uses_parts_from") or [],
+                "lp_consideration": data.get("lp_consideration") or "not_considered",
             }
         )
     return songs
@@ -382,7 +421,158 @@ def create_app(
 
     @app.get("/songs/active")
     def get_active_song():
+        if _active_song and _production_dir:
+            _active_song["stage"] = _compute_stage(_production_dir)
         return {"active": _active_song}
+
+    def _resolve_song(song_id: str) -> tuple[dict, Path]:
+        """Return (song_entry, prod_dir) for song_id, or raise 404."""
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(status_code=503, detail="Server not in album mode")
+        songs = scan_songs(_shrink_wrapped_dir)
+        entry = next((s for s in songs if s["id"] == song_id), None)
+        if entry is None:
+            raise HTTPException(status_code=404, detail=f"Song '{song_id}' not found")
+        return entry, Path(entry["production_path"])
+
+    def _patch_manifest(prod_dir: Path, updates: dict) -> None:
+        """Merge updates into manifest_bootstrap.yml atomically."""
+        bootstrap_path = prod_dir / "manifest_bootstrap.yml"
+        data: dict = {}
+        if bootstrap_path.exists():
+            with open(bootstrap_path) as f:
+                loaded = yaml.safe_load(f)
+            if isinstance(loaded, dict):
+                data = loaded
+        data.update(updates)
+        tmp_fd, tmp_path = tempfile.mkstemp(
+            dir=bootstrap_path.parent, suffix=".yml.tmp"
+        )
+        try:
+            with os.fdopen(tmp_fd, "w") as f:
+                yaml.dump(
+                    data, f, allow_unicode=True, sort_keys=False, width=float("inf")
+                )
+            os.replace(tmp_path, bootstrap_path)
+        except Exception:
+            with contextlib.suppress(OSError):
+                os.unlink(tmp_path)
+            raise
+
+    def _set_lp_consideration(song_id: str, prod_dir: Path, status: str) -> None:
+        """Patch lp_consideration and keep the active-song cache fresh if needed."""
+        global _active_song
+        _patch_manifest(prod_dir, {"lp_consideration": status})
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
+
+    class LifecycleBody(BaseModel):
+        status: str
+        merged_with: list[str] = Field(default_factory=list)
+
+    @app.post("/songs/{song_id}/lifecycle")
+    def set_lifecycle(song_id: str, body: LifecycleBody):
+        global _active_song
+        if body.status not in _LIFECYCLE_STATUSES:
+            raise HTTPException(
+                status_code=422,
+                detail=f"status must be one of: {sorted(_LIFECYCLE_STATUSES)}",
+            )
+        _entry, prod_dir = _resolve_song(song_id)
+        if body.status == "merged":
+            if not body.merged_with:
+                raise HTTPException(
+                    status_code=422,
+                    detail="merged_with must contain at least one song ID",
+                )
+            # Resolve all partner IDs first so we 404 before writing anything.
+            partner_dirs: list[tuple[str, Path]] = []
+            for partner_id in body.merged_with:
+                _pe, partner_dir = _resolve_song(partner_id)
+                partner_dirs.append((partner_id, partner_dir))
+            # Bilateral write — active song points to partners, each partner points back.
+            _patch_manifest(
+                prod_dir,
+                {"lifecycle_status": "merged", "merged_with": body.merged_with},
+            )
+            for partner_id, partner_dir in partner_dirs:
+                partner_merged_with = [song_id] + [
+                    p for p in body.merged_with if p != partner_id
+                ]
+                _patch_manifest(
+                    partner_dir,
+                    {"lifecycle_status": "merged", "merged_with": partner_merged_with},
+                )
+        else:
+            _patch_manifest(prod_dir, {"lifecycle_status": body.status})
+        # Keep _active_song cache fresh if the patched song is currently active.
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
+        return {"ok": True, "status": body.status}
+
+    class LpConsiderationBody(BaseModel):
+        status: str
+
+    @app.post("/songs/{song_id}/lp-consideration")
+    def set_lp_consideration(song_id: str, body: LpConsiderationBody):
+        if body.status not in _LP_CONSIDERATION_STATUSES:
+            raise HTTPException(
+                status_code=422,
+                detail=f"status must be one of: {sorted(_LP_CONSIDERATION_STATUSES)}",
+            )
+        _entry, prod_dir = _resolve_song(song_id)
+        _set_lp_consideration(song_id, prod_dir, body.status)
+        return {"ok": True, "status": body.status}
+
+    @app.get("/songs/scrapped")
+    def list_scrapped_songs():
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(status_code=503, detail="Server not in album mode")
+        return [
+            s
+            for s in scan_songs(_shrink_wrapped_dir)
+            if s.get("lifecycle_status") == "scrapped"
+        ]
+
+    class UsesPartsFromBody(BaseModel):
+        uses_parts_from: list[str]
+
+    @app.patch("/songs/{song_id}/uses-parts-from")
+    def set_uses_parts_from(song_id: str, body: UsesPartsFromBody):
+        global _active_song
+        _entry, prod_dir = _resolve_song(song_id)
+        _patch_manifest(prod_dir, {"uses_parts_from": body.uses_parts_from})
+        # Keep _active_song cache fresh if the patched song is currently active.
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod_dir)
+        ):
+            refreshed = next(
+                (s for s in scan_songs(_shrink_wrapped_dir) if s["id"] == song_id),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
+        return {"ok": True}
 
     # ------------------------------------------------------------------
     # Pipeline — init, run, status
@@ -589,12 +779,25 @@ def create_app(
         }
 
         def _run():
-            global _handoff_job
+            global _handoff_job, _active_song
             try:
                 from white_composition.logic_handoff import handoff
 
                 handoff(prod)
                 _handoff_job["status"] = "done"
+                # Refresh _active_song so stage flips to "composition" immediately.
+                if _shrink_wrapped_dir and _active_song:
+                    song_id = _active_song.get("id")
+                    refreshed = next(
+                        (
+                            s
+                            for s in scan_songs(_shrink_wrapped_dir)
+                            if s["id"] == song_id
+                        ),
+                        None,
+                    )
+                    if refreshed:
+                        _active_song = refreshed
             except Exception as exc:
                 _handoff_job["status"] = "error"
                 _handoff_job["error"] = str(exc)
@@ -1081,6 +1284,77 @@ def create_app(
         return {"ok": True}
 
     # ------------------------------------------------------------------
+    # Stage regression
+    # ------------------------------------------------------------------
+
+    class RegressBody(BaseModel):
+        target_stage: str
+        confirmed: bool = False
+        diary_entry: str | None = None
+
+    @app.post("/composition/regress")
+    def regress_stage(body: RegressBody):
+        prod = _require_production_dir()
+        from white_composition.logic_handoff import (
+            regression_info,
+            resolve_song_dir,
+            write_stage,
+        )
+
+        song_dir = resolve_song_dir(prod)
+        try:
+            from white_composition.logic_handoff import read_composition
+
+            comp = read_composition(song_dir) or {}
+            current = comp.get("current_stage", "structure")
+            info = regression_info(song_dir, current, body.target_stage)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+        if not body.confirmed:
+            return info
+
+        # Delete listed files
+        for rel in info.get("files_to_delete", []):
+            p = song_dir / rel
+            if p.exists():
+                try:
+                    if p.is_dir():
+                        import shutil as _shutil
+
+                        _shutil.rmtree(p)
+                    else:
+                        p.unlink()
+                except OSError as exc:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Could not delete {rel}: {exc}",
+                    ) from exc
+
+        try:
+            write_stage(song_dir, body.target_stage)
+        except (ValueError, FileNotFoundError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+        if body.diary_entry:
+            try:
+                from white_diary import write_entry
+
+                write_entry(
+                    song_slug=(_active_song or {}).get("production_slug", "unknown"),
+                    author="system",
+                    phase="regression",
+                    title=f"Regressed to {body.target_stage}",
+                    body=body.diary_entry,
+                    tags=["regression"],
+                    metadata={"from_stage": current, "to_stage": body.target_stage},
+                )
+            except Exception:
+                pass
+
+        return {"ok": True, "stage": body.target_stage}
+
+    # ------------------------------------------------------------------
     # Mix file
     # ------------------------------------------------------------------
 
@@ -1088,12 +1362,15 @@ def create_app(
     def mix_info():
         prod = _require_production_dir()
         from white_composition.init_production import load_song_context
+        from white_composition.lp_sides import mix_duration_seconds
 
         ctx = load_song_context(prod)
         mix_file = ctx.get("mix_file") or None
+        has_mix = bool(mix_file and Path(mix_file).exists())
         return {
-            "has_mix": bool(mix_file and Path(mix_file).exists()),
+            "has_mix": has_mix,
             "mix_file": mix_file,
+            "duration_seconds": mix_duration_seconds(mix_file) if has_mix else None,
         }
 
     class MixFileBody(BaseModel):
@@ -1146,6 +1423,160 @@ def create_app(
             ".m4a": "audio/mp4",
         }.get(suffix, "audio/mpeg")
         return FileResponse(str(mix_path), media_type=media_type)
+
+    # ------------------------------------------------------------------
+    # LP-side sequencing
+    # ------------------------------------------------------------------
+
+    def _require_shrink_wrapped_dir() -> Path:
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(
+                status_code=503,
+                detail="No album (shrink_wrapped) directory configured",
+            )
+        return _shrink_wrapped_dir
+
+    def _resolve_song_for_sides(song_id: str) -> dict:
+        album_dir = _require_shrink_wrapped_dir()
+        entry = next((s for s in scan_songs(album_dir) if s["id"] == song_id), None)
+        if entry is None:
+            raise HTTPException(status_code=404, detail=f"Song '{song_id}' not found")
+        return entry
+
+    def _song_mix_duration(song_entry: dict) -> float | None:
+        from white_composition.init_production import load_song_context
+        from white_composition.lp_sides import mix_duration_seconds
+
+        ctx = load_song_context(Path(song_entry["production_path"]))
+        mix_file = ctx.get("mix_file")
+        if not mix_file:
+            return None
+        return mix_duration_seconds(mix_file)
+
+    @app.get("/sides")
+    def list_sides():
+        from white_composition.lp_sides import load_sides, side_totals
+
+        album_dir = _require_shrink_wrapped_dir()
+        doc = load_sides(album_dir)
+        totals = side_totals(doc)
+        return {
+            "side_limit_seconds": doc.side_limit_seconds,
+            "sides": {
+                name: {
+                    "songs": [s.model_dump() for s in side.songs],
+                    **totals[name],
+                }
+                for name, side in doc.sides.items()
+            },
+        }
+
+    class SideAssignBody(BaseModel):
+        song_id: str
+        position: int = 0
+
+    @app.post("/sides/{side}/assign")
+    def assign_to_side(side: str, body: SideAssignBody):
+        from white_composition.lp_sides import (
+            SIDE_NAMES,
+            assign_song,
+            load_sides,
+            save_sides,
+        )
+
+        if side not in SIDE_NAMES:
+            raise HTTPException(status_code=404, detail=f"Unknown side '{side}'")
+        album_dir = _require_shrink_wrapped_dir()
+        song_entry = _resolve_song_for_sides(body.song_id)
+        if not song_entry["has_mix"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Song '{body.song_id}' has no mix file — cannot be sequenced",
+            )
+        duration = _song_mix_duration(song_entry)
+        if duration is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Could not read mix duration for '{body.song_id}'",
+            )
+        doc = load_sides(album_dir)
+        assign_song(doc, body.song_id, side, body.position, duration)
+        save_sides(album_dir, doc)
+        _set_lp_consideration(
+            body.song_id, Path(song_entry["production_path"]), "placed"
+        )
+        return {
+            "ok": True,
+            "side": side,
+            "songs": [s.model_dump() for s in doc.sides[side].songs],
+        }
+
+    class SideMoveBody(BaseModel):
+        song_id: str
+        to_side: str
+        to_position: int = 0
+
+    @app.post("/sides/{side}/move")
+    def move_within_sides(side: str, body: SideMoveBody):
+        from white_composition.lp_sides import (
+            SIDE_NAMES,
+            find_song_side,
+            load_sides,
+            move_song,
+            save_sides,
+        )
+
+        if side not in SIDE_NAMES or body.to_side not in SIDE_NAMES:
+            raise HTTPException(status_code=404, detail="Unknown side")
+        album_dir = _require_shrink_wrapped_dir()
+        doc = load_sides(album_dir)
+        actual_side = find_song_side(doc, body.song_id)
+        if actual_side != side:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Song '{body.song_id}' is not on side '{side}' "
+                    f"(currently on {actual_side!r})"
+                ),
+            )
+        try:
+            move_song(doc, body.song_id, body.to_side, body.to_position)
+        except ValueError as e:
+            raise HTTPException(status_code=404, detail=str(e))
+        save_sides(album_dir, doc)
+        song_entry = _resolve_song_for_sides(body.song_id)
+        _set_lp_consideration(
+            body.song_id, Path(song_entry["production_path"]), "placed"
+        )
+        return {
+            "ok": True,
+            "side": body.to_side,
+            "songs": [s.model_dump() for s in doc.sides[body.to_side].songs],
+        }
+
+    @app.delete("/sides/{side}/songs/{song_id}")
+    def remove_from_side(side: str, song_id: str):
+        from white_composition.lp_sides import (
+            SIDE_NAMES,
+            load_sides,
+            remove_song,
+            save_sides,
+        )
+
+        if side not in SIDE_NAMES:
+            raise HTTPException(status_code=404, detail=f"Unknown side '{side}'")
+        album_dir = _require_shrink_wrapped_dir()
+        doc = load_sides(album_dir)
+        if not any(s.song_id == song_id for s in doc.sides[side].songs):
+            raise HTTPException(
+                status_code=404, detail=f"Song '{song_id}' is not on side {side}"
+            )
+        remove_song(doc, song_id)
+        save_sides(album_dir, doc)
+        song_entry = _resolve_song_for_sides(song_id)
+        next_status = "candidate" if song_entry["has_mix"] else "not_considered"
+        _set_lp_consideration(song_id, Path(song_entry["production_path"]), next_status)
+        return {"ok": True}
 
     # ------------------------------------------------------------------
     # Lyrics review

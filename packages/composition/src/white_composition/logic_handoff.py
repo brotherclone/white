@@ -250,3 +250,50 @@ def sync_from_logic(production_dir: Path) -> dict[str, list[str]]:
 def resolve_song_dir(production_dir: Path) -> Path:
     """Return the Logic song dir for a production dir without running handoff."""
     return _song_dir(Path(production_dir))
+
+
+REGRESSION_FILE_MAP: dict[str, list[str]] = {
+    "lyrics": ["lyrics*.txt", "*.lrc"],
+    "vocal_placeholders": [
+        "MIDI/melody/vocal_placeholder*.mid",
+        "MIDI/melody/assembled*.mid",
+    ],
+    "recording": ["Recordings/*"],
+    "augmentation": ["Augmented/*"],
+    "cleaning": ["Cleaned/*"],
+}
+
+
+def regression_info(logic_song_dir: Path, current: str, target: str) -> dict:
+    """Return regression metadata for moving backward from *current* to *target*.
+
+    Raises ValueError on forward movement or unrecognised stage names.
+    Returns { "destructive": bool, "files_to_delete": list[str] }.
+    """
+    logic_song_dir = Path(logic_song_dir)
+    if current not in _STAGE_ORDER:
+        raise ValueError(f"Unknown current stage '{current}'")
+    if target not in _STAGE_ORDER:
+        raise ValueError(f"Unknown target stage '{target}'")
+    current_idx = _STAGE_ORDER.index(current)
+    target_idx = _STAGE_ORDER.index(target)
+    if target_idx >= current_idx:
+        raise ValueError(
+            f"Cannot regress forward: '{current}' → '{target}'. "
+            "Use PATCH /composition/stage to advance."
+        )
+
+    # Collect patterns for every stage that will be passed through going backward
+    files_to_delete: list[str] = []
+    for stage in _STAGE_ORDER[target_idx + 1 : current_idx + 1]:
+        patterns = REGRESSION_FILE_MAP.get(stage, [])
+        for pattern in patterns:
+            for match in sorted(logic_song_dir.glob(pattern)):
+                rel = str(match.relative_to(logic_song_dir))
+                if rel not in files_to_delete:
+                    files_to_delete.append(rel)
+
+    return {
+        "destructive": bool(files_to_delete),
+        "files_to_delete": files_to_delete,
+    }

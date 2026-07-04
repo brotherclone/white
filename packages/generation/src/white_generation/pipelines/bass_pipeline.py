@@ -10,7 +10,7 @@ Pipeline position: chords → drums → harmonic rhythm → strums → BASS → 
 
 Usage:
     python -m app.generators.midi.pipelines.bass_pipeline \
-        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
+        --production-dir shrink_wrapped/.../production/the_archivists_rebellion \
         --seed.logicx 42 --top-k 5
 """
 
@@ -177,7 +177,7 @@ def _note_name_to_midi(note_str: str) -> int:
 
 
 def _voicings_from_midi(
-    midi_path: Path, time_sig_numerator: int = 4
+    midi_path: Path, time_sig: tuple[int, int] = (4, 4)
 ) -> list[list[int]]:
     """Extract one chord voicing per bar from a MIDI file.
 
@@ -187,7 +187,8 @@ def _voicings_from_midi(
     """
     mid = mido.MidiFile(str(midi_path))
     tpb = mid.ticks_per_beat
-    ticks_per_bar = tpb * time_sig_numerator
+    beats_per_bar = time_sig[0] * (4.0 / time_sig[1])
+    ticks_per_bar = int(tpb * beats_per_bar)
 
     bar_notes: dict[int, list[int]] = {}
     for track in mid.tracks:
@@ -223,6 +224,15 @@ def extract_section_chord_data(
     with open(chord_review_path) as f:
         chord_review = yaml.safe_load(f)
 
+    # Parse time_sig for correct bar-width when falling back to MIDI voicing extraction
+    _ts_str = chord_review.get("time_sig", "4/4")
+    try:
+        _ts_parts = str(_ts_str).split("/")
+        _num, _den = int(_ts_parts[0]), int(_ts_parts[1])
+        _ts: tuple[int, int] = (_num, _den) if _num > 0 and _den > 0 else (4, 4)
+    except (ValueError, IndexError):
+        _ts = (4, 4)
+
     chord_data: dict[str, list[list[int]]] = {}
     for candidate in chord_review.get("candidates", []):
         status = str(candidate.get("status", "")).lower()
@@ -249,7 +259,7 @@ def extract_section_chord_data(
         if not voicings:
             approved_midi = production_dir / "chords" / "approved" / f"{key}.mid"
             if approved_midi.exists():
-                voicings = _voicings_from_midi(approved_midi)
+                voicings = _voicings_from_midi(approved_midi, time_sig=_ts)
 
         if voicings:
             chord_data[key] = voicings

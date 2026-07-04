@@ -177,6 +177,23 @@ export async function fetchComposition(): Promise<import("./types").CompositionE
   return res.json();
 }
 
+export async function regressStage(
+  targetStage: string,
+  confirmed: boolean,
+  diaryEntry: string | null,
+): Promise<import("./types").RegressionInfo | { ok: boolean; stage: string }> {
+  const res = await fetch(`${BASE}/composition/regress`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ target_stage: targetStage, confirmed, diary_entry: diaryEntry }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Regress failed");
+  }
+  return res.json();
+}
+
 export async function advanceStage(stage: string): Promise<{ ok: boolean; stage: string }> {
   const res = await fetch(`${BASE}/composition/stage`, {
     method: "PATCH",
@@ -443,6 +460,49 @@ export function audioUrl(segmentId: string): string {
   return `${BASE}/audio/${encodeURIComponent(segmentId)}`;
 }
 
+// ---------------------------------------------------------------------------
+// Song lifecycle
+// ---------------------------------------------------------------------------
+
+export async function setLifecycleStatus(
+  songId: string,
+  status: import("./types").LifecycleStatus,
+  mergedWith?: string[],
+): Promise<{ ok: boolean; status: string }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/lifecycle`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status, merged_with: mergedWith ?? [] }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Lifecycle update failed");
+  }
+  return res.json();
+}
+
+export async function fetchScrappedSongs(): Promise<import("./types").SongEntry[]> {
+  const res = await fetch(`${BASE}/songs/scrapped`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch scrapped songs");
+  return res.json();
+}
+
+export async function setUsesPartsFrom(
+  songId: string,
+  usesPartsFrom: string[],
+): Promise<{ ok: boolean }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/uses-parts-from`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ uses_parts_from: usesPartsFrom }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Uses-parts-from update failed");
+  }
+  return res.json();
+}
+
 export async function exportSample(segmentId: string): Promise<{ ok: boolean; dest: string }> {
   const res = await fetch(`${BASE}/samples/${encodeURIComponent(segmentId)}/export`, {
     method: "POST",
@@ -453,6 +513,78 @@ export async function exportSample(segmentId: string): Promise<{ ok: boolean; de
       new Error((err as { detail?: string }).detail ?? "Export failed"),
       { status: res.status }
     );
+  }
+  return res.json();
+}
+
+export async function fetchSides(): Promise<import("./types").SidesResponse> {
+  const res = await fetch(`${BASE}/sides`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch sides");
+  return res.json();
+}
+
+export async function assignSongToSide(
+  side: string,
+  songId: string,
+  position: number,
+): Promise<{ ok: boolean; side: string; songs: import("./types").SideSong[] }> {
+  const res = await fetch(`${BASE}/sides/${encodeURIComponent(side)}/assign`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ song_id: songId, position }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Assign failed");
+  }
+  return res.json();
+}
+
+export async function moveSongBetweenSides(
+  fromSide: string,
+  songId: string,
+  toSide: string,
+  toPosition: number,
+): Promise<{ ok: boolean; side: string; songs: import("./types").SideSong[] }> {
+  const res = await fetch(`${BASE}/sides/${encodeURIComponent(fromSide)}/move`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ song_id: songId, to_side: toSide, to_position: toPosition }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Move failed");
+  }
+  return res.json();
+}
+
+export async function setLpConsideration(
+  songId: string,
+  status: import("./types").LpConsiderationStatus,
+): Promise<{ ok: boolean; status: string }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/lp-consideration`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "LP consideration update failed");
+  }
+  return res.json();
+}
+
+export async function removeSongFromSide(
+  side: string,
+  songId: string,
+): Promise<{ ok: boolean }> {
+  const res = await fetch(
+    `${BASE}/sides/${encodeURIComponent(side)}/songs/${encodeURIComponent(songId)}`,
+    { method: "DELETE" },
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Remove failed");
   }
   return res.json();
 }

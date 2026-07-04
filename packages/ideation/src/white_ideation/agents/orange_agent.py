@@ -655,7 +655,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
             # Make Anthropic API call (same as MCP tool)
             response = self.llm.invoke([HumanMessage(content=prompt)], max_tokens=2000)
-            updated_text = response.content.strip()
+            updated_text = self._extract_text(response.content).strip()
 
             self.corpus.insert_symbolic_object(
                 story_id=state.selected_story_id,
@@ -787,7 +787,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                 temperature=0.8 + (state.gonzo_intensity * 0.05),
                 max_tokens=3000,
             )
-            gonzo_text = response.content.strip()
+            gonzo_text = self._extract_text(response.content).strip()
 
             self.corpus.add_gonzo_rewrite(
                 story_id=state.selected_story_id,

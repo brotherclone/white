@@ -9,7 +9,7 @@ song manifest.
 Usage:
     # Generate initial plan from approved chords
     python -m app.generators.midi.production.production_plan \
-        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2
+        --production-dir shrink_wrapped/.../production/the_archivists_rebellion
 
     # Refresh bar counts from current approved loops (preserves human edits)
     python -m app.generators.midi.production.production_plan \
@@ -21,6 +21,7 @@ Usage:
 """
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -418,14 +419,19 @@ def load_song_proposal_unified(
     key_str = _key_raw_to_string(raw.get("key", "C major"))
     key_root, mode = _parse_key_components(key_str)
 
-    # Concept — song proposal first; manifest.yml fallback if thread_dir provided
+    # Concept — song proposal first; song_context.yml fallback if thread_dir provided
     concept = str(raw.get("concept", ""))
     if not concept and thread_dir:
-        manifest_path = Path(thread_dir) / "manifest.yml"
-        if manifest_path.exists():
-            with open(manifest_path) as f:
-                manifest = yaml.safe_load(f) or {}
-            concept = str(manifest.get("concept", ""))
+        song_context_path = (
+            Path(thread_dir)
+            / "production"
+            / Path(proposal_path).stem
+            / "song_context.yml"
+        )
+        if song_context_path.exists():
+            with open(song_context_path) as f:
+                ctx = yaml.safe_load(f) or {}
+            concept = str(ctx.get("concept", ""))
 
     # Optional musical constraints block
     mc_raw = raw.get("musical_constraints")
@@ -517,6 +523,10 @@ def _parse_key_components(key_str: str) -> tuple[str, str]:
 
     Mode is returned as 'Major' or 'Minor' for chord-database compatibility.
     """
+    # Normalise unicode accidentals and collapse "B ♭" → "Bb" before splitting
+    key_str = key_str.replace("♯", "#").replace("♭", "b")
+    # Collapse accidental written as separate token: "B b minor" → "Bb minor"
+    key_str = re.sub(r"([A-Ga-g])\s+([b#])\s+", r"\1\2 ", key_str)
     tokens = key_str.strip().split()
     if len(tokens) >= 2:
         root = tokens[0]

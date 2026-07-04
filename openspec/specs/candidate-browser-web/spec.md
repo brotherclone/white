@@ -4,49 +4,21 @@
 TBD - created by archiving change add-candidate-browser-web. Update Purpose after archive.
 ## Requirements
 ### Requirement: FastAPI Backend
-`app/tools/candidate_server.py` SHALL expose a FastAPI application with the following
-endpoints and CORS enabled for `http://localhost:3000`:
+The candidate browser SHALL expose a REST API at `GET /songs` (album mode) that returns
+song entries sourced from `manifest_bootstrap.yml` files discovered under the shrink-wrapped
+directory.
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/candidates` | Return all candidates as JSON; accepts `?phase=` and `?section=` query params |
-| POST | `/candidates/{id}/approve` | Write `status: approved` to the matching `review.yml` entry |
-| POST | `/candidates/{id}/reject` | Write `status: rejected` to the matching `review.yml` entry |
-| GET | `/midi/{id}` | Stream the candidate's `.mid` file with `Content-Type: audio/midi` |
-| GET | `/songs` | Return all songs found in the shrink_wrapped directory; 503 if not in album mode |
-| POST | `/songs/activate` | Set the active production dir for the session; body: `{"id": "<thread_slug>__<production_slug>"}` |
-| GET | `/songs/active` | Return the active song entry, or `{"active": null}` if none selected |
-
-The server SHALL be launched via one of two modes:
-- **Single-song mode**: `python -m app.tools.candidate_server --production-dir <path>` (existing behaviour, unchanged)
-- **Album mode**: `python -m app.tools.candidate_server --shrink-wrapped-dir <path>`
-
-Exactly one of `--production-dir` or `--shrink-wrapped-dir` MUST be supplied; supplying neither or both SHALL be a startup error.
-
-#### Scenario: Candidate list endpoint
-- **WHEN** `GET /candidates` is called
-- **THEN** a JSON array is returned with one object per candidate containing: `id`,
-  `phase`, `section`, `template`, `status`, `rank`, `composite_score`, `midi_url`,
-  and `scores` dict
-
-#### Scenario: Approve endpoint
-- **WHEN** `POST /candidates/{id}/approve` is called
-- **THEN** the matching entry in `review.yml` is updated to `status: approved` and
-  `{"ok": true}` is returned
-
-#### Scenario: Unknown candidate
-- **WHEN** `POST /candidates/{unknown-id}/approve` is called
-- **THEN** a 404 response is returned
-
-#### Scenario: MIDI streaming
-- **WHEN** `GET /midi/{id}` is called for a candidate that has a `.mid` file
-- **THEN** the file bytes are returned with `Content-Type: audio/midi`
-- **WHEN** the MIDI file does not exist
-- **THEN** a 404 response is returned
+Each song entry SHALL include a `schema_version` field and a `stub` field. When
+`manifest_bootstrap.yml` does not contain a `schema_version` field (legacy /
+pre-uv-workspace files), the entry SHALL report `schema_version: "1.x"`. When the file
+contains `stub: true` (written by the migration for pre-scaffold threads), the entry SHALL
+surface `stub: true` so the UI can indicate that the song has incomplete metadata. The API
+SHALL NOT crash on legacy or stub files; missing fields are surfaced as `null` or their
+documented defaults.
 
 #### Scenario: Song list in album mode
 - **WHEN** `GET /songs` is called and the server was launched with `--shrink-wrapped-dir`
-- **THEN** a JSON array is returned with one object per song found under `*/production/*/manifest_bootstrap.yml`, each containing: `id` (`{thread_slug}__{production_slug}`), `thread_slug`, `production_slug`, `title`, `key`, `bpm`, `rainbow_color`, and `singer` (null if absent)
+- **THEN** a JSON array is returned with one object per song found under `*/production/*/manifest_bootstrap.yml`, each containing: `id` (`{thread_slug}__{production_slug}`), `thread_slug`, `production_slug`, `title`, `key`, `bpm`, `rainbow_color`, `singer` (null if absent), and `schema_version` (`"1.x"` if absent from file)
 
 #### Scenario: Song list in single-song mode
 - **WHEN** `GET /songs` is called and the server was launched with `--production-dir`
@@ -64,6 +36,18 @@ Exactly one of `--production-dir` or `--shrink-wrapped-dir` MUST be supplied; su
 - **WHEN** the server is in album mode AND no song has been activated
 - **AND** `GET /candidates` (or any candidate mutation endpoint) is called
 - **THEN** a 503 response is returned with `{"detail": "No song selected — POST /songs/activate first"}`
+
+#### Scenario: Legacy manifest does not crash scan
+- **WHEN** `scan_songs()` encounters a `manifest_bootstrap.yml` with no `schema_version` field
+- **THEN** the song entry is returned with `schema_version: "1.x"`
+- **AND** no exception is raised
+
+#### Scenario: Stub manifest surfaces in song list
+- **WHEN** `scan_songs()` encounters a `manifest_bootstrap.yml` with `stub: true`
+- **THEN** the song entry is returned with `stub: true`
+- **AND** the song appears in the list (stubs are not filtered out)
+
+---
 
 ### Requirement: Next.js Frontend
 The candidate browser SHALL display only the generation phases relevant to the MIDI
@@ -204,7 +188,8 @@ The FastAPI backend SHALL expose a `POST /promote` endpoint that runs phase prom
 ### Requirement: Shrinkwrap Production Scaffolding
 `app/util/shrinkwrap_chain_artifacts.py` SHALL scaffold a `production/<slug>/` directory for every song proposal found in a thread's `yml/` directory when shrinkwrapping. A file is treated as a song proposal if it contains all three of `bpm`, `key`, and `rainbow_color` fields. Known non-proposal files (`evp.yml`, `all_song_proposals.yml`) are always skipped.
 
-Each scaffolded directory SHALL contain a `manifest_bootstrap.yml` with the following fields:
+Each scaffolded directory SHALL contain a `manifest_bootstrap.yml` with the following fields (in this order):
+- `schema_version` — always `"2.0.0"`
 - `title` — from the proposal YAML (or the slug if absent)
 - `key` — from the proposal YAML
 - `bpm` — from the proposal YAML
@@ -218,6 +203,10 @@ The scaffolding SHALL be idempotent: if `manifest_bootstrap.yml` already exists 
 - **WHEN** `shrinkwrap_thread()` runs
 - **THEN** `production/coral_fever_requiem_v1/manifest_bootstrap.yml` is created
 - **AND** no directory is created for `evp.yml`
+
+#### Scenario: schema_version first in bootstrap
+- **WHEN** `scaffold_song_productions()` writes a new `manifest_bootstrap.yml`
+- **THEN** the first YAML field is `schema_version: "2.0.0"`
 
 #### Scenario: Idempotent scaffolding
 - **WHEN** `shrinkwrap_thread()` runs a second time on the same thread
@@ -385,17 +374,19 @@ The background job state follows the same shape as `/handoff/status`:
 - **THEN** the current job state is returned with `status`, `started_at`, `finished_at`,
   and `error` fields
 
-
 ### Requirement: Song Stage Routing
 Each song card SHALL display a stage badge indicating the song's current production
-stage. The badge SHALL replace the former "not initialized" label. Valid stage labels
-and their routing behaviour are:
+stage. Valid stage labels and their routing behaviour are:
 
 | Stage label | `stage` value | Click behaviour |
 |---|---|---|
 | Ideation | `ideation` | Activate → init → `/candidates` |
 | Generation | `generation` | Activate → `/candidates` |
 | Composition | `composition` | Activate → `/board` |
+| Production | `production` | Activate → `/board` |
+| Mixing | `mixing` | Activate → `/board` |
+| Complete | `complete` | Activate → `/board` |
+| Invalid | `invalid` | Activate → `/` (no navigation; toast shown) |
 
 #### Scenario: Ideation song selected
 - **WHEN** the user clicks a song card with `stage: "ideation"`
@@ -412,10 +403,16 @@ and their routing behaviour are:
 - **THEN** `POST /songs/activate` is called
 - **AND** the user is navigated to `/board`
 
+#### Scenario: Invalid song selected
+- **WHEN** the user clicks a song card with `stage: "invalid"`
+- **THEN** no navigation occurs
+- **AND** a toast is shown: "Song metadata is invalid — run migration to repair"
+
 #### Scenario: Stage badge on card
 - **WHEN** a song card renders
-- **THEN** exactly one of the labels "Ideation", "Generation", or "Composition" is
-  visible on the card
+- **THEN** exactly one stage label is visible on the card
+
+---
 
 ### Requirement: Agent Run Screen
 A page at `/agent` SHALL host the agent workflow (LangChain song generation). The page
@@ -449,30 +446,42 @@ A `← Songs` navigation link SHALL appear at the top of the page and navigate t
 
 ### Requirement: Song Stage Field
 `scan_songs` in `candidate_server.py` SHALL include a `stage` field on every returned
-song entry. The value SHALL be one of: `"ideation"`, `"generation"`, `"composition"`.
+song entry. The value SHALL be one of: `"ideation"`, `"generation"`, `"composition"`,
+`"production"`, `"mixing"`, `"complete"`, `"invalid"`.
 
 Computation rules (evaluated in order):
-1. **`ideation`** — `song_context.yml` is absent from the production dir
-2. **`composition`** — `LOGIC_OUTPUT_DIR` env var is set AND `composition.yml` exists
-   in the Logic output dir for this song (path resolved via `_song_dir` from
-   `white_composition.logic_handoff`); if `LOGIC_OUTPUT_DIR` is unset, the import
-   raises, or the file is absent, this rule is skipped
-3. **`generation`** — all other cases
+1. **`invalid`** — `manifest_bootstrap.yml` cannot be parsed, is missing both `title`
+   and `rainbow_color`, or carries an unrecognised `schema_version` prefix (not absent,
+   not starting with `"1"`, not starting with `"2"`)
+2. **`ideation`** — `song_context.yml` is absent from the production dir
+3. **`composition/production/mixing/complete`** — `LOGIC_OUTPUT_DIR` env var is set AND
+   `composition.yml` exists; `current_stage` value maps to the song stage via
+   `_MIX_STAGE_TO_SONG_STAGE`
+4. **`generation`** — all other cases
 
-The TypeScript `SongEntry` type SHALL include `stage: "ideation" | "generation" | "composition"`.
+The TypeScript `SongEntry` type SHALL include
+`stage: "ideation" | "generation" | "composition" | "production" | "mixing" | "complete" | "invalid"`.
+The stage filter on the song index SHALL include all seven values;
+"Invalid" SHALL appear last in the filter order.
 
 #### Scenario: Ideation stage
 - **WHEN** a production dir lacks `song_context.yml`
 - **THEN** `scan_songs` returns `stage: "ideation"` for that entry
 
+#### Scenario: Invalid stage — corrupt manifest
+- **WHEN** `manifest_bootstrap.yml` cannot be parsed by `yaml.safe_load()`
+- **THEN** `scan_songs` returns `stage: "invalid"` for that entry
+
+#### Scenario: Invalid stage — unrecognised schema_version
+- **WHEN** `manifest_bootstrap.yml` has a `schema_version` value not starting with
+  `"1"` or `"2"` (e.g. `"3.0.0"`, `"beta"`)
+- **THEN** `scan_songs` returns `stage: "invalid"` for that entry
+
 #### Scenario: Generation stage
-- **WHEN** a production dir has `song_context.yml` and no `composition.yml` in the
-  Logic dir (or LOGIC_OUTPUT_DIR is unset)
+- **WHEN** a production dir has `song_context.yml` and no `composition.yml`
 - **THEN** `scan_songs` returns `stage: "generation"`
 
-#### Scenario: Composition stage
-- **WHEN** `LOGIC_OUTPUT_DIR` is set and `composition.yml` exists in the Logic song dir
-- **THEN** `scan_songs` returns `stage: "composition"`
+---
 
 ### Requirement: Unified Dev Launch
 A shell script `dev.sh` at the repository root SHALL start both the FastAPI server
@@ -595,3 +604,66 @@ The button SHALL be shown when `quartetStatus` is absent (`undefined`), `null`, 
 #### Scenario: Button hidden after generation
 - **WHEN** quartet status is "generated" or "promoted"
 - **THEN** no Generate Quartet button is shown
+
+### Requirement: Schema Version Badge on Song Cards
+Each song card on the index page SHALL display a `schema_version` badge when the
+song's schema version is not `"2.0.0"`. Cards with `schema_version: "1.x"` or
+`"1"` SHALL show a muted `v1.x` pill. Cards with `stub: true` SHALL show a `Stub`
+pill and replace the key/BPM metadata line with a muted "Incomplete metadata" label.
+Cards at `schema_version: "2.0.0"` with `stub: false` display no version badge.
+
+#### Scenario: Legacy card shows version pill
+- **WHEN** a song card renders with `schema_version: "1.x"`
+- **THEN** a muted `v1.x` pill is visible on the card
+
+#### Scenario: Stub card shows stub pill and masked metadata
+- **WHEN** a song card renders with `stub: true`
+- **THEN** a `Stub` pill is shown and the key/BPM row reads "Incomplete metadata"
+
+#### Scenario: Current-schema card shows no version pill
+- **WHEN** a song card renders with `schema_version: "2.0.0"` and `stub: false`
+- **THEN** no version or stub pill is displayed
+
+---
+
+### Requirement: Phase Regression with Diary Confirmation Modal
+The board page SHALL allow moving a song's MixStage **backward** via a "←" button
+adjacent to the current stage indicator. Backward movement always requires
+confirmation via a modal. Destructive regressions (where files exist that were
+written at or after the target stage) list those files in the modal. All modals
+offer an optional diary-entry textarea so the reason can be recorded inline.
+
+The backend SHALL expose `POST /composition/regress` with body
+`{ target_stage, confirmed, diary_entry }`. When `confirmed: false` it returns
+`{ destructive, files_to_delete }` without making changes. When `confirmed: true`
+it deletes the listed files, sets the stage, and (if `diary_entry` is non-empty)
+writes a diary entry tagged with the song slug and the regression action.
+
+The "←" button SHALL be absent when the current stage is `structure` (nothing to
+regress to).
+
+#### Scenario: Non-destructive regression confirmed
+- **WHEN** the user clicks "←" from `mix_candidate` (target: `rough_mix`)
+- **AND** no files exist in the `REGRESSION_FILE_MAP` for stages passed through
+- **THEN** the modal shows "Move back to Rough Mix?" with no file list but with a diary textarea
+- **AND** on Confirm the stage is set to `rough_mix` and an optional diary entry is written
+
+#### Scenario: Destructive regression shows file list
+- **WHEN** the user clicks "←" from `vocal_placeholders` (target: `lyrics`)
+- **AND** vocal placeholder MIDI files exist in the Logic song dir
+- **THEN** the modal shows those file paths in a scrollable list
+- **AND** the Confirm button is styled destructively (red)
+
+#### Scenario: Diary entry written on regression
+- **WHEN** the user types a note in the diary textarea and confirms the regression
+- **THEN** a diary entry is created with the note text, tagged with the song slug
+  and a `phase_regression` metadata field noting the before/after stages
+
+#### Scenario: Back button absent at structure
+- **WHEN** the current stage is `structure`
+- **THEN** the "←" back button is not rendered
+
+#### Scenario: Modal cancel leaves stage unchanged
+- **WHEN** the user opens the regression modal and clicks Cancel
+- **THEN** no stage change occurs and no files are deleted
+

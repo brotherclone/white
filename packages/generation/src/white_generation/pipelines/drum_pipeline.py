@@ -8,7 +8,7 @@ and writes top candidates as MIDI files with a review YAML.
 
 Usage:
     python -m app.generators.midi.pipelines.drum_pipeline \
-        --production-dir shrink_wrapped/.../production/black__sequential_dissolution_v2 \
+        --production-dir shrink_wrapped/.../production/the_archivists_rebellion \
         --seed.logicx 42 --top-k 5
 """
 
@@ -702,7 +702,7 @@ def main():
     parser.add_argument(
         "--production-dir",
         required=True,
-        help="Song production directory (e.g., .../production/black__sequential_dissolution_v2)",
+        help="Song production directory (e.g., .../production/the_archivists_rebellion)",
     )
     parser.add_argument(
         "--thread",

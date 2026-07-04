@@ -99,7 +99,6 @@ class SongStatus:
     total_approved_bars: int = 0
     plan_present: bool = False
     lyrics_present: bool = False
-    decisions_present: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -191,7 +190,6 @@ def scan_production_dir(production_dir: Path, album_slug: str) -> SongStatus:
         total_approved_bars=total_bars,
         plan_present=(production_dir / "production_plan.yml").exists(),
         lyrics_present=lyrics_present,
-        decisions_present=(production_dir / "production_decisions.yml").exists(),
     )
 
 
@@ -264,7 +262,6 @@ def build_table(statuses: list[SongStatus]) -> Table:
     table.add_column("Bars", justify="right", no_wrap=True, min_width=4)
     table.add_column("Plan", justify="center", no_wrap=True, min_width=4)
     table.add_column("Lyr", justify="center", no_wrap=True, min_width=3)
-    table.add_column("Dec", justify="center", no_wrap=True, min_width=3)
 
     # Sort by color rank then slug
     sorted_statuses = sorted(statuses, key=lambda s: (_color_rank(s.color), s.slug))
@@ -286,7 +283,6 @@ def build_table(statuses: list[SongStatus]) -> Table:
         bars_str = str(s.total_approved_bars) if s.total_approved_bars else "—"
         plan_str = "[green]✓[/green]" if s.plan_present else "[dim]—[/dim]"
         lyrics_str = "[green]✓[/green]" if s.lyrics_present else "[dim]—[/dim]"
-        decisions_str = "[green]✓[/green]" if s.decisions_present else "[dim]—[/dim]"
 
         table.add_row(
             short_slug,
@@ -302,7 +298,6 @@ def build_table(statuses: list[SongStatus]) -> Table:
             bars_str,
             plan_str,
             lyrics_str,
-            decisions_str,
         )
 
     return table

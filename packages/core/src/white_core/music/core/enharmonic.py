@@ -40,5 +40,5 @@ def normalize_to_flat(note_str: str) -> str:
 
     Handles both ASCII ``#`` and unicode ``♯`` sharp symbols.
     """
-    normalised = note_str.replace("♯", "#")
+    normalised = note_str.replace("♯", "#").replace("♭", "b")
     return sharp_to_flat.get(normalised, normalised)

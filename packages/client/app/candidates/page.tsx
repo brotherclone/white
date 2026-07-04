@@ -331,6 +331,8 @@ export default function CandidatesPage() {
           <Link href="/" className="hover:text-zinc-300 transition-colors">← Songs</Link>
           <span>/</span>
           <span className="text-zinc-300">{activeSong.title}</span>
+          <span>/</span>
+          <Link href="/sides" className="hover:text-zinc-300 transition-colors">Sides</Link>
         </div>
       )}
 

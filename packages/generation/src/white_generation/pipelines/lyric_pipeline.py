@@ -47,6 +47,18 @@ from white_composition.production_plan import (  # noqa: E402
 )
 from white_core.enums.lyric_repeat_type import LyricRepeatType
 from white_generation.artist_catalog import load_artist_context  # noqa: E402
+from white_generation.lyric_negative_constraints import (  # noqa: E402
+    format_for_prompt as format_negative_constraints_for_prompt,
+)
+from white_generation.lyric_negative_constraints import (  # noqa: E402
+    generate_constraints as generate_lyric_negative_constraints,
+)
+from white_generation.lyric_negative_constraints import (  # noqa: E402
+    load_constraints as load_lyric_negative_constraints,
+)
+from white_generation.lyric_negative_constraints import (  # noqa: E402
+    write_constraints as write_lyric_negative_constraints,
+)
 from white_generation.pipelines.chord_pipeline import (  # noqa: E402
     _to_python,
     compute_chromatic_match,
@@ -432,6 +444,12 @@ def read_vocal_sections_from_arrangement(
 
 _VERDICT_ORDER = ["spacious", "paste-ready", "tight but workable", "splits needed"]
 
+# Phrases at or below this note count get a widened syllable target range in the
+# generation prompt — the strict 0.8x-1.15x multiplier collapses to a 1-2 syllable
+# window for very short phrases, which pushed candidates toward the same small pool
+# of monosyllabic words instead of treating melisma as a legitimate choice.
+SHORT_PHRASE_NOTE_THRESHOLD = 3
+
 
 def _fitting_verdict(ratio: float) -> str:
     if ratio < 0.75:
@@ -448,6 +466,22 @@ def _verdict_rank(verdict: str) -> int:
     """Rank verdict severity; spacious == paste-ready (both = 0)."""
     v = verdict if verdict != "spacious" else "paste-ready"
     return _VERDICT_ORDER.index(v)
+
+
+def _phrase_syllable_range(note_count: int) -> tuple[int, int]:
+    """Return (lo, hi) syllable target bounds for a phrase's note count.
+
+    Phrases at or below SHORT_PHRASE_NOTE_THRESHOLD get the range widened on both
+    ends so a word or short phrase sustained across the notes (melisma) is a legal,
+    encouraged choice rather than the prompt implicitly pinning every short phrase
+    to a near-single-syllable target.
+    """
+    lo = math.floor(note_count * 0.8)
+    hi = math.ceil(note_count * 1.15)
+    if note_count <= SHORT_PHRASE_NOTE_THRESHOLD:
+        lo = max(0, lo - 1)
+        hi = hi + 1
+    return lo, hi
 
 
 def _compute_fitting(
@@ -847,6 +881,7 @@ def _build_white_cutup_prompt(
     syllable_targets: dict,
     sub_lyrics: list[dict],
     artist_context: str = "",
+    negative_constraints_block: str = "",
 ) -> str:
     """Build the Claude prompt for White lyric cut-up generation.
 
@@ -890,12 +925,13 @@ def _build_white_cutup_prompt(
     if artist_context:
         lines.extend(["", artist_context, ""])
 
+    if negative_constraints_block:
+        lines.extend(["", negative_constraints_block, ""])
+
     lines += [
         "SECTIONS TO WRITE:",
         "(Headers are melody loop labels — each maps to one MIDI clip.)",
     ]
-
-    import math as _math
 
     variation_count_cutup: dict[str, int] = {}
 
@@ -939,9 +975,8 @@ def _build_white_cutup_prompt(
         if phrases:
             all_phrases = phrases * sec["play_count"]
             phrase_counts = [p.note_count for p in all_phrases]
-            phrase_lo = [_math.floor(n * 0.8) for n in phrase_counts]
-            phrase_hi = [_math.ceil(n * 1.15) for n in phrase_counts]
-            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            phrase_ranges = [_phrase_syllable_range(n) for n in phrase_counts]
+            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in phrase_ranges)
             play_note = (
                 f" ({len(phrases)} per loop × {sec['play_count']} plays)"
                 if sec["play_count"] > 1
@@ -954,6 +989,12 @@ def _build_white_cutup_prompt(
                     f"    Write exactly {len(all_phrases)} lines for this section.",
                 ]
             )
+            if any(n <= SHORT_PHRASE_NOTE_THRESHOLD for n in phrase_counts):
+                lines.append(
+                    "    Some phrases above have very few notes — for those, a single"
+                    " word or short phrase sustained across the notes (melisma) is a"
+                    " good choice; don't default to one syllable per note."
+                )
 
     lines.extend(
         [
@@ -977,6 +1018,7 @@ def _build_prompt(
     vocal_sections: list[dict],
     syllable_targets: dict,
     artist_context: str = "",
+    negative_constraints_block: str = "",
 ) -> str:
     """Build the Claude prompt for lyric generation.
 
@@ -1066,9 +1108,8 @@ def _build_prompt(
             # Scale phrase list to cover all plays of this loop
             all_phrases = phrases * sec["play_count"]
             phrase_counts = [p.note_count for p in all_phrases]
-            phrase_lo = [math.floor(n * 0.8) for n in phrase_counts]
-            phrase_hi = [math.ceil(n * 1.15) for n in phrase_counts]
-            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            phrase_ranges = [_phrase_syllable_range(n) for n in phrase_counts]
+            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in phrase_ranges)
             play_note = (
                 f" ({len(phrases)} per loop × {sec['play_count']} plays)"
                 if sec["play_count"] > 1
@@ -1083,9 +1124,18 @@ def _build_prompt(
                     "    Each line should contain approximately the syllable count shown.",
                 ]
             )
+            if any(n <= SHORT_PHRASE_NOTE_THRESHOLD for n in phrase_counts):
+                lines.append(
+                    "    Some phrases above have very few notes — for those, a single"
+                    " word or short phrase sustained across the notes (melisma) is a"
+                    " good choice; don't default to one syllable per note."
+                )
 
     if artist_context:
         lines.extend(["", artist_context])
+
+    if negative_constraints_block:
+        lines.extend(["", negative_constraints_block])
 
     lines.extend(
         [
@@ -1275,6 +1325,17 @@ def sync_lyric_candidates(melody_dir: Path) -> int:
 # ---------------------------------------------------------------------------
 
 
+def _resolve_album_dir(production_dir: Path) -> Path:
+    """Resolve the album (shrink_wrapped) root from a production directory.
+
+    production_dir is <album_dir>/<thread_slug>/production/<production_slug>, so the
+    album root is three levels up. Callers only ever check for a specific filename's
+    existence under the result, so an unconventional layout just resolves to a
+    directory with no matching file rather than raising.
+    """
+    return production_dir.parent.parent.parent
+
+
 def run_lyric_pipeline(
     production_dir: str,
     num_candidates: int = 3,
@@ -1284,6 +1345,7 @@ def run_lyric_pipeline(
     skip_scoring: bool = False,
     melody_channel: int = MELODY_CHANNEL,
     arrangement: Optional[str] = None,
+    refresh_constraints: bool = False,
 ) -> dict:
     """Run the lyric generation pipeline end-to-end.
 
@@ -1397,6 +1459,23 @@ def run_lyric_pipeline(
         for sec in vocal_sections
     }
 
+    # --- 4b. Lyric negative constraints (album-wide word/imagery avoidance) ---
+    album_dir = _resolve_album_dir(prod_path)
+    if refresh_constraints:
+        constraints = generate_lyric_negative_constraints(album_dir)
+        write_lyric_negative_constraints(
+            album_dir / "lyrics_negative_constraints.yml", constraints
+        )
+        print(
+            f"Refreshed lyrics_negative_constraints.yml "
+            f"({len(constraints['overused_words'])} overused word(s))"
+        )
+    else:
+        constraints = load_lyric_negative_constraints(album_dir)
+    negative_constraints_block = (
+        format_negative_constraints_for_prompt(constraints) if constraints else ""
+    )
+
     # --- 5. Build prompt ---
     artist_context = load_artist_context(meta.get("sounds_like") or [])
     is_white = str(meta.get("color", "")).strip().capitalize() == "White"
@@ -1425,10 +1504,21 @@ def run_lyric_pipeline(
         else:
             print("\nWhite cut-up mode: no sub-lyrics found — using synthesis fallback")
         prompt = _build_white_cutup_prompt(
-            meta, vocal_sections, syllable_targets, sub_lyrics, artist_context
+            meta,
+            vocal_sections,
+            syllable_targets,
+            sub_lyrics,
+            artist_context,
+            negative_constraints_block,
         )
     else:
-        prompt = _build_prompt(meta, vocal_sections, syllable_targets, artist_context)
+        prompt = _build_prompt(
+            meta,
+            vocal_sections,
+            syllable_targets,
+            artist_context,
+            negative_constraints_block,
+        )
 
     # --- 6. Generate candidates ---
     from anthropic import Anthropic
@@ -1625,6 +1715,14 @@ def main():
         default=None,
         help="Path to arrangement.txt (default: <production-dir>/arrangement.txt)",
     )
+    parser.add_argument(
+        "--refresh-constraints",
+        action="store_true",
+        help=(
+            "Regenerate lyrics_negative_constraints.yml from the album's promoted "
+            "lyrics before building the prompt"
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -1642,6 +1740,7 @@ def main():
         skip_scoring=args.skip_scoring,
         melody_channel=args.melody_channel,
         arrangement=args.arrangement,
+        refresh_constraints=args.refresh_constraints,
     )
 
 
