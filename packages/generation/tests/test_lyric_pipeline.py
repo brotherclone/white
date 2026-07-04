@@ -125,6 +125,46 @@ class TestFittingVerdict:
 
 
 # ---------------------------------------------------------------------------
+# 2b. _phrase_syllable_range
+# ---------------------------------------------------------------------------
+
+
+class TestPhraseSyllableRange:
+    def test_short_phrase_widened_beyond_strict_multiplier(self):
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        # Strict 0.8x-1.15x multiplier would give (1, 3) for a 2-note phrase.
+        lo, hi = _phrase_syllable_range(2)
+        assert (lo, hi) != (1, 3)
+        assert lo <= 1
+        assert hi >= 4
+
+    def test_one_note_phrase_allows_more_than_two_syllables(self):
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        lo, hi = _phrase_syllable_range(1)
+        assert lo == 0
+        assert hi >= 3
+
+    def test_short_phrase_lower_bound_never_negative(self):
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        lo, _hi = _phrase_syllable_range(1)
+        assert lo >= 0
+
+    def test_longer_phrase_unaffected(self):
+        import math
+
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        # Phrases above SHORT_PHRASE_NOTE_THRESHOLD keep the original multiplier.
+        for notes in (4, 8, 16):
+            lo, hi = _phrase_syllable_range(notes)
+            assert lo == math.floor(notes * 0.8)
+            assert hi == math.ceil(notes * 1.15)
+
+
+# ---------------------------------------------------------------------------
 # 3. _compute_fitting
 # ---------------------------------------------------------------------------
 
@@ -401,6 +441,48 @@ class TestBuildPrompt:
         prompt = _build_prompt(meta, vocal_sections, syllable_targets)
         assert "[verse]" in prompt
         assert "[chorus]" in prompt
+
+    def test_short_phrases_get_melisma_note(self):
+        from white_generation.pipelines.lyric_pipeline import Phrase, _build_prompt
+
+        meta = make_meta()
+        vocal_sections = [
+            {
+                "name": "bridge",
+                "bars": 2,
+                "play_count": 1,
+                "total_notes": 4,
+                "contour": "stepwise",
+                "phrases": [
+                    Phrase(start_tick=0, end_tick=100, note_count=1),
+                    Phrase(start_tick=200, end_tick=300, note_count=2),
+                ],
+            }
+        ]
+        syllable_targets = {"bridge": (2, 4)}
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets)
+        assert "melisma" in prompt
+
+    def test_long_phrases_no_melisma_note(self):
+        from white_generation.pipelines.lyric_pipeline import Phrase, _build_prompt
+
+        meta = make_meta()
+        vocal_sections = [
+            {
+                "name": "verse",
+                "bars": 4,
+                "play_count": 1,
+                "total_notes": 16,
+                "contour": "scalar_run",
+                "phrases": [
+                    Phrase(start_tick=0, end_tick=100, note_count=8),
+                    Phrase(start_tick=200, end_tick=300, note_count=8),
+                ],
+            }
+        ]
+        syllable_targets = {"verse": (12, 17)}
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets)
+        assert "melisma" not in prompt
 
 
 # ---------------------------------------------------------------------------
@@ -984,6 +1066,30 @@ class TestBuildWhiteCutupPrompt:
         prompt = _build_prompt(meta, sections, {"verse": (12, 17)})
         assert "SOURCE LYRICS" not in prompt
         assert "cut-up" not in prompt
+
+    def test_short_phrases_get_melisma_note(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            _build_white_cutup_prompt,
+        )
+
+        sections = [
+            {
+                "name": "bridge",
+                "bars": 2,
+                "play_count": 1,
+                "total_notes": 3,
+                "contour": "stepwise",
+                "phrases": [
+                    Phrase(start_tick=0, end_tick=100, note_count=1),
+                    Phrase(start_tick=200, end_tick=300, note_count=2),
+                ],
+            }
+        ]
+        prompt = _build_white_cutup_prompt(
+            self._dummy_meta(), sections, {"bridge": (2, 3)}, []
+        )
+        assert "melisma" in prompt
 
 
 # ---------------------------------------------------------------------------

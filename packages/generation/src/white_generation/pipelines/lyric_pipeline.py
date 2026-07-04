@@ -432,6 +432,12 @@ def read_vocal_sections_from_arrangement(
 
 _VERDICT_ORDER = ["spacious", "paste-ready", "tight but workable", "splits needed"]
 
+# Phrases at or below this note count get a widened syllable target range in the
+# generation prompt — the strict 0.8x-1.15x multiplier collapses to a 1-2 syllable
+# window for very short phrases, which pushed candidates toward the same small pool
+# of monosyllabic words instead of treating melisma as a legitimate choice.
+SHORT_PHRASE_NOTE_THRESHOLD = 3
+
 
 def _fitting_verdict(ratio: float) -> str:
     if ratio < 0.75:
@@ -448,6 +454,22 @@ def _verdict_rank(verdict: str) -> int:
     """Rank verdict severity; spacious == paste-ready (both = 0)."""
     v = verdict if verdict != "spacious" else "paste-ready"
     return _VERDICT_ORDER.index(v)
+
+
+def _phrase_syllable_range(note_count: int) -> tuple[int, int]:
+    """Return (lo, hi) syllable target bounds for a phrase's note count.
+
+    Phrases at or below SHORT_PHRASE_NOTE_THRESHOLD get the range widened on both
+    ends so a word or short phrase sustained across the notes (melisma) is a legal,
+    encouraged choice rather than the prompt implicitly pinning every short phrase
+    to a near-single-syllable target.
+    """
+    lo = math.floor(note_count * 0.8)
+    hi = math.ceil(note_count * 1.15)
+    if note_count <= SHORT_PHRASE_NOTE_THRESHOLD:
+        lo = max(0, lo - 1)
+        hi = hi + 1
+    return lo, hi
 
 
 def _compute_fitting(
@@ -895,8 +917,6 @@ def _build_white_cutup_prompt(
         "(Headers are melody loop labels — each maps to one MIDI clip.)",
     ]
 
-    import math as _math
-
     variation_count_cutup: dict[str, int] = {}
 
     for sec in vocal_sections:
@@ -939,9 +959,8 @@ def _build_white_cutup_prompt(
         if phrases:
             all_phrases = phrases * sec["play_count"]
             phrase_counts = [p.note_count for p in all_phrases]
-            phrase_lo = [_math.floor(n * 0.8) for n in phrase_counts]
-            phrase_hi = [_math.ceil(n * 1.15) for n in phrase_counts]
-            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            phrase_ranges = [_phrase_syllable_range(n) for n in phrase_counts]
+            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in phrase_ranges)
             play_note = (
                 f" ({len(phrases)} per loop × {sec['play_count']} plays)"
                 if sec["play_count"] > 1
@@ -954,6 +973,12 @@ def _build_white_cutup_prompt(
                     f"    Write exactly {len(all_phrases)} lines for this section.",
                 ]
             )
+            if any(n <= SHORT_PHRASE_NOTE_THRESHOLD for n in phrase_counts):
+                lines.append(
+                    "    Some phrases above have very few notes — for those, a single"
+                    " word or short phrase sustained across the notes (melisma) is a"
+                    " good choice; don't default to one syllable per note."
+                )
 
     lines.extend(
         [
@@ -1066,9 +1091,8 @@ def _build_prompt(
             # Scale phrase list to cover all plays of this loop
             all_phrases = phrases * sec["play_count"]
             phrase_counts = [p.note_count for p in all_phrases]
-            phrase_lo = [math.floor(n * 0.8) for n in phrase_counts]
-            phrase_hi = [math.ceil(n * 1.15) for n in phrase_counts]
-            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in zip(phrase_lo, phrase_hi))
+            phrase_ranges = [_phrase_syllable_range(n) for n in phrase_counts]
+            ranges_str = ", ".join(f"{lo}–{hi}" for lo, hi in phrase_ranges)
             play_note = (
                 f" ({len(phrases)} per loop × {sec['play_count']} plays)"
                 if sec["play_count"] > 1
@@ -1083,6 +1107,12 @@ def _build_prompt(
                     "    Each line should contain approximately the syllable count shown.",
                 ]
             )
+            if any(n <= SHORT_PHRASE_NOTE_THRESHOLD for n in phrase_counts):
+                lines.append(
+                    "    Some phrases above have very few notes — for those, a single"
+                    " word or short phrase sustained across the notes (melisma) is a"
+                    " good choice; don't default to one syllable per note."
+                )
 
     if artist_context:
         lines.extend(["", artist_context])
