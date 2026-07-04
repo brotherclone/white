@@ -6,4 +6,4 @@
 ## 2. Verification
 - [x] 2.1 Add/adjust unit tests in `packages/generation/tests/test_lyric_pipeline.py` covering: a 1-note phrase gets a widened range, a 2-note phrase gets a widened range, a 4+ note phrase is unaffected (matches current behavior)
 - [x] 2.2 Run `pytest packages/generation/tests/test_lyric_pipeline.py` and confirm no regressions to existing fitting-verdict tests
-- [ ] 2.3 Generate a real candidate against a song with several short melody phrases and manually confirm the output no longer defaults to single monosyllables on those lines — **left for you**: this calls the Anthropic API against a real production dir, which I didn't want to trigger unprompted
+- [x] 2.3 Generate a real candidate against a song with several short melody phrases and manually confirm the output no longer defaults to single monosyllables on those lines — verified against `filing_cipher_prism_v1/melody/lyrics.txt`: short phrases now land on real multisyllable words ("colander," "junipers," "forgotten," "untouched," "blackened") instead of defaulting to monosyllables
