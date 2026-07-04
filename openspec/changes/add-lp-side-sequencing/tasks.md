@@ -31,15 +31,7 @@
 - [x] 4.3 Side column: song list (title, duration), running total, over-limit visual warning
 - [x] 4.4 Available-songs source list: only `has_mix: true` songs draggable
 - [x] 4.5 `lib/api.ts` / `lib/types.ts` additions for the new endpoints
-- [~] 4.6 Manual verification: drag a mixed song onto side A, confirm total updates and
-      warning appears once the side exceeds 20 minutes — **partially verified**: `tsc`
-      and `next build` pass, and I ran the exact API sequence the drag handlers issue
-      (assign/move/remove) live against a fixture album, confirming durations, ordering,
-      and the no-mix 400 rejection all work end-to-end. Confirmed via real usage: the
-      first pass refetched `/sides`+`/songs` after every drop, so the dragged item
-      lingered in its source column until the round-trip resolved. Fixed by updating
-      `sides` state optimistically in `handleDragEnd`/`handleRemove` before the API call
-      (with duration backfilled from the response, and rollback to the previous state
-      on error) — dropped items now move instantly. I still could not drive an actual
-      pointer-drag gesture in a browser myself (Chrome extension wasn't connected in
-      this session) — **please confirm the instant-move fix looks right** on your end.
+- [x] 4.6 Manual verification: drag a mixed song onto side A, confirm total updates and
+      warning appears once the side exceeds 20 minutes — verified via real usage: you
+      tried the actual drag interaction and reported two issues (item not disappearing
+      on release; black-on-black text on side tiles), both fixed and confirmed working.
