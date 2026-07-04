@@ -516,3 +516,59 @@ export async function exportSample(segmentId: string): Promise<{ ok: boolean; de
   }
   return res.json();
 }
+
+export async function fetchSides(): Promise<import("./types").SidesResponse> {
+  const res = await fetch(`${BASE}/sides`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch sides");
+  return res.json();
+}
+
+export async function assignSongToSide(
+  side: string,
+  songId: string,
+  position: number,
+): Promise<{ ok: boolean; side: string; songs: import("./types").SideSong[] }> {
+  const res = await fetch(`${BASE}/sides/${encodeURIComponent(side)}/assign`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ song_id: songId, position }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Assign failed");
+  }
+  return res.json();
+}
+
+export async function moveSongBetweenSides(
+  fromSide: string,
+  songId: string,
+  toSide: string,
+  toPosition: number,
+): Promise<{ ok: boolean; side: string; songs: import("./types").SideSong[] }> {
+  const res = await fetch(`${BASE}/sides/${encodeURIComponent(fromSide)}/move`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ song_id: songId, to_side: toSide, to_position: toPosition }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Move failed");
+  }
+  return res.json();
+}
+
+export async function removeSongFromSide(
+  side: string,
+  songId: string,
+): Promise<{ ok: boolean }> {
+  const res = await fetch(
+    `${BASE}/sides/${encodeURIComponent(side)}/songs/${encodeURIComponent(songId)}`,
+    { method: "DELETE" },
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Remove failed");
+  }
+  return res.json();
+}

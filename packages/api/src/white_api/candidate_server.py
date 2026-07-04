@@ -1330,12 +1330,15 @@ def create_app(
     def mix_info():
         prod = _require_production_dir()
         from white_composition.init_production import load_song_context
+        from white_composition.lp_sides import mix_duration_seconds
 
         ctx = load_song_context(prod)
         mix_file = ctx.get("mix_file") or None
+        has_mix = bool(mix_file and Path(mix_file).exists())
         return {
-            "has_mix": bool(mix_file and Path(mix_file).exists()),
+            "has_mix": has_mix,
             "mix_file": mix_file,
+            "duration_seconds": mix_duration_seconds(mix_file) if has_mix else None,
         }
 
     class MixFileBody(BaseModel):
@@ -1388,6 +1391,140 @@ def create_app(
             ".m4a": "audio/mp4",
         }.get(suffix, "audio/mpeg")
         return FileResponse(str(mix_path), media_type=media_type)
+
+    # ------------------------------------------------------------------
+    # LP-side sequencing
+    # ------------------------------------------------------------------
+
+    def _require_shrink_wrapped_dir() -> Path:
+        if _shrink_wrapped_dir is None:
+            raise HTTPException(
+                status_code=503,
+                detail="No album (shrink_wrapped) directory configured",
+            )
+        return _shrink_wrapped_dir
+
+    def _resolve_song_for_sides(song_id: str) -> dict:
+        album_dir = _require_shrink_wrapped_dir()
+        entry = next((s for s in scan_songs(album_dir) if s["id"] == song_id), None)
+        if entry is None:
+            raise HTTPException(status_code=404, detail=f"Song '{song_id}' not found")
+        return entry
+
+    def _song_mix_duration(song_entry: dict) -> float | None:
+        from white_composition.init_production import load_song_context
+        from white_composition.lp_sides import mix_duration_seconds
+
+        ctx = load_song_context(Path(song_entry["production_path"]))
+        mix_file = ctx.get("mix_file")
+        if not mix_file:
+            return None
+        return mix_duration_seconds(mix_file)
+
+    @app.get("/sides")
+    def list_sides():
+        from white_composition.lp_sides import load_sides, side_totals
+
+        album_dir = _require_shrink_wrapped_dir()
+        doc = load_sides(album_dir)
+        totals = side_totals(doc)
+        return {
+            "side_limit_seconds": doc.side_limit_seconds,
+            "sides": {
+                name: {
+                    "songs": [s.model_dump() for s in side.songs],
+                    **totals[name],
+                }
+                for name, side in doc.sides.items()
+            },
+        }
+
+    class SideAssignBody(BaseModel):
+        song_id: str
+        position: int = 0
+
+    @app.post("/sides/{side}/assign")
+    def assign_to_side(side: str, body: SideAssignBody):
+        from white_composition.lp_sides import (
+            SIDE_NAMES,
+            assign_song,
+            load_sides,
+            save_sides,
+        )
+
+        if side not in SIDE_NAMES:
+            raise HTTPException(status_code=404, detail=f"Unknown side '{side}'")
+        album_dir = _require_shrink_wrapped_dir()
+        song_entry = _resolve_song_for_sides(body.song_id)
+        if not song_entry["has_mix"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Song '{body.song_id}' has no mix file — cannot be sequenced",
+            )
+        duration = _song_mix_duration(song_entry)
+        if duration is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Could not read mix duration for '{body.song_id}'",
+            )
+        doc = load_sides(album_dir)
+        assign_song(doc, body.song_id, side, body.position, duration)
+        save_sides(album_dir, doc)
+        return {
+            "ok": True,
+            "side": side,
+            "songs": [s.model_dump() for s in doc.sides[side].songs],
+        }
+
+    class SideMoveBody(BaseModel):
+        song_id: str
+        to_side: str
+        to_position: int = 0
+
+    @app.post("/sides/{side}/move")
+    def move_within_sides(side: str, body: SideMoveBody):
+        from white_composition.lp_sides import (
+            SIDE_NAMES,
+            load_sides,
+            move_song,
+            save_sides,
+        )
+
+        if side not in SIDE_NAMES or body.to_side not in SIDE_NAMES:
+            raise HTTPException(status_code=404, detail="Unknown side")
+        album_dir = _require_shrink_wrapped_dir()
+        doc = load_sides(album_dir)
+        try:
+            move_song(doc, body.song_id, body.to_side, body.to_position)
+        except ValueError as e:
+            raise HTTPException(status_code=404, detail=str(e))
+        save_sides(album_dir, doc)
+        return {
+            "ok": True,
+            "side": body.to_side,
+            "songs": [s.model_dump() for s in doc.sides[body.to_side].songs],
+        }
+
+    @app.delete("/sides/{side}/songs/{song_id}")
+    def remove_from_side(side: str, song_id: str):
+        from white_composition.lp_sides import (
+            SIDE_NAMES,
+            load_sides,
+            remove_song,
+            save_sides,
+        )
+
+        if side not in SIDE_NAMES:
+            raise HTTPException(status_code=404, detail=f"Unknown side '{side}'")
+        album_dir = _require_shrink_wrapped_dir()
+        doc = load_sides(album_dir)
+        if not any(s.song_id == song_id for s in doc.sides[side].songs):
+            raise HTTPException(
+                status_code=404, detail=f"Song '{song_id}' is not on side {side}"
+            )
+        remove_song(doc, song_id)
+        save_sides(album_dir, doc)
+        return {"ok": True}
 
     # ------------------------------------------------------------------
     # Lyrics review
