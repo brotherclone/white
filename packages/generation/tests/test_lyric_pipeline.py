@@ -125,6 +125,46 @@ class TestFittingVerdict:
 
 
 # ---------------------------------------------------------------------------
+# 2b. _phrase_syllable_range
+# ---------------------------------------------------------------------------
+
+
+class TestPhraseSyllableRange:
+    def test_short_phrase_widened_beyond_strict_multiplier(self):
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        # Strict 0.8x-1.15x multiplier would give (1, 3) for a 2-note phrase.
+        lo, hi = _phrase_syllable_range(2)
+        assert (lo, hi) != (1, 3)
+        assert lo <= 1
+        assert hi >= 4
+
+    def test_one_note_phrase_allows_more_than_two_syllables(self):
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        lo, hi = _phrase_syllable_range(1)
+        assert lo == 0
+        assert hi >= 3
+
+    def test_short_phrase_lower_bound_never_negative(self):
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        lo, _hi = _phrase_syllable_range(1)
+        assert lo >= 0
+
+    def test_longer_phrase_unaffected(self):
+        import math
+
+        from white_generation.pipelines.lyric_pipeline import _phrase_syllable_range
+
+        # Phrases above SHORT_PHRASE_NOTE_THRESHOLD keep the original multiplier.
+        for notes in (4, 8, 16):
+            lo, hi = _phrase_syllable_range(notes)
+            assert lo == math.floor(notes * 0.8)
+            assert hi == math.ceil(notes * 1.15)
+
+
+# ---------------------------------------------------------------------------
 # 3. _compute_fitting
 # ---------------------------------------------------------------------------
 
@@ -401,6 +441,48 @@ class TestBuildPrompt:
         prompt = _build_prompt(meta, vocal_sections, syllable_targets)
         assert "[verse]" in prompt
         assert "[chorus]" in prompt
+
+    def test_short_phrases_get_melisma_note(self):
+        from white_generation.pipelines.lyric_pipeline import Phrase, _build_prompt
+
+        meta = make_meta()
+        vocal_sections = [
+            {
+                "name": "bridge",
+                "bars": 2,
+                "play_count": 1,
+                "total_notes": 4,
+                "contour": "stepwise",
+                "phrases": [
+                    Phrase(start_tick=0, end_tick=100, note_count=1),
+                    Phrase(start_tick=200, end_tick=300, note_count=2),
+                ],
+            }
+        ]
+        syllable_targets = {"bridge": (2, 4)}
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets)
+        assert "melisma" in prompt
+
+    def test_long_phrases_no_melisma_note(self):
+        from white_generation.pipelines.lyric_pipeline import Phrase, _build_prompt
+
+        meta = make_meta()
+        vocal_sections = [
+            {
+                "name": "verse",
+                "bars": 4,
+                "play_count": 1,
+                "total_notes": 16,
+                "contour": "scalar_run",
+                "phrases": [
+                    Phrase(start_tick=0, end_tick=100, note_count=8),
+                    Phrase(start_tick=200, end_tick=300, note_count=8),
+                ],
+            }
+        ]
+        syllable_targets = {"verse": (12, 17)}
+        prompt = _build_prompt(meta, vocal_sections, syllable_targets)
+        assert "melisma" not in prompt
 
 
 # ---------------------------------------------------------------------------
@@ -720,6 +802,63 @@ class TestRunPipelineIntegration:
         assert len(txt_files) == 1
         assert txt_files[0].name == "lyrics_01.txt"
 
+    def test_negative_constraints_injected_into_prompt(self, tmp_path):
+        """When lyrics_negative_constraints.yml exists at the album root, its
+        avoidance block should reach the Claude prompt."""
+        import numpy as np
+        import yaml as _yaml
+
+        from white_generation.pipelines.lyric_pipeline import run_lyric_pipeline
+
+        album_dir = tmp_path
+        prod_dir = _make_production_dir(album_dir / "thread_one")
+        with open(album_dir / "lyrics_negative_constraints.yml", "w") as f:
+            _yaml.dump(
+                {
+                    "overused_words": [
+                        {
+                            "word": "blue",
+                            "reason": "'blue' appears in 3/4 songs' lyrics (75%)",
+                        }
+                    ]
+                },
+                f,
+            )
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text="[verse]\nHello world\n")]
+        mock_client.messages.create.return_value = mock_response
+
+        mock_scorer = MagicMock()
+        mock_scorer.prepare_concept.return_value = np.zeros(768, dtype=np.float32)
+        mock_scorer.score_batch.return_value = [
+            {
+                "temporal": {"past": 0.6, "present": 0.3, "future": 0.1},
+                "spatial": {"thing": 0.7, "place": 0.2, "person": 0.1},
+                "ontological": {"imagined": 0.1, "forgotten": 0.1, "known": 0.8},
+                "confidence": 0.042,
+                "rank": 0,
+                "candidate": {"lyric_text": "[verse]\nHello world\n"},
+            }
+        ]
+
+        with (
+            patch("anthropic.Anthropic", return_value=mock_client),
+            patch("white_analysis.refractor.Refractor", return_value=mock_scorer),
+        ):
+            run_lyric_pipeline(
+                production_dir=str(prod_dir),
+                num_candidates=1,
+                model="claude-sonnet-4-6",
+            )
+
+        sent_prompt = mock_client.messages.create.call_args.kwargs["messages"][0][
+            "content"
+        ]
+        assert "blue" in sent_prompt
+        assert "75%" in sent_prompt
+
     def test_run_pipeline_writes_review_yml(self, tmp_path):
         """Pipeline should write lyrics_review.yml with one candidate entry."""
         import numpy as np
@@ -984,6 +1123,30 @@ class TestBuildWhiteCutupPrompt:
         prompt = _build_prompt(meta, sections, {"verse": (12, 17)})
         assert "SOURCE LYRICS" not in prompt
         assert "cut-up" not in prompt
+
+    def test_short_phrases_get_melisma_note(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            _build_white_cutup_prompt,
+        )
+
+        sections = [
+            {
+                "name": "bridge",
+                "bars": 2,
+                "play_count": 1,
+                "total_notes": 3,
+                "contour": "stepwise",
+                "phrases": [
+                    Phrase(start_tick=0, end_tick=100, note_count=1),
+                    Phrase(start_tick=200, end_tick=300, note_count=2),
+                ],
+            }
+        ]
+        prompt = _build_white_cutup_prompt(
+            self._dummy_meta(), sections, {"bridge": (2, 3)}, []
+        )
+        assert "melisma" in prompt
 
 
 # ---------------------------------------------------------------------------

@@ -645,6 +645,9 @@ export default function BoardPage() {
         <Link href="/candidates" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans transition-colors">
           candidate view
         </Link>
+        <Link href="/sides" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans transition-colors">
+          sides
+        </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">Composition Board</h1>
         {activeSong && (
           <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans ml-2 truncate transition-colors" title="Switch song">

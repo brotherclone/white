@@ -2,6 +2,8 @@ export type CandidateStatus = "pending" | "approved" | "accepted" | "rejected";
 
 export type LifecycleStatus = "merged" | "abandoned" | "scrapped";
 
+export type LpConsiderationStatus = "not_considered" | "candidate" | "placed";
+
 export interface SongEntry {
   id: string;
   thread_slug: string;
@@ -23,6 +25,7 @@ export interface SongEntry {
   lifecycle_status: LifecycleStatus | null;
   merged_with: string[];
   uses_parts_from: string[];
+  lp_consideration: LpConsiderationStatus;
 }
 
 export interface RegressionInfo {
@@ -227,4 +230,22 @@ export interface WorkOrder {
   royalty_split?: RoyaltySplit | null;
   created_at: string;
   updated_at: string;
+}
+
+export type SideName = "A" | "B" | "C" | "D";
+
+export interface SideSong {
+  song_id: string;
+  duration_seconds: number;
+}
+
+export interface SideEntry {
+  songs: SideSong[];
+  total_seconds: number;
+  over_limit: boolean;
+}
+
+export interface SidesResponse {
+  side_limit_seconds: number;
+  sides: Record<SideName, SideEntry>;
 }
