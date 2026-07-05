@@ -1879,10 +1879,12 @@ def create_app(
             )
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
+        uncovered_count = sum(1 for a in alignment if a.get("uncovered"))
         return {
             "ok": True,
             "split_midi": str(output_path),
             "alignment": alignment,
+            "uncovered_phrase_count": uncovered_count,
         }
 
     @app.post("/production/auto-split-melody/all")
@@ -1933,6 +1935,7 @@ def create_app(
         return {
             "ok": True,
             "results": results,
+            "warnings": [r["warning"] for r in results if r.get("warning")],
             "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
         }
 
@@ -1968,6 +1971,7 @@ def create_app(
         try:
             from white_generation.pipelines.melody_auto_split import (
                 assemble_melody_midi,
+                write_assembled_lyrics,
             )
 
             output_path = assemble_melody_midi(
@@ -1976,6 +1980,14 @@ def create_app(
                 bpm=bpm,
                 time_sig_str=time_sig,
             )
+
+            assembled_lyrics_path: Path | None = None
+            lyrics_path = prod / "melody" / "lyrics.txt"
+            if lyrics_path.exists():
+                assembled_lyrics_path = write_assembled_lyrics(
+                    arrangement_path=arrangement_path,
+                    lyrics_path=lyrics_path,
+                )
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -1997,6 +2009,9 @@ def create_app(
         return {
             "ok": True,
             "assembled_midi": str(output_path),
+            "assembled_lyrics": (
+                str(assembled_lyrics_path) if assembled_lyrics_path else None
+            ),
             "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
         }
 

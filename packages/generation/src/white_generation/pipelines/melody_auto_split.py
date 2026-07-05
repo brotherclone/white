@@ -243,19 +243,32 @@ def auto_split_melody(
             n for n in notes if phrase.start_tick <= n.start_tick <= phrase.end_tick
         ]
 
-        if phrase_idx >= len(lyric_lines) or not phrase_notes:
+        if not phrase_notes:
+            continue
+
+        if phrase_idx >= len(lyric_lines):
+            # More melody phrases than lyric lines — usually means the approved MIDI
+            # was regenerated/re-approved after lyrics.txt was written. The notes are
+            # passed through unsplit so nothing is silently dropped from the MIDI, but
+            # this is flagged clearly since it means real notes have no lyric coverage.
             output_notes.extend(phrase_notes)
-            if phrase_notes:
-                alignment.append(
-                    {
-                        "phrase": phrase_idx,
-                        "lyric_line": None,
-                        "notes_in": len(phrase_notes),
-                        "notes_out": len(phrase_notes),
-                        "syllables": 0,
-                        "assignments": [],
-                    }
-                )
+            alignment.append(
+                {
+                    "phrase": phrase_idx,
+                    "lyric_line": None,
+                    "notes_in": len(phrase_notes),
+                    "notes_out": len(phrase_notes),
+                    "syllables": 0,
+                    "assignments": [],
+                    "uncovered": True,
+                    "warning": (
+                        f"No lyric line for phrase {phrase_idx} — lyrics.txt has only "
+                        f"{len(lyric_lines)} line(s) for this section but the approved "
+                        "MIDI has more phrases. The MIDI may have changed since lyrics "
+                        "were generated; consider re-running the lyric pipeline."
+                    ),
+                }
+            )
             continue
 
         line = lyric_lines[phrase_idx]
@@ -286,6 +299,7 @@ def auto_split_melody(
                 "notes_out": len(phrase_output),
                 "syllables": len(all_sylls),
                 "assignments": [syl or "(melisma)" for _, syl in assignments],
+                "uncovered": False,
             }
         )
 
@@ -332,14 +346,21 @@ def auto_split_all_instances(
             min_split_ticks=min_split_ticks,
             output_path=output_path,
         )
-        results.append(
-            {
-                "section": section_key,
-                "skipped": False,
-                "split_midi": str(out),
-                "alignment": alignment,
-            }
-        )
+        uncovered_count = sum(1 for a in alignment if a.get("uncovered"))
+        result_entry = {
+            "section": section_key,
+            "skipped": False,
+            "split_midi": str(out),
+            "alignment": alignment,
+            "uncovered_phrase_count": uncovered_count,
+        }
+        if uncovered_count:
+            result_entry["warning"] = (
+                f"{section_key}: {uncovered_count} phrase(s) have no lyric coverage — "
+                "the approved MIDI may have changed since lyrics were generated for "
+                "this section."
+            )
+        results.append(result_entry)
 
     return results
 
@@ -447,4 +468,70 @@ def assemble_melody_midi(
 
     track.append(mido.MetaMessage("end_of_track", time=0))
     out_mid.save(str(output_path))
+    return output_path
+
+
+def assemble_lyrics_text(
+    arrangement_path: Path,
+    lyrics_path: Path,
+    melody_channel: int = 4,
+) -> str:
+    """Build lyric text matching assembled_melody.mid's real instance order.
+
+    `lyrics.txt` only contains one block for EXACT-repeat sections (e.g. a chorus
+    that plays 4 times has a single `[chorus]` block, meant to be reused verbatim).
+    `assemble_melody_midi` concatenates the *real* repeated notes, so comparing the
+    single lyric block against the assembled MIDI's note count looks like a large
+    mismatch. This walks the same arrangement-order clip list `assemble_melody_midi`
+    uses and repeats each instance's lyric block — reusing the instance's own block
+    if `lyrics.txt` has one (`verse_2`, `verse_3`, ...), otherwise falling back to the
+    base label's block (`chorus` reused for `chorus_2`, `chorus_3`, `chorus_4`).
+    """
+    clips = parse_arrangement(arrangement_path)
+    resolved_channel = _detect_melody_channel(clips, fallback=melody_channel)
+    melody_clips = [c for c in clips if c["channel"] == resolved_channel]
+
+    text = lyrics_path.read_text(encoding="utf-8")
+    sections = _parse_sections(text)
+
+    label_seen: dict[str, int] = {}
+    blocks: list[str] = []
+    for clip in melody_clips:
+        label = clip["clip_name"]
+        label_seen[label] = label_seen.get(label, 0) + 1
+        n = label_seen[label]
+        instance_key = label if n == 1 else f"{label}_{n}"
+
+        block = sections.get(instance_key)
+        if block is None:
+            block = sections.get(label)
+
+        if block is None:
+            blocks.append(
+                f"[{instance_key}]\n"
+                f"# NO LYRIC BLOCK FOUND for '{label}' "
+                f"(checked '{instance_key}' and '{label}')"
+            )
+        else:
+            blocks.append(f"[{instance_key}]\n{block}")
+
+    return "\n\n".join(blocks) + "\n"
+
+
+def write_assembled_lyrics(
+    arrangement_path: Path,
+    lyrics_path: Path,
+    output_path: Optional[Path] = None,
+    melody_channel: int = 4,
+) -> Path:
+    """Write assemble_lyrics_text()'s output to <melody_dir>/assembled_lyrics.txt."""
+    if output_path is None:
+        output_path = lyrics_path.parent / "assembled_lyrics.txt"
+    output_path = Path(output_path)
+    output_path.write_text(
+        assemble_lyrics_text(
+            arrangement_path, lyrics_path, melody_channel=melody_channel
+        ),
+        encoding="utf-8",
+    )
     return output_path

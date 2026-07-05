@@ -505,7 +505,12 @@ export default function BoardPage() {
     setError(null);
     try {
       const res = await autoSplitMelody();
-      setSplitResult(`Split ${res.results.length} section(s): ${res.results.map(r => r.label).join(", ")}`);
+      const sections = res.results.filter(r => !r.skipped).map(r => r.section).join(", ");
+      let message = `Split ${res.results.length} section(s): ${sections}`;
+      if (res.warnings.length > 0) {
+        message += ` — ⚠ ${res.warnings.join(" ")}`;
+      }
+      setSplitResult(message);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Auto-split failed");
     } finally {
@@ -550,8 +555,12 @@ export default function BoardPage() {
     setAssembleResult(null);
     setError(null);
     try {
-      await assembleMelody();
-      setAssembleResult("assembled_melody.mid written");
+      const res = await assembleMelody();
+      setAssembleResult(
+        res.assembled_lyrics
+          ? "assembled_melody.mid + assembled_lyrics.txt written"
+          : "assembled_melody.mid written (no lyrics.txt found to assemble)",
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Assemble failed");
     } finally {
