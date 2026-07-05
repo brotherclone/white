@@ -505,10 +505,12 @@ export default function BoardPage() {
     setError(null);
     try {
       const res = await autoSplitMelody();
-      const sections = res.results.filter(r => !r.skipped).map(r => r.section).join(", ");
-      let message = `Split ${res.results.length} section(s): ${sections}`;
-      if (res.warnings.length > 0) {
-        message += ` — ⚠ ${res.warnings.join(" ")}`;
+      const results = res.results ?? [];
+      const warnings = res.warnings ?? [];
+      const sections = results.filter(r => !r.skipped).map(r => r.section).join(", ");
+      let message = `Split ${results.length} section(s): ${sections}`;
+      if (warnings.length > 0) {
+        message += ` — ⚠ ${warnings.join(" ")}`;
       }
       setSplitResult(message);
     } catch (e) {
