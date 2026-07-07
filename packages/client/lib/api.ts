@@ -395,7 +395,20 @@ export async function draftWorkOrderEmail(collaboratorId: string): Promise<{
   return res.json();
 }
 
-export async function autoSplitMelody(): Promise<{ ok: boolean; results: { label: string; split_midi: string }[] }> {
+export interface AutoSplitResult {
+  section: string;
+  skipped: boolean;
+  reason?: string;
+  split_midi?: string;
+  uncovered_phrase_count?: number;
+  warning?: string;
+}
+
+export async function autoSplitMelody(): Promise<{
+  ok: boolean;
+  results: AutoSplitResult[];
+  warnings: string[];
+}> {
   const res = await fetch(`${BASE}/production/auto-split-melody/all`, { method: "POST" });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -404,7 +417,11 @@ export async function autoSplitMelody(): Promise<{ ok: boolean; results: { label
   return res.json();
 }
 
-export async function assembleMelody(): Promise<{ ok: boolean; assembled_midi: string }> {
+export async function assembleMelody(): Promise<{
+  ok: boolean;
+  assembled_midi: string;
+  assembled_lyrics: string | null;
+}> {
   const res = await fetch(`${BASE}/production/assemble-melody`, { method: "POST" });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

@@ -1065,6 +1065,46 @@ class TestSamplesEndpoints:
         assert data["ok"] is True
         assert Path(data["dest"]).exists()
 
+    def test_export_uses_song_context_title_not_manifest_title(self, sw_dir, tmp_path):
+        """Regression: export must land in the real Logic folder (song_context.yml's
+        title), not a recomputed one from manifest_bootstrap.yml's title — the two can
+        drift (e.g. after a song is revised and only one file is updated)."""
+        import pandas as pd
+        import yaml as _yaml
+
+        # manifest_bootstrap.yml (from sw_dir fixture) has title "Song Alpha";
+        # song_context.yml diverges, simulating a post-revision title update.
+        prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
+        with open(prod_dir / "song_context.yml", "w") as f:
+            _yaml.dump(
+                {"title": "Song Alpha (v2)", "thread": ""},
+                f,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
+
+        tc = self._active_client(sw_dir)
+        wav = tmp_path / "seg_001.wav"
+        wav.write_bytes(b"RIFF")
+        logic_dir = tmp_path / "logic"
+        fake_df = pd.DataFrame(
+            [{"segment_id": "seg_001", "source_audio_file": str(wav)}]
+        )
+        with (
+            patch(
+                "white_composition.retrieve_samples.load_clap_index",
+                return_value=fake_df,
+            ),
+            patch("white_api.candidate_server._AUDIO_ROOT", tmp_path),
+            patch.dict("os.environ", {"LOGIC_OUTPUT_DIR": str(logic_dir)}),
+        ):
+            resp = tc.post("/samples/seg_001/export")
+        assert resp.status_code == 200
+        dest = Path(resp.json()["dest"])
+        assert "Song Alpha (v2) (song_a_v1)" in str(dest)
+        assert "Song Alpha (song_a_v1)" not in str(dest)
+
 
 # ---------------------------------------------------------------------------
 # Task 8.6: scan_songs — schema_version and stub fields
