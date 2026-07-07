@@ -775,6 +775,9 @@ export default function BoardPage() {
               ) : (
                 <>
                   <span className="text-[10px] font-mono text-zinc-500">{activeSong.bpm} BPM</span>
+                  {activeSong.time_sig && (
+                    <span className="text-[10px] font-mono text-zinc-600">· {activeSong.time_sig}</span>
+                  )}
                   <button
                     onClick={() => { setBpmInput(String(activeSong.bpm)); setEditingBpm(true); }}
                     className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
