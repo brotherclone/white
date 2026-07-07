@@ -653,6 +653,123 @@ _VIOLA_RANGE = SingerRange(
 )
 
 
+# ---------------------------------------------------------------------------
+# Label resolution + voice-length alignment
+# ---------------------------------------------------------------------------
+
+
+def _resolve_chord_label(label_key: str, available_labels: list[str]) -> Optional[str]:
+    """Find the best-matching chord/harmonic-rhythm label for a melody label.
+
+    Melody labels often carry suffixes the chord phase never sees (_split from
+    auto-split, _2/_3/... repeat instances, _alt/_inst variants). Tries an exact
+    match first, then the longest available label that is a prefix of label_key
+    (so 'verse_alt_2_split' resolves to 'verse', 'bridge_inst' to 'bridge').
+    Returns None if nothing matches even by prefix.
+    """
+    if label_key in available_labels:
+        return label_key
+    candidates = [lbl for lbl in available_labels if label_key.startswith(lbl)]
+    if not candidates:
+        return None
+    return max(candidates, key=len)
+
+
+def _voice_length_beats(midi_bytes: bytes) -> float:
+    """Return a single-voice MIDI's total length in beats (resolution-independent)."""
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    tpb = mid.ticks_per_beat or 480
+    max_tick = 0
+    for track in mid.tracks:
+        abs_tick = 0
+        for msg in track:
+            abs_tick += msg.time
+            if msg.type in ("note_on", "note_off"):
+                max_tick = max(max_tick, abs_tick)
+    return max_tick / tpb
+
+
+def _parse_voice_notes_with_velocity(
+    midi_bytes: bytes,
+) -> tuple[list[tuple[int, int, int, int]], int]:
+    """Parse (abs_tick, pitch, duration_ticks, velocity) from a single-voice MIDI."""
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    tpb = mid.ticks_per_beat or 480
+    pending: dict[int, list[tuple[int, int]]] = {}
+    notes: list[tuple[int, int, int, int]] = []
+    for track in mid.tracks:
+        abs_tick = 0
+        for msg in track:
+            abs_tick += msg.time
+            if msg.type == "note_on" and msg.velocity > 0:
+                pending.setdefault(msg.note, []).append((abs_tick, msg.velocity))
+            elif msg.type == "note_off" or (
+                msg.type == "note_on" and msg.velocity == 0
+            ):
+                stack = pending.get(msg.note)
+                if stack:
+                    start, vel = stack.pop(0)
+                    notes.append((start, msg.note, abs_tick - start, vel))
+    notes.sort(key=lambda n: n[0])
+    return notes, tpb
+
+
+def _align_voice_length(midi_bytes: bytes, target_beats: float) -> bytes:
+    """Pad (sustain final note) or trim a single-voice MIDI to exactly target_beats.
+
+    Violin II, viola, and cello are regenerated independently from harmonic-rhythm
+    durations that don't always agree with the soprano's real length, previously
+    surfacing as a voice ending short (a gap before the section's end) or with an
+    extra dangling measure. This reconciles every voice to the soprano's actual
+    length after generation, regardless of what the harmonic-rhythm data said.
+    """
+    notes, tpb = _parse_voice_notes_with_velocity(midi_bytes)
+    if not notes:
+        return midi_bytes
+
+    target_ticks = round(target_beats * tpb)
+
+    trimmed: list[tuple[int, int, int, int]] = []
+    for tick, pitch, dur, vel in notes:
+        if tick >= target_ticks:
+            continue
+        end = tick + dur
+        if end > target_ticks:
+            dur = target_ticks - tick
+        trimmed.append((tick, pitch, dur, vel))
+
+    if not trimmed:
+        return midi_bytes
+
+    current_end = max(tick + dur for tick, _, dur, _ in trimmed)
+    if current_end < target_ticks:
+        last_tick, last_pitch, _last_dur, last_vel = trimmed[-1]
+        trimmed[-1] = (last_tick, last_pitch, target_ticks - last_tick, last_vel)
+
+    out = mido.MidiFile(ticks_per_beat=tpb)
+    track = mido.MidiTrack()
+    out.tracks.append(track)
+    track.append(mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(120), time=0))
+
+    raw: list[tuple[int, mido.Message]] = []
+    for tick, pitch, dur, vel in trimmed:
+        raw.append((tick, mido.Message("note_on", note=pitch, velocity=vel, time=0)))
+        raw.append(
+            (tick + dur, mido.Message("note_off", note=pitch, velocity=0, time=0))
+        )
+    raw.sort(key=lambda e: (e[0], 0 if e[1].type == "note_off" else 1))
+
+    prev = 0
+    for abs_tick, msg in raw:
+        track.append(msg.copy(time=abs_tick - prev))
+        prev = abs_tick
+    track.append(mido.MetaMessage("end_of_track", time=0))
+
+    buf = io.BytesIO()
+    out.save(file=buf)
+    return buf.getvalue()
+
+
 def _generate_string_voice(
     instrument: str,
     voicings: list[list[int]],
@@ -802,10 +919,15 @@ def generate_quartet(
     time_sig: tuple[int, int] = (int(ts_parts[0]), int(ts_parts[1]))
 
     soprano_midi_bytes = midi_path.read_bytes()
+    soprano_length_beats = _voice_length_beats(soprano_midi_bytes)
 
-    # Harmonic rhythm: per-chord bar durations so lower voices match the soprano length
+    # Harmonic rhythm: per-chord bar durations so lower voices match the soprano length.
+    # Voices are also hard-aligned to soprano_length_beats after generation (see
+    # _align_voice_length below), so a missing/unmatched entry here only affects the
+    # pacing of chord changes within the section, not the final total length.
     _hr = read_approved_harmonic_rhythm(production_dir)
-    section_durations: list[float] | None = _hr.get(label_key)
+    _hr_label = _resolve_chord_label(label_key, list(_hr.keys()))
+    section_durations: list[float] | None = _hr.get(_hr_label) if _hr_label else None
 
     # Diatonic scale pitch classes for out-of-key snapping on melodic voices
     scale_pcs = _compute_scale_pcs(str(ctx.get("key", "")))
@@ -896,21 +1018,22 @@ def generate_quartet(
         candidates.sort(key=lambda c: c["composite_score"], reverse=True)
         return candidates[:top_k]
 
-    # --- Main path: melody patterns for violin II/viola, bass patterns for cello ---
+    # --- Main path: violin II/viola melody patterns, cello bass pattern ---
 
-    # Load chord voicings for this section (needed by violin II, viola, cello generators)
-    try:
-        chord_data, _ = extract_section_chord_data(production_dir)
-        voicings = chord_data.get(label_key)
-        if not voicings:
-            # Try the first available section as a fallback
-            voicings = next(iter(chord_data.values()), None)
-    except Exception:
-        voicings = None
-
-    if not voicings:
-        # Last resort: single C major triad
-        voicings = [[48, 52, 55]]
+    # Load chord voicings for this section (needed by violin II, viola, cello generators).
+    # Resolution must find a real match for this label (exact or prefix) -- silently
+    # substituting an unrelated section's chords produced musically wrong harmony.
+    chord_data, _ = extract_section_chord_data(production_dir)
+    chord_label = _resolve_chord_label(label_key, list(chord_data.keys()))
+    if chord_label is None:
+        raise ValueError(
+            f"No chord data found for melody section '{label_key}' in "
+            f"{production_dir / 'chords' / 'review.yml'} — checked exact match and "
+            f"prefix match against approved chord labels {sorted(chord_data.keys())}. "
+            "Approve chords for this section (or its base section) before generating "
+            "the quartet."
+        )
+    voicings = chord_data[chord_label]
 
     if section_durations is not None and len(section_durations) < len(voicings):
         section_durations = section_durations + [1.0] * (
@@ -947,6 +1070,12 @@ def generate_quartet(
         vc_bytes, vc_pat = _generate_cello_voice(
             voicings, energy, time_sig, bpm, rng, durations=section_durations
         )
+
+        # Reconcile all 3 generated voices to the soprano's real length — their
+        # harmonic-rhythm-derived duration can drift short or long otherwise.
+        vii_bytes = _align_voice_length(vii_bytes, soprano_length_beats)
+        va_bytes = _align_voice_length(va_bytes, soprano_length_beats)
+        vc_bytes = _align_voice_length(vc_bytes, soprano_length_beats)
 
         midi_bytes = merge_voices_to_quartet_midi(
             [
