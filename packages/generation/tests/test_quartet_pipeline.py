@@ -65,7 +65,7 @@ def _write_chords_review(prod_dir: Path, label: str) -> Path:
     }
     path = chords_dir / "review.yml"
     with open(path, "w") as f:
-        yaml.dump(review, f)
+        yaml.dump(review, f, sort_keys=False, allow_unicode=True, width=float("inf"))
     return path
 
 

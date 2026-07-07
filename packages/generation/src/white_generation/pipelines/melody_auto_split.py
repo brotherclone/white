@@ -497,7 +497,9 @@ def assemble_lyrics_text(
     label_seen: dict[str, int] = {}
     blocks: list[str] = []
     for clip in melody_clips:
-        label = clip["clip_name"]
+        # Match _parse_sections()'s header normalization so clip names that differ
+        # only in case/spacing (common from Logic) still resolve to the right block.
+        label = clip["clip_name"].strip().lower().replace(" ", "_")
         label_seen[label] = label_seen.get(label, 0) + 1
         n = label_seen[label]
         instance_key = label if n == 1 else f"{label}_{n}"

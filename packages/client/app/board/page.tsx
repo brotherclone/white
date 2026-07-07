@@ -507,8 +507,15 @@ export default function BoardPage() {
       const res = await autoSplitMelody();
       const results = res.results ?? [];
       const warnings = res.warnings ?? [];
-      const sections = results.filter(r => !r.skipped).map(r => r.section).join(", ");
-      let message = `Split ${results.length} section(s): ${sections}`;
+      const splitResults = results.filter(r => !r.skipped);
+      const skippedCount = results.length - splitResults.length;
+      let message =
+        splitResults.length > 0
+          ? `Split ${splitResults.length} section(s): ${splitResults.map(r => r.section).join(", ")}`
+          : "No sections were split";
+      if (skippedCount > 0) {
+        message += ` (${skippedCount} skipped)`;
+      }
       if (warnings.length > 0) {
         message += ` — ⚠ ${warnings.join(" ")}`;
       }

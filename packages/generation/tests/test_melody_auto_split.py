@@ -368,6 +368,23 @@ def test_assemble_lyrics_repeats_exact_block_verbatim(tmp_path: Path):
     assert text.count("file it wrong") == 3
 
 
+def test_assemble_lyrics_clip_name_case_insensitive(tmp_path: Path):
+    """Arrangement clip names from Logic can differ in case from lyrics.txt headers
+    (which _parse_sections always lowercases) -- normalization must still match them."""
+    from white_generation.pipelines.melody_auto_split import assemble_lyrics_text
+
+    arrangement_path = tmp_path / "arrangement.txt"
+    arrangement_path.write_text(_make_arrangement([("Chorus", 0.0, 8.0)]))
+
+    lyrics_path = tmp_path / "lyrics.txt"
+    lyrics_path.write_text("[chorus]\nsay everything\n")
+
+    text = assemble_lyrics_text(arrangement_path, lyrics_path)
+
+    assert "NO LYRIC BLOCK FOUND" not in text
+    assert "say everything" in text
+
+
 def test_assemble_lyrics_uses_each_variation_instances_own_block(tmp_path: Path):
     from white_generation.pipelines.melody_auto_split import assemble_lyrics_text
 

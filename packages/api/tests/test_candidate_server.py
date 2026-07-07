@@ -1076,7 +1076,13 @@ class TestSamplesEndpoints:
         # song_context.yml diverges, simulating a post-revision title update.
         prod_dir = sw_dir / "thread-alpha" / "production" / "song_a_v1"
         with open(prod_dir / "song_context.yml", "w") as f:
-            _yaml.dump({"title": "Song Alpha (v2)", "thread": ""}, f)
+            _yaml.dump(
+                {"title": "Song Alpha (v2)", "thread": ""},
+                f,
+                sort_keys=False,
+                allow_unicode=True,
+                width=float("inf"),
+            )
 
         tc = self._active_client(sw_dir)
         wav = tmp_path / "seg_001.wav"
