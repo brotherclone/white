@@ -986,15 +986,18 @@ def create_app(
                 status_code=503,
                 detail="No song selected — POST /songs/activate first",
             )
+
+        from white_composition.logic_handoff import resolve_song_dir
+
+        try:
+            song_dir = resolve_song_dir(Path(_active_song["production_path"]))
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
+            ) from exc
+
         logic_root = Path(logic_output_dir).resolve()
-        thread_slug = _active_song.get("thread_slug", "unknown")
-        title = _active_song.get("title", "unknown")
-        production_slug = _active_song.get("production_slug", "")
-        safe_title = title.replace("/", "-").replace(":", "-").replace("..", "")
-        song_folder = (
-            f"{safe_title} ({production_slug})" if production_slug else safe_title
-        )
-        dest_dir = (logic_root / thread_slug / song_folder / "Samples").resolve()
+        dest_dir = (song_dir / "Samples").resolve()
         try:
             dest_dir.relative_to(logic_root)
         except ValueError:
