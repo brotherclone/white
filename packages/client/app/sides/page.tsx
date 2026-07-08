@@ -323,6 +323,7 @@ export default function SidesPage() {
     .filter((s) => showUnmixed || s.has_mix)
     .filter((s) => !poolSearch || s.title.toLowerCase().includes(poolSearch.toLowerCase()));
   const unmixedHiddenCount = songs.filter((s) => !assignedIds.has(s.id) && !s.has_mix).length;
+  const allAssigned = songs.length > 0 && songs.every((s) => assignedIds.has(s.id));
 
   const totalUsedSeconds = sides
     ? SIDE_NAMES.reduce((sum, s) => sum + sides.sides[s].total_seconds, 0)
@@ -380,7 +381,7 @@ export default function SidesPage() {
                 ))}
                 {available.length === 0 && (
                   <div className="text-[11px] text-zinc-600 font-sans italic py-2">
-                    {songs.length === 0 ? "All songs are assigned to a side" : "No matching songs"}
+                    {allAssigned ? "All songs are assigned to a side" : "No matching songs"}
                   </div>
                 )}
               </div>

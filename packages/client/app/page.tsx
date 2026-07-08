@@ -121,7 +121,7 @@ function SongBrowserContent() {
       STAGE_FILTER_VALUES.map(s => {
         const count = s === "all" ? activeSongs.length : s === "stub" ? stubCount : (countsByStage[s as SongEntry["stage"]] ?? 0);
         const label = s === "all" ? "All" : s === "stub" ? "Stub" : STAGE_LABELS[s as SongEntry["stage"]];
-        return { value: s, label: `${label} (${count})`, count };
+        return { value: s, label: `${label} (${count})` };
       }),
     [activeSongs.length, stubCount, countsByStage],
   );
@@ -140,7 +140,6 @@ function SongBrowserContent() {
       options.push({
         value: thread,
         label: `${thread} (${titles.length})`,
-        count: titles.length,
         keywords: titles,
       });
     }
