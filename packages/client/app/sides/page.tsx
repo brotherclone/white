@@ -214,6 +214,8 @@ export default function SidesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeDrag, setActiveDrag] = useState<DragPayload | null>(null);
+  const [poolSearch, setPoolSearch] = useState("");
+  const [showUnmixed, setShowUnmixed] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -316,7 +318,16 @@ export default function SidesPage() {
   const assignedIds = new Set(
     sides ? SIDE_NAMES.flatMap((s) => sides.sides[s].songs.map((song) => song.song_id)) : [],
   );
-  const available = songs.filter((s) => !assignedIds.has(s.id));
+  const available = songs
+    .filter((s) => !assignedIds.has(s.id))
+    .filter((s) => showUnmixed || s.has_mix)
+    .filter((s) => !poolSearch || s.title.toLowerCase().includes(poolSearch.toLowerCase()));
+  const unmixedHiddenCount = songs.filter((s) => !assignedIds.has(s.id) && !s.has_mix).length;
+
+  const totalUsedSeconds = sides
+    ? SIDE_NAMES.reduce((sum, s) => sum + sides.sides[s].total_seconds, 0)
+    : 0;
+  const totalTargetSeconds = sides ? sides.side_limit_seconds * SIDE_NAMES.length : 0;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -325,6 +336,11 @@ export default function SidesPage() {
           ← home
         </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">LP Side Sequencing</h1>
+        {sides && (
+          <span className="ml-auto text-xs font-sans text-zinc-500">
+            Total: <span className="text-zinc-300">{formatDuration(totalUsedSeconds)}</span> / {formatDuration(totalTargetSeconds)} across {SIDE_NAMES.length} sides
+          </span>
+        )}
       </div>
 
       {error && (
@@ -340,13 +356,31 @@ export default function SidesPage() {
           <div className="flex-1 flex gap-4 p-6">
             <div className="w-64 flex flex-col gap-2">
               <h2 className="text-sm font-bold text-white">Available</h2>
+              <input
+                type="text"
+                value={poolSearch}
+                onChange={(e) => setPoolSearch(e.target.value)}
+                placeholder="Search song title…"
+                className="w-full bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+              />
+              {unmixedHiddenCount > 0 && (
+                <label className="flex items-center gap-1.5 text-[11px] font-sans text-zinc-500 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showUnmixed}
+                    onChange={(e) => setShowUnmixed(e.target.checked)}
+                    className="accent-blue-600"
+                  />
+                  Show {unmixedHiddenCount} without a mix
+                </label>
+              )}
               <div className="flex flex-col gap-1.5">
                 {available.map((song) => (
                   <AvailableSongRow key={song.id} song={song} />
                 ))}
                 {available.length === 0 && (
                   <div className="text-[11px] text-zinc-600 font-sans italic py-2">
-                    All songs are assigned to a side
+                    {songs.length === 0 ? "All songs are assigned to a side" : "No matching songs"}
                   </div>
                 )}
               </div>

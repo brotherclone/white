@@ -9,6 +9,8 @@ export interface ComboboxOption<T extends string> {
   count?: number;
   /** Extra terms (e.g. song titles under a thread) that should also match this option. */
   keywords?: string[];
+  /** Dimmed secondary text shown under the label — use to disambiguate duplicate labels. */
+  secondary?: string;
 }
 
 interface ComboboxProps<T extends string> {
@@ -88,7 +90,12 @@ export function Combobox<T extends string>({
                     opt.value === value ? "text-white" : "text-zinc-300"
                   }`}
                 >
-                  <span className="truncate">{opt.label}</span>
+                  <span className="flex flex-col min-w-0">
+                    <span className="truncate">{opt.label}</span>
+                    {opt.secondary && (
+                      <span className="truncate text-[10px] text-zinc-600">{opt.secondary}</span>
+                    )}
+                  </span>
                   {opt.count !== undefined && (
                     <span className="text-zinc-600 shrink-0">{opt.count}</span>
                   )}
