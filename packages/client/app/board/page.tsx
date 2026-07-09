@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
@@ -12,6 +12,7 @@ import {
 import { Collaborator, CompositionEntry, LifecycleStatus, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RegressionInfo, RunJob, SongEntry, WorkOrder } from "@/lib/types";
 import WorkOrderHud from "@/components/WorkOrderHud";
 import WorkOrderDrawer from "@/components/WorkOrderDrawer";
+import { Combobox, ComboboxOption } from "@/components/Combobox";
 
 const STAGE_LABELS: Record<MixStage, string> = {
   structure:          "Structure",
@@ -347,6 +348,32 @@ export default function BoardPage() {
   const [selectedPartsFrom, setSelectedPartsFrom] = useState<string[]>([]);
   const [savingPartsFrom, setSavingPartsFrom] = useState(false);
   const lyricsPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lifecycleScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateLifecycleScrollState = useCallback(() => {
+    const el = lifecycleScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    updateLifecycleScrollState();
+    window.addEventListener("resize", updateLifecycleScrollState);
+    return () => window.removeEventListener("resize", updateLifecycleScrollState);
+  }, [updateLifecycleScrollState, composition]);
+
+  const songOptions: ComboboxOption<string>[] = useMemo(() => {
+    const sorted = [...songs].sort((a, b) => a.title.localeCompare(b.title) || a.thread_slug.localeCompare(b.thread_slug));
+    return sorted.map(s => ({
+      value: s.id,
+      label: s.title,
+      secondary: `${s.thread_slug} · ${s.id}`,
+      keywords: [s.thread_slug, s.id],
+    }));
+  }, [songs]);
 
   const refreshLyrics = useCallback(async () => {
     try {
@@ -667,18 +694,12 @@ export default function BoardPage() {
           sides
         </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">Composition Board</h1>
-        {activeSong && (
-          <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-xs font-sans ml-2 truncate transition-colors" title="Switch song">
-            {activeSong.title}
-          </Link>
-        )}
         <div className="ml-auto flex items-center gap-3">
-          {songs.length > 0 && (
-            <select
-              className="text-xs font-sans bg-zinc-900 border border-zinc-700 rounded px-2 py-1.5 text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          {songOptions.length > 0 && (
+            <Combobox
+              options={songOptions}
               value={activeSong?.id ?? ""}
-              onChange={async (e) => {
-                const id = e.target.value;
+              onChange={async (id) => {
                 if (!id || id === activeSong?.id) return;
                 setLoadState("loading");
                 try {
@@ -689,12 +710,10 @@ export default function BoardPage() {
                   setLoadState("error");
                 }
               }}
-              disabled={loadState === "loading"}
-            >
-              {songs.map(s => (
-                <option key={s.id} value={s.id}>{s.title}</option>
-              ))}
-            </select>
+              triggerLabel={activeSong?.title ?? "Select song…"}
+              placeholder="Search song title or thread…"
+              className={loadState === "loading" ? "opacity-50 pointer-events-none" : ""}
+            />
           )}
           {composition && (
             <button
@@ -775,6 +794,9 @@ export default function BoardPage() {
               ) : (
                 <>
                   <span className="text-[10px] font-mono text-zinc-500">{activeSong.bpm} BPM</span>
+                  {activeSong.time_sig && (
+                    <span className="text-[10px] font-mono text-zinc-600">· {activeSong.time_sig}</span>
+                  )}
                   <button
                     onClick={() => { setBpmInput(String(activeSong.bpm)); setEditingBpm(true); }}
                     className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
@@ -788,6 +810,9 @@ export default function BoardPage() {
 
           {mixFile ? (
             <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 mb-4">
+              <span className="text-[10px] font-sans uppercase tracking-wide text-zinc-600 whitespace-nowrap" title="Full song mix, separate from any per-stage take shown below">
+                Song mix
+              </span>
               <audio
                 key={mixFile}
                 controls
@@ -1026,7 +1051,15 @@ export default function BoardPage() {
       )}
 
       {loadState === "ready" && composition && (
-        <div className="overflow-x-auto px-6 py-6">
+        <div className="relative">
+          {canScrollLeft && (
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-zinc-950 to-transparent" />
+          )}
+          <div
+            ref={lifecycleScrollRef}
+            onScroll={updateLifecycleScrollState}
+            className="overflow-x-auto px-6 py-6"
+          >
           <div className="flex gap-3 min-w-max">
             {MIX_STAGES.map((stage, idx) => {
               const isCurrent = stage === composition.current_stage;
@@ -1060,11 +1093,13 @@ export default function BoardPage() {
                     <div className="flex items-center gap-2">
                       {isPast && !isFinalMix && (
                         <svg className="w-3 h-3 text-green-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <title>Phase reached — cards inside may still be in draft</title>
                           <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                         </svg>
                       )}
                       {isFinalMix && (isCurrent || isPast) && (
                         <svg className="w-3 h-3 text-green-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                          <title>Phase reached — cards inside may still be in draft</title>
                           <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                         </svg>
                       )}
@@ -1275,7 +1310,12 @@ export default function BoardPage() {
               );
             })}
           </div>
-
+          </div>
+          {canScrollRight && (
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-zinc-950 to-transparent flex items-center justify-end pr-1">
+              <span className="text-zinc-500 text-sm">›</span>
+            </div>
+          )}
         </div>
       )}
 

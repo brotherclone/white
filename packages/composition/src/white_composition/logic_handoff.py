@@ -96,10 +96,18 @@ def handoff(production_dir: Path) -> Path:
         for wav in samples_src.glob("*.wav"):
             shutil.copy2(wav, samples_dest / wav.name)
 
+    # 3c. Ensure a blank arrangement.txt exists in the Logic folder — a visible
+    # placeholder from the very first handoff, before the human exports a real
+    # arrangement from Logic.
+    logic_arrangement = song_dir / "arrangement.txt"
+    if not logic_arrangement.exists():
+        logic_arrangement.touch()
+
     # 4. Sync arrangement.txt back from Logic folder → production dir so that
     # lyric gen and drift report can read it after the human has arranged in Logic.
-    logic_arrangement = song_dir / "arrangement.txt"
-    if logic_arrangement.exists():
+    # Skip the blank placeholder so a not-yet-arranged song never overwrites a
+    # previously-synced real arrangement.txt already in the production directory.
+    if logic_arrangement.exists() and logic_arrangement.stat().st_size > 0:
         shutil.copy2(logic_arrangement, production_dir / "arrangement.txt")
         print(f"Synced arrangement.txt from Logic → {production_dir}")
 

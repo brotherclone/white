@@ -4,6 +4,7 @@
 
 import type { Metadata } from "next";
 import Script from "next/script";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,7 +26,9 @@ export default function RootLayout({
           {`try{Typekit.load({async:true});}catch(e){}`}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-200">{children}</body>
+      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-200">
+        <NuqsAdapter>{children}</NuqsAdapter>
+      </body>
     </html>
   );
 }

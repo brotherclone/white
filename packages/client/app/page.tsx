@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { fetchSongs, activateSong, initSong } from "@/lib/api";
 import { SongEntry } from "@/lib/types";
+import { Combobox, ComboboxOption } from "@/components/Combobox";
 
 const COLOR_MAP: Record<string, string> = {
   red: "#dc2626",    r: "#dc2626",
@@ -61,18 +63,46 @@ const STAGE_BADGE_CLS: Record<SongEntry["stage"], string> = {
 
 const ALL_SONG_STAGES = Object.keys(STAGE_LABELS) as SongEntry["stage"][];
 
+const STAGE_FILTER_VALUES = ["all", "stub", ...ALL_SONG_STAGES] as const;
+type StageFilter = (typeof STAGE_FILTER_VALUES)[number];
+
+const PLACEMENT_VALUES = ["candidate", "placed"] as const;
+
 type Toast = { kind: "success" | "error"; message: string };
-type StageFilter = SongEntry["stage"] | "all" | "stub";
 
 export default function SongBrowserPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-500 font-sans">
+          Loading…
+        </div>
+      }
+    >
+      <SongBrowserContent />
+    </Suspense>
+  );
+}
+
+function SongBrowserContent() {
   const router = useRouter();
   const [songs, setSongs] = useState<SongEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
-  const [stageFilter, setStageFilter] = useState<StageFilter>("all");
-  const [lpFilter, setLpFilter] = useState<"" | "candidate" | "placed">("");
+  const [stageFilter, setStageFilter] = useQueryState(
+    "stage",
+    parseAsStringLiteral(STAGE_FILTER_VALUES).withDefault("all"),
+  );
+  const [placementFilter, setPlacementFilter] = useQueryState(
+    "placement",
+    parseAsStringLiteral(PLACEMENT_VALUES),
+  );
+  const [threadFilter, setThreadFilter] = useQueryState(
+    "thread",
+    parseAsString.withDefault(""),
+  );
 
   const activeSongs = useMemo(() => songs.filter(s => !LIFECYCLE_STAGES.has(s.stage)), [songs]);
 
@@ -85,6 +115,36 @@ export default function SongBrowserPage() {
   );
 
   const stubCount = useMemo(() => songs.filter(s => s.stub).length, [songs]);
+
+  const stageOptions: ComboboxOption<StageFilter>[] = useMemo(
+    () =>
+      STAGE_FILTER_VALUES.map(s => {
+        const count = s === "all" ? activeSongs.length : s === "stub" ? stubCount : (countsByStage[s as SongEntry["stage"]] ?? 0);
+        const label = s === "all" ? "All" : s === "stub" ? "Stub" : STAGE_LABELS[s as SongEntry["stage"]];
+        return { value: s, label: `${label} (${count})` };
+      }),
+    [activeSongs.length, stubCount, countsByStage],
+  );
+
+  const threadOptions: ComboboxOption<string>[] = useMemo(() => {
+    const byThread = new Map<string, string[]>();
+    for (const s of songs) {
+      const titles = byThread.get(s.thread_slug) ?? [];
+      titles.push(s.title);
+      byThread.set(s.thread_slug, titles);
+    }
+    const options: ComboboxOption<string>[] = [
+      { value: "", label: `All threads (${songs.length})` },
+    ];
+    for (const [thread, titles] of [...byThread.entries()].sort()) {
+      options.push({
+        value: thread,
+        label: `${thread} (${titles.length})`,
+        keywords: titles,
+      });
+    }
+    return options;
+  }, [songs]);
 
   const showToast = (kind: Toast["kind"], message: string) => {
     setToast({ kind, message });
@@ -138,23 +198,25 @@ export default function SongBrowserPage() {
     <div className="min-h-screen bg-zinc-950 text-zinc-200 p-6 font-mono">
       <div className="flex items-start justify-between gap-4 mb-1">
         <h1 className="text-xl font-bold text-white tracking-tight">Songs</h1>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/sides"
-            className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
-          >
-            Sides
-          </Link>
-          <Link
-            href="/collaborators"
-            className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
-          >
-            Collaborators
-          </Link>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/sides"
+              className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+            >
+              Sides
+            </Link>
+            <Link
+              href="/collaborators"
+              className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+            >
+              Collaborators
+            </Link>
+          </div>
           {!error && (
             <Link
               href="/agent"
-              className="px-3 py-1.5 text-xs font-sans rounded bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+              className="px-3 py-1.5 text-xs font-sans font-medium rounded bg-[#EF7143] text-zinc-950 hover:bg-[#f08662] transition-colors"
             >
               Run Agent
             </Link>
@@ -163,54 +225,56 @@ export default function SongBrowserPage() {
       </div>
       <p className="text-zinc-500 text-xs font-sans mb-3">Select a song to continue</p>
 
-      {/* Stage filter */}
+      {/* Filters */}
       {!error && songs.length > 0 && (
-        <div className="flex gap-1.5 flex-wrap mb-4">
-          {(["all", ...ALL_SONG_STAGES.filter(s => s !== "invalid" && !LIFECYCLE_STAGES.has(s)), "stub", "merged", "abandoned", "scrapped", "invalid"] as StageFilter[]).map(s => {
-            const count = s === "all" ? activeSongs.length : s === "stub" ? stubCount : (countsByStage[s as SongEntry["stage"]] ?? 0);
-            const active = stageFilter === s;
-            return (
-              <button
-                key={s}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setStageFilter(s)}
-                className={`px-2.5 py-1 text-[10px] font-sans border transition-colors ${
-                  active
-                    ? "bg-zinc-200 text-zinc-900 border-zinc-200"
-                    : "bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
-                }`}
-              >
-                {s === "all" ? "all" : s === "stub" ? "stub" : STAGE_LABELS[s as SongEntry["stage"]].toLowerCase()} <span className="text-zinc-600">{count}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* LP consideration filter */}
-      {!error && songs.length > 0 && (
-        <div className="flex gap-1.5 flex-wrap mb-4">
-          {(["candidate", "placed"] as const).map(lp => {
-            const count = songs.filter(s => s.lp_consideration === lp).length;
-            if (count === 0) return null;
-            const active = lpFilter === lp;
-            return (
-              <button
-                key={lp}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setLpFilter(active ? "" : lp)}
-                className={`px-2.5 py-1 text-[10px] font-sans border transition-colors ${
-                  active
-                    ? "bg-blue-200 text-blue-950 border-blue-200"
-                    : "bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
-                }`}
-              >
-                lp: {lp} <span className="text-zinc-600">{count}</span>
-              </button>
-            );
-          })}
+        <div className="flex flex-wrap items-end gap-4 mb-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-[9px] uppercase tracking-wide text-zinc-600 font-sans">Stage</span>
+            <Combobox
+              options={stageOptions}
+              value={stageFilter}
+              onChange={setStageFilter}
+              triggerLabel={stageOptions.find(o => o.value === stageFilter)?.label ?? "All"}
+              placeholder="Filter by stage…"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[9px] uppercase tracking-wide text-zinc-600 font-sans">Thread</span>
+            <Combobox
+              options={threadOptions}
+              value={threadFilter}
+              onChange={setThreadFilter}
+              triggerLabel={threadOptions.find(o => o.value === threadFilter)?.label ?? "All threads"}
+              placeholder="Search thread or song title…"
+            />
+          </div>
+          {(["candidate", "placed"] as const).some(lp => songs.some(s => s.lp_consideration === lp)) && (
+            <div className="flex flex-col gap-1">
+              <span className="text-[9px] uppercase tracking-wide text-zinc-600 font-sans">Placement</span>
+              <div className="flex gap-1.5">
+                {(["candidate", "placed"] as const).map(lp => {
+                  const count = songs.filter(s => s.lp_consideration === lp).length;
+                  if (count === 0) return null;
+                  const active = placementFilter === lp;
+                  return (
+                    <button
+                      key={lp}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setPlacementFilter(active ? null : lp)}
+                      className={`px-2.5 py-1 text-[10px] font-sans border transition-colors ${
+                        active
+                          ? "bg-blue-200 text-blue-950 border-blue-200"
+                          : "bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200"
+                      }`}
+                    >
+                      {lp} <span className="text-zinc-600">{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -240,7 +304,8 @@ export default function SongBrowserPage() {
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {songs.filter(s => {
-          if (lpFilter && s.lp_consideration !== lpFilter) return false;
+          if (placementFilter && s.lp_consideration !== placementFilter) return false;
+          if (threadFilter && s.thread_slug !== threadFilter) return false;
           if (stageFilter === "all") return !LIFECYCLE_STAGES.has(s.stage);
           if (stageFilter === "stub") return s.stub;
           return s.stage === stageFilter;

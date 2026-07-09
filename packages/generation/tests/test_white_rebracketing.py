@@ -229,6 +229,60 @@ def test_extract_bars_note_in_correct_bar():
     assert sum(note_counts) == 1
 
 
+def _paired_notes(midi_bytes: bytes) -> list[tuple[int, int, int]]:
+    """Return (start_tick, pitch, duration_ticks) via FIFO note_on/note_off pairing."""
+    mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+    pending: dict[int, list[int]] = {}
+    notes = []
+    for track in mid.tracks:
+        abs_tick = 0
+        for msg in track:
+            abs_tick += msg.time
+            if msg.type == "note_on" and msg.velocity > 0:
+                pending.setdefault(msg.note, []).append(abs_tick)
+            elif msg.type == "note_off" or (
+                msg.type == "note_on" and msg.velocity == 0
+            ):
+                queue = pending.get(msg.note)
+                if queue:
+                    start = queue.pop(0)
+                    notes.append((start, msg.note, abs_tick - start))
+    return notes
+
+
+def test_extract_bars_no_spurious_short_note_across_bar_boundary():
+    """Regression: a chord sustained through the end of bar 0, immediately followed
+    by a new chord in bar 1 that reuses one of the same pitches, must not produce a
+    near-zero-length note for the shared pitch.
+
+    Previously, filtering raw note_on/note_off events per bar (rather than pairing
+    them into spans first) let bar 1's leftover-from-bar-0 note_off land in bar 1's
+    own event stream and pair with bar 1's fresh note_on for the same pitch.
+    """
+    tpb = 480
+    bpb = 4
+    bar_ticks = tpb * bpb  # 1920
+
+    # Bar 0: chord [60, 64, 67] held for the entire bar (ends exactly at bar_ticks).
+    # Bar 1: chord [60, 63, 67] starts immediately at bar_ticks, sharing 60 and 67.
+    notes = [
+        (0, 60, 0, bar_ticks),
+        (0, 64, 0, bar_ticks),
+        (0, 67, 0, bar_ticks),
+        (0, 60, bar_ticks, bar_ticks + 960),
+        (0, 63, bar_ticks, bar_ticks + 960),
+        (0, 67, bar_ticks, bar_ticks + 960),
+    ]
+    raw = _make_midi(notes, tpb=tpb)
+    bars = extract_bars(raw, tpb, bpb)
+
+    bar0_notes = _paired_notes(bars[0])
+    bar1_notes = _paired_notes(bars[1])
+
+    assert all(dur >= bar_ticks for _, _, dur in bar0_notes)
+    assert all(dur >= 960 for _, _, dur in bar1_notes)
+
+
 # ---------------------------------------------------------------------------
 # concatenate_bars
 # ---------------------------------------------------------------------------
