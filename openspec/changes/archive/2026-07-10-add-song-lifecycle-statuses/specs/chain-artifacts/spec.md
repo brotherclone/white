@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Manifest Bootstrap Schema
 The `manifest_bootstrap.yml` file SHALL contain the following fields:

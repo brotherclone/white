@@ -56,6 +56,17 @@ Fitting ratio = syllables / notes for each phrase.
 When the approved MIDI file for a section is not available, the pipeline SHALL fall back
 to section-level fitting (total syllables / total notes) with no error.
 
+#### Short-phrase target widening
+For phrases with a note count at or below `SHORT_PHRASE_NOTE_THRESHOLD` (default: 3),
+the syllable target range presented in the generation prompt SHALL NOT be the strict
+`floor(notes*0.8)`–`ceil(notes*1.15)` window. The pipeline SHALL widen the lower bound
+of the range so that a single word or short phrase sustained across the notes (melisma)
+is a legal, encouraged option, and a "spacious" ratio (fewer syllables than notes) on
+one of these phrases SHALL NOT be treated as a fitting concern or drive the section's
+overall verdict. This prevents the prompt from pinning every short phrase to a 1–2
+syllable target, which previously converged candidates on a small pool of monosyllabic
+words across songs.
+
 #### Note source: approved melody MIDIs per section
 Note counts SHALL be derived from the approved melody MIDI files in `melody/approved/`,
 not from a merged `melody/melody.mid` (which is never written by the pipeline).
@@ -88,10 +99,20 @@ Syllable count SHALL use a vowel-cluster heuristic (no NLP dependency):
 - **WHEN** phrase data is available before the Claude API call
 - **THEN** the generation prompt includes per-phrase note counts and syllable target
   ranges, and instructs Claude to write exactly one line per phrase
+- **AND** for phrases at or below `SHORT_PHRASE_NOTE_THRESHOLD`, the instruction notes
+  that a single word or short phrase may be sustained across the notes (melisma)
+  rather than requiring one syllable per note
 
 #### Scenario: Paste-ready target
 - **WHEN** all phrases in all sections have ratio 0.75–1.10
 - **THEN** the candidate is flagged as paste-ready (no splits expected in ACE Studio)
+
+#### Scenario: Short phrase does not force a monosyllabic line
+- **WHEN** a phrase has 2 notes
+- **THEN** the syllable target range presented to Claude is wider than
+  `floor(2*0.8)`–`ceil(2*1.15)` (i.e. wider than 1–3 syllables)
+- **AND** a lyric line with fewer syllables than notes for that phrase is not flagged
+  as a fitting problem or included in the worst-case verdict calculation
 
 ### Requirement: Lyric Review File
 The pipeline SHALL write `melody/lyrics_review.yml` listing all candidates with their
@@ -299,4 +320,114 @@ The `lyric_repeat_type` SHALL be:
 - **WHEN** fitting is computed for a section with `exact_repeat` instances
 - **THEN** the fitting result for each `exact_repeat` instance matches the first
   instance (same MIDI, same lyrics block)
+
+### Requirement: Rhyme Scheme Guidance
+The lyric pipeline SHALL derive a per-section rhyme scheme (line-letter assignment,
+e.g. `ABAB`, `AABB`) from the section's phrase count (from `extract_phrases`) before
+building the generation prompt, and SHALL include explicit line-pairing rhyme
+instructions in the prompt.
+
+Scheme notation: each line is assigned a letter (rhyme group) or `X` (free — no rhyme
+required). Lines sharing the same letter MUST rhyme with each other; `X` lines have no
+rhyme constraint and are not checked by the verify/revise loop.
+
+Default scheme by rhyme-eligible line count:
+- 2 lines → `AA`
+- 4 lines → `XAXA` (lines 2 and 4 rhyme; lines 1 and 3 are free)
+- Any other count → unrhymed (no scheme enforced)
+
+A `rhyme_scheme` map in `song_proposal.yml`, keyed by section label (any string in the
+letter/`X` notation, or `none` for no rhyme), SHALL override the default for that
+section.
+
+Sections sharing a base label (e.g. `verse_1`, `verse_2`) SHALL reuse the same rhyme
+scheme so repeated sections read consistently.
+
+#### Scenario: Default XAXA for a four-line section
+- **WHEN** a section has 4 rhyme-eligible phrases and no `rhyme_scheme` override
+- **THEN** the prompt instructs lines 2 and 4 to rhyme, and leaves lines 1 and 3 free
+
+#### Scenario: Proposal override
+- **WHEN** `song_proposal.yml` sets `rhyme_scheme: {chorus: AABB}`
+- **THEN** the chorus section's prompt uses AABB instead of the count-based default
+
+#### Scenario: Partial (X) scheme override
+- **WHEN** `song_proposal.yml` sets `rhyme_scheme: {verse_1: AXAX}`
+- **THEN** the prompt instructs lines 1 and 3 to rhyme, and leaves lines 2 and 4 free
+
+#### Scenario: Explicit no-rhyme
+- **WHEN** `song_proposal.yml` sets `rhyme_scheme: {bridge: none}`
+- **THEN** no rhyme instruction is included for the bridge section
+
+#### Scenario: Repeated section reuses scheme
+- **WHEN** `verse_1` is assigned `ABAB`
+- **THEN** `verse_2` also uses `ABAB`
+
+### Requirement: Syllable and Rhyme Verify-and-Revise Loop
+After the initial draft is generated, the lyric pipeline SHALL check each phrase's
+syllable count against its target range and each rhyme-scheme line pair for an actual
+rhyme, using CMUdict-based rhyme comparison (`pronouncing`) with a same-family suffix
+heuristic fallback for words absent from the dictionary. Fallback "maybe" matches SHALL
+NOT be treated as failures.
+
+When any phrase misses its syllable target or any rhyme pair fails, the pipeline SHALL
+send up to 2 follow-up revision turns to Claude (same conversation, prior draft in
+context) listing only the failing lines and the specific reason, requesting a full
+corrected lyrics text in response.
+
+After the revision budget is exhausted, the pipeline SHALL accept the best available
+draft and continue to scoring — this loop does not block candidate generation from
+completing.
+
+#### Scenario: Syllable miss triggers a revision turn
+- **WHEN** a phrase's line has a syllable count outside its target range
+- **THEN** a follow-up turn is sent naming that line and its target range
+
+#### Scenario: Rhyme miss triggers a revision turn
+- **WHEN** a rhyme-scheme line pair's end words do not rhyme per CMUdict
+- **THEN** a follow-up turn is sent naming both lines and their assigned rhyme letter
+
+#### Scenario: Revision budget is bounded
+- **WHEN** issues remain after 2 revision turns
+- **THEN** the pipeline stops requesting revisions and uses the latest draft
+
+#### Scenario: Dictionary-fallback words don't force a revision
+- **WHEN** a line-final word is absent from CMUdict and the suffix heuristic finds a
+  plausible (not confirmed) match
+- **THEN** that rhyme pair is not treated as a failure
+
+#### Scenario: Clean first draft skips revision entirely
+- **WHEN** all phrases hit their syllable target and all rhyme pairs pass
+- **THEN** no follow-up API calls are made
+
+### Requirement: Chorus/Hook Content Style Guidance
+The lyric pipeline SHALL include additional hook-style prompt guidance for any section
+classified as `EXACT` repeat type (via `_infer_repeat_type` — labels containing
+`chorus`, `refrain`, or `hook`), instructing Claude to write a short, highly
+repeatable hook rather than narrative/descriptive verse content: prefer a single
+strong central phrase (optionally the song or section title), permit repeating the
+same line or phrase more than once within the section, and favor simpler/more
+repetitive vocabulary than surrounding verses.
+
+This guidance SHALL only be added when generating the first (`EXACT`) instance of a
+repeated section; `EXACT_REPEAT` instances are copied verbatim from the first
+instance and do not receive their own prompt.
+
+#### Scenario: Chorus label gets hook guidance
+- **WHEN** a section labeled `chorus_1` is generated (repeat_type EXACT)
+- **THEN** the prompt includes hook-style guidance in addition to its syllable target
+  and rhyme scheme
+
+#### Scenario: Refrain/hook labels also qualify
+- **WHEN** a section is labeled `refrain` or `hook`
+- **THEN** it receives the same hook-style guidance as `chorus`
+
+#### Scenario: Verse sections do not get hook guidance
+- **WHEN** a section labeled `verse_1` is generated (repeat_type VARIATION)
+- **THEN** the prompt does not include hook-style guidance
+
+#### Scenario: Repeated chorus instance is not re-prompted
+- **WHEN** `chorus_2` has repeat_type EXACT_REPEAT (second occurrence)
+- **THEN** no separate prompt block is generated for it — the pipeline reuses the
+  `chorus_1` text verbatim, matching existing (unchanged) repeat-copy behavior
 

@@ -1,8 +1,5 @@
-# pattern-evolution Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change add-evolutionary-pattern-breeding. Update Purpose after archive.
-## Requirements
 ### Requirement: Evolutionary Pattern Engine
 `packages/generation/src/white_generation/patterns/pattern_evolution.py` SHALL provide
 three public functions: `breed_drum_patterns`, `breed_bass_patterns`, and
@@ -57,4 +54,3 @@ highest-fitness parent.
 - **WHEN** crossover is applied across multiple breeding calls
 - **THEN** the bar-boundary splice point varies rather than always splitting at the
   midpoint
-
