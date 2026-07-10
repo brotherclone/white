@@ -465,6 +465,98 @@ class TestMelodyPipelineIntegration:
             c["use_case"] in ("vocal", "instrumental") for c in review["candidates"]
         )
 
+    def test_default_evolve_includes_evolved_candidates(self, production_dir):
+        """With no evolve argument, the candidate pool is bred before scoring."""
+        mock_scorer = MagicMock()
+        mock_scorer.prepare_concept.return_value = MagicMock(shape=(768,))
+
+        def mock_score_batch(candidates, concept_emb=None):
+            return [
+                {
+                    "candidate": c,
+                    "temporal": {"past": 0.8, "present": 0.1, "future": 0.1},
+                    "spatial": {"thing": 0.7, "place": 0.2, "person": 0.1},
+                    "ontological": {
+                        "imagined": 0.1,
+                        "forgotten": 0.1,
+                        "known": 0.8,
+                    },
+                    "confidence": 0.85,
+                }
+                for c in candidates
+            ]
+
+        mock_scorer.score_batch = mock_score_batch
+
+        with (
+            patch("white_analysis.refractor.Refractor", return_value=mock_scorer),
+            patch(
+                "white_generation.patterns.pattern_evolution.breed_melody_patterns"
+            ) as mock_breed,
+        ):
+            mock_breed.return_value = []
+            from white_generation.pipelines.melody_pipeline import (
+                run_melody_pipeline,
+            )
+
+            run_melody_pipeline(
+                production_dir=str(production_dir),
+                singer_name="gabriel",
+                seed=42,
+                top_k=3,
+                evolve_generations=1,
+                evolve_population=4,
+            )
+
+        mock_breed.assert_called_once()
+
+    def test_no_evolve_excludes_evolved_candidates(self, production_dir):
+        """With evolve=False, breeding is skipped entirely."""
+        mock_scorer = MagicMock()
+        mock_scorer.prepare_concept.return_value = MagicMock(shape=(768,))
+
+        def mock_score_batch(candidates, concept_emb=None):
+            return [
+                {
+                    "candidate": c,
+                    "temporal": {"past": 0.8, "present": 0.1, "future": 0.1},
+                    "spatial": {"thing": 0.7, "place": 0.2, "person": 0.1},
+                    "ontological": {
+                        "imagined": 0.1,
+                        "forgotten": 0.1,
+                        "known": 0.8,
+                    },
+                    "confidence": 0.85,
+                }
+                for c in candidates
+            ]
+
+        mock_scorer.score_batch = mock_score_batch
+
+        with (
+            patch("white_analysis.refractor.Refractor", return_value=mock_scorer),
+            patch(
+                "white_generation.patterns.pattern_evolution.breed_melody_patterns"
+            ) as mock_breed,
+        ):
+            from white_generation.pipelines.melody_pipeline import (
+                run_melody_pipeline,
+            )
+
+            run_melody_pipeline(
+                production_dir=str(production_dir),
+                singer_name="gabriel",
+                seed=42,
+                top_k=3,
+                evolve=False,
+            )
+
+        mock_breed.assert_not_called()
+        review_path = production_dir / "melody" / "review.yml"
+        with open(review_path) as f:
+            review = yaml.safe_load(f)
+        assert not any(c["id"].startswith("evolved_") for c in review["candidates"])
+
 
 # ---------------------------------------------------------------------------
 # 6b. Melodic continuity helpers
@@ -731,3 +823,35 @@ class TestUseCasePromotion:
         # Should not raise even when use_case is absent
         promote_part(str(review_path))
         assert (melody_dir / "approved" / "verse.mid").exists()
+
+
+# ---------------------------------------------------------------------------
+# 8. CLI --evolve / --no-evolve flag parsing
+# ---------------------------------------------------------------------------
+
+
+class TestEvolveCliFlag:
+    def _parse_evolve(self, monkeypatch, extra_args: list[str]) -> bool:
+        from white_generation.pipelines import melody_pipeline
+
+        captured = {}
+
+        def fake_run(*args, **kwargs):
+            captured["evolve"] = kwargs["evolve"]
+
+        monkeypatch.setattr(melody_pipeline, "run_melody_pipeline", fake_run)
+        monkeypatch.setattr(
+            "sys.argv",
+            ["melody_pipeline.py", "--production-dir", "/tmp/fake"] + extra_args,
+        )
+        melody_pipeline.main()
+        return captured["evolve"]
+
+    def test_default_evolve_is_true(self, monkeypatch):
+        assert self._parse_evolve(monkeypatch, []) is True
+
+    def test_no_evolve_flag_disables(self, monkeypatch):
+        assert self._parse_evolve(monkeypatch, ["--no-evolve"]) is False
+
+    def test_explicit_evolve_flag_is_noop(self, monkeypatch):
+        assert self._parse_evolve(monkeypatch, ["--evolve"]) is True

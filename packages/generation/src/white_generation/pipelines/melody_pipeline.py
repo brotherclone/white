@@ -473,7 +473,7 @@ def run_melody_pipeline(
     chromatic_weight: float = 0.7,
     onnx_path: Optional[str] = None,
     use_case: str = "vocal",
-    evolve: bool = False,
+    evolve: bool = True,
     evolve_generations: int = 8,
     evolve_population: int = 30,
 ):
@@ -1015,9 +1015,18 @@ def main():
     )
     parser.add_argument(
         "--evolve",
+        dest="evolve",
         action="store_true",
-        help="Breed evolved melody pattern candidates via evolutionary algorithm",
+        help="Breed evolved melody pattern candidates via evolutionary algorithm "
+        "(default: on; accepted for backward compatibility)",
     )
+    parser.add_argument(
+        "--no-evolve",
+        dest="evolve",
+        action="store_false",
+        help="Disable evolutionary candidate breeding",
+    )
+    parser.set_defaults(evolve=True)
     parser.add_argument(
         "--generations",
         type=int,

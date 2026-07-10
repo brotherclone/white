@@ -360,17 +360,17 @@ def load_song_proposal(proposal_path: Path) -> dict:
     # Rainbow color name
     color = raw.get("rainbow_color", {})
     if isinstance(color, dict):
-        color = color.get("color_name", "")
+        color = color.get("color_name") or ""
 
     return {
-        "title": str(raw.get("title", "")),
-        "bpm": int(raw.get("bpm", 120)),
+        "title": str(raw.get("title") or ""),
+        "bpm": int(raw.get("bpm") or 120),
         "time_sig": time_sig,
         "key": _key_raw_to_string(raw.get("key", "")),
-        "color": str(color),
+        "color": str(color or ""),
         "genres": raw.get("genres") or [],
         "mood": raw.get("mood") or [],
-        "concept": str(raw.get("concept", "")),
+        "concept": str(raw.get("concept") or ""),
     }
 
 
@@ -411,7 +411,7 @@ def load_song_proposal_unified(
     # Rainbow color
     color_raw = raw.get("rainbow_color", {})
     if isinstance(color_raw, dict):
-        color = str(color_raw.get("color_name", ""))
+        color = str(color_raw.get("color_name") or "")
     else:
         color = str(color_raw or "")
 
@@ -420,7 +420,7 @@ def load_song_proposal_unified(
     key_root, mode = _parse_key_components(key_str)
 
     # Concept — song proposal first; song_context.yml fallback if thread_dir provided
-    concept = str(raw.get("concept", ""))
+    concept = str(raw.get("concept") or "")
     if not concept and thread_dir:
         song_context_path = (
             Path(thread_dir)
@@ -431,7 +431,7 @@ def load_song_proposal_unified(
         if song_context_path.exists():
             with open(song_context_path) as f:
                 ctx = yaml.safe_load(f) or {}
-            concept = str(ctx.get("concept", ""))
+            concept = str(ctx.get("concept") or "")
 
     # Optional musical constraints block
     mc_raw = raw.get("musical_constraints")
@@ -457,8 +457,8 @@ def load_song_proposal_unified(
         musical_constraints = None
 
     return {
-        "title": str(raw.get("title", "")),
-        "bpm": int(raw.get("bpm", 120)),
+        "title": str(raw.get("title") or ""),
+        "bpm": int(raw.get("bpm") or 120),
         "time_sig": time_sig,
         "key": key_str,
         "key_root": key_root,
@@ -467,7 +467,7 @@ def load_song_proposal_unified(
         "concept": concept,
         "genres": raw.get("genres") or [],
         "mood": raw.get("mood") or [],
-        "singer": str(raw.get("singer", "")),
+        "singer": str(raw.get("singer") or ""),
         "sounds_like": raw.get("sounds_like") or [],
         "sub_proposals": [str(p) for p in (raw.get("sub_proposals") or [])],
         "thread_dir": str(thread_dir) if thread_dir else "",

@@ -120,9 +120,13 @@ def test_empty_approved_phase_creates_empty_folder(production_dir: Path):
 
 
 def test_arrangement_not_copied_to_logic(production_dir: Path):
-    # arrangement.txt flows Logic → production, never production → Logic
+    # arrangement.txt flows Logic → production, never production → Logic.
+    # A blank placeholder is scaffolded in the Logic folder instead of copying
+    # the production directory's existing arrangement.txt content.
     song_dir = handoff(production_dir)
-    assert not (song_dir / "arrangement.txt").exists()
+    logic_arrangement = song_dir / "arrangement.txt"
+    assert logic_arrangement.exists()
+    assert logic_arrangement.stat().st_size == 0
 
 
 def test_arrangement_synced_from_logic(production_dir: Path):
@@ -136,8 +140,10 @@ def test_arrangement_synced_from_logic(production_dir: Path):
 
 
 def test_no_arrangement_in_logic_no_error(production_dir: Path):
+    # Absence of a Logic-side arrangement.txt must not raise — a blank
+    # placeholder is scaffolded instead.
     song_dir = handoff(production_dir)
-    assert not (song_dir / "arrangement.txt").exists()
+    assert (song_dir / "arrangement.txt").exists()
     assert song_dir.is_dir()
 
 

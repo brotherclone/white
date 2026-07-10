@@ -61,6 +61,29 @@ def test_sigil_artifact_mock():
     )
 
 
+# current/transitory/transcendental are unused below — the mock data and
+# constructed artifact never depend on them, so loading + validating on every
+# hypothesis-generated example was pure overhead (and had started tripping the
+# too_slow health check). Load once at module scope and reuse it.
+_EVP_MOCK_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "tests"
+    / "mocks"
+    / "black_evp_artifact_mock.yml"
+)
+with _EVP_MOCK_PATH.open("r") as _f:
+    _EVP_ARTIFACT = EVPArtifact(**yaml.safe_load(_f))
+
+_SIGIL_MOCK_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "tests"
+    / "mocks"
+    / "black_sigil_artifact_mock.yml"
+)
+with _SIGIL_MOCK_PATH.open("r") as _f:
+    _SIGIL_ARTIFACT = SigilArtifact(**yaml.safe_load(_f))
+
+
 @given(
     current=st.sampled_from([m.value for m in RainbowColorModes]),
     transitory=st.sampled_from([m.value for m in RainbowColorModes]),
@@ -68,19 +91,11 @@ def test_sigil_artifact_mock():
 )
 def test_evp_transmigrational_mode_properties(current, transitory, transcendental):
     """Test that EVPArtifact can be created with various transmigrational modes"""
-    path = (
-        Path(__file__).resolve().parents[3]
-        / "tests"
-        / "mocks"
-        / "black_evp_artifact_mock.yml"
+    assert isinstance(_EVP_ARTIFACT, EVPArtifact)
+    assert (
+        _EVP_ARTIFACT.transcript
+        == "This is a test EVP transcript with mysterious voices"
     )
-    with path.open("r") as f:
-        base = yaml.safe_load(f)
-
-    # Just verify we can create the artifact with the mock data
-    evp = EVPArtifact(**base)
-    assert isinstance(evp, EVPArtifact)
-    assert evp.transcript == "This is a test EVP transcript with mysterious voices"
 
 
 @given(
@@ -90,19 +105,8 @@ def test_evp_transmigrational_mode_properties(current, transitory, transcendenta
 )
 def test_sigil_transmigrational_mode_properties(current, transitory, transcendental):
     """Test that SigilArtifact can be created with various transmigrational modes"""
-    path = (
-        Path(__file__).resolve().parents[3]
-        / "tests"
-        / "mocks"
-        / "black_sigil_artifact_mock.yml"
-    )
-    with path.open("r") as f:
-        base = yaml.safe_load(f)
-
-    # Just verify we can create the artifact with the mock data
-    sig = SigilArtifact(**base)
-    assert isinstance(sig, SigilArtifact)
+    assert isinstance(_SIGIL_ARTIFACT, SigilArtifact)
     assert (
-        sig.wish
+        _SIGIL_ARTIFACT.wish
         == "I will encode liberation frequencies that bypass the Demiurge's surveillance grid."
     )

@@ -1425,3 +1425,435 @@ class TestComputeFittingExactRepeat:
         assert "chorus" in result
         assert "chorus_2" in result
         assert result["chorus_2"] == result["chorus"]
+
+
+# ---------------------------------------------------------------------------
+# Rhyme scheme assignment
+# ---------------------------------------------------------------------------
+
+
+def make_vocal_section(
+    name,
+    approved_label=None,
+    phrase_count=4,
+    lyric_repeat_type=None,
+    play_count=1,
+):
+    from white_generation.pipelines.lyric_pipeline import Phrase
+
+    return {
+        "name": name,
+        "approved_label": approved_label or name,
+        "bars": 4,
+        "play_count": play_count,
+        "total_notes": phrase_count * 4,
+        "contour": "stepwise",
+        "lyric_repeat_type": lyric_repeat_type,
+        "phrases": [
+            Phrase(start_tick=i * 100, end_tick=i * 100 + 50, note_count=4)
+            for i in range(phrase_count)
+        ],
+    }
+
+
+class TestDefaultRhymeScheme:
+    def test_two_lines_is_aa(self):
+        from white_generation.pipelines.lyric_pipeline import _default_rhyme_scheme
+
+        assert _default_rhyme_scheme(2) == "AA"
+
+    def test_four_lines_is_xaxa(self):
+        from white_generation.pipelines.lyric_pipeline import _default_rhyme_scheme
+
+        assert _default_rhyme_scheme(4) == "XAXA"
+
+    def test_other_counts_unrhymed(self):
+        from white_generation.pipelines.lyric_pipeline import _default_rhyme_scheme
+
+        assert _default_rhyme_scheme(3) == "none"
+        assert _default_rhyme_scheme(5) == "none"
+        assert _default_rhyme_scheme(0) == "none"
+
+
+class TestAssignRhymeSchemes:
+    def test_default_xaxa_for_four_lines(self):
+        from white_generation.pipelines.lyric_pipeline import assign_rhyme_schemes
+
+        sections = [make_vocal_section("verse", phrase_count=4)]
+        schemes = assign_rhyme_schemes(sections)
+        assert schemes["verse"] == "XAXA"
+
+    def test_proposal_override(self):
+        from white_generation.pipelines.lyric_pipeline import assign_rhyme_schemes
+
+        sections = [make_vocal_section("chorus", phrase_count=4)]
+        schemes = assign_rhyme_schemes(sections, {"chorus": "AABB"})
+        assert schemes["chorus"] == "AABB"
+
+    def test_partial_x_override(self):
+        from white_generation.pipelines.lyric_pipeline import assign_rhyme_schemes
+
+        sections = [make_vocal_section("verse_1", phrase_count=4)]
+        schemes = assign_rhyme_schemes(sections, {"verse_1": "AXAX"})
+        assert schemes["verse_1"] == "AXAX"
+
+    def test_explicit_none_disables_rhyme(self):
+        from white_generation.pipelines.lyric_pipeline import assign_rhyme_schemes
+
+        sections = [make_vocal_section("bridge", phrase_count=2)]
+        schemes = assign_rhyme_schemes(sections, {"bridge": "none"})
+        assert schemes["bridge"] == "none"
+
+    def test_repeated_section_reuses_scheme(self):
+        from white_generation.pipelines.lyric_pipeline import assign_rhyme_schemes
+
+        sections = [
+            make_vocal_section("verse_1", phrase_count=4),
+            make_vocal_section("verse_2", phrase_count=2),  # would default to AA
+        ]
+        schemes = assign_rhyme_schemes(sections, {"verse_1": "ABAB"})
+        assert schemes["verse_1"] == "ABAB"
+        assert schemes["verse_2"] == "ABAB"
+
+    def test_exact_repeat_sections_are_skipped(self):
+        from white_core.enums.lyric_repeat_type import LyricRepeatType
+        from white_generation.pipelines.lyric_pipeline import assign_rhyme_schemes
+
+        sections = [
+            make_vocal_section(
+                "chorus", phrase_count=2, lyric_repeat_type=LyricRepeatType.EXACT
+            ),
+            make_vocal_section(
+                "chorus_2",
+                approved_label="chorus",
+                phrase_count=2,
+                lyric_repeat_type=LyricRepeatType.EXACT_REPEAT,
+            ),
+        ]
+        schemes = assign_rhyme_schemes(sections)
+        assert "chorus" in schemes
+        assert "chorus_2" not in schemes
+
+
+class TestRhymeSchemeLinePairs:
+    def test_xaxa_pairs_lines_2_and_4(self):
+        from white_generation.pipelines.lyric_pipeline import rhyme_scheme_line_pairs
+
+        assert rhyme_scheme_line_pairs("XAXA") == [(2, 4, "A")]
+
+    def test_abab_pairs_both_groups(self):
+        from white_generation.pipelines.lyric_pipeline import rhyme_scheme_line_pairs
+
+        pairs = rhyme_scheme_line_pairs("ABAB")
+        assert (1, 3, "A") in pairs
+        assert (2, 4, "B") in pairs
+
+    def test_none_scheme_has_no_pairs(self):
+        from white_generation.pipelines.lyric_pipeline import rhyme_scheme_line_pairs
+
+        assert rhyme_scheme_line_pairs("none") == []
+        assert rhyme_scheme_line_pairs("") == []
+
+
+class TestRhymeSchemePromptText:
+    def test_xaxa_describes_free_and_rhyming_lines(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            _rhyme_scheme_prompt_text,
+        )
+
+        text = _rhyme_scheme_prompt_text("XAXA")
+        assert "2 and 4" in text
+        assert "free" in text
+
+    def test_none_scheme_returns_none(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            _rhyme_scheme_prompt_text,
+        )
+
+        assert _rhyme_scheme_prompt_text("none") is None
+        assert _rhyme_scheme_prompt_text("") is None
+
+
+# ---------------------------------------------------------------------------
+# Rhyme verification (CMUdict + suffix heuristic)
+# ---------------------------------------------------------------------------
+
+
+class TestCheckRhymePair:
+    def test_dictionary_hit_match(self):
+        from white_generation.pipelines.lyric_pipeline import check_rhyme_pair
+
+        result = check_rhyme_pair("cat", "hat")
+        assert result["status"] == "match"
+        assert result["method"] == "cmudict"
+
+    def test_dictionary_hit_real_mismatch(self):
+        from white_generation.pipelines.lyric_pipeline import check_rhyme_pair
+
+        result = check_rhyme_pair("cat", "dog")
+        assert result["status"] == "fail"
+        assert result["method"] == "cmudict"
+
+    def test_out_of_dictionary_falls_back_to_maybe(self):
+        from white_generation.pipelines.lyric_pipeline import check_rhyme_pair
+
+        # Invented/portmanteau words absent from CMUdict
+        result = check_rhyme_pair("rebracketing", "infranym")
+        assert result["status"] == "maybe"
+
+    def test_one_word_out_of_dictionary_is_maybe_not_fail(self):
+        from white_generation.pipelines.lyric_pipeline import check_rhyme_pair
+
+        result = check_rhyme_pair("cat", "zzznonwordzzz")
+        assert result["status"] == "maybe"
+
+
+# ---------------------------------------------------------------------------
+# Verify / revise loop
+# ---------------------------------------------------------------------------
+
+
+class TestCheckCandidate:
+    def test_clean_draft_has_no_issues(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            _check_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [
+                    Phrase(0, 50, 2),
+                    Phrase(100, 150, 2),
+                ],
+            }
+        ]
+        # 2-note phrases -> _phrase_syllable_range widens to include 1-2 syllables
+        text = "[verse]\nCat\nHat\n"
+        issues = _check_candidate(text, sections, {"verse": "AA"})
+        assert issues["rhyme_issues"] == []
+
+    def test_rhyme_mismatch_is_flagged(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            _check_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [Phrase(0, 50, 2), Phrase(100, 150, 2)],
+            }
+        ]
+        text = "[verse]\nThe cat\nThe dog\n"
+        issues = _check_candidate(text, sections, {"verse": "AA"})
+        assert len(issues["rhyme_issues"]) == 1
+        assert issues["rhyme_issues"][0]["letter"] == "A"
+
+    def test_syllable_miss_is_flagged(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            _check_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [Phrase(0, 500, 12)],  # needs ~9-14 syllables
+            }
+        ]
+        text = "[verse]\nHi\n"  # wildly under target
+        issues = _check_candidate(text, sections, {"verse": "none"})
+        assert len(issues["syllable_issues"]) == 1
+
+    def test_missing_line_is_flagged_not_silently_skipped(self):
+        """A draft with fewer lines than phrases must be flagged, not skipped."""
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            _check_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [Phrase(0, 50, 2), Phrase(100, 150, 2)],
+            }
+        ]
+        # Only one line provided for a two-phrase section — the second is missing.
+        text = "[verse]\nCat\n"
+        issues = _check_candidate(text, sections, {"verse": "AA"})
+        assert len(issues["syllable_issues"]) == 1
+        missing = issues["syllable_issues"][0]
+        assert missing["line_idx"] == 2
+        assert missing["text"] == ""
+        assert missing["syllables"] == 0
+
+
+class TestGenerateLyricCandidate:
+    def test_clean_draft_skips_revision(self):
+        """A draft that passes every check on the first try makes exactly one API call."""
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            generate_lyric_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [Phrase(0, 50, 2), Phrase(100, 150, 2)],
+            }
+        ]
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text="[verse]\nCat\nHat\n")]
+        mock_client.messages.create.return_value = mock_response
+
+        text, outcome = generate_lyric_candidate(
+            mock_client, "prompt text", "claude-sonnet-4-6", sections, {"verse": "AA"}
+        )
+        assert mock_client.messages.create.call_count == 1
+        assert outcome["turns_used"] == 0
+
+    def test_failing_draft_triggers_bounded_revision(self):
+        """A draft that keeps failing is revised exactly MAX_REVISION_TURNS times."""
+        from white_generation.pipelines.lyric_pipeline import (
+            MAX_REVISION_TURNS,
+            Phrase,
+            generate_lyric_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [Phrase(0, 50, 2), Phrase(100, 150, 2)],
+            }
+        ]
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        # Mismatched rhyme every time — never resolves
+        mock_response.content = [MagicMock(text="[verse]\nThe cat\nThe dog\n")]
+        mock_client.messages.create.return_value = mock_response
+
+        text, outcome = generate_lyric_candidate(
+            mock_client, "prompt text", "claude-sonnet-4-6", sections, {"verse": "AA"}
+        )
+        assert outcome["turns_used"] == MAX_REVISION_TURNS
+        assert mock_client.messages.create.call_count == MAX_REVISION_TURNS + 1
+        assert outcome["final_rhyme_issues"] > 0
+
+    def test_revision_message_names_only_failing_lines(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            generate_lyric_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [Phrase(0, 50, 2), Phrase(100, 150, 2)],
+            }
+        ]
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text="[verse]\nThe cat\nThe dog\n")]
+        mock_client.messages.create.return_value = mock_response
+
+        generate_lyric_candidate(
+            mock_client, "prompt text", "claude-sonnet-4-6", sections, {"verse": "AA"}
+        )
+        # `messages` is mutated in place across calls, so every recorded call
+        # shares the same final list object — index 2 (the first revision
+        # turn) is set once and never touched by later appends.
+        final_messages = mock_client.messages.create.call_args_list[-1].kwargs[
+            "messages"
+        ]
+        revision_text = final_messages[2]["content"]
+        assert "cat" in revision_text
+        assert "dog" in revision_text
+        assert "do not rhyme" in revision_text
+
+
+# ---------------------------------------------------------------------------
+# Chorus/hook content guidance
+# ---------------------------------------------------------------------------
+
+
+class TestHookGuidance:
+    def test_chorus_label_gets_hook_guidance(self):
+        from white_core.enums.lyric_repeat_type import LyricRepeatType
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
+
+        meta = make_meta()
+        sections = [
+            make_vocal_section(
+                "chorus_1", phrase_count=4, lyric_repeat_type=LyricRepeatType.EXACT
+            )
+        ]
+        syllable_targets = {"chorus_1": (10, 16)}
+        prompt = _build_prompt(meta, sections, syllable_targets)
+        assert "HOOK GUIDANCE" in prompt
+
+    def test_refrain_and_hook_labels_also_qualify(self):
+        from white_core.enums.lyric_repeat_type import LyricRepeatType
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
+
+        meta = make_meta()
+        for label in ("refrain", "hook"):
+            sections = [
+                make_vocal_section(
+                    label, phrase_count=4, lyric_repeat_type=LyricRepeatType.EXACT
+                )
+            ]
+            prompt = _build_prompt(meta, sections, {label: (10, 16)})
+            assert "HOOK GUIDANCE" in prompt
+
+    def test_verse_does_not_get_hook_guidance(self):
+        from white_core.enums.lyric_repeat_type import LyricRepeatType
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
+
+        meta = make_meta()
+        sections = [
+            make_vocal_section(
+                "verse_1", phrase_count=4, lyric_repeat_type=LyricRepeatType.VARIATION
+            )
+        ]
+        prompt = _build_prompt(meta, sections, {"verse_1": (10, 16)})
+        assert "HOOK GUIDANCE" not in prompt
+
+    def test_exact_repeat_instance_not_reprompted(self):
+        from white_core.enums.lyric_repeat_type import LyricRepeatType
+        from white_generation.pipelines.lyric_pipeline import _build_prompt
+
+        meta = make_meta()
+        sections = [
+            make_vocal_section(
+                "chorus", phrase_count=4, lyric_repeat_type=LyricRepeatType.EXACT
+            ),
+            make_vocal_section(
+                "chorus_2",
+                approved_label="chorus",
+                phrase_count=4,
+                lyric_repeat_type=LyricRepeatType.EXACT_REPEAT,
+            ),
+        ]
+        prompt = _build_prompt(
+            meta, sections, {"chorus": (10, 16), "chorus_2": (10, 16)}
+        )
+        assert "[chorus_2]" not in prompt
+        # Only one hook guidance block should appear (for the EXACT instance)
+        assert prompt.count("HOOK GUIDANCE") == 1

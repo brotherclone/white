@@ -387,7 +387,7 @@ Output as JSON with structure:
                 questions = [VanityInterviewQuestion(**q) for q in data["questions"]]
                 state.interview_questions = questions
                 logger.info("   Using fallback mock questions")
-            except ValueError as e:
+            except Exception as e:
                 logger.warning(f"No mock questions available: {e}")
                 # Last resort - generic questions
                 state.interview_questions = [
