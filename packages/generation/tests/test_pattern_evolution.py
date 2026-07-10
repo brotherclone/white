@@ -253,13 +253,26 @@ class TestBassCrossover:
             assert isinstance(vel, str)
 
     def test_splice_point_varies_across_calls(self):
-        """The bar-boundary splice must not always land at the midpoint."""
+        """The bar-boundary splice must not always land at the same relative
+        point. Parents are split at the same proportional fraction (so the
+        A-prefix and B-suffix stay temporally aligned), so equal-length
+        parents always produce an equal-length child — what must vary is
+        *how much* of the child comes from each parent."""
         a = _make_bass("a")
-        a.notes = a.notes * 3  # 12 notes, room for varied split points
+        a.notes = [(float(i), BassChordTone.ROOT, "accent") for i in range(12)]
         b = _make_bass("b")
-        b.notes = b.notes * 3
-        lengths = {len(_crossover_bass(a, b).notes) for _ in range(50)}
-        assert len(lengths) > 1
+        b.notes = [(float(i), BassChordTone.FIFTH, "normal") for i in range(12)]
+        # All of A's tones are ROOT and none of B's are, so the count of ROOT
+        # tones in the child reveals split_a directly.
+        boundaries = {
+            sum(
+                1
+                for _, tone, _ in _crossover_bass(a, b).notes
+                if tone == BassChordTone.ROOT
+            )
+            for _ in range(50)
+        }
+        assert len(boundaries) > 1
 
 
 class TestBassMutation:
@@ -319,15 +332,22 @@ class TestMelodyCrossover:
         assert len(child.intervals) == len(child.rhythm)
 
     def test_splice_point_varies_across_calls(self):
-        """The bar-boundary splice must not always land at the midpoint."""
+        """The bar-boundary splice must not always land at the same relative
+        point. Parents are split at the same proportional fraction, so
+        equal-length parents always produce an equal-length child — what
+        must vary is *how much* of the child comes from each parent."""
         a = _make_melody("a")
-        a.intervals = a.intervals * 3
-        a.rhythm = [i * 0.5 for i in range(len(a.intervals))]
+        a.intervals = [0] + [5] * 11
+        a.rhythm = [i * 0.5 for i in range(12)]
         b = _make_melody("b")
-        b.intervals = b.intervals * 3
-        b.rhythm = [i * 0.5 for i in range(len(b.intervals))]
-        lengths = {len(_crossover_melody(a, b).intervals) for _ in range(50)}
-        assert len(lengths) > 1
+        b.intervals = [0] + [-5] * 11
+        b.rhythm = [i * 0.5 for i in range(12)]
+        # Only A's non-anchor intervals are 5, so counting them reveals split_a.
+        boundaries = {
+            sum(1 for iv in _crossover_melody(a, b).intervals if iv == 5)
+            for _ in range(50)
+        }
+        assert len(boundaries) > 1
 
 
 class TestMelodyMutation:

@@ -272,19 +272,32 @@ def _mutate_drum(pattern: DrumPattern) -> DrumPattern:
 # ---------------------------------------------------------------------------
 
 
-def _random_split_index(length: int) -> int:
-    """Random bar-boundary split point, varying call to call instead of a fixed midpoint."""
+def _random_split_fraction() -> float:
+    """Random bar-boundary split point as a fraction of pattern length, varying
+    call to call instead of a fixed midpoint."""
+    return random.uniform(0.15, 0.85)
+
+
+def _split_index(length: int, frac: float) -> int:
+    """Index at fraction `frac` of `length`, bounded to a real split (not 0 or length)."""
     if length <= 1:
         return max(1, length)
-    return random.randint(1, length - 1)
+    return max(1, min(length - 1, round(frac * length)))
 
 
 def _crossover_bass(parent_a: BassPattern, parent_b: BassPattern) -> BassPattern:
-    """Randomized bar-boundary splice: take a random prefix of A's notes, random suffix of B's."""
+    """Randomized bar-boundary splice: take a random prefix of A's notes, random suffix of B's.
+
+    Both parents split at the same proportional point so the A-prefix's last
+    onset and the B-suffix's first onset stay temporally aligned — notes are
+    stored in ascending beat-position order and downstream rendering (e.g.
+    bass_pipeline's default-duration derivation) assumes that ordering holds.
+    """
     notes_a = list(parent_a.notes)
     notes_b = list(parent_b.notes)
-    split_a = _random_split_index(len(notes_a))
-    split_b = len(notes_b) - _random_split_index(len(notes_b))
+    frac = _random_split_fraction()
+    split_a = _split_index(len(notes_a), frac)
+    split_b = _split_index(len(notes_b), frac)
     child_notes = notes_a[:split_a] + notes_b[split_b:]
     if not child_notes:
         child_notes = notes_a or notes_b or []
@@ -340,14 +353,21 @@ def _mutate_bass(pattern: BassPattern) -> BassPattern:
 def _crossover_melody(
     parent_a: MelodyPattern, parent_b: MelodyPattern
 ) -> MelodyPattern:
-    """Randomized bar-boundary splice on interval sequences."""
+    """Randomized bar-boundary splice on interval sequences.
+
+    Both parents split at the same proportional point so the A-prefix's last
+    onset and the B-suffix's first onset stay temporally aligned — intervals
+    are cumulative deltas applied in rhythm order, so a non-monotonic splice
+    would desync the interval sequence from actual time order.
+    """
     ivs_a = list(parent_a.intervals)
     ivs_b = list(parent_b.intervals)
     rhy_a = list(parent_a.rhythm)
     rhy_b = list(parent_b.rhythm)
 
-    split_a = _random_split_index(len(ivs_a))
-    split_b = len(ivs_b) - _random_split_index(len(ivs_b))
+    frac = _random_split_fraction()
+    split_a = _split_index(len(ivs_a), frac)
+    split_b = _split_index(len(ivs_b), frac)
 
     child_ivs = ivs_a[:split_a] + ivs_b[split_b:]
     child_rhy = rhy_a[:split_a] + rhy_b[split_b:]

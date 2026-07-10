@@ -727,12 +727,13 @@ def _suffix_rhyme_heuristic(word_a: str, word_b: str) -> bool:
 def check_rhyme_pair(word_a: str, word_b: str) -> dict:
     """Compare two line-final words for rhyme.
 
-    Returns {"status": "match"|"fail"|"maybe", "method": "cmudict"|"suffix"}.
-    "match"/"fail" require both words to resolve via CMUdict. When either word
-    is out-of-dictionary, the suffix heuristic supplies a plausible-match
-    signal, but the result is always "maybe" — CMUdict simply can't judge
-    this project's invented/portmanteau vocabulary, so it must never drive a
-    revision request.
+    Returns {"status": "match"|"fail"|"maybe", "method": "cmudict"|"suffix"|"unresolved"}.
+    "match"/"fail" require both words to resolve via CMUdict, with method
+    "cmudict". When either word is out-of-dictionary, the suffix heuristic is
+    tried: a plausible match gives method "suffix", no match gives method
+    "unresolved" — but the status is always "maybe" either way, since CMUdict
+    simply can't judge this project's invented/portmanteau vocabulary, so it
+    must never drive a revision request.
     """
     key_a = _cmudict_rhyme_key(word_a)
     key_b = _cmudict_rhyme_key(word_b)
@@ -1440,9 +1441,20 @@ def _check_candidate(
         phrases: list[Phrase] = sec.get("phrases") or []
         all_phrases = phrases * sec.get("play_count", 1)
         for i, phrase in enumerate(all_phrases):
-            if i >= len(lines):
-                continue
             lo, hi = _phrase_syllable_range(phrase.note_count)
+            if i >= len(lines):
+                # Missing line entirely — flag it so the revision turn asks
+                # for it, rather than silently accepting an incomplete section.
+                syllable_issues.append(
+                    {
+                        "section": name,
+                        "line_idx": i + 1,
+                        "text": "",
+                        "syllables": 0,
+                        "target": (lo, hi),
+                    }
+                )
+                continue
             syl = _count_syllables(lines[i])
             if syl < lo or syl > hi:
                 syllable_issues.append(
@@ -1489,10 +1501,16 @@ def _build_revision_message(issues: dict) -> str:
     ]
     for issue in issues["syllable_issues"]:
         lo, hi = issue["target"]
-        lines.append(
-            f'- [{issue["section"]}] line {issue["line_idx"]}: "{issue["text"]}"'
-            f" has {issue['syllables']} syllables, target is {lo}-{hi}."
-        )
+        if not issue["text"]:
+            lines.append(
+                f'- [{issue["section"]}] line {issue["line_idx"]}: MISSING — add a'
+                f" line with roughly {lo}-{hi} syllables."
+            )
+        else:
+            lines.append(
+                f'- [{issue["section"]}] line {issue["line_idx"]}: "{issue["text"]}"'
+                f" has {issue['syllables']} syllables, target is {lo}-{hi}."
+            )
     for issue in issues["rhyme_issues"]:
         lines.append(
             f'- [{issue["section"]}] lines {issue["line_a"]} and {issue["line_b"]}'

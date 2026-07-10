@@ -1673,6 +1673,30 @@ class TestCheckCandidate:
         issues = _check_candidate(text, sections, {"verse": "none"})
         assert len(issues["syllable_issues"]) == 1
 
+    def test_missing_line_is_flagged_not_silently_skipped(self):
+        """A draft with fewer lines than phrases must be flagged, not skipped."""
+        from white_generation.pipelines.lyric_pipeline import (
+            Phrase,
+            _check_candidate,
+        )
+
+        sections = [
+            {
+                "name": "verse",
+                "play_count": 1,
+                "lyric_repeat_type": None,
+                "phrases": [Phrase(0, 50, 2), Phrase(100, 150, 2)],
+            }
+        ]
+        # Only one line provided for a two-phrase section — the second is missing.
+        text = "[verse]\nCat\n"
+        issues = _check_candidate(text, sections, {"verse": "AA"})
+        assert len(issues["syllable_issues"]) == 1
+        missing = issues["syllable_issues"][0]
+        assert missing["line_idx"] == 2
+        assert missing["text"] == ""
+        assert missing["syllables"] == 0
+
 
 class TestGenerateLyricCandidate:
     def test_clean_draft_skips_revision(self):
