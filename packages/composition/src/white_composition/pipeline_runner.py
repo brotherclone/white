@@ -79,7 +79,7 @@ def _build_phase_command(
     prod = str(production_dir)
     # song_proposal arg takes precedence over whatever is stored in context
     proposal = song_proposal or ctx.get("song_proposal", "")
-    singer = ctx.get("singer", "gabriel")
+    singer = ctx.get("singer") or "gabriel"
 
     base = [sys.executable, "-m"]
     if phase == "init_production":

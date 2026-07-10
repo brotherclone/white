@@ -376,7 +376,7 @@ def init_production(
     # Also grab singer from the raw proposal if available
     with open(song_proposal_path) as f:
         raw = yaml.safe_load(f) or {}
-    meta["singer"] = str(raw.get("singer", ""))
+    meta["singer"] = str(raw.get("singer") or "")
 
     print(f"Song:    {meta.get('title', '(untitled)')}")
     print(f"Color:   {meta.get('color', '')}")
