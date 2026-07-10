@@ -34,6 +34,7 @@ from pathlib import Path
 from typing import Optional
 
 import mido
+import pronouncing
 import yaml
 from dotenv import load_dotenv
 
@@ -273,7 +274,7 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
 
     Reads thread + song_proposal from chords/review.yml to resolve the path.
     Returns a normalised metadata dict with: title, bpm, time_sig, key, color,
-    concept, genres, mood, singer, sounds_like.
+    concept, genres, mood, singer, sounds_like, rhyme_scheme.
     Returns {} if the proposal cannot be found.
     """
     chord_review_path = production_dir / "chords" / "review.yml"
@@ -299,6 +300,10 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
 
             unified = load_song_proposal_unified(candidate, thread_dir=thread_path)
 
+            with open(candidate) as f:
+                raw_proposal = yaml.safe_load(f) or {}
+            rhyme_scheme = raw_proposal.get("rhyme_scheme") or {}
+
             # Prefer sounds_like from song_context.yml (written by init_production)
             _ctx = load_song_context(production_dir)
             sounds_like = _ctx.get("sounds_like") or unified.get("sounds_like") or []
@@ -321,6 +326,7 @@ def _find_and_load_proposal(production_dir: Path) -> dict:
                 "mood": unified["mood"],
                 "singer": singer,
                 "sounds_like": sounds_like,
+                "rhyme_scheme": rhyme_scheme,
             }
 
     return {}
@@ -572,6 +578,168 @@ def _compute_fitting(
 
     result["overall"] = worst_verdict
     return result
+
+
+# ---------------------------------------------------------------------------
+# Rhyme scheme derivation
+# ---------------------------------------------------------------------------
+
+_NO_RHYME_SCHEME = "none"
+
+
+def _default_rhyme_scheme(line_count: int) -> str:
+    """Return the default scheme letters for a rhyme-eligible line count.
+
+    2 lines -> AA. 4 lines -> XAXA (lines 2 and 4 rhyme; the "ballad meter"
+    most real song lyrics use). Any other count is left unrhymed.
+    """
+    if line_count == 2:
+        return "AA"
+    if line_count == 4:
+        return "XAXA"
+    return _NO_RHYME_SCHEME
+
+
+def _rhyme_base_label(label: str) -> str:
+    """Strip a trailing _<digit> suffix so parallel sections (verse_1, verse_2)
+    resolve to the same structural base ("verse") for scheme reuse."""
+    return re.sub(r"_\d+$", "", label)
+
+
+def assign_rhyme_schemes(
+    vocal_sections: list[dict],
+    rhyme_scheme_overrides: Optional[dict] = None,
+) -> dict[str, str]:
+    """Assign a rhyme scheme string to each non-exact_repeat vocal section.
+
+    Priority per section: explicit override (matched by instance name,
+    approved_label, or structural base label) > count-based default. Sections
+    sharing a structural base label (e.g. verse_1, verse_2) reuse whichever
+    scheme was assigned to the first one encountered.
+    """
+    overrides = rhyme_scheme_overrides or {}
+    schemes: dict[str, str] = {}
+    scheme_by_base: dict[str, str] = {}
+
+    for sec in vocal_sections:
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
+        if repeat_type == LyricRepeatType.EXACT_REPEAT:
+            continue
+
+        name = sec["name"]
+        approved_label = sec.get("approved_label", name)
+        base = _rhyme_base_label(approved_label)
+
+        if base in scheme_by_base:
+            schemes[name] = scheme_by_base[base]
+            continue
+
+        override = (
+            overrides.get(name) or overrides.get(approved_label) or overrides.get(base)
+        )
+        if override:
+            scheme = _NO_RHYME_SCHEME if str(override).lower() == "none" else override
+        else:
+            phrases = sec.get("phrases") or []
+            line_count = len(phrases) * sec.get("play_count", 1)
+            scheme = _default_rhyme_scheme(line_count)
+
+        scheme_by_base[base] = scheme
+        schemes[name] = scheme
+
+    return schemes
+
+
+def rhyme_scheme_line_pairs(scheme: str) -> list[tuple[int, int, str]]:
+    """Return (line_i, line_j, letter) 1-indexed consecutive pairs that must rhyme.
+
+    'X' letters are free (no constraint). A scheme of 'none' (or empty) has
+    no pairs at all.
+    """
+    if not scheme or scheme.lower() == _NO_RHYME_SCHEME:
+        return []
+
+    groups: dict[str, list[int]] = {}
+    for i, letter in enumerate(scheme, start=1):
+        if letter.upper() == "X":
+            continue
+        groups.setdefault(letter.upper(), []).append(i)
+
+    pairs: list[tuple[int, int, str]] = []
+    for letter, lines in groups.items():
+        for a, b in zip(lines, lines[1:]):
+            pairs.append((a, b, letter))
+    return pairs
+
+
+def _rhyme_scheme_prompt_text(scheme: str) -> Optional[str]:
+    """Human-readable rhyme instruction for a scheme string, or None if unrhymed."""
+    pairs = rhyme_scheme_line_pairs(scheme)
+    if not pairs:
+        return None
+
+    parts = [f"lines {a} and {b} rhyme" for a, b, _ in pairs]
+    free = [i for i, letter in enumerate(scheme, start=1) if letter.upper() == "X"]
+    text = f"Rhyme scheme {scheme.upper()}: " + "; ".join(parts)
+    if free:
+        noun = "line" if len(free) == 1 else "lines"
+        text += f"; {noun} {', '.join(str(i) for i in free)} free (no rhyme required)"
+    return text
+
+
+# ---------------------------------------------------------------------------
+# Rhyme verification (CMUdict + suffix-heuristic fallback)
+# ---------------------------------------------------------------------------
+
+
+def _line_final_word(line: str) -> str:
+    """Return the last word-like token in a line, stripped of punctuation."""
+    words = re.findall(r"[A-Za-z']+", line)
+    return words[-1] if words else ""
+
+
+def _cmudict_rhyme_key(word: str) -> Optional[str]:
+    """Return the CMUdict rhyming part (stressed vowel onward) for a word, or
+    None if the word isn't in the dictionary."""
+    cleaned = re.sub(r"[^A-Za-z']", "", word).lower()
+    if not cleaned:
+        return None
+    phones = pronouncing.phones_for_word(cleaned)
+    if not phones:
+        return None
+    return pronouncing.rhyming_part(phones[0])
+
+
+def _suffix_rhyme_heuristic(word_a: str, word_b: str) -> bool:
+    """Same-family suffix heuristic for words absent from CMUdict — compares
+    the last 2-3 letters. A crude but cheap same-family signal for invented
+    or portmanteau vocabulary CMUdict has no entry for."""
+    a = re.sub(r"[^A-Za-z']", "", word_a).lower()
+    b = re.sub(r"[^A-Za-z']", "", word_b).lower()
+    if not a or not b:
+        return False
+    for n in (3, 2):
+        if len(a) >= n and len(b) >= n and a[-n:] == b[-n:]:
+            return True
+    return False
+
+
+def check_rhyme_pair(word_a: str, word_b: str) -> dict:
+    """Compare two line-final words for rhyme.
+
+    Returns {"status": "match"|"fail"|"maybe", "method": "cmudict"|"suffix"}.
+    "match"/"fail" require both words to resolve via CMUdict. When either word
+    is out-of-dictionary, the suffix heuristic supplies a plausible-match
+    signal, but the result is always "maybe" — CMUdict simply can't judge
+    this project's invented/portmanteau vocabulary, so it must never drive a
+    revision request.
+    """
+    key_a = _cmudict_rhyme_key(word_a)
+    key_b = _cmudict_rhyme_key(word_b)
+    if key_a is not None and key_b is not None:
+        return {"status": "match" if key_a == key_b else "fail", "method": "cmudict"}
+    plausible = _suffix_rhyme_heuristic(word_a, word_b)
+    return {"status": "maybe", "method": "suffix" if plausible else "unresolved"}
 
 
 # ---------------------------------------------------------------------------
@@ -875,6 +1043,15 @@ def collect_sub_lyrics(sub_proposal_dirs: list[Path]) -> list[dict]:
     return results
 
 
+_HOOK_GUIDANCE_LINE = (
+    "    HOOK GUIDANCE: Write a short, highly repeatable hook rather than"
+    " narrative/descriptive verse content. Prefer a single strong central"
+    " phrase (the song or section title works well). Repeating the same line"
+    " or phrase within this section is fine. Favor simpler, more repetitive"
+    " vocabulary than the surrounding verses."
+)
+
+
 def _build_white_cutup_prompt(
     meta: dict,
     vocal_sections: list[dict],
@@ -882,6 +1059,7 @@ def _build_white_cutup_prompt(
     sub_lyrics: list[dict],
     artist_context: str = "",
     negative_constraints_block: str = "",
+    rhyme_schemes: Optional[dict] = None,
 ) -> str:
     """Build the Claude prompt for White lyric cut-up generation.
 
@@ -934,6 +1112,7 @@ def _build_white_cutup_prompt(
     ]
 
     variation_count_cutup: dict[str, int] = {}
+    rhyme_schemes = rhyme_schemes or {}
 
     for sec in vocal_sections:
         repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
@@ -957,10 +1136,15 @@ def _build_white_cutup_prompt(
             ]
         )
 
+        rhyme_text = _rhyme_scheme_prompt_text(rhyme_schemes.get(name, ""))
+        if rhyme_text:
+            lines.append(f"    {rhyme_text}")
+
         if repeat_type == LyricRepeatType.EXACT:
             lines.append(
                 "    # This section repeats verbatim — write it once, it will be reused"
             )
+            lines.append(_HOOK_GUIDANCE_LINE)
         elif repeat_type == LyricRepeatType.VARIATION:
             variation_count_cutup[base_label] = (
                 variation_count_cutup.get(base_label, 0) + 1
@@ -1019,6 +1203,7 @@ def _build_prompt(
     syllable_targets: dict,
     artist_context: str = "",
     negative_constraints_block: str = "",
+    rhyme_schemes: Optional[dict] = None,
 ) -> str:
     """Build the Claude prompt for lyric generation.
 
@@ -1066,6 +1251,7 @@ def _build_prompt(
 
     # Track variation instance counts per base label for numbering
     variation_count: dict[str, int] = {}
+    rhyme_schemes = rhyme_schemes or {}
 
     for sec in vocal_sections:
         repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
@@ -1091,10 +1277,15 @@ def _build_prompt(
             ]
         )
 
+        rhyme_text = _rhyme_scheme_prompt_text(rhyme_schemes.get(name, ""))
+        if rhyme_text:
+            lines.append(f"    {rhyme_text}")
+
         if repeat_type == LyricRepeatType.EXACT:
             lines.append(
                 "    # This section repeats verbatim — write it once, it will be reused"
             )
+            lines.append(_HOOK_GUIDANCE_LINE)
         elif repeat_type == LyricRepeatType.VARIATION:
             variation_count[base_label] = variation_count.get(base_label, 0) + 1
             n = variation_count[base_label]
@@ -1169,13 +1360,13 @@ def _build_prompt(
 # ---------------------------------------------------------------------------
 
 
-def _call_api(client, prompt: str, model: str) -> str:
-    response = client.messages.create(
-        model=model,
-        max_tokens=2048,
-        messages=[{"role": "user", "content": prompt}],
-    )
+def _call_messages(client, messages: list[dict], model: str) -> str:
+    response = client.messages.create(model=model, max_tokens=2048, messages=messages)
     return response.content[0].text
+
+
+def _call_api(client, prompt: str, model: str) -> str:
+    return _call_messages(client, [{"role": "user", "content": prompt}], model)
 
 
 # ---------------------------------------------------------------------------
@@ -1209,6 +1400,152 @@ def _parse_sections(text: str) -> dict[str, str]:
         result[current_section] = "\n".join(current_lines).strip()
 
     return result
+
+
+# ---------------------------------------------------------------------------
+# Verify / revise loop
+# ---------------------------------------------------------------------------
+
+MAX_REVISION_TURNS = 2
+
+
+def _check_candidate(
+    text: str,
+    vocal_sections: list[dict],
+    rhyme_schemes: dict[str, str],
+) -> dict:
+    """Check a lyric draft against per-phrase syllable targets and rhyme pairs.
+
+    Returns {"syllable_issues": [...], "rhyme_issues": [...]}. Only "fail"
+    rhyme checks are included — "match" and "maybe" are not issues.
+    EXACT_REPEAT sections are skipped (they aren't separately generated).
+    """
+    parsed = _parse_sections(text)
+    syllable_issues: list[dict] = []
+    rhyme_issues: list[dict] = []
+
+    for sec in vocal_sections:
+        repeat_type = _normalize_repeat_type(sec.get("lyric_repeat_type"))
+        if repeat_type == LyricRepeatType.EXACT_REPEAT:
+            continue
+
+        name = sec["name"]
+        lyric_text = parsed.get(name, "")
+        lines = [
+            ln.strip()
+            for ln in lyric_text.splitlines()
+            if ln.strip() and not ln.strip().startswith("#")
+        ]
+
+        phrases: list[Phrase] = sec.get("phrases") or []
+        all_phrases = phrases * sec.get("play_count", 1)
+        for i, phrase in enumerate(all_phrases):
+            if i >= len(lines):
+                continue
+            lo, hi = _phrase_syllable_range(phrase.note_count)
+            syl = _count_syllables(lines[i])
+            if syl < lo or syl > hi:
+                syllable_issues.append(
+                    {
+                        "section": name,
+                        "line_idx": i + 1,
+                        "text": lines[i],
+                        "syllables": syl,
+                        "target": (lo, hi),
+                    }
+                )
+
+        scheme = rhyme_schemes.get(name, _NO_RHYME_SCHEME)
+        for a, b, letter in rhyme_scheme_line_pairs(scheme):
+            if a - 1 >= len(lines) or b - 1 >= len(lines):
+                continue
+            word_a = _line_final_word(lines[a - 1])
+            word_b = _line_final_word(lines[b - 1])
+            if not word_a or not word_b:
+                continue
+            check = check_rhyme_pair(word_a, word_b)
+            if check["status"] == "fail":
+                rhyme_issues.append(
+                    {
+                        "section": name,
+                        "line_a": a,
+                        "line_b": b,
+                        "letter": letter,
+                        "word_a": word_a,
+                        "word_b": word_b,
+                    }
+                )
+
+    return {"syllable_issues": syllable_issues, "rhyme_issues": rhyme_issues}
+
+
+def _build_revision_message(issues: dict) -> str:
+    """Build a follow-up turn listing only the failing lines and why."""
+    lines = [
+        "The draft above has a few lines that need fixing. Please revise only",
+        "the lines listed below and return the FULL corrected lyrics text",
+        "(all sections, with [headers] intact — not just the fixed lines).",
+        "",
+    ]
+    for issue in issues["syllable_issues"]:
+        lo, hi = issue["target"]
+        lines.append(
+            f'- [{issue["section"]}] line {issue["line_idx"]}: "{issue["text"]}"'
+            f" has {issue['syllables']} syllables, target is {lo}-{hi}."
+        )
+    for issue in issues["rhyme_issues"]:
+        lines.append(
+            f'- [{issue["section"]}] lines {issue["line_a"]} and {issue["line_b"]}'
+            f" (rhyme group {issue['letter']}): \"{issue['word_a']}\" and"
+            f" \"{issue['word_b']}\" do not rhyme."
+        )
+    return "\n".join(lines)
+
+
+def generate_lyric_candidate(
+    client,
+    prompt: str,
+    model: str,
+    vocal_sections: list[dict],
+    rhyme_schemes: dict[str, str],
+    max_revisions: int = MAX_REVISION_TURNS,
+) -> tuple[str, dict]:
+    """Generate a lyric draft, then verify and revise it up to max_revisions times.
+
+    Checks syllable targets and rhyme-scheme pairs after each draft. When any
+    check fails, sends a follow-up turn (same conversation) naming only the
+    failing lines. Stops as soon as a draft passes, or after max_revisions
+    follow-up turns — whichever comes first — and returns the best-effort
+    draft either way.
+
+    Returns (final_text, outcome) where outcome records the initial/final
+    issue counts and how many revision turns were used.
+    """
+    messages: list[dict] = [{"role": "user", "content": prompt}]
+    text = _call_messages(client, messages, model)
+    messages.append({"role": "assistant", "content": text})
+
+    issues = _check_candidate(text, vocal_sections, rhyme_schemes)
+    outcome = {
+        "turns_used": 0,
+        "initial_syllable_issues": len(issues["syllable_issues"]),
+        "initial_rhyme_issues": len(issues["rhyme_issues"]),
+    }
+
+    turns_used = 0
+    while (
+        issues["syllable_issues"] or issues["rhyme_issues"]
+    ) and turns_used < max_revisions:
+        messages.append({"role": "user", "content": _build_revision_message(issues)})
+        text = _call_messages(client, messages, model)
+        messages.append({"role": "assistant", "content": text})
+        turns_used += 1
+        issues = _check_candidate(text, vocal_sections, rhyme_schemes)
+
+    outcome["turns_used"] = turns_used
+    outcome["final_syllable_issues"] = len(issues["syllable_issues"])
+    outcome["final_rhyme_issues"] = len(issues["rhyme_issues"])
+    return text, outcome
 
 
 # ---------------------------------------------------------------------------
@@ -1396,6 +1733,7 @@ def run_lyric_pipeline(
                 "genres": [],
                 "mood": [],
                 "singer": str(cr.get("singer", "")),
+                "rhyme_scheme": {},
             }
         else:
             print(
@@ -1459,6 +1797,9 @@ def run_lyric_pipeline(
         for sec in vocal_sections
     }
 
+    # --- 4a. Rhyme schemes ---
+    rhyme_schemes = assign_rhyme_schemes(vocal_sections, meta.get("rhyme_scheme"))
+
     # --- 4b. Lyric negative constraints (album-wide word/imagery avoidance) ---
     album_dir = _resolve_album_dir(prod_path)
     if refresh_constraints:
@@ -1510,6 +1851,7 @@ def run_lyric_pipeline(
             sub_lyrics,
             artist_context,
             negative_constraints_block,
+            rhyme_schemes,
         )
     else:
         prompt = _build_prompt(
@@ -1518,18 +1860,29 @@ def run_lyric_pipeline(
             syllable_targets,
             artist_context,
             negative_constraints_block,
+            rhyme_schemes,
         )
 
-    # --- 6. Generate candidates ---
+    # --- 6. Generate candidates (verify → revise, up to 2 follow-up turns) ---
     from anthropic import Anthropic
 
     client = Anthropic()
     print(f"\nGenerating {num_candidates} lyric candidate(s) via {model}...")
     texts = []
+    verify_outcomes = []
     for i in range(num_candidates):
         print(f"  Candidate {i + 1}/{num_candidates}...")
-        text = _call_api(client, prompt, model)
+        text, outcome = generate_lyric_candidate(
+            client, prompt, model, vocal_sections, rhyme_schemes
+        )
+        if outcome["turns_used"]:
+            print(
+                f"    Revised {outcome['turns_used']} time(s) — "
+                f"{outcome['initial_syllable_issues']}→{outcome['final_syllable_issues']} syllable issue(s), "
+                f"{outcome['initial_rhyme_issues']}→{outcome['final_rhyme_issues']} rhyme issue(s)"
+            )
         texts.append(text)
+        verify_outcomes.append(outcome)
 
     # --- 7. Score with Refractor (text-only) ---
     scorer_results_map: dict[int, Optional[dict]] = {}
@@ -1580,6 +1933,7 @@ def run_lyric_pipeline(
                 "chromatic_result": result,
                 "chromatic_match": chromatic_match,
                 "fitting": fitting,
+                "verify": verify_outcomes[idx],
             }
         )
 
@@ -1618,6 +1972,7 @@ def run_lyric_pipeline(
             "rank": rank + 1,
             "chromatic": chromatic_block,
             "fitting": fitting_block,
+            "verify": _to_python(entry["verify"]),
             "status": "pending",
             "notes": "",
         }

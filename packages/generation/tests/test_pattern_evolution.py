@@ -252,6 +252,15 @@ class TestBassCrossover:
             assert isinstance(tone, BassChordTone)
             assert isinstance(vel, str)
 
+    def test_splice_point_varies_across_calls(self):
+        """The bar-boundary splice must not always land at the midpoint."""
+        a = _make_bass("a")
+        a.notes = a.notes * 3  # 12 notes, room for varied split points
+        b = _make_bass("b")
+        b.notes = b.notes * 3
+        lengths = {len(_crossover_bass(a, b).notes) for _ in range(50)}
+        assert len(lengths) > 1
+
 
 class TestBassMutation:
     def test_returns_bass_pattern(self):
@@ -266,6 +275,25 @@ class TestBassMutation:
             result = _mutate_bass(_make_bass())
         for _, tone, _ in result.notes:
             assert isinstance(tone, BassChordTone)
+
+    def test_onset_shift_bounded_to_half_beat(self):
+        """The onset-shift branch of bass mutation moves a note by at most 0.5 beat."""
+        p = _make_bass()
+        original = {round(beat, 4) for beat, _, _ in p.notes}
+        for _ in range(100):
+            with patch(
+                "white_generation.patterns.pattern_evolution.random.random",
+                side_effect=[0.0, 0.9],  # trigger mutation, take onset-shift branch
+            ):
+                result = _mutate_bass(p)
+            deltas = [
+                abs(beat - orig)
+                for beat, orig in zip(
+                    (b for b, _, _ in result.notes), (b for b, _, _ in p.notes)
+                )
+            ]
+            assert all(d <= 0.5 + 1e-9 for d in deltas)
+        assert original  # sanity: fixture has notes
 
 
 # ---------------------------------------------------------------------------
@@ -290,6 +318,17 @@ class TestMelodyCrossover:
         child = _crossover_melody(_make_melody("a"), _make_melody("b"))
         assert len(child.intervals) == len(child.rhythm)
 
+    def test_splice_point_varies_across_calls(self):
+        """The bar-boundary splice must not always land at the midpoint."""
+        a = _make_melody("a")
+        a.intervals = a.intervals * 3
+        a.rhythm = [i * 0.5 for i in range(len(a.intervals))]
+        b = _make_melody("b")
+        b.intervals = b.intervals * 3
+        b.rhythm = [i * 0.5 for i in range(len(b.intervals))]
+        lengths = {len(_crossover_melody(a, b).intervals) for _ in range(50)}
+        assert len(lengths) > 1
+
 
 class TestMelodyMutation:
     def test_returns_melody_pattern(self):
@@ -311,6 +350,30 @@ class TestMelodyMutation:
             with patch("random.random", return_value=0.0):
                 result = _mutate_melody(_make_melody())
         assert result.rhythm == sorted(result.rhythm)
+
+    def test_interval_shift_bounded_to_two_semitones(self):
+        p = _make_melody()
+        for _ in range(200):
+            with patch(
+                "white_generation.patterns.pattern_evolution.random.random",
+                side_effect=[0.0, 0.0],  # trigger mutation, take interval branch
+            ):
+                result = _mutate_melody(p)
+            deltas = [abs(r - o) for r, o in zip(result.intervals, p.intervals)]
+            assert max(deltas) <= 2
+
+    def test_onset_shift_bounded_to_half_beat(self):
+        p = _make_melody()
+        for _ in range(200):
+            with patch(
+                "white_generation.patterns.pattern_evolution.random.random",
+                side_effect=[0.0, 0.9],  # trigger mutation, take onset-shift branch
+            ):
+                result = _mutate_melody(p)
+            deltas = [
+                abs(r - o) for r, o in zip(sorted(result.rhythm), sorted(p.rhythm))
+            ]
+            assert max(deltas) <= 0.5 + 1e-9
 
 
 # ---------------------------------------------------------------------------
