@@ -7558,7 +7558,7 @@ requires-dist = [
 
 [[package]]
 name = "white-composition"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/composition" }
 dependencies = [
     { name = "anthropic" },
@@ -7642,7 +7642,7 @@ requires-dist = [
 
 [[package]]
 name = "white-generation"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "packages/generation" }
 dependencies = [
     { name = "mido" },
@@ -7667,7 +7667,7 @@ requires-dist = [
 
 [[package]]
 name = "white-ideation"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/ideation" }
 dependencies = [
     { name = "anthropic" },
