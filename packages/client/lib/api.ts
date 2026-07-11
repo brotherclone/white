@@ -465,6 +465,18 @@ export function mixStreamUrl(): string {
   return `${BASE}/production/mix`;
 }
 
+export async function fetchSongMixInfo(
+  songId: string,
+): Promise<{ has_mix: boolean; mix_file: string | null; duration_seconds: number | null }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/mix/info`);
+  if (!res.ok) return { has_mix: false, mix_file: null, duration_seconds: null };
+  return res.json();
+}
+
+export function songMixStreamUrl(songId: string): string {
+  return `${BASE}/songs/${encodeURIComponent(songId)}/mix`;
+}
+
 export async function fetchSamples(topN?: number): Promise<import("./types").SampleEntry[]> {
   const params = topN != null ? `?top_n=${topN}` : "";
   const res = await fetch(`${BASE}/samples${params}`, { cache: "no-store" });

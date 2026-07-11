@@ -1581,6 +1581,48 @@ def create_app(
         _set_lp_consideration(song_id, Path(song_entry["production_path"]), next_status)
         return {"ok": True}
 
+    @app.get("/songs/{song_id}/mix/info")
+    def song_mix_info(song_id: str):
+        from white_composition.init_production import load_song_context
+
+        song_entry = _resolve_song_for_sides(song_id)
+        ctx = load_song_context(Path(song_entry["production_path"]))
+        mix_file = ctx.get("mix_file") or None
+        has_mix = bool(mix_file and Path(mix_file).exists())
+        return {
+            "has_mix": has_mix,
+            "mix_file": mix_file,
+            "duration_seconds": _song_mix_duration(song_entry) if has_mix else None,
+        }
+
+    @app.get("/songs/{song_id}/mix")
+    def stream_song_mix(song_id: str):
+        from fastapi.responses import FileResponse
+
+        from white_composition.init_production import load_song_context
+
+        song_entry = _resolve_song_for_sides(song_id)
+        ctx = load_song_context(Path(song_entry["production_path"]))
+        mix_file = ctx.get("mix_file")
+        if not mix_file:
+            raise HTTPException(
+                status_code=404, detail="No mix_file set in song_context.yml"
+            )
+        mix_path = Path(mix_file)
+        if not mix_path.exists():
+            raise HTTPException(
+                status_code=404, detail=f"Mix file not found: {mix_path}"
+            )
+        suffix = mix_path.suffix.lower()
+        media_type = {
+            ".mp3": "audio/mpeg",
+            ".wav": "audio/wav",
+            ".aiff": "audio/aiff",
+            ".aif": "audio/aiff",
+            ".m4a": "audio/mp4",
+        }.get(suffix, "audio/mpeg")
+        return FileResponse(str(mix_path), media_type=media_type)
+
     # ------------------------------------------------------------------
     # Lyrics review
     # ------------------------------------------------------------------
