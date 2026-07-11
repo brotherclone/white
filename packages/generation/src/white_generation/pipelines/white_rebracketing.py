@@ -154,33 +154,54 @@ def extract_bars(
 ) -> list[bytes]:
     """Slice a MIDI file into individual bar chunks.
 
-    Each bar spans `ticks_per_beat * beats_per_bar` ticks.  Notes that start
-    within a bar but would extend past its end are truncated.  Tick offsets
-    within each bar are re-zeroed so bar 0 starts at tick 0.
+    Each bar spans `ticks_per_beat * beats_per_bar` ticks. Notes are first paired
+    into complete (start, end) spans across the *whole* file, then each span is
+    assigned to the bar its start falls in — a note that starts within a bar but
+    would extend past its end is truncated to the bar boundary.
+
+    Pairing globally first (rather than filtering raw note_on/note_off events per
+    bar) matters: a note held from the tail of one bar into the next has its real
+    note_off at exactly the next bar's start tick, which is inside that *next*
+    bar's tick range. Naively including that note_off in the next bar's own event
+    stream would let it pair with a same-pitch note_on that starts the next bar's
+    own chord — producing a spurious near-zero-length note there, while the first
+    note's true ending becomes an unpaired orphan. Resolving spans globally avoids
+    this: a note_off is only ever considered together with the note_on that
+    genuinely started it, regardless of which bar the pairing happens to straddle.
+
+    Tick offsets within each bar are re-zeroed so bar 0 starts at tick 0.
 
     Returns a list of MIDI byte strings, one per bar.
     """
     bar_ticks = int(ticks_per_beat * beats_per_bar)
     mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
 
-    # Convert all tracks to absolute tick events, merge into one stream
-    events: list[tuple[int, mido.Message]] = []
+    # Pair note_on/note_off into complete spans using a per-(channel, pitch) queue,
+    # so retriggered notes are matched in chronological order.
+    pending: dict[tuple[int, int], list[tuple[int, int]]] = {}
+    spans: list[tuple[int, int, int, int, int]] = (
+        []
+    )  # (start, end, channel, pitch, velocity)
     for track in mid.tracks:
         abs_tick = 0
         for msg in track:
             abs_tick += msg.time
-            events.append((abs_tick, msg.copy(time=abs_tick)))
+            if msg.type == "note_on" and msg.velocity > 0:
+                pending.setdefault((msg.channel, msg.note), []).append(
+                    (abs_tick, msg.velocity)
+                )
+            elif msg.type == "note_off" or (
+                msg.type == "note_on" and msg.velocity == 0
+            ):
+                queue = pending.get((msg.channel, msg.note))
+                if queue:
+                    start, velocity = queue.pop(0)
+                    spans.append((start, abs_tick, msg.channel, msg.note, velocity))
 
-    if not events:
+    if not spans:
         return []
 
-    # Compute length from note events only — meta end_of_track can carry a huge
-    # accumulated delta on type-1 files (e.g. 307200 ticks when notes end at 16800)
-    # which would generate hundreds of empty bars and flood the bar pool.
-    non_meta_ticks = [t for t, msg in events if msg.type in ("note_on", "note_off")]
-    if not non_meta_ticks:
-        return []
-    total_ticks = max(non_meta_ticks)
+    total_ticks = max(end for _, end, *_ in spans)
     n_bars = max(1, (total_ticks + bar_ticks - 1) // bar_ticks)
 
     bars: list[bytes] = []
@@ -188,36 +209,39 @@ def extract_bars(
         bar_start = bar_idx * bar_ticks
         bar_end = bar_start + bar_ticks
 
-        bar_track = mido.MidiTrack()
-        prev_abs = bar_start
-        pending_note_offs: dict[tuple[int, int], int] = {}  # (channel, note) → end_tick
-
-        for abs_tick, msg in sorted(events, key=lambda x: x[0]):
-            if msg.is_meta:
+        bar_events: list[tuple[int, mido.Message]] = []
+        for start, end, channel, pitch, velocity in spans:
+            if start < bar_start or start >= bar_end:
                 continue
-            if abs_tick < bar_start or abs_tick >= bar_end:
-                continue
-
-            if msg.type == "note_on" and msg.velocity > 0:
-                # Track pending note-off within this bar
-                pending_note_offs[(msg.channel, msg.note)] = bar_end
-
-            rel_tick = abs_tick - bar_start
-            delta = rel_tick - (prev_abs - bar_start)
-            bar_track.append(msg.copy(time=delta))
-            prev_abs = abs_tick
-
-        # Truncate any open notes at bar end
-        for (ch, note), end in pending_note_offs.items():
-            off_rel = end - bar_start
-            delta = off_rel - (prev_abs - bar_start)
-            if delta >= 0:
-                bar_track.append(
+            clipped_end = min(end, bar_end)
+            bar_events.append(
+                (
+                    start - bar_start,
                     mido.Message(
-                        "note_off", channel=ch, note=note, velocity=0, time=delta
-                    )
+                        "note_on",
+                        channel=channel,
+                        note=pitch,
+                        velocity=velocity,
+                        time=0,
+                    ),
                 )
-                prev_abs = end
+            )
+            bar_events.append(
+                (
+                    clipped_end - bar_start,
+                    mido.Message(
+                        "note_off", channel=channel, note=pitch, velocity=0, time=0
+                    ),
+                )
+            )
+
+        bar_events.sort(key=lambda e: (e[0], 0 if e[1].type == "note_off" else 1))
+
+        bar_track = mido.MidiTrack()
+        prev_rel = 0
+        for rel_tick, msg in bar_events:
+            bar_track.append(msg.copy(time=rel_tick - prev_rel))
+            prev_rel = rel_tick
 
         bar_track.append(mido.MetaMessage("end_of_track", time=0))
 

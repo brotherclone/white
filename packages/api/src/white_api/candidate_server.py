@@ -986,15 +986,18 @@ def create_app(
                 status_code=503,
                 detail="No song selected — POST /songs/activate first",
             )
+
+        from white_composition.logic_handoff import resolve_song_dir
+
+        try:
+            song_dir = resolve_song_dir(Path(_active_song["production_path"]))
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
+            ) from exc
+
         logic_root = Path(logic_output_dir).resolve()
-        thread_slug = _active_song.get("thread_slug", "unknown")
-        title = _active_song.get("title", "unknown")
-        production_slug = _active_song.get("production_slug", "")
-        safe_title = title.replace("/", "-").replace(":", "-").replace("..", "")
-        song_folder = (
-            f"{safe_title} ({production_slug})" if production_slug else safe_title
-        )
-        dest_dir = (logic_root / thread_slug / song_folder / "Samples").resolve()
+        dest_dir = (song_dir / "Samples").resolve()
         try:
             dest_dir.relative_to(logic_root)
         except ValueError:
@@ -1578,6 +1581,48 @@ def create_app(
         _set_lp_consideration(song_id, Path(song_entry["production_path"]), next_status)
         return {"ok": True}
 
+    @app.get("/songs/{song_id}/mix/info")
+    def song_mix_info(song_id: str):
+        from white_composition.init_production import load_song_context
+
+        song_entry = _resolve_song_for_sides(song_id)
+        ctx = load_song_context(Path(song_entry["production_path"]))
+        mix_file = ctx.get("mix_file") or None
+        has_mix = bool(mix_file and Path(mix_file).exists())
+        return {
+            "has_mix": has_mix,
+            "mix_file": mix_file,
+            "duration_seconds": _song_mix_duration(song_entry) if has_mix else None,
+        }
+
+    @app.get("/songs/{song_id}/mix")
+    def stream_song_mix(song_id: str):
+        from fastapi.responses import FileResponse
+
+        from white_composition.init_production import load_song_context
+
+        song_entry = _resolve_song_for_sides(song_id)
+        ctx = load_song_context(Path(song_entry["production_path"]))
+        mix_file = ctx.get("mix_file")
+        if not mix_file:
+            raise HTTPException(
+                status_code=404, detail="No mix_file set in song_context.yml"
+            )
+        mix_path = Path(mix_file)
+        if not mix_path.exists():
+            raise HTTPException(
+                status_code=404, detail=f"Mix file not found: {mix_path}"
+            )
+        suffix = mix_path.suffix.lower()
+        media_type = {
+            ".mp3": "audio/mpeg",
+            ".wav": "audio/wav",
+            ".aiff": "audio/aiff",
+            ".aif": "audio/aiff",
+            ".m4a": "audio/mp4",
+        }.get(suffix, "audio/mpeg")
+        return FileResponse(str(mix_path), media_type=media_type)
+
     # ------------------------------------------------------------------
     # Lyrics review
     # ------------------------------------------------------------------
@@ -1879,10 +1924,12 @@ def create_app(
             )
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
+        uncovered_count = sum(1 for a in alignment if a.get("uncovered"))
         return {
             "ok": True,
             "split_midi": str(output_path),
             "alignment": alignment,
+            "uncovered_phrase_count": uncovered_count,
         }
 
     @app.post("/production/auto-split-melody/all")
@@ -1933,6 +1980,7 @@ def create_app(
         return {
             "ok": True,
             "results": results,
+            "warnings": [r["warning"] for r in results if r.get("warning")],
             "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
         }
 
@@ -1968,6 +2016,7 @@ def create_app(
         try:
             from white_generation.pipelines.melody_auto_split import (
                 assemble_melody_midi,
+                write_assembled_lyrics,
             )
 
             output_path = assemble_melody_midi(
@@ -1976,6 +2025,14 @@ def create_app(
                 bpm=bpm,
                 time_sig_str=time_sig,
             )
+
+            assembled_lyrics_path: Path | None = None
+            lyrics_path = prod / "melody" / "lyrics.txt"
+            if lyrics_path.exists():
+                assembled_lyrics_path = write_assembled_lyrics(
+                    arrangement_path=arrangement_path,
+                    lyrics_path=lyrics_path,
+                )
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -1997,6 +2054,9 @@ def create_app(
         return {
             "ok": True,
             "assembled_midi": str(output_path),
+            "assembled_lyrics": (
+                str(assembled_lyrics_path) if assembled_lyrics_path else None
+            ),
             "logic_midi_dir": str(logic_midi_dir) if logic_midi_dir else None,
         }
 

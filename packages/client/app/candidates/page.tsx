@@ -328,11 +328,16 @@ export default function CandidatesPage() {
       {/* Breadcrumb */}
       {activeSong && (
         <div className="flex items-center gap-2 text-xs text-zinc-500 mb-3 font-sans">
-          <Link href="/" className="hover:text-zinc-300 transition-colors">← Songs</Link>
+          <Link href="/" className="text-zinc-400 underline decoration-zinc-700 underline-offset-2 hover:text-zinc-200 hover:decoration-zinc-500 transition-colors">← Songs</Link>
           <span>/</span>
-          <span className="text-zinc-300">{activeSong.title}</span>
+          <span className="text-zinc-300 font-medium">{activeSong.title}</span>
+          {activeSong.bpm && (
+            <span className="text-zinc-600">
+              {activeSong.bpm} BPM{activeSong.time_sig ? ` · ${activeSong.time_sig}` : ""}
+            </span>
+          )}
           <span>/</span>
-          <Link href="/sides" className="hover:text-zinc-300 transition-colors">Sides</Link>
+          <Link href="/sides" className="text-zinc-400 underline decoration-zinc-700 underline-offset-2 hover:text-zinc-200 hover:decoration-zinc-500 transition-colors">Sides</Link>
         </div>
       )}
 
@@ -395,20 +400,32 @@ export default function CandidatesPage() {
         </div>
       </div>
 
-      {/* Pipeline status */}
+      {/* Pipeline status — check / current / upcoming, matching the Board's lifecycle columns */}
       {pipeline && (
         <div className="flex items-center gap-3 mb-4 flex-wrap">
           {pipeline.phase_order.filter(p => PIPELINE_PHASES.includes(p)).map(phase => {
             const status = pipeline.phases[phase] ?? "pending";
             const isNext = pipeline.next_phase === phase;
-            const color =
-              status === "promoted" ? "text-emerald-400" :
-              status === "generated" ? "text-blue-400" :
-              status === "in_progress" ? "text-yellow-400" :
-              isNext ? "text-zinc-300" : "text-zinc-600";
+            const isComplete = status === "promoted";
+            const isCurrent = !isComplete && (isNext || status === "in_progress" || status === "generated");
             return (
-              <span key={phase} className={`text-xs font-sans ${color}`}>
-                {status === "promoted" ? "✓" : status === "generated" ? "●" : status === "in_progress" ? "⟳" : isNext ? "→" : "·"} {phase}
+              <span
+                key={phase}
+                className={`flex items-center gap-1.5 text-xs font-sans ${
+                  isComplete ? "text-emerald-400" : isCurrent ? "text-blue-300" : "text-zinc-600"
+                }`}
+              >
+                {isComplete ? (
+                  <svg className="w-3 h-3 text-emerald-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <title>Phase complete</title>
+                    <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                  </svg>
+                ) : isCurrent ? (
+                  <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                ) : (
+                  <span className="w-2 h-2 rounded-full border border-zinc-700 flex-shrink-0" />
+                )}
+                {phase}
               </span>
             );
           })}
@@ -661,12 +678,14 @@ export default function CandidatesPage() {
         )}
       </div>
 
-      <div className="mt-3 text-xs text-zinc-600 flex gap-4 font-sans flex-wrap">
-        <span><kbd className="bg-zinc-800 px-1 rounded font-mono">a</kbd> approve focused row</span>
-        <span><kbd className="bg-zinc-800 px-1 rounded font-mono">r</kbd> reject</span>
-        <span><kbd className="bg-zinc-800 px-1 rounded font-mono">p</kbd> play / stop</span>
-        <span>click row to expand score detail</span>
-      </div>
+      {visible.length > 0 && (
+        <div className={`mt-3 text-xs flex gap-4 font-sans flex-wrap transition-opacity ${focused ? "text-zinc-600" : "text-zinc-800"}`}>
+          <span><kbd className="bg-zinc-800 px-1 rounded font-mono">a</kbd> approve focused row</span>
+          <span><kbd className="bg-zinc-800 px-1 rounded font-mono">r</kbd> reject</span>
+          <span><kbd className="bg-zinc-800 px-1 rounded font-mono">p</kbd> play / stop</span>
+          <span>click row to expand score detail</span>
+        </div>
+      )}
     </div>
   );
 }

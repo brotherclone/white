@@ -59,6 +59,10 @@ def load_clap_index(
         raise FileNotFoundError(f"Meta parquet not found: {meta_path}")
 
     clap = pd.read_parquet(clap_path)
+    # The CLAP parquet can carry stale duplicate rows from re-extraction runs
+    # that appended instead of replaced; collapse to one row per segment_id
+    # so the inner join below can't multiply a segment into duplicate results.
+    clap = clap.drop_duplicates(subset="segment_id", keep="last")
     # Only request columns that actually exist in the meta parquet
     meta_all_cols = pd.read_parquet(meta_path, columns=None).columns.tolist()
     load_cols = [c for c in _META_COLUMNS if c in meta_all_cols]

@@ -59,3 +59,13 @@ class LyricRepeatType(str, Enum):
 ```
 
 Enums live in `white_core/enums/`. Use `str, Enum` (string-valued) so they serialise cleanly to/from YAML and JSON without extra conversion. When loading from external input (YAML, API), normalise to the enum early and let it be an enum everywhere inside the code.
+
+## Versioning
+
+This is a `uv` workspace: the root `pyproject.toml` and each `packages/*/pyproject.toml` carry their own independent `version`. Versions have gone stale (everything sitting at `0.1.0`) because bumping them was never made part of the routine — fix that going forward.
+
+When preparing a PR, bump `version` in every `packages/*/pyproject.toml` whose package actually changed (source, not just its tests) — never bump a package that wasn't touched. Bump the root `pyproject.toml` version too when the change is workspace-wide (root-level config, cross-package refactors) rather than scoped to one package.
+
+Default to a **minor** bump (`0.1.0` → `0.2.0`) for anything that adds or changes behavior — new pipeline phases, new fields, new CLI flags, changed defaults. All packages are pre-1.0, so under semver a breaking change still bumps minor (not major) at this stage — reserve a major bump for when a package is promoted to a stable 1.0 API. Use a **patch** bump (`0.1.0` → `0.1.1`) only for narrowly-scoped fixes: a bug fix with no behavior change beyond "it now works," a dependency version bump, docs/comments-only changes. Test-only or CI-only changes don't need a version bump at all.
+
+Do this as a normal part of finishing the PR, without asking for confirmation each time — the version bump is a plain edit to a version string, not a risky action.

@@ -395,7 +395,20 @@ export async function draftWorkOrderEmail(collaboratorId: string): Promise<{
   return res.json();
 }
 
-export async function autoSplitMelody(): Promise<{ ok: boolean; results: { label: string; split_midi: string }[] }> {
+export interface AutoSplitResult {
+  section: string;
+  skipped: boolean;
+  reason?: string;
+  split_midi?: string;
+  uncovered_phrase_count?: number;
+  warning?: string;
+}
+
+export async function autoSplitMelody(): Promise<{
+  ok: boolean;
+  results: AutoSplitResult[];
+  warnings: string[];
+}> {
   const res = await fetch(`${BASE}/production/auto-split-melody/all`, { method: "POST" });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -404,7 +417,11 @@ export async function autoSplitMelody(): Promise<{ ok: boolean; results: { label
   return res.json();
 }
 
-export async function assembleMelody(): Promise<{ ok: boolean; assembled_midi: string }> {
+export async function assembleMelody(): Promise<{
+  ok: boolean;
+  assembled_midi: string;
+  assembled_lyrics: string | null;
+}> {
   const res = await fetch(`${BASE}/production/assemble-melody`, { method: "POST" });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -446,6 +463,18 @@ export async function setMixFile(path: string): Promise<void> {
 
 export function mixStreamUrl(): string {
   return `${BASE}/production/mix`;
+}
+
+export async function fetchSongMixInfo(
+  songId: string,
+): Promise<{ has_mix: boolean; mix_file: string | null; duration_seconds: number | null }> {
+  const res = await fetch(`${BASE}/songs/${encodeURIComponent(songId)}/mix/info`);
+  if (!res.ok) return { has_mix: false, mix_file: null, duration_seconds: null };
+  return res.json();
+}
+
+export function songMixStreamUrl(songId: string): string {
+  return `${BASE}/songs/${encodeURIComponent(songId)}/mix`;
 }
 
 export async function fetchSamples(topN?: number): Promise<import("./types").SampleEntry[]> {

@@ -46,6 +46,29 @@ def _write_melody_approved(prod_dir: Path, section: str, notes: list[int]) -> Pa
     return path
 
 
+def _write_chords_review(prod_dir: Path, label: str) -> Path:
+    """Write a minimal approved chords/review.yml for `generate_quartet`'s chord lookup."""
+    chords_dir = prod_dir / "chords"
+    chords_dir.mkdir(parents=True, exist_ok=True)
+    review = {
+        "time_sig": "4/4",
+        "candidates": [
+            {
+                "label": label,
+                "status": "approved",
+                "chords": [
+                    {"notes": ["C3", "E3", "G3"]},
+                    {"notes": ["F3", "A3", "C4"]},
+                ],
+            }
+        ],
+    }
+    path = chords_dir / "review.yml"
+    with open(path, "w") as f:
+        yaml.dump(review, f, sort_keys=False, allow_unicode=True, width=float("inf"))
+    return path
+
+
 # ---------------------------------------------------------------------------
 # 1. extract_soprano_notes
 # ---------------------------------------------------------------------------
@@ -135,6 +158,105 @@ def _make_mock_scorer():
 
 
 # ---------------------------------------------------------------------------
+# 2b. _resolve_chord_label
+# ---------------------------------------------------------------------------
+
+
+class TestResolveChordLabel:
+    def test_exact_match(self):
+        from white_generation.pipelines.quartet_pipeline import _resolve_chord_label
+
+        assert _resolve_chord_label("verse", ["verse", "chorus"]) == "verse"
+
+    def test_prefix_match_for_split_suffix(self):
+        from white_generation.pipelines.quartet_pipeline import _resolve_chord_label
+
+        assert _resolve_chord_label("chorus_split", ["verse", "chorus"]) == "chorus"
+
+    def test_prefix_match_for_numbered_and_split_suffix(self):
+        from white_generation.pipelines.quartet_pipeline import _resolve_chord_label
+
+        assert _resolve_chord_label("verse_alt_2_split", ["verse", "bridge"]) == "verse"
+
+    def test_prefix_match_for_inst_suffix(self):
+        from white_generation.pipelines.quartet_pipeline import _resolve_chord_label
+
+        assert _resolve_chord_label("bridge_inst", ["bridge", "verse"]) == "bridge"
+
+    def test_no_match_returns_none(self):
+        from white_generation.pipelines.quartet_pipeline import _resolve_chord_label
+
+        assert _resolve_chord_label("mystery", ["verse", "chorus"]) is None
+
+    def test_prefers_longest_prefix_match(self):
+        from white_generation.pipelines.quartet_pipeline import _resolve_chord_label
+
+        assert (
+            _resolve_chord_label("verse_alt_split", ["verse", "verse_alt"])
+            == "verse_alt"
+        )
+
+
+# ---------------------------------------------------------------------------
+# 2c. _voice_length_beats / _align_voice_length
+# ---------------------------------------------------------------------------
+
+
+class TestAlignVoiceLength:
+    def test_voice_length_beats_matches_note_span(self):
+        from white_generation.pipelines.quartet_pipeline import _voice_length_beats
+
+        midi_bytes = _make_melody_midi([60, 62, 64, 65])  # 4 quarter notes = 4 beats
+        assert _voice_length_beats(midi_bytes) == 4.0
+
+    def test_pads_short_voice_by_sustaining_last_note(self):
+        from white_generation.pipelines.quartet_pipeline import (
+            _align_voice_length,
+            _parse_voice_notes_with_velocity,
+            _voice_length_beats,
+        )
+
+        midi_bytes = _make_melody_midi([60, 62])  # 2 beats
+        aligned = _align_voice_length(midi_bytes, target_beats=4.0)
+        assert _voice_length_beats(aligned) == 4.0
+        # Still the same 2 notes — no notes invented, just the last one sustained.
+        notes, _ = _parse_voice_notes_with_velocity(aligned)
+        assert len(notes) == 2
+
+    def test_trims_long_voice(self):
+        from white_generation.pipelines.quartet_pipeline import (
+            _align_voice_length,
+            _voice_length_beats,
+        )
+
+        midi_bytes = _make_melody_midi([60, 62, 64, 65, 67, 69])  # 6 beats
+        aligned = _align_voice_length(midi_bytes, target_beats=4.0)
+        assert _voice_length_beats(aligned) == 4.0
+
+    def test_already_aligned_voice_unchanged_length(self):
+        from white_generation.pipelines.quartet_pipeline import (
+            _align_voice_length,
+            _voice_length_beats,
+        )
+
+        midi_bytes = _make_melody_midi([60, 62, 64, 65])  # 4 beats
+        aligned = _align_voice_length(midi_bytes, target_beats=4.0)
+        assert _voice_length_beats(aligned) == 4.0
+
+    def test_empty_midi_returned_unchanged(self):
+        from white_generation.pipelines.quartet_pipeline import _align_voice_length
+
+        mid = mido.MidiFile(ticks_per_beat=480)
+        track = mido.MidiTrack()
+        mid.tracks.append(track)
+        track.append(mido.MetaMessage("end_of_track", time=0))
+        buf = io.BytesIO()
+        mid.save(file=buf)
+        empty_bytes = buf.getvalue()
+        assert _align_voice_length(empty_bytes, target_beats=4.0) == empty_bytes
+
+
+# ---------------------------------------------------------------------------
 # 3. generate_quartet (integration)
 # ---------------------------------------------------------------------------
 
@@ -147,6 +269,7 @@ class TestGenerateQuartet:
         prod.mkdir(parents=True)
         _write_song_context(prod)
         _write_melody_approved(prod, "chorus", [60, 62, 64, 65, 67, 65, 64, 62])
+        _write_chords_review(prod, "chorus")
 
         candidates = generate_quartet(
             prod, "chorus", top_k=2, seed=42, scorer=_make_mock_scorer()
@@ -160,6 +283,7 @@ class TestGenerateQuartet:
         prod.mkdir(parents=True)
         _write_song_context(prod)
         _write_melody_approved(prod, "verse", [60, 62, 64, 65])
+        _write_chords_review(prod, "verse")
 
         candidates = generate_quartet(
             prod, "verse", top_k=1, seed=0, scorer=_make_mock_scorer()
@@ -180,6 +304,7 @@ class TestGenerateQuartet:
         prod.mkdir(parents=True)
         _write_song_context(prod)
         _write_melody_approved(prod, "bridge", [60, 62, 64, 65, 64, 62])
+        _write_chords_review(prod, "bridge")
 
         candidates = generate_quartet(
             prod, "bridge", top_k=3, seed=7, scorer=_make_mock_scorer()
@@ -206,12 +331,75 @@ class TestGenerateQuartet:
         prod.mkdir(parents=True)
         _write_song_context(prod)
         _write_melody_approved(prod, "verse", [60, 62, 64, 65])
+        _write_chords_review(prod, "verse")
 
         with patch.dict("sys.modules", {"white_analysis.refractor": None}):
             candidates = generate_quartet(prod, "verse", top_k=1, seed=0, scorer=None)
         c = candidates[0]
         assert c["composite_score"] == c["scores"]["counterpoint"]
         assert c["scores"]["chromatic"] is None
+
+    def test_unmatched_chord_label_raises_clear_error(self, tmp_path):
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_song_context(prod)
+        _write_melody_approved(prod, "mystery_section", [60, 62, 64, 65])
+        _write_chords_review(prod, "verse")  # unrelated to 'mystery_section'
+
+        with pytest.raises(ValueError, match="No chord data found"):
+            generate_quartet(
+                prod, "mystery_section", top_k=1, scorer=_make_mock_scorer()
+            )
+
+    def test_split_suffix_label_resolves_to_base_chord(self, tmp_path):
+        """A melody label with a _split suffix (from melody_auto_split) should still
+        resolve to its base chord section instead of raising or grabbing an
+        unrelated section's harmony."""
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_song_context(prod)
+        _write_melody_approved(prod, "verse_split", [60, 62, 64, 65])
+        _write_chords_review(prod, "verse")
+
+        candidates = generate_quartet(
+            prod, "verse_split", top_k=1, seed=0, scorer=_make_mock_scorer()
+        )
+        assert len(candidates) == 1
+
+    def test_all_voices_match_soprano_length(self, tmp_path):
+        """Regression: violin_ii/viola/cello must end at the same tick as the
+        soprano, not drift short (a dangling gap) or long (an extra measure) from
+        their independently-derived harmonic-rhythm durations."""
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_song_context(prod)
+        _write_melody_approved(prod, "verse", [60, 62, 64, 65, 67, 69, 71, 72])
+        _write_chords_review(prod, "verse")
+
+        candidates = generate_quartet(
+            prod, "verse", top_k=1, seed=3, scorer=_make_mock_scorer()
+        )
+        midi_bytes = candidates[0]["midi_bytes"]
+        mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
+
+        end_tick_by_channel: dict[int, int] = {}
+        for track in mid.tracks:
+            abs_tick = 0
+            for msg in track:
+                abs_tick += msg.time
+                if msg.type in ("note_on", "note_off"):
+                    end_tick_by_channel[msg.channel] = max(
+                        end_tick_by_channel.get(msg.channel, 0), abs_tick
+                    )
+
+        assert len(end_tick_by_channel) == 4
+        assert len(set(end_tick_by_channel.values())) == 1
 
 
 # ---------------------------------------------------------------------------

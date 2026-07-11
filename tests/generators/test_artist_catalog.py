@@ -365,6 +365,8 @@ class TestScoreChromatic:
         )
 
         mock_scorer = MagicMock()
+        desc_emb = "desc-embedding-sentinel"
+        mock_scorer.prepare_concept.return_value = desc_emb
         mock_scorer.score_batch.return_value = [
             {
                 "temporal": {"past": 0.7, "present": 0.2, "future": 0.1},
@@ -381,7 +383,13 @@ class TestScoreChromatic:
         assert "SKIP" in captured.out
         assert "No Description" in captured.out
 
-        # Only the entry with a description should have been scored
+        # Only the entry with a description should have been scored — the
+        # description is embedded once (prepare_concept) and reused as both
+        # concept_emb and lyric_emb to avoid a double DeBERTa encode.
+        mock_scorer.prepare_concept.assert_called_once_with(
+            "Rich textural soundscapes."
+        )
         mock_scorer.score_batch.assert_called_once()
-        args = mock_scorer.score_batch.call_args[0][0]
-        assert any("Rich textural soundscapes." in str(c) for c in args)
+        _, kwargs = mock_scorer.score_batch.call_args
+        assert kwargs["concept_emb"] == desc_emb
+        assert kwargs["lyric_emb"] == desc_emb

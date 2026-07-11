@@ -38,7 +38,7 @@ from white_generation.patterns.melody_patterns import MelodyPattern
 # Constants
 # ---------------------------------------------------------------------------
 
-_MUTATION_PROB = 0.15
+_MUTATION_PROB = 0.35
 _TOURNAMENT_K = 3
 _ELITISM_N = 2
 _VELOCITY_LEVELS = ("ghost", "normal", "accent")
@@ -272,12 +272,32 @@ def _mutate_drum(pattern: DrumPattern) -> DrumPattern:
 # ---------------------------------------------------------------------------
 
 
+def _random_split_fraction() -> float:
+    """Random bar-boundary split point as a fraction of pattern length, varying
+    call to call instead of a fixed midpoint."""
+    return random.uniform(0.15, 0.85)
+
+
+def _split_index(length: int, frac: float) -> int:
+    """Index at fraction `frac` of `length`, bounded to a real split (not 0 or length)."""
+    if length <= 1:
+        return max(1, length)
+    return max(1, min(length - 1, round(frac * length)))
+
+
 def _crossover_bass(parent_a: BassPattern, parent_b: BassPattern) -> BassPattern:
-    """Bar-boundary splice: take first half of A's notes, second half of B's."""
+    """Randomized bar-boundary splice: take a random prefix of A's notes, random suffix of B's.
+
+    Both parents split at the same proportional point so the A-prefix's last
+    onset and the B-suffix's first onset stay temporally aligned — notes are
+    stored in ascending beat-position order and downstream rendering (e.g.
+    bass_pipeline's default-duration derivation) assumes that ordering holds.
+    """
     notes_a = list(parent_a.notes)
     notes_b = list(parent_b.notes)
-    split_a = max(1, len(notes_a) // 2)
-    split_b = len(notes_b) - max(1, len(notes_b) // 2)
+    frac = _random_split_fraction()
+    split_a = _split_index(len(notes_a), frac)
+    split_b = _split_index(len(notes_b), frac)
     child_notes = notes_a[:split_a] + notes_b[split_b:]
     if not child_notes:
         child_notes = notes_a or notes_b or []
@@ -303,18 +323,25 @@ def _crossover_bass(parent_a: BassPattern, parent_b: BassPattern) -> BassPattern
 
 
 def _mutate_bass(pattern: BassPattern) -> BassPattern:
-    """Shift one note's chord tone to an adjacent tone."""
+    """Shift one note's chord tone by up to 2 steps, or its onset by up to ±0.5 beat."""
     if not pattern.notes or random.random() > _MUTATION_PROB:
         return pattern
 
     notes = list(pattern.notes)
     idx = random.randrange(len(notes))
     beat_pos, tone, vel = notes[idx]
-    # Shift to adjacent chord tone
-    current_index = _BASS_CHORD_TONES.index(tone) if tone in _BASS_CHORD_TONES else 0
-    shift = random.choice([-1, 1])
-    new_index = max(0, min(len(_BASS_CHORD_TONES) - 1, current_index + shift))
-    notes[idx] = (beat_pos, _BASS_CHORD_TONES[new_index], vel)
+
+    if random.random() < 0.5:
+        current_index = (
+            _BASS_CHORD_TONES.index(tone) if tone in _BASS_CHORD_TONES else 0
+        )
+        shift = random.choice([-2, -1, 1, 2])
+        new_index = max(0, min(len(_BASS_CHORD_TONES) - 1, current_index + shift))
+        notes[idx] = (beat_pos, _BASS_CHORD_TONES[new_index], vel)
+    else:
+        delta = random.choice([-0.5, -0.25, 0.25, 0.5])
+        notes[idx] = (max(0.0, beat_pos + delta), tone, vel)
+
     return replace(pattern, notes=notes)
 
 
@@ -326,14 +353,21 @@ def _mutate_bass(pattern: BassPattern) -> BassPattern:
 def _crossover_melody(
     parent_a: MelodyPattern, parent_b: MelodyPattern
 ) -> MelodyPattern:
-    """Bar-boundary splice on interval sequences."""
+    """Randomized bar-boundary splice on interval sequences.
+
+    Both parents split at the same proportional point so the A-prefix's last
+    onset and the B-suffix's first onset stay temporally aligned — intervals
+    are cumulative deltas applied in rhythm order, so a non-monotonic splice
+    would desync the interval sequence from actual time order.
+    """
     ivs_a = list(parent_a.intervals)
     ivs_b = list(parent_b.intervals)
     rhy_a = list(parent_a.rhythm)
     rhy_b = list(parent_b.rhythm)
 
-    split_a = max(1, len(ivs_a) // 2)
-    split_b = len(ivs_b) - max(1, len(ivs_b) // 2)
+    frac = _random_split_fraction()
+    split_a = _split_index(len(ivs_a), frac)
+    split_b = _split_index(len(ivs_b), frac)
 
     child_ivs = ivs_a[:split_a] + ivs_b[split_b:]
     child_rhy = rhy_a[:split_a] + rhy_b[split_b:]
@@ -363,7 +397,7 @@ def _crossover_melody(
 
 
 def _mutate_melody(pattern: MelodyPattern) -> MelodyPattern:
-    """Shift one interval by ±1 semitone, or one onset by one subdivision."""
+    """Shift one interval by up to ±2 semitones, or one onset by up to ±0.5 beat."""
     if not pattern.intervals or random.random() > _MUTATION_PROB:
         return pattern
 
@@ -373,10 +407,10 @@ def _mutate_melody(pattern: MelodyPattern) -> MelodyPattern:
     if random.random() < 0.5 and len(intervals) > 1:
         # Mutate a non-first interval (first must stay 0)
         idx = random.randint(1, len(intervals) - 1)
-        intervals[idx] = intervals[idx] + random.choice([-1, 1])
+        intervals[idx] = intervals[idx] + random.choice([-2, -1, 1, 2])
     elif rhythm:
         idx = random.randrange(len(rhythm))
-        rhythm[idx] = max(0.0, rhythm[idx] + random.choice([-0.25, 0.25]))
+        rhythm[idx] = max(0.0, rhythm[idx] + random.choice([-0.5, -0.25, 0.25, 0.5]))
         rhythm.sort()  # Keep onsets ordered
 
     return replace(pattern, intervals=intervals, rhythm=rhythm)

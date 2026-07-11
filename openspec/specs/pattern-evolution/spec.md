@@ -4,16 +4,20 @@
 TBD - created by archiving change add-evolutionary-pattern-breeding. Update Purpose after archive.
 ## Requirements
 ### Requirement: Evolutionary Pattern Engine
-`app/generators/midi/patterns/pattern_evolution.py` SHALL provide three public functions:
-`breed_drum_patterns`, `breed_bass_patterns`, and `breed_melody_patterns`.
+`packages/generation/src/white_generation/patterns/pattern_evolution.py` SHALL provide
+three public functions: `breed_drum_patterns`, `breed_bass_patterns`, and
+`breed_melody_patterns`.
 
 Each function SHALL accept a concept embedding, seed patterns, and optional
 `generations` (default 8) and `population_size` (default 30) parameters, and return
 `top_n` (default 5) evolved patterns of the same dataclass type as the inputs.
 
 The engine SHALL implement: tournament selection (k=3), elitism (top 2 survive each
-generation), crossover (voice-row swap for drums; bar-boundary splice for bass/melody),
-and mutation with probability 0.15.
+generation), crossover (voice-row swap for drums; randomized bar-boundary splice for
+bass/melody), and mutation with probability 0.35.
+
+Bass/melody mutation SHALL shift an individual's interval by up to ±2 semitones or its
+onset by up to ±0.5 beat (previously ±1 semitone / ±0.25 beat).
 
 Evolved patterns SHALL carry an `evolved` tag plus any tags inherited from their
 highest-fitness parent.
@@ -47,4 +51,10 @@ highest-fitness parent.
 - **GIVEN** a population scored by the Refractor
 - **WHEN** top_n is selected
 - **THEN** the returned patterns are ordered highest fitness first
+
+#### Scenario: Bass/melody crossover splice point is randomized
+- **GIVEN** two bass or melody seed patterns spanning multiple bars
+- **WHEN** crossover is applied across multiple breeding calls
+- **THEN** the bar-boundary splice point varies rather than always splitting at the
+  midpoint
 

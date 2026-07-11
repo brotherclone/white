@@ -173,6 +173,53 @@ class TestRemoveFromSide:
         assert resp.status_code == 404
 
 
+class TestSongMixInfo:
+    def test_info_for_song_with_mix(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=42.0)
+        resp = client.get(f"/songs/{song_id}/mix/info")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["has_mix"] is True
+        assert body["duration_seconds"] == 42.0
+        assert body["mix_file"] is not None
+
+    def test_info_for_song_without_mix(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_two")
+        resp = client.get(f"/songs/{song_id}/mix/info")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["has_mix"] is False
+        assert body["mix_file"] is None
+        assert body["duration_seconds"] is None
+
+    def test_info_unknown_song_404(self, client):
+        resp = client.get("/songs/nope__nope/mix/info")
+        assert resp.status_code == 404
+
+
+class TestSongMixStream:
+    def test_stream_returns_wav_content_type(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=5.0)
+        resp = client.get(f"/songs/{song_id}/mix")
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "audio/wav"
+
+    def test_stream_404_without_mix_file_set(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_two")
+        resp = client.get(f"/songs/{song_id}/mix")
+        assert resp.status_code == 404
+
+    def test_stream_404_when_file_missing_on_disk(self, sw_dir, client):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=5.0)
+        (sw_dir / "thread-a" / "production" / "song_one" / "mix.wav").unlink()
+        resp = client.get(f"/songs/{song_id}/mix")
+        assert resp.status_code == 404
+
+    def test_stream_unknown_song_404(self, client):
+        resp = client.get("/songs/nope__nope/mix")
+        assert resp.status_code == 404
+
+
 def _lp_consideration(client, song_id: str) -> str | None:
     songs = client.get("/songs").json()
     entry = next(s for s in songs if s["id"] == song_id)

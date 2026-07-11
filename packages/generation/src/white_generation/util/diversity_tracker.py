@@ -11,9 +11,10 @@ approved.
 
 Score multipliers
 -----------------
-- Template used in 0 songs   → 1.1×  (novelty bonus)
-- Template used in 1–2 songs → 1.0×  (neutral)
-- Template used in 3+ songs  → 0.75× (repetition penalty)
+- Template used in 0 songs → 1.15× (novelty bonus)
+- Template used in 1 song   → 1.0×  (neutral)
+- Template used in 2+ songs → max(0.35, 0.6 - 0.1 * (uses - 2)) (repetition
+  penalty, deepening with each additional use, floored at 0.35×)
 """
 
 from __future__ import annotations
@@ -23,9 +24,10 @@ from pathlib import Path
 from typing import Optional
 
 REGISTRY_FILENAME = "used_templates.json"
-PENALTY_THRESHOLD = 3  # uses at or above this → apply penalty
-PENALTY_FACTOR = 0.75
-BONUS_FACTOR = 1.1
+PENALTY_THRESHOLD = 2  # uses at or above this → apply penalty
+PENALTY_FLOOR = 0.35
+PENALTY_BASE = 0.6
+BONUS_FACTOR = 1.15
 
 
 # ---------------------------------------------------------------------------
@@ -79,15 +81,15 @@ def save_registry(album_dir: Path, registry: dict[str, int]) -> None:
 def diversity_factor(template_name: str, registry: dict[str, int]) -> float:
     """Return the score multiplier for a template given the current registry.
 
-    0 prior uses   → BONUS_FACTOR  (1.1)
-    1–2 prior uses → 1.0
-    3+ prior uses  → PENALTY_FACTOR (0.75)
+    0 prior uses → BONUS_FACTOR (1.15)
+    1 prior use  → 1.0
+    2+ prior uses → max(PENALTY_FLOOR, PENALTY_BASE - 0.1 * (uses - 2))
     """
     count = registry.get(template_name, 0)
     if count == 0:
         return BONUS_FACTOR
     if count >= PENALTY_THRESHOLD:
-        return PENALTY_FACTOR
+        return max(PENALTY_FLOOR, PENALTY_BASE - 0.1 * (count - 2))
     return 1.0
 
 
