@@ -97,11 +97,27 @@ function SongNotesModal({ song, onClose }: { song: SongEntry; onClose: () => voi
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchSongMixInfo(song.id).then(setMixInfo);
+    let cancelled = false;
+    setMixInfo(null);
+    setLoadingEntries(true);
+
+    fetchSongMixInfo(song.id).then((info) => {
+      if (!cancelled) setMixInfo(info);
+    });
     fetchDiaryEntries(song.production_slug)
-      .then((fetched) => setEntries([...fetched].reverse()))
-      .catch(() => setEntries([]))
-      .finally(() => setLoadingEntries(false));
+      .then((fetched) => {
+        if (!cancelled) setEntries([...fetched].reverse());
+      })
+      .catch(() => {
+        if (!cancelled) setEntries([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingEntries(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [song.id, song.production_slug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
