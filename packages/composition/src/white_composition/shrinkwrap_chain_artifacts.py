@@ -458,6 +458,25 @@ _SKIP_PROPOSALS = {"evp.yml", "all_song_proposals.yml"}
 _PROPOSAL_REQUIRED_KEYS = {"bpm", "key", "rainbow_color"}
 
 
+def _extract_time_sig(proposal: dict) -> str:
+    """Derive a "N/N" time signature string from a raw proposal dict.
+
+    Mirrors the tempo-parsing in production_plan.load_song_proposal(): a
+    proposal may carry a nested {numerator, denominator} tempo dict, a flat
+    "N/N" tempo string, or a flat time_sig field. Defaults to 4/4 when none
+    of those are present.
+    """
+    tempo = proposal.get("tempo", {})
+    if isinstance(tempo, dict) and tempo:
+        return f"{tempo.get('numerator', 4)}/{tempo.get('denominator', 4)}"
+    if isinstance(tempo, str) and "/" in tempo:
+        return tempo
+    time_sig = proposal.get("time_sig")
+    if isinstance(time_sig, str) and "/" in time_sig:
+        return time_sig
+    return "4/4"
+
+
 def scaffold_song_productions(
     thread_dest_dir: Path, yml_dir: Path, force: bool = False
 ) -> list[str]:
@@ -498,8 +517,10 @@ def scaffold_song_productions(
         bootstrap = {
             "schema_version": SHRINKWRAP_SCHEMA_VERSION,
             "title": proposal.get("title") or slug,
+            "thread_slug": thread_dest_dir.name,
             "key": proposal.get("key"),
             "bpm": proposal.get("bpm"),
+            "time_sig": _extract_time_sig(proposal),
             "rainbow_color": rainbow_color,
             "singer": proposal.get("singer") or None,
             "sounds_like": proposal.get("sounds_like") or [],
@@ -649,9 +670,11 @@ def _synthesize_bootstrap_stub(prod_dir: Path) -> dict:
         "schema_version": SHRINKWRAP_SCHEMA_VERSION,
         "stub": True,
         "title": title,
+        "thread_slug": prod_dir.parent.parent.name,
         "rainbow_color": rainbow_color,
         "bpm": None,
         "key": None,
+        "time_sig": None,
         "singer": None,
     }
     manifest_path = prod_dir / "manifest_bootstrap.yml"
