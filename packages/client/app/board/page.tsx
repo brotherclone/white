@@ -5,14 +5,15 @@ import Link from "next/link";
 import {
   fetchSongs, fetchActiveSong, fetchComposition, activateSong, advanceStage, addVersion,
   runNextPhase, getRunStatus, fetchLyrics, approveLyric, promotePhase,
-  autoSplitMelody, assembleMelody, syncArrangement, fetchMixInfo, setMixFile, mixStreamUrl, setBpm,
-  fetchWorkOrders, fetchCollaborators, createDiaryEntry, regressStage,
+  autoSplitMelody, assembleMelody, syncArrangement, fetchSongMixInfo, setMixFile, songMixStreamUrl, setBpm,
+  fetchWorkOrders, fetchCollaborators, regressStage,
   setLifecycleStatus, fetchScrappedSongs, setUsesPartsFrom,
 } from "@/lib/api";
 import { Collaborator, CompositionEntry, LifecycleStatus, LyricCandidate, LyricsResponse, MIX_STAGES, MixStage, RegressionInfo, RunJob, SongEntry, WorkOrder } from "@/lib/types";
 import WorkOrderHud from "@/components/WorkOrderHud";
 import WorkOrderDrawer from "@/components/WorkOrderDrawer";
 import { Combobox, ComboboxOption } from "@/components/Combobox";
+import { NotesButton, SongNotesModal } from "@/components/SongNotes";
 
 const STAGE_LABELS: Record<MixStage, string> = {
   structure:          "Structure",
@@ -102,121 +103,6 @@ function LyricModal({
             </button>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function DiaryModal({
-  songSlug,
-  defaultPhase,
-  onClose,
-}: {
-  songSlug: string;
-  defaultPhase: string;
-  onClose: () => void;
-}) {
-  const [author, setAuthor] = useState("");
-  const [phase, setPhase] = useState(defaultPhase);
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setError(null);
-    try {
-      await createDiaryEntry(songSlug, {
-        song_slug: songSlug,
-        author,
-        phase: phase || null,
-        title: title || null,
-        body,
-        tags: [],
-        metadata: {},
-      });
-      onClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="relative bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-lg mx-4 flex flex-col shadow-2xl"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 flex-shrink-0">
-          <span className="text-sm font-semibold text-white font-sans">New diary entry</span>
-          <button
-            onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-200 text-lg leading-none transition-colors"
-            aria-label="Close"
-          >
-            ×
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 px-5 py-4">
-          <div className="flex gap-3">
-            <label className="flex flex-col gap-1 flex-1">
-              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Author</span>
-              <input
-                type="text"
-                value={author}
-                onChange={e => setAuthor(e.target.value)}
-                required
-                placeholder="gabriel"
-                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
-              />
-            </label>
-            <label className="flex flex-col gap-1 flex-1">
-              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Phase</span>
-              <input
-                type="text"
-                value={phase}
-                onChange={e => setPhase(e.target.value)}
-                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
-              />
-            </label>
-          </div>
-          <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Title</span>
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="optional headline"
-              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Body</span>
-            <textarea
-              value={body}
-              onChange={e => setBody(e.target.value)}
-              required
-              rows={4}
-              placeholder="what happened?"
-              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none transition-colors"
-            />
-          </label>
-          {error && <p className="text-[10px] font-sans text-red-400">{error}</p>}
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full py-2 text-sm font-sans font-semibold rounded-lg bg-violet-700 hover:bg-violet-600 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            {saving ? "Saving…" : "Save entry"}
-          </button>
-        </form>
       </div>
     </div>
   );
@@ -332,7 +218,7 @@ export default function BoardPage() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [workOrderDrawerOpen, setWorkOrderDrawerOpen] = useState(false);
-  const [diaryModal, setDiaryModal] = useState<{ stage: MixStage } | null>(null);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [regressionModal, setRegressionModal] = useState<{ targetStage: MixStage; info: RegressionInfo } | null>(null);
   const [confirmingRegress, setConfirmingRegress] = useState(false);
   // Lifecycle panel state
@@ -387,14 +273,19 @@ export default function BoardPage() {
 
   const refresh = useCallback(async () => {
     try {
-      const [comp, active, mixInfo] = await Promise.all([fetchComposition(), fetchActiveSong(), fetchMixInfo()]);
+      const [comp, active] = await Promise.all([fetchComposition(), fetchActiveSong()]);
       if ("status" in comp && comp.status === "not_initialized") {
         setLoadState("not_initialized");
         return;
       }
       setComposition(comp as CompositionEntry);
       setActiveSong(active.active);
-      setMixFileState(mixInfo.has_mix ? mixInfo.mix_file : null);
+      if (active.active) {
+        const mixInfo = await fetchSongMixInfo(active.active.id);
+        setMixFileState(mixInfo.has_mix ? mixInfo.mix_file : null);
+      } else {
+        setMixFileState(null);
+      }
       setLoadState("ready");
       // Load work orders + collaborators in the background (non-blocking)
       fetchWorkOrders().then(setWorkOrders).catch(() => {});
@@ -651,13 +542,9 @@ export default function BoardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-200 font-mono">
-      {/* Diary modal */}
-      {diaryModal && composition && (
-        <DiaryModal
-          songSlug={composition.production_slug}
-          defaultPhase={STAGE_LABELS[diaryModal.stage]}
-          onClose={() => setDiaryModal(null)}
-        />
+      {/* Diary / notes modal */}
+      {notesOpen && activeSong && (
+        <SongNotesModal song={activeSong} onClose={() => setNotesOpen(false)} onUpdated={refresh} />
       )}
 
       {/* Regression modal */}
@@ -723,6 +610,9 @@ export default function BoardPage() {
             >
               {addingVersion ? "Adding…" : `+ Version (v${composition.current_version})`}
             </button>
+          )}
+          {activeSong && (
+            <NotesButton title={activeSong.title} onOpen={() => setNotesOpen(true)} label="Diary" />
           )}
         </div>
       </div>
@@ -808,7 +698,7 @@ export default function BoardPage() {
             </div>
           )}
 
-          {mixFile ? (
+          {mixFile && activeSong ? (
             <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 mb-4">
               <span className="text-[10px] font-sans uppercase tracking-wide text-zinc-600 whitespace-nowrap" title="Full song mix, separate from any per-stage take shown below">
                 Song mix
@@ -816,7 +706,7 @@ export default function BoardPage() {
               <audio
                 key={mixFile}
                 controls
-                src={mixStreamUrl()}
+                src={songMixStreamUrl(activeSong.id)}
                 className="h-8 flex-1 min-w-0"
                 style={{ colorScheme: "dark" }}
               />
@@ -1140,7 +1030,7 @@ export default function BoardPage() {
                             isCurrent ? "bg-zinc-800 border-zinc-700" : "bg-zinc-900 border-zinc-800 opacity-70"
                           }`}
                         >
-                          <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <div className="flex items-center justify-between gap-1">
                             <span className={`text-xs font-semibold ${isCurrent ? "text-zinc-300" : "text-zinc-500"}`}>
                               v{v.version}
                             </span>
@@ -1148,12 +1038,6 @@ export default function BoardPage() {
                               {new Date(v.created).toLocaleDateString()}
                             </span>
                           </div>
-                          <button
-                            onClick={() => setDiaryModal({ stage })}
-                            className="text-[10px] font-sans text-zinc-600 hover:text-zinc-400 transition-colors"
-                          >
-                            + diary entry
-                          </button>
                         </div>
                       ))
                     }
