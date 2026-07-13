@@ -224,8 +224,8 @@ export function NotesButton({
         e.stopPropagation();
         onOpen();
       }}
-      aria-label={`Listen and add notes for ${title}`}
-      title="Listen / diary notes"
+      aria-label={label ? `${label} for ${title}` : `Listen and add notes for ${title}`}
+      title={label ? `${label} / diary notes` : "Listen / diary notes"}
       className={`shrink-0 flex items-center justify-center gap-2 border border-[var(--ef-gray)] bg-transparent text-[#c9c9c9] hover:text-[var(--ef-orange)] hover:border-[var(--ef-orange)] transition-[color,border-color] duration-500 ease-in-out ${
         label ? "h-[34px] px-3 text-xs font-sans" : "w-[34px] h-[34px]"
       }`}

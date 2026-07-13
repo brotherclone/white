@@ -345,7 +345,9 @@ export default function SidesPage() {
     .filter((s) => s.lifecycle_status !== "abandoned")
     .filter((s) => showUnmixed || s.has_mix)
     .filter((s) => !poolSearch || s.title.toLowerCase().includes(poolSearch.toLowerCase()));
-  const unmixedHiddenCount = songs.filter((s) => !assignedIds.has(s.id) && !s.has_mix).length;
+  const unmixedHiddenCount = songs.filter(
+    (s) => !assignedIds.has(s.id) && s.lifecycle_status !== "abandoned" && !s.has_mix,
+  ).length;
   const allAssigned = songs.length > 0 && songs.every((s) => assignedIds.has(s.id));
 
   const totalUsedSeconds = sides

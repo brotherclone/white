@@ -466,9 +466,11 @@ def _extract_time_sig(proposal: dict) -> str:
     "N/N" tempo string, or a flat time_sig field. Defaults to 4/4 when none
     of those are present.
     """
-    tempo = proposal.get("tempo", {})
+    tempo = proposal.get("tempo") or {}
     if isinstance(tempo, dict) and tempo:
-        return f"{tempo.get('numerator', 4)}/{tempo.get('denominator', 4)}"
+        numerator = tempo.get("numerator") or 4
+        denominator = tempo.get("denominator") or 4
+        return f"{numerator}/{denominator}"
     if isinstance(tempo, str) and "/" in tempo:
         return tempo
     time_sig = proposal.get("time_sig")
