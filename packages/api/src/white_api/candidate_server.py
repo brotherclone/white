@@ -1175,12 +1175,23 @@ def create_app(
                 rv = _yaml.safe_load(f) or {}
             if "bpm" in rv:
                 rv["bpm"] = new_bpm
-                tmp = review_path.with_suffix(".yml.tmp")
-                with open(tmp, "w") as f:
-                    _yaml.dump(
-                        rv, f, allow_unicode=True, sort_keys=False, width=float("inf")
-                    )
-                tmp.replace(review_path)
+                tmp_fd, tmp_path = tempfile.mkstemp(
+                    dir=review_path.parent, suffix=".yml.tmp"
+                )
+                try:
+                    with os.fdopen(tmp_fd, "w") as f:
+                        _yaml.dump(
+                            rv,
+                            f,
+                            allow_unicode=True,
+                            sort_keys=False,
+                            width=float("inf"),
+                        )
+                    os.replace(tmp_path, review_path)
+                except Exception:
+                    with contextlib.suppress(OSError):
+                        os.unlink(tmp_path)
+                    raise
                 updated_files.append(str(review_path.relative_to(prod)))
 
         # 3. Retime all approved MIDI files
@@ -2113,19 +2124,25 @@ def create_app(
         decided_ids = {c["id"] for c in decided}
         new_candidates = [c for c in new_candidates if c.get("id") not in decided_ids]
         review["candidates"] = decided + new_candidates
-        # Atomic write so a mid-dump crash can't leave review.yml empty.
+        # Atomic write so a mid-dump crash (or a concurrent writer) can't
+        # leave review.yml empty or racing another writer's temp file.
         review_path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = review_path.with_suffix(".yml.tmp")
-        with open(tmp, "w") as f:
-            yaml.dump(
-                review,
-                f,
-                default_flow_style=False,
-                sort_keys=False,
-                allow_unicode=True,
-                width=float("inf"),
-            )
-        tmp.replace(review_path)
+        tmp_fd, tmp_path = tempfile.mkstemp(dir=review_path.parent, suffix=".yml.tmp")
+        try:
+            with os.fdopen(tmp_fd, "w") as f:
+                yaml.dump(
+                    review,
+                    f,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    allow_unicode=True,
+                    width=float("inf"),
+                )
+            os.replace(tmp_path, review_path)
+        except Exception:
+            with contextlib.suppress(OSError):
+                os.unlink(tmp_path)
+            raise
         return len(decided)
 
     class EvolveBody(BaseModel):

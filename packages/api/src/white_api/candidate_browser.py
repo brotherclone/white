@@ -18,9 +18,12 @@ Keymap:
 """
 
 import argparse
+import contextlib
+import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import termios
 import tty
 from dataclasses import dataclass, field
@@ -153,18 +156,24 @@ def _update_review_yml(review_yml: Path, candidate_id: str, **fields) -> None:
         if c.get("id") == candidate_id:
             c.update(fields)
             break
-    # Atomic write: dump to a temp file then rename so a mid-write crash
-    # never leaves review.yml empty or truncated.
-    tmp = review_yml.with_suffix(".yml.tmp")
-    with open(tmp, "w") as f:
-        yaml.dump(
-            data,
-            f,
-            allow_unicode=True,
-            sort_keys=False,
-            width=float("inf"),
-        )
-    tmp.replace(review_yml)
+    # Atomic write: dump to a uniquely-named temp file then rename so a
+    # mid-write crash (or a concurrent approve/reject on the same file)
+    # never leaves review.yml empty, truncated, or racing another writer.
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=review_yml.parent, suffix=".yml.tmp")
+    try:
+        with os.fdopen(tmp_fd, "w") as f:
+            yaml.dump(
+                data,
+                f,
+                allow_unicode=True,
+                sort_keys=False,
+                width=float("inf"),
+            )
+        os.replace(tmp_path, review_yml)
+    except Exception:
+        with contextlib.suppress(OSError):
+            os.unlink(tmp_path)
+        raise
 
 
 def approve_candidate(entry: CandidateEntry) -> None:
