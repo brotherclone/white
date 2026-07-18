@@ -450,7 +450,7 @@ export default function BoardPage() {
     setSettingMix(true);
     setError(null);
     try {
-      await setMixFile(mixPathInput.trim());
+      await setMixFile(mixPathInput.trim(), activeSong?.id);
       setMixFileState(mixPathInput.trim());
       setMixPathInput("");
       setShowMixInput(false);

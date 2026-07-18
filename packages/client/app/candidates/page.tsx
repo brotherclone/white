@@ -596,7 +596,7 @@ export default function CandidatesPage() {
                 {playingId === c.id && (
                   <tr key={`${c.id}-player`} className="bg-zinc-900/60 border-b border-zinc-800/60">
                     <td colSpan={9} className="px-4 py-3">
-                      <MidiPlayer url={midiUrl(c.id)} />
+                      <MidiPlayer url={midiUrl(c.id, activeSong?.id)} />
                     </td>
                   </tr>
                 )}

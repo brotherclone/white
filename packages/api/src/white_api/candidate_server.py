@@ -1390,15 +1390,13 @@ def create_app(
     class MixFileBody(BaseModel):
         path: str
 
-    @app.post("/production/mix/set")
-    def set_mix_file(body: MixFileBody):
-        prod = _require_production_dir()
+    def _write_mix_file(prod: Path, path: str) -> None:
         ctx_path = prod / "song_context.yml"
         if not ctx_path.exists():
             raise HTTPException(status_code=404, detail="song_context.yml not found")
         with open(ctx_path) as f:
             ctx = yaml.safe_load(f) or {}
-        ctx["mix_file"] = body.path
+        ctx["mix_file"] = path
         with open(ctx_path, "w") as f:
             yaml.dump(
                 ctx,
@@ -1408,6 +1406,21 @@ def create_app(
                 allow_unicode=True,
                 width=float("inf"),
             )
+
+    @app.post("/production/mix/set")
+    def set_mix_file(body: MixFileBody):
+        prod = _require_production_dir()
+        _write_mix_file(prod, body.path)
+        return {"ok": True, "mix_file": body.path}
+
+    @app.post("/songs/{song_id}/mix/set")
+    def set_song_mix_file(song_id: str, body: MixFileBody):
+        """Song-scoped mix write — resolves the production dir from song_id
+        directly rather than the mutable `_production_dir` global, so a
+        stale/desynced active-song pointer can't attach a mix to the wrong song.
+        """
+        _, prod_dir = _resolve_song(song_id)
+        _write_mix_file(prod_dir, body.path)
         return {"ok": True, "mix_file": body.path}
 
     @app.get("/production/mix")
@@ -1635,6 +1648,44 @@ def create_app(
         return FileResponse(str(mix_path), media_type=media_type)
 
     # ------------------------------------------------------------------
+    # Listening-playlist sync
+    # ------------------------------------------------------------------
+
+    @app.get("/playlists/config")
+    def get_playlist_config():
+        from white_composition.playlist_sync import load_playlist_config
+
+        album_dir = _require_shrink_wrapped_dir()
+        config = load_playlist_config(album_dir)
+        return {"output_dir": config.output_dir}
+
+    class PlaylistConfigBody(BaseModel):
+        output_dir: str
+
+    @app.post("/playlists/config")
+    def set_playlist_config(body: PlaylistConfigBody):
+        from white_composition.playlist_sync import PlaylistConfig, save_playlist_config
+
+        album_dir = _require_shrink_wrapped_dir()
+        save_playlist_config(album_dir, PlaylistConfig(output_dir=body.output_dir))
+        return {"ok": True, "output_dir": body.output_dir}
+
+    @app.post("/playlists/sync")
+    def sync_playlists_endpoint():
+        from white_composition.lp_sides import load_sides
+        from white_composition.playlist_sync import load_playlist_config, sync_playlists
+
+        album_dir = _require_shrink_wrapped_dir()
+        config = load_playlist_config(album_dir)
+        sides_doc = load_sides(album_dir)
+        songs = scan_songs(album_dir)
+        try:
+            counts = sync_playlists(songs, sides_doc, config.output_dir)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        return counts
+
+    # ------------------------------------------------------------------
     # Lyrics review
     # ------------------------------------------------------------------
 
@@ -1806,6 +1857,29 @@ def create_app(
             path=str(entry.midi_file),
             media_type="audio/midi",
             filename=entry.midi_file.name,
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @app.get("/songs/{song_id}/midi/{candidate_id}")
+    def get_song_midi(song_id: str, candidate_id: str):
+        """Song-scoped MIDI lookup — bypasses the mutable `_production_dir`
+        global so candidate ids that repeat across songs (e.g. chord_001..010)
+        can't resolve against whichever song was last activated.
+        """
+        _, prod_dir = _resolve_song(song_id)
+        entries = load_all_candidates(prod_dir)
+        entry = next((e for e in entries if e.candidate_id == candidate_id), None)
+        if entry is None:
+            raise HTTPException(
+                status_code=404, detail=f"Candidate '{candidate_id}' not found"
+            )
+        if not entry.midi_file.exists():
+            raise HTTPException(status_code=404, detail="MIDI file not found")
+        return FileResponse(
+            path=str(entry.midi_file),
+            media_type="audio/midi",
+            filename=entry.midi_file.name,
+            headers={"Cache-Control": "no-store"},
         )
 
     @app.get("/production-dir")

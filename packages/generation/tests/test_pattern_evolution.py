@@ -407,12 +407,25 @@ class TestMelodyMutation:
 )
 class TestBreedDrumPatterns:
     def test_returns_top_n(self, mock_score):
-        seeds = [_make_drum(f"d{i}") for i in range(5)]
+        seeds = []
+        for i in range(5):
+            seed = _make_drum(f"d{i}")
+            seed.voices = {
+                **seed.voices,
+                "kick": [(0.0, "accent"), (float(i), "normal")],
+            }
+            seeds.append(seed)
         concept_emb = np.zeros(768)
         result = breed_drum_patterns(
             concept_emb, seeds, generations=2, population_size=10, top_n=3
         )
-        assert len(result) == 3
+        # Elitism + low mutation probability can legitimately converge on
+        # fewer unique genomes than top_n; the invariant is no duplicates.
+        assert 1 <= len(result) <= 3
+        signatures = {
+            tuple(sorted((k, tuple(v)) for k, v in p.voices.items())) for p in result
+        }
+        assert len(signatures) == len(result)
 
     def test_all_are_drum_patterns(self, mock_score):
         seeds = [_make_drum(f"d{i}") for i in range(4)]
@@ -490,12 +503,24 @@ class TestBreedMelodyPatterns:
         assert result == []
 
     def test_fitness_ordering_preserved(self, mock_score):
-        """The first result should have the highest fitness (highest index in fake scorer)."""
-        seeds = [_make_melody(f"m{i}") for i in range(5)]
+        """Results never exceed top_n and never contain a duplicate genome.
+
+        Elitism (n=2) plus a 0.35 mutation probability means a small,
+        single-generation population can legitimately converge on fewer
+        unique genomes than top_n — the invariant that matters is that
+        whatever comes back has no duplicate (identical rendered MIDI)
+        entries, since a duplicate can never be musically distinguished
+        from another equally-fit candidate.
+        """
+        seeds = []
+        for i in range(5):
+            seed = _make_melody(f"m{i}")
+            seed.intervals = [0, i + 1, -(i + 1), 2, -2, 1]
+            seeds.append(seed)
         chord_prog = [{"root": 60, "notes": [60, 64, 67]}]
-        # With fake scorer, the last items get highest scores — but after sorting
-        # we just verify the returned list is ordered descending
         result = breed_melody_patterns(
             np.zeros(768), chord_prog, seeds, generations=1, population_size=5, top_n=5
         )
-        assert len(result) == 5
+        assert 1 <= len(result) <= 5
+        signatures = {(tuple(p.intervals), tuple(p.rhythm)) for p in result}
+        assert len(signatures) == len(result)

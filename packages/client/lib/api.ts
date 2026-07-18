@@ -41,7 +41,13 @@ export async function setLabel(id: string, label: string) {
   return res.json();
 }
 
-export function midiUrl(id: string) {
+export function midiUrl(id: string, songId?: string) {
+  // Song-scoped when possible: candidate ids (e.g. chord_001) repeat across
+  // every song, so the unscoped route can resolve against whichever song the
+  // server last activated. Scoping by songId gives each song a distinct URL.
+  if (songId) {
+    return `${BASE}/songs/${encodeURIComponent(songId)}/midi/${encodeURIComponent(id)}`;
+  }
   return `${BASE}/midi/${encodeURIComponent(id)}`;
 }
 
@@ -449,8 +455,15 @@ export async function fetchMixInfo(): Promise<{ has_mix: boolean; mix_file: stri
   return res.json();
 }
 
-export async function setMixFile(path: string): Promise<void> {
-  const res = await fetch(`${BASE}/production/mix/set`, {
+export async function setMixFile(path: string, songId?: string): Promise<void> {
+  // Song-scoped when possible: the unscoped route writes into whichever
+  // production dir the server's global "active song" currently points at,
+  // which can desync from what's on screen. Scoping by songId resolves the
+  // production dir directly from the request instead.
+  const url = songId
+    ? `${BASE}/songs/${encodeURIComponent(songId)}/mix/set`
+    : `${BASE}/production/mix/set`;
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path }),
@@ -475,6 +488,34 @@ export async function fetchSongMixInfo(
 
 export function songMixStreamUrl(songId: string): string {
   return `${BASE}/songs/${encodeURIComponent(songId)}/mix`;
+}
+
+export async function fetchPlaylistConfig(): Promise<{ output_dir: string }> {
+  const res = await fetch(`${BASE}/playlists/config`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch playlist config");
+  return res.json();
+}
+
+export async function setPlaylistConfig(outputDir: string): Promise<{ ok: boolean; output_dir: string }> {
+  const res = await fetch(`${BASE}/playlists/config`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ output_dir: outputDir }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Failed to set playlist config");
+  }
+  return res.json();
+}
+
+export async function syncPlaylists(): Promise<{ rejects: number; review: number; wip: number }> {
+  const res = await fetch(`${BASE}/playlists/sync`, { method: "POST" });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Sync failed");
+  }
+  return res.json();
 }
 
 export async function fetchSamples(topN?: number): Promise<import("./types").SampleEntry[]> {

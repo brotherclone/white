@@ -405,6 +405,38 @@ class TestTemplateSelection:
         assert "ambient" in families
         assert "electronic" in families
 
+    def test_5_8_ambient_electronic_experimental(self):
+        """Regression: drum_pipeline raised 'No drum templates for 5/8 +
+        [ambient, electronic, experimental]' before these templates existed.
+        """
+        from white_generation.patterns.drum_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
+
+        for energy in ("low", "medium", "high"):
+            result = select_templates(
+                ALL_TEMPLATES,
+                (5, 8),
+                ["ambient", "electronic", "experimental"],
+                energy,
+            )
+            assert result, f"no 5/8 templates found at energy={energy}"
+            for t in result:
+                assert t.time_sig == (5, 8)
+                assert t.genre_family in ("ambient", "electronic", "experimental")
+
+    def test_5_8_bar_length_and_onsets_in_range(self):
+        from white_generation.patterns.drum_patterns import ALL_TEMPLATES
+
+        five_eight = [t for t in ALL_TEMPLATES if t.time_sig == (5, 8)]
+        assert five_eight
+        for t in five_eight:
+            assert t.bar_length_beats() == 2.5
+            for onsets in t.voices.values():
+                for pos, _velocity in onsets:
+                    assert 0 <= pos < 2.5, f"{t.name}: onset {pos} out of range"
+
 
 # ---------------------------------------------------------------------------
 # 5. Drum MIDI generation

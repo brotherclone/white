@@ -208,6 +208,24 @@ def _tournament_select(
     return population[best]
 
 
+def _dedup_and_rank(
+    population: list[Any], midi_list: list[bytes], fitness: list[float], top_n: int
+) -> list[Any]:
+    """Collapse genomes that render to identical MIDI before taking the top_n.
+
+    Elitism and low-probability mutation let identical genomes persist across
+    generations unchanged; without this, `top_n` can be several copies of the
+    same pattern rather than distinct candidates.
+    """
+    best_by_midi: dict[bytes, tuple[float, int]] = {}
+    for idx, (midi, fit) in enumerate(zip(midi_list, fitness)):
+        current = best_by_midi.get(midi)
+        if current is None or fit > current[0]:
+            best_by_midi[midi] = (fit, idx)
+    ranked = sorted(best_by_midi.values(), key=lambda x: x[0], reverse=True)
+    return [population[idx] for _, idx in ranked[:top_n]]
+
+
 def _elite_indices(fitness: list[float], n: int = _ELITISM_N) -> list[int]:
     """Return indices of the top-n fittest individuals."""
     return sorted(range(len(fitness)), key=lambda i: fitness[i], reverse=True)[:n]
@@ -499,15 +517,7 @@ def breed_drum_patterns(
     # Final scoring and selection
     midi_list = [_drum_to_midi(p) for p in population]
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [
-        p
-        for _, _, p in sorted(
-            zip(fitness, range(len(population)), population),
-            key=lambda x: x[0],
-            reverse=True,
-        )
-    ]
-    return sorted_pop[:top_n]
+    return _dedup_and_rank(population, midi_list, fitness, top_n)
 
 
 def breed_bass_patterns(
@@ -566,15 +576,7 @@ def breed_bass_patterns(
         except Exception:
             midi_list.append(b"")
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [
-        p
-        for _, _, p in sorted(
-            zip(fitness, range(len(population)), population),
-            key=lambda x: x[0],
-            reverse=True,
-        )
-    ]
-    return sorted_pop[:top_n]
+    return _dedup_and_rank(population, midi_list, fitness, top_n)
 
 
 def breed_melody_patterns(
@@ -633,12 +635,4 @@ def breed_melody_patterns(
         except Exception:
             midi_list.append(b"")
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [
-        p
-        for _, _, p in sorted(
-            zip(fitness, range(len(population)), population),
-            key=lambda x: x[0],
-            reverse=True,
-        )
-    ]
-    return sorted_pop[:top_n]
+    return _dedup_and_rank(population, midi_list, fitness, top_n)
