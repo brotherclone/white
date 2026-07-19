@@ -981,6 +981,75 @@ TEMPLATES_5_4 = [
     ),
 ]
 
+# ---------------------------------------------------------------------------
+# 5/8 Templates
+# ---------------------------------------------------------------------------
+# 5/8 = 5 eighth notes = 2.5 quarter-note beats. Positions are in quarter-note
+# beats: 0, 0.5, 1, 1.5, 2. Common grouping: 3+2 (strong on 1 and position 1.5).
+
+TEMPLATES_5_8 = [
+    MelodyPattern(
+        name="five_eight_stepwise",
+        contour="stepwise",
+        energy="low",
+        time_sig=(5, 8),
+        description="Stepwise descent, held close — elegiac 5/8 phrase",
+        intervals=[0, -2, -1],
+        rhythm=[0.0, 1.0, 1.5],
+        durations=[1.0, 0.5, 1.0],
+    ),
+    MelodyPattern(
+        name="five_eight_stepwise_rise",
+        contour="stepwise",
+        energy="medium",
+        time_sig=(5, 8),
+        description="Ascending step across the 3+2 grouping",
+        intervals=[0, 2, 1, -1],
+        rhythm=[0.0, 0.5, 1.0, 1.5],
+        durations=[0.5, 0.5, 0.5, 1.0],
+    ),
+    MelodyPattern(
+        name="five_eight_arp",
+        contour="arpeggiated",
+        energy="medium",
+        time_sig=(5, 8),
+        description="Triad arpeggio up on group starts",
+        intervals=[0, 4, 3],
+        rhythm=[0.0, 1.5, 2.0],
+        durations=[1.5, 0.5, 0.5],
+    ),
+    MelodyPattern(
+        name="five_eight_arp_fall",
+        contour="arpeggiated",
+        energy="low",
+        time_sig=(5, 8),
+        description="Falling arpeggio — high note drifting down, held close",
+        intervals=[0, -3, -4],
+        rhythm=[0.0, 1.0, 1.5],
+        durations=[1.0, 0.5, 1.0],
+    ),
+    MelodyPattern(
+        name="five_eight_penta",
+        contour="pentatonic",
+        energy="high",
+        time_sig=(5, 8),
+        description="Pentatonic run across the full 5/8 bar in eighths",
+        intervals=[0, 2, 3, 2, -2],
+        rhythm=[0.0, 0.5, 1.0, 1.5, 2.0],
+        durations=[0.5, 0.5, 0.5, 0.5, 0.5],
+    ),
+    MelodyPattern(
+        name="five_eight_repeated",
+        contour="repeated",
+        energy="low",
+        time_sig=(5, 8),
+        description="Two-note motif, held close — 5/8 breath",
+        intervals=[0, 0, 2],
+        rhythm=[0.0, 1.0, 1.5],
+        durations=[1.0, 0.5, 1.0],
+    ),
+]
+
 _EXISTING_LEAD_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_STEPWISE,
     *TEMPLATES_4_4_ARPEGGIATED,
@@ -990,6 +1059,7 @@ _EXISTING_LEAD_TEMPLATES: list[MelodyPattern] = [
     *TEMPLATES_4_4_SCALAR,
     *TEMPLATES_3_4,
     *TEMPLATES_5_4,
+    *TEMPLATES_5_8,
     *TEMPLATES_7_8,
     *TEMPLATES_6_8_LEAD,
 ]
@@ -1802,6 +1872,61 @@ VOCAL_5_4 = [
     ),
 ]
 
+# ---------------------------------------------------------------------------
+# 5/8 Vocal
+# (bar = 2.5 beats; >= 1 gap of >= 0.5 beats or anacrusis opening, >= 1 note
+# with duration >= 1.5 — see test_vocal_templates_have_rest_gap /
+# test_vocal_templates_have_held_note, which apply to every use_case="vocal"
+# template regardless of time signature)
+# ---------------------------------------------------------------------------
+
+VOCAL_5_8 = [
+    MelodyPattern(
+        name="vocal_5_8_hold_low",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="low",
+        time_sig=(5, 8),
+        description="5/8 held note, breath, short step-down close",
+        intervals=[0, -2],
+        rhythm=[0.0, 2.0],
+        durations=[1.5, 0.5],
+    ),
+    MelodyPattern(
+        name="vocal_5_8_call_rest_low",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="low",
+        time_sig=(5, 8),
+        description="5/8 short call, breath, long held resolution",
+        intervals=[0, -3],
+        rhythm=[0.0, 1.0],
+        durations=[0.5, 1.5],
+    ),
+    MelodyPattern(
+        name="vocal_5_8_haiku_med",
+        contour="haiku",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(5, 8),
+        description="5/8 haiku — anacrusis opening, short-short-LONG resolution",
+        intervals=[0, 2, -3],
+        rhythm=[0.5, 0.75, 1.0],
+        durations=[0.25, 0.25, 1.5],
+    ),
+    MelodyPattern(
+        name="vocal_5_8_surge_high",
+        contour="declarative",
+        use_case="vocal",
+        energy="high",
+        time_sig=(5, 8),
+        description="5/8 surge — held opener, breath, three-note closing flourish",
+        intervals=[0, 2, 1, -2],
+        rhythm=[0.0, 2.0, 2.15, 2.3],
+        durations=[1.5, 0.15, 0.15, 0.2],
+    ),
+]
+
 ALL_TEMPLATES: list[MelodyPattern] = [
     # Existing templates reclassified as lead (instrument tracks)
     *_EXISTING_LEAD_TEMPLATES,
@@ -1817,6 +1942,7 @@ ALL_TEMPLATES: list[MelodyPattern] = [
     # New vocal templates for other time signatures
     *VOCAL_3_4,
     *VOCAL_5_4,
+    *VOCAL_5_8,
     *VOCAL_6_8,
     *VOCAL_7_8,
     # 4/4 Lamentful / Sparse
