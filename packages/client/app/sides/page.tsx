@@ -271,6 +271,14 @@ export default function SidesPage() {
     setSyncError(null);
     setSyncResult(null);
     try {
+      // Clicking this button blurs the directory input, which also fires
+      // handleSavePlaylistDir (onBlur) — that save and this sync would race
+      // if we didn't also save here first: awaiting it before syncing
+      // guarantees the sync always uses the latest typed directory rather
+      // than whatever was last persisted.
+      if (playlistDirInput.trim()) {
+        await setPlaylistConfig(playlistDirInput.trim());
+      }
       const result = await syncPlaylists();
       setSyncResult(result);
     } catch (e) {

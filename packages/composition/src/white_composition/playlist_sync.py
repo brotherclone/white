@@ -183,14 +183,21 @@ def _plain_bucket_filenames(songs: list[dict], prefix: str = "") -> dict[str, st
 
 
 def _wip_filenames(wip_songs: list[dict]) -> dict[str, str]:
+    """Sequenced entries are already unique via their index prefix. Unsequenced
+    entries all share the "99_unsequenced_" prefix, so — unlike the sequenced
+    ones — they need the same collision-suffix handling as the Rejects/Review
+    buckets to avoid two same-titled unsequenced songs overwriting each other.
+    """
     names: dict[str, str] = {}
+    unsequenced_entries: list[tuple[dict, str, str]] = []
     for i, song in enumerate(wip_songs):
         stem = _sanitize_filename(song["title"])
         ext = _mix_extension(song)
         if song.get("_side") is not None:
             names[song["id"]] = f"{i + 1:02d}_{song['_side']}_{stem}{ext}"
         else:
-            names[song["id"]] = f"99_unsequenced_{stem}{ext}"
+            unsequenced_entries.append((song, f"99_unsequenced_{stem}", ext))
+    names.update(_dedupe_filenames(unsequenced_entries))
     return names
 
 

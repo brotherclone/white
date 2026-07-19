@@ -213,6 +213,26 @@ class TestSyncPlaylists:
         names = sorted(p.name for p in wip_dir.iterdir())
         assert names == ["01_A_Beta.mp3", "02_B_Alpha.mp3"]
 
+    def test_unsequenced_wip_title_collision_gets_suffixed(self, tmp_path):
+        """Two unsequenced placed songs sharing a title both get the fixed
+        '99_unsequenced_' prefix — without collision suffixing they'd map to
+        the same filename and one copy would silently overwrite the other."""
+        song_1 = _make_song(tmp_path, "dup1", "Same Title", lp_consideration="placed")
+        song_2 = _make_song(tmp_path, "dup2", "Same Title", lp_consideration="placed")
+        output_dir = tmp_path / "Listening"
+
+        counts = sync_playlists(
+            [song_1, song_2], SidesDocument.empty(), str(output_dir)
+        )
+
+        assert counts["wip"] == 2
+        wip_dir = output_dir / "White Album WiP"
+        names = {p.name for p in wip_dir.iterdir()}
+        assert names == {
+            "99_unsequenced_Same Title_dup1.mp3",
+            "99_unsequenced_Same Title_dup2.mp3",
+        }
+
     def test_unchanged_file_not_recopied(self, tmp_path):
         song = _make_song(tmp_path, "r1", "Rejected", lifecycle_status="scrapped")
         output_dir = tmp_path / "Listening"
