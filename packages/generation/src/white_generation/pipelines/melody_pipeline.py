@@ -858,7 +858,14 @@ def run_melody_pipeline(
             )
 
         scored.sort(key=lambda x: x["composite"], reverse=True)
-        top = scored[:top_k]
+        seen_midi: set[bytes] = set()
+        deduped_scored = []
+        for item in scored:
+            if item["midi_bytes"] in seen_midi:
+                continue
+            seen_midi.add(item["midi_bytes"])
+            deduped_scored.append(item)
+        top = deduped_scored[:top_k]
 
         # Record the winning contour so subsequent sections are penalised for reuse
         if top:

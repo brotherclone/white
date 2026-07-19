@@ -14,7 +14,8 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
-  assignSongToSide, fetchSides, fetchSongs, moveSongBetweenSides, removeSongFromSide,
+  assignSongToSide, fetchPlaylistConfig, fetchSides, fetchSongs, moveSongBetweenSides,
+  removeSongFromSide, setPlaylistConfig, syncPlaylists,
 } from "@/lib/api";
 import { SideEntry, SideName, SideSong, SidesResponse, SongEntry } from "@/lib/types";
 import { NotesButton, SongNotesModal } from "@/components/SongNotes";
@@ -238,8 +239,54 @@ export default function SidesPage() {
   const [poolSearch, setPoolSearch] = useState("");
   const [showUnmixed, setShowUnmixed] = useState(false);
   const [notesSongId, setNotesSongId] = useState<string | null>(null);
+  const [playlistDirInput, setPlaylistDirInput] = useState("");
+  const [savingPlaylistDir, setSavingPlaylistDir] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ rejects: number; review: number; wip: number } | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
+  useEffect(() => {
+    fetchPlaylistConfig()
+      .then((config) => setPlaylistDirInput(config.output_dir))
+      .catch(() => {});
+  }, []);
+
+  const handleSavePlaylistDir = async () => {
+    if (!playlistDirInput.trim()) return;
+    setSavingPlaylistDir(true);
+    setSyncError(null);
+    try {
+      await setPlaylistConfig(playlistDirInput.trim());
+    } catch (e) {
+      setSyncError(e instanceof Error ? e.message : "Failed to save output directory");
+    } finally {
+      setSavingPlaylistDir(false);
+    }
+  };
+
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncError(null);
+    setSyncResult(null);
+    try {
+      // Clicking this button blurs the directory input, which also fires
+      // handleSavePlaylistDir (onBlur) — that save and this sync would race
+      // if we didn't also save here first: awaiting it before syncing
+      // guarantees the sync always uses the latest typed directory rather
+      // than whatever was last persisted.
+      if (playlistDirInput.trim()) {
+        await setPlaylistConfig(playlistDirInput.trim());
+      }
+      const result = await syncPlaylists();
+      setSyncResult(result);
+    } catch (e) {
+      setSyncError(e instanceof Error ? e.message : "Sync failed");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const refresh = useCallback(() => {
     Promise.all([fetchSongs(), fetchSides()])
@@ -367,6 +414,34 @@ export default function SidesPage() {
             Total: <span className="text-zinc-300">{formatDuration(totalUsedSeconds)}</span> / {formatDuration(totalTargetSeconds)} across {SIDE_NAMES.length} sides
           </span>
         )}
+      </div>
+
+      <div className="border-b border-zinc-800 px-6 py-3 flex items-center gap-3">
+        <span className="text-xs font-sans text-zinc-500 shrink-0">Playlist output:</span>
+        <input
+          type="text"
+          value={playlistDirInput}
+          onChange={(e) => setPlaylistDirInput(e.target.value)}
+          onBlur={handleSavePlaylistDir}
+          placeholder="/path/to/Listening"
+          className="flex-1 max-w-xl bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+        />
+        {savingPlaylistDir && <span className="text-[11px] text-zinc-600 font-sans">saving…</span>}
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="px-3 py-1 rounded border border-blue-700 bg-blue-950/40 text-xs font-sans text-blue-300 hover:bg-blue-950/70 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {syncing ? "Syncing…" : "Sync to Playlists"}
+        </button>
+        {syncResult && (
+          <span className="text-xs font-sans text-zinc-400">
+            Rejects: <span className="text-zinc-200">{syncResult.rejects}</span>, Review:{" "}
+            <span className="text-zinc-200">{syncResult.review}</span>, White Album WiP:{" "}
+            <span className="text-zinc-200">{syncResult.wip}</span>
+          </span>
+        )}
+        {syncError && <span className="text-xs font-sans text-red-400">{syncError}</span>}
       </div>
 
       {error && (

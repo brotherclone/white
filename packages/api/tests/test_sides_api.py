@@ -22,11 +22,18 @@ def _make_song(
     production_slug: str,
     *,
     mix_seconds: float | None = None,
+    lifecycle_status: str | None = None,
+    lp_consideration: str | None = None,
 ) -> str:
     prod_dir = root / thread_slug / "production" / production_slug
     prod_dir.mkdir(parents=True, exist_ok=True)
+    manifest: dict = {"title": production_slug, "rainbow_color": "Red"}
+    if lifecycle_status is not None:
+        manifest["lifecycle_status"] = lifecycle_status
+    if lp_consideration is not None:
+        manifest["lp_consideration"] = lp_consideration
     with open(prod_dir / "manifest_bootstrap.yml", "w") as f:
-        yaml.dump({"title": production_slug, "rainbow_color": "Red"}, f)
+        yaml.dump(manifest, f)
 
     if mix_seconds is not None:
         mix_path = prod_dir / "mix.wav"
@@ -282,3 +289,189 @@ class TestLpConsiderationAutoTransitions:
         (sw_dir / "thread-a" / "production" / "song_one" / "mix.wav").unlink()
         client.delete(f"/sides/A/songs/{song_id}")
         assert _lp_consideration(client, song_id) == "not_considered"
+
+
+def _write_chord_candidate(
+    prod_dir: Path, candidate_id: str, midi_bytes: bytes
+) -> None:
+    """Write a minimal chords/review.yml + matching candidate MIDI file.
+
+    Used to reproduce candidate id collisions across songs — every song's
+    chord candidates are literally named chord_001..chord_010, so two
+    different songs can share the exact same candidate_id.
+    """
+    review_dir = prod_dir / "chords"
+    review_dir.mkdir(parents=True, exist_ok=True)
+    with open(review_dir / "review.yml", "w") as f:
+        yaml.dump(
+            {
+                "candidates": [
+                    {
+                        "id": candidate_id,
+                        "midi_file": f"candidates/{candidate_id}.mid",
+                        "rank": 1,
+                        "status": "pending",
+                        "scores": {"composite": 0.5, "theory": {}, "chromatic": {}},
+                    }
+                ]
+            },
+            f,
+        )
+    midi_path = review_dir / "candidates" / f"{candidate_id}.mid"
+    midi_path.parent.mkdir(parents=True, exist_ok=True)
+    midi_path.write_bytes(midi_bytes)
+
+
+class TestSongScopedMidi:
+    """The unscoped /midi/{candidate_id} route resolves against whichever
+    song the server's global `_production_dir` currently points at — since
+    candidate ids like chord_001 repeat across every song, that route can't
+    disambiguate. /songs/{song_id}/midi/{candidate_id} resolves directly from
+    the URL instead.
+    """
+
+    def test_distinguishes_same_candidate_id_across_songs(self, sw_dir, client):
+        song_a = _make_song(sw_dir, "thread-a", "song_one")
+        song_b = _make_song(sw_dir, "thread-b", "song_two")
+        _write_chord_candidate(
+            sw_dir / "thread-a" / "production" / "song_one", "chord_001", b"AAAA"
+        )
+        _write_chord_candidate(
+            sw_dir / "thread-b" / "production" / "song_two", "chord_001", b"BBBB"
+        )
+
+        resp_a = client.get(f"/songs/{song_a}/midi/chord_001")
+        resp_b = client.get(f"/songs/{song_b}/midi/chord_001")
+        assert resp_a.status_code == 200
+        assert resp_b.status_code == 200
+        assert resp_a.content == b"AAAA"
+        assert resp_b.content == b"BBBB"
+
+    def test_ignores_stale_active_song_global(self, sw_dir, client):
+        song_a = _make_song(sw_dir, "thread-a", "song_one")
+        song_b = _make_song(sw_dir, "thread-b", "song_two")
+        _write_chord_candidate(
+            sw_dir / "thread-a" / "production" / "song_one", "chord_001", b"AAAA"
+        )
+        _write_chord_candidate(
+            sw_dir / "thread-b" / "production" / "song_two", "chord_001", b"BBBB"
+        )
+
+        # Activate song A globally, then request song B's candidate by URL —
+        # the response must reflect the URL, not the stale active-song global.
+        assert client.post("/songs/activate", json={"id": song_a}).status_code == 200
+        resp = client.get(f"/songs/{song_b}/midi/chord_001")
+        assert resp.content == b"BBBB"
+
+    def test_unknown_song_returns_404(self, sw_dir, client):
+        resp = client.get("/songs/does-not-exist/midi/chord_001")
+        assert resp.status_code == 404
+
+    def test_unknown_candidate_returns_404(self, sw_dir, client):
+        song_a = _make_song(sw_dir, "thread-a", "song_one")
+        _write_chord_candidate(
+            sw_dir / "thread-a" / "production" / "song_one", "chord_001", b"AAAA"
+        )
+        resp = client.get(f"/songs/{song_a}/midi/ghost_candidate")
+        assert resp.status_code == 404
+
+    def test_response_has_no_store_cache_control(self, sw_dir, client):
+        song_a = _make_song(sw_dir, "thread-a", "song_one")
+        _write_chord_candidate(
+            sw_dir / "thread-a" / "production" / "song_one", "chord_001", b"AAAA"
+        )
+        resp = client.get(f"/songs/{song_a}/midi/chord_001")
+        assert resp.headers.get("cache-control") == "no-store"
+
+
+class TestSongScopedMixSet:
+    """POST /production/mix/set writes into whichever production dir the
+    server's global `_production_dir` currently points at.
+    /songs/{song_id}/mix/set resolves the production dir from the URL
+    instead, so it can't attach a mix to the wrong song when the global is
+    stale or was never pointed at the right song in the first place.
+    """
+
+    def test_writes_only_to_the_targeted_song(self, sw_dir, client):
+        _make_song(sw_dir, "thread-a", "song_one", mix_seconds=1.0)
+        song_b = _make_song(sw_dir, "thread-b", "song_two", mix_seconds=1.0)
+
+        resp = client.post(f"/songs/{song_b}/mix/set", json={"path": "/tmp/new_b.mp3"})
+        assert resp.status_code == 200
+
+        prod_a = sw_dir / "thread-a" / "production" / "song_one"
+        prod_b = sw_dir / "thread-b" / "production" / "song_two"
+        with open(prod_b / "song_context.yml") as f:
+            assert yaml.safe_load(f)["mix_file"] == "/tmp/new_b.mp3"
+        with open(prod_a / "song_context.yml") as f:
+            assert yaml.safe_load(f)["mix_file"] != "/tmp/new_b.mp3"
+
+    def test_ignores_stale_active_song_global(self, sw_dir, client):
+        song_a = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=1.0)
+        song_b = _make_song(sw_dir, "thread-b", "song_two", mix_seconds=1.0)
+
+        # Activate song A globally, then write a mix for song B via URL — it
+        # must land in song B's context, not the globally-active song A's.
+        assert client.post("/songs/activate", json={"id": song_a}).status_code == 200
+        client.post(f"/songs/{song_b}/mix/set", json={"path": "/tmp/new_b.mp3"})
+
+        prod_a = sw_dir / "thread-a" / "production" / "song_one"
+        prod_b = sw_dir / "thread-b" / "production" / "song_two"
+        with open(prod_b / "song_context.yml") as f:
+            assert yaml.safe_load(f)["mix_file"] == "/tmp/new_b.mp3"
+        with open(prod_a / "song_context.yml") as f:
+            assert yaml.safe_load(f)["mix_file"] != "/tmp/new_b.mp3"
+
+    def test_unknown_song_returns_404(self, client):
+        resp = client.post("/songs/does-not-exist/mix/set", json={"path": "/tmp/x.mp3"})
+        assert resp.status_code == 404
+
+
+class TestPlaylistEndpoints:
+    def test_config_defaults_and_materializes(self, sw_dir, client):
+        resp = client.get("/playlists/config")
+        assert resp.status_code == 200
+        assert "Listening" in resp.json()["output_dir"]
+        assert (sw_dir / "playlist_config.yml").exists()
+
+    def test_config_update_persists(self, sw_dir, client, tmp_path):
+        new_dir = str(tmp_path / "MyListening")
+        resp = client.post("/playlists/config", json={"output_dir": new_dir})
+        assert resp.status_code == 200
+
+        resp = client.get("/playlists/config")
+        assert resp.json()["output_dir"] == new_dir
+
+    def test_sync_buckets_songs_correctly(self, sw_dir, client, tmp_path):
+        _make_song(
+            sw_dir,
+            "thread-a",
+            "rejected_song",
+            mix_seconds=10.0,
+            lifecycle_status="scrapped",
+        )
+        _make_song(sw_dir, "thread-a", "review_song", mix_seconds=10.0)
+        placed_id = _make_song(
+            sw_dir,
+            "thread-a",
+            "placed_song",
+            mix_seconds=10.0,
+            lp_consideration="placed",
+        )
+        _make_song(sw_dir, "thread-a", "no_mix_song")
+
+        output_dir = tmp_path / "Listening"
+        client.post("/playlists/config", json={"output_dir": str(output_dir)})
+        client.post("/sides/A/assign", json={"song_id": placed_id, "position": 0})
+
+        resp = client.post("/playlists/sync")
+        assert resp.status_code == 200
+        assert resp.json() == {"rejects": 1, "review": 1, "wip": 1}
+        assert (output_dir / "Rejects" / "REJECT_rejected_song.wav").exists()
+        assert (output_dir / "Review" / "review_song.wav").exists()
+        assert (output_dir / "White Album WiP" / "01_A_placed_song.wav").exists()
+
+    def test_sync_rejects_unsafe_output_dir(self, sw_dir, client):
+        client.post("/playlists/config", json={"output_dir": ""})
+        resp = client.post("/playlists/sync")
+        assert resp.status_code == 400

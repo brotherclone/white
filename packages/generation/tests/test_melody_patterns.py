@@ -402,6 +402,24 @@ class TestTemplateSelection:
         assert len(results) > 0
         assert all(t.time_sig == (6, 8) for t in results)
 
+    def test_5_8_templates_exist_vocal_and_lead(self):
+        """Regression: melody_pipeline raised 'No melody templates for 5/8
+        time (use_case=...)' before these templates existed.
+        """
+        from white_generation.patterns.melody_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
+
+        for use_case in ("vocal", "lead"):
+            for energy in ("low", "medium", "high"):
+                results = select_templates(
+                    ALL_TEMPLATES, (5, 8), energy, use_case=use_case
+                )
+                assert results, f"no 5/8 {use_case} templates found at energy={energy}"
+                assert all(t.time_sig == (5, 8) for t in results)
+                assert all(t.use_case == use_case for t in results)
+
 
 # ---------------------------------------------------------------------------
 # 7. Theory scoring
