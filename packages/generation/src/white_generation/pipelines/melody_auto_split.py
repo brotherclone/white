@@ -75,6 +75,47 @@ def assign_syllables_to_notes(
     ]
 
 
+def distribute_syllables_and_split(
+    notes: list[Note], syllables: list[str], min_split_ticks: int, ticks_per_beat: int
+) -> tuple[list[Note], list[str]]:
+    """Greedily distribute `syllables` (flattened across every word in a lyric
+    line) across `notes`, splitting a note into sub-notes whenever it must
+    carry more than one syllable.
+
+    This is syllable-indexed, not word-indexed: it doesn't assume one word per
+    note. At each note, the number of syllables it should carry is recomputed
+    as ceil(syllables_remaining / notes_remaining), so if an earlier note's
+    duration was too short to physically hold its share (see split_note's
+    duration cap), the shortfall is automatically redistributed across the
+    notes that follow rather than desyncing the rest of the line.
+
+    Returns (output_notes, assigned_syllable_per_output_note) — the second
+    list is parallel to output_notes; "" marks a melisma continuation slot.
+    """
+    output_notes: list[Note] = []
+    assigned: list[str] = []
+    syll_idx = 0
+    total = len(syllables)
+
+    for i, note in enumerate(notes):
+        notes_remaining = len(notes) - i
+        sylls_remaining = total - syll_idx
+        target = -(-sylls_remaining // notes_remaining) if sylls_remaining > 0 else 1
+        target = max(target, 1)
+
+        can_split = target > 1 and note.duration_ticks >= min_split_ticks
+        parts = split_note(note, target, ticks_per_beat) if can_split else [note]
+        for part in parts:
+            output_notes.append(part)
+            if syll_idx < total:
+                assigned.append(syllables[syll_idx])
+                syll_idx += 1
+            else:
+                assigned.append("")
+
+    return output_notes, assigned
+
+
 def split_note(note: Note, n: int, ticks_per_beat: int) -> list[Note]:
     """Divide note into n equal-duration sub-notes at the same pitch and velocity.
 
@@ -274,23 +315,19 @@ def auto_split_melody(
         line = lyric_lines[phrase_idx]
         words = line.split()
 
-        phrase_output: list[Note] = []
-        for note_idx, note in enumerate(phrase_notes):
-            if note_idx < len(words):
-                word_sylls = syllabify(words[note_idx])
-                n = len(word_sylls)
-                if n > 1 and note.duration_ticks >= min_split_ticks:
-                    phrase_output.extend(split_note(note, n, ticks_per_beat))
-                else:
-                    phrase_output.append(note)
-            else:
-                phrase_output.append(note)
-
         all_sylls: list[str] = []
         for word in words:
             all_sylls.extend(syllabify(word))
 
-        assignments = assign_syllables_to_notes(phrase_output, all_sylls)
+        # Syllable-indexed, not word-indexed: distributes the line's full
+        # syllable sequence across the phrase's notes left-to-right, splitting
+        # a note into sub-notes whenever it must carry more than one syllable.
+        # This correctly handles multi-word lines (a note doesn't have to line
+        # up with a single word) as well as melisma (more notes than syllables).
+        phrase_output, assigned_sylls = distribute_syllables_and_split(
+            phrase_notes, all_sylls, min_split_ticks, ticks_per_beat
+        )
+
         alignment.append(
             {
                 "phrase": phrase_idx,
@@ -298,7 +335,7 @@ def auto_split_melody(
                 "notes_in": len(phrase_notes),
                 "notes_out": len(phrase_output),
                 "syllables": len(all_sylls),
-                "assignments": [syl or "(melisma)" for _, syl in assignments],
+                "assignments": [syl or "(melisma)" for syl in assigned_sylls],
                 "uncovered": False,
             }
         )
