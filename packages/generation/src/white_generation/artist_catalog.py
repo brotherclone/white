@@ -428,6 +428,8 @@ def load_artist_context(
 
     blocks: list[str] = []
     for artist_name in sounds_like:
+        if not artist_name or not artist_name.strip() or artist_name.startswith("```"):
+            continue
         entry = catalog.get(artist_name)
         if entry is None:
             print(

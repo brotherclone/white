@@ -882,7 +882,7 @@ class TestRunPipelineIntegration:
 
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nHello world\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nHello world\n")]
         mock_client.messages.create.return_value = mock_response
 
         mock_scorer = MagicMock()
@@ -938,7 +938,7 @@ class TestRunPipelineIntegration:
 
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nHello world\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nHello world\n")]
         mock_client.messages.create.return_value = mock_response
 
         mock_scorer = MagicMock()
@@ -983,7 +983,7 @@ class TestRunPipelineIntegration:
 
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nTest lyrics\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nTest lyrics\n")]
         mock_client.messages.create.return_value = mock_response
 
         mock_scorer = MagicMock()
@@ -1033,7 +1033,9 @@ class TestRunPipelineIntegration:
 
             mock_client = MagicMock()
             mock_response = MagicMock()
-            mock_response.content = [MagicMock(text="[verse]\nSome lyrics\n")]
+            mock_response.content = [
+                MagicMock(type="text", text="[verse]\nSome lyrics\n")
+            ]
             mock_client.messages.create.return_value = mock_response
 
             mock_scorer = MagicMock()
@@ -1830,6 +1832,58 @@ class TestCheckCandidate:
         assert missing["syllables"] == 0
 
 
+class TestCallMessages:
+    def test_returns_text_from_valid_response(self):
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(type="text", text="[verse]\nHello\n")]
+        mock_client.messages.create.return_value = mock_response
+
+        result = _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+        assert result == "[verse]\nHello\n"
+
+    def test_no_content_blocks_raises_with_stop_reason(self):
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = []
+        mock_response.stop_reason = "refusal"
+        mock_client.messages.create.return_value = mock_response
+
+        with pytest.raises(RuntimeError, match="refusal"):
+            _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+
+    def test_non_text_block_raises(self):
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(type="tool_use")]
+        mock_response.stop_reason = "tool_use"
+        mock_client.messages.create.return_value = mock_response
+
+        with pytest.raises(RuntimeError, match="tool_use"):
+            _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+
+    def test_empty_text_block_raises(self):
+        """A text block with empty/whitespace-only content (e.g. a truncated or
+        partially-refused response) must be treated the same as no content at
+        all, not silently returned as an empty string."""
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(type="text", text="   \n")]
+        mock_response.stop_reason = "refusal"
+        mock_client.messages.create.return_value = mock_response
+
+        with pytest.raises(RuntimeError, match="empty text block"):
+            _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+
+
 class TestGenerateLyricCandidate:
     def test_clean_draft_skips_revision(self):
         """A draft that passes every check on the first try makes exactly one API call."""
@@ -1848,7 +1902,7 @@ class TestGenerateLyricCandidate:
         ]
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nCat\nHat\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nCat\nHat\n")]
         mock_client.messages.create.return_value = mock_response
 
         text, outcome = generate_lyric_candidate(
@@ -1876,7 +1930,9 @@ class TestGenerateLyricCandidate:
         mock_client = MagicMock()
         mock_response = MagicMock()
         # Mismatched rhyme every time — never resolves
-        mock_response.content = [MagicMock(text="[verse]\nThe cat\nThe dog\n")]
+        mock_response.content = [
+            MagicMock(type="text", text="[verse]\nThe cat\nThe dog\n")
+        ]
         mock_client.messages.create.return_value = mock_response
 
         text, outcome = generate_lyric_candidate(
@@ -1902,7 +1958,9 @@ class TestGenerateLyricCandidate:
         ]
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nThe cat\nThe dog\n")]
+        mock_response.content = [
+            MagicMock(type="text", text="[verse]\nThe cat\nThe dog\n")
+        ]
         mock_client.messages.create.return_value = mock_response
 
         generate_lyric_candidate(

@@ -5,7 +5,10 @@ import pytest
 from white_core.artifacts.circle_jerk_interview_artifact import (
     CircleJerkInterviewArtifact,
 )
-from white_core.concepts.vanity_interview_question import VanityInterviewQuestion
+from white_core.concepts.vanity_interview_question import (
+    VanityInterviewQuestion,
+    VanityInterviewQuestionOutput,
+)
 from white_core.concepts.vanity_interview_response import VanityInterviewResponse
 from white_core.concepts.vanity_persona import VanityPersona
 from white_core.enums.disrupting_event_type import DisruptingEventType
@@ -476,17 +479,30 @@ class TestVioletAgentErrorHandling:
     def test_generate_questions_handles_missing_mock(
         self, violet_agent, violet_agent_state, monkeypatch
     ):
-        """Test that generate_questions handles missing mock file gracefully."""
+        """Test that generate_questions falls back to the LLM when the mock file is missing."""
         monkeypatch.setenv("MOCK_MODE", "true")
         monkeypatch.setenv("BLOCK_MODE", "false")
         monkeypatch.setenv("AGENT_MOCK_DATA_PATH", "/nonexistent/path")
         violet_agent_state.interviewer_persona = VanityPersona()
 
-        # Should not raise an exception in non-blocking mode
+        mock_output = VanityInterviewQuestionOutput(
+            questions=[
+                VanityInterviewQuestion(number=1, question="Question one?"),
+                VanityInterviewQuestion(number=2, question="Question two?"),
+                VanityInterviewQuestion(number=3, question="Question three?"),
+            ]
+        )
+        mock_structured_llm = MagicMock()
+        mock_structured_llm.invoke.return_value = mock_output
+        violet_agent.llm = MagicMock()
+        violet_agent.llm.with_structured_output.return_value = mock_structured_llm
+
+        # Non-blocking mode: the missing mock file should be logged and the
+        # agent should fall through to the (mocked) LLM rather than raising
+        # or hitting a real Anthropic call.
         result = violet_agent.generate_questions(violet_agent_state)
         assert isinstance(result, VioletAgentState)
-        # Should have fallback questions
-        assert result.interview_questions is not None
+        assert result.interview_questions == mock_output.questions
 
     def test_generate_questions_raises_in_block_mode(
         self, violet_agent, violet_agent_state, monkeypatch
