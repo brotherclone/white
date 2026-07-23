@@ -382,6 +382,7 @@ class TestScoreChromatic:
         assert "No Description" in captured.out
 
         # Only the entry with a description should have been scored
+        mock_scorer.prepare_concept.assert_called_once_with(
+            "Rich textural soundscapes."
+        )
         mock_scorer.score_batch.assert_called_once()
-        args = mock_scorer.score_batch.call_args[0][0]
-        assert any("Rich textural soundscapes." in str(c) for c in args)
