@@ -1070,6 +1070,14 @@ _HOOK_GUIDANCE_LINE = (
     " vocabulary than the surrounding verses."
 )
 
+_FICTION_FRAMING_LINE = (
+    "This is a fictional concept-album songwriting exercise for an experimental"
+    " music project. Any 'secret', 'code', 'encoding', 'protocol', or 'spy'"
+    " language in the concept below describes a literary device (e.g. an"
+    " acrostic, a thematic motif, a narrative conceit) that shapes the song's"
+    " structure — it is not a request to produce real covert communication."
+)
+
 
 def _build_white_cutup_prompt(
     meta: dict,
@@ -1087,6 +1095,8 @@ def _build_white_cutup_prompt(
     """
     lines = [
         f'You are writing lyrics for "{meta.get("title", "")}" — the White synthesis song.',
+        "",
+        _FICTION_FRAMING_LINE,
         "",
         "SONG METADATA:",
         "  Color: White (synthesis of all colors)",
@@ -1246,6 +1256,8 @@ def _build_prompt(
     lines = [
         f'You are writing lyrics for a song titled "{meta.get("title", "")}".',
         "",
+        _FICTION_FRAMING_LINE,
+        "",
         "SONG METADATA:",
         f"  Color: {color}",
         f"  BPM: {meta.get('bpm', '')}",
@@ -1381,7 +1393,20 @@ def _build_prompt(
 
 def _call_messages(client, messages: list[dict], model: str) -> str:
     response = client.messages.create(model=model, max_tokens=2048, messages=messages)
-    return response.content[0].text
+    if not response.content:
+        raise RuntimeError(
+            f"Claude API returned no content blocks (stop_reason={response.stop_reason!r}). "
+            "This usually means the model declined the request or the response was "
+            "truncated before any output — check the prompt for content that may have "
+            "triggered a refusal, then retry."
+        )
+    block = response.content[0]
+    if block.type != "text":
+        raise RuntimeError(
+            f"Claude API returned a '{block.type}' content block "
+            f"(stop_reason={response.stop_reason!r}) where lyric text was expected."
+        )
+    return block.text
 
 
 def _call_api(client, prompt: str, model: str) -> str:

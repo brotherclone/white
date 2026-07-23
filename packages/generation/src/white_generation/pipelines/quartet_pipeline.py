@@ -675,6 +675,35 @@ def _resolve_chord_label(label_key: str, available_labels: list[str]) -> Optiona
     return max(candidates, key=len)
 
 
+def _melody_section_for_label(production_dir: Path, label_key: str) -> str:
+    """Map an approved melody label back to its underlying section name.
+
+    A single generated section can be approved multiple times under distinct
+    per-instance labels (e.g. a 'double' section approved five times as labels
+    '1'..'5' for five separate occurrences in the arrangement). Chords and
+    harmonic rhythm are keyed by the original section name, not the instance
+    label, so look it up via melody/review.yml. Falls back to label_key when
+    no matching entry is found (the common case where label == section).
+    """
+    review_path = production_dir / "melody" / "review.yml"
+    if not review_path.exists():
+        return label_key
+    with open(review_path) as f:
+        review = yaml.safe_load(f) or {}
+    for candidate in review.get("candidates", []):
+        cand_label = (
+            str(candidate.get("label") or "")
+            .lower()
+            .replace("-", "_")
+            .replace(" ", "_")
+        )
+        if cand_label == label_key:
+            section = candidate.get("section")
+            if section:
+                return str(section).lower().replace("-", "_").replace(" ", "_")
+    return label_key
+
+
 def _voice_length_beats(midi_bytes: bytes) -> float:
     """Return a single-voice MIDI's total length in beats (resolution-independent)."""
     mid = mido.MidiFile(file=io.BytesIO(midi_bytes))
@@ -909,6 +938,12 @@ def generate_quartet(
             f"No approved melody MIDI found for section '{section}' at {midi_path}"
         )
 
+    # Chords/harmonic-rhythm are keyed by the melody's original section name,
+    # which can differ from label_key when the same section was approved
+    # multiple times under distinct per-instance labels (see
+    # _melody_section_for_label).
+    chord_section = _melody_section_for_label(production_dir, label_key)
+
     # Song metadata
     ctx = load_song_context(production_dir)
     bpm = int(ctx.get("bpm", 120))
@@ -926,7 +961,7 @@ def generate_quartet(
     # _align_voice_length below), so a missing/unmatched entry here only affects the
     # pacing of chord changes within the section, not the final total length.
     _hr = read_approved_harmonic_rhythm(production_dir)
-    _hr_label = _resolve_chord_label(label_key, list(_hr.keys()))
+    _hr_label = _resolve_chord_label(chord_section, list(_hr.keys()))
     section_durations: list[float] | None = _hr.get(_hr_label) if _hr_label else None
 
     # Diatonic scale pitch classes for out-of-key snapping on melodic voices
@@ -957,7 +992,7 @@ def generate_quartet(
     if simple_voicings:
         soprano_notes = extract_soprano_notes(soprano_midi_bytes)
         note_events = extract_note_events(soprano_midi_bytes)
-        triad_map = load_section_triad_map(production_dir, label_key)
+        triad_map = load_section_triad_map(production_dir, chord_section)
         if triad_map:
             soprano_notes = snap_soprano_to_triads(soprano_notes, triad_map)
             print(
@@ -1024,14 +1059,14 @@ def generate_quartet(
     # Resolution must find a real match for this label (exact or prefix) -- silently
     # substituting an unrelated section's chords produced musically wrong harmony.
     chord_data, _ = extract_section_chord_data(production_dir)
-    chord_label = _resolve_chord_label(label_key, list(chord_data.keys()))
+    chord_label = _resolve_chord_label(chord_section, list(chord_data.keys()))
     if chord_label is None:
         raise ValueError(
-            f"No chord data found for melody section '{label_key}' in "
-            f"{production_dir / 'chords' / 'review.yml'} — checked exact match and "
-            f"prefix match against approved chord labels {sorted(chord_data.keys())}. "
-            "Approve chords for this section (or its base section) before generating "
-            "the quartet."
+            f"No chord data found for melody section '{label_key}' (resolved section "
+            f"'{chord_section}') in {production_dir / 'chords' / 'review.yml'} — "
+            "checked exact match and prefix match against approved chord labels "
+            f"{sorted(chord_data.keys())}. Approve chords for this section (or its "
+            "base section) before generating the quartet."
         )
     voicings = chord_data[chord_label]
 
