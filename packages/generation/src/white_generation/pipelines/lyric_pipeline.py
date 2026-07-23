@@ -1406,6 +1406,13 @@ def _call_messages(client, messages: list[dict], model: str) -> str:
             f"Claude API returned a '{block.type}' content block "
             f"(stop_reason={response.stop_reason!r}) where lyric text was expected."
         )
+    if not block.text.strip():
+        raise RuntimeError(
+            f"Claude API returned an empty text block (stop_reason={response.stop_reason!r}). "
+            "This usually means the model declined the request or the response was "
+            "truncated before any output — check the prompt for content that may have "
+            "triggered a refusal, then retry."
+        )
     return block.text
 
 

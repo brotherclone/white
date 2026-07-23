@@ -69,6 +69,22 @@ def _write_chords_review(prod_dir: Path, label: str) -> Path:
     return path
 
 
+def _write_melody_review(prod_dir: Path, label: str, section: str) -> Path:
+    """Write a minimal melody/review.yml candidate mapping an approved instance
+    label back to its underlying generated section (for _melody_section_for_label)."""
+    melody_dir = prod_dir / "melody"
+    melody_dir.mkdir(parents=True, exist_ok=True)
+    review = {
+        "candidates": [
+            {"label": label, "section": section, "status": "approved"},
+        ],
+    }
+    path = melody_dir / "review.yml"
+    with open(path, "w") as f:
+        yaml.dump(review, f, sort_keys=False, allow_unicode=True, width=float("inf"))
+    return path
+
+
 # ---------------------------------------------------------------------------
 # 1. extract_soprano_notes
 # ---------------------------------------------------------------------------
@@ -195,6 +211,45 @@ class TestResolveChordLabel:
             _resolve_chord_label("verse_alt_split", ["verse", "verse_alt"])
             == "verse_alt"
         )
+
+
+# ---------------------------------------------------------------------------
+# 2b-ii. _melody_section_for_label
+# ---------------------------------------------------------------------------
+
+
+class TestMelodySectionForLabel:
+    def test_maps_instance_label_to_section(self, tmp_path):
+        from white_generation.pipelines.quartet_pipeline import (
+            _melody_section_for_label,
+        )
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_melody_review(prod, label="1", section="double")
+
+        assert _melody_section_for_label(prod, "1") == "double"
+
+    def test_falls_back_to_label_when_no_review_file(self, tmp_path):
+        from white_generation.pipelines.quartet_pipeline import (
+            _melody_section_for_label,
+        )
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+
+        assert _melody_section_for_label(prod, "verse") == "verse"
+
+    def test_falls_back_to_label_when_no_matching_candidate(self, tmp_path):
+        from white_generation.pipelines.quartet_pipeline import (
+            _melody_section_for_label,
+        )
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_melody_review(prod, label="2", section="double")
+
+        assert _melody_section_for_label(prod, "1") == "1"
 
 
 # ---------------------------------------------------------------------------
@@ -367,6 +422,27 @@ class TestGenerateQuartet:
 
         candidates = generate_quartet(
             prod, "verse_split", top_k=1, seed=0, scorer=_make_mock_scorer()
+        )
+        assert len(candidates) == 1
+
+    def test_repeated_section_under_instance_label_resolves_chords(self, tmp_path):
+        """Regression: a section generated once ('double') but approved multiple
+        times under distinct per-instance labels ('1'..'5' for separate
+        occurrences in the arrangement) must still resolve to that section's
+        chords via melody/review.yml, not raise 'No chord data found' just
+        because the instance label has no string relationship to the chord
+        section name."""
+        from white_generation.pipelines.quartet_pipeline import generate_quartet
+
+        prod = tmp_path / "production" / "test_song"
+        prod.mkdir(parents=True)
+        _write_song_context(prod)
+        _write_melody_approved(prod, "1", [60, 62, 64, 65])
+        _write_melody_review(prod, label="1", section="double")
+        _write_chords_review(prod, "double")
+
+        candidates = generate_quartet(
+            prod, "1", top_k=1, seed=0, scorer=_make_mock_scorer()
         )
         assert len(candidates) == 1
 
