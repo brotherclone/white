@@ -28,7 +28,11 @@ from white_core.agents.agent_settings import AgentSettings
 from white_core.concepts.white_facet_system import WhiteFacetSystem
 from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.synthesis_prompt_template import SynthesisPromptTemplate
-from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
+from white_core.manifests.song_proposal import (
+    SongProposal,
+    SongProposalIteration,
+    resolve_supersession_chains,
+)
 from white_extraction.util.generate_negative_constraints import (
     format_for_prompt,
     generate_constraints,
@@ -4101,17 +4105,31 @@ The song should be buildable from these specifications.
                 raise Exception(error_msg)
             return
 
+        # Drop exact duplicates and clear is_final on any iteration that a later
+        # counter-proposal in the same revision chain has superseded (see
+        # resolve_supersession_chains docstring — this can pivot color/title
+        # entirely, so it must run before the per-color grouping below).
+        iterations, superseded_ids = resolve_supersession_chains(
+            state.song_proposals.iterations
+        )
+        state.song_proposals.iterations = iterations
+
         # For each color group, if no iteration is explicitly marked final,
         # treat the last iteration in that group as final. This handles single-agent
         # workflows and agents (Orange, Green, etc.) that never call is_final themselves.
-        iterations = state.song_proposals.iterations
+        # Skip groups where every unmarked member was just superseded above —
+        # that's a deliberate "this lineage's final now lives under a different
+        # color" outcome, not an undecided orphan to fall back on.
         iterations_by_color: dict = {}
         for idx, iteration in enumerate(iterations):
             color = str(iteration.rainbow_color)
             iterations_by_color.setdefault(color, []).append(idx)
         for color_indexes in iterations_by_color.values():
-            if not any(iterations[idx].is_final for idx in color_indexes):
-                iterations[color_indexes[-1]].is_final = True
+            if any(iterations[idx].is_final for idx in color_indexes):
+                continue
+            if any(id(iterations[idx]) in superseded_ids for idx in color_indexes):
+                continue
+            iterations[color_indexes[-1]].is_final = True
 
         # Deduplicate titles within this run: if two final iterations share the same
         # title, append the color name so init_production never sees a collision.
@@ -4124,12 +4142,21 @@ The song should be buildable from these specifications.
             if len(_dupes) > 1:
                 for it in _dupes:
                     rc = it.rainbow_color
-                    _label = (
-                        rc.color_name
-                        if hasattr(rc, "color_name")
-                        else str(rc).split("(")[0].strip()
-                    )
-                    it.title = f"{it.title} ({_label})"
+                    if hasattr(rc, "color_name"):
+                        _label = rc.color_name
+                    else:
+                        _label = str(rc).split("(")[0].strip()
+                        # Guard against a malformed rainbow_color — e.g. the
+                        # LLM dumping raw JSON/dict text into the field
+                        # instead of a clean color name (real-world case:
+                        # last_click_train_prism_v1) — which would otherwise
+                        # get interpolated whole into the title below.
+                        if len(_label) > 20 or any(c in _label for c in "{}:\"'"):
+                            _label = "unknown"
+                    # Cap to the model's own title max_length so a malformed
+                    # label (or this block running more than once) can never
+                    # produce a title that fails validation on next load.
+                    it.title = f"{it.title} ({_label})"[:150]
                 logger.warning(
                     "Duplicate title within run — appended color suffix: %s",
                     [it.title for it in _dupes],

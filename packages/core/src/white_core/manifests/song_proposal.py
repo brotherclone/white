@@ -244,3 +244,56 @@ class SongProposal(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
+
+
+def resolve_supersession_chains(
+    iterations: List[SongProposalIteration],
+) -> tuple[List[SongProposalIteration], set[int]]:
+    """Drop exact-duplicate iterations and clear is_final on superseded links.
+
+    A counter-proposal is always generated from the current last entry in
+    the run's iteration list (see e.g. black_agent.py's
+    `current_proposal = state.song_proposals.iterations[-1]`), and each agent
+    assigns its result the next `iteration_number` in the overall sequence.
+    A maximal run of consecutive iteration_number values (n, n+1, n+2, ...)
+    therefore represents one continuous revision chain — even when a
+    counter-proposal pivots the color or title entirely (e.g. a White seed
+    rejected into a Black rework) — and only the last entry in that chain is
+    the one that should end up is_final. Entries with no iteration_number, or
+    whose number doesn't continue from the previous entry, start their own
+    independent chain of length one and are left untouched: they represent a
+    genuinely new, separate song rather than a revision of what came before.
+
+    Returns (deduped_iterations, superseded_ids) where superseded_ids holds
+    id() of every iteration this pass cleared — callers must not treat those
+    as "never decided" and re-promote them via a same-color/default fallback.
+    """
+    deduped: List[SongProposalIteration] = []
+    seen: set[tuple] = set()
+    for it in iterations:
+        key = (it.iteration_id, it.iteration_number)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(it)
+
+    chains: List[List[SongProposalIteration]] = []
+    for it in deduped:
+        prev_chain = chains[-1] if chains else None
+        prev_number = prev_chain[-1].iteration_number if prev_chain else None
+        if (
+            prev_chain is not None
+            and prev_number is not None
+            and it.iteration_number == prev_number + 1
+        ):
+            prev_chain.append(it)
+        else:
+            chains.append([it])
+
+    superseded_ids: set[int] = set()
+    for chain in chains:
+        for superseded in chain[:-1]:
+            superseded.is_final = False
+            superseded_ids.add(id(superseded))
+
+    return deduped, superseded_ids
