@@ -446,6 +446,265 @@ def test_save_all_proposals_single_iteration_implicit_final(
     assert "solo_v1" in standalone[0].name
 
 
+def test_save_all_proposals_clears_superseded_color_pivot(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: a White seed (iteration 1) pivoted to Black by a counter-
+    proposal (iteration 2) must not both end up is_final — only the last
+    entry in the consecutive-iteration_number chain should survive, even
+    though the color and title change mid-chain (real-world case:
+    instantiation_sequence_v1 → v2/v3/v4)."""
+    seed = _make_proposal(
+        iteration_id="seed_v1",
+        rainbow_color="White",
+        title="Compile, Then Breathe",
+        iteration_number=1,
+        is_final=True,
+    )
+    pivot = _make_proposal(
+        iteration_id="pivot_v2",
+        rainbow_color="Black",
+        title="Error Log",
+        iteration_number=2,
+        is_final=True,
+    )
+    final = _make_proposal(
+        iteration_id="final_v3",
+        rainbow_color="Black",
+        title="Form B-Minor",
+        iteration_number=3,
+        is_final=True,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_pivot_test",
+        song_proposals=SongProposal(iterations=[seed, pivot, final]),
+    )
+    white_agent.save_all_proposals(state)
+
+    yml_dir = tmp_path / "tid_pivot_test" / "yml"
+    standalone = list(yml_dir.glob("song_proposal_*.yml"))
+    assert len(standalone) == 1
+    assert "final_v3" in standalone[0].name
+    assert seed.is_final is False
+    assert pivot.is_final is False
+    assert final.is_final is True
+
+
+def test_save_all_proposals_clears_superseded_same_color_revision(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: two same-color revisions (real-world case:
+    sultan_mirror_confession_v1 → v2, a 'post-interview synthesis') both got
+    marked is_final by their own agent step; only the later one should
+    survive."""
+    draft = _make_proposal(
+        iteration_id="draft_v1",
+        rainbow_color="Violet",
+        title="I Loved Making the Record That Isn't Out Yet",
+        iteration_number=1,
+        is_final=True,
+    )
+    revised = _make_proposal(
+        iteration_id="revised_v2",
+        rainbow_color="Violet",
+        title="I Loved Making the Record That Isn't Out Yet",
+        iteration_number=2,
+        is_final=True,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_revision_test",
+        song_proposals=SongProposal(iterations=[draft, revised]),
+    )
+    white_agent.save_all_proposals(state)
+
+    yml_dir = tmp_path / "tid_revision_test" / "yml"
+    standalone = list(yml_dir.glob("song_proposal_*.yml"))
+    assert len(standalone) == 1
+    assert "revised_v2" in standalone[0].name
+    assert draft.is_final is False
+    assert revised.is_final is True
+
+
+def test_save_all_proposals_leaves_independent_colors_untouched(
+    white_agent, tmp_path, monkeypatch
+):
+    """Two genuinely independent songs (different colors, non-consecutive or
+    absent iteration_number) must both remain final — a chain must not be
+    inferred across unrelated proposals."""
+    orange = _make_proposal(
+        iteration_id="orange_v1",
+        rainbow_color="Orange",
+        title="Orange Song",
+        iteration_number=1,
+        is_final=True,
+    )
+    yellow = _make_proposal(
+        iteration_id="yellow_v1",
+        rainbow_color="Yellow",
+        title="Yellow Song",
+        iteration_number=None,
+        is_final=True,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_independent_test",
+        song_proposals=SongProposal(iterations=[orange, yellow]),
+    )
+    white_agent.save_all_proposals(state)
+
+    yml_dir = tmp_path / "tid_independent_test" / "yml"
+    standalone = list(yml_dir.glob("song_proposal_*.yml"))
+    assert len(standalone) == 2
+    assert orange.is_final is True
+    assert yellow.is_final is True
+
+
+def test_save_all_proposals_promotes_untouched_entry_sharing_color_with_superseded(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: a color group containing both a superseded chain member
+    and a genuinely separate, never-decided entry of the same color must
+    still promote the untouched one — even when the superseded entry sorts
+    last within the group (an any()-based skip, or a naive all()-based
+    promote-last-in-group fix, both mishandle this ordering)."""
+    seed = _make_proposal(
+        iteration_id="seed_v1",
+        rainbow_color="Green",
+        iteration_number=1,
+        is_final=True,
+    )
+    pivot = _make_proposal(
+        iteration_id="pivot_v2",
+        rainbow_color="Black",
+        iteration_number=2,
+        is_final=True,
+    )
+    # Same color as seed (Green), added after pivot so it sorts last within
+    # the Green group by list position — but it is NOT part of any chain.
+    untouched = _make_proposal(
+        iteration_id="untouched_v1",
+        rainbow_color="Green",
+        iteration_number=None,
+        is_final=False,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_mixed_color_group_test",
+        song_proposals=SongProposal(iterations=[seed, pivot, untouched]),
+    )
+    white_agent.save_all_proposals(state)
+
+    assert seed.is_final is False
+    assert pivot.is_final is True
+    assert untouched.is_final is True
+
+
+def test_save_all_proposals_title_dedup_preserves_suffix_near_max_length(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: when the base title is already near the 150-char max,
+    truncating the whole suffixed string (instead of the base) chops the
+    suffix off entirely, leaving the title collision unresolved."""
+    long_title = "A" * 150
+    clean = _make_proposal(
+        iteration_id="clean_v1",
+        title=long_title,
+        rainbow_color="Green",
+        is_final=True,
+    )
+    other = _make_proposal(
+        iteration_id="other_v1",
+        title=long_title,
+        rainbow_color="Blue",
+        is_final=True,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_long_title_test",
+        song_proposals=SongProposal(iterations=[clean, other]),
+    )
+    white_agent.save_all_proposals(state)
+
+    assert len(clean.title) <= 150
+    assert len(other.title) <= 150
+    assert clean.title != other.title
+    assert clean.title.endswith("(Green)")
+    assert other.title.endswith("(Blue)")
+
+
+def test_save_all_proposals_drops_exact_duplicate_iterations(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: an exact-duplicate entry (same iteration_id and
+    iteration_number, appended twice — real-world case: instantiation_sequence_v2
+    appearing twice in all_song_proposals.yml) must be deduplicated before
+    chain resolution, not treated as a chain-breaking event that leaves an
+    intermediate link incorrectly final."""
+    seed = _make_proposal(iteration_id="seed_v1", iteration_number=1, is_final=True)
+    dup_a = _make_proposal(iteration_id="dup_v2", iteration_number=2, is_final=True)
+    dup_b = _make_proposal(iteration_id="dup_v2", iteration_number=2, is_final=True)
+    final = _make_proposal(iteration_id="final_v3", iteration_number=3, is_final=True)
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_dup_test",
+        song_proposals=SongProposal(iterations=[seed, dup_a, dup_b, final]),
+    )
+    white_agent.save_all_proposals(state)
+
+    assert len(state.song_proposals.iterations) == 3
+    yml_dir = tmp_path / "tid_dup_test" / "yml"
+    standalone = list(yml_dir.glob("song_proposal_*.yml"))
+    assert len(standalone) == 1
+    assert "final_v3" in standalone[0].name
+
+
+def test_save_all_proposals_title_dedup_guards_malformed_rainbow_color(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: when rainbow_color is a malformed string (e.g. the LLM
+    dumped raw JSON/dict text into the field instead of a clean color name —
+    real-world case: last_click_train_prism_v1), the title-dedup suffix must
+    fall back to a safe label and stay within the model's own 150-char
+    title max_length, instead of embedding the garbage and producing a
+    title that fails validation on next load."""
+    garbled_color = (
+        '{"color_name": "Blue", "hex_value": 1727categ983, '
+        '"mnemonic_character_value": "B"}'
+    )
+    clean = _make_proposal(
+        iteration_id="clean_v1",
+        title="Shared Title",
+        rainbow_color="Green",
+        is_final=True,
+    )
+    malformed = _make_proposal(
+        iteration_id="malformed_v1",
+        title="Shared Title",
+        rainbow_color=garbled_color,
+        is_final=True,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_malformed_color_test",
+        song_proposals=SongProposal(iterations=[clean, malformed]),
+    )
+    white_agent.save_all_proposals(state)
+
+    assert len(malformed.title) <= 150
+    assert garbled_color not in malformed.title
+    assert malformed.title == "Shared Title (unknown)"
+    assert clean.title == "Shared Title (Green)"
+
+
 def test_finalize_writes_run_success_sentinel(monkeypatch, tmp_path, white_agent):
     """finalize_song_proposal should write a run_success sentinel file."""
     monkeypatch.setenv("MOCK_MODE", "true")

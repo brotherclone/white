@@ -834,6 +834,34 @@ def _write_proposal(yml_dir: Path, name: str, extra: dict | None = None) -> Path
     return path
 
 
+def _iteration_dict(
+    iteration_id: str,
+    iteration_number: int | None,
+    is_final: bool,
+    rainbow_color: str = "Red",
+) -> dict:
+    return {
+        "iteration_id": iteration_id,
+        "iteration_number": iteration_number,
+        "is_final": is_final,
+        "bpm": 120,
+        "key": "C major",
+        "rainbow_color": rainbow_color,
+        "title": iteration_id,
+        "mood": ["melancholic"],
+        "genres": ["ambient"],
+        "concept": "A test concept that is long enough to pass the minimum "
+        "length validator for the concept field.",
+    }
+
+
+def _write_bundle(yml_dir: Path, iterations: list[dict]) -> Path:
+    path = yml_dir / "all_song_proposals.yml"
+    with open(path, "w") as f:
+        yaml.dump({"iterations": iterations}, f)
+    return path
+
+
 class TestScaffoldSongProductions:
     def test_creates_production_dir_and_manifest(self, tmp_path):
         yml_dir = tmp_path / "yml"
@@ -919,6 +947,124 @@ class TestScaffoldSongProductions:
         second_run = scaffold_song_productions(tmp_path, yml_dir)
         assert manifest.read_text() == "title: overwritten\n"
         assert second_run == []  # nothing newly created
+
+    def test_skips_proposal_marked_not_final_by_bundle(self, tmp_path):
+        """Regression: a proposal file whose own is_final field is stale/true
+        must still be skipped if the thread's all_song_proposals.yml bundle
+        (the authoritative, resolved source) says it's not final."""
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(
+            yml_dir,
+            "seed_v1",
+            {"iteration_id": "seed_v1", "iteration_number": 1, "is_final": True},
+        )
+        _write_bundle(
+            yml_dir,
+            [_iteration_dict("seed_v1", 1, is_final=False)],
+        )
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == []
+        assert not (tmp_path / "production" / "seed_v1").exists()
+
+    def test_scaffolds_proposal_marked_final_by_bundle(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(
+            yml_dir,
+            "final_v3",
+            {"iteration_id": "final_v3", "iteration_number": 3, "is_final": True},
+        )
+        _write_bundle(
+            yml_dir,
+            [_iteration_dict("final_v3", 3, is_final=True)],
+        )
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == ["final_v3"]
+
+    def test_bundle_resolves_pivot_chain_and_skips_superseded(self, tmp_path):
+        """Integration case: a White seed (iteration 1) pivoted to Black by a
+        counter-proposal (iteration 2), both individually dumped with
+        is_final: true (real-world case: instantiation_sequence_v1/v2). Only
+        the last entry in the chain should be scaffolded into a production
+        directory."""
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(
+            yml_dir,
+            "seed_v1",
+            {
+                "iteration_id": "seed_v1",
+                "iteration_number": 1,
+                "rainbow_color": "White",
+                "is_final": True,
+            },
+        )
+        _write_proposal(
+            yml_dir,
+            "pivot_v2",
+            {
+                "iteration_id": "pivot_v2",
+                "iteration_number": 2,
+                "rainbow_color": "Black",
+                "is_final": True,
+            },
+        )
+        _write_bundle(
+            yml_dir,
+            [
+                _iteration_dict("seed_v1", 1, is_final=True, rainbow_color="White"),
+                _iteration_dict("pivot_v2", 2, is_final=True, rainbow_color="Black"),
+            ],
+        )
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == ["pivot_v2"]
+        assert not (tmp_path / "production" / "seed_v1").exists()
+
+    def test_falls_back_to_own_is_final_when_no_bundle(self, tmp_path):
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(
+            yml_dir, "draft_v1", {"iteration_id": "draft_v1", "is_final": False}
+        )
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == []
+
+    def test_scaffolds_when_is_final_absent_and_no_bundle(self, tmp_path):
+        """Legacy proposals with no is_final field at all (and no bundle to
+        resolve against) keep working exactly as before this fix."""
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(yml_dir, "legacy_v1")
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == ["legacy_v1"]
+
+    def test_malformed_bundle_entry_does_not_disable_whole_lookup(self, tmp_path):
+        """A single unparseable entry in the bundle (e.g. a corrupted title,
+        real-world case: last_click_train_prism_v1) must be skipped, not
+        abort resolution for every other entry in the thread."""
+        yml_dir = tmp_path / "yml"
+        yml_dir.mkdir()
+        _write_proposal(
+            yml_dir,
+            "seed_v1",
+            {"iteration_id": "seed_v1", "iteration_number": 1, "is_final": True},
+        )
+        malformed = _iteration_dict("broken_v1", None, is_final=True)
+        malformed["title"] = "x" * 200  # exceeds the 150-char max_length
+        _write_bundle(
+            yml_dir,
+            [_iteration_dict("seed_v1", 1, is_final=False), malformed],
+        )
+
+        slugs = scaffold_song_productions(tmp_path, yml_dir)
+        assert slugs == []
+        assert not (tmp_path / "production" / "seed_v1").exists()
 
     def test_singer_field_included_when_present(self, tmp_path):
         yml_dir = tmp_path / "yml"

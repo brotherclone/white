@@ -893,10 +893,13 @@ Write ONLY the riddle (no answer, no explanation):
                     data = yaml.safe_load(f)
                 counter_proposal = SongProposalIteration(**data)
                 counter_proposal.agent_name = "indigo"
+                # Continue the chain from the proposal this counters (see the
+                # real-mode branch below) rather than snapshotting the overall
+                # list length, which can coincidentally collide with an
+                # unrelated lineage's next number.
+                previous = state.white_proposal
                 counter_proposal.iteration_number = (
-                    len(state.song_proposals.iterations) + 1
-                    if state.song_proposals
-                    else 1
+                    (previous.iteration_number or 0) + 1 if previous else 1
                 )
                 counter_proposal.timestamp = time.time()
                 state.counter_proposal = counter_proposal
@@ -972,9 +975,12 @@ Concept: [full concept explanation]
                     )
                     counter_proposal.concept += f"Decoding: {decoding_hint}\n"
 
+                # Continue the chain from the proposal this counters, rather
+                # than snapshotting the overall list length (see mock-mode
+                # branch above for why).
                 counter_proposal.iteration_number = (
-                    len(state.song_proposals.iterations) + 1
-                )
+                    previous_iteration.iteration_number or 0
+                ) + 1
                 counter_proposal.agent_name = "indigo"
                 counter_proposal.timestamp = time.time()
                 state.counter_proposal = counter_proposal
@@ -1005,7 +1011,7 @@ Concept: [full concept explanation]
                     mood=["cryptic", "puzzling", "revelatory"],
                     genres=previous_iteration.genres,
                     concept=f"FALLBACK: Infranym puzzle encoding {state.secret_name} → {state.surface_name}",
-                    iteration_number=len(state.song_proposals.iterations) + 1,
+                    iteration_number=(previous_iteration.iteration_number or 0) + 1,
                     agent_name="indigo",
                     timestamp=time.time(),
                 )
