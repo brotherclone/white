@@ -24,6 +24,10 @@ from typing import Optional
 
 import yaml
 
+from white_core.manifests.song_proposal import (
+    SongProposalIteration,
+    resolve_supersession_chains,
+)
 from white_extraction.util.generate_negative_constraints import (
     generate_constraints,
     write_constraints,
@@ -475,11 +479,6 @@ def _load_final_iteration_lookup(yml_dir: Path) -> dict[str, bool]:
     bundle_paths = sorted(yml_dir.glob("all_song_proposals*.yml"))
     if not bundle_paths:
         return {}
-    from white_core.manifests.song_proposal import (
-        SongProposalIteration,
-        resolve_supersession_chains,
-    )
-
     try:
         with open(bundle_paths[0]) as f:
             data = yaml.safe_load(f) or {}

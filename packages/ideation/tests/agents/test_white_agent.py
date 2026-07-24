@@ -564,6 +564,81 @@ def test_save_all_proposals_leaves_independent_colors_untouched(
     assert yellow.is_final is True
 
 
+def test_save_all_proposals_promotes_untouched_entry_sharing_color_with_superseded(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: a color group containing both a superseded chain member
+    and a genuinely separate, never-decided entry of the same color must
+    still promote the untouched one — even when the superseded entry sorts
+    last within the group (an any()-based skip, or a naive all()-based
+    promote-last-in-group fix, both mishandle this ordering)."""
+    seed = _make_proposal(
+        iteration_id="seed_v1",
+        rainbow_color="Green",
+        iteration_number=1,
+        is_final=True,
+    )
+    pivot = _make_proposal(
+        iteration_id="pivot_v2",
+        rainbow_color="Black",
+        iteration_number=2,
+        is_final=True,
+    )
+    # Same color as seed (Green), added after pivot so it sorts last within
+    # the Green group by list position — but it is NOT part of any chain.
+    untouched = _make_proposal(
+        iteration_id="untouched_v1",
+        rainbow_color="Green",
+        iteration_number=None,
+        is_final=False,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_mixed_color_group_test",
+        song_proposals=SongProposal(iterations=[seed, pivot, untouched]),
+    )
+    white_agent.save_all_proposals(state)
+
+    assert seed.is_final is False
+    assert pivot.is_final is True
+    assert untouched.is_final is True
+
+
+def test_save_all_proposals_title_dedup_preserves_suffix_near_max_length(
+    white_agent, tmp_path, monkeypatch
+):
+    """Regression: when the base title is already near the 150-char max,
+    truncating the whole suffixed string (instead of the base) chops the
+    suffix off entirely, leaving the title collision unresolved."""
+    long_title = "A" * 150
+    clean = _make_proposal(
+        iteration_id="clean_v1",
+        title=long_title,
+        rainbow_color="Green",
+        is_final=True,
+    )
+    other = _make_proposal(
+        iteration_id="other_v1",
+        title=long_title,
+        rainbow_color="Blue",
+        is_final=True,
+    )
+    monkeypatch.setenv("BLOCK_MODE", "false")
+    monkeypatch.setattr(white_agent, "_artifact_base_path", lambda: str(tmp_path))
+    state = MainAgentState(
+        thread_id="tid_long_title_test",
+        song_proposals=SongProposal(iterations=[clean, other]),
+    )
+    white_agent.save_all_proposals(state)
+
+    assert len(clean.title) <= 150
+    assert len(other.title) <= 150
+    assert clean.title != other.title
+    assert clean.title.endswith("(Green)")
+    assert other.title.endswith("(Blue)")
+
+
 def test_save_all_proposals_drops_exact_duplicate_iterations(
     white_agent, tmp_path, monkeypatch
 ):

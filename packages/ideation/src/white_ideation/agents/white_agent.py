@@ -4117,9 +4117,12 @@ The song should be buildable from these specifications.
         # For each color group, if no iteration is explicitly marked final,
         # treat the last iteration in that group as final. This handles single-agent
         # workflows and agents (Orange, Green, etc.) that never call is_final themselves.
-        # Skip groups where every unmarked member was just superseded above —
-        # that's a deliberate "this lineage's final now lives under a different
-        # color" outcome, not an undecided orphan to fall back on.
+        # Entries superseded above are excluded from the candidate pool — that's
+        # a deliberate "this lineage's final now lives under a different color"
+        # outcome, not an undecided orphan to fall back on — but a color group
+        # can still contain a genuinely separate, untouched entry alongside a
+        # superseded one, so only skip the whole group when every member in it
+        # was superseded, not merely any.
         iterations_by_color: dict = {}
         for idx, iteration in enumerate(iterations):
             color = str(iteration.rainbow_color)
@@ -4127,9 +4130,13 @@ The song should be buildable from these specifications.
         for color_indexes in iterations_by_color.values():
             if any(iterations[idx].is_final for idx in color_indexes):
                 continue
-            if any(id(iterations[idx]) in superseded_ids for idx in color_indexes):
-                continue
-            iterations[color_indexes[-1]].is_final = True
+            eligible = [
+                idx
+                for idx in color_indexes
+                if id(iterations[idx]) not in superseded_ids
+            ]
+            if eligible:
+                iterations[eligible[-1]].is_final = True
 
         # Deduplicate titles within this run: if two final iterations share the same
         # title, append the color name so init_production never sees a collision.
@@ -4156,7 +4163,18 @@ The song should be buildable from these specifications.
                     # Cap to the model's own title max_length so a malformed
                     # label (or this block running more than once) can never
                     # produce a title that fails validation on next load.
-                    it.title = f"{it.title} ({_label})"[:150]
+                    # Truncate the base title first, not the whole suffixed
+                    # string — otherwise a title already near 150 chars would
+                    # have the suffix truncated away, leaving the collision
+                    # unresolved.
+                    suffix = f" ({_label})"
+                    base_budget = max(0, 150 - len(suffix))
+                    base = (
+                        it.title
+                        if len(it.title) <= base_budget
+                        else it.title[:base_budget].rstrip()
+                    )
+                    it.title = f"{base}{suffix}"
                 logger.warning(
                     "Duplicate title within run — appended color suffix: %s",
                     [it.title for it in _dupes],
