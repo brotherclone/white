@@ -1670,6 +1670,23 @@ def create_app(
         save_playlist_config(album_dir, PlaylistConfig(output_dir=body.output_dir))
         return {"ok": True, "output_dir": body.output_dir}
 
+    @app.get("/playlists/material")
+    def get_material_produced():
+        from white_composition.playlist_sync import (
+            DEFAULT_MATERIAL_TARGET_SECONDS,
+            load_playlist_config,
+            material_produced_seconds,
+        )
+
+        album_dir = _require_shrink_wrapped_dir()
+        config = load_playlist_config(album_dir)
+        total_seconds, file_count = material_produced_seconds(config.output_dir)
+        return {
+            "total_seconds": total_seconds,
+            "file_count": file_count,
+            "target_seconds": DEFAULT_MATERIAL_TARGET_SECONDS,
+        }
+
     @app.post("/playlists/sync")
     def sync_playlists_endpoint():
         from white_composition.lp_sides import load_sides

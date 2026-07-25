@@ -15,12 +15,13 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel
 
-from white_composition.lp_sides import SIDE_NAMES, SidesDocument
+from white_composition.lp_sides import SIDE_NAMES, SidesDocument, mix_duration_seconds
 
 PLAYLIST_CONFIG_FILENAME = "playlist_config.yml"
 DEFAULT_OUTPUT_DIR = (
     "/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Listening"
 )
+DEFAULT_MATERIAL_TARGET_SECONDS = 9 * 3600.0
 
 REJECTS_DIRNAME = "Rejects"
 REVIEW_DIRNAME = "Review"
@@ -273,3 +274,28 @@ def sync_playlists(
         "review": _rebuild_folder(base / REVIEW_DIRNAME, review_names, songs_by_id),
         "wip": _rebuild_folder(base / WIP_DIRNAME, wip_names, songs_by_id),
     }
+
+
+# ---------------------------------------------------------------------------
+# Material produced
+# ---------------------------------------------------------------------------
+
+
+def material_produced_seconds(output_dir: str) -> tuple[float, int]:
+    """Sum durations of mp3s directly under `output_dir` (Rejects/Review/WiP
+    subfolders excluded — this counts only tracks the user has placed loose in
+    the Listening folder itself). Returns (total_seconds, file_count)."""
+    base = _validate_output_dir(output_dir)
+    if not base.is_dir():
+        return 0.0, 0
+    total = 0.0
+    count = 0
+    for entry in base.iterdir():
+        if not entry.is_file() or entry.suffix.lower() != ".mp3":
+            continue
+        duration = mix_duration_seconds(entry)
+        if duration is None:
+            continue
+        total += duration
+        count += 1
+    return round(total, 3), count

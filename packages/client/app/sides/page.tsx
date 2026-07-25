@@ -14,10 +14,10 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
-  assignSongToSide, fetchPlaylistConfig, fetchSides, fetchSongs, moveSongBetweenSides,
-  removeSongFromSide, setPlaylistConfig, syncPlaylists,
+  assignSongToSide, fetchMaterialProduced, fetchPlaylistConfig, fetchSides, fetchSongs,
+  moveSongBetweenSides, removeSongFromSide, setPlaylistConfig, syncPlaylists,
 } from "@/lib/api";
-import { SideEntry, SideName, SideSong, SidesResponse, SongEntry } from "@/lib/types";
+import { MaterialProduced, SideEntry, SideName, SideSong, SidesResponse, SongEntry } from "@/lib/types";
 import { NotesButton, SongNotesModal } from "@/components/SongNotes";
 
 const SIDE_NAMES: SideName[] = ["A", "B", "C", "D"];
@@ -240,6 +240,7 @@ export default function SidesPage() {
   const [showUnmixed, setShowUnmixed] = useState(false);
   const [notesSongId, setNotesSongId] = useState<string | null>(null);
   const [playlistDirInput, setPlaylistDirInput] = useState("");
+  const [material, setMaterial] = useState<MaterialProduced | null>(null);
   const [savingPlaylistDir, setSavingPlaylistDir] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<{ rejects: number; review: number; wip: number } | null>(null);
@@ -251,6 +252,7 @@ export default function SidesPage() {
     fetchPlaylistConfig()
       .then((config) => setPlaylistDirInput(config.output_dir))
       .catch(() => {});
+    fetchMaterialProduced().then(setMaterial).catch(() => {});
   }, []);
 
   const handleSavePlaylistDir = async () => {
@@ -409,11 +411,18 @@ export default function SidesPage() {
           ← home
         </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">LP Side Sequencing</h1>
-        {sides && (
-          <span className="ml-auto text-xs font-sans text-zinc-500">
-            Total: <span className="text-zinc-300">{formatDuration(totalUsedSeconds)}</span> / {formatDuration(totalTargetSeconds)} across {SIDE_NAMES.length} sides
-          </span>
-        )}
+        <span className="ml-auto flex items-center gap-4">
+          {sides && (
+            <span className="text-xs font-sans text-zinc-500">
+              Total: <span className="text-zinc-300">{formatDuration(totalUsedSeconds)}</span> / {formatDuration(totalTargetSeconds)} across {SIDE_NAMES.length} sides
+            </span>
+          )}
+          {material && (
+            <span className="text-xs font-sans text-zinc-500">
+              Material produced: <span className="text-zinc-300">{formatDuration(material.total_seconds)}</span> / {formatDuration(material.target_seconds)}
+            </span>
+          )}
+        </span>
       </div>
 
       <div className="border-b border-zinc-800 px-6 py-3 flex items-center gap-3">

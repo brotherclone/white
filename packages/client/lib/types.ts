@@ -249,3 +249,9 @@ export interface SidesResponse {
   side_limit_seconds: number;
   sides: Record<SideName, SideEntry>;
 }
+
+export interface MaterialProduced {
+  total_seconds: number;
+  file_count: number;
+  target_seconds: number;
+}
