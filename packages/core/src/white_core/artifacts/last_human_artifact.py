@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 import yaml
 from dotenv import load_dotenv
-from pydantic import Field, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from white_core.artifacts.base_artifact import ChainArtifact
 from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
@@ -21,15 +21,21 @@ from white_core.util.string_utils import sanitize_for_filename
 load_dotenv()
 
 
-class LastHumanArtifact(ChainArtifact, ABC):
-    """
-    Individual human whose vulnerability mirrors a species extinction.
-    Intimate, specific, NOT abstract climate victim.
+class LastHumanFields(BaseModel):
+    """The content fields of a LastHumanArtifact, split out from
+    ChainArtifact's bookkeeping fields (thread_id, artifact_id, file_name,
+    ...) so this smaller shape can be used as the LLM tool-call schema.
+
+    ChainArtifact contributes 8 fields to LastHumanArtifact, none of which
+    the LLM should be deciding — the caller always overwrites or discards
+    them after generation. Exposing all of it in the tool schema anyway
+    made the tool call bigger than it needed to be; on a schema already
+    carrying 9 required content fields plus a full narrative field, that
+    was enough to occasionally push claude-fable-5 into answering in prose
+    instead of calling the tool at all. Trimming to just this class cut
+    that failure mode noticeably in testing.
     """
 
-    chain_artifact_type: ChainArtifactType = ChainArtifactType.LAST_HUMAN
-    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
-    rainbow_color_mnemonic_character_value: str = "G"
     name: str = Field(..., description="Full name")
     age: int = Field(..., ge=0, le=120)
     pronouns: str = Field(default="they/them")
@@ -66,11 +72,6 @@ class LastHumanArtifact(ChainArtifact, ABC):
         None, description="What were they thinking about at the end?"
     )
 
-    def __init__(self, **data):
-        if "artifact_name" not in data and "name" in data:
-            data["artifact_name"] = sanitize_for_filename(data["name"])
-        super().__init__(**data)
-
     @field_validator("year_documented")
     @classmethod
     def _validate_year_documented(cls, v: int) -> int:
@@ -79,6 +80,22 @@ class LastHumanArtifact(ChainArtifact, ABC):
         raise ValueError(
             "year_documented must be 1975 or between 2028 and 2350 (inclusive)"
         )
+
+
+class LastHumanArtifact(ChainArtifact, LastHumanFields, ABC):
+    """
+    Individual human whose vulnerability mirrors a species extinction.
+    Intimate, specific, NOT abstract climate victim.
+    """
+
+    chain_artifact_type: ChainArtifactType = ChainArtifactType.LAST_HUMAN
+    chain_artifact_file_type: ChainArtifactFileType = ChainArtifactFileType.YML
+    rainbow_color_mnemonic_character_value: str = "G"
+
+    def __init__(self, **data):
+        if "artifact_name" not in data and "name" in data:
+            data["artifact_name"] = sanitize_for_filename(data["name"])
+        super().__init__(**data)
 
     def flatten(self) -> Dict:
         parent_data = super().flatten()

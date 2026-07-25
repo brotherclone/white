@@ -38,7 +38,6 @@ class RedAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -177,9 +176,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             {the_rainbow_table_colors['R']}
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                     state.song_proposals.iterations.append(self.counter_proposal)
@@ -274,9 +272,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookPageCollection)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookPageCollection, prompt)
                 if isinstance(result, BookPageCollection):
                     page_1_text = result.page_1_text
                     page_2_text = result.page_2_text
@@ -392,9 +389,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             notable_quote=cls.generate_quote(topic, author, the_genre),
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookArtifact)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookArtifact, prompt)
                 if isinstance(result, BookArtifact):
                     result_dict = result.model_dump()
                 elif isinstance(result, dict):
@@ -483,9 +479,8 @@ class RedAgent(BaseRainbowAgent, ABC):
                 page_2.text_content: "This is the second page of the book."
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookPageCollection)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookPageCollection, prompt)
                 if isinstance(result, dict):
                     reaction_book_pages = BookPageCollection(**result)
                     state.current_reaction_book.excerpts = [
@@ -572,9 +567,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookEvaluationDecision)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookEvaluationDecision, prompt)
                 if isinstance(result, dict):
                     state.should_create_book = result.get("new_book", False)
                     state.should_respond_with_reaction_book = result.get(

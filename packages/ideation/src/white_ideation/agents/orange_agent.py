@@ -51,7 +51,6 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -179,10 +178,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             6. Always sets rainbow_color to: {the_rainbow_table_colors['O']}
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
 
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                 elif isinstance(result, SongProposalIteration):
@@ -319,9 +317,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             The story should resonate thematically with White's proposal ({state.white_proposal.concept}).
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(NewspaperArtifact)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, NewspaperArtifact, prompt)
                 if isinstance(result, dict):
                     # Remove fields that should use class defaults, not LLM-generated values
                     result.pop("chain_artifact_file_type", None)
@@ -522,10 +519,9 @@ class OrangeAgent(BaseRainbowAgent, ABC):
     """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SymbolicObjectArtifact)
 
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SymbolicObjectArtifact, prompt)
                 if isinstance(result, dict):
                     # Remove fields that should use class defaults, not LLM-generated values
                     result.pop("chain_artifact_file_type", None)
@@ -784,7 +780,6 @@ class OrangeAgent(BaseRainbowAgent, ABC):
 
             response = self.llm.invoke(
                 [HumanMessage(content=prompt)],
-                temperature=0.8 + (state.gonzo_intensity * 0.05),
                 max_tokens=3000,
             )
             gonzo_text = self._extract_text(response.content).strip()

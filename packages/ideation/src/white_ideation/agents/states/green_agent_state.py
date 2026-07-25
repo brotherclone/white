@@ -52,6 +52,15 @@ class GreenAgentState(BaseRainbowAgentState):
         default=None,
         description="Claude's, or what its evolved to, decision made by the agent to rescue the last human.",
     )
+    human_generation_attempts: Annotated[
+        int, lambda x, y: y if y is not None else x
+    ] = Field(
+        default=0,
+        description="Retry counter for get_human — LastHumanArtifact is large "
+        "enough that the model occasionally responds in prose instead of "
+        "calling the tool; retried rather than letting current_human stay "
+        "None and cascade-skip the rest of the agent.",
+    )
 
     def __init__(self, **data):
         super().__init__(**data)

@@ -13,7 +13,7 @@ from langgraph.graph.state import StateGraph
 from white_core.agents.agent_settings import AgentSettings
 from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
-from white_core.artifacts.last_human_artifact import LastHumanArtifact
+from white_core.artifacts.last_human_artifact import LastHumanArtifact, LastHumanFields
 from white_core.artifacts.last_human_species_extinction_narative_artifact import (
     LastHumanSpeciesExtinctionNarrativeArtifact,
 )
@@ -48,7 +48,6 @@ class GreenAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -119,7 +118,11 @@ class GreenAgent(BaseRainbowAgent, ABC):
         )  # SongProposalIteration
         work_flow.add_edge(START, "get_species")
         work_flow.add_edge("get_species", "get_human")
-        work_flow.add_edge("get_human", "get_parallel_moment")
+        work_flow.add_conditional_edges(
+            "get_human",
+            self.route_after_get_human,
+            {"retry": "get_human", "continue": "get_parallel_moment"},
+        )
         work_flow.add_edge(
             "get_parallel_moment", "write_last_human_extinction_narrative"
         )
@@ -183,6 +186,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
     @agent_error_handler("Sub-Arbitrary")
     def get_human(self, state: GreenAgentState) -> GreenAgentState:
         get_state_snapshot(state, "get_human_enter", state.thread_id, "Sub-Arbitrary")
+        state.human_generation_attempts += 1
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if mock_mode:
@@ -224,7 +228,7 @@ Symbolic resonance: {state.current_species.symbolic_resonance}
 Human parallel hints:
 {json.dumps(state.current_species.human_parallel_hints, indent=2)}
 
-Generate a LastHumanCharacterArtifact with:
+Generate a LastHumanArtifact with:
 - Specific name, age, location (real place)
 - Occupation that mirrors species' ecological role
 - Daily routine disrupted by same forces killing the species
@@ -235,39 +239,31 @@ Generate a LastHumanCharacterArtifact with:
 Be intimate and specific, not generic. This person exists in 2025-2050 timeline.
                 """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(LastHumanArtifact)
             try:
-                result = proposer.invoke(prompt)
+                # LastHumanFields is LastHumanArtifact's content fields without
+                # ChainArtifact's bookkeeping ones (thread_id, artifact_id,
+                # file_name, ...) — the model never needs to decide those, and
+                # the smaller tool schema is measurably less likely to get a
+                # prose answer back with no tool call at all.
+                result = self._invoke_structured(claude, LastHumanFields, prompt)
                 if isinstance(result, dict):
-                    # Remove fields that should use class defaults, not LLM-generated values
-                    result.pop("chain_artifact_file_type", None)
-                    result.pop("chain_artifact_type", None)
-                    result.pop("file_name", None)
-                    result.pop("file_path", None)
-                    result.pop("thread_id", None)  # Will be set below
-                    result.pop("artifact_id", None)  # Let class generate UUID
-
-                    result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-                    result["thread_id"] = state.thread_id
-                    current_human = LastHumanArtifact(**result)
+                    fields = result
+                elif isinstance(result, LastHumanFields):
+                    fields = result.model_dump()
+                else:
+                    error_msg = f"Expected LastHumanFields, got {type(result)}"
+                    if block_mode:
+                        raise TypeError(error_msg)
+                    logger.warning(error_msg)
+                    fields = None
+                if fields is not None:
+                    fields["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
+                    fields["thread_id"] = state.thread_id
+                    current_human = LastHumanArtifact(**fields)
                     state.current_human = current_human
                     current_human.save_file()
                     state.artifacts.append(current_human)
                     return state
-                elif isinstance(result, LastHumanArtifact):
-                    # Override any LLM-generated values with correct ones
-                    result.thread_id = state.thread_id
-                    result.base_path = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
-                    result.get_file_name()
-                    state.current_human = result
-                    result.save_file()
-                    state.artifacts.append(result)
-                    return state
-                else:
-                    error_msg = f"Expected LastHumanArtifact, got {type(result)}"
-                    if block_mode:
-                        raise TypeError(error_msg)
-                    logger.warning(error_msg)
             except Exception as e:
                 error_msg = f"Failed to generate last human artifact: {e!s}"
                 logger.error(error_msg)
@@ -275,6 +271,22 @@ Be intimate and specific, not generic. This person exists in 2025-2050 timeline.
                     raise Exception(error_msg)
         get_state_snapshot(state, "get_human_exit", state.thread_id, "Sub-Arbitrary")
         return state
+
+    @staticmethod
+    @agent_error_handler("Sub-Arbitrary")
+    def route_after_get_human(state: GreenAgentState) -> str:
+        """LastHumanArtifact is large enough that the model occasionally
+        responds in prose instead of calling the tool even with retries
+        inside _invoke_structured. Retry the whole node with a fresh call
+        rather than let current_human stay None and cascade-skip the rest
+        of Green Agent (get_parallel_moment, narrative, survey, decision)."""
+        if state.current_human is None and state.human_generation_attempts < 3:
+            logger.warning(
+                f"⚠️ get_human produced no artifact, retrying "
+                f"(attempt {state.human_generation_attempts}/3)"
+            )
+            return "retry"
+        return "continue"
 
     @agent_error_handler("Sub-Arbitrary")
     def get_parallel_moment(self, state: GreenAgentState) -> GreenAgentState:
@@ -334,11 +346,10 @@ This is THE EMPTY FIELDS methodology: finding the exact point where deep time an
 Write 2-3 paragraphs exploring this resonance. Be poetic but grounded. This insight will anchor the narrative to come.
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(
-                LastHumanSpeciesExtinctionParallelMoment
-            )
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(
+                    claude, LastHumanSpeciesExtinctionParallelMoment, prompt
+                )
                 if isinstance(result, dict):
                     result["base_path"] = os.getenv("AGENT_WORK_PRODUCT_BASE_PATH")
                     current_parallel_moment = LastHumanSpeciesExtinctionParallelMoment(
@@ -441,11 +452,10 @@ The narrative structure should feel like:
 Parallel the timelines, mirror the losses, but never explain the connection - let it emerge.
                 """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(
-                LastHumanSpeciesExtinctionNarrativeArtifact
-            )
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(
+                    claude, LastHumanSpeciesExtinctionNarrativeArtifact, prompt
+                )
                 if isinstance(result, dict):
                     # Remove fields that should use class defaults, not LLM-generated values
                     result.pop("chain_artifact_file_type", None)
@@ -555,9 +565,8 @@ Be honest. You are kind but discriminating. Not everything deserves rescue - onl
 Score each dimension (1-10) and provide brief reasoning. Then give an overall assessment: IS THIS WORTH SAVING?
 """
         claude = self._get_claude()
-        proposer = claude.with_structured_output(ArbitrarysSurveyArtifact)
         try:
-            result = proposer.invoke(prompt)
+            result = self._invoke_structured(claude, ArbitrarysSurveyArtifact, prompt)
             if isinstance(result, dict):
                 # Remove fields that should use class defaults, not LLM-generated values
                 result.pop("chain_artifact_file_type", None)
@@ -672,9 +681,8 @@ Be honest. The rescue decision should feel earned, not automatic. If you're move
 Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual foundation for the song proposal.
             """
         claude = self._get_claude()
-        proposer = claude.with_structured_output(RescueDecisionArtifact)
         try:
-            result = proposer.invoke(prompt)
+            result = self._invoke_structured(claude, RescueDecisionArtifact, prompt)
             if isinstance(result, dict):
                 # Remove fields that should use class defaults, not LLM-generated values
                 result.pop("chain_artifact_file_type", None)
@@ -793,9 +801,8 @@ and finally Claude's decision on what to save from Earth:
 Using all of this, create a new SongProposalIteration that captures the essence of extinction, loss, and the bittersweet beauty of endings.
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                 else:

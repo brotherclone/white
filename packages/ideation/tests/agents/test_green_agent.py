@@ -1,7 +1,9 @@
+from unittest.mock import patch
+
 import pytest
 
 from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
-from white_core.artifacts.last_human_artifact import LastHumanArtifact
+from white_core.artifacts.last_human_artifact import LastHumanArtifact, LastHumanFields
 from white_core.artifacts.last_human_species_extinction_narative_artifact import (
     LastHumanSpeciesExtinctionNarrativeArtifact,
 )
@@ -153,6 +155,75 @@ class TestGetHuman:
 
         assert result.thread_id == original_thread_id
         assert isinstance(result, GreenAgentState)
+
+
+class TestGetHumanUsesTrimmedSchema:
+    """get_human targets LastHumanFields (content only) instead of the full
+    LastHumanArtifact (which also carries ChainArtifact's bookkeeping
+    fields) as the tool-call schema, then builds the real artifact from the
+    result plus thread_id/base_path. Confirms that wiring end to end without
+    a live API call."""
+
+    def test_builds_last_human_artifact_from_fields_result(
+        self, green_agent, green_agent_state, monkeypatch
+    ):
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+        # get_species in non-mock mode is a local corpus draw, no LLM call.
+        green_agent_state = GreenAgent.get_species(green_agent_state)
+
+        fields = LastHumanFields(
+            name="Aputi Kristiansen",
+            age=52,
+            location="Ilulissat, Greenland",
+            year_documented=2041,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="details",
+            environmental_stressor="stressor",
+            documentation_type=LastHumanDocumentationType.WITNESS,
+            last_days_scenario="scenario",
+        )
+
+        with patch.object(
+            green_agent, "_invoke_structured", lambda llm, schema, prompt: fields
+        ):
+            result = green_agent.get_human(green_agent_state)
+
+        assert isinstance(result.current_human, LastHumanArtifact)
+        assert result.current_human.name == "Aputi Kristiansen"
+        assert result.current_human.thread_id == green_agent_state.thread_id
+
+
+class TestRouteAfterGetHuman:
+    """Tests for route_after_get_human — retries the get_human node rather
+    than letting a failed structured-output call cascade-skip the rest of
+    Green Agent (get_parallel_moment, narrative, survey, decision all
+    early-return when current_human is None)."""
+
+    def test_continues_when_human_was_generated(self, green_agent_state):
+        green_agent_state.current_human = LastHumanArtifact(
+            thread_id="test",
+            name="Test Human",
+            age=40,
+            location="Test Location",
+            year_documented=2050,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="Test details",
+            environmental_stressor="Test stressor",
+            documentation_type=LastHumanDocumentationType.WITNESS,
+            last_days_scenario="Test scenario",
+        )
+        assert GreenAgent.route_after_get_human(green_agent_state) == "continue"
+
+    def test_retries_when_human_missing_and_attempts_remain(self, green_agent_state):
+        green_agent_state.current_human = None
+        green_agent_state.human_generation_attempts = 1
+        assert GreenAgent.route_after_get_human(green_agent_state) == "retry"
+
+    def test_gives_up_after_max_attempts(self, green_agent_state):
+        green_agent_state.current_human = None
+        green_agent_state.human_generation_attempts = 3
+        assert GreenAgent.route_after_get_human(green_agent_state) == "continue"
 
 
 class TestGetParallelMoment:

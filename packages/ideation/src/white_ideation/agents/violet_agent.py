@@ -75,7 +75,6 @@ class VioletAgent(BaseRainbowAgent, ABC):
             self.settings = AgentSettings()
 
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -366,10 +365,9 @@ Output as JSON with structure:
 }}"""
 
         try:
-            structured_llm = self.llm.with_structured_output(
-                VanityInterviewQuestionOutput
+            result = self._invoke_structured(
+                self.llm, VanityInterviewQuestionOutput, prompt
             )
-            result = structured_llm.invoke(prompt)
             state.interview_questions = result.questions
             logger.info(f"   Generated {len(result.questions)} questions")
             for q in result.questions:
@@ -500,10 +498,9 @@ Keep response 2-4 sentences. Output as JSON:
 
             try:
                 # Structured output
-                structured_llm = self.llm.with_structured_output(
-                    VanityInterviewResponse
+                response = self._invoke_structured(
+                    self.llm, VanityInterviewResponse, prompt
                 )
-                response = structured_llm.invoke(prompt)
                 response.question_number = q.number  # Ensure match
                 responses.append(response)
 
@@ -581,8 +578,7 @@ Keep it brief (1-2 sentences each). Be Lynchian: specific, concrete details that
 Not horror — just wrong. The frame breaks, then continues."""
 
         try:
-            structured_llm = self.llm.with_structured_output(DisruptionExchange)
-            exchange = structured_llm.invoke(prompt)
+            exchange = self._invoke_structured(self.llm, DisruptionExchange, prompt)
 
             sentinel_q = VanityInterviewQuestion(
                 number=DISRUPTION_QUESTION_NUMBER, question=exchange.interviewer_line
@@ -721,8 +717,9 @@ Output a COMPLETE revised SongProposalIteration with ALL fields populated.
 The revision should be INFORMED BY but not DEFEATED BY the criticism."""
 
         try:
-            structured_llm = self.llm.with_structured_output(SongProposalIteration)
-            counter_proposal = structured_llm.invoke(prompt)
+            counter_proposal = self._invoke_structured(
+                self.llm, SongProposalIteration, prompt
+            )
             logger.info(f"   Generated counter-proposal: {counter_proposal.title}")
 
         except Exception as e:

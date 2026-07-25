@@ -95,7 +95,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -629,9 +628,8 @@ Think Bob Dylan's personal mythology.
 The tape has been recorded over. What life exists on it now?
 """
         claude = self._get_claude()
-        proposer = claude.with_structured_output(AlternateTimelineArtifact)
         try:
-            result = proposer.invoke(prompt)
+            result = self._invoke_structured(claude, AlternateTimelineArtifact, prompt)
             if isinstance(result, dict):
                 # Remove fields that should use class defaults, not LLM-generated values
                 result.pop("chain_artifact_file_type", None)
@@ -1354,10 +1352,9 @@ dream into a song about THIS erased timeline - the one in your hands.
             """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
 
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                 else:

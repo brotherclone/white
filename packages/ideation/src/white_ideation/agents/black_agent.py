@@ -55,7 +55,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             self.settings = AgentSettings()
 
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -168,9 +167,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
             Ambiguity and subtlety are valued.
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                 elif isinstance(result, SongProposalIteration):
@@ -461,9 +459,8 @@ Here's the EVP transcript:
                    """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(YesOrNo)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, YesOrNo, prompt)
                 if isinstance(result, dict):
                     state.should_update_proposal_with_evp = result.get("answer", False)
                 elif isinstance(result, YesOrNo):
@@ -564,9 +561,8 @@ And here is the EVP transcript:
     {state.artifacts[-1].transcript}
                """
         claude = self._get_claude()
-        proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            result = proposer.invoke(prompt)
+            result = self._invoke_structured(claude, SongProposalIteration, prompt)
             if isinstance(result, dict):
                 updated_proposal = SongProposalIteration(**result)
             elif isinstance(result, SongProposalIteration):

@@ -492,10 +492,10 @@ class TestVioletAgentErrorHandling:
                 VanityInterviewQuestion(number=3, question="Question three?"),
             ]
         )
-        mock_structured_llm = MagicMock()
-        mock_structured_llm.invoke.return_value = mock_output
         violet_agent.llm = MagicMock()
-        violet_agent.llm.with_structured_output.return_value = mock_structured_llm
+        monkeypatch.setattr(
+            violet_agent, "_invoke_structured", lambda llm, schema, prompt: mock_output
+        )
 
         # Non-blocking mode: the missing mock file should be logged and the
         # agent should fall through to the (mocked) LLM rather than raising
@@ -551,9 +551,15 @@ class TestInjectDisruptingEvent:
             gabe_response="I know. I let it.",
         )
         mock_llm = MagicMock()
-        mock_llm.with_structured_output.return_value.invoke.return_value = mock_exchange
 
-        with patch.object(violet_agent, "llm", mock_llm):
+        with (
+            patch.object(violet_agent, "llm", mock_llm),
+            patch.object(
+                violet_agent,
+                "_invoke_structured",
+                lambda llm, schema, prompt: mock_exchange,
+            ),
+        ):
             result = violet_agent.inject_disrupting_event(violet_agent_state)
 
         assert result.disrupting_event is not None

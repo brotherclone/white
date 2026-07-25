@@ -67,7 +67,6 @@ class YellowAgent(BaseRainbowAgent, ABC):
 
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -321,9 +320,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
                        """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(GameEvaluationDecision)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, GameEvaluationDecision, prompt)
                 if isinstance(result, dict):
                     state.should_add_to_story = result.get("should_add_to_story", False)
                 elif isinstance(result, GameEvaluationDecision):
@@ -433,9 +431,8 @@ NOT a dictionary like {{"color_name": "Yellow"}}
 Just: "Y"
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                     counter_proposal.bpm = base_proposal.bpm

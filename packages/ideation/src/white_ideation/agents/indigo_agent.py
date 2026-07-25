@@ -9,7 +9,6 @@ from typing import Dict, List
 import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
-from langchain_core.output_parsers import StrOutputParser
 from langgraph.constants import END, START
 from langgraph.graph.state import StateGraph
 
@@ -67,7 +66,6 @@ class IndigoAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -253,8 +251,9 @@ Think strategically: these letters must form TWO different meaningful phrases.
 Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
 """
             try:
-                chain = self.llm | StrOutputParser()
-                response = chain.invoke(prompt).strip().upper()
+                response = (
+                    self._extract_text(self.llm.invoke(prompt).content).strip().upper()
+                )
                 letters = "".join(c for c in response if c.isalpha())
                 state.letter_bank = "".join(sorted(letters))
                 return state
@@ -312,8 +311,9 @@ Use ALL letters EXACTLY ONCE. No letters left over, no letters added.
 Respond with ONLY the secret name (proper capitalization, with spaces).
 """
             try:
-                chain = self.llm | StrOutputParser()
-                secret_name = chain.invoke(prompt).strip()
+                secret_name = self._extract_text(
+                    self.llm.invoke(prompt).content
+                ).strip()
                 state.secret_name = secret_name
                 logger.info(f"🃏 FOOL created: {secret_name}")
                 return state
@@ -368,8 +368,9 @@ This is the decoy. Make it plausible.
 Respond with ONLY the surface name (proper capitalization, with spaces).
             """
             try:
-                chain = self.llm | StrOutputParser()
-                surface_name = chain.invoke(spy_prompt).strip()
+                surface_name = self._extract_text(
+                    self.llm.invoke(spy_prompt).content
+                ).strip()
                 state.surface_name = surface_name
                 logger.info(f"🕵️ SPY created: {surface_name}")
                 return state
@@ -682,8 +683,7 @@ The clue should:
 
 Write ONLY the clue:
 """
-        chain = self.llm | StrOutputParser()
-        clue = chain.invoke(prompt).strip()
+        clue = self._extract_text(self.llm.invoke(prompt).content).strip()
         logger.info(f"🔍 Generated surface clue: {clue}")
         return clue
 
@@ -701,8 +701,7 @@ The solution should:
 
 Write ONLY the solution text:
 """
-        chain = self.llm | StrOutputParser()
-        solution = chain.invoke(prompt).strip()
+        solution = self._extract_text(self.llm.invoke(prompt).content).strip()
         logger.info(f"✨ Generated solution: {solution[:50]}...")
         return solution
 
@@ -766,8 +765,7 @@ Write ONLY the lines (no numbers, no extra text):
     """
 
         logger.info(f"🤖 Generating acrostic for '{secret}'...")
-        chain = self.llm | StrOutputParser()
-        response = chain.invoke(prompt).strip()
+        response = self._extract_text(self.llm.invoke(prompt).content).strip()
         lines = [line.strip() for line in response.split("\n") if line.strip()]
         if len(lines) != len(secret):
             logger.warning(
@@ -808,8 +806,7 @@ Write ONLY the riddle (no answer, no explanation):
         logger.info(
             f"🤖 Generating riddle for '{secret}' (difficulty: {difficulty})..."
         )
-        chain = self.llm | StrOutputParser()
-        riddle_text = chain.invoke(prompt).strip()
+        riddle_text = self._extract_text(self.llm.invoke(prompt).content).strip()
         state.generated_riddle_text = riddle_text
         state.text_infranym_difficulty = difficulty
         state.text_infranym_method = "riddle"
@@ -957,8 +954,7 @@ Genres: [genre1, genre2]
 Concept: [full concept explanation]
 """
             try:
-                chain = self.llm | StrOutputParser()
-                response = chain.invoke(proposal_prompt)
+                response = self._extract_text(self.llm.invoke(proposal_prompt).content)
                 counter_proposal = _parse_proposal_response(response)
                 counter_proposal.concept += "\n\n**INFRANYM PROTOCOL:**\n"
                 counter_proposal.concept += (
@@ -1062,8 +1058,10 @@ Concept: [full concept explanation]
     # ========================================================================
 
     @staticmethod
-    def _is_valid_anagram(phrase1: str, phrase2: str) -> bool:
+    def _is_valid_anagram(phrase1: str | None, phrase2: str | None) -> bool:
         """Validate that two phrases are true anagrams"""
+        if phrase1 is None or phrase2 is None:
+            return False
         clean1 = "".join(c.upper() for c in phrase1 if c.isalnum())
         clean2 = "".join(c.upper() for c in phrase2 if c.isalnum())
         return sorted(clean1) == sorted(clean2) and len(clean1) > 0

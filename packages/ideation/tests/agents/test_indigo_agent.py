@@ -69,3 +69,24 @@ Concept: A life lived in someone else's shadow
     ), "iteration_id looks like a timestamp"
     assert result.iteration_id.startswith("indigo_")
     assert result.iteration_id.endswith("_v1")
+
+
+def test_is_valid_anagram_true_positive():
+    agent = IndigoAgent()
+    assert agent._is_valid_anagram("Eleven plus two", "Twelve plus one")
+
+
+def test_is_valid_anagram_false_for_mismatched_letters():
+    agent = IndigoAgent()
+    assert not agent._is_valid_anagram("The Silent Answer", "Completely Different")
+
+
+def test_is_valid_anagram_none_surface_returns_false_not_crash():
+    """Regression: a failed SPY generation (empty structured output) used to
+    leave surface_name as None, which crashed validate_anagram with
+    TypeError: 'NoneType' object is not iterable and killed the whole
+    workflow instead of falling through to the existing retry/fallback."""
+    agent = IndigoAgent()
+    assert agent._is_valid_anagram("The Silent Answer", None) is False
+    assert agent._is_valid_anagram(None, "The Silent Answer") is False
+    assert agent._is_valid_anagram(None, None) is False
