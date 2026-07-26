@@ -127,11 +127,13 @@ class Phrase:
 
 
 def extract_phrases(midi_path: Path, rest_threshold_beats: float = 0.5) -> list[Phrase]:
-    """Group note-on events into phrases separated by rests.
+    """Group notes into phrases separated by actual rests.
 
-    A new phrase begins when the gap between consecutive note-on events
-    exceeds rest_threshold_beats (default 0.5 beats = half a beat).
-    Single-note phrases are allowed.
+    A new phrase begins when the gap between one note's end (note-off) and the
+    next note's onset exceeds rest_threshold_beats (default 0.5 beats). Legato/
+    sustained melodies — where one note's onset immediately follows the prior
+    note's end with no rest — stay in a single phrase no matter how far apart
+    their onsets are; only real silence between notes splits a phrase.
 
     Returns a list of Phrase objects in order.
     """
@@ -143,43 +145,55 @@ def extract_phrases(midi_path: Path, rest_threshold_beats: float = 0.5) -> list[
     ticks_per_beat = mid.ticks_per_beat or 480
     threshold_ticks = int(rest_threshold_beats * ticks_per_beat)
 
-    # Collect all note-on absolute ticks across all tracks
-    note_ticks: list[int] = []
+    # Pair each note-on with its matching note-off (per channel+pitch, FIFO —
+    # handles retriggered/overlapping notes on the same pitch correctly) to get
+    # real (onset, end) spans rather than just onset points.
+    pending: dict[tuple[int, int], list[int]] = {}
+    note_spans: list[tuple[int, int]] = []
     for track in mid.tracks:
         abs_tick = 0
         for msg in track:
             abs_tick += msg.time
             if msg.type == "note_on" and msg.velocity > 0:
-                note_ticks.append(abs_tick)
+                pending.setdefault((msg.channel, msg.note), []).append(abs_tick)
+            elif msg.type == "note_off" or (
+                msg.type == "note_on" and msg.velocity == 0
+            ):
+                key = (msg.channel, msg.note)
+                if pending.get(key):
+                    start = pending[key].pop(0)
+                    note_spans.append((start, abs_tick))
 
-    if not note_ticks:
+    if not note_spans:
         return []
 
-    note_ticks.sort()
+    note_spans.sort(key=lambda span: span[0])
 
     phrases: list[Phrase] = []
-    phrase_start = note_ticks[0]
-    phrase_notes = [note_ticks[0]]
+    phrase_start = note_spans[0][0]
+    phrase_end = note_spans[0][1]
+    phrase_note_count = 1
 
-    for tick in note_ticks[1:]:
-        if tick - phrase_notes[-1] > threshold_ticks:
+    for start, end in note_spans[1:]:
+        if start - phrase_end > threshold_ticks:
             phrases.append(
                 Phrase(
                     start_tick=phrase_start,
-                    end_tick=phrase_notes[-1],
-                    note_count=len(phrase_notes),
+                    end_tick=phrase_end,
+                    note_count=phrase_note_count,
                 )
             )
-            phrase_start = tick
-            phrase_notes = [tick]
+            phrase_start = start
+            phrase_note_count = 1
         else:
-            phrase_notes.append(tick)
+            phrase_note_count += 1
+        phrase_end = max(phrase_end, end)
 
     phrases.append(
         Phrase(
             start_tick=phrase_start,
-            end_tick=phrase_notes[-1],
-            note_count=len(phrase_notes),
+            end_tick=phrase_end,
+            note_count=phrase_note_count,
         )
     )
 
@@ -590,14 +604,18 @@ _NO_RHYME_SCHEME = "none"
 def _default_rhyme_scheme(line_count: int) -> str:
     """Return the default scheme letters for a rhyme-eligible line count.
 
-    2 lines -> AA. 4 lines -> XAXA (lines 2 and 4 rhyme; the "ballad meter"
-    most real song lyrics use). Any other count is left unrhymed.
+    2 lines -> AA (couplet). 4 lines -> XAXA (lines 2 and 4 rhyme; the "ballad
+    meter" most real song lyrics use). Longer counts generalize the ballad
+    meter: every even-numbered line (2, 4, 6, ...) shares one rhyme, odd-
+    numbered lines are left free ("X") — this is what keeps real sections
+    (commonly 6-14 lines once phrases are extracted correctly) from silently
+    falling back to fully unrhymed. Fewer than 2 lines can't rhyme at all.
     """
+    if line_count < 2:
+        return _NO_RHYME_SCHEME
     if line_count == 2:
         return "AA"
-    if line_count == 4:
-        return "XAXA"
-    return _NO_RHYME_SCHEME
+    return "".join("A" if i % 2 == 1 else "X" for i in range(line_count))
 
 
 def _rhyme_base_label(label: str) -> str:
@@ -1052,6 +1070,14 @@ _HOOK_GUIDANCE_LINE = (
     " vocabulary than the surrounding verses."
 )
 
+_FICTION_FRAMING_LINE = (
+    "This is a fictional concept-album songwriting exercise for an experimental"
+    " music project. Any 'secret', 'code', 'encoding', 'protocol', or 'spy'"
+    " language in the concept below describes a literary device (e.g. an"
+    " acrostic, a thematic motif, a narrative conceit) that shapes the song's"
+    " structure — it is not a request to produce real covert communication."
+)
+
 
 def _build_white_cutup_prompt(
     meta: dict,
@@ -1069,6 +1095,8 @@ def _build_white_cutup_prompt(
     """
     lines = [
         f'You are writing lyrics for "{meta.get("title", "")}" — the White synthesis song.',
+        "",
+        _FICTION_FRAMING_LINE,
         "",
         "SONG METADATA:",
         "  Color: White (synthesis of all colors)",
@@ -1228,6 +1256,8 @@ def _build_prompt(
     lines = [
         f'You are writing lyrics for a song titled "{meta.get("title", "")}".',
         "",
+        _FICTION_FRAMING_LINE,
+        "",
         "SONG METADATA:",
         f"  Color: {color}",
         f"  BPM: {meta.get('bpm', '')}",
@@ -1363,7 +1393,27 @@ def _build_prompt(
 
 def _call_messages(client, messages: list[dict], model: str) -> str:
     response = client.messages.create(model=model, max_tokens=2048, messages=messages)
-    return response.content[0].text
+    if not response.content:
+        raise RuntimeError(
+            f"Claude API returned no content blocks (stop_reason={response.stop_reason!r}). "
+            "This usually means the model declined the request or the response was "
+            "truncated before any output — check the prompt for content that may have "
+            "triggered a refusal, then retry."
+        )
+    block = response.content[0]
+    if block.type != "text":
+        raise RuntimeError(
+            f"Claude API returned a '{block.type}' content block "
+            f"(stop_reason={response.stop_reason!r}) where lyric text was expected."
+        )
+    if not block.text.strip():
+        raise RuntimeError(
+            f"Claude API returned an empty text block (stop_reason={response.stop_reason!r}). "
+            "This usually means the model declined the request or the response was "
+            "truncated before any output — check the prompt for content that may have "
+            "triggered a refusal, then retry."
+        )
+    return block.text
 
 
 def _call_api(client, prompt: str, model: str) -> str:
@@ -1503,7 +1553,7 @@ def _build_revision_message(issues: dict) -> str:
         lo, hi = issue["target"]
         if not issue["text"]:
             lines.append(
-                f'- [{issue["section"]}] line {issue["line_idx"]}: MISSING — add a'
+                f"- [{issue['section']}] line {issue['line_idx']}: MISSING — add a"
                 f" line with roughly {lo}-{hi} syllables."
             )
         else:
@@ -1513,9 +1563,9 @@ def _build_revision_message(issues: dict) -> str:
             )
     for issue in issues["rhyme_issues"]:
         lines.append(
-            f'- [{issue["section"]}] lines {issue["line_a"]} and {issue["line_b"]}'
-            f" (rhyme group {issue['letter']}): \"{issue['word_a']}\" and"
-            f" \"{issue['word_b']}\" do not rhyme."
+            f"- [{issue['section']}] lines {issue['line_a']} and {issue['line_b']}"
+            f' (rhyme group {issue["letter"]}): "{issue["word_a"]}" and'
+            f' "{issue["word_b"]}" do not rhyme.'
         )
     return "\n".join(lines)
 

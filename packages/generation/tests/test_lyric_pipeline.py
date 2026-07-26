@@ -92,6 +92,117 @@ class TestCountNotes:
         assert _count_notes(tmp_path / "nonexistent.mid") == 0
 
 
+def _make_notes_midi(spans: list[tuple[int, int]], ticks_per_beat: int = 480) -> bytes:
+    """Build a MIDI file from explicit (start_tick, duration_ticks) note spans,
+    so gaps (or their absence) between notes are exact and easy to reason about."""
+    mid = mido.MidiFile(ticks_per_beat=ticks_per_beat)
+    track = mido.MidiTrack()
+    mid.tracks.append(track)
+    track.append(mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(120), time=0))
+
+    events: list[tuple[int, bool]] = []
+    for start, dur in spans:
+        events.append((start, True))
+        events.append((start + dur, False))
+    events.sort(key=lambda e: (e[0], not e[1]))
+
+    prev = 0
+    for abs_tick, is_on in events:
+        msg_type = "note_on" if is_on else "note_off"
+        track.append(
+            mido.Message(
+                msg_type, note=60, velocity=80 if is_on else 0, time=abs_tick - prev
+            )
+        )
+        prev = abs_tick
+
+    track.append(mido.MetaMessage("end_of_track", time=0))
+    buf = io.BytesIO()
+    mid.save(file=buf)
+    return buf.getvalue()
+
+
+class TestExtractPhrases:
+    def test_legato_notes_merge_into_one_phrase(self, tmp_path):
+        """Zero-gap (legato) notes must stay in a single phrase regardless of
+        how far apart their onsets are — this is the exact bug that caused
+        every note in a sustained melody to be treated as its own phrase."""
+        from white_generation.pipelines.lyric_pipeline import extract_phrases
+
+        # 4 notes, each 2 beats long, perfectly back-to-back (no rest at all).
+        spans = [(i * 960, 960) for i in range(4)]
+        midi_path = tmp_path / "legato.mid"
+        midi_path.write_bytes(_make_notes_midi(spans))
+
+        phrases = extract_phrases(midi_path)
+        assert len(phrases) == 1
+        assert phrases[0].note_count == 4
+
+    def test_real_rest_splits_phrases(self, tmp_path):
+        from white_generation.pipelines.lyric_pipeline import extract_phrases
+
+        # Two notes with a full-beat rest (480 ticks) between them — well over
+        # the default 0.5-beat threshold.
+        spans = [(0, 240), (720, 240)]
+        midi_path = tmp_path / "gapped.mid"
+        midi_path.write_bytes(_make_notes_midi(spans))
+
+        phrases = extract_phrases(midi_path)
+        assert len(phrases) == 2
+        assert phrases[0].note_count == 1
+        assert phrases[1].note_count == 1
+
+    def test_rest_under_threshold_stays_one_phrase(self, tmp_path):
+        from white_generation.pipelines.lyric_pipeline import extract_phrases
+
+        # 100-tick rest, well under the default 240-tick (0.5-beat) threshold.
+        spans = [(0, 240), (340, 240)]
+        midi_path = tmp_path / "small_gap.mid"
+        midi_path.write_bytes(_make_notes_midi(spans))
+
+        phrases = extract_phrases(midi_path)
+        assert len(phrases) == 1
+        assert phrases[0].note_count == 2
+
+    def test_mixed_legato_and_rests(self, tmp_path):
+        """A realistic phrase shape: a run of legato notes, a real rest, then
+        another run of legato notes."""
+        from white_generation.pipelines.lyric_pipeline import extract_phrases
+
+        spans = [
+            (0, 480),
+            (480, 480),  # legato with previous
+            (960, 480),  # legato with previous
+            (2400, 480),  # 960 tick rest after previous note ends at 1440
+        ]
+        midi_path = tmp_path / "mixed.mid"
+        midi_path.write_bytes(_make_notes_midi(spans))
+
+        phrases = extract_phrases(midi_path)
+        assert len(phrases) == 2
+        assert phrases[0].note_count == 3
+        assert phrases[1].note_count == 1
+
+    def test_no_notes_returns_empty(self, tmp_path):
+        from white_generation.pipelines.lyric_pipeline import extract_phrases
+
+        mid = mido.MidiFile(ticks_per_beat=480)
+        track = mido.MidiTrack()
+        mid.tracks.append(track)
+        track.append(mido.MetaMessage("end_of_track", time=0))
+        path = tmp_path / "empty.mid"
+        buf = io.BytesIO()
+        mid.save(file=buf)
+        path.write_bytes(buf.getvalue())
+
+        assert extract_phrases(path) == []
+
+    def test_missing_file_returns_empty(self, tmp_path):
+        from white_generation.pipelines.lyric_pipeline import extract_phrases
+
+        assert extract_phrases(tmp_path / "nonexistent.mid") == []
+
+
 # ---------------------------------------------------------------------------
 # 2. _fitting_verdict
 # ---------------------------------------------------------------------------
@@ -771,7 +882,7 @@ class TestRunPipelineIntegration:
 
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nHello world\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nHello world\n")]
         mock_client.messages.create.return_value = mock_response
 
         mock_scorer = MagicMock()
@@ -827,7 +938,7 @@ class TestRunPipelineIntegration:
 
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nHello world\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nHello world\n")]
         mock_client.messages.create.return_value = mock_response
 
         mock_scorer = MagicMock()
@@ -872,7 +983,7 @@ class TestRunPipelineIntegration:
 
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nTest lyrics\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nTest lyrics\n")]
         mock_client.messages.create.return_value = mock_response
 
         mock_scorer = MagicMock()
@@ -922,7 +1033,9 @@ class TestRunPipelineIntegration:
 
             mock_client = MagicMock()
             mock_response = MagicMock()
-            mock_response.content = [MagicMock(text="[verse]\nSome lyrics\n")]
+            mock_response.content = [
+                MagicMock(type="text", text="[verse]\nSome lyrics\n")
+            ]
             mock_client.messages.create.return_value = mock_response
 
             mock_scorer = MagicMock()
@@ -1467,12 +1580,33 @@ class TestDefaultRhymeScheme:
 
         assert _default_rhyme_scheme(4) == "XAXA"
 
-    def test_other_counts_unrhymed(self):
+    def test_fewer_than_two_lines_unrhymed(self):
         from white_generation.pipelines.lyric_pipeline import _default_rhyme_scheme
 
-        assert _default_rhyme_scheme(3) == "none"
-        assert _default_rhyme_scheme(5) == "none"
         assert _default_rhyme_scheme(0) == "none"
+        assert _default_rhyme_scheme(1) == "none"
+
+    def test_longer_counts_generalize_ballad_meter(self):
+        """Real sections commonly land at 6-14 lines once phrases are extracted
+        correctly (see extract_phrases) — these must not silently go unrhymed."""
+        from white_generation.pipelines.lyric_pipeline import _default_rhyme_scheme
+
+        assert _default_rhyme_scheme(3) == "XAX"
+        assert _default_rhyme_scheme(5) == "XAXAX"
+        assert _default_rhyme_scheme(6) == "XAXAXA"
+        assert _default_rhyme_scheme(14) == "XA" * 7
+
+    def test_longer_counts_still_produce_rhyme_pairs(self):
+        from white_generation.pipelines.lyric_pipeline import (
+            _default_rhyme_scheme,
+            rhyme_scheme_line_pairs,
+        )
+
+        pairs = rhyme_scheme_line_pairs(_default_rhyme_scheme(14))
+        assert len(pairs) > 0
+        # Every even line (2, 4, ..., 14) participates in at least one pair.
+        involved = {a for a, _, _ in pairs} | {b for _, b, _ in pairs}
+        assert involved == set(range(2, 15, 2))
 
 
 class TestAssignRhymeSchemes:
@@ -1698,6 +1832,58 @@ class TestCheckCandidate:
         assert missing["syllables"] == 0
 
 
+class TestCallMessages:
+    def test_returns_text_from_valid_response(self):
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(type="text", text="[verse]\nHello\n")]
+        mock_client.messages.create.return_value = mock_response
+
+        result = _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+        assert result == "[verse]\nHello\n"
+
+    def test_no_content_blocks_raises_with_stop_reason(self):
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = []
+        mock_response.stop_reason = "refusal"
+        mock_client.messages.create.return_value = mock_response
+
+        with pytest.raises(RuntimeError, match="refusal"):
+            _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+
+    def test_non_text_block_raises(self):
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(type="tool_use")]
+        mock_response.stop_reason = "tool_use"
+        mock_client.messages.create.return_value = mock_response
+
+        with pytest.raises(RuntimeError, match="tool_use"):
+            _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+
+    def test_empty_text_block_raises(self):
+        """A text block with empty/whitespace-only content (e.g. a truncated or
+        partially-refused response) must be treated the same as no content at
+        all, not silently returned as an empty string."""
+        from white_generation.pipelines.lyric_pipeline import _call_messages
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(type="text", text="   \n")]
+        mock_response.stop_reason = "refusal"
+        mock_client.messages.create.return_value = mock_response
+
+        with pytest.raises(RuntimeError, match="empty text block"):
+            _call_messages(mock_client, [{"role": "user", "content": "hi"}], "m")
+
+
 class TestGenerateLyricCandidate:
     def test_clean_draft_skips_revision(self):
         """A draft that passes every check on the first try makes exactly one API call."""
@@ -1716,7 +1902,7 @@ class TestGenerateLyricCandidate:
         ]
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nCat\nHat\n")]
+        mock_response.content = [MagicMock(type="text", text="[verse]\nCat\nHat\n")]
         mock_client.messages.create.return_value = mock_response
 
         text, outcome = generate_lyric_candidate(
@@ -1744,7 +1930,9 @@ class TestGenerateLyricCandidate:
         mock_client = MagicMock()
         mock_response = MagicMock()
         # Mismatched rhyme every time — never resolves
-        mock_response.content = [MagicMock(text="[verse]\nThe cat\nThe dog\n")]
+        mock_response.content = [
+            MagicMock(type="text", text="[verse]\nThe cat\nThe dog\n")
+        ]
         mock_client.messages.create.return_value = mock_response
 
         text, outcome = generate_lyric_candidate(
@@ -1770,7 +1958,9 @@ class TestGenerateLyricCandidate:
         ]
         mock_client = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="[verse]\nThe cat\nThe dog\n")]
+        mock_response.content = [
+            MagicMock(type="text", text="[verse]\nThe cat\nThe dog\n")
+        ]
         mock_client.messages.create.return_value = mock_response
 
         generate_lyric_candidate(

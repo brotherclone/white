@@ -948,6 +948,102 @@ TEMPLATES_5_4 = [
 ]
 
 # ---------------------------------------------------------------------------
+# 5/8 Templates
+# ---------------------------------------------------------------------------
+# 5/8 = 5 eighth notes = 2.5 quarter-note beats. Group positions: 0, 1.5
+# (3+2 grouping) — same convention as the 7/8 templates below.
+
+TEMPLATES_5_8 = [
+    BassPattern(
+        name="five_eight_root_sparse",
+        style=BassStyle.ROOT,
+        energy="low",
+        time_sig=(5, 8),
+        description="Root on 1, held entire bar — sparse anchor",
+        notes=[(0, "root", "normal")],
+        note_durations=[2.5],
+    ),
+    BassPattern(
+        name="five_eight_pedal",
+        style=BassStyle.PEDAL,
+        energy="low",
+        time_sig=(5, 8),
+        description="Root pedal held whole bar",
+        notes=[(0, "root", "normal")],
+        note_durations=[2.5],
+    ),
+    BassPattern(
+        name="five_eight_root_3_2",
+        style=BassStyle.ROOT,
+        energy="medium",
+        time_sig=(5, 8),
+        description="Root on group starts (0, 1.5) — 3+2 grouping",
+        notes=[(0, "root", "accent"), (1.5, "root", "normal")],
+        note_durations=[1.5, 1.0],
+    ),
+    BassPattern(
+        name="five_eight_walking",
+        style=BassStyle.WALKING,
+        energy="medium",
+        time_sig=(5, 8),
+        description="Walking 5/8 — root, passing tone, 5th on group starts",
+        notes=[
+            (0, "root", "accent"),
+            (1, "passing_tone", "normal"),
+            (1.5, "5th", "normal"),
+        ],
+        note_durations=[1.0, 0.5, 1.0],
+    ),
+    BassPattern(
+        name="five_eight_arp",
+        style=BassStyle.ARPEGGIATED,
+        energy="medium",
+        time_sig=(5, 8),
+        description="Root-3rd-5th arpeggio across the 3+2 grouping",
+        notes=[(0, "root", "accent"), (1, "3rd", "normal"), (1.5, "5th", "normal")],
+        note_durations=[1.0, 0.5, 1.0],
+    ),
+    BassPattern(
+        name="five_eight_octave",
+        style=BassStyle.OCTAVE,
+        energy="medium",
+        time_sig=(5, 8),
+        description="Root-octave bounce on group boundaries",
+        notes=[(0, "root", "accent"), (1.5, "octave_up", "normal")],
+        note_durations=[1.5, 1.0],
+    ),
+    BassPattern(
+        name="five_eight_root_pulse",
+        style=BassStyle.ROOT,
+        energy="high",
+        time_sig=(5, 8),
+        description="Root on every eighth — driving pulse",
+        notes=[
+            (0, "root", "accent"),
+            (0.5, "root", "normal"),
+            (1, "root", "normal"),
+            (1.5, "root", "normal"),
+            (2, "root", "normal"),
+        ],
+        note_durations=[0.5, 0.5, 0.5, 0.5, 0.5],
+    ),
+    BassPattern(
+        name="five_eight_synco",
+        style=BassStyle.SYNCOPATED,
+        energy="high",
+        time_sig=(5, 8),
+        description="Syncopated 5/8 — root on 1, ghost 5th on the offbeat, root on group 2",
+        notes=[
+            (0, "root", "accent"),
+            (0.5, "5th", "ghost"),
+            (1.5, "root", "normal"),
+            (2, "5th", "ghost"),
+        ],
+        note_durations=[0.5, 1.0, 0.5, 0.5],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # 7/8 Templates
 # ---------------------------------------------------------------------------
 # 7/8 = 3.5 quarter-note beats. Group positions: 0, 1.5, 2.5 (3+2+2 grouping)
@@ -1382,6 +1478,8 @@ ALL_TEMPLATES: list[BassPattern] = [
     *TEMPLATES_3_4,
     # 5/4
     *TEMPLATES_5_4,
+    # 5/8
+    *TEMPLATES_5_8,
     # 6/8 (compound duple)
     *TEMPLATES_6_8,
     # 7/8

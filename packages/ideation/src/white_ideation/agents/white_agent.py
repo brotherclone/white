@@ -25,10 +25,15 @@ from pydantic import BaseModel, PrivateAttr
 
 from white_composition.shrinkwrap_chain_artifacts import shrinkwrap
 from white_core.agents.agent_settings import AgentSettings
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.concepts.white_facet_system import WhiteFacetSystem
 from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.synthesis_prompt_template import SynthesisPromptTemplate
-from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
+from white_core.manifests.song_proposal import (
+    SongProposal,
+    SongProposalIteration,
+    resolve_supersession_chains,
+)
 from white_extraction.util.generate_negative_constraints import (
     format_for_prompt,
     generate_constraints,
@@ -406,7 +411,7 @@ class WhiteAgent(BaseModel):
 
     def _get_claude_supervisor(self) -> ChatAnthropic:
         return ChatAnthropic(
-            model_name="claude-fable-5",
+            model_name="claude-sonnet-5",
             api_key=self.settings.anthropic_api_key,
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
@@ -556,9 +561,10 @@ class WhiteAgent(BaseModel):
                 )
             return state
         claude = self._get_claude_supervisor()
-        proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            initial_proposal = proposer.invoke(prompt)
+            initial_proposal = BaseRainbowAgent._invoke_structured(
+                claude, SongProposalIteration, prompt
+            )
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
             state.white_facet = facet
@@ -759,9 +765,10 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 prompt = prompt + "\n\n" + state.negative_constraints
 
             claude = self._get_claude_supervisor()
-            proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            rewrite_proposal = proposer.invoke(prompt)
+            rewrite_proposal = BaseRainbowAgent._invoke_structured(
+                claude, SongProposalIteration, prompt
+            )
             if isinstance(rewrite_proposal, dict):
                 rewrite_proposal = SongProposalIteration(**rewrite_proposal)
             if not isinstance(rewrite_proposal, SongProposalIteration):
@@ -4101,17 +4108,38 @@ The song should be buildable from these specifications.
                 raise Exception(error_msg)
             return
 
+        # Drop exact duplicates and clear is_final on any iteration that a later
+        # counter-proposal in the same revision chain has superseded (see
+        # resolve_supersession_chains docstring — this can pivot color/title
+        # entirely, so it must run before the per-color grouping below).
+        iterations, superseded_ids = resolve_supersession_chains(
+            state.song_proposals.iterations
+        )
+        state.song_proposals.iterations = iterations
+
         # For each color group, if no iteration is explicitly marked final,
         # treat the last iteration in that group as final. This handles single-agent
         # workflows and agents (Orange, Green, etc.) that never call is_final themselves.
-        iterations = state.song_proposals.iterations
+        # Entries superseded above are excluded from the candidate pool — that's
+        # a deliberate "this lineage's final now lives under a different color"
+        # outcome, not an undecided orphan to fall back on — but a color group
+        # can still contain a genuinely separate, untouched entry alongside a
+        # superseded one, so only skip the whole group when every member in it
+        # was superseded, not merely any.
         iterations_by_color: dict = {}
         for idx, iteration in enumerate(iterations):
             color = str(iteration.rainbow_color)
             iterations_by_color.setdefault(color, []).append(idx)
         for color_indexes in iterations_by_color.values():
-            if not any(iterations[idx].is_final for idx in color_indexes):
-                iterations[color_indexes[-1]].is_final = True
+            if any(iterations[idx].is_final for idx in color_indexes):
+                continue
+            eligible = [
+                idx
+                for idx in color_indexes
+                if id(iterations[idx]) not in superseded_ids
+            ]
+            if eligible:
+                iterations[eligible[-1]].is_final = True
 
         # Deduplicate titles within this run: if two final iterations share the same
         # title, append the color name so init_production never sees a collision.
@@ -4124,12 +4152,32 @@ The song should be buildable from these specifications.
             if len(_dupes) > 1:
                 for it in _dupes:
                     rc = it.rainbow_color
-                    _label = (
-                        rc.color_name
-                        if hasattr(rc, "color_name")
-                        else str(rc).split("(")[0].strip()
+                    if hasattr(rc, "color_name"):
+                        _label = rc.color_name
+                    else:
+                        _label = str(rc).split("(")[0].strip()
+                        # Guard against a malformed rainbow_color — e.g. the
+                        # LLM dumping raw JSON/dict text into the field
+                        # instead of a clean color name (real-world case:
+                        # last_click_train_prism_v1) — which would otherwise
+                        # get interpolated whole into the title below.
+                        if len(_label) > 20 or any(c in _label for c in "{}:\"'"):
+                            _label = "unknown"
+                    # Cap to the model's own title max_length so a malformed
+                    # label (or this block running more than once) can never
+                    # produce a title that fails validation on next load.
+                    # Truncate the base title first, not the whole suffixed
+                    # string — otherwise a title already near 150 chars would
+                    # have the suffix truncated away, leaving the collision
+                    # unresolved.
+                    suffix = f" ({_label})"
+                    base_budget = max(0, 150 - len(suffix))
+                    base = (
+                        it.title
+                        if len(it.title) <= base_budget
+                        else it.title[:base_budget].rstrip()
                     )
-                    it.title = f"{it.title} ({_label})"
+                    it.title = f"{base}{suffix}"
                 logger.warning(
                     "Duplicate title within run — appended color suffix: %s",
                     [it.title for it in _dupes],

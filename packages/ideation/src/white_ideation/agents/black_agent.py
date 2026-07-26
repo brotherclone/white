@@ -23,7 +23,11 @@ from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.sigil_state import SigilState
 from white_core.enums.sigil_type import SigilType
 from white_core.manifests.song_proposal import SongProposalIteration
-from white_extraction.util.manifest_loader import get_my_reference_proposals
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.black_agent_state import BlackAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -55,7 +59,6 @@ class BlackAgent(BaseRainbowAgent, ABC):
             self.settings = AgentSettings()
 
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -69,6 +72,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         current_proposal = state.song_proposals.iterations[-1]
         black_state = BlackAgentState(
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             song_proposals=state.song_proposals,
             thread_id=state.thread_id,
             artifacts=[],
@@ -144,6 +148,14 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.counter_proposal = counter_proposal
             return state
         else:
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("Z")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""
             You are the ThreadKeepr, writing creative fiction about an experimental musician creating concept albums.
             Context: This character is an artist working in the experimental music space, creating 
@@ -158,7 +170,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
     
             Reference works in this artist's style paying close attention to 'concept' property:
             {get_my_reference_proposals('Z')}
-            
+
+            {sounds_like_line}
+
             In your counter proposal your 'rainbow_color' property should always be:
             {the_rainbow_table_colors['Z']}
     
@@ -167,10 +181,11 @@ class BlackAgent(BaseRainbowAgent, ABC):
             resistance and psychological liberation. Try to avoid being too "on the nose" or literal.
             Ambiguity and subtlety are valued.
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                 elif isinstance(result, SongProposalIteration):
@@ -461,9 +476,8 @@ Here's the EVP transcript:
                    """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(YesOrNo)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, YesOrNo, prompt)
                 if isinstance(result, dict):
                     state.should_update_proposal_with_evp = result.get("answer", False)
                 elif isinstance(result, YesOrNo):
@@ -563,10 +577,11 @@ The counter-proposal and new updated counter-proposal should have the 'rainbow_c
 And here is the EVP transcript:
     {state.artifacts[-1].transcript}
                """
+        if state.negative_constraints:
+            prompt = prompt + "\n\n" + state.negative_constraints
         claude = self._get_claude()
-        proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            result = proposer.invoke(prompt)
+            result = self._invoke_structured(claude, SongProposalIteration, prompt)
             if isinstance(result, dict):
                 updated_proposal = SongProposalIteration(**result)
             elif isinstance(result, SongProposalIteration):

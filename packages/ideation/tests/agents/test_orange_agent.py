@@ -337,6 +337,183 @@ def test_gonzo_rewrite_node_non_mock(tmp_path, monkeypatch):
 
 
 # =============================================================================
+# Regression: synthesize_base_story exception path must fall back, not leave
+# synthesized_story as None (it used to cascade through add_to_corpus /
+# gonzo_rewrite_node and crash generate_alternate_song_spec with an unguarded
+# AttributeError on mythologized_story.headline)
+# =============================================================================
+
+
+def _white_proposal() -> SongProposalIteration:
+    return SongProposalIteration(
+        iteration_id="white_001",
+        bpm=120,
+        tempo="4/4",
+        key="C Major",
+        rainbow_color="white",
+        title="Test White Song",
+        mood=["contemplative"],
+        genres=["ambient"],
+        concept="A test concept long enough to pass the minimum length validator "
+        "for the concept field, exploring existence through sound.",
+    )
+
+
+@patch.dict("os.environ", {"MOCK_MODE": "false"})
+def test_synthesize_base_story_exception_sets_fallback_story(tmp_path, monkeypatch):
+    monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
+
+    agent = create_mock_agent()
+    with patch.object(
+        agent, "_invoke_structured", side_effect=RuntimeError("model refused")
+    ):
+        state = OrangeAgentState(
+            thread_id="test-thread", white_proposal=_white_proposal()
+        )
+        result = agent.synthesize_base_story(state)
+
+    assert result.synthesized_story is not None
+    assert result.synthesized_story.headline
+
+
+@patch.dict("os.environ", {"MOCK_MODE": "false"})
+def test_gonzo_rewrite_node_no_story_sets_fallback_mythologized_story(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
+
+    agent = create_mock_agent()
+    state = OrangeAgentState(thread_id="test-thread", synthesized_story=None)
+
+    result = agent.gonzo_rewrite_node(state)
+
+    assert result.mythologized_story is not None
+    assert result.mythologized_story.headline
+
+
+@patch.dict("os.environ", {"MOCK_MODE": "false"})
+def test_generate_alternate_song_spec_no_story_does_not_crash(tmp_path, monkeypatch):
+    """The exact crash from the bug report: mythologized_story and
+    synthesized_story both None, prompt-building used to raise
+    AttributeError before the try/except even started."""
+    monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
+
+    agent = create_mock_agent()
+    counter_proposal = SongProposalIteration(
+        iteration_id="orange_v1",
+        bpm=182,
+        tempo="4/4",
+        key="D Major",
+        rainbow_color="orange",
+        title="Test Orange Song",
+        mood=["paranoid"],
+        genres=["gonzo"],
+        concept="A test concept long enough to pass the minimum length validator "
+        "for the concept field, exploring mythologized information.",
+    )
+    with patch.object(agent, "_invoke_structured", return_value=counter_proposal):
+        state = OrangeAgentState(
+            thread_id="test-thread",
+            white_proposal=_white_proposal(),
+            mythologized_story=None,
+            synthesized_story=None,
+        )
+        result = agent.generate_alternate_song_spec(state)
+
+    assert result.counter_proposal is not None
+    assert result.counter_proposal.title == "Test Orange Song"
+
+
+@patch.dict("os.environ", {"MOCK_MODE": "false"})
+def test_generate_alternate_song_spec_includes_sounds_like(tmp_path, monkeypatch):
+    """Regression for add-ideation-sounds-like: Orange's reference-works
+    section must include sampled sounds-like artists."""
+    monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
+    monkeypatch.setattr(
+        "white_ideation.agents.orange_agent.get_sounds_like_by_color",
+        lambda color: ["Test Reference Artist"],
+    )
+    monkeypatch.setattr(
+        "white_ideation.agents.orange_agent.sample_reference_artists",
+        lambda artists, **kwargs: list(artists),
+    )
+
+    agent = create_mock_agent()
+    counter_proposal = SongProposalIteration(
+        iteration_id="orange_v1",
+        bpm=182,
+        tempo="4/4",
+        key="D Major",
+        rainbow_color="orange",
+        title="Test Orange Song",
+        mood=["paranoid"],
+        genres=["gonzo"],
+        concept="A test concept long enough to pass the minimum length validator "
+        "for the concept field, exploring mythologized information.",
+    )
+    seen_prompts = []
+
+    def fake_invoke_structured(llm, schema, prompt):
+        seen_prompts.append(prompt)
+        return counter_proposal
+
+    with patch.object(agent, "_invoke_structured", side_effect=fake_invoke_structured):
+        state = OrangeAgentState(
+            thread_id="test-thread",
+            white_proposal=_white_proposal(),
+            mythologized_story=None,
+            synthesized_story=None,
+        )
+        agent.generate_alternate_song_spec(state)
+
+    assert len(seen_prompts) == 1
+    assert "Test Reference Artist" in seen_prompts[0]
+
+
+@patch.dict("os.environ", {"MOCK_MODE": "false"})
+def test_generate_alternate_song_spec_includes_negative_constraints(
+    tmp_path, monkeypatch
+):
+    """Regression for add-ideation-negative-constraints: Orange's own
+    counter-proposal prompt must honor negative_constraints, not just
+    White's initial proposal and final rewrite."""
+    monkeypatch.setenv("AGENT_WORK_PRODUCT_BASE_PATH", str(tmp_path))
+
+    agent = create_mock_agent()
+    counter_proposal = SongProposalIteration(
+        iteration_id="orange_v1",
+        bpm=182,
+        tempo="4/4",
+        key="D Major",
+        rainbow_color="orange",
+        title="Test Orange Song",
+        mood=["paranoid"],
+        genres=["gonzo"],
+        concept="A test concept long enough to pass the minimum length validator "
+        "for the concept field, exploring mythologized information.",
+    )
+    seen_prompts = []
+
+    def fake_invoke_structured(llm, schema, prompt):
+        seen_prompts.append(prompt)
+        return counter_proposal
+
+    with patch.object(agent, "_invoke_structured", side_effect=fake_invoke_structured):
+        state = OrangeAgentState(
+            thread_id="test-thread",
+            white_proposal=_white_proposal(),
+            negative_constraints="AVOID: the word 'transmission', keys already used: D Major",
+            mythologized_story=None,
+            synthesized_story=None,
+        )
+        result = agent.generate_alternate_song_spec(state)
+
+    assert result.counter_proposal is not None
+    assert len(seen_prompts) == 1
+    assert state.negative_constraints in seen_prompts[0]
+
+
+# =============================================================================
 # Test: Full workflow integration (mock mode)
 # =============================================================================
 

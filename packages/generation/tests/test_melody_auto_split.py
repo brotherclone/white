@@ -9,6 +9,7 @@ from white_generation.pipelines.melody_auto_split import (
     Note,
     assign_syllables_to_notes,
     auto_split_melody,
+    distribute_syllables_and_split,
     split_note,
     syllabify,
 )
@@ -137,6 +138,74 @@ def test_assign_empty_notes():
 
 
 # ---------------------------------------------------------------------------
+# distribute_syllables_and_split
+# ---------------------------------------------------------------------------
+
+
+def test_distribute_equal_count_no_splitting():
+    notes, sylls = distribute_syllables_and_split(
+        _notes(3), ["one", "two", "three"], TICKS, TICKS
+    )
+    assert len(notes) == 3
+    assert sylls == ["one", "two", "three"]
+
+
+def test_distribute_more_notes_than_syllables_is_melisma():
+    notes, sylls = distribute_syllables_and_split(_notes(4), ["a", "b"], TICKS, TICKS)
+    assert len(notes) == 4
+    assert sylls == ["a", "b", "", ""]
+
+
+def test_distribute_more_syllables_than_notes_splits():
+    """3 syllables, 2 notes -> the first note splits to carry 2 syllables."""
+    notes, sylls = distribute_syllables_and_split(
+        _notes(2), ["a", "b", "c"], TICKS, TICKS
+    )
+    assert len(notes) == 3
+    assert sylls == ["a", "b", "c"]
+
+    original = _notes(2)
+    # First original note (index 0, duration TICKS) absorbed 2 syllables.
+    assert (
+        notes[0].duration_ticks + notes[1].duration_ticks == original[0].duration_ticks
+    )
+    # Second original note (index 1) kept its full duration, one syllable.
+    assert notes[2].duration_ticks == original[1].duration_ticks
+
+
+def test_distribute_short_note_shortfall_redistributes_to_later_notes():
+    """If a note is too short to split (below min_split_ticks), the syllable
+    it couldn't absorb rolls forward onto later notes instead of being lost."""
+    short_note = Note(start_tick=0, pitch=60, velocity=80, duration_ticks=10, channel=0)
+    long_note = Note(
+        start_tick=10, pitch=61, velocity=80, duration_ticks=TICKS * 2, channel=0
+    )
+    notes, sylls = distribute_syllables_and_split(
+        [short_note, long_note],
+        ["a", "b", "c"],
+        min_split_ticks=TICKS,
+        ticks_per_beat=TICKS,
+    )
+    # short_note couldn't split (below min_split_ticks) -> carries only "a".
+    # long_note absorbs both remaining syllables ("b", "c") by splitting.
+    assert sylls == ["a", "b", "c"]
+    assert len(notes) == 3
+    assert notes[0].duration_ticks == 10
+
+
+def test_distribute_empty_notes():
+    notes, sylls = distribute_syllables_and_split([], ["a"], TICKS, TICKS)
+    assert notes == []
+    assert sylls == []
+
+
+def test_distribute_empty_syllables_no_split():
+    notes, sylls = distribute_syllables_and_split(_notes(2), [], TICKS, TICKS)
+    assert len(notes) == 2
+    assert sylls == ["", ""]
+
+
+# ---------------------------------------------------------------------------
 # split_note
 # ---------------------------------------------------------------------------
 
@@ -179,15 +248,15 @@ def test_split_n1_is_noop():
 
 
 def test_auto_split_integration(tmp_path: Path):
-    """4-bar melody: 4 notes, lyrics with multi-syllable words → output has >= 4 notes."""
-    # Build a 4-note melody: each note is 2 beats long (enough to split)
+    """4 legato (back-to-back, no rest) notes form a single phrase; a
+    multi-syllable single-word line assigned to it should split notes to
+    surface all its syllables."""
     note_data = [(i * TICKS * 2, 60 + i, TICKS * 2) for i in range(4)]
     midi_bytes = make_melody_midi(note_data)
     midi_path = tmp_path / "verse.mid"
     midi_path.write_bytes(midi_bytes)
 
-    # Lyrics: 4 lines, each a multi-syllable word
-    lyrics = "[verse]\nbeautiful\ncataloging\neverything\nbelonging\n"
+    lyrics = "[verse]\nbeautiful\n"
     lyrics_path = tmp_path / "lyrics.txt"
     lyrics_path.write_text(lyrics)
 
@@ -208,9 +277,44 @@ def test_auto_split_integration(tmp_path: Path):
     output_pitches = set(pitches_from_midi(output_bytes))
     assert original_pitches.issubset(output_pitches)
 
-    # Alignment report has one entry per phrase
-    assert len(alignment) == 4
-    assert all(a["notes_in"] == 1 for a in alignment)
+    # The 4 notes are legato (zero rest) -> exactly one real phrase.
+    assert len(alignment) == 1
+    assert alignment[0]["notes_in"] == 4
+
+
+def test_auto_split_multiword_line_distributes_by_syllable_not_word(
+    tmp_path: Path,
+):
+    """Regression: a phrase with fewer notes than a lyric line has words used
+    to silently drop trailing words (word-indexed assignment). Syllables from
+    every word in the line must now be distributed across the phrase's notes
+    by syllable position, splitting notes as needed."""
+    # 2 legato notes (one phrase), each long enough to split into 2.
+    note_data = [(0, 60, TICKS * 2), (TICKS * 2, 61, TICKS * 2)]
+    midi_bytes = make_melody_midi(note_data)
+    midi_path = tmp_path / "verse.mid"
+    midi_path.write_bytes(midi_bytes)
+
+    # 3 one-syllable words across only 2 notes.
+    lyrics = "[verse]\nthree word phrase\n"
+    lyrics_path = tmp_path / "lyrics.txt"
+    lyrics_path.write_text(lyrics)
+
+    _, alignment = auto_split_melody(
+        midi_path=midi_path,
+        lyrics_path=lyrics_path,
+        section="verse",
+        min_split_ticks=TICKS,
+    )
+
+    assert len(alignment) == 1
+    entry = alignment[0]
+    assert entry["notes_in"] == 2
+    assert entry["syllables"] == 3
+    # All three words must survive into the assignment — none silently dropped.
+    assert entry["assignments"] == ["three", "word", "phrase"]
+    # A note had to be split to make room for the 3rd syllable.
+    assert entry["notes_out"] == 3
 
 
 def test_auto_split_output_path_convention(tmp_path: Path):

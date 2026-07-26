@@ -349,6 +349,47 @@ class TestMelodyCrossover:
         }
         assert len(boundaries) > 1
 
+    def test_child_stays_monophonic_across_mismatched_parents(self):
+        """Regression: splicing two parents' rhythm/duration arrays verbatim
+        (without re-anchoring) let the B-suffix's first onset land before the
+        A-prefix's last note actually finished — producing overlapping notes
+        in real evolved output (confirmed against production data: up to 3
+        simultaneous notes). Parents here have deliberately mismatched
+        rhythmic density so the splice boundary is very likely to collide
+        without the fix."""
+        a = _make_melody("a")
+        a.intervals = [0, 1, 1, 1, 1]
+        a.rhythm = [0.0, 0.2, 0.4, 0.6, 0.8]
+        a.durations = [0.9, 0.9, 0.9, 0.9, 0.9]  # deliberately long, overlapping-prone
+
+        b = _make_melody("b")
+        b.intervals = [0, -1, -1, -1, -1]
+        b.rhythm = [0.0, 1.0, 2.0, 3.0, 3.9]
+        b.durations = [1.0, 1.0, 1.0, 1.0, 0.5]
+
+        for _ in range(100):
+            child = _crossover_melody(a, b)
+            assert child.rhythm == sorted(child.rhythm)
+            assert len(set(child.rhythm)) == len(child.rhythm)  # strictly increasing
+            if child.durations:
+                for i in range(len(child.rhythm) - 1):
+                    gap = child.rhythm[i + 1] - child.rhythm[i]
+                    assert child.durations[i] <= gap + 1e-9
+
+    def test_child_notes_fit_within_bar(self):
+        a = _make_melody("a")
+        a.intervals = [0, 1, 1, 1, 1]
+        a.rhythm = [0.0, 0.5, 1.0, 1.5, 3.9]
+        a.durations = [0.5, 0.5, 0.5, 0.5, 0.5]
+        b = _make_melody("b")
+        b.intervals = [0, -1, -1, -1, -1]
+        b.rhythm = [0.0, 0.1, 0.2, 0.3, 0.4]
+        b.durations = [2.0, 2.0, 2.0, 2.0, 2.0]
+
+        for _ in range(50):
+            child = _crossover_melody(a, b)
+            assert child.rhythm[-1] < child.bar_length_beats()
+
 
 class TestMelodyMutation:
     def test_returns_melody_pattern(self):
@@ -395,6 +436,38 @@ class TestMelodyMutation:
             ]
             assert max(deltas) <= 0.5 + 1e-9
 
+    def test_onset_shift_never_crosses_a_neighbor(self):
+        """Regression: shifting one onset then re-sorting the whole rhythm
+        array (the previous behavior) could move that onset past a neighbor,
+        silently desyncing `intervals`/`durations` from `rhythm` by index for
+        every note between the old and new position. The shift must instead
+        be clamped so onset order — and therefore note identity — never
+        changes."""
+        p = _make_melody()
+        p.rhythm = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
+        for _ in range(200):
+            with patch(
+                "white_generation.patterns.pattern_evolution.random.random",
+                side_effect=[0.0, 0.9],  # trigger mutation, take onset-shift branch
+            ):
+                result = _mutate_melody(p)
+            assert result.rhythm == sorted(result.rhythm)
+            assert len(set(result.rhythm)) == len(result.rhythm)
+
+    def test_mutation_keeps_notes_monophonic(self):
+        p = _make_melody()
+        p.rhythm = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
+        p.durations = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+        for _ in range(200):
+            with patch(
+                "white_generation.patterns.pattern_evolution.random.random",
+                side_effect=[0.0, 0.9],
+            ):
+                result = _mutate_melody(p)
+            for i in range(len(result.rhythm) - 1):
+                gap = result.rhythm[i + 1] - result.rhythm[i]
+                assert result.durations[i] <= gap + 1e-9
+
 
 # ---------------------------------------------------------------------------
 # breed_* top-level functions
@@ -407,12 +480,25 @@ class TestMelodyMutation:
 )
 class TestBreedDrumPatterns:
     def test_returns_top_n(self, mock_score):
-        seeds = [_make_drum(f"d{i}") for i in range(5)]
+        seeds = []
+        for i in range(5):
+            seed = _make_drum(f"d{i}")
+            seed.voices = {
+                **seed.voices,
+                "kick": [(0.0, "accent"), (float(i), "normal")],
+            }
+            seeds.append(seed)
         concept_emb = np.zeros(768)
         result = breed_drum_patterns(
             concept_emb, seeds, generations=2, population_size=10, top_n=3
         )
-        assert len(result) == 3
+        # Elitism + low mutation probability can legitimately converge on
+        # fewer unique genomes than top_n; the invariant is no duplicates.
+        assert 1 <= len(result) <= 3
+        signatures = {
+            tuple(sorted((k, tuple(v)) for k, v in p.voices.items())) for p in result
+        }
+        assert len(signatures) == len(result)
 
     def test_all_are_drum_patterns(self, mock_score):
         seeds = [_make_drum(f"d{i}") for i in range(4)]
@@ -442,12 +528,25 @@ class TestBreedDrumPatterns:
 )
 class TestBreedBassPatterns:
     def test_returns_top_n(self, mock_score):
-        seeds = [_make_bass(f"b{i}") for i in range(5)]
+        seeds = []
+        for i in range(5):
+            seed = _make_bass(f"b{i}")
+            seed.notes = [
+                (0.0, BassChordTone.ROOT, "accent"),
+                (1.0, BassChordTone.FIFTH, "normal"),
+                (2.0, BassChordTone.ROOT, "normal"),
+                (3.0 - i * 0.1, BassChordTone.OCTAVE_UP, "ghost"),
+            ]
+            seeds.append(seed)
         chord_prog = [{"root": 36, "notes": [36, 43, 48]}]
         result = breed_bass_patterns(
             np.zeros(768), chord_prog, seeds, generations=2, population_size=10, top_n=3
         )
-        assert len(result) == 3
+        # Elitism + low mutation probability can legitimately converge on
+        # fewer unique genomes than top_n; the invariant is no duplicates.
+        assert 1 <= len(result) <= 3
+        signatures = {tuple(n for n in p.notes) for p in result}
+        assert len(signatures) == len(result)
 
     def test_all_are_bass_patterns(self, mock_score):
         seeds = [_make_bass(f"b{i}") for i in range(4)]
@@ -490,12 +589,24 @@ class TestBreedMelodyPatterns:
         assert result == []
 
     def test_fitness_ordering_preserved(self, mock_score):
-        """The first result should have the highest fitness (highest index in fake scorer)."""
-        seeds = [_make_melody(f"m{i}") for i in range(5)]
+        """Results never exceed top_n and never contain a duplicate genome.
+
+        Elitism (n=2) plus a 0.35 mutation probability means a small,
+        single-generation population can legitimately converge on fewer
+        unique genomes than top_n — the invariant that matters is that
+        whatever comes back has no duplicate (identical rendered MIDI)
+        entries, since a duplicate can never be musically distinguished
+        from another equally-fit candidate.
+        """
+        seeds = []
+        for i in range(5):
+            seed = _make_melody(f"m{i}")
+            seed.intervals = [0, i + 1, -(i + 1), 2, -2, 1]
+            seeds.append(seed)
         chord_prog = [{"root": 60, "notes": [60, 64, 67]}]
-        # With fake scorer, the last items get highest scores — but after sorting
-        # we just verify the returned list is ordered descending
         result = breed_melody_patterns(
             np.zeros(768), chord_prog, seeds, generations=1, population_size=5, top_n=5
         )
-        assert len(result) == 5
+        assert 1 <= len(result) <= 5
+        signatures = {(tuple(p.intervals), tuple(p.rhythm)) for p in result}
+        assert len(signatures) == len(result)

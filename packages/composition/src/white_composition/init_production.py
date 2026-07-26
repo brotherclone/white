@@ -133,6 +133,11 @@ def _parse_sounds_like_response(text: str) -> list[str]:
         if not stripped:
             continue
 
+        # Skip markdown code-fence lines (```yaml, ```, etc.) in case Claude
+        # wraps the list in a fenced block despite the prompt asking for bare YAML.
+        if stripped.startswith("```"):
+            continue
+
         # Remove YAML list marker
         if stripped.startswith("- "):
             stripped = stripped[2:].strip()

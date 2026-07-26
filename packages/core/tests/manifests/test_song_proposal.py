@@ -1,7 +1,10 @@
 import pytest
 from pydantic import ValidationError
 
-from white_core.manifests.song_proposal import SongProposalIteration
+from white_core.manifests.song_proposal import (
+    SongProposalIteration,
+    resolve_supersession_chains,
+)
 
 
 def valid_iteration_data(**overrides):
@@ -87,3 +90,84 @@ def test_mood_and_genres_type_validators():
 
     with pytest.raises(ValidationError):
         SongProposalIteration(**valid_iteration_data(genres="also-not-a-list"))
+
+
+def test_resolve_supersession_chains_clears_pivoted_seed():
+    """A White seed pivoted to Black by a counter-proposal must lose is_final,
+    even though color and title change mid-chain."""
+    seed = SongProposalIteration(
+        **valid_iteration_data(
+            iteration_id="seed_v1",
+            iteration_number=1,
+            rainbow_color="White",
+            is_final=True,
+        )
+    )
+    pivot = SongProposalIteration(
+        **valid_iteration_data(
+            iteration_id="pivot_v2",
+            iteration_number=2,
+            rainbow_color="Black",
+            is_final=True,
+        )
+    )
+
+    resolved, superseded_ids = resolve_supersession_chains([seed, pivot])
+
+    assert resolved == [seed, pivot]
+    assert seed.is_final is False
+    assert pivot.is_final is True
+    assert id(seed) in superseded_ids
+    assert id(pivot) not in superseded_ids
+
+
+def test_resolve_supersession_chains_drops_exact_duplicates():
+    seed = SongProposalIteration(
+        **valid_iteration_data(
+            iteration_id="seed_v1", iteration_number=1, is_final=True
+        )
+    )
+    dup_a = SongProposalIteration(
+        **valid_iteration_data(iteration_id="dup_v2", iteration_number=2, is_final=True)
+    )
+    dup_b = SongProposalIteration(
+        **valid_iteration_data(iteration_id="dup_v2", iteration_number=2, is_final=True)
+    )
+    final = SongProposalIteration(
+        **valid_iteration_data(
+            iteration_id="final_v3", iteration_number=3, is_final=True
+        )
+    )
+
+    resolved, _ = resolve_supersession_chains([seed, dup_a, dup_b, final])
+
+    assert [it.iteration_id for it in resolved] == ["seed_v1", "dup_v2", "final_v3"]
+    assert seed.is_final is False
+    assert dup_a.is_final is False
+    assert final.is_final is True
+
+
+def test_resolve_supersession_chains_leaves_independent_iterations_untouched():
+    """Non-consecutive iteration_number, or None, starts an independent chain
+    of length one and must not be cleared."""
+    orange = SongProposalIteration(
+        **valid_iteration_data(
+            iteration_id="orange_v1",
+            iteration_number=1,
+            rainbow_color="Orange",
+            is_final=True,
+        )
+    )
+    yellow = SongProposalIteration(
+        **valid_iteration_data(
+            iteration_id="yellow_v1",
+            iteration_number=None,
+            rainbow_color="Yellow",
+            is_final=True,
+        )
+    )
+
+    resolve_supersession_chains([orange, yellow])
+
+    assert orange.is_final is True
+    assert yellow.is_final is True

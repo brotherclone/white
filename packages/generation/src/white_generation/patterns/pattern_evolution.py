@@ -208,6 +208,24 @@ def _tournament_select(
     return population[best]
 
 
+def _dedup_and_rank(
+    population: list[Any], midi_list: list[bytes], fitness: list[float], top_n: int
+) -> list[Any]:
+    """Collapse genomes that render to identical MIDI before taking the top_n.
+
+    Elitism and low-probability mutation let identical genomes persist across
+    generations unchanged; without this, `top_n` can be several copies of the
+    same pattern rather than distinct candidates.
+    """
+    best_by_midi: dict[bytes, tuple[float, int]] = {}
+    for idx, (midi, fit) in enumerate(zip(midi_list, fitness)):
+        current = best_by_midi.get(midi)
+        if current is None or fit > current[0]:
+            best_by_midi[midi] = (fit, idx)
+    ranked = sorted(best_by_midi.values(), key=lambda x: x[0], reverse=True)
+    return [population[idx] for _, idx in ranked[:top_n]]
+
+
 def _elite_indices(fitness: list[float], n: int = _ELITISM_N) -> list[int]:
     """Return indices of the top-n fittest individuals."""
     return sorted(range(len(fitness)), key=lambda i: fitness[i], reverse=True)[:n]
@@ -350,15 +368,36 @@ def _mutate_bass(pattern: BassPattern) -> BassPattern:
 # ---------------------------------------------------------------------------
 
 
+def _clip_durations_to_next_onset(
+    rhythm: list[float], durations: list[float]
+) -> list[float]:
+    """Ensure no note's duration extends past the next note's onset.
+
+    Melody must be monophonic — a defensive clamp applied after any operation
+    that could combine onset/duration values from independent sources (e.g.
+    crossover splicing two parents, or a mutation shifting one onset).
+    """
+    clipped = list(durations)
+    for i in range(len(clipped) - 1):
+        gap = rhythm[i + 1] - rhythm[i]
+        clipped[i] = max(0.0, min(clipped[i], gap))
+    return clipped
+
+
 def _crossover_melody(
     parent_a: MelodyPattern, parent_b: MelodyPattern
 ) -> MelodyPattern:
     """Randomized bar-boundary splice on interval sequences.
 
-    Both parents split at the same proportional point so the A-prefix's last
-    onset and the B-suffix's first onset stay temporally aligned — intervals
-    are cumulative deltas applied in rhythm order, so a non-monotonic splice
-    would desync the interval sequence from actual time order.
+    B's suffix is re-anchored to start right after A's prefix's last note
+    actually ends, rather than concatenating each parent's absolute onset
+    values verbatim — the two parents' onsets come from independent rhythmic
+    contexts, so splicing them as-is doesn't guarantee the B-suffix's first
+    onset falls after (or even after in time at all) the A-prefix's last
+    note, which produced overlapping and out-of-order notes in evolved
+    output. Intervals are cumulative deltas applied in rhythm order, so
+    onsets must stay strictly increasing for the pitch sequence to render
+    correctly.
     """
     ivs_a = list(parent_a.intervals)
     ivs_b = list(parent_b.intervals)
@@ -370,10 +409,8 @@ def _crossover_melody(
     split_b = _split_index(len(ivs_b), frac)
 
     child_ivs = ivs_a[:split_a] + ivs_b[split_b:]
-    child_rhy = rhy_a[:split_a] + rhy_b[split_b:]
-    # Ensure first interval is 0 (starting pitch anchor)
-    if child_ivs:
-        child_ivs[0] = 0
+    a_prefix_rhy = rhy_a[:split_a]
+    b_suffix_rhy = rhy_b[split_b:]
 
     child_durs: list[float] | None = None
     durs_a = parent_a.durations or []
@@ -384,6 +421,37 @@ def _crossover_melody(
         child_durs = durs_a[: len(child_ivs)]
     elif durs_b:
         child_durs = durs_b[: len(child_ivs)]
+
+    if a_prefix_rhy and b_suffix_rhy:
+        a_last_idx = len(a_prefix_rhy) - 1
+        a_last_dur = (
+            child_durs[a_last_idx]
+            if child_durs and a_last_idx < len(child_durs)
+            else 0.5
+        )
+        min_next_onset = a_prefix_rhy[-1] + a_last_dur
+        deficit = min_next_onset - b_suffix_rhy[0]
+        if deficit > 0:
+            b_suffix_rhy = [round(t + deficit, 4) for t in b_suffix_rhy]
+
+    child_rhy = a_prefix_rhy + b_suffix_rhy
+
+    # Drop any trailing notes pushed past the bar by the re-anchoring shift —
+    # otherwise repeated crossbreeding could let a pattern's notes drift
+    # further past its own bar length with each generation.
+    bar_length = parent_a.bar_length_beats()
+    keep = len(child_rhy)
+    while keep > 1 and child_rhy[keep - 1] >= bar_length:
+        keep -= 1
+    child_ivs = child_ivs[:keep]
+    child_rhy = child_rhy[:keep]
+    if child_durs:
+        child_durs = child_durs[:keep]
+        child_durs = _clip_durations_to_next_onset(child_rhy, child_durs)
+
+    # Ensure first interval is 0 (starting pitch anchor)
+    if child_ivs:
+        child_ivs[0] = 0
 
     tags = _merge_tags(parent_a.tags, parent_b.tags)
     return replace(
@@ -403,6 +471,7 @@ def _mutate_melody(pattern: MelodyPattern) -> MelodyPattern:
 
     intervals = list(pattern.intervals)
     rhythm = list(pattern.rhythm)
+    durations = list(pattern.durations) if pattern.durations else None
 
     if random.random() < 0.5 and len(intervals) > 1:
         # Mutate a non-first interval (first must stay 0)
@@ -410,10 +479,23 @@ def _mutate_melody(pattern: MelodyPattern) -> MelodyPattern:
         intervals[idx] = intervals[idx] + random.choice([-2, -1, 1, 2])
     elif rhythm:
         idx = random.randrange(len(rhythm))
-        rhythm[idx] = max(0.0, rhythm[idx] + random.choice([-0.5, -0.25, 0.25, 0.5]))
-        rhythm.sort()  # Keep onsets ordered
+        lower = rhythm[idx - 1] if idx > 0 else 0.0
+        upper = rhythm[idx + 1] if idx + 1 < len(rhythm) else pattern.bar_length_beats()
+        margin = 0.05
+        # Clamp the shift so it can never cross a neighboring onset — this
+        # keeps `intervals`/`durations` correctly aligned with `rhythm` by
+        # index. Re-sorting rhythm after a crossing shift (the previous
+        # behavior) would silently desync which pitch/duration belongs to
+        # which onset for every note between the old and new position.
+        if upper - lower > 2 * margin:
+            shift = random.choice([-0.5, -0.25, 0.25, 0.5])
+            new_onset = max(lower + margin, min(upper - margin, rhythm[idx] + shift))
+            rhythm[idx] = round(max(0.0, new_onset), 4)
 
-    return replace(pattern, intervals=intervals, rhythm=rhythm)
+    if durations:
+        durations = _clip_durations_to_next_onset(rhythm, durations)
+
+    return replace(pattern, intervals=intervals, rhythm=rhythm, durations=durations)
 
 
 # ---------------------------------------------------------------------------
@@ -499,15 +581,7 @@ def breed_drum_patterns(
     # Final scoring and selection
     midi_list = [_drum_to_midi(p) for p in population]
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [
-        p
-        for _, _, p in sorted(
-            zip(fitness, range(len(population)), population),
-            key=lambda x: x[0],
-            reverse=True,
-        )
-    ]
-    return sorted_pop[:top_n]
+    return _dedup_and_rank(population, midi_list, fitness, top_n)
 
 
 def breed_bass_patterns(
@@ -566,15 +640,7 @@ def breed_bass_patterns(
         except Exception:
             midi_list.append(b"")
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [
-        p
-        for _, _, p in sorted(
-            zip(fitness, range(len(population)), population),
-            key=lambda x: x[0],
-            reverse=True,
-        )
-    ]
-    return sorted_pop[:top_n]
+    return _dedup_and_rank(population, midi_list, fitness, top_n)
 
 
 def breed_melody_patterns(
@@ -633,12 +699,4 @@ def breed_melody_patterns(
         except Exception:
             midi_list.append(b"")
     fitness = _score_population(midi_list, concept_emb)
-    sorted_pop = [
-        p
-        for _, _, p in sorted(
-            zip(fitness, range(len(population)), population),
-            key=lambda x: x[0],
-            reverse=True,
-        )
-    ]
-    return sorted_pop[:top_n]
+    return _dedup_and_rank(population, midi_list, fitness, top_n)

@@ -14,10 +14,11 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
-  assignSongToSide, createDiaryEntry, fetchDiaryEntries, fetchSides, fetchSongMixInfo,
-  fetchSongs, moveSongBetweenSides, removeSongFromSide, songMixStreamUrl,
+  assignSongToSide, fetchMaterialProduced, fetchPlaylistConfig, fetchSides, fetchSongs,
+  moveSongBetweenSides, removeSongFromSide, setPlaylistConfig, syncPlaylists,
 } from "@/lib/api";
-import { DiaryEntry, SideEntry, SideName, SideSong, SidesResponse, SongEntry } from "@/lib/types";
+import { MaterialProduced, SideEntry, SideName, SideSong, SidesResponse, SongEntry } from "@/lib/types";
+import { NotesButton, SongNotesModal } from "@/components/SongNotes";
 
 const SIDE_NAMES: SideName[] = ["A", "B", "C", "D"];
 
@@ -81,200 +82,6 @@ interface DragPayload {
   fromSide: SideName | null;
 }
 
-function SongNotesModal({ song, onClose }: { song: SongEntry; onClose: () => void }) {
-  const [mixInfo, setMixInfo] = useState<{
-    has_mix: boolean;
-    mix_file: string | null;
-    duration_seconds: number | null;
-  } | null>(null);
-  const [entries, setEntries] = useState<DiaryEntry[]>([]);
-  const [loadingEntries, setLoadingEntries] = useState(true);
-  const [author, setAuthor] = useState("");
-  const [phase, setPhase] = useState("");
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setMixInfo(null);
-    setLoadingEntries(true);
-
-    fetchSongMixInfo(song.id).then((info) => {
-      if (!cancelled) setMixInfo(info);
-    });
-    fetchDiaryEntries(song.production_slug)
-      .then((fetched) => {
-        if (!cancelled) setEntries([...fetched].reverse());
-      })
-      .catch(() => {
-        if (!cancelled) setEntries([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingEntries(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [song.id, song.production_slug]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setError(null);
-    try {
-      const created = await createDiaryEntry(song.production_slug, {
-        song_slug: song.production_slug,
-        author,
-        phase: phase || null,
-        title: title || null,
-        body,
-        tags: [],
-        metadata: {},
-      });
-      setEntries((prev) => [created, ...prev]);
-      setAuthor("");
-      setPhase("");
-      setTitle("");
-      setBody("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="relative bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-lg mx-4 flex flex-col max-h-[85vh] shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 flex-shrink-0">
-          <span className="text-sm font-semibold text-white font-sans truncate">{song.title}</span>
-          <button
-            onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-200 text-lg leading-none transition-colors"
-            aria-label="Close"
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="px-5 py-3 border-b border-zinc-800/60 flex-shrink-0">
-          {mixInfo === null ? (
-            <p className="text-[11px] font-sans text-zinc-600 italic">Loading mix…</p>
-          ) : mixInfo.has_mix ? (
-            <audio controls src={songMixStreamUrl(song.id)} className="w-full h-9" />
-          ) : (
-            <p className="text-[11px] font-sans text-zinc-600 italic">No mix file yet</p>
-          )}
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-3 flex flex-col gap-2">
-          {loadingEntries ? (
-            <p className="text-[11px] font-sans text-zinc-600 italic">Loading entries…</p>
-          ) : entries.length === 0 ? (
-            <p className="text-[11px] font-sans text-zinc-600 italic">No diary entries yet</p>
-          ) : (
-            entries.map((entry) => (
-              <div key={entry.id} className="border border-zinc-800 rounded px-3 py-2">
-                <div className="flex items-center justify-between gap-2 text-[10px] font-sans text-zinc-500">
-                  <span>
-                    {entry.author}
-                    {entry.phase ? ` · ${entry.phase}` : ""}
-                  </span>
-                  <span>{new Date(entry.created_at).toLocaleString()}</span>
-                </div>
-                {entry.title && (
-                  <p className="text-xs font-sans font-semibold text-zinc-200 mt-1">{entry.title}</p>
-                )}
-                <p className="text-xs font-sans text-zinc-300 mt-1 whitespace-pre-wrap">{entry.body}</p>
-              </div>
-            ))
-          )}
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 px-5 py-4 border-t border-zinc-800 flex-shrink-0">
-          <div className="flex gap-3">
-            <label className="flex flex-col gap-1 flex-1">
-              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Author</span>
-              <input
-                type="text"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                required
-                placeholder="gabriel"
-                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
-              />
-            </label>
-            <label className="flex flex-col gap-1 flex-1">
-              <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Phase</span>
-              <input
-                type="text"
-                value={phase}
-                onChange={(e) => setPhase(e.target.value)}
-                className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
-              />
-            </label>
-          </div>
-          <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Title</span>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="optional headline"
-              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">Body</span>
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              required
-              rows={4}
-              placeholder="what happened?"
-              className="bg-zinc-800 border border-zinc-700 rounded px-2.5 py-1.5 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none transition-colors"
-            />
-          </label>
-          {error && <p className="text-[10px] font-sans text-red-400">{error}</p>}
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full py-2 text-sm font-sans font-semibold rounded-lg bg-violet-700 hover:bg-violet-600 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            {saving ? "Saving…" : "Save entry"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function NotesButton({ title, onOpen }: { title: string; onOpen: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onOpen();
-      }}
-      aria-label={`Listen and add notes for ${title}`}
-      title="Listen / diary notes"
-      className="w-[34px] h-[34px] shrink-0 flex items-center justify-center border border-[var(--ef-gray)] bg-transparent text-[#c9c9c9] hover:text-[var(--ef-orange)] hover:border-[var(--ef-orange)] transition-[color,border-color] duration-500 ease-in-out"
-    >
-      <i className="fa-solid fa-feather-pointed text-[15px]" aria-hidden="true" />
-    </button>
-  );
-}
-
 function AvailableSongRow({
   song,
   onOpenNotes,
@@ -283,6 +90,7 @@ function AvailableSongRow({
   onOpenNotes: (songId: string) => void;
 }) {
   const disabled = !song.has_mix;
+  const considered = song.lp_consideration !== "not_considered";
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `avail:${song.id}`,
     data: { songId: song.id, title: song.title, fromSide: null } satisfies DragPayload,
@@ -296,7 +104,9 @@ function AvailableSongRow({
       className={`px-3 py-2 rounded border text-xs font-sans flex items-center justify-between gap-2 ${
         disabled
           ? "border-zinc-800 text-zinc-600 cursor-not-allowed"
-          : "border-zinc-700 text-zinc-200 cursor-grab hover:border-zinc-500"
+          : considered
+            ? "border-blue-700 bg-blue-800 text-white cursor-grab hover:border-blue-500"
+            : "border-zinc-700 text-zinc-200 cursor-grab hover:border-zinc-500"
       } ${isDragging ? "opacity-40" : ""}`}
       title={disabled ? "No mix file — cannot be sequenced" : "Drag onto a side"}
     >
@@ -341,8 +151,8 @@ function SideSongRow({
       ref={setRefs}
       {...attributes}
       {...listeners}
-      className={`px-3 py-2 rounded border bg-zinc-900 text-xs font-sans text-zinc-200 flex items-center justify-between gap-2 cursor-grab ${
-        isOver ? "border-blue-500" : "border-zinc-700 hover:border-zinc-500"
+      className={`px-3 py-2 rounded border bg-blue-900/10 text-xs font-sans text-zinc-200 flex items-center justify-between gap-2 cursor-grab ${
+        isOver ? "border-blue-400" : "border-blue-800 hover:border-blue-600"
       } ${isDragging ? "opacity-40" : ""}`}
     >
       <span className="truncate">{title}</span>
@@ -429,8 +239,56 @@ export default function SidesPage() {
   const [poolSearch, setPoolSearch] = useState("");
   const [showUnmixed, setShowUnmixed] = useState(false);
   const [notesSongId, setNotesSongId] = useState<string | null>(null);
+  const [playlistDirInput, setPlaylistDirInput] = useState("");
+  const [material, setMaterial] = useState<MaterialProduced | null>(null);
+  const [savingPlaylistDir, setSavingPlaylistDir] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ rejects: number; review: number; wip: number } | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
+  useEffect(() => {
+    fetchPlaylistConfig()
+      .then((config) => setPlaylistDirInput(config.output_dir))
+      .catch(() => {});
+    fetchMaterialProduced().then(setMaterial).catch(() => {});
+  }, []);
+
+  const handleSavePlaylistDir = async () => {
+    if (!playlistDirInput.trim()) return;
+    setSavingPlaylistDir(true);
+    setSyncError(null);
+    try {
+      await setPlaylistConfig(playlistDirInput.trim());
+    } catch (e) {
+      setSyncError(e instanceof Error ? e.message : "Failed to save output directory");
+    } finally {
+      setSavingPlaylistDir(false);
+    }
+  };
+
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncError(null);
+    setSyncResult(null);
+    try {
+      // Clicking this button blurs the directory input, which also fires
+      // handleSavePlaylistDir (onBlur) — that save and this sync would race
+      // if we didn't also save here first: awaiting it before syncing
+      // guarantees the sync always uses the latest typed directory rather
+      // than whatever was last persisted.
+      if (playlistDirInput.trim()) {
+        await setPlaylistConfig(playlistDirInput.trim());
+      }
+      const result = await syncPlaylists();
+      setSyncResult(result);
+    } catch (e) {
+      setSyncError(e instanceof Error ? e.message : "Sync failed");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const refresh = useCallback(() => {
     Promise.all([fetchSongs(), fetchSides()])
@@ -533,9 +391,12 @@ export default function SidesPage() {
   );
   const available = songs
     .filter((s) => !assignedIds.has(s.id))
+    .filter((s) => s.lifecycle_status !== "abandoned")
     .filter((s) => showUnmixed || s.has_mix)
     .filter((s) => !poolSearch || s.title.toLowerCase().includes(poolSearch.toLowerCase()));
-  const unmixedHiddenCount = songs.filter((s) => !assignedIds.has(s.id) && !s.has_mix).length;
+  const unmixedHiddenCount = songs.filter(
+    (s) => !assignedIds.has(s.id) && s.lifecycle_status !== "abandoned" && !s.has_mix,
+  ).length;
   const allAssigned = songs.length > 0 && songs.every((s) => assignedIds.has(s.id));
 
   const totalUsedSeconds = sides
@@ -550,11 +411,46 @@ export default function SidesPage() {
           ← home
         </Link>
         <h1 className="text-lg font-bold text-white tracking-tight">LP Side Sequencing</h1>
-        {sides && (
-          <span className="ml-auto text-xs font-sans text-zinc-500">
-            Total: <span className="text-zinc-300">{formatDuration(totalUsedSeconds)}</span> / {formatDuration(totalTargetSeconds)} across {SIDE_NAMES.length} sides
+        <span className="ml-auto flex items-center gap-4">
+          {sides && (
+            <span className="text-xs font-sans text-zinc-500">
+              Total: <span className="text-zinc-300">{formatDuration(totalUsedSeconds)}</span> / {formatDuration(totalTargetSeconds)} across {SIDE_NAMES.length} sides
+            </span>
+          )}
+          {material && (
+            <span className="text-xs font-sans text-zinc-500">
+              Material produced: <span className="text-zinc-300">{formatDuration(material.total_seconds)}</span> / {formatDuration(material.target_seconds)}
+            </span>
+          )}
+        </span>
+      </div>
+
+      <div className="border-b border-zinc-800 px-6 py-3 flex items-center gap-3">
+        <span className="text-xs font-sans text-zinc-500 shrink-0">Playlist output:</span>
+        <input
+          type="text"
+          value={playlistDirInput}
+          onChange={(e) => setPlaylistDirInput(e.target.value)}
+          onBlur={handleSavePlaylistDir}
+          placeholder="/path/to/Listening"
+          className="flex-1 max-w-xl bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs font-sans text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+        />
+        {savingPlaylistDir && <span className="text-[11px] text-zinc-600 font-sans">saving…</span>}
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="px-3 py-1 rounded border border-blue-700 bg-blue-950/40 text-xs font-sans text-blue-300 hover:bg-blue-950/70 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {syncing ? "Syncing…" : "Sync to Playlists"}
+        </button>
+        {syncResult && (
+          <span className="text-xs font-sans text-zinc-400">
+            Rejects: <span className="text-zinc-200">{syncResult.rejects}</span>, Review:{" "}
+            <span className="text-zinc-200">{syncResult.review}</span>, White Album WiP:{" "}
+            <span className="text-zinc-200">{syncResult.wip}</span>
           </span>
         )}
+        {syncError && <span className="text-xs font-sans text-red-400">{syncError}</span>}
       </div>
 
       {error && (
@@ -630,7 +526,7 @@ export default function SidesPage() {
         (() => {
           const notesSong = songs.find((s) => s.id === notesSongId);
           return notesSong ? (
-            <SongNotesModal song={notesSong} onClose={() => setNotesSongId(null)} />
+            <SongNotesModal song={notesSong} onClose={() => setNotesSongId(null)} onUpdated={refresh} />
           ) : null;
         })()}
     </div>

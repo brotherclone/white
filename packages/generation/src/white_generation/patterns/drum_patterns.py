@@ -1922,6 +1922,143 @@ TEMPLATES_5_4_ROCK = [
 ]
 
 # ---------------------------------------------------------------------------
+# 5/8 Templates
+# ---------------------------------------------------------------------------
+# 5/8 = 5 eighth notes = 2.5 quarter-note beats. Positions are in quarter-note
+# beats: 0, 0.5, 1, 1.5, 2. Common grouping: 3+2 (strong on 1 and the 4th
+# eighth, i.e. position 1.5).
+
+TEMPLATES_5_8_AMBIENT = [
+    DrumPattern(
+        name="ambient_5_8_sparse",
+        genre_family="ambient",
+        energy="low",
+        time_sig=(5, 8),
+        description="Sparse 5/8 (3+2) — kick on 1, ghost hat on the 2-group",
+        voices={
+            "kick": [(0, "normal")],
+            "hh_closed": [(1.5, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="ambient_5_8_pulse",
+        genre_family="ambient",
+        energy="medium",
+        time_sig=(5, 8),
+        description="5/8 ambient pulse — kick on group starts (3+2), ghost hats on all five eighths",
+        voices={
+            "kick": [(0, "normal"), (1.5, "ghost")],
+            "hh_closed": [
+                (0, "ghost"),
+                (0.5, "ghost"),
+                (1, "ghost"),
+                (1.5, "ghost"),
+                (2, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="ambient_5_8_wash",
+        genre_family="ambient",
+        energy="high",
+        time_sig=(5, 8),
+        description="5/8 ambient wash — crash on 1, kick on group starts, open hat swell",
+        voices={
+            "crash": [(0, "normal")],
+            "kick": [(0, "accent"), (1.5, "normal")],
+            "hh_open": [(2, "normal")],
+        },
+    ),
+]
+
+TEMPLATES_5_8_ELECTRONIC = [
+    DrumPattern(
+        name="electronic_5_8_minimal",
+        genre_family="electronic",
+        energy="low",
+        time_sig=(5, 8),
+        description="Minimal 5/8 — kick on 1, ghost hat on the 2-group",
+        voices={
+            "kick": [(0, "normal")],
+            "hh_closed": [(1.5, "ghost")],
+        },
+    ),
+    DrumPattern(
+        name="electronic_5_8_groove",
+        genre_family="electronic",
+        energy="medium",
+        time_sig=(5, 8),
+        description="5/8 electronic groove (3+2) — kick on group starts, clap on the 2-group, hats on eighths",
+        voices={
+            "kick": [(0, "accent"), (1.5, "normal")],
+            "clap": [(1.5, "normal")],
+            "hh_closed": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1, "ghost"),
+                (1.5, "normal"),
+                (2, "ghost"),
+            ],
+        },
+    ),
+    DrumPattern(
+        name="electronic_5_8_driving",
+        genre_family="electronic",
+        energy="high",
+        time_sig=(5, 8),
+        description="Driving 5/8 — kick accented on both group starts, snare on the 2-group, eighths on hats",
+        voices={
+            "kick": [(0, "accent"), (1, "normal"), (1.5, "accent")],
+            "snare": [(1.5, "accent")],
+            "hh_closed": [
+                (0, "accent"),
+                (0.5, "normal"),
+                (1, "normal"),
+                (1.5, "accent"),
+                (2, "normal"),
+            ],
+        },
+    ),
+]
+
+TEMPLATES_5_8_EXPERIMENTAL = [
+    DrumPattern(
+        name="experimental_5_8_off_grid",
+        genre_family="experimental",
+        energy="low",
+        time_sig=(5, 8),
+        description="Off-grid 5/8 — single ghost kick displaced onto the 2-group, no fixed pulse",
+        voices={
+            "kick": [(1.5, "ghost")],
+        },
+        tags=["sparse"],
+    ),
+    DrumPattern(
+        name="experimental_5_8_stutter",
+        genre_family="experimental",
+        energy="medium",
+        time_sig=(5, 8),
+        description="Stuttered 5/8 — irregular kick/rimshot placement across the bar, no fixed grouping",
+        voices={
+            "kick": [(0, "accent"), (1, "ghost")],
+            "rimshot": [(0.5, "ghost"), (2, "normal")],
+        },
+    ),
+    DrumPattern(
+        name="experimental_5_8_glitch",
+        genre_family="experimental",
+        energy="high",
+        time_sig=(5, 8),
+        description="Glitch 5/8 — dense clap texture against sparse accented kick, cross-grouping tension",
+        voices={
+            "kick": [(0, "accent"), (1.5, "accent")],
+            "clap": [(0.5, "ghost"), (1, "ghost"), (2, "ghost")],
+            "hh_closed": [(0, "ghost"), (1, "ghost"), (1.5, "ghost")],
+        },
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # 4/4 Breakbeat (classic breaks + energy variants)
 # ---------------------------------------------------------------------------
 # Grid mapping: 16th-note positions in quarter-beat floats
@@ -2845,6 +2982,10 @@ ALL_TEMPLATES: list[DrumPattern] = [
     *TEMPLATES_5_4_ELECTRONIC,
     *TEMPLATES_5_4_FOLK,
     *TEMPLATES_5_4_ROCK,
+    # 5/8
+    *TEMPLATES_5_8_AMBIENT,
+    *TEMPLATES_5_8_ELECTRONIC,
+    *TEMPLATES_5_8_EXPERIMENTAL,
     # 4/4 Breakbeat
     *TEMPLATES_4_4_BREAKBEAT,
     # 4/4 Sparse / Atmospheric

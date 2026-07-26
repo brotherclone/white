@@ -328,6 +328,32 @@ class TestTemplateSelection:
             first_energy = result[0].energy
             assert first_energy == "low"
 
+    def test_5_8_templates_exist_at_every_energy(self):
+        """Regression: bass_pipeline raised 'No bass templates for 5/8 time'
+        before these templates existed.
+        """
+        from white_generation.patterns.bass_patterns import (
+            ALL_TEMPLATES,
+            select_templates,
+        )
+
+        for energy in ("low", "medium", "high"):
+            result = select_templates(ALL_TEMPLATES, (5, 8), energy)
+            assert result, f"no 5/8 bass templates found at energy={energy}"
+            assert all(t.time_sig == (5, 8) for t in result)
+
+    def test_5_8_bar_length_and_durations_match(self):
+        from white_generation.patterns.bass_patterns import ALL_TEMPLATES
+
+        five_eight = [t for t in ALL_TEMPLATES if t.time_sig == (5, 8)]
+        assert five_eight
+        for t in five_eight:
+            assert t.bar_length_beats() == 2.5
+            if t.note_durations:
+                assert sum(t.note_durations) == 2.5, t.name
+            for pos, _tone, _velocity in t.notes:
+                assert 0 <= pos < 2.5, f"{t.name}: onset {pos} out of range"
+
 
 # ---------------------------------------------------------------------------
 # 4. Theory scoring

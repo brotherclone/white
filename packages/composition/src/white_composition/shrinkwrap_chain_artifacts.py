@@ -24,6 +24,10 @@ from typing import Optional
 
 import yaml
 
+from white_core.manifests.song_proposal import (
+    SongProposalIteration,
+    resolve_supersession_chains,
+)
 from white_extraction.util.generate_negative_constraints import (
     generate_constraints,
     write_constraints,
@@ -458,19 +462,79 @@ _SKIP_PROPOSALS = {"evp.yml", "all_song_proposals.yml"}
 _PROPOSAL_REQUIRED_KEYS = {"bpm", "key", "rainbow_color"}
 
 
+def _load_final_iteration_lookup(yml_dir: Path) -> dict[str, bool]:
+    """Return {iteration_id: is_final}, resolved via resolve_supersession_chains,
+    from this thread's all_song_proposals*.yml bundle if one exists.
+
+    Individual per-iteration yml files can be dumped to yml_dir at generation
+    time and never revisited, so their own is_final field may be stale by the
+    time a later counter-proposal in the same chain supersedes them (see
+    resolve_supersession_chains). The combined bundle is the one place that
+    reflects the fully-resolved state, so scaffolding should defer to it.
+    Returns {} if no bundle is found — callers should then fall back to
+    trusting each file's own is_final field. A single malformed entry in the
+    bundle (e.g. a corrupted title) is skipped rather than aborting the whole
+    lookup — the remaining entries still resolve correctly.
+    """
+    bundle_paths = sorted(yml_dir.glob("all_song_proposals*.yml"))
+    if not bundle_paths:
+        return {}
+    try:
+        with open(bundle_paths[0]) as f:
+            data = yaml.safe_load(f) or {}
+    except Exception:
+        return {}
+    iterations = []
+    for it in data.get("iterations") or []:
+        try:
+            iterations.append(SongProposalIteration(**it))
+        except Exception:
+            continue
+    resolved, _ = resolve_supersession_chains(iterations)
+    return {it.iteration_id: it.is_final for it in resolved}
+
+
+def _extract_time_sig(proposal: dict) -> str:
+    """Derive a "N/N" time signature string from a raw proposal dict.
+
+    Mirrors the tempo-parsing in production_plan.load_song_proposal(): a
+    proposal may carry a nested {numerator, denominator} tempo dict, a flat
+    "N/N" tempo string, or a flat time_sig field. Defaults to 4/4 when none
+    of those are present.
+    """
+    tempo = proposal.get("tempo") or {}
+    if isinstance(tempo, dict) and tempo:
+        numerator = tempo.get("numerator") or 4
+        denominator = tempo.get("denominator") or 4
+        return f"{numerator}/{denominator}"
+    if isinstance(tempo, str) and "/" in tempo:
+        return tempo
+    time_sig = proposal.get("time_sig")
+    if isinstance(time_sig, str) and "/" in time_sig:
+        return time_sig
+    return "4/4"
+
+
 def scaffold_song_productions(
     thread_dest_dir: Path, yml_dir: Path, force: bool = False
 ) -> list[str]:
-    """Create production/<slug>/manifest_bootstrap.yml for each song proposal in yml_dir.
+    """Create production/<slug>/manifest_bootstrap.yml for each *final* song proposal in yml_dir.
 
     A YAML file is treated as a song proposal if it contains bpm, key, and rainbow_color.
     Known non-proposal files (evp.yml, all_song_proposals.yml) are always skipped.
+    A proposal that resolves to is_final=False — either per the thread's
+    all_song_proposals*.yml bundle (see _load_final_iteration_lookup) or, absent
+    a bundle, per its own is_final field — is skipped: it was superseded by a
+    later counter-proposal in the same revision chain and should not get its
+    own production directory.
     Existing manifest_bootstrap.yml files are never overwritten (idempotent).
 
     Returns list of production slugs created (or already existing).
     """
     if not yml_dir.exists():
         return []
+
+    final_lookup = _load_final_iteration_lookup(yml_dir)
 
     created = []
     for yml_path in sorted(yml_dir.glob("*.yml")):
@@ -486,6 +550,13 @@ def scaffold_song_productions(
         if not _PROPOSAL_REQUIRED_KEYS.issubset(proposal):
             continue
 
+        iteration_id = proposal.get("iteration_id")
+        if iteration_id in final_lookup:
+            if not final_lookup[iteration_id]:
+                continue
+        elif proposal.get("is_final") is False:
+            continue
+
         slug = yml_path.stem
         prod_dir = thread_dest_dir / "production" / slug
         manifest_path = prod_dir / "manifest_bootstrap.yml"
@@ -498,8 +569,10 @@ def scaffold_song_productions(
         bootstrap = {
             "schema_version": SHRINKWRAP_SCHEMA_VERSION,
             "title": proposal.get("title") or slug,
+            "thread_slug": thread_dest_dir.name,
             "key": proposal.get("key"),
             "bpm": proposal.get("bpm"),
+            "time_sig": _extract_time_sig(proposal),
             "rainbow_color": rainbow_color,
             "singer": proposal.get("singer") or None,
             "sounds_like": proposal.get("sounds_like") or [],
@@ -649,9 +722,11 @@ def _synthesize_bootstrap_stub(prod_dir: Path) -> dict:
         "schema_version": SHRINKWRAP_SCHEMA_VERSION,
         "stub": True,
         "title": title,
+        "thread_slug": prod_dir.parent.parent.name,
         "rainbow_color": rainbow_color,
         "bpm": None,
         "key": None,
+        "time_sig": None,
         "singer": None,
     }
     manifest_path = prod_dir / "manifest_bootstrap.yml"
