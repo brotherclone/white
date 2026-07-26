@@ -302,6 +302,91 @@ class TestGenerateAlternateSongSpec:
         assert hasattr(proposal, "genres")
         assert hasattr(proposal, "concept")
 
+    def test_generate_alternate_song_spec_includes_sounds_like(
+        self, violet_agent, violet_agent_state, monkeypatch
+    ):
+        """Regression for add-ideation-sounds-like: Violet's reference-works
+        section must include sampled sounds-like artists."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+        monkeypatch.setattr(
+            "white_ideation.agents.violet_agent.get_sounds_like_by_color",
+            lambda color: ["Test Reference Artist"],
+        )
+        monkeypatch.setattr(
+            "white_ideation.agents.violet_agent.sample_reference_artists",
+            lambda artists, **kwargs: list(artists),
+        )
+
+        violet_agent_state.interviewer_persona = VanityPersona()
+
+        counter_proposal = SongProposalIteration(
+            iteration_id="violet_v1",
+            bpm=120,
+            tempo="4/4",
+            key="F Major",
+            rainbow_color="violet",
+            title="Test Violet Song",
+            mood=["defiant"],
+            genres=["experimental"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring self-mythology.",
+        )
+        seen_prompts = []
+
+        def fake_invoke_structured(llm, schema, prompt):
+            seen_prompts.append(prompt)
+            return counter_proposal
+
+        with patch.object(
+            violet_agent, "_invoke_structured", side_effect=fake_invoke_structured
+        ):
+            violet_agent.generate_alternate_song_spec(violet_agent_state)
+
+        assert len(seen_prompts) == 1
+        assert "Test Reference Artist" in seen_prompts[0]
+
+    def test_generate_alternate_song_spec_includes_negative_constraints(
+        self, violet_agent, violet_agent_state, monkeypatch
+    ):
+        """Regression for add-ideation-negative-constraints: Violet's own
+        counter-proposal prompt must honor negative_constraints, not just
+        White's initial proposal and final rewrite."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+
+        violet_agent_state.interviewer_persona = VanityPersona()
+        violet_agent_state.negative_constraints = (
+            "AVOID: the word 'confidence', keys already used: C Major"
+        )
+
+        counter_proposal = SongProposalIteration(
+            iteration_id="violet_v1",
+            bpm=120,
+            tempo="4/4",
+            key="F Major",
+            rainbow_color="violet",
+            title="Test Violet Song",
+            mood=["defiant"],
+            genres=["experimental"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring self-mythology.",
+        )
+        seen_prompts = []
+
+        def fake_invoke_structured(llm, schema, prompt):
+            seen_prompts.append(prompt)
+            return counter_proposal
+
+        with patch.object(
+            violet_agent, "_invoke_structured", side_effect=fake_invoke_structured
+        ):
+            result = violet_agent.generate_alternate_song_spec(violet_agent_state)
+
+        assert result.counter_proposal is not None
+        assert len(seen_prompts) == 1
+        assert violet_agent_state.negative_constraints in seen_prompts[0]
+
 
 class TestLoadCorpus:
     """Tests for _load_corpus helper method."""

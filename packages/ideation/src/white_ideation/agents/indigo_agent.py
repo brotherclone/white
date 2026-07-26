@@ -79,6 +79,7 @@ class IndigoAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
             white_proposal=state.song_proposals.iterations[-1],
+            negative_constraints=state.negative_constraints or "",
             counter_proposal=None,
             artifacts=[],
             secret_name=None,
@@ -953,6 +954,8 @@ Mood: [mood1, mood2, mood3]
 Genres: [genre1, genre2]
 Concept: [full concept explanation]
 """
+            if state.negative_constraints:
+                proposal_prompt = proposal_prompt + "\n\n" + state.negative_constraints
             try:
                 response = self._extract_text(self.llm.invoke(proposal_prompt).content)
                 counter_proposal = _parse_proposal_response(response)

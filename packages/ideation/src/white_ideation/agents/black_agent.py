@@ -23,7 +23,11 @@ from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.sigil_state import SigilState
 from white_core.enums.sigil_type import SigilType
 from white_core.manifests.song_proposal import SongProposalIteration
-from white_extraction.util.manifest_loader import get_my_reference_proposals
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.black_agent_state import BlackAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -68,6 +72,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
         current_proposal = state.song_proposals.iterations[-1]
         black_state = BlackAgentState(
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             song_proposals=state.song_proposals,
             thread_id=state.thread_id,
             artifacts=[],
@@ -157,7 +162,9 @@ class BlackAgent(BaseRainbowAgent, ABC):
     
             Reference works in this artist's style paying close attention to 'concept' property:
             {get_my_reference_proposals('Z')}
-            
+
+            Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('Z'))) or 'no artists catalogued yet for this color'}
+
             In your counter proposal your 'rainbow_color' property should always be:
             {the_rainbow_table_colors['Z']}
     
@@ -166,6 +173,8 @@ class BlackAgent(BaseRainbowAgent, ABC):
             resistance and psychological liberation. Try to avoid being too "on the nose" or literal.
             Ambiguity and subtlety are valued.
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
             claude = self._get_claude()
             try:
                 result = self._invoke_structured(claude, SongProposalIteration, prompt)
@@ -560,6 +569,8 @@ The counter-proposal and new updated counter-proposal should have the 'rainbow_c
 And here is the EVP transcript:
     {state.artifacts[-1].transcript}
                """
+        if state.negative_constraints:
+            prompt = prompt + "\n\n" + state.negative_constraints
         claude = self._get_claude()
         try:
             result = self._invoke_structured(claude, SongProposalIteration, prompt)

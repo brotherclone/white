@@ -26,6 +26,11 @@ from white_core.concepts.last_human_species_extinction_parallel_moment import (
 )
 from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
 from white_core.manifests.song_proposal import SongProposalIteration
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.green_agent_state import GreenAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -74,6 +79,7 @@ class GreenAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             counter_proposal=None,
             artifacts=[],
             current_species=None,
@@ -781,7 +787,9 @@ Your counter-proposal's 'title' must be a vivid, descriptive phrase about extinc
 Your counter-proposal's 'iteration_id' must follow this exact format: green_<title_slug>_v1 where <title_slug> is the title lowercased with spaces and punctuation replaced by underscores, max 30 characters (e.g. "green_the_last_migration_v1").
 
 Some other examples from the archive in the 'green' category:
-{the_rainbow_table_colors['G']}
+{get_my_reference_proposals('G')}
+
+Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('G'))) or 'no artists catalogued yet for this color'}
 
 Your observations of species extinction:
 {state.current_species}
@@ -800,6 +808,8 @@ and finally Claude's decision on what to save from Earth:
 
 Using all of this, create a new SongProposalIteration that captures the essence of extinction, loss, and the bittersweet beauty of endings.
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
             claude = self._get_claude()
             try:
                 result = self._invoke_structured(claude, SongProposalIteration, prompt)

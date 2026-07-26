@@ -370,6 +370,121 @@ class TestGenerateAlternateSongSpec:
         assert result.counter_proposal.title is not None
         assert isinstance(result.counter_proposal.bpm, (int, float))
 
+    def test_generate_alternate_song_spec_includes_sounds_like(
+        self, green_agent, green_agent_state, monkeypatch
+    ):
+        """Regression for add-ideation-sounds-like: Green never had a
+        reference-works section at all (its prompt accidentally repeated
+        the rainbow_color value where reference examples should have been);
+        this confirms both the fixed reference section and the new
+        sounds-like line reach the prompt."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+        monkeypatch.setattr(
+            "white_ideation.agents.green_agent.get_sounds_like_by_color",
+            lambda color: ["Test Reference Artist"],
+        )
+        monkeypatch.setattr(
+            "white_ideation.agents.green_agent.sample_reference_artists",
+            lambda artists, **kwargs: list(artists),
+        )
+        monkeypatch.setattr(
+            "white_ideation.agents.green_agent.get_my_reference_proposals",
+            lambda color: "Test Reference Proposal",
+        )
+
+        green_agent_state.white_proposal = SongProposalIteration(
+            iteration_id="white_001",
+            bpm=120,
+            tempo="4/4",
+            key="C Major",
+            rainbow_color="white",
+            title="Test White Song",
+            mood=["contemplative"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and time.",
+        )
+
+        counter_proposal = SongProposalIteration(
+            iteration_id="green_v1",
+            bpm=90,
+            tempo="4/4",
+            key="D minor",
+            rainbow_color="green",
+            title="Test Green Song",
+            mood=["elegiac"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and extinction.",
+        )
+        seen_prompts = []
+
+        def fake_invoke_structured(llm, schema, prompt):
+            seen_prompts.append(prompt)
+            return counter_proposal
+
+        with patch.object(
+            green_agent, "_invoke_structured", side_effect=fake_invoke_structured
+        ):
+            green_agent.generate_alternate_song_spec(green_agent_state)
+
+        assert len(seen_prompts) == 1
+        assert "Test Reference Artist" in seen_prompts[0]
+        assert "Test Reference Proposal" in seen_prompts[0]
+
+    def test_generate_alternate_song_spec_includes_negative_constraints(
+        self, green_agent, green_agent_state, monkeypatch
+    ):
+        """Regression for add-ideation-negative-constraints: Green's own
+        counter-proposal prompt must honor negative_constraints, not just
+        White's initial proposal and final rewrite."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+
+        green_agent_state.negative_constraints = (
+            "AVOID: the word 'extinction', keys already used: C Major"
+        )
+        green_agent_state.white_proposal = SongProposalIteration(
+            iteration_id="white_001",
+            bpm=120,
+            tempo="4/4",
+            key="C Major",
+            rainbow_color="white",
+            title="Test White Song",
+            mood=["contemplative"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and time.",
+        )
+
+        counter_proposal = SongProposalIteration(
+            iteration_id="green_v1",
+            bpm=90,
+            tempo="4/4",
+            key="D minor",
+            rainbow_color="green",
+            title="Test Green Song",
+            mood=["elegiac"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and extinction.",
+        )
+        seen_prompts = []
+
+        def fake_invoke_structured(llm, schema, prompt):
+            seen_prompts.append(prompt)
+            return counter_proposal
+
+        with patch.object(
+            green_agent, "_invoke_structured", side_effect=fake_invoke_structured
+        ):
+            result = green_agent.generate_alternate_song_spec(green_agent_state)
+
+        assert result.counter_proposal is not None
+        assert len(seen_prompts) == 1
+        assert green_agent_state.negative_constraints in seen_prompts[0]
+
 
 class TestGreenAgentFullWorkflow:
     """Tests for the full GreenAgent workflow."""

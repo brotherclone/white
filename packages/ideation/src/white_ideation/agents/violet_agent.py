@@ -35,7 +35,11 @@ from white_core.enums.disrupting_event_type import (
     DisruptingEventType,
 )
 from white_core.manifests.song_proposal import SongProposalIteration
-from white_extraction.util.manifest_loader import get_my_reference_proposals
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.violet_agent_state import VioletAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -104,6 +108,7 @@ class VioletAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
             white_proposal=state.song_proposals.iterations[-1],
+            negative_constraints=state.negative_constraints or "",
             counter_proposal=None,
             artifacts=[],
             interviewer_persona=None,
@@ -710,11 +715,15 @@ This is dialectical synthesis - thesis/antithesis → synthesis.
 Reference works in this artist's style (pay attention to 'concept' property):
 {get_my_reference_proposals('V')}
 
+Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('V'))) or 'no artists catalogued yet for this color'}
+
 CRITICAL: Your 'rainbow_color' property must be:
 {the_rainbow_table_colors['V']}
 
 Output a COMPLETE revised SongProposalIteration with ALL fields populated.
 The revision should be INFORMED BY but not DEFEATED BY the criticism."""
+        if state.negative_constraints:
+            prompt = prompt + "\n\n" + state.negative_constraints
 
         try:
             counter_proposal = self._invoke_structured(

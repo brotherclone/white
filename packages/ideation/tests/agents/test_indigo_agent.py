@@ -1,4 +1,5 @@
 import re
+from unittest.mock import MagicMock, patch
 
 from white_core.manifests.song_proposal import SongProposal, SongProposalIteration
 from white_ideation.agents.indigo_agent import IndigoAgent, _parse_proposal_response
@@ -79,6 +80,44 @@ def test_is_valid_anagram_true_positive():
 def test_is_valid_anagram_false_for_mismatched_letters():
     agent = IndigoAgent()
     assert not agent._is_valid_anagram("The Silent Answer", "Completely Different")
+
+
+def test_generate_alternate_song_spec_includes_negative_constraints(monkeypatch):
+    """Regression for add-ideation-negative-constraints: Indigo's own
+    counter-proposal prompt must honor negative_constraints, not just
+    White's initial proposal and final rewrite."""
+    monkeypatch.setenv("MOCK_MODE", "false")
+    monkeypatch.setenv("BLOCK_MODE", "false")
+
+    agent = IndigoAgent()
+    predecessor = _proposal(iteration_id="prior_v3", iteration_number=3)
+    state = IndigoAgentState(
+        white_proposal=predecessor,
+        song_proposals=SongProposal(iterations=[predecessor]),
+        secret_name="The Silent Answer",
+        surface_name="White Sea Lanterns",
+        negative_constraints="AVOID: the word 'puzzle', keys already used: C major",
+    )
+
+    response_text = """Title: Test Indigo Song
+Key: E minor
+BPM: 100
+Tempo: Moderate
+Mood: mysterious, layered
+Genres: art pop
+Concept: A test concept about encoded meaning and revelation through layered puzzles."""
+    mock_response = MagicMock()
+    mock_response.content = response_text
+    mock_llm = MagicMock()
+    mock_llm.invoke = MagicMock(return_value=mock_response)
+
+    with patch.object(agent, "llm", mock_llm):
+        result_state = agent.generate_alternate_song_spec(state)
+
+    assert result_state.counter_proposal is not None
+    mock_llm.invoke.assert_called_once()
+    sent_prompt = mock_llm.invoke.call_args[0][0]
+    assert state.negative_constraints in sent_prompt
 
 
 def test_is_valid_anagram_none_surface_returns_false_not_crash():

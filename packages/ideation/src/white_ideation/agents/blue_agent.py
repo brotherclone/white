@@ -120,6 +120,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             counter_proposal=None,
             artifacts=[],
             biographical_timeline=None,
@@ -1334,6 +1335,7 @@ You sense the magnetic arrangements without hearing. The song's shape emerges:
 - Production: {"Tape sim, " + f"{state.musical_params.production_aesthetic.hiss_level:.2f}" + " hiss, " +
                f"{state.musical_params.production_aesthetic.wow_flutter:.2f}" + " flutter"}
 - Themes: {', '.join(state.musical_params.lyrical_themes[:5])}
+- Sounds like: {', '.join(state.musical_params.reference_artists) or 'no artists catalogued yet for this color'}
 
 The tape tells a story of a lost timeline:
 
@@ -1347,9 +1349,11 @@ Blue proposals are folk rock requiems for alternate lives. They must:
 - Follow these constraints: minimum plausibility {self.alternate_history_constraints.minimum_plausibility_score},
   minimum specificity {self.alternate_history_constraints.minimum_specificity_score}
 
-Before the tides change again, write your counter-proposal. Transform the White Agent's 
+Before the tides change again, write your counter-proposal. Transform the White Agent's
 dream into a song about THIS erased timeline - the one in your hands.
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
 
             claude = self._get_claude()
 

@@ -411,7 +411,7 @@ class WhiteAgent(BaseModel):
 
     def _get_claude_supervisor(self) -> ChatAnthropic:
         return ChatAnthropic(
-            model_name="claude-fable-5",
+            model_name="claude-sonnet-5",
             api_key=self.settings.anthropic_api_key,
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,

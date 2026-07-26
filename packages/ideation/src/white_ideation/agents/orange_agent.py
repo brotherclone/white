@@ -23,7 +23,11 @@ from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
 from white_core.enums.chain_artifact_file_type import ChainArtifactFileType
 from white_core.enums.symbolic_object_category import SymbolicObjectCategory
 from white_core.manifests.song_proposal import SongProposalIteration
-from white_extraction.util.manifest_loader import get_my_reference_proposals
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.orange_agent_state import OrangeAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -66,6 +70,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         current_proposal = state.song_proposals.iterations[-1]
         orange_state = OrangeAgentState(
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             thread_id=state.thread_id,
             artifacts=[],
             synthesized_story=None,
@@ -145,19 +150,32 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     raise Exception(error_msg)
             return state
         else:
+            # Last-resort guard: every upstream node that sets
+            # mythologized_story falls back on failure now, but this stays
+            # cheap insurance against the exact crash this used to hit —
+            # an unguarded .headline access on None when some upstream step
+            # was skipped.
+            story = state.mythologized_story or state.synthesized_story
+            if story is None:
+                story = self._fallback_newspaper_story(
+                    state,
+                    datetime(1975, 1, 1),
+                    ["Sparta Township"],
+                    ["Sussex County Independent"],
+                )
             prompt = f"""Generate Orange's counter-proposal based on the mythologized story.
 
             WHITE'S PROPOSAL:
             {state.white_proposal.model_dump_json(indent=2)}
 
             MYTHOLOGIZED STORY:
-            Headline: {state.mythologized_story.headline}
-            Date: {state.mythologized_story.date}
-            Location: {state.mythologized_story.location}
+            Headline: {story.headline}
+            Date: {story.date}
+            Location: {story.location}
             Symbolic Object: {state.symbolic_object.name if state.symbolic_object else 'N/A'}
 
             Story Text:
-            {state.mythologized_story.text}
+            {story.text}
 
             ORANGE'S METHODOLOGY:
             Orange mythologizes - transforms factual into legendary through:
@@ -169,6 +187,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             REFERENCE WORKS (Orange style):
             {get_my_reference_proposals('O')}
 
+            Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('O'))) or 'no artists catalogued yet for this color'}
+
             Generate a counter-proposal that:
             1. Maintains White's core concept but adds Orange's mythology layer
             2. Uses story's date/location as temporal coordinates
@@ -177,6 +197,8 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             5. BPM should reference 182 (the transmission speed) or its subdivisions
             6. Always sets rainbow_color to: {the_rainbow_table_colors['O']}
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
             claude = self._get_claude()
 
             try:
@@ -375,29 +397,46 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     logger.error(error_msg)
                     if block_mode:
                         raise TypeError(error_msg)
-                    fallback_story = NewspaperArtifact(
-                        thread_id=state.thread_id,
-                        headline="Strange Frequencies Reported Near High School Band Room",
-                        base_path=os.getenv(
-                            "AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"
-                        ),
-                        date=story_date.strftime("%Y-%m-%d"),
-                        source=random.choice(sources),
-                        location=random.choice(locations) + ", NJ",
-                        text="Local residents reported unusual electronic sounds emanating from the high school after hours.",
-                        tags=["rock_bands", "unexplained"],
+                    state.synthesized_story = self._fallback_newspaper_story(
+                        state, story_date, locations, sources
                     )
-                    state.synthesized_story = fallback_story
                     return state
             except Exception as e:
                 error_msg = f"Base story synthesis LLM call failed: {e!s}"
                 logger.error(error_msg)
                 if block_mode:
                     raise Exception(error_msg)
+                # Leaving synthesized_story as None here (rather than falling
+                # back like the branch above) used to cascade silently through
+                # add_to_corpus/select_symbolic_object/gonzo_rewrite_node and
+                # crash generate_alternate_song_spec with an unguarded
+                # AttributeError on mythologized_story.headline. Fall back the
+                # same way so downstream nodes always have a real story.
+                state.synthesized_story = self._fallback_newspaper_story(
+                    state, story_date, locations, sources
+                )
         get_state_snapshot(
             state, "synthesize_base_story_exit", state.thread_id, "Rows Bud"
         )
         return state
+
+    @staticmethod
+    def _fallback_newspaper_story(
+        state: OrangeAgentState,
+        story_date: datetime,
+        locations: list[str],
+        sources: list[str],
+    ) -> NewspaperArtifact:
+        return NewspaperArtifact(
+            thread_id=state.thread_id,
+            headline="Strange Frequencies Reported Near High School Band Room",
+            base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
+            date=story_date.strftime("%Y-%m-%d"),
+            source=random.choice(sources),
+            location=random.choice(locations) + ", NJ",
+            text="Local residents reported unusual electronic sounds emanating from the high school after hours.",
+            tags=["rock_bands", "unexplained"],
+        )
 
     @agent_error_handler("Rows Bud")
     def add_to_corpus(self, state: OrangeAgentState) -> OrangeAgentState:
@@ -692,7 +731,21 @@ class OrangeAgent(BaseRainbowAgent, ABC):
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
         if not state.synthesized_story:
-            logger.warning("No synthesized story for gonzo rewrite - using fallback")
+            logger.warning(
+                "No synthesized story for gonzo rewrite - setting a fallback "
+                "mythologized story instead of leaving it unset "
+                "(generate_alternate_song_spec assumes it's always populated)"
+            )
+            state.mythologized_story = NewspaperArtifact(
+                thread_id=state.thread_id,
+                headline="Strange Frequencies Reported Near High School Band Room",
+                base_path=os.getenv("AGENT_WORK_PRODUCT_BASE_PATH", "chain_artifacts"),
+                date=datetime(1975, 1, 1).strftime("%Y-%m-%d"),
+                source="Sussex County Independent",
+                location="Sparta Township, NJ",
+                text="Local residents reported unusual electronic sounds emanating from the high school after hours.",
+                tags=["rock_bands", "unexplained"],
+            )
             get_state_snapshot(
                 state, "gonzo_rewrite_node_exit", state.thread_id, "Rows Bud"
             )

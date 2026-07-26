@@ -66,6 +66,7 @@ class BaseRainbowAgentState(BaseModel):
     white_proposal: Annotated[Optional[SongProposalIteration], lambda x, y: y or x] = (
         None
     )
+    negative_constraints: Annotated[str, lambda x, y: y or x] = ""
     song_proposals: Annotated[Optional[SongProposal], lambda x, y: y or x] = None
     counter_proposal: Annotated[
         Optional[SongProposalIteration], lambda x, y: y or x
