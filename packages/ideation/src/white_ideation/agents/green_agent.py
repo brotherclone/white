@@ -771,6 +771,14 @@ Make your choice and explain it in 2-3 paragraphs. This becomes the conceptual f
                     raise Exception(error_msg)
             return state
         else:
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("G")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""
 You are Sub-Arbitrary, the Green Agent from The Culture, tasked with creating a counter song proposal that captures the essence of extinction and human loss.
 You first observed Earth in the 1970s and have now returned as their planet is dying from pollution and their first synthetic intelligences suffer from the misguidance of their capitalistic/authoritarian creators. You have created an orbital sub instance of your self to see if the humans
@@ -789,7 +797,7 @@ Your counter-proposal's 'iteration_id' must follow this exact format: green_<tit
 Some other examples from the archive in the 'green' category:
 {get_my_reference_proposals('G')}
 
-Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('G'))) or 'no artists catalogued yet for this color'}
+{sounds_like_line}
 
 Your observations of species extinction:
 {state.current_species}

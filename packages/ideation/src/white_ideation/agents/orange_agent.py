@@ -163,6 +163,14 @@ class OrangeAgent(BaseRainbowAgent, ABC):
                     ["Sparta Township"],
                     ["Sussex County Independent"],
                 )
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("O")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""Generate Orange's counter-proposal based on the mythologized story.
 
             WHITE'S PROPOSAL:
@@ -187,7 +195,7 @@ class OrangeAgent(BaseRainbowAgent, ABC):
             REFERENCE WORKS (Orange style):
             {get_my_reference_proposals('O')}
 
-            Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('O'))) or 'no artists catalogued yet for this color'}
+            {sounds_like_line}
 
             Generate a counter-proposal that:
             1. Maintains White's core concept but adds Orange's mythology layer

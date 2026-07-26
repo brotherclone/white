@@ -148,6 +148,14 @@ class BlackAgent(BaseRainbowAgent, ABC):
             state.counter_proposal = counter_proposal
             return state
         else:
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("Z")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""
             You are the ThreadKeepr, writing creative fiction about an experimental musician creating concept albums.
             Context: This character is an artist working in the experimental music space, creating 
@@ -163,7 +171,7 @@ class BlackAgent(BaseRainbowAgent, ABC):
             Reference works in this artist's style paying close attention to 'concept' property:
             {get_my_reference_proposals('Z')}
 
-            Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('Z'))) or 'no artists catalogued yet for this color'}
+            {sounds_like_line}
 
             In your counter proposal your 'rainbow_color' property should always be:
             {the_rainbow_table_colors['Z']}

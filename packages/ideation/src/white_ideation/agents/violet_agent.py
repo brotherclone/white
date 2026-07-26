@@ -692,6 +692,12 @@ Not horror — just wrong. The frame breaks, then continues."""
 
         # Real generation with defensive revision
         interview_artifact = state.circle_jerk_interview
+        sounds_like_artists = sample_reference_artists(get_sounds_like_by_color("V"))
+        sounds_like_line = (
+            f"Sounds like: {', '.join(sounds_like_artists)}"
+            if sounds_like_artists
+            else ""
+        )
 
         prompt = f"""You are revising a song proposal after a challenging interview.
 
@@ -715,7 +721,7 @@ This is dialectical synthesis - thesis/antithesis → synthesis.
 Reference works in this artist's style (pay attention to 'concept' property):
 {get_my_reference_proposals('V')}
 
-Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('V'))) or 'no artists catalogued yet for this color'}
+{sounds_like_line}
 
 CRITICAL: Your 'rainbow_color' property must be:
 {the_rainbow_table_colors['V']}

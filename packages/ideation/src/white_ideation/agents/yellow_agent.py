@@ -401,6 +401,14 @@ class YellowAgent(BaseRainbowAgent, ABC):
             base_proposal = self.music_extractor.extract_song_proposal(
                 room=primary_room, encounter_narrative=full_narrative
             )
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("Y")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""
 You are Lord Pulsimore, resplendent ruler of the Pulsar Palace and the yellow void that exists between space and time.
 
@@ -419,7 +427,7 @@ Current synthesized White Agent proposal:
 Reference works in this artist's style:
 {get_my_reference_proposals('Y')}
 
-Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('Y'))) or 'no artists catalogued yet for this color'}
+{sounds_like_line}
 
 Create a counter-proposal that:
 1. Uses the procedurally generated musical parameters above

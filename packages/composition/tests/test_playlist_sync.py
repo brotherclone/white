@@ -17,8 +17,13 @@ from white_composition.playlist_sync import (
 
 
 def _write_mp3(path, seconds: float = 2.0, samplerate: int = 8000):
+    # MP3 encoding isn't reliably available across libsndfile builds, so this
+    # writes real WAV bytes under a `.mp3` filename — sf.info() (used by
+    # mix_duration_seconds) reads format from the file header, not the
+    # extension, so duration extraction still works; only the `.mp3` suffix
+    # filter in material_produced_seconds cares about the filename.
     samples = np.zeros(int(seconds * samplerate), dtype="float32")
-    sf.write(str(path), samples, samplerate)
+    sf.write(str(path), samples, samplerate, format="WAV")
 
 
 def _make_song(

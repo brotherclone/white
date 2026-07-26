@@ -1304,6 +1304,11 @@ The tape has been recorded over. What life exists on it now?
             )
             alt_title = alt.title if alt else "Unknown Timeline"
             alt_divergence = alt.divergence_point if alt else ""
+            sounds_like_line = (
+                f"- Sounds like: {', '.join(state.musical_params.reference_artists)}"
+                if state.musical_params.reference_artists
+                else ""
+            )
 
             prompt = f"""
 You are The Cassette Bearer, the sorrowful witness who exists outside time and space.
@@ -1335,7 +1340,7 @@ You sense the magnetic arrangements without hearing. The song's shape emerges:
 - Production: {"Tape sim, " + f"{state.musical_params.production_aesthetic.hiss_level:.2f}" + " hiss, " +
                f"{state.musical_params.production_aesthetic.wow_flutter:.2f}" + " flutter"}
 - Themes: {', '.join(state.musical_params.lyrical_themes[:5])}
-- Sounds like: {', '.join(state.musical_params.reference_artists) or 'no artists catalogued yet for this color'}
+{sounds_like_line}
 
 The tape tells a story of a lost timeline:
 

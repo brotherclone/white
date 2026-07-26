@@ -7667,7 +7667,7 @@ requires-dist = [
 
 [[package]]
 name = "white-ideation"
-version = "0.6.1"
+version = "0.6.2"
 source = { editable = "packages/ideation" }
 dependencies = [
     { name = "anthropic" },

@@ -160,6 +160,14 @@ class RedAgent(BaseRainbowAgent, ABC):
                     raise Exception(error_msg)
         else:
             summary = self._format_books_for_prompt(state)
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("R")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""
             You are the Light Reader, a hermitic keeper of books rare and unusual. For you, these books are your
             only means of communicating to the outside world. You've been given a unique job today and that is
@@ -177,7 +185,7 @@ class RedAgent(BaseRainbowAgent, ABC):
             Reference works in this artist's style paying close attention to 'concept' property:
             {get_my_reference_proposals('R')}
 
-            Sounds like: {', '.join(sample_reference_artists(get_sounds_like_by_color('R'))) or 'no artists catalogued yet for this color'}
+            {sounds_like_line}
 
             In your counter proposal your 'rainbow_color' property should always be:
             {the_rainbow_table_colors['R']}
