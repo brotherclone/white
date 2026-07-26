@@ -15,7 +15,11 @@ from white_core.artifacts.book_artifact import BookArtifact, BookPageCollection
 from white_core.concepts.book_evaluation import BookEvaluationDecision
 from white_core.concepts.rainbow_table_color import the_rainbow_table_colors
 from white_core.manifests.song_proposal import SongProposalIteration
-from white_extraction.util.manifest_loader import get_my_reference_proposals
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.red_agent_state import RedAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -38,7 +42,6 @@ class RedAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -55,6 +58,7 @@ class RedAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             counter_proposal=None,
             artifacts=[],
             should_respond_with_reaction_book=False,
@@ -156,6 +160,14 @@ class RedAgent(BaseRainbowAgent, ABC):
                     raise Exception(error_msg)
         else:
             summary = self._format_books_for_prompt(state)
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("R")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""
             You are the Light Reader, a hermitic keeper of books rare and unusual. For you, these books are your
             only means of communicating to the outside world. You've been given a unique job today and that is
@@ -172,24 +184,35 @@ class RedAgent(BaseRainbowAgent, ABC):
     
             Reference works in this artist's style paying close attention to 'concept' property:
             {get_my_reference_proposals('R')}
-            
+
+            {sounds_like_line}
+
             In your counter proposal your 'rainbow_color' property should always be:
             {the_rainbow_table_colors['R']}
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
-                    state.song_proposals.iterations.append(self.counter_proposal)
-                    state.counter_proposal = counter_proposal
-                    return state
-                if not isinstance(result, SongProposalIteration):
+                elif isinstance(result, SongProposalIteration):
+                    # This is the actual return shape of _invoke_structured in
+                    # normal operation — without this branch, Red's counter
+                    # proposal was silently never appended to song_proposals
+                    # or set on state, even on a fully successful LLM call.
+                    counter_proposal = result
+                else:
                     error_msg = f"Expected SongProposalIteration, got {type(result)}"
                     if block_mode:
                         raise TypeError(error_msg)
                     logger.warning(error_msg)
+                    counter_proposal = None
+                if counter_proposal is not None:
+                    state.song_proposals.iterations.append(counter_proposal)
+                    state.counter_proposal = counter_proposal
+                    return state
             except Exception as e:
                 print(
                     f"Anthropic model call failed: {e!s}; returning stub SongProposalIteration for red's counter proposal after authoring a book."
@@ -274,9 +297,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookPageCollection)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookPageCollection, prompt)
                 if isinstance(result, BookPageCollection):
                     page_1_text = result.page_1_text
                     page_2_text = result.page_2_text
@@ -392,9 +414,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             notable_quote=cls.generate_quote(topic, author, the_genre),
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookArtifact)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookArtifact, prompt)
                 if isinstance(result, BookArtifact):
                     result_dict = result.model_dump()
                 elif isinstance(result, dict):
@@ -444,6 +465,18 @@ class RedAgent(BaseRainbowAgent, ABC):
         )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        if state.current_reaction_book is None:
+            # generate_reaction_book sets this to None on failure rather than a
+            # fallback object; format_card_catalog() dereferences it with no
+            # guard, so building the prompt below would crash uncaught.
+            logger.warning("No reaction book to write pages for - skipping")
+            get_state_snapshot(
+                state,
+                "write_reaction_book_pages_exit",
+                state.thread_id,
+                "The Light Reader",
+            )
+            return state
         if mock_mode:
             try:
                 with open(
@@ -483,9 +516,8 @@ class RedAgent(BaseRainbowAgent, ABC):
                 page_2.text_content: "This is the second page of the book."
             """
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookPageCollection)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookPageCollection, prompt)
                 if isinstance(result, dict):
                     reaction_book_pages = BookPageCollection(**result)
                     state.current_reaction_book.excerpts = [
@@ -572,9 +604,8 @@ class RedAgent(BaseRainbowAgent, ABC):
             """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(BookEvaluationDecision)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, BookEvaluationDecision, prompt)
                 if isinstance(result, dict):
                     state.should_create_book = result.get("new_book", False)
                     state.should_respond_with_reaction_book = result.get(

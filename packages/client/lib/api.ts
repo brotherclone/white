@@ -593,6 +593,12 @@ export async function fetchSides(): Promise<import("./types").SidesResponse> {
   return res.json();
 }
 
+export async function fetchMaterialProduced(): Promise<import("./types").MaterialProduced> {
+  const res = await fetch(`${BASE}/playlists/material`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch material produced");
+  return res.json();
+}
+
 export async function assignSongToSide(
   side: string,
   songId: string,

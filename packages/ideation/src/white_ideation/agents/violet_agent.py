@@ -35,7 +35,11 @@ from white_core.enums.disrupting_event_type import (
     DisruptingEventType,
 )
 from white_core.manifests.song_proposal import SongProposalIteration
-from white_extraction.util.manifest_loader import get_my_reference_proposals
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.violet_agent_state import VioletAgentState
 from white_ideation.agents.states.white_agent_state import MainAgentState
@@ -75,7 +79,6 @@ class VioletAgent(BaseRainbowAgent, ABC):
             self.settings = AgentSettings()
 
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -105,6 +108,7 @@ class VioletAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
             white_proposal=state.song_proposals.iterations[-1],
+            negative_constraints=state.negative_constraints or "",
             counter_proposal=None,
             artifacts=[],
             interviewer_persona=None,
@@ -366,10 +370,9 @@ Output as JSON with structure:
 }}"""
 
         try:
-            structured_llm = self.llm.with_structured_output(
-                VanityInterviewQuestionOutput
+            result = self._invoke_structured(
+                self.llm, VanityInterviewQuestionOutput, prompt
             )
-            result = structured_llm.invoke(prompt)
             state.interview_questions = result.questions
             logger.info(f"   Generated {len(result.questions)} questions")
             for q in result.questions:
@@ -500,10 +503,9 @@ Keep response 2-4 sentences. Output as JSON:
 
             try:
                 # Structured output
-                structured_llm = self.llm.with_structured_output(
-                    VanityInterviewResponse
+                response = self._invoke_structured(
+                    self.llm, VanityInterviewResponse, prompt
                 )
-                response = structured_llm.invoke(prompt)
                 response.question_number = q.number  # Ensure match
                 responses.append(response)
 
@@ -581,8 +583,7 @@ Keep it brief (1-2 sentences each). Be Lynchian: specific, concrete details that
 Not horror — just wrong. The frame breaks, then continues."""
 
         try:
-            structured_llm = self.llm.with_structured_output(DisruptionExchange)
-            exchange = structured_llm.invoke(prompt)
+            exchange = self._invoke_structured(self.llm, DisruptionExchange, prompt)
 
             sentinel_q = VanityInterviewQuestion(
                 number=DISRUPTION_QUESTION_NUMBER, question=exchange.interviewer_line
@@ -691,6 +692,12 @@ Not horror — just wrong. The frame breaks, then continues."""
 
         # Real generation with defensive revision
         interview_artifact = state.circle_jerk_interview
+        sounds_like_artists = sample_reference_artists(get_sounds_like_by_color("V"))
+        sounds_like_line = (
+            f"Sounds like: {', '.join(sounds_like_artists)}"
+            if sounds_like_artists
+            else ""
+        )
 
         prompt = f"""You are revising a song proposal after a challenging interview.
 
@@ -714,15 +721,20 @@ This is dialectical synthesis - thesis/antithesis → synthesis.
 Reference works in this artist's style (pay attention to 'concept' property):
 {get_my_reference_proposals('V')}
 
+{sounds_like_line}
+
 CRITICAL: Your 'rainbow_color' property must be:
 {the_rainbow_table_colors['V']}
 
 Output a COMPLETE revised SongProposalIteration with ALL fields populated.
 The revision should be INFORMED BY but not DEFEATED BY the criticism."""
+        if state.negative_constraints:
+            prompt = prompt + "\n\n" + state.negative_constraints
 
         try:
-            structured_llm = self.llm.with_structured_output(SongProposalIteration)
-            counter_proposal = structured_llm.invoke(prompt)
+            counter_proposal = self._invoke_structured(
+                self.llm, SongProposalIteration, prompt
+            )
             logger.info(f"   Generated counter-proposal: {counter_proposal.title}")
 
         except Exception as e:

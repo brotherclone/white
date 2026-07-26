@@ -23,7 +23,11 @@ from white_core.generators.character_action_generator import (
 from white_core.generators.markov_room_generator import MarkovRoomGenerator
 from white_core.generators.music_extractor import MusicExtractor
 from white_core.manifests.song_proposal import SongProposalIteration
-from white_extraction.util.manifest_loader import get_my_reference_proposals
+from white_extraction.util.manifest_loader import (
+    get_my_reference_proposals,
+    get_sounds_like_by_color,
+    sample_reference_artists,
+)
 from white_ideation.agents.agent_state_utils import get_state_snapshot
 from white_ideation.agents.states.white_agent_state import MainAgentState
 from white_ideation.agents.states.yellow_agent_state import YellowAgentState
@@ -67,7 +71,6 @@ class YellowAgent(BaseRainbowAgent, ABC):
 
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -85,6 +88,7 @@ class YellowAgent(BaseRainbowAgent, ABC):
             counter_proposal=None,
             artifacts=[],
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             rooms=[],
             current_room_index=0,
             characters=[],
@@ -321,9 +325,8 @@ class YellowAgent(BaseRainbowAgent, ABC):
                        """
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(GameEvaluationDecision)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, GameEvaluationDecision, prompt)
                 if isinstance(result, dict):
                     state.should_add_to_story = result.get("should_add_to_story", False)
                 elif isinstance(result, GameEvaluationDecision):
@@ -398,6 +401,14 @@ class YellowAgent(BaseRainbowAgent, ABC):
             base_proposal = self.music_extractor.extract_song_proposal(
                 room=primary_room, encounter_narrative=full_narrative
             )
+            sounds_like_artists = sample_reference_artists(
+                get_sounds_like_by_color("Y")
+            )
+            sounds_like_line = (
+                f"Sounds like: {', '.join(sounds_like_artists)}"
+                if sounds_like_artists
+                else ""
+            )
             prompt = f"""
 You are Lord Pulsimore, resplendent ruler of the Pulsar Palace and the yellow void that exists between space and time.
 
@@ -416,6 +427,8 @@ Current synthesized White Agent proposal:
 Reference works in this artist's style:
 {get_my_reference_proposals('Y')}
 
+{sounds_like_line}
+
 Create a counter-proposal that:
 1. Uses the procedurally generated musical parameters above
 2. Synthesizes the White Agent's themes with the game narrative
@@ -432,10 +445,11 @@ CRITICAL: rainbow_color should be the STRING "Y"
 NOT a dictionary like {{"color_name": "Yellow"}}
 Just: "Y"
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                     counter_proposal.bpm = base_proposal.bpm

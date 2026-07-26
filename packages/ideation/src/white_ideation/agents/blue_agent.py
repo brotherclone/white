@@ -95,7 +95,6 @@ class BlueAgent(BaseRainbowAgent, ABC):
         if self.settings is None:
             self.settings = AgentSettings()
         self.llm = ChatAnthropic(
-            temperature=self.settings.temperature,
             api_key=self.settings.anthropic_api_key,
             model_name=self.settings.anthropic_model_name,
             max_retries=self.settings.max_retries,
@@ -121,6 +120,7 @@ class BlueAgent(BaseRainbowAgent, ABC):
             thread_id=state.thread_id,
             song_proposals=state.song_proposals,
             white_proposal=current_proposal,
+            negative_constraints=state.negative_constraints or "",
             counter_proposal=None,
             artifacts=[],
             biographical_timeline=None,
@@ -629,9 +629,8 @@ Think Bob Dylan's personal mythology.
 The tape has been recorded over. What life exists on it now?
 """
         claude = self._get_claude()
-        proposer = claude.with_structured_output(AlternateTimelineArtifact)
         try:
-            result = proposer.invoke(prompt)
+            result = self._invoke_structured(claude, AlternateTimelineArtifact, prompt)
             if isinstance(result, dict):
                 # Remove fields that should use class defaults, not LLM-generated values
                 result.pop("chain_artifact_file_type", None)
@@ -1305,6 +1304,11 @@ The tape has been recorded over. What life exists on it now?
             )
             alt_title = alt.title if alt else "Unknown Timeline"
             alt_divergence = alt.divergence_point if alt else ""
+            sounds_like_line = (
+                f"- Sounds like: {', '.join(state.musical_params.reference_artists)}"
+                if state.musical_params.reference_artists
+                else ""
+            )
 
             prompt = f"""
 You are The Cassette Bearer, the sorrowful witness who exists outside time and space.
@@ -1336,6 +1340,7 @@ You sense the magnetic arrangements without hearing. The song's shape emerges:
 - Production: {"Tape sim, " + f"{state.musical_params.production_aesthetic.hiss_level:.2f}" + " hiss, " +
                f"{state.musical_params.production_aesthetic.wow_flutter:.2f}" + " flutter"}
 - Themes: {', '.join(state.musical_params.lyrical_themes[:5])}
+{sounds_like_line}
 
 The tape tells a story of a lost timeline:
 
@@ -1349,15 +1354,16 @@ Blue proposals are folk rock requiems for alternate lives. They must:
 - Follow these constraints: minimum plausibility {self.alternate_history_constraints.minimum_plausibility_score},
   minimum specificity {self.alternate_history_constraints.minimum_specificity_score}
 
-Before the tides change again, write your counter-proposal. Transform the White Agent's 
+Before the tides change again, write your counter-proposal. Transform the White Agent's
 dream into a song about THIS erased timeline - the one in your hands.
             """
+            if state.negative_constraints:
+                prompt = prompt + "\n\n" + state.negative_constraints
 
             claude = self._get_claude()
-            proposer = claude.with_structured_output(SongProposalIteration)
 
             try:
-                result = proposer.invoke(prompt)
+                result = self._invoke_structured(claude, SongProposalIteration, prompt)
                 if isinstance(result, dict):
                     counter_proposal = SongProposalIteration(**result)
                 else:

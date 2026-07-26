@@ -25,6 +25,7 @@ from pydantic import BaseModel, PrivateAttr
 
 from white_composition.shrinkwrap_chain_artifacts import shrinkwrap
 from white_core.agents.agent_settings import AgentSettings
+from white_core.agents.base_rainbow_agent import BaseRainbowAgent
 from white_core.concepts.white_facet_system import WhiteFacetSystem
 from white_core.enums.chain_artifact_type import ChainArtifactType
 from white_core.enums.synthesis_prompt_template import SynthesisPromptTemplate
@@ -410,7 +411,7 @@ class WhiteAgent(BaseModel):
 
     def _get_claude_supervisor(self) -> ChatAnthropic:
         return ChatAnthropic(
-            model_name="claude-fable-5",
+            model_name="claude-sonnet-5",
             api_key=self.settings.anthropic_api_key,
             max_retries=self.settings.max_retries,
             timeout=self.settings.timeout,
@@ -560,9 +561,10 @@ class WhiteAgent(BaseModel):
                 )
             return state
         claude = self._get_claude_supervisor()
-        proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            initial_proposal = proposer.invoke(prompt)
+            initial_proposal = BaseRainbowAgent._invoke_structured(
+                claude, SongProposalIteration, prompt
+            )
             if isinstance(initial_proposal, dict):
                 initial_proposal = SongProposalIteration(**initial_proposal)
             state.white_facet = facet
@@ -763,9 +765,10 @@ Structure your proposal as the final, complete vision - ready for human implemen
                 prompt = prompt + "\n\n" + state.negative_constraints
 
             claude = self._get_claude_supervisor()
-            proposer = claude.with_structured_output(SongProposalIteration)
         try:
-            rewrite_proposal = proposer.invoke(prompt)
+            rewrite_proposal = BaseRainbowAgent._invoke_structured(
+                claude, SongProposalIteration, prompt
+            )
             if isinstance(rewrite_proposal, dict):
                 rewrite_proposal = SongProposalIteration(**rewrite_proposal)
             if not isinstance(rewrite_proposal, SongProposalIteration):

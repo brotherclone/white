@@ -48,7 +48,6 @@ def test__get_claude_uses_settings(monkeypatch):
     settings = SimpleNamespace(
         anthropic_sub_model_name="claude-1",
         anthropic_api_key="test-key",
-        temperature=0.7,
         max_retries=2,
         timeout=30,
         stop=["\n"],
@@ -72,7 +71,6 @@ def test__get_claude_uses_settings(monkeypatch):
     assert isinstance(result, FakeChatAnthropic)
     assert captured["model_name"] == settings.anthropic_sub_model_name
     assert captured["api_key"] == settings.anthropic_api_key
-    assert captured["temperature"] == settings.temperature
     assert captured["max_retries"] == settings.max_retries
     assert captured["timeout"] == settings.timeout
     assert captured["stop"] == settings.stop

@@ -1,5 +1,7 @@
 """Tests for playlist_sync."""
 
+import numpy as np
+import soundfile as sf
 import yaml
 
 from white_composition.lp_sides import SidesDocument, assign_song
@@ -8,9 +10,20 @@ from white_composition.playlist_sync import (
     PlaylistConfig,
     classify_songs,
     load_playlist_config,
+    material_produced_seconds,
     save_playlist_config,
     sync_playlists,
 )
+
+
+def _write_mp3(path, seconds: float = 2.0, samplerate: int = 8000):
+    # MP3 encoding isn't reliably available across libsndfile builds, so this
+    # writes real WAV bytes under a `.mp3` filename — sf.info() (used by
+    # mix_duration_seconds) reads format from the file header, not the
+    # extension, so duration extraction still works; only the `.mp3` suffix
+    # filter in material_produced_seconds cares about the filename.
+    samples = np.zeros(int(seconds * samplerate), dtype="float32")
+    sf.write(str(path), samples, samplerate, format="WAV")
 
 
 def _make_song(
@@ -166,6 +179,36 @@ class TestSyncPlaylists:
         song["has_mix"] = False
         sync_playlists([song], SidesDocument.empty(), str(output_dir))
         assert not (output_dir / "Rejects" / "REJECT_Rejected.mp3").exists()
+
+
+class TestMaterialProducedSeconds:
+    def test_sums_only_top_level_mp3s(self, tmp_path):
+        output_dir = tmp_path / "Listening"
+        output_dir.mkdir()
+        _write_mp3(output_dir / "a.mp3", seconds=3.0)
+        _write_mp3(output_dir / "b.mp3", seconds=2.0)
+        (output_dir / "notes.txt").write_text("not audio")
+        subdir = output_dir / "Rejects"
+        subdir.mkdir()
+        _write_mp3(subdir / "c.mp3", seconds=10.0)
+
+        total, count = material_produced_seconds(str(output_dir))
+
+        assert total == 5.0
+        assert count == 2
+
+    def test_missing_dir_returns_zero(self, tmp_path):
+        total, count = material_produced_seconds(str(tmp_path / "nope"))
+        assert (total, count) == (0.0, 0)
+
+    def test_ignores_non_mp3_extensions(self, tmp_path):
+        output_dir = tmp_path / "Listening"
+        output_dir.mkdir()
+        _write_mp3(output_dir / "a.wav", seconds=3.0)
+
+        total, count = material_produced_seconds(str(output_dir))
+
+        assert (total, count) == (0.0, 0)
 
     def test_unrelated_file_outside_subfolders_untouched(self, tmp_path):
         output_dir = tmp_path / "Listening"

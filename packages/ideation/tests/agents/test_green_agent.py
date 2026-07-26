@@ -1,7 +1,9 @@
+from unittest.mock import patch
+
 import pytest
 
 from white_core.artifacts.arbitrarys_survey_artifact import ArbitrarysSurveyArtifact
-from white_core.artifacts.last_human_artifact import LastHumanArtifact
+from white_core.artifacts.last_human_artifact import LastHumanArtifact, LastHumanFields
 from white_core.artifacts.last_human_species_extinction_narative_artifact import (
     LastHumanSpeciesExtinctionNarrativeArtifact,
 )
@@ -155,6 +157,75 @@ class TestGetHuman:
         assert isinstance(result, GreenAgentState)
 
 
+class TestGetHumanUsesTrimmedSchema:
+    """get_human targets LastHumanFields (content only) instead of the full
+    LastHumanArtifact (which also carries ChainArtifact's bookkeeping
+    fields) as the tool-call schema, then builds the real artifact from the
+    result plus thread_id/base_path. Confirms that wiring end to end without
+    a live API call."""
+
+    def test_builds_last_human_artifact_from_fields_result(
+        self, green_agent, green_agent_state, monkeypatch
+    ):
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+        # get_species in non-mock mode is a local corpus draw, no LLM call.
+        green_agent_state = GreenAgent.get_species(green_agent_state)
+
+        fields = LastHumanFields(
+            name="Aputi Kristiansen",
+            age=52,
+            location="Ilulissat, Greenland",
+            year_documented=2041,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="details",
+            environmental_stressor="stressor",
+            documentation_type=LastHumanDocumentationType.WITNESS,
+            last_days_scenario="scenario",
+        )
+
+        with patch.object(
+            green_agent, "_invoke_structured", lambda llm, schema, prompt: fields
+        ):
+            result = green_agent.get_human(green_agent_state)
+
+        assert isinstance(result.current_human, LastHumanArtifact)
+        assert result.current_human.name == "Aputi Kristiansen"
+        assert result.current_human.thread_id == green_agent_state.thread_id
+
+
+class TestRouteAfterGetHuman:
+    """Tests for route_after_get_human — retries the get_human node rather
+    than letting a failed structured-output call cascade-skip the rest of
+    Green Agent (get_parallel_moment, narrative, survey, decision all
+    early-return when current_human is None)."""
+
+    def test_continues_when_human_was_generated(self, green_agent_state):
+        green_agent_state.current_human = LastHumanArtifact(
+            thread_id="test",
+            name="Test Human",
+            age=40,
+            location="Test Location",
+            year_documented=2050,
+            parallel_vulnerability=LastHumanVulnerabilityType.DISPLACEMENT,
+            vulnerability_details="Test details",
+            environmental_stressor="Test stressor",
+            documentation_type=LastHumanDocumentationType.WITNESS,
+            last_days_scenario="Test scenario",
+        )
+        assert GreenAgent.route_after_get_human(green_agent_state) == "continue"
+
+    def test_retries_when_human_missing_and_attempts_remain(self, green_agent_state):
+        green_agent_state.current_human = None
+        green_agent_state.human_generation_attempts = 1
+        assert GreenAgent.route_after_get_human(green_agent_state) == "retry"
+
+    def test_gives_up_after_max_attempts(self, green_agent_state):
+        green_agent_state.current_human = None
+        green_agent_state.human_generation_attempts = 3
+        assert GreenAgent.route_after_get_human(green_agent_state) == "continue"
+
+
 class TestGetParallelMoment:
     """Tests for get_parallel_moment node."""
 
@@ -298,6 +369,121 @@ class TestGenerateAlternateSongSpec:
         assert result.counter_proposal is not None
         assert result.counter_proposal.title is not None
         assert isinstance(result.counter_proposal.bpm, (int, float))
+
+    def test_generate_alternate_song_spec_includes_sounds_like(
+        self, green_agent, green_agent_state, monkeypatch
+    ):
+        """Regression for add-ideation-sounds-like: Green never had a
+        reference-works section at all (its prompt accidentally repeated
+        the rainbow_color value where reference examples should have been);
+        this confirms both the fixed reference section and the new
+        sounds-like line reach the prompt."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+        monkeypatch.setattr(
+            "white_ideation.agents.green_agent.get_sounds_like_by_color",
+            lambda color: ["Test Reference Artist"],
+        )
+        monkeypatch.setattr(
+            "white_ideation.agents.green_agent.sample_reference_artists",
+            lambda artists, **kwargs: list(artists),
+        )
+        monkeypatch.setattr(
+            "white_ideation.agents.green_agent.get_my_reference_proposals",
+            lambda color: "Test Reference Proposal",
+        )
+
+        green_agent_state.white_proposal = SongProposalIteration(
+            iteration_id="white_001",
+            bpm=120,
+            tempo="4/4",
+            key="C Major",
+            rainbow_color="white",
+            title="Test White Song",
+            mood=["contemplative"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and time.",
+        )
+
+        counter_proposal = SongProposalIteration(
+            iteration_id="green_v1",
+            bpm=90,
+            tempo="4/4",
+            key="D minor",
+            rainbow_color="green",
+            title="Test Green Song",
+            mood=["elegiac"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and extinction.",
+        )
+        seen_prompts = []
+
+        def fake_invoke_structured(llm, schema, prompt):
+            seen_prompts.append(prompt)
+            return counter_proposal
+
+        with patch.object(
+            green_agent, "_invoke_structured", side_effect=fake_invoke_structured
+        ):
+            green_agent.generate_alternate_song_spec(green_agent_state)
+
+        assert len(seen_prompts) == 1
+        assert "Test Reference Artist" in seen_prompts[0]
+        assert "Test Reference Proposal" in seen_prompts[0]
+
+    def test_generate_alternate_song_spec_includes_negative_constraints(
+        self, green_agent, green_agent_state, monkeypatch
+    ):
+        """Regression for add-ideation-negative-constraints: Green's own
+        counter-proposal prompt must honor negative_constraints, not just
+        White's initial proposal and final rewrite."""
+        monkeypatch.setenv("MOCK_MODE", "false")
+        monkeypatch.setenv("BLOCK_MODE", "false")
+
+        green_agent_state.negative_constraints = (
+            "AVOID: the word 'extinction', keys already used: C Major"
+        )
+        green_agent_state.white_proposal = SongProposalIteration(
+            iteration_id="white_001",
+            bpm=120,
+            tempo="4/4",
+            key="C Major",
+            rainbow_color="white",
+            title="Test White Song",
+            mood=["contemplative"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and time.",
+        )
+
+        counter_proposal = SongProposalIteration(
+            iteration_id="green_v1",
+            bpm=90,
+            tempo="4/4",
+            key="D minor",
+            rainbow_color="green",
+            title="Test Green Song",
+            mood=["elegiac"],
+            genres=["ambient"],
+            concept="A test concept long enough to pass the minimum length "
+            "validator for the concept field, exploring loss and extinction.",
+        )
+        seen_prompts = []
+
+        def fake_invoke_structured(llm, schema, prompt):
+            seen_prompts.append(prompt)
+            return counter_proposal
+
+        with patch.object(
+            green_agent, "_invoke_structured", side_effect=fake_invoke_structured
+        ):
+            result = green_agent.generate_alternate_song_spec(green_agent_state)
+
+        assert result.counter_proposal is not None
+        assert len(seen_prompts) == 1
+        assert green_agent_state.negative_constraints in seen_prompts[0]
 
 
 class TestGreenAgentFullWorkflow:

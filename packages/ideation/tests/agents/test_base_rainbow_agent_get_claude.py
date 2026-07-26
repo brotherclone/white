@@ -30,7 +30,6 @@ def test_get_claude_uses_settings(monkeypatch):
         update={
             "anthropic_sub_model_name": "submodel",
             "anthropic_api_key": "sekrit",
-            "temperature": 0.2,
             "max_retries": 1,
             "timeout": 10,
             "stop": ["\n"],
@@ -44,7 +43,6 @@ def test_get_claude_uses_settings(monkeypatch):
     cw = claude._constructed_with
     assert cw["model_name"] == settings.anthropic_sub_model_name
     assert cw["api_key"] == settings.anthropic_api_key
-    assert cw["temperature"] == settings.temperature
 
 
 def test_manifest_fallback_data_getitem_and_get():
