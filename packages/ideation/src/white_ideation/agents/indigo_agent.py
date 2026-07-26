@@ -256,6 +256,15 @@ Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
                     self._extract_text(self.llm.invoke(prompt).content).strip().upper()
                 )
                 letters = "".join(c for c in response if c.isalpha())
+                if not letters:
+                    # An empty string is falsy, so IndigoAgentState's
+                    # `lambda x, y: y or x` reducer would silently discard it
+                    # and keep the previous (default None) value instead —
+                    # crashing fool_arrange_secret's `' '.join(state.letter_bank)`
+                    # on the next node with no error in between. Treat "the
+                    # model gave us nothing usable" the same as the except
+                    # branch below: fall back to a real letter bank.
+                    raise ValueError("SPY response contained no usable letters")
                 state.letter_bank = "".join(sorted(letters))
                 return state
             except Exception as e:
@@ -280,6 +289,9 @@ Respond with ONLY the letters (uppercase, no spaces), like: AEILNORSTDM
         )
         mock_mode = os.getenv("MOCK_MODE", "false").lower() == "true"
         block_mode = os.getenv("BLOCK_MODE", "false").lower() == "true"
+        if not state.letter_bank:
+            logger.warning("No letter bank available - using fallback")
+            state.letter_bank = "AEILNORSTDM"
         logger.info(f"🃏 FOOL arranging secret from: {state.letter_bank}")
         if mock_mode:
             try:

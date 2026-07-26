@@ -129,3 +129,53 @@ def test_is_valid_anagram_none_surface_returns_false_not_crash():
     assert agent._is_valid_anagram("The Silent Answer", None) is False
     assert agent._is_valid_anagram(None, "The Silent Answer") is False
     assert agent._is_valid_anagram(None, None) is False
+
+
+def test_spy_choose_letter_bank_falls_back_when_response_has_no_letters(monkeypatch):
+    """Regression: if the SPY's LLM response has zero alphabetic characters
+    after filtering, `state.letter_bank = ""` used to be set — an empty
+    string is falsy, so IndigoAgentState's `lambda x, y: y or x` reducer
+    silently discards it and keeps the default None. fool_arrange_secret's
+    ' '.join(state.letter_bank) then crashes the whole workflow on the very
+    next node with no error logged in between. Must fall back to a real
+    letter bank instead, matching the existing exception-path behavior."""
+    monkeypatch.setenv("MOCK_MODE", "false")
+    monkeypatch.setenv("BLOCK_MODE", "false")
+
+    agent = IndigoAgent()
+    state = IndigoAgentState(thread_id="test-thread", concepts="memory, static")
+
+    mock_response = MagicMock()
+    mock_response.content = "12345 !!! ???"  # no alphabetic characters at all
+    mock_llm = MagicMock()
+    mock_llm.invoke = MagicMock(return_value=mock_response)
+
+    with patch.object(agent, "llm", mock_llm):
+        result_state = agent.spy_choose_letter_bank(state)
+
+    assert result_state.letter_bank
+    assert result_state.letter_bank.isalpha()
+
+
+def test_fool_arrange_secret_guards_against_missing_letter_bank(monkeypatch):
+    """Defense in depth: even if letter_bank somehow stays unset (e.g. the
+    LangGraph reducer edge case above, or a future caller that skips
+    spy_choose_letter_bank), fool_arrange_secret must not crash."""
+    monkeypatch.setenv("MOCK_MODE", "false")
+    monkeypatch.setenv("BLOCK_MODE", "false")
+
+    agent = IndigoAgent()
+    state = IndigoAgentState(
+        thread_id="test-thread", concepts="memory, static", letter_bank=None
+    )
+
+    mock_response = MagicMock()
+    mock_response.content = "Test Secret Name"
+    mock_llm = MagicMock()
+    mock_llm.invoke = MagicMock(return_value=mock_response)
+
+    with patch.object(agent, "llm", mock_llm):
+        result_state = agent.fool_arrange_secret(state)
+
+    assert result_state.letter_bank
+    assert result_state.secret_name == "Test Secret Name"
