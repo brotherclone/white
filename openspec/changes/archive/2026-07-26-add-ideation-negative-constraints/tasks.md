@@ -32,6 +32,6 @@
 
 ## 4. Verification
 - [x] 4.1 Run full test suite (`packages/ideation/tests`, `packages/core/tests`)
-- [ ] 4.2 Live smoke test: run the full proposal chain once and confirm (via
+- [x] 4.2 Live smoke test: run the full proposal chain once and confirm (via
       chain_artifacts debug snapshots) that a color agent's counter-proposal
       prompt actually contains the constraints text

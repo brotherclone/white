@@ -34,6 +34,6 @@
 ## 4. Verification
 - [x] 4.1 Run full test suite (`packages/ideation/tests`, `packages/core/tests`,
       `packages/extraction/tests`)
-- [ ] 4.2 Live smoke test: run the full proposal chain once and confirm (via
+- [x] 4.2 Live smoke test: run the full proposal chain once and confirm (via
       chain_artifacts debug snapshots) that at least one color agent's prompt
       contains sounds-like artist names
