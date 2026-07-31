@@ -1,6 +1,6 @@
 [project]
 name = "white-generation"
-version = "0.4.2"
+version = "0.5.0"
 description = "MIDI pattern templates and generation pipelines for White project"
 requires-python = ">=3.12"
 dependencies = [

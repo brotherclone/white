@@ -69,3 +69,13 @@ When preparing a PR, bump `version` in every `packages/*/pyproject.toml` whose p
 Default to a **minor** bump (`0.1.0` → `0.2.0`) for anything that adds or changes behavior — new pipeline phases, new fields, new CLI flags, changed defaults. All packages are pre-1.0, so under semver a breaking change still bumps minor (not major) at this stage — reserve a major bump for when a package is promoted to a stable 1.0 API. Use a **patch** bump (`0.1.0` → `0.1.1`) only for narrowly-scoped fixes: a bug fix with no behavior change beyond "it now works," a dependency version bump, docs/comments-only changes. Test-only or CI-only changes don't need a version bump at all.
 
 Do this as a normal part of finishing the PR, without asking for confirmation each time — the version bump is a plain edit to a version string, not a risky action.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

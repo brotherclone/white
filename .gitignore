@@ -62,3 +62,6 @@ packages/generation/shrink_wrapped/
 # Claude Code runtime artifacts
 .claude/scheduled_tasks.lock
 packages/composition/logic/
+
+# graphify knowledge-graph build output (regenerate with `graphify update .`)
+graphify-out/
