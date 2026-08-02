@@ -86,6 +86,9 @@ def parse_key_string(key_str: str) -> tuple[str, str]:
     key_str = key_str.strip()
     # Handle unicode symbols and collapse "B ♭" / "B b" → "Bb" before splitting
     key_str = key_str.replace("♭", "b").replace("♯", "#")
+    # Collapse spelled-out accidentals: "E flat major" → "Eb major"
+    key_str = re.sub(r"([A-Ga-g])\s+flat\b", r"\1b", key_str, flags=re.IGNORECASE)
+    key_str = re.sub(r"([A-Ga-g])\s+sharp\b", r"\1#", key_str, flags=re.IGNORECASE)
     key_str = re.sub(r"([A-Ga-g])\s+([b#])\s*", r"\1\2 ", key_str).strip()
 
     parts = key_str.split()

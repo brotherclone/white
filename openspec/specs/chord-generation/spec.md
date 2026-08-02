@@ -272,8 +272,7 @@ added to `review.yml` with:
 
 ### Requirement: Constrained Chord Generation Path
 
-When the loaded song proposal contains a `musical_constraints.harmonic_sequence`, the
-chord pipeline SHALL use a constrained generation path instead of Markov sampling.
+When the loaded song proposal contains a `musical_constraints.harmonic_sequence`, the chord pipeline SHALL use a constrained generation path instead of Markov sampling.
 
 A new function `build_constrained_candidates` SHALL be added to `chord_pipeline.py`.
 It SHALL:

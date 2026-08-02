@@ -1,5 +1,7 @@
 # Song Diary
 
+## Purpose
+
 A lightweight per-song diary system that lets any agent, hook, or human collaborator
 append timestamped narrative entries to a song's production history — independent of
 pipeline state.
@@ -7,7 +9,7 @@ pipeline state.
 Entries live at `packages/diary/src/entries/<song_slug>/` so ThreadKeepr, Prism, and
 system hooks can write to a diary before any production directory exists.
 
----
+## Requirements
 
 ### Requirement: DiaryEntry Model
 The `white_diary` package SHALL provide a `DiaryEntry` Pydantic model with the following
