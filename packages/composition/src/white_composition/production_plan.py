@@ -525,6 +525,9 @@ def _parse_key_components(key_str: str) -> tuple[str, str]:
     """
     # Normalise unicode accidentals and collapse "B ♭" → "Bb" before splitting
     key_str = key_str.replace("♯", "#").replace("♭", "b")
+    # Collapse spelled-out accidentals: "E flat major" → "Eb major"
+    key_str = re.sub(r"([A-Ga-g])\s+flat\b", r"\1b", key_str, flags=re.IGNORECASE)
+    key_str = re.sub(r"([A-Ga-g])\s+sharp\b", r"\1#", key_str, flags=re.IGNORECASE)
     # Collapse accidental written as separate token: "B b minor" → "Bb minor"
     key_str = re.sub(r"([A-Ga-g])\s+([b#])\s+", r"\1\2 ", key_str)
     tokens = key_str.strip().split()

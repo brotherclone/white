@@ -311,8 +311,54 @@ class TestCmdRun:
 
 
 # ---------------------------------------------------------------------------
-# 6. promote_part status sync
+# 6. cmd_promote
 # ---------------------------------------------------------------------------
+
+
+class TestCmdPromote:
+    def test_duplicate_label_conflict_does_not_mark_phase_promoted(self, tmp_path):
+        from white_composition.pipeline_runner import cmd_promote, read_phase_statuses
+
+        _write_song_context(
+            tmp_path,
+            {
+                "init_production": "promoted",
+                "chords": "promoted",
+                "drums": "promoted",
+                "bass": "promoted",
+                "melody": "generated",
+                "lyrics": "pending",
+            },
+        )
+        melody_dir = tmp_path / "melody"
+        (melody_dir / "candidates").mkdir(parents=True)
+        review_path = melody_dir / "review.yml"
+        review = {
+            "candidates": [
+                {
+                    "id": "evolved_melody_antler_01",
+                    "midi_file": "candidates/evolved_melody_antler_01.mid",
+                    "label": "antler",
+                    "status": "approved",
+                },
+                {
+                    "id": "evolved_melody_antler_03",
+                    "midi_file": "candidates/evolved_melody_antler_03.mid",
+                    "label": "antler",
+                    "status": "approved",
+                },
+            ]
+        }
+        review_path.write_text(yaml.dump(review))
+
+        result = cmd_promote(tmp_path, "melody", yes=True)
+
+        assert result == 1
+        statuses = read_phase_statuses(tmp_path)
+        assert statuses["melody"] == "generated"  # not falsely promoted
+        assert not (melody_dir / "approved").exists() or not list(
+            (melody_dir / "approved").glob("*.mid")
+        )
 
 
 class TestPromotePartStatusSync:

@@ -1011,3 +1011,9 @@ class TestParseKeyComponents:
     def test_unknown_mode_falls_back(self):
         root, quality = _parse_key_components("C# mystery scale")
         assert quality == "Major"
+
+    def test_spelled_out_flat(self):
+        assert _parse_key_components("E flat major") == ("Eb", "Major")
+
+    def test_spelled_out_sharp(self):
+        assert _parse_key_components("A sharp minor") == ("A#", "Minor")

@@ -93,8 +93,9 @@ def parse_chord_metadata(path: Path) -> Dict:
     function = None
     chord_name = None
 
-    # Try to match roman numeral patterns
-    roman_match = re.match(r"^([ivIV]+(?:sus)?)\s*-\s*(.+)", filename)
+    # Try to match roman numeral patterns, allowing a leading accidental for
+    # borrowed/modal functions (e.g. "bII - Db13", "#vi - ...").
+    roman_match = re.match(r"^([b#]?[ivIV]+(?:sus)?)\s*-\s*(.+)", filename)
     if roman_match:
         function = roman_match.group(1)
         chord_name = roman_match.group(2).strip()
@@ -333,6 +334,12 @@ def parse_all_chords(chords_dir: Path, exclude_progressions: bool = True) -> Lis
     for midi_file in chords_dir.rglob("*.mid"):
         # Skip progression files if requested
         if exclude_progressions and "Progression" in str(midi_file):
+            continue
+
+        # Skip per-category reference files (e.g. "All Borrowed & Modal Chords
+        # (F Minor).mid") — these stack every chord tone in the category into
+        # one sustained cluster and are not a playable chord.
+        if midi_file.stem.startswith("All "):
             continue
 
         chord_data = extract_chord_from_midi(midi_file)

@@ -331,7 +331,9 @@ def cmd_promote(production_dir: Path, phase: str, yes: bool = False) -> int:
 
     from white_composition.promote_part import promote_part
 
-    promote_part(str(review_path))
+    if not promote_part(str(review_path)):
+        print(f"\n✗ Phase {phase} NOT promoted — resolve the errors above and re-run.")
+        return 1
 
     write_phase_status(production_dir, phase, "promoted")
     print(f"\n✓ Phase {phase} promoted. Status: promoted.")

@@ -13,6 +13,7 @@ Usage:
 import argparse
 import re
 import shutil
+import sys
 from pathlib import Path
 
 import mido
@@ -253,12 +254,18 @@ def register_part(
     return entry
 
 
-def promote_part(review_path: str, clean: bool = False):
-    """Read review.yml and promote approved candidates."""
+def promote_part(review_path: str, clean: bool = False) -> bool:
+    """Read review.yml and promote approved candidates.
+
+    Returns True if candidates were actually promoted, False if promotion
+    was aborted (missing review file, no approved candidates, or a
+    conflict such as duplicate labels). Callers must check this before
+    treating the phase as promoted.
+    """
     review_file = Path(review_path)
     if not review_file.exists():
         print(f"ERROR: Review file not found: {review_file}")
-        return
+        return False
 
     with open(review_file) as f:
         review = yaml.safe_load(f)
@@ -296,7 +303,7 @@ def promote_part(review_path: str, clean: bool = False):
         print(
             "Edit the review file and set status: approved on candidates you want to promote"
         )
-        return
+        return False
 
     # Split into MIDI candidates and lyric .txt candidates
     # Lyrics entries have a "file" key (pointing to .txt); MIDI entries have "midi_file"
@@ -310,7 +317,7 @@ def promote_part(review_path: str, clean: bool = False):
         print("Only one lyrics.txt can be promoted at a time.")
         print(f"  Approved lyric IDs: {ids}")
         print("Reject all but one, then re-run promotion.")
-        return
+        return False
 
     if txt_approved:
         lyric_candidate = txt_approved[0]
@@ -335,7 +342,7 @@ def promote_part(review_path: str, clean: bool = False):
         print(
             "Edit the review file and set status: approved on candidates you want to promote"
         )
-        return
+        return False
 
     # Enforce one approved per label (for MIDI candidates)
     label_to_candidates: dict[str, list] = {}
@@ -357,7 +364,7 @@ def promote_part(review_path: str, clean: bool = False):
         for label, cands in conflicts.items():
             ids = ", ".join(c.get("id", "?") for c in cands)
             print(f"  label '{label}': {ids}")
-        return
+        return False
 
     promoted = []
     for label_clean, cands in label_to_candidates.items():
@@ -422,6 +429,8 @@ def promote_part(review_path: str, clean: bool = False):
     # Sync phase status to song_context.yml when present
     _sync_promote_status(review_file)
 
+    return True
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -434,7 +443,8 @@ def main():
         help="Remove all existing .mid files from approved/ before promoting",
     )
     args = parser.parse_args()
-    promote_part(args.review, clean=args.clean)
+    if not promote_part(args.review, clean=args.clean):
+        sys.exit(1)
 
 
 if __name__ == "__main__":
