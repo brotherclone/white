@@ -108,6 +108,16 @@ class TestKeyParsing:
 
         assert parse_key_string("C") == ("C", "Major")
 
+    def test_spelled_out_accidentals(self):
+        from white_generation.pipelines.chord_pipeline import parse_key_string
+
+        assert parse_key_string("E flat major") == ("Eb", "Major")
+        assert parse_key_string("B flat minor") == ("Bb", "Minor")
+        assert parse_key_string("A sharp minor") == (
+            "Bb",
+            "Minor",
+        )  # A# → Bb via normalize_to_flat
+
     def test_modal_keys_map_to_major_or_minor(self):
         from white_generation.pipelines.chord_pipeline import parse_key_string
 
