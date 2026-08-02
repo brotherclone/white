@@ -18,8 +18,13 @@ from pydantic import BaseModel
 from white_composition.lp_sides import SIDE_NAMES, SidesDocument, mix_duration_seconds
 
 PLAYLIST_CONFIG_FILENAME = "playlist_config.yml"
-DEFAULT_OUTPUT_DIR = (
-    "/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Listening"
+DEFAULT_OUTPUT_DIR = str(
+    Path.home()
+    / "Documents"
+    / "Music Production"
+    / "Earthly Frames"
+    / "White"
+    / "Listening"
 )
 DEFAULT_MATERIAL_TARGET_SECONDS = 9 * 3600.0
 

@@ -40,10 +40,11 @@ class TestParseChordMetadataFunction:
 
     def test_sharp_borrowed_function(self):
         path = Path(
-            "chords/01 - C Major - A Minor/3 Borrowed & Modal Chords/02 - A Minor/#vi - .mid"
+            "chords/01 - C Major - A Minor/3 Borrowed & Modal Chords/02 - A Minor/#vi - F#dim.mid"
         )
         meta = parse_chord_metadata(path)
         assert meta["function"] == "#vi"
+        assert meta["chord_name"] == "F#dim"
 
     def test_category_reference_file_has_no_function(self):
         path = Path(

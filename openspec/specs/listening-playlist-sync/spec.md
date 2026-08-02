@@ -1,12 +1,16 @@
 # listening-playlist-sync Specification
 
 ## Purpose
-TBD - created by archiving change add-listening-playlist-sync. Update Purpose after archive.
+Bucket every mixed song into one of three Apple-Music-importable listening folders
+(Rejects, Review, White Album WiP) so the local filesystem always mirrors each song's
+current `lifecycle_status`/`lp_consideration`, without hand-managing playlists as songs
+move through review.
+
 ## Requirements
 ### Requirement: Playlist Output Configuration
 The system SHALL persist a configurable playlist output directory in
 `playlist_config.yml` at the album root (`$SHRINKWRAP_OUTPUT_DIR/playlist_config.yml`),
-defaulting to `/Users/gabrielwalsh/Documents/Music Production/Earthly Frames/White/Listening`
+defaulting to `<home directory>/Documents/Music Production/Earthly Frames/White/Listening`
 when unset.
 
 #### Scenario: Default config on first read
