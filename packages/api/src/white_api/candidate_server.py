@@ -1934,7 +1934,7 @@ def create_app(
         )
 
         captured = io.StringIO()
-        with contextlib.redirect_stdout(captured):
+        with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
             result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:
             reason_lines = [
