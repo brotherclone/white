@@ -648,36 +648,55 @@ class WhiteAgent(BaseModel):
                 logger.info(f"Mock reworked proposal not found:{e!s}")
             return state
         else:
-            baton_list: List[str] = [
-                "Black Agent - ThreadKeepr. He is obsessed with the occult, hacking, and uncovering hidden patterns in reality.",
-                "Red Agent - The Light Reader. It is an Archivist of books both mundane and obscure.",
-                "Orange Agent - Rows Bud. A journalist whose factual articles about New Jersey in 80s and 90s have been mis-remembered by the injection of a symbolic object.",
-                "Yellow Agent - Lord Pulsimore. A hypnagogic game-master whose stately manor resides between the flickering of all RGB pixels, He's concerned with FUTURE, IMAGINED, PLACE",
-                "Green Agent - Sub-Arbitrary. A forked version of The Culture Mind Arbitrary, sent to observe Earth's climate collapse.",
-                "Blue Agent - The Cassette Bearer. Witness to the oblivion that awaits when we fall out of our own timelines.",
-                "Indigo Agent - Decider Tangents. A fool and a spy who masterfully hides the secret name of all he surveys",
-                "Violet Agent - The Sultan of Solipsism. A self-absorbed Pop star who is so 'now' he's already past.",
+            baton: List[tuple[str, str]] = [
+                (
+                    "Black",
+                    "Black Agent - ThreadKeepr. He is obsessed with the occult, hacking, and uncovering hidden patterns in reality.",
+                ),
+                (
+                    "Red",
+                    "Red Agent - The Light Reader. It is an Archivist of books both mundane and obscure.",
+                ),
+                (
+                    "Orange",
+                    "Orange Agent - Rows Bud. A journalist whose factual articles about New Jersey in 80s and 90s have been mis-remembered by the injection of a symbolic object.",
+                ),
+                (
+                    "Yellow",
+                    "Yellow Agent - Lord Pulsimore. A hypnagogic game-master whose stately manor resides between the flickering of all RGB pixels, He's concerned with FUTURE, IMAGINED, PLACE",
+                ),
+                (
+                    "Green",
+                    "Green Agent - Sub-Arbitrary. A forked version of The Culture Mind Arbitrary, sent to observe Earth's climate collapse.",
+                ),
+                (
+                    "Blue",
+                    "Blue Agent - The Cassette Bearer. Witness to the oblivion that awaits when we fall out of our own timelines.",
+                ),
+                (
+                    "Indigo",
+                    "Indigo Agent - Decider Tangents. A fool and a spy who masterfully hides the secret name of all he surveys",
+                ),
+                (
+                    "Violet",
+                    "Violet Agent - The Sultan of Solipsism. A self-absorbed Pop star who is so 'now' he's already past.",
+                ),
             ]
-            agent_a_description = baton_list[0]
-            agent_b_description = baton_list[1]
+            agent_a_index = 0
             if state.ready_for_orange:
-                agent_a_description = baton_list[1]
-                agent_b_description = baton_list[2]
+                agent_a_index = 1
             elif state.ready_for_yellow:
-                agent_a_description = baton_list[2]
-                agent_b_description = baton_list[3]
+                agent_a_index = 2
             elif state.ready_for_green:
-                agent_a_description = baton_list[3]
-                agent_b_description = baton_list[4]
+                agent_a_index = 3
             elif state.ready_for_blue:
-                agent_a_description = baton_list[4]
-                agent_b_description = baton_list[5]
+                agent_a_index = 4
             elif state.ready_for_indigo:
-                agent_a_description = baton_list[5]
-                agent_b_description = baton_list[6]
+                agent_a_index = 5
             elif state.ready_for_violet:
-                agent_a_description = baton_list[6]
-                agent_b_description = baton_list[7]
+                agent_a_index = 6
+            agent_a_description = baton[agent_a_index][1]
+            agent_b_color, agent_b_description = baton[agent_a_index + 1]
             if not state.ready_for_white:
                 prompt = f"""
 You are the Prism, the Architect of INFORMATION.
@@ -708,6 +727,7 @@ You must provide:
 - **mood**: List of mood descriptors
 - **genres**: List of genre tags
 - **concept**: The complete conceptual framework for this song
+- **rainbow_color**: Set this to "{agent_b_color}" — the color of the next agent this proposal is being prepared for.
 
 Focus on clarity, coherence, and creative possibility - make it ready for the next agent to build upon.
 """
@@ -757,6 +777,7 @@ You must provide a complete, final song proposal with:
 - **mood**: List of mood descriptors capturing the full spectrum
 - **genres**: List of genre tags
 - **concept**: The complete, final conceptual framework
+- **rainbow_color**: Set this to "White" — this is the final synthesis.
 
 Structure your proposal as the final, complete vision - ready for human implementation.
 """

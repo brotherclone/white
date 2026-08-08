@@ -72,6 +72,21 @@ _STATUS_ICONS = {
 }
 
 
+def _find_donor_production_dirs(production_dir: Path) -> list[Path]:
+    """Return sibling production dirs (same thread) with promoted chord material.
+
+    White mode synthesizes its chords by cutting up bars donated by other
+    already-produced songs in the same thread, so any sibling with a
+    chords/review.yml is a valid donor.
+    """
+    siblings_root = production_dir.parent
+    return sorted(
+        d
+        for d in siblings_root.iterdir()
+        if d.is_dir() and d != production_dir and (d / "chords" / "review.yml").exists()
+    )
+
+
 def _build_phase_command(
     phase: str, production_dir: Path, ctx: dict, song_proposal: str = ""
 ) -> list[str]:
@@ -99,6 +114,10 @@ def _build_phase_command(
         ]
         if proposal:
             cmd += ["--song", proposal]
+        if str(ctx.get("color", "")).strip().lower() == "white":
+            donors = _find_donor_production_dirs(production_dir)
+            if donors:
+                cmd += ["--sub-proposals"] + [str(d) for d in donors]
         return cmd
     if phase == "drums":
         return base + [

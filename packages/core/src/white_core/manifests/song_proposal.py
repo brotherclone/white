@@ -1,3 +1,4 @@
+import ast
 import re
 from typing import List
 
@@ -132,6 +133,21 @@ class SongProposalIteration(BaseModel):
             raise ValueError("Concept cannot contain placeholder text")
 
         return v_stripped
+
+    @field_validator("mood", "genres", mode="before")
+    @classmethod
+    def _coerce_stringified_list(cls, v):
+        """The LLM occasionally answers a list field with its Python repr
+        (e.g. "['wary', 'defiant']") instead of an actual list — coerce it
+        back rather than fail validation outright."""
+        if isinstance(v, str):
+            try:
+                parsed = ast.literal_eval(v)
+            except (ValueError, SyntaxError):
+                return v
+            if isinstance(parsed, list):
+                return parsed
+        return v
 
     @field_validator("mood")
     @classmethod
