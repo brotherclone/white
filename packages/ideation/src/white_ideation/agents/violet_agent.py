@@ -359,15 +359,7 @@ Example authentic questions:
 - "That sound at 2:34 - is that a broken tape deck or are you just fucking with us?"
 - "You've talked about 'rebracketing' — is that like... sampling yourself? Or more conceptual?"
 - "Nine albums in one color series is pretty intense — when does dedication become obsession?"
-
-Output as JSON with structure:
-{{
-  "questions": [
-    {{"number": 1, "question": "..."}},
-    {{"number": 2, "question": "..."}},
-    {{"number": 3, "question": "..."}}
-  ]
-}}"""
+"""
 
         try:
             result = self._invoke_structured(
@@ -498,8 +490,7 @@ Bad: Pure theory without the undercut. Pure confidence without the vulnerability
 The interviewer might not get the academic stuff, but you don't dumb it down—you just
 immediately acknowledge how ridiculous it sounds by pivoting to something lowbrow.
 
-Keep response 2-4 sentences. Output as JSON:
-{{"question_number": {q.number}, "response": "..."}}"""
+Keep response 2-4 sentences. The response is for question number {q.number}."""
 
             try:
                 # Structured output

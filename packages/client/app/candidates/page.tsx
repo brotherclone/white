@@ -331,6 +331,7 @@ export default function CandidatesPage() {
           <Link href="/" className="text-zinc-400 underline decoration-zinc-700 underline-offset-2 hover:text-zinc-200 hover:decoration-zinc-500 transition-colors">← Songs</Link>
           <span>/</span>
           <span className="text-zinc-300 font-medium">{activeSong.title}</span>
+          {activeSong.key && <span className="text-zinc-600">{activeSong.key}</span>}
           {activeSong.bpm && (
             <span className="text-zinc-600">
               {activeSong.bpm} BPM{activeSong.time_sig ? ` · ${activeSong.time_sig}` : ""}

@@ -1933,11 +1933,22 @@ def create_app(
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
 
-        result = cmd_promote(prod, body.phase, yes=True)
+        captured = io.StringIO()
+        with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
+            result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:
+            reason_lines = [
+                line
+                for line in captured.getvalue().splitlines()
+                if "ERROR" in line or "No approved candidates" in line
+            ]
+            reason = (
+                " ".join(reason_lines)
+                or "ensure review.yml contains approved candidates"
+            )
             raise HTTPException(
                 status_code=409,
-                detail=f"Promotion could not be completed for phase '{body.phase}' — ensure review.yml contains approved candidates",
+                detail=f"Promotion could not be completed for phase '{body.phase}' — {reason}",
             )
         count_after = (
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0

@@ -81,6 +81,16 @@ class LastHumanFields(BaseModel):
             "year_documented must be 1975 or between 2028 and 2350 (inclusive)"
         )
 
+    @field_validator("adaptation_attempts", mode="before")
+    @classmethod
+    def _coerce_adaptation_attempts(cls, v):
+        """The LLM occasionally answers this field with a single prose
+        string instead of a list, which used to fail validation outright
+        and burn a retry (see get_human retry loop in green_agent.py)."""
+        if isinstance(v, str):
+            return [v]
+        return v
+
 
 class LastHumanArtifact(ChainArtifact, LastHumanFields, ABC):
     """
