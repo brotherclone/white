@@ -658,26 +658,43 @@ class WhiteAgent(BaseModel):
                 "Indigo Agent - Decider Tangents. A fool and a spy who masterfully hides the secret name of all he surveys",
                 "Violet Agent - The Sultan of Solipsism. A self-absorbed Pop star who is so 'now' he's already past.",
             ]
+            baton_colors: List[str] = [
+                "Black",
+                "Red",
+                "Orange",
+                "Yellow",
+                "Green",
+                "Blue",
+                "Indigo",
+                "Violet",
+            ]
             agent_a_description = baton_list[0]
             agent_b_description = baton_list[1]
+            agent_b_color = baton_colors[1]
             if state.ready_for_orange:
                 agent_a_description = baton_list[1]
                 agent_b_description = baton_list[2]
+                agent_b_color = baton_colors[2]
             elif state.ready_for_yellow:
                 agent_a_description = baton_list[2]
                 agent_b_description = baton_list[3]
+                agent_b_color = baton_colors[3]
             elif state.ready_for_green:
                 agent_a_description = baton_list[3]
                 agent_b_description = baton_list[4]
+                agent_b_color = baton_colors[4]
             elif state.ready_for_blue:
                 agent_a_description = baton_list[4]
                 agent_b_description = baton_list[5]
+                agent_b_color = baton_colors[5]
             elif state.ready_for_indigo:
                 agent_a_description = baton_list[5]
                 agent_b_description = baton_list[6]
+                agent_b_color = baton_colors[6]
             elif state.ready_for_violet:
                 agent_a_description = baton_list[6]
                 agent_b_description = baton_list[7]
+                agent_b_color = baton_colors[7]
             if not state.ready_for_white:
                 prompt = f"""
 You are the Prism, the Architect of INFORMATION.
@@ -708,6 +725,7 @@ You must provide:
 - **mood**: List of mood descriptors
 - **genres**: List of genre tags
 - **concept**: The complete conceptual framework for this song
+- **rainbow_color**: Set this to "{agent_b_color}" — the color of the next agent this proposal is being prepared for.
 
 Focus on clarity, coherence, and creative possibility - make it ready for the next agent to build upon.
 """
@@ -757,6 +775,7 @@ You must provide a complete, final song proposal with:
 - **mood**: List of mood descriptors capturing the full spectrum
 - **genres**: List of genre tags
 - **concept**: The complete, final conceptual framework
+- **rainbow_color**: Set this to "White" — this is the final synthesis.
 
 Structure your proposal as the final, complete vision - ready for human implementation.
 """

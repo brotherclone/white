@@ -22,6 +22,10 @@ import { NotesButton, SongNotesModal } from "@/components/SongNotes";
 
 const SIDE_NAMES: SideName[] = ["A", "B", "C", "D"];
 
+const EXCLUDED_LIFECYCLE_STATUSES = new Set<SongEntry["lifecycle_status"]>([
+  "abandoned", "scrapped", "merged",
+]);
+
 function sideEntryFromSongs(songs: SideSong[], limitSeconds: number): SideEntry {
   const total = songs.reduce((sum, s) => sum + s.duration_seconds, 0);
   return { songs, total_seconds: total, over_limit: total > limitSeconds };
@@ -391,11 +395,11 @@ export default function SidesPage() {
   );
   const available = songs
     .filter((s) => !assignedIds.has(s.id))
-    .filter((s) => s.lifecycle_status !== "abandoned")
+    .filter((s) => !EXCLUDED_LIFECYCLE_STATUSES.has(s.lifecycle_status))
     .filter((s) => showUnmixed || s.has_mix)
     .filter((s) => !poolSearch || s.title.toLowerCase().includes(poolSearch.toLowerCase()));
   const unmixedHiddenCount = songs.filter(
-    (s) => !assignedIds.has(s.id) && s.lifecycle_status !== "abandoned" && !s.has_mix,
+    (s) => !assignedIds.has(s.id) && !EXCLUDED_LIFECYCLE_STATUSES.has(s.lifecycle_status) && !s.has_mix,
   ).length;
   const allAssigned = songs.length > 0 && songs.every((s) => assignedIds.has(s.id));
 
