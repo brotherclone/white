@@ -22,9 +22,18 @@ import { NotesButton, SongNotesModal } from "@/components/SongNotes";
 
 const SIDE_NAMES: SideName[] = ["A", "B", "C", "D"];
 
-const EXCLUDED_LIFECYCLE_STATUSES = new Set<SongEntry["lifecycle_status"]>([
-  "abandoned", "scrapped", "merged",
+const ALWAYS_EXCLUDED_LIFECYCLE_STATUSES = new Set<SongEntry["lifecycle_status"]>([
+  "abandoned", "scrapped",
 ]);
+
+// Merged tracks are only hidden from the pool when they have no audio to
+// place on a side — a merged track that still has a mix should remain
+// selectable regardless of the "show unmixed" toggle.
+function isPoolEligible(s: SongEntry): boolean {
+  if (ALWAYS_EXCLUDED_LIFECYCLE_STATUSES.has(s.lifecycle_status)) return false;
+  if (s.lifecycle_status === "merged" && !s.has_mix) return false;
+  return true;
+}
 
 function sideEntryFromSongs(songs: SideSong[], limitSeconds: number): SideEntry {
   const total = songs.reduce((sum, s) => sum + s.duration_seconds, 0);
@@ -395,11 +404,11 @@ export default function SidesPage() {
   );
   const available = songs
     .filter((s) => !assignedIds.has(s.id))
-    .filter((s) => !EXCLUDED_LIFECYCLE_STATUSES.has(s.lifecycle_status))
+    .filter(isPoolEligible)
     .filter((s) => showUnmixed || s.has_mix)
     .filter((s) => !poolSearch || s.title.toLowerCase().includes(poolSearch.toLowerCase()));
   const unmixedHiddenCount = songs.filter(
-    (s) => !assignedIds.has(s.id) && !EXCLUDED_LIFECYCLE_STATUSES.has(s.lifecycle_status) && !s.has_mix,
+    (s) => !assignedIds.has(s.id) && isPoolEligible(s) && !s.has_mix,
   ).length;
   const allAssigned = songs.length > 0 && songs.every((s) => assignedIds.has(s.id));
 

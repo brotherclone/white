@@ -216,32 +216,20 @@ def _validate_output_dir(output_dir: str) -> Path:
     return resolved
 
 
-def _copy_if_needed(src: Path, dest: Path) -> None:
-    if dest.exists():
-        src_stat = src.stat()
-        dest_stat = dest.stat()
-        if (
-            dest_stat.st_size == src_stat.st_size
-            and dest_stat.st_mtime >= src_stat.st_mtime
-        ):
-            return
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(src, dest)
-
-
 def _rebuild_folder(
     folder: Path, target_names: dict[str, str], songs_by_id: dict[str, dict]
 ) -> int:
-    """Make `folder` exactly match `target_names` {song_id: filename}. Returns count synced."""
+    """Empty `folder` of prior audio files, then copy in `target_names`
+    {song_id: filename} fresh. Returns count synced.
+
+    Rebuilding from an empty folder (rather than diffing against what's already
+    there) avoids stale duplicates left behind when a song moves between sides
+    or buckets and its filename changes.
+    """
     folder.mkdir(parents=True, exist_ok=True)
-    target_filenames = set(target_names.values())
 
     for existing in folder.iterdir():
-        if (
-            existing.is_file()
-            and existing.suffix.lower() in _AUDIO_EXTENSIONS
-            and existing.name not in target_filenames
-        ):
+        if existing.is_file() and existing.suffix.lower() in _AUDIO_EXTENSIONS:
             existing.unlink()
 
     count = 0
@@ -250,7 +238,7 @@ def _rebuild_folder(
         mix_path = read_mix_path(song["production_path"])
         if mix_path is None:
             continue
-        _copy_if_needed(mix_path, folder / filename)
+        shutil.copy2(mix_path, folder / filename)
         count += 1
     return count
 
