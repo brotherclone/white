@@ -17,6 +17,7 @@ class ModeName(Enum):
     LOCRIAN = "locrian"
     HARMONIC_MINOR = "harmonic_minor"
     MELODIC_MINOR = "melodic_minor"
+    PHRYGIAN_DOMINANT = "phrygian_dominant"
 
 
 class Mode(BaseModel):
@@ -47,14 +48,15 @@ class KeySignature(BaseModel):
         if isinstance(data, dict) and "note" in data and "mode" in data:
             return data
 
-        # Parse string format: "NOTE MODE"
+        # Parse string format: "NOTE MODE", where MODE may be multiple words
+        # (e.g. "B phrygian dominant" for the phrygian_dominant mode).
         if isinstance(data, str):
             parts = data.strip().split()
-            if len(parts) != 2:
+            if len(parts) < 2:
                 raise ValueError(f"Key signature must be 'NOTE MODE', got: {data}")
 
-            note_str, mode_str = parts
-            mode_str = mode_str.lower()
+            note_str, *mode_parts = parts
+            mode_str = "_".join(mode_parts).lower()
 
             # Normalise sharp spellings to flat (e.g. A# → Bb) so the
             # note_map lookup always succeeds for enharmonic equivalents.
@@ -122,6 +124,9 @@ tempered_modes = {
     "melodic_minor": Mode(
         name=ModeName.MELODIC_MINOR, intervals=[2, 1, 2, 2, 2, 2, 1]
     ),  # Added Melodic Minor!
+    "phrygian_dominant": Mode(
+        name=ModeName.PHRYGIAN_DOMINANT, intervals=[1, 3, 1, 2, 1, 2, 2]
+    ),  # 5th mode of harmonic minor — the augmented 2nd between b2 and 3.
 }
 
 

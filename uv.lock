@@ -7522,7 +7522,7 @@ requires-dist = [
 
 [[package]]
 name = "white-api"
-version = "0.4.1"
+version = "0.5.0"
 source = { editable = "packages/api" }
 dependencies = [
     { name = "fastapi" },
@@ -7555,7 +7555,7 @@ requires-dist = [
 
 [[package]]
 name = "white-composition"
-version = "0.8.1"
+version = "0.9.0"
 source = { editable = "packages/composition" }
 dependencies = [
     { name = "anthropic" },
@@ -7582,7 +7582,7 @@ requires-dist = [
 
 [[package]]
 name = "white-core"
-version = "0.6.1"
+version = "0.7.0"
 source = { editable = "packages/core" }
 dependencies = [
     { name = "pydantic" },
@@ -7597,7 +7597,7 @@ requires-dist = [
 
 [[package]]
 name = "white-diary"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "packages/diary" }
 dependencies = [
     { name = "pyyaml" },
@@ -7639,7 +7639,7 @@ requires-dist = [
 
 [[package]]
 name = "white-generation"
-version = "0.6.0"
+version = "0.7.0"
 source = { editable = "packages/generation" }
 dependencies = [
     { name = "mido" },

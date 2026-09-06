@@ -1,7 +1,13 @@
 from pathlib import Path
 
 from white_diary.diary_entry import DiaryEntry
-from white_diary.store import delete_entry, list_entries, load_entry, write_entry
+from white_diary.store import (
+    count_entries_by_song,
+    delete_entry,
+    list_entries,
+    load_entry,
+    write_entry,
+)
 
 ENTRIES_DIR: Path = Path(__file__).parent.parent / "entries"
 
@@ -11,5 +17,6 @@ __all__ = [
     "write_entry",
     "load_entry",
     "list_entries",
+    "count_entries_by_song",
     "delete_entry",
 ]

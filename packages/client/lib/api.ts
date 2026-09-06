@@ -270,6 +270,13 @@ export async function fetchDiaryEntries(songSlug: string): Promise<import("./typ
   return res.json();
 }
 
+/** Entry counts for every song with a diary directory, keyed by production_slug. */
+export async function fetchDiaryCounts(): Promise<Record<string, number>> {
+  const res = await fetch(`${BASE}/diary/counts`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch diary counts");
+  return res.json();
+}
+
 export async function createDiaryEntry(
   songSlug: string,
   entry: Omit<import("./types").DiaryEntry, "id" | "created_at">,

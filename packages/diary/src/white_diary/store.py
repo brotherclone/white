@@ -33,6 +33,20 @@ def load_entry(entry_id: str, diary_dir: Path) -> DiaryEntry:
     return DiaryEntry.model_validate(data)
 
 
+def count_entries_by_song(entries_dir: Path) -> dict[str, int]:
+    """Return {song_slug: entry_count} for every song with a diary directory.
+
+    Cheaper than list_entries() per song — counts files without parsing YAML.
+    """
+    if not entries_dir.exists():
+        return {}
+    return {
+        song_dir.name: sum(1 for _ in song_dir.glob("*.yml"))
+        for song_dir in entries_dir.iterdir()
+        if song_dir.is_dir()
+    }
+
+
 def list_entries(diary_dir: Path) -> list[DiaryEntry]:
     if not diary_dir.exists():
         return []

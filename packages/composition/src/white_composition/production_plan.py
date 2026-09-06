@@ -488,6 +488,7 @@ _ALL_MODES = {
     "locrian",
     "harmonic_minor",
     "melodic_minor",
+    "phrygian_dominant",
 }
 _MINOR_MODES = {
     "minor",
