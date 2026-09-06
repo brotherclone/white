@@ -1460,6 +1460,83 @@ TEMPLATES_6_8 = [
 ]
 
 # ---------------------------------------------------------------------------
+# 11/8 Templates
+# ---------------------------------------------------------------------------
+# 11/8 = 5.5 quarter-note beats. One pattern per asymmetric grouping
+# (6+5, 4+7, 3+8) so a song that shifts groupings by cycle gets a genuinely
+# different bass feel each time.
+
+TEMPLATES_11_8 = [
+    BassPattern(
+        name="eleven_eight_root_6_5",
+        style=BassStyle.ROOT,
+        energy="low",
+        time_sig=(11, 8),
+        description="Root on group starts (0, 3.0) — 6+5 grouping",
+        notes=[(0, "root", "normal"), (3.0, "root", "normal")],
+        note_durations=[3.0, 2.5],
+    ),
+    BassPattern(
+        name="eleven_eight_pedal",
+        style=BassStyle.PEDAL,
+        energy="low",
+        time_sig=(11, 8),
+        description="Root pedal held the whole bar",
+        notes=[(0, "root", "normal")],
+        note_durations=[5.5],
+    ),
+    BassPattern(
+        name="eleven_eight_walking_4_7",
+        style=BassStyle.WALKING,
+        energy="medium",
+        time_sig=(11, 8),
+        description="Walking 11/8 — root, 5th, 3rd on the 4+7 group starts and midpoint",
+        notes=[
+            (0, "root", "accent"),
+            (2.0, "5th", "normal"),
+            (3.75, "3rd", "normal"),
+        ],
+        note_durations=[2.0, 1.75, 1.75],
+    ),
+    BassPattern(
+        name="eleven_eight_arp_3_8",
+        style=BassStyle.ARPEGGIATED,
+        energy="medium",
+        time_sig=(11, 8),
+        description="Root-3rd-5th arpeggio across the 3+8 grouping",
+        notes=[
+            (0, "root", "accent"),
+            (1.5, "3rd", "normal"),
+            (3.5, "5th", "normal"),
+        ],
+        note_durations=[1.5, 2.0, 2.0],
+    ),
+    BassPattern(
+        name="eleven_eight_octave_6_5",
+        style=BassStyle.OCTAVE,
+        energy="medium",
+        time_sig=(11, 8),
+        description="Root-octave bounce on the 6+5 group boundary",
+        notes=[(0, "root", "accent"), (3.0, "octave_up", "normal")],
+        note_durations=[3.0, 2.5],
+    ),
+    BassPattern(
+        name="eleven_eight_synco_4_7",
+        style=BassStyle.SYNCOPATED,
+        energy="high",
+        time_sig=(11, 8),
+        description="Syncopated 11/8 4+7 — root on 1, ghost 5th on the offbeat, root re-entry on group 2",
+        notes=[
+            (0, "root", "accent"),
+            (0.5, "5th", "ghost"),
+            (2.0, "root", "normal"),
+            (2.5, "5th", "ghost"),
+        ],
+        note_durations=[0.5, 1.5, 0.5, 3.0],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -1486,4 +1563,6 @@ ALL_TEMPLATES: list[BassPattern] = [
     *TEMPLATES_7_8,
     # 4/4 Drone / Pedal / Minimal
     *TEMPLATES_4_4_DRONE,
+    # 11/8
+    *TEMPLATES_11_8,
 ]

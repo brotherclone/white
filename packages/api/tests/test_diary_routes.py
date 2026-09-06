@@ -163,3 +163,46 @@ def test_delete_missing_entry_returns_404(tmp_path):
     client = _client(tmp_path)
     resp = client.delete("/diary/my-song/00000000-0000-0000-0000-000000000000")
     assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Counts
+# ---------------------------------------------------------------------------
+
+
+def test_counts_empty_entries_dir_returns_empty_dict(tmp_path):
+    client = _client(tmp_path)
+    resp = client.get("/diary/counts")
+    assert resp.status_code == 200
+    assert resp.json() == {}
+
+
+def test_counts_reflects_entries_per_song(tmp_path):
+    client = _client(tmp_path)
+    client.post("/diary/song-a", json=_payload(song_slug="song-a"))
+    client.post("/diary/song-a", json=_payload(song_slug="song-a"))
+    client.post("/diary/song-b", json=_payload(song_slug="song-b"))
+
+    resp = client.get("/diary/counts")
+    assert resp.status_code == 200
+    assert resp.json() == {"song-a": 2, "song-b": 1}
+
+
+def test_counts_omits_songs_with_no_diary_directory(tmp_path):
+    # A song that's never had an entry created has no directory at all —
+    # it should be absent from the response, not present with a 0.
+    client = _client(tmp_path)
+    client.post("/diary/song-a", json=_payload(song_slug="song-a"))
+
+    resp = client.get("/diary/counts")
+    assert resp.json() == {"song-a": 1}
+    assert "song-b" not in resp.json()
+
+
+def test_counts_route_not_shadowed_by_song_slug_route(tmp_path):
+    # "/counts" must resolve to the counts endpoint, not be swallowed as a
+    # request for a song literally named "counts".
+    client = _client(tmp_path)
+    resp = client.get("/diary/counts")
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), dict)

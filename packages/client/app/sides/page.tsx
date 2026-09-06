@@ -14,8 +14,8 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
-  assignSongToSide, fetchMaterialProduced, fetchPlaylistConfig, fetchSides, fetchSongs,
-  moveSongBetweenSides, removeSongFromSide, setPlaylistConfig, syncPlaylists,
+  assignSongToSide, fetchDiaryCounts, fetchMaterialProduced, fetchPlaylistConfig, fetchSides,
+  fetchSongs, moveSongBetweenSides, removeSongFromSide, setPlaylistConfig, syncPlaylists,
 } from "@/lib/api";
 import { MaterialProduced, SideEntry, SideName, SideSong, SidesResponse, SongEntry } from "@/lib/types";
 import { NotesButton, SongNotesModal } from "@/components/SongNotes";
@@ -28,10 +28,21 @@ const ALWAYS_EXCLUDED_LIFECYCLE_STATUSES = new Set<SongEntry["lifecycle_status"]
 
 // Merged tracks are only hidden from the pool when they have no audio to
 // place on a side — a merged track that still has a mix should remain
-// selectable regardless of the "show unmixed" toggle.
-function isPoolEligible(s: SongEntry): boolean {
+// selectable regardless of the "show unmixed" toggle. But once one side of
+// the merge has actually been placed on an LP side, the other side is a
+// superseded duplicate of the same audio and should drop out of the pool
+// even though it still technically has a mix file.
+function isPoolEligible(s: SongEntry, songsById: Map<string, SongEntry>): boolean {
   if (ALWAYS_EXCLUDED_LIFECYCLE_STATUSES.has(s.lifecycle_status)) return false;
-  if (s.lifecycle_status === "merged" && !s.has_mix) return false;
+  if (s.lifecycle_status === "merged") {
+    if (!s.has_mix) return false;
+    if (s.lp_consideration !== "placed") {
+      const partnerPlaced = s.merged_with.some(
+        (id) => songsById.get(id)?.lp_consideration === "placed",
+      );
+      if (partnerPlaced) return false;
+    }
+  }
   return true;
 }
 
@@ -97,13 +108,16 @@ interface DragPayload {
 
 function AvailableSongRow({
   song,
+  diaryEntryCount,
   onOpenNotes,
 }: {
   song: SongEntry;
+  diaryEntryCount: number | undefined;
   onOpenNotes: (songId: string) => void;
 }) {
   const disabled = !song.has_mix;
   const considered = song.lp_consideration !== "not_considered";
+  const noDiaryEntries = diaryEntryCount === 0;
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `avail:${song.id}`,
     data: { songId: song.id, title: song.title, fromSide: null } satisfies DragPayload,
@@ -119,9 +133,17 @@ function AvailableSongRow({
           ? "border-zinc-800 text-zinc-600 cursor-not-allowed"
           : considered
             ? "border-blue-700 bg-blue-800 text-white cursor-grab hover:border-blue-500"
-            : "border-zinc-700 text-zinc-200 cursor-grab hover:border-zinc-500"
+            : noDiaryEntries
+              ? "border-amber-900 text-amber-200/70 cursor-grab hover:border-amber-700"
+              : "border-zinc-700 text-zinc-200 cursor-grab hover:border-zinc-500"
       } ${isDragging ? "opacity-40" : ""}`}
-      title={disabled ? "No mix file — cannot be sequenced" : "Drag onto a side"}
+      title={
+        disabled
+          ? "No mix file — cannot be sequenced"
+          : noDiaryEntries
+            ? "No diary entries yet"
+            : "Drag onto a side"
+      }
     >
       <span className="truncate">{song.title}</span>
       <span className="flex items-center gap-2 shrink-0">
@@ -245,6 +267,7 @@ function SideColumn({
 
 export default function SidesPage() {
   const [songs, setSongs] = useState<SongEntry[]>([]);
+  const [diaryCounts, setDiaryCounts] = useState<Record<string, number>>({});
   const [sides, setSides] = useState<SidesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -312,6 +335,7 @@ export default function SidesPage() {
       })
       .catch((e) => setError(e.message ?? "Failed to load"))
       .finally(() => setLoading(false));
+    fetchDiaryCounts().then(setDiaryCounts).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -402,13 +426,14 @@ export default function SidesPage() {
   const assignedIds = new Set(
     sides ? SIDE_NAMES.flatMap((s) => sides.sides[s].songs.map((song) => song.song_id)) : [],
   );
+  const songsById = new Map(songs.map((s) => [s.id, s]));
   const available = songs
     .filter((s) => !assignedIds.has(s.id))
-    .filter(isPoolEligible)
+    .filter((s) => isPoolEligible(s, songsById))
     .filter((s) => showUnmixed || s.has_mix)
     .filter((s) => !poolSearch || s.title.toLowerCase().includes(poolSearch.toLowerCase()));
   const unmixedHiddenCount = songs.filter(
-    (s) => !assignedIds.has(s.id) && isPoolEligible(s) && !s.has_mix,
+    (s) => !assignedIds.has(s.id) && isPoolEligible(s, songsById) && !s.has_mix,
   ).length;
   const allAssigned = songs.length > 0 && songs.every((s) => assignedIds.has(s.id));
 
@@ -499,7 +524,12 @@ export default function SidesPage() {
               )}
               <div className="flex flex-col gap-1.5">
                 {available.map((song) => (
-                  <AvailableSongRow key={song.id} song={song} onOpenNotes={setNotesSongId} />
+                  <AvailableSongRow
+                    key={song.id}
+                    song={song}
+                    diaryEntryCount={diaryCounts[song.production_slug]}
+                    onOpenNotes={setNotesSongId}
+                  />
                 ))}
                 {available.length === 0 && (
                   <div className="text-[11px] text-zinc-600 font-sans italic py-2">
