@@ -112,7 +112,7 @@ function AvailableSongRow({
   onOpenNotes,
 }: {
   song: SongEntry;
-  diaryEntryCount: number;
+  diaryEntryCount: number | undefined;
   onOpenNotes: (songId: string) => void;
 }) {
   const disabled = !song.has_mix;
@@ -527,7 +527,7 @@ export default function SidesPage() {
                   <AvailableSongRow
                     key={song.id}
                     song={song}
-                    diaryEntryCount={diaryCounts[song.production_slug] ?? 0}
+                    diaryEntryCount={diaryCounts[song.production_slug]}
                     onOpenNotes={setNotesSongId}
                   />
                 ))}

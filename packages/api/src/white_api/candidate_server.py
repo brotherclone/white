@@ -34,7 +34,6 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
-from white_diary import ENTRIES_DIR
 
 from white_api.candidate_browser import (
     CandidateEntry,
@@ -47,6 +46,7 @@ from white_api.candidate_browser import (
 from white_api.routes.collaborators import make_collaborators_router
 from white_api.routes.diary import make_diary_router
 from white_api.routes.work_orders import make_work_orders_router
+from white_diary import ENTRIES_DIR
 
 VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
 EVOLVABLE_PHASES = {"drums", "bass", "melody"}
@@ -1160,7 +1160,7 @@ def create_app(
         new_tempo = _mido.bpm2tempo(new_bpm)
         updated_files: list[str] = []
 
-        # 1. manifest_bootstrap.yml — the source of truth scan_songs()/_active_song read bpm from
+        # 1. manifest_bootstrap.yml — the source of truth scan_songs()/_active_song reads bpm from
         _patch_manifest(prod, {"bpm": new_bpm})
         updated_files.append("manifest_bootstrap.yml")
 
