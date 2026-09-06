@@ -4,7 +4,15 @@ import re
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
-from white_diary import DiaryEntry, delete_entry, list_entries, load_entry, write_entry
+
+from white_diary import (
+    DiaryEntry,
+    count_entries_by_song,
+    delete_entry,
+    list_entries,
+    load_entry,
+    write_entry,
+)
 
 _SAFE_SLUG = re.compile(r"^[a-zA-Z0-9_\-]+$")
 _SAFE_UUID = re.compile(r"^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
@@ -32,6 +40,12 @@ def make_diary_router(entries_dir: Path) -> APIRouter:
     def _song_dir(song_slug: str) -> Path:
         _check_slug(song_slug, "song_slug")
         return entries_dir / song_slug
+
+    @router.get("/counts")
+    def get_entry_counts() -> dict[str, int]:
+        """Entry counts for every song with a diary directory. Registered
+        before /{song_slug} so 'counts' isn't swallowed as a song_slug."""
+        return count_entries_by_song(entries_dir)
 
     @router.get("/{song_slug}")
     def list_song_entries(song_slug: str) -> list[dict]:

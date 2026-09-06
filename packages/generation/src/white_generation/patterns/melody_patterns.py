@@ -1927,6 +1927,76 @@ VOCAL_5_8 = [
     ),
 ]
 
+# ---------------------------------------------------------------------------
+# 11/8 Vocal
+# ---------------------------------------------------------------------------
+# 11/8 = 5.5 quarter-note beats. One pattern per asymmetric grouping
+# (6+5, 4+7, 3+8) so a song that shifts groupings by cycle gets a genuinely
+# different vocal phrasing each time.
+
+VOCAL_11_8 = [
+    MelodyPattern(
+        name="vocal_11_8_hold_low",
+        contour="drone_and_step",
+        use_case="vocal",
+        energy="low",
+        time_sig=(11, 8),
+        description="11/8 long drone across the 6-group, breath, step-down close in the 5-group",
+        intervals=[0, -2],
+        rhythm=[0.0, 3.5],
+        durations=[3.0, 1.5],
+        tags=["6+5"],
+    ),
+    MelodyPattern(
+        name="vocal_11_8_haiku_low",
+        contour="haiku",
+        use_case="vocal",
+        energy="low",
+        time_sig=(11, 8),
+        description="11/8 haiku — short-short-LONG, long resolution spans the 7-group",
+        intervals=[0, 2, -3],
+        rhythm=[0.0, 1.0, 2.0],
+        durations=[0.5, 0.5, 3.0],
+        tags=["4+7"],
+    ),
+    MelodyPattern(
+        name="vocal_11_8_arc_med",
+        contour="declarative",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(11, 8),
+        description="11/8 arc — held opener, breath, three-note resolution opening the 8-group",
+        intervals=[0, 2, -1, -2],
+        rhythm=[0.0, 2.0, 2.5, 3.0],
+        durations=[1.5, 0.4, 0.4, 0.5],
+        tags=["3+8"],
+    ),
+    MelodyPattern(
+        name="vocal_11_8_step_med",
+        contour="call_and_rest",
+        use_case="vocal",
+        energy="medium",
+        time_sig=(11, 8),
+        description="11/8 step — two quick motifs in the 6-group, long held resolution in the 5-group",
+        intervals=[0, -1, 3],
+        rhythm=[0.0, 1.0, 3.0],
+        durations=[0.5, 0.5, 2.0],
+        tags=["6+5"],
+    ),
+    MelodyPattern(
+        name="vocal_11_8_surge_high",
+        contour="declarative",
+        use_case="vocal",
+        energy="high",
+        time_sig=(11, 8),
+        description="11/8 surge — held opener through the 4-group, four-note ascending phrase opening the 7-group",
+        intervals=[0, 2, 1, -1, -2],
+        rhythm=[0.0, 2.0, 2.5, 3.0, 3.25],
+        durations=[1.5, 0.4, 0.4, 0.2, 0.25],
+        tags=["4+7"],
+    ),
+]
+
 ALL_TEMPLATES: list[MelodyPattern] = [
     # Existing templates reclassified as lead (instrument tracks)
     *_EXISTING_LEAD_TEMPLATES,
@@ -1945,6 +2015,7 @@ ALL_TEMPLATES: list[MelodyPattern] = [
     *VOCAL_5_8,
     *VOCAL_6_8,
     *VOCAL_7_8,
+    *VOCAL_11_8,
     # 4/4 Lamentful / Sparse
     *VOCAL_4_4_LAMENTFUL,
 ]

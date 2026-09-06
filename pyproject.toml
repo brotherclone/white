@@ -77,6 +77,7 @@ per-file-ignores = { "tests/generators/midi/test_chord_pipeline.py" = ["F401"] }
 known-first-party = [
     "white_core", "white_training", "white_extraction", "white_analysis",
     "white_generation", "white_composition", "white_ideation", "white_api",
+    "white_diary", "white_production",
     "tests",
 ]
 # Inline imports inside functions are allowed only to break circular imports.

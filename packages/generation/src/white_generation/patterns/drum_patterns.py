@@ -2949,6 +2949,177 @@ TEMPLATES_6_8_ELECTRONIC = [
 ]
 
 # ---------------------------------------------------------------------------
+# 11/8 Templates
+# ---------------------------------------------------------------------------
+# 11/8 = 11 eighth notes = 5.5 quarter-note beats. Positions are in
+# quarter-note beats: 0, 0.5, 1, ..., 5. Each family provides one pattern per
+# asymmetric grouping (6+5, 4+7, 3+8) so a song built on shifting groupings
+# gets a genuinely different feel each time a section rotates templates.
+
+TEMPLATES_11_8_FOLK = [
+    DrumPattern(
+        name="folk_11_6_5",
+        genre_family="folk",
+        energy="low",
+        time_sig=(11, 8),
+        description="Sparse 11/8 6+5 — kick on group starts, brushed snare ghosts",
+        voices={
+            "kick": [(0, "normal"), (3.0, "ghost")],
+            "snare": [(0, "ghost"), (1.5, "ghost"), (3.0, "ghost"), (4.5, "ghost")],
+        },
+        tags=["6+5"],
+    ),
+    DrumPattern(
+        name="folk_11_4_7",
+        genre_family="folk",
+        energy="medium",
+        time_sig=(11, 8),
+        description="Folk 11/8 4+7 — kick on group starts, tambourine on eighths",
+        voices={
+            "kick": [(0, "normal"), (2.0, "normal")],
+            "snare": [(2.0, "ghost")],
+            "tambourine": [
+                (0, "normal"),
+                (1.0, "ghost"),
+                (2.0, "normal"),
+                (3.0, "ghost"),
+                (4.0, "ghost"),
+            ],
+        },
+        tags=["4+7"],
+    ),
+    DrumPattern(
+        name="folk_11_3_8",
+        genre_family="folk",
+        energy="high",
+        time_sig=(11, 8),
+        description="Driving folk 11/8 3+8 — kick and snare trade group starts, tambourine stream",
+        voices={
+            "kick": [(0, "accent"), (1.5, "normal")],
+            "snare": [(1.5, "accent"), (3.5, "normal")],
+            "tambourine": [
+                (0, "normal"),
+                (0.5, "ghost"),
+                (1.0, "ghost"),
+                (1.5, "normal"),
+                (2.5, "ghost"),
+                (3.5, "normal"),
+                (4.5, "ghost"),
+            ],
+        },
+        tags=["3+8"],
+    ),
+]
+
+TEMPLATES_11_8_ROCK = [
+    DrumPattern(
+        name="rock_11_6_5",
+        genre_family="rock",
+        energy="medium",
+        time_sig=(11, 8),
+        description="Rock 11/8 6+5 — kick on group starts, snare on group two, driving hats",
+        voices={
+            "kick": [(0, "accent"), (3.0, "normal")],
+            "snare": [(3.0, "accent")],
+            "hh_closed": [
+                (0, "normal"),
+                (0.5, "normal"),
+                (1.0, "normal"),
+                (1.5, "normal"),
+                (2.0, "normal"),
+                (2.5, "normal"),
+                (3.0, "normal"),
+                (3.5, "normal"),
+                (4.0, "normal"),
+                (4.5, "normal"),
+                (5.0, "normal"),
+            ],
+        },
+        tags=["6+5"],
+    ),
+    DrumPattern(
+        name="rock_11_4_7",
+        genre_family="rock",
+        energy="high",
+        time_sig=(11, 8),
+        description="Rock 11/8 4+7 — accented kick/snare on group starts, crash on 1",
+        voices={
+            "kick": [(0, "accent"), (2.0, "accent")],
+            "snare": [(2.0, "accent")],
+            "crash": [(0, "normal")],
+            "hh_closed": [
+                (0.5, "normal"),
+                (1.0, "normal"),
+                (1.5, "normal"),
+                (2.5, "normal"),
+                (3.0, "normal"),
+                (3.5, "normal"),
+                (4.0, "normal"),
+                (4.5, "normal"),
+                (5.0, "normal"),
+            ],
+        },
+        tags=["4+7"],
+    ),
+    DrumPattern(
+        name="rock_11_3_8",
+        genre_family="rock",
+        energy="low",
+        time_sig=(11, 8),
+        description="Stripped rock 11/8 3+8 — kick on group starts only, ghost snare fills the long half",
+        voices={
+            "kick": [(0, "normal"), (1.5, "normal")],
+            "snare": [(3.5, "ghost")],
+        },
+        tags=["3+8"],
+    ),
+]
+
+TEMPLATES_11_8_EXPERIMENTAL = [
+    DrumPattern(
+        name="experimental_11_6_5",
+        genre_family="experimental",
+        energy="low",
+        time_sig=(11, 8),
+        description="Sparse experimental 11/8 6+5 — kick and tape-warped rimshot mark the groups",
+        voices={
+            "kick": [(0, "ghost")],
+            "rimshot": [(3.0, "ghost")],
+            "hh_pedal": [(1.5, "ghost"), (4.0, "ghost")],
+        },
+        tags=["6+5"],
+    ),
+    DrumPattern(
+        name="experimental_11_4_7",
+        genre_family="experimental",
+        energy="medium",
+        time_sig=(11, 8),
+        description="Industrial 11/8 4+7 — clap on group starts, low tom drone under the long half",
+        voices={
+            "kick": [(0, "accent")],
+            "clap": [(2.0, "accent")],
+            "tom_low": [(2.0, "ghost"), (3.5, "ghost")],
+            "hh_closed": [(0.5, "ghost"), (4.5, "ghost")],
+        },
+        tags=["4+7"],
+    ),
+    DrumPattern(
+        name="experimental_11_3_8",
+        genre_family="experimental",
+        energy="high",
+        time_sig=(11, 8),
+        description="Polyrhythmic 11/8 3+8 — kick hits the short group hard, clap and toms scatter the long group",
+        voices={
+            "kick": [(0, "accent"), (1.0, "normal")],
+            "clap": [(1.5, "accent"), (3.0, "accent")],
+            "tom_high": [(2.0, "ghost"), (4.0, "ghost")],
+            "tom_low": [(4.5, "ghost")],
+        },
+        tags=["3+8"],
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All templates registry
 # ---------------------------------------------------------------------------
 
@@ -2990,4 +3161,8 @@ ALL_TEMPLATES: list[DrumPattern] = [
     *TEMPLATES_4_4_BREAKBEAT,
     # 4/4 Sparse / Atmospheric
     *TEMPLATES_4_4_SPARSE,
+    # 11/8
+    *TEMPLATES_11_8_FOLK,
+    *TEMPLATES_11_8_ROCK,
+    *TEMPLATES_11_8_EXPERIMENTAL,
 ]

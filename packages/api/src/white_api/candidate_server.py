@@ -34,7 +34,6 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
-from white_diary import ENTRIES_DIR
 
 from white_api.candidate_browser import (
     CandidateEntry,
@@ -47,6 +46,7 @@ from white_api.candidate_browser import (
 from white_api.routes.collaborators import make_collaborators_router
 from white_api.routes.diary import make_diary_router
 from white_api.routes.work_orders import make_work_orders_router
+from white_diary import ENTRIES_DIR
 
 VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
 EVOLVABLE_PHASES = {"drums", "bass", "melody"}
@@ -1141,11 +1141,14 @@ def create_app(
     def set_bpm(body: BpmBody):
         """Change BPM for the active production.
 
-        Updates song_context.yml, all phase review.yml files, retimes every
-        approved MIDI, and regenerates assembled_melody.mid if present.
+        Updates manifest_bootstrap.yml, song_context.yml, all phase review.yml
+        files, retimes every approved MIDI, and regenerates assembled_melody.mid
+        if present.
         """
         import mido as _mido
         import yaml as _yaml
+
+        global _active_song
 
         prod = _require_production_dir()
         new_bpm = body.bpm
@@ -1157,7 +1160,11 @@ def create_app(
         new_tempo = _mido.bpm2tempo(new_bpm)
         updated_files: list[str] = []
 
-        # 1. song_context.yml
+        # 1. manifest_bootstrap.yml — the source of truth scan_songs()/_active_song reads bpm from
+        _patch_manifest(prod, {"bpm": new_bpm})
+        updated_files.append("manifest_bootstrap.yml")
+
+        # 2. song_context.yml
         ctx_path = prod / "song_context.yml"
         if ctx_path.exists():
             with open(ctx_path) as f:
@@ -1169,7 +1176,7 @@ def create_app(
                 )
             updated_files.append("song_context.yml")
 
-        # 2. All phase review.yml files
+        # 3. All phase review.yml files
         for review_path in prod.glob("*/review.yml"):
             with open(review_path) as f:
                 rv = _yaml.safe_load(f) or {}
@@ -1194,7 +1201,7 @@ def create_app(
                     raise
                 updated_files.append(str(review_path.relative_to(prod)))
 
-        # 3. Retime all approved MIDI files
+        # 4. Retime all approved MIDI files
         for mid_path in prod.glob("*/approved/*.mid"):
             try:
                 mid = _mido.MidiFile(str(mid_path))
@@ -1210,7 +1217,7 @@ def create_app(
             except Exception:
                 pass
 
-        # 4. Regenerate assembled_melody.mid if it exists
+        # 5. Regenerate assembled_melody.mid if it exists
         assembled = prod / "melody" / "assembled_melody.mid"
         arrangement = prod / "arrangement.txt"
         approved_dir = prod / "melody" / "approved"
@@ -1246,6 +1253,23 @@ def create_app(
                     pass
             except Exception:
                 pass  # assembled_melody regen is best-effort
+
+        # Keep _active_song cache fresh so /songs/active reflects the new bpm.
+        if (
+            _shrink_wrapped_dir
+            and _active_song
+            and _active_song.get("production_path") == str(prod)
+        ):
+            refreshed = next(
+                (
+                    s
+                    for s in scan_songs(_shrink_wrapped_dir)
+                    if s["id"] == _active_song["id"]
+                ),
+                None,
+            )
+            if refreshed:
+                _active_song = refreshed
 
         return {"ok": True, "bpm": new_bpm, "updated": updated_files}
 
@@ -1933,11 +1957,22 @@ def create_app(
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
         )
 
-        result = cmd_promote(prod, body.phase, yes=True)
+        captured = io.StringIO()
+        with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
+            result = cmd_promote(prod, body.phase, yes=True)
         if result != 0:
+            reason_lines = [
+                line
+                for line in captured.getvalue().splitlines()
+                if "ERROR" in line or "No approved candidates" in line
+            ]
+            reason = (
+                " ".join(reason_lines)
+                or "ensure review.yml contains approved candidates"
+            )
             raise HTTPException(
                 status_code=409,
-                detail=f"Promotion could not be completed for phase '{body.phase}' — ensure review.yml contains approved candidates",
+                detail=f"Promotion could not be completed for phase '{body.phase}' — {reason}",
             )
         count_after = (
             len(list(approved_dir.glob("*.mid"))) if approved_dir.exists() else 0
