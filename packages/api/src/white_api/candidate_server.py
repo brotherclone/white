@@ -1506,10 +1506,31 @@ def create_app(
 
     @app.get("/sides")
     def list_sides():
-        from white_composition.lp_sides import load_sides, side_totals
+        from white_composition.lp_sides import load_sides, save_sides, side_totals
 
         album_dir = _require_shrink_wrapped_dir()
         doc = load_sides(album_dir)
+
+        # sides.yml caches each song's duration from whenever it was assigned —
+        # re-exporting a mix afterward doesn't touch that cache, so reconcile
+        # it against the current mix file on every read.
+        song_entries_by_id = {s["id"]: s for s in scan_songs(album_dir)}
+        dirty = False
+        for side in doc.sides.values():
+            for song in side.songs:
+                entry = song_entries_by_id.get(song.song_id)
+                if entry is None or not entry["has_mix"]:
+                    continue
+                current_duration = _song_mix_duration(entry)
+                if (
+                    current_duration is not None
+                    and current_duration != song.duration_seconds
+                ):
+                    song.duration_seconds = current_duration
+                    dirty = True
+        if dirty:
+            save_sides(album_dir, doc)
+
         totals = side_totals(doc)
         return {
             "side_limit_seconds": doc.side_limit_seconds,
