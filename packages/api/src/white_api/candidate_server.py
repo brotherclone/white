@@ -32,7 +32,7 @@ import uvicorn
 import yaml
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from white_api.candidate_browser import (
@@ -46,6 +46,7 @@ from white_api.candidate_browser import (
 from white_api.routes.collaborators import make_collaborators_router
 from white_api.routes.diary import make_diary_router
 from white_api.routes.work_orders import make_work_orders_router
+from white_composition.logic_archive import LogicArchiveOfflineError
 from white_diary import ENTRIES_DIR
 
 VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
@@ -333,6 +334,10 @@ def create_app(
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
+
+    @app.exception_handler(LogicArchiveOfflineError)
+    async def _archive_offline_handler(request: Request, exc: LogicArchiveOfflineError):
+        return JSONResponse(status_code=503, content={"detail": str(exc)})
 
     # ------------------------------------------------------------------
     # Helpers
@@ -991,6 +996,8 @@ def create_app(
 
         try:
             song_dir = resolve_song_dir(Path(_active_song["production_path"]))
+        except LogicArchiveOfflineError:
+            raise
         except Exception as exc:
             raise HTTPException(
                 status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
@@ -1026,6 +1033,8 @@ def create_app(
             )
 
             song_dir = resolve_song_dir(prod)
+        except LogicArchiveOfflineError:
+            raise
         except Exception as exc:
             raise HTTPException(
                 status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
@@ -1506,10 +1515,31 @@ def create_app(
 
     @app.get("/sides")
     def list_sides():
-        from white_composition.lp_sides import load_sides, side_totals
+        from white_composition.lp_sides import load_sides, save_sides, side_totals
 
         album_dir = _require_shrink_wrapped_dir()
         doc = load_sides(album_dir)
+
+        # sides.yml caches each song's duration from whenever it was assigned —
+        # re-exporting a mix afterward doesn't touch that cache, so reconcile
+        # it against the current mix file on every read.
+        song_entries_by_id = {s["id"]: s for s in scan_songs(album_dir)}
+        dirty = False
+        for side in doc.sides.values():
+            for song in side.songs:
+                entry = song_entries_by_id.get(song.song_id)
+                if entry is None or not entry["has_mix"]:
+                    continue
+                current_duration = _song_mix_duration(entry)
+                if (
+                    current_duration is not None
+                    and current_duration != song.duration_seconds
+                ):
+                    song.duration_seconds = current_duration
+                    dirty = True
+        if dirty:
+            save_sides(album_dir, doc)
+
         totals = side_totals(doc)
         return {
             "side_limit_seconds": doc.side_limit_seconds,

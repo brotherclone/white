@@ -8,6 +8,13 @@ from pathlib import Path
 
 import yaml
 
+from white_composition.logic_archive import (
+    LogicArchiveOfflineError,
+    load_manifest,
+    logic_archive_dir,
+)
+from white_core.enums.archive_status import ArchiveStatus
+
 COMPOSITION_FILENAME = "composition.yml"
 SEED_PATH = (
     Path(__file__).parents[4] / "packages" / "composition" / "logic" / "seed.logicx"
@@ -47,7 +54,8 @@ def _logic_output_dir() -> Path:
     return Path(val)
 
 
-def _song_dir(production_dir: Path) -> Path:
+def _song_dir_relpath(production_dir: Path) -> Path:
+    """`<thread>/<title> (<slug>)` — the same layout under the primary and archive roots."""
     from white_composition.init_production import load_song_context
 
     ctx = load_song_context(production_dir)
@@ -55,7 +63,35 @@ def _song_dir(production_dir: Path) -> Path:
     title = ctx.get("title") or production_dir.name
     safe_title = title.replace("/", "-").replace(":", "-").replace("..", "-")
     production_slug = production_dir.name
-    return _logic_output_dir() / thread_slug / f"{safe_title} ({production_slug})"
+    return Path(thread_slug) / f"{safe_title} ({production_slug})"
+
+
+def _song_dir(production_dir: Path) -> Path:
+    """Primary Logic song dir if present, else the archived copy.
+
+    Raises LogicArchiveOfflineError when the manifest says the song is archived
+    but the archive volume can't be reached — so callers never scaffold an empty
+    duplicate on the primary drive.
+    """
+    rel = _song_dir_relpath(production_dir)
+    primary = _logic_output_dir() / rel
+    if primary.exists():
+        return primary
+
+    archive_root = logic_archive_dir()
+    if archive_root is not None and (archive_root / rel).exists():
+        return archive_root / rel
+
+    # shrink_wrapped/<thread>/production/<slug>
+    album_dir = production_dir.parent.parent.parent
+    song_id = f"{production_dir.parent.parent.name}__{production_dir.name}"
+    entry = load_manifest(album_dir).songs.get(song_id)
+    if entry is not None and entry.status == ArchiveStatus.ARCHIVED:
+        raise LogicArchiveOfflineError(
+            f"'{song_id}' is archived at {entry.dest_path} but that path isn't "
+            "reachable — is the archive volume mounted?"
+        )
+    return primary
 
 
 def handoff(production_dir: Path) -> Path:

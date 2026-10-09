@@ -475,3 +475,42 @@ class TestPlaylistEndpoints:
         client.post("/playlists/config", json={"output_dir": ""})
         resp = client.post("/playlists/sync")
         assert resp.status_code == 400
+
+
+class TestDurationReconciliation:
+    def _assign(self, client, song_id):
+        resp = client.post("/sides/A/assign", json={"song_id": song_id, "position": 0})
+        assert resp.status_code == 200
+
+    def test_reexported_mix_updates_cached_duration(self, client, sw_dir):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=3.0)
+        self._assign(client, song_id)
+
+        _write_wav(sw_dir / "thread-a" / "production" / "song_one" / "mix.wav", 5.0)
+        resp = client.get("/sides")
+
+        side_a = resp.json()["sides"]["A"]
+        assert side_a["songs"][0]["duration_seconds"] == 5.0
+        assert side_a["total_seconds"] == 5.0
+        with open(sw_dir / "sides.yml") as f:
+            stored = yaml.safe_load(f)
+        assert stored["sides"]["A"]["songs"][0]["duration_seconds"] == 5.0
+
+    def test_unchanged_mix_does_not_rewrite_sides_yml(self, client, sw_dir):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=3.0)
+        self._assign(client, song_id)
+        mtime_before = (sw_dir / "sides.yml").stat().st_mtime_ns
+
+        resp = client.get("/sides")
+
+        assert resp.json()["sides"]["A"]["songs"][0]["duration_seconds"] == 3.0
+        assert (sw_dir / "sides.yml").stat().st_mtime_ns == mtime_before
+
+    def test_missing_mix_keeps_cached_duration(self, client, sw_dir):
+        song_id = _make_song(sw_dir, "thread-a", "song_one", mix_seconds=3.0)
+        self._assign(client, song_id)
+
+        (sw_dir / "thread-a" / "production" / "song_one" / "mix.wav").unlink()
+        resp = client.get("/sides")
+
+        assert resp.json()["sides"]["A"]["songs"][0]["duration_seconds"] == 3.0
