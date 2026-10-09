@@ -10,6 +10,7 @@ import yaml
 from fastapi.testclient import TestClient
 
 from white_api.candidate_server import create_app, scan_songs
+from white_composition.logic_archive import LogicArchiveOfflineError
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -1400,3 +1401,21 @@ class TestLifecycleEndpoints:
         assert a["uses_parts_from"] == []
         c = next(s for s in songs if s["production_slug"] == "song_c")
         assert c["lifecycle_status"] == "scrapped"
+
+
+# ---------------------------------------------------------------------------
+# Logic archive offline → 503
+# ---------------------------------------------------------------------------
+
+
+def test_composition_returns_503_when_archive_offline(tmp_path):
+    prod_dir = tmp_path / "production" / "song_a"
+    prod_dir.mkdir(parents=True)
+    client = TestClient(create_app(prod_dir))
+    with patch(
+        "white_composition.logic_handoff.resolve_song_dir",
+        side_effect=LogicArchiveOfflineError("archive volume not mounted"),
+    ):
+        resp = client.get("/composition")
+    assert resp.status_code == 503
+    assert "archive volume not mounted" in resp.json()["detail"]

@@ -32,7 +32,7 @@ import uvicorn
 import yaml
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from white_api.candidate_browser import (
@@ -46,6 +46,7 @@ from white_api.candidate_browser import (
 from white_api.routes.collaborators import make_collaborators_router
 from white_api.routes.diary import make_diary_router
 from white_api.routes.work_orders import make_work_orders_router
+from white_composition.logic_archive import LogicArchiveOfflineError
 from white_diary import ENTRIES_DIR
 
 VALID_PHASES = {"chords", "drums", "bass", "melody", "lyrics", "quartet"}
@@ -333,6 +334,10 @@ def create_app(
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
+
+    @app.exception_handler(LogicArchiveOfflineError)
+    async def _archive_offline_handler(request: Request, exc: LogicArchiveOfflineError):
+        return JSONResponse(status_code=503, content={"detail": str(exc)})
 
     # ------------------------------------------------------------------
     # Helpers
@@ -991,6 +996,8 @@ def create_app(
 
         try:
             song_dir = resolve_song_dir(Path(_active_song["production_path"]))
+        except LogicArchiveOfflineError:
+            raise
         except Exception as exc:
             raise HTTPException(
                 status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
@@ -1026,6 +1033,8 @@ def create_app(
             )
 
             song_dir = resolve_song_dir(prod)
+        except LogicArchiveOfflineError:
+            raise
         except Exception as exc:
             raise HTTPException(
                 status_code=500, detail=f"Could not resolve Logic project dir: {exc}"
