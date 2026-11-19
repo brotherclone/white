@@ -3,10 +3,12 @@
 import numpy as np
 import soundfile as sf
 import yaml
+from mutagen.id3 import ID3, TALB, ID3NoHeaderError
 
 from white_composition.lp_sides import SidesDocument, assign_song
 from white_composition.playlist_sync import (
     DEFAULT_OUTPUT_DIR,
+    DEFAULT_WIP_ALBUM_TITLE,
     PlaylistConfig,
     classify_songs,
     load_playlist_config,
@@ -62,6 +64,15 @@ class TestPlaylistConfig:
         config = load_playlist_config(tmp_path)
         assert config.output_dir == DEFAULT_OUTPUT_DIR
         assert (tmp_path / "playlist_config.yml").exists()
+
+    def test_default_wip_album_title(self, tmp_path):
+        assert load_playlist_config(tmp_path).wip_album_title == DEFAULT_WIP_ALBUM_TITLE
+
+    def test_legacy_config_without_album_title_gets_default(self, tmp_path):
+        (tmp_path / "playlist_config.yml").write_text("output_dir: /tmp/custom\n")
+        loaded = load_playlist_config(tmp_path)
+        assert loaded.output_dir == "/tmp/custom"
+        assert loaded.wip_album_title == DEFAULT_WIP_ALBUM_TITLE
 
     def test_round_trip(self, tmp_path):
         save_playlist_config(tmp_path, PlaylistConfig(output_dir="/tmp/custom"))
@@ -179,6 +190,95 @@ class TestSyncPlaylists:
         song["has_mix"] = False
         sync_playlists([song], SidesDocument.empty(), str(output_dir))
         assert not (output_dir / "Rejects" / "REJECT_Rejected.mp3").exists()
+
+
+def _id3(path):
+    try:
+        return ID3(str(path))
+    except ID3NoHeaderError:
+        return None
+
+
+class TestWipTagging:
+    def _placed(self, tmp_path, song_id, title, **kw):
+        return _make_song(tmp_path, song_id, title, lp_consideration="placed", **kw)
+
+    def test_sequenced_wip_mp3_gets_album_and_track(self, tmp_path):
+        a = self._placed(tmp_path, "a", "First")
+        b = self._placed(tmp_path, "b", "Second")
+        doc = SidesDocument.empty()
+        assign_song(doc, "a", "A", 0, 100.0)
+        assign_song(doc, "b", "B", 0, 100.0)
+        out = tmp_path / "Listening"
+
+        sync_playlists([a, b], doc, str(out), wip_album_title="White (Demo)")
+
+        wip = out / "White Album WiP"
+        first = _id3(wip / "01_A_First.mp3")
+        second = _id3(wip / "02_B_Second.mp3")
+        assert str(first["TALB"]) == "White (Demo)"
+        assert str(first["TRCK"]) == "1/2"
+        assert str(second["TALB"]) == "White (Demo)"
+        assert str(second["TRCK"]) == "2/2"
+
+    def test_unsequenced_wip_mp3_has_album_but_no_track(self, tmp_path):
+        song = self._placed(tmp_path, "u", "Loose")
+        out = tmp_path / "Listening"
+
+        sync_playlists([song], SidesDocument.empty(), str(out))
+
+        tags = _id3(out / "White Album WiP" / "99_unsequenced_Loose.mp3")
+        assert str(tags["TALB"]) == DEFAULT_WIP_ALBUM_TITLE
+        assert "TRCK" not in tags
+
+    def test_source_mix_is_unchanged(self, tmp_path):
+        song = self._placed(tmp_path, "s", "Source")
+        mix = tmp_path / "productions" / "s" / "mix.mp3"
+        before = mix.read_bytes()
+
+        sync_playlists([song], SidesDocument.empty(), str(tmp_path / "Listening"))
+
+        assert mix.read_bytes() == before
+
+    def test_rejects_and_review_keep_original_tags(self, tmp_path):
+        rejected = _make_song(tmp_path, "r", "Rej", lifecycle_status="scrapped")
+        reviewed = _make_song(tmp_path, "v", "Rev")
+        for sid in ("r", "v"):
+            src = tmp_path / "productions" / sid / "mix.mp3"
+            original = ID3()
+            original.add(TALB(encoding=3, text="Session Bounce"))
+            original.save(str(src))
+        out = tmp_path / "Listening"
+
+        sync_playlists([rejected, reviewed], SidesDocument.empty(), str(out))
+
+        assert str(_id3(out / "Rejects" / "REJECT_Rej.mp3")["TALB"]) == "Session Bounce"
+        assert str(_id3(out / "Review" / "Rev.mp3")["TALB"]) == "Session Bounce"
+
+    def test_non_mp3_wip_mix_copied_untagged(self, tmp_path):
+        song = self._placed(tmp_path, "w", "Wave", mix_ext=".wav")
+        out = tmp_path / "Listening"
+
+        counts = sync_playlists([song], SidesDocument.empty(), str(out))
+
+        copy = out / "White Album WiP" / "99_unsequenced_Wave.wav"
+        assert counts["wip"] == 1
+        assert copy.read_bytes() == b"fake audio bytes"
+
+    def test_tagging_failure_does_not_abort_sync(self, tmp_path, monkeypatch):
+        a = self._placed(tmp_path, "a", "One")
+        b = self._placed(tmp_path, "b", "Two")
+
+        def boom(path, tag):
+            raise RuntimeError("bad tag")
+
+        monkeypatch.setattr("white_composition.playlist_sync._tag_wip_copy", boom)
+        out = tmp_path / "Listening"
+
+        counts = sync_playlists([a, b], SidesDocument.empty(), str(out))
+
+        assert counts["wip"] == 2
+        assert len(list((out / "White Album WiP").iterdir())) == 2
 
 
 class TestMaterialProducedSeconds:

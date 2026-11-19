@@ -1711,18 +1711,25 @@ def create_app(
 
         album_dir = _require_shrink_wrapped_dir()
         config = load_playlist_config(album_dir)
-        return {"output_dir": config.output_dir}
+        return config.model_dump()
 
     class PlaylistConfigBody(BaseModel):
-        output_dir: str
+        output_dir: str | None = None
+        wip_album_title: str | None = None
 
     @app.post("/playlists/config")
     def set_playlist_config(body: PlaylistConfigBody):
-        from white_composition.playlist_sync import PlaylistConfig, save_playlist_config
+        from white_composition.playlist_sync import (
+            load_playlist_config,
+            save_playlist_config,
+        )
 
         album_dir = _require_shrink_wrapped_dir()
-        save_playlist_config(album_dir, PlaylistConfig(output_dir=body.output_dir))
-        return {"ok": True, "output_dir": body.output_dir}
+        config = load_playlist_config(album_dir).model_copy(
+            update=body.model_dump(exclude_none=True)
+        )
+        save_playlist_config(album_dir, config)
+        return {"ok": True, **config.model_dump()}
 
     @app.get("/playlists/material")
     def get_material_produced():
@@ -1751,7 +1758,9 @@ def create_app(
         sides_doc = load_sides(album_dir)
         songs = scan_songs(album_dir)
         try:
-            counts = sync_playlists(songs, sides_doc, config.output_dir)
+            counts = sync_playlists(
+                songs, sides_doc, config.output_dir, config.wip_album_title
+            )
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
         return counts

@@ -442,6 +442,22 @@ class TestPlaylistEndpoints:
         resp = client.get("/playlists/config")
         assert resp.json()["output_dir"] == new_dir
 
+    def test_config_includes_wip_album_title(self, sw_dir, client):
+        resp = client.get("/playlists/config")
+        assert resp.json()["wip_album_title"] == "White Album WiP"
+
+    def test_partial_update_preserves_other_field(self, sw_dir, client, tmp_path):
+        new_dir = str(tmp_path / "MyListening")
+        client.post("/playlists/config", json={"output_dir": new_dir})
+        client.post("/playlists/config", json={"wip_album_title": "White v2"})
+        assert client.get("/playlists/config").json() == {
+            "output_dir": new_dir,
+            "wip_album_title": "White v2",
+        }
+
+        client.post("/playlists/config", json={"output_dir": new_dir + "2"})
+        assert client.get("/playlists/config").json()["wip_album_title"] == "White v2"
+
     def test_sync_buckets_songs_correctly(self, sw_dir, client, tmp_path):
         _make_song(
             sw_dir,
