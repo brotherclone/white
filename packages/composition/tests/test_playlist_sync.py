@@ -280,6 +280,23 @@ class TestWipTagging:
         assert counts["wip"] == 2
         assert len(list((out / "White Album WiP").iterdir())) == 2
 
+    def test_tagging_failure_logs_traceback(self, tmp_path, monkeypatch, caplog):
+        a = self._placed(tmp_path, "a", "One")
+
+        def boom(path, tag):
+            raise RuntimeError("bad tag")
+
+        monkeypatch.setattr("white_composition.playlist_sync._tag_wip_copy", boom)
+        out = tmp_path / "Listening"
+
+        with caplog.at_level("WARNING", logger="white_composition.playlist_sync"):
+            sync_playlists([a], SidesDocument.empty(), str(out))
+
+        failures = [r for r in caplog.records if "Could not tag" in r.getMessage()]
+        assert len(failures) == 1
+        assert failures[0].exc_info is not None
+        assert failures[0].exc_info[0] is RuntimeError
+
 
 class TestMaterialProducedSeconds:
     def test_sums_only_top_level_mp3s(self, tmp_path):

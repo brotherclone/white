@@ -296,7 +296,7 @@ def _rebuild_folder(
             try:
                 _tag_wip_copy(dest, tag)
             except Exception as e:
-                logger.warning("Could not tag WiP copy %s: %s", dest, e)
+                logger.warning("Could not tag WiP copy %s: %s", dest, e, exc_info=True)
     return count
 
 
