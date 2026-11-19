@@ -26,17 +26,28 @@ title in `playlist_config.yml` at the album root
 
 ## ADDED Requirements
 ### Requirement: White Album WiP Metadata Tagging
-After copying a song's mix into `White Album WiP/`, the system SHALL write ID3 tags on
-the copied file when it is an mp3: the album tag set to the configured
-`wip_album_title`, and the track number set from the song's position in the WiP
-sequence. Tags SHALL be written to the copy only; source mix files and files in
-`Rejects/` and `Review/` SHALL NOT be tagged or modified.
+After copying a song's mix into `White Album WiP/`, the system SHALL write title,
+album (`wip_album_title`) and track-number ID3 tags on the copy when it is an mp3. The
+title SHALL come from `song_context.yml` (`song_slug`, else `title`, else the scanned
+title). Only the copy is tagged; source mixes and `Rejects/`/`Review/` files SHALL NOT
+be modified.
 
 #### Scenario: Sequenced WiP mp3 is tagged
 - **WHEN** a sync copies an mp3 for a song at global sequence position `seq` out of
   `total` sequenced songs
 - **THEN** the copy's album tag equals `wip_album_title` and its track number is
   `seq/total`
+
+#### Scenario: Title tag prefers song_slug
+- **WHEN** a WiP song has a non-blank `song_slug`
+- **THEN** the copy's title tag equals `song_slug`, while its filename is still derived
+  from the scanned title (`manifest_bootstrap.yml`)
+
+#### Scenario: Blank song_slug falls back to the context title
+- **WHEN** a WiP song's `song_slug` is empty or blank and `song_context.yml` has a
+  non-blank `title`
+- **THEN** the copy's title tag equals that `title`, replacing any title the source mix
+  carried, while the filename is still derived from the scanned title
 
 #### Scenario: Unsequenced WiP mp3 is tagged without a track number
 - **WHEN** a sync copies an mp3 for a placed song absent from `sides.yml`

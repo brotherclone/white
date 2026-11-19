@@ -12,6 +12,8 @@ album that plays in Side A→D order.
   `"White Album WiP"`.
 - During sync, after copying each mp3 into `White Album WiP/`, write ID3 tags on the
   **copy only**:
+  - title (`TIT2`) from `song_context.yml`: `song_slug` when non-blank, else its
+    `title`, else the scanned title (filenames keep using the scanned title)
   - album (`TALB`) = `wip_album_title`
   - track number (`TRCK`) = `seq/total` for sequenced songs, using the same global
     1-based counter already used for the `{seq:02d}_` filename prefix; unsequenced

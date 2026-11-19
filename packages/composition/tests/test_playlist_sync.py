@@ -3,7 +3,7 @@
 import numpy as np
 import soundfile as sf
 import yaml
-from mutagen.id3 import ID3, TALB, ID3NoHeaderError
+from mutagen.id3 import ID3, TALB, TIT2, ID3NoHeaderError
 
 from white_composition.lp_sides import SidesDocument, assign_song
 from white_composition.playlist_sync import (
@@ -230,6 +230,50 @@ class TestWipTagging:
         tags = _id3(out / "White Album WiP" / "99_unsequenced_Loose.mp3")
         assert str(tags["TALB"]) == DEFAULT_WIP_ALBUM_TITLE
         assert "TRCK" not in tags
+
+    def _set_context(self, tmp_path, song_id, **fields):
+        ctx_path = tmp_path / "productions" / song_id / "song_context.yml"
+        ctx = yaml.safe_load(ctx_path.read_text()) or {}
+        ctx.update(fields)
+        ctx_path.write_text(yaml.dump(ctx))
+
+    def test_title_tag_uses_context_song_slug_but_filename_uses_title(self, tmp_path):
+        song = self._placed(tmp_path, "e", "The Evans Street Blank Reel")
+        self._set_context(tmp_path, "e", title="Ignored", song_slug="Blank Reel")
+        doc = SidesDocument.empty()
+        assign_song(doc, "e", "D", 0, 100.0)
+        out = tmp_path / "Listening"
+
+        sync_playlists([song], doc, str(out))
+
+        copy = out / "White Album WiP" / "01_D_The Evans Street Blank Reel.mp3"
+        assert str(_id3(copy)["TIT2"]) == "Blank Reel"
+
+    def test_blank_song_slug_uses_context_title(self, tmp_path):
+        song = self._placed(tmp_path, "e", "The Evans Street Blank Reel")
+        self._set_context(tmp_path, "e", title="Blank Reel", song_slug="")
+        out = tmp_path / "Listening"
+
+        sync_playlists([song], SidesDocument.empty(), str(out))
+
+        copy = (
+            out / "White Album WiP" / "99_unsequenced_The Evans Street Blank Reel.mp3"
+        )
+        assert str(_id3(copy)["TIT2"]) == "Blank Reel"
+
+    def test_no_context_title_falls_back_to_song_title(self, tmp_path):
+        song = self._placed(tmp_path, "t", "Real Fun")
+        self._set_context(tmp_path, "t", song_slug="  ")
+        src = tmp_path / "productions" / "t" / "mix.mp3"
+        stale = ID3()
+        stale.add(TIT2(encoding=3, text="Old Session Name"))
+        stale.save(str(src))
+        out = tmp_path / "Listening"
+
+        sync_playlists([song], SidesDocument.empty(), str(out))
+
+        tags = _id3(out / "White Album WiP" / "99_unsequenced_Real Fun.mp3")
+        assert str(tags["TIT2"]) == "Real Fun"
 
     def test_source_mix_is_unchanged(self, tmp_path):
         song = self._placed(tmp_path, "s", "Source")

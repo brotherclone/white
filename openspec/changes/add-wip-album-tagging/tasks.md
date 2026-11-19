@@ -7,6 +7,8 @@
 - [x] 2.2 Thread `wip_album_title` into `sync_playlists()` and apply tagging only for `.mp3` files in the WiP rebuild (sequenced → `seq/total`, unsequenced → no track)
 - [x] 2.3 Tagging failure on one file logs a warning and leaves the untagged copy in place; it does not abort the sync
 
+- [x] 2.4 Write `TIT2` on WiP copies from `song_context.yml` (`song_slug`, else `title`, else scanned title); filenames unchanged
+
 ## 3. API / client
 - [x] 3.1 `GET /playlists/config` returns `wip_album_title`
 - [x] 3.2 `POST /playlists/config` accepts optional `output_dir` and `wip_album_title`, updating only the fields provided
@@ -18,6 +20,7 @@
 - [x] 4.3 Source mix file bytes are unchanged after sync
 - [x] 4.4 Rejects/Review copies keep the source's original tags
 - [x] 4.5 Non-mp3 WiP mix is copied untagged without error
+- [x] 4.7 Title tag uses context `song_slug`, then context `title`, then scanned title; filename unchanged
 - [x] 4.6 POST with only `wip_album_title` preserves `output_dir` (and vice versa)
 
 ## 5. Finish
