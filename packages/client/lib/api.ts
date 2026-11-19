@@ -497,13 +497,18 @@ export function songMixStreamUrl(songId: string): string {
   return `${BASE}/songs/${encodeURIComponent(songId)}/mix`;
 }
 
-export async function fetchPlaylistConfig(): Promise<{ output_dir: string }> {
+export interface PlaylistConfig {
+  output_dir: string;
+  wip_album_title: string;
+}
+
+export async function fetchPlaylistConfig(): Promise<PlaylistConfig> {
   const res = await fetch(`${BASE}/playlists/config`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch playlist config");
   return res.json();
 }
 
-export async function setPlaylistConfig(outputDir: string): Promise<{ ok: boolean; output_dir: string }> {
+export async function setPlaylistConfig(outputDir: string): Promise<{ ok: boolean } & PlaylistConfig> {
   const res = await fetch(`${BASE}/playlists/config`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -8,11 +8,13 @@ in `playlist_config.yml` at the album root (sibling to `sides.yml`).
 
 from __future__ import annotations
 
+import logging
 import re
 import shutil
 from pathlib import Path
 
 import yaml
+from mutagen.id3 import ID3, TALB, TRCK, ID3NoHeaderError
 from pydantic import BaseModel
 
 from white_composition.lp_sides import SIDE_NAMES, SidesDocument, mix_duration_seconds
@@ -27,6 +29,7 @@ DEFAULT_OUTPUT_DIR = str(
     / "Listening"
 )
 DEFAULT_MATERIAL_TARGET_SECONDS = 9 * 3600.0
+DEFAULT_WIP_ALBUM_TITLE = "White Album WiP"
 
 REJECTS_DIRNAME = "Rejects"
 REVIEW_DIRNAME = "Review"
@@ -36,9 +39,21 @@ _LIFECYCLE_REJECT_STATUSES = {"scrapped", "abandoned"}
 _AUDIO_EXTENSIONS = {".mp3", ".wav", ".aiff", ".aif", ".m4a"}
 _DEFAULT_EXTENSION = ".mp3"
 
+logger = logging.getLogger(__name__)
+
 
 class PlaylistConfig(BaseModel):
     output_dir: str = DEFAULT_OUTPUT_DIR
+    wip_album_title: str = DEFAULT_WIP_ALBUM_TITLE
+
+
+class WipTag(BaseModel):
+    """ID3 tags stamped on a White Album WiP mp3 copy. `track` is None for
+    unsequenced songs (their copy gets no track number)."""
+
+    album: str
+    track: int | None = None
+    total: int | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -207,6 +222,35 @@ def _wip_filenames(wip_songs: list[dict]) -> dict[str, str]:
     return names
 
 
+def _wip_tags(wip_songs: list[dict], album: str) -> dict[str, WipTag]:
+    """Album + track tags for each WiP song. Track numbers follow the same global
+    1-based sequence as the `{seq:02d}_` filename prefix; unsequenced songs get
+    the album tag only."""
+    total = sum(1 for s in wip_songs if s.get("_side") is not None)
+    tags: dict[str, WipTag] = {}
+    for i, song in enumerate(wip_songs):
+        if song.get("_side") is not None:
+            tags[song["id"]] = WipTag(album=album, track=i + 1, total=total)
+        else:
+            tags[song["id"]] = WipTag(album=album)
+    return tags
+
+
+def _tag_wip_copy(path: Path, tag: WipTag) -> None:
+    """Write album/track ID3 tags to a copied WiP mp3. Never call on a source
+    mix — only on the copy in the WiP folder."""
+    try:
+        id3 = ID3(str(path))
+    except ID3NoHeaderError:
+        id3 = ID3()
+    id3.setall("TALB", [TALB(encoding=3, text=tag.album)])
+    if tag.track is not None:
+        id3.setall("TRCK", [TRCK(encoding=3, text=f"{tag.track}/{tag.total}")])
+    else:
+        id3.delall("TRCK")
+    id3.save(str(path))
+
+
 def _validate_output_dir(output_dir: str) -> Path:
     if not output_dir or not output_dir.strip():
         raise ValueError("Playlist output_dir is not configured")
@@ -217,7 +261,10 @@ def _validate_output_dir(output_dir: str) -> Path:
 
 
 def _rebuild_folder(
-    folder: Path, target_names: dict[str, str], songs_by_id: dict[str, dict]
+    folder: Path,
+    target_names: dict[str, str],
+    songs_by_id: dict[str, dict],
+    tags: dict[str, WipTag] | None = None,
 ) -> int:
     """Empty `folder` of prior audio files, then copy in `target_names`
     {song_id: filename} fresh. Returns count synced.
@@ -225,6 +272,9 @@ def _rebuild_folder(
     Rebuilding from an empty folder (rather than diffing against what's already
     there) avoids stale duplicates left behind when a song moves between sides
     or buckets and its filename changes.
+
+    When `tags` is given, each copied `.mp3` whose song has an entry is tagged
+    in place; a tagging failure is logged and leaves the untagged copy.
     """
     folder.mkdir(parents=True, exist_ok=True)
 
@@ -238,15 +288,28 @@ def _rebuild_folder(
         mix_path = read_mix_path(song["production_path"])
         if mix_path is None:
             continue
-        shutil.copy2(mix_path, folder / filename)
+        dest = folder / filename
+        shutil.copy2(mix_path, dest)
         count += 1
+        tag = (tags or {}).get(song_id)
+        if tag is not None and dest.suffix.lower() == ".mp3":
+            try:
+                _tag_wip_copy(dest, tag)
+            except Exception as e:
+                logger.warning("Could not tag WiP copy %s: %s", dest, e, exc_info=True)
     return count
 
 
 def sync_playlists(
-    songs: list[dict], sides_doc: SidesDocument, output_dir: str
+    songs: list[dict],
+    sides_doc: SidesDocument,
+    output_dir: str,
+    wip_album_title: str = DEFAULT_WIP_ALBUM_TITLE,
 ) -> dict[str, int]:
     """Classify songs and rebuild the 3 playlist folders under output_dir.
+
+    White Album WiP mp3 copies are tagged with `wip_album_title` and a track
+    number from the sides.yml sequence; Rejects/Review copies are untouched.
 
     Returns {"rejects": n, "review": n, "wip": n} — the number of files present in
     each subfolder after the rebuild.
@@ -265,7 +328,12 @@ def sync_playlists(
     return {
         "rejects": _rebuild_folder(base / REJECTS_DIRNAME, rejects_names, songs_by_id),
         "review": _rebuild_folder(base / REVIEW_DIRNAME, review_names, songs_by_id),
-        "wip": _rebuild_folder(base / WIP_DIRNAME, wip_names, songs_by_id),
+        "wip": _rebuild_folder(
+            base / WIP_DIRNAME,
+            wip_names,
+            songs_by_id,
+            tags=_wip_tags(buckets["wip"], wip_album_title),
+        ),
     }
 
 
