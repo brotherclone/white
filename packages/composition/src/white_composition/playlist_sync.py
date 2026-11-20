@@ -14,7 +14,7 @@ import shutil
 from pathlib import Path
 
 import yaml
-from mutagen.id3 import ID3, TALB, TRCK, ID3NoHeaderError
+from mutagen.id3 import ID3, TALB, TIT2, TRCK, ID3NoHeaderError
 from pydantic import BaseModel
 
 from white_composition.lp_sides import SIDE_NAMES, SidesDocument, mix_duration_seconds
@@ -51,6 +51,7 @@ class WipTag(BaseModel):
     """ID3 tags stamped on a White Album WiP mp3 copy. `track` is None for
     unsequenced songs (their copy gets no track number)."""
 
+    title: str
     album: str
     track: int | None = None
     total: int | None = None
@@ -157,17 +158,22 @@ def _sanitize_filename(name: str) -> str:
     return name or "untitled"
 
 
-def read_mix_path(production_path: str) -> Path | None:
-    """Return the song's mix file path from song_context.yml, if set and present."""
+def _read_song_context(production_path: str) -> dict:
+    """Load song_context.yml for a production; {} if missing or unreadable."""
     ctx_path = Path(production_path) / "song_context.yml"
     if not ctx_path.exists():
-        return None
+        return {}
     try:
         with open(ctx_path) as f:
             ctx = yaml.safe_load(f) or {}
     except Exception:
-        return None
-    mix = ctx.get("mix_file")
+        return {}
+    return ctx if isinstance(ctx, dict) else {}
+
+
+def read_mix_path(production_path: str) -> Path | None:
+    """Return the song's mix file path from song_context.yml, if set and present."""
+    mix = _read_song_context(production_path).get("mix_file")
     if not mix:
         return None
     mix_path = Path(mix)
@@ -222,27 +228,44 @@ def _wip_filenames(wip_songs: list[dict]) -> dict[str, str]:
     return names
 
 
+def _display_title(song: dict) -> str:
+    """Track title for the WiP tag, from song_context.yml (where title edits
+    land): non-blank `song_slug`, else non-blank `title`, else the scanned
+    song's `title` (from manifest_bootstrap.yml). Filenames always use the
+    scanned `title`."""
+    ctx = _read_song_context(song["production_path"])
+    for key in ("song_slug", "title"):
+        value = ctx.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return song["title"]
+
+
 def _wip_tags(wip_songs: list[dict], album: str) -> dict[str, WipTag]:
-    """Album + track tags for each WiP song. Track numbers follow the same global
-    1-based sequence as the `{seq:02d}_` filename prefix; unsequenced songs get
-    the album tag only."""
+    """Title + album + track tags for each WiP song. Track numbers follow the
+    same global 1-based sequence as the `{seq:02d}_` filename prefix;
+    unsequenced songs get no track number."""
     total = sum(1 for s in wip_songs if s.get("_side") is not None)
     tags: dict[str, WipTag] = {}
     for i, song in enumerate(wip_songs):
+        title = _display_title(song)
         if song.get("_side") is not None:
-            tags[song["id"]] = WipTag(album=album, track=i + 1, total=total)
+            tags[song["id"]] = WipTag(
+                title=title, album=album, track=i + 1, total=total
+            )
         else:
-            tags[song["id"]] = WipTag(album=album)
+            tags[song["id"]] = WipTag(title=title, album=album)
     return tags
 
 
 def _tag_wip_copy(path: Path, tag: WipTag) -> None:
-    """Write album/track ID3 tags to a copied WiP mp3. Never call on a source
+    """Write title/album/track ID3 tags to a copied WiP mp3. Never call on a source
     mix — only on the copy in the WiP folder."""
     try:
         id3 = ID3(str(path))
     except ID3NoHeaderError:
         id3 = ID3()
+    id3.setall("TIT2", [TIT2(encoding=3, text=tag.title)])
     id3.setall("TALB", [TALB(encoding=3, text=tag.album)])
     if tag.track is not None:
         id3.setall("TRCK", [TRCK(encoding=3, text=f"{tag.track}/{tag.total}")])
@@ -308,8 +331,8 @@ def sync_playlists(
 ) -> dict[str, int]:
     """Classify songs and rebuild the 3 playlist folders under output_dir.
 
-    White Album WiP mp3 copies are tagged with `wip_album_title` and a track
-    number from the sides.yml sequence; Rejects/Review copies are untouched.
+    White Album WiP mp3 copies are tagged with a title (song_context.yml
+    `song_slug`, else its `title`), `wip_album_title`, and a track number from the sides.yml sequence; Rejects/Review copies are untouched.
 
     Returns {"rejects": n, "review": n, "wip": n} — the number of files present in
     each subfolder after the rebuild.
